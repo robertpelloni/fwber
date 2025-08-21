@@ -1,7 +1,7 @@
-# FWBer.com Revival Plan - Modern Adult Matching Platform
+# FWBer.me Revival Plan - Modern Adult Matching Platform
 
 ## Project Overview
-Reviving the 2011 fwber.com adult matching platform with modern technologies, enhanced features, and AI-powered avatar generation.
+Reviving the 2011 FWBer.me adult matching platform with modern technologies, enhanced features, and AI-powered avatar generation.
 
 ## Core Vision
 - **Location-based presence announcement** at venues/festivals

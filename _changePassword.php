@@ -1,6 +1,6 @@
 <?php
 /*
-    Copyright 2020 FWBer.com
+    Copyright 2020 FWBer.me
 
     This file is part of FWBer.
 
