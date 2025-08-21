@@ -1,4 +1,4 @@
-# FWBer.com Quick Start Guide
+# FWBer.me Quick Start Guide
 
 ## Prerequisites
 
@@ -407,4 +407,4 @@ If you encounter issues:
 4. Ensure all services (MySQL, Redis) are running
 5. Check Docker logs if using containers: `docker-compose logs`
 
-This quick start guide should get you up and running with the basic FWBer.com revival setup. From here, you can build upon the foundation to add all the advanced features outlined in the implementation plan.
+This quick start guide should get you up and running with the basic FWBer.me revival setup. From here, you can build upon the foundation to add all the advanced features outlined in the implementation plan.

@@ -1,6 +1,6 @@
-# FWBer.com
+# FWBer.me
 
-This is the PHP source code to FWBer.com, an open source Adult Match website.  Its goal is to replace the defunct Craigslist Casual Encounters and websites like AdultFriendFinder with a completely free and open source replacement that improves upon the concept.
+This is the PHP source code to FWBer.me, an open source Adult Match website.  Its goal is to replace the defunct Craigslist Casual Encounters and websites like AdultFriendFinder with a completely free and open source replacement that improves upon the concept.
 
 
 ## Supports all types of lifestyles and preferences.
@@ -29,4 +29,4 @@ We don't have a built in messenger, we only share your contact information with 
 
 ## Open source and fully transparent.
 
-Verify your data is stored properly and your secrets are safe.  Suggest new features or add them yourself.  FWBer.com is licensed under the AGPL v3.
+Verify your data is stored properly and your secrets are safe.  Suggest new features or add them yourself.  FWBer.me is licensed under the AGPL v3.
