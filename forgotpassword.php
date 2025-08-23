@@ -52,9 +52,6 @@
 
 <?php include("f.php");?>
 
-    <script src="/js/jquery-3.4.1.min.js" type="text/javascript"></script>
-    <script src="/js/jquery-ui-1.12.1/jquery-ui.min.js" type="text/javascript"></script>
-
     <script type="text/javascript">
         function requestPasswordReset()
         {
@@ -88,8 +85,6 @@
                 });
         }
     </script>
-
-    <script src="/js/jquery-validation-1.19.1/dist/jquery.validate.min.js" type="text/javascript"></script>
 
     <script type="text/javascript">
         $.validator.setDefaults({});
