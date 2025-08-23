@@ -951,9 +951,6 @@ What You're Looking For
 
 <?php include("f.php");?>
 
-
-<script src="/js/jquery-3.4.1.min.js" type="text/javascript"></script>
-<script src="/js/jquery-validation-1.19.1/dist/jquery.validate.min.js" type="text/javascript"></script>
 <script src="/js/Datejs-master/build/date.js" type="text/javascript"></script>
 
 <script type="text/javascript">
