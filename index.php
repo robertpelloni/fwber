@@ -311,7 +311,6 @@ if (!isset($_SESSION['page_tracked'])) {
             }
         });
 
-
         // PWA Installation
         let deferredPrompt;
         const installButton = document.createElement('button');
