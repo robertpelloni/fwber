@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:fwber.me)",
+      "Bash(php artisan make:model:*)",
+      "Bash(composer:*)",
+      "Bash(php:*)",
+      "WebSearch",
+      "WebFetch(domain:replicate.com)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

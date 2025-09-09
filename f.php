@@ -46,14 +46,6 @@
     </div>
     </div>
 </footer>
-
-<script src='https://kit.fontawesome.com/a076d05399.js'/>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.js" type="text/javascript" crossorigin="anonymous"/>
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.js" type="text/javascript"/>
-<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.21.0/dist/jquery.validate.js" type="text/javascript"/>
-<script src="https://cdn.jsdelivr.net/npm/jquery-ui@1.14.1/dist/jquery-ui.js" type="text/javascript"/>
-
-
 <script type="text/javascript">
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-32334329-1']);

@@ -17,33 +17,12 @@
     You should have received a copy of the GNU Affero Public License
     along with FWBer.  If not, see <https://www.gnu.org/licenses/>.
 */
+require_once("_db.php");
+require_once("security-manager.php");
 include("_debug.php");
 
-//include_once("_secrets.php");
-//include_once("_names.php");
-//include_once("_getProfile.php");
-//include_once("_getMatches.php");
-//include_once("_emailFunctions.php");
-
-
-//=========================================================================================
-function getSaltedPassword($password,$date)
-{//=========================================================================================
-    include("_secrets.php");
-    return md5($password.$salt.$date);
-}
-
-//=========================================================================================
-function mysqli_result($search, $row, $field)
-{//=========================================================================================
-    $i=0; 
-	while($results=mysqli_fetch_array($search))
-	{
-        if ($i==$row){$result=$results[$field];}
-        $i++;
-	}
-    return $result;
-}
+// Initialize the Security Manager
+$securityManager = new SecurityManager($pdo);
 
 //=========================================================================================
 function currentPageURL()
@@ -62,119 +41,46 @@ function currentPageURL()
 //=========================================================================================
 function validateSessionOrCookiesReturnLoggedIn()
 {//=========================================================================================
+    global $securityManager, $pdo;
 
-    include("_secrets.php");
-    include("_debug.php");
+    $token = $_SESSION['token'] ?? $_COOKIE['token'] ?? null;
 
-    $loggedIn = false;
-
-    //first we'll handle validating the session
-    if(!isset($_SESSION["token"])){}//if($debug)echo "<!-- DEBUG: No session token -->\n";}
-    else if($_SESSION["token"]==null){}//if($debug)echo "<!-- DEBUG: Session token null -->\n";}
-    else if(!isset($_SESSION["email"])){}//if($debug)echo "<!-- DEBUG: No session email -->\n";}
-    else if($_SESSION["email"]==null){}//if($debug)echo "<!-- DEBUG: Session email null -->\n";}
-    else if(strlen($_SESSION["email"])==0){}//if($debug)echo "<!-- DEBUG: Session email zero length -->\n";}
-    else {
-
-            //check salt, if doesn't match, delete cookies.
-            $db = mysqli_connect($dburl,$dbuser,$dbpass);
-            if(!$db)exit(mysqli_connect_error());
-
-            $email = mysqli_real_escape_string($db,$_SESSION["email"]);
-
-            $dbquerystring = sprintf("SELECT id, email, passwordHash, dateLastSeen, dateLastSignedIn FROM ".$dbname.".users WHERE email='%s'",$email);
-            $dbquery = mysqli_query($db, $dbquerystring);
-            $dbresults = mysqli_fetch_array($dbquery);
-            mysqli_free_result($dbquery);
-
-            if
-			(
-                $dbresults==null
-                ||$dbresults['email']==null
-                ||$dbresults['email']!=$email
-                ||$dbresults['passwordHash']==null
-                ||getSaltedPassword($dbresults['passwordHash'],$dbresults['dateLastSignedIn'])!=$_SESSION["token"]
-            )
-            {
-                //if($debug)echo "<!-- DEBUG: No email, no password, or password didn't match. Destroying session. -->\n";
-                session_destroy();
-                $loggedIn = false;
-            }
-            else
-            {
-                $loggedIn=true;
-
-                //if($debug)echo "<!-- DEBUG: Logged in with session token -->\n";
-                //update the last seen every 2 hours
-                $time2h = 7200; //3600 per hour
-                if(($dbresults['dateLastSeen']==null) || (time() > $dbresults['dateLastSeen'] + $time2h))
-                {
-                    mysqli_query($db, "UPDATE ".$dbname.".users SET `dateLastSeen` = '".time()."' WHERE `email` = '".$email."'");
-                }
-            }
-
-            //done with the db
-            mysqli_close($db);
-
+    if (!$token) {
+        return false;
     }
 
+    $userId = $securityManager->validateSession($token);
 
-    //then we'll handle the cookies
-    if(!isset($_COOKIE["token"])){}//if($debug)echo "<!-- DEBUG: No cookie token -->\n";}
-    else if($_COOKIE["token"]==null){}//if($debug)echo "<!-- DEBUG: Cookie token null -->\n";}
-    else if(!isset($_COOKIE["email"])){}//if($debug)echo "<!-- DEBUG: No cookie email -->\n";}
-    else if($_COOKIE["email"]==null){}//if($debug)echo "<!-- DEBUG: Cookie email null -->\n";}
-    else if(strlen($_COOKIE["email"])==0){}//if($debug)echo "<!-- DEBUG: Cookie email zero length -->\n";}
-    else
-    {
-            //check salt, if doesn't match, delete cookies.
-            $db = mysqli_connect($dburl,$dbuser,$dbpass);
-            if(!$db)exit(mysqli_connect_error());
+    if ($userId) {
+        // Session is valid. If it came from a cookie, let's set the session.
+        if (!isset($_SESSION['token'])) {
+            $stmt = $pdo->prepare("SELECT email FROM users WHERE id = ?");
+            $stmt->execute([$userId]);
+            $email = $stmt->fetchColumn();
 
-            $email = mysqli_real_escape_string($db, $_COOKIE["email"]);
-
-            $dbquerystring = sprintf("SELECT id, email, passwordHash, dateLastSeen, dateLastSignedIn FROM ".$dbname.".users WHERE email='%s'",$email);
-            $dbquery = mysqli_query($db, $dbquerystring);
-            $dbresults = mysqli_fetch_array($dbquery);
-            mysqli_free_result($dbquery);
-
-            if(
-                $dbresults==null
-                ||$dbresults['passwordHash']==null
-                ||md5(getSaltedPassword($dbresults['passwordHash'],$dbresults['dateLastSignedIn']))!=$_COOKIE["token"]
-            )
-            {
-                //if($debug)echo "<!-- DEBUG: Cookie email not found in db, no passwordHash, or passwordHash didn't match cookie. Destroying cookie. -->\n";
-                setcookie("email","",time()-1000,'/',".".getSiteDomain());
-                setcookie("token","",time()-1000,'/',".".getSiteDomain());
+            if ($email) {
+                $_SESSION['email'] = $email;
+                $_SESSION['token'] = $token;
             }
-            else
-            {
-                //verified user.
-                if($loggedIn==false) //we don't have a valid session but we have a valid cookie
-                {
-                    //if($debug)echo "<!-- DEBUG: Logged in with cookie and set session token -->\n";
-                    //update the last seen every 2 hours
-                    $time2h = 7200; //3600 per hour
-                    if(($dbresults['dateLastSeen']==null) || (time() > $dbresults['dateLastSeen'] + $time2h))
-                    {
-                        mysqli_query($db, "UPDATE ".$dbname.".users SET `dateLastSeen` = '".time()."' WHERE `email` = '".$email."'");
-                    }
+        }
+        // Update last_online timestamp
+        $updateStmt = $pdo->prepare("UPDATE users SET last_online = NOW() WHERE id = ?");
+        $updateStmt->execute([$userId]);
 
-                    //set the session email and token from the cookie
-                    $_SESSION['email']=$email;
-                    $_SESSION['token']=$_COOKIE["token"];
-                }
-                $loggedIn =  true;
-            }
-
-            //done with the db
-            mysqli_close($db);
+        return true;
+    } else {
+        // Invalid token, clear session and cookies
+        if (isset($_SESSION['token'])) {
+            session_destroy();
+        }
+        if (isset($_COOKIE['token'])) {
+            setcookie("email", "", time() - 3600, '/');
+            setcookie("token", "", time() - 3600, '/');
+        }
+        return false;
     }
-
-    return $loggedIn;
-
 }
+
 
 //=========================================================================================
 function goHomeIfCookieNotSet()
@@ -193,30 +99,16 @@ function goHomeIfCookieNotSet()
 //=========================================================================================
 function isProfileDone()
 {//=========================================================================================
-
-    include("_secrets.php");
-
-    $db = mysqli_connect($dburl,$dbuser,$dbpass);
-    if(!$db)exit(mysqli_connect_error());
-
-    $email = mysqli_real_escape_string($db, $_SESSION["email"]);
-
-    $dbquerystring = sprintf("SELECT id, email, profileDone FROM ".$dbname.".users WHERE email='%s'",$email);
-    $dbquery = mysqli_query($db, $dbquerystring);
-    $dbresults = mysqli_fetch_array($dbquery);
-    mysqli_free_result($dbquery);
-
-    //done with the db
-    mysqli_close($db);
-
-    if(
-        $dbresults!=null&&$dbresults['profileDone']==1
-    )
-    {
-        //let's set the profileDone for below, whether to pull vars from db or not
-        return 1;
+    global $pdo;
+    if (!isset($_SESSION["email"])) {
+        return 0;
     }
-    else return 0;
+
+    $stmt = $pdo->prepare("SELECT age FROM users WHERE email = ?"); // A simple check for profile data
+    $stmt->execute([$_SESSION["email"]]);
+    $result = $stmt->fetchColumn();
+
+    return !empty($result) ? 1 : 0;
 }
 
 //=========================================================================================
@@ -465,7 +357,7 @@ function usortByArrayKey(&$array, $key, $asc=SORT_ASC)
                     throw new Exception('attempting to sort on non-existent keys');
                 }
                 if($a[$sub_key] == $b[$sub_key]) continue;
-                return ($sub_asc==SORT_ASC xor $a[$sub_key] < $b[$sub_key]) ? 1 : -1;
+                return ($sub_asc==SORT_ASC xor $a[$sub_key] < $b[$key]) ? 1 : -1;
             }
             return 0;
         }
@@ -496,4 +388,21 @@ function convert_line_breaks($string, $line_break="<br>")
     $string = preg_replace($patterns, $replacements, $string);
     return $string;
 }
-		
+
+//=========================================================================================
+function getUserIdByEmail($email)
+{//=========================================================================================
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+    $stmt->execute([$email]);
+    return $stmt->fetchColumn();
+}
+
+//=========================================================================================
+function getUserProfileById($userId)
+{//=========================================================================================
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT username, age FROM users WHERE id = ?");
+    $stmt->execute([$userId]);
+    return $stmt->fetch();
+}

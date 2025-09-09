@@ -1437,333 +1437,152 @@ background: rgba(255, 204, 238, 0.25);
 	box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
 }
 
-/* ===================================================================
-   FWBer "Neon Noir" Theme - Modern Redesign (2025)
-   =================================================================== */
-
-/*
-  This stylesheet has been updated to a modern, dark theme.
-  It uses CSS variables for easy customization and modern design principles.
-  Old styles from the original 2011 version have been replaced or commented out.
-*/
-
-/* --- Google Font Import --- */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@700&display=swap');
-
-/* --- CSS Variables (Theme Colors) --- */
-:root {
-  --color-background: #1A1A1A; /* Charcoal / Off-Black */
-  --color-surface: #222222; /* Slightly lighter for cards */
-  --color-text: #F5F5F5; /* Off-White */
-  --color-text-muted: #888888; /* Gray for secondary text */
-  --color-border: #333333;
-  --color-accent-primary: #FF00FF; /* Electric Magenta */
-  --color-accent-secondary: #00FFFF; /* Cyber Blue */
-  --color-accent-tertiary: #3D00B3; /* Deep Purple */
-  --font-primary: 'Inter', sans-serif;
-  --font-headings: 'Poppins', sans-serif;
-}
-
-/* ====================================================
-   Global Reset & Base Styles
-==================================================== */
+/* =====================================
+   Global Reset & Base
+===================================== */
 html, body {
-  font-family: var(--font-primary);
-  background-color: var(--color-background);
-  color: var(--color-text);
-  width: 100%;
-  height: 100%;
+  font-family: "Inter", "Poppins", sans-serif;
+  background-color: #f8fafc;
+  color: #333;
   margin: 0;
   padding: 0;
-  font-size: 16px;
-  text-align: center;
+  height: 100%;
 }
 
-/* ====================================================
-   Links
-==================================================== */
 a {
-  color: var(--color-accent-secondary);
+  color: #0096ff;
   text-decoration: none;
-  transition: all 0.2s ease-in-out;
-  text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+  transition: color 0.2s ease;
 }
-
-a:visited {
-  color: var(--color-accent-tertiary);
-}
-
 a:hover {
-  color: var(--color-accent-primary);
-  text-decoration: none;
-  text-shadow: 0 0 10px var(--color-accent-primary);
+  color: #ff00a8;
 }
 
-/* ====================================================
-   Layout & Structure
-==================================================== */
+/* =====================================
+   Layout
+===================================== */
 #mainbody {
-  max-width: 1100px; /* Wider for modern screens */
+  max-width: 960px;
   margin: 0 auto;
   padding: 20px;
-  background-color: transparent;
-  overflow: visible;
 }
 
-/* Old table-based layout styles can be removed/replaced with Flexbox/Grid in HTML */
-#body_table {
-  width: 100%;
-}
-
-#middle_column {
-  padding: 10px;
-}
-
-#right_sidebar, #left_sidebar {
-  padding: 10px;
-  border-color: var(--color-border);
-}
-
-/* ====================================================
-   Header & Footer
-==================================================== */
-#h, #f {
-  background-color: rgba(17, 17, 17, 0.8); /* #111 with transparency */
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  backdrop-filter: saturate(180%) blur(20px);
-  padding: 20px 0;
-  border: 0;
-  background-image: none; /* Remove old image backgrounds */
-}
-
-#h {
-  border-bottom: 1px solid var(--color-border);
-  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
-}
-
-#f {
-  margin-top: 50px;
-  border-top: 1px solid var(--color-border);
-  box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.3);
-}
-
-#copyright {
-  color: var(--color-text-muted);
-}
-
-/* ====================================================
-   Typography
-==================================================== */
 #fwberLogo {
-  font-family: var(--font-headings);
-  font-size: 32px;
-  color: var(--color-accent-primary);
-  text-shadow: 0 0 15px var(--color-accent-primary);
+  font-size: 28px;
   font-weight: 700;
-  text-align: center;
+  color: #0096ff;
+  text-shadow: none;
+  margin: 20px 0;
 }
 
+/* =====================================
+   Typography
+===================================== */
 .tagline {
-  color: var(--color-text-muted);
   font-size: 18px;
-  font-weight: normal;
-  text-shadow: none;
+  font-weight: 600;
+  color: #666;
+  margin-top: 8px;
 }
 
-#missionStatement, #howItWorks, #quotes {
+#missionStatement {
   font-size: 16px;
-  color: var(--color-text);
-  text-shadow: none;
-  line-height: 1.6;
+  color: #444;
 }
 
-#newDatingSite {
-  font-family: var(--font-headings);
-  font-size: 36px;
-  color: var(--color-text);
-  text-shadow: none;
+#quotes {
+  font-size: 18px;
+  font-style: italic;
+  color: #555;
 }
 
-/* ====================================================
-   Modern Buttons (Replaces image-based buttons)
-==================================================== */
-.button, .btn-primary, .btn-secondary {
+/* =====================================
+   Buttons
+===================================== */
+button, .button, .btn-primary {
   display: inline-block;
-  padding: 12px 28px;
-  font-family: var(--font-headings);
+  padding: 10px 20px;
+  border-radius: 9999px;
   font-size: 16px;
-  font-weight: 700;
-  border-radius: 50px; /* Pill shape */
-  border: 2px solid transparent;
+  font-weight: 600;
+  border: none;
   cursor: pointer;
-  text-align: center;
-  text-decoration: none;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease;
 }
 
 .btn-primary {
-  background-color: var(--color-accent-primary);
+  background: #0096ff;
   color: white;
-  border-color: var(--color-accent-primary);
-  box-shadow: 0 0 15px rgba(255, 0, 255, 0.4);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
-
 .btn-primary:hover {
-  background-color: #E500E5;
-  box-shadow: 0 0 25px rgba(255, 0, 255, 0.7);
-  transform: translateY(-2px);
+  background: #007add;
 }
 
-.btn-secondary {
-  background-color: transparent;
-  color: var(--color-accent-primary);
-  border-color: var(--color-accent-primary);
-}
-
-.btn-secondary:hover {
-  background-color: var(--color-accent-primary);
+.btn-accent {
+  background: #ff00a8;
   color: white;
-  box-shadow: 0 0 15px rgba(255, 0, 255, 0.4);
-  transform: translateY(-2px);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.btn-accent:hover {
+  background: #d8008f;
 }
 
-/* Hide old image-based button elements if they cannot be removed from HTML */
-.headerbutton, .bigbutton {
-  display: none;
-}
-
-/* ====================================================
-   Modern Forms & Inputs
-==================================================== */
-form label {
-  display: block;
-  text-align: left;
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: var(--color-text-muted);
-}
-
-.form-signin {
-    width: 100%;
-    max-width: 500px;
-    padding: 2rem;
-    margin: auto;
-    background-color: var(--color-surface);
-    border-radius: 12px;
-    border: 1px solid var(--color-border);
-}
-
-input[type=text], input[type=password], input[type=email], select, textarea {
+/* =====================================
+   Form Inputs
+===================================== */
+input[type=text], input[type=password], input[type=email],
+select, textarea {
   width: 100%;
-  background-color: var(--color-background);
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
   padding: 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
   font-size: 16px;
-  font-family: var(--font-primary);
-  box-sizing: border-box; /* Important for modern layouts */
-  transition: all 0.2s ease-in-out;
-  text-shadow: none;
-}
-
-input[type=text]:focus, input[type=password]:focus, input[type=email]:focus, select:focus, textarea:focus {
   outline: none;
-  border-color: var(--color-accent-primary);
-  box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: #0096ff;
+  box-shadow: 0 0 0 3px rgba(0,150,255,0.2);
 }
 
-/* ====================================================
-   Modern Cards & Containers (Replaces gradient boxes)
-==================================================== */
-.card, .profile_container_content {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+/* =====================================
+   Cards & Containers
+===================================== */
+.card, .blueBox, .profile_container_content {
+  background: white;
   border-radius: 12px;
-  padding: 24px;
-  margin: 24px 0;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-  text-align: left;
+  padding: 16px;
+  margin: 16px 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border: none;
 }
 
 .profile_container_title_bar {
-    padding: 0;
-    margin-bottom: 16px;
-    background: none;
-    border: none;
-    text-align: left;
+  font-size: 20px;
+  font-weight: 600;
+  color: #0096ff;
+  margin-bottom: 8px;
+  border: none;
+  background: none;
+  padding: 0;
 }
 
-.profile_container_title, .profile_container_title a {
-    font-family: var(--font-headings);
-    font-size: 24px;
-    color: var(--color-accent-secondary);
-    text-shadow: 0 0 10px var(--color-accent-secondary);
+/* =====================================
+   Header & Footer
+===================================== */
+#h, .site-header {
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: saturate(180%) blur(20px);
+  padding: 10px 20px;
+  border-bottom: 1px solid #eee;
 }
 
-.captionText {
-    border-top: 1px solid var(--color-border);
-    font-size: 18px;
-    padding: 16px 0 0 0;
-    margin: 16px 0 0 0;
-    font-weight: 600;
-}
-
-/* ====================================================
-   Error & Validation States
-==================================================== */
-#generalError, .form-signin div.error, .form-signin .error, #error {
-  color: var(--color-accent-primary);
-  font-weight: bold;
+#f, .footer {
+  background: #f8fafc;
+  padding: 40px 20px;
+  text-align: center;
   font-size: 14px;
-  text-shadow: 0 0 5px var(--color-accent-primary);
+  color: #777;
+  border-top: 1px solid #eee;
 }
-
-.form-signin .valid {
-  color: var(--color-accent-secondary);
-  font-weight: bold;
-  font-size: 14px;
-  text-shadow: 0 0 5px var(--color-accent-secondary);
-}
-
-
-/* ===================================================================
-   DEPRECATED STYLES FROM 2011 (Kept for reference, can be deleted)
-   =================================================================== */
-
-/*
-html, body {
-	text-shadow:#bbb 0px 1px 1px;
-}
-.FWBer {
-    font-weight:bold;
-    color:#f0f;
-    text-shadow:#00f 0px 0px 10px;
-}
-#h {
-	background-image:url('https://FWBer.me/images/buttons/borderblue.png');
-}
-#f {
-	background-image:url('https://FWBer.me/images/buttons/borderpink.png');
-}
-.headerbutton, .bigbutton, #button-signup, #button-login, etc {
-    background-image:url('...');
-}
-.blueBox, .cbb {
-    border-color: #acddff #acddff #ffcffc #ffcffc;
-}
-input[type=text], input[type=password], input[type=email], select, textarea {
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee', endColorstr='#ffffff');
-    background: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#fff));
-    background: -moz-linear-gradient(top,  #eee,  #fff);
-}
-.buttonGreen, .buttonRed, .buttonBlue, .buttonPink, .buttonGray {
-    ...
-}
-.yellowToWhiteCaption, .greenToWhiteCaption, .blueToWhiteCaption, etc {
-    ...
-}
-.yellowToWhite, .greenToWhite, .blueToWhite, etc {
-    ...
-}
-*/

@@ -100,6 +100,14 @@
 
 
 <?php include("f.php");?>
+
+<script src="/js/jquery-3.4.1.min.js"></script>
+<script src="/bootstrap-4.3.1-dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="/js/jquery-validation-1.19.1/dist/jquery.validate.min.jss" type="text/javascript"></script>
+
+<script src='https://kit.fontawesome.com/a076d05399.js'></script>
+
 <script type="text/javascript">
 
     var doSubmit = false;
