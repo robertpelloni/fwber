@@ -28,22 +28,6 @@
     if($logged_in==false) {
 ?>
 
-<div id="root"></div>
-
-<script type="module">
-    const rootElement = document.getElementById('root')
-    // const element = document.createElement('div')
-    // element.textContent = 'Hello World'
-    // element.className = 'container'
-    // rootElement.append(element)
-
-    const element = React.createElement(
-        'div',
-        { className: 'container' },
-        'Hello World',
-    )
-</script>
-
 <main role="main" class="flex-shrink-0 my-auto">
     <div class="">
 
