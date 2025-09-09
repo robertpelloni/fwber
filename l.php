@@ -22,12 +22,10 @@
  
  <div style="position:relative; top:20px;left:0px;">
  
-	<img src="/images/fwber_logo.png" alt="logo" border="0" id="fwber_logo_img" style="position:relative;top:-50px;left:-40px;"/>
+	<img src="https://FWBer.me/images/fwber_logo.png" alt="logo" border="0" id="fwber_logo_img" style="position:relative;top:-50px;left:-40px;"/>
 	<div style="position:relative;top:-180px;left:80px;">
-		<span id="fwberLogo" style="color:#aaa">A simple, discreet, elegant, <span style="color:#777"><b>completely free</b></span>
-            <br><div style="padding-top:8px"/>
-	adult match site to find <span style="color:#777"><b>friends with benefits</b></span> <br>
-            <div style="padding-top:8px">near you!</div></span>
+		<span id="fwberLogo" style="color:#aaa">A simple, discreet, elegant, <span style="color:#777"><b>completely free</b></span> <br><div style="padding-top:8px"/>
+	adult match site to find <span style="color:#777"><b>friends with benefits</b></span> <br><div style="padding-top:8px">near you!</div></span>
 	<br>
 	</div>
 	
