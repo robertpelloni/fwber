@@ -20,15 +20,14 @@
 
 	session_start(); 
 
+	require_once("_init.php");
 	include("_debug.php");
-	include("_init.php");
-	include("_secrets.php");
 	include("_names.php");
 
     $show_html=false;
     $error_string = "";
 
-    if(isset($_SESSION["email"])&&$_SESSION["email"]!=null&&strlen($_SESSION["email"])>0)
+    if(validateSessionOrCookiesReturnLoggedIn())
     {
         header('Location: '.getSiteURL().'/matches.php');
         exit();
@@ -45,11 +44,8 @@
            &&isset($_POST['namePassword']) &&!empty($_POST['namePassword']))
         {
 
-            $db = mysqli_connect($dburl,$dbuser,$dbpass);
-            if(!$db)exit(mysqli_connect_error());
-
-            $email = mysqli_escape_string($db,$_POST['nameEmail']);
-            $password = mysqli_escape_string($db,$_POST['namePassword']);
+            $email = $_POST['nameEmail'];
+            $password = $_POST['namePassword'];
             $staySignedIn = 0;
             if(isset($_POST['staySignedIn'])&&!empty($_POST['staySignedIn']))$staySignedIn = 1;
 
@@ -59,33 +55,28 @@
                 exit("not valid.");
             }
 
-            //connect to the database to see if the email is already registered.
-            $dbquerystring = sprintf("SELECT id, email, passwordHash, verified, dateJoined FROM ".$dbname.".users WHERE email='%s'",$email);
-            $dbquery = mysqli_query($db,$dbquerystring);
-            $dbresults = mysqli_fetch_array($dbquery);
-            mysqli_free_result($dbquery);
-
-            //done with the db
-            mysqli_close($db);
+            $stmt = $pdo->prepare("SELECT id, email, password_hash, password_salt, email_verified FROM users WHERE email = ?");
+            $stmt->execute([$email]);
+            $user = $stmt->fetch();
 
             if(
-                $dbresults==null
-                ||$dbresults['email']==null
-                ||$dbresults['email']!=$email
-                ||$dbresults['passwordHash']==null
-                ||$dbresults['passwordHash']!=getSaltedPassword($password,$dbresults['dateJoined'])
-                ||$dbresults['verified']==null
-                ||$dbresults['verified']==0
+                $user == null
+                || !$securityManager->verifyPassword($password, $user['password_hash'], $user['password_salt'])
             )
             {
                 $show_html=true;
+                $error_string =
+                        "<div style='width:100%;text-align:center;font-size:14px;padding-bottom:16px;'>
+                            Either you typed the wrong password or your email address is not yet signed up.
+                            <br>
+                            <br>
 
-                if($dbresults!=null
-                    &&$dbresults['email']==$email
-                    &&$dbresults['passwordHash']==getSaltedPassword($password,$dbresults['dateJoined'])
-                    &&$dbresults['verified']==0)
-                {
-                    $error_string =
+                        </div>";
+            }
+            else if ($user['email_verified'] == 0)
+            {
+                $show_html=true;
+                $error_string =
                         "<div style='width:100%;text-align:center;font-size:14px;padding-bottom:16px;'>
                             Your email address is not yet verified.
                             <br>
@@ -94,41 +85,24 @@
                                 Please verify your email address by clicking the link in your email. Check your spam folder if you can't find it, and mark it not spam.
                             </div>
                         </div>";
-                }
-                else
-                {
-                    $error_string =
-                        "<div style='width:100%;text-align:center;font-size:14px;padding-bottom:16px;'>
-                            Either you typed the wrong password or your email address is not yet signed up.
-                            <br>
-                            <br>
-
-                        </div>";
-                }
             }
             else
             {
-                $dateLastSignedIn = time();
+                $token = $securityManager->generateSessionToken($user['id']);
 
-                //connect to database and set dateLastSignedIn
-
-                $db = mysqli_connect($dburl,$dbuser,$dbpass);
-                if(!$db)exit(mysqli_connect_error());
-
-
-                mysqli_query($db,"UPDATE ".$dbname.".users SET `dateLastSignedIn` = '".$dateLastSignedIn."' WHERE `email` = '".$email."'");
-
-                //done with the db
-                mysqli_close($db);
-
-                $_SESSION['email']=$email;
-                $_SESSION['token']=getSaltedPassword($dbresults['passwordHash'],$dateLastSignedIn);
+                $_SESSION['email'] = $user['email'];
+                $_SESSION['token'] = $token;
 
                 if($staySignedIn==1)
                 {
-                    setcookie("email",$email,time()+(3600*24*30),'/',".".getSiteDomain());
-                    setcookie("token",getSaltedPassword($dbresults['passwordHash'],$dateLastSignedIn),time()+(3600*24*30),'/',".".getSiteDomain());
+                    // Set a long-lived cookie
+                    setcookie("email", $user['email'], time() + (3600 * 24 * 30), '/', ".".getSiteDomain());
+                    setcookie("token", $token, time() + (3600 * 24 * 30), '/', ".".getSiteDomain());
                 }
+
+                // Update last_online timestamp
+                $updateStmt = $pdo->prepare("UPDATE users SET last_online = NOW() WHERE id = ?");
+                $updateStmt->execute([$user['id']]);
 
                 header('Location: '.getSiteURL().'/matches');
                 exit();
@@ -206,6 +180,9 @@
 
 <?php include("f.php");?>
 
+<script src="/js/jquery-3.4.1.min.js" type="text/javascript" ></script>
+<script src="/js/jquery-validation-1.19.1/dist/jquery.validate.min.js" type="text/javascript"></script>
+
 <script type="text/javascript">
     $.validator.setDefaults({});
     $().ready
@@ -249,5 +226,3 @@
 </script>
 </body>
 </html>
-
-
