@@ -107,14 +107,32 @@ require_once 'vendor/autoload.php';
 			If this wasn't you, just ignore this email.<br>
 			<br>
 			If you can't remember your password, go here instead:<br>
-			<a href='".getSiteURL()."/forgotpassword'>".getSiteURL()."/forgotpassword</a>
+			<a href='".getSiteURL()."/forgot-password.php'>".getSiteURL()."/forgot-password.php</a>
 			";
-			$mailTextBody = "Your email address was recently used to sign up for an account at ".getSiteDomain().", but it is already in our system. If this wasn't you, just ignore this email. If you forgot your password, visit ".getSiteURL()."/forgotpassword";
+			$mailTextBody = "Your email address was recently used to sign up for an account at ".getSiteDomain().", but it is already in our system. If this wasn't you, just ignore this email. If you forgot your password, visit ".getSiteURL()."/forgot-password.php";
 		}
 
         return doMail($theirEmail, $mailSubject, $mailHTMLBody, $mailTextBody);
 	}
 
-    // NOTE: The other email functions (sendMatchNoticeEmail, sendPasswordResetVerificationEmail, etc.) 
+    //=========================================================================================
+    function sendPasswordResetLink($email, $token)
+    {//=========================================================================================
+        $mailSubject = "Password Reset Request for " . getSiteName();
+        $resetLink = getSiteURL() . "/forgot-password.php?token=" . $token;
+
+        $mailHTMLBody = "
+            <p>Someone has requested a password reset for your account at ".getSiteName().".</p>
+            <p>If this was you, click the link below to reset your password. This link is valid for one hour.</p>
+            <p><a href='".$resetLink."'>".$resetLink."</a></p>
+            <p>If you did not request a password reset, please ignore this email.</p>
+        ";
+
+        $mailTextBody = "To reset your password, please copy and paste this link into your browser: \n\n" . $resetLink;
+
+        return doMail($email, $mailSubject, $mailHTMLBody, $mailTextBody);
+    }
+
+    // NOTE: The other email functions (sendMatchNoticeEmail, etc.) 
     // should also be reviewed and updated to match the new system as you build out those features.
 

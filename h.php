@@ -21,9 +21,7 @@
 <?php
     require_once("_init.php");
 
-	validateSessionOrCookiesReturnLoggedIn();
-	$logged_in=false;
-	if(isCookieSet())$logged_in=true;
+	$logged_in = validateSessionOrCookiesReturnLoggedIn();
 
     if($logged_in==false) {
 ?>
@@ -37,10 +35,10 @@
         <div class="" id="">
             <ul class="navbar-nav" style="-ms-flex-direction:row;flex-direction:row;">
                 <li class="nav-item">
-                    <a class="nav-link btn btn-outline-secondary my-0 px-3 mx-1" href="/signin">Sign In</a>
+                    <a class="nav-link btn btn-outline-secondary my-0 px-3 mx-1" href="/signin.php">Sign In</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link btn btn-outline-secondary my-0 px-3 mx-1" href="/join">Join Now</a>
+                    <a class="nav-link btn btn-outline-secondary my-0 px-3 mx-1" href="/">Join Now</a>
                 </li>
             </ul>
         </div>
@@ -54,13 +52,20 @@
                 <div class="" id="">
                     <ul class="navbar-nav" style="-ms-flex-direction:row;flex-direction:row;">
                         <li class="nav-item">
-                            <a class="nav-link btn btn-outline-secondary my-0 px-3 mx-1" href="/matches">Matches</a>
+                            <a class="nav-link btn btn-outline-primary my-0 px-3 mx-1" href="/matches.php" title="AI-Enhanced Matching">
+                                <i class="fas fa-magic"></i> Matches
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link btn btn-outline-secondary my-0 px-3 mx-1" href="/profile">Profile</a>
+                            <a class="nav-link btn btn-outline-info my-0 px-3 mx-1" href="/realtime-demo.php" title="Real-time Matching Demo">
+                                <i class="fas fa-bolt"></i> Live Demo
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link btn btn-outline-secondary my-0 px-3 mx-1" href="/signout">Sign Out</a>
+                            <a class="nav-link btn btn-outline-secondary my-0 px-3 mx-1" href="/profile.php">Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-outline-secondary my-0 px-3 mx-1" href="/signout.php">Sign Out</a>
                         </li>
                     </ul>
                 </div>

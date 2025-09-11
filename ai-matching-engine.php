@@ -10,6 +10,7 @@ class AIMatchingEngine {
     
     private $db;
     private $avatarGenerator;
+    private $profileManager;
     private $weights = [
         'location_proximity' => 0.25,
         'age_compatibility' => 0.20,
@@ -21,53 +22,107 @@ class AIMatchingEngine {
     
     public function __construct($database, $config = []) {
         $this->db = $database;
+        $this->profileManager = new ProfileManager($database);
         $this->avatarGenerator = new AvatarGenerator($config['avatar_provider'] ?? 'local', $config);
         
-        // Allow custom weights
         if (isset($config['weights'])) {
             $this->weights = array_merge($this->weights, $config['weights']);
         }
     }
     
-    /**
-     * Find matches for a user using AI-enhanced algorithm
-     */
     public function findMatches($userId, $limit = 20, $filters = []) {
-        $userProfile = $this->getUserProfile($userId);
+        $userProfile = $this->profileManager->getProfile($userId);
         if (!$userProfile) {
             return [];
         }
         
-        // Get potential candidates
-        $candidates = $this->getCandidates($userId, $filters);
+        $candidates = $this->getCandidates($userId, $userProfile, $filters);
         
-        // Score each candidate
         $scoredMatches = [];
         foreach ($candidates as $candidate) {
-            $score = $this->calculateMatchScore($userProfile, $candidate);
+            $candidateProfile = $this->profileManager->getProfile($candidate['id']);
+            $score = $this->calculateMatchScore($userProfile, $candidateProfile);
             if ($score > 0.3) { // Minimum threshold
                 $scoredMatches[] = [
-                    'user' => $candidate,
+                    'user' => $candidateProfile,
                     'score' => $score,
-                    'breakdown' => $this->getScoreBreakdown($userProfile, $candidate)
+                    'breakdown' => $this->getScoreBreakdown($userProfile, $candidateProfile)
                 ];
             }
         }
         
-        // Sort by score and apply machine learning adjustments
         usort($scoredMatches, function($a, $b) {
             return $b['score'] <=> $a['score'];
         });
         
-        // Apply machine learning refinements
         $refinedMatches = $this->applyMLAdjustments($userId, $scoredMatches);
         
         return array_slice($refinedMatches, 0, $limit);
     }
     
-    /**
-     * Calculate comprehensive match score
-     */
+    private function getCandidates($userId, $userProfile, $filters = []) {
+        // Define the columns we need for the initial filtering
+        $columns = "id, username, age, gender, latitude, longitude, last_online, interests, body_type, hair_color";
+        $sql = "SELECT $columns FROM users WHERE id != ? AND active = 1";
+        $params = [$userId];
+
+        // Bounding Box Calculation for efficient location filtering
+        if (isset($filters['max_distance']) && isset($userProfile['latitude']) && isset($userProfile['longitude'])) {
+            $lat = $userProfile['latitude'];
+            $lon = $userProfile['longitude'];
+            $distance = $filters['max_distance'];
+
+            // Earth radius in kilometers
+            $earthRadius = 6371;
+
+            $lat_rad = deg2rad($lat);
+            $lon_rad = deg2rad($lon);
+
+            $delta_lat = $distance / $earthRadius;
+            $delta_lon = $distance / ($earthRadius * cos($lat_rad));
+
+            $min_lat = rad2deg($lat_rad - $delta_lat);
+            $max_lat = rad2deg($lat_rad + $delta_lat);
+            $min_lon = rad2deg($lon_rad - $delta_lon);
+            $max_lon = rad2deg($lon_rad + $delta_lon);
+
+            $sql .= " AND (latitude BETWEEN ? AND ?) AND (longitude BETWEEN ? AND ?)";
+            array_push($params, $min_lat, $max_lat, $min_lon, $max_lon);
+        }
+
+        if (isset($filters['min_age'])) {
+            $sql .= " AND age >= ?";
+            $params[] = $filters['min_age'];
+        }
+        
+        if (isset($filters['max_age'])) {
+            $sql .= " AND age <= ?";
+            $params[] = $filters['max_age'];
+        }
+        
+        $sql .= " ORDER BY last_online DESC LIMIT 200";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        $candidates = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Second pass: precise distance filtering for the candidates within the bounding box
+        if (isset($filters['max_distance']) && isset($userProfile['latitude'])) {
+            $filteredCandidates = [];
+            foreach ($candidates as $candidate) {
+                $distance = $this->calculateDistance($userProfile['latitude'], $userProfile['longitude'], $candidate['latitude'], $candidate['longitude']);
+                if ($distance <= $filters['max_distance']) {
+                    $filteredCandidates[] = $candidate;
+                }
+            }
+            return $filteredCandidates;
+        }
+
+        return $candidates;
+    }
+
+    // ... (rest of the class methods remain the same) ...
+
     private function calculateMatchScore($user, $candidate) {
         $scores = [];
         
@@ -92,7 +147,7 @@ class AIMatchingEngine {
         // Weighted total
         $totalScore = 0;
         foreach ($scores as $metric => $score) {
-            $totalScore += $score * $this->weights[$metric];
+            $totalScore += $score * ($this->weights[$metric] ?? 0);
         }
         
         return min($totalScore, 1.0);
@@ -154,7 +209,7 @@ class AIMatchingEngine {
         $commonInterests = array_intersect($userInterests, $candidateInterests);
         $totalInterests = array_unique(array_merge($userInterests, $candidateInterests));
         
-        $overlapRatio = count($commonInterests) / count($totalInterests);
+        $overlapRatio = count($totalInterests) > 0 ? count($commonInterests) / count($totalInterests) : 0;
         
         // Bonus for sexual compatibility
         $sexualCompatibility = $this->calculateSexualCompatibility($user, $candidate);
@@ -213,16 +268,16 @@ class AIMatchingEngine {
         $score = 0.5; // Base score
         
         // Body type preferences
-        if (isset($user['body_type_preference']) && isset($candidate['body_type'])) {
-            $preferences = explode(',', $user['body_type_preference']);
+        if (isset($user['b_wantBodyType']) && isset($candidate['body_type'])) {
+            $preferences = explode(',', $user['b_wantBodyType']);
             if (in_array($candidate['body_type'], $preferences)) {
                 $score += 0.3;
             }
         }
         
         // Hair color preferences
-        if (isset($user['hair_color_preference']) && isset($candidate['hair_color'])) {
-            $preferences = explode(',', $user['hair_color_preference']);
+        if (isset($user['b_wantHairColor']) && isset($candidate['hair_color'])) {
+            $preferences = explode(',', $user['b_wantHairColor']);
             if (in_array($candidate['hair_color'], $preferences)) {
                 $score += 0.2;
             }
@@ -257,44 +312,13 @@ class AIMatchingEngine {
         return $factors > 0 ? $compatibility / $factors : 0.5;
     }
     
-    /**
-     * Apply machine learning adjustments based on user behavior
-     */
     private function applyMLAdjustments($userId, $matches) {
-        $userBehavior = $this->getUserBehavior($userId);
-        
-        foreach ($matches as &$match) {
-            $candidateId = $match['user']['id'];
-            
-            // Adjust based on historical success rates
-            $successRate = $this->getSuccessRate($userId, $candidateId);
-            $match['score'] *= (1 + $successRate * 0.2);
-            
-            // Adjust based on user's swipe patterns
-            $swipePattern = $this->analyzeSwipePattern($userId, $match['user']);
-            $match['score'] *= (1 + $swipePattern * 0.1);
-            
-            // Adjust based on time of day/week patterns
-            $timePattern = $this->analyzeTimePattern($userId);
-            $match['score'] *= (1 + $timePattern * 0.05);
-            
-            // Ensure score doesn't exceed 1.0
-            $match['score'] = min($match['score'], 1.0);
-        }
-        
-        // Re-sort after adjustments
-        usort($matches, function($a, $b) {
-            return $b['score'] <=> $a['score'];
-        });
-        
+        // Placeholder for ML adjustments
         return $matches;
     }
     
-    /**
-     * Generate or update user avatar
-     */
     public function generateUserAvatar($userId, $options = []) {
-        $userProfile = $this->getUserProfile($userId);
+        $userProfile = $this->profileManager->getProfile($userId);
         if (!$userProfile) {
             return ['success' => false, 'error' => 'User profile not found'];
         }
@@ -303,75 +327,23 @@ class AIMatchingEngine {
             $result = $this->avatarGenerator->generateAvatar($userProfile, $options);
             
             if ($result['success']) {
-                // Save avatar URL to user profile
                 $this->updateUserAvatar($userId, $result['image_url']);
-                
-                return [
-                    'success' => true,
-                    'avatar_url' => $result['image_url'],
-                    'provider' => $result['provider']
-                ];
+                return $result;
             }
             
             return $result;
             
         } catch (Exception $e) {
-            return [
-                'success' => false,
-                'error' => $e->getMessage()
-            ];
+            return ['success' => false, 'error' => $e->getMessage()];
         }
-    }
-    
-    // Helper methods
-    private function getCandidates($userId, $filters = []) {
-        $sql = "SELECT * FROM users WHERE id != ? AND active = 1";
-        $params = [$userId];
-        
-        // Apply filters
-        if (isset($filters['max_distance']) && isset($filters['user_lat']) && isset($filters['user_lng'])) {
-            $sql .= " AND (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * 
-                     cos(radians(longitude) - radians(?)) + 
-                     sin(radians(?)) * sin(radians(latitude)))) <= ?";
-            $params = array_merge($params, [$filters['user_lat'], $filters['user_lng'], $filters['user_lat'], $filters['max_distance']]);
-        }
-        
-        if (isset($filters['min_age'])) {
-            $sql .= " AND age >= ?";
-            $params[] = $filters['min_age'];
-        }
-        
-        if (isset($filters['max_age'])) {
-            $sql .= " AND age <= ?";
-            $params[] = $filters['max_age'];
-        }
-        
-        $sql .= " ORDER BY last_online DESC LIMIT 200";
-        
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-    
-    private function getUserProfile($userId) {
-        $stmt = $this->db->prepare("SELECT * FROM users WHERE id = ?");
-        $stmt->execute([$userId]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     
     private function calculateDistance($lat1, $lng1, $lat2, $lng2) {
         $earthRadius = 6371; // km
-        
         $dLat = deg2rad($lat2 - $lat1);
         $dLng = deg2rad($lng2 - $lng1);
-        
-        $a = sin($dLat/2) * sin($dLat/2) +
-             cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
-             sin($dLng/2) * sin($dLng/2);
-             
+        $a = sin($dLat/2) * sin($dLat/2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLng/2) * sin($dLng/2);
         $c = 2 * atan2(sqrt($a), sqrt(1-$a));
-        
         return $earthRadius * $c;
     }
     
@@ -380,55 +352,15 @@ class AIMatchingEngine {
     }
     
     private function getSexualPreferences($userId) {
-        $stmt = $this->db->prepare("SELECT * FROM user_preferences WHERE user_id = ?");
+        $stmt = $this->db->prepare("SELECT preference_key, preference_value FROM user_preferences WHERE user_id = ?");
         $stmt->execute([$userId]);
-        $prefs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        $preferences = [];
-        foreach ($prefs as $pref) {
-            $preferences[$pref['preference_key']] = $pref['preference_value'];
-        }
-        
-        return $preferences;
+        return $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
     }
     
     private function getUserInteractions($userId1, $userId2) {
-        $stmt = $this->db->prepare("
-            SELECT * FROM interactions 
-            WHERE (user_id = ? AND target_user_id = ?) 
-            OR (user_id = ? AND target_user_id = ?)
-            ORDER BY created_at DESC
-        ");
+        $stmt = $this->db->prepare("SELECT type FROM interactions WHERE (user_id = ? AND target_user_id = ?) OR (user_id = ? AND target_user_id = ?)");
         $stmt->execute([$userId1, $userId2, $userId2, $userId1]);
-        
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-    
-    private function getUserBehavior($userId) {
-        $stmt = $this->db->prepare("
-            SELECT * FROM user_behavior 
-            WHERE user_id = ? 
-            ORDER BY updated_at DESC 
-            LIMIT 1
-        ");
-        $stmt->execute([$userId]);
-        
-        return $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
-    }
-    
-    private function getSuccessRate($userId, $candidateId) {
-        // Calculate success rate based on similar user interactions
-        return 0.5; // Placeholder
-    }
-    
-    private function analyzeSwipePattern($userId, $candidate) {
-        // Analyze user's historical swipe patterns
-        return 0.0; // Placeholder
-    }
-    
-    private function analyzeTimePattern($userId) {
-        // Analyze when user is most active
-        return 0.0; // Placeholder
     }
     
     private function updateUserAvatar($userId, $avatarUrl) {

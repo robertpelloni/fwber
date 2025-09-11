@@ -16,11 +16,12 @@ class AvatarGenerator {
     
     private $currentProvider;
     private $config;
+    private $profileManager;
     
-    public function __construct($provider = 'replicate', $config = []) {
+    public function __construct($provider = 'replicate', $config = [], $profileManager) {
         $this->config = array_merge([
-            'replicate_token' => '', // Set in environment
-            'openai_api_key' => '', // Set in environment
+            'replicate_token' => $_ENV['REPLICATE_API_TOKEN'] ?? '',
+            'openai_api_key' => $_ENV['OPENAI_API_KEY'] ?? '',
             'local_sd_url' => 'http://127.0.0.1:7860',
             'comfyui_url' => 'http://127.0.0.1:8188',
             'default_style' => 'realistic portrait',
@@ -30,6 +31,7 @@ class AvatarGenerator {
         ], $config);
         
         $this->setProvider($provider);
+        $this->profileManager = $profileManager;
     }
     
     public function setProvider($provider) {
@@ -42,7 +44,12 @@ class AvatarGenerator {
         return $this;
     }
     
-    public function generateAvatar($userProfile, $options = []) {
+    public function generateAvatar($userId, $options = []) {
+        $userProfile = $this->profileManager->getProfile($userId);
+        if (!$userProfile) {
+            throw new Exception("User profile not found for ID: $userId");
+        }
+
         $prompt = $this->buildPrompt($userProfile, $options);
         $negativePrompt = $this->buildNegativePrompt();
         
@@ -331,7 +338,7 @@ class LocalSDProvider {
             $filename = 'avatar_' . uniqid() . '.png';
             $filepath = '/avatars/' . $filename;
             
-            file_put_contents('.' . $filepath, $imageData);
+            file_put_contents(__DIR__ . $filepath, $imageData);
             
             return [
                 'success' => true,
@@ -426,28 +433,3 @@ class DALLEProvider {
         ];
     }
 }
-
-// Usage example:
-/*
-$generator = new AvatarGenerator('replicate', [
-    'replicate_token' => 'your_replicate_token_here'
-]);
-
-$userProfile = [
-    'age' => 25,
-    'gender' => 'female',
-    'hair_color' => 'blonde',
-    'hair_style' => 'long',
-    'eye_color' => 'blue',
-    'ethnicity' => 'caucasian',
-    'body_type' => 'athletic'
-];
-
-$result = $generator->generateAvatar($userProfile);
-if ($result['success']) {
-    echo "Avatar generated: " . $result['image_url'];
-} else {
-    echo "Error: " . $result['error'];
-}
-*/
-?>

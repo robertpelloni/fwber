@@ -92,11 +92,32 @@ if (!$userProfile) {
                     </button>
                 </div>
 
+                <!-- AI Avatar Status -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-semibold mb-4">
+                        <i class="fas fa-user-circle text-blue-500 mr-2"></i>
+                        AI Avatar Status
+                    </h2>
+                    <div id="avatar-status">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center">
+                                <i class="fas fa-camera text-gray-500"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-600 mb-2">Generate your AI avatar for better matches</p>
+                                <button onclick="generateRealtimeAvatar()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-magic mr-1"></i> Generate Avatar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Recent Matches -->
                 <div class="bg-white rounded-lg shadow p-6">
                     <h2 class="text-lg font-semibold mb-4">
                         <i class="fas fa-heart text-pink-500 mr-2"></i>
-                        Recent Matches
+                        AI-Enhanced Matches
                     </h2>
                     <div id="recent-matches">
                         <p class="text-gray-500">No recent matches</p>
@@ -346,6 +367,96 @@ if (!$userProfile) {
                 const seconds = onlineTime % 60;
                 document.getElementById('online-time').textContent = `${minutes}m ${seconds}s`;
             }, 1000);
+        }
+
+        function generateRealtimeAvatar() {
+            const avatarStatus = document.getElementById('avatar-status');
+            
+            // Show loading state
+            avatarStatus.innerHTML = `
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
+                        <i class="fas fa-spinner fa-spin text-blue-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-600 mb-2">Generating your AI avatar...</p>
+                        <div class="w-48 h-2 bg-gray-200 rounded-full">
+                            <div class="h-2 bg-blue-600 rounded-full animate-pulse" style="width: 60%;"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Get user profile data for avatar generation
+            const profileData = {
+                age: '<?php echo htmlspecialchars($userProfile['age'] ?? '25'); ?>',
+                gender: '<?php echo htmlspecialchars($userProfile['gender'] ?? 'other'); ?>',
+                hair_color: '<?php echo htmlspecialchars($userProfile['hair_color'] ?? 'brown'); ?>',
+                hair_style: '<?php echo htmlspecialchars($userProfile['hair_style'] ?? 'medium'); ?>',
+                eye_color: '<?php echo htmlspecialchars($userProfile['eye_color'] ?? 'brown'); ?>',
+                ethnicity: '<?php echo htmlspecialchars($userProfile['ethnicity'] ?? 'mixed'); ?>',
+                body_type: '<?php echo htmlspecialchars($userProfile['body_type'] ?? 'average'); ?>'
+            };
+
+            fetch('/api/generate-avatar.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({ profile: JSON.stringify(profileData) })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    avatarStatus.innerHTML = `
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-green-500">
+                                <img src="${data.avatar_url}" alt="AI Generated Avatar" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <p class="text-green-600 mb-2">
+                                    <i class="fas fa-check-circle mr-1"></i>
+                                    AI Avatar generated successfully!
+                                </p>
+                                <p class="text-sm text-gray-500">Provider: ${data.provider}</p>
+                            </div>
+                        </div>
+                    `;
+                    logActivity('AI Avatar generated', 'success');
+                } else {
+                    avatarStatus.innerHTML = `
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+                                <i class="fas fa-exclamation-triangle text-red-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-red-600 mb-2">Avatar generation failed</p>
+                                <p class="text-sm text-gray-500">${data.error || 'Unknown error'}</p>
+                                <button onclick="generateRealtimeAvatar()" class="mt-2 bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700 transition-colors">
+                                    Retry
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    logActivity('Avatar generation failed', 'error');
+                }
+            })
+            .catch(error => {
+                avatarStatus.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                        <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+                            <i class="fas fa-wifi text-red-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-red-600 mb-2">Network error</p>
+                            <button onclick="generateRealtimeAvatar()" class="mt-2 bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700 transition-colors">
+                                Retry
+                            </button>
+                        </div>
+                    </div>
+                `;
+                logActivity('Network error during avatar generation', 'error');
+            });
         }
     </script>
 </body>

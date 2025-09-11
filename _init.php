@@ -17,6 +17,19 @@
     You should have received a copy of the GNU Affero Public License
     along with FWBer.  If not, see <https://www.gnu.org/licenses/>.
 */
+
+// Composer Autoloader - THIS MUST BE THE FIRST THING
+require_once __DIR__ . '/vendor/autoload.php';
+
+// Load environment variables from .env file
+try {
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+    $dotenv->load();
+} catch (Dotenv\Exception\InvalidPathException $e) {
+    // This is not a fatal error. It just means the .env file is not present.
+    error_log("Could not find .env file: " . $e->getMessage());
+}
+
 require_once("_db.php");
 require_once("security-manager.php");
 include("_debug.php");
