@@ -27,12 +27,19 @@ class ProfileManager {
     }
 
     public function saveProfile($userId, $data) {
-        // Define which keys belong to the users table
+        // Define which keys belong to the users table (core profile data)
         $userTableColumns = [
             'username', 'age', 'gender', 'seeking_gender', 'relationship_type',
             'hair_color', 'hair_style', 'eye_color', 'ethnicity', 'body_type', 'height',
             'interests', 'latitude', 'longitude', 'location_updated_at', 'city', 'state',
-            'country', 'zip_code', 'age_preference_min', 'age_preference_max', 'max_distance'
+            'country', 'zip_code', 'age_preference_min', 'age_preference_max', 'max_distance',
+            'avatar_url', 'avatar_updated_at', 'publicText', 'privateText', 'firstName',
+            // Legacy fields that should stay in users table
+            'dateJoined', 'dateLastSignedIn', 'dateLastSeen', 'postalCode', 
+            'isoCountryCode', 'lat', 'lon', 'distance', 'birthdayMonth', 'birthdayDay', 
+            'birthdayYear', 'body', 'hairLength', 'tattoos', 'overallLooks', 
+            'intelligence', 'bedroomPersonality', 'pubicHair', 'penisSize', 'bodyHair', 
+            'breastSize', 'wantAgeFrom', 'wantAgeTo'
         ];
 
         $userData = [];

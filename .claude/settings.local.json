@@ -6,7 +6,10 @@
       "Bash(composer:*)",
       "Bash(php:*)",
       "WebSearch",
-      "WebFetch(domain:replicate.com)"
+      "WebFetch(domain:replicate.com)",
+      "Bash(dir)",
+      "Bash(dir:*)",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []
