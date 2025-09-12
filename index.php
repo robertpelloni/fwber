@@ -5,10 +5,18 @@
 
 require_once("_init.php");
 
+// Force HTTPS
+if (!isSecure()) {
+    header("Location: https://" . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
+    exit();
+}
+
+session_start();
+
 // Redirect if already logged in
 if (validateSessionOrCookiesReturnLoggedIn()) {
     require_once("_names.php");
-    header('Location: '.getSiteURL().'/matches');
+    header('Location: '.getSiteURL().'/matches.php');
     exit();
 }
 
@@ -193,7 +201,7 @@ if (!isset($_SESSION['page_tracked'])) {
             <div class="bg-white rounded-lg shadow-xl p-8">
                 <h2 class="text-2xl font-bold text-center mb-8 text-gray-800">Join FWBer Free</h2>
                 
-                <form id="signupForm" action="_makeAccount" method="POST" class="space-y-6">
+                <form id="signupForm" action="_makeAccount.php" method="POST" class="space-y-6">
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
                         <input type="email" id="email" name="nameEmail" required 

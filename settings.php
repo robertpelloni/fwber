@@ -1,5 +1,6 @@
 <?php
 require_once('_init.php');
+session_start(); // Ensure session is started for CSRF
 
 // Ensure the user is logged in
 if (!validateSessionOrCookiesReturnLoggedIn()) {
@@ -13,76 +14,78 @@ $error = '';
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'] ?? '';
+    if (!isset($_POST['csrf_token']) || !$securityManager->validateCsrfToken($_POST['csrf_token'])) {
+        $error = "Invalid form submission. Please try again.";
+    } else {
+        $action = $_POST['action'] ?? '';
 
-    try {
-        switch ($action) {
-            case 'change_password':
-                $oldPass = $_POST['oldPass'] ?? '';
-                $newPass = $_POST['newPass'] ?? '';
-                $verifyPass = $_POST['verifyPass'] ?? '';
+        try {
+            switch ($action) {
+                case 'change_password':
+                    $oldPass = $_POST['oldPass'] ?? '';
+                    $newPass = $_POST['newPass'] ?? '';
+                    $verifyPass = $_POST['verifyPass'] ?? '';
 
-                if ($newPass !== $verifyPass) {
-                    throw new Exception("New passwords do not match.");
-                }
+                    if ($newPass !== $verifyPass) {
+                        throw new Exception("New passwords do not match.");
+                    }
 
-                $stmt = $pdo->prepare("SELECT password_hash, password_salt FROM users WHERE id = ?");
-                $stmt->execute([$userId]);
-                $user = $stmt->fetch();
+                    $stmt = $pdo->prepare("SELECT password_hash, password_salt FROM users WHERE id = ?");
+                    $stmt->execute([$userId]);
+                    $user = $stmt->fetch();
 
-                if (!$user || !$securityManager->verifyPassword($oldPass, $user['password_hash'], $user['password_salt'])) {
-                    throw new Exception("Incorrect old password.");
-                }
+                    if (!$user || !$securityManager->verifyPassword($oldPass, $user['password_hash'], $user['password_salt'])) {
+                        throw new Exception("Incorrect old password.");
+                    }
 
-                $hashedData = $securityManager->hashPassword($newPass);
-                $updateStmt = $pdo->prepare("UPDATE users SET password_hash = ?, password_salt = ? WHERE id = ?");
-                $updateStmt->execute([$hashedData['hash'], $hashedData['salt'], $userId]);
-                $message = "Password changed successfully.";
-                break;
+                    $hashedData = $securityManager->hashPassword($newPass);
+                    $updateStmt = $pdo->prepare("UPDATE users SET password_hash = ?, password_salt = ? WHERE id = ?");
+                    $updateStmt->execute([$hashedData['hash'], $hashedData['salt'], $userId]);
+                    $message = "Password changed successfully.";
+                    break;
 
-            case 'change_email_settings':
-                $settings = [
-                    'emailMatches' => isset($_POST['emailMatches']) ? 1 : 0,
-                    'emailInterested' => isset($_POST['emailInterested']) ? 1 : 0,
-                    'emailApproved' => isset($_POST['emailApproved']) ? 1 : 0,
-                ];
+                case 'change_email_settings':
+                    $settings = [
+                        'emailMatches' => isset($_POST['emailMatches']) ? 1 : 0,
+                        'emailInterested' => isset($_POST['emailInterested']) ? 1 : 0,
+                        'emailApproved' => isset($_POST['emailApproved']) ? 1 : 0,
+                    ];
 
-                $stmt = $pdo->prepare("INSERT INTO user_privacy_settings (user_id, setting_key, setting_value) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");
-                foreach ($settings as $key => $value) {
-                    $stmt->execute([$userId, $key, $value]);
-                }
-                $message = "Email settings updated.";
-                break;
+                    $stmt = $pdo->prepare("INSERT INTO user_privacy_settings (user_id, setting_key, setting_value) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");
+                    foreach ($settings as $key => $value) {
+                        $stmt->execute([$userId, $key, $value]);
+                    }
+                    $message = "Email settings updated.";
+                    break;
 
-            case 'delete_account':
-                $myPass = $_POST['myPass'] ?? '';
-                $goodbyeCheck = $_POST['goodbyeCheck'] ?? '';
+                case 'delete_account':
+                    $myPass = $_POST['myPass'] ?? '';
+                    $goodbyeCheck = $_POST['goodbyeCheck'] ?? '';
 
-                if ($goodbyeCheck !== 'goodbye') {
-                    throw new Exception('You must type \'goodbye\' to confirm.');
-                }
+                    if ($goodbyeCheck !== 'goodbye') {
+                        throw new Exception('You must type \'goodbye\' to confirm.');
+                    }
 
-                $stmt = $pdo->prepare("SELECT password_hash, password_salt FROM users WHERE id = ?");
-                $stmt->execute([$userId]);
-                $user = $stmt->fetch();
+                    $stmt = $pdo->prepare("SELECT password_hash, password_salt FROM users WHERE id = ?");
+                    $stmt->execute([$userId]);
+                    $user = $stmt->fetch();
 
-                if (!$user || !$securityManager->verifyPassword($myPass, $user['password_hash'], $user['password_salt'])) {
-                    throw new Exception("Incorrect password.");
-                }
+                    if (!$user || !$securityManager->verifyPassword($myPass, $user['password_hash'], $user['password_salt'])) {
+                        throw new Exception("Incorrect password.");
+                    }
 
-                // Soft delete the user
-                $updateStmt = $pdo->prepare("UPDATE users SET active = 0, email = CONCAT(email, '_deleted_', id) WHERE id = ?");
-                $updateStmt->execute([$userId]);
+                    $updateStmt = $pdo->prepare("UPDATE users SET active = 0, email = CONCAT(email, '_deleted_', id) WHERE id = ?");
+                    $updateStmt->execute([$userId]);
 
-                // Log the user out and redirect
-                session_destroy();
-                setcookie("email", "", time() - 3600, '/');
-                setcookie("token", "", time() - 3600, '/');
-                header('Location: /?message=account_deleted');
-                exit();
+                    session_destroy();
+                    setcookie("email", "", time() - 3600, '/');
+                    setcookie("token", "", time() - 3600, '/');
+                    header('Location: /?message=account_deleted');
+                    exit();
+            }
+        } catch (Exception $e) {
+            $error = $e->getMessage();
         }
-    } catch (Exception $e) {
-        $error = $e->getMessage();
     }
 }
 
@@ -94,6 +97,8 @@ $currentSettings = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 $emailMatches = $currentSettings['emailMatches'] ?? 1;
 $emailInterested = $currentSettings['emailInterested'] ?? 1;
 $emailApproved = $currentSettings['emailApproved'] ?? 1;
+
+$csrf_token = $securityManager->generateCsrfToken();
 
 ?>
 <!doctype html>
@@ -118,6 +123,7 @@ $emailApproved = $currentSettings['emailApproved'] ?? 1;
         <div class="card mb-5 shadow-sm p-5" style="display:inline-block;">
             <form action="settings.php" method="POST" id="changePasswordForm">
                 <input type="hidden" name="action" value="change_password">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                 <fieldset style="text-align:center;border:none;">
                     <h1 class="h3 mb-3 font-weight-normal text-center">Change Password</h1>
                     <input type="password" name="oldPass" id="oldPass" style="margin:4px;" placeholder="Old Password" required><br>
@@ -134,6 +140,7 @@ $emailApproved = $currentSettings['emailApproved'] ?? 1;
         <div class="card mb-5 shadow-sm p-5" style="display:inline-block;">
             <form action="settings.php" method="POST">
                 <input type="hidden" name="action" value="change_email_settings">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                 <fieldset style="text-align:center;border:none;">
                     <h1 class="h3 mb-3 font-weight-normal text-center">Email Settings</h1>
                     <table style="width:100%;">
@@ -158,6 +165,7 @@ $emailApproved = $currentSettings['emailApproved'] ?? 1;
         <div class="card mb-5 shadow-sm p-5" style="display:inline-block;">
             <form action="settings.php" method="POST" id="deleteAccountForm">
                 <input type="hidden" name="action" value="delete_account">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                 <fieldset style="text-align:center;border:none;">
                     <h1 class="h3 mb-3 font-weight-normal text-center">Delete Account</h1>
                     <p class="text-danger">This action is irreversible.</p>
