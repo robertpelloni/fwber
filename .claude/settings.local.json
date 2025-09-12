@@ -1,15 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:fwber.me)",
-      "Bash(php artisan make:model:*)",
-      "Bash(composer:*)",
-      "Bash(php:*)",
-      "WebSearch",
-      "WebFetch(domain:replicate.com)",
-      "Bash(dir)",
-      "Bash(dir:*)",
-      "Bash(findstr:*)"
+      "Bash(Measure-Object)",
+      "Bash(Select-Object Count)"
     ],
     "deny": [],
     "ask": []

@@ -38,12 +38,19 @@ include("_debug.php");
 $securityManager = new SecurityManager($pdo);
 
 //=========================================================================================
+function isSecure() {
+    return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (!empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
+        || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+        || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on');
+}
+
+//=========================================================================================
 function currentPageURL()
 {//=========================================================================================
-    $pageURL = 'http';
-    if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
+    $pageURL = isSecure() ? 'https' : 'http';
     $pageURL .= "://";
-    if ($_SERVER["SERVER_PORT"] != "80") {
+    if ($_SERVER["SERVER_PORT"] != "80" && $_SERVER["SERVER_PORT"] != "443") {
         $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
         } else {
         $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
@@ -65,7 +72,6 @@ function validateSessionOrCookiesReturnLoggedIn()
     $userId = $securityManager->validateSession($token);
 
     if ($userId) {
-        // Session is valid. If it came from a cookie, let's set the session.
         if (!isset($_SESSION['token'])) {
             $stmt = $pdo->prepare("SELECT email FROM users WHERE id = ?");
             $stmt->execute([$userId]);
@@ -76,13 +82,14 @@ function validateSessionOrCookiesReturnLoggedIn()
                 $_SESSION['token'] = $token;
             }
         }
-        // Update last_online timestamp
+        
+        $securityManager->generateCsrfToken();
+        
         $updateStmt = $pdo->prepare("UPDATE users SET last_online = NOW() WHERE id = ?");
         $updateStmt->execute([$userId]);
 
         return true;
     } else {
-        // Invalid token, clear session and cookies
         if (isset($_SESSION['token'])) {
             session_destroy();
         }
@@ -99,7 +106,6 @@ function validateSessionOrCookiesReturnLoggedIn()
 function goHomeIfCookieNotSet()
 {//=========================================================================================
 
-    // make sure signed in, otherwise go home
     if(isCookieSet()==false)
     {
         header('Location: '.getSiteURL());
@@ -117,7 +123,7 @@ function isProfileDone()
         return 0;
     }
 
-    $stmt = $pdo->prepare("SELECT age FROM users WHERE email = ?"); // A simple check for profile data
+    $stmt = $pdo->prepare("SELECT age FROM users WHERE email = ?");
     $stmt->execute([$_SESSION["email"]]);
     $result = $stmt->fetchColumn();
 
@@ -179,9 +185,6 @@ function getTimeElapsedStringSinceTimestamp($time)
         ' week' => $secs / 604800 % 52,
         ' day' => $secs / 86400 % 7,
         ' hour' =>$secs / 3600 % 24
-        //,
-        //' minute' => $secs / 60 % 60,
-        //' second' => $secs % 60
     );
 
     $ret = null;

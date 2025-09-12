@@ -47,6 +47,44 @@ class SecurityManager {
     public function verifyPassword($password, $hash, $salt) {
         return password_verify($password . $salt, $hash);
     }
+
+    public function generateCsrfToken() {
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+        return $_SESSION['csrf_token'];
+    }
+
+    public function validateCsrfToken($token) {
+        if (!empty($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token)) {
+            unset($_SESSION['csrf_token']);
+            return true;
+        }
+        return false;
+    }
+
+    public function checkRateLimit($action, $limit = 10, $window = 3600) {
+        $ipAddress = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $stmt = $this->db->prepare("
+            SELECT COUNT(*) FROM user_actions 
+            WHERE action_type = ? AND ip_address = ? AND created_at > DATE_SUB(NOW(), INTERVAL ? SECOND)
+        ");
+        $stmt->execute([$action, $ipAddress, $window]);
+        return $stmt->fetchColumn() < $limit;
+    }
+
+    public function logAction($action, $userId = null, $details = []) {
+        $stmt = $this->db->prepare("
+            INSERT INTO user_actions (user_id, action_type, details, ip_address)
+            VALUES (?, ?, ?, ?)
+        ");
+        $stmt->execute([
+            $userId,
+            $action,
+            json_encode($details),
+            $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+        ]);
+    }
     
     public function encryptData($data, $key = null) {
         if (!$key) {
@@ -122,28 +160,6 @@ class SecurityManager {
     public function invalidateSession($token) {
         $stmt = $this->db->prepare("UPDATE user_sessions SET is_active = 0 WHERE session_token = ?");
         $stmt->execute([$token]);
-    }
-    
-    public function setup2FA($userId) {
-        $secret = $this->generate2FASecret();
-        
-        $encryptedSecret = $this->encryptData($secret);
-        $this->store2FASecret($userId, $encryptedSecret);
-        
-        return [
-            'secret' => $secret,
-            'qr_code' => $this->generate2FAQRCode($userId, $secret)
-        ];
-    }
-    
-    public function verify2FA($userId, $token) {
-        $encryptedSecret = $this->get2FASecret($userId);
-        if (!$encryptedSecret) {
-            return false;
-        }
-        
-        $secret = $this->decryptData($encryptedSecret);
-        return $this->verifyTOTP($secret, $token);
     }
     
     // ... (other methods remain the same)
