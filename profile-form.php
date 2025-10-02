@@ -78,16 +78,314 @@
             </tbody>
         </table>
 
-        <div class="captionText">Preferences</div>
+        <div class="captionText">Physical Attributes</div>
+        <table>
+            <tbody>
+            <tr>
+                <td style="text-align:right; width:40%;"><label for="body">Body Type</label></td>
+                <td style="text-align:left;">
+                    <select name="body" id="body" class="required">
+                        <option value="">Select body type</option>
+                        <option value="tiny" <?php if (($userProfile['body'] ?? '') == 'tiny') echo 'selected'; ?>>Tiny</option>
+                        <option value="slim" <?php if (($userProfile['body'] ?? '') == 'slim') echo 'selected'; ?>>Slim</option>
+                        <option value="average" <?php if (($userProfile['body'] ?? '') == 'average') echo 'selected'; ?>>Average</option>
+                        <option value="muscular" <?php if (($userProfile['body'] ?? '') == 'muscular') echo 'selected'; ?>>Muscular</option>
+                        <option value="curvy" <?php if (($userProfile['body'] ?? '') == 'curvy') echo 'selected'; ?>>Curvy</option>
+                        <option value="thick" <?php if (($userProfile['body'] ?? '') == 'thick') echo 'selected'; ?>>Thick</option>
+                        <option value="bbw" <?php if (($userProfile['body'] ?? '') == 'bbw') echo 'selected'; ?>>BBW</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:right;"><label for="ethnicity">Ethnicity</label></td>
+                <td style="text-align:left;">
+                    <select name="ethnicity" id="ethnicity" class="required">
+                        <option value="">Select ethnicity</option>
+                        <option value="white" <?php if (($userProfile['ethnicity'] ?? '') == 'white') echo 'selected'; ?>>White</option>
+                        <option value="asian" <?php if (($userProfile['ethnicity'] ?? '') == 'asian') echo 'selected'; ?>>Asian</option>
+                        <option value="latino" <?php if (($userProfile['ethnicity'] ?? '') == 'latino') echo 'selected'; ?>>Latino</option>
+                        <option value="indian" <?php if (($userProfile['ethnicity'] ?? '') == 'indian') echo 'selected'; ?>>Indian</option>
+                        <option value="black" <?php if (($userProfile['ethnicity'] ?? '') == 'black') echo 'selected'; ?>>Black</option>
+                        <option value="other" <?php if (($userProfile['ethnicity'] ?? '') == 'other') echo 'selected'; ?>>Other</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:right;"><label for="hairColor">Hair Color</label></td>
+                <td style="text-align:left;">
+                    <select name="hairColor" id="hairColor" class="required">
+                        <option value="">Select hair color</option>
+                        <option value="light" <?php if (($userProfile['hairColor'] ?? '') == 'light') echo 'selected'; ?>>Light</option>
+                        <option value="medium" <?php if (($userProfile['hairColor'] ?? '') == 'medium') echo 'selected'; ?>>Medium</option>
+                        <option value="dark" <?php if (($userProfile['hairColor'] ?? '') == 'dark') echo 'selected'; ?>>Dark</option>
+                        <option value="red" <?php if (($userProfile['hairColor'] ?? '') == 'red') echo 'selected'; ?>>Red</option>
+                        <option value="gray" <?php if (($userProfile['hairColor'] ?? '') == 'gray') echo 'selected'; ?>>Gray</option>
+                        <option value="other" <?php if (($userProfile['hairColor'] ?? '') == 'other') echo 'selected'; ?>>Other</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:right;"><label for="hairLength">Hair Length</label></td>
+                <td style="text-align:left;">
+                    <select name="hairLength" id="hairLength" class="required">
+                        <option value="">Select hair length</option>
+                        <option value="bald" <?php if (($userProfile['hairLength'] ?? '') == 'bald') echo 'selected'; ?>>Bald</option>
+                        <option value="short" <?php if (($userProfile['hairLength'] ?? '') == 'short') echo 'selected'; ?>>Short</option>
+                        <option value="medium" <?php if (($userProfile['hairLength'] ?? '') == 'medium') echo 'selected'; ?>>Medium</option>
+                        <option value="long" <?php if (($userProfile['hairLength'] ?? '') == 'long') echo 'selected'; ?>>Long</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:right;"><label for="tattoos">Tattoos</label></td>
+                <td style="text-align:left;">
+                    <select name="tattoos" id="tattoos" class="required">
+                        <option value="">Select tattoo preference</option>
+                        <option value="none" <?php if (($userProfile['tattoos'] ?? '') == 'none') echo 'selected'; ?>>None</option>
+                        <option value="some" <?php if (($userProfile['tattoos'] ?? '') == 'some') echo 'selected'; ?>>Some</option>
+                        <option value="allOver" <?php if (($userProfile['tattoos'] ?? '') == 'allOver') echo 'selected'; ?>>All Over</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:right;"><label for="overallLooks">Overall Looks</label></td>
+                <td style="text-align:left;">
+                    <select name="overallLooks" id="overallLooks" class="required">
+                        <option value="">Select looks level</option>
+                        <option value="ugly" <?php if (($userProfile['overallLooks'] ?? '') == 'ugly') echo 'selected'; ?>>Ugly</option>
+                        <option value="plain" <?php if (($userProfile['overallLooks'] ?? '') == 'plain') echo 'selected'; ?>>Plain</option>
+                        <option value="quirky" <?php if (($userProfile['overallLooks'] ?? '') == 'quirky') echo 'selected'; ?>>Quirky</option>
+                        <option value="average" <?php if (($userProfile['overallLooks'] ?? '') == 'average') echo 'selected'; ?>>Average</option>
+                        <option value="attractive" <?php if (($userProfile['overallLooks'] ?? '') == 'attractive') echo 'selected'; ?>>Attractive</option>
+                        <option value="hottie" <?php if (($userProfile['overallLooks'] ?? '') == 'hottie') echo 'selected'; ?>>Hottie</option>
+                        <option value="superModel" <?php if (($userProfile['overallLooks'] ?? '') == 'superModel') echo 'selected'; ?>>Super Model</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:right;"><label for="intelligence">Intelligence</label></td>
+                <td style="text-align:left;">
+                    <select name="intelligence" id="intelligence" class="required">
+                        <option value="">Select intelligence level</option>
+                        <option value="goodHands" <?php if (($userProfile['intelligence'] ?? '') == 'goodHands') echo 'selected'; ?>>Good Hands</option>
+                        <option value="bitSlow" <?php if (($userProfile['intelligence'] ?? '') == 'bitSlow') echo 'selected'; ?>>Bit Slow</option>
+                        <option value="average" <?php if (($userProfile['intelligence'] ?? '') == 'average') echo 'selected'; ?>>Average</option>
+                        <option value="faster" <?php if (($userProfile['intelligence'] ?? '') == 'faster') echo 'selected'; ?>>Faster</option>
+                        <option value="genius" <?php if (($userProfile['intelligence'] ?? '') == 'genius') echo 'selected'; ?>>Genius</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:right;"><label for="bedroomPersonality">Bedroom Personality</label></td>
+                <td style="text-align:left;">
+                    <select name="bedroomPersonality" id="bedroomPersonality" class="required">
+                        <option value="">Select bedroom personality</option>
+                        <option value="passive" <?php if (($userProfile['bedroomPersonality'] ?? '') == 'passive') echo 'selected'; ?>>Passive</option>
+                        <option value="shy" <?php if (($userProfile['bedroomPersonality'] ?? '') == 'shy') echo 'selected'; ?>>Shy</option>
+                        <option value="confident" <?php if (($userProfile['bedroomPersonality'] ?? '') == 'confident') echo 'selected'; ?>>Confident</option>
+                        <option value="aggressive" <?php if (($userProfile['bedroomPersonality'] ?? '') == 'aggressive') echo 'selected'; ?>>Aggressive</option>
+                    </select>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="captionText">Age Preferences</div>
+        <table>
+            <tbody>
+            <tr>
+                <td style="text-align:right; width:40%;"><label for="wantAgeFrom">Seeking Age Range</label></td>
+                <td style="text-align:left;">
+                    <input type="number" name="wantAgeFrom" id="wantAgeFrom" min="18" max="99" style="width:5em" value="<?php echo htmlspecialchars($userProfile['wantAgeFrom'] ?? '18'); ?>"> to 
+                    <input type="number" name="wantAgeTo" id="wantAgeTo" min="18" max="99" style="width:5em" value="<?php echo htmlspecialchars($userProfile['wantAgeTo'] ?? '99'); ?>">
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="captionText">Gender Preferences</div>
         <table>
             <tbody>
             <tr>
                 <td colspan="2" style="text-align:left;">
                     <strong>What gender(s) are you seeking?</strong><br>
                     <div style="margin: 10px 0;">
-                        <label><input type="checkbox" name="wantGenderMan" value="1" <?php if ($userProfile['wantGenderMan'] ?? 0) echo 'checked'; ?>> Men</label><br>
-                        <label><input type="checkbox" name="wantGenderWoman" value="1" <?php if ($userProfile['wantGenderWoman'] ?? 0) echo 'checked'; ?>> Women</label><br>
-                        <label><input type="checkbox" name="wantGenderNonBinary" value="1" <?php if ($userProfile['wantGenderNonBinary'] ?? 0) echo 'checked'; ?>> Non-Binary</label><br>
+                        <label><input type="checkbox" name="b_wantGenderMan" value="1" <?php if ($userProfile['b_wantGenderMan'] ?? 0) echo 'checked'; ?>> Men</label><br>
+                        <label><input type="checkbox" name="b_wantGenderWoman" value="1" <?php if ($userProfile['b_wantGenderWoman'] ?? 0) echo 'checked'; ?>> Women</label><br>
+                        <label><input type="checkbox" name="b_wantGenderTSWoman" value="1" <?php if ($userProfile['b_wantGenderTSWoman'] ?? 0) echo 'checked'; ?>> Trans Women</label><br>
+                        <label><input type="checkbox" name="b_wantGenderTSMan" value="1" <?php if ($userProfile['b_wantGenderTSMan'] ?? 0) echo 'checked'; ?>> Trans Men</label><br>
+                        <label><input type="checkbox" name="b_wantGenderCDWoman" value="1" <?php if ($userProfile['b_wantGenderCDWoman'] ?? 0) echo 'checked'; ?>> Crossdresser Women</label><br>
+                        <label><input type="checkbox" name="b_wantGenderCDMan" value="1" <?php if ($userProfile['b_wantGenderCDMan'] ?? 0) echo 'checked'; ?>> Crossdresser Men</label><br>
+                        <label><input type="checkbox" name="b_wantGenderCoupleMF" value="1" <?php if ($userProfile['b_wantGenderCoupleMF'] ?? 0) echo 'checked'; ?>> MF Couples</label><br>
+                        <label><input type="checkbox" name="b_wantGenderCoupleMM" value="1" <?php if ($userProfile['b_wantGenderCoupleMM'] ?? 0) echo 'checked'; ?>> MM Couples</label><br>
+                        <label><input type="checkbox" name="b_wantGenderCoupleFF" value="1" <?php if ($userProfile['b_wantGenderCoupleFF'] ?? 0) echo 'checked'; ?>> FF Couples</label><br>
+                        <label><input type="checkbox" name="b_wantGenderGroup" value="1" <?php if ($userProfile['b_wantGenderGroup'] ?? 0) echo 'checked'; ?>> Groups</label><br>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="captionText">Physical Preferences</div>
+        <table>
+            <tbody>
+            <tr>
+                <td colspan="2" style="text-align:left;">
+                    <strong>Body Type Preferences:</strong><br>
+                    <div style="margin: 10px 0;">
+                        <label><input type="checkbox" name="b_wantBodyTiny" value="1" <?php if ($userProfile['b_wantBodyTiny'] ?? 0) echo 'checked'; ?>> Tiny</label>
+                        <label><input type="checkbox" name="b_wantBodySlim" value="1" <?php if ($userProfile['b_wantBodySlim'] ?? 0) echo 'checked'; ?>> Slim</label>
+                        <label><input type="checkbox" name="b_wantBodyAverage" value="1" <?php if ($userProfile['b_wantBodyAverage'] ?? 0) echo 'checked'; ?>> Average</label>
+                        <label><input type="checkbox" name="b_wantBodyMuscular" value="1" <?php if ($userProfile['b_wantBodyMuscular'] ?? 0) echo 'checked'; ?>> Muscular</label>
+                        <label><input type="checkbox" name="b_wantBodyCurvy" value="1" <?php if ($userProfile['b_wantBodyCurvy'] ?? 0) echo 'checked'; ?>> Curvy</label>
+                        <label><input type="checkbox" name="b_wantBodyThick" value="1" <?php if ($userProfile['b_wantBodyThick'] ?? 0) echo 'checked'; ?>> Thick</label>
+                        <label><input type="checkbox" name="b_wantBodyBBW" value="1" <?php if ($userProfile['b_wantBodyBBW'] ?? 0) echo 'checked'; ?>> BBW</label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:left;">
+                    <strong>Ethnicity Preferences:</strong><br>
+                    <div style="margin: 10px 0;">
+                        <label><input type="checkbox" name="b_wantEthnicityWhite" value="1" <?php if ($userProfile['b_wantEthnicityWhite'] ?? 0) echo 'checked'; ?>> White</label>
+                        <label><input type="checkbox" name="b_wantEthnicityAsian" value="1" <?php if ($userProfile['b_wantEthnicityAsian'] ?? 0) echo 'checked'; ?>> Asian</label>
+                        <label><input type="checkbox" name="b_wantEthnicityLatino" value="1" <?php if ($userProfile['b_wantEthnicityLatino'] ?? 0) echo 'checked'; ?>> Latino</label>
+                        <label><input type="checkbox" name="b_wantEthnicityIndian" value="1" <?php if ($userProfile['b_wantEthnicityIndian'] ?? 0) echo 'checked'; ?>> Indian</label>
+                        <label><input type="checkbox" name="b_wantEthnicityBlack" value="1" <?php if ($userProfile['b_wantEthnicityBlack'] ?? 0) echo 'checked'; ?>> Black</label>
+                        <label><input type="checkbox" name="b_wantEthnicityOther" value="1" <?php if ($userProfile['b_wantEthnicityOther'] ?? 0) echo 'checked'; ?>> Other</label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:left;">
+                    <strong>Hair Color Preferences:</strong><br>
+                    <div style="margin: 10px 0;">
+                        <label><input type="checkbox" name="b_wantHairColorLight" value="1" <?php if ($userProfile['b_wantHairColorLight'] ?? 0) echo 'checked'; ?>> Light</label>
+                        <label><input type="checkbox" name="b_wantHairColorMedium" value="1" <?php if ($userProfile['b_wantHairColorMedium'] ?? 0) echo 'checked'; ?>> Medium</label>
+                        <label><input type="checkbox" name="b_wantHairColorDark" value="1" <?php if ($userProfile['b_wantHairColorDark'] ?? 0) echo 'checked'; ?>> Dark</label>
+                        <label><input type="checkbox" name="b_wantHairColorRed" value="1" <?php if ($userProfile['b_wantHairColorRed'] ?? 0) echo 'checked'; ?>> Red</label>
+                        <label><input type="checkbox" name="b_wantHairColorGray" value="1" <?php if ($userProfile['b_wantHairColorGray'] ?? 0) echo 'checked'; ?>> Gray</label>
+                        <label><input type="checkbox" name="b_wantHairColorOther" value="1" <?php if ($userProfile['b_wantHairColorOther'] ?? 0) echo 'checked'; ?>> Other</label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:left;">
+                    <strong>Hair Length Preferences:</strong><br>
+                    <div style="margin: 10px 0;">
+                        <label><input type="checkbox" name="b_wantHairLengthBald" value="1" <?php if ($userProfile['b_wantHairLengthBald'] ?? 0) echo 'checked'; ?>> Bald</label>
+                        <label><input type="checkbox" name="b_wantHairLengthShort" value="1" <?php if ($userProfile['b_wantHairLengthShort'] ?? 0) echo 'checked'; ?>> Short</label>
+                        <label><input type="checkbox" name="b_wantHairLengthMedium" value="1" <?php if ($userProfile['b_wantHairLengthMedium'] ?? 0) echo 'checked'; ?>> Medium</label>
+                        <label><input type="checkbox" name="b_wantHairLengthLong" value="1" <?php if ($userProfile['b_wantHairLengthLong'] ?? 0) echo 'checked'; ?>> Long</label>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="captionText">Lifestyle & Health</div>
+        <table>
+            <tbody>
+            <tr>
+                <td colspan="2" style="text-align:left;">
+                    <strong>Substances:</strong><br>
+                    <div style="margin: 10px 0;">
+                        <label><input type="checkbox" name="b_smokeCigarettes" value="1" <?php if ($userProfile['b_smokeCigarettes'] ?? 0) echo 'checked'; ?>> Smoke Cigarettes</label>
+                        <label><input type="checkbox" name="b_noCigs" value="1" <?php if ($userProfile['b_noCigs'] ?? 0) echo 'checked'; ?>> No Cigarettes</label><br>
+                        <label><input type="checkbox" name="b_lightDrinker" value="1" <?php if ($userProfile['b_lightDrinker'] ?? 0) echo 'checked'; ?>> Light Drinker</label>
+                        <label><input type="checkbox" name="b_noLightDrink" value="1" <?php if ($userProfile['b_noLightDrink'] ?? 0) echo 'checked'; ?>> No Light Drinking</label><br>
+                        <label><input type="checkbox" name="b_heavyDrinker" value="1" <?php if ($userProfile['b_heavyDrinker'] ?? 0) echo 'checked'; ?>> Heavy Drinker</label>
+                        <label><input type="checkbox" name="b_noHeavyDrink" value="1" <?php if ($userProfile['b_noHeavyDrink'] ?? 0) echo 'checked'; ?>> No Heavy Drinking</label><br>
+                        <label><input type="checkbox" name="b_smokeMarijuana" value="1" <?php if ($userProfile['b_smokeMarijuana'] ?? 0) echo 'checked'; ?>> Smoke Marijuana</label>
+                        <label><input type="checkbox" name="b_noMarijuana" value="1" <?php if ($userProfile['b_noMarijuana'] ?? 0) echo 'checked'; ?>> No Marijuana</label><br>
+                        <label><input type="checkbox" name="b_psychedelics" value="1" <?php if ($userProfile['b_psychedelics'] ?? 0) echo 'checked'; ?>> Psychedelics</label>
+                        <label><input type="checkbox" name="b_noPsychedelics" value="1" <?php if ($userProfile['b_noPsychedelics'] ?? 0) echo 'checked'; ?>> No Psychedelics</label><br>
+                        <label><input type="checkbox" name="b_otherDrugs" value="1" <?php if ($userProfile['b_otherDrugs'] ?? 0) echo 'checked'; ?>> Other Drugs</label>
+                        <label><input type="checkbox" name="b_noDrugs" value="1" <?php if ($userProfile['b_noDrugs'] ?? 0) echo 'checked'; ?>> No Drugs</label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:left;">
+                    <strong>STI Status (be honest for safety):</strong><br>
+                    <div style="margin: 10px 0;">
+                        <label><input type="checkbox" name="b_haveWarts" value="1" <?php if ($userProfile['b_haveWarts'] ?? 0) echo 'checked'; ?>> Have Warts</label>
+                        <label><input type="checkbox" name="b_noWarts" value="1" <?php if ($userProfile['b_noWarts'] ?? 0) echo 'checked'; ?>> No Warts</label><br>
+                        <label><input type="checkbox" name="b_haveHerpes" value="1" <?php if ($userProfile['b_haveHerpes'] ?? 0) echo 'checked'; ?>> Have Herpes</label>
+                        <label><input type="checkbox" name="b_noHerpes" value="1" <?php if ($userProfile['b_noHerpes'] ?? 0) echo 'checked'; ?>> No Herpes</label><br>
+                        <label><input type="checkbox" name="b_haveHepatitis" value="1" <?php if ($userProfile['b_haveHepatitis'] ?? 0) echo 'checked'; ?>> Have Hepatitis</label>
+                        <label><input type="checkbox" name="b_noHepatitis" value="1" <?php if ($userProfile['b_noHepatitis'] ?? 0) echo 'checked'; ?>> No Hepatitis</label><br>
+                        <label><input type="checkbox" name="b_haveHIV" value="1" <?php if ($userProfile['b_haveHIV'] ?? 0) echo 'checked'; ?>> Have HIV</label>
+                        <label><input type="checkbox" name="b_noHIV" value="1" <?php if ($userProfile['b_noHIV'] ?? 0) echo 'checked'; ?>> No HIV</label><br>
+                        <label><input type="checkbox" name="b_haveOtherSTI" value="1" <?php if ($userProfile['b_haveOtherSTI'] ?? 0) echo 'checked'; ?>> Have Other STI</label>
+                        <label><input type="checkbox" name="b_noOtherSTIs" value="1" <?php if ($userProfile['b_noOtherSTIs'] ?? 0) echo 'checked'; ?>> No Other STIs</label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:left;">
+                    <strong>Relationship Status:</strong><br>
+                    <div style="margin: 10px 0;">
+                        <label><input type="checkbox" name="b_marriedTheyKnow" value="1" <?php if ($userProfile['b_marriedTheyKnow'] ?? 0) echo 'checked'; ?>> Married (They Know)</label>
+                        <label><input type="checkbox" name="b_noMarriedTheyKnow" value="1" <?php if ($userProfile['b_noMarriedTheyKnow'] ?? 0) echo 'checked'; ?>> No Married (They Know)</label><br>
+                        <label><input type="checkbox" name="b_marriedSecret" value="1" <?php if ($userProfile['b_marriedSecret'] ?? 0) echo 'checked'; ?>> Married (Secret)</label>
+                        <label><input type="checkbox" name="b_noMarriedSecret" value="1" <?php if ($userProfile['b_noMarriedSecret'] ?? 0) echo 'checked'; ?>> No Married (Secret)</label><br>
+                        <label><input type="checkbox" name="b_poly" value="1" <?php if ($userProfile['b_poly'] ?? 0) echo 'checked'; ?>> Polyamorous</label>
+                        <label><input type="checkbox" name="b_noPoly" value="1" <?php if ($userProfile['b_noPoly'] ?? 0) echo 'checked'; ?>> No Polyamorous</label><br>
+                        <label><input type="checkbox" name="b_disability" value="1" <?php if ($userProfile['b_disability'] ?? 0) echo 'checked'; ?>> Have Disability</label>
+                        <label><input type="checkbox" name="b_noDisabled" value="1" <?php if ($userProfile['b_noDisabled'] ?? 0) echo 'checked'; ?>> No Disability</label>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="captionText">Sexual Activities</div>
+        <table>
+            <tbody>
+            <tr>
+                <td colspan="2" style="text-align:left;">
+                    <strong>Sexual Preferences:</strong><br>
+                    <div style="margin: 10px 0;">
+                        <label><input type="checkbox" name="b_wantSafeSex" value="1" <?php if ($userProfile['b_wantSafeSex'] ?? 0) echo 'checked'; ?>> Safe Sex</label>
+                        <label><input type="checkbox" name="b_wantBarebackSex" value="1" <?php if ($userProfile['b_wantBarebackSex'] ?? 0) echo 'checked'; ?>> Bareback Sex</label><br>
+                        <label><input type="checkbox" name="b_wantOralGive" value="1" <?php if ($userProfile['b_wantOralGive'] ?? 0) echo 'checked'; ?>> Give Oral</label>
+                        <label><input type="checkbox" name="b_wantOralReceive" value="1" <?php if ($userProfile['b_wantOralReceive'] ?? 0) echo 'checked'; ?>> Receive Oral</label><br>
+                        <label><input type="checkbox" name="b_wantAnalTop" value="1" <?php if ($userProfile['b_wantAnalTop'] ?? 0) echo 'checked'; ?>> Anal Top</label>
+                        <label><input type="checkbox" name="b_wantAnalBottom" value="1" <?php if ($userProfile['b_wantAnalBottom'] ?? 0) echo 'checked'; ?>> Anal Bottom</label><br>
+                        <label><input type="checkbox" name="b_wantFilming" value="1" <?php if ($userProfile['b_wantFilming'] ?? 0) echo 'checked'; ?>> Filming</label><br>
+                        <label><input type="checkbox" name="b_wantVoyeur" value="1" <?php if ($userProfile['b_wantVoyeur'] ?? 0) echo 'checked'; ?>> Voyeur</label>
+                        <label><input type="checkbox" name="b_wantExhibitionist" value="1" <?php if ($userProfile['b_wantExhibitionist'] ?? 0) echo 'checked'; ?>> Exhibitionist</label><br>
+                        <label><input type="checkbox" name="b_wantRoleplay" value="1" <?php if ($userProfile['b_wantRoleplay'] ?? 0) echo 'checked'; ?>> Roleplay</label>
+                        <label><input type="checkbox" name="b_wantSpanking" value="1" <?php if ($userProfile['b_wantSpanking'] ?? 0) echo 'checked'; ?>> Spanking</label><br>
+                        <label><input type="checkbox" name="b_wantDom" value="1" <?php if ($userProfile['b_wantDom'] ?? 0) echo 'checked'; ?>> Dominant</label>
+                        <label><input type="checkbox" name="b_wantSub" value="1" <?php if ($userProfile['b_wantSub'] ?? 0) echo 'checked'; ?>> Submissive</label><br>
+                        <label><input type="checkbox" name="b_wantStrapon" value="1" <?php if ($userProfile['b_wantStrapon'] ?? 0) echo 'checked'; ?>> Strap-on</label>
+                        <label><input type="checkbox" name="b_wantCuckold" value="1" <?php if ($userProfile['b_wantCuckold'] ?? 0) echo 'checked'; ?>> Cuckold</label>
+                        <label><input type="checkbox" name="b_wantFurry" value="1" <?php if ($userProfile['b_wantFurry'] ?? 0) echo 'checked'; ?>> Furry</label>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="captionText">Meeting Preferences</div>
+        <table>
+            <tbody>
+            <tr>
+                <td colspan="2" style="text-align:left;">
+                    <strong>Where to meet:</strong><br>
+                    <div style="margin: 10px 0;">
+                        <label><input type="checkbox" name="b_whereMyPlace" value="1" <?php if ($userProfile['b_whereMyPlace'] ?? 0) echo 'checked'; ?>> My Place</label>
+                        <label><input type="checkbox" name="b_whereYouHost" value="1" <?php if ($userProfile['b_whereYouHost'] ?? 0) echo 'checked'; ?>> You Host</label><br>
+                        <label><input type="checkbox" name="b_whereCarDate" value="1" <?php if ($userProfile['b_whereCarDate'] ?? 0) echo 'checked'; ?>> Car Date</label><br>
+                        <label><input type="checkbox" name="b_whereHotelIPay" value="1" <?php if ($userProfile['b_whereHotelIPay'] ?? 0) echo 'checked'; ?>> Hotel (I Pay)</label>
+                        <label><input type="checkbox" name="b_whereHotelYouPay" value="1" <?php if ($userProfile['b_whereHotelYouPay'] ?? 0) echo 'checked'; ?>> Hotel (You Pay)</label>
+                        <label><input type="checkbox" name="b_whereHotelSplit" value="1" <?php if ($userProfile['b_whereHotelSplit'] ?? 0) echo 'checked'; ?>> Hotel (Split)</label><br>
+                        <label><input type="checkbox" name="b_whereBarClub" value="1" <?php if ($userProfile['b_whereBarClub'] ?? 0) echo 'checked'; ?>> Bar/Club</label>
+                        <label><input type="checkbox" name="b_whereGymSauna" value="1" <?php if ($userProfile['b_whereGymSauna'] ?? 0) echo 'checked'; ?>> Gym/Sauna</label><br>
+                        <label><input type="checkbox" name="b_whereNudeBeach" value="1" <?php if ($userProfile['b_whereNudeBeach'] ?? 0) echo 'checked'; ?>> Nude Beach</label>
+                        <label><input type="checkbox" name="b_whereOther" value="1" <?php if ($userProfile['b_whereOther'] ?? 0) echo 'checked'; ?>> Other</label>
                     </div>
                 </td>
             </tr>
@@ -149,6 +447,100 @@ function generateAvatar() {
         }
     });
 }
+
+// Form validation and UX improvements
+$(document).ready(function() {
+    // Add collapsible sections
+    $('.captionText').each(function() {
+        const $this = $(this);
+        const $nextTable = $this.next('table');
+        
+        if ($nextTable.length) {
+            $this.css({
+                'cursor': 'pointer',
+                'user-select': 'none',
+                'background-color': '#f8f9fa',
+                'padding': '10px',
+                'border-radius': '5px',
+                'border': '1px solid #dee2e6'
+            });
+            
+            $this.append(' <span style="float: right;">▼</span>');
+            
+            $this.click(function() {
+                $nextTable.slideToggle();
+                const $arrow = $(this).find('span');
+                $arrow.text($arrow.text() === '▼' ? '▶' : '▼');
+            });
+        }
+    });
+    
+    // Form validation
+    $('form').on('submit', function(e) {
+        let isValid = true;
+        let errorMessage = '';
+        
+        // Check required fields
+        const requiredFields = ['username', 'age', 'gender', 'body', 'ethnicity', 'hairColor', 'hairLength', 'tattoos', 'overallLooks', 'intelligence', 'bedroomPersonality'];
+        
+        requiredFields.forEach(function(field) {
+            const $field = $('#' + field);
+            if (!$field.val()) {
+                isValid = false;
+                errorMessage += 'Please fill in all required fields.\n';
+                $field.css('border-color', '#dc3545');
+            } else {
+                $field.css('border-color', '');
+            }
+        });
+        
+        // Check age
+        const age = parseInt($('#age').val());
+        if (age < 18) {
+            isValid = false;
+            errorMessage += 'You must be 18 or older.\n';
+            $('#age').css('border-color', '#dc3545');
+        }
+        
+        // Check gender preferences
+        const genderPrefs = $('input[name^="b_wantGender"]:checked');
+        if (genderPrefs.length === 0) {
+            isValid = false;
+            errorMessage += 'Please select at least one gender preference.\n';
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert(errorMessage);
+        }
+    });
+    
+    // Real-time validation
+    $('input[type="number"]').on('input', function() {
+        const $this = $(this);
+        const val = parseInt($this.val());
+        
+        if ($this.attr('id') === 'age' && val < 18) {
+            $this.css('border-color', '#dc3545');
+        } else if ($this.attr('id') === 'wantAgeFrom' && val < 18) {
+            $this.css('border-color', '#dc3545');
+        } else if ($this.attr('id') === 'wantAgeTo' && val > 99) {
+            $this.css('border-color', '#dc3545');
+        } else {
+            $this.css('border-color', '');
+        }
+    });
+    
+    // Auto-save progress (optional)
+    let saveTimeout;
+    $('input, select').on('change', function() {
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(function() {
+            // Could implement auto-save here
+            console.log('Form changed - could auto-save');
+        }, 2000);
+    });
+});
 </script>
 
 </body>
