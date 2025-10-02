@@ -1,241 +1,152 @@
 <?php
 /*
     API endpoint for updating user location
-    Used by the real-time matching system
+    Handles GPS coordinates, venue check-ins, and location-based matching
 */
 
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
 
-// Handle preflight requests
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
+try {
+    require_once('../_init.php');
+    require_once('../ProfileManager.php');
 
-// Only accept POST requests
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed']);
-    exit();
-}
+    // Ensure the user is logged in
+    if (!validateSessionOrCookiesReturnLoggedIn()) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'error' => 'Authentication required']);
+        exit();
+    }
 
-require_once('../_init.php');
+    // Only accept POST requests
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        echo json_encode(['success' => false, 'error' => 'Method not allowed']);
+        exit();
+    }
 
-// Check if user is logged in
-$loggedIn = validateSessionOrCookiesReturnLoggedIn();
-if (!$loggedIn) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Not authenticated']);
-    exit();
-}
+    // Validate CSRF token
+    if (!isset($_POST['csrf_token']) || !$securityManager->validateCsrfToken($_POST['csrf_token'])) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'error' => 'Invalid security token']);
+        exit();
+    }
 
-$userId = getUserId();
+    $userId = getUserIdByEmail($_SESSION['email']);
+    if (!$userId) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'User not found']);
+        exit();
+    }
 
-// Get JSON input
-$input = json_decode(file_get_contents('php://input'), true);
+    $profileManager = new ProfileManager($pdo);
 
-if (!$input || !isset($input['latitude']) || !isset($input['longitude'])) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Invalid input. Latitude and longitude required.']);
-    exit();
-}
+    // Get and validate location data
+    $latitude = floatval($_POST['latitude'] ?? 0);
+    $longitude = floatval($_POST['longitude'] ?? 0);
+    $venueId = intval($_POST['venue_id'] ?? 0);
+    $venueName = trim($_POST['venue_name'] ?? '');
+    $checkInType = $_POST['check_in_type'] ?? 'manual'; // manual, gps, venue
 
-$latitude = floatval($input['latitude']);
-$longitude = floatval($input['longitude']);
-$timestamp = isset($input['timestamp']) ? intval($input['timestamp']) : time();
+    // Validate coordinates
+    if ($latitude < -90 || $latitude > 90 || $longitude < -180 || $longitude > 180) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Invalid coordinates']);
+        exit();
+    }
 
-// Validate coordinates
-if ($latitude < -90 || $latitude > 90 || $longitude < -180 || $longitude > 180) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Invalid coordinates']);
-    exit();
-}
+    // Prepare location data
+    $locationData = [
+        'latitude' => $latitude,
+        'longitude' => $longitude,
+        'location_updated_at' => date('Y-m-d H:i:s'),
+        'last_location_type' => $checkInType
+    ];
 
-// Update user location in database
-$sql = "UPDATE users SET 
-        latitude = ?, 
-        longitude = ?, 
-        location_updated_at = NOW(),
-        last_online = NOW() 
-        WHERE id = ?";
+    // Add venue information if provided
+    if ($venueId > 0) {
+        $locationData['current_venue_id'] = $venueId;
+    }
+    if (!empty($venueName)) {
+        $locationData['current_venue_name'] = $venueName;
+    }
 
-if ($stmt = $link->prepare($sql)) {
-    $stmt->bind_param('ddi', $latitude, $longitude, $userId);
-    
-    if ($stmt->execute()) {
-        $stmt->close();
+    // Update user location
+    if ($profileManager->saveProfile($userId, $locationData)) {
         
-        // Log location update for analytics
-        error_log("Location updated for user $userId: $latitude, $longitude");
-        
-        // Check for nearby users and potential matches
-        $nearbyMatches = findNearbyMatches($userId, $latitude, $longitude);
-        
+        // Log the location update
+        $securityManager->logAction('location_update', $userId, [
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'venue_id' => $venueId,
+            'venue_name' => $venueName,
+            'check_in_type' => $checkInType
+        ]);
+
+        // Get nearby users for potential matches
+        $nearbyUsers = getNearbyUsers($pdo, $userId, $latitude, $longitude, 50); // 50km radius
+
         echo json_encode([
             'success' => true,
             'message' => 'Location updated successfully',
-            'nearby_matches' => count($nearbyMatches),
-            'coordinates' => [
+            'nearby_users' => count($nearbyUsers),
+            'location' => [
                 'latitude' => $latitude,
-                'longitude' => $longitude
-            ],
-            'updated_at' => date('Y-m-d H:i:s')
+                'longitude' => $longitude,
+                'venue_name' => $venueName
+            ]
         ]);
-        
     } else {
         http_response_code(500);
-        echo json_encode(['error' => 'Failed to update location']);
+        echo json_encode(['success' => false, 'error' => 'Failed to update location']);
     }
-} else {
+
+} catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['error' => 'Database error']);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Server error: ' . $e->getMessage()
+    ]);
 }
 
 /**
- * Find potential matches nearby
+ * Get nearby users for location-based matching
  */
-function findNearbyMatches($userId, $userLat, $userLng, $radiusKm = 10) {
-    global $link;
+function getNearbyUsers($pdo, $userId, $latitude, $longitude, $radiusKm = 50) {
+    $earthRadius = 6371; // Earth's radius in kilometers
     
-    // Get user's preferences
-    $userProfile = getProfile($userId);
-    if (!$userProfile) {
-        return [];
-    }
+    $sql = "
+        SELECT 
+            u.id,
+            u.username,
+            u.age,
+            u.gender,
+            u.latitude,
+            u.longitude,
+            u.avatar_url,
+            u.last_online,
+            (
+                $earthRadius * acos(
+                    cos(radians(?)) * 
+                    cos(radians(u.latitude)) * 
+                    cos(radians(u.longitude) - radians(?)) + 
+                    sin(radians(?)) * 
+                    sin(radians(u.latitude))
+                )
+            ) AS distance_km
+        FROM users u
+        WHERE u.id != ?
+        AND u.latitude IS NOT NULL 
+        AND u.longitude IS NOT NULL
+        AND u.active = 1
+        AND u.last_online > DATE_SUB(NOW(), INTERVAL 24 HOUR)
+        HAVING distance_km <= ?
+        ORDER BY distance_km ASC
+        LIMIT 50
+    ";
     
-    // Find users within radius with compatible preferences
-    $sql = "SELECT u.id, u.username, u.latitude, u.longitude,
-                   (6371 * acos(cos(radians(?)) * cos(radians(u.latitude)) * 
-                   cos(radians(u.longitude) - radians(?)) + 
-                   sin(radians(?)) * sin(radians(u.latitude)))) AS distance
-            FROM users u 
-            WHERE u.id != ? 
-            AND u.latitude IS NOT NULL 
-            AND u.longitude IS NOT NULL
-            AND u.last_online > DATE_SUB(NOW(), INTERVAL 24 HOUR)
-            AND u.id NOT IN (
-                SELECT target_user_id FROM user_actions 
-                WHERE user_id = ? AND action_type IN ('pass', 'block')
-            )
-            HAVING distance < ?
-            ORDER BY distance ASC, u.last_online DESC
-            LIMIT 20";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$latitude, $longitude, $latitude, $userId, $radiusKm]);
     
-    if ($stmt = $link->prepare($sql)) {
-        $stmt->bind_param('dddiii', $userLat, $userLng, $userLat, $userId, $userId, $radiusKm);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        
-        $matches = [];
-        while ($row = $result->fetch_assoc()) {
-            // Check compatibility
-            $targetProfile = getProfile($row['id']);
-            if ($targetProfile && areCompatible($userProfile, $targetProfile)) {
-                $matches[] = [
-                    'id' => $row['id'],
-                    'username' => $row['username'],
-                    'distance' => round($row['distance'], 1),
-                    'compatibility' => calculateCompatibility($userProfile, $targetProfile)
-                ];
-            }
-        }
-        
-        $stmt->close();
-        
-        // If we found new nearby matches, trigger notifications
-        if (!empty($matches)) {
-            triggerMatchNotifications($userId, $matches);
-        }
-        
-        return $matches;
-    }
-    
-    return [];
-}
-
-/**
- * Check if two users are compatible based on preferences
- */
-function areCompatible($user1, $user2) {
-    // Basic compatibility checks
-    // Age preferences
-    if (isset($user1['age_min']) && $user2['age'] < $user1['age_min']) return false;
-    if (isset($user1['age_max']) && $user2['age'] > $user1['age_max']) return false;
-    if (isset($user2['age_min']) && $user1['age'] < $user2['age_min']) return false;
-    if (isset($user2['age_max']) && $user1['age'] > $user2['age_max']) return false;
-    
-    // Gender preferences
-    if (isset($user1['seeking_gender']) && $user1['seeking_gender'] != 'any') {
-        if ($user1['seeking_gender'] != $user2['gender']) return false;
-    }
-    if (isset($user2['seeking_gender']) && $user2['seeking_gender'] != 'any') {
-        if ($user2['seeking_gender'] != $user1['gender']) return false;
-    }
-    
-    // Additional compatibility logic can be added here
-    return true;
-}
-
-/**
- * Calculate compatibility score
- */
-function calculateCompatibility($user1, $user2) {
-    $score = 0;
-    $factors = 0;
-    
-    // Age compatibility
-    $ageDiff = abs($user1['age'] - $user2['age']);
-    if ($ageDiff <= 5) $score += 20;
-    else if ($ageDiff <= 10) $score += 10;
-    $factors++;
-    
-    // Location proximity bonus (already filtered by distance)
-    $score += 20;
-    $factors++;
-    
-    // Interests matching (simplified)
-    if (isset($user1['interests']) && isset($user2['interests'])) {
-        $user1Interests = explode(',', $user1['interests']);
-        $user2Interests = explode(',', $user2['interests']);
-        $commonInterests = count(array_intersect($user1Interests, $user2Interests));
-        $score += min($commonInterests * 10, 30);
-        $factors++;
-    }
-    
-    // Online activity bonus
-    $user1LastOnline = strtotime($user1['last_online'] ?? 'now');
-    $user2LastOnline = strtotime($user2['last_online'] ?? 'now');
-    if (time() - $user1LastOnline < 3600 && time() - $user2LastOnline < 3600) {
-        $score += 15; // Both online recently
-    }
-    $factors++;
-    
-    return min(round($score / $factors * 5), 100); // Scale to 0-100
-}
-
-/**
- * Trigger match notifications for nearby users
- */
-function triggerMatchNotifications($userId, $matches) {
-    // This could integrate with push notification services
-    // For now, we'll log it for the real-time system to pick up
-    
-    foreach ($matches as $match) {
-        error_log("New nearby match for user $userId: user {$match['id']} at {$match['distance']}km");
-        
-        // Store notification in database for real-time pickup
-        $sql = "INSERT INTO notifications (user_id, type, data, created_at) 
-                VALUES (?, 'nearby_match', ?, NOW())";
-        
-        if ($stmt = $GLOBALS['link']->prepare($sql)) {
-            $notificationData = json_encode($match);
-            $stmt->bind_param('is', $userId, $notificationData);
-            $stmt->execute();
-            $stmt->close();
-        }
-    }
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 ?>

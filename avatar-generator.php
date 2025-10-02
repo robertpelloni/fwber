@@ -10,6 +10,7 @@ class AvatarGenerator {
     private $providers = [
         'replicate' => 'ReplicateProvider',
         'dalle' => 'DALLEProvider',
+        'gemini' => 'GeminiProvider',
         'local' => 'LocalSDProvider',
         'comfyui' => 'ComfyUIProvider'
     ];
@@ -18,16 +19,19 @@ class AvatarGenerator {
     private $config;
     private $profileManager;
     
-    public function __construct($provider = 'replicate', $config = [], $profileManager) {
+    public function __construct($profileManager, $provider = 'replicate', $config = []) {
         $this->config = array_merge([
             'replicate_token' => $_ENV['REPLICATE_API_TOKEN'] ?? '',
             'openai_api_key' => $_ENV['OPENAI_API_KEY'] ?? '',
+            'gemini_api_key' => $_ENV['GEMINI_API_KEY'] ?? '',
             'local_sd_url' => 'http://127.0.0.1:7860',
             'comfyui_url' => 'http://127.0.0.1:8188',
-            'default_style' => 'realistic portrait',
+            'default_style' => 'realistic portrait, professional headshot',
             'image_size' => '512x512',
             'steps' => 30,
-            'guidance_scale' => 7.5
+            'guidance_scale' => 7.5,
+            'cache_avatars' => true,
+            'max_retries' => 3
         ], $config);
         
         $this->setProvider($provider);
@@ -50,6 +54,22 @@ class AvatarGenerator {
             throw new Exception("User profile not found for ID: $userId");
         }
 
+        // Check if user already has an avatar and caching is enabled
+        if ($this->config['cache_avatars'] && !empty($userProfile['avatar_url'])) {
+            // Check if the cached avatar is still valid (less than 30 days old)
+            if (isset($userProfile['avatar_updated_at'])) {
+                $avatarAge = time() - strtotime($userProfile['avatar_updated_at']);
+                if ($avatarAge < (30 * 24 * 60 * 60)) { // 30 days
+                    return [
+                        'success' => true,
+                        'image_url' => $userProfile['avatar_url'],
+                        'provider' => 'cached',
+                        'cached' => true
+                    ];
+                }
+            }
+        }
+
         $prompt = $this->buildPrompt($userProfile, $options);
         $negativePrompt = $this->buildNegativePrompt();
         
@@ -63,7 +83,40 @@ class AvatarGenerator {
             'seed' => $this->generateSeed($userProfile)
         ], $options);
         
-        return $this->currentProvider->generate($parameters);
+        // Retry logic for failed generations
+        $maxRetries = $this->config['max_retries'] ?? 3;
+        $lastError = null;
+        
+        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            try {
+                $result = $this->currentProvider->generate($parameters);
+                
+                if ($result['success']) {
+                    return $result;
+                }
+                
+                $lastError = $result['error'] ?? 'Unknown error';
+                
+                // If this is not the last attempt, wait before retrying
+                if ($attempt < $maxRetries) {
+                    sleep(2 * $attempt); // Exponential backoff
+                }
+                
+            } catch (Exception $e) {
+                $lastError = $e->getMessage();
+                
+                // If this is not the last attempt, wait before retrying
+                if ($attempt < $maxRetries) {
+                    sleep(2 * $attempt);
+                }
+            }
+        }
+        
+        return [
+            'success' => false,
+            'error' => "Avatar generation failed after $maxRetries attempts. Last error: $lastError",
+            'provider' => $this->currentProvider
+        ];
     }
     
     private function buildPrompt($profile, $options = []) {
@@ -83,12 +136,16 @@ class AvatarGenerator {
             $promptParts[] = $this->mapGender($profile['gender']);
         }
         
-        // Physical attributes
-        if (isset($profile['hair_color'])) {
+        // Physical attributes - use new field names
+        if (isset($profile['hairColor'])) {
+            $promptParts[] = $this->mapHairColor($profile['hairColor']) . ' hair';
+        } elseif (isset($profile['hair_color'])) {
             $promptParts[] = $profile['hair_color'] . ' hair';
         }
         
-        if (isset($profile['hair_style'])) {
+        if (isset($profile['hairLength'])) {
+            $promptParts[] = $this->mapHairLength($profile['hairLength']) . ' hair';
+        } elseif (isset($profile['hair_style'])) {
             $promptParts[] = $profile['hair_style'] . ' hairstyle';
         }
         
@@ -100,8 +157,20 @@ class AvatarGenerator {
             $promptParts[] = $this->mapEthnicity($profile['ethnicity']);
         }
         
-        if (isset($profile['body_type'])) {
+        if (isset($profile['body'])) {
+            $promptParts[] = $this->mapBodyType($profile['body']);
+        } elseif (isset($profile['body_type'])) {
             $promptParts[] = $this->mapBodyType($profile['body_type']);
+        }
+        
+        // Overall looks
+        if (isset($profile['overallLooks'])) {
+            $promptParts[] = $this->mapOverallLooks($profile['overallLooks']);
+        }
+        
+        // Tattoos
+        if (isset($profile['tattoos']) && $profile['tattoos'] !== 'none') {
+            $promptParts[] = $this->mapTattoos($profile['tattoos']);
         }
         
         // Style preferences
@@ -112,6 +181,7 @@ class AvatarGenerator {
         // Quality modifiers
         $promptParts[] = 'high quality, detailed, professional photography';
         $promptParts[] = 'attractive, confident expression';
+        $promptParts[] = 'natural lighting, clean background';
         
         // Clothing (appropriate)
         $clothing = $options['clothing'] ?? $this->getDefaultClothing($profile);
@@ -166,14 +236,59 @@ class AvatarGenerator {
     
     private function mapBodyType($bodyType) {
         $mapping = [
+            'tiny' => 'petite build',
             'slim' => 'slim build',
             'athletic' => 'athletic build',
             'average' => 'average build',
             'curvy' => 'curvy',
-            'plus_size' => 'plus size',
+            'thick' => 'thick build',
+            'bbw' => 'plus size',
             'muscular' => 'muscular'
         ];
         return $mapping[strtolower($bodyType)] ?? '';
+    }
+    
+    private function mapHairColor($hairColor) {
+        $mapping = [
+            'light' => 'blonde',
+            'medium' => 'brown',
+            'dark' => 'dark brown',
+            'red' => 'red',
+            'gray' => 'gray',
+            'other' => 'colored'
+        ];
+        return $mapping[strtolower($hairColor)] ?? $hairColor;
+    }
+    
+    private function mapHairLength($hairLength) {
+        $mapping = [
+            'bald' => 'bald',
+            'short' => 'short',
+            'medium' => 'medium length',
+            'long' => 'long'
+        ];
+        return $mapping[strtolower($hairLength)] ?? $hairLength;
+    }
+    
+    private function mapOverallLooks($overallLooks) {
+        $mapping = [
+            'ugly' => 'unique features',
+            'plain' => 'natural appearance',
+            'quirky' => 'distinctive features',
+            'average' => 'pleasant appearance',
+            'attractive' => 'attractive features',
+            'hottie' => 'very attractive',
+            'superModel' => 'stunning appearance'
+        ];
+        return $mapping[strtolower($overallLooks)] ?? '';
+    }
+    
+    private function mapTattoos($tattoos) {
+        $mapping = [
+            'some' => 'visible tattoos',
+            'allOver' => 'extensive tattoos'
+        ];
+        return $mapping[strtolower($tattoos)] ?? '';
     }
     
     private function getDefaultClothing($profile) {
@@ -430,6 +545,83 @@ class DALLEProvider {
             'success' => false,
             'error' => 'No image generated',
             'provider' => 'dalle'
+        ];
+    }
+}
+
+class GeminiProvider {
+    private $config;
+    
+    public function __construct($config) {
+        $this->config = $config;
+    }
+    
+    public function generate($parameters) {
+        // Google Gemini API implementation for image generation
+        $url = 'https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:generateImage';
+        
+        $payload = [
+            'prompt' => $parameters['prompt'],
+            'negativePrompt' => $parameters['negative_prompt'],
+            'width' => $parameters['width'],
+            'height' => $parameters['height'],
+            'seed' => $parameters['seed'],
+            'guidanceScale' => $parameters['guidance_scale'],
+            'numInferenceSteps' => $parameters['num_inference_steps']
+        ];
+        
+        $headers = [
+            'Authorization: Bearer ' . $this->config['gemini_api_key'],
+            'Content-Type: application/json'
+        ];
+        
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 120);
+        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        if ($httpCode !== 200) {
+            return [
+                'success' => false,
+                'error' => "Gemini API error: HTTP $httpCode - $response",
+                'provider' => 'gemini'
+            ];
+        }
+        
+        $result = json_decode($response, true);
+        
+        if (isset($result['generatedImages'][0]['imageBase64'])) {
+            // Save base64 image
+            $imageData = base64_decode($result['generatedImages'][0]['imageBase64']);
+            $filename = 'avatar_' . uniqid() . '.png';
+            $filepath = '/avatars/' . $filename;
+            
+            // Ensure avatars directory exists
+            $avatarDir = __DIR__ . '/avatars';
+            if (!is_dir($avatarDir)) {
+                mkdir($avatarDir, 0755, true);
+            }
+            
+            file_put_contents($avatarDir . '/' . $filename, $imageData);
+            
+            return [
+                'success' => true,
+                'image_url' => $filepath,
+                'provider' => 'gemini'
+            ];
+        }
+        
+        return [
+            'success' => false,
+            'error' => 'No image generated by Gemini',
+            'provider' => 'gemini'
         ];
     }
 }

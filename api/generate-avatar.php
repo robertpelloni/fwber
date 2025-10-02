@@ -43,20 +43,25 @@ try {
     $config = [
         'replicate_token' => $_ENV['REPLICATE_API_TOKEN'] ?? '',
         'openai_api_key' => $_ENV['OPENAI_API_KEY'] ?? '',
+        'gemini_api_key' => $_ENV['GEMINI_API_KEY'] ?? '',
         'local_sd_url' => 'http://127.0.0.1:7860',
-        'default_style' => 'realistic portrait, professional headshot'
+        'default_style' => 'realistic portrait, professional headshot',
+        'cache_avatars' => true,
+        'max_retries' => 3
     ];
 
     // Determine which provider to use based on available configuration
-    $provider = 'local'; // Default to local
-    if (!empty($config['replicate_token'])) {
+    $provider = 'local'; // Default fallback
+    if (!empty($config['gemini_api_key'])) {
+        $provider = 'gemini'; // Prefer Gemini for better quality
+    } elseif (!empty($config['replicate_token'])) {
         $provider = 'replicate';
     } elseif (!empty($config['openai_api_key'])) {
         $provider = 'dalle';
     }
 
     // The AvatarGenerator now requires the ProfileManager in its constructor
-    $generator = new AvatarGenerator($provider, $config, $profileManager);
+    $generator = new AvatarGenerator($profileManager, $provider, $config);
 
     // Generate the avatar using the secure userId
     $result = $generator->generateAvatar($userId);

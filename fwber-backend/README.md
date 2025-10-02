@@ -59,3 +59,6 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## API Quick Reference
+- See `docs/API_REFERENCE.md` for current authentication and profile endpoints.
+- Running `php artisan test` requires PDO MySQL or SQLite; install the driver locally or expect migrations to fail.
