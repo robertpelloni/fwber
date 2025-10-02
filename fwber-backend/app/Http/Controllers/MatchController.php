@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\MatchResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 
@@ -17,21 +18,16 @@ class MatchController extends Controller
             ->limit(20)
             ->get()
             ->map(function (User $candidate) use ($user) {
-                return [
-                    "id" => $candidate->getKey(),
-                    "name" => $candidate->profile?->display_name ?? $candidate->name,
-                    "email" => $candidate->email,
-                    "avatar_url" => $candidate->profile?->avatar_url,
-                    "bio" => $candidate->profile?->bio,
-                    "location_description" => $candidate->profile?->location_description,
-                    "compatibility_score" => $this->compatibilityScore($user->getKey(), $candidate->getKey()),
-                ];
-            })
-            ->values()
-            ->all();
+                $candidate->setAttribute(
+                    "compatibility_score",
+                    $this->compatibilityScore($user->getKey(), $candidate->getKey())
+                );
+
+                return $candidate;
+            });
 
         return response()->json([
-            "matches" => $matches,
+            "matches" => MatchResource::collection($matches)->toArray(request()),
         ]);
     }
 
