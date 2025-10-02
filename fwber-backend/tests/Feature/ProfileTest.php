@@ -28,7 +28,7 @@ class ProfileTest extends TestCase
             ]);
 
         $updateResponse->assertOk()->assertJsonPath("user.name", "Updated User")
-            ->assertJsonPath("user.profile.display_name", "Updated");
+            ->assertJsonPath("user.profile.displayName", "Updated");
 
         $this->assertDatabaseHas("users", ["email" => "profile@example.com", "name" => "Updated User"]);
         $this->assertDatabaseHas("user_profiles", ["display_name" => "Updated"]);

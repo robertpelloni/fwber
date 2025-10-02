@@ -35,10 +35,10 @@ class MatchesTest extends TestCase
                     "id",
                     "name",
                     "email",
-                    "avatar_url",
+                    "avatarUrl",
                     "bio",
-                    "location_description",
-                    "compatibility_score",
+                    "locationDescription",
+                    "compatibilityScore",
                 ],
             ],
         ]);
