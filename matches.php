@@ -1,6 +1,6 @@
 <?php
 require_once('_init.php');
-require_once('ai-matching-engine.php');
+require_once('MatchingEngine.php');
 require_once('ProfileManager.php');
 
 // Ensure the user is logged in

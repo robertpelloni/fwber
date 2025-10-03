@@ -16,9 +16,9 @@ class AuthTest extends TestCase
             "password" => "password123",
             "password_confirmation" => "password123",
             "profile" => [
-                "display_name" => "Example",
+                "displayName" => "Example",
                 "bio" => "Testing profile creation.",
-                "sti_status" => ["hiv" => "negative"],
+                "stiStatus" => ["hiv" => "negative"],
             ],
         ]);
 
