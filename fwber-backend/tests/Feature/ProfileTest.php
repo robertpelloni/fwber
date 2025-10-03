@@ -21,7 +21,7 @@ class ProfileTest extends TestCase
             ->putJson("/api/user", [
                 "name" => "Updated User",
                 "profile" => [
-                    "display_name" => "Updated",
+                    "displayName" => "Updated",
                     "bio" => "Updated bio",
                     "preferences" => ["looking_for" => "friends"],
                 ],
