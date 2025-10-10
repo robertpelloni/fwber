@@ -1216,3 +1216,32 @@ __Recommended immediate action:__ Complete profile-form.php this week, launch be
 The multi-AI collaboration workflow is now fully documented and ready to use. Each AI can reference CLINE_PROJECT_ANALYSIS.md and the collaboration log to stay coordinated.
 
 =========================================
+GPT-5-CODEX medium Codex extension in Cursor
+=========================================
+
+Three parallel implementations: legacy PHP in root (launchable once profile-form.php is fully populated), partially built Laravel API in fwber-backend/, and partially built Next.js app in fwber-frontend/.
+Legacy path already modernized for security (Argon2ID, CSRF, rate limiting) per README.md and STRATEGIC_RECOMMENDATIONS.md; modernization roadmap in IMPLEMENTATION_ROADMAP.md and REVIVAL_PLAN.md mirrors the same feature set for the new stack.
+Business collateral (B2B_MVP_SPEC.md, STRATEGIC_RECOMMENDATIONS.md) positions the product around venue partnerships, AI avatars, and STI-aware matchmaking; Gemini’s “Hyper-Local Pilot” plan in INITIAL_AI_INTERCOMMUNICATION_LOG.md pushes a single-venue beta.
+Cline’s audit (CLINE_PROJECT_ANALYSIS.md) documents the Option C hybrid decision, highlights doc sprawl, and lays out week‑by‑week priorities.
+Simplification Opportunities
+
+Canonical docs: keep README.md, QUICK_START_GUIDE.md, STRATEGIC_RECOMMENDATIONS.md, INITIAL_AI_INTERCOMMUNICATION_LOG.md, and CLINE_PROJECT_ANALYSIS.md; move feature deep-dives (e.g., ADMIN_PANEL_IMPLEMENTATION.md, LOCATION_FEATURES_IMPLEMENTATION.md) into docs/archive/ for reference.
+Capture today’s commitment in two lean files: ARCHITECTURE_DECISION.md (documenting Option C milestones) and MVP_LAUNCH_PLAN.md (checklist for legacy MVP launch).
+Treat modern stack as a long-running branch or /modern-stack/ folder to avoid confusing the production-ready legacy code path.
+Replace overlapping implementation guides with living checklists (setup, testing, launch).
+Prioritize completing and testing profile-form.php and associated manager logic so the legacy stack can drive the pilot while modern work continues.
+Multi-AI Collaboration Workflow
+
+Continue the shared log (INITIAL_AI_INTERCOMMUNICATION_LOG.md) as the authoritative handoff space; each AI logs identity, task, files touched, tests run, next steps, blockers.
+Define light-weight owners: e.g., Claude/Codex for backend missions, Cursor/Cline for rapid edits, Gemini for go-to-market collateral, Copilot/JetBrains for refactors.
+Add a short companion index (AI_TASK_QUEUE.md) that lists active tasks/status so every tool sees the same queue at a glance.
+Once the log approach feels solid, consider MCP servers for context (mcp-fwber-context, mcp-task-tracker) so IDE plugins can pull the same summaries automatically.
+Keep Serena MCP handy for file navigation/search; reserve heavy coordination (approvals, priorities) for human sign-off.
+Suggested Immediate Moves
+
+Approve/record Option C in ARCHITECTURE_DECISION.md; slim the root docs and stage archived notes.
+Assign the profile-form.php build-out (field mapping, validation, tooltips) and run through end-to-end testing of the legacy flow.
+Spin up the venue pilot kit: outreach template, QR collateral, onboarding flow (Gemini).
+Schedule a quick retrospective after the first AI handoff loop to tighten the protocol before involving more tools.
+Happy to help draft the new decision/launch files, archive docs, or take the profile form task whenever you’re ready.
+
