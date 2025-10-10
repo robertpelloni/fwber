@@ -4,7 +4,10 @@
       "Bash(Measure-Object)",
       "Bash(Select-Object Count)",
       "Bash(curl:*)",
-      "mcp__gemini-cli__ask-gemini"
+      "mcp__gemini-cli__ask-gemini",
+      "Bash(Get-ChildItem -Directory -Name)",
+      "Bash(Get-ChildItem -Directory)",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "ask": []
