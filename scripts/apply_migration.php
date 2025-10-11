@@ -70,7 +70,7 @@ $pdo->beginTransaction();
 try {
     foreach ($statements as $stmt) {
         $s = trim($stmt);
-        if ($s === '' || str_starts_with($s, '--') || str_starts_with($s, '/*')) {
+        if ($s === '' || preg_match('/^\s*--/m', $s) || preg_match('#^/\*#', $s)) {
             continue;
         }
         $pdo->exec($s);

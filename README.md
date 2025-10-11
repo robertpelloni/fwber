@@ -1,4 +1,4 @@
-# FWBer.me Modernization Project
+commu# FWBer.me Modernization Project
 
 This document outlines the current state of the FWBer.me application following a comprehensive security and architectural overhaul. It is intended as a handoff document for future development.
 
@@ -81,3 +81,47 @@ The application is now ready for the final pre-launch phase. The following tasks
 ## 7. A Note on Project History
 
 This project was modernized in a unique collaboration between a human developer and multiple AI assistants (Gemini and Claude). The development process was iterative and conversational, which is reflected in the evolution of the codebase. This `README.md` serves as the canonical summary of the project's current state, superseding any previous conversational logs.
+
+## Migration & Diagnostics (Legacy Matcher Compatibility)
+
+To ensure the legacy matcher works with the new profile form:
+
+1) Enable debug and start the app
+- Copy and edit your environment
+```cmd
+copy .env.example .env
+notepad .env
+```
+- Set `DEBUG_MODE=true`, then start a local server (or use your Apache/XAMPP)
+```cmd
+php -S 127.0.0.1:8000
+```
+
+2) Apply the migration (login required)
+- Visit: `http://127.0.0.1:8000/scripts/apply_migration_web.php`
+- Expected: `Applied N migration statements successfully.`
+- If you see `Forbidden`, ensure you are logged in and `DEBUG_MODE=true`.
+
+3) Verify mirrors and columns
+- Visit: `http://127.0.0.1:8000/scripts/profile_diagnostics.php`
+- Confirm: no missing columns and b_* mirrors appear in users after saving your profile.
+
+4) Run a quick smoke test
+- Create two users, set complementary preferences, and confirm matches appear.
+
+5) Disable debug for safety
+```cmd
+notepad .env
+```
+Set `DEBUG_MODE=false`
+
+
+## CLI Migration (optional)
+If PHP and MySQL CLIs are available, you can run:
+```cmd
+php scripts\apply_migration.php
+```
+Or:
+```cmd
+mysql -h localhost -u fwber -p fwber < db\migrations\2025-10-11-legacy-matcher-compat.sql
+```
