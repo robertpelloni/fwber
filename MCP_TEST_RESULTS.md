@@ -272,4 +272,20 @@ The following JetBrains tools are available but not tested in this session:
 
 ---
 
-**Conclusion:** JetBrains MCP integration is excellent and provides all necessary tools for development work. The 13 tested tools cover file operations, search, code inspection, and project navigation comprehensively.
+# MCP Tools & Servers Test Summary (2025-10-11)
+
+- JetBrains MCP: PASS (modules, dependencies, repos, run configs, file reads, search, inspections)
+- Serena MCP: PASS (onboarding/memory, list, find, search, symbols)
+- Sequential Thinking MCP: PASS (basic call) — tool reachable
+- Codex MCP: PARTIAL (ping OK; help/listSessions limited)
+- Gemini MCP: FAIL (ping/help failed — likely not installed/configured on this machine)
+
+Next steps to enable all MCP servers:
+- Gemini MCP: add GEMINI_API_KEY and install CLI/tool; verify PATH
+- Codex MCP: ensure server is running or configured for help endpoints
+- Sequential Thinking: optional — install via `npx @modelcontextprotocol/server-sequential-thinking`
+
+Notes:
+- Env secured (.env ignored; .env.example added)
+- Legacy matcher fixed; migration added at `db/migrations/2025-10-11-legacy-matcher-compat.sql`
+- Profile save now mirrors b_* flags into users when columns exist
