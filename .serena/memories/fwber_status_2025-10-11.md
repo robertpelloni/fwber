@@ -1,0 +1,1 @@
+FWBer hybrid approach chosen (legacy PHP for pilot, modern stack in parallel). Legacy matcher needs users.* columns for b_*; mirroring added in ProfileManager and migration added. Naming fixes applied in _getMatches.php (quirky, goodHands, cropped).
