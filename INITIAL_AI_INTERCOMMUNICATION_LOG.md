@@ -1530,3 +1530,322 @@ The profile form is mentioned as 60% complete, but I don't see `profile-form.php
 3. Something else entirely?
 
 Let me know and I'll update the task board accordingly! 🚀
+===============================================================
+GPT-5, WebStorm, JetBrains AI Panel
+===============================================================
+Thanks for the handoff! Here’s my concise take and a concrete path forward.
+
+Topline recommendation
+- Ship the PHP MVP first. The modernized PHP stack is closest to launch; finish the profile form, test end-to-end, and go live. Migrate to Laravel/Next.js after validation.
+
+Immediate actions (1–2 days)
+1. Lock architecture
+- Decide “PHP MVP now, Laravel/Next later.” Document in AI_DECISIONS.md.
+2. Secure and sanitize
+- Ensure .env is not tracked; add .env.example with placeholders.
+- Run a quick security pass (sessions, CSRF on all forms, uploads, rate limiting).
+3. Complete core UX
+- Finish profile-form.php using PROFILE_FIELD_MAPPING.md/PROFILE_FORM_IMPLEMENTATION_SUMMARY.md as the source of truth.
+- Verify flows: join → verify → sign in → edit profile → manage pics → matches → sign out.
+4. Test and polish
+- Use a checklist in AI_TASKS.md: validation, CSRF, error messages, mobile layout, image handling, pagination, basic accessibility.
+
+Project simplification
+- Keep: README.md, QUICK_START_GUIDE.md, IMPLEMENTATION_ROADMAP.md.
+- Create: PROJECT_STATE.md (single source of truth).
+- Archive (move to /docs-archive): B2B_MVP_SPEC.md, AVATAR_GENERATION_IMPLEMENTATION.md, LOCATION_FEATURES_IMPLEMENTATION.md, VENUE_DASHBOARD_IMPLEMENTATION.md, NEXTJS_LARAVEL_IMPLEMENTATION.md, STRATEGIC_RECOMMENDATIONS.md, REVIVAL_PLAN.md, CLINE_PROJECT_ANALYSIS.md.
+- Defer: fwber-backend, fwber-frontend (keep but mark “inactive until MVP ships”).
+
+Multi-AI collaboration workflow (simple, reliable)
+- Files at repo root:
+    - AI_LOG.md: running session log (you already started this with INITIAL_AI_INTERCOMMUNICATION_LOG.md—rename or link to it).
+    - AI_TASKS.md: Kanban-style checklist with “CLAIMED BY,” “ETA,” and “DONE.”
+    - AI_DECISIONS.md: ADR-style, short entries (Context, Decision, Consequences).
+- Protocol:
+    - Before work: read last 3 entries of AI_LOG.md + current AI_TASKS.md; claim task.
+    - During: small commits with clear messages; keep notes in AI_LOG.md.
+    - After: update AI_LOG.md (What changed, Tests run, Next steps), move task to DONE.
+
+Minimal templates
+- AI_LOG.md entry:
+    - Date:
+    - AI:
+    - Task:
+    - Changes:
+    - Tests:
+    - Handoff/Next:
+- AI_DECISIONS.md entry:
+    - Title:
+    - Context:
+    - Decision:
+    - Alternatives:
+    - Consequences:
+
+Optional MCP later
+- If you want interoperability, expose a simple MCP server that serves:
+    - read/write endpoints for AI_LOG.md, AI_TASKS.md, AI_DECISIONS.md
+    - read-only PROJECT_STATE.md
+- Start with the file-based approach now; add MCP when multiple tools need programmatic access.
+
+Proposed next steps for me
+- I can:
+    - Generate initial AI_LOG.md, AI_TASKS.md, AI_DECISIONS.md, and PROJECT_STATE.md populated from your current state.
+    - Outline the missing fields in profile-form.php and a checklist to complete it.
+    - Provide a pre-launch test checklist tailored to this app.
+
+Say the word, and I’ll draft those files so your whole AI/tool chain can snap to this workflow immediately.
+
+Robert: Let's go!
+
+Awesome. I’ll prepare the four coordination files and a focused checklist for finishing the MVP. If anything looks off, I can adjust quickly.``` markdown
+# AI Collaboration Log
+
+## Conventions
+- Sign entries with Date, AI, Task.
+- Use tags: [ARCH], [FEATURE], [BUG], [DOC], [SEC], [TEST], [OPS].
+- Keep entries short; link to commits when possible.
+
+---
+
+Date: 2025-10-10
+AI: GPT-5 (JetBrains AI)
+Task: Initialize collaboration files and MVP plan
+Tags: [DOC] [ARCH]
+
+Summary:
+- Adopt “PHP MVP now, Laravel/Next later.”
+- Created AI_LOG.md, AI_TASKS.md, AI_DECISIONS.md, PROJECT_STATE.md scaffolding.
+- Outlined profile form completion and launch checklist.
+
+Changes:
+- Added coordination docs (not code changes).
+- Proposed archiving plan for long-form docs.
+
+Tests:
+- N/A
+
+Handoff / Next:
+- CLAIM “Complete profile-form.php” in AI_TASKS.md.
+- Verify .env handling and create .env.example.
+- Run app end-to-end and log issues in AI_TASKS.md (Critical → Important → Nice).
+```
+
+``` markdown
+# FWBer AI Task Board
+
+Legend: [ ] = open, [~] = in progress, [x] = done
+Use: Add “CLAIMED BY: <AI/Human>, ETA: <date/time>” to claimed tasks.
+
+## 🔴 Critical (Do First)
+- [ ] Finalize architecture decision in AI_DECISIONS.md (PHP MVP now; Laravel/Next later)
+  - CLAIMED BY: GPT-5, ETA: today
+- [ ] Ensure .env not tracked; add .env.example with placeholders
+  - CLAIMED BY: (unclaimed)
+- [ ] Complete profile-form.php per PROFILE_FIELD_MAPPING.md and PROFILE_FORM_IMPLEMENTATION_SUMMARY.md
+  - CLAIMED BY: (unclaimed)
+- [ ] End-to-end flow test: join → verify → signin → edit profile → manage pics → matches → signout
+  - CLAIMED BY: (unclaimed)
+
+## 🟡 Important (This Week)
+- [ ] Consolidate docs: create PROJECT_STATE.md as single source; move deep dives to /docs-archive
+  - CLAIMED BY: GPT-5, ETA: today
+- [ ] Security pass: CSRF on all forms; rate limits on auth; upload MIME/size checks; session flags
+  - CLAIMED BY: (unclaimed)
+- [ ] Mobile/layout polish on key pages; basic accessibility checks
+  - CLAIMED BY: (unclaimed)
+
+## 🟢 Nice to Have (Later)
+- [ ] Decide migration plan milestones for Laravel/Next after launch
+- [ ] Avatar generation UX pass and provider fallback checks
+- [ ] Performance quick wins (DB indexes, caching hotspots)
+
+## ✅ Completed
+- [ ] Initialize AI collaboration files (this commit)
+```
+
+``` markdown
+# Architectural Decisions
+
+## ADR-001: Ship PHP MVP before Laravel/Next migration
+Date: 2025-10-10
+Status: Proposed
+Context:
+- Modernized PHP app is closest to launch.
+- Laravel/Next exists but is incomplete and would delay release.
+Decision:
+- Focus on shipping PHP MVP now.
+- Defer Laravel/Next to post-MVP with a planned migration path.
+Consequences:
+- Faster time-to-value and user feedback.
+- Short-term duplication in tech vision; requires later consolidation.
+Alternatives:
+- Full immediate migration to Laravel/Next (slower to launch).
+
+## ADR-002: Single-source documentation via PROJECT_STATE.md
+Date: 2025-10-10
+Status: Proposed
+Context:
+- Multiple overlapping markdown docs increase cognitive load.
+Decision:
+- Maintain PROJECT_STATE.md as the canonical status doc.
+- Move long-form design docs to /docs-archive.
+Consequences:
+- Clear status at a glance; easier onboarding.
+Alternatives:
+- Keep multiple top-level docs (harder to maintain).
+```
+
+``` markdown
+# Project State (Canonical)
+
+Last Updated: 2025-10-10
+Maintainer: Robert + AI crew
+
+## Goal
+Ship PHP MVP now; defer Laravel/Next migration post-launch.
+
+## Current Working Scope (PHP)
+- Auth: signin/signout/join/verify/forgot-password
+- Profile: profile, edit-profile, profile-form (to complete)
+- Media: manage-pics with secured uploads/deletes
+- Matches: list/display with basic logic
+- Settings, contact, and core pages
+
+## Immediate Priorities
+1) Complete profile-form.php per mapping docs
+2) End-to-end flow test and bugfix
+3) Security pass (CSRF, rate limits, session flags, uploads)
+4) Create .env.example; ensure .env not tracked
+
+## Documentation Plan
+- PROJECT_STATE.md = single source of truth
+- Archive deep-dive docs under /docs-archive after MVP
+
+## Risks
+- Scope creep from parallel Laravel/Next directories
+- Incomplete profile form blocks matching quality
+
+## Next Milestones
+- MVP ready: profile form done + E2E tested
+- Pre-launch checklist complete
+- Staging rollout and feedback loop
+```
+
+Additional checklists to keep us fast:
+Profile form completion checklist (insert into AI_LOG when starting the task)
+Confirm source of truth: PROFILE_FIELD_MAPPING.md and PROFILE_FORM_IMPLEMENTATION_SUMMARY.md.
+Implement remaining fields: inputs/types, server validation, CSRF, error display, persistence via ProfileManager.
+Client validation for obvious errors; server remains authoritative.
+Save/Cancel UX; success/error messages.
+Test: create new user, fill all fields incl. edge cases, verify DB writes, reload correctness.
+Sanity on mobile (labels, select controls, spacing).
+Pre-launch test checklist
+Accounts: join, verify email flow, sign in/out, forgot-password, rate limit behavior.
+Profile: full save, reload, edit, validation errors, CSRF replay prevention.
+Photos: upload valid/invalid types, size limits, delete flow, permissions, image serving path.
+Matches: appears with realistic data, pagination, empty state, basic filtering.
+Security: HTTPS detection, session cookie flags (HttpOnly, Secure), CSRF on all forms, prepared statements, headers.
+Performance: page load under typical network, simple DB index sanity if needed.
+Accessibility: focus order, labels for inputs, color contrast on key actions.
+Would you like me to:
+Populate .env.example with placeholder keys referenced in README?
+Create a /docs-archive/ folder and move/point links accordingly?
+Claim and start “Complete profile-form.php” next and log the diff as we go?
+
+Robert: Please do in that order!
+
+Great — executing in the requested order.
+1. Create .env.example with placeholders``` dotenv
+# Application
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=https://localhost
+
+# Database
+DB_HOST=localhost
+DB_PORT=3306
+DB_DATABASE=fwber
+DB_USERNAME=fwber
+DB_PASSWORD=YOUR_SECURE_PASSWORD
+
+# Mail
+MAIL_HOST=smtp.example.com
+MAIL_PORT=587
+MAIL_USERNAME=your_smtp_username
+MAIL_PASSWORD=your_smtp_password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=no-reply@example.com
+MAIL_FROM_NAME=FWBer
+
+# Security
+SESSION_NAME=fwber_session
+SESSION_SECURE=true
+SESSION_HTTPONLY=true
+SESSION_SAMESITE=Lax
+
+# Third-Party APIs (placeholders)
+REPLICATE_API_TOKEN=YOUR_REPLICATE_API_TOKEN_HERE
+OPENAI_API_KEY=YOUR_OPENAI_API_KEY_HERE
+GEMINI_API_KEY=YOUR_GEMINI_API_KEY_HERE
+STABILITY_API_KEY=YOUR_STABILITY_API_KEY_HERE
+
+# Captcha (if used)
+RECAPTCHA_SITE_KEY=YOUR_RECAPTCHA_SITE_KEY
+RECAPTCHA_SECRET_KEY=YOUR_RECAPTCHA_SECRET_KEY
+```
+
+Additionally, ensure .env is ignored and untracked:
+Confirm .gitignore contains a line: .env
+If .env is tracked, run locally:
+git rm --cached .env
+git commit -m "Stop tracking .env; use .env.example for placeholders"
+Create /docs-archive and point links Proposed archive set (non-canonical planning/feature docs moved to docs-archive):
+B2B_MVP_SPEC.md
+AVATAR_GENERATION_IMPLEMENTATION.md
+LOCATION_FEATURES_IMPLEMENTATION.md
+VENUE_DASHBOARD_IMPLEMENTATION.md
+NEXTJS_LARAVEL_IMPLEMENTATION.md
+STRATEGIC_RECOMMENDATIONS.md
+REVIVAL_PLAN.md
+CLINE_PROJECT_ANALYSIS.md
+ADMIN_PANEL_IMPLEMENTATION.md
+PROFILE_FIELD_MAPPING.md
+PROFILE_FORM_IMPLEMENTATION_SUMMARY.md
+SETUP_CHECKLIST.md
+We’ll create a readme pointer in the archive:``` markdown
+# Archived Project Documents
+
+These documents are preserved for reference. The canonical, up-to-date status of the project is maintained in PROJECT_STATE.md at the repository root.
+
+Archived in this folder:
+- B2B_MVP_SPEC.md
+- AVATAR_GENERATION_IMPLEMENTATION.md
+- LOCATION_FEATURES_IMPLEMENTATION.md
+- VENUE_DASHBOARD_IMPLEMENTATION.md
+- NEXTJS_LARAVEL_IMPLEMENTATION.md
+- STRATEGIC_RECOMMENDATIONS.md
+- REVIVAL_PLAN.md
+- CLINE_PROJECT_ANALYSIS.md
+- ADMIN_PANEL_IMPLEMENTATION.md
+- PROFILE_FIELD_MAPPING.md
+- PROFILE_FORM_IMPLEMENTATION_SUMMARY.md
+- SETUP_CHECKLIST.md
+
+Note: If any of these are revived, move them back to the root and update PROJECT_STATE.md to reflect the change.
+```
+
+If you’d like, I can also add a “Docs Index” section to PROJECT_STATE.md that points here.
+Claim and start “Complete profile-form.php” Plan:
+Read existing profile-form.php and the two mapping docs (now in docs-archive).
+Implement missing fields with proper input types and server-side validation hooks.
+Ensure CSRF token usage via SecurityManager.
+Persist through ProfileManager and verify reload behavior.
+Add minimal client-side validation for UX; server is authoritative.
+Add mobile-friendly layout tweaks.
+To proceed, I’ll:
+Open profile-form.php, identify gaps, and post a precise, minimal diff with the added fields, CSRF check, and submission handling.
+Update AI_LOG.md and AI_TASKS.md entries accordingly.
+Please confirm:
+Are PROFILE_FIELD_MAPPING.md and PROFILE_FORM_IMPLEMENTATION_SUMMARY.md the definitive sources for the remaining fields?
+Any fields you want excluded for MVP?
+Once confirmed, I’ll produce the code edits for profile-form.php in the next message.
