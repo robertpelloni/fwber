@@ -77,8 +77,14 @@ class ProfileManager {
             if (strpos($key, 'b_') === 0 && isset($usersCols[$key])) {
                 // Normalize boolean-ish values to 0/1 for users table
                 $userData[$key] = (int)!!$value;
-                // Keep in preferences as well for forward compatibility (do not unset)
             }
+        }
+        // Ensure legacy matcher gating columns are set when present
+        if (isset($usersCols['profileDone'])) {
+            $userData['profileDone'] = 1;
+        }
+        if (isset($usersCols['verified'])) {
+            $userData['verified'] = 1; // for pilot; switch to real verification when ready
         }
 
         try {
