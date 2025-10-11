@@ -43,7 +43,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $profileData['overallLooks'] = $_POST['overallLooks'] ?? '';
         $profileData['intelligence'] = $_POST['intelligence'] ?? '';
         $profileData['bedroomPersonality'] = $_POST['bedroomPersonality'] ?? '';
-        
+        $profileData['pubicHair'] = $_POST['pubicHair'] ?? '';
+
+        // Gender-specific physical attributes with validation
+        $gender = $profileData['gender'];
+        if ($gender === 'male' || $gender === 'non-binary') {
+            $profileData['penisSize'] = $_POST['penisSize'] ?? '';
+            $profileData['bodyHair'] = $_POST['bodyHair'] ?? '';
+            // Ensure female-specific fields are not set
+            unset($profileData['breastSize']);
+        } elseif ($gender === 'female' || $gender === 'non-binary') {
+            $profileData['breastSize'] = $_POST['breastSize'] ?? '';
+            // Ensure male-specific fields are not set for female users
+            if ($gender === 'female') {
+                unset($profileData['penisSize']);
+                unset($profileData['bodyHair']);
+            }
+        }
+
         // Age preferences
         $profileData['wantAgeFrom'] = (int)($_POST['wantAgeFrom'] ?? 18);
         $profileData['wantAgeTo'] = (int)($_POST['wantAgeTo'] ?? 99);
@@ -79,7 +96,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         foreach ($hairLengthPrefs as $pref) {
             $profileData[$pref] = isset($_POST[$pref]) ? 1 : 0;
         }
-        
+
+        // Tattoo, looks, intelligence, personality preferences
+        $tattooPrefs = ['b_wantTattoosNone', 'b_wantTattoosSome', 'b_wantTattoosAllOver'];
+        foreach ($tattooPrefs as $pref) {
+            $profileData[$pref] = isset($_POST[$pref]) ? 1 : 0;
+        }
+
+        $looksPrefs = ['b_wantLooksUgly', 'b_wantLooksPlain', 'b_wantLooksQuirky', 'b_wantLooksAverage',
+                      'b_wantLooksAttractive', 'b_wantLooksHottie', 'b_wantLooksSuperModel'];
+        foreach ($looksPrefs as $pref) {
+            $profileData[$pref] = isset($_POST[$pref]) ? 1 : 0;
+        }
+
+        $intelligencePrefs = ['b_wantIntelligenceGoodHands', 'b_wantIntelligenceBitSlow', 'b_wantIntelligenceAverage',
+                             'b_wantIntelligenceFaster', 'b_wantIntelligenceGenius'];
+        foreach ($intelligencePrefs as $pref) {
+            $profileData[$pref] = isset($_POST[$pref]) ? 1 : 0;
+        }
+
+        $bedroomPrefs = ['b_wantBedroomPersonalityPassive', 'b_wantBedroomPersonalityShy',
+                        'b_wantBedroomPersonalityConfident', 'b_wantBedroomPersonalityAggressive'];
+        foreach ($bedroomPrefs as $pref) {
+            $profileData[$pref] = isset($_POST[$pref]) ? 1 : 0;
+        }
+
+        // Grooming preferences
+        $pubicHairPrefs = ['b_wantPubicHairShaved', 'b_wantPubicHairTrimmed', 'b_wantPubicHairCropped',
+                          'b_wantPubicHairNatural', 'b_wantPubicHairHairy'];
+        foreach ($pubicHairPrefs as $pref) {
+            $profileData[$pref] = isset($_POST[$pref]) ? 1 : 0;
+        }
+
+        // Gender-specific preference fields (only save if user selected matching gender preferences)
+        $seeksMale = ($profileData['b_wantGenderMan'] ?? 0) || ($profileData['b_wantGenderTSMan'] ?? 0) ||
+                     ($profileData['b_wantGenderCDMan'] ?? 0) || ($profileData['b_wantGenderCoupleMM'] ?? 0) ||
+                     ($profileData['b_wantGenderCoupleMF'] ?? 0);
+
+        $seeksFemale = ($profileData['b_wantGenderWoman'] ?? 0) || ($profileData['b_wantGenderTSWoman'] ?? 0) ||
+                       ($profileData['b_wantGenderCDWoman'] ?? 0) || ($profileData['b_wantGenderCoupleFF'] ?? 0) ||
+                       ($profileData['b_wantGenderCoupleMF'] ?? 0);
+
+        if ($seeksMale) {
+            $penisSizePrefs = ['b_wantPenisSizeTiny', 'b_wantPenisSizeSkinny', 'b_wantPenisSizeAverage',
+                              'b_wantPenisSizeThick', 'b_wantPenisSizeHuge'];
+            foreach ($penisSizePrefs as $pref) {
+                $profileData[$pref] = isset($_POST[$pref]) ? 1 : 0;
+            }
+
+            $bodyHairPrefs = ['b_wantBodyHairSmooth', 'b_wantBodyHairAverage', 'b_wantBodyHairHairy'];
+            foreach ($bodyHairPrefs as $pref) {
+                $profileData[$pref] = isset($_POST[$pref]) ? 1 : 0;
+            }
+        }
+
+        if ($seeksFemale) {
+            $breastSizePrefs = ['b_wantBreastSizeTiny', 'b_wantBreastSizeSmall', 'b_wantBreastSizeAverage',
+                               'b_wantBreastSizeLarge', 'b_wantBreastSizeHuge'];
+            foreach ($breastSizePrefs as $pref) {
+                $profileData[$pref] = isset($_POST[$pref]) ? 1 : 0;
+            }
+        }
+
         // Lifestyle & Health flags
         $lifestyleFlags = ['b_smokeCigarettes', 'b_noCigs', 'b_lightDrinker', 'b_noLightDrink', 'b_heavyDrinker', 
                           'b_noHeavyDrink', 'b_smokeMarijuana', 'b_noMarijuana', 'b_psychedelics', 'b_noPsychedelics', 
