@@ -7,10 +7,11 @@
 ## 🔴 CRITICAL (This Week)
 
 ### Task: End-to-End Profile Form Testing
-- **Status:** 🟡 READY TO START
-- **Claimed By:** UNCLAIMED
+- **Status:** 🟢 IN PROGRESS (Prerequisites Complete)
+- **Claimed By:** Claude Code CLI (Sonnet 4.5)
 - **Estimated Time:** 3-4 hours
 - **Blockers:** None
+- **Test Infrastructure:** ✅ Complete (see db/test-personas.md, test-results/)
 - **Description:** Test complete user flow: Register → Verify Email → Fill Profile (all 150+ fields) → Save → Reload → Verify Data Persists
 - **Test Cases:**
   - Male user with penis size / body hair fields
@@ -101,6 +102,28 @@
 ---
 
 ## ✅ DONE
+
+### Task: E2E Testing Infrastructure Setup
+- **Completed:** 2025-10-11
+- **By:** Claude Code CLI (Sonnet 4.5)
+- **Description:** Created complete testing framework per Codex's strategic recommendation
+- **Files Created:**
+  - db/test-setup.sql - Clean test database schema
+  - db/generate-test-users.php - Creates 3 test personas with Argon2ID hashes
+  - db/verify-test-data.php - Validates data persistence & gender-specific fields
+  - db/cleanup-test-users.php - Cleanup script
+  - db/test-personas.md - Comprehensive test checklists (John, Jane, Alex)
+  - test-results/README.md - Test result templates and documentation
+  - test-results/screenshots/ - Directory for screenshots
+  - test-results/database-snapshots/ - Directory for DB dumps
+- **Test Coverage:**
+  - Male user persona (penis size, body hair fields)
+  - Female user persona (breast size field)
+  - Non-binary user persona (all gender-specific fields)
+  - Data leakage prevention tests
+  - CSRF token validation
+  - Database persistence verification
+- **Status:** Ready for manual E2E test execution
 
 ### Task: Multi-AI Collaboration Framework
 - **Completed:** 2025-10-11
