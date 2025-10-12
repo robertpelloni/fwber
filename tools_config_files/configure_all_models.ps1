@@ -184,18 +184,18 @@ Write-Host "Orchestration Ready: Yes" -ForegroundColor Green
 
 Write-Host "`n🚀 Quick Start Commands..." -ForegroundColor Yellow
 
-Write-Host "`nCodex (GPT-5-Codex):" -ForegroundColor Cyan
+Write-Host "`nCodex GPT-5-Codex:" -ForegroundColor Cyan
 Write-Host "  codex exec --model gpt-5-codex \"Implement user authentication\"" -ForegroundColor White
 Write-Host "  codex --model gpt-5-codex --full-auto" -ForegroundColor White
 
-Write-Host "`nGemini (2.5 Pro/Flash):" -ForegroundColor Cyan
+Write-Host "`nGemini 2.5 Pro-Flash:" -ForegroundColor Cyan
 Write-Host "  gemini -m gemini-2.5-pro \"Analyze system architecture\"" -ForegroundColor White
 Write-Host "  gemini -m gemini-2.5-flash \"Quick code review\"" -ForegroundColor White
 
-Write-Host "`nGrok (4 Code):" -ForegroundColor Cyan
+Write-Host "`nGrok 4 Code:" -ForegroundColor Cyan
 Write-Host "  grok --api-key YOUR_KEY -m grok-4-code \"Optimize performance\"" -ForegroundColor White
 
-Write-Host "`nOrchestration (Parallel):" -ForegroundColor Cyan
+Write-Host "`nOrchestration Parallel:" -ForegroundColor Cyan
 Write-Host "  echo '{\"task\": \"Implement feature\", \"priority\": \"high\"}' | node tools_config_files\ai-orchestrator.js" -ForegroundColor White
 
 Write-Host "`nMCP Servers:" -ForegroundColor Cyan
