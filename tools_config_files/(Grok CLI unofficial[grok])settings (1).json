@@ -50,6 +50,74 @@
 				"-y",
 				"gemini-mcp-tool"
 			]
+		},
+		"filesystem": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-filesystem",
+				"C:\\Users\\mrgen\\fwber\\"
+			]
+		},
+		"memory": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-memory"
+			]
+		},
+		"everything": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-everything"
+			]
+		},
+		"postgres": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"enhanced-postgres-mcp-server"
+			],
+			"env": {
+				"POSTGRES_CONNECTION_STRING": "postgresql://user:password@localhost:5432/fwber"
+			}
+		},
+		"puppeteer": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"puppeteer-mcp-server"
+			]
+		},
+		"smart-crawler": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"mcp-smart-crawler"
+			]
+		},
+		"bolide-ai": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@bolide-ai/mcp"
+			]
+		},
+		"terry": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"terry-mcp"
+			]
 		}
 	}
 }

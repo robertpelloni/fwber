@@ -134,6 +134,82 @@
       ],
       "timeout": 30000,
       "startupTimeout": 60000
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "C:\\Users\\mrgen\\fwber\\"
+      ],
+      "timeout": 30000,
+      "startupTimeout": 60000
+    },
+    "memory": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ],
+      "timeout": 30000,
+      "startupTimeout": 60000
+    },
+    "everything": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-everything"
+      ],
+      "timeout": 30000,
+      "startupTimeout": 60000
+    },
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "enhanced-postgres-mcp-server"
+      ],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "postgresql://user:password@localhost:5432/fwber"
+      },
+      "timeout": 30000,
+      "startupTimeout": 60000
+    },
+    "puppeteer": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "puppeteer-mcp-server"
+      ],
+      "timeout": 30000,
+      "startupTimeout": 60000
+    },
+    "smart-crawler": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-smart-crawler"
+      ],
+      "timeout": 30000,
+      "startupTimeout": 60000
+    },
+    "bolide-ai": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@bolide-ai/mcp"
+      ],
+      "timeout": 30000,
+      "startupTimeout": 60000
+    },
+    "terry": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "terry-mcp"
+      ],
+      "timeout": 30000,
+      "startupTimeout": 60000
     }
   },
   "oauthAccount": {
