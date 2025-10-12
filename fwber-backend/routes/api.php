@@ -13,6 +13,9 @@ Route::middleware("api")->group(function (): void {
         Route::get("/user", [ProfileController::class, "show"]);
         Route::put("/user", [ProfileController::class, "update"]);
         Route::post("/auth/logout", [AuthController::class, "logout"]);
+        
+        // Matching routes
         Route::get("/matches", [MatchController::class, "index"]);
+        Route::post("/matches/action", [MatchController::class, "action"]);
     });
 });
