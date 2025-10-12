@@ -1,0 +1,19 @@
+model = "gpt-5-codex"
+model_reasoning_effort = "medium"
+windows_wsl_setup_acknowledged = true
+[mcp_servers.serena]
+command = "uv"
+args = ["run","--directory","C:\\Users\\mrgen\\serena\\","serena","start-mcp-server","--context","codex","--project","C:\\Users\\mrgen\\fwber\\"]
+[mcp_servers.gemini-mcp-tool]
+command = "cmd"
+args = ["/c","npx","-y","gemini-mcp-tool"]
+[mcp_servers.jetbrains]
+command = "C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\jbr\\bin\\java"
+args = ["-classpath","C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\plugins\\mcpserver\\lib\\mcpserver-frontend.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\util-8.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.ktor.client.cio.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.ktor.client.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.ktor.network.tls.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.ktor.io.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.ktor.utils.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.kotlinx.io.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.kotlinx.serialization.core.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.kotlinx.serialization.json.jar","com.intellij.mcpserver.stdio.McpStdioRunnerKt"]
+[mcp_servers.jetbrains.env]
+IJ_MCP_SERVER_PORT = "64342"
+[mcp_servers.sequential-thinking]
+command = "cmd"
+args = ["/c","npx","-y","@modelcontextprotocol/server-sequential-thinking"]
+[projects.'\\?\C:\Users\mrgen\fwber']
+trust_level = "trusted"

@@ -1,0 +1,46 @@
+{
+	"mcpServers": {
+		"serena": {
+			"command": "uv",
+			"type": "stdio",
+			"transport": "stdio",
+			"args": [
+				"run",
+				"--directory",
+				"C:\\Users\\mrgen\\serena\\",
+				"serena",
+				"start-mcp-server",
+				"--context",
+				"ide-assistant",
+				"--project",
+				"C:\\Users\\mrgen\\fwber\\"
+			]
+		},
+		"jetbrains": {
+			"url": "http://localhost:64342/sse"
+		},
+		"sequential-thinking": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-sequential-thinking"
+			]
+		},
+		"codex-mcp-server": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"codex-mcp-server"
+			]
+		},
+		"gemini-mcp-tool": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"gemini-mcp-tool"
+			]
+		}
+	}
+}

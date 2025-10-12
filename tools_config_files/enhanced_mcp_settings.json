@@ -1,0 +1,91 @@
+{
+	"mcpServers": {
+		"serena": {
+			"command": "uv",
+			"type": "stdio",
+			"transport": "stdio",
+			"args": [
+				"run",
+				"--directory",
+				"C:\\Users\\mrgen\\serena\\",
+				"serena",
+				"start-mcp-server",
+				"--context",
+				"ide-assistant",
+				"--project",
+				"C:\\Users\\mrgen\\fwber\\"
+			],
+			"description": "Semantic code analysis and editing server with 20+ tools for efficient codebase interaction",
+			"enabled": true,
+			"priority": 1
+		},
+		"sequential-thinking": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-sequential-thinking"
+			],
+			"description": "Dynamic problem-solving through structured thought chains with revision capabilities",
+			"enabled": true,
+			"priority": 2
+		},
+		"codex-mcp-server": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"codex-mcp-server"
+			],
+			"description": "GPT-5 Codex and GPT-4 powered code assistance with session management",
+			"enabled": true,
+			"priority": 3
+		},
+		"gemini-mcp-tool": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"gemini-mcp-tool"
+			],
+			"description": "Multi-model AI assistance with Gemini 2.5 Pro/Flash integration",
+			"enabled": true,
+			"priority": 4
+		},
+		"claude-code-orchestrator": {
+			"type": "stdio",
+			"command": "node",
+			"args": [
+				"C:\\Users\\mrgen\\fwber\\tools_config_files\\ai-orchestrator.js"
+			],
+			"env": {
+				"PROJECT_ROOT": "C:\\Users\\mrgen\\fwber\\",
+				"AI_COORDINATION_DIR": "C:\\Users\\mrgen\\fwber\\AI_COORDINATION\\",
+				"MCP_CONFIG_PATH": "C:\\Users\\mrgen\\fwber\\tools_config_files\\cline_mcp_settings.json"
+			},
+			"description": "Custom orchestration engine for parallel AI model collaboration",
+			"enabled": true,
+			"priority": 0
+		}
+	},
+	"orchestration": {
+		"parallelProcessing": true,
+		"maxConcurrentSessions": 5,
+		"consensusThreshold": 0.7,
+		"autoHandoff": true,
+		"sessionPersistence": true,
+		"contextSharing": true
+	},
+	"modelHierarchy": {
+		"tier1": ["claude-4.5"],
+		"tier2": ["gpt-5-codex-low", "gpt-5-codex-medium", "gpt-5-codex-high"],
+		"tier3": ["cheetah"],
+		"tier4": ["code-supernova-1-million"],
+		"tier5": ["gpt-5-low", "gpt-5-medium", "gpt-5-high", "gemini-2.5-pro", "gemini-2.5-flash", "grok-4-code"]
+	},
+	"communicationProtocols": {
+		"interModelMessaging": true,
+		"contextHandoff": true,
+		"consensusBuilding": true,
+		"errorHandling": "fallback_to_higher_tier"
+	}
+}

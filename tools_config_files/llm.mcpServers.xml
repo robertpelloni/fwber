@@ -1,0 +1,51 @@
+<application>
+  <component name="McpApplicationServerCommands" modifiable="true">
+    <McpServerCommand sourceId="UserConfigurationSource">
+      <option name="allowedToolsNames" />
+      <option name="enabled" value="true" />
+      <option name="name" value="serena" />
+      <option name="programPath" value="uv" />
+      <option name="arguments" value="run --directory C:\\Users\\mrgen\\serena\\ serena start-mcp-server --context ide-assistant --project C:\\Users\\mrgen\\fwber\\" />
+      <option name="workingDirectory" value="" />
+      <envs />
+    </McpServerCommand>
+    <McpServerCommand sourceId="ImportConfigurationSource">
+      <option name="allowedToolsNames" />
+      <option name="enabled" value="true" />
+      <option name="name" value="jetbrains" />
+      <option name="programPath" value="C:\Program Files\JetBrains\WebStorm 253.25908.30\jbr\bin\java" />
+      <option name="arguments" value="-classpath &quot;C:\Program Files\JetBrains\WebStorm 253.25908.30\plugins\mcpserver\lib\mcpserver-frontend.jar;C:\Program Files\JetBrains\WebStorm 253.25908.30\lib\util-8.jar;C:\Program Files\JetBrains\WebStorm 253.25908.30\lib\module-intellij.libraries.ktor.client.cio.jar;C:\Program Files\JetBrains\WebStorm 253.25908.30\lib\module-intellij.libraries.ktor.client.jar;C:\Program Files\JetBrains\WebStorm 253.25908.30\lib\module-intellij.libraries.ktor.network.tls.jar;C:\Program Files\JetBrains\WebStorm 253.25908.30\lib\module-intellij.libraries.ktor.io.jar;C:\Program Files\JetBrains\WebStorm 253.25908.30\lib\module-intellij.libraries.ktor.utils.jar;C:\Program Files\JetBrains\WebStorm 253.25908.30\lib\module-intellij.libraries.kotlinx.io.jar;C:\Program Files\JetBrains\WebStorm 253.25908.30\lib\module-intellij.libraries.kotlinx.serialization.core.jar;C:\Program Files\JetBrains\WebStorm 253.25908.30\lib\module-intellij.libraries.kotlinx.serialization.json.jar&quot; com.intellij.mcpserver.stdio.McpStdioRunnerKt" />
+      <option name="workingDirectory" value="" />
+      <envs>
+        <env name="IJ_MCP_SERVER_PORT" value="64342" />
+      </envs>
+    </McpServerCommand>
+	<McpServerCommand sourceId="UserConfigurationSource">
+      <option name="allowedToolsNames" />
+      <option name="enabled" value="true" />
+      <option name="name" value="sequential-thinking" />
+      <option name="programPath" value="npx" />
+      <option name="arguments" value="-y @modelcontextprotocol/server-sequential-thinking" />
+      <option name="workingDirectory" value="" />
+      <envs />
+    </McpServerCommand>
+	<McpServerCommand sourceId="UserConfigurationSource">
+      <option name="allowedToolsNames" />
+      <option name="enabled" value="true" />
+      <option name="name" value="codex-mcp-server" />
+      <option name="programPath" value="npx" />
+      <option name="arguments" value="-y codex-mcp-server" />
+      <option name="workingDirectory" value="" />
+      <envs />
+    </McpServerCommand>
+	<McpServerCommand sourceId="UserConfigurationSource">
+      <option name="allowedToolsNames" />
+      <option name="enabled" value="true" />
+      <option name="name" value="gemini-mcp-tool" />
+      <option name="programPath" value="npx" />
+      <option name="arguments" value="-y gemini-mcp-tool" />
+      <option name="workingDirectory" value="" />
+      <envs />
+    </McpServerCommand>
+  </component>
+</application>
