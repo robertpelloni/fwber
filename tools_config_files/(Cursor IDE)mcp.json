@@ -109,6 +109,19 @@
 				"-y",
 				"terry-mcp"
 			]
+		},
+		"zen-mcp-server": {
+			"type": "stdio",
+			"command": "uv",
+			"args": [
+				"run",
+				"--directory",
+				"C:\\Users\\mrgen\\zen-mcp-server\\",
+				"zen-mcp-server"
+			],
+			"env": {
+
+			}
 		}
 	}
 }

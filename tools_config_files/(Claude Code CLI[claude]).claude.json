@@ -210,6 +210,20 @@
       ],
       "timeout": 30000,
       "startupTimeout": 60000
+    },
+    "zen-mcp-server": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "C:\\Users\\mrgen\\zen-mcp-server\\",
+        "zen-mcp-server"
+      ],
+      "env": {
+
+      },
+      "timeout": 30000,
+      "startupTimeout": 60000
     }
   },
   "oauthAccount": {
