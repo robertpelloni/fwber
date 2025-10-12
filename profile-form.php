@@ -1,6 +1,9 @@
 <?php
 // This is the view file for the profile form.
 // It is included by edit-profile.php and uses the $userProfile and $message variables.
+
+// Include required functions
+require_once("_names.php");
 ?>
 <!doctype html>
 <html lang="en">
