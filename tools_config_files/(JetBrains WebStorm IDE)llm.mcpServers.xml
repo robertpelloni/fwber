@@ -121,5 +121,16 @@
       <option name="workingDirectory" value="" />
       <envs />
     </McpServerCommand>
+	<McpServerCommand sourceId="UserConfigurationSource">
+      <option name="allowedToolsNames" />
+      <option name="enabled" value="true" />
+      <option name="name" value="zen-mcp-server" />
+      <option name="programPath" value="uv" />
+      <option name="arguments" value="run --directory C:\Users\mrgen\zen-mcp-server\ zen-mcp-server" />
+      <option name="workingDirectory" value="" />
+      <envs>
+
+      </envs>
+    </McpServerCommand>
   </component>
 </application>

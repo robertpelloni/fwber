@@ -49,5 +49,12 @@ args = ["/c","npx","-y","@bolide-ai/mcp"]
 [mcp_servers.terry]
 command = "cmd"
 args = ["/c","npx","-y","terry-mcp"]
+
+[mcp_servers."zen-mcp-server"]
+command = "uv"
+args = ["run","--directory","C:\\Users\\mrgen\\zen-mcp-server\\","zen-mcp-server"]
+[mcp_servers."zen-mcp-server".env]
+
+
 [projects.'\\?\C:\Users\mrgen\fwber']
 trust_level = "trusted"

@@ -117,6 +117,22 @@
 				"-y",
 				"terry-mcp"
 			]
+		},
+		"zen-mcp-server": {
+			"type": "stdio",
+			"command": "uv",
+			"args": [
+				"run",
+				"--directory",
+				"C:\\Users\\mrgen\\zen-mcp-server\\",
+				"zen-mcp-server"
+			],
+			"env": {
+
+			},
+			"description": "Advanced multi-model AI server with 18 tools and intelligent model selection",
+			"enabled": true,
+			"priority": 0
 		}
 	}
 }
