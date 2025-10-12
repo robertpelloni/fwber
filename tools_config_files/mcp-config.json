@@ -1,0 +1,66 @@
+{
+  "mcpServers": {
+    "jetbrains": {
+      "type": "local",
+      "command": "C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\jbr\\bin\\java",
+      "tools": [
+        "*"
+      ],
+      "args": [
+        "C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\plugins\\mcpserver\\lib\\mcpserver-frontend.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\util-8.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.ktor.client.cio.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.ktor.client.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.ktor.network.tls.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.ktor.io.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.ktor.utils.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.kotlinx.io.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.kotlinx.serialization.core.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.kotlinx.serialization.json.jar",
+        "com.intellij.mcpserver.stdio.McpStdioRunnerKt"
+      ]
+    },
+    "serena": {
+      "type": "local",
+      "command": "uv",
+      "tools": [
+        "*"
+      ],
+      "args": [
+        "run",
+        "--directory",
+        "C:\\Users\\mrgen\\serena\\",
+        "serena",
+        "start-mcp-server",
+        "--context",
+        "ide-assistant",
+        "--project",
+        "C:\\Users\\mrgen\\fwber\\"
+      ]
+    },
+    "sequential-thinking": {
+      "type": "local",
+      "command": "npx",
+      "tools": [
+        "*"
+      ],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    },
+    "codex-mcp-server": {
+      "type": "local",
+      "command": "npx",
+      "tools": [
+        "*"
+      ],
+      "args": [
+        "-y",
+        "codex-mcp-server"
+      ]
+    },
+    "gemini-mcp-tool": {
+      "type": "local",
+      "command": "npx",
+      "tools": [
+        "*"
+      ],
+      "args": [
+        "-y",
+        "gemini-mcp-tool"
+      ]
+    }
+  }
+}
