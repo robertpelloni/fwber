@@ -15,5 +15,39 @@ IJ_MCP_SERVER_PORT = "64342"
 [mcp_servers.sequential-thinking]
 command = "cmd"
 args = ["/c","npx","-y","@modelcontextprotocol/server-sequential-thinking"]
+
+[mcp_servers.filesystem]
+command = "cmd"
+args = ["/c","npx","-y","@modelcontextprotocol/server-filesystem","C:\\Users\\mrgen\\fwber\\"]
+
+[mcp_servers.memory]
+command = "cmd"
+args = ["/c","npx","-y","@modelcontextprotocol/server-memory"]
+
+[mcp_servers.everything]
+command = "cmd"
+args = ["/c","npx","-y","@modelcontextprotocol/server-everything"]
+
+[mcp_servers.postgres]
+command = "cmd"
+args = ["/c","npx","-y","enhanced-postgres-mcp-server"]
+[mcp_servers.postgres.env]
+POSTGRES_CONNECTION_STRING = "postgresql://user:password@localhost:5432/fwber"
+
+[mcp_servers.puppeteer]
+command = "cmd"
+args = ["/c","npx","-y","puppeteer-mcp-server"]
+
+[mcp_servers."smart-crawler"]
+command = "cmd"
+args = ["/c","npx","-y","mcp-smart-crawler"]
+
+[mcp_servers."bolide-ai"]
+command = "cmd"
+args = ["/c","npx","-y","@bolide-ai/mcp"]
+
+[mcp_servers.terry]
+command = "cmd"
+args = ["/c","npx","-y","terry-mcp"]
 [projects.'\\?\C:\Users\mrgen\fwber']
 trust_level = "trusted"

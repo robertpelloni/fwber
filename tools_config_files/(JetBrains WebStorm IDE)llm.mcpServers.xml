@@ -47,5 +47,79 @@
       <option name="workingDirectory" value="" />
       <envs />
     </McpServerCommand>
+	<McpServerCommand sourceId="UserConfigurationSource">
+      <option name="allowedToolsNames" />
+      <option name="enabled" value="true" />
+      <option name="name" value="filesystem" />
+      <option name="programPath" value="npx" />
+      <option name="arguments" value="-y @modelcontextprotocol/server-filesystem C:\Users\mrgen\fwber\" />
+      <option name="workingDirectory" value="" />
+      <envs />
+    </McpServerCommand>
+	<McpServerCommand sourceId="UserConfigurationSource">
+      <option name="allowedToolsNames" />
+      <option name="enabled" value="true" />
+      <option name="name" value="memory" />
+      <option name="programPath" value="npx" />
+      <option name="arguments" value="-y @modelcontextprotocol/server-memory" />
+      <option name="workingDirectory" value="" />
+      <envs />
+    </McpServerCommand>
+	<McpServerCommand sourceId="UserConfigurationSource">
+      <option name="allowedToolsNames" />
+      <option name="enabled" value="true" />
+      <option name="name" value="everything" />
+      <option name="programPath" value="npx" />
+      <option name="arguments" value="-y @modelcontextprotocol/server-everything" />
+      <option name="workingDirectory" value="" />
+      <envs />
+    </McpServerCommand>
+	<McpServerCommand sourceId="UserConfigurationSource">
+      <option name="allowedToolsNames" />
+      <option name="enabled" value="true" />
+      <option name="name" value="postgres" />
+      <option name="programPath" value="npx" />
+      <option name="arguments" value="-y enhanced-postgres-mcp-server" />
+      <option name="workingDirectory" value="" />
+      <envs>
+        <env name="POSTGRES_CONNECTION_STRING" value="postgresql://user:password@localhost:5432/fwber" />
+      </envs>
+    </McpServerCommand>
+	<McpServerCommand sourceId="UserConfigurationSource">
+      <option name="allowedToolsNames" />
+      <option name="enabled" value="true" />
+      <option name="name" value="puppeteer" />
+      <option name="programPath" value="npx" />
+      <option name="arguments" value="-y puppeteer-mcp-server" />
+      <option name="workingDirectory" value="" />
+      <envs />
+    </McpServerCommand>
+	<McpServerCommand sourceId="UserConfigurationSource">
+      <option name="allowedToolsNames" />
+      <option name="enabled" value="true" />
+      <option name="name" value="smart-crawler" />
+      <option name="programPath" value="npx" />
+      <option name="arguments" value="-y mcp-smart-crawler" />
+      <option name="workingDirectory" value="" />
+      <envs />
+    </McpServerCommand>
+	<McpServerCommand sourceId="UserConfigurationSource">
+      <option name="allowedToolsNames" />
+      <option name="enabled" value="true" />
+      <option name="name" value="bolide-ai" />
+      <option name="programPath" value="npx" />
+      <option name="arguments" value="-y @bolide-ai/mcp" />
+      <option name="workingDirectory" value="" />
+      <envs />
+    </McpServerCommand>
+	<McpServerCommand sourceId="UserConfigurationSource">
+      <option name="allowedToolsNames" />
+      <option name="enabled" value="true" />
+      <option name="name" value="terry" />
+      <option name="programPath" value="npx" />
+      <option name="arguments" value="-y terry-mcp" />
+      <option name="workingDirectory" value="" />
+      <envs />
+    </McpServerCommand>
   </component>
 </application>
