@@ -1,2 +1,27 @@
+# Ignore IDE settings
 /.idea/*
+
+# Secrets and environment
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.production.local
+.env.test.local
+.encryption_key
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+
+# Vendor (PHP Composer) - optional if vendor is committed elsewhere
+# vendor/
+
+# Local runtime files
+*.log
+
+# Legacy secrets file already handled
 _secrets.php

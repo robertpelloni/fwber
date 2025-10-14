@@ -1,0 +1,138 @@
+{
+	"mcpServers": {
+		"serena": {
+			"command": "uv",
+			"type": "stdio",
+			"transport": "stdio",
+			"args": [
+				"run",
+				"--directory",
+				"C:\\Users\\mrgen\\serena\\",
+				"serena",
+				"start-mcp-server",
+				"--context",
+				"ide-assistant",
+				"--project",
+				"C:\\Users\\mrgen\\fwber\\"
+			]
+		},
+		"jetbrains": {
+			"command": "C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\jbr\\bin\\java",
+			"args": [
+				"-classpath",
+				"C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\plugins\\mcpserver\\lib\\mcpserver-frontend.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\util-8.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.ktor.client.cio.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.ktor.client.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.ktor.network.tls.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.ktor.io.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.ktor.utils.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.kotlinx.io.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.kotlinx.serialization.core.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.kotlinx.serialization.json.jar",
+				"com.intellij.mcpserver.stdio.McpStdioRunnerKt"
+			],
+			"env": {
+				"IJ_MCP_SERVER_PORT": "64342"
+			}
+		},
+		"sequential-thinking": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-sequential-thinking"
+			]
+		},
+		"codex-mcp-server": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"codex-mcp-server"
+			]
+		},
+		"gemini-mcp-tool": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"gemini-mcp-tool"
+			]
+		},
+		"filesystem": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-filesystem",
+				"C:\\Users\\mrgen\\fwber\\"
+			]
+		},
+		"memory": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-memory"
+			]
+		},
+		"everything": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-everything"
+			]
+		},
+		"postgres": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"enhanced-postgres-mcp-server"
+			],
+			"env": {
+				"POSTGRES_CONNECTION_STRING": "postgresql://user:password@localhost:5432/fwber"
+			}
+		},
+		"puppeteer": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"puppeteer-mcp-server"
+			]
+		},
+		"smart-crawler": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"mcp-smart-crawler"
+			]
+		},
+		"bolide-ai": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@bolide-ai/mcp"
+			]
+		},
+		"terry": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"terry-mcp"
+			]
+		},
+		"zen-mcp-server": {
+			"type": "stdio",
+			"command": "uv",
+			"args": [
+				"run",
+				"--directory",
+				"C:\\Users\\mrgen\\zen-mcp-server\\",
+				"zen-mcp-server"
+			],
+			"env": {
+
+			},
+			"description": "Advanced multi-model AI server with 18 tools and intelligent model selection",
+			"enabled": true,
+			"priority": 0
+		}
+	}
+}
