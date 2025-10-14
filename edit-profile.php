@@ -43,6 +43,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $profileData['overallLooks'] = $_POST['overallLooks'] ?? '';
         $profileData['intelligence'] = $_POST['intelligence'] ?? '';
         $profileData['bedroomPersonality'] = $_POST['bedroomPersonality'] ?? '';
+        $profileData['pubicHair'] = $_POST['pubicHair'] ?? '';
+        $profileData['penisSize'] = $_POST['penisSize'] ?? '';
+        $profileData['bodyHair'] = $_POST['bodyHair'] ?? '';
+        $profileData['breastSize'] = $_POST['breastSize'] ?? '';
         
         // Age preferences
         $profileData['wantAgeFrom'] = (int)($_POST['wantAgeFrom'] ?? 18);
@@ -77,6 +81,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $hairLengthPrefs = ['b_wantHairLengthBald', 'b_wantHairLengthShort', 'b_wantHairLengthMedium', 'b_wantHairLengthLong'];
         foreach ($hairLengthPrefs as $pref) {
+            $profileData[$pref] = isset($_POST[$pref]) ? 1 : 0;
+        }
+        
+        // Tattoo preferences
+        $tattooPrefs = ['b_wantTattoosNone', 'b_wantTattoosSome', 'b_wantTattoosAllOver'];
+        foreach ($tattooPrefs as $pref) {
+            $profileData[$pref] = isset($_POST[$pref]) ? 1 : 0;
+        }
+        
+        // Looks preferences
+        $looksPrefs = ['b_wantLooksUgly', 'b_wantLooksPlain', 'b_wantLooksQuirks', 'b_wantLooksAverage', 
+                       'b_wantLooksAttractive', 'b_wantLooksHottie', 'b_wantLooksSuperModel'];
+        foreach ($looksPrefs as $pref) {
+            $profileData[$pref] = isset($_POST[$pref]) ? 1 : 0;
+        }
+        
+        // Intelligence preferences
+        $intelligencePrefs = ['b_wantIntelligenceSlow', 'b_wantIntelligenceBitSlow', 'b_wantIntelligenceAverage', 
+                             'b_wantIntelligenceFaster', 'b_wantIntelligenceGenius'];
+        foreach ($intelligencePrefs as $pref) {
+            $profileData[$pref] = isset($_POST[$pref]) ? 1 : 0;
+        }
+        
+        // Bedroom personality preferences
+        $bedroomPersonalityPrefs = ['b_wantBedroomPersonalityPassive', 'b_wantBedroomPersonalityShy', 
+                                   'b_wantBedroomPersonalityConfident', 'b_wantBedroomPersonalityAggressive'];
+        foreach ($bedroomPersonalityPrefs as $pref) {
+            $profileData[$pref] = isset($_POST[$pref]) ? 1 : 0;
+        }
+        
+        // Pubic hair preferences
+        $pubicHairPrefs = ['b_wantPubicHairShaved', 'b_wantPubicHairTrimmed', 'b_wantPubicHairAverage', 
+                           'b_wantPubicHairNatural', 'b_wantPubicHairHairy'];
+        foreach ($pubicHairPrefs as $pref) {
+            $profileData[$pref] = isset($_POST[$pref]) ? 1 : 0;
+        }
+        
+        // Penis size preferences
+        $penisSizePrefs = ['b_wantPenisSizeTiny', 'b_wantPenisSizeSkinny', 'b_wantPenisSizeAverage', 
+                           'b_wantPenisSizeThick', 'b_wantPenisSizeHuge'];
+        foreach ($penisSizePrefs as $pref) {
+            $profileData[$pref] = isset($_POST[$pref]) ? 1 : 0;
+        }
+        
+        // Body hair preferences
+        $bodyHairPrefs = ['b_wantBodyHairSmooth', 'b_wantBodyHairAverage', 'b_wantBodyHairHairy'];
+        foreach ($bodyHairPrefs as $pref) {
+            $profileData[$pref] = isset($_POST[$pref]) ? 1 : 0;
+        }
+        
+        // Breast size preferences
+        $breastSizePrefs = ['b_wantBreastSizeTiny', 'b_wantBreastSizeSmall', 'b_wantBreastSizeAverage', 
+                            'b_wantBreastSizeLarge', 'b_wantBreastSizeHuge'];
+        foreach ($breastSizePrefs as $pref) {
             $profileData[$pref] = isset($_POST[$pref]) ? 1 : 0;
         }
         

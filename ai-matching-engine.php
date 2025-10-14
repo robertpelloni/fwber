@@ -23,7 +23,7 @@ class AIMatchingEngine {
     public function __construct($database, $config = []) {
         $this->db = $database;
         $this->profileManager = new ProfileManager($database);
-        $this->avatarGenerator = new AvatarGenerator($config['avatar_provider'] ?? 'local', $config, $this->profileManager);
+        $this->avatarGenerator = new AvatarGenerator($this->profileManager, $config['avatar_provider'] ?? 'replicate', $config);
         
         if (isset($config['weights'])) {
             $this->weights = array_merge($this->weights, $config['weights']);

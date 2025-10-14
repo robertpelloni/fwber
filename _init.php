@@ -30,6 +30,16 @@ try {
     error_log("Could not find .env file: " . $e->getMessage());
 }
 
+// Configure secure session settings
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', isSecure() ? 1 : 0);
+ini_set('session.cookie_samesite', 'Strict');
+ini_set('session.use_strict_mode', 1);
+ini_set('session.gc_maxlifetime', 3600); // 1 hour
+
+// Start session with secure configuration
+session_start();
+
 require_once("_db.php");
 require_once("security-manager.php");
 include("_debug.php");
@@ -195,7 +205,7 @@ function getTimeElapsedStringSinceTimestamp($time)
         if($v == 1)$ret[] = $v . $k;
     }
 
-    if($ret!=null)
+    if($ret !== null && is_array($ret) && count($ret) > 0)
     {
         array_splice($ret, count($ret)-1, 0, 'and');
         $ret[] = 'ago.';
