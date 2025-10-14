@@ -1,6 +1,9 @@
 <?php
 // This is the view file for the profile form.
 // It is included by edit-profile.php and uses the $userProfile and $message variables.
+
+// Include required functions
+require_once("_names.php");
 ?>
 <!doctype html>
 <html lang="en">
@@ -190,8 +193,8 @@
             <tr>
                 <td style="text-align:right;"><label for="pubicHair">Pubic Hair</label></td>
                 <td style="text-align:left;">
-                    <select name="pubicHair" id="pubicHair">
-                        <option value="">Select pubic hair preference</option>
+                    <select name="pubicHair" id="pubicHair" class="required">
+                        <option value="">Select pubic hair style</option>
                         <option value="shaved" <?php if (($userProfile['pubicHair'] ?? '') == 'shaved') echo 'selected'; ?>>Shaved</option>
                         <option value="trimmed" <?php if (($userProfile['pubicHair'] ?? '') == 'trimmed') echo 'selected'; ?>>Trimmed</option>
                         <option value="cropped" <?php if (($userProfile['pubicHair'] ?? '') == 'cropped') echo 'selected'; ?>>Cropped</option>
@@ -200,7 +203,7 @@
                     </select>
                 </td>
             </tr>
-            <tr>
+            <tr class="gender-specific male-only">
                 <td style="text-align:right;"><label for="penisSize">Penis Size</label></td>
                 <td style="text-align:left;">
                     <select name="penisSize" id="penisSize">
@@ -213,7 +216,7 @@
                     </select>
                 </td>
             </tr>
-            <tr>
+            <tr class="gender-specific male-only">
                 <td style="text-align:right;"><label for="bodyHair">Body Hair</label></td>
                 <td style="text-align:left;">
                     <select name="bodyHair" id="bodyHair">
@@ -224,7 +227,7 @@
                     </select>
                 </td>
             </tr>
-            <tr>
+            <tr class="gender-specific female-only">
                 <td style="text-align:right;"><label for="breastSize">Breast Size</label></td>
                 <td style="text-align:left;">
                     <select name="breastSize" id="breastSize">
@@ -346,8 +349,8 @@
                     <div style="margin: 10px 0;">
                         <label><input type="checkbox" name="b_wantLooksUgly" value="1" <?php if ($userProfile['b_wantLooksUgly'] ?? 0) echo 'checked'; ?>> Ugly</label>
                         <label><input type="checkbox" name="b_wantLooksPlain" value="1" <?php if ($userProfile['b_wantLooksPlain'] ?? 0) echo 'checked'; ?>> Plain</label>
-                        <label><input type="checkbox" name="b_wantLooksQuirks" value="1" <?php if ($userProfile['b_wantLooksQuirks'] ?? 0) echo 'checked'; ?>> Quirky</label>
-                        <label><input type="checkbox" name="b_wantLooksAverage" value="1" <?php if ($userProfile['b_wantLooksAverage'] ?? 0) echo 'checked'; ?>> Average</label><br>
+                        <label><input type="checkbox" name="b_wantLooksQuirky" value="1" <?php if ($userProfile['b_wantLooksQuirky'] ?? 0) echo 'checked'; ?>> Quirky</label>
+                        <label><input type="checkbox" name="b_wantLooksAverage" value="1" <?php if ($userProfile['b_wantLooksAverage'] ?? 0) echo 'checked'; ?>> Average</label>
                         <label><input type="checkbox" name="b_wantLooksAttractive" value="1" <?php if ($userProfile['b_wantLooksAttractive'] ?? 0) echo 'checked'; ?>> Attractive</label>
                         <label><input type="checkbox" name="b_wantLooksHottie" value="1" <?php if ($userProfile['b_wantLooksHottie'] ?? 0) echo 'checked'; ?>> Hottie</label>
                         <label><input type="checkbox" name="b_wantLooksSuperModel" value="1" <?php if ($userProfile['b_wantLooksSuperModel'] ?? 0) echo 'checked'; ?>> Super Model</label>
@@ -358,9 +361,9 @@
                 <td colspan="2" style="text-align:left;">
                     <strong>Intelligence Preferences:</strong><br>
                     <div style="margin: 10px 0;">
-                        <label><input type="checkbox" name="b_wantIntelligenceSlow" value="1" <?php if ($userProfile['b_wantIntelligenceSlow'] ?? 0) echo 'checked'; ?>> Good Hands</label>
+                        <label><input type="checkbox" name="b_wantIntelligenceGoodHands" value="1" <?php if ($userProfile['b_wantIntelligenceGoodHands'] ?? 0) echo 'checked'; ?>> Good Hands</label>
                         <label><input type="checkbox" name="b_wantIntelligenceBitSlow" value="1" <?php if ($userProfile['b_wantIntelligenceBitSlow'] ?? 0) echo 'checked'; ?>> Bit Slow</label>
-                        <label><input type="checkbox" name="b_wantIntelligenceAverage" value="1" <?php if ($userProfile['b_wantIntelligenceAverage'] ?? 0) echo 'checked'; ?>> Average</label><br>
+                        <label><input type="checkbox" name="b_wantIntelligenceAverage" value="1" <?php if ($userProfile['b_wantIntelligenceAverage'] ?? 0) echo 'checked'; ?>> Average</label>
                         <label><input type="checkbox" name="b_wantIntelligenceFaster" value="1" <?php if ($userProfile['b_wantIntelligenceFaster'] ?? 0) echo 'checked'; ?>> Faster</label>
                         <label><input type="checkbox" name="b_wantIntelligenceGenius" value="1" <?php if ($userProfile['b_wantIntelligenceGenius'] ?? 0) echo 'checked'; ?>> Genius</label>
                     </div>
@@ -383,25 +386,25 @@
                     <div style="margin: 10px 0;">
                         <label><input type="checkbox" name="b_wantPubicHairShaved" value="1" <?php if ($userProfile['b_wantPubicHairShaved'] ?? 0) echo 'checked'; ?>> Shaved</label>
                         <label><input type="checkbox" name="b_wantPubicHairTrimmed" value="1" <?php if ($userProfile['b_wantPubicHairTrimmed'] ?? 0) echo 'checked'; ?>> Trimmed</label>
-                        <label><input type="checkbox" name="b_wantPubicHairAverage" value="1" <?php if ($userProfile['b_wantPubicHairAverage'] ?? 0) echo 'checked'; ?>> Cropped</label><br>
+                        <label><input type="checkbox" name="b_wantPubicHairCropped" value="1" <?php if ($userProfile['b_wantPubicHairCropped'] ?? 0) echo 'checked'; ?>> Cropped</label>
                         <label><input type="checkbox" name="b_wantPubicHairNatural" value="1" <?php if ($userProfile['b_wantPubicHairNatural'] ?? 0) echo 'checked'; ?>> Natural</label>
                         <label><input type="checkbox" name="b_wantPubicHairHairy" value="1" <?php if ($userProfile['b_wantPubicHairHairy'] ?? 0) echo 'checked'; ?>> Hairy</label>
                     </div>
                 </td>
             </tr>
-            <tr>
+            <tr class="gender-preference male-pref">
                 <td colspan="2" style="text-align:left;">
                     <strong>Penis Size Preferences:</strong><br>
                     <div style="margin: 10px 0;">
                         <label><input type="checkbox" name="b_wantPenisSizeTiny" value="1" <?php if ($userProfile['b_wantPenisSizeTiny'] ?? 0) echo 'checked'; ?>> Tiny</label>
                         <label><input type="checkbox" name="b_wantPenisSizeSkinny" value="1" <?php if ($userProfile['b_wantPenisSizeSkinny'] ?? 0) echo 'checked'; ?>> Skinny</label>
-                        <label><input type="checkbox" name="b_wantPenisSizeAverage" value="1" <?php if ($userProfile['b_wantPenisSizeAverage'] ?? 0) echo 'checked'; ?>> Average</label><br>
+                        <label><input type="checkbox" name="b_wantPenisSizeAverage" value="1" <?php if ($userProfile['b_wantPenisSizeAverage'] ?? 0) echo 'checked'; ?>> Average</label>
                         <label><input type="checkbox" name="b_wantPenisSizeThick" value="1" <?php if ($userProfile['b_wantPenisSizeThick'] ?? 0) echo 'checked'; ?>> Thick</label>
                         <label><input type="checkbox" name="b_wantPenisSizeHuge" value="1" <?php if ($userProfile['b_wantPenisSizeHuge'] ?? 0) echo 'checked'; ?>> Huge</label>
                     </div>
                 </td>
             </tr>
-            <tr>
+            <tr class="gender-preference male-pref">
                 <td colspan="2" style="text-align:left;">
                     <strong>Body Hair Preferences:</strong><br>
                     <div style="margin: 10px 0;">
@@ -411,13 +414,13 @@
                     </div>
                 </td>
             </tr>
-            <tr>
+            <tr class="gender-preference female-pref">
                 <td colspan="2" style="text-align:left;">
                     <strong>Breast Size Preferences:</strong><br>
                     <div style="margin: 10px 0;">
                         <label><input type="checkbox" name="b_wantBreastSizeTiny" value="1" <?php if ($userProfile['b_wantBreastSizeTiny'] ?? 0) echo 'checked'; ?>> Tiny</label>
                         <label><input type="checkbox" name="b_wantBreastSizeSmall" value="1" <?php if ($userProfile['b_wantBreastSizeSmall'] ?? 0) echo 'checked'; ?>> Small</label>
-                        <label><input type="checkbox" name="b_wantBreastSizeAverage" value="1" <?php if ($userProfile['b_wantBreastSizeAverage'] ?? 0) echo 'checked'; ?>> Average</label><br>
+                        <label><input type="checkbox" name="b_wantBreastSizeAverage" value="1" <?php if ($userProfile['b_wantBreastSizeAverage'] ?? 0) echo 'checked'; ?>> Average</label>
                         <label><input type="checkbox" name="b_wantBreastSizeLarge" value="1" <?php if ($userProfile['b_wantBreastSizeLarge'] ?? 0) echo 'checked'; ?>> Large</label>
                         <label><input type="checkbox" name="b_wantBreastSizeHuge" value="1" <?php if ($userProfile['b_wantBreastSizeHuge'] ?? 0) echo 'checked'; ?>> Huge</label>
                     </div>
@@ -591,13 +594,62 @@ function generateAvatar() {
     });
 }
 
+// Gender-specific field visibility
+function updateGenderSpecificFields() {
+    const gender = $('#gender').val();
+
+    // Hide all gender-specific fields first
+    $('.gender-specific').hide();
+    $('.gender-preference').hide();
+
+    // Show male-specific fields
+    if (gender === 'male') {
+        $('.male-only').show();
+    }
+
+    // Show female-specific fields
+    if (gender === 'female') {
+        $('.female-only').show();
+    }
+
+    // Show preference fields based on gender preferences selected
+    const showMalePrefs = $('input[name="b_wantGenderMan"]:checked').length > 0 ||
+                          $('input[name="b_wantGenderTSMan"]:checked').length > 0 ||
+                          $('input[name="b_wantGenderCDMan"]:checked').length > 0 ||
+                          $('input[name="b_wantGenderCoupleMM"]:checked').length > 0 ||
+                          $('input[name="b_wantGenderCoupleMF"]:checked').length > 0;
+
+    const showFemalePrefs = $('input[name="b_wantGenderWoman"]:checked').length > 0 ||
+                            $('input[name="b_wantGenderTSWoman"]:checked').length > 0 ||
+                            $('input[name="b_wantGenderCDWoman"]:checked').length > 0 ||
+                            $('input[name="b_wantGenderCoupleFF"]:checked').length > 0 ||
+                            $('input[name="b_wantGenderCoupleMF"]:checked').length > 0;
+
+    if (showMalePrefs) {
+        $('.male-pref').show();
+    }
+
+    if (showFemalePrefs) {
+        $('.female-pref').show();
+    }
+}
+
 // Form validation and UX improvements
 $(document).ready(function() {
+    // Initialize gender-specific field visibility
+    updateGenderSpecificFields();
+
+    // Update on gender change
+    $('#gender').on('change', updateGenderSpecificFields);
+
+    // Update on gender preference change
+    $('input[name^="b_wantGender"]').on('change', updateGenderSpecificFields);
+
     // Add collapsible sections
     $('.captionText').each(function() {
         const $this = $(this);
         const $nextTable = $this.next('table');
-        
+
         if ($nextTable.length) {
             $this.css({
                 'cursor': 'pointer',
@@ -607,9 +659,9 @@ $(document).ready(function() {
                 'border-radius': '5px',
                 'border': '1px solid #dee2e6'
             });
-            
+
             $this.append(' <span style="float: right;">▼</span>');
-            
+
             $this.click(function() {
                 $nextTable.slideToggle();
                 const $arrow = $(this).find('span');

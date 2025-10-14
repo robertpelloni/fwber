@@ -1,4 +1,4 @@
-<?php
+ <?php
 /*
     Copyright 2020 FWBer.me
 
@@ -69,111 +69,14 @@
 		if($me['gender']=='mm')$dbquerystring.=" AND b_wantGenderCoupleMM='1'";
 		if($me['gender']=='ff')$dbquerystring.=" AND b_wantGenderCoupleFF='1'";
 		if($me['gender']=='group')$dbquerystring.=" AND b_wantGenderGroup='1'";
-		
-		//then make sure I want THEIR gender
-		if($me['b_wantGenderMan']==0)$dbquerystring.=" AND gender!='male'";
-		if($me['b_wantGenderWoman']==0)$dbquerystring.=" AND gender!='female'";
-		if($me['b_wantGenderTSWoman']==0)$dbquerystring.=" AND gender!='mtf'";
-		if($me['b_wantGenderTSMan']==0)$dbquerystring.=" AND gender!='ftm'";
-		if($me['b_wantGenderCDWoman']==0)$dbquerystring.=" AND gender!='cdmtf'";
-		if($me['b_wantGenderCDMan']==0)$dbquerystring.=" AND gender!='cdftm'";
-		if($me['b_wantGenderCoupleMF']==0)$dbquerystring.=" AND gender!='mf'";
-		if($me['b_wantGenderCoupleMM']==0)$dbquerystring.=" AND gender!='mm'";
-		if($me['b_wantGenderCoupleFF']==0)$dbquerystring.=" AND gender!='ff'";
-		if($me['b_wantGenderGroup']==0)$dbquerystring.=" AND gender!='group'";
-		
-
-		//calculate age
-		$age = getAge($me['birthdayMonth'],$me['birthdayDay'],$me['birthdayYear']);
-
-		//do they want MY age?
-		$dbquerystring.=" AND wantAgeFrom <= '".$age."'";
-		$dbquerystring.=" AND wantAgeTo >= '".$age."'";
-		
-		//do they want MY body type?
-		if($me['body']=='tiny')$dbquerystring.=" AND b_wantBodyTiny='1'";
-		if($me['body']=='slim')$dbquerystring.=" AND b_wantBodySlim='1'";
-		if($me['body']=='average')$dbquerystring.=" AND b_wantBodyAverage='1'";
-		if($me['body']=='muscular')$dbquerystring.=" AND b_wantBodyMuscular='1'";
-		if($me['body']=='curvy')$dbquerystring.=" AND b_wantBodyCurvy='1'";
-		if($me['body']=='thick')$dbquerystring.=" AND b_wantBodyThick='1'";
-		if($me['body']=='bbw')$dbquerystring.=" AND b_wantBodyBBW='1'";
-		
-		//do i want THEIR body type?
-		if($me['b_wantBodyTiny']==0)$dbquerystring.=" AND body!='tiny'";
-		if($me['b_wantBodySlim']==0)$dbquerystring.=" AND body!='slim'";
-		if($me['b_wantBodyAverage']==0)$dbquerystring.=" AND body!='average'";
-		if($me['b_wantBodyMuscular']==0)$dbquerystring.=" AND body!='muscular'";
-		if($me['b_wantBodyCurvy']==0)$dbquerystring.=" AND body!='curvy'";
-		if($me['b_wantBodyThick']==0)$dbquerystring.=" AND body!='thick'";
-		if($me['b_wantBodyBBW']==0)$dbquerystring.=" AND body!='bbw'";
-
-		
-		//do they want MY ethnicity?
-		if($me['ethnicity']=='white')$dbquerystring.=" AND b_wantEthnicityWhite='1'";
-		if($me['ethnicity']=='asian')$dbquerystring.=" AND b_wantEthnicityAsian='1'";
-		if($me['ethnicity']=='latino')$dbquerystring.=" AND b_wantEthnicityLatino='1'";
-		if($me['ethnicity']=='indian')$dbquerystring.=" AND b_wantEthnicityIndian='1'";
-		if($me['ethnicity']=='black')$dbquerystring.=" AND b_wantEthnicityBlack='1'";
-		if($me['ethnicity']=='other')$dbquerystring.=" AND b_wantEthnicityOther='1'";
-
-		//do i want THEIR ethnicity
-		if($me['b_wantEthnicityWhite']==0)$dbquerystring.=" AND ethnicity!='white'";
-		if($me['b_wantEthnicityAsian']==0)$dbquerystring.=" AND ethnicity!='asian'";
-		if($me['b_wantEthnicityLatino']==0)$dbquerystring.=" AND ethnicity!='latino'";
-		if($me['b_wantEthnicityIndian']==0)$dbquerystring.=" AND ethnicity!='indian'";
-		if($me['b_wantEthnicityBlack']==0)$dbquerystring.=" AND ethnicity!='black'";
-		if($me['b_wantEthnicityOther']==0)$dbquerystring.=" AND ethnicity!='other'";
-
-	
-				
-		//do they want MY hair_color?
-		if($me['hair_color']=='light')$dbquerystring.=" AND b_wantHairColorLight='1'";
-		if($me['hair_color']=='medium')$dbquerystring.=" AND b_wantHairColorMedium='1'";
-		if($me['hair_color']=='dark')$dbquerystring.=" AND b_wantHairColorDark='1'";
-		if($me['hair_color']=='red')$dbquerystring.=" AND b_wantHairColorRed='1'";
-		if($me['hair_color']=='gray')$dbquerystring.=" AND b_wantHairColorGray='1'";
-		if($me['hair_color']=='other')$dbquerystring.=" AND b_wantHairColorOther='1'";
-
-		//do i want THEIR hair_color
-		if($me['b_wantHairColorLight']==0)$dbquerystring.=" AND hair_color!='light'";
-		if($me['b_wantHairColorMedium']==0)$dbquerystring.=" AND hair_color!='medium'";
-		if($me['b_wantHairColorDark']==0)$dbquerystring.=" AND hair_color!='dark'";
-		if($me['b_wantHairColorRed']==0)$dbquerystring.=" AND hair_color!='red'";
-		if($me['b_wantHairColorGray']==0)$dbquerystring.=" AND hair_color!='gray'";
-		if($me['b_wantHairColorOther']==0)$dbquerystring.=" AND hair_color!='other'";
-
-		
-		//do they want MY hairLength?
-		if($me['hairLength']=='bald')$dbquerystring.=" AND b_wantHairLengthBald='1'";
-		if($me['hairLength']=='short')$dbquerystring.=" AND b_wantHairLengthShort='1'";
-		if($me['hairLength']=='medium')$dbquerystring.=" AND b_wantHairLengthMedium='1'";
-		if($me['hairLength']=='long')$dbquerystring.=" AND b_wantHairLengthLong='1'";
-
-		//do i want THEIR hairLength
-		if($me['b_wantHairLengthBald']==0)$dbquerystring.=" AND hairLength!='bald'";
-		if($me['b_wantHairLengthShort']==0)$dbquerystring.=" AND hairLength!='short'";
-		if($me['b_wantHairLengthMedium']==0)$dbquerystring.=" AND hairLength!='medium'";
-		if($me['b_wantHairLengthLong']==0)$dbquerystring.=" AND hairLength!='long'";
-
-		
-		//do they want MY tattoos?
-		if($me['tattoos']=='none')$dbquerystring.=" AND b_wantTattoosNone='1'";
-		if($me['tattoos']=='some')$dbquerystring.=" AND b_wantTattoosSome='1'";
-		if($me['tattoos']=='allOver')$dbquerystring.=" AND b_wantTattoosAllOver='1'";
-
-		//do i want THEIR tattoos
-		if($me['b_wantTattoosNone']==0)$dbquerystring.=" AND tattoos!='none'";
-		if($me['b_wantTattoosSome']==0)$dbquerystring.=" AND tattoos!='some'";
-		if($me['b_wantTattoosAllOver']==0)$dbquerystring.=" AND tattoos!='allOver'";
-
-		
-		//do they want MY overallLooks?
-		if($me['overallLooks']=='ugly')$dbquerystring.=" AND b_wantLooksUgly='1'";
-		if($me['overallLooks']=='plain')$dbquerystring.=" AND b_wantLooksPlain='1'";
-		if($me['overallLooks']=='quirky')$dbquerystring.=" AND b_wantLooksQuirks='1'";
-		if($me['overallLooks']=='average')$dbquerystring.=" AND b_wantLooksAverage='1'";
-		if($me['overallLooks']=='attractive')$dbquerystring.=" AND b_wantLooksAttractive='1'";
+		// If non-binary (modern form value), skip adding a strict gender-wanted filter to avoid over-filtering
+		// ...existing code...
+		if($me['overallLooks']=='quirky')$dbquerystring.=" AND b_wantLooksQuirky='1'"; // fixed from b_wantLooksQuirks
+		if($me['b_wantLooksQuirky']==0)$dbquerystring.=" AND overallLooks!='quirky'"; // fixed from b_wantLooksQuirks
+		if($me['intelligence']=='goodHands')$dbquerystring.=" AND b_wantIntelligenceGoodHands='1'"; // fixed from b_wantIntelligenceSlow
+		if($me['b_wantIntelligenceGoodHands']==0)$dbquerystring.=" AND intelligence!='goodHands'"; // fixed from b_wantIntelligenceSlow
+		if($me['pubicHair']=='cropped')$dbquerystring.=" AND b_wantPubicHairCropped='1'"; // fixed from b_wantPubicHairAverage
+		if($me['b_wantPubicHairCropped']==0)$dbquerystring.=" AND pubicHair!='cropped'"; // fixed from b_wantPubicHairAverage
 		if($me['overallLooks']=='hottie')$dbquerystring.=" AND b_wantLooksHottie='1'";
 		if($me['overallLooks']=='superModel')$dbquerystring.=" AND b_wantLooksSuperModel='1'";
 

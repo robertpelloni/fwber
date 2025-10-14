@@ -49,12 +49,12 @@
 - `b_wantHairColorLight`, `b_wantHairColorMedium`, `b_wantHairColorDark`, `b_wantHairColorRed`, `b_wantHairColorGray`, `b_wantHairColorOther`
 - `b_wantHairLengthBald`, `b_wantHairLengthShort`, `b_wantHairLengthMedium`, `b_wantHairLengthLong`
 - `b_wantTattoosNone`, `b_wantTattoosSome`, `b_wantTattoosAllOver`
-- `b_wantLooksUgly`, `b_wantLooksPlain`, `b_wantLooksQuirks`, `b_wantLooksAverage`, `b_wantLooksAttractive`, `b_wantLooksHottie`, `b_wantLooksSuperModel`
-- `b_wantIntelligenceSlow`, `b_wantIntelligenceBitSlow`, `b_wantIntelligenceAverage`, `b_wantIntelligenceFaster`, `b_wantIntelligenceGenius`
+- `b_wantLooksUgly`, `b_wantLooksPlain`, `b_wantLooksQuirky`, `b_wantLooksAverage`, `b_wantLooksAttractive`, `b_wantLooksHottie`, `b_wantLooksSuperModel`
+- `b_wantIntelligenceGoodHands`, `b_wantIntelligenceBitSlow`, `b_wantIntelligenceAverage`, `b_wantIntelligenceFaster`, `b_wantIntelligenceGenius`
 - `b_wantBedroomPersonalityPassive`, `b_wantBedroomPersonalityShy`, `b_wantBedroomPersonalityConfident`, `b_wantBedroomPersonalityAggressive`
 
 ### 7. Physical Attribute Preferences (b_* flags)
-- `b_wantPubicHairShaved`, `b_wantPubicHairTrimmed`, `b_wantPubicHairAverage`, `b_wantPubicHairNatural`, `b_wantPubicHairHairy`
+- `b_wantPubicHairShaved`, `b_wantPubicHairTrimmed`, `b_wantPubicHairCropped`, `b_wantPubicHairNatural`, `b_wantPubicHairHairy`
 - `b_wantPenisSizeTiny`, `b_wantPenisSizeSkinny`, `b_wantPenisSizeAverage`, `b_wantPenisSizeThick`, `b_wantPenisSizeHuge`
 - `b_wantBodyHairSmooth`, `b_wantBodyHairAverage`, `b_wantBodyHairHairy`
 - `b_wantBreastSizeTiny`, `b_wantBreastSizeSmall`, `b_wantBreastSizeAverage`, `b_wantBreastSizeLarge`, `b_wantBreastSizeHuge`
@@ -100,26 +100,9 @@
 
 ## Form Implementation Notes
 
-1. **Current form fields** (profile-form.php):
-   - username, age, gender ✓
-   - country, zip_code, max_distance ✓
-   - wantGenderMan, wantGenderWoman, wantGenderNonBinary (needs mapping to b_* flags)
-
-2. **Missing critical fields**:
-   - All physical attributes (body, ethnicity, hair, tattoos, etc.)
-   - All preference checkboxes (b_* flags)
-   - Age preferences (wantAgeFrom, wantAgeTo)
-   - Lifestyle/health flags
-   - Sexual activity preferences
-   - Meeting location preferences
-
-3. **Data flow**:
-   - Form POST → edit-profile.php → ProfileManager->saveProfile()
-   - ProfileManager splits fields between users table and user_preferences table
-   - getMatches() reads from both tables for matching logic
-
-4. **Validation needed**:
-   - Age range validation (18+)
-   - Gender-specific fields (penisSize for male-presenting, breastSize for female-presenting)
-   - At least one gender preference selected
-   - At least one activity preference selected
+1. The legacy matcher (`_getMatches.php`) primarily reads attributes and b_* flags from the `users` table. To maintain compatibility with the modern form which stores preferences in `user_preferences`, the save layer mirrors b_* flags into `users` columns when those columns exist.
+2. Naming alignment implemented across form, handler, and matcher:
+   - Looks: `quirky` → `b_wantLooksQuirky`
+   - Intelligence: `goodHands` → `b_wantIntelligenceGoodHands`
+   - Pubic hair: `cropped` → `b_wantPubicHairCropped`
+3. Modern `gender` value `non-binary` is supported minimally by avoiding over-filtering in the first matcher gate; all “I want their gender” filters still apply via b_* flags.

@@ -1,0 +1,35 @@
+cursor mcp host
+
+list all tools and all models
+set up mcp and cli
+
+cline cli?
+cline webstorm?
+
+Here is what I am using and what I want to utilize:
+
+Models in order of importance: Claude 4.5, GPT-5-Codex low/medium/high, cheetah, code-supernova-1-million, GPT-5 low/medium/high, Gemini 2.5 Pro/Flash (Flash is newer), Grok 4 code.
+
+Claude Code CLI: Claude 4.5. MCP client support.
+OpenAI Codex CLI: GPT-5-Codex low/medium/high, GPT-5 low/medium/high, other providers. MCP client support. MCP server capability.
+Gemini CLI: Gemini 2.5 Pro/Flash (Flash is newer). MCP client support.
+Github Copilot CLI: GPT-5-Codex low/medium/high, GPT-5 low/medium/high, other providers. MCP client support.
+Grok CLI: Grok 4 code, other providers. MCP client support.
+Grok CLI: Grok 4 code, other providers. MCP client support.
+
+Cursor IDE, built in AI agent panel: Claude 4.5, GPT-5-Codex low/medium/high, cheetah, code-supernova-1-million, GPT-5 low/medium/high, Gemini 2.5 Pro/Flash (Flash is newer), Grok 4 code. MCP client support.
+Codex plugin inside Cursor IDE. See Codex CLI capabilities.
+Claude Code plugin inside Cursor IDE. See Claude Code CLI capabilities.
+Gemini Code Assist plugin inside Cursor IDE. See Gemini CLI capabilities.
+Copilot plugin inside Cursor IDE?
+Cline plugin inside Cursor IDE: Claude 4.5, GPT-5-Codex low/medium/high, cheetah, code-supernova-1-million, GPT-5 low/medium/high, Gemini 2.5 Pro/Flash (Flash is newer), Grok 4 code. MCP client support.
+
+JetBrains WebStorm IDE, built in JetBrains AI panel: GPT-5-Codex, other providers? Claude Agent plugin: Claude 4.5. MCP client support. MCP server capability.
+Copilot plugin for JetBrains WebStorm IDE: Claude 4.5, GPT-5-Codex low/medium/high, GPT-5 low/medium/high, Gemini 2.5 Pro/Flash (Flash is newer), Grok 4 code, other providers. MCP client support. 
+Cline for JetBrains WebStorm IDE?
+Other plugins for JetBrains?
+
+Serena MCP for memory-based orchestration/communication, and large project file access.
+Other MCP servers?
+Subagent systems?
+

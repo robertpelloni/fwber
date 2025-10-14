@@ -1,0 +1,159 @@
+{
+  "mcpServers": {
+    "serena": {
+      "command": "uv",
+      "type": "stdio",
+      "transport": "stdio",
+      "args": [
+        "run",
+        "--directory",
+        "C:\\Users\\mrgen\\serena\\",
+        "serena",
+        "start-mcp-server",
+        "--context",
+        "ide-assistant",
+        "--project",
+        "C:\\Users\\mrgen\\fwber\\"
+      ],
+      "description": "Semantic code analysis and editing server with 20+ tools for efficient codebase interaction",
+      "enabled": true,
+      "priority": 1,
+      "models": ["claude-4.5", "claude-3.5-sonnet", "cheetah"],
+      "capabilities": ["memory", "symbolic-analysis", "code-editing", "project-navigation"]
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "description": "Dynamic problem-solving through structured thought chains with revision capabilities",
+      "enabled": true,
+      "priority": 2,
+      "models": ["any"],
+      "capabilities": ["structured-reasoning", "problem-solving", "hypothesis-generation"]
+    },
+    "codex-mcp-server": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "codex-mcp-server"
+      ],
+      "description": "GPT-5 Codex and GPT-4 powered code assistance with session management",
+      "enabled": true,
+      "priority": 3,
+      "models": ["gpt-5-codex", "gpt-5", "gpt-4", "gpt-3.5-turbo"],
+      "capabilities": ["code-assistance", "session-management", "execution", "analysis"]
+    },
+    "gemini-mcp-tool": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "gemini-mcp-tool"
+      ],
+      "description": "Multi-model AI assistance with Gemini 2.5 Pro/Flash integration",
+      "enabled": true,
+      "priority": 4,
+      "models": ["gemini-2.5-pro", "gemini-2.5-flash"],
+      "capabilities": ["analysis", "creative", "brainstorming", "file-inclusion"]
+    },
+    "claude-code-orchestrator": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "C:\\Users\\mrgen\\fwber\\tools_config_files\\ai-orchestrator.js"
+      ],
+      "env": {
+        "PROJECT_ROOT": "C:\\Users\\mrgen\\fwber\\",
+        "AI_COORDINATION_DIR": "C:\\Users\\mrgen\\fwber\\AI_COORDINATION\\",
+        "MCP_CONFIG_PATH": "C:\\Users\\mrgen\\fwber\\tools_config_files\\cline_mcp_settings.json"
+      },
+      "description": "Custom orchestration engine for parallel AI model collaboration",
+      "enabled": true,
+      "priority": 0,
+      "models": ["all"],
+      "capabilities": ["parallel-processing", "consensus-building", "task-routing", "session-management"]
+    },
+    "jetbrains": {
+      "command": "C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\jbr\\bin\\java",
+      "args": [
+        "-classpath",
+        "C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\plugins\\mcpserver\\lib\\mcpserver-frontend.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\util-8.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.ktor.client.cio.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.ktor.client.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.ktor.network.tls.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.ktor.io.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.ktor.utils.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.kotlinx.io.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.kotlinx.serialization.core.jar;C:\\Program Files\\JetBrains\\WebStorm 253.25908.30\\lib\\module-intellij.libraries.kotlinx.serialization.json.jar",
+        "com.intellij.mcpserver.stdio.McpStdioRunnerKt"
+      ],
+      "env": {
+        "IJ_MCP_SERVER_PORT": "64342"
+      },
+      "description": "JetBrains IDE integration with 13 tools for project analysis",
+      "enabled": false,
+      "priority": 5,
+      "models": ["any"],
+      "capabilities": ["ide-integration", "code-analysis", "project-management"],
+      "status": "timeout-issues"
+    }
+  },
+  "orchestration": {
+    "parallelProcessing": true,
+    "maxConcurrentSessions": 5,
+    "consensusThreshold": 0.7,
+    "autoHandoff": true,
+    "sessionPersistence": true,
+    "contextSharing": true,
+    "modelRouting": {
+      "implementation": ["gpt-5-codex-high", "grok-4-code"],
+      "architecture": ["claude-4.5", "gemini-2.5-pro"],
+      "analysis": ["claude-4.5", "gemini-2.5-pro"],
+      "creative": ["gemini-2.5-flash", "claude-4.5"],
+      "fast": ["gemini-2.5-flash", "grok-code-fast-1"],
+      "reasoning": ["claude-4.5", "gemini-2.5-pro"],
+      "performance": ["cheetah", "gpt-5-codex-high"],
+      "context": ["code-supernova-1-million", "claude-4.5"]
+    }
+  },
+  "modelHierarchy": {
+    "tier1": ["claude-4.5"],
+    "tier2": ["gpt-5-codex-low", "gpt-5-codex-medium", "gpt-5-codex-high"],
+    "tier3": ["cheetah"],
+    "tier4": ["code-supernova-1-million"],
+    "tier5": ["gpt-5-low", "gpt-5-medium", "gpt-5-high", "gemini-2.5-pro", "gemini-2.5-flash", "grok-4-code"]
+  },
+  "communicationProtocols": {
+    "interModelMessaging": true,
+    "contextHandoff": true,
+    "consensusBuilding": true,
+    "errorHandling": "fallback_to_higher_tier",
+    "sessionSynchronization": true,
+    "performanceMonitoring": true
+  },
+  "cliTools": {
+    "codex": {
+      "status": "active",
+      "models": ["gpt-5-codex", "gpt-5", "gpt-4", "gpt-3.5-turbo"],
+      "authentication": "oauth",
+      "mcpIntegration": true
+    },
+    "gemini": {
+      "status": "active",
+      "models": ["gemini-2.5-pro", "gemini-2.5-flash"],
+      "authentication": "oauth",
+      "mcpIntegration": true
+    },
+    "grok": {
+      "status": "needs-api-key",
+      "models": ["grok-4-code", "grok-code-fast-1"],
+      "authentication": "api-key",
+      "mcpIntegration": false
+    }
+  },
+  "status": {
+    "totalMCPServers": 6,
+    "activeMCPServers": 5,
+    "totalModels": 12,
+    "activeModels": 10,
+    "orchestrationReady": true,
+    "parallelProcessing": true,
+    "lastUpdated": "2025-01-12"
+  }
+}

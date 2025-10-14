@@ -1,0 +1,127 @@
+{
+	"mcpServers": {
+		"serena": {
+			"command": "uv",
+			"type": "stdio",
+			"transport": "stdio",
+			"args": [
+				"run",
+				"--directory",
+				"C:\\Users\\mrgen\\serena\\",
+				"serena",
+				"start-mcp-server",
+				"--context",
+				"ide-assistant",
+				"--project",
+				"C:\\Users\\mrgen\\fwber\\"
+			]
+		},
+		"jetbrains": {
+			"url": "http://localhost:64342/sse"
+		},
+		"sequential-thinking": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-sequential-thinking"
+			]
+		},
+		"codex-mcp-server": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"codex-mcp-server"
+			]
+		},
+		"gemini-mcp-tool": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"gemini-mcp-tool"
+			]
+		},
+		"filesystem": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-filesystem",
+				"C:\\Users\\mrgen\\fwber\\"
+			]
+		},
+		"memory": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-memory"
+			]
+		},
+		"everything": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-everything"
+			]
+		},
+		"postgres": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"enhanced-postgres-mcp-server"
+			],
+			"env": {
+				"POSTGRES_CONNECTION_STRING": "postgresql://user:password@localhost:5432/fwber"
+			}
+		},
+		"puppeteer": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"puppeteer-mcp-server"
+			]
+		},
+		"smart-crawler": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"mcp-smart-crawler"
+			]
+		},
+		"bolide-ai": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@bolide-ai/mcp"
+			]
+		},
+		"terry": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"terry-mcp"
+			]
+		},
+		"zen-mcp-server": {
+			"type": "stdio",
+			"command": "uv",
+			"args": [
+				"run",
+				"--directory",
+				"C:\\Users\\mrgen\\zen-mcp-server\\",
+				"zen-mcp-server"
+			],
+			"env": {
+
+			}
+		}
+	}
+}
