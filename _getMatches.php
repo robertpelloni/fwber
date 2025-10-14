@@ -127,21 +127,21 @@
 
 	
 				
-		//do they want MY hairColor?
-		if($me['hairColor']=='light')$dbquerystring.=" AND b_wantHairColorLight='1'";
-		if($me['hairColor']=='medium')$dbquerystring.=" AND b_wantHairColorMedium='1'";
-		if($me['hairColor']=='dark')$dbquerystring.=" AND b_wantHairColorDark='1'";
-		if($me['hairColor']=='red')$dbquerystring.=" AND b_wantHairColorRed='1'";
-		if($me['hairColor']=='gray')$dbquerystring.=" AND b_wantHairColorGray='1'";
-		if($me['hairColor']=='other')$dbquerystring.=" AND b_wantHairColorOther='1'";
+		//do they want MY hair_color?
+		if($me['hair_color']=='light')$dbquerystring.=" AND b_wantHairColorLight='1'";
+		if($me['hair_color']=='medium')$dbquerystring.=" AND b_wantHairColorMedium='1'";
+		if($me['hair_color']=='dark')$dbquerystring.=" AND b_wantHairColorDark='1'";
+		if($me['hair_color']=='red')$dbquerystring.=" AND b_wantHairColorRed='1'";
+		if($me['hair_color']=='gray')$dbquerystring.=" AND b_wantHairColorGray='1'";
+		if($me['hair_color']=='other')$dbquerystring.=" AND b_wantHairColorOther='1'";
 
-		//do i want THEIR hairColor
-		if($me['b_wantHairColorLight']==0)$dbquerystring.=" AND hairColor!='light'";
-		if($me['b_wantHairColorMedium']==0)$dbquerystring.=" AND hairColor!='medium'";
-		if($me['b_wantHairColorDark']==0)$dbquerystring.=" AND hairColor!='dark'";
-		if($me['b_wantHairColorRed']==0)$dbquerystring.=" AND hairColor!='red'";
-		if($me['b_wantHairColorGray']==0)$dbquerystring.=" AND hairColor!='gray'";
-		if($me['b_wantHairColorOther']==0)$dbquerystring.=" AND hairColor!='other'";
+		//do i want THEIR hair_color
+		if($me['b_wantHairColorLight']==0)$dbquerystring.=" AND hair_color!='light'";
+		if($me['b_wantHairColorMedium']==0)$dbquerystring.=" AND hair_color!='medium'";
+		if($me['b_wantHairColorDark']==0)$dbquerystring.=" AND hair_color!='dark'";
+		if($me['b_wantHairColorRed']==0)$dbquerystring.=" AND hair_color!='red'";
+		if($me['b_wantHairColorGray']==0)$dbquerystring.=" AND hair_color!='gray'";
+		if($me['b_wantHairColorOther']==0)$dbquerystring.=" AND hair_color!='other'";
 
 		
 		//do they want MY hairLength?

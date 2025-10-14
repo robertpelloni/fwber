@@ -1,5 +1,7 @@
 {
-  "fileFiltering": {
-    "respectGitIgnore": false
+  "context": {
+    "fileFiltering": {
+      "respectGitIgnore": false
+    }
   }
 }
