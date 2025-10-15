@@ -1,0 +1,1 @@
+﻿Use the available MCP tools to analyze the FWBer project. Start by listing the directory contents and then provide a brief overview of the project structure.
