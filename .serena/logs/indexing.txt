@@ -1,0 +1,2 @@
+fwber-frontend\.next\static\chunks\node_modules_next_dist_compiled_next-devtools_index_5277ebc8.js
+
