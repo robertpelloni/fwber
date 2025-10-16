@@ -1,5 +1,16 @@
 # Ignore IDE settings
 /.idea/*
+.vscode/
+*.swp
+*.swo
+/.claude/*
+/.cursor/*
+/.gemini/*
+/.grok/*
+/.copilot/*
+/.codex/*
+/.serena/*
+/.vscode/*
 
 # Secrets and environment
 .env
@@ -11,6 +22,29 @@
 .encryption_key
 *.toml
 
+# API Keys and Secrets (CRITICAL - Never commit these!)
+*api_key*
+*secret*
+*.key
+*.secret
+*_secrets*
+*_keys*
+
+# Configuration files with potential API keys
+unified-copilot-config.json
+unified-cline-config.json
+unified-ai-orchestrator.js
+setup_wsl_*.ps1
+*_config.json
+*_config.toml
+
+# Tools configuration directory (contains API key placeholders)
+tools_config_files/
+
+# Configuration backups
+config-backups/
+tool-optimization-backups/
+
 # OS junk
 .DS_Store
 Thumbs.db
@@ -18,11 +52,18 @@ Thumbs.db
 # Node
 node_modules/
 
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
 # Vendor (PHP Composer) - optional if vendor is committed elsewhere
 # vendor/
 
 # Local runtime files
 *.log
+logs/
 
 # Legacy secrets file already handled
 _secrets.php
