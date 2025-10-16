@@ -18,9 +18,9 @@ const env = {
     ...process.env,
     // Ensure required environment variables are set
     NODE_ENV: process.env.NODE_ENV || "development",
-    PYTHONPATH: process.env.PYTHONPATH || "C:\\Python313\\Lib\\site-packages",
+    PYTHONPATH: process.env.PYTHONPATH || "C:\\Users\\hyper\\AppData\\Roaming\\uv\\python\\cpython-3.11.13-windows-x86_64-none\\Lib\\site-packages",
     UV_CACHE_DIR: process.env.UV_CACHE_DIR || "C:\\Users\\hyper\\.cache\\uv",
-    UV_PYTHON: process.env.UV_PYTHON || "C:\\Python313\\python.exe",
+    UV_PYTHON: process.env.UV_PYTHON || "C:\\Users\\hyper\\AppData\\Roaming\\uv\\python\\cpython-3.11.13-windows-x86_64-none\\python.exe",
     WSLENV: process.env.WSLENV || "PATH/u:NODE_PATH/u:PYTHONPATH/u",
     IJ_MCP_SERVER_PORT: process.env.IJ_MCP_SERVER_PORT || "64342"
 };
@@ -45,17 +45,17 @@ if (missingKeys.length > 0) {
 
 // Unified MCP server configurations
 const mcpServers = {
-    // Core AI Tools (commented out due to Python version conflicts)
-    // "serena": {
-    //     command: "uv",
-    //     args: ["run", "--directory", "C:\\Users\\hyper\\serena\\", "serena", "start-mcp-server", "--context", "unified-orchestrator", "--project", "C:\\Users\\hyper\\fwber\\"],
-    //     priority: 1
-    // },
-    // "zen-mcp-server": {
-    //     command: "uv",
-    //     args: ["run", "--directory", "C:\\Users\\hyper\\zen-mcp-server\\", "zen-mcp-server"],
-    //     priority: 1
-    // },
+    // Core AI Tools (now using Python 3.11)
+    "serena": {
+        command: "uv",
+        args: ["run", "--python", "3.11", "--directory", "C:\\Users\\hyper\\serena\\", "serena", "start-mcp-server", "--context", "desktop-app", "--project", "C:\\Users\\hyper\\fwber\\", "--transport", "stdio"],
+        priority: 1
+    },
+    "zen-mcp-server": {
+        command: "uv",
+        args: ["run", "--python", "3.11", "--directory", "C:\\Users\\hyper\\zen-mcp-server\\", "zen-mcp-server"],
+        priority: 1
+    },
     
     // Essential MCP Servers
     "filesystem": {
