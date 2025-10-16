@@ -3,14 +3,15 @@ I am currently evaluating all the major AI models, CLI tools, IDEs, IDE plugins,
 
 Here is what I am using and what I want to utilize:
 
-Models in order of importance: Claude 4.5, GPT-5-Codex low/medium/high, cheetah, code-supernova-1-million, GPT-5 low/medium/high, Gemini 2.5 Pro/Flash (Flash is newer), Grok 4 code.
+Models in order of importance: Claude 4.5, GPT-5-Codex low/medium/high, cheetah (claude in cursor?), code-supernova-1-million (claude in cline?), GPT-5 low/medium/high, Gemini 2.5 Pro/Flash (Flash is newer, nano-banana is newest), Grok 4 code fast.
 
-Claude Code CLI: Claude 4.5. MCP client support.
-OpenAI Codex CLI: GPT-5-Codex low/medium/high, GPT-5 low/medium/high, other providers. MCP client support. MCP server capability.
-Gemini CLI: Gemini 2.5 Pro/Flash (Flash is newer). MCP client support.
-Github Copilot CLI: GPT-5-Codex low/medium/high, GPT-5 low/medium/high, other providers. MCP client support.
-Grok CLI: Grok 4 code, other providers. MCP client support.
-Grok CLI: Grok 4 code, other providers. MCP client support.
+Claude Code CLI (claude): Claude 4.5. MCP client support.
+OpenAI Codex CLI (codex): GPT-5-Codex low/medium/high, GPT-5 low/medium/high, other providers. MCP client support. MCP server capability.
+Gemini CLI (gemini): Gemini 2.5 Pro/Flash (Flash is newer). MCP client support.
+Github Copilot CLI (copilot): GPT-5-Codex low/medium/high, GPT-5 low/medium/high, other providers. MCP client support.
+Grok CLI (grok (unofficial)): Grok 4 code, other providers. MCP client support.
+Cursor CLI (cursor-agent (WSL only)).
+Qwen CLI (qwen).
 
 Cursor IDE, built in AI agent panel: Claude 4.5, GPT-5-Codex low/medium/high, cheetah, code-supernova-1-million, GPT-5 low/medium/high, Gemini 2.5 Pro/Flash (Flash is newer), Grok 4 code. MCP client support.
 Codex plugin inside Cursor IDE. See Codex CLI capabilities.
@@ -20,18 +21,29 @@ Copilot plugin inside Cursor IDE?
 Cline plugin inside Cursor IDE: Claude 4.5, GPT-5-Codex low/medium/high, cheetah, code-supernova-1-million, GPT-5 low/medium/high, Gemini 2.5 Pro/Flash (Flash is newer), Grok 4 code. MCP client support.
 Claude Code for VSCode in Cursor.
 Zen MCP server
-Cursor CLI.
-Qwen CLI.
 Microsoft Amplifier MCP.
 Microsoft AutoGen.
 Claude Code plugins.
 
 JetBrains WebStorm IDE, built in JetBrains AI panel: GPT-5-Codex, other providers? Claude Agent plugin: Claude 4.5. MCP client support. MCP server capability.
 Copilot plugin for JetBrains WebStorm IDE: Claude 4.5, GPT-5-Codex low/medium/high, GPT-5 low/medium/high, Gemini 2.5 Pro/Flash (Flash is newer), Grok 4 code, other providers. MCP client support. 
-Cline for JetBrains WebStorm IDE?
+Cline for JetBrains WebStorm IDE?,
 Other plugins for JetBrains?
 
 Serena MCP for memory-based orchestration/communication, and large project file access.
 Other MCP servers?
 Subagent systems?
 
+"C:\Users\hyper\.claude.json"
+"C:\Users\hyper\.cursor\mcp.json"
+"C:\Users\hyper\AppData\Roaming\Cursor\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json"
+"C:\Users\hyper\.codex\config.toml"
+"C:\Users\hyper\.gemini\settings.json"
+"C:\Users\hyper\.copilot\mcp-config.json"
+"C:\Users\hyper\.grok\settings.json"
+"C:\Users\hyper\AppData\Roaming\JetBrains\WebStorm2025.3\options\llm.mcpServers.xml"
+"C:\Users\hyper\AppData\Roaming\Claude\claude_desktop_config.json"
+"C:\Users\hyper\AppData\Local\github-copilot\intellij\mcp.json"
+"C:\Users\hyper\.grok\user-settings.json"
+"C:\Users\hyper\.serena\serena_config.yml"
+(add more, qwen, cursor-agent, claude code vscode, etc)
