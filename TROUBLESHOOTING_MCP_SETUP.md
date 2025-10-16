@@ -156,3 +156,87 @@ npm install -g @playwright/mcp
 npm install -g chrome-devtools-mcp
 npm install -g terry-mcp
 npm install -g codex-mcp-server
+npm install -g gemini-mcp-tool
+```
+
+Then update config to not use `-y`:
+```toml
+[mcp_servers.filesystem]
+command = "npx"
+args = ["@modelcontextprotocol/server-filesystem", "C:\\Users\\hyper\\fwber\\"]
+```
+
+## Testing MCP Servers Independently
+
+Test if MCP servers can start outside of Codex:
+
+```cmd
+# Test filesystem server
+npx -y @modelcontextprotocol/server-filesystem C:\Users\hyper\fwber\
+
+# Test memory server
+npx -y @modelcontextprotocol/server-memory
+
+# Test zen-mcp-server
+cd C:\Users\hyper\zen-mcp-server
+uv run zen-mcp-server
+```
+
+If these work independently, the issue is with Codex's environment.
+
+## Recommended Fix Order
+
+1. **Add Node.js and Python to System PATH** (permanent fix)
+2. **Restart terminal** to pick up PATH changes
+3. **Test individual tools**: `npx --version`, `uv --version`
+4. **Try Codex with alternative model**: `codex -c model_provider=anthropic exec "test"`
+5. **Verify MCP servers load**: `codex mcp list`
+
+## Verification Commands
+
+After applying fixes:
+
+```cmd
+# Check PATH
+echo %PATH%
+
+# Verify tools
+npx --version
+node --version
+uv --version
+
+# Test Codex with Anthropic (no quota issues)
+codex -c model_provider=anthropic exec "Hello"
+
+# Check MCP servers
+codex mcp list
+codex mcp get filesystem
+```
+
+## Environment Setup Script
+
+Create a permanent fix by adding to PowerShell profile:
+
+```powershell
+# Edit profile
+notepad $PROFILE
+
+# Add these lines:
+$env:PATH = "C:\Program Files\nodejs;$env:PATH"
+$env:PATH = "$env:APPDATA\npm;$env:PATH"  
+$env:PATH = "$env:USERPROFILE\.local\bin;$env:PATH"
+```
+
+## Summary of Root Causes
+
+1. ✅ **Configuration is correct** - all MCP servers are properly defined
+2. ❌ **PATH issue** - Codex can't find npx/uv when spawning MCP processes  
+3. ❌ **API quota** - OpenAI key is over limit, need to use alternative provider
+
+## Next Steps
+
+1. Fix PATH issue (Solution A recommended)
+2. Switch to Anthropic or OpenRouter for API calls
+3. Test with: `codex -c model_provider=anthropic mcp list`
+4. Verify MCP servers load successfully
+5. Run actual task with working configuration
