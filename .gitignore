@@ -9,6 +9,7 @@
 .env.production.local
 .env.test.local
 .encryption_key
+*.toml
 
 # OS junk
 .DS_Store
