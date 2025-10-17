@@ -1,9 +1,8 @@
 {
   "unifiedModelConfiguration": {
-    "version": "1.0.0",
-    "lastUpdated": "2025-01-12",
-    "description": "Unified configuration for maximum model access across all CLI tools and MCP servers",
-    
+    "version": "1.1.0",
+    "lastUpdated": "2025-10-17",
+    "description": "Unified configuration for models across CLI tools and MCP servers (Windows, environment-driven, no tildes)",
     "availableModels": {
       "claude": {
         "claude-4.5": {
@@ -11,14 +10,16 @@
           "cliTools": ["cursor", "claude-code"],
           "mcpServers": ["serena"],
           "capabilities": ["reasoning", "analysis", "architecture"],
-          "priority": 1
+          "priority": 1,
+          "status": "active"
         },
         "claude-3.5-sonnet": {
-          "provider": "anthropic", 
+          "provider": "anthropic",
           "cliTools": ["cursor"],
           "mcpServers": ["serena"],
           "capabilities": ["coding", "analysis"],
-          "priority": 2
+          "priority": 2,
+          "status": "active"
         }
       },
       "openai": {
@@ -28,7 +29,8 @@
           "mcpServers": ["codex-mcp-server"],
           "capabilities": ["coding", "implementation", "refactoring"],
           "priority": 1,
-          "variants": ["low", "medium", "high"]
+          "variants": ["low", "medium", "high"],
+          "status": "active"
         },
         "gpt-5": {
           "provider": "openai",
@@ -36,21 +38,24 @@
           "mcpServers": ["codex-mcp-server"],
           "capabilities": ["general", "reasoning", "analysis"],
           "priority": 2,
-          "variants": ["low", "medium", "high"]
+          "variants": ["low", "medium", "high"],
+          "status": "active"
         },
         "gpt-4": {
           "provider": "openai",
           "cliTools": ["codex", "cursor", "copilot"],
           "mcpServers": ["codex-mcp-server"],
           "capabilities": ["general", "coding"],
-          "priority": 3
+          "priority": 3,
+          "status": "active"
         },
         "gpt-3.5-turbo": {
           "provider": "openai",
           "cliTools": ["codex", "cursor", "copilot"],
           "mcpServers": ["codex-mcp-server"],
           "capabilities": ["general", "fast"],
-          "priority": 4
+          "priority": 4,
+          "status": "active"
         }
       },
       "google": {
@@ -59,14 +64,16 @@
           "cliTools": ["gemini", "cursor"],
           "mcpServers": ["gemini-mcp-tool"],
           "capabilities": ["reasoning", "analysis", "creative"],
-          "priority": 1
+          "priority": 1,
+          "status": "active"
         },
         "gemini-2.5-flash": {
           "provider": "google",
           "cliTools": ["gemini", "cursor"],
           "mcpServers": ["gemini-mcp-tool"],
           "capabilities": ["fast", "creative", "analysis"],
-          "priority": 2
+          "priority": 2,
+          "status": "active"
         }
       },
       "xai": {
@@ -75,14 +82,16 @@
           "cliTools": ["grok"],
           "mcpServers": [],
           "capabilities": ["coding", "analysis"],
-          "priority": 1
+          "priority": 1,
+          "status": "needs-api-key"
         },
         "grok-code-fast-1": {
           "provider": "xai",
           "cliTools": ["grok"],
           "mcpServers": [],
           "capabilities": ["fast-coding"],
-          "priority": 2
+          "priority": 2,
+          "status": "needs-api-key"
         }
       },
       "specialized": {
@@ -91,21 +100,22 @@
           "cliTools": ["cursor"],
           "mcpServers": ["serena"],
           "capabilities": ["performance", "optimization"],
-          "priority": 1
+          "priority": 1,
+          "status": "active"
         },
         "code-supernova-1-million": {
           "provider": "anthropic",
           "cliTools": ["cline"],
           "mcpServers": ["serena"],
           "capabilities": ["context", "memory", "integration"],
-          "priority": 1
+          "priority": 1,
+          "status": "active"
         }
       }
     },
-    
     "cliToolConfigurations": {
       "codex": {
-        "configFile": "~/.codex/config.toml",
+        "configFile": "${USERPROFILE}\\\\.codex\\\\config.toml",
         "availableModels": ["gpt-5-codex", "gpt-5", "gpt-4", "gpt-3.5-turbo"],
         "defaultModel": "gpt-5-codex",
         "authentication": "oauth",
@@ -115,10 +125,28 @@
           "exec": "codex exec --model {model} \"{prompt}\"",
           "interactive": "codex --model {model}",
           "mcp": "codex mcp"
+        },
+        "security": {
+          "envAllowlist": [
+            "PROJECT_ROOT",
+            "AI_COORDINATION_DIR",
+            "MCP_CONFIG_PATH",
+            "MCP_FILESYSTEM_ROOTS",
+            "OPENAI_API_KEY",
+            "OPENAI_ORG",
+            "ANTHROPIC_API_KEY",
+            "GEMINI_API_KEY",
+            "XAI_API_KEY",
+            "OPENROUTER_API_KEY",
+            "POSTGRES_URL",
+            "USERPROFILE",
+            "PATH"
+          ],
+          "filesystemRoots": ["C:\\\\Users\\\\hyper\\\\fwber"]
         }
       },
       "gemini": {
-        "configFile": "~/.gemini/settings.json",
+        "configFile": "${USERPROFILE}\\\\.gemini\\\\settings.json",
         "availableModels": ["gemini-2.5-pro", "gemini-2.5-flash"],
         "defaultModel": "gemini-2.5-pro",
         "authentication": "oauth",
@@ -131,7 +159,7 @@
         }
       },
       "grok": {
-        "configFile": "~/.grok/user-settings.json",
+        "configFile": "${USERPROFILE}\\\\.grok\\\\user-settings.json",
         "availableModels": ["grok-4-code", "grok-code-fast-1"],
         "defaultModel": "grok-4-code",
         "authentication": "api-key",
@@ -157,7 +185,6 @@
         "mcpIntegration": true
       }
     },
-    
     "mcpServerConfigurations": {
       "serena": {
         "status": "active",
@@ -188,17 +215,16 @@
         "priority": 4
       },
       "jetbrains": {
-        "status": "timeout-issues",
+        "status": "disabled",
         "tools": 13,
         "models": ["any"],
         "capabilities": ["ide-integration", "code-analysis"],
         "priority": 5
       }
     },
-    
     "orchestrationSettings": {
       "parallelProcessing": true,
-      "maxConcurrentSessions": 5,
+      "maxConcurrentSessions": 4,
       "consensusThreshold": 0.7,
       "autoHandoff": true,
       "sessionPersistence": true,
@@ -208,14 +234,12 @@
         "tier2": ["gpt-5-codex-low", "gpt-5-codex-medium", "gpt-5-codex-high"],
         "tier3": ["cheetah"],
         "tier4": ["code-supernova-1-million"],
-        "tier5": ["gpt-5-low", "gpt-5-medium", "gpt-5-high", "gemini-2.5-pro", "gemini-2.5-flash", "grok-4-code"]
+        "tier5": ["gpt-5", "gemini-2.5-pro", "gemini-2.5-flash", "grok-4-code"]
       }
     },
-    
     "optimizationRecommendations": {
       "immediate": [
-        "Configure Grok API key for full XAI model access",
-        "Fix JetBrains MCP server timeout issues",
+        "Ensure Codex env allowlist configured",
         "Test all MCP server connections",
         "Validate model switching across tools"
       ],
@@ -226,7 +250,6 @@
         "Add model capability testing"
       ]
     },
-    
     "status": {
       "totalModels": 12,
       "activeModels": 10,
