@@ -67,3 +67,4 @@ logs/
 
 # Legacy secrets file already handled
 _secrets.php
+test-db-connection.php
