@@ -189,17 +189,26 @@ class SecurityManager {
     }
 
     private function getOrCreateEncryptionKey() {
-        $keyPath = __DIR__ . '/.encryption_key';
+        // SECURITY FIX (2025-10-18): Load from environment variable
+        // Multi-AI Consensus: GPT-5-Codex, Gemini 2.5 Pro, GPT-5, Gemini 2.5 Flash
+        // Priority 1A: Move encryption key to secure environment storage
         
+        $key = $_ENV['ENCRYPTION_KEY'] ?? null;
+        
+        if ($key) {
+            // Decode base64-encoded key from environment
+            return base64_decode($key);
+        }
+        
+        // FALLBACK: Check for legacy file-based key (for migration period only)
+        $keyPath = __DIR__ . '/.encryption_key';
         if (file_exists($keyPath)) {
+            error_log("WARNING: Using legacy file-based encryption key. Please set ENCRYPTION_KEY environment variable.");
             return file_get_contents($keyPath);
         }
         
-        $key = random_bytes(32);
-        file_put_contents($keyPath, $key);
-        chmod($keyPath, 0600);
-        
-        return $key;
+        // ERROR: No encryption key found
+        throw new Exception('ENCRYPTION_KEY must be set in environment. Generate with: openssl rand -base64 32');
     }
     
     private function generateSalt($length = 32) {
