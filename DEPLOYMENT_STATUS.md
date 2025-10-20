@@ -40,7 +40,7 @@
 ### Cleanup Completed
 - ✅ Archived 7 old Codex configs with inline secrets to `archive/old_configs/`
 - ✅ Archived 5 redundant orchestration docs to `archive/old_configs/`
-- ✅ Normalized paths from hyper -> mrgen in [tools_config_files/enhanced_mcp_settings.json](tools_config_files/enhanced_mcp_settings.json:1)
+- ✅ Normalized paths from hyper -> hyper in [tools_config_files/enhanced_mcp_settings.json](tools_config_files/enhanced_mcp_settings.json:1)
 
 ---
 

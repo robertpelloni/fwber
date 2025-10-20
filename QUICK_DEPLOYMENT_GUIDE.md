@@ -73,7 +73,7 @@ ENCRYPTION_KEY=WWX6zi4UyNdkV0nBNKyloHA0tjNz+f/91KlO4NOcDgg=
 
 ### Test 1: Legacy PHP (with secure wrapper)
 ```bash
-cd C:\Users\mrgen\fwber
+cd C:\Users\hyper\fwber
 php -S 127.0.0.1:8000
 
 # Open browser: http://127.0.0.1:8000
@@ -84,7 +84,7 @@ php -S 127.0.0.1:8000
 
 ### Test 2: Laravel API
 ```bash
-cd C:\Users\mrgen\fwber\fwber-backend
+cd C:\Users\hyper\fwber\fwber-backend
 php artisan serve
 
 # Test API endpoints:
@@ -93,7 +93,7 @@ php artisan serve
 
 ### Test 3: Next.js Frontend
 ```bash
-cd C:\Users\mrgen\fwber\fwber-frontend
+cd C:\Users\hyper\fwber\fwber-frontend
 npm install
 npm run dev
 
@@ -106,7 +106,7 @@ npm run dev
 ## ✅ Step 6: Run Test Suite (Optional)
 
 ```bash
-cd C:\Users\mrgen\fwber
+cd C:\Users\hyper\fwber
 cd tests
 phpunit MatchingParityTest.php
 ```

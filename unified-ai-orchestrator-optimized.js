@@ -92,6 +92,17 @@ const mcpServers = {
         priority: 3,
         description: "Gemini CLI integration as MCP server"
     },
+    "chroma-knowledge": {
+        command: "python",
+        args: ["-m", "chroma_mcp_server"],
+        priority: 3,
+        description: "Chroma vector database for semantic search and knowledge management",
+        env: {
+            "CHROMA_CLIENT_TYPE": "http",
+            "CHROMA_HOST": "localhost",
+            "CHROMA_PORT": "8000"
+        }
+    },
 
     // Development Tools (Priority 4)
     "everything": {

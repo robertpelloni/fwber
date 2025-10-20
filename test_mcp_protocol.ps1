@@ -94,7 +94,7 @@ $everythingResult = Test-MCPProtocol "Everything" "cmd" @("/c", "npx.cmd", "@mod
 
 Write-Host ""
 Write-Host "3. Testing Serena MCP Server:" -ForegroundColor Yellow
-$serenaResult = Test-MCPProtocol "Serena" "C:\Users\mrgen\.local\bin\uv.exe" @("run", "--directory", "C:\Users\mrgen\serena\", "serena", "start-mcp-server", "--context", "codex", "--project", "C:\Users\mrgen\fwber\")
+$serenaResult = Test-MCPProtocol "Serena" "C:\Users\hyper\.local\bin\uv.exe" @("run", "--directory", "C:\Users\hyper\serena\", "serena", "start-mcp-server", "--context", "codex", "--project", "C:\Users\hyper\fwber\")
 
 Write-Host ""
 Write-Host "4. Summary:" -ForegroundColor Yellow

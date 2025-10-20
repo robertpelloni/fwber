@@ -60,11 +60,11 @@ $results = @{}
 
 $results["memory"] = Test-MCPServerStartup "Memory" "cmd" @("/c", "npx.cmd", "@modelcontextprotocol/server-memory", "stdio") 15
 $results["everything"] = Test-MCPServerStartup "Everything" "cmd" @("/c", "npx.cmd", "@modelcontextprotocol/server-everything", "stdio") 15
-$results["filesystem"] = Test-MCPServerStartup "Filesystem" "cmd" @("/c", "npx.cmd", "@modelcontextprotocol/server-filesystem", "C:\Users\mrgen\fwber\") 15
+$results["filesystem"] = Test-MCPServerStartup "Filesystem" "cmd" @("/c", "npx.cmd", "@modelcontextprotocol/server-filesystem", "C:\Users\hyper\fwber\") 15
 
 Write-Host ""
 Write-Host "2. Testing UV-based servers:" -ForegroundColor Yellow
-$results["serena"] = Test-MCPServerStartup "Serena" "C:\Users\mrgen\.local\bin\uv.exe" @("run", "--directory", "C:\Users\mrgen\serena\", "serena", "start-mcp-server", "--context", "codex", "--project", "C:\Users\mrgen\fwber\") 30
+$results["serena"] = Test-MCPServerStartup "Serena" "C:\Users\hyper\.local\bin\uv.exe" @("run", "--directory", "C:\Users\hyper\serena\", "serena", "start-mcp-server", "--context", "codex", "--project", "C:\Users\hyper\fwber\") 30
 
 Write-Host ""
 Write-Host "3. Summary:" -ForegroundColor Yellow

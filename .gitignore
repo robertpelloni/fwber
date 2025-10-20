@@ -69,3 +69,4 @@ logs/
 _secrets.php
 test-db-connection.php
 FIXING_MCP_FOR_REAL_PARALLEL_WORK.md
+fix-database-quick.ps1

@@ -162,6 +162,6 @@ Acceptance Checklist for Any New Tool/Server
 Change Log
 - 1.1.0 (2025-10-17)
   - Rewrote this file into an operational policy with security, orchestration workflow, Codex env allowlist, and troubleshooting guide
-  - Standardized Windows paths (mrgen → hyper)
+  - Standardized Windows paths (hyper → hyper)
   - Set JetBrains MCP disabled by default; custom orchestrator disabled by default
   - Introduced JSONL structured logging and rotation guidance

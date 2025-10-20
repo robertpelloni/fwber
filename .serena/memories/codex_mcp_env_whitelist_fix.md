@@ -13,7 +13,7 @@ The user correctly identified that Codex has environment variable whitelisting t
    - `NODE_ENV`: Production environment setting
 
 ## Configuration Applied
-Updated `C:\Users\mrgen\.codex\config.toml` with comprehensive environment variables for all servers:
+Updated `C:\Users\hyper\.codex\config.toml` with comprehensive environment variables for all servers:
 - `gemini-mcp-tool`
 - `sequential-thinking`
 - `filesystem`

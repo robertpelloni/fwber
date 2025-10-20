@@ -7,13 +7,13 @@
       "args": [
         "run",
         "--directory",
-        "C:\\\\Users\\\\mrgen\\\\serena\\\\",
+        "C:\\\\Users\\\\hyper\\\\serena\\\\",
         "serena",
         "start-mcp-server",
         "--context",
         "ide-assistant",
         "--project",
-        "C:\\\\Users\\\\mrgen\\\\fwber\\\\"
+        "C:\\\\Users\\\\hyper\\\\fwber\\\\"
       ],
       "description": "Semantic code analysis and editing server with memory and symbol tools",
       "enabled": true,
@@ -25,12 +25,12 @@
       "models": ["claude-4.5", "claude-3.5-sonnet", "cheetah"],
       "capabilities": ["memory", "symbolic-analysis", "code-editing", "project-navigation"],
       "env": {
-        "PROJECT_ROOT": "C:\\\\Users\\\\mrgen\\\\fwber\\\\",
-        "SERENA_HOME": "C:\\\\Users\\\\mrgen\\\\.serena",
-        "USERPROFILE": "C:\\\\Users\\\\mrgen"
+        "PROJECT_ROOT": "C:\\\\Users\\\\hyper\\\\fwber\\\\",
+        "SERENA_HOME": "C:\\\\Users\\\\hyper\\\\.serena",
+        "USERPROFILE": "C:\\\\Users\\\\hyper"
       },
       "security": {
-        "allowedPaths": ["C:\\\\Users\\\\mrgen\\\\fwber"],
+        "allowedPaths": ["C:\\\\Users\\\\hyper\\\\fwber"],
         "commandAllowlist": [],
         "redactLogs": true
       },
@@ -55,11 +55,11 @@
       "models": ["any"],
       "capabilities": ["structured-reasoning", "problem-solving", "hypothesis-generation"],
       "env": {
-        "PROJECT_ROOT": "C:\\\\Users\\\\mrgen\\\\fwber\\\\",
-        "USERPROFILE": "C:\\\\Users\\\\mrgen"
+        "PROJECT_ROOT": "C:\\\\Users\\\\hyper\\\\fwber\\\\",
+        "USERPROFILE": "C:\\\\Users\\\\hyper"
       },
       "security": {
-        "allowedPaths": ["C:\\\\Users\\\\mrgen\\\\fwber"],
+        "allowedPaths": ["C:\\\\Users\\\\hyper\\\\fwber"],
         "commandAllowlist": [],
         "redactLogs": true
       },
@@ -84,14 +84,14 @@
       "models": ["gpt-5-codex", "gpt-5", "gpt-4", "gpt-3.5-turbo"],
       "capabilities": ["code-assistance", "session-management", "analysis"],
       "env": {
-        "PROJECT_ROOT": "C:\\\\Users\\\\mrgen\\\\fwber\\\\",
-        "MCP_FILESYSTEM_ROOTS": "C:\\\\Users\\\\mrgen\\\\fwber",
+        "PROJECT_ROOT": "C:\\\\Users\\\\hyper\\\\fwber\\\\",
+        "MCP_FILESYSTEM_ROOTS": "C:\\\\Users\\\\hyper\\\\fwber",
         "OPENAI_API_KEY": "${OPENAI_API_KEY}",
         "OPENAI_ORG": "${OPENAI_ORG}",
-        "USERPROFILE": "C:\\\\Users\\\\mrgen"
+        "USERPROFILE": "C:\\\\Users\\\\hyper"
       },
       "security": {
-        "allowedPaths": ["C:\\\\Users\\\\mrgen\\\\fwber"],
+        "allowedPaths": ["C:\\\\Users\\\\hyper\\\\fwber"],
         "commandAllowlist": [],
         "redactLogs": true
       },
@@ -116,12 +116,12 @@
       "models": ["gemini-2.5-pro", "gemini-2.5-flash"],
       "capabilities": ["analysis", "creative", "brainstorming", "file-inclusion"],
       "env": {
-        "PROJECT_ROOT": "C:\\\\Users\\\\mrgen\\\\fwber\\\\",
+        "PROJECT_ROOT": "C:\\\\Users\\\\hyper\\\\fwber\\\\",
         "GEMINI_API_KEY": "${GEMINI_API_KEY}",
-        "USERPROFILE": "C:\\\\Users\\\\mrgen"
+        "USERPROFILE": "C:\\\\Users\\\\hyper"
       },
       "security": {
-        "allowedPaths": ["C:\\\\Users\\\\mrgen\\\\fwber"],
+        "allowedPaths": ["C:\\\\Users\\\\hyper\\\\fwber"],
         "commandAllowlist": [],
         "redactLogs": true
       },
@@ -135,7 +135,7 @@
     "claude-code-orchestrator": {
       "type": "stdio",
       "command": "node",
-      "args": ["C:\\\\Users\\\\mrgen\\\\fwber\\\\tools_config_files\\\\ai-orchestrator.js"],
+      "args": ["C:\\\\Users\\\\hyper\\\\fwber\\\\tools_config_files\\\\ai-orchestrator.js"],
       "description": "Custom orchestration engine for parallel AI model collaboration",
       "enabled": false,
       "status": "superseded-default",
@@ -145,20 +145,51 @@
       "maxRetries": 1,
       "retryBackoff": { "baseMs": 500, "factor": 2.0, "maxMs": 5000, "jitter": true },
       "env": {
-        "PROJECT_ROOT": "C:\\\\Users\\\\mrgen\\\\fwber\\\\",
-        "AI_COORDINATION_DIR": "C:\\\\Users\\\\mrgen\\\\fwber\\\\AI_COORDINATION\\\\",
-        "MCP_CONFIG_PATH": "C:\\\\Users\\\\mrgen\\\\fwber\\\\tools_config_files\\\\enhanced_mcp_settings.json",
+        "PROJECT_ROOT": "C:\\\\Users\\\\hyper\\\\fwber\\\\",
+        "AI_COORDINATION_DIR": "C:\\\\Users\\\\hyper\\\\fwber\\\\AI_COORDINATION\\\\",
+        "MCP_CONFIG_PATH": "C:\\\\Users\\\\hyper\\\\fwber\\\\tools_config_files\\\\enhanced_mcp_settings.json",
         "AI_LOG_JSONL": "1",
         "AI_LOG_REDACT": "1"
       },
       "security": {
-        "allowedPaths": ["C:\\\\Users\\\\mrgen\\\\fwber"],
+        "allowedPaths": ["C:\\\\Users\\\\hyper\\\\fwber"],
         "commandAllowlist": [],
         "redactLogs": true
       },
       "healthChecks": {
         "type": "disabled",
         "graceMs": 0
+      }
+    },
+    "chroma-knowledge": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["-m", "chroma_mcp_server"],
+      "description": "Chroma vector database for semantic search and knowledge management",
+      "enabled": true,
+      "priority": 3,
+      "timeoutMs": 30000,
+      "startupTimeoutMs": 60000,
+      "maxRetries": 2,
+      "retryBackoff": { "baseMs": 500, "factor": 2.0, "maxMs": 15000, "jitter": true },
+      "models": ["any"],
+      "capabilities": ["vector-search", "knowledge-management", "semantic-search", "document-storage"],
+      "env": {
+        "CHROMA_CLIENT_TYPE": "http",
+        "CHROMA_HOST": "localhost",
+        "CHROMA_PORT": "8000",
+        "PROJECT_ROOT": "C:\\\\Users\\\\hyper\\\\fwber\\\\",
+        "USERPROFILE": "C:\\\\Users\\\\hyper"
+      },
+      "security": {
+        "allowedPaths": ["C:\\\\Users\\\\hyper\\\\fwber"],
+        "commandAllowlist": [],
+        "redactLogs": true
+      },
+      "healthChecks": {
+        "type": "http",
+        "url": "http://localhost:8000/api/v1/heartbeat",
+        "graceMs": 5000
       }
     },
     "jetbrains": {
@@ -179,7 +210,7 @@
       "maxRetries": 0,
       "retryBackoff": { "baseMs": 0, "factor": 1.0, "maxMs": 0, "jitter": false },
       "security": {
-        "allowedPaths": ["C:\\\\Users\\\\mrgen\\\\fwber"],
+        "allowedPaths": ["C:\\\\Users\\\\hyper\\\\fwber"],
         "commandAllowlist": [],
         "redactLogs": true
       },

@@ -6,7 +6,7 @@ Write-Host ""
 # Test 1: Zen MCP Server
 Write-Host "1. Testing Zen MCP Server..." -ForegroundColor Yellow
 try {
-    $zenProcess = Start-Process -FilePath "uv" -ArgumentList "run", "--directory", "C:\Users\mrgen\zen-mcp-server\", "zen-mcp-server" -PassThru -WindowStyle Hidden -RedirectStandardOutput "zen_output.txt" -RedirectStandardError "zen_error.txt"
+    $zenProcess = Start-Process -FilePath "uv" -ArgumentList "run", "--directory", "C:\Users\hyper\zen-mcp-server\", "zen-mcp-server" -PassThru -WindowStyle Hidden -RedirectStandardOutput "zen_output.txt" -RedirectStandardError "zen_error.txt"
     Start-Sleep -Seconds 5
     
     if (!$zenProcess.HasExited) {
@@ -50,7 +50,7 @@ try {
 # Test 3: Serena MCP Server
 Write-Host "3. Testing Serena MCP Server..." -ForegroundColor Yellow
 try {
-    $serenaProcess = Start-Process -FilePath "uv" -ArgumentList "run", "--directory", "C:\Users\mrgen\serena\", "serena", "start-mcp-server", "--context", "codex", "--project", "C:\Users\mrgen\fwber\" -PassThru -WindowStyle Hidden -RedirectStandardOutput "serena_output.txt" -RedirectStandardError "serena_error.txt"
+    $serenaProcess = Start-Process -FilePath "uv" -ArgumentList "run", "--directory", "C:\Users\hyper\serena\", "serena", "start-mcp-server", "--context", "codex", "--project", "C:\Users\hyper\fwber\" -PassThru -WindowStyle Hidden -RedirectStandardOutput "serena_output.txt" -RedirectStandardError "serena_error.txt"
     Start-Sleep -Seconds 5
     
     if (!$serenaProcess.HasExited) {

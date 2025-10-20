@@ -56,7 +56,7 @@ $results = @{}
 Write-Host "1. Testing npx-based servers:" -ForegroundColor Yellow
 $results["everything"] = Test-MCPServer "Everything" "npx" @("-y", "@modelcontextprotocol/server-everything", "stdio") 5
 $results["memory"] = Test-MCPServer "Memory" "npx" @("-y", "@modelcontextprotocol/server-memory", "stdio") 5
-$results["filesystem"] = Test-MCPServer "Filesystem" "npx" @("-y", "@modelcontextprotocol/server-filesystem", "C:\Users\mrgen\fwber\", "stdio") 5
+$results["filesystem"] = Test-MCPServer "Filesystem" "npx" @("-y", "@modelcontextprotocol/server-filesystem", "C:\Users\hyper\fwber\", "stdio") 5
 $results["sequential-thinking"] = Test-MCPServer "Sequential Thinking" "npx" @("-y", "@modelcontextprotocol/server-sequential-thinking", "stdio") 5
 
 Write-Host ""
@@ -69,8 +69,8 @@ $results["terry"] = Test-MCPServer "Terry" "npx" @("-y", "terry-mcp", "stdio") 5
 
 Write-Host ""
 Write-Host "3. Testing UV-based servers:" -ForegroundColor Yellow
-$results["serena"] = Test-MCPServer "Serena" "uv" @("run", "--directory", "C:\Users\mrgen\serena\", "serena", "start-mcp-server", "--context", "codex", "--project", "C:\Users\mrgen\fwber\") 10
-$results["zen-mcp-server"] = Test-MCPServer "Zen MCP Server" "uv" @("run", "--directory", "C:\Users\mrgen\zen-mcp-server\", "zen-mcp-server") 10
+$results["serena"] = Test-MCPServer "Serena" "uv" @("run", "--directory", "C:\Users\hyper\serena\", "serena", "start-mcp-server", "--context", "codex", "--project", "C:\Users\hyper\fwber\") 10
+$results["zen-mcp-server"] = Test-MCPServer "Zen MCP Server" "uv" @("run", "--directory", "C:\Users\hyper\zen-mcp-server\", "zen-mcp-server") 10
 
 Write-Host ""
 Write-Host "4. Summary:" -ForegroundColor Yellow

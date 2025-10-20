@@ -49,12 +49,12 @@ set GEMINI_API_KEY=your_gemini_key_here
 set OPENROUTER_API_KEY=your_openrouter_key_here
 
 # Or create .env file in zen-mcp-server directory
-echo OPENAI_API_KEY=your_key_here > C:\Users\mrgen\zen-mcp-server\.env
+echo OPENAI_API_KEY=your_key_here > C:\Users\hyper\zen-mcp-server\.env
 ```
 
 ### **Step 2: Test Zen MCP Server**
 ```bash
-cd C:\Users\mrgen\zen-mcp-server
+cd C:\Users\hyper\zen-mcp-server
 uv run zen-mcp-server --help
 ```
 
@@ -69,7 +69,7 @@ Add Zen MCP Server to our existing MCP configurations:
       "args": [
         "run",
         "--directory",
-        "C:\\Users\\mrgen\\zen-mcp-server\\",
+        "C:\\Users\\hyper\\zen-mcp-server\\",
         "zen-mcp-server"
       ],
       "env": {
