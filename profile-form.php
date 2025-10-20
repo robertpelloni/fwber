@@ -10,12 +10,234 @@ require_once("_names.php");
 <head>
     <title><?php echo getSiteName(); ?> - Edit Profile<?php echo getTitleTagline(); ?></title>
     <?php include("head.php");?>
+    
+    <!-- Enhanced Profile Form Styles -->
+    <style>
+        .profile-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+        }
+        
+        .profile-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            color: #6366f1;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        
+        .form-group {
+            flex: 1;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 5px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .checkbox-item:hover {
+            background: #e2e8f0;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 8px;
+            transform: scale(1.2);
+        }
+        
+        .avatar-section {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .avatar-btn {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .avatar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+        }
+        
+        .avatar-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .save-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin: 30px auto;
+            display: block;
+        }
+        
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+        
+        .progress-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        
+        .progress-bar {
+            width: 200px;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            transition: width 0.3s ease;
+        }
+        
+        .collapsible-section {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .collapsible-section:hover {
+            background: #f8fafc;
+        }
+        
+        .section-content {
+            transition: all 0.3s ease;
+        }
+        
+        .section-content.collapsed {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-container {
+                padding: 10px;
+            }
+        }
+    </style>
 </head>
 <body class="d-flex flex-column h-100">
     <?php include("h.php");?>
-    <div class="col-sm-12 my-auto text-center">
-        <br><br><br><br>
-        <h1 class="h3 mb-3 font-weight-normal text-center"> Edit Profile</h1>
+    
+    <div class="profile-container">
+        <div class="profile-header">
+            <h1 class="h2 mb-3">✨ Complete Your Profile</h1>
+            <p class="mb-0">Help us find your perfect matches with a detailed profile</p>
+        </div>
+        
+        <!-- Progress Indicator -->
+        <div class="progress-indicator">
+            <div class="text-sm font-medium text-gray-700 mb-2">Profile Completion</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <div class="text-xs text-gray-500 mt-1" id="progressText">0% Complete</div>
+        </div>
 
         <?php if (!empty($message)): ?>
             <div class="alert alert-success" role="alert"><?php echo $message; ?></div>
@@ -24,62 +246,70 @@ require_once("_names.php");
             <div class="alert alert-danger" role="alert"><?php echo $error; ?></div>
         <?php endif; ?>
 
-	<form class="form-signin" action="edit-profile.php" method="POST">
+	<form class="profile-form" action="edit-profile.php" method="POST" id="profileForm">
     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
-	<fieldset style="text-align:center;border:none;">
 
-		<div class="captionText">Area</div>
-        <table>
-            <tbody>
-                <tr>
-                    <td style="text-align:right; width:40%;"><label for="country">Country</label></td>
-                    <td style="text-align:left;">
-                        <select name="country" id="country" class="required" style="max-width:200px;">
-                        <?php include("_countrySelector.php"); // This might need updating to set the selected value correctly ?>
+        <!-- Location & Search Preferences Section -->
+        <div class="profile-section">
+            <div class="section-title collapsible-section" onclick="toggleSection(this)">
+                <i class="fas fa-map-marker-alt"></i>
+                Location & Search Preferences
+                <span class="ml-auto">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="country" class="form-label">Country</label>
+                        <select name="country" id="country" class="form-control required">
+                            <?php include("_countrySelector.php"); ?>
                         </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="text-align:right;"><label for="zip_code">Zip / Postal Code</label></td>
-                    <td style="text-align:left;"><input type="text" class="required" name="zip_code" id="zip_code" style="width:8em" value="<?php echo htmlspecialchars($userProfile['zip_code'] ?? ''); ?>"></td>
-                </tr>
-                <tr>
-                    <td style="text-align:right;"><label for="max_distance">Distance To Search</label></td>
-                    <td style="text-align:left;">
-                        <select name="max_distance" id="max_distance" class="required">
+                    </div>
+                    <div class="form-group">
+                        <label for="zip_code" class="form-label">Zip / Postal Code</label>
+                        <input type="text" class="form-control required" name="zip_code" id="zip_code" value="<?php echo htmlspecialchars($userProfile['zip_code'] ?? ''); ?>" placeholder="Enter your postal code">
+                    </div>
+                    <div class="form-group">
+                        <label for="max_distance" class="form-label">Search Radius</label>
+                        <select name="max_distance" id="max_distance" class="form-control required">
                             <option value="5"  <?php if (($userProfile['max_distance'] ?? '') == '5') echo 'selected'; ?>>5 Miles</option>
                             <option value="10" <?php if (($userProfile['max_distance'] ?? '') == '10') echo 'selected'; ?>>10 Miles</option>
                             <option value="20" <?php if (($userProfile['max_distance'] ?? '') == '20') echo 'selected'; ?>>20 Miles</option>
                             <option value="50" <?php if (($userProfile['max_distance'] ?? '50') == '50') echo 'selected'; ?>>50 Miles</option>
                         </select>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-		<div class="captionText">About You</div>
-        <table>
-            <tbody>
-            <tr>
-                <td style="text-align:right; width:40%;"><label for="username">Your Nickname</label></td>
-                <td style="text-align:left;"><input type="text" class="required" id="username" name="username" style="width:12em" value="<?php echo htmlspecialchars($userProfile['username'] ?? ''); ?>"></td>
-            </tr>
-            <tr>
-                <td style="text-align:right;"><label for="age">Your Age</label></td>
-                <td style="text-align:left;"><input type="number" class="required" id="age" name="age" style="width:5em" value="<?php echo htmlspecialchars($userProfile['age'] ?? ''); ?>" placeholder="##"></td>
-            </tr>
-            <tr>
-                <td style="text-align:right;"><label for="gender">Your Gender</label></td>
-                <td style="text-align:left;">
-                    <select name="gender" id="gender" class="required">
-                        <option value="male" <?php if (($userProfile['gender'] ?? '') == 'male') echo 'selected'; ?>>Man</option>
-                        <option value="female" <?php if (($userProfile['gender'] ?? '') == 'female') echo 'selected'; ?>>Woman</option>
-                        <option value="non-binary" <?php if (($userProfile['gender'] ?? '') == 'non-binary') echo 'selected'; ?>>Non-Binary</option>
-                    </select>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <!-- Basic Information Section -->
+        <div class="profile-section">
+            <div class="section-title collapsible-section" onclick="toggleSection(this)">
+                <i class="fas fa-user"></i>
+                Basic Information
+                <span class="ml-auto">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="username" class="form-label">Your Nickname</label>
+                        <input type="text" class="form-control required" id="username" name="username" value="<?php echo htmlspecialchars($userProfile['username'] ?? ''); ?>" placeholder="Choose a unique nickname">
+                    </div>
+                    <div class="form-group">
+                        <label for="age" class="form-label">Your Age</label>
+                        <input type="number" class="form-control required" id="age" name="age" min="18" max="99" value="<?php echo htmlspecialchars($userProfile['age'] ?? ''); ?>" placeholder="Your age">
+                    </div>
+                    <div class="form-group">
+                        <label for="gender" class="form-label">Your Gender</label>
+                        <select name="gender" id="gender" class="form-control required">
+                            <option value="">Select your gender</option>
+                            <option value="male" <?php if (($userProfile['gender'] ?? '') == 'male') echo 'selected'; ?>>Man</option>
+                            <option value="female" <?php if (($userProfile['gender'] ?? '') == 'female') echo 'selected'; ?>>Woman</option>
+                            <option value="non-binary" <?php if (($userProfile['gender'] ?? '') == 'non-binary') echo 'selected'; ?>>Non-Binary</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="captionText">Physical Attributes</div>
         <table>
@@ -538,27 +768,147 @@ require_once("_names.php");
             </tbody>
         </table>
 
-        <div class="captionText">AI Avatar Generation</div>
-        <div class="text-center" style="margin: 20px 0;">
-            <button type="button" class="btn btn-secondary" onclick="generateAvatar()" id="generateAvatarBtn">
+        <!-- AI Avatar Generation Section -->
+        <div class="avatar-section">
+            <h3 class="section-title">
+                <i class="fas fa-robot"></i>
+                AI Avatar Generation
+            </h3>
+            <p class="text-gray-600 mb-4">Create a personalized avatar based on your physical attributes</p>
+            <button type="button" class="avatar-btn" onclick="generateAvatar()" id="generateAvatarBtn">
                 <i class="fas fa-magic"></i> Generate AI Avatar
             </button>
-            <div id="avatarStatus" style="margin-top: 10px;"></div>
-            <div id="avatarPreview" style="margin-top: 10px;"></div>
+            <div id="avatarStatus" style="margin-top: 15px;"></div>
+            <div id="avatarPreview" style="margin-top: 15px;"></div>
         </div>
 
-        <br>
+        <!-- Save Button -->
         <div class="text-center">
-            <button class="btn btn-lg btn-primary" type="submit">Save Profile</button>
+            <button class="save-btn" type="submit" id="saveProfileBtn">
+                <i class="fas fa-save"></i> Save Profile
+            </button>
         </div>
 
-	</fieldset>
 	</form>
 
 
 </div>
 
 <?php include("f.php");?>
+
+<!-- Enhanced Profile Form JavaScript -->
+<script>
+    // Enhanced JavaScript functionality for profile form
+    let profileProgress = 0;
+    const totalFields = 25; // Approximate number of important fields
+    
+    // Initialize form on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateProgress();
+        initializeCollapsibleSections();
+        addFormValidation();
+    });
+    
+    // Toggle collapsible sections
+    function toggleSection(sectionTitle) {
+        const content = sectionTitle.nextElementSibling;
+        const arrow = sectionTitle.querySelector('span');
+        
+        if (content.classList.contains('collapsed')) {
+            content.classList.remove('collapsed');
+            arrow.textContent = '▼';
+        } else {
+            content.classList.add('collapsed');
+            arrow.textContent = '▶';
+        }
+    }
+    
+    // Initialize all collapsible sections
+    function initializeCollapsibleSections() {
+        const sections = document.querySelectorAll('.collapsible-section');
+        sections.forEach(section => {
+            const content = section.nextElementSibling;
+            if (content) {
+                content.classList.add('collapsed');
+                const arrow = section.querySelector('span');
+                if (arrow) arrow.textContent = '▶';
+            }
+        });
+    }
+    
+    // Update progress indicator
+    function updateProgress() {
+        const requiredFields = document.querySelectorAll('.required');
+        let filledFields = 0;
+        
+        requiredFields.forEach(field => {
+            if (field.value && field.value.trim() !== '') {
+                filledFields++;
+            }
+        });
+        
+        profileProgress = Math.round((filledFields / requiredFields.length) * 100);
+        
+        const progressFill = document.querySelector('.progress-fill');
+        const progressText = document.querySelector('.progress-text');
+        
+        if (progressFill) {
+            progressFill.style.width = profileProgress + '%';
+        }
+        
+        if (progressText) {
+            progressText.textContent = `Profile ${profileProgress}% Complete`;
+        }
+    }
+    
+    // Add form validation
+    function addFormValidation() {
+        const form = document.querySelector('form');
+        const requiredFields = document.querySelectorAll('.required');
+        
+        // Add event listeners to required fields
+        requiredFields.forEach(field => {
+            field.addEventListener('input', updateProgress);
+            field.addEventListener('change', updateProgress);
+            
+            // Add visual feedback for validation
+            field.addEventListener('blur', function() {
+                if (this.hasAttribute('required') && !this.value.trim()) {
+                    this.style.borderColor = '#ef4444';
+                } else {
+                    this.style.borderColor = '#e5e7eb';
+                }
+            });
+        });
+        
+        // Form submission validation
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            const errors = [];
+            
+            requiredFields.forEach(field => {
+                if (field.hasAttribute('required') && !field.value.trim()) {
+                    isValid = false;
+                    field.style.borderColor = '#ef4444';
+                    errors.push(`${field.previousElementSibling?.textContent || field.name} is required`);
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert('Please fill in all required fields:\n' + errors.join('\n'));
+                return false;
+            }
+            
+            // Show loading state
+            const saveBtn = document.getElementById('saveProfileBtn');
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            }
+        });
+    }
+</script>
 
 <script src="/js/jquery-3.4.1.min.js" type="text/javascript"></script>
 <script type="text/javascript">
