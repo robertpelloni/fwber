@@ -3,45 +3,50 @@
 ## Overview
 This guide provides comprehensive instructions for using multiple AI models and MCP servers in parallel to achieve optimal results for planning, designing, and implementing software projects.
 
-## Core Principles
+## Core Principles (Consensus-Enhanced)
 
-### 1. Always Work in Parallel
-- **Never work with a single model** - Always get input from at least 2-3 models
-- **Use consensus building** - Resolve disagreements through structured debate
-- **Validate with multiple perspectives** - Each model brings unique strengths
+### 1. Intelligent Model Routing (Not Always Parallel)
+- **High-Stakes Tasks**: Use primary model + 2-3 other models for consensus
+- **Medium Complexity**: Use primary model + 1 validator model
+- **Simple Tasks**: Single model approach with quality gates
+- **Progressive Escalation**: Start with efficient models, escalate when complexity warrants
 
-### 2. Leverage MCP Servers
-- **Zen MCP**: Orchestrate multi-model collaboration and consensus building
-- **Serena MCP**: Access large amounts of code and maintain project context
-- **Chroma MCP**: Store and retrieve knowledge for semantic search
+### 2. Enhanced MCP Server Usage
+- **Zen MCP**: Dynamic routing with confidence-based validation and quality gates
+- **Serena MCP**: Hierarchical memory (immediate/project/cross-project) with automatic context tagging
+- **Chroma MCP**: Enhanced semantic search with code-aware chunking and contextual filtering
 
-### 3. Always Check Work with Other Models
-- **Primary work**: One model performs the main task
-- **Secondary review**: Another model validates and challenges
-- **Consensus building**: Use Zen MCP to resolve differences
-- **Final validation**: Store results and update memory
+### 3. Quality-Gated Validation
+- **Quality Gates**: Automated validation before consensus building
+- **Confidence-Based Routing**: Use model confidence scores to determine validation needs
+- **Execution-Based Validation**: Primary quality measure through automated testing
+- **Progressive Fidelity**: Fast pass with strict gates, escalate on failure
 
-## Model Specializations
+## Model Specializations (Consensus-Defined)
 
-### Claude (Anthropic)
-- **Strengths**: Architecture analysis, security review, quality assurance
-- **Best for**: System design, code review, documentation
-- **Use when**: Need comprehensive analysis and quality validation
+### Claude (Anthropic) - **Architect/Synthesizer**
+- **Primary Role**: Complex reasoning, architectural design, task decomposition, synthesizing outputs
+- **Specialization Zones**: Complex architecture, large codebases, nuanced requirements, security analysis, algorithmic optimization
+- **Best for**: System design, code review, documentation, high-level integration
+- **Use when**: Need comprehensive analysis, quality validation, or architectural decisions
 
-### GPT-5-Codex (OpenAI)
-- **Strengths**: Code generation, implementation, refactoring
-- **Best for**: Writing code, debugging, technical implementation
-- **Use when**: Need to implement features or fix code issues
+### GPT-5-Codex (OpenAI) - **Technical Specialist**
+- **Primary Role**: Code-intensive tasks, deep domain knowledge, technical implementation
+- **Specialization Zones**: Code generation, debugging, refactoring, testing, technical documentation, API development
+- **Best for**: Writing code, debugging, technical implementation, security implementation
+- **Use when**: Need to implement features, fix code issues, or perform technical analysis
 
-### Gemini 2.5 Pro (Google)
-- **Strengths**: Performance analysis, large context processing, multimodal
-- **Best for**: Performance optimization, architecture analysis, data analysis
-- **Use when**: Need to analyze large codebases or performance issues
+### Gemini 2.5 Pro (Google) - **Performance Specialist**
+- **Primary Role**: Performance analysis, large context processing, optimization
+- **Specialization Zones**: Performance optimization, architecture analysis, data analysis, multimodal processing
+- **Best for**: Performance optimization, large codebase analysis, data analysis
+- **Use when**: Need to analyze large codebases, performance issues, or data processing
 
-### Grok 4 (X.AI)
-- **Strengths**: Creative problem-solving, UX/UI design, alternative approaches
-- **Best for**: Innovation, user experience, challenging conventional solutions
-- **Use when**: Need creative solutions or alternative approaches
+### Grok 4 (X.AI) - **Creative Specialist**
+- **Primary Role**: Creative problem-solving, UX/UI design, alternative approaches
+- **Specialization Zones**: Innovation, user experience, challenging conventional solutions, creative problem-solving
+- **Best for**: Innovation, user experience, alternative approaches, creative solutions
+- **Use when**: Need creative solutions, alternative approaches, or UX/UI improvements
 
 ## Standard Workflows
 
