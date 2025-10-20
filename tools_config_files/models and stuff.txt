@@ -32,6 +32,7 @@ Other plugins for JetBrains?
 Serena MCP for memory-based orchestration/communication, and large project file access.
 Other MCP servers?
 Subagent systems?
+
 "C:\Users\hyper\.claude.json"
 "C:\Users\hyper\.cursor\mcp.json"
 "C:\Users\hyper\AppData\Roaming\Cursor\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json"
@@ -44,6 +45,15 @@ Subagent systems?
 "C:\Users\hyper\AppData\Local\github-copilot\intellij\mcp.json"
 "C:\Users\hyper\.grok\user-settings.json"
 "C:\Users\hyper\.serena\serena_config.yml"
+"C:\Users\hyper\.code\config.toml"
+"C:\Users\hyper\.gemini\mcp-config.json"
+"C:\Users\hyper\.lingma\lingma_mcp.json"
+"C:\Users\hyper\.lmstudio\mcp.json"
+"C:\Users\hyper\.qwen\settings.json"
+"C:\Users\hyper\AppData\Roaming\Witsy\settings.json"
+C:\Users\hyper\AppData\Roaming\Cursor\User\globalStorage\kilocode.kilo-code\settings\mcp_settings.json
+
+
 (add more, qwen, cursor-agent, claude code vscode, etc)
 Operational Policy and Playbook for Multi-Model Orchestration (FWBer)
 Version: 1.1.0
