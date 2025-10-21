@@ -18,6 +18,8 @@ Codex was having MCP timeout issues due to environment variable whitelisting.
 
 There are still hundreds of node, conhost, uv etc processes being created and not ending. Please make sure this is handled somehow.
 
+Please evaluate and use MCP servers and tools as much as is reasonable in order to communicate and orchestrate parallel analysis with multiple major llm models through zen, analyze and debate the direction of the project and next steps, and store key information in chroma, memory, and serena memory. Use serena to access code and so forth as much as you can. Try to use as many CLI tools and models as you can, this is also a test of their configurations. Fixing errors as they come up may be helpful, especially collaborating with other models and using other CLI tools to fix errors in other tools!
+
 
 Here is what I am using and what I want to utilize:
 
