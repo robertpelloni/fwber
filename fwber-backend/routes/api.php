@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MatchController;
+use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,5 +21,12 @@ Route::middleware("api")->group(function (): void {
         // Matching routes
         Route::get("/matches", [MatchController::class, "index"]);
         Route::post("/matches/action", [MatchController::class, "action"]);
+        
+        // Photo routes (Phase 4A - Multi-AI Photo Upload System)
+        Route::get("/photos", [PhotoController::class, "index"]);
+        Route::post("/photos", [PhotoController::class, "store"]);
+        Route::put("/photos/{id}", [PhotoController::class, "update"]);
+        Route::delete("/photos/{id}", [PhotoController::class, "destroy"]);
+        Route::post("/photos/reorder", [PhotoController::class, "reorder"]);
     });
 });
