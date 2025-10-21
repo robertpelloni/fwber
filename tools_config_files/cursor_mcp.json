@@ -1,0 +1,50 @@
+{
+  "$schema": "https://raw.githubusercontent.com/modelcontextprotocol/client-typescript/main/schemas/mcp-config.schema.json",
+  "mcpServers": {
+    "serena": {
+      "command": "C:\\Users\\hyper\\.local\\bin\\uv.exe",
+      "args": ["run","--directory","C:\\Users\\hyper\\serena\\","serena","start-mcp-server","--context","ide-assistant","--project","C:\\Users\\hyper\\fwber\\"],
+      "startupTimeoutMs": 90000,
+      "timeoutMs": 30000
+    },
+    "zen-mcp-server": {
+      "command": "C:\\Users\\hyper\\.local\\bin\\uv.exe",
+      "args": ["run","--directory","C:\\Users\\hyper\\zen-mcp-server\\","zen-mcp-server"],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+        "OPENROUTER_API_KEY": "${OPENROUTER_API_KEY}",
+        "GEMINI_API_KEY": "${GEMINI_API_KEY}"
+      },
+      "startupTimeoutMs": 120000,
+      "timeoutMs": 60000
+    },
+    "memory": {
+      "command": "mcp-server-memory",
+      "args": [],
+      "startupTimeoutMs": 60000,
+      "timeoutMs": 30000
+    },
+    "filesystem": {
+      "command": "mcp-server-filesystem",
+      "args": ["C:\\Users\\hyper\\fwber\\"],
+      "startupTimeoutMs": 60000,
+      "timeoutMs": 30000
+    },
+    "sequential-thinking": {
+      "command": "mcp-server-sequential-thinking",
+      "args": [],
+      "startupTimeoutMs": 60000,
+      "timeoutMs": 30000
+    },
+    "chroma-knowledge": {
+      "command": "C:\\Users\\hyper\\chroma-env-312\\Scripts\\chroma-mcp-server.exe",
+      "args": ["--mode", "stdio", "--client-type", "http", "--host", "localhost", "--port", "8000", "--ssl", "false"],
+      "startupTimeoutMs": 60000,
+      "timeoutMs": 30000
+    }
+  },
+  "security": {
+    "allowedPaths": ["C:\\Users\\hyper\\fwber"],
+    "redactLogs": true
+  }
+}

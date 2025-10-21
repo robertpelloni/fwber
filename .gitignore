@@ -39,7 +39,7 @@ setup_wsl_*.ps1
 *_config.toml
 
 # Tools configuration directory (contains API key placeholders)
-tools_config_files/
+#tools_config_files/
 
 # Configuration backups
 config-backups/
