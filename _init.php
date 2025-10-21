@@ -30,6 +30,9 @@ try {
     error_log("Could not find .env file: " . $e->getMessage());
 }
 
+// Load secure configuration (Phase 1B: Eliminate hardcoded credentials)
+require_once __DIR__ . '/secure-config.php';
+
 // Configure secure session settings
 ini_set('session.cookie_httponly', 1);
 ini_set('session.cookie_secure', isSecure() ? 1 : 0);

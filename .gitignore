@@ -70,3 +70,6 @@ _secrets.php
 test-db-connection.php
 FIXING_MCP_FOR_REAL_PARALLEL_WORK.md
 fix-database-quick.ps1
+fwber-backend/.env.mysql
+COMPREHENSIVE_DEVELOPMENT_STATUS_2025_01_19.md
+DEVELOPMENT_STATUS_2025_01_19.md
