@@ -14,7 +14,7 @@
 
 #### **2. Serena MCP Server**
 - **Error:** "request timed out"
-- **Command:** `uv run --directory C:\Users\mrgen\serena\ serena start-mcp-server`
+- **Command:** `uv run --directory C:\Users\hyper\serena\ serena start-mcp-server`
 - **Status:** ❌ FAILING in Codex CLI
 - **Impact:** Blocks memory and project coordination features
 
@@ -65,7 +65,7 @@
 **Investigation Steps:**
 1. Verify UV installation: `uv --version`
 2. Check Serena package: `uv run serena --version`
-3. Test directory access: `C:\Users\mrgen\serena\`
+3. Test directory access: `C:\Users\hyper\serena\`
 4. Check Python environment
 
 ### **3. NPM-based MCP Servers Issues**
@@ -105,10 +105,10 @@ java -version
 uv --version
 
 # Check Serena package
-uv run --directory C:\Users\mrgen\serena\ serena --version
+uv run --directory C:\Users\hyper\serena\ serena --version
 
 # Test Serena MCP server manually
-uv run --directory C:\Users\mrgen\serena\ serena start-mcp-server --context ide-assistant --project C:\Users\mrgen\fwber\
+uv run --directory C:\Users\hyper\serena\ serena start-mcp-server --context ide-assistant --project C:\Users\hyper\fwber\
 ```
 
 ### **3. Check NPM-based MCP Servers**
@@ -152,7 +152,7 @@ npx -y gemini-mcp-tool
 pip install uv
 
 # Install Serena package
-uv run --directory C:\Users\mrgen\serena\ pip install serena
+uv run --directory C:\Users\hyper\serena\ pip install serena
 ```
 
 ### **3. Fix NPM-based Servers**

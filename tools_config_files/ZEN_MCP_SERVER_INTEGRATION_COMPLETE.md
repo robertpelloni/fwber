@@ -114,7 +114,7 @@ Zen MCP Server has been added to **ALL 7** configuration files:
 
 ### **Direct Usage:**
 ```bash
-cd C:\Users\mrgen\zen-mcp-server
+cd C:\Users\hyper\zen-mcp-server
 uv run zen-mcp-server --help
 uv run zen-mcp-server listmodels
 ```

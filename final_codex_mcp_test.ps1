@@ -6,7 +6,7 @@ Write-Host ""
 Write-Host "Configuration Status:" -ForegroundColor Yellow
 Write-Host "✅ All MCP servers now use full paths to executables" -ForegroundColor Green
 Write-Host "✅ npx servers: C:\Program Files\nodejs\npx.cmd" -ForegroundColor Green
-Write-Host "✅ UV servers: C:\Users\mrgen\.local\bin\uv.exe" -ForegroundColor Green
+Write-Host "✅ UV servers: C:\Users\hyper\.local\bin\uv.exe" -ForegroundColor Green
 Write-Host "✅ Timeout values increased to 120s startup, 300s operations" -ForegroundColor Green
 Write-Host ""
 

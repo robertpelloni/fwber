@@ -50,7 +50,7 @@ All servers installed via `npm install -g`:
 ✅ @playwright/mcp
 ```
 
-**Location:** `C:\Users\mrgen\AppData\Roaming\npm\node_modules\`
+**Location:** `C:\Users\hyper\AppData\Roaming\npm\node_modules\`
 
 ## 🔧 Immediate Action Plan
 
@@ -72,7 +72,7 @@ Remove redundant Codex config files and documentation
 ## 📝 Configuration Files to Keep
 
 ### Keep:
-- `C:\Users\mrgen\.codex\config.toml` - Archived for reference
+- `C:\Users\hyper\.codex\config.toml` - Archived for reference
 - This file (`MCP_WORKING_SOLUTION.md`) - Single source of truth
 
 ### Create:

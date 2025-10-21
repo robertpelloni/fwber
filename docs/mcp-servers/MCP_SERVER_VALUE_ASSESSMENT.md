@@ -8,7 +8,7 @@
 
 ### 1. **filesystem** - mcp-server-filesystem
 **Status**: ✅ ESSENTIAL - Keep enabled  
-**Command**: `mcp-server-filesystem C:\Users\mrgen\fwber\`  
+**Command**: `mcp-server-filesystem C:\Users\hyper\fwber\`  
 **What it does**: Provides file system operations (read, write, list, search) within the project directory  
 **Value for you**:
 - **Critical**: All AI models need to read/write code files
@@ -62,7 +62,7 @@
 
 ### 5. **serena** - Serena MCP (via uv)
 **Status**: ✅ VERY USEFUL - Keep enabled  
-**Command**: `uv run --directory %USERPROFILE%\serena\ serena start-mcp-server --context codex --project C:\Users\mrgen\fwber\`  
+**Command**: `uv run --directory %USERPROFILE%\serena\ serena start-mcp-server --context codex --project C:\Users\hyper\fwber\`  
 **Requires**: uv installed, Serena repository cloned  
 **What it does**: 
 - Memory-based context management across sessions
@@ -276,7 +276,7 @@
 
 - All configs use global executables (no npx) to avoid stdio handshake issues
 - No API keys in config files - all via environment variables
-- Filesystem roots restricted to C:\Users\mrgen\fwber
+- Filesystem roots restricted to C:\Users\hyper\fwber
 - Env allowlists enforce least-privilege access
 - Process cleanup script available to prevent zombie processes
 

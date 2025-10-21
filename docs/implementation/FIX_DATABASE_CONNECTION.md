@@ -54,7 +54,7 @@ DB_PASSWORD=Temppass0!
 Run these commands:
 
 ```bash
-cd C:\Users\mrgen\fwber\fwber-backend
+cd C:\Users\hyper\fwber\fwber-backend
 
 # Test connection
 php ..\test-db-connection.php

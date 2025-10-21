@@ -85,6 +85,16 @@ const mcpServers = {
         args: ["-y", "gemini-mcp-tool"],
         priority: 3
     },
+    "chroma-knowledge": {
+        command: "python",
+        args: ["-m", "chroma_mcp_server"],
+        priority: 3,
+        env: {
+            "CHROMA_CLIENT_TYPE": "http",
+            "CHROMA_HOST": "localhost",
+            "CHROMA_PORT": "8000"
+        }
+    },
     
     // Development Tools
     "everything": {

@@ -5,7 +5,7 @@ Write-Host ""
 
 Write-Host "Configuration Status:" -ForegroundColor Yellow
 Write-Host "✅ All npx servers now use: cmd /c npx.cmd" -ForegroundColor Green
-Write-Host "✅ All UV servers use full path: C:\Users\mrgen\.local\bin\uv.exe" -ForegroundColor Green
+Write-Host "✅ All UV servers use full path: C:\Users\hyper\.local\bin\uv.exe" -ForegroundColor Green
 Write-Host "✅ Timeout values: 120s startup, 300s operations" -ForegroundColor Green
 Write-Host ""
 

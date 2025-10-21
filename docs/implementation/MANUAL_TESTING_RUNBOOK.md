@@ -57,7 +57,7 @@ If you have PHP installed but no Apache/Nginx:
 
 ```bash
 # 1. Navigate to project
-cd C:\Users\mrgen\fwber
+cd C:\Users\hyper\fwber
 
 # 2. Start PHP built-in server
 php -S localhost:8000

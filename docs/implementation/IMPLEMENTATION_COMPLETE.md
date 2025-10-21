@@ -40,7 +40,7 @@ env_allowlist = [
   "XAI_API_KEY", "OPENROUTER_API_KEY",
   "USERPROFILE", "PATH", "NODE_PATH", "NODE"
 ]
-filesystem_roots = ["C:\\Users\\mrgen\\fwber"]
+filesystem_roots = ["C:\\Users\\hyper\\fwber"]
 ```
 
 ### Timeout & Retry Settings (Per Policy)
@@ -51,7 +51,7 @@ filesystem_roots = ["C:\\Users\\mrgen\\fwber"]
 
 ### Logging (Ready to Enable)
 - **Format:** JSONL
-- **Location:** `C:\Users\mrgen\fwber\AI_COORDINATION\logs\orchestrator.jsonl`
+- **Location:** `C:\Users\hyper\fwber\AI_COORDINATION\logs\orchestrator.jsonl`
 - **Rotation:** 10 MB / 10K events, keep 5, 14-day retention
 - **Redaction:** AI_LOG_REDACT=1
 
@@ -89,20 +89,20 @@ filesystem_roots = ["C:\\Users\\mrgen\\fwber"]
 ## 📁 Configuration Files Created
 
 ### Codex CLI
-**File:** `C:\Users\mrgen\.codex\config.toml`
+**File:** `C:\Users\hyper\.codex\config.toml`
 - ✅ Security allowlist implemented
 - ✅ 6 essential MCP servers
 - ✅ 2 optional servers (disabled)
 - ✅ Proper timeouts (60s/30s)
 
 ### Claude CLI  
-**File:** `C:\Users\mrgen\.claude\claude.json`
+**File:** `C:\Users\hyper\.claude\claude.json`
 - ✅ 6 essential MCP servers
 - ✅ Proper timeout/startup settings
 - ⚠️ Tool has startup bug (waiting for fix)
 
 ### Gemini CLI
-**File:** `C:\Users\mrgen\.gemini\mcp-config.json`
+**File:** `C:\Users\hyper\.gemini\mcp-config.json`
 - ✅ 5 essential MCP servers (no gemini-mcp-tool - native)
 - ✅ Working tool (tested)
 

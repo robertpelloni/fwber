@@ -35,7 +35,7 @@ Navigate to `fwber-backend/` directory and create `.env` file:
 
 **Option A: Copy from example**
 ```bash
-cd C:\Users\mrgen\fwber\fwber-backend
+cd C:\Users\hyper\fwber\fwber-backend
 copy .env.example .env
 notepad .env
 ```
@@ -71,7 +71,7 @@ ENCRYPTION_KEY=WWX6zi4UyNdkV0nBNKyloHA0tjNz+f/91KlO4NOcDgg=
 ### Step 2: Generate Laravel Application Key (30 seconds)
 
 ```bash
-cd C:\Users\mrgen\fwber\fwber-backend
+cd C:\Users\hyper\fwber\fwber-backend
 php artisan key:generate
 ```
 
@@ -109,7 +109,7 @@ curl http://localhost:8000/api/health
 
 ### Step 5: Add Encryption Key to Root .env (1 minute)
 
-Edit `C:\Users\mrgen\fwber\.env` and add:
+Edit `C:\Users\hyper\fwber\.env` and add:
 
 ```env
 # Multi-AI Security Fix (Phase 1A - October 18, 2025)
@@ -122,7 +122,7 @@ ENCRYPTION_KEY=WWX6zi4UyNdkV0nBNKyloHA0tjNz+f/91KlO4NOcDgg=
 
 **Test Legacy PHP:**
 ```bash
-cd C:\Users\mrgen\fwber
+cd C:\Users\hyper\fwber
 php -S 127.0.0.1:9000
 ```
 Open: http://127.0.0.1:9000

@@ -2,7 +2,7 @@
 
 **Version:** 1.1.0  
 **Date:** 2025-10-17  
-**Updated:** 2025-10-18 (adapted for mrgen user)
+**Updated:** 2025-10-18 (adapted for hyper user)
 
 ## Purpose and Scope
 
@@ -13,11 +13,11 @@
 ## Project Roots and Paths (Windows)
 
 ```
-PROJECT_ROOT: C:\Users\mrgen\fwber
-AI_COORDINATION_DIR: C:\Users\mrgen\fwber\AI_COORDINATION
-MCP_CONFIG_PATH: C:\Users\mrgen\fwber\tools_config_files\enhanced_mcp_settings.json
-MCP_FILESYSTEM_ROOTS: C:\Users\mrgen\fwber
-USERPROFILE: C:\Users\mrgen
+PROJECT_ROOT: C:\Users\hyper\fwber
+AI_COORDINATION_DIR: C:\Users\hyper\fwber\AI_COORDINATION
+MCP_CONFIG_PATH: C:\Users\hyper\fwber\tools_config_files\enhanced_mcp_settings.json
+MCP_FILESYSTEM_ROOTS: C:\Users\hyper\fwber
+USERPROFILE: C:\Users\hyper
 ```
 
 ## Secrets and API Keys (set via environment, not files)
@@ -97,11 +97,11 @@ POSTGRES_URL (optional; only if database tools are enabled)
 - **Retries:** maxRetries=2
 - **Backoff:** base=500ms, factor=2.0, max=15s, jitter on
 - **Health Checks:** Use "--version" or "--help" where available
-- **Allowed Paths:** Restricted to `C:\Users\mrgen\fwber`
+- **Allowed Paths:** Restricted to `C:\Users\hyper\fwber`
 
 ## Codex CLI Environment Allowlist (Explicit Policy)
 
-**File:** `C:\Users\mrgen\.codex\config.toml`
+**File:** `C:\Users\hyper\.codex\config.toml`
 
 ### Minimal Allowlist (Recommended)
 ```toml
@@ -118,7 +118,7 @@ env_allowlist = [
   "USERPROFILE",
   "PATH"
 ]
-filesystem_roots = ["C:\\Users\\mrgen\\fwber"]
+filesystem_roots = ["C:\\Users\\hyper\\fwber"]
 ```
 
 ### Secure-Expanded Allowlist (Opt-in After Validation)
@@ -141,7 +141,7 @@ env_allowlist = [
   "USERPROFILE",
   "PATH"
 ]
-filesystem_roots = ["C:\\Users\\mrgen\\fwber"]
+filesystem_roots = ["C:\\Users\\hyper\\fwber"]
 ```
 
 ## Operational Defaults for Orchestration
@@ -158,7 +158,7 @@ filesystem_roots = ["C:\\Users\\mrgen\\fwber"]
 
 1. **Store secrets only in environment variables** - Never commit keys to version control
 2. **Redact secrets from logs** - Enable AI_LOG_REDACT=1
-3. **Restrict filesystem access** - C:\Users\mrgen\fwber unless explicitly opted in
+3. **Restrict filesystem access** - C:\Users\hyper\fwber unless explicitly opted in
 4. **Least-privilege env allowlists** - For MCP clients (Codex, etc.)
 5. **Limit high-risk flags** - ("full-auto", raw mode) prefer "secure" profiles
 
@@ -166,7 +166,7 @@ filesystem_roots = ["C:\\Users\\mrgen\\fwber"]
 
 ```
 AI_LOG_JSONL=1
-Log file: C:\Users\mrgen\fwber\AI_COORDINATION\logs\orchestrator.jsonl
+Log file: C:\Users\hyper\fwber\AI_COORDINATION\logs\orchestrator.jsonl
 Rotation: 10 MB or 10,000 events; keep 5 rotations; 14-day retention
 Event keys: ts, level, event, taskId, model, durationMs, attempt, outcome, error, meta
 ```
@@ -292,30 +292,30 @@ Enable when you need:
 ## Configuration File Locations
 
 ```
-C:\Users\mrgen\.claude\claude.json
-C:\Users\mrgen\.cursor\mcp.json
-C:\Users\mrgen\AppData\Roaming\Cursor\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json
-C:\Users\mrgen\.codex\config.toml
-C:\Users\mrgen\.gemini\mcp-config.json (or settings.json)
-C:\Users\mrgen\.copilot\mcp-config.json
-C:\Users\mrgen\.grok\settings.json (or user-settings.json)
-C:\Users\mrgen\AppData\Roaming\JetBrains\WebStorm2025.3\options\llm.mcpServers.xml
-C:\Users\mrgen\AppData\Roaming\Claude\claude_desktop_config.json
-C:\Users\mrgen\AppData\Local\github-copilot\intellij\mcp.json
-C:\Users\mrgen\.serena\serena_config.yml
+C:\Users\hyper\.claude\claude.json
+C:\Users\hyper\.cursor\mcp.json
+C:\Users\hyper\AppData\Roaming\Cursor\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json
+C:\Users\hyper\.codex\config.toml
+C:\Users\hyper\.gemini\mcp-config.json (or settings.json)
+C:\Users\hyper\.copilot\mcp-config.json
+C:\Users\hyper\.grok\settings.json (or user-settings.json)
+C:\Users\hyper\AppData\Roaming\JetBrains\WebStorm2025.3\options\llm.mcpServers.xml
+C:\Users\hyper\AppData\Roaming\Claude\claude_desktop_config.json
+C:\Users\hyper\AppData\Local\github-copilot\intellij\mcp.json
+C:\Users\hyper\.serena\serena_config.yml
 ```
 
 ## Change Log
 
 ### 1.1.1 (2025-10-18)
-- Adapted for mrgen user (was hyper)
+- Adapted for hyper user (was hyper)
 - Added current status of working/broken tools
 - Integrated lessons learned from Codex stdio bug discovery
 - Added globally installed MCP servers to enabled list
 
 ### 1.1.0 (2025-10-17)
 - Rewrote into operational policy with security, orchestration workflow
-- Standardized Windows paths (mrgen → hyper)
+- Standardized Windows paths (hyper → hyper)
 - Set JetBrains MCP disabled by default
 - Custom orchestrator disabled by default
 - Introduced JSONL structured logging and rotation guidance

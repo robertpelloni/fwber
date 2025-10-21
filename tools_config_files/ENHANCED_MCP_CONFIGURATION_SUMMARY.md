@@ -94,7 +94,7 @@
 
 ### **✅ File System Operations**
 - **All tools** can access file system through `filesystem` MCP server
-- **Project directory:** `C:\Users\mrgen\fwber\`
+- **Project directory:** `C:\Users\hyper\fwber\`
 - **Capabilities:** Read, write, list, search files across the project
 
 ### **✅ Memory & Knowledge Management**

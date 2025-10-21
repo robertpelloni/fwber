@@ -16,8 +16,8 @@ I deleted these 3 files (can restore from git if needed):
 - `MCP_WORKING_SOLUTION.md`
 - `MULTI_AI_ORCHESTRATION_FINAL_STATUS.md`
 - `ROLLBACK_INSTRUCTIONS.md` (this file)
-- `C:\Users\mrgen\.claude\claude.json`
-- `C:\Users\mrgen\.gemini\mcp-config.json`
+- `C:\Users\hyper\.claude\claude.json`
+- `C:\Users\hyper\.gemini\mcp-config.json`
 
 ### 4. Installed Global npm Packages
 ```bash
@@ -53,9 +53,9 @@ git checkout HEAD -- codex_config_improved.toml
 
 ### Option 2: From Backup
 If you have backups at:
-- `C:\Users\mrgen\.codex\config.toml.backup`
-- `C:\Users\mrgen\.codex\config.toml.backup_20251015_133128`
-- `C:\Users\mrgen\.codex\config.toml.backup_full`
+- `C:\Users\hyper\.codex\config.toml.backup`
+- `C:\Users\hyper\.codex\config.toml.backup_20251015_133128`
+- `C:\Users\hyper\.codex\config.toml.backup_full`
 
 ## How to Uninstall Global Packages
 

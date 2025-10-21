@@ -39,7 +39,7 @@ All servers successfully installed via `npm install -g`:
 ✅ @playwright/mcp
 ```
 
-**Global Location:** `C:\Users\mrgen\AppData\Roaming\npm\node_modules\`
+**Global Location:** `C:\Users\hyper\AppData\Roaming\npm\node_modules\`
 
 ## 🔧 CLI Tools Status
 
@@ -52,7 +52,7 @@ All servers successfully installed via `npm install -g`:
 ### ✅ **Gemini CLI** (WORKING)
 - **Status:** ✅ OPERATIONAL  
 - **Version:** 0.9.0
-- **MCP Config:** Created at `C:\Users\mrgen\.gemini\mcp-config.json`
+- **MCP Config:** Created at `C:\Users\hyper\.gemini\mcp-config.json`
 - **Recommendation:** Use for alternative AI perspectives
 
 ### ❌ **Codex CLI** - BROKEN
@@ -65,7 +65,7 @@ All servers successfully installed via `npm install -g`:
 ### ❌ **Claude CLI** - BROKEN  
 - **Status:** ❌ CRASH ON START
 - **Issue:** `TypeError: Cannot read properties of undefined (reading 'prototype')`
-- **MCP Config:** Created at `C:\Users\mrgen\.claude\claude.json` (for when fixed)
+- **MCP Config:** Created at `C:\Users\hyper\.claude\claude.json` (for when fixed)
 - **Recommendation:** Wait for Anthropic to fix
 
 ## 🚀 Working Multi-AI Orchestration Approach
@@ -96,11 +96,11 @@ gemini "Review this architecture design"
 
 ### Working Configurations:
 1. **Cursor IDE**: Already configured (built-in)
-2. **Gemini CLI**: `C:\Users\mrgen\.gemini\mcp-config.json` ✅
-3. **Claude CLI**: `C:\Users\mrgen\.claude\claude.json` (ready for when fixed)
+2. **Gemini CLI**: `C:\Users\hyper\.gemini\mcp-config.json` ✅
+3. **Claude CLI**: `C:\Users\hyper\.claude\claude.json` (ready for when fixed)
 
 ### Archived Configurations:
-4. **Codex CLI**: `C:\Users\mrgen\.codex\config.toml` (broken, archived)
+4. **Codex CLI**: `C:\Users\hyper\.codex\config.toml` (broken, archived)
 
 ## 🎯 Recommended Workflow for FWBer.me
 

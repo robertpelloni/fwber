@@ -87,13 +87,13 @@
       "args": [
         "run",
         "--directory",
-        "C:\\Users\\mrgen\\serena\\",
+        "C:\\Users\\hyper\\serena\\",
         "serena",
         "start-mcp-server",
         "--context",
         "ide-assistant",
         "--project",
-        "C:\\Users\\mrgen\\fwber\\"
+        "C:\\Users\\hyper\\fwber\\"
       ],
       "timeout": 30000,
       "startupTimeout": 60000

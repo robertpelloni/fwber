@@ -110,7 +110,7 @@ The workflow I demonstrated (parallel analysis → consensus → parallel implem
 ### Option 1: Fix Zen MCP Connection (RECOMMENDED)
 
 **Steps:**
-1. Update `C:\Users\mrgen\.cursor\mcp.json` (add Zen MCP Server with API keys)
+1. Update `C:\Users\hyper\.cursor\mcp.json` (add Zen MCP Server with API keys)
 2. Restart Cursor completely
 3. Verify `mcp_zen-mcp-server_*` tools appear
 4. Use analyze/secaudit/consensus/codereview tools

@@ -17,7 +17,7 @@ This guide documents the unified configuration for orchestrating multiple AI mod
 
 ### 1. filesystem - File Operations
 - **Package**: `@modelcontextprotocol/server-filesystem`
-- **Command**: `mcp-server-filesystem C:\Users\mrgen\fwber\`
+- **Command**: `mcp-server-filesystem C:\Users\hyper\fwber\`
 - **Purpose**: Read, write, list, search files within project
 - **Status**: ✅ Essential - enabled in ALL configs
 
@@ -29,7 +29,7 @@ This guide documents the unified configuration for orchestrating multiple AI mod
 
 ### 3. serena - Memory & Symbol Analysis
 - **Package**: Custom (via uv)
-- **Command**: `uv run --directory %USERPROFILE%\serena\ serena start-mcp-server --context <cli> --project C:\Users\mrgen\fwber\`
+- **Command**: `uv run --directory %USERPROFILE%\serena\ serena start-mcp-server --context <cli> --project C:\Users\hyper\fwber\`
 - **Purpose**: Context memory, symbol tracking, large project navigation
 - **Status**: ✅ Very useful - enabled in ALL configs
 
@@ -90,7 +90,7 @@ ANTHROPIC_API_KEY=sk-ant-...
 GEMINI_API_KEY=AIza...
 XAI_API_KEY=xai-...
 GITHUB_TOKEN=ghp_...
-PROJECT_ROOT=C:\Users\mrgen\fwber
+PROJECT_ROOT=C:\Users\hyper\fwber
 ```
 
 **Security**: Never commit API keys to files. All configs reference `${env:VAR_NAME}` or `${VAR_NAME}`.

@@ -67,7 +67,7 @@ Write-Host "5. Testing MCP server startup..." -ForegroundColor Yellow
 # Test Zen MCP Server startup
 Write-Host "   Testing Zen MCP Server startup..." -ForegroundColor Blue
 try {
-    $zenProcess = Start-Process -FilePath "uv" -ArgumentList "run", "--directory", "C:\Users\mrgen\zen-mcp-server\", "zen-mcp-server" -PassThru -WindowStyle Hidden
+    $zenProcess = Start-Process -FilePath "uv" -ArgumentList "run", "--directory", "C:\Users\hyper\zen-mcp-server\", "zen-mcp-server" -PassThru -WindowStyle Hidden
     Start-Sleep -Seconds 3
     if (!$zenProcess.HasExited) {
         Write-Host "      ✅ Zen MCP Server started successfully" -ForegroundColor Green
