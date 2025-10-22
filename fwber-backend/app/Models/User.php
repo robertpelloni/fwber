@@ -44,4 +44,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Photo::class);
     }
+
+    public function location()
+    {
+        return $this->hasOne(UserLocation::class);
+    }
 }

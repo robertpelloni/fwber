@@ -1,14 +1,19 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BulletinBoardController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\MatchController;
+use App\Http\Controllers\MercureAuthController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware("api")->group(function (): void {
-    Route::post("/auth/register", [AuthController::class, "register"]);
-    Route::post("/auth/login", [AuthController::class, "login"]);
+    Route::middleware('throttle:auth')->group(function () {
+        Route::post("/auth/register", [AuthController::class, "register"]);
+        Route::post("/auth/login", [AuthController::class, "login"]);
+    });
 
     Route::middleware("auth.api")->group(function (): void {
         // Profile routes (Phase 3A - Multi-AI Implementation)
@@ -28,5 +33,26 @@ Route::middleware("api")->group(function (): void {
         Route::put("/photos/{id}", [PhotoController::class, "update"]);
         Route::delete("/photos/{id}", [PhotoController::class, "destroy"]);
         Route::post("/photos/reorder", [PhotoController::class, "reorder"]);
+        
+        // Location routes (Phase 5A - Location-Based Social Features)
+        Route::get("/location", [LocationController::class, "show"]);
+        Route::post("/location", [LocationController::class, "update"]);
+        Route::put("/location/privacy", [LocationController::class, "updatePrivacy"]);
+        Route::delete("/location", [LocationController::class, "clear"]);
+        Route::get("/location/nearby", [LocationController::class, "nearby"]);
+        
+        // Bulletin Board routes (Phase 5B - Location-Based Bulletin Board System)
+        Route::get("/bulletin-boards", [BulletinBoardController::class, "index"]);
+        Route::get("/bulletin-boards/{id}", [BulletinBoardController::class, "show"]);
+        Route::post("/bulletin-boards", [BulletinBoardController::class, "createOrFind"]);
+        Route::middleware('throttle:bulletin-message')->group(function () {
+            Route::post("/bulletin-boards/{id}/messages", [BulletinBoardController::class, "postMessage"]);
+        });
+        Route::get("/bulletin-boards/{id}/messages", [BulletinBoardController::class, "getMessages"]);
+        Route::get("/bulletin-boards/{id}/stream", [BulletinBoardController::class, "stream"]);
+        
+        // Mercure SSE Broker routes
+        Route::get("/mercure/cookie", [MercureAuthController::class, "cookie"]);
+        Route::get("/mercure/status", [MercureAuthController::class, "status"]);
     });
 });
