@@ -23,7 +23,7 @@
 				"serena",
 				"start-mcp-server",
 				"--context",
-				"claude",
+				"desktop-app",
 				"--project",
 				"C:\\Users\\hyper\\fwber\\"
 			],
@@ -55,16 +55,19 @@
 			"timeout": 30000
 		},
 		"chroma-knowledge": {
-			"command": "python",
+			"command": "C:\\Users\\hyper\\chroma-env-312\\Scripts\\chroma-mcp-server.exe",
 			"args": [
-				"-m",
-				"chroma_mcp_server"
+				"--mode",
+				"stdio",
+				"--client-type",
+				"http",
+				"--host",
+				"localhost",
+				"--port",
+				"8000",
+				"--ssl",
+				"false"
 			],
-			"env": {
-				"CHROMA_CLIENT_TYPE": "http",
-				"CHROMA_HOST": "localhost",
-				"CHROMA_PORT": "8000"
-			},
 			"timeout": 30000
 		}
 	}

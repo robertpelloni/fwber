@@ -65,8 +65,8 @@
     "lightTint": "white"
   },
   "scratchpad": {
-    "engine": "",
-    "model": "",
+    "engine": "google",
+    "model": "gemini-pro-latest",
     "fontSize": "3",
     "fontFamily": "serif"
   },
@@ -88,7 +88,7 @@
   "studio": {
     "type": "image",
     "engines": {
-      "image": "openai",
+      "image": "xai",
       "imageEdit": "google",
       "video": "replicate",
       "videoEdit": "replicate"
@@ -430,9 +430,9 @@
         "command": "C:\\Users\\hyper\\.local\\bin\\uv.exe",
         "url": "run --directory C:\\Users\\hyper\\zen-mcp-server\\ zen-mcp-server",
         "env": {
-			"OPENAI_API_KEY": "${OPENAI_API_KEY}",
-			"OPENROUTER_API_KEY": "${OPENROUTER_API_KEY}",
-			"GEMINI_API_KEY": "${GEMINI_API_KEY}"
+          "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+          "OPENROUTER_API_KEY": "${OPENROUTER_API_KEY}",
+          "GEMINI_API_KEY": "${GEMINI_API_KEY}"
         },
         "toolSelection": null
       },

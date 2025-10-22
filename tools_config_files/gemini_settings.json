@@ -1,66 +1,7 @@
 {
 	"mcpServers": {
-		"serena": {
-			"command": "uv",
-			"type": "stdio",
-			"transport": "stdio",
-			"args": [
-				"run",
-				"--directory",
-				"C:\\Users\\hyper\\serena\\",
-				"serena",
-				"start-mcp-server",
-				"--context",
-				"agent",
-				"--project",
-				"C:\\Users\\hyper\\fwber\\"
-			]
-		},
-		"sequential-thinking": {
-			"command": "npx",
-			"args": [
-				"-y",
-				"@modelcontextprotocol/server-sequential-thinking"
-			]
-		},
-		"codex-mcp-server": {
-			"type": "stdio",
-			"command": "npx",
-			"args": [
-				"-y",
-				"codex-mcp-server"
-			]
-		},
-		"filesystem": {
-			"command": "npx",
-			"args": [
-				"-y",
-				"@modelcontextprotocol/server-filesystem",
-				"C:\\Users\\hyper\\fwber\\"
-			],
-			"timeout": 30000,
-			"startupTimeout": 60000
-		},
-		"memory": {
-			"command": "npx",
-			"args": [
-				"-y",
-				"@modelcontextprotocol/server-memory"
-			],
-			"timeout": 30000,
-			"startupTimeout": 60000
-		},
-		"everything": {
-			"command": "npx",
-			"args": [
-				"-y",
-				"@modelcontextprotocol/server-everything"
-			],
-			"timeout": 30000,
-			"startupTimeout": 60000
-		},
 		"zen-mcp-server": {
-			"command": "uv",
+			"command": "C:\\Users\\hyper\\.local\\bin\\uv.exe",
 			"args": [
 				"run",
 				"--directory",
@@ -68,20 +9,57 @@
 				"zen-mcp-server"
 			],
 			"env": {
-				"OPENAI_API_KEY": "${OPENAI_API_KEY}",
-				"OPENROUTER_API_KEY": "${OPENROUTER_API_KEY}",
-				"GEMINI_API_KEY": "${GEMINI_API_KEY}"
 			},
-			"timeout": 30000,
-			"startupTimeout": 60000
+			"startupTimeoutMs": 120000,
+			"timeoutMs": 60000
 		},
 		"chroma-knowledge": {
-			"command": "chroma-mcp-server",
+			"command": "C:\\Users\\hyper\\chroma-env-312\\Scripts\\chroma-mcp-server.exe",
 			"args": [
-				"--mode", "stdio", "--client-type", "http", "--host", "localhost", "--port", "8000", "--ssl", "false"
+				"--mode",
+				"stdio",
+				"--client-type",
+				"http",
+				"--host",
+				"localhost",
+				"--port",
+				"8000",
+				"--ssl",
+				"false"
+			],
+			"startupTimeoutMs": 60000,
+			"timeoutMs": 30000
+		},
+		"codex-mcp-server": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"codex-mcp-server"
 			],
 			"timeout": 30000,
 			"startupTimeout": 60000
+		},
+		"memory": {
+			"command": "mcp-server-memory",
+			"args": [
+			],
+			"startupTimeoutMs": 60000,
+			"timeoutMs": 30000
+		},
+		"sequential-thinking": {
+			"command": "mcp-server-sequential-thinking",
+			"args": [
+			],
+			"startupTimeoutMs": 60000,
+			"timeoutMs": 30000
+		},
+		"everything": {
+			"command": "mcp-server-everything",
+			"args": [
+			],
+			"startupTimeoutMs": 60000,
+			"timeoutMs": 30000
 		}
 	},
 	"security": {

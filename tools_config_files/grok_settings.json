@@ -1,22 +1,6 @@
 {
 	"model": "grok-code-fast-1",
 	"mcpServers": {
-		"serena": {
-			"command": "uv",
-			"type": "stdio",
-			"transport": "stdio",
-			"args": [
-				"run",
-				"--directory",
-				"C:\\Users\\hyper\\serena\\",
-				"serena",
-				"start-mcp-server",
-				"--context",
-				"agent",
-				"--project",
-				"C:\\Users\\hyper\\fwber\\"
-			]
-		},
 		"sequential-thinking": {
 			"command": "npx",
 			"args": [
@@ -39,16 +23,6 @@
 				"-y",
 				"gemini-mcp-tool"
 			]
-		},
-		"filesystem": {
-			"command": "npx",
-			"args": [
-				"-y",
-				"@modelcontextprotocol/server-filesystem",
-				"C:\\Users\\hyper\\fwber\\"
-			],
-			"timeout": 30000,
-			"startupTimeout": 60000
 		},
 		"memory": {
 			"command": "npx",
