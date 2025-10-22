@@ -39,13 +39,11 @@ class BulletinBoardController extends Controller
         $lng = $request->input('lng');
         $radius = $request->input('radius', 5000); // Default 5km
 
-        // Use PostGIS spatial query for accurate proximity search
-        $point = DB::raw('ST_SetSRID(ST_MakePoint(?, ?), 4326)::geography');
-        
+        // Use MySQL spatial query for proximity search
         $boards = DB::table('bulletin_boards')
             ->where('is_active', true)
-            ->whereRaw('ST_DWithin(location, ?, ?)', [$point, $lng, $lat, $radius])
-            ->orderByRaw('ST_Distance(location, ?)', [$point, $lng, $lat])
+            ->whereRaw('ST_Distance_Sphere(location, POINT(?, ?)) <= ?', [$lng, $lat, $radius])
+            ->orderByRaw('ST_Distance_Sphere(location, POINT(?, ?))', [$lng, $lat])
             ->orderBy('last_activity_at', 'desc')
             ->limit(20)
             ->get();
@@ -118,10 +116,10 @@ class BulletinBoardController extends Controller
             ]
         );
         
-        // Update PostGIS location if it's null
+        // Update MySQL spatial location if it's null
         if (!$board->location) {
             DB::statement(
-                'UPDATE bulletin_boards SET location = ST_SetSRID(ST_MakePoint(?, ?), 4326)::geography WHERE id = ?',
+                'UPDATE bulletin_boards SET location = POINT(?, ?) WHERE id = ?',
                 [$lng, $lat, $board->id]
             );
         }
@@ -173,9 +171,9 @@ class BulletinBoardController extends Controller
                 : now()->addDays(7), // Default 7 days
         ]);
         
-        // Set PostGIS location for the message
+        // Set MySQL spatial location for the message
         DB::statement(
-            'UPDATE bulletin_messages SET location = ST_SetSRID(ST_MakePoint(?, ?), 4326)::geography WHERE id = ?',
+            'UPDATE bulletin_messages SET location = POINT(?, ?) WHERE id = ?',
             [$lng, $lat, $message->id]
         );
 
