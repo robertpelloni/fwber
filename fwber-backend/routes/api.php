@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BulletinBoardController;
 use App\Http\Controllers\LocationController;
@@ -7,6 +8,8 @@ use App\Http\Controllers\MatchController;
 use App\Http\Controllers\MercureAuthController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RecommendationController;
+use App\Http\Controllers\WebSocketController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware("api")->group(function (): void {
@@ -54,5 +57,20 @@ Route::middleware("api")->group(function (): void {
         // Mercure SSE Broker routes
         Route::get("/mercure/cookie", [MercureAuthController::class, "cookie"]);
         Route::get("/mercure/status", [MercureAuthController::class, "status"]);
+        
+        // Analytics routes (admin only)
+        Route::get("/analytics", [AnalyticsController::class, "index"]);
+        Route::get("/analytics/realtime", [AnalyticsController::class, "realtime"]);
+        Route::get("/analytics/moderation", [AnalyticsController::class, "moderation"]);
+        
+        // Recommendation routes (AI-powered personalization)
+        Route::prefix("recommendations")->group(function (): void {
+            Route::get("/", [RecommendationController::class, "index"]);
+            Route::get("/trending", [RecommendationController::class, "trending"]);
+            Route::get("/feed", [RecommendationController::class, "feed"]);
+            Route::get("/type/{type}", [RecommendationController::class, "byType"]);
+            Route::post("/feedback", [RecommendationController::class, "feedback"]);
+            Route::get("/analytics", [RecommendationController::class, "analytics"]);
+        });
     });
 });
