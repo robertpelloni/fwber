@@ -9,6 +9,7 @@ use App\Http\Controllers\MatchController;
 use App\Http\Controllers\MercureAuthController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RateLimitController;
 use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\WebSocketController;
 use Illuminate\Support\Facades\Route;
@@ -99,6 +100,16 @@ Route::middleware("api")->group(function (): void {
                 Route::post("/feedback", [ContentGenerationController::class, "submitContentFeedback"]);
                 Route::get("/history", [ContentGenerationController::class, "getGenerationHistory"]);
                 Route::delete("/content/{contentId}", [ContentGenerationController::class, "deleteGeneratedContent"]);
+            });
+
+            // Rate Limiting routes (Advanced security features)
+            Route::prefix("rate-limits")->group(function (): void {
+                Route::get("/status/{action?}", [RateLimitController::class, "getStatus"]);
+                Route::get("/all-status", [RateLimitController::class, "getAllStatus"]);
+                Route::post("/reset/{action}", [RateLimitController::class, "reset"]);
+                Route::get("/stats/{timeframe?}", [RateLimitController::class, "getStats"]);
+                Route::get("/suspicious-activity", [RateLimitController::class, "checkSuspiciousActivity"]);
+                Route::post("/cleanup", [RateLimitController::class, "cleanup"]);
             });
     });
 });
