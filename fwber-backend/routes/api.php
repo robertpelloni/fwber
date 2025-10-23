@@ -72,5 +72,19 @@ Route::middleware("api")->group(function (): void {
             Route::post("/feedback", [RecommendationController::class, "feedback"]);
             Route::get("/analytics", [RecommendationController::class, "analytics"]);
         });
+
+        // WebSocket routes (bidirectional real-time communication)
+        Route::prefix("websocket")->group(function (): void {
+            Route::post("/connect", [WebSocketController::class, "connect"]);
+            Route::post("/disconnect", [WebSocketController::class, "disconnect"]);
+            Route::post("/message", [WebSocketController::class, "sendMessage"]);
+            Route::post("/typing", [WebSocketController::class, "sendTypingIndicator"]);
+            Route::post("/presence", [WebSocketController::class, "updatePresence"]);
+            Route::post("/notification", [WebSocketController::class, "sendNotification"]);
+            Route::get("/online-users", [WebSocketController::class, "getOnlineUsers"]);
+            Route::get("/connections", [WebSocketController::class, "getUserConnections"]);
+            Route::get("/status", [WebSocketController::class, "status"]);
+            Route::post("/broadcast", [WebSocketController::class, "broadcast"]);
+        });
     });
 });
