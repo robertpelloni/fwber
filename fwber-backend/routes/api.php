@@ -3,6 +3,7 @@
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BulletinBoardController;
+use App\Http\Controllers\ContentGenerationController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\MatchController;
 use App\Http\Controllers\MercureAuthController;
@@ -73,18 +74,31 @@ Route::middleware("api")->group(function (): void {
             Route::get("/analytics", [RecommendationController::class, "analytics"]);
         });
 
-        // WebSocket routes (bidirectional real-time communication)
-        Route::prefix("websocket")->group(function (): void {
-            Route::post("/connect", [WebSocketController::class, "connect"]);
-            Route::post("/disconnect", [WebSocketController::class, "disconnect"]);
-            Route::post("/message", [WebSocketController::class, "sendMessage"]);
-            Route::post("/typing", [WebSocketController::class, "sendTypingIndicator"]);
-            Route::post("/presence", [WebSocketController::class, "updatePresence"]);
-            Route::post("/notification", [WebSocketController::class, "sendNotification"]);
-            Route::get("/online-users", [WebSocketController::class, "getOnlineUsers"]);
-            Route::get("/connections", [WebSocketController::class, "getUserConnections"]);
-            Route::get("/status", [WebSocketController::class, "status"]);
-            Route::post("/broadcast", [WebSocketController::class, "broadcast"]);
-        });
+            // WebSocket routes (bidirectional real-time communication)
+            Route::prefix("websocket")->group(function (): void {
+                Route::post("/connect", [WebSocketController::class, "connect"]);
+                Route::post("/disconnect", [WebSocketController::class, "disconnect"]);
+                Route::post("/message", [WebSocketController::class, "sendMessage"]);
+                Route::post("/typing", [WebSocketController::class, "sendTypingIndicator"]);
+                Route::post("/presence", [WebSocketController::class, "updatePresence"]);
+                Route::post("/notification", [WebSocketController::class, "sendNotification"]);
+                Route::get("/online-users", [WebSocketController::class, "getOnlineUsers"]);
+                Route::get("/connections", [WebSocketController::class, "getUserConnections"]);
+                Route::get("/status", [WebSocketController::class, "status"]);
+                Route::post("/broadcast", [WebSocketController::class, "broadcast"]);
+            });
+
+            // Content Generation routes (AI-powered content creation and optimization)
+            Route::prefix("content-generation")->group(function (): void {
+                Route::post("/profile", [ContentGenerationController::class, "generateProfileContent"]);
+                Route::post("/posts/{boardId}/suggestions", [ContentGenerationController::class, "generatePostSuggestions"]);
+                Route::post("/conversation-starters", [ContentGenerationController::class, "generateConversationStarters"]);
+                Route::post("/optimize", [ContentGenerationController::class, "optimizeContent"]);
+                Route::get("/stats", [ContentGenerationController::class, "getGenerationStats"]);
+                Route::get("/optimization-stats", [ContentGenerationController::class, "getOptimizationStats"]);
+                Route::post("/feedback", [ContentGenerationController::class, "submitContentFeedback"]);
+                Route::get("/history", [ContentGenerationController::class, "getGenerationHistory"]);
+                Route::delete("/content/{contentId}", [ContentGenerationController::class, "deleteGeneratedContent"]);
+            });
     });
 });
