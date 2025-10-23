@@ -167,6 +167,48 @@ Essential environment variables for all tools:
 4. **Standardize Configurations**: Keep all tool configurations synchronized
 5. **Leverage Multi-Model Consensus**: Use Zen MCP Server for complex decisions
 
+## User Instructions for Project Workflow
+
+### Orchestration Commands
+- **"Please continue!"** - Continue with current development phase
+- **"Keep on going!"** - Maintain momentum on current tasks
+- **"Reach out to several other major models and get their input"** - Use multi-model consensus
+- **"Delegate tasks through their respective CLI tools"** - Assign specific tasks to different AI models
+- **"Use your MCP tools as effectively as you can"** - Leverage all available MCP servers
+
+### Fix and Debug Commands
+- **"Fix any errors encountered during development"** - Proactively identify and resolve issues
+- **"Use your resources to come up with solutions to solve them"** - Leverage all available tools for problem-solving
+- **"Ask me to help if needed"** - Escalate to user when tools are insufficient
+- **"Troubleshoot and fix API key issues proactively"** - Monitor and resolve authentication problems
+- **"Use fallback models"** - Switch to alternative AI models when primary ones fail
+
+### Memory and Documentation Commands
+- **"Please store extensive memories and documentation"** - Use all available memory systems
+- **"Store memories in chroma, memory, serena memory, and md documents"** - Comprehensive documentation across systems
+- **"Document the project and all progress"** - Maintain complete project documentation
+- **"Debate decisions and points made by the multi-AI system"** - Record all AI model interactions and decisions
+
+### Development Workflow Commands
+- **"Test the system by running the migrations and starting the servers"** - End-to-end testing
+- **"Implement the AI recommendations"** - Execute consensus-based recommendations
+- **"Continue with the next feature"** - Proceed to next development phase
+- **"Create a demo showing the feature in action"** - Build demonstration capabilities
+
+### Multi-AI Collaboration Commands
+- **"Make sure to communicate with other models"** - Maintain inter-model communication
+- **"Assign them tasks and have them do work through the CLI tools"** - Task delegation across models
+- **"Make recommendations about what I could do to improve the process"** - Continuous improvement suggestions
+- **"If there are other/better tools I could install"** - Tool recommendations for enhancement
+- **"Anything that you need from me on my end"** - User assistance requests
+
+### Error Handling Commands
+- **"If you encounter errors, use your resources to come up with solutions"** - Self-sufficient problem solving
+- **"Ask me to help"** - User escalation when needed
+- **"Proactive error identification"** - Anticipate and prevent issues
+- **"Graceful degradation"** - Maintain functionality during failures
+- **"Fallback AI models"** - Use alternative models when primary ones fail
+
 ## Future Enhancements
 
 1. **Subagent Systems**: Implement specialized AI agents for specific tasks
