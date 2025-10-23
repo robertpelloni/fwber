@@ -3,14 +3,7 @@
 .vscode/
 *.swp
 *.swo
-/.claude/*
-/.cursor/*
-/.gemini/*
-/.grok/*
-/.copilot/*
-/.codex/*
-/.serena/*
-/.vscode/*
+
 
 # Secrets and environment
 .env
@@ -76,3 +69,8 @@ DEVELOPMENT_STATUS_2025_01_19.md
 FWBER_DEVELOPMENT_PROGRESS_2025_01_19.md
 test-token.txt
 API_CONFIGURATION_SOLUTION_2025_01_21.md
+.serena/memories/api_configuration_troubleshooting_2025_01_21.md
+.serena/memories/api_fix_success_2025_01_21.md
+.serena/memories/fwber_phase1_security_complete_2025_01_19.md
+.serena/memories/iphone_4_recovery_summary.md
+.serena/memories/proximity_chatroom_testing_and_deployment.md
