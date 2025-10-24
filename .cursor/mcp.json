@@ -73,14 +73,6 @@
 			],
 			"startupTimeoutMs": 60000,
 			"timeoutMs": 30000
-		},
-		"everything": {
-			"type": "stdio",
-			"command": "mcp-server-everything",
-			"args": [
-			],
-			"startupTimeoutMs": 60000,
-			"timeoutMs": 30000
 		}
 	}
 }
