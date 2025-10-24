@@ -1,90 +1,285 @@
-# Comprehensive MCP Server Test
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
 
-Write-Host "=== Comprehensive MCP Server Test ===" -ForegroundColor Cyan
-Write-Host ""
+function Get-LogDirectory {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$StartDirectory
+  )
 
-# Test 1: Check MCP server status
-Write-Host "1. MCP Server Status Check:" -ForegroundColor Yellow
-$mcpList = codex mcp list 2>&1
-$enabledCount = ($mcpList | Select-String "enabled").Count
-$disabledCount = ($mcpList | Select-String "disabled").Count
-
-Write-Host "   ✅ Enabled Servers: $enabledCount" -ForegroundColor Green
-Write-Host "   ⚠️  Disabled Servers: $disabledCount" -ForegroundColor Yellow
-
-# Test 2: Test individual server connectivity
-Write-Host ""
-Write-Host "2. Testing Individual Server Connectivity:" -ForegroundColor Yellow
-
-# Test Serena
-Write-Host "   Testing Serena MCP Server..." -ForegroundColor White
-try {
-    $serenaTest = codex mcp get serena 2>&1
-    if ($serenaTest -match "enabled: true") {
-        Write-Host "   ✅ Serena: Working" -ForegroundColor Green
-    } else {
-        Write-Host "   ❌ Serena: Not working" -ForegroundColor Red
+  $currentDir = $StartDirectory
+  while ($currentDir -and -not (Test-Path -LiteralPath (Join-Path -Path $currentDir -ChildPath "AI_COORDINATION"))) {
+    $parentDir = Split-Path -Parent $currentDir
+    if (-not $parentDir -or $parentDir -eq $currentDir) {
+      break
     }
-} catch {
-    Write-Host "   ❌ Serena: Error - $($_.Exception.Message)" -ForegroundColor Red
+    $currentDir = $parentDir
+  }
+
+  if ($currentDir -and (Test-Path -LiteralPath (Join-Path -Path $currentDir -ChildPath "AI_COORDINATION"))) {
+    $logDir = Join-Path -Path $currentDir -ChildPath "AI_COORDINATION\logs"
+  } else {
+    $logDir = Join-Path -Path $StartDirectory -ChildPath "logs"
+  }
+
+  if (-not (Test-Path -LiteralPath $logDir)) {
+    New-Item -Path $logDir -ItemType Directory -Force | Out-Null
+  }
+
+  return $logDir
 }
 
-# Test Zen MCP Server
-Write-Host "   Testing Zen MCP Server..." -ForegroundColor White
-try {
-    $zenTest = codex mcp get zen-mcp-server 2>&1
-    if ($zenTest -match "enabled: true") {
-        Write-Host "   ✅ Zen MCP Server: Working" -ForegroundColor Green
-    } else {
-        Write-Host "   ❌ Zen MCP Server: Not working" -ForegroundColor Red
+function Invoke-ProcessTest {
+  param(
+    [Parameter(Mandatory = $true)]
+    [hashtable]$Test
+  )
+
+  if (-not $Test.ContainsKey('Name') -or [string]::IsNullOrWhiteSpace([string]$Test['Name'])) {
+    throw "Test definition is missing the 'Name' property."
+  }
+
+  if (-not $Test.ContainsKey('FilePath') -or [string]::IsNullOrWhiteSpace([string]$Test['FilePath'])) {
+    throw "Test '$($Test['Name'])' is missing the 'FilePath' property."
+  }
+
+  $name = [string]$Test['Name']
+  $filePath = [string]$Test['FilePath']
+  $argumentList = [System.Collections.Generic.List[string]]::new()
+  if ($Test.ContainsKey('Arguments') -and $Test['Arguments']) {
+    foreach ($argument in @($Test['Arguments'])) {
+      $null = $argumentList.Add([string]$argument)
     }
-} catch {
-    Write-Host "   ❌ Zen MCP Server: Error - $($_.Exception.Message)" -ForegroundColor Red
+  }
+  [string[]]$arguments = $argumentList.ToArray()
+  $timeout = if ($Test.ContainsKey('TimeoutSeconds') -and $Test['TimeoutSeconds']) { [int]$Test['TimeoutSeconds'] } else { 120 }
+  $workingDirectory = if ($Test.ContainsKey('WorkingDirectory')) { [string]$Test['WorkingDirectory'] } else { $null }
+  $skipIfMissing = if ($Test.ContainsKey('SkipIfMissing')) { [bool]$Test['SkipIfMissing'] } else { $false }
+
+  $startTime = Get-Date
+  $resolvedFilePath = $null
+  $notFoundMessage = $null
+
+  if ([System.IO.Path]::IsPathRooted($filePath)) {
+    if (Test-Path -LiteralPath $filePath) {
+      $resolvedFilePath = $filePath
+    } else {
+      $notFoundMessage = "File not found at path '$filePath'."
+    }
+  } else {
+    try {
+      $commandInfo = Get-Command -Name $filePath -ErrorAction Stop
+      if ($commandInfo.Source) {
+        $resolvedFilePath = $commandInfo.Source
+      } elseif ($commandInfo.Definition) {
+        $resolvedFilePath = $commandInfo.Definition
+      } else {
+        $resolvedFilePath = $commandInfo.Name
+      }
+    } catch {
+      $notFoundMessage = $_.Exception.Message
+    }
+  }
+
+  if (-not $resolvedFilePath) {
+    $endTime = Get-Date
+    return [pscustomobject][ordered]@{
+      Name = $name
+      Command = $filePath
+      ResolvedCommand = $null
+      Arguments = @($arguments)
+      StartTimestamp = $startTime.ToString("o")
+      EndTimestamp = $endTime.ToString("o")
+      DurationSeconds = [math]::Round(($endTime - $startTime).TotalSeconds, 3)
+      ExitCode = $null
+      StdOut = ""
+      StdErr = $notFoundMessage
+      Status = "NotFound"
+      SkipIfMissing = $skipIfMissing
+    }
+  }
+
+  $stdoutFile = [System.IO.Path]::GetTempFileName()
+  $stderrFile = [System.IO.Path]::GetTempFileName()
+  $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+  $timedOut = $false
+  $exitCode = $null
+  $stdOut = ""
+  $stdErr = ""
+  $errorMessage = $null
+
+  try {
+    $startParams = @{
+      FilePath = $resolvedFilePath
+      ArgumentList = $arguments
+      RedirectStandardOutput = $stdoutFile
+      RedirectStandardError = $stderrFile
+      PassThru = $true
+      NoNewWindow = $true
+    }
+    if ($workingDirectory) {
+      $startParams['WorkingDirectory'] = $workingDirectory
+    }
+
+    $process = Start-Process @startParams
+
+    if (-not $process.WaitForExit($timeout * 1000)) {
+      $timedOut = $true
+      try {
+        $process.Kill()
+      } catch {
+      }
+      $process.WaitForExit()
+    }
+
+    if (-not $timedOut) {
+      $exitCode = $process.ExitCode
+    }
+
+    if (Test-Path -LiteralPath $stdoutFile) {
+      $stdOut = Get-Content -Path $stdoutFile -Raw -ErrorAction SilentlyContinue
+    }
+
+    if (Test-Path -LiteralPath $stderrFile) {
+      $stdErr = Get-Content -Path $stderrFile -Raw -ErrorAction SilentlyContinue
+    }
+  } catch {
+    $errorMessage = $_.Exception.Message
+    if (Test-Path -LiteralPath $stdoutFile) {
+      $stdOut = Get-Content -Path $stdoutFile -Raw -ErrorAction SilentlyContinue
+    }
+    if (Test-Path -LiteralPath $stderrFile) {
+      $stdErr = Get-Content -Path $stderrFile -Raw -ErrorAction SilentlyContinue
+    }
+    if ([string]::IsNullOrWhiteSpace($stdErr)) {
+      $stdErr = $errorMessage
+    } else {
+      $stdErr = ($stdErr + "`n" + $errorMessage).Trim()
+    }
+  } finally {
+    $stopwatch.Stop()
+    Remove-Item -Path $stdoutFile, $stderrFile -ErrorAction SilentlyContinue
+  }
+
+  $endTime = Get-Date
+  $duration = [math]::Round($stopwatch.Elapsed.TotalSeconds, 3)
+  $status = if ($timedOut) {
+    "Timeout"
+  } elseif ($errorMessage) {
+    "Failed"
+  } elseif ($exitCode -eq 0) {
+    "Success"
+  } else {
+    "Failed"
+  }
+
+  return [pscustomobject][ordered]@{
+    Name = $name
+    Command = $filePath
+    ResolvedCommand = $resolvedFilePath
+    Arguments = @($arguments)
+    StartTimestamp = $startTime.ToString("o")
+    EndTimestamp = $endTime.ToString("o")
+    DurationSeconds = $duration
+    ExitCode = $exitCode
+    StdOut = $stdOut
+    StdErr = $stdErr
+    Status = $status
+    SkipIfMissing = $skipIfMissing
+  }
 }
 
-# Test JetBrains
-Write-Host "   Testing JetBrains MCP Server..." -ForegroundColor White
-try {
-    $jetbrainsTest = codex mcp get jetbrains 2>&1
-    if ($jetbrainsTest -match "enabled: true") {
-        Write-Host "   ✅ JetBrains: Working" -ForegroundColor Green
-    } else {
-        Write-Host "   ❌ JetBrains: Not working" -ForegroundColor Red
-    }
-} catch {
-    Write-Host "   ❌ JetBrains: Error - $($_.Exception.Message)" -ForegroundColor Red
+$scriptDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
+if (-not $scriptDirectory) {
+  $scriptDirectory = (Get-Location).ProviderPath
 }
+$logDirectory = Get-LogDirectory -StartDirectory $scriptDirectory
+$scriptLabel = [System.IO.Path]::GetFileNameWithoutExtension($MyInvocation.MyCommand.Name)
+$timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$transcriptPath = Join-Path -Path $logDirectory -ChildPath ("mcp_diagnostic_{0}_{1}.log" -f $scriptLabel, $timestamp)
+$transcriptStarted = $false
 
-# Test 3: Create a test prompt for Codex
-Write-Host ""
-Write-Host "3. Creating Test Prompt for Codex:" -ForegroundColor Yellow
+try {
+  Start-Transcript -Path $transcriptPath -Append | Out-Null
+  $transcriptStarted = $true
 
-$testPrompt = @"
-Please use the available MCP tools to:
+  Write-Host "$(Get-Date -Format o) :: Starting diagnostics for $scriptLabel" -ForegroundColor Cyan
 
-1. **Serena MCP Server**: List the current directory contents and get project overview
-2. **Zen MCP Server**: List available AI models and their capabilities  
-3. **Filesystem MCP Server**: Show file structure of the project
-4. **Memory MCP Server**: Create a memory about this test session
-5. **Everything MCP Server**: Demonstrate available tools
+  $results = [System.Collections.Generic.List[pscustomobject]]::new()
+  $defaultTimeout = 90
 
-Provide a brief summary of what MCP tools are available and working.
-"@
+  $serverNames = @("serena","sequential-thinking","filesystem","memory","everything","chroma-knowledge","zen-mcp-server","gemini-mcp")
 
-$testPrompt | Out-File -FilePath "mcp_test_prompt.txt" -Encoding UTF8
-Write-Host "   ✅ Test prompt created: mcp_test_prompt.txt" -ForegroundColor Green
+  $tests = [System.Collections.Generic.List[hashtable]]::new()
+  $tests.Add(@{ Name = "codex mcp list"; FilePath = "codex"; Arguments = @("mcp","list") })
 
-# Test 4: Summary
-Write-Host ""
-Write-Host "4. Summary:" -ForegroundColor Yellow
-Write-Host "   📊 Total MCP Servers: $($enabledCount + $disabledCount)" -ForegroundColor White
-Write-Host "   ✅ Working Servers: $enabledCount" -ForegroundColor Green
-Write-Host "   ⚠️  Disabled Servers: $disabledCount" -ForegroundColor Yellow
+  foreach ($serverName in $serverNames) {
+    $tests.Add(@{
+      Name = "codex mcp get $serverName"
+      FilePath = "codex"
+      Arguments = @("mcp","get",$serverName)
+    })
+  }
 
-Write-Host ""
-Write-Host "5. Next Steps:" -ForegroundColor Yellow
-Write-Host "   - Run: codex --full-auto 'Use MCP tools to analyze the project'" -ForegroundColor White
-Write-Host "   - Or use the test prompt: codex --full-auto '$(Get-Content mcp_test_prompt.txt -Raw)'" -ForegroundColor White
+  $tests.Add(@{
+    Name = "codex dry-run prompt"
+    FilePath = "codex"
+    Arguments = @("-p","Use the filesystem MCP to list the root directory.")
+    TimeoutSeconds = 120
+  })
 
-Write-Host ""
-Write-Host "=== Test Complete ===" -ForegroundColor Cyan
+  foreach ($test in $tests) {
+    if (-not $test.ContainsKey('Arguments') -or -not $test['Arguments']) {
+      $test['Arguments'] = @()
+    }
+    if (-not $test.ContainsKey('TimeoutSeconds') -or -not $test['TimeoutSeconds']) {
+      $test['TimeoutSeconds'] = $defaultTimeout
+    }
+
+    Write-Host "$(Get-Date -Format o) :: Running test '$($test['Name'])'" -ForegroundColor Yellow
+    $result = Invoke-ProcessTest -Test $test
+    $results.Add($result)
+    $statusColor = switch ($result.Status) {
+      "Success" { "Green" }
+      "Timeout" { "Yellow" }
+      "NotFound" { "DarkYellow" }
+      default { "Red" }
+    }
+    Write-Host "$(Get-Date -Format o) :: Completed '$($result.Name)' with status $($result.Status)" -ForegroundColor $statusColor
+    if ($result.Status -eq "Failed") {
+      Write-Host "  stderr: $($result.StdErr)" -ForegroundColor Red
+    } elseif ($result.Status -eq "Timeout") {
+      Write-Host "  Command exceeded timeout of $($test['TimeoutSeconds']) seconds." -ForegroundColor Yellow
+    } elseif ($result.Status -eq "NotFound") {
+      Write-Host "  Required dependency missing for '$($result.Name)'." -ForegroundColor DarkYellow
+    }
+  }
+
+  Write-Host ""
+  Write-Host "=== Test Summary ===" -ForegroundColor Cyan
+  $summaryTable = $results.ToArray() | Select-Object Name, Status, ExitCode, DurationSeconds | Format-Table -AutoSize | Out-String
+  Write-Host $summaryTable
+
+  $statusGroups = $results.ToArray() | Group-Object -Property Status
+  foreach ($group in $statusGroups) {
+    Write-Host ("{0}: {1}" -f $group.Name, $group.Count) -ForegroundColor White
+  }
+
+  $resultsArray = $results.ToArray()
+  $summary = [pscustomobject]@{
+    Script = $scriptLabel
+    GeneratedAt = (Get-Date).ToString("o")
+    Results = $resultsArray
+  }
+  $jsonPath = Join-Path -Path $logDirectory -ChildPath ("mcp_diagnostic_{0}_{1}.json" -f $scriptLabel, $timestamp)
+  $summary | ConvertTo-Json -Depth 6 | Out-File -FilePath $jsonPath -Encoding UTF8
+  Write-Host "Summary JSON saved to: $jsonPath" -ForegroundColor Green
+  Write-Host "Transcript saved to: $transcriptPath" -ForegroundColor Gray
+} finally {
+  if ($transcriptStarted) {
+    try {
+      Stop-Transcript | Out-Null
+    } catch {
+    }
+  }
+}
