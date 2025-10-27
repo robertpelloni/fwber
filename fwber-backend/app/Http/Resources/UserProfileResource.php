@@ -35,15 +35,18 @@ class UserProfileResource extends JsonResource
                 'bio' => $this->profile?->bio,
                 'age' => $this->profile?->age,
                 'gender' => $this->profile?->gender,
+                'pronouns' => $this->profile?->pronouns,
+                'sexual_orientation' => $this->profile?->sexual_orientation,
+                'relationship_style' => $this->profile?->relationship_style,
                 'looking_for' => $this->profile?->looking_for ?? [],
                 
                 // Location (with privacy controls)
                 'location' => [
-                    'latitude' => $this->profile?->latitude,
-                    'longitude' => $this->profile?->longitude,
-                    'max_distance' => $this->profile?->max_distance ?? 25,
-                    'city' => $this->profile?->city,
-                    'state' => $this->profile?->state,
+                    'latitude' => $this->profile?->location_latitude,
+                    'longitude' => $this->profile?->location_longitude,
+                    'max_distance' => $this->profile?->preferences['max_distance'] ?? 25,
+                    'city' => $this->extractCityFromLocation(),
+                    'state' => $this->extractStateFromLocation(),
                 ],
                 
                 // Preferences
@@ -81,8 +84,8 @@ class UserProfileResource extends JsonResource
             'display_name',
             'age',
             'gender',
-            'latitude',
-            'longitude',
+            'location_latitude',
+            'location_longitude',
             'looking_for',
         ];
         
@@ -109,10 +112,12 @@ class UserProfileResource extends JsonResource
             'bio',
             'age',
             'gender',
+            'pronouns',
+            'sexual_orientation',
+            'relationship_style',
             'looking_for',
-            'latitude',
-            'longitude',
-            'max_distance',
+            'location_latitude',
+            'location_longitude',
             'preferences',
         ];
         
@@ -124,6 +129,32 @@ class UserProfileResource extends JsonResource
         }
         
         return round(($completed / count($allFields)) * 100);
+    }
+    
+    /**
+     * Extract city from location description
+     */
+    private function extractCityFromLocation(): ?string
+    {
+        if (!$this->profile?->location_description) {
+            return null;
+        }
+        
+        $parts = explode(',', $this->profile->location_description);
+        return trim($parts[0]) ?: null;
+    }
+    
+    /**
+     * Extract state from location description
+     */
+    private function extractStateFromLocation(): ?string
+    {
+        if (!$this->profile?->location_description) {
+            return null;
+        }
+        
+        $parts = explode(',', $this->profile->location_description);
+        return isset($parts[1]) ? trim($parts[1]) : null;
     }
 }
 

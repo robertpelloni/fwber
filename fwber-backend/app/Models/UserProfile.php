@@ -23,6 +23,7 @@ class UserProfile extends Model
         'sti_status',
         'preferences',
         'avatar_url',
+        'looking_for',
     ];
 
     protected $casts = [
@@ -31,6 +32,7 @@ class UserProfile extends Model
         'location_longitude' => 'float',
         'sti_status' => 'array',
         'preferences' => 'array',
+        'looking_for' => 'array',
     ];
 
     public function user()
