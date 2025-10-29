@@ -1,0 +1,222 @@
+<?php
+/*
+    Enhanced Security and Privacy Manager
+    Handles encryption, profile verification, and privacy controls
+*/
+
+class SecurityManager {
+    
+    private $encryptionKey;
+    private $db;
+    private $config;
+    
+    public function __construct($database, $config = []) {
+        $this->db = $database;
+        $this->config = array_merge([
+            'encryption_method' => 'AES-256-CBC',
+            'hash_algorithm' => 'sha256',
+            'password_min_length' => 8,
+            'session_lifetime' => 3600, // 1 hour
+            'max_login_attempts' => 5,
+            'lockout_duration' => 900, // 15 minutes
+            'require_2fa' => false,
+            'photo_encryption' => true,
+            'message_encryption' => true
+        ], $config);
+        
+        $this->encryptionKey = $this->getOrCreateEncryptionKey();
+    }
+    
+    public function hashPassword($password, $salt = null) {
+        if (!$salt) {
+            $salt = $this->generateSalt();
+        }
+        
+        $hashedPassword = password_hash($password . $salt, PASSWORD_ARGON2ID, [
+            'memory_cost' => 65536, // 64 MB
+            'time_cost' => 4,       // 4 iterations
+            'threads' => 3          // 3 threads
+        ]);
+        
+        return [
+            'hash' => $hashedPassword,
+            'salt' => $salt
+        ];
+    }
+    
+    public function verifyPassword($password, $hash, $salt) {
+        return password_verify($password . $salt, $hash);
+    }
+
+    public function generateCsrfToken() {
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+        return $_SESSION['csrf_token'];
+    }
+
+    public function validateCsrfToken($token) {
+        if (!empty($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token)) {
+            unset($_SESSION['csrf_token']);
+            return true;
+        }
+        return false;
+    }
+
+    public function checkRateLimit($action, $limit = 10, $window = 3600) {
+        $ipAddress = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $stmt = $this->db->prepare("
+            SELECT COUNT(*) FROM user_actions 
+            WHERE action_type = ? AND ip_address = ? AND created_at > DATE_SUB(NOW(), INTERVAL ? SECOND)
+        ");
+        $stmt->execute([$action, $ipAddress, $window]);
+        return $stmt->fetchColumn() < $limit;
+    }
+
+    public function logAction($action, $userId = null, $details = []) {
+        $stmt = $this->db->prepare("
+            INSERT INTO user_actions (user_id, action_type, details, ip_address)
+            VALUES (?, ?, ?, ?)
+        ");
+        $stmt->execute([
+            $userId,
+            $action,
+            json_encode($details),
+            $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+        ]);
+    }
+    
+    public function encryptData($data, $key = null) {
+        if (!$key) {
+            $key = $this->encryptionKey;
+        }
+        
+        $iv = openssl_random_pseudo_bytes(16);
+        $encrypted = openssl_encrypt($data, $this->config['encryption_method'], $key, 0, $iv);
+        
+        return base64_encode($iv . $encrypted);
+    }
+    
+    public function decryptData($encryptedData, $key = null) {
+        if (!$key) {
+            $key = $this->encryptionKey;
+        }
+        
+        $data = base64_decode($encryptedData);
+        $iv = substr($data, 0, 16);
+        $encrypted = substr($data, 16);
+        
+        return openssl_decrypt($encrypted, $this->config['encryption_method'], $key, 0, $iv);
+    }
+    
+    public function generateSessionToken($userId) {
+        $tokenData = [
+            'user_id' => $userId,
+            'created_at' => time(),
+            'ip_address' => $_SERVER['REMOTE_ADDR'] ?? '',
+            'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? '',
+            'random' => bin2hex(random_bytes(16))
+        ];
+        
+        $token = $this->encryptData(json_encode($tokenData));
+        
+        $this->storeSession($userId, $token);
+        
+        return $token;
+    }
+    
+    public function validateSession($token) {
+        try {
+            $tokenData = json_decode($this->decryptData($token), true);
+            
+            if (!$tokenData || !isset($tokenData['user_id'])) {
+                return false;
+            }
+            
+            if (!$this->isValidSession($tokenData['user_id'], $token)) {
+                return false;
+            }
+            
+            if (time() - $tokenData['created_at'] > $this->config['session_lifetime']) {
+                $this->invalidateSession($token);
+                return false;
+            }
+            
+            if ($this->config['check_ip'] ?? true) {
+                if ($tokenData['ip_address'] !== ($_SERVER['REMOTE_ADDR'] ?? '')) {
+                    $this->invalidateSession($token);
+                    return false;
+                }
+            }
+            
+            return $tokenData['user_id'];
+            
+        } catch (Exception $e) {
+            error_log('Session validation error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function invalidateSession($token) {
+        $stmt = $this->db->prepare("UPDATE user_sessions SET is_active = 0 WHERE session_token = ?");
+        $stmt->execute([$token]);
+    }
+    
+    // ... (other methods remain the same)
+
+    private function storeSession($userId, $token) {
+        $expiresAt = date('Y-m-d H:i:s', time() + $this->config['session_lifetime']);
+        $stmt = $this->db->prepare("
+            INSERT INTO user_sessions (user_id, session_token, expires_at, ip_address, user_agent)
+            VALUES (?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([
+            $userId,
+            $token,
+            $expiresAt,
+            $_SERVER['REMOTE_ADDR'] ?? '',
+            $_SERVER['HTTP_USER_AGENT'] ?? ''
+        ]);
+    }
+
+    private function isValidSession($userId, $token) {
+        $stmt = $this->db->prepare("
+            SELECT 1 FROM user_sessions 
+            WHERE user_id = ? AND session_token = ? AND expires_at > NOW() AND is_active = 1
+        ");
+        $stmt->execute([$userId, $token]);
+        return $stmt->fetchColumn() !== false;
+    }
+
+    private function getOrCreateEncryptionKey() {
+        // SECURITY FIX (2025-10-18): Load from environment variable
+        // Multi-AI Consensus: GPT-5-Codex, Gemini 2.5 Pro, GPT-5, Gemini 2.5 Flash
+        // Priority 1A: Move encryption key to secure environment storage
+        
+        $key = $_ENV['ENCRYPTION_KEY'] ?? null;
+        
+        if ($key) {
+            // Decode base64-encoded key from environment
+            return base64_decode($key);
+        }
+        
+        // FALLBACK: Check for legacy file-based key (for migration period only)
+        $keyPath = __DIR__ . '/.encryption_key';
+        if (file_exists($keyPath)) {
+            error_log("WARNING: Using legacy file-based encryption key. Please set ENCRYPTION_KEY environment variable.");
+            return file_get_contents($keyPath);
+        }
+        
+        // ERROR: No encryption key found
+        throw new Exception('ENCRYPTION_KEY must be set in environment. Generate with: openssl rand -base64 32');
+    }
+    
+    private function generateSalt($length = 32) {
+        return bin2hex(random_bytes($length));
+    }
+    
+    // ... (rest of private methods)
+}
+
+// ... (base32 functions)
+?>

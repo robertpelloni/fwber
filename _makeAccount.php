@@ -1,6 +1,6 @@
 <?php
 /*
-    Copyright 2020 FWBer.com
+    Copyright 2025 FWBer.me
 
     This file is part of FWBer.
 
@@ -16,9 +16,13 @@
 
     You should have received a copy of the GNU Affero Public License
     along with FWBer.  If not, see <https://www.gnu.org/licenses/>.
-*/
-    include("_init.php");
-    include("_secrets.php");
+ */
+
+    //include("_init.php");
+    //include("_secrets.php");
+
+    require_once("_init.php");
+
     include("_names.php");
     include("_debug.php");
 
@@ -38,16 +42,22 @@
         exit();
     }
 
-    $db = mysqli_connect($dburl,$dbuser,$dbpass);
-    if(!$db)exit(mysqli_connect_error());
+    $email = $_POST['nameEmail'];
+    $password = $_POST['namePassword'];
+    $verify = $_POST['nameVerify'];
 
-    //escape the values
-    $email = mysqli_real_escape_string($db,$_POST['nameEmail']);
-    $password = mysqli_real_escape_string($db,$_POST['namePassword']);
-    $verify = mysqli_real_escape_string($db,$_POST['nameVerify']);
+
+   ////escape the values
+   //$email = mysqli_real_escape_string($db,$_POST['nameEmail']);
+   //$password = mysqli_real_escape_string($db,$_POST['namePassword']);
+   //$verify = mysqli_real_escape_string($db,$_POST['nameVerify']);
+   //
+   //if(
+   //        strlen($password)<5 ||
 
     if(
-            strlen($password)<5 ||
+            strlen($password)<8 || // Increased min length to 8 for better security
+
             strcmp($password,$verify)!=0 ||
             $_POST['nameAgreeLegalAge']!=true ||
             $_POST['nameAgreeTOS']!=true ||
@@ -67,6 +77,8 @@
         exit();
     }
 
+    // Note: $reCaptchaSecretKey needs to be defined in _secrets.php
+    include('_secrets.php');
     $ip = $_SERVER['REMOTE_ADDR'];
     // post request to server
     $url = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($reCaptchaSecretKey) .  '&response=' . urlencode($captcha);
@@ -79,17 +91,14 @@
         exit();
     }
 
-    //connect to the database to see if the email is already registered.
-    $dbquerystring = sprintf("SELECT email, verifyHash FROM ".$dbname.".users WHERE email='%s'",$email);
-    $dbquery = mysqli_query($db, $dbquerystring);
-    $dbresult = mysqli_fetch_array($dbquery);
-    mysqli_free_result($dbquery);
+    // Check if the email is already registered.
+    $stmt = $pdo->prepare("SELECT email, email_verification_token FROM users WHERE email = ?");
+    $stmt->execute([$email]);
+    $dbresult = $stmt->fetch();
 
-    $emailExists = true;
-
-    if($dbresult==null || $dbresult['email']==null || $dbresult['email']!=$email)
-    {
-        $emailExists=false;
+    $emailExists = false;
+    if ($dbresult) {
+        $emailExists = true;
     }
 ?>
 <!doctype html>
@@ -113,29 +122,32 @@
 
     if($emailExists==false)
     {
-        $dateJoined = time();
-        $verifyHash = md5(rand(0,1000));
-        $dbquerystring = "INSERT INTO ".$dbname.".users (email, passwordHash, verifyHash, dateJoined) VALUES(
-        '". mysqli_real_escape_string($db,$email) ."',
-        '". mysqli_real_escape_string($db,getSaltedPassword($password,$dateJoined)) ."',
-        '". mysqli_real_escape_string($db,$verifyHash) ."',
-        '". mysqli_real_escape_string($db,$dateJoined) ."') ";
+        $verification_token = bin2hex(random_bytes(32));
+        
+        // Use the SecurityManager to hash the password
+        $hashedData = $securityManager->hashPassword($password);
+        $password_hash = $hashedData['hash'];
+        $password_salt = $hashedData['salt'];
 
-        $dbquery = mysqli_query($db, $dbquerystring);
+        // Generate a temporary username from the email
+        $username = strstr($email, '@', true);
+
+        $insertStmt = $pdo->prepare(
+            "INSERT INTO users (email, username, password_hash, password_salt, email_verification_token) VALUES (?, ?, ?, ?, ?)"
+        );
+        $insertStmt->execute([$email, $username, $password_hash, $password_salt, $verification_token]);
     }
     else
     {
-        $verifyHash = $dbresult['verifyHash'];
+        $verification_token = $dbresult['email_verification_token'];
     }
 
-    mysqli_close($db);
-
+    // Note: _emailFunctions.php and sendJoinVerificationEmail might need refactoring as well.
     include("_emailFunctions.php");
-    sendJoinVerificationEmail($email,$verifyHash,$emailExists);
+    sendJoinVerificationEmail($email, $verification_token, $emailExists);
 
 ?>
 </div>
 <?php include("f.php");?>
 </body>
 </html>
-

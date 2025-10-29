@@ -1,6 +1,6 @@
 <?php
 /*
-    Copyright 2020 FWBer.com
+    Copyright 2025 FWBer.me
 
     This file is part of FWBer.
 
@@ -16,323 +16,155 @@
 
     You should have received a copy of the GNU Affero Public License
     along with FWBer.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+
+// Use Composer's autoloader
+require_once 'vendor/autoload.php';
+
+
     //=========================================================================================
-    function doMail($mailFromAddress,$mailFromName,$mailToAddress,$mailSubject,$mailHTMLBody,$mailTextBody)
+    function doMail($mailToAddress, $mailSubject, $mailHTMLBody, $mailTextBody)
     {//=========================================================================================
 
-        include('_secrets.php');
+        include('_secrets.php'); // Contains mail server settings ($mailHost, $mailPort, etc.)
 
-        // sendgrid swift mailer
-        /*
-        require_once("./sendgrid/SendGrid_loader.php");
-        $sendgrid = new SendGrid($mailUsername, $mailPassword);
-        $sgmail = new SendGrid\Mail();
-        $sgmail->addTo($mailToAddress);
-        $sgmail->setFrom($mailFromAddress,$mailFromName);
-        $sgmail->setSubject($mailSubject);
-        $sgmail->setText($mailTextBody);
-        $sgmail->setHtml($mailHTMLBody);
-        //$sgmail->addAttachment("");
-        if($sendgrid->smtp->send($sgmail)==false)return false;
-        return true;
-        */
+        $mail = new PHPMailer(true); // Passing `true` enables exceptions
 
         //phpmailer
-
-
-        require 'js/PHPMailer-6.1.4/src/Exception.php';
-        require 'js/PHPMailer-6.1.4/src/PHPMailer.php';
-        require 'js/PHPMailer-6.1.4/src/SMTP.php';
+        //require 'js/PHPMailer-6.1.4/src/Exception.php';
+        //require 'js/PHPMailer-6.1.4/src/PHPMailer.php';
+        //require 'js/PHPMailer-6.1.4/src/SMTP.php';
 
         //include('js/PHPMailer-6.1.4/src/PHPMailer.php');
-        $mail             = new PHPMailer();
+        //$mail             = new PHPMailer();
         //$mailHTMLBody   = file_get_contents('contents.html');
         //$mailHTMLBody   = eregi_replace("[\]",'',$mailHTMLBody);
-        $mail->IsSMTP(); // telling the class to use SMTP
-        $mail->SMTPDebug  = $mailSMTPDebug;// enables SMTP debug information (for testing)// 1 = errors and messages // 2 = messages only
-        $mail->SMTPAuth   = $mailSMTPAuth;// enable SMTP authentication
-        $mail->SMTPSecure = $mailSMTPSecurityType;// sets the prefix to the servier
-        $mail->Host       = $mailHost;// sets GMAIL as the SMTP server
-        $mail->Port       = $mailPort;// set the SMTP port for the GMAIL server
-        $mail->Username   = $mailUsername;// GMAIL username
-        $mail->Password   = $mailPassword;// GMAIL password
-        $mail->SetFrom($mailFromAddress,$mailFromName);
-        $mail->AddReplyTo($mailFromAddress,$mailFromName);
-        $mail->Subject    = $mailSubject;
-        $mail->AltBody    =  $mailTextBody;
-        $mail->MsgHTML($mailHTMLBody);
-        $mail->AddAddress($mailToAddress);
+        //$mail->IsSMTP(); // telling the class to use SMTP
+        //$mail->SMTPDebug  = $mailSMTPDebug;// enables SMTP debug information (for testing)// 1 = errors and messages // 2 = messages only
+        //$mail->SMTPAuth   = $mailSMTPAuth;// enable SMTP authentication
+        //$mail->SMTPSecure = $mailSMTPSecurityType;// sets the prefix to the servier
+        //$mail->Host       = $mailHost;// sets GMAIL as the SMTP server
+        //$mail->Port       = $mailPort;// set the SMTP port for the GMAIL server
+        //$mail->Username   = $mailUsername;// GMAIL username
+        //$mail->Password   = $mailPassword;// GMAIL password
+        //$mail->SetFrom($mailFromAddress,$mailFromName);
+        //$mail->AddReplyTo($mailFromAddress,$mailFromName);
+        //$mail->Subject    = $mailSubject;
+        //$mail->AltBody    =  $mailTextBody;
+        //$mail->MsgHTML($mailHTMLBody);
+        //$mail->AddAddress($mailToAddress);
         //$mail->AddAttachment("images/phpmailer.gif");      // attachment
         //$mail->AddAttachment("images/phpmailer_mini.gif"); // attachment
-        if(!$mail->Send()){echo "Mailer Error: ".$mail->ErrorInfo;return false;}
+        //if(!$mail->Send()){echo "Mailer Error: ".$mail->ErrorInfo;return false;}
         //else echo "Message sent!";
-        return true;
+        //return true;
+
+        try {
+            //Server settings
+            $mail->SMTPDebug = $mailSMTPDebug ?? 0; // Enable verbose debug output
+            $mail->isSMTP();
+            $mail->Host       = $mailHost;
+            $mail->SMTPAuth   = $mailSMTPAuth ?? true;
+            $mail->Username   = $mailUsername;
+            $mail->Password   = $mailPassword;
+            $mail->SMTPSecure = $mailSMTPSecurityType ?? PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = $mailPort;
+
+            //Recipients
+            $mail->setFrom(getEmailAddress(), getSiteName());
+            $mail->addAddress($mailToAddress);
+            $mail->addReplyTo(getEmailAddress(), getSiteName());
+
+            // Content
+            $mail->isHTML(true);
+            $mail->Subject = $mailSubject;
+            $mail->Body    = $mailHTMLBody;
+            $mail->AltBody = $mailTextBody;
+
+            $mail->send();
+            return true;
+        } catch (Exception $e) {
+            error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
+            return false;
+        }
+
     }
 
 	//=========================================================================================
-	function sendContactEmail($subject,$message,$theirEmail)
+	function sendContactEmail($subject, $message, $theirEmail)
 	{//=========================================================================================
 
-		$mailSubject=$subject;
+		$mailSubject = getSiteName() . " Contact Form: " . $subject;
 
         $mailHTMLBody = "";
-		if($theirEmail!="")$mailHTMLBody="
-		    Email: ".$theirEmail."<br>";
+		if($theirEmail!=""){
+            $mailHTMLBody="<b>From:</b> ".$theirEmail."<br><br>";
+        }
 
-        $mailHTMLBody=$mailHTMLBody.
-		"
-			Subject: ".$subject."<br>
-			Message:<br>
-			".$message."
-		";
-		$mailTextBody = "Contact Form";
+        $mailHTMLBody .= "<b>Subject:</b> ".$subject."<br><b>Message:</b><br>".nl2br($message);
+		$mailTextBody = "From: ".$theirEmail."\n\nMessage:\n".$message;
 
-        $success = doMail(getEmailAddress(),getSiteDomain(),getEmailAddress(),$mailSubject,$mailHTMLBody,$mailTextBody);
-        return $success;
+        return doMail(getEmailAddress(), $mailSubject, $mailHTMLBody, $mailTextBody);
 	}
 
 	//=========================================================================================
-	function sendMatchNoticeEmail($myFirstName,$theirEmail,$verifyHash)
+	function sendJoinVerificationEmail($theirEmail, $verificationToken, $emailExists)
 	{//=========================================================================================
 
-		//should store this in database instead, and batch it.
-		//i should send in newUser and existingUser, store both.
-			
-		$mailToAddress=$theirEmail;
-		$mailSubject=getSiteDomain()." - You got a new match";
-		$mailHTMLBody=	
-		"
-		<b>".$myFirstName."</b> just signed up for ".getSiteName().", and we've discovered they have compatible interests.<br>
-		<br>
-		Go take a look and see if they are a good match for you.<br>
-		<br>
-		Check them out here:
-		<a href='".getSiteURL()."/matches'>My Matches</a>
-		<br>
-		<br>
-		<br>
-		To immediately unsubscribe from <b>new match</b> notifications, please visit this link:<br>
-		<a href='".getSiteURL()."/unsubscribe?type=matches&email=".$theirEmail."&verifyHash=".$verifyHash."'>".getSiteURL()."/unsubscribe?type=matches&email=".$theirEmail."&verifyHash=".$verifyHash."</a><br>
-		<br>
-		To immediately unsubscribe from <b>ALL</b> notifications, please visit this link:<br>
-		<a href='".getSiteURL()."/unsubscribe?type=all&email=".$theirEmail."&verifyHash=".$verifyHash."'>".getSiteURL()."/unsubscribe?type=all&email=".$theirEmail."&verifyHash=".$verifyHash."</a><br>
-		<br>
-		";
-		$mailTextBody = $myFirstName." just signed up for ".getSiteName().", and we've discovered they have compatible interests. Check them out here: ".getSiteURL()."/matches";
-
-        $success = doMail(getEmailAddress(),getSiteDomain(),$mailToAddress,$mailSubject,$mailHTMLBody,$mailTextBody);
-        return $success;
-	}
-
-	
-	//=========================================================================================
-	function sendMatchActionEmail($myFirstName,$theirEmail,$action,$verifyHash)
-	{//=========================================================================================
-	
-		$mailToAddress=$theirEmail;
-		$mailTextBody = "Check them out here: ".getSiteURL()."/matches";
-		
-
-		if($action=='askprivate')
-		{
-			$mailSubject=getSiteDomain()." - ".$myFirstName." wants to see your private profile";
-			$mailHTMLBody=	
-			"
-			".$myFirstName." wants to see your private profile on ".getSiteName()."<br>
-			<br>
-			This will show them your full profile including contact information and private pictures, and you'll be able to see theirs.<br>
-			<br>
-			Check them out here:
-			<a href='".getSiteURL()."/matches?show=waitingforme'>My Matches</a>
-			<br>
-			<br>
-			<br>
-			To immediately unsubscribe from request notifications, please visit this link:<br>
-			<a href='".getSiteURL()."/unsubscribe?type=interested&email=".$theirEmail."&verifyHash=".$verifyHash."'>".getSiteURL()."/unsubscribe?type=interested&email=".$theirEmail."&verifyHash=".$verifyHash."</a><br>
-			<br>
-			To immediately unsubscribe from ALL notifications, please visit this link:<br>
-			<a href='".getSiteURL()."/unsubscribe?type=all&email=".$theirEmail."&verifyHash=".$verifyHash."'>".getSiteURL()."/unsubscribe?type=all&email=".$theirEmail."&verifyHash=".$verifyHash."</a><br>
-			<br>
-			";
-		}
-	
-		
-		if($action=='authorizeprivate')
-		{
-			$mailSubject=getSiteDomain()." - You've been approved to see ".$myFirstName."'s private profile!";
-			$mailHTMLBody=	
-			"
-			".$myFirstName." has agreed to share their private profile with you on ".getSiteName()."<br>
-			<br>
-			Quick, go check them out and take it to the next step!<br>
-			<br>
-			Check them out here:
-			<a href='".getSiteURL()."/matches?show=fwbs'>My fwbs</a>
-			<br>
-			<br>
-			<br>
-			To immediately unsubscribe from approval notifications, please visit this link: <br>
-			<a href='".getSiteURL()."/unsubscribe?type=approval&email=".$theirEmail."&verifyHash=".$verifyHash."'>".getSiteURL()."/unsubscribe?type=approval&email=".$theirEmail."&verifyHash=".$verifyHash."</a><br>
-			<br>
-			To immediately unsubscribe from ALL notifications, please visit this link: <br>
-			<a href='".getSiteURL()."/unsubscribe?type=all&email=".$theirEmail."&verifyHash=".$verifyHash."'>".getSiteURL()."/unsubscribe?type=all&email=".$theirEmail."&verifyHash=".$verifyHash."</a><br>
-			<br>
-			";
-		}
-
-        $success = doMail(getEmailAddress(),getSiteDomain(),$mailToAddress,$mailSubject,$mailHTMLBody,$mailTextBody);
-        return $success;
-	}
-	
-	//=========================================================================================
-	function sendPasswordResetVerificationEmail($theirEmail,$verifyHash)
-	{//=========================================================================================
-
-		//send verification email to new email
-		$mailToAddress=$theirEmail;
-		$mailSubject=getSiteDomain()." - Password Reset Request";
-		$mailHTMLBody=	
-		"
-            Someone recently requested a password reset for your account at ".getSiteDomain()."<br>
-            If this wasn't you, please ignore this email.<br>
-            <br>
-            To get a new password sent to you, click on or paste this link into your browser:<br>
-            <a href='".getSiteURL()."/_mailNewPassword?email=".$theirEmail."&verifyHash=".$verifyHash."'>".getSiteURL()."/_mailNewPassword?email=".$theirEmail."&verifyHash=".$verifyHash."</a>
-            <br>
-            <br>
-			<br>
-			To immediately unsubscribe from ALL notifications, please visit this link: <br>
-			<a href='".getSiteURL()."/unsubscribe?type=all&email=".$theirEmail."&verifyHash=".$verifyHash."'>".getSiteURL()."/unsubscribe?type=all&email=".$theirEmail."&verifyHash=".$verifyHash."</a><br>
-			<br>
-		";
-		$mailTextBody = "To get a new password sent to you, please copy and paste this link into your browser. \n\n ".getSiteURL()."/_mailNewPassword?email=".$theirEmail."&verifyHash=".$verifyHash;
-
-        $success = doMail(getEmailAddress(),getSiteDomain(),$mailToAddress,$mailSubject,$mailHTMLBody,$mailTextBody);
-        return $success;
-	}
-	
-	//=========================================================================================
-	function sendNewPasswordEmail($theirEmail, $newPass,$verifyHash)
-	{//=========================================================================================
-	
-		$success=true;
-	
-		//send verification email to new email
-		$mailToAddress=$theirEmail;
-		$mailSubject=getSiteDomain()." - Your New Password";
-		$mailHTMLBody=
-		"
-            Here is your new password for your ".getSiteDomain()." account:<br>
-            \"".$newPass."\"
-            <br><br>
-            Sign in and change it if you'd like under My Profile | Settings.
-            <br>
-            <br>
-			<br>
-			To immediately unsubscribe from ALL notifications, please visit this link: <br>
-			<a href='".getSiteURL()."/unsubscribe?type=all&email=".$theirEmail."&verifyHash=".$verifyHash."'>".getSiteURL()."/unsubscribe?type=all&email=".$theirEmail."&verifyHash=".$verifyHash."</a><br>
-			<br>
-		";
-		$mailTextBody = "Here is your new password for your account at ".getSiteDomain()." (not including quotes): \"".$newPass."\"";
-
-        $success = doMail(getEmailAddress(),getSiteDomain(),$mailToAddress,$mailSubject,$mailHTMLBody,$mailTextBody);
-		return $success;
-	}
-	
-	//=========================================================================================
-	function sendJoinVerificationEmail($theirEmail,$verifyHash,$emailExists)
-	{//=========================================================================================
-
-		//if email is in use, send email asking if they wanted to change their password.
-		//if email isn't in use, send verification email.
-
-		$mailToAddress=$theirEmail;
-		
 		if($emailExists==false)
 		{
 			//send verification email
-			$mailSubject=getSiteDomain()." - Verify your new ".getSiteName()." account";
+			$mailSubject = "Verify your new " . getSiteName() . " account";
+            $verificationLink = getSiteURL()."/verify-email.php?token=".$verificationToken;
 			$mailHTMLBody=
 			"
-			Your email address was recently signed up for an account at ".getSiteDomain()."<br>
+			Your email address was recently signed up for an account at ".getSiteDomain().".<br>
 			<br>
 			Click on or paste this link into your browser to verify your account and sign in:<br>
-			<a href='".getSiteURL()."/verify?email=".$theirEmail."&verifyHash=".$verifyHash."'>".getSiteURL()."/verify?email=".$theirEmail."&verifyHash=".$verifyHash."</a>
-			<br>
-			<br>
-			<br>
-			To immediately unsubscribe from ALL notifications, please visit this link: <br>
-			<a href='".getSiteURL()."/unsubscribe?type=all&email=".$theirEmail."&verifyHash=".$verifyHash."'>".getSiteURL()."/unsubscribe?type=all&email=".$theirEmail."&verifyHash=".$verifyHash."</a><br>
-			<br>
+			<a href='".$verificationLink."'>".$verificationLink."</a>
 			";
-			$mailTextBody = "To verify your account, please copy and paste this link into your browser. \n\n ".getSiteURL()."/verify?email=".$theirEmail."&verifyHash=".$verifyHash;
+			$mailTextBody = "To verify your account, please copy and paste this link into your browser: \n\n ".$verificationLink;
 		}
 		else
 		{
 			//send warning email
-			$mailSubject=getSiteDomain()." - You already have a ".getSiteName()." account";
+			$mailSubject = "You already have a " . getSiteName() . " account";
 			$mailHTMLBody=
 			"
-			Your email address was recently signed up for an account at ".getSiteDomain().", but your email address is already in our system.<br>
+			Your email address was recently used to sign up for an account at ".getSiteDomain().", but it is already in our system.<br>
 			If this wasn't you, just ignore this email.<br>
 			<br>
-			If this was on purpose and you can't remember your password, go here instead:<br>
-			<a href='".getSiteURL()."/forgotpassword'>".getSiteURL()."/forgotpassword</a>
-			<br>
-			<br>
-			<br>
-			If you needed your verification link again, here it is:<br>
-			<a href='".getSiteURL()."/verify?email=".$theirEmail."&verifyHash=".$verifyHash."'>".getSiteURL()."/verify?email=".$theirEmail."&verifyHash=".$verifyHash."</a>
-			<br>
-			<br>
-			<br>
-			To immediately unsubscribe from ALL notifications, please visit this link: <br>
-			<a href='".getSiteURL()."/unsubscribe?type=all&email=".$theirEmail."&verifyHash=".$verifyHash."'>".getSiteURL()."/unsubscribe?type=all&email=".$theirEmail."&verifyHash=".$verifyHash."</a><br>
-			<br>
+			If you can't remember your password, go here instead:<br>
+			<a href='".getSiteURL()."/forgot-password.php'>".getSiteURL()."/forgot-password.php</a>
 			";
-			
-			$mailTextBody = "Your email address was recently signed up for an account at ".getSiteDomain().", but your email address is already in our system. If this was on purpose and you can't remember your password, go here instead: ".getSiteURL()."/forgotpassword \n\n If you lost your verification email and wanted a new one, use this: ".getSiteURL()."/verify?email=".$theirEmail."&verifyHash=".$verifyHash;
+			$mailTextBody = "Your email address was recently used to sign up for an account at ".getSiteDomain().", but it is already in our system. If this wasn't you, just ignore this email. If you forgot your password, visit ".getSiteURL()."/forgot-password.php";
 		}
 
-        $success = doMail(getEmailAddress(),getSiteDomain(),$mailToAddress,$mailSubject,$mailHTMLBody,$mailTextBody);
-        return $success;
+        return doMail($theirEmail, $mailSubject, $mailHTMLBody, $mailTextBody);
 	}
-	
-	//=========================================================================================
-	function sendNewEmailAddressVerificationEmail($myNewEmail,$verifyHash)
-	{//=========================================================================================
 
-		//send verification email to new email
+    //=========================================================================================
+    function sendPasswordResetLink($email, $token)
+    {//=========================================================================================
+        $mailSubject = "Password Reset Request for " . getSiteName();
+        $resetLink = getSiteURL() . "/forgot-password.php?token=" . $token;
 
-		$mailToAddress=$myNewEmail;
+        $mailHTMLBody = "
+            <p>Someone has requested a password reset for your account at ".getSiteName().".</p>
+            <p>If this was you, click the link below to reset your password. This link is valid for one hour.</p>
+            <p><a href='".$resetLink."'>".$resetLink."</a></p>
+            <p>If you did not request a password reset, please ignore this email.</p>
+        ";
 
-		$mailSubject=getSiteDomain()." - Verify your new email address";
-		$mailHTMLBody=	
-		"
-		Your email address was recently changed for your account at ".getSiteDomain().".<br>
-		Click on or paste this link into your browser to verify your new email address and sign in:<br>
-		<br>
-		<a href='".getSiteURL()."/verify?email=".$myNewEmail."&verifyHash=".$verifyHash."'>".getSiteURL()."/verify?email=".$myNewEmail."&verifyHash=".$verifyHash."</a>
-		<br>
-		<br>
-		Thanks for signing up for ".getSiteName()."!<br>
-		<br>
-		<br>
-			<br>
-			To immediately unsubscribe from ALL notifications, please visit this link: <br>
-			<a href='".getSiteURL()."/unsubscribe?type=all&email=".$myNewEmail."&verifyHash=".$verifyHash."'>".getSiteURL()."/unsubscribe?type=all&email=".$myNewEmail."&verifyHash=".$verifyHash."</a><br>
-			<br>
-		";
-				
-		$mailTextBody= "To verify your new email address, please copy and paste this link into your browser. \n\n ".getSiteURL()."/verify?email=".$myNewEmail."&verifyHash=".$verifyHash;
+        $mailTextBody = "To reset your password, please copy and paste this link into your browser: \n\n" . $resetLink;
 
-        $success = doMail(getEmailAddress(),getSiteDomain(),$mailToAddress,$mailSubject,$mailHTMLBody,$mailTextBody);
-        return $success;
-	}
-	
-	
+        return doMail($email, $mailSubject, $mailHTMLBody, $mailTextBody);
+    }
+
+    // NOTE: The other email functions (sendMatchNoticeEmail, etc.) 
+    // should also be reviewed and updated to match the new system as you build out those features.
+

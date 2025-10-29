@@ -1,6 +1,6 @@
 <?php
 /*
-    Copyright 2020 FWBer.com
+    Copyright 2025 FWBer.me
 
     This file is part of FWBer.
 
@@ -20,15 +20,15 @@
 
 	session_start(); 
 
+	require_once("_init.php");
 	include("_debug.php");
-	include("_init.php");
-	include("_secrets.php");
 	include("_names.php");
 
     $show_html=false;
     $error_string = "";
+    $csrf_token = '';
 
-    if(isset($_SESSION["email"])&&$_SESSION["email"]!=null&&strlen($_SESSION["email"])>0)
+    if(validateSessionOrCookiesReturnLoggedIn())
     {
         header('Location: '.getSiteURL().'/matches.php');
         exit();
@@ -37,102 +37,98 @@
     if($_SERVER["REQUEST_METHOD"] != "POST")
     {
         $show_html=true;
+        $csrf_token = $securityManager->generateCsrfToken();
     }
     else
     {
-
-        if(isset($_POST['nameEmail']) &&!empty($_POST['nameEmail'])
+        if (!isset($_POST['csrf_token']) || !$securityManager->validateCsrfToken($_POST['csrf_token'])) {
+            $error_string = "Invalid form submission. Please try again.";
+            $show_html = true;
+            $csrf_token = $securityManager->generateCsrfToken();
+        } else if(isset($_POST['nameEmail']) &&!empty($_POST['nameEmail'])
            &&isset($_POST['namePassword']) &&!empty($_POST['namePassword']))
         {
-
-            $db = mysqli_connect($dburl,$dbuser,$dbpass);
-            if(!$db)exit(mysqli_connect_error());
-
-            $email = mysqli_escape_string($db,$_POST['nameEmail']);
-            $password = mysqli_escape_string($db,$_POST['namePassword']);
-            $staySignedIn = 0;
+            $email = $_POST['nameEmail'];
+            
+            // Rate limiting: Allow 5 login attempts per hour per email
+            if (!$securityManager->checkRateLimit('login_attempt_' . $email, 5, 3600)) {
+                $show_html = true;
+                $error_string = "<div style='width:100%;text-align:center;font-size:14px;padding-bottom:16px;color:red;'>Too many login attempts. Please wait 15 minutes before trying again.</div>";
+                $csrf_token = $securityManager->generateCsrfToken();
+            } else {
+                $password = $_POST['namePassword'];
+                $staySignedIn = 0;
             if(isset($_POST['staySignedIn'])&&!empty($_POST['staySignedIn']))$staySignedIn = 1;
 
-            //validate email using php filter_var
-            if(!filter_var($email,FILTER_VALIDATE_EMAIL))
-            {
+            if(!filter_var($email,FILTER_VALIDATE_EMAIL)) {
                 exit("not valid.");
             }
 
-            //connect to the database to see if the email is already registered.
-            $dbquerystring = sprintf("SELECT id, email, passwordHash, verified, dateJoined FROM ".$dbname.".users WHERE email='%s'",$email);
-            $dbquery = mysqli_query($db,$dbquerystring);
-            $dbresults = mysqli_fetch_array($dbquery);
-            mysqli_free_result($dbquery);
+            $stmt = $pdo->prepare("SELECT id, email, password_hash, password_salt, email_verified FROM users WHERE email = ?");
+            $stmt->execute([$email]);
+            $user = $stmt->fetch();
 
-            //done with the db
-            mysqli_close($db);
-
-            if(
-                $dbresults==null
-                ||$dbresults['email']==null
-                ||$dbresults['email']!=$email
-                ||$dbresults['passwordHash']==null
-                ||$dbresults['passwordHash']!=getSaltedPassword($password,$dbresults['dateJoined'])
-                ||$dbresults['verified']==null
-                ||$dbresults['verified']==0
-            )
+            if($user == null || !$securityManager->verifyPassword($password, $user['password_hash'], $user['password_salt']))
             {
                 $show_html=true;
 
-                if($dbresults!=null
-                    &&$dbresults['email']==$email
-                    &&$dbresults['passwordHash']==getSaltedPassword($password,$dbresults['dateJoined'])
-                    &&$dbresults['verified']==0)
-                {
-                    $error_string =
-                        "<div style='width:100%;text-align:center;font-size:14px;padding-bottom:16px;'>
-                            Your email address is not yet verified.
-                            <br>
-                            <br>
-                            <div style='color:#000;font-size:14px;font-weight:normal;text-shadow:#aaa 0px 0px 1px;'>
-                                Please verify your email address by clicking the link in your email. Check your spam folder if you can't find it, and mark it not spam.
-                            </div>
-                        </div>";
-                }
-                else
-                {
-                    $error_string =
-                        "<div style='width:100%;text-align:center;font-size:14px;padding-bottom:16px;'>
-                            Either you typed the wrong password or your email address is not yet signed up.
-                            <br>
-                            <br>
 
-                        </div>";
-                }
+                //if($dbresults!=null
+                //    &&$dbresults['email']==$email
+                //    &&$dbresults['passwordHash']==getSaltedPassword($password,$dbresults['dateJoined'])
+                //    &&$dbresults['verified']==0)
+                //{
+                //    $error_string =
+                //        "<div style='width:100%;text-align:center;font-size:14px;padding-bottom:16px;'>
+                //            Your email address is not yet verified.
+                //            <br>
+                //            <br>
+                //            <div style='color:#000;font-size:14px;font-weight:normal;text-shadow:#aaa 0px 0px 1px;'>
+                //                Please verify your email address by clicking the link in your email. Check your spam folder if you can't find it, and mark it not spam.
+                //            </div>
+                //        </div>";
+                //}
+                //else
+                //{
+                //    $error_string =
+                //        "<div style='width:100%;text-align:center;font-size:14px;padding-bottom:16px;'>
+                //            Either you typed the wrong password or your email address is not yet signed up.
+                //            <br>
+                //            <br>
+				//
+                //        </div>";
+                //}
+
+                $error_string = "<div style='width:100%;text-align:center;font-size:14px;padding-bottom:16px;'>Either you typed the wrong password or your email address is not yet signed up.</div>";
+                $csrf_token = $securityManager->generateCsrfToken();
+            }
+            else if ($user['email_verified'] == 0)
+            {
+                $show_html=true;
+                $error_string = "<div style='width:100%;text-align:center;font-size:14px;padding-bottom:16px;'>Your email address is not yet verified. Please check your email.</div>";
+                $csrf_token = $securityManager->generateCsrfToken();
+
             }
             else
             {
-                $dateLastSignedIn = time();
+                $token = $securityManager->generateSessionToken($user['id']);
 
-                //connect to database and set dateLastSignedIn
-
-                $db = mysqli_connect($dburl,$dbuser,$dbpass);
-                if(!$db)exit(mysqli_connect_error());
-
-
-                mysqli_query($db,"UPDATE ".$dbname.".users SET `dateLastSignedIn` = '".$dateLastSignedIn."' WHERE `email` = '".$email."'");
-
-                //done with the db
-                mysqli_close($db);
-
-                $_SESSION['email']=$email;
-                $_SESSION['token']=getSaltedPassword($dbresults['passwordHash'],$dateLastSignedIn);
+                $_SESSION['email'] = $user['email'];
+                $_SESSION['token'] = $token;
 
                 if($staySignedIn==1)
                 {
-                    setcookie("email",$email,time()+(3600*24*30),'/',".".getSiteDomain());
-                    setcookie("token",getSaltedPassword($dbresults['passwordHash'],$dateLastSignedIn),time()+(3600*24*30),'/',".".getSiteDomain());
+                    setcookie("email", $user['email'], time() + (3600 * 24 * 30), '/');
+                    setcookie("token", $token, time() + (3600 * 24 * 30), '/');
                 }
 
-                header('Location: '.getSiteURL().'/matches');
+                $updateStmt = $pdo->prepare("UPDATE users SET last_online = NOW() WHERE id = ?");
+                $updateStmt->execute([$user['id']]);
+
+                header('Location: '.getSiteURL().'/matches.php');
                 exit();
             }
+            } // Close rate limiting else block
         }
     }
 
@@ -149,8 +145,9 @@
 <?php include("h.php");?>
 
     <div class="col-sm-12 my-auto text-center">
-        <form class="form-signin" action="signin" method="POST" enctype="multipart/form-data"
+        <form class="form-signin" action="signin.php" method="POST" enctype="multipart/form-data"
               name="signinFormName" id="signinFormID">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
             <fieldset style="text-align:left;">
 
                 <h1 class="h3 mb-3 font-weight-normal text-center"> Sign In</h1>
@@ -175,12 +172,9 @@
     {
         echo '
             <br>
-            <br>
-            <br>
-            <div style="color:#0096ff;font-size:12pt;text-shadow:#aad 1px 1px 1px;">
+            <div style="color:#c00;font-size:12pt;text-shadow:#aad 1px 1px 1px;">
                     '.$error_string.'
             </div>
-            <br>
             <br>
 ';
     }
@@ -195,7 +189,7 @@
                 <br>
 
                 <div style="width:100%;text-align:center;font-size:14px;padding-bottom:16px;">
-                    <a href="/forgotpassword">Forgot Password?</a>
+                    <a href="/forgot-password.php">Forgot Password?</a>
                 </div>
 
             </fieldset>
@@ -252,5 +246,3 @@
 </script>
 </body>
 </html>
-
-
