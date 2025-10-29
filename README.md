@@ -22,9 +22,10 @@ We don't have a built in messenger, we only share your contact information with 
 
 Open source and fully transparent.
 Verify your data is stored properly and your secrets are safe. Suggest new features or add them yourself. FWBer.com is licensed under the AGPL v3.
+
 --
 # FWBer.me Modernization Project
-
+--
 This document outlines the current state of the FWBer.me application following a comprehensive security and architectural overhaul. It is intended as a handoff document for future development.
 
 ## 1. Project Overview
