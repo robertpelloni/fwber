@@ -1,6 +1,6 @@
 <?php
 /*
-    Copyright 2020 FWBer.com
+    Copyright 2025 FWBer.me
 
     This file is part of FWBer.
 
@@ -16,7 +16,7 @@
 
     You should have received a copy of the GNU Affero Public License
     along with FWBer.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 //=========================================================================================
 function getTitleTagline()
@@ -34,15 +34,15 @@ function getSiteName()
 //=========================================================================================
 function getSiteURL()
 {//=========================================================================================
-    return 'https://'.getSiteName().'.com';
+    return 'https://'.getSiteName().'.me';
 }
 //=========================================================================================
 function getSiteDomain()
 {//=========================================================================================
-    return ''.getSiteName().'.com';
+    return ''.getSiteName().'.me';
 }
 //=========================================================================================
 function getEmailAddress()
 {//=========================================================================================
-    return "fwber@fwber.com";
+    return "fwber@FWBer.me";
 }

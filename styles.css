@@ -198,7 +198,7 @@ text-shadow:#00f 0px 0px 10px;
 	
 	background-position:bottom;
 	background-repeat:repeat-x;
-	background-image:url('https://FWBer.com/images/buttons/borderblue.png');
+	background-image:url('https://FWBer.me/images/buttons/borderblue.png');
 }
 
 #f {
@@ -211,7 +211,7 @@ text-shadow:#00f 0px 0px 10px;
 	
 	background-position:top;
 	background-repeat:repeat-x;
-	background-image:url('https://FWBer.com/images/buttons/borderpink.png');
+	background-image:url('https://FWBer.me/images/buttons/borderpink.png');
 }
 
 #copyright 
@@ -266,16 +266,16 @@ text-shadow:#00f 0px 0px 10px;
 }
 
 
-#button-signup, .button-signup {background-image:url('https://FWBer.com/images/buttons/signup.png');}
+#button-signup, .button-signup {background-image:url('https://FWBer.me/images/buttons/signup.png');}
 
-#button-login, .button-login {background-image:url('https://FWBer.com/images/buttons/login.png');}
-#button-signout, .button-signout {background-image:url('https://FWBer.com/images/buttons/signout.png');}
-#button-settings, .button-settings {background-image:url('https://FWBer.com/images/buttons/settings.png');}
-#button-matches, .button-matches {background-image:url('https://FWBer.com/images/buttons/matches.png');}
-#button-ok, .button-ok {background-image:url('https://FWBer.com/images/buttons/ok.png');}
-#button-myprofile, .button-myprofile {background-image:url('https://FWBer.com/images/buttons/myprofile.png');}
-#button-editprofile, .button-editprofile {background-image:url('https://FWBer.com/images/buttons/editprofile.png');}
-#button-uploadpics, .button-uploadpics {background-image:url('https://FWBer.com/images/buttons/uploadpics.png');}
+#button-login, .button-login {background-image:url('https://FWBer.me/images/buttons/login.png');}
+#button-signout, .button-signout {background-image:url('https://FWBer.me/images/buttons/signout.png');}
+#button-settings, .button-settings {background-image:url('https://FWBer.me/images/buttons/settings.png');}
+#button-matches, .button-matches {background-image:url('https://FWBer.me/images/buttons/matches.png');}
+#button-ok, .button-ok {background-image:url('https://FWBer.me/images/buttons/ok.png');}
+#button-myprofile, .button-myprofile {background-image:url('https://FWBer.me/images/buttons/myprofile.png');}
+#button-editprofile, .button-editprofile {background-image:url('https://FWBer.me/images/buttons/editprofile.png');}
+#button-uploadpics, .button-uploadpics {background-image:url('https://FWBer.me/images/buttons/uploadpics.png');}
 
 
 
@@ -286,7 +286,7 @@ text-shadow:#00f 0px 0px 10px;
   margin: 0;
   padding: 0;
   border: 0;
-  background: transparent url('https://FWBer.com/images/buttons/ok.png') no-repeat center top;
+  background: transparent url('https://FWBer.me/images/buttons/ok.png') no-repeat center top;
   text-indent: -1000em;
   cursor: pointer; /* hand-shaped cursor */
   cursor: hand; /* for IE 5.x */
@@ -1435,4 +1435,154 @@ background: rgba(255, 204, 238, 0.25);
 .btn-primary:not(:disabled):not(.disabled):active:focus, .btn-primary:not(:disabled):not(.disabled).active:focus,
 .show > .btn-primary.dropdown-toggle:focus {
 	box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+}
+
+/* =====================================
+   Global Reset & Base
+===================================== */
+html, body {
+  font-family: "Inter", "Poppins", sans-serif;
+  background-color: #f8fafc;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+a {
+  color: #0096ff;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+a:hover {
+  color: #ff00a8;
+}
+
+/* =====================================
+   Layout
+===================================== */
+#mainbody {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+#fwberLogo {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0096ff;
+  text-shadow: none;
+  margin: 20px 0;
+}
+
+/* =====================================
+   Typography
+===================================== */
+.tagline {
+  font-size: 18px;
+  font-weight: 600;
+  color: #666;
+  margin-top: 8px;
+}
+
+#missionStatement {
+  font-size: 16px;
+  color: #444;
+}
+
+#quotes {
+  font-size: 18px;
+  font-style: italic;
+  color: #555;
+}
+
+/* =====================================
+   Buttons
+===================================== */
+button, .button, .btn-primary {
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 9999px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: #0096ff;
+  color: white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.btn-primary:hover {
+  background: #007add;
+}
+
+.btn-accent {
+  background: #ff00a8;
+  color: white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.btn-accent:hover {
+  background: #d8008f;
+}
+
+/* =====================================
+   Form Inputs
+===================================== */
+input[type=text], input[type=password], input[type=email],
+select, textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: #0096ff;
+  box-shadow: 0 0 0 3px rgba(0,150,255,0.2);
+}
+
+/* =====================================
+   Cards & Containers
+===================================== */
+.card, .blueBox, .profile_container_content {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border: none;
+}
+
+.profile_container_title_bar {
+  font-size: 20px;
+  font-weight: 600;
+  color: #0096ff;
+  margin-bottom: 8px;
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+/* =====================================
+   Header & Footer
+===================================== */
+#h, .site-header {
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: saturate(180%) blur(20px);
+  padding: 10px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+#f, .footer {
+  background: #f8fafc;
+  padding: 40px 20px;
+  text-align: center;
+  font-size: 14px;
+  color: #777;
+  border-top: 1px solid #eee;
 }

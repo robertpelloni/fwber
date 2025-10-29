@@ -1,0 +1,17 @@
+model = "gpt-5-codex"
+model_reasoning_effort = "medium"
+windows_wsl_setup_acknowledged = true
+
+# Global MCP server timeout settings
+mcp_server_startup_timeout_ms = 300000
+mcp_server_timeout_ms = 600000
+
+# Test with just one MCP server
+[mcp_servers.memory]
+command = "npx"
+args = ["@modelcontextprotocol/server-memory","stdio"]
+startup_timeout_ms = 300000
+timeout_ms = 600000
+
+[projects.'/mnt/c/Users/hyper/fwber']
+trust_level = "trusted"

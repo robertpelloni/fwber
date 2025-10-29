@@ -1,6 +1,6 @@
 <?php
 /*
-    Copyright 2020 FWBer.com
+    Copyright 2025 FWBer.me
 
     This file is part of FWBer.
 
@@ -18,50 +18,48 @@
     along with FWBer.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-	session_start(); 
+require_once('_init.php');
+require_once('ProfileManager.php');
 
-	include("_debug.php");
-	include("_names.php");
-	include("_init.php");
-    include("_profileVars.php");
 
-	goHomeIfCookieNotSet();
-	
-	$profileDone=isProfileDone();
+// Ensure the user is logged in
+if (!validateSessionOrCookiesReturnLoggedIn()) {
+    header('Location: /signin.php');
+    exit();
+}
 
-	//go to edit profile if profile isn't finished
-	if($profileDone==0)
-	{
-		header('Location: '.getSiteURL().'/editprofile');
-		exit();
-	}
+// Redirect to edit profile if it's not done yet
+if (!isProfileDone()) {
+    header('Location: /edit-profile.php');
+    exit();
+}
 
-	//if profile is done, fill in all the boxes from the database, otherwise it will use the initialized values in _profileVars.php
-	if($profileDone==1)
-	{
-		initAllVariablesFromDB();
-	}
+$profileManager = new ProfileManager($pdo);
+$userId = getUserIdByEmail($_SESSION['email']);
+$userProfile = $profileManager->getProfile($userId);
+
 ?>
 <!doctype html>
 <html lang="en">
 <head>
-    <title><?php echo getSiteName(); ?> - Manage Your Profile<?php echo getTitleTagline(); ?></title>
+    <title><?php echo getSiteName(); ?> - Your Profile</title>
 	<?php include("head.php");?>
 </head>
 <body class="d-flex flex-column h-100">
 <?php include("h.php");?>
-<div id="" align="center" class="matches">
+<div class="container">
     <br>
     <br>
     <br>
     <br>
     <div class="card p-5 m-2 shadow-sm" style="display:inline-block;">
-        <a class="btn btn-outline-secondary my-0 px-3 mx-1" href="/managepics">Manage Pictures</a>
-        <a class="btn btn-outline-secondary my-0 px-3 mx-1" href="/editprofile">Edit Profile</a>
-        <a class="btn btn-outline-secondary my-0 px-3 mx-1" href="/settings">Account Settings</a>
+        <a class="btn btn-outline-secondary my-0 px-3 mx-1" href="/managepics.php">Manage Pictures</a>
+        <a class="btn btn-outline-secondary my-0 px-3 mx-1" href="/edit-profile.php">Edit Profile</a>
+        <a class="btn btn-outline-secondary my-0 px-3 mx-1" href="/settings.php">Account Settings</a>
     </div>
 
 <?php
+/*
     $db = mysqli_connect($dburl,$dbuser,$dbpass);
     if(!$db)exit(mysqli_connect_error());
 
@@ -116,6 +114,21 @@
 
 
 
+*/?>
+    <div class="card p-5 m-2 shadow-sm">
+        <h2>Your Profile Information</h2>
+        <p>This is the information you have provided. It is used to find your matches.</p>
+        
+        <table class="table">
+            <?php foreach ($userProfile as $key => $value): ?>
+                <tr>
+                    <th scope="row"><?php echo htmlspecialchars(ucwords(str_replace('_', ' ', $key))); ?></th>
+                    <td><?php echo htmlspecialchars($value); ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </table>
+    </div>
+</div>
+<?php include("f.php");?>
 </body>
 </html>
-

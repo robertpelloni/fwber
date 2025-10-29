@@ -1,6 +1,6 @@
 <?php
 /*
-    Copyright 2020 FWBer.com
+    Copyright 2025 FWBer.me
 
     This file is part of FWBer.
 
@@ -16,7 +16,7 @@
 
     You should have received a copy of the GNU Affero Public License
     along with FWBer.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 global $dateJoined;
 global $dateLastSignedIn;
 global $dateLastSeen;

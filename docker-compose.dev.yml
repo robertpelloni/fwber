@@ -1,0 +1,118 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: fwber-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: fwber
+      MYSQL_USER: fwber
+      MYSQL_PASSWORD: Temppass0!
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./fwber-backend/database/init:/docker-entrypoint-initdb.d
+    networks:
+      - fwber_network
+
+  # Laravel Backend
+  laravel:
+    build:
+      context: ./fwber-backend
+      dockerfile: Dockerfile.dev
+    container_name: fwber-laravel
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./fwber-backend:/var/www/html
+      - /var/www/html/vendor
+      - /var/www/html/node_modules
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=fwber
+      - DB_USERNAME=fwber
+      - DB_PASSWORD=Temppass0!
+      - MERCURE_PUBLISHER_JWT_KEY=uWnEOi51TibZqRn3YbRMvu0XbZwWp42X6z6s0aZMcAw=
+      - MERCURE_SUBSCRIBER_JWT_KEY=0DyZctGxb2WUcwL3XH0HFq+5XWgnEI9ojHn5Y2cY3ic=
+      - MERCURE_PUBLIC_URL=http://localhost:3001
+      - MERCURE_INTERNAL_URL=http://mercure:80
+    depends_on:
+      - mysql
+      - mercure
+    networks:
+      - fwber_network
+
+  # Next.js Frontend
+  nextjs:
+    build:
+      context: ./fwber-frontend
+      dockerfile: Dockerfile.dev
+    container_name: fwber-nextjs
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./fwber-frontend:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api
+      - NEXT_PUBLIC_MERCURE_URL=http://localhost:3001
+    depends_on:
+      - laravel
+    networks:
+      - fwber_network
+
+  # Mercure SSE Hub
+  mercure:
+    image: dunglas/mercure:latest
+    container_name: fwber-mercure
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+    environment:
+      SERVER_NAME: ":80"
+      MERCURE_PUBLISHER_JWT_KEY: uWnEOi51TibZqRn3YbRMvu0XbZwWp42X6z6s0aZMcAw=
+      MERCURE_SUBSCRIBER_JWT_KEY: 0DyZctGxb2WUcwL3XH0HFq+5XWgnEI9ojHn5Y2cY3ic=
+      MERCURE_CORS_ALLOWED_ORIGINS: http://localhost:3000
+      MERCURE_PUBLISH_ALLOWED_ORIGINS: http://localhost:8000
+      MERCURE_SUBSCRIPTIONS: "1"
+      MERCURE_EXTRA_DIRECTIVES: |
+        subscriptions
+        heartbeat 10s
+        write_timeout 30s
+        read_timeout 30s
+    networks:
+      - fwber_network
+
+  # Redis for Caching and Sessions
+  redis:
+    image: redis:7-alpine
+    container_name: fwber-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - fwber_network
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  fwber_network:
+    driver: bridge
+
+

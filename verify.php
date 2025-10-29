@@ -1,6 +1,6 @@
 <?php
 /*
-    Copyright 2020 FWBer.com
+    Copyright 2025 FWBer.me
 
     This file is part of FWBer.
 
@@ -17,7 +17,6 @@
     You should have received a copy of the GNU Affero Public License
     along with FWBer.  If not, see <https://www.gnu.org/licenses/>.
 */
-
 include("_init.php");
 include("_secrets.php");
 include("_names.php");

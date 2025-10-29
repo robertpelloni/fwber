@@ -1,0 +1,6 @@
+Use the available MCP tools to:
+1. List the current directory contents
+2. Get information about the project
+3. Show available models
+
+Please provide a brief summary of what tools are available.
