@@ -171,7 +171,7 @@ class PhotoController extends Controller
             
             // Store the original image
             $filePath = 'photos/' . $user->id . '/' . $filename;
-            Storage::put($filePath, (string) $image->encode());
+            Storage::disk('public')->put($filePath, (string) $image->encode());
             
             // Create thumbnail
             $thumbnailFilename = 'thumb_' . $filename;
@@ -180,7 +180,7 @@ class PhotoController extends Controller
             // Scale down to 300x300 max while maintaining aspect ratio
             $thumbnail = $image->scaleDown(width: 300, height: 300);
             
-            Storage::put($thumbnailPath, (string) $thumbnail->encode());
+            Storage::disk('public')->put($thumbnailPath, (string) $thumbnail->encode());
             
             // Create photo record
             $photo = Photo::create([
