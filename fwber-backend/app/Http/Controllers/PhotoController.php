@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 /**
  * Photo Controller - User Photo Management API
@@ -160,25 +161,26 @@ class PhotoController extends Controller
             $filename = Str::uuid() . '.' . $extension;
             $originalFilename = $file->getClientOriginalName();
             
-            // Get image dimensions
-            $image = Image::make($file);
+            // Get image dimensions and create manager
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read($file->getRealPath());
+            // Downscale very large originals to reduce memory usage
+            $image = $image->scaleDown(width: 2000, height: 2000);
             $width = $image->width();
             $height = $image->height();
             
             // Store the original image
             $filePath = 'photos/' . $user->id . '/' . $filename;
-            Storage::put($filePath, $image->encode());
+            Storage::put($filePath, (string) $image->encode());
             
             // Create thumbnail
             $thumbnailFilename = 'thumb_' . $filename;
             $thumbnailPath = 'photos/' . $user->id . '/thumbnails/' . $thumbnailFilename;
             
-            $thumbnail = $image->resize(300, 300, function ($constraint) {
-                $constraint->aspectRatio();
-                $constraint->upsize();
-            });
+            // Scale down to 300x300 max while maintaining aspect ratio
+            $thumbnail = $image->scaleDown(width: 300, height: 300);
             
-            Storage::put($thumbnailPath, $thumbnail->encode());
+            Storage::put($thumbnailPath, (string) $thumbnail->encode());
             
             // Create photo record
             $photo = Photo::create([

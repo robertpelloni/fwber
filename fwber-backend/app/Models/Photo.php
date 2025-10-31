@@ -66,7 +66,11 @@ class Photo extends Model
      */
     public function getUrlAttribute(): string
     {
-        return Storage::url($this->file_path);
+        $url = Storage::url($this->file_path);
+        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
+            return $url;
+        }
+        return rtrim((string) config('app.url'), '/') . $url;
     }
 
     /**
@@ -74,11 +78,12 @@ class Photo extends Model
      */
     public function getThumbnailUrlAttribute(): string
     {
-        if ($this->thumbnail_path) {
-            return Storage::url($this->thumbnail_path);
+        $path = $this->thumbnail_path ?: $this->file_path;
+        $url = Storage::url($path);
+        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
+            return $url;
         }
-        
-        return $this->url;
+        return rtrim((string) config('app.url'), '/') . $url;
     }
 
     /**
