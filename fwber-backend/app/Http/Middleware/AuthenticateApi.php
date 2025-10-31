@@ -23,6 +23,29 @@ class AuthenticateApi
             return $this->unauthorized();
         }
 
+        // Development bypass token: when running locally, allow a configured token
+        // to authenticate as a development user without DB tokens.
+        // This is safe only for local development and is disabled in non-local envs.
+        if (app()->environment('local')) {
+            $devBypass = (string) env('API_DEV_BYPASS_TOKEN', '');
+            if ($devBypass !== '' && hash_equals($devBypass, $plainToken)) {
+                // Find or create a development user
+                $userModel = \App\Models\User::class;
+                /** @var \Illuminate\Database\Eloquent\Model|\App\Models\User $user */
+                $user = $userModel::query()->where('email', 'dev@fwber.me')->first();
+                if (! $user) {
+                    $user = $userModel::query()->create([
+                        'name' => 'Dev User',
+                        'email' => 'dev@fwber.me',
+                        'password' => bcrypt(str()->random(32)),
+                    ]);
+                }
+
+                auth()->setUser($user);
+                return $next($request);
+            }
+        }
+
         $hashed = hash('sha256', $plainToken);
         $apiToken = ApiToken::query()->with('user')->where('token', $hashed)->first();
 

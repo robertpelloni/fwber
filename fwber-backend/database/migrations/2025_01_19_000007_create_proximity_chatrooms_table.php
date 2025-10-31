@@ -53,8 +53,15 @@ return new class extends Migration
             $table->index('last_activity_at');
         });
 
-        // Create spatial index for proximity queries (MySQL compatible)
-        DB::statement('CREATE SPATIAL INDEX idx_proximity_chatrooms_location ON proximity_chatrooms (POINT(longitude, latitude))');
+        // Create spatial index for proximity queries (MySQL compatible only)
+        // SQLite doesn't support SPATIAL indexes
+        if (config('database.default') !== 'sqlite') {
+            try {
+                DB::statement('CREATE SPATIAL INDEX idx_proximity_chatrooms_location ON proximity_chatrooms (POINT(longitude, latitude))');
+            } catch (\Exception $e) {
+                // Index might already exist or fail silently
+            }
+        }
     }
 
     /**

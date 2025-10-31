@@ -13,8 +13,17 @@ return new class extends Migration
     public function up(): void
     {
         // Add spatial columns to bulletin_boards table (MySQL compatible)
+        // SQLite doesn't support POINT type or COMMENT in ALTER TABLE
         if (!Schema::hasColumn('bulletin_boards', 'location')) {
-            DB::statement('ALTER TABLE bulletin_boards ADD COLUMN location POINT NULL COMMENT "Center point as spatial data"');
+            if (config('database.default') === 'sqlite') {
+                // SQLite: Use TEXT to store JSON coordinates
+                Schema::table('bulletin_boards', function (Blueprint $table) {
+                    $table->text('location')->nullable();
+                });
+            } else {
+                // MySQL/MariaDB: Use POINT type
+                DB::statement('ALTER TABLE bulletin_boards ADD COLUMN location POINT NULL COMMENT "Center point as spatial data"');
+            }
         }
         
         // Add missing columns to bulletin_boards table
@@ -43,8 +52,17 @@ return new class extends Migration
         });
         
         // Add spatial columns to bulletin_messages table (MySQL compatible)
+        // SQLite doesn't support POINT type or COMMENT in ALTER TABLE
         if (!Schema::hasColumn('bulletin_messages', 'location')) {
-            DB::statement('ALTER TABLE bulletin_messages ADD COLUMN location POINT NULL COMMENT "Message location as spatial data"');
+            if (config('database.default') === 'sqlite') {
+                // SQLite: Use TEXT to store JSON coordinates
+                Schema::table('bulletin_messages', function (Blueprint $table) {
+                    $table->text('location')->nullable();
+                });
+            } else {
+                // MySQL/MariaDB: Use POINT type
+                DB::statement('ALTER TABLE bulletin_messages ADD COLUMN location POINT NULL COMMENT "Message location as spatial data"');
+            }
         }
         
         // Add missing columns to bulletin_messages table
@@ -60,25 +78,27 @@ return new class extends Migration
             }
         });
         
-        // Create spatial indexes for efficient proximity queries (MySQL syntax)
-        try {
-            DB::statement('CREATE SPATIAL INDEX idx_bulletin_boards_location ON bulletin_boards (location)');
-        } catch (\Exception $e) {
-            // Index might already exist
+        // Create spatial indexes for efficient proximity queries (MySQL syntax only)
+        if (config('database.default') !== 'sqlite') {
+            try {
+                DB::statement('CREATE SPATIAL INDEX idx_bulletin_boards_location ON bulletin_boards (location)');
+            } catch (\Exception $e) {
+                // Index might already exist
+            }
+            
+            try {
+                DB::statement('CREATE SPATIAL INDEX idx_bulletin_messages_location ON bulletin_messages (location)');
+            } catch (\Exception $e) {
+                // Index might already exist
+            }
+            
+            // Backfill location data from existing lat/lng columns (MySQL only)
+            DB::statement("
+                UPDATE bulletin_boards 
+                SET location = POINT(center_lng, center_lat) 
+                WHERE center_lat IS NOT NULL AND center_lng IS NOT NULL AND location IS NULL
+            ");
         }
-        
-        try {
-            DB::statement('CREATE SPATIAL INDEX idx_bulletin_messages_location ON bulletin_messages (location)');
-        } catch (\Exception $e) {
-            // Index might already exist
-        }
-        
-        // Backfill location data from existing lat/lng columns
-        DB::statement("
-            UPDATE bulletin_boards 
-            SET location = POINT(center_lng, center_lat) 
-            WHERE center_lat IS NOT NULL AND center_lng IS NOT NULL AND location IS NULL
-        ");
     }
 
     /**
