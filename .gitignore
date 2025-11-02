@@ -46,6 +46,12 @@ Thumbs.db
 # Node
 node_modules/
 
+# Next.js build output and cache
+.next/
+out/
+dist/
+build/
+
 # Python
 __pycache__/
 *.pyc
