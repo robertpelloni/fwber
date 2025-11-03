@@ -35,7 +35,7 @@ class PhotoAPI {
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`
     
-    const defaultHeaders = {
+    const defaultHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     }

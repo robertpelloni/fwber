@@ -37,7 +37,7 @@ export function useRecommendations(params?: {
     },
     enabled: params?.enabled !== false,
     staleTime: 30 * 60 * 1000, // 30 minutes
-    cacheTime: 60 * 60 * 1000, // 1 hour
+    gcTime: 60 * 60 * 1000, // 1 hour
     retry: 2,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
@@ -59,7 +59,7 @@ export function useRecommendationsByType(
     queryFn: () => getRecommendationsByType(type, params),
     enabled: params?.enabled !== false && !!type,
     staleTime: 30 * 60 * 1000,
-    cacheTime: 60 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
     retry: 2,
   });
 }
@@ -77,7 +77,7 @@ export function useTrendingRecommendations(params?: {
     queryFn: () => getTrendingRecommendations(params),
     enabled: params?.enabled !== false,
     staleTime: 5 * 60 * 1000, // 5 minutes (trending changes frequently)
-    cacheTime: 15 * 60 * 1000, // 15 minutes
+    gcTime: 15 * 60 * 1000, // 15 minutes
     refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
     retry: 2,
   });
@@ -96,7 +96,7 @@ export function usePersonalizedFeed(params?: {
     queryFn: () => getPersonalizedFeed(params),
     enabled: params?.enabled !== false,
     staleTime: 10 * 60 * 1000, // 10 minutes
-    cacheTime: 30 * 60 * 1000, // 30 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
     retry: 2,
   });
 }
@@ -132,7 +132,7 @@ export function useRecommendationAnalytics(params?: {
     queryFn: () => getRecommendationAnalytics(params),
     enabled: params?.enabled !== false,
     staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 15 * 60 * 1000, // 15 minutes
+    gcTime: 15 * 60 * 1000, // 15 minutes
     retry: 2,
   });
 }

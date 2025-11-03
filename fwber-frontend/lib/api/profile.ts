@@ -19,6 +19,7 @@ export interface UserProfile {
   profile: {
     display_name: string | null;
     bio: string | null;
+    date_of_birth?: string | null;
     age: number | null;
     gender: string | null;
     pronouns: string | null;
@@ -78,7 +79,8 @@ export interface UserProfile {
 export interface ProfileUpdateData {
   display_name?: string;
   bio?: string;
-  age?: number;
+  // ISO date string YYYY-MM-DD
+  date_of_birth?: string;
   gender?: string;
   pronouns?: string;
   sexual_orientation?: string;

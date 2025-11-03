@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Carbon\Carbon;
 
 /**
  * User Profile API Resource
@@ -33,7 +34,16 @@ class UserProfileResource extends JsonResource
             'profile' => [
                 'display_name' => $this->profile?->display_name,
                 'bio' => $this->profile?->bio,
-                'age' => $this->profile?->age,
+                // Include date_of_birth for client-side prefill (Y-m-d)
+                'date_of_birth' => $this->profile?->date_of_birth instanceof \DateTimeInterface
+                    ? $this->profile->date_of_birth->format('Y-m-d')
+                    : ($this->profile?->date_of_birth
+                        ? Carbon::parse($this->profile->date_of_birth)->toDateString()
+                        : null),
+                // Compute age from date_of_birth when present
+                'age' => $this->profile?->date_of_birth
+                    ? Carbon::parse($this->profile->date_of_birth)->age
+                    : null,
                 'gender' => $this->profile?->gender,
                 'pronouns' => $this->profile?->pronouns,
                 'sexual_orientation' => $this->profile?->sexual_orientation,
@@ -82,19 +92,29 @@ class UserProfileResource extends JsonResource
         
         $requiredFields = [
             'display_name',
-            'age',
             'gender',
             'location_latitude',
             'location_longitude',
             'looking_for',
         ];
-        
+
         foreach ($requiredFields as $field) {
             if (empty($this->profile->$field)) {
                 return false;
             }
         }
-        
+
+        // Require DOB and adulthood >= 18
+        if (empty($this->profile->date_of_birth)) {
+            return false;
+        }
+        $dob = $this->profile->date_of_birth instanceof \DateTimeInterface
+            ? Carbon::instance($this->profile->date_of_birth)
+            : Carbon::parse($this->profile->date_of_birth);
+        if ($dob->age < 18) {
+            return false;
+        }
+
         return true;
     }
     
@@ -110,7 +130,8 @@ class UserProfileResource extends JsonResource
         $allFields = [
             'display_name',
             'bio',
-            'age',
+            // Count DOB presence instead of raw age field
+            'date_of_birth',
             'gender',
             'pronouns',
             'sexual_orientation',

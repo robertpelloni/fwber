@@ -25,19 +25,34 @@ export default function ProfilePage() {
   // Photo management
   const { photos, uploadPhotos, deletePhoto, setPrimaryPhoto } = usePhotos()
 
+  // Local form type: ensure location, looking_for, and key array prefs are present for UI binding
+  type BasePrefs = NonNullable<ProfileUpdateData['preferences']>
+  type ProfileFormData = Omit<ProfileUpdateData, 'preferences' | 'location' | 'looking_for'> & {
+    preferences: BasePrefs & {
+      hobbies: string[]
+      music: string[]
+      movies: string[]
+      books: string[]
+      sports: string[]
+      ethnicity?: string[]
+    }
+    location: NonNullable<ProfileUpdateData['location']>
+    looking_for: string[]
+  }
+
   // Form state
-  const [formData, setFormData] = useState<ProfileUpdateData>({
+  const [formData, setFormData] = useState<ProfileFormData>({
     display_name: '',
     bio: '',
-    age: null,
+    date_of_birth: '',
     gender: '',
     pronouns: '',
     sexual_orientation: '',
     relationship_style: '',
     looking_for: [],
     location: {
-      latitude: null,
-      longitude: null,
+      latitude: undefined,
+      longitude: undefined,
       max_distance: 25,
       city: '',
       state: '',
@@ -103,22 +118,22 @@ export default function ProfilePage() {
       ])
 
       setProfile(profileData)
-      setCompleteness(completenessData.completion_percentage)
+      setCompleteness(completenessData.percentage)
 
       // Populate form with existing data
       if (profileData.profile) {
         setFormData({
           display_name: profileData.profile.display_name || '',
           bio: profileData.profile.bio || '',
-          age: profileData.profile.age || null,
+          date_of_birth: (profileData.profile as any).date_of_birth || '',
           gender: profileData.profile.gender || '',
           pronouns: profileData.profile.pronouns || '',
           sexual_orientation: profileData.profile.sexual_orientation || '',
           relationship_style: profileData.profile.relationship_style || '',
           looking_for: profileData.profile.looking_for || [],
           location: {
-            latitude: profileData.profile.location.latitude,
-            longitude: profileData.profile.location.longitude,
+            latitude: profileData.profile.location.latitude ?? undefined,
+            longitude: profileData.profile.location.longitude ?? undefined,
             max_distance: profileData.profile.location.max_distance || 25,
             city: profileData.profile.location.city || '',
             state: profileData.profile.location.state || '',
@@ -230,7 +245,10 @@ export default function ProfilePage() {
     }))
   }
 
-  const handlePreferenceChange = (field: string, value: any) => {
+  type PreferenceKey = keyof ProfileFormData['preferences']
+  type PreferenceArrayKey = Extract<PreferenceKey, 'hobbies' | 'music' | 'movies' | 'books' | 'sports' | 'ethnicity'>
+
+  const handlePreferenceChange = (field: PreferenceKey, value: any) => {
     setFormData(prev => ({
       ...prev,
       preferences: {
@@ -240,14 +258,14 @@ export default function ProfilePage() {
     }))
   }
 
-  const handleArrayPreferenceChange = (field: string, value: string, checked: boolean) => {
+  const handleArrayPreferenceChange = (field: PreferenceArrayKey, value: string, checked: boolean) => {
     setFormData(prev => ({
       ...prev,
       preferences: {
         ...prev.preferences,
         [field]: checked 
-          ? [...(prev.preferences[field] || []), value]
-          : (prev.preferences[field] || []).filter((item: string) => item !== value)
+          ? ([...(prev.preferences[field] as string[] | undefined ?? []), value])
+          : ((prev.preferences[field] as string[] | undefined ?? []).filter((item: string) => item !== value))
       }
     }))
   }
@@ -335,16 +353,14 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label htmlFor="age" className="block text-sm font-medium text-gray-700">
-                    Age
+                  <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700">
+                    Date of Birth
                   </label>
                   <input
-                    type="number"
-                    id="age"
-                    min="18"
-                    max="100"
-                    value={formData.age || ''}
-                    onChange={(e) => handleInputChange('age', e.target.value ? parseInt(e.target.value) : null)}
+                    type="date"
+                    id="date_of_birth"
+                    value={formData.date_of_birth || ''}
+                    onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   />
                 </div>

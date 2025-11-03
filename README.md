@@ -1,63 +1,36 @@
-<<<<<<< HEAD
-# FWBer.com
+# FWBer.me (aka FWBer.com) – an open-source, privacy-first hookup platform
 
-This is the PHP source code to FWBer.com, an open source Adult Match website.  Its goal is to replace the defunct Craigslist Casual Encounters and websites like AdultFriendFinder with a completely free and open source replacement that improves upon the concept.
+This is the PHP source code to FWBer, an open-source Adult Match website. Its goal is to replace the defunct Craigslist Casual Encounters and sites like AdultFriendFinder with a completely free and open-source replacement that improves upon the concept.
 
+## Supports all types of lifestyles and preferences
 
-## Supports all types of lifestyles and preferences.
-
-Men, women, couples, groups, transgender, crossdressers, straight, gay, and bisexual lifestyles are supported.  More preferences to come in the future.
-
-## Match by dozens of specific sexual interests and fetishes.
-
-Find exactly who you are looking for, no matter how kinky.  More fetishes and kinks can be easily added by the community.
-
-## Automatic avatar creation based on your attributes.
-
-You don't need a public picture.  We make one for you.  Create your FWBer avatar by filling out your profile.  This levels the playing field for everyone, gives an idea of what to expect, and discourages bots with fake pictures.
-
-## No searching. Automatic matches based on sexual interests.
-
-No digging through hundreds of profiles. We find you and send you to each other.  You are alerted instantly when someone new signs up who matches your interests.
-
-## Privacy comes first. We only show your profile to your matches.
-
-Your pictures always remain private until you agree to show them.  Private pictures are only shown to matches you authorize.  Public pictures are shown to potential matches only.  Share as much or as little information as you want.
-
-## Messaging is done off-site using your preferred tools.
-
-We don't have a built in messenger, we only share your contact information with your authorized matches.  You communicate through email, text, phone, Skype, Kik, whatever you decide.  That keeps your data safe, protects us from liability, and uses higher quality tools than an in-built messenger.  We hook you up, the rest is up to you.
-
-## Open source and fully transparent.
-
-Verify your data is stored properly and your secrets are safe.  Suggest new features or add them yourself.  FWBer.com is licensed under the AGPL v3.
-=======
-# FWBer.me - The most basic and detailed (and open source) hookup website
-
-This is the PHP source code to FWBer.com, an open source Adult Match website. Its goal is to replace the defunct Craigslist Casual Encounters and websites like AdultFriendFinder with a completely free and open source replacement that improves upon the concept.
-
-Supports all types of lifestyles and preferences.
 Men, women, couples, groups, transgender, crossdressers, straight, gay, and bisexual lifestyles are supported. More preferences to come in the future.
 
-Match by dozens of specific sexual interests and fetishes.
+## Match by dozens of specific sexual interests and fetishes
+
 Find exactly who you are looking for, no matter how kinky. More fetishes and kinks can be easily added by the community.
 
-Automatic avatar creation based on your attributes.
+## Automatic avatar creation based on your attributes
+
 You don't need a public picture. We make one for you. Create your FWBer avatar by filling out your profile. This levels the playing field for everyone, gives an idea of what to expect, and discourages bots with fake pictures.
 
-No searching. Automatic matches based on sexual interests.
+## No searching. Automatic matches based on sexual interests
+
 No digging through hundreds of profiles. We find you and send you to each other. You are alerted instantly when someone new signs up who matches your interests.
 
-Privacy comes first. We only show your profile to your matches.
+## Privacy comes first. We only show your profile to your matches
+
 Your pictures always remain private until you agree to show them. Private pictures are only shown to matches you authorize. Public pictures are shown to potential matches only. Share as much or as little information as you want.
 
-Messaging is done off-site using your preferred tools.
-We don't have a built in messenger, we only share your contact information with your authorized matches. You communicate through email, text, phone, Skype, Kik, whatever you decide. That keeps your data safe, protects us from liability, and uses higher quality tools than an in-built messenger. We hook you up, the rest is up to you.
+## Messaging is done off-site using your preferred tools
 
-Open source and fully transparent.
-Verify your data is stored properly and your secrets are safe. Suggest new features or add them yourself. FWBer.com is licensed under the AGPL v3.
+We don't have a built-in messenger; we only share your contact information with your authorized matches. You communicate through email, text, phone, Skype, Kik—whatever you decide. That keeps your data safe, protects us from liability, and uses higher-quality tools than an in-built messenger. We hook you up; the rest is up to you.
 
-# 
+## Open source and fully transparent
+
+Verify your data is stored properly and your secrets are safe. Suggest new features or add them yourself. FWBer is licensed under the AGPL v3.
+
+---
 
 # FWBer.me Modernization Project
 
@@ -83,20 +56,20 @@ The new architecture is designed to be modular and secure, with a clear separati
 
 ### `_init.php`
 This is the new central bootstrap file for the application. It is responsible for:
-1.  Loading the Composer autoloader.
-2.  Loading environment variables (API keys, etc.) from the `.env` file.
-3.  Establishing the secure PDO database connection (`_db.php`).
-4.  Initializing the core manager classes (`SecurityManager`, `ProfileManager`, etc.).
+1. Loading the Composer autoloader.
+2. Loading environment variables (API keys, etc.) from the `.env` file.
+3. Establishing the secure PDO database connection (`_db.php`).
+4. Initializing the core manager classes (`SecurityManager`, `ProfileManager`, etc.).
 
 ### `_db.php`
 This file contains the single source of truth for the application's database connection, using PDO for secure, modern database interactions.
 
 ### Manager Classes
 - **`SecurityManager.php`**: The heart of the application's security. It handles:
-    - **Password Hashing:** Using the modern `Argon2ID` algorithm.
-    - **Session Management:** Secure, database-driven session validation.
-    - **CSRF Protection:** Generation and validation of single-use CSRF tokens for all forms.
-    - **Rate Limiting:** Protection against brute-force attacks on authentication endpoints.
+  - **Password Hashing:** Using the modern `Argon2ID` algorithm.
+  - **Session Management:** Secure, database-driven session validation.
+  - **CSRF Protection:** Generation and validation of single-use CSRF tokens for all forms.
+  - **Rate Limiting:** Protection against brute-force attacks on authentication endpoints.
 - **`ProfileManager.php`**: A robust class for managing all user profile data. It intelligently handles data for both the `users` and `user_preferences` tables, making the profile system easily extensible.
 - **`PhotoManager.php`**: A secure class for handling all aspects of photo management, including secure file uploads (with MIME type validation), secure file deletion, and database integration.
 
@@ -117,27 +90,27 @@ A comprehensive security overhaul was completed, addressing all critical vulnera
 
 To get the application running locally, follow these steps:
 
-1.  **Clone the Repository:** Clone the project to your local machine (e.g., into `C:/xampp/htdocs`).
-2.  **Install Dependencies:** Open a terminal in the project root and run `composer install`.
-3.  **Create `.env` File:** Create a `.env` file in the project root and add your secret API keys. Use the following template:
-    ```
-    REPLICATE_API_TOKEN="YOUR_REPLICATE_API_TOKEN_HERE"
-    OPENAI_API_KEY="YOUR_OPENAI_API_KEY_HERE"
-    ```
-4.  **Set Up the Database:**
-    - In phpMyAdmin, create a new user: `fwber` with password `Temppass0!` (or your preferred password, updated in `_secrets.php`).
-    - When creating the user, check the box to **"Create database with same name and grant all privileges."**
-    - Navigate to the newly created `fwber` database and use the "Import" tab to run the `setup-database.sql` script.
+1. **Clone the Repository:** Clone the project to your local machine (e.g., into `C:/xampp/htdocs`).
+2. **Install Dependencies:** Open a terminal in the project root and run `composer install`.
+3. **Create `.env` File:** Create a `.env` file in the project root and add your secret API keys. Use the following template:
+   ```
+   REPLICATE_API_TOKEN="YOUR_REPLICATE_API_TOKEN_HERE"
+   OPENAI_API_KEY="YOUR_OPENAI_API_KEY_HERE"
+   ```
+4. **Set Up the Database:**
+   - In phpMyAdmin, create a new user: `fwber` with password `Temppass0!` (or your preferred password, updated in `_secrets.php`).
+   - When creating the user, check the box to **"Create database with same name and grant all privileges."**
+   - Navigate to the newly created `fwber` database and use the "Import" tab to run the `setup-database.sql` script.
 
 ## 6. The Path to Launch (Next Steps)
 
 The application is now ready for the final pre-launch phase. The following tasks remain:
 
-1.  **Complete the Profile Form:** This is the #1 priority. The `profile-form.php` file needs to be updated to include all the detailed preference fields from the original design. The backend `ProfileManager` is already built to handle this data automatically.
+1. **Complete the Profile Form:** This is the #1 priority. The `profile-form.php` file needs to be updated to include all the detailed preference fields from the original design. The backend `ProfileManager` is already built to handle this data automatically.
 
-2.  **Thorough End-to-End Testing:** Once the profile form is complete, the entire application must be tested systematically to find and fix any remaining bugs.
+2. **Thorough End-to-End Testing:** Once the profile form is complete, the entire application must be tested systematically to find and fix any remaining bugs.
 
-3.  **Final Polish:** Modernize any remaining minor pages and implement the placeholder AI/ML logic in the `AIMatchingEngine` when ready.
+3. **Final Polish:** Modernize any remaining minor pages and implement the placeholder AI/ML logic in the `AIMatchingEngine` when ready.
 
 ## 7. A Note on Project History
 
@@ -186,4 +159,3 @@ Or:
 ```cmd
 mysql -h localhost -u fwber -p fwber < db\migrations\2025-10-11-legacy-matcher-compat.sql
 ```
->>>>>>> robert/main

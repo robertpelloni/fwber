@@ -71,7 +71,7 @@ export const useProfileContentGeneration = (preferences: ProfileContentRequest) 
     queryFn: () => generateProfileContent(preferences),
     enabled: Object.keys(preferences).length > 0,
     staleTime: 1000 * 60 * 30, // 30 minutes
-    cacheTime: 1000 * 60 * 60, // 1 hour
+    gcTime: 1000 * 60 * 60, // 1 hour
   });
 };
 
@@ -84,7 +84,7 @@ export const usePostSuggestionsGeneration = (boardId: number, request: PostSugge
     queryFn: () => generatePostSuggestions(boardId, request),
     enabled: boardId > 0,
     staleTime: 1000 * 60 * 15, // 15 minutes
-    cacheTime: 1000 * 60 * 30, // 30 minutes
+    gcTime: 1000 * 60 * 30, // 30 minutes
   });
 };
 
@@ -96,7 +96,7 @@ export const useConversationStartersGeneration = (request: ConversationStartersR
     queryKey: ['conversationStartersGeneration', request],
     queryFn: () => generateConversationStarters(request),
     staleTime: 1000 * 60 * 10, // 10 minutes
-    cacheTime: 1000 * 60 * 30, // 30 minutes
+    gcTime: 1000 * 60 * 30, // 30 minutes
   });
 };
 
@@ -146,7 +146,7 @@ export const useGenerationStats = () => {
     queryKey: ['generationStats'],
     queryFn: getGenerationStats,
     staleTime: 1000 * 60 * 5, // 5 minutes
-    cacheTime: 1000 * 60 * 30, // 30 minutes
+    gcTime: 1000 * 60 * 30, // 30 minutes
   });
 };
 
@@ -158,7 +158,7 @@ export const useOptimizationStats = () => {
     queryKey: ['optimizationStats'],
     queryFn: getOptimizationStats,
     staleTime: 1000 * 60 * 5, // 5 minutes
-    cacheTime: 1000 * 60 * 30, // 30 minutes
+    gcTime: 1000 * 60 * 30, // 30 minutes
   });
 };
 
@@ -170,7 +170,7 @@ export const useGenerationHistory = (params?: { page?: number; per_page?: number
     queryKey: ['generationHistory', params],
     queryFn: () => getGenerationHistory(params),
     staleTime: 1000 * 60 * 2, // 2 minutes
-    cacheTime: 1000 * 60 * 10, // 10 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
   });
 };
 
@@ -201,7 +201,7 @@ export const useCachedContentSuggestions = (
     queryKey: ['cachedContentSuggestions', cacheKey, type, request],
     queryFn: () => getCachedContentSuggestions(cacheKey, type, request),
     staleTime: 1000 * 60 * 30, // 30 minutes
-    cacheTime: 1000 * 60 * 60, // 1 hour
+    gcTime: 1000 * 60 * 60, // 1 hour
   });
 };
 

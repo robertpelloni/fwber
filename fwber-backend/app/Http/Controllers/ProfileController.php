@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 /**
  * Profile Controller - User Profile Management API
@@ -87,7 +88,8 @@ class ProfileController extends Controller
             $validator = Validator::make($request->all(), [
                 'display_name' => 'sometimes|string|max:50',
                 'bio' => 'sometimes|string|max:500',
-                'age' => 'sometimes|integer|min:18|max:99',
+                // Accept DOB and compute age downstream
+                'date_of_birth' => 'sometimes|date|before_or_equal:' . now()->subYears(18)->toDateString() . '|after:1900-01-01',
                 'gender' => 'sometimes|string|in:male,female,non-binary,mtf,ftm,other,prefer-not-to-say',
                 'pronouns' => 'sometimes|string|in:he/him,she/her,they/them,he/they,she/they,other,prefer-not-to-say',
                 'sexual_orientation' => 'sometimes|string|in:straight,gay,lesbian,bisexual,pansexual,asexual,demisexual,queer,questioning,other,prefer-not-to-say',
@@ -138,7 +140,7 @@ class ProfileController extends Controller
             $profile->fill($request->only([
                 'display_name',
                 'bio',
-                'age',
+                'date_of_birth',
                 'gender',
                 'pronouns',
                 'sexual_orientation',
@@ -217,21 +219,32 @@ class ProfileController extends Controller
      */
     private function isProfileComplete(UserProfile $profile): bool
     {
+        // Must have basic identity and location
         $requiredFields = [
             'display_name',
-            'age',
             'gender',
             'location_latitude',
             'location_longitude',
             'looking_for',
         ];
-        
+
         foreach ($requiredFields as $field) {
             if (empty($profile->$field)) {
                 return false;
             }
         }
-        
+
+        // Validate adult age via DOB (>= 18)
+        if (empty($profile->date_of_birth)) {
+            return false;
+        }
+        $dob = $profile->date_of_birth instanceof \DateTimeInterface
+            ? Carbon::instance($profile->date_of_birth)
+            : Carbon::parse($profile->date_of_birth);
+        if ($dob->age < 18) {
+            return false;
+        }
+
         // looking_for should be an array with at least one entry
         if (!is_array($profile->looking_for) || count($profile->looking_for) === 0) {
             return false;

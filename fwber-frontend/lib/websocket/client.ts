@@ -1,3 +1,4 @@
+import React from 'react';
 import { apiClient } from '../api/client';
 
 export interface WebSocketMessage {

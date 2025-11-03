@@ -1,0 +1,449 @@
+[33mcommit 28c8945156867cafd49f02994ebda72bcfea1fd8[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Robert Pelloni <pelloni.robert@gmail.com>
+Date:   Sun Nov 2 02:50:46 2025 -0500
+
+    ok
+
+ fwber-frontend/.next/app-build-manifest.json       |   25 [32m+[m
+ fwber-frontend/.next/build-manifest.json           |   30 [32m+[m
+ ...m0Jp65ZSSbxJF36Y15jktQAIc03L+vxAHcYuYslvA=.avif |  Bin [31m0[m -> [32m2697[m bytes
+ ...GbuxSxh8LK1O2gznwJu7fDqkJYM524v4TddlD01yQ=.avif |  Bin [31m0[m -> [32m5452[m bytes
+ ...zwj+58cK20g2QjKRcGmk+Q4guZK91buhyJbIo5exE=.avif |  Bin [31m0[m -> [32m6643[m bytes
+ ...GbuxSxh8LK1O2gznwJu7fDqkJYM524v4TddlD01yQ=.avif |  Bin [31m0[m -> [32m5452[m bytes
+ ...R1F-4xlUqX1rrfJ5E6DBD7o89cCTMsAK+Zsphp1qY=.avif |  Bin [31m0[m -> [32m2027[m bytes
+ ...R1F-4xlUqX1rrfJ5E6DBD7o89cCTMsAK+Zsphp1qY=.avif |  Bin [31m0[m -> [32m2027[m bytes
+ ...zwj+58cK20g2QjKRcGmk+Q4guZK91buhyJbIo5exE=.avif |  Bin [31m0[m -> [32m6643[m bytes
+ ...m0Jp65ZSSbxJF36Y15jktQAIc03L+vxAHcYuYslvA=.avif |  Bin [31m0[m -> [32m2697[m bytes
+ ...zwj+58cK20g2QjKRcGmk+Q4guZK91buhyJbIo5exE=.avif |  Bin [31m0[m -> [32m6643[m bytes
+ ...4rwB4h5VCD5K-ZLGkgNOoYctZzO17A8LqRGviB8DY=.avif |  Bin [31m0[m -> [32m4629[m bytes
+ ...r3xqa7j5XDNwT+SktRoGtdJ36j3KJaKC5e2jF6TaI=.avif |  Bin [31m0[m -> [32m21226[m bytes
+ ...1sfk9pIvDoWw6UP0CQDjI2odACmHDy4fe-B071z4o=.avif |  Bin [31m0[m -> [32m3278[m bytes
+ .../webpack/client-development-fallback/0.pack.gz  |  Bin [31m0[m -> [32m11561663[m bytes
+ .../client-development-fallback/index.pack.gz      |  Bin [31m0[m -> [32m83223[m bytes
+ .../cache/webpack/client-development/0.pack.gz     |  Bin [31m0[m -> [32m28401[m bytes
+ .../cache/webpack/client-development/1.pack.gz     |  Bin [31m0[m -> [32m3544309[m bytes
+ .../cache/webpack/client-development/2.pack.gz     |  Bin [31m0[m -> [32m11219[m bytes
+ .../cache/webpack/client-development/3.pack.gz     |  Bin [31m0[m -> [32m314644[m bytes
+ .../cache/webpack/client-development/4.pack.gz     |  Bin [31m0[m -> [32m25147[m bytes
+ .../cache/webpack/client-development/5.pack.gz     |  Bin [31m0[m -> [32m228590[m bytes
+ .../cache/webpack/client-development/6.pack.gz     |  Bin [31m0[m -> [32m17396651[m bytes
+ .../cache/webpack/client-development/7.pack.gz     |  Bin [31m0[m -> [32m34968[m bytes
+ .../cache/webpack/client-development/8.pack.gz     |  Bin [31m0[m -> [32m56337[m bytes
+ .../cache/webpack/client-development/index.pack.gz |  Bin [31m0[m -> [32m200398[m bytes
+ .../webpack/client-development/index.pack.gz.old   |  Bin [31m0[m -> [32m200383[m bytes
+ .../cache/webpack/server-development/0.pack.gz     |  Bin [31m0[m -> [32m118574[m bytes
+ .../cache/webpack/server-development/1.pack.gz     |  Bin [31m0[m -> [32m179405[m bytes
+ .../cache/webpack/server-development/10.pack.gz    |  Bin [31m0[m -> [32m576213[m bytes
+ .../cache/webpack/server-development/11.pack.gz    |  Bin [31m0[m -> [32m89023[m bytes
+ .../cache/webpack/server-development/12.pack.gz    |  Bin [31m0[m -> [32m179880[m bytes
+ .../cache/webpack/server-development/13.pack.gz    |  Bin [31m0[m -> [32m2343800[m bytes
+ .../cache/webpack/server-development/14.pack.gz    |  Bin [31m0[m -> [32m28397[m bytes
+ .../cache/webpack/server-development/2.pack.gz     |  Bin [31m0[m -> [32m1966907[m bytes
+ .../cache/webpack/server-development/3.pack.gz     |  Bin [31m0[m -> [32m846810[m bytes
+ .../cache/webpack/server-development/4.pack.gz     |  Bin [31m0[m -> [32m316344[m bytes
+ .../cache/webpack/server-development/5.pack.gz     |  Bin [31m0[m -> [32m4526[m bytes
+ .../cache/webpack/server-development/6.pack.gz     |  Bin [31m0[m -> [32m3817[m bytes
+ .../cache/webpack/server-development/7.pack.gz     |  Bin [31m0[m -> [32m6463[m bytes
+ .../cache/webpack/server-development/8.pack.gz     |  Bin [31m0[m -> [32m6848[m bytes
+ .../cache/webpack/server-development/9.pack.gz     |  Bin [31m0[m -> [32m8796[m bytes
+ .../cache/webpack/server-development/index.pack.gz |  Bin [31m0[m -> [32m129928[m bytes
+ .../webpack/server-development/index.pack.gz.old   |  Bin [31m0[m -> [32m129939[m bytes
+ fwber-frontend/.next/fallback-build-manifest.json  |   27 [32m+[m
+ fwber-frontend/.next/package.json                  |    1 [32m+[m
+ fwber-frontend/.next/react-loadable-manifest.json  |    1 [32m+[m
+ fwber-frontend/.next/server/_error.js              |   76 [32m+[m
+ .../.next/server/app-paths-manifest.json           |    5 [32m+[m
+ fwber-frontend/.next/server/app/_not-found/page.js |  276 [32m++[m
+ .../_not-found/page_client-reference-manifest.js   |    1 [32m+[m
+ fwber-frontend/.next/server/app/photos/page.js     |  381 [32m+++[m
+ .../app/photos/page_client-reference-manifest.js   |    1 [32m+[m
+ fwber-frontend/.next/server/app/profile/page.js    |  381 [32m+++[m
+ .../app/profile/page_client-reference-manifest.js  |    1 [32m+[m
+ .../server/interception-route-rewrite-manifest.js  |    1 [32m+[m
+ .../.next/server/middleware-build-manifest.js      |    1 [32m+[m
+ .../.next/server/middleware-manifest.json          |    6 [32m+[m
+ .../server/middleware-react-loadable-manifest.js   |    1 [32m+[m
+ fwber-frontend/.next/server/next-font-manifest.js  |    1 [32m+[m
+ .../.next/server/next-font-manifest.json           |    1 [32m+[m
+ fwber-frontend/.next/server/pages-manifest.json    |    5 [32m+[m
+ fwber-frontend/.next/server/pages/_app.js          |   46 [32m+[m
+ fwber-frontend/.next/server/pages/_document.js     |   66 [32m+[m
+ fwber-frontend/.next/server/pages/_error.js        |   76 [32m+[m
+ .../.next/server/server-reference-manifest.js      |    1 [32m+[m
+ .../.next/server/server-reference-manifest.json    |    5 [32m+[m
+ .../.next/server/vendor-chunks/@dnd-kit.js         |   55 [32m+[m
+ fwber-frontend/.next/server/vendor-chunks/@swc.js  |   95 [32m+[m
+ .../.next/server/vendor-chunks/@tanstack.js        |  175 [32m++[m
+ .../.next/server/vendor-chunks/attr-accept.js      |   25 [32m+[m
+ .../vendor-chunks/class-variance-authority.js      |   25 [32m+[m
+ fwber-frontend/.next/server/vendor-chunks/clsx.js  |   25 [32m+[m
+ .../.next/server/vendor-chunks/file-selector.js    |   45 [32m+[m
+ .../.next/server/vendor-chunks/lucide-react.js     |  135 [32m+[m
+ fwber-frontend/.next/server/vendor-chunks/next.js  | 2682 [32m++++++++++++++++++++[m
+ .../.next/server/vendor-chunks/object-assign.js    |   25 [32m+[m
+ .../.next/server/vendor-chunks/prop-types.js       |   67 [32m+[m
+ .../.next/server/vendor-chunks/react-dropzone.js   |   35 [32m+[m
+ .../.next/server/vendor-chunks/react-is.js         |   35 [32m+[m
+ .../.next/server/vendor-chunks/tailwind-merge.js   |   25 [32m+[m
+ fwber-frontend/.next/server/vendor-chunks/tslib.js |   25 [32m+[m
+ fwber-frontend/.next/server/webpack-runtime.js     |  215 [32m++[m
+ fwber-frontend/.next/static/chunks/_error.js       |   28 [32m+[m
+ .../.next/static/chunks/app-pages-internals.js     |  138 [32m+[m
+ .../.next/static/chunks/app/_not-found/page.js     |   39 [32m+[m
+ fwber-frontend/.next/static/chunks/app/layout.js   |  290 [32m+++[m
+ .../.next/static/chunks/app/photos/page.js         |  673 [32m+++++[m
+ .../.next/static/chunks/app/profile/page.js        |  596 [32m+++++[m
+ fwber-frontend/.next/static/chunks/fallback/amp.js |  841 [32m++++++[m
+ .../.next/static/chunks/fallback/main.js           | 1946 [32m++++++++++++++[m
+ .../.next/static/chunks/fallback/pages/_app.js     |   28 [32m+[m
+ .../.next/static/chunks/fallback/pages/_error.js   |   28 [32m+[m
+ .../.next/static/chunks/fallback/react-refresh.js  |   62 [32m+[m
+ .../.next/static/chunks/fallback/webpack.js        | 1218 [32m+++++++++[m
+ fwber-frontend/.next/static/chunks/main-app.js     | 1989 [32m+++++++++++++++[m
+ fwber-frontend/.next/static/chunks/main.js         | 1946 [32m++++++++++++++[m
+ fwber-frontend/.next/static/chunks/pages/_app.js   |   28 [32m+[m
+ fwber-frontend/.next/static/chunks/pages/_error.js |   28 [32m+[m
+ fwber-frontend/.next/static/chunks/polyfills.js    |    1 [32m+[m
+ .../.next/static/chunks/react-refresh.js           |   62 [32m+[m
+ fwber-frontend/.next/static/chunks/webpack.js      | 1410 [32m++++++++++[m
+ fwber-frontend/.next/static/css/app/layout.css     |  214 [32m++[m
+ .../.next/static/development/_buildManifest.js     |    1 [32m+[m
+ .../.next/static/development/_ssgManifest.js       |    1 [32m+[m
+ .../.next/static/media/19cfc7226ec3afaa-s.woff2    |  Bin [31m0[m -> [32m19044[m bytes
+ .../.next/static/media/21350d82a1f187e9-s.woff2    |  Bin [31m0[m -> [32m18744[m bytes
+ .../.next/static/media/8e9860b6e62d6359-s.woff2    |  Bin [31m0[m -> [32m85272[m bytes
+ .../.next/static/media/ba9851c3c22cd980-s.woff2    |  Bin [31m0[m -> [32m25844[m bytes
+ .../.next/static/media/c5fe6dc8356a8c31-s.woff2    |  Bin [31m0[m -> [32m11272[m bytes
+ .../.next/static/media/df0a9ae256c0569c-s.woff2    |  Bin [31m0[m -> [32m10280[m bytes
+ .../.next/static/media/e4af272ccee01ff0-s.p.woff2  |  Bin [31m0[m -> [32m48432[m bytes
+ .../07feec0346a59972.webpack.hot-update.json       |    1 [32m+[m
+ .../0df6faf628f9fd59.webpack.hot-update.json       |    1 [32m+[m
+ .../13b38384da6ef85a.webpack.hot-update.json       |    1 [32m+[m
+ .../15895061707636bd.webpack.hot-update.json       |    1 [32m+[m
+ .../181cd2b4adc17b66.webpack.hot-update.json       |    1 [32m+[m
+ .../18d86809750f2bed.webpack.hot-update.json       |    1 [32m+[m
+ .../19c8502eb5d24756.webpack.hot-update.json       |    1 [32m+[m
+ .../1f047b98d4204f96.webpack.hot-update.json       |    1 [32m+[m
+ .../1fb56740eab752c0.webpack.hot-update.json       |    1 [32m+[m
+ .../2a6f24a8eabc6675.webpack.hot-update.json       |    1 [32m+[m
+ .../2b7954a2078b8413.webpack.hot-update.json       |    1 [32m+[m
+ .../325846a9d70ce42c.webpack.hot-update.json       |    1 [32m+[m
+ .../37d4cccf864b43a0.webpack.hot-update.json       |    1 [32m+[m
+ .../3b66b5bd355556ed.webpack.hot-update.json       |    1 [32m+[m
+ .../3b9bcf716fe36a66.webpack.hot-update.json       |    1 [32m+[m
+ .../3bf97be58f4931c5.webpack.hot-update.json       |    1 [32m+[m
+ .../3c8a57f902a84081.webpack.hot-update.json       |    1 [32m+[m
+ .../40d30d4c4be30a7d.webpack.hot-update.json       |    1 [32m+[m
+ .../4144c6eeef758f10.webpack.hot-update.json       |    1 [32m+[m
+ .../454c549e8ddcb632.webpack.hot-update.json       |    1 [32m+[m
+ .../4acb3df11cdc8b38.webpack.hot-update.json       |    1 [32m+[m
+ .../4bc687ed352b185c.webpack.hot-update.json       |    1 [32m+[m
+ .../4cbbad39ee14f058.webpack.hot-update.json       |    1 [32m+[m
+ .../4cbd53f41d4286fd.webpack.hot-update.json       |    1 [32m+[m
+ .../4ce04cc1aa94eaa0.webpack.hot-update.json       |    1 [32m+[m
+ .../4d8886bd76aa0c6c.webpack.hot-update.json       |    1 [32m+[m
+ .../4d9d5db53c860fc0.webpack.hot-update.json       |    1 [32m+[m
+ .../4f9de2ba05675a27.webpack.hot-update.json       |    1 [32m+[m
+ .../526e160045d0d96a.webpack.hot-update.json       |    1 [32m+[m
+ .../52729534da0d0431.webpack.hot-update.json       |    1 [32m+[m
+ .../531de900d4f3b605.webpack.hot-update.json       |    1 [32m+[m
+ .../5cdc5d2572dadf74.webpack.hot-update.json       |    1 [32m+[m
+ .../webpack/633457081244afec._.hot-update.json     |    1 [32m+[m
+ .../638c4d1841d03ec5.webpack.hot-update.json       |    1 [32m+[m
+ .../64ed975e640ccef2.webpack.hot-update.json       |    1 [32m+[m
+ .../6555dfdac4ccd0c4.webpack.hot-update.json       |    1 [32m+[m
+ .../6db2b66d11cc715a.webpack.hot-update.json       |    1 [32m+[m
+ .../6fb3d0e94c7bf3d9.webpack.hot-update.json       |    1 [32m+[m
+ .../6fda9ef21ad56cf2.webpack.hot-update.json       |    1 [32m+[m
+ .../7041a424215321db.webpack.hot-update.json       |    1 [32m+[m
+ .../705f0f1ddf0100f4.webpack.hot-update.json       |    1 [32m+[m
+ .../72a9987e3720644a.webpack.hot-update.json       |    1 [32m+[m
+ .../75b84c0ea6e4e0ce.webpack.hot-update.json       |    1 [32m+[m
+ .../776967c036124e55.webpack.hot-update.json       |    1 [32m+[m
+ .../78c55dd589531b76.webpack.hot-update.json       |    1 [32m+[m
+ .../79c64837426bcd6d.webpack.hot-update.json       |    1 [32m+[m
+ .../7d93e04ec45e1bc9.webpack.hot-update.json       |    1 [32m+[m
+ .../7e8e3a968185e150.webpack.hot-update.json       |    1 [32m+[m
+ .../895738bb7641f0c0.webpack.hot-update.json       |    1 [32m+[m
+ .../89eabc784f2a9746.webpack.hot-update.json       |    1 [32m+[m
+ .../8afe781ea932e380.webpack.hot-update.json       |    1 [32m+[m
+ .../8b8ba319781e1b82.webpack.hot-update.json       |    1 [32m+[m
+ .../8b948781390a5849.webpack.hot-update.json       |    1 [32m+[m
+ .../8f34b9ff641af29a.webpack.hot-update.json       |    1 [32m+[m
+ .../8f4208504d9ddaa9.webpack.hot-update.json       |    1 [32m+[m
+ .../99dda499ab28d64d.webpack.hot-update.json       |    1 [32m+[m
+ .../9a16af9445750ca2.webpack.hot-update.json       |    1 [32m+[m
+ .../9c25bf73e536aec3.webpack.hot-update.json       |    1 [32m+[m
+ .../a27fc1d4b3863ae2.webpack.hot-update.json       |    1 [32m+[m
+ .../a2ec458ab440510f.webpack.hot-update.json       |    1 [32m+[m
+ .../a31fc079a816a339.webpack.hot-update.json       |    1 [32m+[m
+ .../a3f6cea73e98b11c.webpack.hot-update.json       |    1 [32m+[m
+ .../a6f1eb2f0954e870.webpack.hot-update.json       |    1 [32m+[m
+ .../a785bdfd34dda176.webpack.hot-update.json       |    1 [32m+[m
+ .../a7b02513cdb513ed.webpack.hot-update.json       |    1 [32m+[m
+ .../a907fc5f82994919.webpack.hot-update.json       |    1 [32m+[m
+ .../af6c0ba37302801d.webpack.hot-update.json       |    1 [32m+[m
+ .../app/photos/page.07feec0346a59972.hot-update.js |   22 [32m+[m
+ .../app/photos/page.0df6faf628f9fd59.hot-update.js |   22 [32m+[m
+ .../app/photos/page.13b38384da6ef85a.hot-update.js |   22 [32m+[m
+ .../app/photos/page.181cd2b4adc17b66.hot-update.js |   22 [32m+[m
+ .../app/photos/page.19c8502eb5d24756.hot-update.js |   22 [32m+[m
+ .../app/photos/page.1f047b98d4204f96.hot-update.js |   22 [32m+[m
+ .../app/photos/page.2a6f24a8eabc6675.hot-update.js |   22 [32m+[m
+ .../app/photos/page.2b7954a2078b8413.hot-update.js |   22 [32m+[m
+ .../app/photos/page.325846a9d70ce42c.hot-update.js |   22 [32m+[m
+ .../app/photos/page.37d4cccf864b43a0.hot-update.js |   22 [32m+[m
+ .../app/photos/page.3b66b5bd355556ed.hot-update.js |   22 [32m+[m
+ .../app/photos/page.3b9bcf716fe36a66.hot-update.js |   22 [32m+[m
+ .../app/photos/page.3bf97be58f4931c5.hot-update.js |   22 [32m+[m
+ .../app/photos/page.40d30d4c4be30a7d.hot-update.js |   22 [32m+[m
+ .../app/photos/page.454c549e8ddcb632.hot-update.js |   22 [32m+[m
+ .../app/photos/page.4acb3df11cdc8b38.hot-update.js |   22 [32m+[m
+ .../app/photos/page.4bc687ed352b185c.hot-update.js |   22 [32m+[m
+ .../app/photos/page.4cbbad39ee14f058.hot-update.js |   22 [32m+[m
+ .../app/photos/page.4cbd53f41d4286fd.hot-update.js |   22 [32m+[m
+ .../app/photos/page.4ce04cc1aa94eaa0.hot-update.js |   22 [32m+[m
+ .../app/photos/page.4d8886bd76aa0c6c.hot-update.js |   22 [32m+[m
+ .../app/photos/page.4f9de2ba05675a27.hot-update.js |   22 [32m+[m
+ .../app/photos/page.526e160045d0d96a.hot-update.js |   22 [32m+[m
+ .../app/photos/page.52729534da0d0431.hot-update.js |   22 [32m+[m
+ .../app/photos/page.5cdc5d2572dadf74.hot-update.js |   22 [32m+[m
+ .../app/photos/page.638c4d1841d03ec5.hot-update.js |   22 [32m+[m
+ .../app/photos/page.64ed975e640ccef2.hot-update.js |   22 [32m+[m
+ .../app/photos/page.6fb3d0e94c7bf3d9.hot-update.js |   22 [32m+[m
+ .../app/photos/page.6fda9ef21ad56cf2.hot-update.js |   22 [32m+[m
+ .../app/photos/page.7041a424215321db.hot-update.js |   22 [32m+[m
+ .../app/photos/page.705f0f1ddf0100f4.hot-update.js |   22 [32m+[m
+ .../app/photos/page.72a9987e3720644a.hot-update.js |   22 [32m+[m
+ .../app/photos/page.75b84c0ea6e4e0ce.hot-update.js |   22 [32m+[m
+ .../app/photos/page.78c55dd589531b76.hot-update.js |   21 [32m+[m
+ .../app/photos/page.79c64837426bcd6d.hot-update.js |   21 [32m+[m
+ .../app/photos/page.7d93e04ec45e1bc9.hot-update.js |   22 [32m+[m
+ .../app/photos/page.7e8e3a968185e150.hot-update.js |  666 [32m+++++[m
+ .../app/photos/page.895738bb7641f0c0.hot-update.js |   22 [32m+[m
+ .../app/photos/page.89eabc784f2a9746.hot-update.js |   22 [32m+[m
+ .../app/photos/page.8afe781ea932e380.hot-update.js |   22 [32m+[m
+ .../app/photos/page.8b8ba319781e1b82.hot-update.js |   22 [32m+[m
+ .../app/photos/page.8f34b9ff641af29a.hot-update.js |   22 [32m+[m
+ .../app/photos/page.8f4208504d9ddaa9.hot-update.js |   22 [32m+[m
+ .../app/photos/page.99dda499ab28d64d.hot-update.js |   22 [32m+[m
+ .../app/photos/page.a27fc1d4b3863ae2.hot-update.js |   22 [32m+[m
+ .../app/photos/page.a2ec458ab440510f.hot-update.js |   22 [32m+[m
+ .../app/photos/page.a31fc079a816a339.hot-update.js |   22 [32m+[m
+ .../app/photos/page.a3f6cea73e98b11c.hot-update.js |   22 [32m+[m
+ .../app/photos/page.a785bdfd34dda176.hot-update.js |   22 [32m+[m
+ .../app/photos/page.af6c0ba37302801d.hot-update.js |  666 [32m+++++[m
+ .../app/photos/page.b7505cde0b8b303c.hot-update.js |   22 [32m+[m
+ .../app/photos/page.b9045f980bcaea2e.hot-update.js |   22 [32m+[m
+ .../app/photos/page.ba1dde20e99470ad.hot-update.js |   22 [32m+[m
+ .../app/photos/page.c159baeafbc79158.hot-update.js |   22 [32m+[m
+ .../app/photos/page.cb554c2083b3b36d.hot-update.js |   22 [32m+[m
+ .../app/photos/page.ce4a2b85f59feebd.hot-update.js |   22 [32m+[m
+ .../app/photos/page.d563fc3e518fe2e0.hot-update.js |   22 [32m+[m
+ .../app/photos/page.d9c604c1959313ad.hot-update.js |   22 [32m+[m
+ .../app/photos/page.dd9613535a877616.hot-update.js |   22 [32m+[m
+ .../app/photos/page.df55b3b0b47fe1f7.hot-update.js |   22 [32m+[m
+ .../app/photos/page.e2c7e226f680a5bf.hot-update.js |   22 [32m+[m
+ .../app/photos/page.f022056d4f05c069.hot-update.js |   22 [32m+[m
+ .../app/photos/page.f21586045dea0206.hot-update.js |   22 [32m+[m
+ .../app/photos/page.f84db2bba2f327a5.hot-update.js |   42 [32m+[m
+ .../app/photos/page.f992706ccf6fb642.hot-update.js |   22 [32m+[m
+ .../app/photos/page.f9fa42109dcfecc3.hot-update.js |   22 [32m+[m
+ .../app/photos/page.fccca291e9bf60d0.hot-update.js |   22 [32m+[m
+ .../app/photos/page.ff6fbb843f7871e0.hot-update.js |   22 [32m+[m
+ .../profile/page.07feec0346a59972.hot-update.js    |   22 [32m+[m
+ .../profile/page.0df6faf628f9fd59.hot-update.js    |   22 [32m+[m
+ .../profile/page.13b38384da6ef85a.hot-update.js    |   22 [32m+[m
+ .../profile/page.18d86809750f2bed.hot-update.js    |   22 [32m+[m
+ .../profile/page.1f047b98d4204f96.hot-update.js    |   22 [32m+[m
+ .../profile/page.2a6f24a8eabc6675.hot-update.js    |   22 [32m+[m
+ .../profile/page.37d4cccf864b43a0.hot-update.js    |   22 [32m+[m
+ .../profile/page.3b66b5bd355556ed.hot-update.js    |   22 [32m+[m
+ .../profile/page.3b9bcf716fe36a66.hot-update.js    |   22 [32m+[m
+ .../profile/page.4acb3df11cdc8b38.hot-update.js    |   22 [32m+[m
+ .../profile/page.4cbbad39ee14f058.hot-update.js    |   22 [32m+[m
+ .../profile/page.4d8886bd76aa0c6c.hot-update.js    |   22 [32m+[m
+ .../profile/page.638c4d1841d03ec5.hot-update.js    |   22 [32m+[m
+ .../profile/page.7041a424215321db.hot-update.js    |   22 [32m+[m
+ .../profile/page.72a9987e3720644a.hot-update.js    |   22 [32m+[m
+ .../profile/page.75b84c0ea6e4e0ce.hot-update.js    |   22 [32m+[m
+ .../profile/page.7d93e04ec45e1bc9.hot-update.js    |   22 [32m+[m
+ .../profile/page.895738bb7641f0c0.hot-update.js    |   22 [32m+[m
+ .../profile/page.89eabc784f2a9746.hot-update.js    |   22 [32m+[m
+ .../profile/page.8f4208504d9ddaa9.hot-update.js    |   22 [32m+[m
+ .../profile/page.99dda499ab28d64d.hot-update.js    |   22 [32m+[m
+ .../profile/page.a2ec458ab440510f.hot-update.js    |   22 [32m+[m
+ .../profile/page.a31fc079a816a339.hot-update.js    |   22 [32m+[m
+ .../profile/page.b052bc11d4aed520.hot-update.js    |   22 [32m+[m
+ .../profile/page.ba1dde20e99470ad.hot-update.js    |   22 [32m+[m
+ .../profile/page.cb554c2083b3b36d.hot-update.js    |   22 [32m+[m
+ .../profile/page.ce4a2b85f59feebd.hot-update.js    |   22 [32m+[m
+ .../profile/page.df55b3b0b47fe1f7.hot-update.js    |   22 [32m+[m
+ .../profile/page.f84db2bba2f327a5.hot-update.js    |   52 [32m+[m
+ .../profile/page.f992706ccf6fb642.hot-update.js    |   22 [32m+[m
+ .../profile/page.f9fa42109dcfecc3.hot-update.js    |   22 [32m+[m
+ .../profile/page.fccca291e9bf60d0.hot-update.js    |   22 [32m+[m
+ .../b052bc11d4aed520.webpack.hot-update.json       |    1 [32m+[m
+ .../b7505cde0b8b303c.webpack.hot-update.json       |    1 [32m+[m
+ .../b9045f980bcaea2e.webpack.hot-update.json       |    1 [32m+[m
+ .../ba1dde20e99470ad.webpack.hot-update.json       |    1 [32m+[m
+ .../c159baeafbc79158.webpack.hot-update.json       |    1 [32m+[m
+ .../c3c32ecccce7af0a.webpack.hot-update.json       |    1 [32m+[m
+ .../cb554c2083b3b36d.webpack.hot-update.json       |    1 [32m+[m
+ .../cc69ad0568cfe4c5.webpack.hot-update.json       |    1 [32m+[m
+ .../ce4a2b85f59feebd.webpack.hot-update.json       |    1 [32m+[m
+ .../d563fc3e518fe2e0.webpack.hot-update.json       |    1 [32m+[m
+ .../d9c604c1959313ad.webpack.hot-update.json       |    1 [32m+[m
+ .../db36301e3a943725.webpack.hot-update.json       |    1 [32m+[m
+ .../dd9613535a877616.webpack.hot-update.json       |    1 [32m+[m
+ .../de83a42ffc956836.webpack.hot-update.json       |    1 [32m+[m
+ .../de9852903eb461ce.webpack.hot-update.json       |    1 [32m+[m
+ .../df55b3b0b47fe1f7.webpack.hot-update.json       |    1 [32m+[m
+ .../dfd82434a9348290.webpack.hot-update.json       |    1 [32m+[m
+ .../e217dfd382a6d895.webpack.hot-update.json       |    1 [32m+[m
+ .../e2c7e226f680a5bf.webpack.hot-update.json       |    1 [32m+[m
+ .../f022056d4f05c069.webpack.hot-update.json       |    1 [32m+[m
+ .../f21586045dea0206.webpack.hot-update.json       |    1 [32m+[m
+ .../f84db2bba2f327a5.webpack.hot-update.json       |    1 [32m+[m
+ .../f992706ccf6fb642.webpack.hot-update.json       |    1 [32m+[m
+ .../f9fa42109dcfecc3.webpack.hot-update.json       |    1 [32m+[m
+ .../fccca291e9bf60d0.webpack.hot-update.json       |    1 [32m+[m
+ .../ff6fbb843f7871e0.webpack.hot-update.json       |    1 [32m+[m
+ .../webpack/webpack.07feec0346a59972.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.0df6faf628f9fd59.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.13b38384da6ef85a.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.15895061707636bd.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.181cd2b4adc17b66.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.18d86809750f2bed.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.19c8502eb5d24756.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.1f047b98d4204f96.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.1fb56740eab752c0.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.2a6f24a8eabc6675.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.2b7954a2078b8413.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.325846a9d70ce42c.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.37d4cccf864b43a0.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.3b66b5bd355556ed.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.3b9bcf716fe36a66.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.3bf97be58f4931c5.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.3c8a57f902a84081.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.40d30d4c4be30a7d.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.4144c6eeef758f10.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.454c549e8ddcb632.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.4acb3df11cdc8b38.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.4bc687ed352b185c.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.4cbbad39ee14f058.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.4cbd53f41d4286fd.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.4ce04cc1aa94eaa0.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.4d8886bd76aa0c6c.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.4d9d5db53c860fc0.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.4f9de2ba05675a27.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.526e160045d0d96a.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.52729534da0d0431.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.531de900d4f3b605.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.5cdc5d2572dadf74.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.638c4d1841d03ec5.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.64ed975e640ccef2.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.6555dfdac4ccd0c4.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.6db2b66d11cc715a.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.6fb3d0e94c7bf3d9.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.6fda9ef21ad56cf2.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.7041a424215321db.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.705f0f1ddf0100f4.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.72a9987e3720644a.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.75b84c0ea6e4e0ce.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.776967c036124e55.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.78c55dd589531b76.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.79c64837426bcd6d.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.7d93e04ec45e1bc9.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.7e8e3a968185e150.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.895738bb7641f0c0.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.89eabc784f2a9746.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.8afe781ea932e380.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.8b8ba319781e1b82.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.8b948781390a5849.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.8f34b9ff641af29a.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.8f4208504d9ddaa9.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.99dda499ab28d64d.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.9a16af9445750ca2.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.9c25bf73e536aec3.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.a27fc1d4b3863ae2.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.a2ec458ab440510f.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.a31fc079a816a339.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.a3f6cea73e98b11c.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.a6f1eb2f0954e870.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.a785bdfd34dda176.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.a7b02513cdb513ed.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.a907fc5f82994919.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.af6c0ba37302801d.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.b052bc11d4aed520.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.b7505cde0b8b303c.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.b9045f980bcaea2e.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.ba1dde20e99470ad.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.c159baeafbc79158.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.c3c32ecccce7af0a.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.cb554c2083b3b36d.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.cc69ad0568cfe4c5.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.ce4a2b85f59feebd.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.d563fc3e518fe2e0.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.d9c604c1959313ad.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.db36301e3a943725.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.dd9613535a877616.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.de83a42ffc956836.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.de9852903eb461ce.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.df55b3b0b47fe1f7.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.dfd82434a9348290.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.e217dfd382a6d895.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.e2c7e226f680a5bf.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.f022056d4f05c069.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.f21586045dea0206.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.f84db2bba2f327a5.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.f992706ccf6fb642.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.f9fa42109dcfecc3.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.fccca291e9bf60d0.hot-update.js |   18 [32m+[m
+ .../webpack/webpack.ff6fbb843f7871e0.hot-update.js |   18 [32m+[m
+ fwber-frontend/.next/trace                         |  161 [32m++[m
+ fwber-frontend/.next/types/app/layout.ts           |   79 [32m+[m
+ fwber-frontend/.next/types/app/photos/page.ts      |   79 [32m+[m
+ fwber-frontend/.next/types/app/profile/page.ts     |   79 [32m+[m
+ fwber-frontend/.next/types/package.json            |    1 [32m+[m
+ fwber-frontend/components/AIProfileBuilder.tsx     |  288 [32m+++[m
+ fwber-frontend/components/OptimizedImage.tsx       |  152 [32m++[m
+ fwber-frontend/components/PerformanceMonitor.tsx   |  249 [32m++[m
+ fwber-frontend/components/PhotoUpload.tsx          |  737 [32m++++++[m
+ fwber-frontend/components/ProtectedRoute.tsx       |   40 [32m+[m
+ fwber-frontend/components/RealTimeChat.tsx         |  232 [32m++[m
+ fwber-frontend/components/SmartContentEditor.tsx   |  217 [32m++[m
+ fwber-frontend/components/SwipeableCard.tsx        |  249 [32m++[m
+ fwber-frontend/components/ui/badge.tsx             |   35 [32m+[m
+ fwber-frontend/components/ui/button.tsx            |   55 [32m+[m
+ fwber-frontend/components/ui/card.tsx              |   78 [32m+[m
+ fwber-frontend/components/ui/input.tsx             |   24 [32m+[m
+ fwber-frontend/components/ui/label.tsx             |   22 [32m+[m
+ fwber-frontend/cypress/e2e/bulletin-board.cy.js    |  135 [32m+[m
+ .../cypress/e2e/ml-content-generation.cy.js        |  335 [32m+++[m
+ fwber-frontend/lib/api/bulletin-boards.ts          |  206 [32m++[m
+ fwber-frontend/lib/api/chatrooms.ts                |  380 [32m+++[m
+ fwber-frontend/lib/api/content-generation.ts       |  375 [32m+++[m
+ fwber-frontend/lib/api/location.ts                 |  252 [32m++[m
+ fwber-frontend/lib/api/matches.ts                  |  150 [32m++[m
+ fwber-frontend/lib/api/messages.ts                 |  193 [32m++[m
+ fwber-frontend/lib/api/photos.ts                   |  433 [32m++++[m
+ fwber-frontend/lib/api/profile.ts                  |  203 [32m++[m
+ fwber-frontend/lib/api/proximity-chatrooms.ts      |  465 [32m++++[m
+ fwber-frontend/lib/api/recommendations.ts          |  239 [32m++[m
+ fwber-frontend/lib/auth-context.tsx                |  292 [32m+++[m
+ fwber-frontend/lib/auth.ts                         |   61 [32m+[m
+ fwber-frontend/lib/hooks/use-bulletin-boards.ts    |  205 [32m++[m
+ fwber-frontend/lib/hooks/use-chatrooms.ts          |  367 [32m+++[m
+ fwber-frontend/lib/hooks/use-content-generation.ts |  365 [32m+++[m
+ fwber-frontend/lib/hooks/use-mercure-sse.ts        |  158 [32m++[m
+ .../lib/hooks/use-proximity-chatrooms.ts           |  342 [32m+++[m
+ fwber-frontend/lib/hooks/use-recommendations.ts    |  257 [32m++[m
+ fwber-frontend/lib/hooks/use-websocket.ts          |  399 [32m+++[m
+ fwber-frontend/lib/query-client.tsx                |   26 [32m+[m
+ fwber-frontend/lib/utils.ts                        |    6 [32m+[m
+ fwber-frontend/lib/websocket/client.ts             |  524 [32m++++[m
+ fwber-frontend/public/manifest.json                |  157 [32m++[m
+ fwber-frontend/public/offline.html                 |  243 [32m++[m
+ fwber-frontend/public/sw.js                        |  315 [32m+++[m
+ 442 files changed, 31817 insertions(+)

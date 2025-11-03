@@ -19,19 +19,26 @@ class ProfileTest extends TestCase
 
         $updateResponse = $this->withHeader("Authorization", "Bearer " . $token)
             ->putJson("/api/user", [
-                "name" => "Updated User",
-                "profile" => [
-                    "displayName" => "Updated",
-                    "bio" => "Updated bio",
-                    "preferences" => ["looking_for" => "friends"],
+                // Align with current API: flat profile fields, not nested under "profile"
+                "display_name" => "Updated",
+                "bio" => "Updated bio",
+                // looking_for is a top-level array per controller contract
+                "looking_for" => ["friendship"],
+                // preferences is an object; choose a valid subkey from the validator
+                "preferences" => [
+                    "exercise" => "weekly",
                 ],
             ]);
 
-        $updateResponse->assertOk()->assertJsonPath("user.name", "Updated User")
-            ->assertJsonPath("user.profile.displayName", "Updated");
+        // Response shape: { success, message, data: UserProfileResource, profile_complete }
+        $updateResponse->assertOk()
+            ->assertJsonPath("success", true)
+            ->assertJsonPath("data.profile.display_name", "Updated")
+            ->assertJsonPath("data.profile.bio", "Updated bio");
 
-        $this->assertDatabaseHas("users", ["email" => "profile@example.com", "name" => "Updated User"]);
-        $this->assertDatabaseHas("user_profiles", ["display_name" => "Updated"]);
+        // Ensure DB reflects the updated profile
+        $this->assertDatabaseHas("users", ["email" => "profile@example.com"]);
+        $this->assertDatabaseHas("user_profiles", ["display_name" => "Updated", "bio" => "Updated bio"]);
     }
 
     public function test_requests_without_token_are_rejected(): void
