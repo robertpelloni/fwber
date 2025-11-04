@@ -17,6 +17,16 @@ export const metadata: Metadata = {
   description: 'A modern adult dating platform with advanced matching algorithms',
   keywords: ['dating', 'adult', 'matching', 'relationships'],
   authors: [{ name: 'FWBer.me Team' }],
+  manifest: '/manifest.json',
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/icon.svg', type: 'image/svg+xml', sizes: 'any' },
+    ],
+    apple: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+    ],
+  },
   openGraph: {
     title: 'FWBer.me - Adult Dating Platform',
     description: 'A modern adult dating platform with advanced matching algorithms',
@@ -32,6 +42,12 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+  },
+  themeColor: '#f97316',
   // Performance optimizations
   other: {
     'X-DNS-Prefetch-Control': 'on',
