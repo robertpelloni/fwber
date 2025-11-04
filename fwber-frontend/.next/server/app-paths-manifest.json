@@ -1,1 +1,3 @@
-{}
+{
+  "/sentry-test/page": "app/sentry-test/page.js"
+}
