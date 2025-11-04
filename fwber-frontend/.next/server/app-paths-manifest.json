@@ -2,8 +2,8 @@
   "/_not-found/page": "app/_not-found/page.js",
   "/sentry-test/page": "app/sentry-test/page.js",
   "/dashboard/page": "app/dashboard/page.js",
-  "/login/page": "app/login/page.js",
-  "/profile/page": "app/profile/page.js",
   "/page": "app/page.js",
-  "/tier-demo/page": "app/tier-demo/page.js"
+  "/tier-demo/page": "app/tier-demo/page.js",
+  "/profile/page": "app/profile/page.js",
+  "/login/page": "app/login/page.js"
 }

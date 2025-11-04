@@ -74,13 +74,11 @@ export default function PhotoRevealGate({
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {/* AI Photos - Always visible */}
         {aiPhotos.map((photo) => (
-          <div key={photo.id} className="relative aspect-square rounded-lg overflow-hidden">
-            <Image
+          <div key={photo.id} className="relative aspect-square rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-800">
+            <img
               src={photo.url}
               alt="AI generated photo"
-              fill
-              className="object-cover"
-              sizes="(max-width: 640px) 50vw, 33vw"
+              className="w-full h-full object-cover"
             />
             <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
               AI
@@ -90,13 +88,11 @@ export default function PhotoRevealGate({
 
         {/* Visible Real Photos */}
         {visibleRealPhotos.map((photo) => (
-          <div key={photo.id} className="relative aspect-square rounded-lg overflow-hidden">
-            <Image
+          <div key={photo.id} className="relative aspect-square rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-800">
+            <img
               src={photo.url}
               alt="Photo"
-              fill
-              className="object-cover"
-              sizes="(max-width: 640px) 50vw, 33vw"
+              className="w-full h-full object-cover"
             />
             {photo.isPrimary && (
               <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
@@ -110,15 +106,13 @@ export default function PhotoRevealGate({
         {blurredRealPhotos.map((photo, index) => (
           <div 
             key={photo.id} 
-            className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group"
+            className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group bg-gray-200 dark:bg-gray-800"
             onClick={onUnlockClick}
           >
-            <Image
+            <img
               src={photo.url}
               alt="Blurred photo"
-              fill
-              className="object-cover blur-xl scale-110"
-              sizes="(max-width: 640px) 50vw, 33vw"
+              className="w-full h-full object-cover blur-xl scale-110"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-center justify-center">
               <div className="text-center text-white">
