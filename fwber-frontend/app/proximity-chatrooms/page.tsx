@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/contexts/AuthContext';
+import { useAuth } from '@/lib/auth-context';
 import { useNearbyProximityChatrooms, useCreateProximityChatroom } from '@/lib/hooks/use-proximity-chatrooms';
 import { MapPin, Users, MessageCircle, Plus, Search, Filter, Map, Navigation } from 'lucide-react';
 
@@ -13,7 +13,7 @@ interface LocationState {
 }
 
 export default function ProximityChatroomsPage() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, token, isAuthenticated } = useAuth();
   const router = useRouter();
   const [location, setLocation] = useState<LocationState>({
     latitude: null,
