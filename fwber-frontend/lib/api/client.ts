@@ -1,7 +1,17 @@
 /**
  * Shared API client utilities
  * This module provides a centralized way to make authenticated API calls.
+ * Uses TypeScript types from ./types.ts for full type safety.
  */
+
+import type {
+  ApiResponse,
+  ApiErrorResponse,
+  ValidationError,
+  SuccessResponse,
+  ErrorResponse,
+  PaginatedResponse,
+} from './types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -14,8 +24,13 @@ export interface RequestOptions extends RequestInit {
 
 /**
  * Custom API Error class with detailed information
+ * Extends the ApiErrorResponse type for consistency
  */
-export class ApiError extends Error {
+export class ApiError extends Error implements ApiErrorResponse {
+  public readonly timestamp: string;
+  public readonly errors?: ValidationError[];
+  public readonly code?: string;
+
   constructor(
     message: string,
     public status: number,
@@ -24,6 +39,17 @@ export class ApiError extends Error {
   ) {
     super(message);
     this.name = 'ApiError';
+    this.timestamp = new Date().toISOString();
+
+    // Extract validation errors if present
+    if (data?.errors && Array.isArray(data.errors)) {
+      this.errors = data.errors;
+    }
+
+    // Extract error code if present
+    if (data?.code) {
+      this.code = data.code;
+    }
   }
 
   get isAuthError(): boolean {
@@ -35,7 +61,7 @@ export class ApiError extends Error {
   }
 
   get isValidationError(): boolean {
-    return this.status === 422;
+    return this.status === 422 && !!this.errors;
   }
 
   get isServerError(): boolean {
@@ -44,6 +70,37 @@ export class ApiError extends Error {
 
   get isClientError(): boolean {
     return this.status >= 400 && this.status < 500;
+  }
+
+  /**
+   * Get validation errors by field name
+   */
+  getFieldErrors(field: string): string[] {
+    if (!this.errors) return [];
+    return this.errors
+      .filter(e => e.field === field)
+      .map(e => e.message);
+  }
+
+  /**
+   * Get all validation error messages
+   */
+  getAllErrorMessages(): string[] {
+    if (!this.errors) return [this.message];
+    return this.errors.map(e => e.message);
+  }
+
+  /**
+   * Convert to ApiErrorResponse format
+   */
+  toErrorResponse(): ApiErrorResponse {
+    return {
+      message: this.message,
+      status: this.status,
+      timestamp: this.timestamp,
+      errors: this.errors,
+      code: this.code,
+    };
   }
 }
 
@@ -239,4 +296,209 @@ export function getErrorMessage(error: unknown): string {
     return error.message;
   }
   return 'An unexpected error occurred';
+}
+
+/**
+ * Check if error has validation errors
+ */
+export function hasValidationErrors(error: unknown): error is ApiError {
+  return isApiError(error) && error.isValidationError;
+}
+
+/**
+ * Extract validation errors from error
+ */
+export function getValidationErrors(error: unknown): ValidationError[] {
+  if (hasValidationErrors(error)) {
+    return error.errors || [];
+  }
+  return [];
+}
+
+/**
+ * Get validation errors for a specific field
+ */
+export function getFieldValidationErrors(error: unknown, field: string): string[] {
+  if (hasValidationErrors(error)) {
+    return error.getFieldErrors(field);
+  }
+  return [];
+}
+
+// ============================================================================
+// Typed API Client Wrappers
+// ============================================================================
+
+/**
+ * Typed wrapper around apiClient.get that unwraps the data property
+ * Usage: const user = await api.get<User>('/users/1')
+ */
+export const api = {
+  /**
+   * GET request that returns unwrapped data
+   */
+  async get<T>(endpoint: string, options?: RequestOptions): Promise<T> {
+    const response = await apiClient.get<T>(endpoint, options);
+    return response.data;
+  },
+
+  /**
+   * POST request that returns unwrapped data
+   */
+  async post<T>(endpoint: string, body?: any, options?: RequestOptions): Promise<T> {
+    const response = await apiClient.post<T>(endpoint, body, options);
+    return response.data;
+  },
+
+  /**
+   * PUT request that returns unwrapped data
+   */
+  async put<T>(endpoint: string, body?: any, options?: RequestOptions): Promise<T> {
+    const response = await apiClient.put<T>(endpoint, body, options);
+    return response.data;
+  },
+
+  /**
+   * PATCH request that returns unwrapped data
+   */
+  async patch<T>(endpoint: string, body?: any, options?: RequestOptions): Promise<T> {
+    const response = await apiClient.patch<T>(endpoint, body, options);
+    return response.data;
+  },
+
+  /**
+   * DELETE request that returns unwrapped data
+   */
+  async delete<T>(endpoint: string, options?: RequestOptions): Promise<T> {
+    const response = await apiClient.delete<T>(endpoint, options);
+    return response.data;
+  },
+};
+
+/**
+ * Helper to handle paginated responses
+ * Extracts the data array and pagination metadata
+ */
+export async function getPaginated<T>(
+  endpoint: string,
+  options?: RequestOptions
+): Promise<PaginatedResponse<T>> {
+  return api.get<PaginatedResponse<T>>(endpoint, options);
+}
+
+/**
+ * Helper to handle API responses wrapped in success/error format
+ * Automatically unwraps SuccessResponse or throws error from ErrorResponse
+ */
+export async function getApiResponse<T>(
+  endpoint: string,
+  options?: RequestOptions
+): Promise<T> {
+  const response = await api.get<ApiResponse<T>>(endpoint, options);
+
+  if (response.success) {
+    return response.data;
+  } else {
+    throw new ApiError(
+      response.error.message,
+      response.error.status,
+      '',
+      response.error
+    );
+  }
+}
+
+// ============================================================================
+// Utility Functions for Common API Patterns
+// ============================================================================
+
+/**
+ * Build query string from params object
+ */
+export function buildQueryString(params: Record<string, any>): string {
+  const searchParams = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      if (Array.isArray(value)) {
+        value.forEach(v => searchParams.append(key, String(v)));
+      } else {
+        searchParams.append(key, String(value));
+      }
+    }
+  });
+  return searchParams.toString();
+}
+
+/**
+ * Helper to upload files with FormData
+ */
+export async function uploadFile<T>(
+  endpoint: string,
+  file: File,
+  additionalData?: Record<string, any>
+): Promise<T> {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  if (additionalData) {
+    Object.entries(additionalData).forEach(([key, value]) => {
+      formData.append(key, String(value));
+    });
+  }
+
+  const token = typeof window !== 'undefined' ? localStorage.getItem('fwber_token') : null;
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${BASE_URL}${endpoint}`, {
+    method: 'POST',
+    headers,
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new ApiError(
+      data.message || 'Upload failed',
+      response.status,
+      response.statusText,
+      data
+    );
+  }
+
+  return response.json();
+}
+
+/**
+ * Helper to handle optimistic updates with automatic retry on failure
+ */
+export async function optimisticUpdate<T>(
+  updateFn: () => Promise<T>,
+  rollbackFn: () => void,
+  options?: {
+    maxRetries?: number;
+    retryDelay?: number;
+  }
+): Promise<T> {
+  const { maxRetries = 2, retryDelay = 1000 } = options || {};
+
+  try {
+    return await updateFn();
+  } catch (error) {
+    // Rollback optimistic update
+    rollbackFn();
+
+    // Retry if network error
+    if (isNetworkError(error) && maxRetries > 0) {
+      await new Promise(resolve => setTimeout(resolve, retryDelay));
+      return optimisticUpdate(updateFn, rollbackFn, {
+        maxRetries: maxRetries - 1,
+        retryDelay: retryDelay * 2,
+      });
+    }
+
+    throw error;
+  }
 }
