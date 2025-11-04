@@ -129,43 +129,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   const wsUrl = options.wsUrl || process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8080';
   const token = user?.token || '';
 
-  // Initialize WebSocket client
-  useEffect(() => {
-    if (isAuthenticated && user?.token && options.autoConnect !== false) {
-      const wsClient = createWebSocketClient(wsUrl, token, {
-        autoConnect: true,
-        heartbeatInterval: options.heartbeatInterval || 30000,
-        maxReconnectAttempts: options.maxReconnectAttempts || 5,
-        reconnectDelay: options.reconnectDelay || 1000,
-      });
-
-      setClient(wsClient);
-
-      // Set up event listeners
-      wsClient.on('connection', handleConnection);
-      wsClient.on('disconnection', handleDisconnection);
-      wsClient.on('message', handleMessage);
-      wsClient.on('presence_update', handlePresenceUpdate);
-      wsClient.on('notification', handleNotification);
-      wsClient.on('chat_message', handleChatMessage);
-      wsClient.on('typing_indicator', handleTypingIndicator);
-      wsClient.on('error', handleError);
-
-      return () => {
-        wsClient.off('connection', handleConnection);
-        wsClient.off('disconnection', handleDisconnection);
-        wsClient.off('message', handleMessage);
-        wsClient.off('presence_update', handlePresenceUpdate);
-        wsClient.off('notification', handleNotification);
-        wsClient.off('chat_message', handleChatMessage);
-        wsClient.off('typing_indicator', handleTypingIndicator);
-        wsClient.off('error', handleError);
-        wsClient.disconnect();
-      };
-    }
-  }, [isAuthenticated, user?.token, wsUrl, JSON.stringify(options)]);
-
-  // Event handlers
+  // Event handlers (defined before useEffect to avoid hoisting issues)
   const handleConnection = useCallback((data: any) => {
     console.log('WebSocket connected:', data);
     setConnectionStatus(prev => ({
@@ -232,6 +196,59 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   const handleError = useCallback((error: any) => {
     console.error('WebSocket error:', error);
   }, []);
+
+  // Initialize WebSocket client
+  useEffect(() => {
+    if (isAuthenticated && user?.token && options.autoConnect !== false) {
+      const wsClient = createWebSocketClient(wsUrl, token, {
+        autoConnect: true,
+        heartbeatInterval: options.heartbeatInterval || 30000,
+        maxReconnectAttempts: options.maxReconnectAttempts || 5,
+        reconnectDelay: options.reconnectDelay || 1000,
+      });
+
+      setClient(wsClient);
+
+      // Set up event listeners
+      wsClient.on('connection', handleConnection);
+      wsClient.on('disconnection', handleDisconnection);
+      wsClient.on('message', handleMessage);
+      wsClient.on('presence_update', handlePresenceUpdate);
+      wsClient.on('notification', handleNotification);
+      wsClient.on('chat_message', handleChatMessage);
+      wsClient.on('typing_indicator', handleTypingIndicator);
+      wsClient.on('error', handleError);
+
+      return () => {
+        wsClient.off('connection', handleConnection);
+        wsClient.off('disconnection', handleDisconnection);
+        wsClient.off('message', handleMessage);
+        wsClient.off('presence_update', handlePresenceUpdate);
+        wsClient.off('notification', handleNotification);
+        wsClient.off('chat_message', handleChatMessage);
+        wsClient.off('typing_indicator', handleTypingIndicator);
+        wsClient.off('error', handleError);
+        wsClient.disconnect();
+      };
+    }
+  }, [
+    isAuthenticated,
+    user?.token,
+    wsUrl,
+    token,
+    options.autoConnect,
+    options.heartbeatInterval,
+    options.maxReconnectAttempts,
+    options.reconnectDelay,
+    handleConnection,
+    handleDisconnection,
+    handleMessage,
+    handlePresenceUpdate,
+    handleNotification,
+    handleChatMessage,
+    handleTypingIndicator,
+    handleError,
+  ]);
 
   // WebSocket actions
   const connect = useCallback(() => {

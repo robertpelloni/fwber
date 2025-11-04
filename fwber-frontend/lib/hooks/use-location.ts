@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export interface Location {
   latitude: number;
@@ -103,6 +103,7 @@ export function useLocation(options: UseLocationOptions = {}): UseLocationReturn
 
   useEffect(() => {
     refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enableHighAccuracy, timeout, maximumAge, watch]);
 
   return { location, error, loading, refetch };
