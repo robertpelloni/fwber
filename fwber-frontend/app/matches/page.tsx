@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { getMatches, performMatchAction, type Match, type MatchAction } from '@/lib/api/matches'
+import { RelationshipTier } from '@/lib/relationshipTiers'
+import RelationshipTierBadge from '@/components/RelationshipTierBadge'
+import PhotoRevealGate from '@/components/PhotoRevealGate'
 
 export default function MatchesPage() {
   const { token, isAuthenticated } = useAuth()
@@ -13,6 +16,13 @@ export default function MatchesPage() {
   const [isPerformingAction, setIsPerformingAction] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showMatchDetails, setShowMatchDetails] = useState(false)
+  const [showTierInfo, setShowTierInfo] = useState(true)
+
+  // Simulated tier data - in real app, fetch from API
+  const getCurrentTier = (match: Match): RelationshipTier => {
+    // For discovery phase, all new matches start at DISCOVERY tier
+    return RelationshipTier.DISCOVERY
+  }
 
   useEffect(() => {
     if (isAuthenticated && token) {
@@ -160,9 +170,9 @@ export default function MatchesPage() {
             <div className="bg-white rounded-lg shadow-lg overflow-hidden">
               {/* Match Card */}
               <div className="relative">
-                {/* Profile Photo */}
+                {/* Profile Photo with Tier-based Reveal */}
                 <div className="aspect-w-3 aspect-h-4 bg-gray-200">
-                  <div className="w-full h-96 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                  <div className="w-full h-96 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center relative">
                     {currentMatch.profile?.photos?.[0] ? (
                       <img
                         src={currentMatch.profile.photos[0].url}
@@ -174,6 +184,11 @@ export default function MatchesPage() {
                         {currentMatch.profile?.display_name?.[0] || '?'}
                       </div>
                     )}
+                    {/* Discovery tier overlay for AI photos */}
+                    <div className="absolute top-4 left-4 bg-black/50 text-white text-xs px-3 py-1.5 rounded-full flex items-center gap-2">
+                      <span>🤖</span>
+                      <span>AI Generated</span>
+                    </div>
                   </div>
                 </div>
 
@@ -195,21 +210,55 @@ export default function MatchesPage() {
                   </div>
                 </div>
 
-                {/* Compatibility Score */}
-                <div className="absolute top-4 right-4 bg-white bg-opacity-90 rounded-full px-3 py-1">
-                  <span className="text-sm font-semibold text-gray-900">
-                    {Math.round(currentMatch.compatibility_score * 100)}% Match
-                  </span>
+                {/* Compatibility Score & Tier Badge */}
+                <div className="absolute top-4 right-4 flex flex-col gap-2">
+                  <div className="bg-white bg-opacity-90 rounded-full px-3 py-1">
+                    <span className="text-sm font-semibold text-gray-900">
+                      {Math.round(currentMatch.compatibility_score * 100)}% Match
+                    </span>
+                  </div>
+                  <RelationshipTierBadge
+                    tier={getCurrentTier(currentMatch)}
+                    compact={true}
+                  />
                 </div>
               </div>
 
               {/* Match Details */}
               <div className="p-6">
+                {/* Tier Information Banner */}
+                {showTierInfo && (
+                  <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-200 dark:border-purple-700">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-sm text-purple-900 dark:text-purple-100 mb-1">
+                          🔍 Discovery Mode
+                        </h4>
+                        <p className="text-xs text-purple-700 dark:text-purple-300">
+                          You&apos;re viewing AI-generated photos. Match to unlock real photos and start chatting!
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setShowTierInfo(false)}
+                        className="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-200 text-xs ml-2"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Bio */}
                 {currentMatch.profile?.bio && (
                   <div className="mb-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">About</h3>
-                    <p className="text-gray-700">{currentMatch.profile.bio}</p>
+                    <p className="text-gray-700">
+                      {/* Show preview in discovery mode */}
+                      {currentMatch.profile.bio.length > 150 
+                        ? `${currentMatch.profile.bio.slice(0, 150)}... (Match to read more)`
+                        : currentMatch.profile.bio
+                      }
+                    </p>
                   </div>
                 )}
 
