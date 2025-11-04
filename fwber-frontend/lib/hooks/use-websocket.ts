@@ -344,7 +344,45 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
   const sendChatMessage = useCallback((recipientId: string, content: string, type: string = 'text') => {
     if (client) {
-      client.sendChatMessage(recipientId, content, type);
+      const messageId = client.sendChatMessage(recipientId, content, type);
+      
+      // Add optimistic message with 'sending' status
+      const optimisticMessage: ChatMessage = {
+        message_id: messageId as string,
+        from_user_id: user?.id || '',
+        to_user_id: recipientId,
+        content,
+        message: { content, type, id: messageId as string },
+        timestamp: new Date().toISOString(),
+        status: 'sending',
+      };
+      
+      setChatMessages(prev => [...prev.slice(-99), optimisticMessage]);
+      
+      // Update to 'sent' after a brief delay (will be updated to 'delivered' when server confirms)
+      setTimeout(() => {
+        setChatMessages(prev => prev.map(msg => 
+          msg.message_id === messageId ? { ...msg, status: 'sent' as MessageStatus } : msg
+        ));
+      }, 100);
+    }
+  }, [client, user]);
+
+  const markMessageAsRead = useCallback((messageId: string) => {
+    if (client) {
+      // Send read receipt to server
+      client.send({
+        type: 'message_read',
+        data: { message_id: messageId, read_at: new Date().toISOString() },
+        timestamp: new Date().toISOString(),
+      });
+      
+      // Update local state
+      setChatMessages(prev => prev.map(msg => 
+        (msg.message_id === messageId || msg.id === messageId)
+          ? { ...msg, status: 'read' as MessageStatus, read_at: new Date().toISOString() }
+          : msg
+      ));
     }
   }, [client]);
 
@@ -410,6 +448,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     sendTypingIndicator,
     updatePresence,
     sendNotification,
+    markMessageAsRead,
     
     // Utilities
     clearMessages,

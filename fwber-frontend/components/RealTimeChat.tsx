@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useWebSocketChat, ChatMessage, OnlineUser } from '@/lib/hooks/use-websocket';
+import { useAuth } from '@/lib/contexts/AuthContext';
+import { MessageMetadata } from '@/components/MessageStatusIndicator';
+import { UserAvatar, PresenceIndicator, PresenceStatus } from '@/components/PresenceIndicator';
 
 interface RealTimeChatProps {
   recipientId: string;
@@ -17,14 +20,20 @@ export default function RealTimeChat({
   const [message, setMessage] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
   
   const {
     messages,
     typingIndicators,
+    onlineUsers,
     sendMessage,
     handleTypingChange,
     isTyping,
   } = useWebSocketChat(recipientId);
+
+  // Find recipient's online status
+  const recipientUser = (onlineUsers as OnlineUser[]).find(u => u.user_id === recipientId);
+  const recipientStatus: PresenceStatus = (recipientUser?.status as PresenceStatus) || 'offline';
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -55,16 +64,18 @@ export default function RealTimeChat({
       {/* Chat Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-700">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
-            <span className="text-white text-sm font-bold">
-              {recipientName.charAt(0).toUpperCase()}
-            </span>
-          </div>
+          <UserAvatar 
+            name={recipientName}
+            status={recipientStatus}
+            size="md"
+          />
           <div>
             <h3 className="text-white font-semibold">{recipientName}</h3>
-            <p className="text-gray-400 text-sm">
-              {isConnected ? 'Online' : 'Offline'}
-            </p>
+            <PresenceIndicator 
+              status={recipientStatus}
+              lastSeen={recipientUser?.last_seen}
+              showLabel
+            />
           </div>
         </div>
         <div className="flex items-center space-x-2">
@@ -88,25 +99,31 @@ export default function RealTimeChat({
             <p>No messages yet. Start a conversation!</p>
           </div>
         ) : (
-          (messages as ChatMessage[]).map((msg, index) => (
-            <div
-              key={index}
-              className={`flex ${msg.from_user_id === recipientId ? 'justify-start' : 'justify-end'}`}
-            >
+          (messages as ChatMessage[]).map((msg, index) => {
+            const isOwnMessage = msg.from_user_id === user?.id;
+            return (
               <div
-                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                  msg.from_user_id === recipientId
-                    ? 'bg-gray-700 text-white'
-                    : 'bg-red-600 text-white'
-                }`}
+                key={msg.message_id || msg.id || index}
+                className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}
               >
-                <p className="text-sm">{msg.message?.content || msg.content}</p>
-                <p className="text-xs opacity-70 mt-1">
-                  {new Date(msg.timestamp).toLocaleTimeString()}
-                </p>
+                <div
+                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                    isOwnMessage
+                      ? 'bg-red-600 text-white'
+                      : 'bg-gray-700 text-white'
+                  }`}
+                >
+                  <p className="text-sm">{msg.message?.content || msg.content}</p>
+                  <MessageMetadata 
+                    timestamp={msg.timestamp}
+                    status={msg.status}
+                    isOwnMessage={isOwnMessage}
+                    className="mt-1"
+                  />
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
         <div ref={messagesEndRef} />
       </div>

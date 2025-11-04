@@ -203,6 +203,14 @@ export const logAPI = {
     }
   },
 
+  success: (message: string, data?: any) => {
+    log('api', 'info', message, data);
+  },
+
+  warning: (message: string, data?: any) => {
+    log('api', 'warn', message, data);
+  },
+
   error: (method: string, url: string, error: any) => {
     log('api', 'error', `API ${method} failed`, { url, error });
   },
