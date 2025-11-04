@@ -29,6 +29,7 @@ export default function TierDemoPage() {
   const [previousTier, setPreviousTier] = useState<RelationshipTier>(RelationshipTier.DISCOVERY)
 
   const handleTierChange = (newTier: RelationshipTier) => {
+    console.log('Tier change:', { from: currentTier, to: newTier })
     if (newTier > currentTier) {
       setPreviousTier(currentTier)
       setCurrentTier(newTier)
@@ -92,7 +93,11 @@ export default function TierDemoPage() {
                   min="0"
                   max="100"
                   value={messagesExchanged}
-                  onChange={(e) => setMessagesExchanged(Number(e.target.value))}
+                  onChange={(e) => {
+                    const val = Number(e.target.value)
+                    console.log('Messages changed:', val)
+                    setMessagesExchanged(val)
+                  }}
                   className="w-full"
                 />
               </div>
@@ -106,7 +111,11 @@ export default function TierDemoPage() {
                   min="0"
                   max="30"
                   value={daysConnected}
-                  onChange={(e) => setDaysConnected(Number(e.target.value))}
+                  onChange={(e) => {
+                    const val = Number(e.target.value)
+                    console.log('Days changed:', val)
+                    setDaysConnected(val)
+                  }}
                   className="w-full"
                 />
               </div>
@@ -116,7 +125,10 @@ export default function TierDemoPage() {
                   type="checkbox"
                   id="metInPerson"
                   checked={hasMetInPerson}
-                  onChange={(e) => setHasMetInPerson(e.target.checked)}
+                  onChange={(e) => {
+                    console.log('Met in person:', e.target.checked)
+                    setHasMetInPerson(e.target.checked)
+                  }}
                   className="w-4 h-4"
                 />
                 <label htmlFor="metInPerson" className="text-sm font-medium text-gray-700 dark:text-gray-300">
