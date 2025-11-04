@@ -556,16 +556,22 @@ export function PhotoGallery({
     }
   }
   
+  // Use ref to avoid onClose dependency issues
+  const onCloseRef = useRef(onClose)
+  useEffect(() => {
+    onCloseRef.current = onClose
+  }, [onClose])
+
   // Update current index when photos array changes (e.g., after deletion)
   useEffect(() => {
     if (photos.length === 0) {
       // If no photos left, close gallery
-      onClose()
+      onCloseRef.current()
     } else if (currentIndex >= photos.length) {
       // If current index is out of bounds, move to last photo
       setCurrentIndex(Math.max(0, photos.length - 1))
     }
-  }, [photos.length, currentIndex, onClose])
+  }, [photos.length, currentIndex])
 
   if (photos.length === 0) {
     return null

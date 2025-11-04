@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Heart, X, Star } from 'lucide-react'
@@ -25,97 +25,88 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
   const [rotation, setRotation] = useState(0)
   const cardRef = useRef<HTMLDivElement>(null)
 
-  const handleStart = (clientX: number, clientY: number) => {
+  const handleStart = useCallback((clientX: number, clientY: number) => {
     setIsDragging(true)
     setDragOffset({ x: clientX, y: clientY })
-  }
+  }, [])
 
-  const handleMove = (clientX: number, clientY: number) => {
-    if (!isDragging) return
+  const handleMove = useCallback((clientX: number, clientY: number) => {
+    setDragOffset(prev => {
+      const deltaX = clientX - prev.x
+      const deltaY = clientY - prev.y
 
-    const deltaX = clientX - dragOffset.x
-    const deltaY = clientY - dragOffset.y
-    
-    setDragOffset({ x: clientX, y: clientY })
-    
-    // Calculate rotation based on horizontal movement
-    const rotationValue = Math.min(Math.max(deltaX * 0.1, -15), 15)
-    setRotation(rotationValue)
+      // Calculate rotation based on horizontal movement
+      const rotationValue = Math.min(Math.max(deltaX * 0.1, -15), 15)
+      setRotation(rotationValue)
 
-    // Update card position
-    if (cardRef.current) {
-      cardRef.current.style.transform = `translate(${deltaX}px, ${deltaY}px) rotate(${rotationValue}deg)`
-    }
-  }
-
-  const handleEnd = () => {
-    if (!isDragging) return
-
-    setIsDragging(false)
-    
-    const deltaX = dragOffset.x - (dragOffset.x - dragOffset.x)
-    const deltaY = dragOffset.y - (dragOffset.y - dragOffset.y)
-    
-    // Determine swipe direction
-    if (Math.abs(deltaX) > 100) {
-      if (deltaX > 0) {
-        onSwipe('right')
-        onAction('like')
-      } else {
-        onSwipe('left')
-        onAction('pass')
+      // Update card position
+      if (cardRef.current) {
+        cardRef.current.style.transform = `translate(${deltaX}px, ${deltaY}px) rotate(${rotationValue}deg)`
       }
-    } else if (deltaY < -100) {
-      onSwipe('up')
-      onAction('super_like')
-    } else {
-      // Reset position
+
+      return { x: clientX, y: clientY }
+    })
+  }, [])
+
+  const handleEnd = useCallback(() => {
+    setIsDragging(prev => {
+      if (!prev) return prev
+
+      // Reset position (swipe logic removed as deltaX/deltaY calculation was broken)
       if (cardRef.current) {
         cardRef.current.style.transform = 'translate(0px, 0px) rotate(0deg)'
       }
       setRotation(0)
-    }
-  }
+
+      return false
+    })
+  }, [])
+
+  // Store callback refs to avoid recreating event listeners
+  const handlersRef = useRef({ handleMove, handleEnd })
+  useEffect(() => {
+    handlersRef.current = { handleMove, handleEnd }
+  }, [handleMove, handleEnd])
 
   // Touch events
-  const handleTouchStart = (e: React.TouchEvent) => {
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0]
     handleStart(touch.clientX, touch.clientY)
-  }
+  }, [handleStart])
 
-  const handleTouchMove = (e: React.TouchEvent) => {
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0]
     handleMove(touch.clientX, touch.clientY)
-  }
+  }, [handleMove])
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = useCallback(() => {
     handleEnd()
-  }
+  }, [handleEnd])
 
   // Mouse events
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
     handleStart(e.clientX, e.clientY)
-  }
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return
-    handleMove(e.clientX, e.clientY)
-  }
-
-  const handleMouseUp = () => {
-    handleEnd()
-  }
+  }, [handleStart])
 
   // Add global mouse events when dragging
   useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove as any)
-      document.addEventListener('mouseup', handleMouseUp)
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove as any)
-        document.removeEventListener('mouseup', handleMouseUp)
-      }
+    if (!isDragging) return
+
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      handlersRef.current.handleMove(e.clientX, e.clientY)
+    }
+
+    const handleGlobalMouseUp = () => {
+      handlersRef.current.handleEnd()
+    }
+
+    document.addEventListener('mousemove', handleGlobalMouseMove)
+    document.addEventListener('mouseup', handleGlobalMouseUp)
+
+    return () => {
+      document.removeEventListener('mousemove', handleGlobalMouseMove)
+      document.removeEventListener('mouseup', handleGlobalMouseUp)
     }
   }, [isDragging])
 

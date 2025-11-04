@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../lib/auth-context';
 import { useRouter } from 'next/navigation';
 
@@ -53,27 +53,14 @@ export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState('7d');
   const [refreshInterval, setRefreshInterval] = useState(30000); // 30 seconds
 
-  useEffect(() => {
-    if (!user) {
-      router.push('/login');
-      return;
-    }
-
-    fetchAnalytics();
-    
-    // Set up auto-refresh
-    const interval = setInterval(fetchAnalytics, refreshInterval);
-    return () => clearInterval(interval);
-  }, [user, timeRange, refreshInterval]);
-
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     try {
       const response = await fetch(`/api/analytics?range=${timeRange}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setAnalytics(data);
@@ -83,7 +70,20 @@ export default function AnalyticsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [timeRange, token]);
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+
+    fetchAnalytics();
+
+    // Set up auto-refresh
+    const interval = setInterval(fetchAnalytics, refreshInterval);
+    return () => clearInterval(interval);
+  }, [user, router, fetchAnalytics, refreshInterval]);
 
   if (!user) {
     return null;
