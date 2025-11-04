@@ -25,9 +25,20 @@ export default function TierDemoPage() {
   const [showUpgradeNotification, setShowUpgradeNotification] = useState(false)
   const [previousTier, setPreviousTier] = useState<RelationshipTier>(RelationshipTier.DISCOVERY)
 
+  const tierOrder = [
+    RelationshipTier.DISCOVERY,
+    RelationshipTier.MATCHED,
+    RelationshipTier.CONNECTED,
+    RelationshipTier.ESTABLISHED,
+    RelationshipTier.VERIFIED
+  ]
+
   const handleTierChange = (newTier: RelationshipTier) => {
     console.log('Tier change:', { from: currentTier, to: newTier })
-    if (newTier > currentTier) {
+    const currentIndex = tierOrder.indexOf(currentTier)
+    const newIndex = tierOrder.indexOf(newTier)
+    
+    if (newIndex > currentIndex) {
       setPreviousTier(currentTier)
       setCurrentTier(newTier)
       setShowUpgradeNotification(true)
@@ -66,9 +77,9 @@ export default function TierDemoPage() {
                 {Object.entries(tierLabels).map(([tier, label]) => (
                   <button
                     key={tier}
-                    onClick={() => handleTierChange(Number(tier) as unknown as RelationshipTier)}
+                    onClick={() => handleTierChange(tier as RelationshipTier)}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      currentTier === (Number(tier) as unknown as RelationshipTier)
+                      currentTier === tier
                         ? 'bg-purple-600 text-white'
                         : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                     }`}

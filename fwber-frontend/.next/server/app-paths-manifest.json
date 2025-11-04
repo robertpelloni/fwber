@@ -1,3 +1,4 @@
 {
-  "/tier-demo/page": "app/tier-demo/page.js"
+  "/tier-demo/page": "app/tier-demo/page.js",
+  "/_not-found/page": "app/_not-found/page.js"
 }
