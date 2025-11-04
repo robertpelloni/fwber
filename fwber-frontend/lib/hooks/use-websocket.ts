@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useAuth } from '@/lib/auth-context';
-import { createWebSocketClient, WebSocketClient, WebSocketMessage } from '@/lib/websocket/client';
+import { useAuth } from '@/lib/contexts/AuthContext';
+import { createWebSocketClient, WebSocketClient, WebSocketMessage as WSMessage } from '@/lib/websocket/client';
 
 export interface WebSocketConnectionStatus {
   connected: boolean;
@@ -252,7 +252,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
  * Hook for WebSocket chat functionality
  */
 export function useWebSocketChat(recipientId?: string) {
-  const { sendChatMessage, sendTypingIndicator, chatMessages, typingIndicators } = useWebSocket();
+  const { sendChatMessage, sendTypingIndicator, chatMessages, typingIndicators, onlineUsers } = useWebSocket();
   
   const [isTyping, setIsTyping] = useState(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -321,6 +321,8 @@ export function useWebSocketChat(recipientId?: string) {
     sendMessage: handleSendMessage,
     handleTypingChange,
     isTyping,
+    chatMessages, // Add for ChatList component
+    onlineUsers, // Add for OnlineUsers component
   };
 }
 

@@ -112,7 +112,9 @@ export default function ProximityChatroomPage({ params }: ProximityChatroomPageP
         chatroomId,
         data: {
           content: newMessage.trim(),
-          type: selectedTab === 'all' ? 'general' : selectedTab,
+          message_type: 'text',
+          is_networking: selectedTab === 'networking',
+          is_social: selectedTab === 'social',
         },
       });
       setNewMessage('');

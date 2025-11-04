@@ -133,7 +133,7 @@ export interface GenerationHistory {
 export async function generateProfileContent(
   preferences: ProfileContentRequest
 ): Promise<ContentGenerationResponse> {
-  const response = await apiClient.post('/content-generation/profile', preferences);
+  const response = await apiClient.post<ContentGenerationResponse>('/content-generation/profile', preferences);
   return response.data;
 }
 
@@ -144,7 +144,7 @@ export async function generatePostSuggestions(
   boardId: number,
   request: PostSuggestionsRequest
 ): Promise<ContentGenerationResponse> {
-  const response = await apiClient.post(`/content-generation/posts/${boardId}/suggestions`, request);
+  const response = await apiClient.post<ContentGenerationResponse>(`/content-generation/posts/${boardId}/suggestions`, request);
   return response.data;
 }
 
@@ -154,7 +154,7 @@ export async function generatePostSuggestions(
 export async function generateConversationStarters(
   request: ConversationStartersRequest
 ): Promise<ContentGenerationResponse> {
-  const response = await apiClient.post('/content-generation/conversation-starters', request);
+  const response = await apiClient.post<ContentGenerationResponse>('/content-generation/conversation-starters', request);
   return response.data;
 }
 
@@ -164,7 +164,7 @@ export async function generateConversationStarters(
 export async function optimizeContent(
   request: ContentOptimizationRequest
 ): Promise<ContentOptimizationResponse> {
-  const response = await apiClient.post('/content-generation/optimize', request);
+  const response = await apiClient.post<ContentOptimizationResponse>('/content-generation/optimize', request);
   return response.data;
 }
 
@@ -172,7 +172,7 @@ export async function optimizeContent(
  * Get content generation statistics
  */
 export async function getGenerationStats(): Promise<GenerationStats> {
-  const response = await apiClient.get('/content-generation/stats');
+  const response = await apiClient.get<{ data: GenerationStats }>('/content-generation/stats');
   return response.data.data;
 }
 
@@ -180,7 +180,7 @@ export async function getGenerationStats(): Promise<GenerationStats> {
  * Get content optimization statistics
  */
 export async function getOptimizationStats(): Promise<OptimizationStats> {
-  const response = await apiClient.get('/content-generation/optimization-stats');
+  const response = await apiClient.get<{ data: OptimizationStats }>('/content-generation/optimization-stats');
   return response.data.data;
 }
 
@@ -193,7 +193,12 @@ export async function submitContentFeedback(feedback: ContentFeedback): Promise<
   feedback_id: string;
   submitted_at: string;
 }> {
-  const response = await apiClient.post('/content-generation/feedback', feedback);
+  const response = await apiClient.post<{
+    success: boolean;
+    message: string;
+    feedback_id: string;
+    submitted_at: string;
+  }>('/content-generation/feedback', feedback);
   return response.data;
 }
 
@@ -204,7 +209,7 @@ export async function getGenerationHistory(params?: {
   page?: number;
   per_page?: number;
 }): Promise<GenerationHistory> {
-  const response = await apiClient.get('/content-generation/history', { params });
+  const response = await apiClient.get<{ data: GenerationHistory }>('/content-generation/history', { params });
   return response.data.data;
 }
 
@@ -217,7 +222,12 @@ export async function deleteGeneratedContent(contentId: string): Promise<{
   content_id: string;
   deleted_at: string;
 }> {
-  const response = await apiClient.delete(`/content-generation/content/${contentId}`);
+  const response = await apiClient.delete<{
+    success: boolean;
+    message: string;
+    content_id: string;
+    deleted_at: string;
+  }>(`/content-generation/content/${contentId}`);
   return response.data;
 }
 

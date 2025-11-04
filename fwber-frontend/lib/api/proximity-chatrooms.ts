@@ -21,11 +21,13 @@ export interface ProximityChatroom {
   tags?: string[];
   settings?: Record<string, any>;
   created_by: number;
+  owner_id: number; // Added for compatibility
   is_active: boolean;
   is_public: boolean;
   requires_approval: boolean;
   max_members?: number;
   current_members: number;
+  member_count: number; // Added for compatibility (same as current_members)
   message_count: number;
   last_activity_at: string;
   expires_at?: string;
@@ -43,8 +45,15 @@ export interface ProximityChatroom {
 
 export interface ProximityChatroomMember {
   id: number;
+  user_id?: number; // For backward compatibility
   name: string;
   email: string;
+  role: 'admin' | 'moderator' | 'member'; // Flattened from pivot
+  user?: { // Added for compatibility
+    id: number;
+    name: string;
+    email: string;
+  };
   pivot: {
     role: 'admin' | 'moderator' | 'member';
     is_muted: boolean;
@@ -104,6 +113,7 @@ export interface ProximityChatroomMessageReaction {
   message_id: number;
   user_id: number;
   emoji: string;
+  count?: number;
   created_at: string;
   user?: {
     id: number;
@@ -141,6 +151,7 @@ export interface CreateProximityChatroomRequest {
   address?: string;
   tags?: string[];
   max_members?: number;
+  is_public?: boolean;
   requires_approval?: boolean;
   expires_at?: string;
 }
@@ -188,6 +199,7 @@ export interface NearbyNetworkingRequest {
 }
 
 export interface ProximityChatroomResponse {
+  data?: ProximityChatroom[]; // For paginated responses
   chatrooms: ProximityChatroom[];
   user_location: {
     latitude: number;
@@ -246,7 +258,7 @@ export async function findNearby(filters: FindNearbyRequest): Promise<ProximityC
     filters.tags.forEach(tag => params.append('tags[]', tag));
   }
 
-  const response = await apiClient.get(`/proximity-chatrooms/nearby?${params.toString()}`);
+  const response = await apiClient.get<ProximityChatroomResponse>(`/proximity-chatrooms/nearby?${params.toString()}`);
   return response.data;
 }
 
@@ -254,7 +266,7 @@ export async function findNearby(filters: FindNearbyRequest): Promise<ProximityC
  * Create a proximity chatroom
  */
 export async function createProximityChatroom(data: CreateProximityChatroomRequest): Promise<ProximityChatroom> {
-  const response = await apiClient.post('/proximity-chatrooms', data);
+  const response = await apiClient.post<ProximityChatroom>('/proximity-chatrooms', data);
   return response.data;
 }
 
@@ -268,7 +280,7 @@ export async function getProximityChatroom(id: number, location?: { latitude: nu
     params.append('longitude', location.longitude.toString());
   }
 
-  const response = await apiClient.get(`/proximity-chatrooms/${id}?${params.toString()}`);
+  const response = await apiClient.get<ProximityChatroom>(`/proximity-chatrooms/${id}?${params.toString()}`);
   return response.data;
 }
 
@@ -276,7 +288,7 @@ export async function getProximityChatroom(id: number, location?: { latitude: nu
  * Join a proximity chatroom
  */
 export async function joinProximityChatroom(id: number, data: JoinProximityChatroomRequest): Promise<{ message: string }> {
-  const response = await apiClient.post(`/proximity-chatrooms/${id}/join`, data);
+  const response = await apiClient.post<{ message: string }>(`/proximity-chatrooms/${id}/join`, data);
   return response.data;
 }
 
@@ -284,7 +296,7 @@ export async function joinProximityChatroom(id: number, data: JoinProximityChatr
  * Leave a proximity chatroom
  */
 export async function leaveProximityChatroom(id: number): Promise<{ message: string }> {
-  const response = await apiClient.post(`/proximity-chatrooms/${id}/leave`);
+  const response = await apiClient.post<{ message: string }>(`/proximity-chatrooms/${id}/leave`);
   return response.data;
 }
 
@@ -292,7 +304,7 @@ export async function leaveProximityChatroom(id: number): Promise<{ message: str
  * Update member location
  */
 export async function updateLocation(id: number, data: UpdateLocationRequest): Promise<{ message: string }> {
-  const response = await apiClient.post(`/proximity-chatrooms/${id}/location`, data);
+  const response = await apiClient.post<{ message: string }>(`/proximity-chatrooms/${id}/location`, data);
   return response.data;
 }
 
@@ -304,7 +316,7 @@ export async function getProximityChatroomMembers(id: number, filters: { network
   if (filters.networking_only) params.append('networking_only', 'true');
   if (filters.social_only) params.append('social_only', 'true');
 
-  const response = await apiClient.get(`/proximity-chatrooms/${id}/members?${params.toString()}`);
+  const response = await apiClient.get<MemberResponse>(`/proximity-chatrooms/${id}/members?${params.toString()}`);
   return response.data;
 }
 
@@ -317,7 +329,7 @@ export async function getNearbyNetworking(id: number, data: NearbyNetworkingRequ
   params.append('longitude', data.longitude.toString());
   if (data.radius_meters) params.append('radius_meters', data.radius_meters.toString());
 
-  const response = await apiClient.get(`/proximity-chatrooms/${id}/networking?${params.toString()}`);
+  const response = await apiClient.get<NearbyNetworkingResponse>(`/proximity-chatrooms/${id}/networking?${params.toString()}`);
   return response.data;
 }
 
@@ -325,7 +337,7 @@ export async function getNearbyNetworking(id: number, data: NearbyNetworkingRequ
  * Get proximity chatroom analytics
  */
 export async function getProximityAnalytics(id: number): Promise<ProximityAnalytics> {
-  const response = await apiClient.get(`/proximity-chatrooms/${id}/analytics`);
+  const response = await apiClient.get<ProximityAnalytics>(`/proximity-chatrooms/${id}/analytics`);
   return response.data;
 }
 
@@ -352,7 +364,7 @@ export async function getProximityChatroomMessages(
   if (filters.pinned !== undefined) params.append('pinned', filters.pinned.toString());
   if (filters.announcements !== undefined) params.append('announcements', filters.announcements.toString());
 
-  const response = await apiClient.get(`/proximity-chatrooms/${chatroomId}/messages?${params.toString()}`);
+  const response = await apiClient.get<MessageResponse>(`/proximity-chatrooms/${chatroomId}/messages?${params.toString()}`);
   return response.data;
 }
 
@@ -360,7 +372,7 @@ export async function getProximityChatroomMessages(
  * Send a message to a proximity chatroom
  */
 export async function sendProximityMessage(chatroomId: number, data: SendProximityMessageRequest): Promise<ProximityChatroomMessage> {
-  const response = await apiClient.post(`/proximity-chatrooms/${chatroomId}/messages`, data);
+  const response = await apiClient.post<ProximityChatroomMessage>(`/proximity-chatrooms/${chatroomId}/messages`, data);
   return response.data;
 }
 
@@ -368,7 +380,7 @@ export async function sendProximityMessage(chatroomId: number, data: SendProximi
  * Get a specific message
  */
 export async function getProximityMessage(chatroomId: number, messageId: number): Promise<ProximityChatroomMessage> {
-  const response = await apiClient.get(`/proximity-chatrooms/${chatroomId}/messages/${messageId}`);
+  const response = await apiClient.get<ProximityChatroomMessage>(`/proximity-chatrooms/${chatroomId}/messages/${messageId}`);
   return response.data;
 }
 
@@ -380,7 +392,7 @@ export async function editProximityMessage(
   messageId: number,
   data: { content: string; is_networking?: boolean; is_social?: boolean }
 ): Promise<ProximityChatroomMessage> {
-  const response = await apiClient.put(`/proximity-chatrooms/${chatroomId}/messages/${messageId}`, data);
+  const response = await apiClient.put<ProximityChatroomMessage>(`/proximity-chatrooms/${chatroomId}/messages/${messageId}`, data);
   return response.data;
 }
 
@@ -388,7 +400,7 @@ export async function editProximityMessage(
  * Delete a message
  */
 export async function deleteProximityMessage(chatroomId: number, messageId: number): Promise<{ message: string }> {
-  const response = await apiClient.delete(`/proximity-chatrooms/${chatroomId}/messages/${messageId}`);
+  const response = await apiClient.delete<{ message: string }>(`/proximity-chatrooms/${chatroomId}/messages/${messageId}`);
   return response.data;
 }
 
@@ -400,7 +412,7 @@ export async function addProximityReaction(
   messageId: number,
   data: AddReactionRequest
 ): Promise<{ message: string }> {
-  const response = await apiClient.post(`/proximity-chatrooms/${chatroomId}/messages/${messageId}/reactions`, data);
+  const response = await apiClient.post<{ message: string }>(`/proximity-chatrooms/${chatroomId}/messages/${messageId}/reactions`, data);
   return response.data;
 }
 
@@ -412,7 +424,7 @@ export async function removeProximityReaction(
   messageId: number,
   data: AddReactionRequest
 ): Promise<{ message: string }> {
-  const response = await apiClient.delete(`/proximity-chatrooms/${chatroomId}/messages/${messageId}/reactions`, { data });
+  const response = await apiClient.delete<{ message: string }>(`/proximity-chatrooms/${chatroomId}/messages/${messageId}/reactions`, { body: JSON.stringify(data) });
   return response.data;
 }
 
@@ -420,7 +432,7 @@ export async function removeProximityReaction(
  * Pin a message (moderator only)
  */
 export async function pinProximityMessage(chatroomId: number, messageId: number): Promise<{ message: string }> {
-  const response = await apiClient.post(`/proximity-chatrooms/${chatroomId}/messages/${messageId}/pin`);
+  const response = await apiClient.post<{ message: string }>(`/proximity-chatrooms/${chatroomId}/messages/${messageId}/pin`);
   return response.data;
 }
 
@@ -428,7 +440,7 @@ export async function pinProximityMessage(chatroomId: number, messageId: number)
  * Unpin a message (moderator only)
  */
 export async function unpinProximityMessage(chatroomId: number, messageId: number): Promise<{ message: string }> {
-  const response = await apiClient.delete(`/proximity-chatrooms/${chatroomId}/messages/${messageId}/pin`);
+  const response = await apiClient.delete<{ message: string }>(`/proximity-chatrooms/${chatroomId}/messages/${messageId}/pin`);
   return response.data;
 }
 
@@ -436,7 +448,7 @@ export async function unpinProximityMessage(chatroomId: number, messageId: numbe
  * Get pinned messages for a proximity chatroom
  */
 export async function getPinnedProximityMessages(chatroomId: number): Promise<ProximityChatroomMessage[]> {
-  const response = await apiClient.get(`/proximity-chatrooms/${chatroomId}/messages/pinned`);
+  const response = await apiClient.get<ProximityChatroomMessage[]>(`/proximity-chatrooms/${chatroomId}/messages/pinned`);
   return response.data;
 }
 
@@ -444,7 +456,7 @@ export async function getPinnedProximityMessages(chatroomId: number): Promise<Pr
  * Get networking messages
  */
 export async function getNetworkingMessages(chatroomId: number): Promise<MessageResponse> {
-  const response = await apiClient.get(`/proximity-chatrooms/${chatroomId}/messages/networking`);
+  const response = await apiClient.get<MessageResponse>(`/proximity-chatrooms/${chatroomId}/messages/networking`);
   return response.data;
 }
 
@@ -452,7 +464,7 @@ export async function getNetworkingMessages(chatroomId: number): Promise<Message
  * Get social messages
  */
 export async function getSocialMessages(chatroomId: number): Promise<MessageResponse> {
-  const response = await apiClient.get(`/proximity-chatrooms/${chatroomId}/messages/social`);
+  const response = await apiClient.get<MessageResponse>(`/proximity-chatrooms/${chatroomId}/messages/social`);
   return response.data;
 }
 
@@ -460,6 +472,6 @@ export async function getSocialMessages(chatroomId: number): Promise<MessageResp
  * Get message replies
  */
 export async function getProximityMessageReplies(chatroomId: number, messageId: number): Promise<ProximityChatroomMessage[]> {
-  const response = await apiClient.get(`/proximity-chatrooms/${chatroomId}/messages/${messageId}/replies`);
+  const response = await apiClient.get<ProximityChatroomMessage[]>(`/proximity-chatrooms/${chatroomId}/messages/${messageId}/replies`);
   return response.data;
 }

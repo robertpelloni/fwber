@@ -107,7 +107,7 @@ export async function getRecommendations(params?: {
     [key: string]: any;
   };
 }): Promise<RecommendationResponse> {
-  const response = await apiClient.get('/recommendations', { params });
+  const response = await apiClient.get<RecommendationResponse>('/recommendations', { params });
   return response.data;
 }
 
@@ -121,7 +121,7 @@ export async function getRecommendationsByType(
     context?: Record<string, any>;
   }
 ): Promise<RecommendationResponse> {
-  const response = await apiClient.get(`/recommendations/type/${type}`, { params });
+  const response = await apiClient.get<RecommendationResponse>(`/recommendations/type/${type}`, { params });
   return response.data;
 }
 
@@ -132,7 +132,7 @@ export async function getTrendingRecommendations(params?: {
   limit?: number;
   timeframe?: '24h' | '7d' | '30d';
 }): Promise<TrendingResponse> {
-  const response = await apiClient.get('/recommendations/trending', { params });
+  const response = await apiClient.get<TrendingResponse>('/recommendations/trending', { params });
   return response.data;
 }
 
@@ -143,7 +143,7 @@ export async function getPersonalizedFeed(params?: {
   page?: number;
   per_page?: number;
 }): Promise<FeedResponse> {
-  const response = await apiClient.get('/recommendations/feed', { params });
+  const response = await apiClient.get<FeedResponse>('/recommendations/feed', { params });
   return response.data;
 }
 
@@ -153,7 +153,7 @@ export async function getPersonalizedFeed(params?: {
 export async function submitRecommendationFeedback(
   feedback: RecommendationFeedback
 ): Promise<{ message: string; feedback_id: string }> {
-  const response = await apiClient.post('/recommendations/feedback', feedback);
+  const response = await apiClient.post<{ message: string; feedback_id: string }>('/recommendations/feedback', feedback);
   return response.data;
 }
 
@@ -163,7 +163,7 @@ export async function submitRecommendationFeedback(
 export async function getRecommendationAnalytics(params?: {
   timeframe?: string;
 }): Promise<RecommendationAnalyticsResponse> {
-  const response = await apiClient.get('/recommendations/analytics', { params });
+  const response = await apiClient.get<RecommendationAnalyticsResponse>('/recommendations/analytics', { params });
   return response.data;
 }
 

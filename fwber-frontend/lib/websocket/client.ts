@@ -423,7 +423,12 @@ export class WebSocketClient {
     channels: string[];
     heartbeat_interval: number;
   }> {
-    const response = await apiClient.post('/websocket/connect', {
+    const response = await apiClient.post<{
+      connection_id: string;
+      user_id: string;
+      channels: string[];
+      heartbeat_interval: number;
+    }>('/websocket/connect', {
       connection_data: {
         user_agent: navigator.userAgent,
         ip_address: '', // Will be determined by server
@@ -486,7 +491,12 @@ export function useWebSocket(
   }
 ) {
   const [client, setClient] = React.useState<WebSocketClient | null>(null);
-  const [connectionStatus, setConnectionStatus] = React.useState({
+  const [connectionStatus, setConnectionStatus] = React.useState<{
+    connected: boolean;
+    connectionId: string | null;
+    userId: string | null;
+    reconnectAttempts: number;
+  }>({
     connected: false,
     connectionId: null,
     userId: null,

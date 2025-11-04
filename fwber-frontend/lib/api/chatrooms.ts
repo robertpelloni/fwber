@@ -9,6 +9,7 @@ export interface Chatroom {
   city?: string;
   neighborhood?: string;
   created_by: number;
+  created_at: string;
   is_public: boolean;
   is_active: boolean;
   member_count: number;
@@ -168,7 +169,7 @@ export async function getChatrooms(filters: ChatroomFilters = {}): Promise<Chatr
   if (filters.search) params.append('search', filters.search);
   if (filters.sort) params.append('sort', filters.sort);
 
-  const response = await apiClient.get(`/chatrooms?${params.toString()}`);
+  const response = await apiClient.get<ChatroomResponse>(`/chatrooms?${params.toString()}`);
   return response.data;
 }
 
@@ -179,7 +180,7 @@ export async function getChatroom(id: number): Promise<{
   chatroom: Chatroom;
   messages: MessageResponse;
 }> {
-  const response = await apiClient.get(`/chatrooms/${id}`);
+  const response = await apiClient.get<{ chatroom: Chatroom; messages: MessageResponse }>(`/chatrooms/${id}`);
   return response.data;
 }
 
@@ -187,7 +188,7 @@ export async function getChatroom(id: number): Promise<{
  * Create a new chatroom
  */
 export async function createChatroom(data: CreateChatroomRequest): Promise<Chatroom> {
-  const response = await apiClient.post('/chatrooms', data);
+  const response = await apiClient.post<Chatroom>('/chatrooms', data);
   return response.data;
 }
 
@@ -195,7 +196,7 @@ export async function createChatroom(data: CreateChatroomRequest): Promise<Chatr
  * Join a chatroom
  */
 export async function joinChatroom(id: number): Promise<{ message: string }> {
-  const response = await apiClient.post(`/chatrooms/${id}/join`);
+  const response = await apiClient.post<{ message: string }>(`/chatrooms/${id}/join`);
   return response.data;
 }
 
@@ -203,7 +204,7 @@ export async function joinChatroom(id: number): Promise<{ message: string }> {
  * Leave a chatroom
  */
 export async function leaveChatroom(id: number): Promise<{ message: string }> {
-  const response = await apiClient.post(`/chatrooms/${id}/leave`);
+  const response = await apiClient.post<{ message: string }>(`/chatrooms/${id}/leave`);
   return response.data;
 }
 
@@ -211,7 +212,7 @@ export async function leaveChatroom(id: number): Promise<{ message: string }> {
  * Get chatroom members
  */
 export async function getChatroomMembers(id: number): Promise<MemberResponse> {
-  const response = await apiClient.get(`/chatrooms/${id}/members`);
+  const response = await apiClient.get<MemberResponse>(`/chatrooms/${id}/members`);
   return response.data;
 }
 
@@ -219,7 +220,7 @@ export async function getChatroomMembers(id: number): Promise<MemberResponse> {
  * Update chatroom settings (admin/moderator only)
  */
 export async function updateChatroom(id: number, data: Partial<CreateChatroomRequest>): Promise<Chatroom> {
-  const response = await apiClient.put(`/chatrooms/${id}`, data);
+  const response = await apiClient.put<Chatroom>(`/chatrooms/${id}`, data);
   return response.data;
 }
 
@@ -227,7 +228,7 @@ export async function updateChatroom(id: number, data: Partial<CreateChatroomReq
  * Delete chatroom (creator only)
  */
 export async function deleteChatroom(id: number): Promise<{ message: string }> {
-  const response = await apiClient.delete(`/chatrooms/${id}`);
+  const response = await apiClient.delete<{ message: string }>(`/chatrooms/${id}`);
   return response.data;
 }
 
@@ -235,7 +236,7 @@ export async function deleteChatroom(id: number): Promise<{ message: string }> {
  * Get user's chatrooms
  */
 export async function getMyChatrooms(): Promise<Chatroom[]> {
-  const response = await apiClient.get('/chatrooms/my');
+  const response = await apiClient.get<Chatroom[]>('/chatrooms/my');
   return response.data;
 }
 
@@ -243,7 +244,7 @@ export async function getMyChatrooms(): Promise<Chatroom[]> {
  * Get chatroom categories
  */
 export async function getChatroomCategories(): Promise<string[]> {
-  const response = await apiClient.get('/chatrooms/categories');
+  const response = await apiClient.get<string[]>('/chatrooms/categories');
   return response.data;
 }
 
@@ -251,7 +252,7 @@ export async function getChatroomCategories(): Promise<string[]> {
  * Get popular chatrooms
  */
 export async function getPopularChatrooms(): Promise<Chatroom[]> {
-  const response = await apiClient.get('/chatrooms/popular');
+  const response = await apiClient.get<Chatroom[]>('/chatrooms/popular');
   return response.data;
 }
 
@@ -265,7 +266,7 @@ export async function searchChatrooms(query: string, filters: Partial<ChatroomFi
   if (filters.category) params.append('category', filters.category);
   if (filters.city) params.append('city', filters.city);
 
-  const response = await apiClient.get(`/chatrooms/search?${params.toString()}`);
+  const response = await apiClient.get<ChatroomResponse>(`/chatrooms/search?${params.toString()}`);
   return response.data;
 }
 
@@ -283,7 +284,7 @@ export async function getChatroomMessages(
   if (filters.pinned !== undefined) params.append('pinned', filters.pinned.toString());
   if (filters.announcements !== undefined) params.append('announcements', filters.announcements.toString());
 
-  const response = await apiClient.get(`/chatrooms/${chatroomId}/messages?${params.toString()}`);
+  const response = await apiClient.get<MessageResponse>(`/chatrooms/${chatroomId}/messages?${params.toString()}`);
   return response.data;
 }
 
@@ -291,7 +292,7 @@ export async function getChatroomMessages(
  * Send a message to a chatroom
  */
 export async function sendMessage(chatroomId: number, data: SendMessageRequest): Promise<ChatroomMessage> {
-  const response = await apiClient.post(`/chatrooms/${chatroomId}/messages`, data);
+  const response = await apiClient.post<ChatroomMessage>(`/chatrooms/${chatroomId}/messages`, data);
   return response.data;
 }
 
@@ -299,7 +300,7 @@ export async function sendMessage(chatroomId: number, data: SendMessageRequest):
  * Get a specific message
  */
 export async function getMessage(chatroomId: number, messageId: number): Promise<ChatroomMessage> {
-  const response = await apiClient.get(`/chatrooms/${chatroomId}/messages/${messageId}`);
+  const response = await apiClient.get<ChatroomMessage>(`/chatrooms/${chatroomId}/messages/${messageId}`);
   return response.data;
 }
 
@@ -311,7 +312,7 @@ export async function editMessage(
   messageId: number,
   content: string
 ): Promise<ChatroomMessage> {
-  const response = await apiClient.put(`/chatrooms/${chatroomId}/messages/${messageId}`, { content });
+  const response = await apiClient.put<ChatroomMessage>(`/chatrooms/${chatroomId}/messages/${messageId}`, { content });
   return response.data;
 }
 
@@ -319,7 +320,7 @@ export async function editMessage(
  * Delete a message
  */
 export async function deleteMessage(chatroomId: number, messageId: number): Promise<{ message: string }> {
-  const response = await apiClient.delete(`/chatrooms/${chatroomId}/messages/${messageId}`);
+  const response = await apiClient.delete<{ message: string }>(`/chatrooms/${chatroomId}/messages/${messageId}`);
   return response.data;
 }
 
@@ -331,7 +332,7 @@ export async function addReaction(
   messageId: number,
   data: AddReactionRequest
 ): Promise<{ message: string }> {
-  const response = await apiClient.post(`/chatrooms/${chatroomId}/messages/${messageId}/reactions`, data);
+  const response = await apiClient.post<{ message: string }>(`/chatrooms/${chatroomId}/messages/${messageId}/reactions`, data);
   return response.data;
 }
 
@@ -343,7 +344,7 @@ export async function removeReaction(
   messageId: number,
   data: AddReactionRequest
 ): Promise<{ message: string }> {
-  const response = await apiClient.delete(`/chatrooms/${chatroomId}/messages/${messageId}/reactions`, { data });
+  const response = await apiClient.delete<{ message: string }>(`/chatrooms/${chatroomId}/messages/${messageId}/reactions`, { body: JSON.stringify(data) });
   return response.data;
 }
 
@@ -351,7 +352,7 @@ export async function removeReaction(
  * Pin a message (moderator only)
  */
 export async function pinMessage(chatroomId: number, messageId: number): Promise<{ message: string }> {
-  const response = await apiClient.post(`/chatrooms/${chatroomId}/messages/${messageId}/pin`);
+  const response = await apiClient.post<{ message: string }>(`/chatrooms/${chatroomId}/messages/${messageId}/pin`);
   return response.data;
 }
 
@@ -359,7 +360,7 @@ export async function pinMessage(chatroomId: number, messageId: number): Promise
  * Unpin a message (moderator only)
  */
 export async function unpinMessage(chatroomId: number, messageId: number): Promise<{ message: string }> {
-  const response = await apiClient.delete(`/chatrooms/${chatroomId}/messages/${messageId}/pin`);
+  const response = await apiClient.delete<{ message: string }>(`/chatrooms/${chatroomId}/messages/${messageId}/pin`);
   return response.data;
 }
 
@@ -367,7 +368,7 @@ export async function unpinMessage(chatroomId: number, messageId: number): Promi
  * Get pinned messages for a chatroom
  */
 export async function getPinnedMessages(chatroomId: number): Promise<ChatroomMessage[]> {
-  const response = await apiClient.get(`/chatrooms/${chatroomId}/messages/pinned`);
+  const response = await apiClient.get<ChatroomMessage[]>(`/chatrooms/${chatroomId}/messages/pinned`);
   return response.data;
 }
 
@@ -375,6 +376,7 @@ export async function getPinnedMessages(chatroomId: number): Promise<ChatroomMes
  * Get message replies
  */
 export async function getMessageReplies(chatroomId: number, messageId: number): Promise<ChatroomMessage[]> {
-  const response = await apiClient.get(`/chatrooms/${chatroomId}/messages/${messageId}/replies`);
+  const response = await apiClient.get<ChatroomMessage[]>(`/chatrooms/${chatroomId}/messages/${messageId}/replies`);
   return response.data;
 }
+

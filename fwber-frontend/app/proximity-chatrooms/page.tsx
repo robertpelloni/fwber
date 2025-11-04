@@ -21,7 +21,7 @@ export default function ProximityChatroomsPage() {
     error: null,
   });
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedType, setSelectedType] = useState<string>('all');
+  const [selectedType, setSelectedType] = useState<'all' | 'conference' | 'event' | 'venue' | 'area' | 'temporary'>('all');
   const [radius, setRadius] = useState(1000); // 1km default
   const [showCreateForm, setShowCreateForm] = useState(false);
 
@@ -61,7 +61,7 @@ export default function ProximityChatroomsPage() {
     latitude: location.latitude || 0,
     longitude: location.longitude || 0,
     radius_meters: radius,
-    type: selectedType === 'all' ? undefined : selectedType,
+    type: selectedType === 'all' ? undefined : selectedType as 'conference' | 'event' | 'venue' | 'area' | 'temporary',
     search: searchTerm || undefined,
   });
 

@@ -298,7 +298,7 @@ export const useContentGenerationWithFeedback = (
     try {
       await feedbackMutation.mutateAsync({
         content_id: contentId,
-        content_type: type === 'post_suggestions' ? 'post_suggestion' : type,
+        content_type: type === 'post_suggestions' ? 'post_suggestion' : type === 'conversation_starters' ? 'conversation_starter' : type,
         rating,
         feedback,
         improvements,

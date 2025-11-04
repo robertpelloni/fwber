@@ -176,7 +176,7 @@ export default function AIProfileBuilder({
                       name="style"
                       value={style.value}
                       checked={preferences.style === style.value}
-                      onChange={(e) => setPreferences(prev => ({ ...prev, style: e.target.value }))}
+                      onChange={(e) => setPreferences(prev => ({ ...prev, style: e.target.value as "casual" | "professional" | "humorous" | "romantic" }))}
                       className="mt-1"
                     />
                     <div>
