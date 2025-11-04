@@ -49,20 +49,35 @@ export interface PresenceUpdate {
 }
 
 /**
+ * Message delivery and read status
+ */
+export type MessageStatus = 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
+
+/**
  * Represents a direct message between users.
  * Supports both structured message objects and plain content.
  */
 export interface ChatMessage {
+  /** Unique message identifier */
+  id?: string;
+  /** Message ID for tracking acknowledgments */
+  message_id?: string;
   /** Sender's user ID */
   from_user_id: string;
   /** Recipient's user ID */
   to_user_id: string;
   /** Structured message object with content and type */
-  message?: { content?: string; type?: string };
+  message?: { content?: string; type?: string; id?: string };
   /** Plain text content (alternative to message object) */
   content?: string;
   /** When the message was sent */
   timestamp: string | number | Date;
+  /** Delivery and read status */
+  status?: MessageStatus;
+  /** When the message was delivered */
+  delivered_at?: string;
+  /** When the message was read */
+  read_at?: string;
   /** Additional message metadata (attachments, reactions, etc.) */
   metadata?: Record<string, any>;
 }
@@ -193,7 +208,37 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
   const handleChatMessage = useCallback((data: ChatMessage) => {
     logWebSocket.messageReceived('chat_message', data.from_user_id)
-    setChatMessages(prev => [...prev.slice(-99), data]); // Keep last 100 messages
+    // Set initial status for received messages
+    const messageWithStatus: ChatMessage = {
+      ...data,
+      status: 'delivered',
+      delivered_at: new Date().toISOString(),
+    };
+    setChatMessages(prev => [...prev.slice(-99), messageWithStatus]); // Keep last 100 messages
+  }, []);
+
+  const handleMessageDelivered = useCallback((data: { message_id: string; delivered_at: string }) => {
+    setChatMessages(prev => prev.map(msg => 
+      (msg.message_id === data.message_id || msg.id === data.message_id)
+        ? { ...msg, status: 'delivered' as MessageStatus, delivered_at: data.delivered_at }
+        : msg
+    ));
+  }, []);
+
+  const handleMessageRead = useCallback((data: { message_id: string; read_at: string }) => {
+    setChatMessages(prev => prev.map(msg => 
+      (msg.message_id === data.message_id || msg.id === data.message_id)
+        ? { ...msg, status: 'read' as MessageStatus, read_at: data.read_at }
+        : msg
+    ));
+  }, []);
+
+  const handleMessageFailed = useCallback((data: { messageId: string }) => {
+    setChatMessages(prev => prev.map(msg => 
+      (msg.message_id === data.messageId || msg.id === data.messageId)
+        ? { ...msg, status: 'failed' as MessageStatus }
+        : msg
+    ));
   }, []);
 
   const handleTypingIndicator = useCallback((data: TypingIndicator) => {
@@ -231,6 +276,9 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       wsClient.on('presence_update', handlePresenceUpdate);
       wsClient.on('notification', handleNotification);
       wsClient.on('chat_message', handleChatMessage);
+      wsClient.on('message_delivered', handleMessageDelivered);
+      wsClient.on('message_read', handleMessageRead);
+      wsClient.on('message_failed', handleMessageFailed);
       wsClient.on('typing_indicator', handleTypingIndicator);
       wsClient.on('error', handleError);
 
@@ -243,6 +291,9 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         wsClient.off('presence_update', handlePresenceUpdate);
         wsClient.off('notification', handleNotification);
         wsClient.off('chat_message', handleChatMessage);
+        wsClient.off('message_delivered', handleMessageDelivered);
+        wsClient.off('message_read', handleMessageRead);
+        wsClient.off('message_failed', handleMessageFailed);
         wsClient.off('typing_indicator', handleTypingIndicator);
         wsClient.off('error', handleError);
         wsClient.disconnect();
@@ -265,6 +316,9 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     handlePresenceUpdate,
     handleNotification,
     handleChatMessage,
+    handleMessageDelivered,
+    handleMessageRead,
+    handleMessageFailed,
     handleTypingIndicator,
     handleError,
   ]);
