@@ -16,6 +16,7 @@ use App\Http\Controllers\ProximityChatroomMessageController;
 use App\Http\Controllers\RateLimitController;
 use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\Api\RelationshipTierController;
+use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\WebSocketController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +37,14 @@ Route::middleware("api")->group(function (): void {
         // Matching routes
         Route::get("/matches", [MatchController::class, "index"]);
         Route::post("/matches/action", [MatchController::class, "action"]);
+        
+        // Message routes with tier tracking
+        Route::prefix("messages")->group(function (): void {
+            Route::get("/unread-count", [MessageController::class, "unreadCount"]);
+            Route::get("/{userId}", [MessageController::class, "index"]);
+            Route::post("/", [MessageController::class, "store"]);
+            Route::post("/{messageId}/read", [MessageController::class, "markAsRead"]);
+        });
         
         // Relationship Tier routes
         Route::prefix("matches/{matchId}")->group(function (): void {
