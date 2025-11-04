@@ -34,7 +34,6 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Form submitted', formData)
     setIsLoading(true)
     clearError()
     setValidationError(null)
@@ -42,7 +41,6 @@ export default function RegisterPage() {
 
     // Client-side validation
     if (formData.password !== formData.passwordConfirmation) {
-      console.log('Password mismatch detected!')
       setValidationError('Passwords do not match')
       setIsLoading(false)
       return
@@ -61,7 +59,6 @@ export default function RegisterPage() {
         router.push('/dashboard')
       }, 1500)
     } catch (error) {
-      console.error('Registration error:', error)
       setValidationError(error instanceof Error ? error.message : 'Registration failed. Please try again.')
     } finally {
       setIsLoading(false)
