@@ -13,6 +13,8 @@ export default function RegisterPage() {
     passwordConfirmation: '',
   })
   const [isLoading, setIsLoading] = useState(false)
+  const [validationError, setValidationError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const { register, error, clearError, isAuthenticated } = useAuth()
   const router = useRouter()
 
@@ -33,18 +35,31 @@ export default function RegisterPage() {
     e.preventDefault()
     setIsLoading(true)
     clearError()
+    setValidationError(null)
+    setSuccessMessage(null)
 
+    // Client-side validation
     if (formData.password !== formData.passwordConfirmation) {
-      // This should be handled by the auth context, but let's add it here too
+      setValidationError('Passwords do not match')
+      setIsLoading(false)
+      return
+    }
+
+    if (formData.password.length < 8) {
+      setValidationError('Password must be at least 8 characters')
       setIsLoading(false)
       return
     }
 
     try {
       await register(formData.name, formData.email, formData.password, formData.passwordConfirmation)
-      router.push('/dashboard')
+      setSuccessMessage('Account created successfully! Redirecting...')
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 1500)
     } catch (error) {
-      // Error is handled by the auth context
+      console.error('Registration error:', error)
+      setValidationError(error instanceof Error ? error.message : 'Registration failed. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -139,9 +154,15 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {error && (
+          {successMessage && (
+            <div className="rounded-md bg-green-50 p-4">
+              <div className="text-sm text-green-700">{successMessage}</div>
+            </div>
+          )}
+
+          {(error || validationError) && (
             <div className="rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-700">{error}</div>
+              <div className="text-sm text-red-700">{validationError || error}</div>
             </div>
           )}
 
