@@ -33,6 +33,7 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log('Form submitted', formData)
     setIsLoading(true)
     clearError()
     setValidationError(null)
@@ -40,6 +41,7 @@ export default function RegisterPage() {
 
     // Client-side validation
     if (formData.password !== formData.passwordConfirmation) {
+      console.log('Password mismatch detected!')
       setValidationError('Passwords do not match')
       setIsLoading(false)
       return
@@ -155,14 +157,14 @@ export default function RegisterPage() {
           </div>
 
           {successMessage && (
-            <div className="rounded-md bg-green-50 p-4">
-              <div className="text-sm text-green-700">{successMessage}</div>
+            <div className="rounded-md bg-green-50 border border-green-200 p-4">
+              <div className="text-sm font-medium text-green-800">{successMessage}</div>
             </div>
           )}
 
           {(error || validationError) && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-700">{validationError || error}</div>
+            <div className="rounded-md bg-red-50 border border-red-200 p-4">
+              <div className="text-sm font-medium text-red-800">{validationError || error}</div>
             </div>
           )}
 
