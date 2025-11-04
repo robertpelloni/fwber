@@ -114,7 +114,7 @@ export default function ChatroomPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Chatroom not found</h1>
-          <p className="text-gray-600 mb-4">The chatroom you're looking for doesn't exist or you don't have access to it.</p>
+          <p className="text-gray-600 mb-4">The chatroom you&apos;re looking for doesn&apos;t exist or you don&apos;t have access to it.</p>
           <button
             onClick={() => router.push('/chatrooms')}
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"

@@ -46,8 +46,8 @@ export default function DashboardPage() {
                   <div className="bg-white p-6 rounded-lg shadow">
                     <h3 className="text-lg font-medium text-gray-900 mb-2">Profile</h3>
                     <p className="text-gray-600 mb-4">
-                      {user?.profile?.profile_complete 
-                        ? `Profile ${user.profile.completion_percentage}% complete`
+                      {user?.profile?.bio 
+                        ? 'Profile set up'
                         : 'Complete your profile to get started'
                       }
                     </p>
@@ -183,19 +183,19 @@ export default function DashboardPage() {
                     <div>
                       <span className="font-medium text-gray-700">Member since:</span>
                       <span className="ml-2 text-gray-600">
-                        {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
+                        {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                       </span>
                     </div>
                     <div>
                       <span className="font-medium text-gray-700">Email verified:</span>
                       <span className="ml-2 text-gray-600">
-                        {user?.email_verified ? 'Yes' : 'No'}
+                        {user?.emailVerifiedAt ? 'Yes' : 'No'}
                       </span>
                     </div>
                     <div>
-                      <span className="font-medium text-gray-700">Last online:</span>
+                      <span className="font-medium text-gray-700">Last updated:</span>
                       <span className="ml-2 text-gray-600">
-                        {user?.last_online ? new Date(user.last_online).toLocaleString() : 'N/A'}
+                        {user?.updatedAt ? new Date(user.updatedAt).toLocaleString() : 'N/A'}
                       </span>
                     </div>
                   </div>

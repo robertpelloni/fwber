@@ -1,7 +1,5 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/proximity-chatrooms/page": "app/proximity-chatrooms/page.js",
-  "/login/page": "app/login/page.js",
+  "/photos/page": "app/photos/page.js",
   "/dashboard/page": "app/dashboard/page.js",
-  "/recommendations/page": "app/recommendations/page.js"
+  "/profile/page": "app/profile/page.js"
 }

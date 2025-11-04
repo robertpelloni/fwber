@@ -99,7 +99,7 @@ export default function MatchesPage() {
             <div className="text-center">
               <h1 className="text-3xl font-bold text-gray-900 mb-4">No Matches Found</h1>
               <p className="text-gray-600 mb-8">
-                We couldn't find any potential matches for you right now. 
+                We couldn&apos;t find any potential matches for you right now. 
                 Try updating your profile or preferences to find more people.
               </p>
               <div className="space-x-4">

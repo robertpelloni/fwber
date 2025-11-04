@@ -655,7 +655,7 @@ export default function ProfilePage() {
                     <option value="">Select preference</option>
                     <option value="have-children">Have children</option>
                     <option value="want-children">Want children</option>
-                    <option value="dont-want-children">Don't want children</option>
+                    <option value="dont-want-children">Don&apos;t want children</option>
                     <option value="maybe-someday">Maybe someday</option>
                     <option value="not-sure">Not sure</option>
                   </select>
@@ -773,9 +773,9 @@ export default function ProfilePage() {
                     <option value="">Select education</option>
                     <option value="high-school">High School</option>
                     <option value="some-college">Some College</option>
-                    <option value="associates">Associate's Degree</option>
-                    <option value="bachelors">Bachelor's Degree</option>
-                    <option value="masters">Master's Degree</option>
+                    <option value="associates">Associate&apos;s Degree</option>
+                    <option value="bachelors">Bachelor&apos;s Degree</option>
+                    <option value="masters">Master&apos;s Degree</option>
                     <option value="phd">PhD</option>
                     <option value="other">Other</option>
                   </select>

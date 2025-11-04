@@ -255,7 +255,7 @@ export default function LocationSettingsPage() {
               <div className="text-gray-400 text-6xl mb-4">📍</div>
               <h3 className="text-xl font-semibold text-gray-600 mb-2">No Location Data</h3>
               <p className="text-gray-500 mb-6">
-                You haven't shared your location yet. Enable location sharing to discover people nearby!
+                You haven&apos;t shared your location yet. Enable location sharing to discover people nearby!
               </p>
               <button
                 onClick={handleUpdateLocation}
@@ -271,7 +271,7 @@ export default function LocationSettingsPage() {
           <div className="mt-8 p-6 bg-yellow-50 rounded-lg">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">About Location Sharing</h3>
             <ul className="text-sm text-gray-600 space-y-1">
-              <li>• Your location is only shared when you're actively using the app</li>
+              <li>• Your location is only shared when you&apos;re actively using the app</li>
               <li>• You can change your privacy settings at any time</li>
               <li>• Location data is encrypted and stored securely</li>
               <li>• You can clear your location history to stop sharing</li>
