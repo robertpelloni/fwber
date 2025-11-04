@@ -21,6 +21,11 @@ export default function TierUpgradeNotification({
   const tierInfo = getTierInfo(newTier)
   const previousTierInfo = getTierInfo(previousTier)
 
+  // Don't show if tiers are the same (prevents showing on initial render)
+  if (previousTier === newTier) {
+    return null
+  }
+
   useEffect(() => {
     // Fade in animation
     setTimeout(() => setIsVisible(true), 100)

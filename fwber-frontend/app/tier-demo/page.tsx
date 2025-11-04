@@ -9,15 +9,15 @@ import TierUpgradeNotification from '@/components/TierUpgradeNotification'
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
-// Mock data
+// Mock data - using data URLs to avoid broken images
 const mockPhotos = [
-  { id: '1', url: '/api/placeholder/400/400', isPrimary: true, type: 'ai' as const },
-  { id: '2', url: '/api/placeholder/400/400', isPrimary: false, type: 'ai' as const },
-  { id: '3', url: '/api/placeholder/400/400', isPrimary: false, type: 'real' as const },
-  { id: '4', url: '/api/placeholder/400/400', isPrimary: false, type: 'real' as const },
-  { id: '5', url: '/api/placeholder/400/400', isPrimary: false, type: 'real' as const },
-  { id: '6', url: '/api/placeholder/400/400', isPrimary: false, type: 'real' as const },
-  { id: '7', url: '/api/placeholder/400/400', isPrimary: false, type: 'real' as const },
+  { id: '1', url: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect width="400" height="400" fill="%234f46e5"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="48" fill="white"%3EAI Photo 1%3C/text%3E%3C/svg%3E', isPrimary: true, type: 'ai' as const },
+  { id: '2', url: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect width="400" height="400" fill="%236366f1"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="48" fill="white"%3EAI Photo 2%3C/text%3E%3C/svg%3E', isPrimary: false, type: 'ai' as const },
+  { id: '3', url: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect width="400" height="400" fill="%2310b981"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="48" fill="white"%3EReal Photo 1%3C/text%3E%3C/svg%3E', isPrimary: false, type: 'real' as const },
+  { id: '4', url: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect width="400" height="400" fill="%2314b8a6"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="48" fill="white"%3EReal Photo 2%3C/text%3E%3C/svg%3E', isPrimary: false, type: 'real' as const },
+  { id: '5', url: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect width="400" height="400" fill="%2306b6d4"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="48" fill="white"%3EReal Photo 3%3C/text%3E%3C/svg%3E', isPrimary: false, type: 'real' as const },
+  { id: '6', url: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect width="400" height="400" fill="%233b82f6"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="48" fill="white"%3EReal Photo 4%3C/text%3E%3C/svg%3E', isPrimary: false, type: 'real' as const },
+  { id: '7', url: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect width="400" height="400" fill="%238b5cf6"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="48" fill="white"%3EReal Photo 5%3C/text%3E%3C/svg%3E', isPrimary: false, type: 'real' as const },
 ]
 
 export default function TierDemoPage() {
