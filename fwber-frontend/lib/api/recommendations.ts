@@ -107,7 +107,14 @@ export async function getRecommendations(params?: {
     [key: string]: any;
   };
 }): Promise<RecommendationResponse> {
-  const response = await apiClient.get<RecommendationResponse>('/recommendations', { params });
+  // Serialize complex params (arrays/objects) for query string compatibility
+  const serializedParams = {
+    limit: params?.limit,
+    types: params?.types ? params.types.join(',') : undefined,
+    context: params?.context ? JSON.stringify(params.context) : undefined,
+  } as const;
+
+  const response = await apiClient.get<RecommendationResponse>('/recommendations', { params: serializedParams });
   return response.data;
 }
 
@@ -121,7 +128,12 @@ export async function getRecommendationsByType(
     context?: Record<string, any>;
   }
 ): Promise<RecommendationResponse> {
-  const response = await apiClient.get<RecommendationResponse>(`/recommendations/type/${type}`, { params });
+  const serializedParams = {
+    limit: params?.limit,
+    context: params?.context ? JSON.stringify(params.context) : undefined,
+  } as const;
+
+  const response = await apiClient.get<RecommendationResponse>(`/recommendations/type/${type}`, { params: serializedParams });
   return response.data;
 }
 

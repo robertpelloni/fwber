@@ -31,7 +31,7 @@ export default function BulletinBoardsPage() {
   
   const { data: boardData, isLoading: boardLoading } = useBulletinBoard(
     selectedBoardId || 0,
-    location
+    location || undefined
   );
   
   const { data: messagesData, isLoading: messagesLoading } = useBulletinBoardMessages(

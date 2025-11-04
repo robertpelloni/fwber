@@ -21,7 +21,7 @@ export default function ProximityChatroomsPage() {
     error: null,
   });
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedType, setSelectedType] = useState<'all' | 'conference' | 'event' | 'venue' | 'area' | 'temporary'>('all');
+  const [selectedType, setSelectedType] = useState<'all' | 'conference' | 'event' | 'venue' | 'area' | 'temporary' | 'networking' | 'social' | 'dating' | 'professional' | 'casual'>('all');
   const [radius, setRadius] = useState(1000); // 1km default
   const [showCreateForm, setShowCreateForm] = useState(false);
 
@@ -61,7 +61,7 @@ export default function ProximityChatroomsPage() {
     latitude: location.latitude || 0,
     longitude: location.longitude || 0,
     radius_meters: radius,
-    type: selectedType === 'all' ? undefined : selectedType as 'conference' | 'event' | 'venue' | 'area' | 'temporary',
+    type: (['conference','event','venue','area','temporary'] as const).includes(selectedType as any) ? (selectedType as 'conference' | 'event' | 'venue' | 'area' | 'temporary') : undefined,
     search: searchTerm || undefined,
   });
 
@@ -78,7 +78,9 @@ export default function ProximityChatroomsPage() {
         latitude: location.latitude,
         longitude: location.longitude,
         radius_meters: formData.radius_meters || 500,
-        type: formData.type || 'social',
+        type: (['conference','event','venue','area','temporary'] as const).includes((formData.type as string))
+          ? (formData.type as 'conference' | 'event' | 'venue' | 'area' | 'temporary')
+          : 'temporary',
         is_public: formData.is_public !== false,
       });
 
@@ -180,7 +182,7 @@ export default function ProximityChatroomsPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
               <select
                 value={selectedType}
-                onChange={(e) => setSelectedType(e.target.value)}
+                onChange={(e) => setSelectedType(e.target.value as any)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="all">All Types</option>

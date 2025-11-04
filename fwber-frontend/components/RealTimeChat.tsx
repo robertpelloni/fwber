@@ -3,6 +3,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { useWebSocketChat } from '@/lib/hooks/use-websocket';
 
+interface ChatMessage {
+  from_user_id?: string;
+  to_user_id?: string;
+  message?: { content?: string };
+  content?: string;
+  timestamp: string | number | Date;
+}
+
+interface OnlineUser { user_id: string; status?: string }
+
 interface RealTimeChatProps {
   recipientId: string;
   recipientName?: string;
@@ -83,12 +93,12 @@ export default function RealTimeChat({
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.length === 0 ? (
+        {(messages as ChatMessage[]).length === 0 ? (
           <div className="text-center text-gray-400 py-8">
             <p>No messages yet. Start a conversation!</p>
           </div>
         ) : (
-          messages.map((msg, index) => (
+          (messages as ChatMessage[]).map((msg, index) => (
             <div
               key={index}
               className={`flex ${msg.from_user_id === recipientId ? 'justify-start' : 'justify-end'}`}
@@ -142,14 +152,14 @@ export function ChatList({ className = '' }: { className?: string }) {
   const { chatMessages, onlineUsers } = useWebSocketChat();
   
   // Group messages by conversation
-  const conversations = chatMessages.reduce((acc, msg) => {
-    const otherUserId = msg.from_user_id || msg.to_user_id;
+  const conversations = (chatMessages as ChatMessage[]).reduce<Record<string, ChatMessage[]>>((acc, msg) => {
+    const otherUserId = msg.from_user_id || msg.to_user_id || '';
     if (!acc[otherUserId]) {
       acc[otherUserId] = [];
     }
     acc[otherUserId].push(msg);
     return acc;
-  }, {} as Record<string, any[]>);
+  }, {});
 
   return (
     <div className={`bg-gray-800 rounded-lg ${className}`}>
@@ -160,7 +170,7 @@ export function ChatList({ className = '' }: { className?: string }) {
       <div className="divide-y divide-gray-700">
         {Object.entries(conversations).map(([userId, messages]) => {
           const lastMessage = messages[messages.length - 1];
-          const isOnline = onlineUsers.some(user => user.user_id === userId);
+          const isOnline = (onlineUsers as OnlineUser[]).some(user => user.user_id === userId);
           
           return (
             <div key={userId} className="p-4 hover:bg-gray-700 cursor-pointer transition-colors">
@@ -202,14 +212,14 @@ export function OnlineUsers({ className = '' }: { className?: string }) {
   return (
     <div className={`bg-gray-800 rounded-lg ${className}`}>
       <div className="p-4 border-b border-gray-700">
-        <h3 className="text-white font-semibold">Online Users ({onlineUsers.length})</h3>
+        <h3 className="text-white font-semibold">Online Users ({(onlineUsers as OnlineUser[]).length})</h3>
       </div>
       
       <div className="p-4 space-y-3">
-        {onlineUsers.length === 0 ? (
+        {(onlineUsers as OnlineUser[]).length === 0 ? (
           <p className="text-gray-400 text-center py-4">No users online</p>
         ) : (
-          onlineUsers.map((user) => (
+          (onlineUsers as OnlineUser[]).map((user) => (
             <div key={user.user_id} className="flex items-center space-x-3">
               <div className="relative">
                 <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">

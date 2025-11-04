@@ -185,6 +185,7 @@ export interface FindNearbyRequest {
   type?: 'conference' | 'event' | 'venue' | 'area' | 'temporary';
   venue_type?: string;
   tags?: string[];
+  search?: string;
 }
 
 export interface UpdateLocationRequest {
@@ -257,6 +258,7 @@ export async function findNearby(filters: FindNearbyRequest): Promise<ProximityC
   if (filters.tags) {
     filters.tags.forEach(tag => params.append('tags[]', tag));
   }
+  if (filters.search) params.append('search', filters.search);
 
   const response = await apiClient.get<ProximityChatroomResponse>(`/proximity-chatrooms/nearby?${params.toString()}`);
   return response.data;

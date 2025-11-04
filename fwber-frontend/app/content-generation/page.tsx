@@ -75,10 +75,10 @@ export default function ContentGenerationPage() {
                   onContentChange={(content) => setGeneratedContent(content)}
                   context={{
                     location: {
-                      latitude: user?.latitude || 0,
-                      longitude: user?.longitude || 0,
+                      latitude: (user as any)?.latitude ?? (user as any)?.profile?.location?.latitude ?? 0,
+                      longitude: (user as any)?.longitude ?? (user as any)?.profile?.location?.longitude ?? 0,
                     },
-                    interests: user?.interests || [],
+                    interests: ((user as any)?.interests as string[] | undefined) ?? [],
                   }}
                   placeholder="Start writing your content here..."
                   maxLength={1000}
