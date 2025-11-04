@@ -17,6 +17,46 @@ export interface WebSocketMessage {
   user_id?: string;
 }
 
+export interface OnlineUser {
+  user_id: string;
+  status?: string;
+  last_seen?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface PresenceUpdate {
+  user_id: string;
+  status: string;
+  timestamp: string;
+  metadata?: Record<string, any>;
+}
+
+export interface ChatMessage {
+  from_user_id: string;
+  to_user_id: string;
+  message?: { content?: string; type?: string };
+  content?: string;
+  timestamp: string | number | Date;
+  metadata?: Record<string, any>;
+}
+
+export interface TypingIndicator {
+  from_user_id: string;
+  to_user_id: string;
+  is_typing: boolean;
+  timestamp: string;
+}
+
+export interface NotificationPayload {
+  id?: string;
+  type: string;
+  title?: string;
+  message?: string;
+  data?: any;
+  timestamp: string;
+  read?: boolean;
+}
+
 export interface UseWebSocketOptions {
   autoConnect?: boolean;
   heartbeatInterval?: number;
@@ -35,11 +75,11 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     reconnectAttempts: 0,
   });
   const [messages, setMessages] = useState<WebSocketMessage[]>([]);
-  const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
-  const [presenceUpdates, setPresenceUpdates] = useState<any[]>([]);
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [chatMessages, setChatMessages] = useState<any[]>([]);
-  const [typingIndicators, setTypingIndicators] = useState<any[]>([]);
+  const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
+  const [presenceUpdates, setPresenceUpdates] = useState<PresenceUpdate[]>([]);
+  const [notifications, setNotifications] = useState<NotificationPayload[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [typingIndicators, setTypingIndicators] = useState<TypingIndicator[]>([]);
 
   const wsUrl = options.wsUrl || process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8080';
   const token = user?.token || '';
@@ -105,7 +145,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     setMessages(prev => [...prev.slice(-99), message]); // Keep last 100 messages
   }, []);
 
-  const handlePresenceUpdate = useCallback((data: any) => {
+  const handlePresenceUpdate = useCallback((data: PresenceUpdate) => {
     console.log('Presence update:', data);
     setPresenceUpdates(prev => [...prev.slice(-49), data]); // Keep last 50 updates
     
@@ -118,23 +158,23 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
           updated[existingIndex] = { ...updated[existingIndex], ...data };
           return updated;
         } else {
-          return [...prev, data];
+          return [...prev, { user_id: data.user_id, status: data.status, last_seen: data.timestamp, metadata: data.metadata }];
         }
       });
     }
   }, []);
 
-  const handleNotification = useCallback((data: any) => {
+  const handleNotification = useCallback((data: NotificationPayload) => {
     console.log('Notification received:', data);
     setNotifications(prev => [...prev.slice(-49), data]); // Keep last 50 notifications
   }, []);
 
-  const handleChatMessage = useCallback((data: any) => {
+  const handleChatMessage = useCallback((data: ChatMessage) => {
     console.log('Chat message received:', data);
     setChatMessages(prev => [...prev.slice(-99), data]); // Keep last 100 messages
   }, []);
 
-  const handleTypingIndicator = useCallback((data: any) => {
+  const handleTypingIndicator = useCallback((data: TypingIndicator) => {
     console.log('Typing indicator:', data);
     setTypingIndicators(prev => {
       const filtered = prev.filter(item => 

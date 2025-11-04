@@ -19,6 +19,8 @@ export interface ProximityChatroom {
   neighborhood?: string;
   address?: string;
   tags?: string[];
+  is_networking?: boolean;
+  is_social?: boolean;
   settings?: Record<string, any>;
   created_by: number;
   owner_id: number; // Added for compatibility

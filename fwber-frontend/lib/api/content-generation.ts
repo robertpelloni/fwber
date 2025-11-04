@@ -334,7 +334,7 @@ export function analyzeContentQuality(content: string): {
   // Engagement score based on question marks, exclamation marks, and emojis
   const questionMarks = (content.match(/\?/g) || []).length;
   const exclamationMarks = (content.match(/!/g) || []).length;
-  const emojis = (content.match(/[\x{1F600}-\x{1F64F}]|[\x{1F300}-\x{1F5FF}]|[\x{1F680}-\x{1F6FF}]|[\x{1F1E0}-\x{1F1FF}]|[\x{2600}-\x{26FF}]|[\x{2700}-\x{27BF}]/gu) || []).length;
+  const emojis = (content.match(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu) || []).length;
   const engagement = Math.min(1, (questionMarks * 0.3 + exclamationMarks * 0.2 + emojis * 0.1) / 5);
   
   // Clarity score based on sentence length and complexity

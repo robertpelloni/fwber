@@ -78,7 +78,9 @@ export default function ProximityChatroomPage({ params }: ProximityChatroomPageP
   // Hooks
   const { data: chatroom, isLoading: chatroomLoading } = useProximityChatroom(
     chatroomId,
-    location.latitude && location.longitude ? location : undefined
+    (location && location.latitude != null && location.longitude != null)
+      ? { latitude: location.latitude, longitude: location.longitude }
+      : undefined
   );
   
   const { data: messages, isLoading: messagesLoading } = useProximityChatroomMessages(chatroomId, {
@@ -225,7 +227,7 @@ export default function ProximityChatroomPage({ params }: ProximityChatroomPageP
   }
 
   const isMember = members?.data?.some(member => member.user_id === user?.id);
-  const isOwner = chatroom.owner_id === user?.id;
+  const isOwner = String(chatroom.owner_id) === String(user?.id);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -275,9 +277,9 @@ export default function ProximityChatroomPage({ params }: ProximityChatroomPageP
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                      chatroom.type === 'networking' ? 'bg-blue-100 text-blue-800' :
-                      chatroom.type === 'social' ? 'bg-green-100 text-green-800' :
-                      chatroom.type === 'dating' ? 'bg-pink-100 text-pink-800' :
+                      chatroom.is_networking ? 'bg-blue-100 text-blue-800' :
+                      chatroom.is_social ? 'bg-green-100 text-green-800' :
+                      chatroom.tags?.includes('dating') ? 'bg-pink-100 text-pink-800' :
                       'bg-gray-100 text-gray-800'
                     }`}>
                       {chatroom.type}

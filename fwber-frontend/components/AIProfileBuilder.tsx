@@ -31,7 +31,12 @@ export default function AIProfileBuilder({
   const [isGenerating, setIsGenerating] = useState(false);
   
   const { user } = useAuth();
-  const { data: generatedContent, isLoading, error, refetch } = useProfileContentGeneration(preferences);
+  const { data: generatedContent, isLoading, error, refetch } = useProfileContentGeneration({
+    ...preferences,
+    style: (['casual','professional','humorous','romantic'] as readonly string[]).includes(preferences.style)
+      ? (preferences.style as 'casual' | 'professional' | 'humorous' | 'romantic')
+      : undefined,
+  });
   const feedbackMutation = useContentFeedback();
 
   const handleGenerateProfile = async () => {

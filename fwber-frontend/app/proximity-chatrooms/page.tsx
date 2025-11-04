@@ -78,7 +78,7 @@ export default function ProximityChatroomsPage() {
         latitude: location.latitude,
         longitude: location.longitude,
         radius_meters: formData.radius_meters || 500,
-        type: (['conference','event','venue','area','temporary'] as const).includes((formData.type as string))
+        type: (['conference','event','venue','area','temporary'] as readonly string[]).includes((formData.type as string))
           ? (formData.type as 'conference' | 'event' | 'venue' | 'area' | 'temporary')
           : 'temporary',
         is_public: formData.is_public !== false,
@@ -259,9 +259,9 @@ export default function ProximityChatroomsPage() {
                   <div className="flex items-center space-x-3 mb-2">
                     <h3 className="text-lg font-semibold text-gray-900">{chatroom.name}</h3>
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                      chatroom.type === 'networking' ? 'bg-blue-100 text-blue-800' :
-                      chatroom.type === 'social' ? 'bg-green-100 text-green-800' :
-                      chatroom.type === 'dating' ? 'bg-pink-100 text-pink-800' :
+                      chatroom.is_networking ? 'bg-blue-100 text-blue-800' :
+                      chatroom.is_social ? 'bg-green-100 text-green-800' :
+                      chatroom.tags?.includes('dating') ? 'bg-pink-100 text-pink-800' :
                       'bg-gray-100 text-gray-800'
                     }`}>
                       {chatroom.type}

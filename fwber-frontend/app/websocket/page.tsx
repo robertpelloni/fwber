@@ -7,7 +7,7 @@ import { useWebSocket, useWebSocketPresence, useWebSocketNotifications } from '@
 import RealTimeChat, { ChatList, OnlineUsers } from '@/components/RealTimeChat';
 
 export default function WebSocketPage() {
-  const { user, isAuthenticated, loading } = useAuth();
+  const { user, isAuthenticated, isLoading: loading } = useAuth();
   const router = useRouter();
   const [selectedRecipient, setSelectedRecipient] = useState<string>('');
   const [testMessage, setTestMessage] = useState('');

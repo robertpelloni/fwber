@@ -1,17 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { useWebSocketChat } from '@/lib/hooks/use-websocket';
-
-interface ChatMessage {
-  from_user_id?: string;
-  to_user_id?: string;
-  message?: { content?: string };
-  content?: string;
-  timestamp: string | number | Date;
-}
-
-interface OnlineUser { user_id: string; status?: string }
+import { useWebSocketChat, ChatMessage, OnlineUser } from '@/lib/hooks/use-websocket';
 
 interface RealTimeChatProps {
   recipientId: string;

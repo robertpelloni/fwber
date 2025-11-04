@@ -18,7 +18,7 @@ import {
 import { useLocation } from '@/lib/hooks/use-location';
 
 export default function RecommendationsPage() {
-  const { user, isAuthenticated, loading } = useAuth();
+  const { user, isAuthenticated, isLoading: loading } = useAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('mixed');
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
