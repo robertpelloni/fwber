@@ -150,6 +150,18 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     }));
   }, []);
 
+  const handleReconnecting = useCallback((data: any) => {
+    logWebSocket.reconnecting(data.attempt, data.maxAttempts, data.delay);
+    setConnectionStatus(prev => ({
+      ...prev,
+      reconnectAttempts: data.attempt,
+    }));
+  }, []);
+
+  const handleReconnectFailed = useCallback((data: any) => {
+    logWebSocket.reconnectFailed(data.attempts);
+  }, []);
+
   const handleMessage = useCallback((message: WebSocketMessage) => {
     console.log('WebSocket message received:', message);
     setMessages(prev => [...prev.slice(-99), message]); // Keep last 100 messages
@@ -213,6 +225,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       // Set up event listeners
       wsClient.on('connection', handleConnection);
       wsClient.on('disconnection', handleDisconnection);
+      wsClient.on('reconnecting', handleReconnecting);
+      wsClient.on('max_reconnect_attempts', handleReconnectFailed);
       wsClient.on('message', handleMessage);
       wsClient.on('presence_update', handlePresenceUpdate);
       wsClient.on('notification', handleNotification);
@@ -223,6 +237,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       return () => {
         wsClient.off('connection', handleConnection);
         wsClient.off('disconnection', handleDisconnection);
+        wsClient.off('reconnecting', handleReconnecting);
+        wsClient.off('max_reconnect_attempts', handleReconnectFailed);
         wsClient.off('message', handleMessage);
         wsClient.off('presence_update', handlePresenceUpdate);
         wsClient.off('notification', handleNotification);
@@ -243,6 +259,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     options.reconnectDelay,
     handleConnection,
     handleDisconnection,
+    handleReconnecting,
+    handleReconnectFailed,
     handleMessage,
     handlePresenceUpdate,
     handleNotification,

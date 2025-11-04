@@ -1,5 +1,6 @@
 import React from 'react';
 import { apiClient } from '../api/client';
+import { logWebSocket } from '../logger';
 
 export interface WebSocketMessage {
   type: string;
@@ -73,11 +74,16 @@ export class WebSocketClient {
   private userId: string | null = null;
   private heartbeatInterval: number = 30000; // 30 seconds
   private heartbeatTimer: NodeJS.Timeout | null = null;
+  private heartbeatTimeoutTimer: NodeJS.Timeout | null = null;
+  private heartbeatTimeout: number = 60000; // 60 seconds
+  private lastHeartbeatResponse: number = Date.now();
   private reconnectAttempts: number = 0;
   private maxReconnectAttempts: number = 5;
   private reconnectDelay: number = 1000; // 1 second
+  private maxReconnectDelay: number = 30000; // 30 seconds max
   private isConnecting: boolean = false;
   private messageQueue: WebSocketMessage[] = [];
+  private pendingMessages: Map<string, { message: WebSocketMessage; timestamp: number; retries: number }> = new Map();
   private eventListeners: Map<string, Function[]> = new Map();
 
   constructor(
@@ -141,6 +147,11 @@ export class WebSocketClient {
       this.heartbeatTimer = null;
     }
 
+    if (this.heartbeatTimeoutTimer) {
+      clearTimeout(this.heartbeatTimeoutTimer);
+      this.heartbeatTimeoutTimer = null;
+    }
+
     if (this.ws) {
       this.ws.close();
       this.ws = null;
@@ -152,21 +163,45 @@ export class WebSocketClient {
   }
 
   /**
-   * Send message to WebSocket server
+   * Send message to WebSocket server with acknowledgment tracking
    */
-  public send(message: WebSocketMessage): void {
+  public send(message: WebSocketMessage, requireAck: boolean = false): string | void {
+    const messageId = this.generateMessageId();
+    const messageWithId = { ...message, message_id: messageId };
+    
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify(message));
+      this.ws.send(JSON.stringify(messageWithId));
+      logWebSocket.messageSent(message.type, message.data?.to_user_id, messageId);
+      
+      // Track message for acknowledgment if required
+      if (requireAck) {
+        this.pendingMessages.set(messageId, {
+          message: messageWithId,
+          timestamp: Date.now(),
+          retries: 0,
+        });
+        return messageId;
+      }
     } else {
       // Queue message if not connected
-      this.messageQueue.push(message);
+      this.messageQueue.push(messageWithId);
+      logWebSocket.messageQueued(messageId, this.messageQueue.length);
+      
+      if (requireAck) {
+        this.pendingMessages.set(messageId, {
+          message: messageWithId,
+          timestamp: Date.now(),
+          retries: 0,
+        });
+        return messageId;
+      }
     }
   }
 
   /**
-   * Send chat message
+   * Send chat message with acknowledgment
    */
-  public sendChatMessage(recipientId: string, content: string, type: string = 'text'): void {
+  public sendChatMessage(recipientId: string, content: string, type: string = 'text'): string | void {
     const message: WebSocketMessage = {
       type: 'chat_message',
       data: {
@@ -181,7 +216,7 @@ export class WebSocketClient {
       timestamp: new Date().toISOString(),
     };
 
-    this.send(message);
+    return this.send(message, true); // Require acknowledgment for chat messages
   }
 
   /**
@@ -297,15 +332,19 @@ export class WebSocketClient {
    * Handle WebSocket open
    */
   private handleOpen(): void {
-    console.log('WebSocket connected');
+    logWebSocket.connected(this.connectionId || undefined);
     this.isConnecting = false;
     this.reconnectAttempts = 0;
+    this.lastHeartbeatResponse = Date.now();
     
     // Start heartbeat
     this.startHeartbeat();
     
     // Send queued messages
     this.sendQueuedMessages();
+    
+    // Retry pending messages
+    this.retryPendingMessages();
     
     // Emit connection event
     this.emit('connection', {
@@ -321,6 +360,19 @@ export class WebSocketClient {
     try {
       const message: WebSocketMessage = JSON.parse(event.data);
       
+      // Track heartbeat response
+      if (message.type === 'heartbeat_ack' || message.type === 'pong') {
+        this.lastHeartbeatResponse = Date.now();
+        this.resetHeartbeatTimeout();
+        logWebSocket.heartbeatReceived();
+      }
+      
+      // Handle message acknowledgment
+      if (message.type === 'message_ack' && message.data?.message_id) {
+        this.pendingMessages.delete(message.data.message_id);
+        logWebSocket.messageAcknowledged(message.data.message_id);
+      }
+      
       // Emit message event
       this.emit('message', message);
       
@@ -329,6 +381,7 @@ export class WebSocketClient {
       
     } catch (error) {
       console.error('Failed to parse WebSocket message:', error);
+      logWebSocket.error(error, 'message parsing');
     }
   }
 
@@ -336,11 +389,16 @@ export class WebSocketClient {
    * Handle WebSocket close
    */
   private handleClose(event: CloseEvent): void {
-    console.log('WebSocket disconnected:', event.code, event.reason);
+    logWebSocket.disconnected(`${event.code}: ${event.reason}`);
     
     if (this.heartbeatTimer) {
       clearInterval(this.heartbeatTimer);
       this.heartbeatTimer = null;
+    }
+    
+    if (this.heartbeatTimeoutTimer) {
+      clearTimeout(this.heartbeatTimeoutTimer);
+      this.heartbeatTimeoutTimer = null;
     }
     
     this.isConnecting = false;
@@ -359,24 +417,33 @@ export class WebSocketClient {
    * Handle WebSocket error
    */
   private handleError(error: Event): void {
-    console.error('WebSocket error:', error);
+    logWebSocket.error(error, 'WebSocket connection error');
     this.emit('error', error);
   }
 
   /**
-   * Handle reconnection
+   * Handle reconnection with exponential backoff
    */
   private handleReconnect(): void {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.log('Max reconnection attempts reached');
+      logWebSocket.reconnectFailed(this.reconnectAttempts);
       this.emit('max_reconnect_attempts', { attempts: this.reconnectAttempts });
       return;
     }
 
     this.reconnectAttempts++;
-    const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
     
-    console.log(`Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+    // Exponential backoff: 1s, 2s, 4s, 8s, 16s, capped at 30s
+    const exponentialDelay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
+    const delay = Math.min(exponentialDelay, this.maxReconnectDelay);
+    
+    logWebSocket.reconnecting(this.reconnectAttempts, this.maxReconnectAttempts, delay);
+    
+    this.emit('reconnecting', { 
+      attempt: this.reconnectAttempts, 
+      maxAttempts: this.maxReconnectAttempts,
+      delay 
+    });
     
     setTimeout(() => {
       this.connect();
@@ -384,22 +451,59 @@ export class WebSocketClient {
   }
 
   /**
-   * Start heartbeat
+   * Start heartbeat with timeout detection
    */
   private startHeartbeat(): void {
     if (this.heartbeatTimer) {
       clearInterval(this.heartbeatTimer);
     }
 
+    this.lastHeartbeatResponse = Date.now();
+    
     this.heartbeatTimer = setInterval(() => {
       if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+        // Check if we've received a response recently
+        const timeSinceLastResponse = Date.now() - this.lastHeartbeatResponse;
+        if (timeSinceLastResponse > this.heartbeatTimeout) {
+          logWebSocket.heartbeatTimeout(timeSinceLastResponse);
+          this.emit('heartbeat_timeout', { timeSinceLastResponse });
+          // Force reconnection
+          if (this.ws) {
+            this.ws.close();
+          }
+          return;
+        }
+        
+        // Send heartbeat ping
         this.send({
           type: 'heartbeat',
           data: { timestamp: new Date().toISOString() },
           timestamp: new Date().toISOString(),
         });
+        logWebSocket.heartbeatSent();
+        
+        // Start timeout timer
+        this.resetHeartbeatTimeout();
       }
     }, this.heartbeatInterval);
+  }
+
+  /**
+   * Reset heartbeat timeout timer
+   */
+  private resetHeartbeatTimeout(): void {
+    if (this.heartbeatTimeoutTimer) {
+      clearTimeout(this.heartbeatTimeoutTimer);
+    }
+    
+    this.heartbeatTimeoutTimer = setTimeout(() => {
+      logWebSocket.heartbeatTimeout(this.heartbeatTimeout);
+      this.emit('heartbeat_timeout', { timeout: this.heartbeatTimeout });
+      // Force reconnection
+      if (this.ws) {
+        this.ws.close();
+      }
+    }, this.heartbeatTimeout);
   }
 
   /**
@@ -408,10 +512,39 @@ export class WebSocketClient {
   private sendQueuedMessages(): void {
     while (this.messageQueue.length > 0) {
       const message = this.messageQueue.shift();
-      if (message) {
-        this.send(message);
+      if (message && this.ws && this.ws.readyState === WebSocket.OPEN) {
+        this.ws.send(JSON.stringify(message));
       }
     }
+  }
+
+  /**
+   * Retry pending messages that haven't been acknowledged
+   */
+  private retryPendingMessages(): void {
+    const now = Date.now();
+    const maxRetries = 3;
+    const retryTimeout = 5000; // 5 seconds
+    
+    this.pendingMessages.forEach((pending, messageId) => {
+      const timeSinceMessage = now - pending.timestamp;
+      
+      // Retry if message is older than timeout and hasn't exceeded max retries
+      if (timeSinceMessage > retryTimeout && pending.retries < maxRetries) {
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(JSON.stringify(pending.message));
+          pending.retries++;
+          pending.timestamp = now;
+          logWebSocket.messageRetry(messageId, pending.retries);
+          this.emit('message_retry', { messageId, retries: pending.retries });
+        }
+      } else if (pending.retries >= maxRetries) {
+        // Give up after max retries
+        this.pendingMessages.delete(messageId);
+        logWebSocket.messageFailed(messageId, pending.retries);
+        this.emit('message_failed', { messageId, retries: pending.retries });
+      }
+    });
   }
 
   /**

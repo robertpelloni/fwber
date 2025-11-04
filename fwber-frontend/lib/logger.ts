@@ -117,20 +117,36 @@ export const logWebSocket = {
     log('websocket', 'warn', 'WebSocket disconnected', { reason });
   },
 
-  reconnecting: (attempt: number, maxAttempts: number) => {
-    log('websocket', 'info', 'WebSocket reconnecting', { attempt, maxAttempts });
+  reconnecting: (attempt: number, maxAttempts: number, delay?: number) => {
+    log('websocket', 'info', 'WebSocket reconnecting', { attempt, maxAttempts, delay });
   },
 
   reconnectFailed: (attempts: number) => {
     log('websocket', 'error', 'WebSocket reconnection failed after max attempts', { attempts });
   },
 
-  messageSent: (type: string, recipientId?: string) => {
-    log('websocket', 'debug', 'Message sent', { type, recipientId });
+  messageSent: (type: string, recipientId?: string, messageId?: string) => {
+    log('websocket', 'debug', 'Message sent', { type, recipientId, messageId });
   },
 
   messageReceived: (type: string, senderId?: string) => {
     log('websocket', 'debug', 'Message received', { type, senderId });
+  },
+
+  messageQueued: (messageId: string, queueSize: number) => {
+    log('websocket', 'debug', 'Message queued (offline)', { messageId, queueSize });
+  },
+
+  messageAcknowledged: (messageId: string) => {
+    log('websocket', 'debug', 'Message acknowledged', { messageId });
+  },
+
+  messageRetry: (messageId: string, retries: number) => {
+    log('websocket', 'warn', 'Message retry attempt', { messageId, retries });
+  },
+
+  messageFailed: (messageId: string, retries: number) => {
+    log('websocket', 'error', 'Message delivery failed after retries', { messageId, retries });
   },
 
   error: (error: any, context?: string) => {
@@ -143,6 +159,10 @@ export const logWebSocket = {
 
   heartbeatReceived: () => {
     log('websocket', 'debug', 'Heartbeat pong received');
+  },
+
+  heartbeatTimeout: (timeSinceLastResponse?: number) => {
+    log('websocket', 'warn', 'Heartbeat timeout - forcing reconnection', { timeSinceLastResponse });
   },
 };
 
