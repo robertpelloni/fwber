@@ -15,6 +15,7 @@ use App\Http\Controllers\ProximityChatroomController;
 use App\Http\Controllers\ProximityChatroomMessageController;
 use App\Http\Controllers\RateLimitController;
 use App\Http\Controllers\RecommendationController;
+use App\Http\Controllers\Api\RelationshipTierController;
 use App\Http\Controllers\WebSocketController;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +36,13 @@ Route::middleware("api")->group(function (): void {
         // Matching routes
         Route::get("/matches", [MatchController::class, "index"]);
         Route::post("/matches/action", [MatchController::class, "action"]);
+        
+        // Relationship Tier routes
+        Route::prefix("matches/{matchId}")->group(function (): void {
+            Route::get("/tier", [RelationshipTierController::class, "show"]);
+            Route::post("/tier/update", [RelationshipTierController::class, "update"]);
+            Route::get("/photos", [RelationshipTierController::class, "getPhotos"]);
+        });
         
         // Photo routes (Phase 4A - Multi-AI Photo Upload System)
         Route::get("/photos", [PhotoController::class, "index"]);
