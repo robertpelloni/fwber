@@ -17,43 +17,88 @@ export interface WebSocketMessage {
   user_id?: string;
 }
 
+/**
+ * Represents an online user in the WebSocket connection.
+ * Tracks user presence status and metadata.
+ */
 export interface OnlineUser {
+  /** Unique identifier for the user */
   user_id: string;
+  /** Current presence status (online, away, busy, offline) */
   status?: string;
+  /** ISO timestamp of last activity */
   last_seen?: string;
+  /** Additional user metadata */
   metadata?: Record<string, any>;
 }
 
+/**
+ * Represents a real-time presence status update.
+ * Emitted when a user's online status changes.
+ */
 export interface PresenceUpdate {
+  /** User who changed status */
   user_id: string;
+  /** New presence status */
   status: string;
+  /** ISO timestamp when status changed */
   timestamp: string;
+  /** Additional context about the status change */
   metadata?: Record<string, any>;
 }
 
+/**
+ * Represents a direct message between users.
+ * Supports both structured message objects and plain content.
+ */
 export interface ChatMessage {
+  /** Sender's user ID */
   from_user_id: string;
+  /** Recipient's user ID */
   to_user_id: string;
+  /** Structured message object with content and type */
   message?: { content?: string; type?: string };
+  /** Plain text content (alternative to message object) */
   content?: string;
+  /** When the message was sent */
   timestamp: string | number | Date;
+  /** Additional message metadata (attachments, reactions, etc.) */
   metadata?: Record<string, any>;
 }
 
+/**
+ * Represents a typing indicator in a chat conversation.
+ * Shows when a user starts or stops typing.
+ */
 export interface TypingIndicator {
+  /** User who is typing */
   from_user_id: string;
+  /** User being typed to */
   to_user_id: string;
+  /** Whether user is currently typing */
   is_typing: boolean;
+  /** ISO timestamp of the typing event */
   timestamp: string;
 }
 
+/**
+ * Represents a real-time notification payload.
+ * Can be used for system alerts, user mentions, or custom events.
+ */
 export interface NotificationPayload {
+  /** Unique notification identifier */
   id?: string;
+  /** Notification category (mention, like, follow, system, etc.) */
   type: string;
+  /** Notification title/heading */
   title?: string;
+  /** Notification body text */
   message?: string;
+  /** Additional structured data for the notification */
   data?: any;
+  /** ISO timestamp when notification was created */
   timestamp: string;
+  /** Whether the notification has been read by the user */
   read?: boolean;
 }
 
