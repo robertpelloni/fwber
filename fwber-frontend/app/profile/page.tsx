@@ -14,7 +14,7 @@ export default function ProfilePage() {
   const { isAuthenticated, user, token, isLoading: authLoading } = useAuth()
   const router = useRouter()
   // Fallback dev token support
-  const localToken = typeof window !== 'undefined' ? (localStorage.getItem('auth_token') || '') : ''
+  const localToken = typeof window !== 'undefined' ? (localStorage.getItem('fwber_token') || '') : ''
   const effectiveToken = token || localToken
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [completeness, setCompleteness] = useState<number>(0)
@@ -132,7 +132,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     // Check for dev token as fallback
-    const hasDevToken = typeof window !== 'undefined' && localStorage.getItem('auth_token') === 'dev'
+    const hasDevToken = typeof window !== 'undefined' && localStorage.getItem('fwber_token') === 'dev'
     
     if (!authLoading && !isAuthenticated && !hasDevToken) {
       router.push('/login')

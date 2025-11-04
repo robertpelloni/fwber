@@ -159,9 +159,53 @@ export default function PhotoUpload({
     },
     maxFiles: maxPhotos - photos.length - previews.length,
     disabled: photos.length + previews.length >= maxPhotos,
-    noClick: false, // Allow clicking the dropzone
+    noClick: true, // Disable click on the entire dropzone
     noKeyboard: false, // Allow keyboard navigation
   })
+
+  // Full-page drag and drop listener
+  useEffect(() => {
+    const handleDragEnter = (e: DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      if (e.dataTransfer?.types.includes('Files')) {
+        setDragActive(true)
+      }
+    }
+
+    const handleDragOver = (e: DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+
+    const handleDragLeave = (e: DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      // Only deactivate if leaving the window
+      if (e.target === document || e.target === document.documentElement) {
+        setDragActive(false)
+      }
+    }
+
+    const handleDrop = (e: DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      setDragActive(false)
+    }
+
+    // Add listeners to the document
+    document.addEventListener('dragenter', handleDragEnter)
+    document.addEventListener('dragover', handleDragOver)
+    document.addEventListener('dragleave', handleDragLeave)
+    document.addEventListener('drop', handleDrop)
+
+    return () => {
+      document.removeEventListener('dragenter', handleDragEnter)
+      document.removeEventListener('dragover', handleDragOver)
+      document.removeEventListener('dragleave', handleDragLeave)
+      document.removeEventListener('drop', handleDrop)
+    }
+  }, [])
   
 
   const removePreview = (id: string) => {
@@ -180,9 +224,32 @@ export default function PhotoUpload({
 
   return (
     <div className={`space-y-6 ${className}`}>
+      {/* Full-page drag overlay */}
+      {dragActive && (
+        <div 
+          {...getRootProps()}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-primary/10 backdrop-blur-sm"
+          style={{ pointerEvents: 'auto' }}
+        >
+          <input {...getInputProps()} />
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-8 shadow-2xl border-4 border-dashed border-primary">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="p-6 rounded-full bg-primary/20">
+                <Upload className="w-16 h-16 text-primary" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                Drop photos here
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Release to upload (max {maxPhotos - totalPhotos} more)
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Upload Area */}
       <div
-        {...getRootProps()}
         className={`
           relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer
           transition-all duration-200 ease-in-out
@@ -192,6 +259,11 @@ export default function PhotoUpload({
           }
           ${totalPhotos >= maxPhotos ? 'opacity-50 cursor-not-allowed' : ''}
         `}
+        onClick={() => {
+          if (totalPhotos < maxPhotos) {
+            open()
+          }
+        }}
         style={{
           pointerEvents: totalPhotos >= maxPhotos ? 'none' : 'auto',
           userSelect: 'none',
@@ -199,7 +271,7 @@ export default function PhotoUpload({
           minHeight: '200px',
         }}
       >
-        <input {...getInputProps()} ref={fileInputRef} style={{ pointerEvents: 'auto', cursor: 'pointer' }} />
+        <input {...getInputProps()} ref={fileInputRef} style={{ display: 'none' }} />
         
         <div 
           className="flex flex-col items-center space-y-4"
