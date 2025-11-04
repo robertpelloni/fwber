@@ -13,28 +13,39 @@ use Illuminate\Support\Facades\Auth;
 class RelationshipTierController extends Controller
 {
     /**
+     * Verify user is authorized to access this match and return the match with tier
+     */
+    private function authorizeAndLoadMatch(int $matchId): UserMatch
+    {
+        $match = UserMatch::with('relationshipTier')->findOrFail($matchId);
+
+        $userId = Auth::id();
+        if ($match->user1_id !== $userId && $match->user2_id !== $userId) {
+            abort(403, 'Unauthorized');
+        }
+
+        return $match;
+    }
+
+    /**
+     * Get or create tier for a match
+     */
+    private function getOrCreateTier(UserMatch $match): RelationshipTier
+    {
+        return $match->relationshipTier ?? RelationshipTier::create([
+            'match_id' => $match->id,
+            'current_tier' => 'matched',
+            'first_matched_at' => $match->created_at,
+        ]);
+    }
+
+    /**
      * Get tier progress for a specific match
      */
     public function show(int $matchId): JsonResponse
     {
-        $match = UserMatch::with('relationshipTier')->findOrFail($matchId);
-        
-        // Verify user is part of this match
-        $userId = Auth::id();
-        if ($match->user1_id !== $userId && $match->user2_id !== $userId) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
-        $tier = $match->relationshipTier;
-        
-        if (!$tier) {
-            // Create initial tier record if it doesn't exist
-            $tier = RelationshipTier::create([
-                'match_id' => $matchId,
-                'current_tier' => 'matched',
-                'first_matched_at' => $match->created_at,
-            ]);
-        }
+        $match = $this->authorizeAndLoadMatch($matchId);
+        $tier = $this->getOrCreateTier($match);
 
         // Update days connected
         $tier->updateDaysConnected();
@@ -56,19 +67,8 @@ class RelationshipTierController extends Controller
      */
     public function update(Request $request, int $matchId): JsonResponse
     {
-        $match = UserMatch::with('relationshipTier')->findOrFail($matchId);
-        
-        // Verify user is part of this match
-        $userId = Auth::id();
-        if ($match->user1_id !== $userId && $match->user2_id !== $userId) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
-        $tier = $match->relationshipTier ?? RelationshipTier::create([
-            'match_id' => $matchId,
-            'current_tier' => 'matched',
-            'first_matched_at' => $match->created_at,
-        ]);
+        $match = $this->authorizeAndLoadMatch($matchId);
+        $tier = $this->getOrCreateTier($match);
 
         $validated = $request->validate([
             'increment_messages' => 'sometimes|boolean',
@@ -104,25 +104,11 @@ class RelationshipTierController extends Controller
      */
     public function getPhotos(int $matchId): JsonResponse
     {
-        $match = UserMatch::with('relationshipTier')->findOrFail($matchId);
-        
-        // Verify user is part of this match
-        $userId = Auth::id();
-        if ($match->user1_id !== $userId && $match->user2_id !== $userId) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
-        $tier = $match->relationshipTier;
-        
-        if (!$tier) {
-            $tier = RelationshipTier::create([
-                'match_id' => $matchId,
-                'current_tier' => 'matched',
-                'first_matched_at' => $match->created_at,
-            ]);
-        }
+        $match = $this->authorizeAndLoadMatch($matchId);
+        $tier = $this->getOrCreateTier($match);
 
         // Get the other user's photos
+        $userId = Auth::id();
         $otherUser = $match->getOtherUser($userId);
         
         $aiPhotos = Photo::where('user_id', $otherUser->id)
