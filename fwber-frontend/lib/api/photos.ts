@@ -41,7 +41,7 @@ class PhotoAPI {
     }
 
     // Add authorization header if token exists
-    const token = localStorage.getItem('auth_token')
+    const token = localStorage.getItem('fwber_token')
     if (token) {
       defaultHeaders['Authorization'] = `Bearer ${token}`
     }
@@ -94,7 +94,7 @@ class PhotoAPI {
       formData.append('photo', file) // Backend expects 'photo', not 'photos[...]'
       
       const url = `${this.baseUrl}/photos`
-      const token = localStorage.getItem('auth_token')
+      const token = localStorage.getItem('fwber_token')
       
       try {
         // Simulate progress for better UX

@@ -14,7 +14,7 @@ export interface RequestOptions extends RequestInit {
  * Get authorization headers from localStorage
  */
 function getAuthHeaders(): Record<string, string> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('fwber_token') : null;
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
