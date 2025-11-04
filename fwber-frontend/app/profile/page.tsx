@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import { getUserProfile, updateUserProfile, getProfileCompleteness, type UserProfile, type ProfileUpdateData } from '@/lib/api/profile'
@@ -8,6 +8,7 @@ import { usePhotos } from '@/lib/api/photos'
 import PhotoUpload from '@/components/PhotoUpload'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Camera, Star } from 'lucide-react'
+import { ProfileCompletenessBar, ProfileCompletenessChecklist, calculateProfileCompleteness, type ProfileField } from '@/lib/profileCompleteness'
 
 export default function ProfilePage() {
   const { isAuthenticated, user, token, isLoading: authLoading } = useAuth()
@@ -90,6 +91,44 @@ export default function ProfilePage() {
       meeting_preference: '',
     },
   })
+
+  // Calculate completeness from current form data
+  const currentCompleteness = useMemo(() => {
+    return calculateProfileCompleteness({
+      displayName: formData.display_name,
+      age: formData.date_of_birth ? Math.floor((Date.now() - new Date(formData.date_of_birth).getTime()) / 31536000000) : undefined,
+      location: formData.location.city && formData.location.state 
+        ? `${formData.location.city}, ${formData.location.state}` 
+        : undefined,
+      bio: formData.bio,
+      photos: photos.map(p => p.url),
+      interests: [...formData.preferences.hobbies, ...formData.preferences.music, ...formData.preferences.sports],
+      occupation: formData.preferences.occupation,
+      education: formData.preferences.education,
+      height: formData.preferences.height_min,
+      religion: formData.preferences.religion,
+      politics: formData.preferences.politics,
+      drinking: formData.preferences.drinking,
+      smoking: formData.preferences.smoking
+    });
+  }, [
+    formData.display_name,
+    formData.date_of_birth,
+    formData.location.city,
+    formData.location.state,
+    formData.bio,
+    formData.preferences.hobbies,
+    formData.preferences.music,
+    formData.preferences.sports,
+    formData.preferences.occupation,
+    formData.preferences.education,
+    formData.preferences.height_min,
+    formData.preferences.religion,
+    formData.preferences.politics,
+    formData.preferences.drinking,
+    formData.preferences.smoking,
+    photos
+  ]);
 
   useEffect(() => {
     // Check for dev token as fallback
@@ -287,31 +326,77 @@ export default function ProfilePage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Complete Your Profile</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Complete Your Profile</h1>
+          <p className="mt-2 text-gray-600 dark:text-gray-300">
             Help others get to know you better. Complete your profile to find better matches.
           </p>
           
-          {/* Progress Bar */}
+          {/* Profile Completeness Bar */}
           <div className="mt-4">
-            <div className="flex justify-between text-sm text-gray-600 mb-2">
-              <span>Profile Completion</span>
-              <span>{completeness}%</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${completeness}%` }}
-              ></div>
-            </div>
+            <ProfileCompletenessBar 
+              percentage={currentCompleteness.percentage}
+            />
           </div>
+
+          {/* Celebration Message at 100% */}
+          {currentCompleteness.percentage === 100 && (
+            <div className="mt-4 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-4 border border-green-200 dark:border-green-800">
+              <div className="flex items-center space-x-2">
+                <Star className="w-5 h-5 text-yellow-500 fill-current" />
+                <span className="text-green-800 dark:text-green-200 font-semibold">
+                  🎉 Amazing! Your profile is 100% complete!
+                </span>
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* Profile Completeness Checklist */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Profile Checklist</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ProfileCompletenessChecklist 
+              completeness={currentCompleteness}
+              onFieldClick={(field: ProfileField) => {
+                // Scroll to the corresponding field
+                const fieldMap: Record<string, string> = {
+                  name: 'display_name',
+                  age: 'date_of_birth',
+                  location: 'city',
+                  bio: 'bio',
+                  photos: 'photos',
+                  interests: 'hobbies',
+                  occupation: 'occupation',
+                  education: 'education',
+                  height: 'height_min',
+                  religion: 'religion',
+                  politics: 'politics',
+                  drinking: 'drinking',
+                  smoking: 'smoking'
+                }
+                const elementId = fieldMap[field.key]
+                if (elementId) {
+                  const element = document.getElementById(elementId)
+                  element?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                  element?.focus()
+                  // Add highlight animation
+                  element?.classList.add('ring-4', 'ring-blue-500', 'ring-opacity-50')
+                  setTimeout(() => {
+                    element?.classList.remove('ring-4', 'ring-blue-500', 'ring-opacity-50')
+                  }, 2000)
+                }
+              }}
+            />
+          </CardContent>
+        </Card>
 
         {/* Profile Form */}
         <div className="bg-white shadow rounded-lg">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             {/* Photo Upload Section */}
-            <Card>
+            <Card id="photos">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Camera className="w-5 h-5" />
@@ -510,7 +595,7 @@ export default function ProfilePage() {
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Location</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="city" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     City
                   </label>
                   <input
@@ -544,7 +629,21 @@ export default function ProfilePage() {
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Lifestyle Preferences</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
-                  <label htmlFor="smoking" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="occupation" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Occupation
+                  </label>
+                  <input
+                    type="text"
+                    id="occupation"
+                    value={formData.preferences.occupation}
+                    onChange={(e) => handlePreferenceChange('occupation', e.target.value)}
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="Your job or profession"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="smoking" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Smoking
                   </label>
                   <select
@@ -563,7 +662,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label htmlFor="drinking" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="drinking" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Drinking
                   </label>
                   <select
@@ -668,7 +767,21 @@ export default function ProfilePage() {
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Dating Preferences</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
-                  <label htmlFor="age_range_min" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="height_min" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Your Height
+                  </label>
+                  <input
+                    type="text"
+                    id="height_min"
+                    value={formData.preferences.height_min}
+                    onChange={(e) => handlePreferenceChange('height_min', e.target.value)}
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="e.g., 5'10&quot; or 178cm"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="age_range_min" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Minimum Age
                   </label>
                   <input
@@ -718,7 +831,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label htmlFor="religion" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="religion" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Religion
                   </label>
                   <select
@@ -742,7 +855,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label htmlFor="politics" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="politics" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Politics
                   </label>
                   <select
@@ -761,7 +874,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label htmlFor="education" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="education" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Education Level
                   </label>
                   <select
@@ -788,10 +901,10 @@ export default function ProfilePage() {
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Interests & Hobbies</h2>
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     Hobbies
                   </label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3" id="hobbies">
                     {['reading', 'writing', 'photography', 'cooking', 'gardening', 'art', 'music', 'dancing', 'hiking', 'traveling', 'gaming', 'sports', 'fitness', 'yoga', 'meditation', 'volunteering'].map((hobby) => (
                       <label key={hobby} className="flex items-center">
                         <input
