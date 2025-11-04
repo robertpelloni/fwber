@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { useWebSocketChat, ChatMessage, OnlineUser } from '@/lib/hooks/use-websocket';
+import { useWebSocketChat, ChatMessage, OnlineUser, useWebSocket } from '@/lib/hooks/use-websocket';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { MessageMetadata } from '@/components/MessageStatusIndicator';
 import { UserAvatar, PresenceIndicator, PresenceStatus } from '@/components/PresenceIndicator';
@@ -19,6 +19,7 @@ export default function RealTimeChat({
 }: RealTimeChatProps) {
   const [message, setMessage] = useState('');
   const [isConnected, setIsConnected] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
   
@@ -30,6 +31,18 @@ export default function RealTimeChat({
     handleTypingChange,
     isTyping,
   } = useWebSocketChat(recipientId);
+
+  const { loadConversationHistory } = useWebSocket();
+
+  // Load conversation history on mount
+  useEffect(() => {
+    if (recipientId && user?.id) {
+      setLoadingHistory(true);
+      loadConversationHistory(recipientId).finally(() => {
+        setLoadingHistory(false);
+      });
+    }
+  }, [recipientId, user?.id, loadConversationHistory]);
 
   // Find recipient's online status
   const recipientUser = (onlineUsers as OnlineUser[]).find(u => u.user_id === recipientId);

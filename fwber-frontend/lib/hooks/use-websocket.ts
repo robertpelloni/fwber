@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { createWebSocketClient, WebSocketClient, WebSocketMessage as WSMessage } from '@/lib/websocket/client';
 import { logWebSocket } from '@/lib/logger';
+import { storeMessage, updateMessageStatus, getConversationMessages } from '@/lib/messageStorage';
 
 export interface WebSocketConnectionStatus {
   connected: boolean;
@@ -215,6 +216,11 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       delivered_at: new Date().toISOString(),
     };
     setChatMessages(prev => [...prev.slice(-99), messageWithStatus]); // Keep last 100 messages
+    
+    // Store message in IndexedDB for offline access
+    storeMessage(messageWithStatus).catch(err => 
+      console.error('Failed to store message:', err)
+    );
   }, []);
 
   const handleMessageDelivered = useCallback((data: { message_id: string; delivered_at: string }) => {
@@ -223,6 +229,11 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         ? { ...msg, status: 'delivered' as MessageStatus, delivered_at: data.delivered_at }
         : msg
     ));
+    
+    // Update status in IndexedDB
+    updateMessageStatus(data.message_id, 'delivered', data.delivered_at).catch(err =>
+      console.error('Failed to update message status:', err)
+    );
   }, []);
 
   const handleMessageRead = useCallback((data: { message_id: string; read_at: string }) => {
@@ -231,6 +242,11 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         ? { ...msg, status: 'read' as MessageStatus, read_at: data.read_at }
         : msg
     ));
+    
+    // Update status in IndexedDB
+    updateMessageStatus(data.message_id, 'read', data.read_at).catch(err =>
+      console.error('Failed to update message status:', err)
+    );
   }, []);
 
   const handleMessageFailed = useCallback((data: { messageId: string }) => {
@@ -239,6 +255,11 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         ? { ...msg, status: 'failed' as MessageStatus }
         : msg
     ));
+    
+    // Update status in IndexedDB
+    updateMessageStatus(data.messageId, 'failed').catch(err =>
+      console.error('Failed to update message status:', err)
+    );
   }, []);
 
   const handleTypingIndicator = useCallback((data: TypingIndicator) => {
@@ -359,11 +380,21 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       
       setChatMessages(prev => [...prev.slice(-99), optimisticMessage]);
       
+      // Store optimistic message in IndexedDB
+      storeMessage(optimisticMessage).catch(err =>
+        console.error('Failed to store optimistic message:', err)
+      );
+      
       // Update to 'sent' after a brief delay (will be updated to 'delivered' when server confirms)
       setTimeout(() => {
         setChatMessages(prev => prev.map(msg => 
           msg.message_id === messageId ? { ...msg, status: 'sent' as MessageStatus } : msg
         ));
+        
+        // Update status in IndexedDB
+        updateMessageStatus(messageId as string, 'sent').catch(err =>
+          console.error('Failed to update sent status:', err)
+        );
       }, 100);
     }
   }, [client, user]);
@@ -430,6 +461,20 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     return client?.getConnectionStatus() || connectionStatus;
   }, [client, connectionStatus]);
 
+  // Load conversation history from IndexedDB
+  const loadConversationHistory = useCallback(async (recipientId: string) => {
+    if (!user?.id) return;
+    
+    try {
+      const messages = await getConversationMessages(user.id, recipientId);
+      setChatMessages(messages);
+      return messages;
+    } catch (error) {
+      console.error('Failed to load conversation history:', error);
+      return [];
+    }
+  }, [user]);
+
   return {
     // State
     connectionStatus,
@@ -449,6 +494,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     updatePresence,
     sendNotification,
     markMessageAsRead,
+    loadConversationHistory,
     
     // Utilities
     clearMessages,
