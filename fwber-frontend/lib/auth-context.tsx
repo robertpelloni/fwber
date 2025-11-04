@@ -7,25 +7,25 @@ interface User {
   id: number
   email: string
   name: string
-  email_verified: boolean
-  created_at: string
-  last_online: string
+  emailVerifiedAt: string | null
+  createdAt: string
+  updatedAt: string
   profile?: {
-    display_name: string | null
-    bio: string | null
-    age: number | null
+    displayName: string | null
+    dateOfBirth: string | null
     gender: string | null
-    looking_for: string[]
-    location: {
-      latitude: number | null
-      longitude: number | null
-      max_distance: number
-      city: string | null
-      state: string | null
-    }
-    preferences: Record<string, any>
-    profile_complete: boolean
-    completion_percentage: number
+    pronouns: string | null
+    sexualOrientation: string | null
+    relationshipStyle: string | null
+    bio: string | null
+    locationLatitude: number | null
+    locationLongitude: number | null
+    locationDescription: string | null
+    stiStatus: string | null
+    preferences: Record<string, any> | null
+    avatarUrl: string | null
+    createdAt: string
+    updatedAt: string
   }
 }
 
@@ -135,9 +135,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               id: 1, 
               email: 'dev@fwber.local', 
               name: 'Dev User',
-              email_verified: true,
-              created_at: new Date().toISOString(),
-              last_online: new Date().toISOString()
+              emailVerifiedAt: null,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
             }, 
             token: devToken 
           } 
