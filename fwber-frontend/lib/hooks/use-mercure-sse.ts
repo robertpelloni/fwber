@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useAuth } from '@/lib/auth-context';
 
 interface MercureSSEOptions {
@@ -28,7 +28,10 @@ export const useMercureSSE = (options: MercureSSEOptions) => {
     reconnectInterval = 5000
   } = options;
 
-  const connect = async () => {
+  // Stable topics key for dependency tracking
+  const topicsKey = useMemo(() => topics.join(','), [topics]);
+
+  const connect = useCallback(async () => {
     if (!token) {
       setError('No authentication token available');
       return;
@@ -92,9 +95,9 @@ export const useMercureSSE = (options: MercureSSEOptions) => {
       setError(err instanceof Error ? err.message : 'Connection failed');
       setIsConnected(false);
     }
-  };
+  }, [token, topics, onMessage, onError, onOpen, autoReconnect, reconnectInterval]);
 
-  const disconnect = () => {
+  const disconnect = useCallback(() => {
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
       eventSourceRef.current = null;
@@ -107,7 +110,7 @@ export const useMercureSSE = (options: MercureSSEOptions) => {
     
     setIsConnected(false);
     onClose?.();
-  };
+  }, [onClose]);
 
   useEffect(() => {
     if (token && topics.length > 0) {
@@ -117,7 +120,7 @@ export const useMercureSSE = (options: MercureSSEOptions) => {
     return () => {
       disconnect();
     };
-  }, [token, topics.join(',')]);
+  }, [token, topicsKey, connect, disconnect]);
 
   return {
     isConnected,

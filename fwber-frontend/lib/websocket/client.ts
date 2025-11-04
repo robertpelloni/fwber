@@ -503,6 +503,12 @@ export function useWebSocket(
     reconnectAttempts: 0,
   });
 
+  // Extract specific option values for stable dependencies
+  const autoConnect = options?.autoConnect;
+  const heartbeatInterval = options?.heartbeatInterval;
+  const maxReconnectAttempts = options?.maxReconnectAttempts;
+  const reconnectDelay = options?.reconnectDelay;
+
   React.useEffect(() => {
     const wsClient = new WebSocketClient(wsUrl, token, options);
     setClient(wsClient);
@@ -524,7 +530,7 @@ export function useWebSocket(
       wsClient.off('disconnection', handleDisconnection);
       wsClient.disconnect();
     };
-  }, [wsUrl, token, JSON.stringify(options)]);
+  }, [wsUrl, token, autoConnect, heartbeatInterval, maxReconnectAttempts, reconnectDelay, options]);
 
   return {
     client,
