@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react'
+import { logAuth, setUserContext, clearUserContext } from './logger'
 
 // Types
 interface User {
@@ -149,6 +150,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
           const user = JSON.parse(userStr)
           dispatch({ type: 'AUTH_SUCCESS', payload: { user, token } })
+          setUserContext(user)
+          logAuth.sessionRestored(user.id)
         } catch (error) {
           // Clear invalid data
           localStorage.removeItem('fwber_token')
@@ -191,9 +194,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await response.json()
 
       if (!response.ok) {
+        logAuth.login(email, false, data.message)
         throw new Error(data.message || 'Login failed')
       }
 
+      logAuth.login(email, true)
+      setUserContext(data.user)
       dispatch({ 
         type: 'AUTH_SUCCESS', 
         payload: { 
@@ -232,9 +238,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await response.json()
 
       if (!response.ok) {
+        logAuth.register(email, false, data.message)
         throw new Error(data.message || 'Registration failed')
       }
 
+      logAuth.register(email, true)
+      setUserContext(data.user)
       dispatch({ 
         type: 'AUTH_SUCCESS', 
         payload: { 
@@ -253,6 +262,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Logout function
   const logout = () => {
+    const userId = state.user?.id
+    clearUserContext()
+    logAuth.logout(userId)
     dispatch({ type: 'LOGOUT' })
   }
 

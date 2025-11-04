@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { createWebSocketClient, WebSocketClient, WebSocketMessage as WSMessage } from '@/lib/websocket/client';
+import { logWebSocket } from '@/lib/logger';
 
 export interface WebSocketConnectionStatus {
   connected: boolean;
@@ -131,7 +132,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
   // Event handlers (defined before useEffect to avoid hoisting issues)
   const handleConnection = useCallback((data: any) => {
-    console.log('WebSocket connected:', data);
+    logWebSocket.connected(data.connectionId)
     setConnectionStatus(prev => ({
       ...prev,
       connected: true,
@@ -142,7 +143,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   }, []);
 
   const handleDisconnection = useCallback((data: any) => {
-    console.log('WebSocket disconnected:', data);
+    logWebSocket.disconnected(data.reason)
     setConnectionStatus(prev => ({
       ...prev,
       connected: false,
@@ -179,7 +180,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   }, []);
 
   const handleChatMessage = useCallback((data: ChatMessage) => {
-    console.log('Chat message received:', data);
+    logWebSocket.messageReceived('chat_message', data.from_user_id)
     setChatMessages(prev => [...prev.slice(-99), data]); // Keep last 100 messages
   }, []);
 
@@ -194,7 +195,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   }, []);
 
   const handleError = useCallback((error: any) => {
-    console.error('WebSocket error:', error);
+    logWebSocket.error(error)
   }, []);
 
   // Initialize WebSocket client

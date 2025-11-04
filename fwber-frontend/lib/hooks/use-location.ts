@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { logLocation } from '@/lib/logger';
 
 export interface Location {
   latitude: number;
@@ -44,9 +45,13 @@ export function useLocation(options: UseLocationOptions = {}): UseLocationReturn
   } = options;
 
   const handleSuccess = (position: GeolocationPosition) => {
-    setLocation({
+    const coords = {
       latitude: position.coords.latitude,
       longitude: position.coords.longitude,
+    };
+    
+    setLocation({
+      ...coords,
       accuracy: position.coords.accuracy,
       altitude: position.coords.altitude,
       altitudeAccuracy: position.coords.altitudeAccuracy,
@@ -55,15 +60,21 @@ export function useLocation(options: UseLocationOptions = {}): UseLocationReturn
     });
     setError(null);
     setLoading(false);
+    
+    logLocation.permissionGranted(coords);
   };
 
   const handleError = (err: GeolocationPositionError) => {
-    setError({
+    const error = {
       code: err.code,
       message: err.message,
-    });
+    };
+    
+    setError(error);
     setLocation(null);
     setLoading(false);
+    
+    logLocation.permissionDenied(error);
   };
 
   const refetch = () => {
