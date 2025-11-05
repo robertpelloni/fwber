@@ -18,8 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth.api' => AuthenticateApi::class,
         ]);
 
-        $middleware->group('api', [
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        // Enable CORS for API routes
+        $middleware->api(prepend: [
+            \Illuminate\Http\Middleware\HandleCors::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
