@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CORS Test</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin: 10px 5px; }
+        pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>CORS Test - FWBer API</h1>
+    <p>Frontend: <code>http://localhost:3002</code></p>
+    <p>Backend: <code>http://localhost:8000/api</code></p>
+    
+    <button onclick="testCors()">Test API Connection</button>
+    <button onclick="testWithAuth()">Test with Auth Header</button>
+    <button onclick="clearResults()">Clear Results</button>
+    
+    <h2>Results:</h2>
+    <div id="results"></div>
+
+    <script>
+        const API_URL = 'http://localhost:8000/api';
+        
+        async function testCors() {
+            log('Testing CORS with localhost...', 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/matches/1/tier`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                const corsHeader = response.headers.get('access-control-allow-origin');
+                const data = await response.json();
+                
+                log(`✓ Success! Status: ${response.status}`, 'success');
+                log(`CORS Header: ${corsHeader}`, 'info');
+                log(`Response: ${JSON.stringify(data, null, 2)}`, 'info');
+                
+            } catch (error) {
+                log(`✗ Error: ${error.message}`, 'error');
+                log(`This means CORS is still blocking the request`, 'error');
+            }
+        }
+        
+        async function testWithAuth() {
+            log('Testing with Authorization header...', 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/matches/1/tier`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': 'Bearer fake-token-for-testing'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                log(`Status: ${response.status}`, 'info');
+                log(`Response: ${JSON.stringify(data, null, 2)}`, 'info');
+                
+            } catch (error) {
+                log(`✗ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : '';
+            results.innerHTML += `<pre class="${className}">${new Date().toLocaleTimeString()}: ${message}</pre>`;
+            results.scrollTop = results.scrollHeight;
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        // Auto-test on load
+        window.onload = () => {
+            log('Page loaded. Click "Test API Connection" to verify CORS is working.', 'info');
+        };
+    </script>
+</body>
+</html>
