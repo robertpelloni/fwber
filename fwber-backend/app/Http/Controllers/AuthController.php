@@ -60,6 +60,6 @@ class AuthController extends Controller
             ApiToken::query()->where("token", hash("sha256", $token))->delete();
         }
 
-        return response()->noContent();
+        return response()->json(null, JsonResponse::HTTP_NO_CONTENT);
     }
 }
