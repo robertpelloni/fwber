@@ -163,6 +163,30 @@
         </ul>
       </div>
 
+      <div class="card" id="messageCard" style="display: none;">
+        <h2>💬 Send a Message</h2>
+        <p style="color: #586069; margin: 0 0 16px;">Send messages to progress your relationship tier!</p>
+        
+        <div style="display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap;">
+          <textarea 
+            id="messageInput" 
+            placeholder="Type your message..."
+            style="flex: 1; padding: 12px; font-size: 14px; border: 2px solid #e1e4e8; border-radius: 8px; font-family: inherit; resize: vertical; min-height: 80px;"
+          ></textarea>
+          <button class="primary" onclick="sendMessage()" id="sendBtn" style="padding: 12px 24px;">
+            Send ✉️
+          </button>
+          <button class="secondary" onclick="sendMultipleMessages(7)" id="turboBtn" style="padding: 12px 16px; font-weight: 700;">
+            Turbo: +7 Messages 🚀
+          </button>
+        </div>
+        
+        <div id="tierUpgradeAlert" style="margin-top: 16px; padding: 16px; background: #dcffe4; border: 2px solid #22863a; border-radius: 8px; display: none;">
+          <strong style="color: #22863a;">🎉 Tier Upgraded!</strong>
+          <p id="tierUpgradeText" style="margin: 8px 0 0; color: #24292e;"></p>
+        </div>
+      </div>
+
       <div class="card">
         <h2>🖼️ Photo Gallery</h2>
         <h3>🤖 AI-Generated Photos (Always Visible)</h3>
@@ -228,17 +252,20 @@
       const status = document.getElementById('authStatus');
       const logoutBtn = document.getElementById('logoutBtn');
       const loginBtn = document.getElementById('loginBtn');
+      const turboBtn = document.getElementById('turboBtn');
       
       if (token) {
         status.textContent = `Logged in as ${currentUser === 'alice' ? 'Alice' : 'Bob'}`;
         status.className = 'status logged-in';
         logoutBtn.disabled = false;
         loginBtn.disabled = true;
+        if (turboBtn) turboBtn.disabled = false;
       } else {
         status.textContent = 'Not Logged In';
         status.className = 'status logged-out';
         logoutBtn.disabled = true;
         loginBtn.disabled = false;
+        if (turboBtn) turboBtn.disabled = true;
       }
     }
 
@@ -261,6 +288,7 @@
           token = data.token;
           log(`✓ Login successful! Token: ${token.slice(0, 16)}...`, 'success');
           updateAuthUI();
+          document.getElementById('messageCard').style.display = 'block';
           await loadTierData();
         } else {
           log(`✗ Login failed: ${data.message}`, 'error');
@@ -293,6 +321,7 @@
           log('✓ Logged out successfully', 'success');
           token = null;
           updateAuthUI();
+          document.getElementById('messageCard').style.display = 'none';
           clearTierData();
         }
       } catch (e) {
@@ -376,7 +405,8 @@
         const data = await res.json();
         
         if (res.ok) {
-          log(`✓ Photos loaded: ${data.available_photos.length} visible, ${data.locked_count} locked`, 'success');
+          const totalVisible = data.ai_photos.length + data.real_photos.visible.length + data.real_photos.blurred.length;
+          log(`✓ Photos loaded: ${totalVisible} visible, ${data.real_photos.locked} locked`, 'success');
           displayPhotos(data);
         } else {
           log(`✗ Failed to load photos: ${data.message}`, 'error');
@@ -387,8 +417,9 @@
     }
 
     function displayPhotos(data) {
-      const aiPhotos = data.available_photos.filter(p => p.photo_type === 'ai');
-      const realPhotos = data.available_photos.filter(p => p.photo_type === 'real');
+      const aiPhotos = data.ai_photos || [];
+      const visibleReal = data.real_photos.visible || [];
+      const blurredReal = data.real_photos.blurred || [];
       
       document.getElementById('aiPhotos').innerHTML = aiPhotos.map((p, i) => `
         <div class="photo-card ai">
@@ -397,14 +428,16 @@
         </div>
       `).join('');
       
-      const realPhotoHTML = realPhotos.map((p, i) => `
+      // Combine visible and blurred real photos
+      const allRealPhotos = [...visibleReal, ...blurredReal];
+      const realPhotoHTML = allRealPhotos.map((p, i) => `
         <div class="photo-card real ${p.blurred ? 'blurred' : ''}">
           <span>${p.blurred ? '🌫️' : '📸'}</span>
-          <span class="photo-badge real">Real ${i + 1}</span>
+          <span class="photo-badge real">${p.blurred ? 'Blurred' : 'Real'} ${i + 1}</span>
         </div>
       `).join('');
       
-      const lockedCount = 5 - realPhotos.length;
+      const lockedCount = data.real_photos.locked || 0;
       const lockedHTML = Array(lockedCount).fill(0).map((_, i) => `
         <div class="photo-card real locked">
           <span>🔒</span>
@@ -413,6 +446,99 @@
       `).join('');
       
       document.getElementById('realPhotos').innerHTML = realPhotoHTML + lockedHTML;
+    }
+
+    async function sendMessage(contentOverride) {
+      if (!token) {
+        log('✗ Please login first', 'error');
+        return;
+      }
+      
+      const messageInput = document.getElementById('messageInput');
+      const content = (contentOverride ?? messageInput.value).trim();
+      
+      if (!content) {
+        log('✗ Message cannot be empty', 'error');
+        return;
+      }
+      
+      // Determine receiver (if logged in as Alice, send to Bob and vice versa)
+      const receiverEmail = currentUser === 'alice' ? 'bob@test.com' : 'alice@test.com';
+      const receiverId = currentUser === 'alice' ? 6 : 5; // Bob is user 6, Alice is user 5
+      
+      log(`Sending message to ${receiverEmail}...`);
+      
+      const sendBtn = document.getElementById('sendBtn');
+      sendBtn.disabled = true;
+      sendBtn.innerHTML = '<span class="loading"></span>';
+      
+      try {
+        const res = await fetch(`${API}/messages`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            receiver_id: receiverId,
+            content: content
+          })
+        });
+        
+        const data = await res.json();
+        
+        if (res.ok) {
+          log(`✓ Message sent! (${data.tier_update.messages_exchanged} total)`, 'success');
+          messageInput.value = '';
+          
+          // Check if tier upgraded
+          if (data.tier_update.tier_upgraded) {
+            log(`🎉 TIER UPGRADED: ${data.tier_update.previous_tier} → ${data.tier_update.current_tier}`, 'success');
+            showTierUpgradeAlert(data.tier_update);
+          }
+          
+          // Reload tier data and photos
+          await loadTierData();
+        } else {
+          log(`✗ Failed to send message: ${data.error || data.message}`, 'error');
+        }
+      } catch (e) {
+        log(`✗ Error: ${e.message}`, 'error');
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = 'Send ✉️';
+      }
+    }
+
+    async function sendMultipleMessages(count) {
+      if (!token) {
+        log('✗ Please login first', 'error');
+        return;
+      }
+      const turboBtn = document.getElementById('turboBtn');
+      turboBtn.disabled = true;
+      log(`Turbo sending ${count} messages...`);
+      for (let i = 0; i < count; i++) {
+        await sendMessage(`Turbo message ${i + 1} 🚀`);
+        // Small delay to keep UI readable
+        await new Promise(r => setTimeout(r, 200));
+      }
+      log('Turbo complete!', 'success');
+      turboBtn.disabled = false;
+    }
+
+    function showTierUpgradeAlert(tierUpdate) {
+      const alert = document.getElementById('tierUpgradeAlert');
+      const text = document.getElementById('tierUpgradeText');
+      
+      text.innerHTML = `You've progressed from <strong>${tierUpdate.previous_tier}</strong> to <strong>${tierUpdate.current_tier}</strong>! More photos have been unlocked. 🎉`;
+      
+      alert.style.display = 'block';
+      
+      setTimeout(() => {
+        alert.style.display = 'none';
+      }, 5000);
     }
 
     function clearTierData() {
