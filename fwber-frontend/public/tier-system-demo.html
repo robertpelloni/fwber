@@ -74,6 +74,12 @@
       font-size: 32px; border: 2px solid #e1e4e8;
       position: relative; overflow: hidden;
     }
+    .photo-card img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .photo-card.blurred img {
+      filter: blur(20px);
+    }
     .photo-card.ai { border-color: #667eea; background: linear-gradient(135deg, #667eea22, #764ba222); }
     .photo-card.real { border-color: #22863a; background: linear-gradient(135deg, #22863a22, #00b89422); }
     .photo-card.locked {
@@ -179,6 +185,9 @@
           <button class="secondary" onclick="sendMultipleMessages(7)" id="turboBtn" style="padding: 12px 16px; font-weight: 700;">
             Turbo: +7 Messages 🚀
           </button>
+          <button class="secondary" onclick="markMetInPerson()" id="meetBtn" style="padding: 12px 16px; font-weight: 700; background: #22863a; color: white;">
+            Meet IRL ✅
+          </button>
         </div>
         
         <div id="tierUpgradeAlert" style="margin-top: 16px; padding: 16px; background: #dcffe4; border: 2px solid #22863a; border-radius: 8px; display: none;">
@@ -253,6 +262,7 @@
       const logoutBtn = document.getElementById('logoutBtn');
       const loginBtn = document.getElementById('loginBtn');
       const turboBtn = document.getElementById('turboBtn');
+      const meetBtn = document.getElementById('meetBtn');
       
       if (token) {
         status.textContent = `Logged in as ${currentUser === 'alice' ? 'Alice' : 'Bob'}`;
@@ -260,12 +270,14 @@
         logoutBtn.disabled = false;
         loginBtn.disabled = true;
         if (turboBtn) turboBtn.disabled = false;
+        if (meetBtn) meetBtn.disabled = false;
       } else {
         status.textContent = 'Not Logged In';
         status.className = 'status logged-out';
         logoutBtn.disabled = true;
         loginBtn.disabled = false;
         if (turboBtn) turboBtn.disabled = true;
+        if (meetBtn) meetBtn.disabled = true;
       }
     }
 
@@ -423,7 +435,8 @@
       
       document.getElementById('aiPhotos').innerHTML = aiPhotos.map((p, i) => `
         <div class="photo-card ai">
-          <span>🎨</span>
+          <img src="${p.url}" alt="AI Photo ${i + 1}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+          <span style="display: none; font-size: 32px;">🎨</span>
           <span class="photo-badge ai">AI ${i + 1}</span>
         </div>
       `).join('');
@@ -432,7 +445,8 @@
       const allRealPhotos = [...visibleReal, ...blurredReal];
       const realPhotoHTML = allRealPhotos.map((p, i) => `
         <div class="photo-card real ${p.blurred ? 'blurred' : ''}">
-          <span>${p.blurred ? '🌫️' : '📸'}</span>
+          <img src="${p.url}" alt="${p.blurred ? 'Blurred' : 'Real'} Photo ${i + 1}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+          <span style="display: none; font-size: 32px;">${p.blurred ? '🌫️' : '📸'}</span>
           <span class="photo-badge real">${p.blurred ? 'Blurred' : 'Real'} ${i + 1}</span>
         </div>
       `).join('');
@@ -440,7 +454,7 @@
       const lockedCount = data.real_photos.locked || 0;
       const lockedHTML = Array(lockedCount).fill(0).map((_, i) => `
         <div class="photo-card real locked">
-          <span>🔒</span>
+          <span style="font-size: 32px;">🔒</span>
           <span class="photo-badge real">Locked</span>
         </div>
       `).join('');
@@ -526,6 +540,50 @@
       }
       log('Turbo complete!', 'success');
       turboBtn.disabled = false;
+    }
+
+    async function markMetInPerson() {
+      if (!token) {
+        log('✗ Please login first', 'error');
+        return;
+      }
+      
+      const meetBtn = document.getElementById('meetBtn');
+      meetBtn.disabled = true;
+      log('Marking as met in person...');
+      
+      try {
+        const res = await fetch(`${API}/matches/1/tier/update`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            mark_met_in_person: true
+          })
+        });
+        
+        const data = await res.json();
+        
+        if (res.ok) {
+          log(`✓ Met in person marked!`, 'success');
+          
+          if (data.tier_upgraded) {
+            log(`🎉 TIER UPGRADED: ${data.previous_tier} → ${data.current_tier}`, 'success');
+            showTierUpgradeAlert(data);
+          }
+          
+          await loadTierData();
+        } else {
+          log(`✗ Failed: ${data.error || data.message}`, 'error');
+        }
+      } catch (e) {
+        log(`✗ Error: ${e.message}`, 'error');
+      } finally {
+        meetBtn.disabled = false;
+      }
     }
 
     function showTierUpgradeAlert(tierUpdate) {
