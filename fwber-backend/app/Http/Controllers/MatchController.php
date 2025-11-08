@@ -24,6 +24,12 @@ class MatchController extends Controller
 
         $matches = $this->findMatches($user, $profile, $request);
 
+        // Emit telemetry
+        app(\App\Services\TelemetryService::class)->emit('feed.viewed', [
+            'user_id' => $user->id,
+            'count' => $matches->count(),
+        ]);
+
         return response()->json([
             "matches" => MatchResource::collection($matches)->toArray(request()),
             "total" => $matches->count(),

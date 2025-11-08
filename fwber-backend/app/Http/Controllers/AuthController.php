@@ -27,6 +27,12 @@ class AuthController extends Controller
 
         $token = ApiToken::generateForUser($user, "api");
 
+        // Emit telemetry
+        app(\App\Services\TelemetryService::class)->emit('user.signup', [
+            'user_id' => $user->id,
+            'method' => 'email',
+        ]);
+
         return response()->json([
             "token" => $token,
             "user" => UserResource::make($user->load("profile")),
