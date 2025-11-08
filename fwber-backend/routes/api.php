@@ -17,6 +17,9 @@ use App\Http\Controllers\RateLimitController;
 use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\Api\RelationshipTierController;
 use App\Http\Controllers\Api\MessageController;
+use App\Http\Controllers\Api\UserPhysicalProfileController;
+use App\Http\Controllers\Api\BlockController;
+use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\WebSocketController;
 use Illuminate\Support\Facades\Route;
 
@@ -51,6 +54,26 @@ Route::middleware("api")->group(function (): void {
             Route::get("/tier", [RelationshipTierController::class, "show"]);
             Route::post("/tier/update", [RelationshipTierController::class, "update"]);
             Route::get("/photos", [RelationshipTierController::class, "getPhotos"]);
+        });
+
+        // Physical Profile & Avatar routes
+        Route::prefix('physical-profile')->group(function (): void {
+            Route::get('/', [UserPhysicalProfileController::class, 'show']);
+            Route::put('/', [UserPhysicalProfileController::class, 'upsert']);
+            Route::post('/avatar/request', [UserPhysicalProfileController::class, 'requestAvatar']);
+        });
+
+        // Block routes
+        Route::prefix('blocks')->group(function (): void {
+            Route::post('/', [BlockController::class, 'store']);
+            Route::delete('/{blockedId}', [BlockController::class, 'destroy']);
+        });
+
+        // Report routes
+        Route::prefix('reports')->group(function (): void {
+            Route::post('/', [ReportController::class, 'store']);
+            Route::get('/', [ReportController::class, 'index']);
+            Route::put('/{reportId}', [ReportController::class, 'update']);
         });
         
         // Photo routes (Phase 4A - Multi-AI Photo Upload System)

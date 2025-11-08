@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Message;
 use App\Models\UserMatch;
 use App\Models\RelationshipTier;
+use App\Models\Block;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -25,6 +26,11 @@ class MessageController extends Controller
 
         $senderId = Auth::id();
         $receiverId = $validated['receiver_id'];
+
+        // Block enforcement (either direction blocks messaging)
+        if (Block::isBlockedBetween($senderId, $receiverId)) {
+            return response()->json(['error' => 'Messaging blocked between users'], 403);
+        }
 
         // Find the match between these users
         $match = UserMatch::where(function ($query) use ($senderId, $receiverId) {
@@ -81,6 +87,11 @@ class MessageController extends Controller
     public function index(Request $request, int $userId): JsonResponse
     {
         $currentUserId = Auth::id();
+
+        // Block enforcement for fetching conversation
+        if (Block::isBlockedBetween($currentUserId, $userId)) {
+            return response()->json(['error' => 'Conversation access blocked'], 403);
+        }
 
         // Verify match exists
         $match = UserMatch::where(function ($query) use ($currentUserId, $userId) {

@@ -194,6 +194,17 @@
           <strong style="color: #22863a;">🎉 Tier Upgraded!</strong>
           <p id="tierUpgradeText" style="margin: 8px 0 0; color: #24292e;"></p>
         </div>
+
+        <!-- Message History -->
+        <div style="margin-top:24px;">
+          <h3 style="margin:0 0 12px; font-size:18px; color:#586069; display:flex; align-items:center; gap:8px;">🗂️ Conversation History
+            <label style="margin-left:auto; display:flex; align-items:center; gap:6px; font-size:12px; background:#f6f8fa; padding:4px 8px; border-radius:6px; cursor:pointer;">
+              <input type="checkbox" id="autoReplyToggle" onchange="toggleAutoReply(this.checked)" style="margin:0;" />
+              <span>Auto-reply bot</span>
+            </label>
+          </h3>
+          <div id="messageHistory" style="background:#f6f8fa; border:1px solid #e1e4e8; border-radius:8px; max-height:220px; overflow-y:auto; padding:12px; font-size:13px; line-height:1.4; font-family: 'Courier New', monospace;"></div>
+        </div>
       </div>
 
       <div class="card">
@@ -514,6 +525,8 @@
           
           // Reload tier data and photos
           await loadTierData();
+          // Reload messages
+          await loadMessages();
         } else {
           log(`✗ Failed to send message: ${data.error || data.message}`, 'error');
         }
@@ -523,6 +536,167 @@
         sendBtn.disabled = false;
         sendBtn.innerHTML = 'Send ✉️';
       }
+    }
+
+    // Load conversation messages
+    async function loadMessages() {
+      if (!token) return;
+      // Receiver is the other user in the match
+      const otherUserId = currentUser === 'alice' ? 6 : 5;
+      try {
+        const res = await fetch(`${API}/messages/${otherUserId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          log(`✗ Failed to load messages: ${data.message || data.error}`, 'error');
+          return;
+        }
+        // Laravel pagination structure
+        const items = data.data || [];
+        renderMessageHistory(items);
+      } catch (e) {
+        log(`✗ Error loading messages: ${e.message}`, 'error');
+      }
+    }
+
+    function renderMessageHistory(messages) {
+      const container = document.getElementById('messageHistory');
+      if (!container) return;
+      if (!messages.length) {
+        container.innerHTML = '<em style="color:#586069;">No messages yet.</em>';
+        return;
+      }
+      container.innerHTML = messages.map(m => {
+        const mine = m.sender_id === (currentUser === 'alice' ? 5 : 6);
+        const ts = new Date(m.sent_at).toLocaleTimeString();
+        const esc = (str) => str.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+        return `<div style="margin:4px 0; display:flex; ${mine ? 'justify-content:flex-end;' : 'justify-content:flex-start;'}">
+          <div style="max-width:70%; padding:8px 10px; border-radius:10px; ${mine ? 'background:#667eea; color:#fff;' : 'background:#e1e4e8; color:#24292e;'}">
+            <div style="font-size:11px; opacity:0.7; margin-bottom:2px;">${mine ? 'You' : (currentUser === 'alice' ? 'Bob' : 'Alice')} • ${ts}</div>
+            <div style="white-space:pre-wrap;">${esc(m.content)}</div>
+          </div>
+        </div>`;
+      }).join('');
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // Auto-reply bot state
+    let autoReplyEnabled = false;
+    let autoReplyInFlight = false;
+
+    function toggleAutoReply(enabled) {
+      autoReplyEnabled = enabled;
+      log(`Auto-reply bot ${enabled ? 'ENABLED' : 'disabled'}.`, enabled ? 'success' : 'info');
+    }
+
+    async function maybeAutoReply(lastUserMessage) {
+      if (!autoReplyEnabled || autoReplyInFlight) return;
+      // Simulate partner reply if we are currentUser sender
+      autoReplyInFlight = true;
+      try {
+        // Instrumentation: verify trigger
+        try {
+          const preview = (lastUserMessage || '').slice(0, 40);
+          log(`Auto-reply trigger received: "${preview}${(lastUserMessage && lastUserMessage.length>40)?'…':''}"`);
+        } catch (e) { /* noop */ }
+        // Small delay to simulate thinking
+        await new Promise(r => setTimeout(r, 600));
+        const replyContent = generateAutoReply(lastUserMessage);
+        // Temporarily switch user context to send from other side
+        const originalUser = currentUser;
+        const originalToken = token;
+        currentUser = originalUser === 'alice' ? 'bob' : 'alice';
+        
+        // Need to login as the other user to send from their perspective
+        const otherEmail = currentUser === 'alice' ? 'alice@test.com' : 'bob@test.com';
+        log(`Auto-reply bot switching to ${currentUser}...`);
+        
+        const loginRes = await fetch(`${API}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ email: otherEmail, password: 'password123' })
+        });
+        
+        if (loginRes.ok) {
+          const loginData = await loginRes.json();
+          token = loginData.token;
+          await sendMessageDirect(replyContent);
+          log(`Auto-reply sent from ${currentUser}!`, 'success');
+        }
+        
+        // Restore original user context
+        currentUser = originalUser;
+        token = originalToken;
+        // Refresh message list from original perspective
+        await loadMessages();
+      } finally {
+        autoReplyInFlight = false;
+      }
+    }
+
+    // Direct send without triggering auto-reply loop
+    async function sendMessageDirect(content) {
+      if (!token || !content) return;
+      
+      const receiverId = currentUser === 'alice' ? 6 : 5;
+      
+      try {
+        const res = await fetch(`${API}/messages`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            receiver_id: receiverId,
+            content: content
+          })
+        });
+        
+        if (!res.ok) {
+          log(`✗ Auto-reply failed to send`, 'error');
+        }
+      } catch (e) {
+        log(`✗ Auto-reply error: ${e.message}`, 'error');
+      }
+    }
+
+    function generateAutoReply(userMessage) {
+      const templates = [
+        'Got it! 😊',
+        'Sounds good to me! 👍',
+        'Haha true! 😄',
+        'Interesting point! 🤔',
+        'Let’s chat more about that soon!',
+        'Absolutely agree!',
+        'That made me smile 😌',
+        'Tell me more!',
+      ];
+      const pick = templates[Math.floor(Math.random() * templates.length)];
+      if (!userMessage) return pick;
+      // Light transformation based on user message length
+      if (userMessage.length < 20) return pick;
+      return pick + ' (' + userMessage.slice(0, 20) + '...)';
+    }
+
+    // Hook into sendMessage to trigger auto-reply when enabled
+    const originalSendMessage = sendMessage;
+    sendMessage = async function(contentOverride) {
+      // Capture the message content before clearing
+      const messageContent = contentOverride || document.getElementById('messageInput').value.trim();
+      const result = await originalSendMessage(contentOverride);
+      // After sending (and reloading) fetch messages and maybe auto reply
+      await loadMessages();
+      if (autoReplyEnabled && messageContent) {
+        log('Auto-reply conditions met; invoking bot…');
+        await maybeAutoReply(messageContent);
+      }
+      return result;
     }
 
     async function sendMultipleMessages(count) {
