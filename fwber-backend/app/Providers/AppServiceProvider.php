@@ -14,7 +14,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Bind FeatureFlagService as a singleton
+        $this->app->singleton(\App\Services\FeatureFlagService::class, function ($app) {
+            return new \App\Services\FeatureFlagService();
+        });
     }
 
     /**
