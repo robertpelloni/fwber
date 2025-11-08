@@ -12,6 +12,8 @@ class BulletinBoardFactory extends Factory
     public function definition(): array
     {
         return [
+            // Provide a geohash to satisfy NOT NULL constraint in migration
+            'geohash' => substr(md5($this->faker->unique()->word()), 0, 10),
             'name' => $this->faker->unique()->words(3, true),
             'description' => $this->faker->sentence(12),
             'center_lat' => $this->faker->latitude(),
