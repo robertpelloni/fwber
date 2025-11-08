@@ -45,13 +45,13 @@ class ContentModerationService
 
         $results = [];
         
-        // OpenAI moderation (skip if API key missing)
-        if (in_array('openai', $this->moderationConfig['providers']) && $this->openaiApiKey !== '') {
+        // OpenAI moderation (in testing allow execution with faked HTTP even if key missing)
+        if (in_array('openai', $this->moderationConfig['providers']) && ($this->openaiApiKey !== '' || app()->environment('testing'))) {
             $results['openai'] = $this->moderateWithOpenAI($content);
         }
         
-        // Gemini moderation (skip if API key missing)
-        if (in_array('gemini', $this->moderationConfig['providers']) && $this->geminiApiKey !== '') {
+        // Gemini moderation (in testing allow execution with faked HTTP even if key missing)
+        if (in_array('gemini', $this->moderationConfig['providers']) && ($this->geminiApiKey !== '' || app()->environment('testing'))) {
             $results['gemini'] = $this->moderateWithGemini($content, $context);
         }
         
