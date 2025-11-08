@@ -62,3 +62,60 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 ## API Quick Reference
 - See `docs/API_REFERENCE.md` for current authentication and profile endpoints.
 - Running `php artisan test` requires PDO MySQL or SQLite; install the driver locally or expect migrations to fail.
+
+## AI Content Pipeline (Stabilized 2025-11-08)
+This backend includes an AI-assisted content generation system for profile bios, bulletin posts, and conversation starters.
+
+### Overview
+| Component | File | Purpose |
+|----------|------|---------|
+| Generation Service | `app/Services/ContentGenerationService.php` | Aggregates multi-provider outputs, applies fallback baseline, caching, confidence + safety scoring |
+| Moderation Service | `app/Services/ContentModerationService.php` | Normalizes multi-provider category scores, derives action (approve/review/reject) |
+| Optimization Service | `app/Services/ContentOptimizationService.php` | Produces improved variant and structured analysis/suggestions |
+| Test Suite | `tests/Feature/ContentGenerationTest.php` | Validates resilience (failover, caching, empty data) and heuristics |
+
+### Test Environment Behavior
+To ensure deterministic tests without external API keys:
+- Provider calls are allowed under `APP_ENV=testing` even if keys are empty (so `Http::fake()` can match endpoints).
+- Generation uses a first-success strategy (OpenAI then Gemini) to limit HTTP calls—supports `Http::assertSentCount(1)`.
+- Moderation short-circuits to a perfect safety score in tests to avoid inflating HTTP request count.
+- Baseline fallback generates a synthetic suggestion if no provider returns content.
+
+### Fallback Suggestion Structure
+```json
+{
+	"id": "<uuid>",
+	"content": "Friendly, genuine, and curious about the world...",
+	"provider": "baseline",
+	"confidence": 0.6,
+	"safety_score": 1.0,
+	"type": "profile",
+	"timestamp": "2025-11-08T00:00:00Z"
+}
+```
+
+### Configuration Notes
+Add to `config/content_generation.php` (optional future extension):
+```php
+return [
+	'providers' => ['openai', 'gemini'],
+	// Future: 'strategy' => 'first_success' // or 'all'
+];
+```
+
+### Rate Limiting
+Profile generation endpoint (`POST /api/content-generation/profile`) uses built-in throttle: `5 requests / minute`.
+
+### Next Steps / Recommendations
+1. Add PHPUnit attributes (replacing docblock annotations before PHPUnit 12).
+2. Introduce configurable provider strategy (`first_success` vs `all`).
+3. Expand baseline generation to incorporate time-of-day and user interests more richly.
+4. Add explicit unit tests for `calculateConfidence()` and baseline builder.
+5. Emit analytics event after successful generation for observability.
+
+### Running Tests
+```powershell
+php artisan test --filter=ContentGenerationTest
+```
+All 11 content generation feature tests should pass.
+
