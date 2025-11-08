@@ -172,6 +172,9 @@
       <div class="card" id="messageCard" style="display: none;">
         <h2>💬 Send a Message</h2>
         <p style="color: #586069; margin: 0 0 16px;">Send messages to progress your relationship tier!</p>
+        <div id="blockedBanner" style="display:none; margin-bottom:12px; padding:12px; border-radius:8px; background:#ffeef0; border:2px solid #d73a49; color:#24292e;">
+          🚫 Messaging is blocked between you and the other user. Unblock from the Safety panel below.
+        </div>
         
         <div style="display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap;">
           <textarea 
@@ -245,6 +248,98 @@
           </div>
         </div>
       </div>
+      <!-- Physical Profile & Avatar Card -->
+      <div class="card" id="profileCard" style="display:none;">
+        <h2>🧍 Physical Profile & Avatar</h2>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; align-items:end;">
+          <div>
+            <label style="display:block; font-size:12px; color:#586069;">Height (cm)</label>
+            <input id="pp_height_cm" type="number" min="80" max="250" placeholder="e.g., 180" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#586069;">Body type</label>
+            <input id="pp_body_type" type="text" placeholder="e.g., athletic" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#586069;">Hair color</label>
+            <input id="pp_hair_color" type="text" placeholder="e.g., brown" />
+          </div>
+            <div>
+            <label style="display:block; font-size:12px; color:#586069;">Eye color</label>
+            <input id="pp_eye_color" type="text" placeholder="e.g., green" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#586069;">Skin tone</label>
+            <input id="pp_skin_tone" type="text" placeholder="e.g., medium" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#586069;">Ethnicity</label>
+            <input id="pp_ethnicity" type="text" placeholder="optional" />
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#586069;">Facial hair</label>
+            <input id="pp_facial_hair" type="text" placeholder="e.g., stubble" />
+          </div>
+          <div style="display:flex; gap:12px; align-items:center; margin-top:18px;">
+            <label style="display:flex; gap:6px; align-items:center; font-size:12px; color:#586069;"><input id="pp_tattoos" type="checkbox"/> Tattoos</label>
+            <label style="display:flex; gap:6px; align-items:center; font-size:12px; color:#586069;"><input id="pp_piercings" type="checkbox"/> Piercings</label>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#586069;">Dominant hand</label>
+            <select id="pp_dominant_hand">
+              <option value="">(select)</option>
+              <option value="left">left</option>
+              <option value="right">right</option>
+              <option value="ambi">ambi</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#586069;">Fitness level</label>
+            <select id="pp_fitness_level">
+              <option value="">(select)</option>
+              <option value="low">low</option>
+              <option value="average">average</option>
+              <option value="fit">fit</option>
+              <option value="athletic">athletic</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; color:#586069;">Clothing style</label>
+            <input id="pp_clothing_style" type="text" placeholder="e.g., streetwear" />
+          </div>
+          <div style="grid-column: 1 / -1;">
+            <label style="display:block; font-size:12px; color:#586069;">Avatar prompt</label>
+            <input id="pp_avatar_prompt" type="text" placeholder="Describe your avatar style..." />
+          </div>
+        </div>
+        <div style="display:flex; gap:12px; margin-top:12px;">
+          <button class="secondary" onclick="saveProfile()">Save Profile</button>
+          <button class="primary" onclick="requestAvatarGen()">Generate Avatar</button>
+          <span id="avatarStatus" class="status logged-out" style="display:none;"></span>
+        </div>
+        <div id="avatarPreview" style="margin-top:12px; display:flex; align-items:center; gap:12px;">
+          <div style="width:96px; height:96px; border-radius:12px; border:2px solid #e1e4e8; background:#f6f8fa; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+            <img id="avatarImg" src="" alt="avatar" style="display:none; width:100%; height:100%; object-fit:cover;" />
+            <span id="avatarPlaceholder" style="font-size:28px; color:#667eea;">👤</span>
+          </div>
+          <div id="avatarNote" style="color:#586069; font-size:13px;">No avatar generated yet.</div>
+        </div>
+      </div>
+      <!-- Safety Card -->
+      <div class="card" id="safetyCard" style="display:none;">
+        <h2>🛡️ Safety: Block & Report</h2>
+        <div style="display:flex; gap:12px; align-items:center; margin-bottom:12px;">
+          <button class="secondary" id="blockBtn" onclick="blockUser()">Block other user</button>
+          <button class="secondary" id="unblockBtn" onclick="unblockUser()" style="display:none;">Unblock</button>
+          <span id="blockState" class="status" style="display:none;"></span>
+        </div>
+        <h3 style="margin-top:0;">🚩 Report User</h3>
+        <div style="display:grid; gap:8px;">
+          <input id="reportReason" type="text" placeholder="Reason (e.g., harassment)" />
+          <textarea id="reportDetails" placeholder="Details (optional)" style="min-height:80px; padding:8px; border:2px solid #e1e4e8; border-radius:8px;"></textarea>
+          <button class="secondary" onclick="reportUser()">Submit Report</button>
+        </div>
+      </div>
     </div>
 
     <div class="card" style="margin-top: 24px;">
@@ -257,6 +352,7 @@
     const API = 'http://localhost:8010/api';
     let token = null;
     let currentUser = 'alice';
+    let isBlocked = false;
 
     function log(msg, type = 'info') {
       const el = document.getElementById('log');
@@ -312,7 +408,11 @@
           log(`✓ Login successful! Token: ${token.slice(0, 16)}...`, 'success');
           updateAuthUI();
           document.getElementById('messageCard').style.display = 'block';
+          document.getElementById('profileCard').style.display = 'block';
+          document.getElementById('safetyCard').style.display = 'block';
           await loadTierData();
+          await loadProfile();
+          await loadMessages(); // also sets block state
         } else {
           log(`✗ Login failed: ${data.message}`, 'error');
         }
@@ -345,7 +445,11 @@
           token = null;
           updateAuthUI();
           document.getElementById('messageCard').style.display = 'none';
+          document.getElementById('profileCard').style.display = 'none';
+          document.getElementById('safetyCard').style.display = 'none';
           clearTierData();
+          clearProfileUI();
+          setBlockedUI(false);
         }
       } catch (e) {
         log(`✗ Error: ${e.message}`, 'error');
@@ -550,12 +654,19 @@
             'Accept': 'application/json'
           }
         });
-        const data = await res.json();
-        if (!res.ok) {
-          log(`✗ Failed to load messages: ${data.message || data.error}`, 'error');
+        if (res.status === 403) {
+          isBlocked = true;
+          setBlockedUI(true);
+          log('⚠️ Messaging blocked between users.', 'error');
           return;
         }
-        // Laravel pagination structure
+        const data = await res.json();
+        if (!res.ok) {
+            log(`✗ Failed to load messages: ${data.message || data.error}`, 'error');
+            return;
+        }
+        isBlocked = false;
+        setBlockedUI(false);
         const items = data.data || [];
         renderMessageHistory(items);
       } catch (e) {
@@ -687,6 +798,10 @@
     // Hook into sendMessage to trigger auto-reply when enabled
     const originalSendMessage = sendMessage;
     sendMessage = async function(contentOverride) {
+      if (isBlocked) {
+        log('✗ Cannot send: users are blocked.', 'error');
+        return;
+      }
       // Capture the message content before clearing
       const messageContent = contentOverride || document.getElementById('messageInput').value.trim();
       const result = await originalSendMessage(contentOverride);
@@ -697,6 +812,233 @@
         await maybeAutoReply(messageContent);
       }
       return result;
+    }
+
+    // ---------- Safety / Block & Report ----------
+    function setBlockedUI(blocked) {
+      const banner = document.getElementById('blockedBanner');
+      const sendBtn = document.getElementById('sendBtn');
+      const turboBtn = document.getElementById('turboBtn');
+      const meetBtn = document.getElementById('meetBtn');
+      const blockBtn = document.getElementById('blockBtn');
+      const unblockBtn = document.getElementById('unblockBtn');
+      const blockState = document.getElementById('blockState');
+      if (!banner) return;
+      if (blocked) {
+        banner.style.display = 'block';
+        sendBtn.disabled = true;
+        turboBtn.disabled = true;
+        meetBtn.disabled = true;
+        blockBtn.style.display = 'none';
+        unblockBtn.style.display = 'inline-block';
+        blockState.style.display = 'inline-block';
+        blockState.className = 'status logged-out';
+        blockState.textContent = 'Blocked';
+      } else {
+        banner.style.display = 'none';
+        sendBtn.disabled = false;
+        turboBtn.disabled = false;
+        meetBtn.disabled = false;
+        blockBtn.style.display = 'inline-block';
+        unblockBtn.style.display = 'none';
+        blockState.style.display = 'none';
+      }
+    }
+
+    async function blockUser() {
+      if (!token) return log('✗ Login first', 'error');
+      const otherUserId = currentUser === 'alice' ? 6 : 5;
+      log('Blocking other user...');
+      try {
+        const res = await fetch(`${API}/blocks`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
+          body: JSON.stringify({ blocked_id: otherUserId })
+        });
+        const data = await res.json().catch(()=>({}));
+        if (res.ok) {
+          log('✓ User blocked', 'success');
+          isBlocked = true;
+          setBlockedUI(true);
+        } else {
+          log(`✗ Block failed: ${data.message || data.error}`, 'error');
+        }
+      } catch(e){ log(`✗ Error: ${e.message}`, 'error'); }
+    }
+
+    async function unblockUser() {
+      if (!token) return log('✗ Login first', 'error');
+      const otherUserId = currentUser === 'alice' ? 6 : 5;
+      log('Unblocking other user...');
+      try {
+        const res = await fetch(`${API}/blocks/${otherUserId}`, {
+          method: 'DELETE', headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
+        });
+        if (res.status === 204 || res.ok) {
+          log('✓ User unblocked', 'success');
+          isBlocked = false;
+          setBlockedUI(false);
+          await loadMessages();
+        } else {
+          const data = await res.json().catch(()=>({}));
+          log(`✗ Unblock failed: ${data.message || data.error}`, 'error');
+        }
+      } catch(e){ log(`✗ Error: ${e.message}`, 'error'); }
+    }
+
+    async function reportUser() {
+      if (!token) return log('✗ Login first', 'error');
+      const otherUserId = currentUser === 'alice' ? 6 : 5;
+      const reason = document.getElementById('reportReason').value.trim();
+      const details = document.getElementById('reportDetails').value.trim();
+      if (!reason) return log('✗ Reason required', 'error');
+      log('Submitting report...');
+      try {
+        const res = await fetch(`${API}/reports`, {
+          method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`, 'Accept':'application/json'},
+          body: JSON.stringify({ reported_user_id: otherUserId, reason, details })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          log('✓ Report submitted', 'success');
+          document.getElementById('reportReason').value='';
+          document.getElementById('reportDetails').value='';
+        } else {
+          log(`✗ Report failed: ${data.message || data.error}`, 'error');
+        }
+      } catch(e){ log(`✗ Error: ${e.message}`, 'error'); }
+    }
+
+    // ---------- Physical Profile & Avatar ----------
+    function collectProfileForm() {
+      return {
+        height_cm: parseInt(document.getElementById('pp_height_cm').value)||null,
+        body_type: document.getElementById('pp_body_type').value||null,
+        hair_color: document.getElementById('pp_hair_color').value||null,
+        eye_color: document.getElementById('pp_eye_color').value||null,
+        skin_tone: document.getElementById('pp_skin_tone').value||null,
+        ethnicity: document.getElementById('pp_ethnicity').value||null,
+        facial_hair: document.getElementById('pp_facial_hair').value||null,
+        tattoos: document.getElementById('pp_tattoos').checked,
+        piercings: document.getElementById('pp_piercings').checked,
+        dominant_hand: document.getElementById('pp_dominant_hand').value||null,
+        fitness_level: document.getElementById('pp_fitness_level').value||null,
+        clothing_style: document.getElementById('pp_clothing_style').value||null,
+        avatar_prompt: document.getElementById('pp_avatar_prompt').value||null,
+      };
+    }
+
+    function applyProfileToForm(p){
+      if(!p) return;
+      const set=(id,val)=>{ if(document.getElementById(id)) document.getElementById(id).value = val ?? ''; };
+      set('pp_height_cm', p.height_cm??'');
+      set('pp_body_type', p.body_type??'');
+      set('pp_hair_color', p.hair_color??'');
+      set('pp_eye_color', p.eye_color??'');
+      set('pp_skin_tone', p.skin_tone??'');
+      set('pp_ethnicity', p.ethnicity??'');
+      set('pp_facial_hair', p.facial_hair??'');
+      document.getElementById('pp_tattoos').checked = !!p.tattoos;
+      document.getElementById('pp_piercings').checked = !!p.piercings;
+      set('pp_dominant_hand', p.dominant_hand??'');
+      set('pp_fitness_level', p.fitness_level??'');
+      set('pp_clothing_style', p.clothing_style??'');
+      set('pp_avatar_prompt', p.avatar_prompt??'');
+      updateAvatarUI(p);
+    }
+
+    function updateAvatarUI(p){
+      const statusEl = document.getElementById('avatarStatus');
+      const img = document.getElementById('avatarImg');
+      const placeholder = document.getElementById('avatarPlaceholder');
+      const note = document.getElementById('avatarNote');
+      if(!statusEl) return;
+      if(!p || !p.avatar_status){
+        statusEl.style.display='none';
+        img.style.display='none';
+        placeholder.style.display='block';
+        note.textContent='No avatar generated yet.';
+        return;
+      }
+      statusEl.style.display='inline-block';
+      statusEl.textContent = p.avatar_status;
+      if(p.avatar_status==='ready' && p.avatar_image_url){
+        img.src = p.avatar_image_url;
+        img.style.display='block';
+        placeholder.style.display='none';
+        note.textContent='Avatar ready.';
+        statusEl.className='status logged-in';
+      } else if(p.avatar_status==='failed') {
+        img.style.display='none';
+        placeholder.style.display='block';
+        note.textContent='Avatar generation failed.';
+        statusEl.className='status logged-out';
+      } else {
+        img.style.display='none';
+        placeholder.style.display='block';
+        note.textContent='Avatar is generating...';
+        statusEl.className='status logged-in';
+      }
+    }
+
+    async function loadProfile(){
+      if(!token) return;
+      log('Loading physical profile...');
+      try {
+        const res = await fetch(`${API}/physical-profile`, { headers:{'Authorization':`Bearer ${token}`, 'Accept':'application/json'} });
+        const data = await res.json();
+        if(res.ok){
+          log('✓ Profile loaded','success');
+          applyProfileToForm(data);
+          if(data.avatar_status==='generating') pollAvatarStatus();
+        } else {
+          log(`✗ Profile load failed: ${data.message||data.error}`,'error');
+        }
+      } catch(e){ log(`✗ Error: ${e.message}`,'error'); }
+    }
+
+    async function saveProfile(){
+      if(!token) return log('✗ Login first','error');
+      const payload = collectProfileForm();
+      log('Saving profile...');
+      try {
+        const res = await fetch(`${API}/physical-profile`, { method:'PUT', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`,'Accept':'application/json'}, body: JSON.stringify(payload)});
+        const data = await res.json();
+        if(res.ok){ log('✓ Profile saved','success'); applyProfileToForm(data); }
+        else log(`✗ Save failed: ${data.message||data.error}`,'error');
+      } catch(e){ log(`✗ Error: ${e.message}`,'error'); }
+    }
+
+    async function requestAvatarGen(){
+      if(!token) return log('✗ Login first','error');
+      const prompt = document.getElementById('pp_avatar_prompt').value.trim();
+      if(!prompt) return log('✗ Avatar prompt required','error');
+      log('Requesting avatar generation...');
+      try {
+        const res = await fetch(`${API}/physical-profile/avatar/request`, { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`,'Accept':'application/json'} });
+        const data = await res.json();
+        if(res.ok){ log('✓ Avatar generation started','success'); applyProfileToForm(data); pollAvatarStatus(); }
+        else log(`✗ Avatar request failed: ${data.message||data.error}`,'error');
+      } catch(e){ log(`✗ Error: ${e.message}`,'error'); }
+    }
+
+    async function pollAvatarStatus(){
+      for(let i=0;i<30;i++){ // up to ~60s if 2s interval
+        await new Promise(r=>setTimeout(r,2000));
+        if(!token) return;
+        try {
+          const res = await fetch(`${API}/physical-profile`, { headers:{'Authorization':`Bearer ${token}`, 'Accept':'application/json'} });
+          const data = await res.json();
+          if(res.ok){
+            applyProfileToForm(data);
+            if(data.avatar_status==='ready' || data.avatar_status==='failed') { break; }
+          }
+        } catch(e){ log(`✗ Poll error: ${e.message}`,'error'); }
+      }
+    }
+
+    function clearProfileUI(){
+      applyProfileToForm(null);
     }
 
     async function sendMultipleMessages(count) {

@@ -14,8 +14,9 @@ class ContentOptimizationService
 
     public function __construct()
     {
-        $this->openaiApiKey = config('services.openai.api_key');
-        $this->geminiApiKey = config('services.gemini.api_key');
+        // Default to empty strings in test/dev when keys are not configured
+        $this->openaiApiKey = (string) (config('services.openai.api_key') ?? '');
+        $this->geminiApiKey = (string) (config('services.gemini.api_key') ?? '');
         $this->optimizationConfig = config('content_optimization', [
             'enabled' => true,
             'providers' => ['openai', 'gemini'],
@@ -265,7 +266,16 @@ class ContentOptimizationService
             }
         }
 
-        return [
+        // Build a simple suggestions array from improvements for compatibility with tests
+        $suggestions = [];
+        foreach ($allImprovements as $type => $improve) {
+            foreach ($improve as $k => $v) {
+                $suggestions[] = is_string($k) ? "$type: $k => $v" : "$type: $v";
+            }
+        }
+
+        $payload = [
+            // Original structure (backwards compatible)
             'original' => $originalContent,
             'optimized' => $finalOptimization,
             'improvements' => $allImprovements,
@@ -273,6 +283,14 @@ class ContentOptimizationService
             'optimization_types' => array_keys($optimizations),
             'timestamp' => now()->toISOString(),
         ];
+
+        // Add fields expected by the existing test suite
+        $payload['original_content'] = $originalContent;
+        $payload['optimized_version'] = $finalOptimization;
+        $payload['analysis'] = $allImprovements;
+        $payload['suggestions'] = $suggestions;
+
+        return $payload;
     }
 
     /**

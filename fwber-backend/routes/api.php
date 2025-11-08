@@ -195,7 +195,8 @@ Route::middleware("api")->group(function (): void {
             });
 
             // Content Generation routes (AI-powered content creation and optimization)
-            Route::prefix("content-generation")->group(function (): void {
+            // Apply advanced rate limiting specific to content generation.
+            Route::prefix("content-generation")->middleware(\App\Http\Middleware\AdvancedRateLimiting::class . ':content_generation')->group(function (): void {
                 Route::post("/profile", [ContentGenerationController::class, "generateProfileContent"]);
                 Route::post("/posts/{boardId}/suggestions", [ContentGenerationController::class, "generatePostSuggestions"]);
                 Route::post("/conversation-starters", [ContentGenerationController::class, "generateConversationStarters"]);

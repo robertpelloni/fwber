@@ -14,8 +14,9 @@ class ContentModerationService
 
     public function __construct()
     {
-        $this->openaiApiKey = config('services.openai.api_key');
-        $this->geminiApiKey = config('services.gemini.api_key');
+        // Default to empty strings if missing to avoid TypeError in tests
+        $this->openaiApiKey = (string) (config('services.openai.api_key') ?? '');
+        $this->geminiApiKey = (string) (config('services.gemini.api_key') ?? '');
         $this->moderationConfig = config('moderation', [
             'enabled' => true,
             'providers' => ['openai', 'gemini'],

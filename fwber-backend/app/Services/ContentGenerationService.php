@@ -5,6 +5,7 @@ namespace App\Services;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\BulletinBoard;
 use App\Models\BulletinMessage;
@@ -17,8 +18,9 @@ class ContentGenerationService
 
     public function __construct()
     {
-        $this->openaiApiKey = config('services.openai.api_key');
-        $this->geminiApiKey = config('services.gemini.api_key');
+        // Default to empty strings in test/dev when keys are not configured
+        $this->openaiApiKey = (string) (config('services.openai.api_key') ?? '');
+        $this->geminiApiKey = (string) (config('services.gemini.api_key') ?? '');
         $this->generationConfig = config('content_generation', [
             'enabled' => true,
             'providers' => ['openai', 'gemini'],
@@ -327,18 +329,22 @@ class ContentGenerationService
     private function calculateConfidence(string $content): float
     {
         // Analyze content quality, coherence, and relevance
-        $length = strlen($content);
         $wordCount = str_word_count($content);
-        $sentenceCount = substr_count($content, '.') + substr_count($content, '!') + substr_count($content, '?');
-        
+        $sentenceCount = max(1, substr_count($content, '.') + substr_count($content, '!') + substr_count($content, '?'));
+
         // Basic quality metrics
-        $avgWordsPerSentence = $sentenceCount > 0 ? $wordCount / $sentenceCount : 0;
+        $avgWordsPerSentence = $wordCount > 0 ? $wordCount / $sentenceCount : 0;
         $readabilityScore = $this->calculateReadabilityScore($content);
-        
-        // Combine metrics for confidence score
-        $confidence = min(1.0, ($readabilityScore + $avgWordsPerSentence / 20) / 2);
-        
-        return max(0.0, min(1.0, $confidence));
+
+        // Penalize extremely short content to avoid single-word or trivial sentences scoring too high
+        $lengthScore = min(1.0, $wordCount / 25); // reaches 1.0 at ~25+ words
+
+        // Weighted combination (readability 50%, length 30%, structure 20%)
+        $combined = (0.5 * $readabilityScore)
+                  + (0.3 * $lengthScore)
+                  + (0.2 * min(1.0, $avgWordsPerSentence / 20));
+
+        return max(0.0, min(1.0, $combined));
     }
 
     /**
