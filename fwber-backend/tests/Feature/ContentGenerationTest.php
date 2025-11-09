@@ -10,6 +10,7 @@ use App\Services\ContentOptimizationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use PHPUnit\Framework\Attributes\Test;
 
 class ContentGenerationTest extends TestCase
 {
@@ -25,7 +26,7 @@ class ContentGenerationTest extends TestCase
         $this->contentOptimizationService = app(ContentOptimizationService::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_generate_profile_content_with_mock_ai_providers()
     {
         // Mock OpenAI response
@@ -88,7 +89,7 @@ class ContentGenerationTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_ai_provider_failures_gracefully()
     {
         // Mock OpenAI failure
@@ -124,7 +125,7 @@ class ContentGenerationTest extends TestCase
         $this->assertGreaterThan(0, count($geminiSuggestions));
     }
 
-    /** @test */
+    #[Test]
     public function it_caches_generation_results()
     {
         Http::fake([
@@ -154,7 +155,7 @@ class ContentGenerationTest extends TestCase
         Http::assertSentCount(1);
     }
 
-    /** @test */
+    #[Test]
     public function it_generates_post_suggestions_for_bulletin_board()
     {
         Http::fake([
@@ -187,7 +188,7 @@ class ContentGenerationTest extends TestCase
         $this->assertGreaterThan(0, count($result['suggestions']));
     }
 
-    /** @test */
+    #[Test]
     public function it_generates_conversation_starters()
     {
         Http::fake([
@@ -215,7 +216,7 @@ class ContentGenerationTest extends TestCase
         $this->assertGreaterThan(0, count($result['suggestions']));
     }
 
-    /** @test */
+    #[Test]
     public function it_optimizes_content_with_multi_ai_consensus()
     {
         Http::fake([
@@ -245,7 +246,7 @@ class ContentGenerationTest extends TestCase
         $this->assertNotEmpty($result['optimized_version']);
     }
 
-    /** @test */
+    #[Test]
     public function it_calculates_confidence_scores_correctly()
     {
         $service = new \ReflectionClass($this->contentGenerationService);
@@ -263,7 +264,7 @@ class ContentGenerationTest extends TestCase
         $this->assertLessThanOrEqual(1, $goodScore);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_empty_user_data_gracefully()
     {
         $user = User::factory()->create([
@@ -280,7 +281,7 @@ class ContentGenerationTest extends TestCase
         $this->assertGreaterThan(0, count($result['suggestions']));
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_feedback_submission()
     {
         $user = User::factory()->create();
@@ -315,7 +316,7 @@ class ContentGenerationTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_requires_authentication_for_content_generation()
     {
         $response = $this->postJson('/api/content-generation/profile', [
@@ -325,7 +326,7 @@ class ContentGenerationTest extends TestCase
         $response->assertStatus(401);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_rate_limiting()
     {
         $user = User::factory()->create();
