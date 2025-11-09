@@ -274,15 +274,75 @@ class MatchController extends Controller
             ->exists();
 
         if ($mutualLike) {
-            // Create match record
-            DB::table('matches')->insert([
-                'user1_id' => min($userId, $targetUserId),
-                'user2_id' => max($userId, $targetUserId),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            $user1 = min($userId, $targetUserId);
+            $user2 = max($userId, $targetUserId);
+
+            // Create match record (idempotent: skip if exists)
+            $existing = DB::table('matches')
+                ->where('user1_id', $user1)
+                ->where('user2_id', $user2)
+                ->exists();
+
+            if (!$existing) {
+                DB::table('matches')->insert([
+                    'user1_id' => $user1,
+                    'user2_id' => $user2,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            // Auto chat creation under feature flag
+            $flags = app(\App\Services\FeatureFlagService::class);
+            if ($flags->isEnabled('auto_chat_on_match')) {
+                $this->createAutoChatIfMissing($user1, $user2);
+            }
         }
 
         return $mutualLike;
+    }
+
+    /**
+     * Create a private chatroom for a matched pair if one doesn't exist; insert system message.
+     */
+    private function createAutoChatIfMissing(int $user1, int $user2): void
+    {
+        // Deterministic unique name for pair
+        $pairName = "match_{$user1}_{$user2}";
+
+        // Look for existing private chatroom with both members
+        $existing = \App\Models\Chatroom::query()
+            ->where('type', 'private')
+            ->where('name', $pairName)
+            ->first();
+
+        if (!$existing) {
+            $chatroom = \App\Models\Chatroom::create([
+                'name' => $pairName,
+                'description' => 'Private chat for matched users',
+                'type' => 'private',
+                'created_by' => $user1,
+                'is_public' => false,
+                'is_active' => true,
+                'member_count' => 0,
+                'message_count' => 0,
+            ]);
+
+            // Attach members
+            $chatroom->addMember(\App\Models\User::find($user1));
+            $chatroom->addMember(\App\Models\User::find($user2));
+
+            // System message
+            \App\Models\ChatroomMessage::create([
+                'chatroom_id' => $chatroom->id,
+                'user_id' => $user1, // attribute to first user for simplicity
+                'content' => "It's a match! Start your conversation.",
+                'type' => 'system',
+                'is_edited' => false,
+                'is_deleted' => false,
+            ]);
+
+            $chatroom->update(['message_count' => 1, 'last_activity_at' => now()]);
+        }
     }
 }

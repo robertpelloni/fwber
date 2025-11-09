@@ -12,5 +12,8 @@ return [
         'moderation_v2' => (bool) env('FLAG_MODERATION_V2', true),
         'reviewer_console' => (bool) env('FLAG_REVIEWER_CONSOLE', false),
         'analytics_v0' => (bool) env('FLAG_ANALYTICS_V0', true),
+        // New MVP flags
+        'auto_chat_on_match' => (bool) env('FLAG_AUTO_CHAT_ON_MATCH', false),
+        'email_notifications' => (bool) env('FLAG_EMAIL_NOTIFICATIONS', false),
     ],
 ];
