@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\ApiToken;
 use App\Models\User;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 
 class MutualMatchChatroomTest extends TestCase
@@ -24,17 +25,26 @@ class MutualMatchChatroomTest extends TestCase
 
         // A likes B
         $this->withHeader('Authorization', 'Bearer '.$tokenA)
-            ->postJson('/api/match/action', [
+            ->postJson('/api/matches/action', [
                 'action' => 'like',
                 'target_user_id' => $b->id,
             ])->assertOk();
 
+        // Ensure next request re-authenticates with new token
+        Auth::logout();
+
         // B likes A (mutual)
-        $resp = $this->withHeader('Authorization', 'Bearer '.$tokenB)
-            ->postJson('/api/match/action', [
+        $responseB = $this->withHeader('Authorization', 'Bearer '.$tokenB)
+            ->postJson('/api/matches/action', [
                 'action' => 'like',
                 'target_user_id' => $a->id,
-            ])->assertOk()->json();
+            ]);
+
+        if ($responseB->getStatusCode() !== 200) {
+            $this->fail('Second like returned status '.$responseB->getStatusCode().' with body: '.json_encode($responseB->json()));
+        }
+
+        $resp = $responseB->json();
 
         $this->assertTrue($resp['is_match'] ?? false);
 
