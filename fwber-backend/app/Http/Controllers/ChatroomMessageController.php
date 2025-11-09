@@ -6,6 +6,7 @@ use App\Models\Chatroom;
 use App\Models\ChatroomMessage;
 use App\Models\ChatroomMessageReaction;
 use App\Services\ContentModerationService;
+use App\Services\TelemetryService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -15,10 +16,12 @@ use Illuminate\Support\Facades\Log;
 class ChatroomMessageController extends Controller
 {
     protected $contentModeration;
+    protected $telemetry;
 
-    public function __construct(ContentModerationService $contentModeration)
+    public function __construct(ContentModerationService $contentModeration, TelemetryService $telemetry)
     {
         $this->contentModeration = $contentModeration;
+        $this->telemetry = $telemetry;
     }
 
     /**
@@ -93,6 +96,15 @@ class ChatroomMessageController extends Controller
         ]);
 
         if ($moderationResult['flagged']) {
+            // Emit telemetry for moderation action
+            $this->telemetry->emit('moderation.flagged', [
+                'user_id' => Auth::id(),
+                'content_type' => 'chatroom_message',
+                'chatroom_id' => $chatroomId,
+                'reason' => $moderationResult['reason'] ?? 'Inappropriate content',
+                'severity' => $moderationResult['severity'] ?? 'medium',
+            ]);
+
             return response()->json([
                 'message' => 'Message blocked by content moderation',
                 'reason' => $moderationResult['reason'] ?? 'Inappropriate content',
@@ -132,6 +144,16 @@ class ChatroomMessageController extends Controller
             'user_id' => Auth::id(),
             'message_id' => $message->id,
             'type' => $message->type,
+        ]);
+
+        // Emit telemetry
+        $this->telemetry->emit('message.sent', [
+            'chatroom_id' => $chatroomId,
+            'user_id' => Auth::id(),
+            'message_id' => $message->id,
+            'type' => $message->type,
+            'is_reply' => !is_null($request->parent_id),
+            'content_length' => strlen($request->content),
         ]);
 
         return response()->json($message, 201);
