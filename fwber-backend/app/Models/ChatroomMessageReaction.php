@@ -11,7 +11,7 @@ class ChatroomMessageReaction extends Model
     use HasFactory;
 
     protected $fillable = [
-        'message_id',
+        'chatroom_message_id',
         'user_id',
         'emoji',
     ];
@@ -21,7 +21,7 @@ class ChatroomMessageReaction extends Model
      */
     public function message(): BelongsTo
     {
-        return $this->belongsTo(ChatroomMessage::class, 'message_id');
+        return $this->belongsTo(ChatroomMessage::class, 'chatroom_message_id');
     }
 
     /**

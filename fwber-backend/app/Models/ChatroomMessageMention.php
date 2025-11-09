@@ -11,7 +11,7 @@ class ChatroomMessageMention extends Model
     use HasFactory;
 
     protected $fillable = [
-        'message_id',
+        'chatroom_message_id',
         'mentioned_user_id',
         'position',
         'length',
@@ -22,7 +22,7 @@ class ChatroomMessageMention extends Model
      */
     public function message(): BelongsTo
     {
-        return $this->belongsTo(ChatroomMessage::class, 'message_id');
+        return $this->belongsTo(ChatroomMessage::class, 'chatroom_message_id');
     }
 
     /**
