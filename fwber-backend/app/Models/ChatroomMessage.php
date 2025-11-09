@@ -16,7 +16,8 @@ class ChatroomMessage extends Model
         'user_id',
         'parent_id',
         'content',
-        'message_type',
+        // Normalize to use 'type' column like migration defines
+        'type',
         'metadata',
         'is_edited',
         'is_deleted',
@@ -276,7 +277,7 @@ class ChatroomMessage extends Model
      */
     public function scopeByType($query, string $type)
     {
-        return $query->where('message_type', $type);
+        return $query->where('type', $type);
     }
 
     /**

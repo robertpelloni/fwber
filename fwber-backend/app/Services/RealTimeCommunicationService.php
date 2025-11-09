@@ -229,7 +229,7 @@ class RealTimeCommunicationService
         $this->redis->publish('message_read_updates', json_encode([
             'message_id' => $message->id,
             'receiver_id' => $message->receiver_id,
-            'read_at' => $message->read_at->toISOString(),
+            'read_at' => $message->read_at?->toISOString(),
         ]));
     }
 

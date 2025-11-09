@@ -36,7 +36,7 @@ class ChatroomMessageController extends Controller
 
         // Filter by message type
         if ($request->has('type')) {
-            $query->where('message_type', $request->type);
+            $query->where('type', $request->type);
         }
 
         // Filter by user
@@ -80,7 +80,7 @@ class ChatroomMessageController extends Controller
 
         $request->validate([
             'content' => 'required|string|max:2000',
-            'message_type' => 'nullable|in:text,image,file,announcement',
+            'type' => 'nullable|in:text,image,file,announcement',
             'parent_id' => 'nullable|exists:chatroom_messages,id',
             'metadata' => 'nullable|array',
         ]);
@@ -105,12 +105,12 @@ class ChatroomMessageController extends Controller
             'user_id' => Auth::id(),
             'parent_id' => $request->parent_id,
             'content' => $request->content,
-            'message_type' => $request->get('message_type', 'text'),
+            'type' => $request->get('type', 'text'),
             'metadata' => $request->metadata ?? [],
             'is_edited' => false,
             'is_deleted' => false,
             'is_pinned' => false,
-            'is_announcement' => $request->get('message_type') === 'announcement',
+            'is_announcement' => $request->get('type') === 'announcement',
             'reaction_count' => 0,
             'reply_count' => 0,
         ]);
@@ -131,7 +131,7 @@ class ChatroomMessageController extends Controller
             'chatroom_id' => $chatroomId,
             'user_id' => Auth::id(),
             'message_id' => $message->id,
-            'message_type' => $message->message_type,
+            'type' => $message->type,
         ]);
 
         return response()->json($message, 201);
