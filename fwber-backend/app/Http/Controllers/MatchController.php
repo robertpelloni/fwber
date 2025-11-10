@@ -8,6 +8,7 @@ use App\Models\UserProfile;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class MatchController extends Controller
 {
@@ -22,12 +23,25 @@ class MatchController extends Controller
             ], 400);
         }
 
-        $matches = $this->findMatches($user, $profile, $request);
+        // Validate filter parameters
+        $request->validate([
+            'age_min' => 'nullable|integer|min:18|max:100',
+            'age_max' => 'nullable|integer|min:18|max:100',
+            'max_distance' => 'nullable|integer|min:1|max:500',
+        ]);
+
+        // Cache feed for 60 seconds per user with filter params
+        $cacheKey = "feed:user_{$user->id}:" . md5($request->getQueryString() ?? '');
+        
+        $matches = Cache::remember($cacheKey, 60, function () use ($user, $profile, $request) {
+            return $this->findMatches($user, $profile, $request);
+        });
 
         // Emit telemetry
         app(\App\Services\TelemetryService::class)->emit('feed.viewed', [
             'user_id' => $user->id,
             'count' => $matches->count(),
+            'filters_applied' => !empty($request->query()),
         ]);
 
         return response()->json([
@@ -102,16 +116,16 @@ class MatchController extends Controller
             });
         }
 
-        // Age filter
-        if ($profile->preferences && isset($profile->preferences['age_range'])) {
-            $ageRange = $profile->preferences['age_range'];
-            $query->whereHas('profile', function ($q) use ($ageRange) {
-                $q->whereRaw('TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN ? AND ?', [
-                    $ageRange['min'] ?? 18,
-                    $ageRange['max'] ?? 100
-                ]);
-            });
-        }
+        // Age filter (request params override preferences)
+        $ageMin = $request->get('age_min', $profile->preferences['age_range']['min'] ?? 18);
+        $ageMax = $request->get('age_max', $profile->preferences['age_range']['max'] ?? 100);
+        
+        $query->whereHas('profile', function ($q) use ($ageMin, $ageMax) {
+            $q->whereRaw('TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN ? AND ?', [
+                $ageMin,
+                $ageMax
+            ]);
+        });
 
         // Exclude users already interacted with
         $excludedIds = DB::table('match_actions')
@@ -166,7 +180,29 @@ class MatchController extends Controller
         // Preference compatibility (40 points)
         $score += $this->calculatePreferenceCompatibility($userProfile, $candidateProfile);
 
+        // Freshness/recency boost (up to 5 points)
+        $score += $this->calculateFreshnessBoost($candidateProfile->user);
+
         return min($maxScore, max(0, $score));
+    }
+
+    private function calculateFreshnessBoost(User $candidate): int
+    {
+        if (!$candidate->last_seen_at) {
+            return 0;
+        }
+
+        $hoursSinceActive = now()->diffInHours($candidate->last_seen_at);
+        
+        if ($hoursSinceActive < 1) {
+            return 5; // Very recent activity
+        } elseif ($hoursSinceActive < 24) {
+            return 3; // Active today
+        } elseif ($hoursSinceActive < 168) {
+            return 1; // Active this week
+        }
+        
+        return 0;
     }
 
     private function calculateDistance(UserProfile $profile1, UserProfile $profile2): float
