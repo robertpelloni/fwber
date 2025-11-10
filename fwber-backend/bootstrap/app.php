@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'auth.api' => AuthenticateApi::class,
+            'profile.complete' => \App\Http\Middleware\EnsureProfileComplete::class,
         ]);
 
         // Enable CORS for API routes

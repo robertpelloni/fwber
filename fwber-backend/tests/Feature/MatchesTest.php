@@ -13,6 +13,9 @@ class MatchesTest extends TestCase
         $user = User::factory()->create();
         $user->profile()->create([
             "display_name" => "Primary",
+            "date_of_birth" => "1990-01-01",
+            "gender" => "male",
+            "location_description" => "Austin, TX",
         ]);
 
         $others = User::factory()->count(2)->create();
@@ -20,6 +23,8 @@ class MatchesTest extends TestCase
         foreach ($others as $index => $candidate) {
             $candidate->profile()->create([
                 "display_name" => "Candidate " . ($index + 1),
+                "date_of_birth" => "1992-06-15",
+                "gender" => "female",
                 "bio" => "Bio " . ($index + 1),
                 "location_description" => "Austin, TX",
             ]);

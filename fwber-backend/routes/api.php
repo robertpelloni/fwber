@@ -37,9 +37,11 @@ Route::middleware("api")->group(function (): void {
         
         Route::post("/auth/logout", [AuthController::class, "logout"]);
         
-        // Matching routes
-        Route::get("/matches", [MatchController::class, "index"]);
-        Route::post("/matches/action", [MatchController::class, "action"]);
+        // Matching routes (require complete profile)
+        Route::middleware('profile.complete')->group(function (): void {
+            Route::get("/matches", [MatchController::class, "index"]);
+            Route::post("/matches/action", [MatchController::class, "action"]);
+        });
         
         // Message routes with tier tracking
         Route::prefix("messages")->group(function (): void {

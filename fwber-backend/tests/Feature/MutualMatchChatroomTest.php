@@ -16,9 +16,19 @@ class MutualMatchChatroomTest extends TestCase
         Config::set('feature_flags.flags.auto_chat_on_match', true);
 
         $a = User::factory()->create();
-        $a->profile()->create(['display_name' => 'A']);
+        $a->profile()->create([
+            'display_name' => 'A',
+            'date_of_birth' => '1990-01-01',
+            'gender' => 'male',
+            'location_description' => 'New York, NY',
+        ]);
         $b = User::factory()->create();
-        $b->profile()->create(['display_name' => 'B']);
+        $b->profile()->create([
+            'display_name' => 'B',
+            'date_of_birth' => '1992-06-15',
+            'gender' => 'female',
+            'location_description' => 'New York, NY',
+        ]);
 
         $tokenA = ApiToken::generateForUser($a, 'test');
         $tokenB = ApiToken::generateForUser($b, 'test');

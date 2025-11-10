@@ -13,9 +13,19 @@ class ChatroomMessageTypeTest extends TestCase
     public function test_chatroom_message_store_uses_type_column(): void
     {
         $user = User::factory()->create();
-        $user->profile()->create(['display_name' => 'Sender']);
+        $user->profile()->create([
+            'display_name' => 'Sender',
+            'date_of_birth' => '1990-01-01',
+            'gender' => 'male',
+            'location_description' => 'Los Angeles, CA',
+        ]);
         $other = User::factory()->create();
-        $other->profile()->create(['display_name' => 'Receiver']);
+        $other->profile()->create([
+            'display_name' => 'Receiver',
+            'date_of_birth' => '1992-06-15',
+            'gender' => 'female',
+            'location_description' => 'Los Angeles, CA',
+        ]);
 
         $token = ApiToken::generateForUser($user, 'test');
         $tokenOther = ApiToken::generateForUser($other, 'test');
