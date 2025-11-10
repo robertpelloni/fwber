@@ -30,10 +30,7 @@ class FeedQualityTest extends TestCase
             'location_description' => 'Test City',
             'location_latitude' => 40.7128,
             'location_longitude' => -74.0060,
-            'preferences' => [
-                'age_range' => ['min' => 21, 'max' => 35],
-                'gender_preferences' => ['female' => true],
-            ],
+            'preferences' => null, // No preferences = no filtering except request params
         ]);
         
         $this->token = ApiToken::generateForUser($this->user, 'test');
@@ -42,10 +39,11 @@ class FeedQualityTest extends TestCase
     #[Test]
     public function age_min_filter_excludes_younger_users(): void
     {
-        // Create users of different ages
-        $young = $this->createCandidate(20, 'female', 40.7, -74.0); // Too young
-        $perfect = $this->createCandidate(28, 'female', 40.7, -74.0); // In range
-        $older = $this->createCandidate(35, 'female', 40.7, -74.0); // In range
+        Cache::flush();
+        
+        $young = $this->createCandidate(20, 'female', 40.7, -74.0);
+        $perfect = $this->createCandidate(28, 'female', 40.7, -74.0);
+        $older = $this->createCandidate(35, 'female', 40.7, -74.0);
         
         $response = $this->getJson('/api/matches?age_min=25', [
             'Authorization' => "Bearer {$this->token}",
@@ -62,6 +60,8 @@ class FeedQualityTest extends TestCase
     #[Test]
     public function age_max_filter_excludes_older_users(): void
     {
+        Cache::flush();
+        
         $young = $this->createCandidate(22, 'female', 40.7, -74.0); // In range
         $perfect = $this->createCandidate(28, 'female', 40.7, -74.0); // In range
         $old = $this->createCandidate(45, 'female', 40.7, -74.0); // Too old
@@ -81,9 +81,11 @@ class FeedQualityTest extends TestCase
     #[Test]
     public function max_distance_filter_excludes_far_users(): void
     {
+        Cache::flush();
+        
         // Create users at different distances (NYC lat/lon: 40.7128, -74.0060)
         $nearby = $this->createCandidate(25, 'female', 40.7500, -74.0060); // ~3 miles
-        $far = $this->createCandidate(25, 'female', 41.7128, -74.0060); // ~69 miles
+        $far = $this->createCandidate(25, 'female', 42.7128, -74.0060); // ~138 miles (well beyond 50)
         
         $response = $this->getJson('/api/matches?max_distance=50', [
             'Authorization' => "Bearer {$this->token}",
@@ -199,7 +201,11 @@ class FeedQualityTest extends TestCase
             'location_longitude' => $lon,
             'preferences' => [
                 'age_range' => ['min' => 18, 'max' => 100],
-                'gender_preferences' => ['male' => true],
+                'gender_preferences' => [
+                    'male' => true,
+                    'female' => true,
+                    'non_binary' => true,
+                ],
             ],
         ]);
         

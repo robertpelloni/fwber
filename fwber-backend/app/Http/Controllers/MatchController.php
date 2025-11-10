@@ -117,11 +117,12 @@ class MatchController extends Controller
         }
 
         // Age filter (request params override preferences)
-        $ageMin = $request->get('age_min', $profile->preferences['age_range']['min'] ?? 18);
-        $ageMax = $request->get('age_max', $profile->preferences['age_range']['max'] ?? 100);
+        $ageMin = (int) $request->get('age_min', $profile->preferences['age_range']['min'] ?? 18);
+        $ageMax = (int) $request->get('age_max', $profile->preferences['age_range']['max'] ?? 100);
         
         $query->whereHas('profile', function ($q) use ($ageMin, $ageMax) {
-            $q->whereRaw('TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN ? AND ?', [
+            // SQLite-compatible age calculation
+            $q->whereRaw("(julianday('now') - julianday(date_of_birth)) / 365.25 BETWEEN ? AND ?", [
                 $ageMin,
                 $ageMax
             ]);
