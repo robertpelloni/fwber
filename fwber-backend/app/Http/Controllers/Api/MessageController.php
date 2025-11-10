@@ -107,7 +107,23 @@ class MessageController extends Controller
             ->orderBy('sent_at', 'asc')
             ->paginate(50);
 
-        return response()->json($messages);
+        // Include other user's presence info
+        $otherUser = User::find($userId);
+
+        return response()->json([
+            'messages' => $messages->items(),
+            'pagination' => [
+                'total' => $messages->total(),
+                'per_page' => $messages->perPage(),
+                'current_page' => $messages->currentPage(),
+                'last_page' => $messages->lastPage(),
+            ],
+            'other_user' => [
+                'id' => $otherUser->id,
+                'name' => $otherUser->name,
+                'last_seen_at' => optional($otherUser->last_seen_at)->toIso8601String(),
+            ],
+        ]);
     }
 
     /**
