@@ -116,16 +116,29 @@ class MessageController extends Controller
     public function markAsRead(int $messageId): JsonResponse
     {
         $message = Message::findOrFail($messageId);
+        $currentUserId = Auth::id();
 
-        if ($message->receiver_id !== Auth::id()) {
+        // Only the receiver can mark a message as read
+        if ($message->receiver_id !== $currentUserId) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $message->is_read = true;
-        $message->read_at = now();
-        $message->save();
+        // Idempotent: do not overwrite existing timestamp
+        if (!$message->is_read) {
+            $message->is_read = true;
+            $message->read_at = now();
+            $message->save();
+        }
 
-        return response()->json(['success' => true]);
+        return response()->json([
+            'message' => [
+                'id' => $message->id,
+                'sender_id' => $message->sender_id,
+                'receiver_id' => $message->receiver_id,
+                'is_read' => $message->is_read,
+                'read_at' => $message->read_at?->toISOString(),
+            ],
+        ]);
     }
 
     /**

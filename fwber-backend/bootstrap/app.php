@@ -17,11 +17,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'auth.api' => AuthenticateApi::class,
             'profile.complete' => \App\Http\Middleware\EnsureProfileComplete::class,
+            'presence.update' => \App\Http\Middleware\UpdateLastSeen::class,
         ]);
 
         // Enable CORS for API routes
         $middleware->api(prepend: [
             \App\Http\Middleware\CorsMiddleware::class,
+            \App\Http\Middleware\UpdateLastSeen::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
