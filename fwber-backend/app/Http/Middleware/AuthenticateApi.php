@@ -14,8 +14,8 @@ class AuthenticateApi
         $header = (string) $request->header('Authorization');
 
         // Support standard session-based auth for tests using actingAs() where no bearer token is supplied.
-        // If a user is already authenticated (e.g. via actingAs in the test suite), bypass token check.
-        if (auth()->check()) {
+        // If a user is already authenticated AND no Authorization header is present, bypass token check.
+        if (auth()->check() && !str_starts_with($header, 'Bearer ')) {
             return $next($request);
         }
 

@@ -119,7 +119,7 @@ class MessageController extends Controller
         $currentUserId = Auth::id();
 
         // Only the receiver can mark a message as read
-        if ($message->receiver_id !== $currentUserId) {
+        if ($message->receiver_id != $currentUserId) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 

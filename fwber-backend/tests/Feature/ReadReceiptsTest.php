@@ -73,8 +73,21 @@ class ReadReceiptsTest extends TestCase
 
         // Initially unread
         $message = Message::find($messageId);
+        $this->assertEquals($this->b->id, $message->receiver_id, 'Receiver ID mismatch');
         $this->assertFalse($message->is_read);
         $this->assertNull($message->read_at);
+
+        // B should have 1 unread message
+        $unread = $this->withHeader('Authorization', 'Bearer ' . $this->tokenB)
+            ->getJson('/api/messages/unread-count');
+        $unread->assertOk();
+        $this->assertEquals(1, $unread->json('unread_count'));
+
+        // Sender should have 0 unread
+        $unreadSender = $this->withHeader('Authorization', 'Bearer ' . $this->tokenA)
+            ->getJson('/api/messages/unread-count');
+        $unreadSender->assertOk();
+        $this->assertEquals(0, $unreadSender->json('unread_count'));
 
         // B marks as read
         $r1 = $this->withHeader('Authorization', 'Bearer ' . $this->tokenB)
