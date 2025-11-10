@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Message;
-use App\Models\UserMatch;
-use App\Models\RelationshipTier;
 use App\Models\Block;
+use App\Models\Message;
+use App\Models\RelationshipTier;
+use App\Models\User;
+use App\Models\UserMatch;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;

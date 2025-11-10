@@ -2,11 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\ApiToken;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Models\UserMatch;
-use App\Services\ApiToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class PresenceExposureTest extends TestCase

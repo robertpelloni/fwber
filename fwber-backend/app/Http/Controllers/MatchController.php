@@ -327,6 +327,16 @@ class MatchController extends Controller
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
+
+                // Send email notifications to both users
+                $emailService = app(\App\Services\EmailNotificationService::class);
+                $userA = User::find($user1);
+                $userB = User::find($user2);
+                
+                if ($userA && $userB) {
+                    $emailService->sendNewMatchNotification($userA, $userB);
+                    $emailService->sendNewMatchNotification($userB, $userA);
+                }
             }
 
             // Auto chat creation under feature flag
