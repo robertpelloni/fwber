@@ -157,6 +157,12 @@ class GroupController extends Controller
             return response()->json(['error' => 'Cannot join private group'], 403);
         }
 
+        // If user was banned previously, prevent joining
+        $existing = $group->members()->where('user_id', $userId)->orderByDesc('id')->first();
+        if ($existing && ($existing->is_banned ?? false)) {
+            return response()->json(['error' => 'You are banned from this group'], 403);
+        }
+
         if ($group->hasMember($userId)) {
             return response()->json(['error' => 'Already a member'], 400);
         }
@@ -199,6 +205,168 @@ class GroupController extends Controller
         $member->save();
 
         return response()->json(['message' => 'Left group successfully']);
+    }
+
+    /**
+     * Set member role (owner can set any non-owner; admin can set moderator/member)
+     */
+    public function setRole(Request $request, int $groupId, int $memberUserId): JsonResponse
+    {
+        $validated = $request->validate([
+            'role' => 'required|in:admin,moderator,member',
+        ]);
+
+        $group = Group::findOrFail($groupId);
+        $actorId = Auth::id();
+
+        $actor = $group->activeMembers()->where('user_id', $actorId)->first();
+        if (!$actor) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $target = $group->activeMembers()->where('user_id', $memberUserId)->first();
+        if (!$target) {
+            return response()->json(['error' => 'Member not found or inactive'], 404);
+        }
+
+        if ($target->isOwner()) {
+            return response()->json(['error' => 'Cannot change owner role'], 400);
+        }
+
+        // Permissions: owner can set any role; admin can set moderator/member only
+        if ($actor->isOwner()) {
+            $target->role = $validated['role'];
+            $target->role_changed_at = now();
+            $target->save();
+            return response()->json(['message' => 'Role updated']);
+        }
+
+        if ($actor->role === 'admin') {
+            if (in_array($validated['role'], ['moderator', 'member'], true)) {
+                $target->role = $validated['role'];
+                $target->role_changed_at = now();
+                $target->save();
+                return response()->json(['message' => 'Role updated']);
+            }
+            return response()->json(['error' => 'Admins cannot assign admin role'], 403);
+        }
+
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+
+    /**
+     * Transfer ownership to another active member
+     */
+    public function transferOwnership(Request $request, int $groupId): JsonResponse
+    {
+        $validated = $request->validate([
+            'new_owner_user_id' => 'required|integer',
+        ]);
+
+        $group = Group::findOrFail($groupId);
+        $actorId = Auth::id();
+        $actor = $group->activeMembers()->where('user_id', $actorId)->first();
+        if (!$actor || !$actor->isOwner()) {
+            return response()->json(['error' => 'Only owner can transfer ownership'], 403);
+        }
+
+        $target = $group->activeMembers()->where('user_id', $validated['new_owner_user_id'])->first();
+        if (!$target) {
+            return response()->json(['error' => 'Target user is not an active member'], 400);
+        }
+
+        if ($target->isOwner()) {
+            return response()->json(['message' => 'Already owner']);
+        }
+
+        // Perform transfer: target -> owner, actor (current owner) -> admin
+        $target->role = 'owner';
+        $target->role_changed_at = now();
+        $target->save();
+
+        $actor->role = 'admin';
+        $actor->role_changed_at = now();
+        $actor->save();
+
+        return response()->json(['message' => 'Ownership transferred']);
+    }
+
+    /**
+     * Ban a member (owner/admin). Banned members are deactivated and cannot rejoin until unbanned.
+     */
+    public function banMember(int $groupId, int $memberUserId): JsonResponse
+    {
+        $group = Group::findOrFail($groupId);
+        $actorId = Auth::id();
+        $actor = $group->activeMembers()->where('user_id', $actorId)->first();
+        if (!$actor || !$actor->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $target = $group->members()->where('user_id', $memberUserId)->orderByDesc('id')->first();
+        if (!$target) {
+            return response()->json(['error' => 'Member not found'], 404);
+        }
+        if ($target->isOwner()) {
+            return response()->json(['error' => 'Cannot ban owner'], 400);
+        }
+
+        $target->is_banned = true;
+        $target->is_active = false;
+        $target->left_at = now();
+        $target->save();
+
+        return response()->json(['message' => 'Member banned']);
+    }
+
+    /**
+     * Unban a member (owner/admin)
+     */
+    public function unbanMember(int $groupId, int $memberUserId): JsonResponse
+    {
+        $group = Group::findOrFail($groupId);
+        $actorId = Auth::id();
+        $actor = $group->activeMembers()->where('user_id', $actorId)->first();
+        if (!$actor || !$actor->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $target = $group->members()->where('user_id', $memberUserId)->orderByDesc('id')->first();
+        if (!$target) {
+            return response()->json(['error' => 'Member not found'], 404);
+        }
+
+        $target->is_banned = false;
+        $target->save();
+
+        return response()->json(['message' => 'Member unbanned']);
+    }
+
+    /**
+     * Kick a member (owner/admin). Makes member inactive but not banned.
+     */
+    public function kickMember(int $groupId, int $memberUserId): JsonResponse
+    {
+        $group = Group::findOrFail($groupId);
+        $actorId = Auth::id();
+        $actor = $group->activeMembers()->where('user_id', $actorId)->first();
+        if (!$actor || !$actor->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $target = $group->activeMembers()->where('user_id', $memberUserId)->first();
+        if (!$target) {
+            return response()->json(['error' => 'Member not found or inactive'], 404);
+        }
+        if ($target->isOwner()) {
+            return response()->json(['error' => 'Cannot kick owner'], 400);
+        }
+
+        $target->is_active = false;
+        $target->left_at = now();
+        $target->save();
+
+        return response()->json(['message' => 'Member removed']);
     }
 
     /**

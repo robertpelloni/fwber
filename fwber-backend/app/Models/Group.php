@@ -65,12 +65,12 @@ class Group extends Model
 
     public function hasMember(int $userId): bool
     {
-        return $this->activeMembers()->where('user_id', $userId)->exists();
+        return $this->activeMembers()->where('user_id', $userId)->where('is_banned', false)->exists();
     }
 
     public function getMemberRole(int $userId): ?string
     {
-        $member = $this->activeMembers()->where('user_id', $userId)->first();
+        $member = $this->activeMembers()->where('user_id', $userId)->where('is_banned', false)->first();
         return $member?->role;
     }
 

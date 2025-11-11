@@ -400,4 +400,335 @@ class GroupFeatureTest extends TestCase
 
         $response->assertStatus(403);
     }
+
+    #[Test]
+    public function cannot_join_same_group_twice(): void
+    {
+        $group = Group::create([
+            'name' => 'Dup Group',
+            'creator_id' => $this->user->id,
+            'visibility' => 'public',
+        ]);
+        GroupMember::create([
+            'group_id' => $group->id,
+            'user_id' => $this->user->id,
+            'role' => 'owner',
+            'is_active' => true,
+        ]);
+
+        // First join succeeds
+        $this->withHeader('Authorization', "Bearer {$this->token2}")
+            ->postJson("/api/groups/{$group->id}/join")
+            ->assertOk();
+
+        // Second join attempt
+        $this->withHeader('Authorization', "Bearer {$this->token2}")
+            ->postJson("/api/groups/{$group->id}/join")
+            ->assertStatus(400);
+    }
+
+    #[Test]
+    public function owner_cannot_leave_group(): void
+    {
+        $group = Group::create([
+            'name' => 'Leave Test',
+            'creator_id' => $this->user->id,
+            'visibility' => 'public',
+        ]);
+        GroupMember::create([
+            'group_id' => $group->id,
+            'user_id' => $this->user->id,
+            'role' => 'owner',
+            'is_active' => true,
+        ]);
+
+        $this->withHeader('Authorization', "Bearer {$this->token}")
+            ->postJson("/api/groups/{$group->id}/leave")
+            ->assertStatus(400);
+    }
+
+    #[Test]
+    public function member_can_leave_group(): void
+    {
+        $group = Group::create([
+            'name' => 'Leave OK',
+            'creator_id' => $this->user->id,
+            'visibility' => 'public',
+        ]);
+        GroupMember::create([
+            'group_id' => $group->id,
+            'user_id' => $this->user->id,
+            'role' => 'owner',
+            'is_active' => true,
+        ]);
+        GroupMember::create([
+            'group_id' => $group->id,
+            'user_id' => $this->user2->id,
+            'role' => 'member',
+            'is_active' => true,
+        ]);
+
+        $this->withHeader('Authorization', "Bearer {$this->token2}")
+            ->postJson("/api/groups/{$group->id}/leave")
+            ->assertOk();
+
+        $member = GroupMember::where('group_id', $group->id)->where('user_id', $this->user2->id)->first();
+        $this->assertNotNull($member);
+        $this->assertFalse((bool)$member->is_active);
+        $this->assertNotNull($member->left_at);
+    }
+
+    #[Test]
+    public function cannot_join_full_group(): void
+    {
+        $group = Group::create([
+            'name' => 'Full Group',
+            'creator_id' => $this->user->id,
+            'visibility' => 'public',
+            'max_members' => 2,
+        ]);
+        GroupMember::create([
+            'group_id' => $group->id,
+            'user_id' => $this->user->id,
+            'role' => 'owner',
+            'is_active' => true,
+        ]);
+
+        // Second member joins
+        $this->withHeader('Authorization', "Bearer {$this->token2}")
+            ->postJson("/api/groups/{$group->id}/join")
+            ->assertOk();
+
+        // Third user attempts to join
+        $user3 = User::factory()->create();
+        UserProfile::factory()->create([
+            'user_id' => $user3->id,
+            'display_name' => 'User Three',
+            'date_of_birth' => now()->subYears(27),
+            'gender' => 'other',
+        ]);
+        $token3 = ApiToken::generateForUser($user3, 'test');
+
+        $this->withHeader('Authorization', "Bearer {$token3}")
+            ->postJson("/api/groups/{$group->id}/join")
+            ->assertStatus(400);
+    }
+
+    #[Test]
+    public function unread_count_across_groups(): void
+    {
+        $group = Group::create([
+            'name' => 'Unread Group',
+            'creator_id' => $this->user->id,
+            'visibility' => 'public',
+        ]);
+        GroupMember::create([
+            'group_id' => $group->id,
+            'user_id' => $this->user->id,
+            'role' => 'owner',
+            'is_active' => true,
+        ]);
+        GroupMember::create([
+            'group_id' => $group->id,
+            'user_id' => $this->user2->id,
+            'role' => 'member',
+            'is_active' => true,
+        ]);
+
+        // Two messages from user1
+        $m1 = GroupMessage::create([
+            'group_id' => $group->id,
+            'sender_id' => $this->user->id,
+            'content' => 'm1',
+            'message_type' => 'text',
+            'sent_at' => now(),
+        ]);
+        $m2 = GroupMessage::create([
+            'group_id' => $group->id,
+            'sender_id' => $this->user->id,
+            'content' => 'm2',
+            'message_type' => 'text',
+            'sent_at' => now(),
+        ]);
+
+        $this->withHeader('Authorization', "Bearer {$this->token2}")
+            ->getJson('/api/group-messages/unread-count')
+            ->assertOk()
+            ->assertJson(['unread_count' => 2]);
+
+        // Mark one as read
+        $this->withHeader('Authorization', "Bearer {$this->token2}")
+            ->postJson("/api/group-messages/{$m1->id}/read")
+            ->assertOk();
+
+        $this->withHeader('Authorization', "Bearer {$this->token2}")
+            ->getJson('/api/group-messages/unread-count')
+            ->assertOk()
+            ->assertJson(['unread_count' => 1]);
+
+        // User2 sends a message; shouldn't count for themselves
+        GroupMessage::create([
+            'group_id' => $group->id,
+            'sender_id' => $this->user2->id,
+            'content' => 'm3',
+            'message_type' => 'text',
+            'sent_at' => now(),
+        ]);
+
+        $this->withHeader('Authorization', "Bearer {$this->token2}")
+            ->getJson('/api/group-messages/unread-count')
+            ->assertOk()
+            ->assertJson(['unread_count' => 1]);
+    }
+
+    #[Test]
+    public function private_group_hidden_from_non_member_show(): void
+    {
+        $group = Group::create([
+            'name' => 'Hidden Private',
+            'creator_id' => $this->user->id,
+            'visibility' => 'private',
+        ]);
+        GroupMember::create([
+            'group_id' => $group->id,
+            'user_id' => $this->user->id,
+            'role' => 'owner',
+            'is_active' => true,
+        ]);
+
+        $this->withHeader('Authorization', "Bearer {$this->token2}")
+            ->getJson("/api/groups/{$group->id}")
+            ->assertStatus(404);
+    }
+
+    #[Test]
+    public function private_group_visible_to_member_show(): void
+    {
+        $group = Group::create([
+            'name' => 'Private OK',
+            'creator_id' => $this->user->id,
+            'visibility' => 'private',
+        ]);
+        GroupMember::create([
+            'group_id' => $group->id,
+            'user_id' => $this->user->id,
+            'role' => 'owner',
+            'is_active' => true,
+        ]);
+        GroupMember::create([
+            'group_id' => $group->id,
+            'user_id' => $this->user2->id,
+            'role' => 'member',
+            'is_active' => true,
+        ]);
+
+        $this->withHeader('Authorization', "Bearer {$this->token2}")
+            ->getJson("/api/groups/{$group->id}")
+            ->assertOk()
+            ->assertJsonPath('is_member', true);
+    }
+
+    #[Test]
+    public function admin_can_update_group(): void
+    {
+        $group = Group::create([
+            'name' => 'Admin Update',
+            'creator_id' => $this->user->id,
+            'visibility' => 'public',
+        ]);
+        GroupMember::create([
+            'group_id' => $group->id,
+            'user_id' => $this->user->id,
+            'role' => 'owner',
+            'is_active' => true,
+        ]);
+        GroupMember::create([
+            'group_id' => $group->id,
+            'user_id' => $this->user2->id,
+            'role' => 'admin',
+            'is_active' => true,
+        ]);
+
+        $this->withHeader('Authorization', "Bearer {$this->token2}")
+            ->putJson("/api/groups/{$group->id}", [
+                'name' => 'Admin Updated',
+            ])
+            ->assertOk();
+
+        $this->assertDatabaseHas('groups', [
+            'id' => $group->id,
+            'name' => 'Admin Updated',
+        ]);
+    }
+
+    #[Test]
+    public function owner_can_delete_group(): void
+    {
+        $group = Group::create([
+            'name' => 'To Delete',
+            'creator_id' => $this->user->id,
+            'visibility' => 'public',
+        ]);
+        GroupMember::create([
+            'group_id' => $group->id,
+            'user_id' => $this->user->id,
+            'role' => 'owner',
+            'is_active' => true,
+        ]);
+
+        $this->withHeader('Authorization', "Bearer {$this->token}")
+            ->deleteJson("/api/groups/{$group->id}")
+            ->assertOk();
+
+        $this->assertDatabaseHas('groups', [
+            'id' => $group->id,
+            'is_active' => false,
+        ]);
+    }
+
+    #[Test]
+    public function non_owner_cannot_delete_group(): void
+    {
+        $group = Group::create([
+            'name' => 'No Delete',
+            'creator_id' => $this->user->id,
+            'visibility' => 'public',
+        ]);
+        GroupMember::create([
+            'group_id' => $group->id,
+            'user_id' => $this->user->id,
+            'role' => 'owner',
+            'is_active' => true,
+        ]);
+        GroupMember::create([
+            'group_id' => $group->id,
+            'user_id' => $this->user2->id,
+            'role' => 'admin',
+            'is_active' => true,
+        ]);
+
+        $this->withHeader('Authorization', "Bearer {$this->token2}")
+            ->deleteJson("/api/groups/{$group->id}")
+            ->assertStatus(403);
+    }
+
+    #[Test]
+    public function non_member_cannot_list_group_messages(): void
+    {
+        $group = Group::create([
+            'name' => 'No List',
+            'creator_id' => $this->user->id,
+            'visibility' => 'public',
+        ]);
+        GroupMember::create([
+            'group_id' => $group->id,
+            'user_id' => $this->user->id,
+            'role' => 'owner',
+            'is_active' => true,
+        ]);
+
+        $this->withHeader('Authorization', "Bearer {$this->token2}")
+            ->getJson("/api/groups/{$group->id}/messages")
+            ->assertStatus(403);
+    }
 }

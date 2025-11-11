@@ -63,6 +63,11 @@ Route::middleware("api")->group(function (): void {
                 Route::delete("/{groupId}", [GroupController::class, "destroy"]);
                 Route::post("/{groupId}/join", [GroupController::class, "join"]);
                 Route::post("/{groupId}/leave", [GroupController::class, "leave"]);
+                Route::post("/{groupId}/ownership/transfer", [GroupController::class, "transferOwnership"]);
+                Route::post("/{groupId}/members/{memberUserId}/role", [GroupController::class, "setRole"]);
+                Route::post("/{groupId}/members/{memberUserId}/ban", [GroupController::class, "banMember"]);
+                Route::post("/{groupId}/members/{memberUserId}/unban", [GroupController::class, "unbanMember"]);
+                Route::post("/{groupId}/members/{memberUserId}/kick", [GroupController::class, "kickMember"]);
             });
         
             // Group message routes
