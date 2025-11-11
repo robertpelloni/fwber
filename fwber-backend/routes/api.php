@@ -20,6 +20,8 @@ use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\UserPhysicalProfileController;
 use App\Http\Controllers\Api\BlockController;
 use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\GroupController;
+use App\Http\Controllers\Api\GroupMessageController;
 use App\Http\Controllers\WebSocketController;
 use Illuminate\Support\Facades\Route;
 
@@ -50,6 +52,27 @@ Route::middleware("api")->group(function (): void {
             Route::post("/", [MessageController::class, "store"]);
             Route::post("/{messageId}/read", [MessageController::class, "markAsRead"]);
         });
+        
+            // Group routes
+            Route::prefix("groups")->group(function (): void {
+                Route::get("/", [GroupController::class, "index"]);
+                Route::post("/", [GroupController::class, "store"]);
+                Route::get("/discover", [GroupController::class, "discover"]);
+                Route::get("/{groupId}", [GroupController::class, "show"]);
+                Route::put("/{groupId}", [GroupController::class, "update"]);
+                Route::delete("/{groupId}", [GroupController::class, "destroy"]);
+                Route::post("/{groupId}/join", [GroupController::class, "join"]);
+                Route::post("/{groupId}/leave", [GroupController::class, "leave"]);
+            });
+        
+            // Group message routes
+            Route::prefix("groups/{groupId}/messages")->group(function (): void {
+                Route::get("/", [GroupMessageController::class, "index"]);
+                Route::post("/", [GroupMessageController::class, "store"]);
+            });
+        
+            Route::post("/group-messages/{messageId}/read", [GroupMessageController::class, "markAsRead"]);
+            Route::get("/group-messages/unread-count", [GroupMessageController::class, "unreadCount"]);
         
         // Relationship Tier routes
         Route::prefix("matches/{matchId}")->group(function (): void {

@@ -13,7 +13,13 @@ return new class extends Migration
     {
         Schema::create('group_message_reads', function (Blueprint $table) {
             $table->id();
+                $table->foreignId('group_message_id')->constrained('group_messages')->onDelete('cascade');
+                $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+                $table->timestamp('read_at')->useCurrent();
             $table->timestamps();
+            
+                $table->unique(['group_message_id', 'user_id']);
+                $table->index('user_id');
         });
     }
 
