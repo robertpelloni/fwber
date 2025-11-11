@@ -23,8 +23,9 @@ class MessageController extends Controller
             'receiver_id' => 'required|exists:users,id',
             'content' => 'nullable|string|max:5000',
             'message_type' => 'sometimes|string|in:text,image,video,audio,file',
-            'media' => 'nullable|file|max:50000', // 50MB max
-            'media_duration' => 'nullable|integer|min:1|max:300', // For voice notes (5 min max)
+            'media' => 'nullable|file',
+            // media_duration provided by clients for audio/video; we clamp to type-specific caps later
+            'media_duration' => 'nullable|integer|min:1',
         ]);
 
         $senderId = Auth::id();
@@ -45,19 +46,117 @@ class MessageController extends Controller
             return response()->json(['error' => 'No active match found'], 404);
         }
 
-        // Handle media upload
+        // At least one of content or media is required
+        if (!$request->hasFile('media') && (!isset($validated['content']) || trim((string)$validated['content']) === '')) {
+            return response()->json([
+                'message' => 'The given data was invalid.',
+                'errors' => [
+                    'content' => ['Either content or media is required']
+                ]
+            ], 422);
+        }
+
+        // Determine and validate media constraints
         $mediaUrl = null;
         $mediaType = null;
         $thumbnailUrl = null;
-        
+        $resolvedType = $validated['message_type'] ?? 'text';
+        $duration = $validated['media_duration'] ?? null;
+
         if ($request->hasFile('media')) {
             $file = $request->file('media');
             $mediaType = $file->getMimeType();
-            
+
+            // Infer message type from MIME when not explicitly set
+            if (!isset($validated['message_type'])) {
+                if (str_starts_with($mediaType, 'image/')) {
+                    $resolvedType = 'image';
+                } elseif (str_starts_with($mediaType, 'audio/')) {
+                    $resolvedType = 'audio';
+                } elseif (str_starts_with($mediaType, 'video/')) {
+                    $resolvedType = 'video';
+                } else {
+                    $resolvedType = 'file';
+                }
+            }
+
+            // If client specified a type, ensure it matches the detected type (for media)
+            if (isset($validated['message_type'])) {
+                $detectedForCompare = str_starts_with($mediaType, 'image/') ? 'image'
+                    : (str_starts_with($mediaType, 'audio/') ? 'audio'
+                        : (str_starts_with($mediaType, 'video/') ? 'video' : 'file'));
+
+                if ($validated['message_type'] !== $detectedForCompare) {
+                    return response()->json([
+                        'message' => 'The given data was invalid.',
+                        'errors' => [
+                            'message_type' => ['message_type does not match uploaded media']
+                        ]
+                    ], 422);
+                }
+            }
+
+            // Type-specific constraints
+            $sizeKB = (int) ceil(($file->getSize() ?? 0) / 1024);
+            $limits = [
+                'image' => 5120,   // 5 MB
+                'audio' => 3072,   // 3 MB
+                'video' => 15360,  // 15 MB
+                'file'  => 2048,   // 2 MB
+            ];
+
+            // Validate size by resolved type
+            $cap = $limits[$resolvedType] ?? $limits['file'];
+            if ($sizeKB > $cap) {
+                return response()->json([
+                    'message' => 'The given data was invalid.',
+                    'errors' => [
+                        'media' => ["{$resolvedType} exceeds maximum size of {$cap} KB"]
+                    ]
+                ], 422);
+            }
+
+            // Validate allowed MIME for images specifically to block disguised executables
+            if ($resolvedType === 'image') {
+                $allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                if (!in_array($mediaType, $allowed, true)) {
+                    return response()->json([
+                        'message' => 'The given data was invalid.',
+                        'errors' => [
+                            'media' => ['Unsupported image type']
+                        ]
+                    ], 422);
+                }
+            }
+
+            // Clamp duration for audio/video
+            if ($resolvedType === 'audio') {
+                $duration = (int)($duration ?? 1);
+                if ($duration < 1 || $duration > 120) {
+                    return response()->json([
+                        'message' => 'The given data was invalid.',
+                        'errors' => [
+                            'media_duration' => ['Audio duration must be between 1 and 120 seconds']
+                        ]
+                    ], 422);
+                }
+            } elseif ($resolvedType === 'video') {
+                $duration = (int)($duration ?? 1);
+                if ($duration < 1 || $duration > 60) {
+                    return response()->json([
+                        'message' => 'The given data was invalid.',
+                        'errors' => [
+                            'media_duration' => ['Video duration must be between 1 and 60 seconds']
+                        ]
+                    ], 422);
+                }
+            } else {
+                $duration = null; // Not applicable
+            }
+
             // Store in public disk under messages/{senderId}
             $path = $file->store("messages/{$senderId}", 'public');
             $mediaUrl = \Storage::url($path);
-            
             // TODO: Generate thumbnail for videos (future enhancement)
         }
 
@@ -66,10 +165,10 @@ class MessageController extends Controller
             'sender_id' => $senderId,
             'receiver_id' => $receiverId,
             'content' => $validated['content'] ?? '',
-            'message_type' => $validated['message_type'] ?? 'text',
+            'message_type' => $resolvedType,
             'media_url' => $mediaUrl,
             'media_type' => $mediaType,
-            'media_duration' => $validated['media_duration'] ?? null,
+            'media_duration' => $duration,
             'thumbnail_url' => $thumbnailUrl,
             'sent_at' => now(),
         ]);
