@@ -154,10 +154,11 @@ class MessageController extends Controller
                 $duration = null; // Not applicable
             }
 
-            // Store in public disk under messages/{senderId}
-            $path = $file->store("messages/{$senderId}", 'public');
-            $mediaUrl = \Storage::url($path);
-            // TODO: Generate thumbnail for videos (future enhancement)
+            // Store in public disk under messages/{$senderId}
+            $stored = \App\Services\MediaUploadService::store($file, $senderId, $resolvedType);
+            $mediaUrl = $stored['media_url'];
+            $mediaType = $stored['media_type'];
+            $thumbnailUrl = $stored['thumbnail_url'];
         }
 
         // Create the message
