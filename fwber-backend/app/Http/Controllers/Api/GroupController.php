@@ -163,6 +163,7 @@ class GroupController extends Controller
             return response()->json(['error' => 'You are banned from this group'], 403);
         }
 
+        // If already an active member, block duplicate join
         if ($group->hasMember($userId)) {
             return response()->json(['error' => 'Already a member'], 400);
         }
@@ -171,13 +172,27 @@ class GroupController extends Controller
             return response()->json(['error' => 'Group is full'], 400);
         }
 
-        GroupMember::create([
-            'group_id' => $group->id,
-            'user_id' => $userId,
-            'role' => 'member',
-            'is_active' => true,
-            'joined_at' => now(),
-        ]);
+        // If there is a historical membership record (e.g., left, kicked, or previously banned but now unbanned), reactivate it
+        if ($existing) {
+            $existing->is_active = true;
+            $existing->is_banned = false; // ensure cleared
+            $existing->left_at = null;
+            $existing->joined_at = now();
+            // Preserve prior role if present; default to member if missing
+            if (empty($existing->role)) {
+                $existing->role = 'member';
+            }
+            $existing->save();
+        } else {
+            // No prior record exists; create fresh membership
+            GroupMember::create([
+                'group_id' => $group->id,
+                'user_id' => $userId,
+                'role' => 'member',
+                'is_active' => true,
+                'joined_at' => now(),
+            ]);
+        }
 
         return response()->json(['message' => 'Joined group successfully']);
     }
