@@ -21,8 +21,10 @@ class MessageController extends Controller
     {
         $validated = $request->validate([
             'receiver_id' => 'required|exists:users,id',
-            'content' => 'required|string|max:5000',
-            'message_type' => 'sometimes|string|in:text,image,video,audio',
+            'content' => 'nullable|string|max:5000',
+            'message_type' => 'sometimes|string|in:text,image,video,audio,file',
+            'media' => 'nullable|file|max:50000', // 50MB max
+            'media_duration' => 'nullable|integer|min:1|max:300', // For voice notes (5 min max)
         ]);
 
         $senderId = Auth::id();
@@ -43,12 +45,32 @@ class MessageController extends Controller
             return response()->json(['error' => 'No active match found'], 404);
         }
 
+        // Handle media upload
+        $mediaUrl = null;
+        $mediaType = null;
+        $thumbnailUrl = null;
+        
+        if ($request->hasFile('media')) {
+            $file = $request->file('media');
+            $mediaType = $file->getMimeType();
+            
+            // Store in public disk under messages/{senderId}
+            $path = $file->store("messages/{$senderId}", 'public');
+            $mediaUrl = \Storage::url($path);
+            
+            // TODO: Generate thumbnail for videos (future enhancement)
+        }
+
         // Create the message
         $message = Message::create([
             'sender_id' => $senderId,
             'receiver_id' => $receiverId,
-            'content' => $validated['content'],
+            'content' => $validated['content'] ?? '',
             'message_type' => $validated['message_type'] ?? 'text',
+            'media_url' => $mediaUrl,
+            'media_type' => $mediaType,
+            'media_duration' => $validated['media_duration'] ?? null,
+            'thumbnail_url' => $thumbnailUrl,
             'sent_at' => now(),
         ]);
 

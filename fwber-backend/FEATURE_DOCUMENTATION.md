@@ -217,28 +217,181 @@ php artisan serve
 
 ---
 
+---
+
+## P2 Features: Media Messaging (Voice, Photo, Video)
+
+**Status:** ✅ Completed
+
+### Overview
+
+Users can now send rich media in 1:1 messages:
+- **Voice messages** (audio files, max 5 minutes)
+- **Photos** (images)
+- **Videos** (with duration tracking)
+- **Files** (general attachments)
+
+### Database Schema
+
+**New fields on `messages` table:**
+- `media_url` (string, nullable): Public URL to media file
+- `media_type` (string, nullable): MIME type (e.g., `audio/mpeg`, `image/jpeg`)
+- `media_duration` (integer, nullable): Duration in seconds for audio/video
+- `thumbnail_url` (string, nullable): Thumbnail for video previews (future)
+
+### API Changes
+
+**Endpoint:** `POST /api/messages`
+
+**Request (multipart/form-data):**
+```
+receiver_id: 123
+content: "Check this out!" (optional for media)
+message_type: "audio" | "image" | "video" | "file"
+media: <file upload>
+media_duration: 30 (optional, for audio/video)
+```
+
+**Validation:**
+- `media`: max 50MB
+- `media_duration`: 1-300 seconds (5 min max for voice notes)
+- `content`: optional when media attached, max 5000 chars
+
+**Response:**
+```json
+{
+  "message": {
+    "id": 456,
+    "sender_id": 1,
+    "receiver_id": 2,
+    "content": "Voice message",
+    "message_type": "audio",
+    "media_url": "/storage/messages/1/voice_xyz.mp3",
+    "media_type": "audio/mpeg",
+    "media_duration": 15,
+    "thumbnail_url": null,
+    "sent_at": "2025-11-10T22:15:00+00:00"
+  },
+  "tier_update": {...}
+}
+```
+
+### Storage
+
+**Location:** `storage/app/public/messages/{sender_id}/`
+
+**Access:** Files are served via Laravel's `public` disk symlink (`php artisan storage:link`)
+
+**Security:** 
+- Files stored per sender for organization
+- Access control enforced via match verification in MessageController
+- Future: Add signed URLs for private media access
+
+### Use Cases
+
+1. **Voice Messages:**
+   ```bash
+   curl -X POST http://localhost:8000/api/messages \
+     -H "Authorization: Bearer TOKEN" \
+     -F "receiver_id=2" \
+     -F "message_type=audio" \
+     -F "media=@voice.mp3" \
+     -F "media_duration=15"
+   ```
+
+2. **Photo Sharing:**
+   ```bash
+   curl -X POST http://localhost:8000/api/messages \
+     -H "Authorization: Bearer TOKEN" \
+     -F "receiver_id=2" \
+     -F "content=Check this out!" \
+     -F "message_type=image" \
+     -F "media=@photo.jpg"
+   ```
+
+3. **Video Messages:**
+   ```bash
+   curl -X POST http://localhost:8000/api/messages \
+     -H "Authorization: Bearer TOKEN" \
+     -F "receiver_id=2" \
+     -F "message_type=video" \
+     -F "media=@video.mp4" \
+     -F "media_duration=30"
+   ```
+
+### Frontend Integration Notes
+
+**Conversation View:**
+- Text messages: Display `content` as before
+- Audio messages: Render audio player with duration badge
+- Image messages: Display thumbnail/lightbox
+- Video messages: Show video player (use `thumbnail_url` when available)
+
+**Message Indicators:**
+- Show microphone icon for audio
+- Show camera icon for images
+- Show video icon for videos
+- Display `media_duration` for audio/video (e.g., "0:15")
+
+### Tests
+
+**Coverage:** `tests/Feature/MediaMessagingTest.php` (7 tests, 36 assertions)
+
+**Test Cases:**
+- ✓ Send voice message with audio file
+- ✓ Send image message
+- ✓ Send video message
+- ✓ Text messages still work without media
+- ✓ Media file size validation (50MB limit)
+- ✓ Voice duration validation (5 min limit)
+- ✓ Conversation includes mixed media messages
+
+---
+
 ## Future Enhancements (Optional)
 
-1. **WebSocket Integration:**
+1. **Video Thumbnails:**
+   - Auto-generate thumbnails for video messages using FFmpeg
+   - Store in `thumbnail_url` field
+
+2. **Media Compression:**
+   - Compress images on upload to save bandwidth
+   - Transcode videos to web-friendly formats
+
+3. **Signed URLs:**
+   - Generate temporary signed URLs for media access
+   - Prevents unauthorized direct file access
+
+4. **WebSocket Integration:**
    - Wire `UpdateLastSeen` middleware into WebSocket presence endpoints
    - Real-time presence updates for connected users
+   - Push media message notifications
 
-2. **Typing Indicators:**
+5. **Typing Indicators:**
    - Extend presence system with "is typing" events
    - Ephemeral state (not persisted)
 
-3. **Email Preferences:**
+6. **Email Preferences:**
    - User settings to control notification frequency
    - Opt-out per notification type
 
-4. **Rich Email Analytics:**
+7. **Rich Email Analytics:**
    - Track open rates, click-through rates
    - A/B test email content
+
+8. **Stickers & GIFs:**
+   - Integrate GIPHY API for GIF search
+   - Custom sticker packs per user
+
+9. **Voice Transcription:**
+   - Use Whisper API to transcribe voice messages
+   - Store transcript in `content` field for searchability
 
 ---
 
 ## Deployment Checklist
 
+**Email Notifications:**
 - [ ] Set `FLAG_EMAIL_NOTIFICATIONS=true` in production
 - [ ] Configure SMTP settings in `.env`
 - [ ] Test email delivery in staging
@@ -246,7 +399,19 @@ php artisan serve
 - [ ] Monitor email queue/logs for issues
 - [ ] Consider using Laravel Queue for async email sending
 
+**Media Messaging:**
+- [ ] Run `php artisan storage:link` to create public symlink
+- [ ] Ensure `storage/app/public/messages/` is writable
+- [ ] Configure max upload size in `php.ini` (`upload_max_filesize`, `post_max_size`)
+- [ ] Set up CDN for media delivery (optional but recommended)
+- [ ] Configure S3/object storage for production media (see `FILESYSTEM_DISK` in `.env`)
+- [ ] Monitor storage usage and implement cleanup policy for old media
+
+**Database:**
+- [ ] Run migrations: `php artisan migrate`
+- [ ] Verify `messages` table has new media fields
+
 ---
 
 **Last Updated:** November 10, 2025
-**Test Suite Status:** ✅ All Green (64 passed)
+**Test Suite Status:** ✅ All Green (71 passed, 297 assertions)
