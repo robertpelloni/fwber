@@ -17,6 +17,12 @@ class GroupMember extends Model
         'is_active',
         'is_muted',
         'is_banned',
+        'muted_until',
+        'mute_reason',
+        'muted_by_user_id',
+        'banned_reason',
+        'banned_at',
+        'banned_by_user_id',
     ];
 
     protected $casts = [
@@ -26,6 +32,8 @@ class GroupMember extends Model
         'is_active' => 'boolean',
         'is_muted' => 'boolean',
         'is_banned' => 'boolean',
+        'muted_until' => 'datetime',
+        'banned_at' => 'datetime',
     ];
 
     public function group(): BelongsTo
@@ -56,5 +64,16 @@ class GroupMember extends Model
     public function isBanned(): bool
     {
         return (bool)($this->is_banned ?? false);
+    }
+
+    public function isCurrentlyMuted(): bool
+    {
+        if (!(bool)($this->is_muted ?? false)) {
+            return false;
+        }
+        if ($this->muted_until && now()->greaterThan($this->muted_until)) {
+            return false; // expired
+        }
+        return true;
     }
 }

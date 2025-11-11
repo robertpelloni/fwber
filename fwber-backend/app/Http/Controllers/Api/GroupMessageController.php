@@ -33,6 +33,12 @@ class GroupMessageController extends Controller
             return response()->json(['error' => 'Not a member of this group'], 403);
         }
 
+        // Check mute status
+        $member = $group->activeMembers()->where('user_id', $senderId)->first();
+        if ($member && $member->isCurrentlyMuted()) {
+            return response()->json(['error' => 'You are muted until '.$member->muted_until?->toIso8601String()], 403);
+        }
+
         // At least one of content or media is required
         if (!$request->hasFile('media') && (!isset($validated['content']) || trim((string)$validated['content']) === '')) {
             return response()->json([

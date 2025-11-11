@@ -326,9 +326,13 @@ class GroupController extends Controller
             return response()->json(['error' => 'Cannot ban owner'], 400);
         }
 
+        $reason = request()->input('reason');
         $target->is_banned = true;
         $target->is_active = false;
         $target->left_at = now();
+        $target->banned_reason = $reason;
+        $target->banned_at = now();
+        $target->banned_by_user_id = $actorId;
         $target->save();
 
         return response()->json(['message' => 'Member banned']);
@@ -352,9 +356,116 @@ class GroupController extends Controller
         }
 
         $target->is_banned = false;
+        $target->banned_reason = null;
+        $target->banned_at = null;
+        $target->banned_by_user_id = null;
         $target->save();
 
         return response()->json(['message' => 'Member unbanned']);
+    }
+
+    /**
+     * Mute a member temporarily (owner/admin). Accepts either duration_minutes or until timestamp.
+     */
+    public function muteMember(int $groupId, int $memberUserId): JsonResponse
+    {
+        $group = Group::findOrFail($groupId);
+        $actorId = Auth::id();
+        $actor = $group->activeMembers()->where('user_id', $actorId)->first();
+        if (!$actor || !$actor->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $target = $group->activeMembers()->where('user_id', $memberUserId)->first();
+        if (!$target) {
+            return response()->json(['error' => 'Member not found or inactive'], 404);
+        }
+        if ($target->isOwner()) {
+            return response()->json(['error' => 'Cannot mute owner'], 400);
+        }
+
+        $validated = request()->validate([
+            'duration_minutes' => 'nullable|integer|min:1|max:10080', // up to 7 days
+            'until' => 'nullable|date',
+            'reason' => 'nullable|string|max:255',
+        ]);
+
+        $until = null;
+        if (!empty($validated['until'])) {
+            $until = \Carbon\Carbon::parse($validated['until']);
+        } elseif (!empty($validated['duration_minutes'])) {
+            $until = now()->addMinutes($validated['duration_minutes']);
+        }
+
+        if (!$until) {
+            $until = now()->addHour(); // default 1 hour
+        }
+
+        $target->is_muted = true;
+        $target->muted_until = $until;
+        $target->mute_reason = $validated['reason'] ?? null;
+        $target->muted_by_user_id = $actorId;
+        $target->save();
+
+        return response()->json(['message' => 'Member muted', 'muted_until' => $until->toIso8601String()]);
+    }
+
+    /**
+     * Unmute a member.
+     */
+    public function unmuteMember(int $groupId, int $memberUserId): JsonResponse
+    {
+        $group = Group::findOrFail($groupId);
+        $actorId = Auth::id();
+        $actor = $group->activeMembers()->where('user_id', $actorId)->first();
+        if (!$actor || !$actor->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $target = $group->members()->where('user_id', $memberUserId)->orderByDesc('id')->first();
+        if (!$target) {
+            return response()->json(['error' => 'Member not found'], 404);
+        }
+
+        $target->is_muted = false;
+        $target->muted_until = null;
+        $target->mute_reason = null;
+        $target->muted_by_user_id = null;
+        $target->save();
+
+        return response()->json(['message' => 'Member unmuted']);
+    }
+
+    /**
+     * Simple analytics endpoint for group (owner/admin only).
+     */
+    public function stats(int $groupId): JsonResponse
+    {
+        $group = Group::with(['activeMembers'])->findOrFail($groupId);
+        $actorId = Auth::id();
+        $actor = $group->activeMembers()->where('user_id', $actorId)->first();
+        if (!$actor || !$actor->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $roleCounts = $group->activeMembers()
+            ->selectRaw('role, COUNT(*) as count')
+            ->groupBy('role')
+            ->pluck('count', 'role');
+
+        $totalMessages = \App\Models\GroupMessage::where('group_id', $groupId)->count();
+        $bannedCount = $group->members()->where('is_banned', true)->count();
+        $mutedCount = $group->activeMembers()->where('is_muted', true)->count();
+
+        return response()->json([
+            'group_id' => $groupId,
+            'roles' => $roleCounts,
+            'total_messages' => $totalMessages,
+            'banned_members' => $bannedCount,
+            'muted_members' => $mutedCount,
+            'max_members' => $group->max_members,
+            'is_full' => $group->isFull(),
+        ]);
     }
 
     /**

@@ -68,6 +68,9 @@ Route::middleware("api")->group(function (): void {
                 Route::post("/{groupId}/members/{memberUserId}/ban", [GroupController::class, "banMember"]);
                 Route::post("/{groupId}/members/{memberUserId}/unban", [GroupController::class, "unbanMember"]);
                 Route::post("/{groupId}/members/{memberUserId}/kick", [GroupController::class, "kickMember"]);
+                Route::post("/{groupId}/members/{memberUserId}/mute", [GroupController::class, "muteMember"]);
+                Route::post("/{groupId}/members/{memberUserId}/unmute", [GroupController::class, "unmuteMember"]);
+                Route::get("/{groupId}/stats", [GroupController::class, "stats"]);
             });
         
             // Group message routes
