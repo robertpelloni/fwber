@@ -7,6 +7,14 @@ use App\Models\Group;
 use App\Models\GroupMember;
 use App\Models\GroupMessage;
 use App\Models\GroupMessageRead;
+use App\Models\GroupModerationEvent;
+use App\Events\GroupRoleChanged;
+use App\Events\GroupOwnershipTransferred;
+use App\Events\GroupMemberBanned;
+use App\Events\GroupMemberUnbanned;
+use App\Events\GroupMemberMuted;
+use App\Events\GroupMemberUnmuted;
+use App\Events\GroupMemberKicked;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -253,6 +261,16 @@ class GroupController extends Controller
             $target->role = $validated['role'];
             $target->role_changed_at = now();
             $target->save();
+            GroupModerationEvent::create([
+                'group_id' => $group->id,
+                'actor_user_id' => $actorId,
+                'target_user_id' => $memberUserId,
+                'action' => 'role_change',
+                'reason' => null,
+                'metadata' => ['new_role' => $validated['role']],
+                'occurred_at' => now(),
+            ]);
+            event(new GroupRoleChanged($group->id, $actorId, $memberUserId, $validated['role']));
             return response()->json(['message' => 'Role updated']);
         }
 
@@ -261,6 +279,16 @@ class GroupController extends Controller
                 $target->role = $validated['role'];
                 $target->role_changed_at = now();
                 $target->save();
+                GroupModerationEvent::create([
+                    'group_id' => $group->id,
+                    'actor_user_id' => $actorId,
+                    'target_user_id' => $memberUserId,
+                    'action' => 'role_change',
+                    'reason' => null,
+                    'metadata' => ['new_role' => $validated['role']],
+                    'occurred_at' => now(),
+                ]);
+                event(new GroupRoleChanged($group->id, $actorId, $memberUserId, $validated['role']));
                 return response()->json(['message' => 'Role updated']);
             }
             return response()->json(['error' => 'Admins cannot assign admin role'], 403);
@@ -303,6 +331,17 @@ class GroupController extends Controller
         $actor->role_changed_at = now();
         $actor->save();
 
+        GroupModerationEvent::create([
+            'group_id' => $group->id,
+            'actor_user_id' => $actorId,
+            'target_user_id' => $target->user_id,
+            'action' => 'ownership_transfer',
+            'reason' => null,
+            'metadata' => ['from' => $actorId, 'to' => $target->user_id],
+            'occurred_at' => now(),
+        ]);
+        event(new GroupOwnershipTransferred($group->id, $actorId, $target->user_id));
+
         return response()->json(['message' => 'Ownership transferred']);
     }
 
@@ -335,6 +374,17 @@ class GroupController extends Controller
         $target->banned_by_user_id = $actorId;
         $target->save();
 
+        GroupModerationEvent::create([
+            'group_id' => $group->id,
+            'actor_user_id' => $actorId,
+            'target_user_id' => $memberUserId,
+            'action' => 'ban',
+            'reason' => $reason,
+            'metadata' => null,
+            'occurred_at' => now(),
+        ]);
+        event(new GroupMemberBanned($group->id, $actorId, $memberUserId, $reason));
+
         return response()->json(['message' => 'Member banned']);
     }
 
@@ -360,6 +410,17 @@ class GroupController extends Controller
         $target->banned_at = null;
         $target->banned_by_user_id = null;
         $target->save();
+
+        GroupModerationEvent::create([
+            'group_id' => $group->id,
+            'actor_user_id' => $actorId,
+            'target_user_id' => $memberUserId,
+            'action' => 'unban',
+            'reason' => null,
+            'metadata' => null,
+            'occurred_at' => now(),
+        ]);
+        event(new GroupMemberUnbanned($group->id, $actorId, $memberUserId));
 
         return response()->json(['message' => 'Member unbanned']);
     }
@@ -407,6 +468,17 @@ class GroupController extends Controller
         $target->muted_by_user_id = $actorId;
         $target->save();
 
+        GroupModerationEvent::create([
+            'group_id' => $group->id,
+            'actor_user_id' => $actorId,
+            'target_user_id' => $memberUserId,
+            'action' => 'mute',
+            'reason' => $validated['reason'] ?? null,
+            'metadata' => ['muted_until' => $until->toIso8601String()],
+            'occurred_at' => now(),
+        ]);
+        event(new GroupMemberMuted($group->id, $actorId, $memberUserId, $until->toIso8601String(), $validated['reason'] ?? null));
+
         return response()->json(['message' => 'Member muted', 'muted_until' => $until->toIso8601String()]);
     }
 
@@ -432,6 +504,17 @@ class GroupController extends Controller
         $target->mute_reason = null;
         $target->muted_by_user_id = null;
         $target->save();
+
+        GroupModerationEvent::create([
+            'group_id' => $group->id,
+            'actor_user_id' => $actorId,
+            'target_user_id' => $memberUserId,
+            'action' => 'unmute',
+            'reason' => null,
+            'metadata' => null,
+            'occurred_at' => now(),
+        ]);
+        event(new GroupMemberUnmuted($group->id, $actorId, $memberUserId));
 
         return response()->json(['message' => 'Member unmuted']);
     }
@@ -491,6 +574,17 @@ class GroupController extends Controller
         $target->is_active = false;
         $target->left_at = now();
         $target->save();
+
+        GroupModerationEvent::create([
+            'group_id' => $group->id,
+            'actor_user_id' => $actorId,
+            'target_user_id' => $memberUserId,
+            'action' => 'kick',
+            'reason' => null,
+            'metadata' => null,
+            'occurred_at' => now(),
+        ]);
+        event(new GroupMemberKicked($group->id, $actorId, $memberUserId));
 
         return response()->json(['message' => 'Member removed']);
     }
