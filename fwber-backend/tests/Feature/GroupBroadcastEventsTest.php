@@ -181,4 +181,50 @@ class GroupBroadcastEventsTest extends TestCase
             return $e->groupId === $this->group->id && $e->targetUserId === $this->member->id && $e->actorUserId === $this->admin->id;
         });
     }
+
+    #[Test]
+    public function no_op_actions_do_not_dispatch_events(): void
+    {
+        Event::fake();
+
+        // Set role to current role (member)
+        $this->withHeader('Authorization', "Bearer {$this->ownerToken}")
+            ->postJson("/api/groups/{$this->group->id}/members/{$this->member->id}/role", [
+                'role' => 'member'
+            ])
+            ->assertOk();
+        Event::assertNotDispatched(GroupRoleChanged::class);
+
+        // Unban when not banned
+        $this->withHeader('Authorization', "Bearer {$this->ownerToken}")
+            ->postJson("/api/groups/{$this->group->id}/members/{$this->member->id}/unban")
+            ->assertOk();
+        Event::assertNotDispatched(GroupMemberUnbanned::class);
+
+        // Unmute when not muted
+        $this->withHeader('Authorization', "Bearer {$this->ownerToken}")
+            ->postJson("/api/groups/{$this->group->id}/members/{$this->member->id}/unmute")
+            ->assertOk();
+        Event::assertNotDispatched(GroupMemberUnmuted::class);
+
+        // Mute no-op: request a shorter or equal duration than existing
+        // First apply a 60 minute mute
+        $this->withHeader('Authorization', "Bearer {$this->ownerToken}")
+            ->postJson("/api/groups/{$this->group->id}/members/{$this->member->id}/mute", [
+                'duration_minutes' => 60,
+                'reason' => 'test'
+            ])
+            ->assertOk();
+
+        Event::fake(); // reset
+
+        // Now request a 30 minute mute (shorter) with same reason => no-op
+        $this->withHeader('Authorization', "Bearer {$this->ownerToken}")
+            ->postJson("/api/groups/{$this->group->id}/members/{$this->member->id}/mute", [
+                'duration_minutes' => 30,
+                'reason' => 'test'
+            ])
+            ->assertOk();
+        Event::assertNotDispatched(GroupMemberMuted::class);
+    }
 }

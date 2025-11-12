@@ -22,4 +22,18 @@ class GroupMemberUnmuted implements ShouldBroadcast
     {
         return new PrivateChannel('groups.'.$this->groupId);
     }
+
+    public function broadcastAs(): string
+    {
+        return 'group.member.unmuted';
+    }
+
+    public function broadcastWith(): array
+    {
+        return [
+            'group_id' => $this->groupId,
+            'actor_user_id' => $this->actorUserId,
+            'target_user_id' => $this->targetUserId,
+        ];
+    }
 }

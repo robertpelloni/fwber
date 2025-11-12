@@ -258,6 +258,9 @@ class GroupController extends Controller
 
         // Permissions: owner can set any role; admin can set moderator/member only
         if ($actor->isOwner()) {
+            if ($target->role === $validated['role']) {
+                return response()->json(['message' => 'Role unchanged']);
+            }
             $target->role = $validated['role'];
             $target->role_changed_at = now();
             $target->save();
@@ -276,6 +279,9 @@ class GroupController extends Controller
 
         if ($actor->role === 'admin') {
             if (in_array($validated['role'], ['moderator', 'member'], true)) {
+                if ($target->role === $validated['role']) {
+                    return response()->json(['message' => 'Role unchanged']);
+                }
                 $target->role = $validated['role'];
                 $target->role_changed_at = now();
                 $target->save();
@@ -366,6 +372,9 @@ class GroupController extends Controller
         }
 
         $reason = request()->input('reason');
+        if ($target->is_banned) {
+            return response()->json(['message' => 'Already banned']);
+        }
         $target->is_banned = true;
         $target->is_active = false;
         $target->left_at = now();
@@ -405,6 +414,9 @@ class GroupController extends Controller
             return response()->json(['error' => 'Member not found'], 404);
         }
 
+        if (!$target->is_banned) {
+            return response()->json(['message' => 'Not banned']);
+        }
         $target->is_banned = false;
         $target->banned_reason = null;
         $target->banned_at = null;
@@ -462,6 +474,10 @@ class GroupController extends Controller
             $until = now()->addHour(); // default 1 hour
         }
 
+        // No-op suppression: if already muted until a later time or equal and same reason
+        if ($target->is_muted && $target->muted_until && $until && $target->muted_until >= $until && (($target->mute_reason ?? null) === ($validated['reason'] ?? null))) {
+            return response()->json(['message' => 'Mute unchanged', 'muted_until' => $target->muted_until->toIso8601String()]);
+        }
         $target->is_muted = true;
         $target->muted_until = $until;
         $target->mute_reason = $validated['reason'] ?? null;
@@ -499,6 +515,9 @@ class GroupController extends Controller
             return response()->json(['error' => 'Member not found'], 404);
         }
 
+        if (!$target->is_muted) {
+            return response()->json(['message' => 'Not muted']);
+        }
         $target->is_muted = false;
         $target->muted_until = null;
         $target->mute_reason = null;

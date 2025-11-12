@@ -24,4 +24,20 @@ class GroupMemberMuted implements ShouldBroadcast
     {
         return new PrivateChannel('groups.'.$this->groupId);
     }
+
+    public function broadcastAs(): string
+    {
+        return 'group.member.muted';
+    }
+
+    public function broadcastWith(): array
+    {
+        return [
+            'group_id' => $this->groupId,
+            'actor_user_id' => $this->actorUserId,
+            'target_user_id' => $this->targetUserId,
+            'muted_until' => $this->mutedUntilIso,
+            'reason' => $this->reason,
+        ];
+    }
 }

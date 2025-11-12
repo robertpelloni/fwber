@@ -22,4 +22,18 @@ class GroupOwnershipTransferred implements ShouldBroadcast
     {
         return new PrivateChannel('groups.'.$this->groupId);
     }
+
+    public function broadcastAs(): string
+    {
+        return 'group.ownership.transferred';
+    }
+
+    public function broadcastWith(): array
+    {
+        return [
+            'group_id' => $this->groupId,
+            'from_user_id' => $this->fromUserId,
+            'to_user_id' => $this->toUserId,
+        ];
+    }
 }

@@ -23,4 +23,19 @@ class GroupMemberBanned implements ShouldBroadcast
     {
         return new PrivateChannel('groups.'.$this->groupId);
     }
+
+    public function broadcastAs(): string
+    {
+        return 'group.member.banned';
+    }
+
+    public function broadcastWith(): array
+    {
+        return [
+            'group_id' => $this->groupId,
+            'actor_user_id' => $this->actorUserId,
+            'target_user_id' => $this->targetUserId,
+            'reason' => $this->reason,
+        ];
+    }
 }
