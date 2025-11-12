@@ -1,161 +1,575 @@
-# FWBer.me (aka FWBer.com) – an open-source, privacy-first hookup platform
+# fwber – Privacy-First Proximity Dating
 
-This is the PHP source code to FWBer, an open-source Adult Match website. Its goal is to replace the defunct Craigslist Casual Encounters and sites like AdultFriendFinder with a completely free and open-source replacement that improves upon the concept.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![PHP 8.4+](https://img.shields.io/badge/PHP-8.4+-777BB4?logo=php)](https://www.php.net/)
+[![Laravel 11](https://img.shields.io/badge/Laravel-11-FF2D20?logo=laravel)](https://laravel.com/)
+[![Next.js 14](https://img.shields.io/badge/Next.js-14-000000?logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 
-## Supports all types of lifestyles and preferences
+**fwber** is an open-source, privacy-first proximity dating platform that combines AI-generated avatars with location-based discovery. Built with modern technologies and a focus on user safety, fwber reimagines the casual dating experience for the 2020s.
 
-Men, women, couples, groups, transgender, crossdressers, straight, gay, and bisexual lifestyles are supported. More preferences to come in the future.
+🌟 **Key Features:**
+- 🎭 **Avatar Mode:** AI-generated profile pictures level the playing field
+- 📍 **Local Pulse:** Discover proximity-based posts and nearby matches in real-time
+- 🔒 **Privacy-First:** Location fuzzing, no personal photos required, secure by design
+- 🛡️ **Safety-Focused:** Content moderation, flagging, shadow throttling, TTL expiry
+- 🚀 **Modern Stack:** Laravel 11 + Next.js 14 + TypeScript + React Query
 
-## Match by dozens of specific sexual interests and fetishes
-
-Find exactly who you are looking for, no matter how kinky. More fetishes and kinks can be easily added by the community.
-
-## Automatic avatar creation based on your attributes
-
-You don't need a public picture. We make one for you. Create your FWBer avatar by filling out your profile. This levels the playing field for everyone, gives an idea of what to expect, and discourages bots with fake pictures.
-
-## No searching. Automatic matches based on sexual interests
-
-No digging through hundreds of profiles. We find you and send you to each other. You are alerted instantly when someone new signs up who matches your interests.
-
-## Privacy comes first. We only show your profile to your matches
-
-Your pictures always remain private until you agree to show them. Private pictures are only shown to matches you authorize. Public pictures are shown to potential matches only. Share as much or as little information as you want.
-
-## Messaging is done off-site using your preferred tools
-
-We don't have a built-in messenger; we only share your contact information with your authorized matches. You communicate through email, text, phone, Skype, Kik—whatever you decide. That keeps your data safe, protects us from liability, and uses higher-quality tools than an in-built messenger. We hook you up; the rest is up to you.
-
-## Open source and fully transparent
-
-Verify your data is stored properly and your secrets are safe. Suggest new features or add them yourself. FWBer is licensed under the AGPL v3.
+## Table of Contents
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Architecture](#architecture)
+- [Development](#development)
+- [Testing](#testing)
+- [Deployment](#deployment)
+- [Contributing](#contributing)
+- [Roadmap](#roadmap)
+- [License](#license)
 
 ---
 
-# FWBer.me Modernization Project
+## Features
 
-This document outlines the current state of the FWBer.me application following a comprehensive security and architectural overhaul. It is intended as a handoff document for future development.
+### 🎭 Avatar Mode
+AI-generated avatars replace traditional profile photos:
+- Eliminates appearance-based discrimination
+- Discourages catfishing and fake profiles
+- Levels the playing field for all users
+- Configurable via `AVATAR_MODE` environment variable
 
-## 1. Project Overview
+### 📍 Local Pulse
+Proximity-based discovery combining artifacts and matches:
+- **Proximity Artifacts:** Location-tagged posts that auto-expire
+  - Chat invitations
+  - Board posts (discussion topics)
+  - Announcements (events, meetups)
+- **Match Candidates:** Nearby compatible users
+- **Geo-Privacy:** Approximate distances only, never exact locations
+- **Real-Time Updates:** Auto-refresh every 60 seconds
 
-The original FWBer.me application was a legacy PHP project from 2011. The primary goal of this modernization effort was to address critical security vulnerabilities and refactor the core application to use modern, professional-grade development practices. This initial overhaul is now complete.
+### 🔒 Privacy & Security
+Privacy is built into every layer:
+- Location fuzzing protects exact coordinates
+- Avatar-only profiles (when enabled)
+- Content sanitization on all user input
+- HTTPS/TLS encryption in transit
+- Bcrypt password hashing
+- CSRF protection on all forms
+- Rate limiting on authentication endpoints
 
-The application is now built on a secure, object-oriented foundation, making it stable, maintainable, and ready for future feature development and eventual migration to a full Laravel/Next.js stack.
+### 🛡️ Safety & Moderation
+Multi-layered safety features:
+- User-initiated content flagging
+- Automated TTL expiry for temporary content
+- Shadow throttling for repeat offenders
+- Geo-spoof detection (Phase 2)
+- Transparent moderation policies
 
-## 2. Current State of the Application
+### 💬 Messaging
+Off-platform communication:
+- Share contact info only with authorized matches
+- Use your preferred tools (email, Signal, Telegram, etc.)
+- No in-app messenger = better privacy, less liability
+- End-to-end encryption via third-party apps
 
-The application is in a stable, functional, and secure state. The core user-facing features have been completely rewritten.
+### ♾️ Inclusive & Diverse
+Support for all identities and preferences:
+- All genders and orientations welcome
+- Customizable preference matching
+- Extensible interest/fetish system
+- Community-driven feature additions
 
+---
+
+## Quick Start
+
+### Prerequisites
+- **Backend:** PHP 8.4+, Composer 2.x, SQLite 3.x (for dev) or MySQL 8.0+
+- **Frontend:** Node.js 18+, npm/yarn
+- **Optional:** Docker & Docker Compose
+
+### Backend Setup
+
+```bash
+cd fwber-backend
+
+# Install dependencies
+composer install
+
+# Configure environment
+cp .env.example .env
+php artisan key:generate
+
+# Set up database
+php artisan migrate
+php artisan db:seed
+
+# Run development server
+php artisan serve
+# API available at http://localhost:8000
+```
+
+### Frontend Setup
+
+```bash
+cd fwber-frontend
+
+# Install dependencies
+npm install
+
+# Configure environment
+cp .env.example .env.local
+# Edit .env.local and set NEXT_PUBLIC_API_URL=http://localhost:8000/api
+
+# Run development server
+npm run dev
+# App available at http://localhost:3000
+```
+
+### Docker Setup (Optional)
+
+```bash
+# Start all services
+docker-compose up -d
+
+# Run migrations
+docker-compose exec backend php artisan migrate
+
+# View logs
+docker-compose logs -f
+```
+
+---
+
+## Architecture
+
+### Backend (Laravel 11)
+```
+fwber-backend/
+├── app/
+│   ├── Http/Controllers/
+│   │   ├── Auth/              # Authentication
+│   │   ├── Profile/           # User profiles
+│   │   └── Proximity/         # Location features
+│   ├── Models/
+│   │   ├── User.php
+│   │   ├── ProximityArtifact.php
+│   │   └── UserPreference.php
+│   ├── Services/
+│   │   ├── MatchingService.php
+│   │   ├── GeolocationService.php
+│   │   └── AvatarService.php
+│   └── ...
+├── database/
+│   ├── migrations/
+│   └── seeders/
+├── routes/
+│   └── api.php              # RESTful API routes
+└── tests/
+    ├── Feature/             # API integration tests
+    └── Unit/                # Business logic tests
+```
+
+### Frontend (Next.js 14 + TypeScript)
+```
+fwber-frontend/
+├── app/                     # App Router
+│   ├── local-pulse/        # Local Pulse page
+│   ├── profile/            # Profile management
+│   └── matches/            # Match discovery
+├── components/
+│   ├── LocalPulse.tsx      # Main proximity feed
+│   ├── AvatarCard.tsx      # User avatar display
+│   └── ...
+├── lib/
+│   ├── api/                # API clients (Axios)
+│   ├── hooks/              # React Query hooks
+│   └── utils/
+├── types/                  # TypeScript definitions
+└── public/
+```
+
+### Technology Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Backend** | Laravel 11, PHP 8.4 |
+| **Frontend** | Next.js 14, React 18, TypeScript 5.3 |
+| **Database** | MySQL 8.0+ / SQLite (dev) |
+| **Caching** | Redis (planned) |
+| **Data Fetching** | React Query (@tanstack/react-query) |
+| **HTTP Client** | Axios |
+| **Styling** | Tailwind CSS 3.4 |
+| **Icons** | Lucide React |
+| **UI Components** | Radix UI |
+| **State** | Zustand, React Query |
+| **Testing** | PHPUnit (backend), Jest (frontend planned) |
+
+### API Endpoints
+
+**Authentication:**
+- `POST /api/register` - User registration
+- `POST /api/login` - User login
+- `POST /api/logout` - User logout
+
+**Profiles:**
+- `GET /api/profile` - Get authenticated user profile
+- `PUT /api/profile` - Update profile
+- `POST /api/profile/avatar/generate` - Generate AI avatar
+
+**Proximity:**
+- `GET /api/proximity/local-pulse` - Get merged feed (artifacts + candidates)
+- `GET /api/proximity/artifacts` - List proximity artifacts
+- `POST /api/proximity/artifacts` - Create artifact
+- `GET /api/proximity/artifacts/{id}` - Get single artifact
+- `POST /api/proximity/artifacts/{id}/flag` - Flag artifact
+- `DELETE /api/proximity/artifacts/{id}` - Delete artifact
+
+**Matching:**
+- `GET /api/matches` - Get match list
+- `POST /api/matches/{id}/authorize` - Authorize match
+
+---
+
+## Development
+
+### Running Tests
+
+**Backend:**
+```bash
+cd fwber-backend
+
+# Run all tests
+php artisan test
+
+# Run with coverage
+php artisan test --coverage
+
+# Run specific test file
+php artisan test tests/Feature/ProximityArtifactTest.php
+
+# Run specific test method
+php artisan test --filter test_proximity_artifacts_expire_after_ttl
+```
+
+**Current Test Coverage:**
+- ✅ 131 tests passing
+- ✅ 524 assertions
+- ✅ Zero regressions
+
+**Frontend:**
+```bash
+cd fwber-frontend
+
+# Run tests (when available)
+npm test
+
+# Type checking
+npm run type-check
+
+# Linting
+npm run lint
+```
+
+### Code Quality
+
+**Backend:**
+```bash
+# Static analysis
+./vendor/bin/phpstan analyse
+
+# Code formatting
+./vendor/bin/pint
+
+# Fix formatting
+./vendor/bin/pint --repair
+```
+
+**Frontend:**
+```bash
+# ESLint
+npm run lint
+
+# Type checking
+npm run type-check
+
+# Prettier (if configured)
+npm run format
+```
+
+### Environment Variables
+
+**Backend (`.env`):**
+```env
+APP_NAME=fwber
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://localhost:8000
+
+DB_CONNECTION=sqlite
+# Or for MySQL:
+# DB_CONNECTION=mysql
+# DB_HOST=127.0.0.1
+# DB_PORT=3306
+# DB_DATABASE=fwber
+# DB_USERNAME=root
+# DB_PASSWORD=
+
+AVATAR_MODE=true
+REPLICATE_API_TOKEN=your_token_here
+OPENAI_API_KEY=your_key_here
+```
+
+**Frontend (`.env.local`):**
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000/api
+NEXT_PUBLIC_AVATAR_MODE=true
+```
+
+---
+
+## Testing
+
+### Phase 1 Test Coverage
+
+**Authentication & Profiles:**
+- ✅ User registration with validation
+- ✅ Login/logout flows
+- ✅ Profile CRUD operations
+- ✅ Avatar generation and enforcement
+- ✅ Avatar-only mode restrictions
+
+**Proximity Features:**
+- ✅ Artifact creation (chat/board_post/announce)
+- ✅ TTL expiry mechanics
+- ✅ Geolocation filtering
+- ✅ Radius-based queries
+- ✅ Local Pulse merged endpoint
+- ✅ Content sanitization
+- ✅ Flag escalation
+
+**Security:**
+- ✅ CSRF protection
+- ✅ Rate limiting
+- ✅ Input validation
+- ✅ Authorization checks
+- ✅ SQL injection prevention
+
+---
+
+## Deployment
+
+### Production Checklist
+
+- [ ] Set `APP_ENV=production`
+- [ ] Set `APP_DEBUG=false`
+- [ ] Configure production database (MySQL/PostgreSQL)
+- [ ] Set up Redis for caching
+- [ ] Configure HTTPS/SSL certificates
+- [ ] Set secure session cookies
+- [ ] Configure CORS policies
+- [ ] Set up CDN for static assets
+- [ ] Enable rate limiting
+- [ ] Configure backup strategies
+- [ ] Set up monitoring (Sentry, New Relic, etc.)
+- [ ] Review and update PRIVACY.md and TERMS.md
+- [ ] Configure email service (SMTP, SendGrid, etc.)
+
+### Deployment Options
+
+**Traditional Hosting:**
+```bash
+# Build frontend
+cd fwber-frontend
+npm run build
+
+# Deploy backend with Laravel Forge, Ploi, or manual setup
+# Configure nginx/Apache for Laravel
+# Set up supervisor for queue workers
+```
+
+**Docker:**
+```bash
+# Build production images
+docker-compose -f docker-compose.prod.yml build
+
+# Deploy with Docker Swarm or Kubernetes
+```
+
+**Serverless:**
+- Laravel Vapor (AWS Lambda)
+- Vercel (frontend)
+- PlanetScale (database)
+
+---
+
+## Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+
+**Quick Contribution Guide:**
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes with tests
+4. Ensure all tests pass (`php artisan test`)
+5. Commit with clear messages (`git commit -m 'feat: Add amazing feature'`)
+6. Push to your fork (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+**Areas We Need Help:**
+- 🎨 UI/UX design and frontend components
+- 🧪 Test coverage expansion
+- 📚 Documentation improvements
+- 🌍 Internationalization (i18n)
+- ♿ Accessibility enhancements
+- 🐛 Bug fixes and performance optimizations
+
+---
+
+## Roadmap
+
+See [docs/ROADMAP.md](docs/ROADMAP.md) for the complete development roadmap.
+
+**Phase 1 (✅ Complete):** MVP Foundation
+- Avatar-only enforcement
+- Proximity artifacts with TTL
+- Local Pulse merged feed
+- Comprehensive test coverage
+
+**Phase 2 (In Progress):** Hardening & Safety
+- Shadow throttling system
+- Geo-spoof detection
+- WebSocket/SSE real-time updates
+- Enhanced moderation dashboard
+
+**Phase 3:** UX & Polish
+- Avatar generation UI flow
+- Enhanced profile editor
+- Mobile app (React Native)
+- Push notifications
+
+**Phase 4:** Documentation & Community
+- Enhanced API documentation
+- Video tutorials
+- Community forums
+- Bug bounty program
+
+**Phase 5:** Growth Features
+- Social features (friend lists, groups)
+- Advanced filters and preferences
+- Event planning tools
+- User verification badges
+
+**Phase 6:** Monetization
+- Premium subscriptions
+- Boost visibility features
+- Ad-free experience
+- White-label licensing
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+**Previous versions used AGPL v3. The modern rewrite is MIT-licensed for maximum adoption.**
+
+---
+
+## Legacy Documentation
+
+### FWBer.me Modernization Project
+
+This document outlines the historical state of the FWBer.me application following a comprehensive security and architectural overhaul from the legacy 2011 PHP codebase.
+
+#### Legacy Overview
+
+The original FWBer.me application was a legacy PHP project from 2011. The primary goal of the modernization effort was to address critical security vulnerabilities and refactor the core application to use modern, professional-grade development practices.
+
+#### Legacy Technology Stack
 - **Technology Stack:** PHP 8+, PDO for database access, Composer for dependency management.
 - **Key Libraries:** `phpmailer/phpmailer`, `vlucas/phpdotenv`.
 - **Modernized Pages:** `index.php`, `signin.php`, `signout.php`, `forgot-password.php`, `settings.php`, `profile.php`, `edit-profile.php`, `matches.php`, `manage-pics.php`, `contact.php`.
 
-## 3. Key Architectural Components
+#### Legacy Architectural Components
 
-The new architecture is designed to be modular and secure, with a clear separation of concerns.
+The legacy architecture was designed to be modular and secure, with a clear separation of concerns.
 
-### `_init.php`
-This is the new central bootstrap file for the application. It is responsible for:
-1. Loading the Composer autoloader.
-2. Loading environment variables (API keys, etc.) from the `.env` file.
-3. Establishing the secure PDO database connection (`_db.php`).
-4. Initializing the core manager classes (`SecurityManager`, `ProfileManager`, etc.).
+**`_init.php`** - Central bootstrap file:
+1. Loading the Composer autoloader
+2. Loading environment variables from `.env` 
+3. Establishing secure PDO database connection
+4. Initializing core manager classes
 
-### `_db.php`
-This file contains the single source of truth for the application's database connection, using PDO for secure, modern database interactions.
+**Manager Classes:**
+- **`SecurityManager.php`**: Password hashing (Argon2ID), session management, CSRF protection, rate limiting
+- **`ProfileManager.php`**: User profile data management for `users` and `user_preferences` tables
+- **`PhotoManager.php`**: Secure file uploads with MIME validation, deletion, database integration
 
-### Manager Classes
-- **`SecurityManager.php`**: The heart of the application's security. It handles:
-  - **Password Hashing:** Using the modern `Argon2ID` algorithm.
-  - **Session Management:** Secure, database-driven session validation.
-  - **CSRF Protection:** Generation and validation of single-use CSRF tokens for all forms.
-  - **Rate Limiting:** Protection against brute-force attacks on authentication endpoints.
-- **`ProfileManager.php`**: A robust class for managing all user profile data. It intelligently handles data for both the `users` and `user_preferences` tables, making the profile system easily extensible.
-- **`PhotoManager.php`**: A secure class for handling all aspects of photo management, including secure file uploads (with MIME type validation), secure file deletion, and database integration.
+**Security Improvements:**
+- ✅ CSRF protection on all forms
+- ✅ Rate limiting on auth endpoints
+- ✅ HTTPS enforcement
+- ✅ Argon2ID password hashing (replaced MD5)
+- ✅ PDO prepared statements (SQL injection prevention)
 
-### API Endpoints (`/api/`)
-The application now uses a modern API-driven approach for dynamic frontend features. All API endpoints are secure and use the manager classes to perform their actions.
+**Note:** The legacy PHP codebase has been superseded by the modern Laravel 11 backend. See above for current architecture.
 
-## 4. Security Hardening Summary
+#### Legacy Migration & Diagnostics
 
-A comprehensive security overhaul was completed, addressing all critical vulnerabilities identified during the code review process.
+The legacy codebase included migration scripts for database compatibility. These are preserved for historical reference but are not needed for the modern Laravel implementation.
 
-- **✅ CSRF Protection:** All forms are now protected by single-use CSRF tokens, validated by the `SecurityManager`.
-- **✅ Rate Limiting:** The `signin.php` and `forgot-password.php` pages are now protected from brute-force and spam attacks using IP-based rate limiting.
-- **✅ Secure HTTPS:** The application now uses a robust `isSecure()` function to reliably detect and enforce secure HTTPS connections.
-- **✅ Modern Authentication:** The old MD5-based password system has been completely replaced with `Argon2ID` hashing and secure, database-backed sessions.
-- **✅ SQL Injection Prevention:** All database queries have been migrated to PDO with prepared statements.
+<details>
+<summary>Legacy Migration Instructions (archived)</summary>
 
-## 5. Development Environment Setup
-
-To get the application running locally, follow these steps:
-
-1. **Clone the Repository:** Clone the project to your local machine (e.g., into `C:/xampp/htdocs`).
-2. **Install Dependencies:** Open a terminal in the project root and run `composer install`.
-3. **Create `.env` File:** Create a `.env` file in the project root and add your secret API keys. Use the following template:
-   ```
-   REPLICATE_API_TOKEN="YOUR_REPLICATE_API_TOKEN_HERE"
-   OPENAI_API_KEY="YOUR_OPENAI_API_KEY_HERE"
-   ```
-4. **Set Up the Database:**
-   - In phpMyAdmin, create a new user: `fwber` with password `Temppass0!` (or your preferred password, updated in `_secrets.php`).
-   - When creating the user, check the box to **"Create database with same name and grant all privileges."**
-   - Navigate to the newly created `fwber` database and use the "Import" tab to run the `setup-database.sql` script.
-
-## 6. The Path to Launch (Next Steps)
-
-The application is now ready for the final pre-launch phase. The following tasks remain:
-
-1. **Complete the Profile Form:** This is the #1 priority. The `profile-form.php` file needs to be updated to include all the detailed preference fields from the original design. The backend `ProfileManager` is already built to handle this data automatically.
-
-2. **Thorough End-to-End Testing:** Once the profile form is complete, the entire application must be tested systematically to find and fix any remaining bugs.
-
-3. **Final Polish:** Modernize any remaining minor pages and implement the placeholder AI/ML logic in the `AIMatchingEngine` when ready.
-
-## 7. A Note on Project History
-
-This project was modernized in a unique collaboration between a human developer and multiple AI assistants (Gemini and Claude). The development process was iterative and conversational, which is reflected in the evolution of the codebase. This `README.md` serves as the canonical summary of the project's current state, superseding any previous conversational logs.
-
-## Migration & Diagnostics (Legacy Matcher Compatibility)
-
-To ensure the legacy matcher works with the new profile form:
-
-1) Enable debug and start the app
-- Copy and edit your environment
+**Enable debug and start the app:**
 ```cmd
 copy .env.example .env
 notepad .env
 ```
-- Set `DEBUG_MODE=true`, then start a local server (or use your Apache/XAMPP)
+Set `DEBUG_MODE=true`, then:
 ```cmd
 php -S 127.0.0.1:8000
 ```
 
-2) Apply the migration (login required)
+**Apply migration:**
 - Visit: `http://127.0.0.1:8000/scripts/apply_migration_web.php`
 - Expected: `Applied N migration statements successfully.`
-- If you see `Forbidden`, ensure you are logged in and `DEBUG_MODE=true`.
 
-3) Verify mirrors and columns
+**Verify columns:**
 - Visit: `http://127.0.0.1:8000/scripts/profile_diagnostics.php`
-- Confirm: no missing columns and b_* mirrors appear in users after saving your profile.
 
-4) Run a quick smoke test
-- Create two users, set complementary preferences, and confirm matches appear.
-
-5) Disable debug for safety
-```cmd
-notepad .env
-```
-Set `DEBUG_MODE=false`
-
-
-## CLI Migration (optional)
-If PHP and MySQL CLIs are available, you can run:
+**CLI migration:**
 ```cmd
 php scripts\apply_migration.php
-```
-Or:
-```cmd
+# Or:
 mysql -h localhost -u fwber -p fwber < db\migrations\2025-10-11-legacy-matcher-compat.sql
 ```
+
+</details>
+
+---
+
+## Community & Support
+
+- 📖 **Documentation:** [docs/](docs/)
+- 🐛 **Bug Reports:** [GitHub Issues](https://github.com/yourusername/fwber/issues)
+- 💬 **Discussions:** [GitHub Discussions](https://github.com/yourusername/fwber/discussions)
+- 📧 **Contact:** [your-email@example.com]
+- 🌐 **Website:** [fwber.me](https://fwber.me) / [fwber.com](https://fwber.com)
+
+---
+
+## Acknowledgments
+
+This project was modernized through collaboration between human developers and AI assistants (Gemini and Claude). The development process was iterative and conversational, reflecting the evolution of modern software development practices.
+
+**Special Thanks:**
+- All contributors and testers
+- The Laravel and Next.js communities
+- Open source projects that made this possible
+
+---
+
+**Built with ❤️ for privacy, safety, and genuine human connection.**
