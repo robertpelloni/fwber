@@ -86,6 +86,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Avatar Mode
+    |--------------------------------------------------------------------------
+    |
+    | This option controls whether user photo uploads are allowed or if the
+    | application enforces generated avatars only. Set to "generated-only"
+    | for MVP launch to prevent catfishing and maintain consistent UX.
+    | Set to "flexible" to allow user photo uploads in the future.
+    |
+    | Supported values: "generated-only", "flexible"
+    |
+    */
+
+    'avatar_mode' => env('AVATAR_MODE', 'generated-only'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Encryption Key
     |--------------------------------------------------------------------------
     |

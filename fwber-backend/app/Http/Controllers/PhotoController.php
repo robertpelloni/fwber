@@ -119,6 +119,14 @@ class PhotoController extends Controller
                 return response()->json(['message' => 'Unauthenticated'], 401);
             }
             
+            // Enforce generated-avatars-only mode for MVP
+            if (config('app.avatar_mode', 'generated-only') === 'generated-only') {
+                return response()->json([
+                    'message' => 'Photo uploads disabled. Using generated avatars only.',
+                    'avatar_mode' => 'generated-only',
+                ], 403);
+            }
+            
             // Check photo limit
             $currentPhotoCount = $user->photos()->count();
             if ($currentPhotoCount >= self::MAX_PHOTOS_PER_USER) {
