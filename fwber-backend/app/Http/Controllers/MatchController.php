@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\MatchResource;
 use App\Models\User;
 use App\Models\UserProfile;
+use App\Models\ProximityArtifact;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -184,6 +185,9 @@ class MatchController extends Controller
         // Freshness/recency boost (up to 5 points)
         $score += $this->calculateFreshnessBoost($candidateProfile->user);
 
+        // Saturation penalty for heavy proximity posting (up to -5 points)
+        $score -= $this->calculateProximitySaturationPenalty($candidateProfile->user);
+
         return min($maxScore, max(0, $score));
     }
 
@@ -204,6 +208,16 @@ class MatchController extends Controller
         }
         
         return 0;
+    }
+
+    private function calculateProximitySaturationPenalty(User $candidate): int
+    {
+        // Count artifacts created by candidate in last 24 hours
+        $count = ProximityArtifact::where('user_id', $candidate->id)
+            ->where('created_at', '>=', now()->subDay())
+            ->count();
+        // Each 10 artifacts -> 1 point penalty, capped at 5
+        return (int) min(5, floor($count / 10));
     }
 
     private function calculateDistance(UserProfile $profile1, UserProfile $profile2): float

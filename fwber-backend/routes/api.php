@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\GroupMessageController;
 use App\Http\Controllers\WebSocketController;
+use App\Http\Controllers\ProximityArtifactController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware("api")->group(function (): void {
@@ -122,6 +123,15 @@ Route::middleware("api")->group(function (): void {
         Route::put("/location/privacy", [LocationController::class, "updatePrivacy"]);
         Route::delete("/location", [LocationController::class, "clear"]);
         Route::get("/location/nearby", [LocationController::class, "nearby"]);
+
+        // Proximity Artifacts (Unified Ephemeral Layer)
+        Route::prefix('proximity')->group(function (): void {
+            Route::get('/feed', [ProximityArtifactController::class, 'index']);
+            Route::post('/artifacts', [ProximityArtifactController::class, 'store']);
+            Route::get('/artifacts/{id}', [ProximityArtifactController::class, 'show']);
+            Route::post('/artifacts/{id}/flag', [ProximityArtifactController::class, 'flag']);
+            Route::delete('/artifacts/{id}', [ProximityArtifactController::class, 'destroy']);
+        });
         
         // Bulletin Board routes (Phase 5B - Location-Based Bulletin Board System)
         Route::get("/bulletin-boards", [BulletinBoardController::class, "index"]);
