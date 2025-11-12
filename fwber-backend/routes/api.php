@@ -127,6 +127,7 @@ Route::middleware("api")->group(function (): void {
         // Proximity Artifacts (Unified Ephemeral Layer)
         Route::prefix('proximity')->group(function (): void {
             Route::get('/feed', [ProximityArtifactController::class, 'index']);
+            Route::get('/local-pulse', [ProximityArtifactController::class, 'localPulse']); // Merged feed: artifacts + match candidates
             Route::post('/artifacts', [ProximityArtifactController::class, 'store']);
             Route::get('/artifacts/{id}', [ProximityArtifactController::class, 'show']);
             Route::post('/artifacts/{id}/flag', [ProximityArtifactController::class, 'flag']);

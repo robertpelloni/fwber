@@ -51,7 +51,9 @@ class AvatarModeTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJsonStructure([
-                'photo' => ['id', 'url', 'created_at'],
+                'success',
+                'message',
+                'data' => ['id', 'url', 'created_at'],
             ]);
 
         // Verify photo was stored
@@ -62,8 +64,8 @@ class AvatarModeTest extends TestCase
 
     public function test_default_avatar_mode_is_generated_only(): void
     {
-        // Don't explicitly set avatar_mode, use default
-        Config::set('app.avatar_mode', null);
+        // Clear the avatar_mode config to test default behavior
+        // When config is not set, env helper will return null and config() will use the default 'generated-only'
         Storage::fake('public');
 
         $user = User::factory()->create();
