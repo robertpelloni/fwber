@@ -4,11 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\ProximityArtifact;
 use App\Services\ProximityArtifactService;
+use App\Services\ShadowThrottleService;
+use App\Services\GeoSpoofDetectionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ProximityArtifactController extends Controller
 {
+    public function __construct(
+        private ShadowThrottleService $shadowThrottleService,
+        private GeoSpoofDetectionService $geoSpoofService
+    ) {}
     public function index(Request $request): JsonResponse
     {
         $user = auth()->user();
@@ -58,12 +64,19 @@ class ProximityArtifactController extends Controller
             'radius' => 'nullable|integer|min:100|max:10000',
         ]);
 
+        // Detect potential geo-spoofing
+        $ipAddress = $request->ip();
+        $lat = (float)$request->lat;
+        $lng = (float)$request->lng;
+        
+        $this->geoSpoofService->detectSpoof($user->id, $lat, $lng, $ipAddress);
+
         try {
             $artifact = $service->createArtifact($user, [
                 'type' => $request->type,
                 'content' => $request->content,
-                'location_lat' => (float)$request->lat,
-                'location_lng' => (float)$request->lng,
+                'location_lat' => $lat,
+                'location_lng' => $lng,
                 'visibility_radius_m' => (int)($request->radius ?? 1000),
             ]);
         } catch (\Throwable $e) {
@@ -147,13 +160,25 @@ class ProximityArtifactController extends Controller
         $lng = (float)$request->lng;
         $radius = (int)($request->radius ?? 1000);
 
-        // Get proximity artifacts (limit to 20 for conciseness)
+        // Get proximity artifacts with shadow throttle filtering
         $artifacts = ProximityArtifact::query()
             ->active()
             ->withinBox($lat, $lng, $radius)
             ->orderByDesc('created_at')
-            ->limit(20)
+            ->limit(100) // Get more, then filter and limit
             ->get()
+            ->filter(function (ProximityArtifact $a) {
+                // Apply shadow throttle probabilistic filtering
+                $visibility = $this->shadowThrottleService->getVisibilityMultiplier($a->user_id);
+                
+                if ($visibility >= 1.0) {
+                    return true; // Always show if not throttled
+                }
+                
+                // Probabilistic inclusion based on visibility multiplier
+                return (mt_rand() / mt_getrandmax()) < $visibility;
+            })
+            ->take(20) // Limit to 20 after filtering
             ->map(function (ProximityArtifact $a) {
                 return [
                     'id' => $a->id,
@@ -237,7 +262,18 @@ class ProximityArtifactController extends Controller
             $query->whereNotIn('id', $excludedIds);
         }
 
-        $candidates = $query->limit($limit)->get();
+        $candidates = $query->limit($limit * 2)->get() // Get extra to filter
+            ->filter(function (\App\Models\User $candidate) {
+                // Filter out shadow throttled users probabilistically
+                $visibility = $this->shadowThrottleService->getVisibilityMultiplier($candidate->id);
+                
+                if ($visibility >= 1.0) {
+                    return true;
+                }
+                
+                return (mt_rand() / mt_getrandmax()) < $visibility;
+            })
+            ->take($limit);
 
         // Return lightweight previews (no full profiles, just teasers)
         return $candidates->map(function (\App\Models\User $candidate) use ($profile) {

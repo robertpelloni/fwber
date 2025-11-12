@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\GroupMessageController;
 use App\Http\Controllers\WebSocketController;
 use App\Http\Controllers\ProximityArtifactController;
+use App\Http\Controllers\ModerationController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware("api")->group(function (): void {
@@ -132,6 +133,19 @@ Route::middleware("api")->group(function (): void {
             Route::get('/artifacts/{id}', [ProximityArtifactController::class, 'show']);
             Route::post('/artifacts/{id}/flag', [ProximityArtifactController::class, 'flag']);
             Route::delete('/artifacts/{id}', [ProximityArtifactController::class, 'destroy']);
+        });
+
+        // Moderation routes (Phase 2: Safety Features)
+        Route::prefix('moderation')->middleware('auth.moderator')->group(function (): void {
+            Route::get('/dashboard', [ModerationController::class, 'dashboard']);
+            Route::get('/flagged-content', [ModerationController::class, 'flaggedContent']);
+            Route::post('/flags/{artifactId}/review', [ModerationController::class, 'reviewFlag']);
+            Route::get('/spoof-detections', [ModerationController::class, 'spoofDetections']);
+            Route::post('/spoofs/{detectionId}/review', [ModerationController::class, 'reviewSpoof']);
+            Route::get('/throttles', [ModerationController::class, 'activeThrottles']);
+            Route::delete('/throttles/{throttleId}', [ModerationController::class, 'removeThrottle']);
+            Route::get('/actions', [ModerationController::class, 'actionHistory']);
+            Route::get('/users/{userId}', [ModerationController::class, 'userProfile']);
         });
         
         // Bulletin Board routes (Phase 5B - Location-Based Bulletin Board System)

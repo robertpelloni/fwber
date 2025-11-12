@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth.api' => AuthenticateApi::class,
             'profile.complete' => \App\Http\Middleware\EnsureProfileComplete::class,
             'presence.update' => \App\Http\Middleware\UpdateLastSeen::class,
+            'auth.moderator' => \App\Http\Middleware\EnsureModerator::class,
         ]);
 
         // Enable CORS for API routes
