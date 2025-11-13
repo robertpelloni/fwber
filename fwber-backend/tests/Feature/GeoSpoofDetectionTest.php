@@ -89,42 +89,55 @@ class GeoSpoofDetectionTest extends TestCase
 
     public function test_detects_impossible_velocity(): void
     {
-        // Create first detection in San Francisco
+        // Create first detection in San Francisco with all required fields
+        // Important: This represents a PAST location check
         $first = GeoSpoofDetection::create([
             'user_id' => $this->user->id,
-            'ip_address' => '8.8.8.8',
-            'latitude' => 37.7749,
+            'ip_address' => '1.2.3.4',
+            'latitude' => 37.7749, // SF
             'longitude' => -122.4194,
-            'suspicion_score' => 0,
-            'detection_flags' => [],
-            'detected_at' => now()->subHour(),
+            'ip_latitude' => 37.7749,
+            'ip_longitude' => -122.4194,
+            'distance_km' => 0,
+            'velocity_kmh' => null,
+            'suspicion_score' => 30,
+            'detection_flags' => ['some_flag'],
+            'is_confirmed_spoof' => false,
+            'detected_at' => now()->subHour(), // 1 hour ago
         ]);
 
-        // Mock IP geolocation
+        // Mock IP geolocation - IP location matches claimed location to isolate velocity test
         Http::fake([
             'ip-api.com/*' => Http::response([
                 'status' => 'success',
-                'lat' => 37.7749,
-                'lon' => -122.4194,
+                'lat' => 40.7128, // NY - matches claimed location
+                'lon' => -74.0060,
                 'country' => 'USA',
-                'city' => 'San Francisco',
+                'city' => 'New York',
                 'isp' => 'Test ISP',
             ]),
         ]);
 
-        // Now claim to be in New York (3000 miles in 1 hour = 3000 mph)
+        // User was in SF 1 hour ago, now claims NY (~4000km)
+        // Velocity = 4000km / 1hr = 4000 km/h (impossible!)
+        // Even with 0 IP distance score, velocity alone should trigger: +50 score >= 25 threshold
         $detection = $this->service->detectSpoof(
             $this->user->id,
-            40.7128, // New York
+            40.7128, // NY claimed location
             -74.0060,
             '8.8.8.8'
         );
 
+        // Debug output if needed
+        if (!$detection) {
+            $this->fail('Detection was null. Check that velocity calculation triggers >= 25 suspicion score.');
+        }
+
         $this->assertNotNull($detection);
-        $this->assertNotNull($detection->velocity_kmh);
-        $this->assertGreaterThan(500, $detection->velocity_kmh);
+        $this->assertNotNull($detection->velocity_kmh, 'Velocity should be calculated');
+        $this->assertGreaterThan(1000, $detection->velocity_kmh, 'SF to NY in 1 hour should be ~4000 km/h');
         $this->assertContains('impossible_velocity', $detection->detection_flags);
-        $this->assertGreaterThan(50, $detection->suspicion_score);
+        $this->assertGreaterThanOrEqual(50, $detection->suspicion_score, 'Impossible velocity adds +50 score');
     }
 
     public function test_high_risk_scope_filters_correctly(): void

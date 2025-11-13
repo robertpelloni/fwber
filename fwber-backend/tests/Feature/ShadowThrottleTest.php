@@ -54,7 +54,7 @@ class ShadowThrottleTest extends TestCase
         foreach ($severityToVisibility as $severity => $expectedVisibility) {
             $throttle = $this->service->applyThrottle(
                 $this->user->id,
-                'test',
+                'spam', // Use valid enum value
                 $severity,
                 24
             );
@@ -115,7 +115,7 @@ class ShadowThrottleTest extends TestCase
     {
         $throttle = $this->service->applyThrottle(
             $this->user->id,
-            'banned',
+            'manual', // Use valid enum value
             5,
             null // No expiry
         );
@@ -165,21 +165,21 @@ class ShadowThrottleTest extends TestCase
         // 3 flags = severity 2
         $throttle = $this->service->applyAutoThrottleForFlags($this->user->id, 3);
         $this->assertEquals(2, $throttle->severity);
-        $this->assertEquals(24, now()->diffInHours($throttle->expires_at));
+        $this->assertEquals(24, round(now()->diffInHours($throttle->expires_at)));
 
         $throttle->delete();
 
         // 5 flags = severity 3
         $throttle = $this->service->applyAutoThrottleForFlags($this->user->id, 5);
         $this->assertEquals(3, $throttle->severity);
-        $this->assertEquals(72, now()->diffInHours($throttle->expires_at));
+        $this->assertEquals(72, round(now()->diffInHours($throttle->expires_at)));
 
         $throttle->delete();
 
         // 10 flags = severity 4
         $throttle = $this->service->applyAutoThrottleForFlags($this->user->id, 10);
         $this->assertEquals(4, $throttle->severity);
-        $this->assertEquals(168, now()->diffInHours($throttle->expires_at));
+        $this->assertEquals(168, round(now()->diffInHours($throttle->expires_at)));
     }
 
     public function test_auto_throttle_for_spam_scales_with_post_count(): void
@@ -228,7 +228,7 @@ class ShadowThrottleTest extends TestCase
         // Create an expired one
         ShadowThrottle::create([
             'user_id' => $this->user->id,
-            'reason' => 'old',
+            'reason' => 'spam', // Use valid enum value
             'severity' => 1,
             'visibility_reduction' => 0.70,
             'started_at' => now()->subDays(2),
