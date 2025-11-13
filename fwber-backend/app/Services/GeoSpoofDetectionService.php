@@ -171,11 +171,16 @@ class GeoSpoofDetectionService
         if (!$lastDetection) {
             return null;
         }
+        // Use seconds for higher precision and avoid truncation issues
+        $diffSeconds = now()->diffInSeconds($lastDetection->detected_at);
 
-        $timeDiffHours = now()->diffInHours($lastDetection->detected_at);
-        
-        if ($timeDiffHours < 0.1) {
-            // Too recent, skip velocity check
+        // Skip if less than 5 minutes between detections to reduce noise
+        if ($diffSeconds < 300) {
+            return null;
+        }
+
+        $hours = $diffSeconds / 3600.0;
+        if ($hours <= 0) {
             return null;
         }
 
@@ -186,7 +191,8 @@ class GeoSpoofDetectionService
             $longitude
         );
 
-        return (int) ($distanceKm / $timeDiffHours);
+        // Round to nearest whole km/h for consistency
+        return (int) round($distanceKm / $hours);
     }
 
     /**
