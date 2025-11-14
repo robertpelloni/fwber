@@ -15,6 +15,7 @@ use App\Http\Controllers\ProximityChatroomController;
 use App\Http\Controllers\ProximityChatroomMessageController;
 use App\Http\Controllers\RateLimitController;
 use App\Http\Controllers\RecommendationController;
+use App\Http\Controllers\HealthController;
 use App\Http\Controllers\Api\RelationshipTierController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\UserPhysicalProfileController;
@@ -28,6 +29,11 @@ use App\Http\Controllers\ModerationController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware("api")->group(function (): void {
+    // Health check endpoints (no auth required)
+    Route::get('/health', [HealthController::class, 'check']);
+    Route::get('/health/liveness', [HealthController::class, 'liveness']);
+    Route::get('/health/readiness', [HealthController::class, 'readiness']);
+    
     Route::middleware('throttle:auth')->group(function () {
         Route::post("/auth/register", [AuthController::class, "register"]);
         Route::post("/auth/login", [AuthController::class, "login"]);

@@ -469,11 +469,14 @@ See [docs/ROADMAP.md](docs/ROADMAP.md) for the complete development roadmap.
 - Local Pulse merged feed
 - Comprehensive test coverage
 
-**Phase 2 (In Progress):** Hardening & Safety
-- Shadow throttling system
-- Geo-spoof detection
-- WebSocket/SSE real-time updates
-- Enhanced moderation dashboard
+**Phase 2 (✅ Complete):** Hardening & Safety
+- ✅ Shadow throttling system (progressive penalties)
+- ✅ Geo-spoof detection (velocity & distance checks)
+- ✅ WebSocket/SSE real-time updates (Mercure integrated)
+- ✅ Enhanced moderation dashboard (flagging, throttles, spoofs)
+- ✅ SSL/HTTPS configuration (nginx ready)
+- ✅ Health checks & monitoring setup (Sentry, Prometheus guides)
+- ✅ Production deployment automation (one-command init script)
 
 **Phase 3:** UX & Polish
 - Avatar generation UI flow
