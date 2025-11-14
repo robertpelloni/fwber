@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![PHP 8.4+](https://img.shields.io/badge/PHP-8.4+-777BB4?logo=php)](https://www.php.net/)
-[![Laravel 11](https://img.shields.io/badge/Laravel-11-FF2D20?logo=laravel)](https://laravel.com/)
+[![Laravel 12](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel)](https://laravel.com/)
 [![Next.js 14](https://img.shields.io/badge/Next.js-14-000000?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 
@@ -13,7 +13,7 @@
 - 📍 **Local Pulse:** Discover proximity-based posts and nearby matches in real-time
 - 🔒 **Privacy-First:** Location fuzzing, no personal photos required, secure by design
 - 🛡️ **Safety-Focused:** Content moderation, flagging, shadow throttling, TTL expiry
-- 🚀 **Modern Stack:** Laravel 11 + Next.js 14 + TypeScript + React Query
+- 🚀 **Modern Stack:** Laravel 12 + Next.js 14 + TypeScript + React Query
 
 ## Table of Contents
 - [Features](#features)
@@ -372,6 +372,9 @@ NEXT_PUBLIC_AVATAR_MODE=true
 - [ ] Enable rate limiting
 - [ ] Configure backup strategies
 - [ ] Set up monitoring (Sentry, New Relic, etc.)
+ - [ ] Do not expose internal services (MySQL/Redis) publicly
+ - [ ] Ensure only Nginx is exposed on 80/443
+ - [ ] Confirm no .env files are committed or deployed
 - [ ] Review and update PRIVACY.md and TERMS.md
 - [ ] Configure email service (SMTP, SendGrid, etc.)
 
@@ -388,12 +391,41 @@ npm run build
 # Set up supervisor for queue workers
 ```
 
-**Docker:**
+**Docker (One-Command Setup):**
+```bash
+# Initialize complete production environment
+./init-production.sh
+```
+
+This script handles:
+- Pre-flight checks (Docker, environment files)
+- Building Docker images
+- Starting all services
+- Running migrations
+- Optimizing Laravel caches
+- Setting up storage symlinks
+
+**Docker (Manual Setup):**
 ```bash
 # Build production images
-docker-compose -f docker-compose.prod.yml build
+docker compose -f docker-compose.prod.yml build
 
-# Deploy with Docker Swarm or Kubernetes
+# Start stack (nginx is the only public entrypoint)
+docker compose -f docker-compose.prod.yml up -d
+
+# Run backend migrations
+docker compose -f docker-compose.prod.yml exec laravel php artisan migrate --force
+
+# Optimize Laravel
+docker compose -f docker-compose.prod.yml exec laravel php artisan config:cache
+docker compose -f docker-compose.prod.yml exec laravel php artisan route:cache
+docker compose -f docker-compose.prod.yml exec laravel php artisan view:cache
+
+# Set up storage
+docker compose -f docker-compose.prod.yml exec laravel php artisan storage:link
+
+# Tail logs
+docker compose -f docker-compose.prod.yml logs -f --tail=100
 ```
 
 **Serverless:**

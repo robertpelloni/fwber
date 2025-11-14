@@ -461,7 +461,12 @@ if (!isset($_SESSION['page_tracked'])) {
 
                     <!-- reCAPTCHA -->
                     <div class="flex justify-center">
-                        <div class="g-recaptcha" data-sitekey="6LfUldISAAAAAJjP3rj8cCd1CEmBrfdEMVE_51eZ" data-callback="reCaptchaCallback"></div>
+                        <?php $recaptchaSite = $_ENV['RECAPTCHA_SITE_KEY'] ?? ''; ?>
+                        <?php if ($recaptchaSite): ?>
+                        <div class="g-recaptcha" data-sitekey="<?php echo htmlspecialchars($recaptchaSite, ENT_QUOTES, 'UTF-8'); ?>" data-callback="reCaptchaCallback"></div>
+                        <?php else: ?>
+                        <div class="text-sm text-gray-500">reCAPTCHA is not configured.</div>
+                        <?php endif; ?>
                         <input type="hidden" name="hiddenRecaptcha" id="hiddenRecaptcha">
                     </div>
 
