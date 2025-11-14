@@ -83,6 +83,12 @@ class GeoSpoofDetectionService
             $suspicionScore += 10;
         }
 
+        // Ensure extreme velocity alone triggers creation even without other signals
+        if (in_array('impossible_velocity', $detectionFlags, true) && $suspicionScore < 25) {
+            // Impossible velocity should contribute a minimum high suspicion baseline
+            $suspicionScore = max($suspicionScore, 50);
+        }
+
         // Only create detection record if suspicion score is significant
         if ($suspicionScore >= 25) {
             return GeoSpoofDetection::create([
@@ -115,29 +121,35 @@ class GeoSpoofDetectionService
         }
 
         $cacheKey = "ip_geo:{$ipAddress}";
-        
-        return Cache::remember($cacheKey, 3600, function () use ($ipAddress) {
-            try {
-                // Using ip-api.com (free tier, 45 req/min)
-                // In production, use a paid service like MaxMind, IPinfo, or IP2Location
-                $response = Http::timeout(5)->get("http://ip-api.com/json/{$ipAddress}");
-                
-                if ($response->successful() && $response->json('status') === 'success') {
-                    return [
-                        'latitude' => $response->json('lat'),
-                        'longitude' => $response->json('lon'),
-                        'country' => $response->json('country'),
-                        'city' => $response->json('city'),
-                        'isp' => $response->json('isp'),
-                    ];
-                }
-            } catch (\Exception $e) {
-                // Log error but don't fail the request
-                \Log::warning("IP geolocation failed for {$ipAddress}: " . $e->getMessage());
-            }
 
-            return null;
-        });
+        // Avoid caching null values to prevent sticky failures in tests/production
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        try {
+            // Using ip-api.com (free tier, 45 req/min)
+            // In production, use a paid service like MaxMind, IPinfo, or IP2Location
+            $response = Http::timeout(5)->get("http://ip-api.com/json/{$ipAddress}");
+            
+            if ($response->successful() && $response->json('status') === 'success') {
+                $result = [
+                    'latitude' => $response->json('lat'),
+                    'longitude' => $response->json('lon'),
+                    'country' => $response->json('country'),
+                    'city' => $response->json('city'),
+                    'isp' => $response->json('isp'),
+                ];
+                Cache::put($cacheKey, $result, 3600);
+                return $result;
+            }
+        } catch (\Exception $e) {
+            // Log error but don't fail the request
+            \Log::warning("IP geolocation failed for {$ipAddress}: " . $e->getMessage());
+        }
+
+        return null;
     }
 
     /**
