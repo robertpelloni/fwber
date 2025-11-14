@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { usePhotos } from '@/lib/api/photos'
 import { Eye, Star, Trash2, GripVertical } from 'lucide-react'
 
@@ -40,12 +41,11 @@ export default function PhotoTestPage() {
               backgroundColor: '#f0f0f0'
             }}
           >
-            <img
+            <Image
               src={photo.thumbnail_url || photo.url}
               alt={`Photo ${index + 1}`}
+              fill
               style={{
-                width: '100%',
-                height: '100%',
                 objectFit: 'cover'
               }}
             />

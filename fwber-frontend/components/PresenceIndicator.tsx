@@ -1,6 +1,7 @@
-'use client';
+'use client'
 
-import React from 'react';
+import React from 'react'
+import Image from 'next/image'
 
 export type PresenceStatus = 'online' | 'away' | 'busy' | 'offline';
 
@@ -107,11 +108,14 @@ export function UserAvatar({
   return (
     <div className={`relative inline-block ${className}`}>
       {imageUrl ? (
-        <img 
-          src={imageUrl} 
-          alt={name}
-          className={`${sizeClasses[size]} rounded-full object-cover`}
-        />
+        <div className={`${sizeClasses[size]} rounded-full overflow-hidden relative`}>
+          <Image 
+            src={imageUrl} 
+            alt={name}
+            fill
+            className="object-cover"
+          />
+        </div>
       ) : (
         <div className={`${sizeClasses[size]} rounded-full bg-red-600 flex items-center justify-center text-white font-bold`}>
           {initial}

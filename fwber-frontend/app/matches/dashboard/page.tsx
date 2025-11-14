@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image';
 import { useAuth } from '@/lib/auth-context'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { getMutualMatches, type Match } from '@/lib/api/matches'
@@ -248,10 +249,11 @@ export default function MatchesDashboardPage() {
                   {/* Photo */}
                   <div className="relative aspect-square bg-gradient-to-br from-blue-400 to-purple-500">
                     {match.profile?.photos?.[0] ? (
-                      <img
+                      <Image
                         src={match.profile.photos[0].url}
                         alt={match.profile.display_name || 'Profile'}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-white text-4xl">

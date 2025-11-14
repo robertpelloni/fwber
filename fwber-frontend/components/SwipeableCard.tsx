@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Heart, X, Star } from 'lucide-react'
@@ -30,7 +31,7 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
     setDragOffset({ x: clientX, y: clientY })
   }
 
-  const handleMove = (clientX: number, clientY: number) => {
+  const handleMove = useCallback((clientX: number, clientY: number) => {
     if (!isDragging) return
 
     const deltaX = clientX - dragOffset.x
@@ -46,9 +47,9 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
     if (cardRef.current) {
       cardRef.current.style.transform = `translate(${deltaX}px, ${deltaY}px) rotate(${rotationValue}deg)`
     }
-  }
+  }, [isDragging, dragOffset])
 
-  const handleEnd = () => {
+  const handleEnd = useCallback(() => {
     if (!isDragging) return
 
     setIsDragging(false)
@@ -75,7 +76,7 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
       }
       setRotation(0)
     }
-  }
+  }, [isDragging, dragOffset, onSwipe, onAction])
 
   // Touch events
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -102,11 +103,11 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
     if (!isDragging) return
     handleMove('clientX' in e ? e.clientX : (e as MouseEvent).clientX, 
                'clientY' in e ? e.clientY : (e as MouseEvent).clientY)
-  }, [isDragging, dragOffset, rotation])
+  }, [isDragging, handleMove])
 
   const handleMouseUp = useCallback(() => {
     handleEnd()
-  }, [isDragging, dragOffset, rotation, onSwipe, onAction])
+  }, [handleEnd])
 
   // Add global mouse events when dragging
   useEffect(() => {
@@ -138,10 +139,11 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
         <CardHeader className="relative">
           <div className="aspect-square w-full bg-gray-200 rounded-lg flex items-center justify-center mb-4">
             {user.photos && user.photos.length > 0 ? (
-              <img
+              <Image
                 src={user.photos[0]}
                 alt={user.name}
-                className="w-full h-full object-cover rounded-lg"
+                fill
+                className="object-cover rounded-lg"
               />
             ) : (
               <span className="text-4xl font-semibold text-gray-600">
