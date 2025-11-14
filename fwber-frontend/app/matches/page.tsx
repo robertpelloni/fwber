@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useAuth } from '@/lib/auth-context'
+import { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '../lib/auth-context';
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { getMatches, performMatchAction, type Match, type MatchAction } from '@/lib/api/matches'
 import { RelationshipTier } from '@/lib/relationshipTiers'
@@ -24,13 +24,7 @@ export default function MatchesPage() {
     return RelationshipTier.DISCOVERY
   }
 
-  useEffect(() => {
-    if (isAuthenticated && token) {
-      loadMatches()
-    }
-  }, [isAuthenticated, token])
-
-  const loadMatches = async () => {
+  const loadMatches = useCallback(async () => {
     if (!token) return
 
     try {
@@ -44,7 +38,13 @@ export default function MatchesPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [token])
+
+  useEffect(() => {
+    if (isAuthenticated && token) {
+      loadMatches()
+    }
+  }, [isAuthenticated, token, loadMatches])
 
   const handleMatchAction = async (action: MatchAction) => {
     if (!token || currentMatchIndex >= matches.length) return

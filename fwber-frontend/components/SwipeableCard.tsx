@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Heart, X, Star } from 'lucide-react'
@@ -98,14 +98,15 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
     handleStart(e.clientX, e.clientY)
   }
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleMouseMove = useCallback((e: React.MouseEvent | MouseEvent) => {
     if (!isDragging) return
-    handleMove(e.clientX, e.clientY)
-  }
+    handleMove('clientX' in e ? e.clientX : (e as MouseEvent).clientX, 
+               'clientY' in e ? e.clientY : (e as MouseEvent).clientY)
+  }, [isDragging, dragOffset, rotation])
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     handleEnd()
-  }
+  }, [isDragging, dragOffset, rotation, onSwipe, onAction])
 
   // Add global mouse events when dragging
   useEffect(() => {
@@ -117,7 +118,7 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
         document.removeEventListener('mouseup', handleMouseUp)
       }
     }
-  }, [isDragging])
+  }, [isDragging, handleMouseMove, handleMouseUp])
 
   return (
     <div className="relative w-full max-w-sm mx-auto">

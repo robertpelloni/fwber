@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { getConversations, getMessages, sendMessage, type Conversation, type Message } from '@/lib/api/messages'
@@ -16,27 +16,7 @@ export default function MessagesPage() {
   const [error, setError] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    if (isAuthenticated && token) {
-      loadConversations()
-    }
-  }, [isAuthenticated, token])
-
-  useEffect(() => {
-    if (selectedConversation && token) {
-      loadMessages(selectedConversation.id)
-    }
-  }, [selectedConversation, token])
-
-  useEffect(() => {
-    scrollToBottom()
-  }, [messages])
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
-
-  const loadConversations = async () => {
+  const loadConversations = useCallback(async () => {
     if (!token) return
 
     try {
@@ -49,9 +29,9 @@ export default function MessagesPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [token])
 
-  const loadMessages = async (conversationId: number) => {
+  const loadMessages = useCallback(async (conversationId: number) => {
     if (!token) return
 
     try {
@@ -61,6 +41,26 @@ export default function MessagesPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load messages')
     }
+  }, [token])
+
+  useEffect(() => {
+    if (isAuthenticated && token) {
+      loadConversations()
+    }
+  }, [isAuthenticated, token, loadConversations])
+
+  useEffect(() => {
+    if (selectedConversation && token) {
+      loadMessages(selectedConversation.id)
+    }
+  }, [selectedConversation, token, loadMessages])
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
   const handleSendMessage = async (e: React.FormEvent) => {

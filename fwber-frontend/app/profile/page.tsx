@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import { getUserProfile, updateUserProfile, getProfileCompleteness, type UserProfile, type ProfileUpdateData } from '@/lib/api/profile'
@@ -142,9 +142,9 @@ export default function ProfilePage() {
     if ((isAuthenticated || hasDevToken) && effectiveToken) {
       loadProfile()
     }
-  }, [isAuthenticated, authLoading, token, router, effectiveToken])
+  }, [isAuthenticated, authLoading, token, router, effectiveToken, loadProfile])
 
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     if (!effectiveToken) return
 
     try {
@@ -216,7 +216,7 @@ export default function ProfilePage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [effectiveToken])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

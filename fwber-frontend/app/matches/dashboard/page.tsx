@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { getMutualMatches, type Match } from '@/lib/api/matches'
@@ -27,13 +27,7 @@ export default function MatchesDashboardPage() {
   const [filter, setFilter] = useState<'all' | RelationshipTier>('all')
   const [searchQuery, setSearchQuery] = useState('')
 
-  useEffect(() => {
-    if (token) {
-      loadMatches()
-    }
-  }, [token])
-
-  const loadMatches = async () => {
+  const loadMatches = useCallback(async () => {
     if (!token) return
 
     try {
@@ -66,7 +60,13 @@ export default function MatchesDashboardPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [token])
+
+  useEffect(() => {
+    if (token) {
+      loadMatches()
+    }
+  }, [token, loadMatches])
 
   const filteredMatches = matches.filter(match => {
     const matchesFilter = filter === 'all' || match.tierData.tier === filter

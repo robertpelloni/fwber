@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useChatroom, useChatroomMessages, useSendMessage, useAddReaction, useRemoveReaction } from '@/lib/hooks/use-chatrooms';
 import { useAuth } from '@/lib/auth-context';
@@ -23,7 +23,7 @@ export default function ChatroomPage() {
   const removeReactionMutation = useRemoveReaction();
 
   const chatroom = chatroomData?.chatroom;
-  const messages = messagesData?.data || [];
+  const messages = useMemo(() => messagesData?.data || [], [messagesData?.data]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
