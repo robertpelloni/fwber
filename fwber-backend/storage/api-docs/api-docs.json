@@ -1,0 +1,615 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "FWBer API Documentation",
+        "description": "Comprehensive API documentation for FWBer - A proximity-based dating platform with real-time features, AI-powered matching, and privacy-first design.",
+        "contact": {
+            "name": "FWBer Team",
+            "email": "support@fwber.com"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000/api",
+            "description": "Local Development Server"
+        },
+        {
+            "url": "https://api.fwber.com/api",
+            "description": "Production Server"
+        }
+    ],
+    "paths": {
+        "/dashboard/stats": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get dashboard statistics",
+                "description": "Retrieve comprehensive statistics for the authenticated user including matches, conversations, profile views, and engagement metrics",
+                "operationId": "1a6d542499b9e54f2934002782106a08",
+                "responses": {
+                    "200": {
+                        "description": "Dashboard statistics retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "total_matches": {
+                                            "type": "integer",
+                                            "example": 15
+                                        },
+                                        "pending_matches": {
+                                            "type": "integer",
+                                            "example": 3
+                                        },
+                                        "accepted_matches": {
+                                            "type": "integer",
+                                            "example": 12
+                                        },
+                                        "conversations": {
+                                            "type": "integer",
+                                            "example": 8
+                                        },
+                                        "profile_views": {
+                                            "type": "integer",
+                                            "example": 42
+                                        },
+                                        "today_views": {
+                                            "type": "integer",
+                                            "example": 5
+                                        },
+                                        "match_score_avg": {
+                                            "type": "integer",
+                                            "example": 85
+                                        },
+                                        "response_rate": {
+                                            "type": "integer",
+                                            "example": 75
+                                        },
+                                        "days_active": {
+                                            "type": "integer",
+                                            "example": 14
+                                        },
+                                        "last_login": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2025-01-15T10:30:00Z"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnauthorizedError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/activity": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get recent activity feed",
+                "description": "Retrieve a unified activity feed showing recent matches, messages, and profile views",
+                "operationId": "e9908a935a8ce742b0cf7b644d066ca7",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Maximum number of activity items to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10,
+                            "maximum": 50,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Activity feed retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "type": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "match",
+                                                    "message",
+                                                    "view"
+                                                ],
+                                                "example": "match"
+                                            },
+                                            "user": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 42
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Jane Smith"
+                                                    },
+                                                    "avatar_url": {
+                                                        "type": "string",
+                                                        "example": "https://cdn.fwber.com/avatars/42.jpg",
+                                                        "nullable": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            },
+                                            "timestamp": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2025-01-15T09:45:00Z"
+                                            },
+                                            "match_score": {
+                                                "description": "Only present for match type activities",
+                                                "type": "integer",
+                                                "example": 85,
+                                                "nullable": true
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnauthorizedError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/profile/completeness": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get profile completeness",
+                "description": "Calculate profile completion percentage and identify missing required/optional fields for the authenticated user",
+                "operationId": "916de88ad5ad5404b88d43cfe13969bb",
+                "responses": {
+                    "200": {
+                        "description": "Profile completeness calculated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "percentage": {
+                                            "type": "integer",
+                                            "maximum": 100,
+                                            "minimum": 0,
+                                            "example": 85
+                                        },
+                                        "required_complete": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "missing_required": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "example": [
+                                                "city"
+                                            ]
+                                        },
+                                        "missing_optional": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "example": [
+                                                "bio",
+                                                "interests",
+                                                "height_cm"
+                                            ]
+                                        },
+                                        "sections": {
+                                            "properties": {
+                                                "basic": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "location": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "preferences": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "interests": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "physical": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "lifestyle": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnauthorizedError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/profile/{userId}/view": {
+            "post": {
+                "tags": [
+                    "Profile Views"
+                ],
+                "summary": "Record a profile view",
+                "description": "Track when a user views another user's profile (with 24-hour deduplication). Anonymous views are tracked by IP address. Returns one of three possible messages: 'Profile view recorded' (new view), 'View already recorded' (duplicate within 24h), or 'Cannot view own profile' (self-view blocked).",
+                "operationId": "72e41e042a20a4d42c70cd553a29f0af",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ID of the user whose profile is being viewed",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 42
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operation completed (see message field for details)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Profile view recorded"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/profile/{userId}/views": {
+            "get": {
+                "tags": [
+                    "Profile Views"
+                ],
+                "summary": "Get profile viewers",
+                "description": "Retrieve list of authenticated users who have viewed the profile (last 50 views, excludes anonymous views)",
+                "operationId": "387f0c51a6dc7d8cf32ec2266ade9f6e",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ID of the user whose profile views to retrieve",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 42
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Profile viewers retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 123
+                                            },
+                                            "viewer": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 67
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Jane Smith"
+                                                    },
+                                                    "avatar_url": {
+                                                        "type": "string",
+                                                        "example": "https://cdn.fwber.com/avatars/67.jpg",
+                                                        "nullable": true
+                                                    },
+                                                    "age": {
+                                                        "type": "integer",
+                                                        "example": 28
+                                                    },
+                                                    "city": {
+                                                        "type": "string",
+                                                        "example": "New York"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            },
+                                            "viewed_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2025-01-15T14:30:00Z"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized to view other user's profile views",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnauthorizedError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/profile/{userId}/view-stats": {
+            "get": {
+                "tags": [
+                    "Profile Views"
+                ],
+                "summary": "Get profile view statistics",
+                "description": "Retrieve aggregated profile view analytics including total, daily, weekly, and monthly views plus unique viewer count",
+                "operationId": "4accc5b0d30bf40643288ab1532021f2",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ID of the user whose view statistics to retrieve",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 42
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "View statistics retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "total_views": {
+                                            "type": "integer",
+                                            "example": 156
+                                        },
+                                        "today_views": {
+                                            "type": "integer",
+                                            "example": 12
+                                        },
+                                        "week_views": {
+                                            "type": "integer",
+                                            "example": 45
+                                        },
+                                        "month_views": {
+                                            "type": "integer",
+                                            "example": 98
+                                        },
+                                        "unique_viewers": {
+                                            "type": "integer",
+                                            "example": 72
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized to view other user's statistics",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnauthorizedError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "User": {
+                "required": [
+                    "id",
+                    "email"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "user@example.com"
+                    },
+                    "avatar_url": {
+                        "type": "string",
+                        "example": "https://cdn.fwber.com/avatars/123.jpg",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "ValidationError": {
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "The given data was invalid."
+                    },
+                    "errors": {
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "UnauthorizedError": {
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "Unauthenticated"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Enter your bearer token in the format: Bearer {token}",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Dashboard",
+            "description": "User dashboard statistics and activity feeds"
+        },
+        {
+            "name": "Profile Views",
+            "description": "Track and manage profile view analytics"
+        }
+    ]
+}

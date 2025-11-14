@@ -9,7 +9,27 @@ use Carbon\Carbon;
 class ProfileViewController extends Controller
 {
     /**
-     * Record a profile view
+     * @OA\Post(
+     *     path="/profile/{userId}/view",
+     *     tags={"Profile Views"},
+     *     summary="Record a profile view",
+     *     description="Track when a user views another user's profile (with 24-hour deduplication). Anonymous views are tracked by IP address. Returns one of three possible messages: 'Profile view recorded' (new view), 'View already recorded' (duplicate within 24h), or 'Cannot view own profile' (self-view blocked).",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="userId",
+     *         in="path",
+     *         description="ID of the user whose profile is being viewed",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=42)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Operation completed (see message field for details)",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Profile view recorded")
+     *         )
+     *     )
+     * )
      */
     public function recordView(Request $request, $userId)
     {
@@ -52,7 +72,53 @@ class ProfileViewController extends Controller
     }
 
     /**
-     * Get profile views for a user
+     * @OA\Get(
+     *     path="/profile/{userId}/views",
+     *     tags={"Profile Views"},
+     *     summary="Get profile viewers",
+     *     description="Retrieve list of authenticated users who have viewed the profile (last 50 views, excludes anonymous views)",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="userId",
+     *         in="path",
+     *         description="ID of the user whose profile views to retrieve",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=42)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Profile viewers retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=123),
+     *                 @OA\Property(
+     *                     property="viewer",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=67),
+     *                     @OA\Property(property="name", type="string", example="Jane Smith"),
+     *                     @OA\Property(property="avatar_url", type="string", nullable=true, example="https://cdn.fwber.com/avatars/67.jpg"),
+     *                     @OA\Property(property="age", type="integer", example=28),
+     *                     @OA\Property(property="city", type="string", example="New York")
+     *                 ),
+     *                 @OA\Property(property="viewed_at", type="string", format="date-time", example="2025-01-15T14:30:00Z")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized to view other user's profile views",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Unauthorized")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
+     *     )
+     * )
      */
     public function getViews(Request $request, $userId)
     {
@@ -90,7 +156,43 @@ class ProfileViewController extends Controller
     }
 
     /**
-     * Get profile view statistics
+     * @OA\Get(
+     *     path="/profile/{userId}/view-stats",
+     *     tags={"Profile Views"},
+     *     summary="Get profile view statistics",
+     *     description="Retrieve aggregated profile view analytics including total, daily, weekly, and monthly views plus unique viewer count",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="userId",
+     *         in="path",
+     *         description="ID of the user whose view statistics to retrieve",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=42)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="View statistics retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="total_views", type="integer", example=156),
+     *             @OA\Property(property="today_views", type="integer", example=12),
+     *             @OA\Property(property="week_views", type="integer", example=45),
+     *             @OA\Property(property="month_views", type="integer", example=98),
+     *             @OA\Property(property="unique_viewers", type="integer", example=72)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized to view other user's statistics",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Unauthorized")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
+     *     )
+     * )
      */
     public function getStats(Request $request, $userId)
     {

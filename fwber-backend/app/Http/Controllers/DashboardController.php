@@ -9,7 +9,34 @@ use Carbon\Carbon;
 class DashboardController extends Controller
 {
     /**
-     * Get dashboard statistics for the authenticated user
+     * @OA\Get(
+     *     path="/dashboard/stats",
+     *     tags={"Dashboard"},
+     *     summary="Get dashboard statistics",
+     *     description="Retrieve comprehensive statistics for the authenticated user including matches, conversations, profile views, and engagement metrics",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Dashboard statistics retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="total_matches", type="integer", example=15),
+     *             @OA\Property(property="pending_matches", type="integer", example=3),
+     *             @OA\Property(property="accepted_matches", type="integer", example=12),
+     *             @OA\Property(property="conversations", type="integer", example=8),
+     *             @OA\Property(property="profile_views", type="integer", example=42),
+     *             @OA\Property(property="today_views", type="integer", example=5),
+     *             @OA\Property(property="match_score_avg", type="integer", example=85),
+     *             @OA\Property(property="response_rate", type="integer", example=75),
+     *             @OA\Property(property="days_active", type="integer", example=14),
+     *             @OA\Property(property="last_login", type="string", format="date-time", example="2025-01-15T10:30:00Z")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
+     *     )
+     * )
      */
     public function getStats(Request $request)
     {
@@ -78,7 +105,45 @@ class DashboardController extends Controller
     }
 
     /**
-     * Get recent activity for the authenticated user
+     * @OA\Get(
+     *     path="/dashboard/activity",
+     *     tags={"Dashboard"},
+     *     summary="Get recent activity feed",
+     *     description="Retrieve a unified activity feed showing recent matches, messages, and profile views",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Maximum number of activity items to return",
+     *         required=false,
+     *         @OA\Schema(type="integer", default=10, minimum=1, maximum=50)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Activity feed retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="type", type="string", enum={"match", "message", "view"}, example="match"),
+     *                 @OA\Property(
+     *                     property="user",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=42),
+     *                     @OA\Property(property="name", type="string", example="Jane Smith"),
+     *                     @OA\Property(property="avatar_url", type="string", nullable=true, example="https://cdn.fwber.com/avatars/42.jpg")
+     *                 ),
+     *                 @OA\Property(property="timestamp", type="string", format="date-time", example="2025-01-15T09:45:00Z"),
+     *                 @OA\Property(property="match_score", type="integer", nullable=true, example=85, description="Only present for match type activities")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
+     *     )
+     * )
      */
     public function getActivity(Request $request)
     {
@@ -175,7 +240,48 @@ class DashboardController extends Controller
     }
 
     /**
-     * Get profile completeness for the authenticated user
+     * @OA\Get(
+     *     path="/profile/completeness",
+     *     tags={"Dashboard"},
+     *     summary="Get profile completeness",
+     *     description="Calculate profile completion percentage and identify missing required/optional fields for the authenticated user",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Profile completeness calculated successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="percentage", type="integer", minimum=0, maximum=100, example=85),
+     *             @OA\Property(property="required_complete", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="missing_required",
+     *                 type="array",
+     *                 @OA\Items(type="string"),
+     *                 example={"city"}
+     *             ),
+     *             @OA\Property(
+     *                 property="missing_optional",
+     *                 type="array",
+     *                 @OA\Items(type="string"),
+     *                 example={"bio", "interests", "height_cm"}
+     *             ),
+     *             @OA\Property(
+     *                 property="sections",
+     *                 type="object",
+     *                 @OA\Property(property="basic", type="boolean", example=true),
+     *                 @OA\Property(property="location", type="boolean", example=false),
+     *                 @OA\Property(property="preferences", type="boolean", example=true),
+     *                 @OA\Property(property="interests", type="boolean", example=false),
+     *                 @OA\Property(property="physical", type="boolean", example=true),
+     *                 @OA\Property(property="lifestyle", type="boolean", example=false)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
+     *     )
+     * )
      */
     public function getProfileCompleteness(Request $request)
     {
