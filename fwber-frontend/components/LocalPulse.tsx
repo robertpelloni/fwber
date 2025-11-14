@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useLocalPulse, useCreateProximityArtifact, useFlagProximityArtifact } from '@/lib/hooks/use-proximity';
+import { useLocalPulseRealtime } from '@/lib/hooks/use-local-pulse-realtime';
 import { 
   MapPin, 
   MessageCircle, 
@@ -116,7 +117,7 @@ const CandidateCard = ({ candidate }: { candidate: MatchCandidate }) => {
             <span>{candidate.distance_miles.toFixed(1)} miles away</span>
           </div>
         </div>
-        <button className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors">
+        <button aria-label="Like" className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors">
           <Heart className="h-5 w-5" />
         </button>
       </div>
@@ -240,6 +241,8 @@ export default function LocalPulse() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Establish real-time subscription to Local Pulse updates */}
+      <LiveStatusBanner />
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
@@ -262,10 +265,9 @@ export default function LocalPulse() {
 
         {/* Radius Selector */}
         <div className="bg-white rounded-lg shadow-sm border p-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Search Radius
-          </label>
+          <label htmlFor="radius-select" className="block text-sm font-medium text-gray-700 mb-2">Search Radius</label>
           <select
+            id="radius-select"
             value={radius}
             onChange={(e) => setRadius(Number(e.target.value))}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -461,6 +463,23 @@ export default function LocalPulse() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function LiveStatusBanner() {
+  const { isConnected, error } = useLocalPulseRealtime();
+  if (error) {
+    return (
+      <div className="mb-4 rounded-md border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800">
+        Live updates degraded; retrying...
+      </div>
+    );
+  }
+  return (
+    <div className="mb-4 flex items-center space-x-2 text-sm text-gray-600">
+      <span className={`inline-block h-2 w-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-400'}`} />
+      <span>{isConnected ? 'Live updates on' : 'Live updates connecting...'}</span>
     </div>
   );
 }
