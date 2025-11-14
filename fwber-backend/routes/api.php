@@ -6,11 +6,13 @@ use App\Http\Controllers\BulletinBoardController;
 use App\Http\Controllers\ChatroomController;
 use App\Http\Controllers\ChatroomMessageController;
 use App\Http\Controllers\ContentGenerationController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\MatchController;
 use App\Http\Controllers\MercureAuthController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProfileViewController;
 use App\Http\Controllers\ProximityChatroomController;
 use App\Http\Controllers\ProximityChatroomMessageController;
 use App\Http\Controllers\RateLimitController;
@@ -44,6 +46,15 @@ Route::middleware("api")->group(function (): void {
         Route::get("/user", [ProfileController::class, "show"]);
         Route::put("/user", [ProfileController::class, "update"]);
         Route::get("/profile/completeness", [ProfileController::class, "completeness"]);
+        
+        // Dashboard routes
+        Route::get("/dashboard/stats", [DashboardController::class, "getStats"]);
+        Route::get("/dashboard/activity", [DashboardController::class, "getActivity"]);
+        
+        // Profile view tracking routes
+        Route::post("/profile/{userId}/view", [ProfileViewController::class, "recordView"]);
+        Route::get("/profile/{userId}/views", [ProfileViewController::class, "getViews"]);
+        Route::get("/profile/{userId}/views/stats", [ProfileViewController::class, "getStats"]);
         
         Route::post("/auth/logout", [AuthController::class, "logout"]);
         
