@@ -3311,7 +3311,7 @@
                         "$ref": "#/components/responses/NotFound"
                     },
                     "422": {
-                        "$ref": "#/components/responses/ValidationError"
+                        "$ref": "#/components/responses/ModerationError"
                     }
                 },
                 "security": [
@@ -3433,7 +3433,7 @@
                         "$ref": "#/components/responses/NotFound"
                     },
                     "422": {
-                        "$ref": "#/components/responses/ValidationError"
+                        "$ref": "#/components/responses/ModerationError"
                     }
                 },
                 "security": [
@@ -7417,7 +7417,7 @@
                         "$ref": "#/components/responses/Forbidden"
                     },
                     "422": {
-                        "$ref": "#/components/responses/ValidationError"
+                        "$ref": "#/components/responses/ModerationError"
                     }
                 },
                 "security": [
@@ -7536,7 +7536,7 @@
                         "$ref": "#/components/responses/Forbidden"
                     },
                     "422": {
-                        "$ref": "#/components/responses/ValidationError"
+                        "$ref": "#/components/responses/ModerationError"
                     }
                 },
                 "security": [
@@ -9083,6 +9083,24 @@
                 },
                 "type": "object"
             },
+            "ModerationError": {
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "Message blocked by content moderation"
+                    },
+                    "reason": {
+                        "type": "string",
+                        "example": "Inappropriate content"
+                    },
+                    "category": {
+                        "type": "string",
+                        "example": "toxicity",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
             "Reaction": {
                 "properties": {
                     "user_id": {
@@ -9750,6 +9768,16 @@
                     "application/json": {
                         "schema": {
                             "$ref": "#/components/schemas/NotFoundError"
+                        }
+                    }
+                }
+            },
+            "ModerationError": {
+                "description": "Moderation blocked",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ModerationError"
                         }
                     }
                 }

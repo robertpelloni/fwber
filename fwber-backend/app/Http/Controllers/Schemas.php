@@ -33,6 +33,12 @@ namespace App\Http\Controllers;
  *     @OA\JsonContent(ref="#/components/schemas/NotFoundError")
  * )
  * 
+ * @OA\Response(
+ *     response="ModerationError",
+ *     description="Moderation blocked",
+ *     @OA\JsonContent(ref="#/components/schemas/ModerationError")
+ * )
+ * 
  * @OA\Schema(
  *     schema="User",
  *     type="object",
@@ -68,6 +74,14 @@ namespace App\Http\Controllers;
  *     schema="NotFoundError",
  *     type="object",
  *     @OA\Property(property="message", type="string", example="Not Found")
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="ModerationError",
+ *     type="object",
+ *     @OA\Property(property="message", type="string", example="Message blocked by content moderation"),
+ *     @OA\Property(property="reason", type="string", example="Inappropriate content"),
+ *     @OA\Property(property="category", type="string", nullable=true, example="toxicity")
  * )
  * 
  * @OA\Schema(

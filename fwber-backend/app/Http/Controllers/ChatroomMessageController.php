@@ -98,7 +98,7 @@ class ChatroomMessageController extends Controller
     *   @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/ChatMessage")),
     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
     *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
-    *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
+    *   @OA\Response(response=422, ref="#/components/responses/ModerationError")
      * )
      */
     public function store(Request $request, int $chatroomId): JsonResponse
@@ -240,7 +240,7 @@ class ChatroomMessageController extends Controller
     *   @OA\Response(response=200, description="Updated", @OA\JsonContent(ref="#/components/schemas/ChatMessage")),
     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
     *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
-    *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
+    *   @OA\Response(response=422, ref="#/components/responses/ModerationError")
      * )
      */
     public function update(Request $request, int $chatroomId, int $messageId): JsonResponse
