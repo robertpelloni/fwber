@@ -24,6 +24,48 @@ use Carbon\Carbon;
 class ProfileController extends Controller
 {
     /**
+     * @OA\Get(
+     *     path="/profile",
+     *     tags={"Profile"},
+     *     summary="Get authenticated user's profile",
+     *     description="Retrieve complete profile information for the authenticated user including preferences, location, and completion status",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Profile retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="John Doe"),
+     *                 @OA\Property(property="email", type="string", example="john@example.com"),
+     *                 @OA\Property(property="display_name", type="string", example="Johnny"),
+     *                 @OA\Property(property="bio", type="string", example="Software developer passionate about technology"),
+     *                 @OA\Property(property="date_of_birth", type="string", format="date", example="1990-05-15"),
+     *                 @OA\Property(property="age", type="integer", example=33),
+     *                 @OA\Property(property="gender", type="string", example="male"),
+     *                 @OA\Property(property="avatar_url", type="string", nullable=true, example="https://cdn.fwber.com/avatars/123.jpg")
+     *             ),
+     *             @OA\Property(property="profile_complete", type="boolean", example=true)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Profile not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Profile not found. Please complete your profile."),
+     *             @OA\Property(property="profile_complete", type="boolean", example=false)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
+     *     )
+     * )
+     * 
      * Get authenticated user's profile
      * 
      * @return JsonResponse
@@ -70,6 +112,69 @@ class ProfileController extends Controller
     }
     
     /**
+     * @OA\Put(
+     *     path="/profile",
+     *     tags={"Profile"},
+     *     summary="Update user profile",
+     *     description="Update profile information including bio, preferences, location, and personal details. All fields are optional.",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="display_name", type="string", maxLength=50, example="Johnny"),
+     *             @OA\Property(property="bio", type="string", maxLength=500, example="Updated bio text"),
+     *             @OA\Property(property="date_of_birth", type="string", format="date", example="1990-05-15"),
+     *             @OA\Property(property="gender", type="string", enum={"male", "female", "non-binary", "mtf", "ftm", "other", "prefer-not-to-say"}, example="male"),
+     *             @OA\Property(property="pronouns", type="string", enum={"he/him", "she/her", "they/them", "he/they", "she/they", "other", "prefer-not-to-say"}, example="he/him"),
+     *             @OA\Property(property="sexual_orientation", type="string", example="bisexual"),
+     *             @OA\Property(property="relationship_style", type="string", example="non-monogamous"),
+     *             @OA\Property(
+     *                 property="looking_for",
+     *                 type="array",
+     *                 @OA\Items(type="string", enum={"friendship", "dating", "relationship", "casual", "marriage", "networking"}),
+     *                 example={"dating", "relationship"}
+     *             ),
+     *             @OA\Property(
+     *                 property="location",
+     *                 type="object",
+     *                 @OA\Property(property="latitude", type="number", format="float", example=40.7128),
+     *                 @OA\Property(property="longitude", type="number", format="float", example=-74.0060),
+     *                 @OA\Property(property="max_distance", type="integer", example=50),
+     *                 @OA\Property(property="city", type="string", example="New York"),
+     *                 @OA\Property(property="state", type="string", example="NY")
+     *             ),
+     *             @OA\Property(
+     *                 property="preferences",
+     *                 type="object",
+     *                 @OA\Property(property="smoking", type="string", example="non-smoker"),
+     *                 @OA\Property(property="drinking", type="string", example="occasional"),
+     *                 @OA\Property(property="exercise", type="string", example="several-times-week"),
+     *                 @OA\Property(property="age_range_min", type="integer", example=25),
+     *                 @OA\Property(property="age_range_max", type="integer", example=40)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Profile updated successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Profile updated successfully"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
+     *     )
+     * )
+     * 
      * Update authenticated user's profile
      * 
      * @param Request $request

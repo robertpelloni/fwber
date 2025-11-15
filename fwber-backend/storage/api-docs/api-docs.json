@@ -24,6 +24,371 @@
         }
     ],
     "paths": {
+        "/messages": {
+            "post": {
+                "tags": [
+                    "Messages"
+                ],
+                "summary": "Send a message",
+                "description": "Send a text message or media (image/video/audio/file) to a matched user. Either content or media is required. Enforces relationship tier limits and blocks.",
+                "operationId": "1aa21572307a1c2e85281f5e04599031",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "receiver_id"
+                                ],
+                                "properties": {
+                                    "receiver_id": {
+                                        "description": "ID of message recipient",
+                                        "type": "integer",
+                                        "example": 42
+                                    },
+                                    "content": {
+                                        "description": "Text message content",
+                                        "type": "string",
+                                        "maxLength": 5000,
+                                        "example": "Hey, how are you?"
+                                    },
+                                    "message_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "text",
+                                            "image",
+                                            "video",
+                                            "audio",
+                                            "file"
+                                        ],
+                                        "example": "text"
+                                    },
+                                    "media": {
+                                        "description": "Media file (image/video/audio/file)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "media_duration": {
+                                        "description": "Duration in seconds for audio/video",
+                                        "type": "integer",
+                                        "example": 30
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Message sent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 123
+                                        },
+                                        "sender_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "receiver_id": {
+                                            "type": "integer",
+                                            "example": 42
+                                        },
+                                        "content": {
+                                            "type": "string",
+                                            "example": "Hey, how are you?"
+                                        },
+                                        "message_type": {
+                                            "type": "string",
+                                            "example": "text"
+                                        },
+                                        "media_url": {
+                                            "type": "string",
+                                            "nullable": true
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Messaging blocked or not allowed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Messaging blocked between users"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No active match found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "No active match found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnauthorizedError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Register a new user",
+                "description": "Create a new user account with email, password, and optional profile information. Automatically generates API token for immediate authentication.",
+                "operationId": "ed42f392010c301892e640067141676e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "minLength": 8,
+                                        "example": "SecurePass123!"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "SecurePass123!"
+                                    },
+                                    "profile": {
+                                        "description": "Optional profile information",
+                                        "properties": {
+                                            "date_of_birth": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "1990-05-15"
+                                            },
+                                            "gender": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "male",
+                                                    "female",
+                                                    "non-binary",
+                                                    "other"
+                                                ],
+                                                "example": "male"
+                                            },
+                                            "bio": {
+                                                "type": "string",
+                                                "maxLength": 500,
+                                                "example": "Software developer passionate about technology"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User registered successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGc..."
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Login user",
+                "description": "Authenticate user with email and password. Returns API token for subsequent requests.",
+                "operationId": "8cb7742ae98d0990acb2907c4e00bf24",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "SecurePass123!"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGc..."
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid credentials",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid credentials."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Logout user",
+                "description": "Revoke current API token and end user session",
+                "operationId": "0d29c740dc06d77602af8095bf4654cc",
+                "responses": {
+                    "204": {
+                        "description": "Logout successful (no content)"
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnauthorizedError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/dashboard/stats": {
             "get": {
                 "tags": [
@@ -274,6 +639,546 @@
                                         }
                                     },
                                     "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnauthorizedError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/matches": {
+            "get": {
+                "tags": [
+                    "Matches"
+                ],
+                "summary": "Get potential matches",
+                "description": "Retrieve a feed of potential matches based on user preferences, location, and filters. Results are cached for 60 seconds per user.",
+                "operationId": "8aee0f4d94037c71d33a1e5c9e9acfcd",
+                "parameters": [
+                    {
+                        "name": "age_min",
+                        "in": "query",
+                        "description": "Minimum age filter",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 18,
+                            "example": 25
+                        }
+                    },
+                    {
+                        "name": "age_max",
+                        "in": "query",
+                        "description": "Maximum age filter",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 18,
+                            "example": 40
+                        }
+                    },
+                    {
+                        "name": "max_distance",
+                        "in": "query",
+                        "description": "Maximum distance in miles",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 50,
+                            "maximum": 500,
+                            "minimum": 1,
+                            "example": 25
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Matches retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "matches": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 42
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Jane Smith"
+                                                    },
+                                                    "age": {
+                                                        "type": "integer",
+                                                        "example": 28
+                                                    },
+                                                    "bio": {
+                                                        "type": "string",
+                                                        "example": "Love hiking and coffee"
+                                                    },
+                                                    "distance": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 5.3
+                                                    },
+                                                    "match_score": {
+                                                        "type": "integer",
+                                                        "example": 85
+                                                    },
+                                                    "avatar_url": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 15
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Profile not complete",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Profile not found. Please complete your profile first."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnauthorizedError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/matches/action": {
+            "post": {
+                "tags": [
+                    "Matches"
+                ],
+                "summary": "Perform match action",
+                "description": "Like, pass, or super like a potential match. Returns whether action resulted in a mutual match.",
+                "operationId": "7bfcec9af33a171d0f7362b942350231",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "action",
+                                    "target_user_id"
+                                ],
+                                "properties": {
+                                    "action": {
+                                        "type": "string",
+                                        "enum": [
+                                            "like",
+                                            "pass",
+                                            "super_like"
+                                        ],
+                                        "example": "like"
+                                    },
+                                    "target_user_id": {
+                                        "type": "integer",
+                                        "example": 42
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Action recorded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "action": {
+                                            "type": "string",
+                                            "example": "like"
+                                        },
+                                        "is_match": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "It's a match!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid action or user not accessible",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cannot perform action on yourself"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnauthorizedError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/profile": {
+            "get": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Get authenticated user's profile",
+                "description": "Retrieve complete profile information for the authenticated user including preferences, location, and completion status",
+                "operationId": "5bb4be46c7974b2c2641a87e3469f86c",
+                "responses": {
+                    "200": {
+                        "description": "Profile retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John Doe"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "john@example.com"
+                                                },
+                                                "display_name": {
+                                                    "type": "string",
+                                                    "example": "Johnny"
+                                                },
+                                                "bio": {
+                                                    "type": "string",
+                                                    "example": "Software developer passionate about technology"
+                                                },
+                                                "date_of_birth": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "1990-05-15"
+                                                },
+                                                "age": {
+                                                    "type": "integer",
+                                                    "example": 33
+                                                },
+                                                "gender": {
+                                                    "type": "string",
+                                                    "example": "male"
+                                                },
+                                                "avatar_url": {
+                                                    "type": "string",
+                                                    "example": "https://cdn.fwber.com/avatars/123.jpg",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "profile_complete": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Profile not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Profile not found. Please complete your profile."
+                                        },
+                                        "profile_complete": {
+                                            "type": "boolean",
+                                            "example": false
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnauthorizedError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Update user profile",
+                "description": "Update profile information including bio, preferences, location, and personal details. All fields are optional.",
+                "operationId": "c6f41207c4916ab1e901279166ddb5b5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "display_name": {
+                                        "type": "string",
+                                        "maxLength": 50,
+                                        "example": "Johnny"
+                                    },
+                                    "bio": {
+                                        "type": "string",
+                                        "maxLength": 500,
+                                        "example": "Updated bio text"
+                                    },
+                                    "date_of_birth": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1990-05-15"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "enum": [
+                                            "male",
+                                            "female",
+                                            "non-binary",
+                                            "mtf",
+                                            "ftm",
+                                            "other",
+                                            "prefer-not-to-say"
+                                        ],
+                                        "example": "male"
+                                    },
+                                    "pronouns": {
+                                        "type": "string",
+                                        "enum": [
+                                            "he/him",
+                                            "she/her",
+                                            "they/them",
+                                            "he/they",
+                                            "she/they",
+                                            "other",
+                                            "prefer-not-to-say"
+                                        ],
+                                        "example": "he/him"
+                                    },
+                                    "sexual_orientation": {
+                                        "type": "string",
+                                        "example": "bisexual"
+                                    },
+                                    "relationship_style": {
+                                        "type": "string",
+                                        "example": "non-monogamous"
+                                    },
+                                    "looking_for": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "enum": [
+                                                "friendship",
+                                                "dating",
+                                                "relationship",
+                                                "casual",
+                                                "marriage",
+                                                "networking"
+                                            ]
+                                        },
+                                        "example": [
+                                            "dating",
+                                            "relationship"
+                                        ]
+                                    },
+                                    "location": {
+                                        "properties": {
+                                            "latitude": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 40.7128
+                                            },
+                                            "longitude": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": -74.006
+                                            },
+                                            "max_distance": {
+                                                "type": "integer",
+                                                "example": 50
+                                            },
+                                            "city": {
+                                                "type": "string",
+                                                "example": "New York"
+                                            },
+                                            "state": {
+                                                "type": "string",
+                                                "example": "NY"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "preferences": {
+                                        "properties": {
+                                            "smoking": {
+                                                "type": "string",
+                                                "example": "non-smoker"
+                                            },
+                                            "drinking": {
+                                                "type": "string",
+                                                "example": "occasional"
+                                            },
+                                            "exercise": {
+                                                "type": "string",
+                                                "example": "several-times-week"
+                                            },
+                                            "age_range_min": {
+                                                "type": "integer",
+                                                "example": 25
+                                            },
+                                            "age_range_max": {
+                                                "type": "integer",
+                                                "example": 40
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profile updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Profile updated successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
                                 }
                             }
                         }
@@ -604,8 +1509,24 @@
     },
     "tags": [
         {
+            "name": "Authentication",
+            "description": "User authentication and session management"
+        },
+        {
+            "name": "Profile",
+            "description": "User profile management and customization"
+        },
+        {
             "name": "Dashboard",
             "description": "User dashboard statistics and activity feeds"
+        },
+        {
+            "name": "Matches",
+            "description": "Match discovery and compatibility scoring"
+        },
+        {
+            "name": "Messages",
+            "description": "Direct messaging between matched users"
         },
         {
             "name": "Profile Views",

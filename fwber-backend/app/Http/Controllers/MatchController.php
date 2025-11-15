@@ -13,6 +13,69 @@ use Illuminate\Support\Facades\Cache;
 
 class MatchController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/matches",
+     *     tags={"Matches"},
+     *     summary="Get potential matches",
+     *     description="Retrieve a feed of potential matches based on user preferences, location, and filters. Results are cached for 60 seconds per user.",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="age_min",
+     *         in="query",
+     *         description="Minimum age filter",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=18, maximum=100, example=25)
+     *     ),
+     *     @OA\Parameter(
+     *         name="age_max",
+     *         in="query",
+     *         description="Maximum age filter",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=18, maximum=100, example=40)
+     *     ),
+     *     @OA\Parameter(
+     *         name="max_distance",
+     *         in="query",
+     *         description="Maximum distance in miles",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=1, maximum=500, default=50, example=25)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Matches retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="matches",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=42),
+     *                     @OA\Property(property="name", type="string", example="Jane Smith"),
+     *                     @OA\Property(property="age", type="integer", example=28),
+     *                     @OA\Property(property="bio", type="string", example="Love hiking and coffee"),
+     *                     @OA\Property(property="distance", type="number", format="float", example=5.3),
+     *                     @OA\Property(property="match_score", type="integer", example=85),
+     *                     @OA\Property(property="avatar_url", type="string", nullable=true)
+     *                 )
+     *             ),
+     *             @OA\Property(property="total", type="integer", example=15)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Profile not complete",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Profile not found. Please complete your profile first.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
+     *     )
+     * )
+     */
     public function index(Request $request): JsonResponse
     {
         $user = auth()->user();
@@ -51,6 +114,49 @@ class MatchController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/matches/action",
+     *     tags={"Matches"},
+     *     summary="Perform match action",
+     *     description="Like, pass, or super like a potential match. Returns whether action resulted in a mutual match.",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"action", "target_user_id"},
+     *             @OA\Property(property="action", type="string", enum={"like", "pass", "super_like"}, example="like"),
+     *             @OA\Property(property="target_user_id", type="integer", example=42)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Action recorded successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="action", type="string", example="like"),
+     *             @OA\Property(property="is_match", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="It's a match!")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid action or user not accessible",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Cannot perform action on yourself")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     */
     public function action(Request $request): JsonResponse
     {
         $request->validate([

@@ -46,8 +46,12 @@ return [
                 'annotations' => [
                     base_path('app/Http/Controllers/Controller.php'),
                     base_path('app/Http/Controllers/Schemas.php'),
+                    base_path('app/Http/Controllers/AuthController.php'),
+                    base_path('app/Http/Controllers/ProfileController.php'),
                     base_path('app/Http/Controllers/DashboardController.php'),
                     base_path('app/Http/Controllers/ProfileViewController.php'),
+                    base_path('app/Http/Controllers/MatchController.php'),
+                    base_path('app/Http/Controllers/Api/MessageController.php'),
                 ],
                 
                 /*

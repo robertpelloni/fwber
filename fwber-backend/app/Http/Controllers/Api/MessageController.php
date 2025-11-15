@@ -15,6 +15,65 @@ use Illuminate\Support\Facades\Auth;
 class MessageController extends Controller
 {
     /**
+     * @OA\Post(
+     *     path="/messages",
+     *     tags={"Messages"},
+     *     summary="Send a message",
+     *     description="Send a text message or media (image/video/audio/file) to a matched user. Either content or media is required. Enforces relationship tier limits and blocks.",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"receiver_id"},
+     *                 @OA\Property(property="receiver_id", type="integer", description="ID of message recipient", example=42),
+     *                 @OA\Property(property="content", type="string", maxLength=5000, description="Text message content", example="Hey, how are you?"),
+     *                 @OA\Property(property="message_type", type="string", enum={"text", "image", "video", "audio", "file"}, example="text"),
+     *                 @OA\Property(property="media", type="string", format="binary", description="Media file (image/video/audio/file)"),
+     *                 @OA\Property(property="media_duration", type="integer", description="Duration in seconds for audio/video", example=30)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Message sent successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="id", type="integer", example=123),
+     *             @OA\Property(property="sender_id", type="integer", example=1),
+     *             @OA\Property(property="receiver_id", type="integer", example=42),
+     *             @OA\Property(property="content", type="string", example="Hey, how are you?"),
+     *             @OA\Property(property="message_type", type="string", example="text"),
+     *             @OA\Property(property="media_url", type="string", nullable=true),
+     *             @OA\Property(property="created_at", type="string", format="date-time")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Messaging blocked or not allowed",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Messaging blocked between users")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No active match found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="No active match found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
+     *     )
+     * )
+     * 
      * Send a message to a matched user
      */
     public function store(Request $request): JsonResponse
