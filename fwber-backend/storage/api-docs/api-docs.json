@@ -7164,6 +7164,602 @@
                     }
                 ]
             }
+        },
+        "/recommendations": {
+            "get": {
+                "tags": [
+                    "Recommendations"
+                ],
+                "summary": "Get personalized recommendations",
+                "description": "Returns AI-powered recommendations tailored to the user's preferences, location, and behavior.",
+                "operationId": "getRecommendations",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Maximum number of recommendations to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10,
+                            "maximum": 50,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "types",
+                        "in": "query",
+                        "description": "Recommendation types to include",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "content",
+                                    "collaborative",
+                                    "ai",
+                                    "location"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "name": "context[latitude]",
+                        "in": "query",
+                        "description": "User latitude for location-based recommendations",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "float",
+                            "maximum": 90,
+                            "minimum": -90
+                        }
+                    },
+                    {
+                        "name": "context[longitude]",
+                        "in": "query",
+                        "description": "User longitude for location-based recommendations",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "float",
+                            "maximum": 180,
+                            "minimum": -180
+                        }
+                    },
+                    {
+                        "name": "context[radius]",
+                        "in": "query",
+                        "description": "Radius in meters for location-based recommendations",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 50000,
+                            "minimum": 100
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Recommendations retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "recommendations": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "content",
+                                                            "collaborative",
+                                                            "ai",
+                                                            "location"
+                                                        ]
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "description": {
+                                                        "type": "string"
+                                                    },
+                                                    "score": {
+                                                        "type": "number",
+                                                        "format": "float"
+                                                    },
+                                                    "reason": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "metadata": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer"
+                                                },
+                                                "types": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "context": {
+                                                    "type": "object"
+                                                },
+                                                "generated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "cache_hit": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/recommendations/type/{type}": {
+            "get": {
+                "tags": [
+                    "Recommendations"
+                ],
+                "summary": "Get recommendations by type",
+                "description": "Returns recommendations filtered by a specific recommendation type.",
+                "operationId": "getRecommendationsByType",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "path",
+                        "description": "Recommendation type",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "content",
+                                "collaborative",
+                                "ai",
+                                "location"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Maximum number of recommendations to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10,
+                            "maximum": 50,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Recommendations retrieved successfully"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/recommendations/trending": {
+            "get": {
+                "tags": [
+                    "Recommendations"
+                ],
+                "summary": "Get trending recommendations",
+                "description": "Returns recommendations for trending content based on recent activity.",
+                "operationId": "getTrendingRecommendations",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Maximum number of trending items",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10,
+                            "maximum": 50,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "timeframe",
+                        "in": "query",
+                        "description": "Timeframe for trending calculation",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "24h",
+                            "enum": [
+                                "24h",
+                                "7d",
+                                "30d"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Trending recommendations retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "trending": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "type": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "engagement_score": {
+                                                        "type": "number",
+                                                        "format": "float"
+                                                    },
+                                                    "trending_since": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "metadata": {
+                                            "properties": {
+                                                "timeframe": {
+                                                    "type": "string"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                },
+                                                "generated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/recommendations/feed": {
+            "get": {
+                "tags": [
+                    "Recommendations"
+                ],
+                "summary": "Get personalized feed",
+                "description": "Returns a personalized feed combining recommendations and recent activity.",
+                "operationId": "getPersonalizedFeed",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20,
+                            "maximum": 50,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Personalized feed retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "feed": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "type": {
+                                                        "type": "string"
+                                                    },
+                                                    "content": {
+                                                        "type": "string"
+                                                    },
+                                                    "score": {
+                                                        "type": "number",
+                                                        "format": "float"
+                                                    },
+                                                    "timestamp": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                },
+                                                "has_more": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "metadata": {
+                                            "properties": {
+                                                "generated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "user_id": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/recommendations/feedback": {
+            "post": {
+                "tags": [
+                    "Recommendations"
+                ],
+                "summary": "Submit recommendation feedback",
+                "description": "Submits feedback on a recommendation to improve future recommendations.",
+                "operationId": "submitRecommendationFeedback",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "recommendation_id",
+                                    "action",
+                                    "content_id"
+                                ],
+                                "properties": {
+                                    "recommendation_id": {
+                                        "type": "string"
+                                    },
+                                    "action": {
+                                        "type": "string",
+                                        "enum": [
+                                            "click",
+                                            "like",
+                                            "dislike",
+                                            "share",
+                                            "ignore"
+                                        ]
+                                    },
+                                    "content_id": {
+                                        "type": "string"
+                                    },
+                                    "rating": {
+                                        "type": "integer",
+                                        "maximum": 5,
+                                        "minimum": 1
+                                    },
+                                    "feedback_text": {
+                                        "type": "string",
+                                        "maxLength": 500
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Feedback recorded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "feedback_id": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/recommendations/analytics": {
+            "get": {
+                "tags": [
+                    "Recommendations"
+                ],
+                "summary": "Get recommendation analytics",
+                "description": "Returns analytics about recommendation system performance. Admin only.",
+                "operationId": "getRecommendationAnalytics",
+                "parameters": [
+                    {
+                        "name": "timeframe",
+                        "in": "query",
+                        "description": "Timeframe for analytics",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "7d",
+                            "enum": [
+                                "24h",
+                                "7d",
+                                "30d"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Analytics retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "analytics": {
+                                            "properties": {
+                                                "total_recommendations": {
+                                                    "type": "integer"
+                                                },
+                                                "click_through_rate": {
+                                                    "type": "number",
+                                                    "format": "float"
+                                                },
+                                                "user_satisfaction": {
+                                                    "type": "number",
+                                                    "format": "float"
+                                                },
+                                                "top_performing_types": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "improvement_suggestions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "timeframe": {
+                                            "type": "string"
+                                        },
+                                        "generated_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden - Admin access required"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -7403,6 +7999,28 @@
                 "type": "object"
             }
         },
+        "responses": {
+            "Unauthorized": {
+                "description": "Unauthenticated",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/UnauthorizedError"
+                        }
+                    }
+                }
+            },
+            "ValidationError": {
+                "description": "Validation error",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        }
+                    }
+                }
+            }
+        },
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
@@ -7480,6 +8098,10 @@
         {
             "name": "Safety",
             "description": "User blocking and reporting"
+        },
+        {
+            "name": "Recommendations",
+            "description": "AI-powered personalized recommendations"
         },
         {
             "name": "Location",

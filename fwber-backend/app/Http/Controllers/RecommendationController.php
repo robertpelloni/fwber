@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use App\Services\RecommendationService;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use OpenApi\Attributes as OA;
 
 class RecommendationController extends Controller
 {
@@ -19,6 +20,73 @@ class RecommendationController extends Controller
 
     /**
      * Get personalized recommendations for the authenticated user
+     *
+     * @OA\Get(
+     *     path="/recommendations",
+     *     summary="Get personalized recommendations",
+     *     description="Returns AI-powered recommendations tailored to the user's preferences, location, and behavior.",
+     *     operationId="getRecommendations",
+     *     tags={"Recommendations"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Maximum number of recommendations to return",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=1, maximum=50, default=10)
+     *     ),
+     *     @OA\Parameter(
+     *         name="types",
+     *         in="query",
+     *         description="Recommendation types to include",
+     *         required=false,
+     *         @OA\Schema(type="array", @OA\Items(type="string", enum={"content","collaborative","ai","location"}))
+     *     ),
+     *     @OA\Parameter(
+     *         name="context[latitude]",
+     *         in="query",
+     *         description="User latitude for location-based recommendations",
+     *         required=false,
+     *         @OA\Schema(type="number", format="float", minimum=-90, maximum=90)
+     *     ),
+     *     @OA\Parameter(
+     *         name="context[longitude]",
+     *         in="query",
+     *         description="User longitude for location-based recommendations",
+     *         required=false,
+     *         @OA\Schema(type="number", format="float", minimum=-180, maximum=180)
+     *     ),
+     *     @OA\Parameter(
+     *         name="context[radius]",
+     *         in="query",
+     *         description="Radius in meters for location-based recommendations",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=100, maximum=50000)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Recommendations retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="recommendations", type="array", @OA\Items(
+     *                 @OA\Property(property="id", type="string"),
+     *                 @OA\Property(property="type", type="string", enum={"content","collaborative","ai","location"}),
+     *                 @OA\Property(property="title", type="string"),
+     *                 @OA\Property(property="description", type="string"),
+     *                 @OA\Property(property="score", type="number", format="float"),
+     *                 @OA\Property(property="reason", type="string")
+     *             )),
+     *             @OA\Property(property="metadata", type="object",
+     *                 @OA\Property(property="total", type="integer"),
+     *                 @OA\Property(property="types", type="array", @OA\Items(type="string")),
+     *                 @OA\Property(property="context", type="object"),
+     *                 @OA\Property(property="generated_at", type="string", format="date-time"),
+     *                 @OA\Property(property="cache_hit", type="boolean")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+     *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     * )
      */
     public function index(Request $request): JsonResponse
     {
@@ -99,6 +167,32 @@ class RecommendationController extends Controller
 
     /**
      * Get recommendations for a specific content type
+     *
+     * @OA\Get(
+     *     path="/recommendations/type/{type}",
+     *     summary="Get recommendations by type",
+     *     description="Returns recommendations filtered by a specific recommendation type.",
+     *     operationId="getRecommendationsByType",
+     *     tags={"Recommendations"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="type",
+     *         in="path",
+     *         description="Recommendation type",
+     *         required=true,
+     *         @OA\Schema(type="string", enum={"content","collaborative","ai","location"})
+     *     ),
+     *     @OA\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Maximum number of recommendations to return",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=1, maximum=50, default=10)
+     *     ),
+     *     @OA\Response(response=200, description="Recommendations retrieved successfully"),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+     *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     * )
      */
     public function byType(Request $request, string $type): JsonResponse
     {
@@ -117,6 +211,48 @@ class RecommendationController extends Controller
 
     /**
      * Get trending recommendations
+     *
+     * @OA\Get(
+     *     path="/recommendations/trending",
+     *     summary="Get trending recommendations",
+     *     description="Returns recommendations for trending content based on recent activity.",
+     *     operationId="getTrendingRecommendations",
+     *     tags={"Recommendations"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Maximum number of trending items",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=1, maximum=50, default=10)
+     *     ),
+     *     @OA\Parameter(
+     *         name="timeframe",
+     *         in="query",
+     *         description="Timeframe for trending calculation",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"24h","7d","30d"}, default="24h")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Trending recommendations retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="trending", type="array", @OA\Items(
+     *                 @OA\Property(property="id", type="string"),
+     *                 @OA\Property(property="type", type="string"),
+     *                 @OA\Property(property="title", type="string"),
+     *                 @OA\Property(property="engagement_score", type="number", format="float"),
+     *                 @OA\Property(property="trending_since", type="string", format="date-time")
+     *             )),
+     *             @OA\Property(property="metadata", type="object",
+     *                 @OA\Property(property="timeframe", type="string"),
+     *                 @OA\Property(property="total", type="integer"),
+     *                 @OA\Property(property="generated_at", type="string", format="date-time")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
+     * )
      */
     public function trending(Request $request): JsonResponse
     {
@@ -157,6 +293,53 @@ class RecommendationController extends Controller
 
     /**
      * Get personalized feed for the user
+     *
+     * @OA\Get(
+     *     path="/recommendations/feed",
+     *     summary="Get personalized feed",
+     *     description="Returns a personalized feed combining recommendations and recent activity.",
+     *     operationId="getPersonalizedFeed",
+     *     tags={"Recommendations"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Page number",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=1, default=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Items per page",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=1, maximum=50, default=20)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Personalized feed retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="feed", type="array", @OA\Items(
+     *                 @OA\Property(property="id", type="string"),
+     *                 @OA\Property(property="type", type="string"),
+     *                 @OA\Property(property="content", type="string"),
+     *                 @OA\Property(property="score", type="number", format="float"),
+     *                 @OA\Property(property="timestamp", type="string", format="date-time")
+     *             )),
+     *             @OA\Property(property="pagination", type="object",
+     *                 @OA\Property(property="current_page", type="integer"),
+     *                 @OA\Property(property="per_page", type="integer"),
+     *                 @OA\Property(property="total", type="integer"),
+     *                 @OA\Property(property="has_more", type="boolean")
+     *             ),
+     *             @OA\Property(property="metadata", type="object",
+     *                 @OA\Property(property="generated_at", type="string", format="date-time"),
+     *                 @OA\Property(property="user_id", type="integer")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
+     * )
      */
     public function feed(Request $request): JsonResponse
     {
@@ -203,6 +386,36 @@ class RecommendationController extends Controller
 
     /**
      * Provide feedback on recommendations
+     *
+     * @OA\Post(
+     *     path="/recommendations/feedback",
+     *     summary="Submit recommendation feedback",
+     *     description="Submits feedback on a recommendation to improve future recommendations.",
+     *     operationId="submitRecommendationFeedback",
+     *     tags={"Recommendations"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"recommendation_id","action","content_id"},
+     *             @OA\Property(property="recommendation_id", type="string"),
+     *             @OA\Property(property="action", type="string", enum={"click","like","dislike","share","ignore"}),
+     *             @OA\Property(property="content_id", type="string"),
+     *             @OA\Property(property="rating", type="integer", minimum=1, maximum=5),
+     *             @OA\Property(property="feedback_text", type="string", maxLength=500)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Feedback recorded successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="feedback_id", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+     *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     * )
      */
     public function feedback(Request $request): JsonResponse
     {
@@ -249,6 +462,39 @@ class RecommendationController extends Controller
 
     /**
      * Get recommendation analytics for admin
+     *
+     * @OA\Get(
+     *     path="/recommendations/analytics",
+     *     summary="Get recommendation analytics",
+     *     description="Returns analytics about recommendation system performance. Admin only.",
+     *     operationId="getRecommendationAnalytics",
+     *     tags={"Recommendations"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="timeframe",
+     *         in="query",
+     *         description="Timeframe for analytics",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"24h","7d","30d"}, default="7d")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Analytics retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="analytics", type="object",
+     *                 @OA\Property(property="total_recommendations", type="integer"),
+     *                 @OA\Property(property="click_through_rate", type="number", format="float"),
+     *                 @OA\Property(property="user_satisfaction", type="number", format="float"),
+     *                 @OA\Property(property="top_performing_types", type="array", @OA\Items(type="string")),
+     *                 @OA\Property(property="improvement_suggestions", type="array", @OA\Items(type="string"))
+     *             ),
+     *             @OA\Property(property="timeframe", type="string"),
+     *             @OA\Property(property="generated_at", type="string", format="date-time")
+     *         )
+     *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+     *     @OA\Response(response=403, description="Forbidden - Admin access required")
+     * )
      */
     public function analytics(Request $request): JsonResponse
     {

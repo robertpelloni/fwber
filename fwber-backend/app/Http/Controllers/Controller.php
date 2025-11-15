@@ -119,6 +119,11 @@ namespace App\Http\Controllers;
  *     name="Safety",
  *     description="User blocking and reporting"
  * )
+ * 
+ * @OA\Tag(
+ *     name="Recommendations",
+ *     description="AI-powered personalized recommendations"
+ * )
  */
 abstract class Controller
 {

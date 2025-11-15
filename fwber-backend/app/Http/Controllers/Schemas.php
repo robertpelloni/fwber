@@ -3,6 +3,18 @@
 namespace App\Http\Controllers;
 
 /**
+ * @OA\Response(
+ *     response="Unauthorized",
+ *     description="Unauthenticated",
+ *     @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
+ * )
+ * 
+ * @OA\Response(
+ *     response="ValidationError",
+ *     description="Validation error",
+ *     @OA\JsonContent(ref="#/components/schemas/ValidationError")
+ * )
+ * 
  * @OA\Schema(
  *     schema="User",
  *     type="object",
