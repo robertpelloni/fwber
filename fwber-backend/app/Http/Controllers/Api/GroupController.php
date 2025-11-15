@@ -29,7 +29,7 @@ class GroupController extends Controller
     *   path="/groups",
     *   tags={"Groups"},
     *   summary="List groups the authenticated user belongs to",
-    *   security={{{"bearerAuth":{}}}},
+    *   security={{"bearerAuth":{}}},
     *   @OA\Response(
     *     response=200,
     *     description="List of groups",
@@ -76,7 +76,7 @@ class GroupController extends Controller
         *   path="/groups",
         *   tags={"Groups"},
         *   summary="Create a new group",
-        *   security={{{"bearerAuth":{}}}},
+        *   security={{"bearerAuth":{}}},
         *   @OA\RequestBody(
         *     required=true,
         *     @OA\JsonContent(
@@ -150,7 +150,7 @@ class GroupController extends Controller
         *   path="/groups/{groupId}",
         *   tags={"Groups"},
         *   summary="Get group details",
-        *   security={{{"bearerAuth":{}}}},
+        *   security={{"bearerAuth":{}}},
         *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
         *   @OA\Response(response=200, description="Group details",
         *     @OA\JsonContent(type="object",
@@ -190,7 +190,7 @@ class GroupController extends Controller
         *   path="/groups/{groupId}",
         *   tags={"Groups"},
         *   summary="Update group settings",
-        *   security={{{"bearerAuth":{}}}},
+        *   security={{"bearerAuth":{}}},
         *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
         *   @OA\RequestBody(@OA\JsonContent(
         *     @OA\Property(property="name", type="string"),
@@ -237,7 +237,7 @@ class GroupController extends Controller
         *   path="/groups/{groupId}",
         *   tags={"Groups"},
         *   summary="Deactivate a group (owner only)",
-        *   security={{{"bearerAuth":{}}}},
+        *   security={{"bearerAuth":{}}},
         *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
         *   @OA\Response(response=200, description="Deactivated",
         *     @OA\JsonContent(type="object",
@@ -272,7 +272,7 @@ class GroupController extends Controller
         *   path="/groups/{groupId}/join",
         *   tags={"Groups"},
         *   summary="Join a public group",
-        *   security={{{"bearerAuth":{}}}},
+        *   security={{"bearerAuth":{}}},
         *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
         *   @OA\Response(response=200, description="Joined"),
         *   @OA\Response(response=400, description="Already a member or full"),
@@ -336,7 +336,7 @@ class GroupController extends Controller
         *   path="/groups/{groupId}/leave",
         *   tags={"Groups"},
         *   summary="Leave a group",
-        *   security={{{"bearerAuth":{}}}},
+        *   security={{"bearerAuth":{}}},
         *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
         *   @OA\Response(response=200, description="Left group"),
         *   @OA\Response(response=400, description="Not a member or owner cannot leave"),
@@ -367,6 +367,24 @@ class GroupController extends Controller
 
     /**
      * Set member role (owner can set any non-owner; admin can set moderator/member)
+        *
+        * @OA\Post(
+        *   path="/groups/{groupId}/members/{memberUserId}/role",
+        *   tags={"Groups"},
+        *   summary="Set a member's role",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
+        *   @OA\Parameter(name="memberUserId", in="path", required=true, @OA\Schema(type="integer")),
+        *   @OA\RequestBody(required=true, @OA\JsonContent(
+        *     required={"role"},
+        *     @OA\Property(property="role", type="string", enum={"admin","moderator","member"})
+        *   )),
+        *   @OA\Response(response=200, description="Role updated or unchanged"),
+        *   @OA\Response(response=403, description="Unauthorized"),
+        *   @OA\Response(response=404, description="Member not found"),
+        *   @OA\Response(response=400, description="Cannot change owner role or invalid assignment"),
+        *   @OA\Response(response=401, description="Unauthenticated")
+        * )
      */
     public function setRole(Request $request, int $groupId, int $memberUserId): JsonResponse
     {
@@ -440,6 +458,22 @@ class GroupController extends Controller
 
     /**
      * Transfer ownership to another active member
+        *
+        * @OA\Post(
+        *   path="/groups/{groupId}/ownership/transfer",
+        *   tags={"Groups"},
+        *   summary="Transfer group ownership",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
+        *   @OA\RequestBody(required=true, @OA\JsonContent(
+        *     required={"new_owner_user_id"},
+        *     @OA\Property(property="new_owner_user_id", type="integer")
+        *   )),
+        *   @OA\Response(response=200, description="Ownership transferred"),
+        *   @OA\Response(response=403, description="Only owner can transfer"),
+        *   @OA\Response(response=400, description="Target not active member or already owner"),
+        *   @OA\Response(response=401, description="Unauthenticated")
+        * )
      */
     public function transferOwnership(Request $request, int $groupId): JsonResponse
     {
@@ -488,6 +522,19 @@ class GroupController extends Controller
 
     /**
      * Ban a member (owner/admin). Banned members are deactivated and cannot rejoin until unbanned.
+        *
+        * @OA\Post(
+        *   path="/groups/{groupId}/members/{memberUserId}/ban",
+        *   tags={"Groups"},
+        *   summary="Ban a member",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
+        *   @OA\Parameter(name="memberUserId", in="path", required=true, @OA\Schema(type="integer")),
+        *   @OA\Response(response=200, description="Member banned or already banned"),
+        *   @OA\Response(response=403, description="Unauthorized or cannot ban owner"),
+        *   @OA\Response(response=404, description="Member not found"),
+        *   @OA\Response(response=401, description="Unauthenticated")
+        * )
      */
     public function banMember(int $groupId, int $memberUserId): JsonResponse
     {
@@ -534,6 +581,19 @@ class GroupController extends Controller
 
     /**
      * Unban a member (owner/admin)
+        *
+        * @OA\Post(
+        *   path="/groups/{groupId}/members/{memberUserId}/unban",
+        *   tags={"Groups"},
+        *   summary="Unban a member",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
+        *   @OA\Parameter(name="memberUserId", in="path", required=true, @OA\Schema(type="integer")),
+        *   @OA\Response(response=200, description="Member unbanned or not banned"),
+        *   @OA\Response(response=403, description="Unauthorized"),
+        *   @OA\Response(response=404, description="Member not found"),
+        *   @OA\Response(response=401, description="Unauthenticated")
+        * )
      */
     public function unbanMember(int $groupId, int $memberUserId): JsonResponse
     {
@@ -574,6 +634,24 @@ class GroupController extends Controller
 
     /**
      * Mute a member temporarily (owner/admin). Accepts either duration_minutes or until timestamp.
+        *
+        * @OA\Post(
+        *   path="/groups/{groupId}/members/{memberUserId}/mute",
+        *   tags={"Groups"},
+        *   summary="Mute a member temporarily",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
+        *   @OA\Parameter(name="memberUserId", in="path", required=true, @OA\Schema(type="integer")),
+        *   @OA\RequestBody(@OA\JsonContent(
+        *     @OA\Property(property="duration_minutes", type="integer", minimum=1, maximum=10080),
+        *     @OA\Property(property="until", type="string", format="date-time"),
+        *     @OA\Property(property="reason", type="string", maxLength=255)
+        *   )),
+        *   @OA\Response(response=200, description="Muted or unchanged"),
+        *   @OA\Response(response=403, description="Unauthorized or cannot mute owner"),
+        *   @OA\Response(response=404, description="Member not found"),
+        *   @OA\Response(response=401, description="Unauthenticated")
+        * )
      */
     public function muteMember(int $groupId, int $memberUserId): JsonResponse
     {
@@ -635,6 +713,19 @@ class GroupController extends Controller
 
     /**
      * Unmute a member.
+        *
+        * @OA\Post(
+        *   path="/groups/{groupId}/members/{memberUserId}/unmute",
+        *   tags={"Groups"},
+        *   summary="Unmute a member",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
+        *   @OA\Parameter(name="memberUserId", in="path", required=true, @OA\Schema(type="integer")),
+        *   @OA\Response(response=200, description="Unmuted or not muted"),
+        *   @OA\Response(response=403, description="Unauthorized"),
+        *   @OA\Response(response=404, description="Member not found"),
+        *   @OA\Response(response=401, description="Unauthenticated")
+        * )
      */
     public function unmuteMember(int $groupId, int $memberUserId): JsonResponse
     {
@@ -680,7 +771,7 @@ class GroupController extends Controller
         *   path="/groups/{groupId}/stats",
         *   tags={"Groups"},
         *   summary="Group statistics (admin/owner)",
-        *   security={{{"bearerAuth":{}}}},
+        *   security={{"bearerAuth":{}}},
         *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
         *   @OA\Response(response=200, description="Stats",
         *     @OA\JsonContent(type="object",
@@ -728,6 +819,19 @@ class GroupController extends Controller
 
     /**
      * Kick a member (owner/admin). Makes member inactive but not banned.
+        *
+        * @OA\Post(
+        *   path="/groups/{groupId}/members/{memberUserId}/kick",
+        *   tags={"Groups"},
+        *   summary="Kick a member",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
+        *   @OA\Parameter(name="memberUserId", in="path", required=true, @OA\Schema(type="integer")),
+        *   @OA\Response(response=200, description="Member removed"),
+        *   @OA\Response(response=403, description="Unauthorized or cannot kick owner"),
+        *   @OA\Response(response=404, description="Member not found or inactive"),
+        *   @OA\Response(response=401, description="Unauthenticated")
+        * )
      */
     public function kickMember(int $groupId, int $memberUserId): JsonResponse
     {
@@ -771,7 +875,7 @@ class GroupController extends Controller
         *   path="/groups/discover",
         *   tags={"Groups"},
         *   summary="Discover public groups",
-        *   security={{{"bearerAuth":{}}}},
+        *   security={{"bearerAuth":{}}},
         *   @OA\Parameter(name="search", in="query", required=false, @OA\Schema(type="string")),
         *   @OA\Parameter(name="per_page", in="query", required=false, @OA\Schema(type="integer", minimum=1, maximum=50)),
         *   @OA\Response(response=200, description="Paginated groups list")

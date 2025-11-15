@@ -21,6 +21,29 @@ class LocationController extends Controller
 {
     /**
      * Update user's current location
+    *
+    * @OA\Post(
+    *   path="/location",
+    *   tags={"Location"},
+    *   summary="Update current location",
+    *   description="Updates the authenticated user's current location and privacy level.",
+    *   security={{"bearerAuth":{}}},
+    *   @OA\RequestBody(required=true,
+    *     @OA\JsonContent(
+    *       required={"latitude","longitude"},
+    *       @OA\Property(property="latitude", type="number", format="float", example=37.7749),
+    *       @OA\Property(property="longitude", type="number", format="float", example=-122.4194),
+    *       @OA\Property(property="accuracy", type="number", example=12.5),
+    *       @OA\Property(property="heading", type="number", example=140),
+    *       @OA\Property(property="speed", type="number", example=1.2),
+    *       @OA\Property(property="altitude", type="number", example=20),
+    *       @OA\Property(property="privacy_level", type="string", enum={"public","friends","private"})
+    *     )
+    *   ),
+    *   @OA\Response(response=200, description="Updated"),
+    *   @OA\Response(response=422, description="Validation failed"),
+    *   @OA\Response(response=401, description="Unauthenticated")
+    * )
      */
     public function update(Request $request): JsonResponse
     {
@@ -109,6 +132,21 @@ class LocationController extends Controller
 
     /**
      * Get nearby users within radius
+        *
+        * @OA\Get(
+        *   path="/location/nearby",
+        *   tags={"Location"},
+        *   summary="Find nearby users",
+        *   description="Finds nearby users within a radius considering privacy settings.",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Parameter(name="latitude", in="query", required=true, @OA\Schema(type="number", format="float")),
+        *   @OA\Parameter(name="longitude", in="query", required=true, @OA\Schema(type="number", format="float")),
+        *   @OA\Parameter(name="radius", in="query", required=false, @OA\Schema(type="integer", minimum=100, maximum=10000)),
+        *   @OA\Parameter(name="limit", in="query", required=false, @OA\Schema(type="integer", minimum=1, maximum=100)),
+        *   @OA\Response(response=200, description="Nearby users list"),
+        *   @OA\Response(response=422, description="Validation failed"),
+        *   @OA\Response(response=401, description="Unauthenticated")
+        * )
      */
     public function nearby(Request $request): JsonResponse
     {
@@ -207,6 +245,23 @@ class LocationController extends Controller
 
     /**
      * Update location privacy settings
+        *
+        * @OA\Put(
+        *   path="/location/privacy",
+        *   tags={"Location"},
+        *   summary="Update location privacy",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\RequestBody(required=true,
+        *     @OA\JsonContent(
+        *       required={"privacy_level"},
+        *       @OA\Property(property="privacy_level", type="string", enum={"public","friends","private"})
+        *     )
+        *   ),
+        *   @OA\Response(response=200, description="Updated"),
+        *   @OA\Response(response=404, description="No location data"),
+        *   @OA\Response(response=422, description="Validation failed"),
+        *   @OA\Response(response=401, description="Unauthenticated")
+        * )
      */
     public function updatePrivacy(Request $request): JsonResponse
     {
@@ -269,6 +324,16 @@ class LocationController extends Controller
 
     /**
      * Clear location history (set inactive)
+        *
+        * @OA\Delete(
+        *   path="/location",
+        *   tags={"Location"},
+        *   summary="Clear current location",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Response(response=200, description="Cleared"),
+        *   @OA\Response(response=404, description="No location data"),
+        *   @OA\Response(response=401, description="Unauthenticated")
+        * )
      */
     public function clear(Request $request): JsonResponse
     {
@@ -314,6 +379,16 @@ class LocationController extends Controller
 
     /**
      * Get current user's location
+        *
+        * @OA\Get(
+        *   path="/location",
+        *   tags={"Location"},
+        *   summary="Get current user's location",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Response(response=200, description="Location"),
+        *   @OA\Response(response=404, description="No location data"),
+        *   @OA\Response(response=401, description="Unauthenticated")
+        * )
      */
     public function show(Request $request): JsonResponse
     {

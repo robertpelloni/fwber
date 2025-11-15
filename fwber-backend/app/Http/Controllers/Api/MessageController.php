@@ -265,6 +265,31 @@ class MessageController extends Controller
 
     /**
      * Get conversation with a matched user
+        *
+        * @OA\Get(
+        *   path="/messages/{userId}",
+        *   tags={"Messages"},
+        *   summary="Get conversation with a matched user",
+        *   description="Returns paginated messages and other user's presence info.",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+        *   @OA\Response(
+        *     response=200,
+        *     description="Conversation",
+        *     @OA\JsonContent(type="object",
+        *       @OA\Property(property="messages", type="array", @OA\Items(type="object")),
+        *       @OA\Property(property="pagination", type="object"),
+        *       @OA\Property(property="other_user", type="object",
+        *         @OA\Property(property="id", type="integer"),
+        *         @OA\Property(property="name", type="string"),
+        *         @OA\Property(property="last_seen_at", type="string", format="date-time", nullable=true)
+        *       )
+        *     )
+        *   ),
+        *   @OA\Response(response=403, description="Conversation access blocked"),
+        *   @OA\Response(response=404, description="No active match"),
+        *   @OA\Response(response=401, description="Unauthenticated")
+        * )
      */
     public function index(Request $request, int $userId): JsonResponse
     {
@@ -310,6 +335,18 @@ class MessageController extends Controller
 
     /**
      * Mark message as read
+        *
+        * @OA\Post(
+        *   path="/messages/{messageId}/read",
+        *   tags={"Messages"},
+        *   summary="Mark a message as read",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+        *   @OA\Response(response=200, description="Marked read"),
+        *   @OA\Response(response=403, description="Only receiver can mark"),
+        *   @OA\Response(response=404, description="Message not found"),
+        *   @OA\Response(response=401, description="Unauthenticated")
+        * )
      */
     public function markAsRead(int $messageId): JsonResponse
     {
@@ -341,6 +378,21 @@ class MessageController extends Controller
 
     /**
      * Get unread message count
+        *
+        * @OA\Get(
+        *   path="/messages/unread-count",
+        *   tags={"Messages"},
+        *   summary="Get count of unread messages",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Response(
+        *     response=200,
+        *     description="Unread count",
+        *     @OA\JsonContent(type="object",
+        *       @OA\Property(property="unread_count", type="integer", example=3)
+        *     )
+        *   ),
+        *   @OA\Response(response=401, description="Unauthenticated")
+        * )
      */
     public function unreadCount(): JsonResponse
     {

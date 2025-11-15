@@ -24,6 +24,19 @@ class ChatroomController extends Controller
 
     /**
      * Get all available chatrooms with filtering
+     *
+     * @OA\Get(
+     *   path="/chatrooms",
+     *   tags={"Chatrooms"},
+     *   summary="List chatrooms",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="type", in="query", required=false, @OA\Schema(type="string", enum={"interest","city","event","private"})),
+     *   @OA\Parameter(name="category", in="query", required=false, @OA\Schema(type="string")),
+     *   @OA\Parameter(name="city", in="query", required=false, @OA\Schema(type="string")),
+     *   @OA\Parameter(name="search", in="query", required=false, @OA\Schema(type="string")),
+     *   @OA\Parameter(name="sort", in="query", required=false, @OA\Schema(type="string", enum={"activity","newest","most_active","most_members"})),
+     *   @OA\Response(response=200, description="Paginated chatrooms list")
+     * )
      */
     public function index(Request $request): JsonResponse
     {
@@ -73,6 +86,22 @@ class ChatroomController extends Controller
 
     /**
      * Get a specific chatroom with messages
+     *
+     * @OA\Get(
+     *   path="/chatrooms/{id}",
+     *   tags={"Chatrooms"},
+     *   summary="Get a chatroom",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Chatroom and recent messages",
+     *     @OA\JsonContent(type="object",
+     *       @OA\Property(property="chatroom", type="object"),
+     *       @OA\Property(property="messages", type="object")
+     *     )
+     *   ),
+     *   @OA\Response(response=403, description="Not a member"),
+     *   @OA\Response(response=404, description="Not found")
+     * )
      */
     public function show(Request $request, int $id): JsonResponse
     {
@@ -98,6 +127,25 @@ class ChatroomController extends Controller
 
     /**
      * Create a new chatroom
+     *
+     * @OA\Post(
+     *   path="/chatrooms",
+     *   tags={"Chatrooms"},
+     *   summary="Create chatroom",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\RequestBody(required=true, @OA\JsonContent(
+     *     required={"name","type"},
+     *     @OA\Property(property="name", type="string", maxLength=100),
+     *     @OA\Property(property="description", type="string", maxLength=500),
+     *     @OA\Property(property="type", type="string", enum={"interest","city","event","private"}),
+     *     @OA\Property(property="category", type="string"),
+     *     @OA\Property(property="city", type="string"),
+     *     @OA\Property(property="neighborhood", type="string"),
+     *     @OA\Property(property="is_public", type="boolean"),
+     *     @OA\Property(property="settings", type="object")
+     *   )),
+     *   @OA\Response(response=201, description="Created")
+     * )
      */
     public function store(Request $request): JsonResponse
     {
@@ -142,6 +190,17 @@ class ChatroomController extends Controller
 
     /**
      * Join a chatroom
+     *
+     * @OA\Post(
+     *   path="/chatrooms/{id}/join",
+     *   tags={"Chatrooms"},
+     *   summary="Join",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Joined"),
+     *   @OA\Response(response=400, description="Already member"),
+     *   @OA\Response(response=403, description="Banned")
+     * )
      */
     public function join(Request $request, int $id): JsonResponse
     {
@@ -170,6 +229,16 @@ class ChatroomController extends Controller
 
     /**
      * Leave a chatroom
+     *
+     * @OA\Post(
+     *   path="/chatrooms/{id}/leave",
+     *   tags={"Chatrooms"},
+     *   summary="Leave",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Left"),
+     *   @OA\Response(response=400, description="Not a member")
+     * )
      */
     public function leave(Request $request, int $id): JsonResponse
     {
@@ -191,6 +260,16 @@ class ChatroomController extends Controller
 
     /**
      * Get chatroom members
+     *
+     * @OA\Get(
+     *   path="/chatrooms/{id}/members",
+     *   tags={"Chatrooms"},
+     *   summary="Members",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Paginated members"),
+     *   @OA\Response(response=403, description="Not a member")
+     * )
      */
     public function members(Request $request, int $id): JsonResponse
     {
@@ -210,6 +289,22 @@ class ChatroomController extends Controller
 
     /**
      * Update chatroom settings (admin/moderator only)
+     *
+     * @OA\Put(
+     *   path="/chatrooms/{id}",
+     *   tags={"Chatrooms"},
+     *   summary="Update",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(@OA\JsonContent(
+     *     @OA\Property(property="name", type="string", maxLength=100),
+     *     @OA\Property(property="description", type="string", maxLength=500),
+     *     @OA\Property(property="is_public", type="boolean"),
+     *     @OA\Property(property="settings", type="object")
+     *   )),
+     *   @OA\Response(response=200, description="Updated"),
+     *   @OA\Response(response=403, description="Forbidden")
+     * )
      */
     public function update(Request $request, int $id): JsonResponse
     {
@@ -233,6 +328,16 @@ class ChatroomController extends Controller
 
     /**
      * Delete chatroom (creator only)
+     *
+     * @OA\Delete(
+     *   path="/chatrooms/{id}",
+     *   tags={"Chatrooms"},
+     *   summary="Delete",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Deleted"),
+     *   @OA\Response(response=403, description="Forbidden")
+     * )
      */
     public function destroy(int $id): JsonResponse
     {
@@ -254,6 +359,14 @@ class ChatroomController extends Controller
 
     /**
      * Get user's chatrooms
+     *
+     * @OA\Get(
+     *   path="/chatrooms/my",
+     *   tags={"Chatrooms"},
+     *   summary="My chatrooms",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="List")
+     * )
      */
     public function myChatrooms(): JsonResponse
     {
@@ -269,6 +382,14 @@ class ChatroomController extends Controller
 
     /**
      * Get chatroom categories
+     *
+     * @OA\Get(
+     *   path="/chatrooms/categories",
+     *   tags={"Chatrooms"},
+     *   summary="Categories",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="List")
+     * )
      */
     public function categories(): JsonResponse
     {
@@ -287,6 +408,14 @@ class ChatroomController extends Controller
 
     /**
      * Get popular chatrooms
+     *
+     * @OA\Get(
+     *   path="/chatrooms/popular",
+     *   tags={"Chatrooms"},
+     *   summary="Popular",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="List")
+     * )
      */
     public function popular(): JsonResponse
     {
@@ -304,6 +433,18 @@ class ChatroomController extends Controller
 
     /**
      * Search chatrooms
+     *
+     * @OA\Get(
+     *   path="/chatrooms/search",
+     *   tags={"Chatrooms"},
+     *   summary="Search",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="q", in="query", required=true, @OA\Schema(type="string", minLength=2)),
+     *   @OA\Parameter(name="type", in="query", required=false, @OA\Schema(type="string", enum={"interest","city","event","private"})),
+     *   @OA\Parameter(name="category", in="query", required=false, @OA\Schema(type="string")),
+     *   @OA\Parameter(name="city", in="query", required=false, @OA\Schema(type="string")),
+     *   @OA\Response(response=200, description="Paginated results")
+     * )
      */
     public function search(Request $request): JsonResponse
     {

@@ -82,9 +82,7 @@
                 },
                 "security": [
                     {
-                        "0": {
-                            "bearerAuth": []
-                        }
+                        "bearerAuth": []
                     }
                 ]
             },
@@ -170,9 +168,7 @@
                 },
                 "security": [
                     {
-                        "0": {
-                            "bearerAuth": []
-                        }
+                        "bearerAuth": []
                     }
                 ]
             }
@@ -227,9 +223,7 @@
                 },
                 "security": [
                     {
-                        "0": {
-                            "bearerAuth": []
-                        }
+                        "bearerAuth": []
                     }
                 ]
             },
@@ -303,9 +297,7 @@
                 },
                 "security": [
                     {
-                        "0": {
-                            "bearerAuth": []
-                        }
+                        "bearerAuth": []
                     }
                 ]
             },
@@ -351,9 +343,7 @@
                 },
                 "security": [
                     {
-                        "0": {
-                            "bearerAuth": []
-                        }
+                        "bearerAuth": []
                     }
                 ]
             }
@@ -392,9 +382,7 @@
                 },
                 "security": [
                     {
-                        "0": {
-                            "bearerAuth": []
-                        }
+                        "bearerAuth": []
                     }
                 ]
             }
@@ -430,9 +418,349 @@
                 },
                 "security": [
                     {
-                        "0": {
-                            "bearerAuth": []
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/groups/{groupId}/members/{memberUserId}/role": {
+            "post": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Set a member's role",
+                "description": "Set member role (owner can set any non-owner; admin can set moderator/member)",
+                "operationId": "06b77786a77d862364214d21dc851cb9",
+                "parameters": [
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
                         }
+                    },
+                    {
+                        "name": "memberUserId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "role"
+                                ],
+                                "properties": {
+                                    "role": {
+                                        "type": "string",
+                                        "enum": [
+                                            "admin",
+                                            "moderator",
+                                            "member"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Role updated or unchanged"
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Member not found"
+                    },
+                    "400": {
+                        "description": "Cannot change owner role or invalid assignment"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/groups/{groupId}/ownership/transfer": {
+            "post": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Transfer group ownership",
+                "description": "Transfer ownership to another active member",
+                "operationId": "ab4ac7c8952f8e65ba2e47926c6f9b01",
+                "parameters": [
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "new_owner_user_id"
+                                ],
+                                "properties": {
+                                    "new_owner_user_id": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Ownership transferred"
+                    },
+                    "403": {
+                        "description": "Only owner can transfer"
+                    },
+                    "400": {
+                        "description": "Target not active member or already owner"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/groups/{groupId}/members/{memberUserId}/ban": {
+            "post": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Ban a member",
+                "description": "Ban a member (owner/admin). Banned members are deactivated and cannot rejoin until unbanned.",
+                "operationId": "6b1bf9d53a9ef3d8b1926f2a5d8cba69",
+                "parameters": [
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "memberUserId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Member banned or already banned"
+                    },
+                    "403": {
+                        "description": "Unauthorized or cannot ban owner"
+                    },
+                    "404": {
+                        "description": "Member not found"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/groups/{groupId}/members/{memberUserId}/unban": {
+            "post": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Unban a member",
+                "description": "Unban a member (owner/admin)",
+                "operationId": "b1c6cdbb36c2ff8e87a216c2bc4b72da",
+                "parameters": [
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "memberUserId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Member unbanned or not banned"
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Member not found"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/groups/{groupId}/members/{memberUserId}/mute": {
+            "post": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Mute a member temporarily",
+                "description": "Mute a member temporarily (owner/admin). Accepts either duration_minutes or until timestamp.",
+                "operationId": "503833b84cd53ba171b431c23bad7433",
+                "parameters": [
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "memberUserId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "duration_minutes": {
+                                        "type": "integer",
+                                        "maximum": 10080,
+                                        "minimum": 1
+                                    },
+                                    "until": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "reason": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Muted or unchanged"
+                    },
+                    "403": {
+                        "description": "Unauthorized or cannot mute owner"
+                    },
+                    "404": {
+                        "description": "Member not found"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/groups/{groupId}/members/{memberUserId}/unmute": {
+            "post": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Unmute a member",
+                "description": "Unmute a member.",
+                "operationId": "1b996e57fc817dee86fd6266b12b8367",
+                "parameters": [
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "memberUserId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Unmuted or not muted"
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Member not found"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
                     }
                 ]
             }
@@ -498,9 +826,54 @@
                 },
                 "security": [
                     {
-                        "0": {
-                            "bearerAuth": []
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/groups/{groupId}/members/{memberUserId}/kick": {
+            "post": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Kick a member",
+                "description": "Kick a member (owner/admin). Makes member inactive but not banned.",
+                "operationId": "af3adf79be444691b44d318d432a8db9",
+                "parameters": [
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
                         }
+                    },
+                    {
+                        "name": "memberUserId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Member removed"
+                    },
+                    "403": {
+                        "description": "Unauthorized or cannot kick owner"
+                    },
+                    "404": {
+                        "description": "Member not found or inactive"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
                     }
                 ]
             }
@@ -540,9 +913,7 @@
                 },
                 "security": [
                     {
-                        "0": {
-                            "bearerAuth": []
-                        }
+                        "bearerAuth": []
                     }
                 ]
             }
@@ -703,6 +1074,154 @@
                 ]
             }
         },
+        "/messages/{userId}": {
+            "get": {
+                "tags": [
+                    "Messages"
+                ],
+                "summary": "Get conversation with a matched user",
+                "description": "Returns paginated messages and other user's presence info.",
+                "operationId": "45f1f9530f5fbeccfeefc179cf845804",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Conversation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "messages": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "type": "object"
+                                        },
+                                        "other_user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "last_seen_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Conversation access blocked"
+                    },
+                    "404": {
+                        "description": "No active match"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/messages/{messageId}/read": {
+            "post": {
+                "tags": [
+                    "Messages"
+                ],
+                "summary": "Mark a message as read",
+                "description": "Mark message as read",
+                "operationId": "d04c1dac090d5ea63256813cdb3073f6",
+                "parameters": [
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Marked read"
+                    },
+                    "403": {
+                        "description": "Only receiver can mark"
+                    },
+                    "404": {
+                        "description": "Message not found"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/messages/unread-count": {
+            "get": {
+                "tags": [
+                    "Messages"
+                ],
+                "summary": "Get count of unread messages",
+                "description": "Get unread message count",
+                "operationId": "bdd00f4d5bb74b58daa312d144a225ae",
+                "responses": {
+                    "200": {
+                        "description": "Unread count",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "unread_count": {
+                                            "type": "integer",
+                                            "example": 3
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/physical-profile": {
             "get": {
                 "tags": [
@@ -802,9 +1321,7 @@
                 },
                 "security": [
                     {
-                        "0": {
-                            "bearerAuth": []
-                        }
+                        "bearerAuth": []
                     }
                 ]
             },
@@ -904,9 +1421,7 @@
                 },
                 "security": [
                     {
-                        "0": {
-                            "bearerAuth": []
-                        }
+                        "bearerAuth": []
                     }
                 ]
             }
@@ -950,9 +1465,7 @@
                 },
                 "security": [
                     {
-                        "0": {
-                            "bearerAuth": []
-                        }
+                        "bearerAuth": []
                     }
                 ]
             }
@@ -1157,6 +1670,888 @@
                                 }
                             }
                         }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/bulletin-boards": {
+            "get": {
+                "tags": [
+                    "Bulletin Boards"
+                ],
+                "summary": "List nearby bulletin boards",
+                "description": "Get bulletin boards near a location",
+                "operationId": "66256b88ec267b940ae0b525668561d0",
+                "parameters": [
+                    {
+                        "name": "lat",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float",
+                            "maximum": 90,
+                            "minimum": -90
+                        }
+                    },
+                    {
+                        "name": "lng",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float",
+                            "maximum": 180,
+                            "minimum": -180
+                        }
+                    },
+                    {
+                        "name": "radius",
+                        "in": "query",
+                        "description": "Meters (default 5000)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 50000,
+                            "minimum": 100
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Nearby boards",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "boards": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "user_location": {
+                                            "properties": {
+                                                "lat": {
+                                                    "type": "number"
+                                                },
+                                                "lng": {
+                                                    "type": "number"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "search_radius": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Bulletin Boards"
+                ],
+                "summary": "Create or find a board for a location",
+                "description": "Create or find a bulletin board for a location",
+                "operationId": "24e2b73d743c19c00a23f61cb556b9ad",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "lat",
+                                    "lng"
+                                ],
+                                "properties": {
+                                    "lat": {
+                                        "type": "number",
+                                        "format": "float"
+                                    },
+                                    "lng": {
+                                        "type": "number",
+                                        "format": "float"
+                                    },
+                                    "radius": {
+                                        "type": "integer",
+                                        "maximum": 5000,
+                                        "minimum": 100
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Found/created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "board": {
+                                            "type": "object"
+                                        },
+                                        "created": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/bulletin-boards/{id}": {
+            "get": {
+                "tags": [
+                    "Bulletin Boards"
+                ],
+                "summary": "Get bulletin board by ID",
+                "description": "Get a specific bulletin board with messages",
+                "operationId": "b01ecd4463e369ef47322f2a5f42d107",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "lat",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "lng",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Board and messages",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "board": {
+                                            "type": "object"
+                                        },
+                                        "messages": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Outside board area"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/bulletin-boards/{boardId}/messages": {
+            "get": {
+                "tags": [
+                    "Bulletin Boards"
+                ],
+                "summary": "List messages for a board",
+                "description": "Get messages for a bulletin board (with pagination)",
+                "operationId": "eefb2f5cd0a1bbbffcfe5a1ff9906198",
+                "parameters": [
+                    {
+                        "name": "boardId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "since",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Messages",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "messages": {
+                                            "type": "object"
+                                        },
+                                        "board": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Board not found"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Bulletin Boards"
+                ],
+                "summary": "Post a message",
+                "description": "Post a message to a bulletin board",
+                "operationId": "86220bb3d4edda38515bbbcabd4fc581",
+                "parameters": [
+                    {
+                        "name": "boardId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "content",
+                                    "lat",
+                                    "lng"
+                                ],
+                                "properties": {
+                                    "content": {
+                                        "type": "string",
+                                        "maxLength": 1000
+                                    },
+                                    "is_anonymous": {
+                                        "type": "boolean"
+                                    },
+                                    "expires_in_hours": {
+                                        "type": "integer",
+                                        "maximum": 168,
+                                        "minimum": 1
+                                    },
+                                    "lat": {
+                                        "type": "number"
+                                    },
+                                    "lng": {
+                                        "type": "number"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "object"
+                                        },
+                                        "board": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Outside board area"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/bulletin-boards/{boardId}/stream": {
+            "get": {
+                "tags": [
+                    "Bulletin Boards"
+                ],
+                "summary": "SSE: stream real-time updates",
+                "description": "Server-Sent Events endpoint for real-time message updates",
+                "operationId": "d3bb1fe7a6703be0e1de126376b21e5f",
+                "parameters": [
+                    {
+                        "name": "boardId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Event stream (text/event-stream)"
+                    }
+                }
+            }
+        },
+        "/chatrooms": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "List chatrooms",
+                "description": "Get all available chatrooms with filtering",
+                "operationId": "c6a9f280c28d4c2dd2c12d83631e42dd",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "interest",
+                                "city",
+                                "event",
+                                "private"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "city",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "activity",
+                                "newest",
+                                "most_active",
+                                "most_members"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated chatrooms list"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Create chatroom",
+                "description": "Create a new chatroom",
+                "operationId": "282c14705f85d52f2ee347c648327ac1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "type"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 100
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maxLength": 500
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "interest",
+                                            "city",
+                                            "event",
+                                            "private"
+                                        ]
+                                    },
+                                    "category": {
+                                        "type": "string"
+                                    },
+                                    "city": {
+                                        "type": "string"
+                                    },
+                                    "neighborhood": {
+                                        "type": "string"
+                                    },
+                                    "is_public": {
+                                        "type": "boolean"
+                                    },
+                                    "settings": {
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/chatrooms/{id}": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Get a chatroom",
+                "description": "Get a specific chatroom with messages",
+                "operationId": "ba11ff674ca14d485c94c2c19f10c265",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Chatroom and recent messages",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "chatroom": {
+                                            "type": "object"
+                                        },
+                                        "messages": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Not a member"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Update",
+                "description": "Update chatroom settings (admin/moderator only)",
+                "operationId": "f8618be5312c7b74f4246bc79125dead",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 100
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maxLength": 500
+                                    },
+                                    "is_public": {
+                                        "type": "boolean"
+                                    },
+                                    "settings": {
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Delete",
+                "description": "Delete chatroom (creator only)",
+                "operationId": "bd557ea2a13f29965657a19e863291df",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/chatrooms/{id}/join": {
+            "post": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Join",
+                "description": "Join a chatroom",
+                "operationId": "abbd1b76d8078f3eaa27db4e07047918",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Joined"
+                    },
+                    "400": {
+                        "description": "Already member"
+                    },
+                    "403": {
+                        "description": "Banned"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/chatrooms/{id}/leave": {
+            "post": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Leave",
+                "description": "Leave a chatroom",
+                "operationId": "85fabffc00ad93a1b9c0ab8a3a51b724",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Left"
+                    },
+                    "400": {
+                        "description": "Not a member"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/chatrooms/{id}/members": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Members",
+                "description": "Get chatroom members",
+                "operationId": "db9252cc388367e3be41d5a3e6ba31c6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated members"
+                    },
+                    "403": {
+                        "description": "Not a member"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/chatrooms/my": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "My chatrooms",
+                "description": "Get user's chatrooms",
+                "operationId": "93c7621ecb4e83021e49764d8e599ccb",
+                "responses": {
+                    "200": {
+                        "description": "List"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/chatrooms/categories": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Categories",
+                "description": "Get chatroom categories",
+                "operationId": "73072033f79437354d610a4a78843d9f",
+                "responses": {
+                    "200": {
+                        "description": "List"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/chatrooms/popular": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Popular",
+                "description": "Get popular chatrooms",
+                "operationId": "62412b6ab7fd6834907957a9014ada8c",
+                "responses": {
+                    "200": {
+                        "description": "List"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/chatrooms/search": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Search",
+                "description": "Search chatrooms",
+                "operationId": "e74f56654e781eceae418270c3e18fdf",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "minLength": 2
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "interest",
+                                "city",
+                                "event",
+                                "private"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "city",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated results"
                     }
                 },
                 "security": [
@@ -1573,6 +2968,248 @@
                         }
                     }
                 }
+            }
+        },
+        "/location": {
+            "get": {
+                "tags": [
+                    "Location"
+                ],
+                "summary": "Get current user's location",
+                "description": "Get current user's location",
+                "operationId": "76e8a81981e2df10a6369fd7ff2aa02d",
+                "responses": {
+                    "200": {
+                        "description": "Location"
+                    },
+                    "404": {
+                        "description": "No location data"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Location"
+                ],
+                "summary": "Update current location",
+                "description": "Updates the authenticated user's current location and privacy level.",
+                "operationId": "70594e85005ccdebfc189822225e0acf",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "latitude",
+                                    "longitude"
+                                ],
+                                "properties": {
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 37.7749
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": -122.4194
+                                    },
+                                    "accuracy": {
+                                        "type": "number",
+                                        "example": 12.5
+                                    },
+                                    "heading": {
+                                        "type": "number",
+                                        "example": 140
+                                    },
+                                    "speed": {
+                                        "type": "number",
+                                        "example": 1.2
+                                    },
+                                    "altitude": {
+                                        "type": "number",
+                                        "example": 20
+                                    },
+                                    "privacy_level": {
+                                        "type": "string",
+                                        "enum": [
+                                            "public",
+                                            "friends",
+                                            "private"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Location"
+                ],
+                "summary": "Clear current location",
+                "description": "Clear location history (set inactive)",
+                "operationId": "82875a613c6ad6a45dc6428f1c8ddfd8",
+                "responses": {
+                    "200": {
+                        "description": "Cleared"
+                    },
+                    "404": {
+                        "description": "No location data"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/location/nearby": {
+            "get": {
+                "tags": [
+                    "Location"
+                ],
+                "summary": "Find nearby users",
+                "description": "Finds nearby users within a radius considering privacy settings.",
+                "operationId": "f5b585d4a0ba054d3f29ffc036b6be86",
+                "parameters": [
+                    {
+                        "name": "latitude",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "radius",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 10000,
+                            "minimum": 100
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Nearby users list"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/location/privacy": {
+            "put": {
+                "tags": [
+                    "Location"
+                ],
+                "summary": "Update location privacy",
+                "description": "Update location privacy settings",
+                "operationId": "e6842cc8f113f67517f3e9c4e9244d6d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "privacy_level"
+                                ],
+                                "properties": {
+                                    "privacy_level": {
+                                        "type": "string",
+                                        "enum": [
+                                            "public",
+                                            "friends",
+                                            "private"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "404": {
+                        "description": "No location data"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/matches": {
@@ -2455,8 +4092,20 @@
             "description": "Community groups and group messaging"
         },
         {
+            "name": "Chatrooms",
+            "description": "Real-time proximity-based chatrooms"
+        },
+        {
+            "name": "Bulletin Boards",
+            "description": "Location-based community bulletin boards"
+        },
+        {
             "name": "Health",
             "description": "System health and monitoring endpoints"
+        },
+        {
+            "name": "Location",
+            "description": "Location"
         }
     ]
 }

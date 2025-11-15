@@ -22,6 +22,26 @@ class BulletinBoardController extends Controller
     }
     /**
      * Get bulletin boards near a location
+     *
+     * @OA\Get(
+     *   path="/bulletin-boards",
+     *   tags={"Bulletin Boards"},
+     *   summary="List nearby bulletin boards",
+     *   @OA\Parameter(name="lat", in="query", required=true, @OA\Schema(type="number", format="float", minimum=-90, maximum=90)),
+     *   @OA\Parameter(name="lng", in="query", required=true, @OA\Schema(type="number", format="float", minimum=-180, maximum=180)),
+     *   @OA\Parameter(name="radius", in="query", required=false, @OA\Schema(type="integer", minimum=100, maximum=50000), description="Meters (default 5000)"),
+     *   @OA\Response(response=200, description="Nearby boards",
+     *     @OA\JsonContent(type="object",
+     *       @OA\Property(property="boards", type="array", @OA\Items(type="object")),
+     *       @OA\Property(property="user_location", type="object",
+     *         @OA\Property(property="lat", type="number"),
+     *         @OA\Property(property="lng", type="number")
+     *       ),
+     *       @OA\Property(property="search_radius", type="integer")
+     *     )
+     *   ),
+     *   @OA\Response(response=400, description="Validation error")
+     * )
      */
     public function index(Request $request): JsonResponse
     {
@@ -57,6 +77,23 @@ class BulletinBoardController extends Controller
 
     /**
      * Get a specific bulletin board with messages
+     *
+     * @OA\Get(
+     *   path="/bulletin-boards/{id}",
+     *   tags={"Bulletin Boards"},
+     *   summary="Get bulletin board by ID",
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="lat", in="query", required=false, @OA\Schema(type="number")),
+     *   @OA\Parameter(name="lng", in="query", required=false, @OA\Schema(type="number")),
+     *   @OA\Response(response=200, description="Board and messages",
+     *     @OA\JsonContent(type="object",
+     *       @OA\Property(property="board", type="object"),
+     *       @OA\Property(property="messages", type="array", @OA\Items(type="object"))
+     *     )
+     *   ),
+     *   @OA\Response(response=403, description="Outside board area"),
+     *   @OA\Response(response=404, description="Not found")
+     * )
      */
     public function show(Request $request, int $id): JsonResponse
     {
@@ -83,6 +120,25 @@ class BulletinBoardController extends Controller
 
     /**
      * Create or find a bulletin board for a location
+     *
+     * @OA\Post(
+     *   path="/bulletin-boards",
+     *   tags={"Bulletin Boards"},
+     *   summary="Create or find a board for a location",
+     *   @OA\RequestBody(required=true, @OA\JsonContent(
+     *     required={"lat","lng"},
+     *     @OA\Property(property="lat", type="number", format="float"),
+     *     @OA\Property(property="lng", type="number", format="float"),
+     *     @OA\Property(property="radius", type="integer", minimum=100, maximum=5000)
+     *   )),
+     *   @OA\Response(response=200, description="Found/created",
+     *     @OA\JsonContent(type="object",
+     *       @OA\Property(property="board", type="object"),
+     *       @OA\Property(property="created", type="boolean")
+     *     )
+     *   ),
+     *   @OA\Response(response=400, description="Validation error")
+     * )
      */
     public function createOrFind(Request $request): JsonResponse
     {
@@ -132,6 +188,31 @@ class BulletinBoardController extends Controller
 
     /**
      * Post a message to a bulletin board
+     *
+     * @OA\Post(
+     *   path="/bulletin-boards/{boardId}/messages",
+     *   tags={"Bulletin Boards"},
+     *   summary="Post a message",
+    *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="boardId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(required=true, @OA\JsonContent(
+     *     required={"content","lat","lng"},
+     *     @OA\Property(property="content", type="string", maxLength=1000),
+     *     @OA\Property(property="is_anonymous", type="boolean"),
+     *     @OA\Property(property="expires_in_hours", type="integer", minimum=1, maximum=168),
+     *     @OA\Property(property="lat", type="number"),
+     *     @OA\Property(property="lng", type="number")
+     *   )),
+     *   @OA\Response(response=201, description="Created",
+     *     @OA\JsonContent(type="object",
+     *       @OA\Property(property="message", type="object"),
+     *       @OA\Property(property="board", type="object")
+     *     )
+     *   ),
+     *   @OA\Response(response=403, description="Outside board area"),
+     *   @OA\Response(response=400, description="Validation error"),
+     *   @OA\Response(response=401, description="Unauthenticated")
+     * )
      */
     public function postMessage(Request $request, int $boardId): JsonResponse
     {
@@ -188,6 +269,22 @@ class BulletinBoardController extends Controller
 
     /**
      * Get messages for a bulletin board (with pagination)
+     *
+     * @OA\Get(
+     *   path="/bulletin-boards/{boardId}/messages",
+     *   tags={"Bulletin Boards"},
+     *   summary="List messages for a board",
+     *   @OA\Parameter(name="boardId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="per_page", in="query", required=false, @OA\Schema(type="integer", minimum=1, maximum=100)),
+     *   @OA\Parameter(name="since", in="query", required=false, @OA\Schema(type="string", format="date-time")),
+     *   @OA\Response(response=200, description="Messages",
+     *     @OA\JsonContent(type="object",
+     *       @OA\Property(property="messages", type="object"),
+     *       @OA\Property(property="board", type="object")
+     *     )
+     *   ),
+     *   @OA\Response(response=404, description="Board not found")
+     * )
      */
     public function getMessages(Request $request, int $boardId): JsonResponse
     {
@@ -216,6 +313,14 @@ class BulletinBoardController extends Controller
 
     /**
      * Server-Sent Events endpoint for real-time message updates
+     *
+     * @OA\Get(
+     *   path="/bulletin-boards/{boardId}/stream",
+     *   tags={"Bulletin Boards"},
+     *   summary="SSE: stream real-time updates",
+     *   @OA\Parameter(name="boardId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Event stream (text/event-stream)")
+     * )
      */
     public function stream(Request $request, int $boardId)
     {
