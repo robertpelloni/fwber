@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'profile.complete' => \App\Http\Middleware\EnsureProfileComplete::class,
             'presence.update' => \App\Http\Middleware\UpdateLastSeen::class,
             'auth.moderator' => \App\Http\Middleware\EnsureModerator::class,
+            'feature' => \App\Http\Middleware\FeatureEnabled::class,
         ]);
 
         // Enable CORS for API routes

@@ -143,7 +143,7 @@ Route::middleware("api")->group(function (): void {
         Route::get("/location/nearby", [LocationController::class, "nearby"]);
 
         // Proximity Artifacts (Unified Ephemeral Layer)
-        Route::prefix('proximity')->group(function (): void {
+        Route::prefix('proximity')->middleware('feature:proximity_artifacts')->group(function (): void {
             Route::get('/feed', [ProximityArtifactController::class, 'index']);
             Route::get('/local-pulse', [ProximityArtifactController::class, 'localPulse']); // Merged feed: artifacts + match candidates
             Route::post('/artifacts', [ProximityArtifactController::class, 'store']);
@@ -176,7 +176,7 @@ Route::middleware("api")->group(function (): void {
         Route::get("/bulletin-boards/{id}/stream", [BulletinBoardController::class, "stream"]);
         
         // Chatroom routes (Phase 6A - Real-time Location-Based Chatrooms)
-        Route::prefix("chatrooms")->group(function (): void {
+        Route::prefix("chatrooms")->middleware('feature:chatrooms')->group(function (): void {
             Route::get("/", [ChatroomController::class, "index"]);
             Route::get("/categories", [ChatroomController::class, "categories"]);
             Route::get("/popular", [ChatroomController::class, "popular"]);
@@ -192,7 +192,7 @@ Route::middleware("api")->group(function (): void {
         });
         
         // Chatroom Message routes (Phase 6A - Real-time Location-Based Chatrooms)
-        Route::prefix("chatrooms/{chatroomId}/messages")->group(function (): void {
+        Route::prefix("chatrooms/{chatroomId}/messages")->middleware('feature:chatrooms')->group(function (): void {
             Route::get("/", [ChatroomMessageController::class, "index"]);
             Route::post("/", [ChatroomMessageController::class, "store"]);
             Route::get("/pinned", [ChatroomMessageController::class, "pinned"]);
@@ -207,7 +207,7 @@ Route::middleware("api")->group(function (): void {
         });
         
         // Proximity Chatroom routes (Phase 6B - Proximity-Based Networking Chatrooms)
-        Route::prefix("proximity-chatrooms")->group(function (): void {
+        Route::prefix("proximity-chatrooms")->middleware('feature:proximity_chatrooms')->group(function (): void {
             Route::get("/nearby", [ProximityChatroomController::class, "findNearby"]);
             Route::post("/", [ProximityChatroomController::class, "create"]);
             Route::get("/{id}", [ProximityChatroomController::class, "show"]);
@@ -220,7 +220,7 @@ Route::middleware("api")->group(function (): void {
         });
         
         // Proximity Chatroom Message routes (Phase 6B - Proximity-Based Networking Chatrooms)
-        Route::prefix("proximity-chatrooms/{chatroomId}/messages")->group(function (): void {
+        Route::prefix("proximity-chatrooms/{chatroomId}/messages")->middleware('feature:proximity_chatrooms')->group(function (): void {
             Route::get("/", [ProximityChatroomMessageController::class, "index"]);
             Route::post("/", [ProximityChatroomMessageController::class, "store"]);
             Route::get("/pinned", [ProximityChatroomMessageController::class, "pinned"]);
@@ -241,12 +241,14 @@ Route::middleware("api")->group(function (): void {
         Route::get("/mercure/status", [MercureAuthController::class, "status"]);
         
         // Analytics routes (admin only)
-        Route::get("/analytics", [AnalyticsController::class, "index"]);
-        Route::get("/analytics/realtime", [AnalyticsController::class, "realtime"]);
-        Route::get("/analytics/moderation", [AnalyticsController::class, "moderation"]);
+        Route::middleware('feature:analytics')->group(function (): void {
+            Route::get("/analytics", [AnalyticsController::class, "index"]);
+            Route::get("/analytics/realtime", [AnalyticsController::class, "realtime"]);
+            Route::get("/analytics/moderation", [AnalyticsController::class, "moderation"]);
+        });
         
         // Recommendation routes (AI-powered personalization)
-        Route::prefix("recommendations")->group(function (): void {
+        Route::prefix("recommendations")->middleware('feature:recommendations')->group(function (): void {
             Route::get("/", [RecommendationController::class, "index"]);
             Route::get("/trending", [RecommendationController::class, "trending"]);
             Route::get("/feed", [RecommendationController::class, "feed"]);
@@ -256,7 +258,7 @@ Route::middleware("api")->group(function (): void {
         });
 
             // WebSocket routes (bidirectional real-time communication)
-            Route::prefix("websocket")->group(function (): void {
+            Route::prefix("websocket")->middleware('feature:websocket')->group(function (): void {
                 Route::post("/connect", [WebSocketController::class, "connect"]);
                 Route::post("/disconnect", [WebSocketController::class, "disconnect"]);
                 Route::post("/message", [WebSocketController::class, "sendMessage"]);
@@ -271,7 +273,7 @@ Route::middleware("api")->group(function (): void {
 
             // Content Generation routes (AI-powered content creation and optimization)
             // Apply a simple throttle to match test expectations (5 requests/minute allowed per user)
-            Route::prefix("content-generation")->group(function (): void {
+            Route::prefix("content-generation")->middleware('feature:content_generation')->group(function (): void {
                 Route::middleware('throttle:5,1')->post("/profile", [ContentGenerationController::class, "generateProfileContent"]);
                 Route::post("/posts/{boardId}/suggestions", [ContentGenerationController::class, "generatePostSuggestions"]);
                 Route::post("/conversation-starters", [ContentGenerationController::class, "generateConversationStarters"]);
@@ -284,7 +286,7 @@ Route::middleware("api")->group(function (): void {
             });
 
             // Rate Limiting routes (Advanced security features)
-            Route::prefix("rate-limits")->group(function (): void {
+            Route::prefix("rate-limits")->middleware('feature:rate_limits')->group(function (): void {
                 Route::get("/status/{action?}", [RateLimitController::class, "getStatus"]);
                 Route::get("/all-status", [RateLimitController::class, "getAllStatus"]);
                 Route::post("/reset/{action}", [RateLimitController::class, "reset"]);
