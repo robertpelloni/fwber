@@ -1,5 +1,7 @@
 # FWBer Project Documentation
 
+> Quick links: [API Docs Quickstart](API_DOCS.md) · [Feature Flags](FEATURE_FLAGS.md) · [Agents & Workflow](../README-agents.md)
+
 ## 📁 Documentation Structure
 
 This directory contains all project documentation organized by category:
