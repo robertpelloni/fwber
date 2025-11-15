@@ -4370,7 +4370,32 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Content deleted successfully"
+                        "description": "Content deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Content deleted successfully"
+                                        },
+                                        "content_id": {
+                                            "type": "string",
+                                            "example": "gen_abc123"
+                                        },
+                                        "deleted_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "$ref": "#/components/responses/Unauthorized"

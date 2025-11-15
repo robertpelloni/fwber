@@ -509,7 +509,14 @@ class ContentGenerationController extends Controller
      *     description="Remove AI-generated content from history",
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(name="contentId", in="path", required=true, @OA\Schema(type="string")),
-     *     @OA\Response(response=200, description="Content deleted successfully"),
+     *     @OA\Response(response=200, description="Content deleted successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Content deleted successfully"),
+     *             @OA\Property(property="content_id", type="string", example="gen_abc123"),
+     *             @OA\Property(property="deleted_at", type="string", format="date-time")
+     *         )
+     *     ),
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
      * )
      */
