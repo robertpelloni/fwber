@@ -65,6 +65,14 @@ venv/
 *.log
 logs/
 
+# Backup and temporary files (prevent future clutter)
+*.bak
+*~
+*_backup
+*.tmp
+*_test_output.txt
+*_test_error.txt
+
 # Legacy secrets file already handled
 _secrets.php
 test-db-connection.php
