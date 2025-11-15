@@ -25,8 +25,8 @@ class ModerationController extends Controller
      *   tags={"Moderation"},
      *   summary="Moderation dashboard overview",
      *   security={{"bearerAuth":{}}},
-     *   @OA\Response(response=200, description="Dashboard stats and recent actions"),
-     *   @OA\Response(response=403, description="Unauthorized")
+    *   @OA\Response(response=200, description="Dashboard stats and recent actions"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function dashboard(Request $request)
@@ -62,8 +62,8 @@ class ModerationController extends Controller
      *   tags={"Moderation"},
      *   summary="Flagged content queue",
      *   security={{"bearerAuth":{}}},
-     *   @OA\Response(response=200, description="Paginated flagged content"),
-     *   @OA\Response(response=403, description="Unauthorized")
+    *   @OA\Response(response=200, description="Paginated flagged content"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function flaggedContent(Request $request)
@@ -97,9 +97,9 @@ class ModerationController extends Controller
      *     @OA\Property(property="throttle_severity", type="integer", minimum=1, maximum=5),
      *     @OA\Property(property="throttle_duration_hours", type="integer", minimum=1)
      *   )),
-     *   @OA\Response(response=200, description="Action completed"),
-     *   @OA\Response(response=403, description="Unauthorized"),
-     *   @OA\Response(response=422, description="Validation error")
+    *   @OA\Response(response=200, description="Action completed"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+    *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function reviewFlag(Request $request, int $artifactId)
@@ -207,8 +207,8 @@ class ModerationController extends Controller
      *   tags={"Moderation"},
      *   summary="Geo-spoof detections",
      *   security={{"bearerAuth":{}}},
-     *   @OA\Response(response=200, description="Paginated detections"),
-     *   @OA\Response(response=403, description="Unauthorized")
+    *   @OA\Response(response=200, description="Paginated detections"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function spoofDetections(Request $request)
@@ -242,9 +242,9 @@ class ModerationController extends Controller
      *     @OA\Property(property="reason", type="string", maxLength=500),
      *     @OA\Property(property="apply_throttle", type="boolean")
      *   )),
-     *   @OA\Response(response=200, description="Review completed"),
-     *   @OA\Response(response=403, description="Unauthorized"),
-     *   @OA\Response(response=422, description="Validation error")
+    *   @OA\Response(response=200, description="Review completed"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+    *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function reviewSpoof(Request $request, int $detectionId)
@@ -311,8 +311,8 @@ class ModerationController extends Controller
      *   tags={"Moderation"},
      *   summary="Active shadow throttles",
      *   security={{"bearerAuth":{}}},
-     *   @OA\Response(response=200, description="Paginated throttles"),
-     *   @OA\Response(response=403, description="Unauthorized")
+    *   @OA\Response(response=200, description="Paginated throttles"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function activeThrottles(Request $request)
@@ -339,8 +339,8 @@ class ModerationController extends Controller
      *   summary="Remove shadow throttle",
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="throttleId", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="Throttle removed"),
-     *   @OA\Response(response=403, description="Unauthorized")
+    *   @OA\Response(response=200, description="Throttle removed"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function removeThrottle(Request $request, int $throttleId)
@@ -371,8 +371,8 @@ class ModerationController extends Controller
      *   tags={"Moderation"},
      *   summary="Moderation action history",
      *   security={{"bearerAuth":{}}},
-     *   @OA\Response(response=200, description="Paginated actions"),
-     *   @OA\Response(response=403, description="Unauthorized")
+    *   @OA\Response(response=200, description="Paginated actions"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function actionHistory(Request $request)
@@ -397,8 +397,8 @@ class ModerationController extends Controller
      *   summary="User moderation profile",
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="User moderation profile"),
-     *   @OA\Response(response=403, description="Unauthorized")
+    *   @OA\Response(response=200, description="User moderation profile"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function userProfile(Request $request, int $userId)

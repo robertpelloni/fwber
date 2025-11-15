@@ -10,6 +10,12 @@ namespace App\Http\Controllers;
  * )
  * 
  * @OA\Response(
+ *     response="Forbidden",
+ *     description="Forbidden",
+ *     @OA\JsonContent(ref="#/components/schemas/ForbiddenError")
+ * )
+ * 
+ * @OA\Response(
  *     response="Unauthorized",
  *     description="Unauthenticated",
  *     @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
@@ -44,6 +50,12 @@ namespace App\Http\Controllers;
  *     schema="UnauthorizedError",
  *     type="object",
  *     @OA\Property(property="message", type="string", example="Unauthenticated")
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="ForbiddenError",
+ *     type="object",
+ *     @OA\Property(property="message", type="string", example="Forbidden")
  * )
  * 
  * @OA\Schema(

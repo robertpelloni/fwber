@@ -106,7 +106,7 @@ class ProximityChatroomMessageController extends Controller
      *     @OA\Property(property="metadata", type="object")
      *   )),
     *   @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/ChatMessage")),
-     *   @OA\Response(response=403, description="Muted/Not member"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
      *   @OA\Response(response=422, description="Moderation blocked")
      * )
      */
@@ -234,7 +234,7 @@ class ProximityChatroomMessageController extends Controller
      *     @OA\Property(property="is_social", type="boolean")
      *   )),
     *   @OA\Response(response=200, description="Updated", @OA\JsonContent(ref="#/components/schemas/ChatMessage")),
-     *   @OA\Response(response=403, description="Forbidden"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
      *   @OA\Response(response=422, description="Moderation blocked")
      * )
      */
@@ -304,7 +304,7 @@ class ProximityChatroomMessageController extends Controller
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="Deleted")
+    *   @OA\Response(response=200, description="Deleted", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse"))
      * )
      */
     public function destroy(int $chatroomId, int $messageId): JsonResponse
@@ -347,7 +347,7 @@ class ProximityChatroomMessageController extends Controller
      *     required={"emoji"},
      *     @OA\Property(property="emoji", type="string", maxLength=10)
      *   )),
-     *   @OA\Response(response=200, description="Added")
+    *   @OA\Response(response=200, description="Added", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse"))
      * )
      */
     public function addReaction(Request $request, int $chatroomId, int $messageId): JsonResponse
@@ -383,7 +383,7 @@ class ProximityChatroomMessageController extends Controller
      *     required={"emoji"},
      *     @OA\Property(property="emoji", type="string", maxLength=10)
      *   )),
-     *   @OA\Response(response=200, description="Removed")
+    *   @OA\Response(response=200, description="Removed", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse"))
      * )
      */
     public function removeReaction(Request $request, int $chatroomId, int $messageId): JsonResponse
@@ -415,7 +415,7 @@ class ProximityChatroomMessageController extends Controller
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="Pinned")
+    *   @OA\Response(response=200, description="Pinned", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse"))
      * )
      */
     public function pin(int $chatroomId, int $messageId): JsonResponse
@@ -442,7 +442,7 @@ class ProximityChatroomMessageController extends Controller
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="Unpinned")
+    *   @OA\Response(response=200, description="Unpinned", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse"))
      * )
      */
     public function unpin(int $chatroomId, int $messageId): JsonResponse

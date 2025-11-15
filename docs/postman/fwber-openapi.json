@@ -2816,7 +2816,7 @@
                         }
                     },
                     "403": {
-                        "description": "Not a member"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "404": {
                         "description": "Not found"
@@ -2872,10 +2872,17 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Updated"
+                        "description": "Updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SimpleMessageResponse"
+                                }
+                            }
+                        }
                     },
                     "403": {
-                        "description": "Forbidden"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -2903,10 +2910,17 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Deleted"
+                        "description": "Deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SimpleMessageResponse"
+                                }
+                            }
+                        }
                     },
                     "403": {
-                        "description": "Forbidden"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -2936,13 +2950,20 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Joined"
+                        "description": "Joined",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SimpleMessageResponse"
+                                }
+                            }
+                        }
                     },
                     "400": {
                         "description": "Already member"
                     },
                     "403": {
-                        "description": "Banned"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -2972,7 +2993,14 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Left"
+                        "description": "Left",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SimpleMessageResponse"
+                                }
+                            }
+                        }
                     },
                     "400": {
                         "description": "Not a member"
@@ -3008,7 +3036,7 @@
                         "description": "Paginated members"
                     },
                     "403": {
-                        "description": "Not a member"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -5162,7 +5190,7 @@
                         "description": "Dashboard stats and recent actions"
                     },
                     "403": {
-                        "description": "Unauthorized"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -5185,7 +5213,7 @@
                         "description": "Paginated flagged content"
                     },
                     "403": {
-                        "description": "Unauthorized"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -5256,10 +5284,10 @@
                         "description": "Action completed"
                     },
                     "403": {
-                        "description": "Unauthorized"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "422": {
-                        "description": "Validation error"
+                        "$ref": "#/components/responses/ValidationError"
                     }
                 },
                 "security": [
@@ -5282,7 +5310,7 @@
                         "description": "Paginated detections"
                     },
                     "403": {
-                        "description": "Unauthorized"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -5345,10 +5373,10 @@
                         "description": "Review completed"
                     },
                     "403": {
-                        "description": "Unauthorized"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "422": {
-                        "description": "Validation error"
+                        "$ref": "#/components/responses/ValidationError"
                     }
                 },
                 "security": [
@@ -5371,7 +5399,7 @@
                         "description": "Paginated throttles"
                     },
                     "403": {
-                        "description": "Unauthorized"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -5404,7 +5432,7 @@
                         "description": "Throttle removed"
                     },
                     "403": {
-                        "description": "Unauthorized"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -5427,7 +5455,7 @@
                         "description": "Paginated actions"
                     },
                     "403": {
-                        "description": "Unauthorized"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -5460,7 +5488,7 @@
                         "description": "User moderation profile"
                     },
                     "403": {
-                        "description": "Unauthorized"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -6302,7 +6330,7 @@
                         }
                     },
                     "422": {
-                        "$ref": "#/components/schemas/ValidationError"
+                        "$ref": "#/components/responses/ValidationError"
                     }
                 },
                 "security": [
@@ -6364,7 +6392,7 @@
                         "description": "Artifact created"
                     },
                     "422": {
-                        "$ref": "#/components/schemas/ValidationError"
+                        "$ref": "#/components/responses/ValidationError"
                     }
                 },
                 "security": [
@@ -6423,10 +6451,17 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Artifact removed"
+                        "description": "Artifact removed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SimpleMessageResponse"
+                                }
+                            }
+                        }
                     },
                     "403": {
-                        "description": "Forbidden"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "404": {
                         "description": "Artifact not found"
@@ -6458,7 +6493,14 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Flag recorded"
+                        "description": "Flag recorded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SimpleMessageResponse"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Artifact not found"
@@ -6535,7 +6577,7 @@
                         }
                     },
                     "422": {
-                        "$ref": "#/components/schemas/ValidationError"
+                        "$ref": "#/components/responses/ValidationError"
                     }
                 },
                 "security": [
@@ -7235,7 +7277,7 @@
                         }
                     },
                     "403": {
-                        "description": "Muted/Not member"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "422": {
                         "description": "Moderation blocked"
@@ -7354,7 +7396,7 @@
                         }
                     },
                     "403": {
-                        "description": "Forbidden"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "422": {
                         "description": "Moderation blocked"
@@ -7393,7 +7435,14 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Deleted"
+                        "description": "Deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SimpleMessageResponse"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -7450,7 +7499,14 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Added"
+                        "description": "Added",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SimpleMessageResponse"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -7505,7 +7561,14 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Removed"
+                        "description": "Removed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SimpleMessageResponse"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -7543,7 +7606,14 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Pinned"
+                        "description": "Pinned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SimpleMessageResponse"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -7579,7 +7649,14 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Unpinned"
+                        "description": "Unpinned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SimpleMessageResponse"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -8851,6 +8928,15 @@
                 },
                 "type": "object"
             },
+            "ForbiddenError": {
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "Forbidden"
+                    }
+                },
+                "type": "object"
+            },
             "Reaction": {
                 "properties": {
                     "user_id": {
@@ -9478,6 +9564,16 @@
                     "application/json": {
                         "schema": {
                             "$ref": "#/components/schemas/ValidationError"
+                        }
+                    }
+                }
+            },
+            "Forbidden": {
+                "description": "Forbidden",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ForbiddenError"
                         }
                     }
                 }

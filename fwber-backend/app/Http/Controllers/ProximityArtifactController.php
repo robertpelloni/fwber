@@ -34,7 +34,7 @@ class ProximityArtifactController extends Controller
      *       @OA\Property(property="artifacts", type="array", @OA\Items(type="object"))
      *     )
      *   ),
-     *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
+    *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function index(Request $request): JsonResponse
@@ -92,8 +92,8 @@ class ProximityArtifactController extends Controller
      *       @OA\Property(property="radius", type="integer", minimum=100, maximum=10000)
      *     )
      *   ),
-     *   @OA\Response(response=201, description="Artifact created"),
-     *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
+    *   @OA\Response(response=201, description="Artifact created"),
+    *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function store(Request $request, ProximityArtifactService $service): JsonResponse
@@ -194,7 +194,7 @@ class ProximityArtifactController extends Controller
      *   summary="Flag artifact for moderation",
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="Flag recorded"),
+    *   @OA\Response(response=200, description="Flag recorded", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
      *   @OA\Response(response=404, description="Artifact not found")
      * )
      */
@@ -233,8 +233,8 @@ class ProximityArtifactController extends Controller
      *   summary="Remove artifact (owner only)",
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="Artifact removed"),
-     *   @OA\Response(response=403, description="Forbidden"),
+    *   @OA\Response(response=200, description="Artifact removed", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
      *   @OA\Response(response=404, description="Artifact not found")
      * )
      */
@@ -291,7 +291,7 @@ class ProximityArtifactController extends Controller
      *       @OA\Property(property="meta", type="object")
      *     )
      *   ),
-     *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
+    *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      * 
      * @param Request $request

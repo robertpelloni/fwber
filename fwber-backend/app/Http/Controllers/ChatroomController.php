@@ -99,7 +99,7 @@ class ChatroomController extends Controller
      *       @OA\Property(property="messages", type="object")
      *     )
      *   ),
-     *   @OA\Response(response=403, description="Not a member"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
      *   @OA\Response(response=404, description="Not found")
      * )
      */
@@ -197,9 +197,9 @@ class ChatroomController extends Controller
      *   summary="Join",
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="Joined"),
+    *   @OA\Response(response=200, description="Joined", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
      *   @OA\Response(response=400, description="Already member"),
-     *   @OA\Response(response=403, description="Banned")
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function join(Request $request, int $id): JsonResponse
@@ -236,7 +236,7 @@ class ChatroomController extends Controller
      *   summary="Leave",
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="Left"),
+    *   @OA\Response(response=200, description="Left", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
      *   @OA\Response(response=400, description="Not a member")
      * )
      */
@@ -268,7 +268,7 @@ class ChatroomController extends Controller
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Response(response=200, description="Paginated members"),
-     *   @OA\Response(response=403, description="Not a member")
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function members(Request $request, int $id): JsonResponse
@@ -302,8 +302,8 @@ class ChatroomController extends Controller
      *     @OA\Property(property="is_public", type="boolean"),
      *     @OA\Property(property="settings", type="object")
      *   )),
-     *   @OA\Response(response=200, description="Updated"),
-     *   @OA\Response(response=403, description="Forbidden")
+    *   @OA\Response(response=200, description="Updated", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function update(Request $request, int $id): JsonResponse
@@ -335,8 +335,8 @@ class ChatroomController extends Controller
      *   summary="Delete",
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="Deleted"),
-     *   @OA\Response(response=403, description="Forbidden")
+    *   @OA\Response(response=200, description="Deleted", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function destroy(int $id): JsonResponse

@@ -68,6 +68,19 @@ See also:
 - If you add a new annotated controller, include its path in:
   - `fwber-backend/config/l5-swagger.php` under the `annotations` array.
 
+### Reusable responses and schemas
+- Responses (components.responses):
+  - `Unauthorized` → `UnauthorizedError` schema (401)
+  - `ValidationError` → `ValidationError` schema (422)
+  - `BadRequest` → `ValidationError` schema (400)
+  - `Forbidden` → `ForbiddenError` schema (403)
+- Common data schemas (components.schemas):
+  - `SimpleMessageResponse` for simple success messages
+  - `RecommendationList`, `TrendingList`, `FeedResponse`
+  - `WebSocketConnectionEstablished`, `WebSocketStatus`
+  - `RateLimitStatusResponse`, `AllRateLimitStatusesResponse`
+  - `ContentOptimizationResponse`, `GenerationStatsResponse`, `OptimizationStatsResponse`
+
 ## Feature flags and endpoints
 Advanced/non-MVP routes are gated by feature flags via middleware and may return 404 if disabled. See:
 - `docs/FEATURE_FLAGS.md`
