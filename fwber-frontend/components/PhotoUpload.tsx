@@ -673,11 +673,50 @@ export function PhotoGallery({
             boxSizing: 'border-box',
           }}
         >
-          <Image
+          <img
             src={photos[currentIndex]}
             alt={`Photo ${currentIndex + 1}`}
-            layout="fill"
-            objectFit="contain"
+            style={{
+              maxWidth: 'calc(100vw - 4rem)',
+              maxHeight: 'calc(100vh - 4rem)',
+              width: 'auto',
+              height: 'auto',
+              minWidth: 'min(50vw, 800px)', // Minimum size for small images
+              minHeight: 'min(50vh, 600px)', // Minimum size for small images
+              objectFit: 'contain',
+              display: 'block',
+            }}
+            onLoad={(e) => {
+              // For small images, scale them up proportionally but cap at 2x natural size to avoid pixelation
+              const img = e.currentTarget
+              const naturalWidth = img.naturalWidth
+              const naturalHeight = img.naturalHeight
+              const maxDisplayWidth = window.innerWidth - 64 // Account for padding
+              const maxDisplayHeight = window.innerHeight - 64
+
+              // Only scale up if image is significantly smaller than viewport (less than 80%)
+              if (naturalWidth < maxDisplayWidth * 0.8 && naturalHeight < maxDisplayHeight * 0.8) {
+                // Scale up to fill at least 60% of viewport, but cap at 2x natural size to avoid pixelation
+                const targetWidth = Math.min(maxDisplayWidth * 0.6, naturalWidth * 2)
+                const targetHeight = Math.min(maxDisplayHeight * 0.6, naturalHeight * 2)
+                const aspectRatio = naturalWidth / naturalHeight
+
+                // Determine which dimension should be used based on aspect ratio
+                if (targetWidth / targetHeight > aspectRatio) {
+                  // Height is the limiting factor
+                  img.style.width = 'auto'
+                  img.style.height = `${targetHeight}px`
+                } else {
+                  // Width is the limiting factor
+                  img.style.width = `${targetWidth}px`
+                  img.style.height = 'auto'
+                }
+              } else {
+                // Reset to auto sizing for larger images to use maxWidth/maxHeight constraints
+                img.style.width = 'auto'
+                img.style.height = 'auto'
+              }
+            }}
           />
         </div>
 
