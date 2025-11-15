@@ -1064,6 +1064,168 @@
                 ]
             }
         },
+        "/groups/{groupId}/messages": {
+            "get": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Get group messages (paginated)",
+                "description": "Get messages for a group",
+                "operationId": "1e1db3d5835aaeee68ed5ee180f28bab",
+                "parameters": [
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Messages returned"
+                    },
+                    "403": {
+                        "description": "Not a member"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Send a message to a group",
+                "description": "Send a message to a group",
+                "operationId": "a16d0acfb80b381e761c05d20daa96ec",
+                "parameters": [
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "content": {
+                                        "type": "string",
+                                        "maxLength": 5000
+                                    },
+                                    "message_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "text",
+                                            "image",
+                                            "video",
+                                            "audio",
+                                            "file"
+                                        ]
+                                    },
+                                    "media": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "media_duration": {
+                                        "type": "integer",
+                                        "minimum": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Message created"
+                    },
+                    "403": {
+                        "description": "Not a member or muted"
+                    },
+                    "422": {
+                        "$ref": "#/components/schemas/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/group-messages/{messageId}/read": {
+            "post": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Mark group message as read",
+                "description": "Mark message as read (idempotent)",
+                "operationId": "c99a3536f0e18d563b3c9e81c412080b",
+                "parameters": [
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Read status updated"
+                    },
+                    "403": {
+                        "description": "Not a member"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/group-messages/unread-count": {
+            "get": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Get unread group message count",
+                "description": "Get unread message count across all user's groups",
+                "operationId": "2ac7df44cfcf75a03d2b5a91c2d32264",
+                "responses": {
+                    "200": {
+                        "description": "Unread count returned"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/messages": {
             "post": {
                 "tags": [

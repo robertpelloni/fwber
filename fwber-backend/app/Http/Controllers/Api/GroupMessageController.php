@@ -15,6 +15,29 @@ class GroupMessageController extends Controller
 {
     /**
      * Send a message to a group
+     *
+     * @OA\Post(
+     *   path="/groups/{groupId}/messages",
+     *   tags={"Groups"},
+     *   summary="Send a message to a group",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\MediaType(
+     *       mediaType="multipart/form-data",
+     *       @OA\Schema(
+     *         @OA\Property(property="content", type="string", maxLength=5000),
+     *         @OA\Property(property="message_type", type="string", enum={"text","image","video","audio","file"}),
+     *         @OA\Property(property="media", type="string", format="binary"),
+     *         @OA\Property(property="media_duration", type="integer", minimum=1)
+     *       )
+     *     )
+     *   ),
+     *   @OA\Response(response=201, description="Message created"),
+     *   @OA\Response(response=403, description="Not a member or muted"),
+     *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
+     * )
      */
     public function store(Request $request, int $groupId): JsonResponse
     {
@@ -154,6 +177,17 @@ class GroupMessageController extends Controller
 
     /**
      * Get messages for a group
+     *
+     * @OA\Get(
+     *   path="/groups/{groupId}/messages",
+     *   tags={"Groups"},
+     *   summary="Get group messages (paginated)",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="page", in="query", @OA\Schema(type="integer", minimum=1)),
+     *   @OA\Response(response=200, description="Messages returned"),
+     *   @OA\Response(response=403, description="Not a member")
+     * )
      */
     public function index(int $groupId): JsonResponse
     {
@@ -184,6 +218,16 @@ class GroupMessageController extends Controller
 
     /**
      * Mark message as read (idempotent)
+     *
+     * @OA\Post(
+     *   path="/group-messages/{messageId}/read",
+     *   tags={"Groups"},
+     *   summary="Mark group message as read",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Read status updated"),
+     *   @OA\Response(response=403, description="Not a member")
+     * )
      */
     public function markAsRead(int $messageId): JsonResponse
     {
@@ -217,6 +261,14 @@ class GroupMessageController extends Controller
 
     /**
      * Get unread message count across all user's groups
+     *
+     * @OA\Get(
+     *   path="/group-messages/unread-count",
+     *   tags={"Groups"},
+     *   summary="Get unread group message count",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="Unread count returned")
+     * )
      */
     public function unreadCount(): JsonResponse
     {

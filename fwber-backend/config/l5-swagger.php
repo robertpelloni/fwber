@@ -68,6 +68,7 @@ return [
                     base_path('app/Http/Controllers/Api/RelationshipTierController.php'),
                     base_path('app/Http/Controllers/Api/BlockController.php'),
                     base_path('app/Http/Controllers/Api/ReportController.php'),
+                    base_path('app/Http/Controllers/Api/GroupMessageController.php'),
                 ],
                 
                 /*
