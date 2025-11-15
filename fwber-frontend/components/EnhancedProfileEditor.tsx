@@ -632,7 +632,7 @@ function ToggleChip({
         selected
           ? 'bg-purple-600 border-purple-600 text-white'
           : 'bg-white border-gray-300 text-gray-700 hover:border-purple-600 hover:text-purple-600'
-      }`}
+      }`.replace(/'/g, "&apos;")}
     >
       {label}
     </button>

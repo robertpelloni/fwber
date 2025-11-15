@@ -203,3 +203,29 @@ export async function getProfileCompleteness(token: string): Promise<ProfileComp
   return response.json();
 }
 
+/**
+ * Generate a new AI avatar
+ */
+export async function generateAvatar(
+  token: string,
+  style: string,
+  prompt: string
+): Promise<{ url: string }> {
+  const response = await fetch(`${API_BASE_URL}/profile/avatar/generate`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify({ style, prompt }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Failed to generate avatar' }));
+    throw new Error(error.message || 'Failed to generate avatar');
+  }
+
+  return response.json();
+}
+

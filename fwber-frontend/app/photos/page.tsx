@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core'
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, rectSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import Image from 'next/image'
 import { usePhotos, usePhotoSettings } from '@/lib/api/photos'
 import PhotoUpload from '@/components/PhotoUpload'
 import { PhotoGallery } from '@/components/PhotoUpload'
@@ -97,18 +98,12 @@ function SortablePhotoItem({
                }}
                draggable={false}
              >
-               <img
+               <Image
                  src={photo.thumbnail_url || photo.url}
                  alt={`Photo ${index + 1}`}
-                 style={{ 
-                   width: '100%', 
-                   height: '100%', 
-                   objectFit: 'cover',
-                   display: 'block',
-                   borderRadius: '0.5rem',
-                   userSelect: 'none',
-                   pointerEvents: 'auto',
-                 } as React.CSSProperties}
+                 layout="fill"
+                 objectFit="cover"
+                 className="rounded-lg"
                  onClick={(e) => {
                    // Only open gallery if not dragging
                    if (!isDragging) {

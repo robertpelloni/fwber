@@ -3,6 +3,7 @@
 import { useAuth } from '@/lib/auth-context';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useQuery } from '@tanstack/react-query';
+import Image from 'next/image';
 import { Heart, Users, MessageSquare, TrendingUp, Clock, Zap, Award, Target } from 'lucide-react';
 import axios from 'axios';
 import Link from 'next/link';
@@ -91,7 +92,7 @@ export default function DashboardPage() {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 Dashboard
               </h2>
-              <p className="text-gray-600">Here's what's happening with your matches.</p>
+              <p className="text-gray-600">Here&apos;s what&apos;s happening with your matches.</p>
             </div>
 
             {/* Stats Grid */}
@@ -514,7 +515,7 @@ function ActivityItem({ activity }: { activity: RecentActivity }) {
     <div className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors">
       <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
         {activity.user.avatar_url ? (
-          <img src={activity.user.avatar_url} alt={activity.user.name} className="w-full h-full object-cover" />
+          <Image src={activity.user.avatar_url} alt={activity.user.name} width={48} height={48} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-xl">
             {icons[activity.type]}

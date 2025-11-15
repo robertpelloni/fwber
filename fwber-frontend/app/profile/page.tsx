@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { getUserProfile, updateUserProfile, getProfileCompleteness, type UserProfile, type ProfileUpdateData } from '@/lib/api/profile'
 import { usePhotos } from '@/lib/api/photos'
 import PhotoUpload from '@/components/PhotoUpload'
+import AvatarGenerationFlow from '@/components/AvatarGenerationFlow'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Camera, Star } from 'lucide-react'
 import { ProfileCompletenessBar, ProfileCompletenessChecklist, calculateProfileCompleteness, type ProfileField } from '@/lib/profileCompleteness'
@@ -394,6 +395,9 @@ export default function ProfilePage() {
 
         {/* Profile Form */}
         <div className="bg-white shadow rounded-lg">
+          <div className="p-6">
+            <AvatarGenerationFlow userId={user!.id} currentAvatarUrl={profile?.profile?.photos?.find(p => p.is_primary)?.url} />
+          </div>
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             {/* Photo Upload Section */}
             <Card id="photos">

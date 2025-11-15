@@ -120,7 +120,7 @@ export const useMercureSSE = (options: MercureSSEOptions) => {
     return () => {
       disconnect();
     };
-  }, [token, topicsKey, connect, disconnect]);
+  }, [token, topicsKey, connect, disconnect, topics.length]);
 
   return {
     isConnected,
