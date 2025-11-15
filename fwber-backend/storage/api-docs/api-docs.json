@@ -24,6 +24,83 @@
         }
     ],
     "paths": {
+        "/analytics": {
+            "get": {
+                "tags": [
+                    "Analytics"
+                ],
+                "summary": "Platform analytics overview",
+                "description": "Get comprehensive analytics data",
+                "operationId": "4aa6ce5a42da56132ee7d769968b58f7",
+                "parameters": [
+                    {
+                        "name": "range",
+                        "in": "query",
+                        "description": "Time range (1d, 7d, 30d, 90d)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "1d",
+                                "7d",
+                                "30d",
+                                "90d"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Analytics payload"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/analytics/realtime": {
+            "get": {
+                "tags": [
+                    "Analytics"
+                ],
+                "summary": "Real-time metrics",
+                "description": "Get real-time metrics",
+                "operationId": "437eac7ed995619e5b2aee7507b5dad6",
+                "responses": {
+                    "200": {
+                        "description": "Realtime metrics payload"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/analytics/moderation": {
+            "get": {
+                "tags": [
+                    "Analytics"
+                ],
+                "summary": "Moderation insights",
+                "description": "Get moderation insights",
+                "operationId": "b36fc3915d7b6699b24ec689b534109d",
+                "responses": {
+                    "200": {
+                        "description": "Moderation insights payload"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/groups": {
             "get": {
                 "tags": [
@@ -2561,6 +2638,538 @@
                 ]
             }
         },
+        "/chatrooms/{chatroomId}/messages": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "List chatroom messages",
+                "description": "Get messages for a chatroom",
+                "operationId": "588f1c047651a12787e42ea996d2bab3",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "pinned",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "announcements",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated messages"
+                    },
+                    "403": {
+                        "description": "Not a member"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Send message",
+                "description": "Send a message to a chatroom",
+                "operationId": "b6751d651bf867c8a0f05c304e996441",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "content"
+                                ],
+                                "properties": {
+                                    "content": {
+                                        "type": "string",
+                                        "maxLength": 2000
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "text",
+                                            "image",
+                                            "file",
+                                            "announcement"
+                                        ]
+                                    },
+                                    "parent_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "metadata": {
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "403": {
+                        "description": "Muted/Not member"
+                    },
+                    "422": {
+                        "description": "Moderation blocked"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/chatrooms/{chatroomId}/messages/{messageId}": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Get message",
+                "description": "Get a specific message",
+                "operationId": "84fe1a7091efda73beab178b60143e49",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message"
+                    },
+                    "403": {
+                        "description": "Not a member"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Edit message",
+                "description": "Edit a message",
+                "operationId": "b44a97f626f8cfbd104af3a9c3e52464",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "content"
+                                ],
+                                "properties": {
+                                    "content": {
+                                        "type": "string",
+                                        "maxLength": 2000
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Moderation blocked"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Delete message",
+                "description": "Delete a message",
+                "operationId": "afc27dbe902e46a1381897720b140140",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/chatrooms/{chatroomId}/messages/{messageId}/reactions": {
+            "post": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Add reaction",
+                "description": "Add reaction to a message",
+                "operationId": "9acc7ba8068ef70b8c8fe163a0289ce6",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "emoji"
+                                ],
+                                "properties": {
+                                    "emoji": {
+                                        "type": "string",
+                                        "maxLength": 10
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Added"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Remove reaction",
+                "description": "Remove reaction from a message",
+                "operationId": "a1a8e80eb555442ca4201b62ee475faa",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "emoji"
+                                ],
+                                "properties": {
+                                    "emoji": {
+                                        "type": "string",
+                                        "maxLength": 10
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Removed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/chatrooms/{chatroomId}/messages/{messageId}/pin": {
+            "post": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Pin message",
+                "description": "Pin a message (moderator only)",
+                "operationId": "5ddc7d60f194c4ee8ea4424a49a49053",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pinned"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Unpin message",
+                "description": "Unpin a message (moderator only)",
+                "operationId": "d297e4260c8b89db7aa6baa9065ab251",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Unpinned"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/chatrooms/{chatroomId}/messages/pinned": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Pinned messages",
+                "description": "Get pinned messages for a chatroom",
+                "operationId": "6ed1b9457030ad4c252854abb7e45d1a",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/chatrooms/{chatroomId}/messages/{messageId}/replies": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Message replies",
+                "description": "Get message replies",
+                "operationId": "5f175ef6c1876edf8e155f1aec767395",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/dashboard/stats": {
             "get": {
                 "tags": [
@@ -3453,6 +4062,327 @@
                 ]
             }
         },
+        "/moderation/dashboard": {
+            "get": {
+                "tags": [
+                    "Moderation"
+                ],
+                "summary": "Moderation dashboard overview",
+                "description": "Get moderation dashboard overview.",
+                "operationId": "9f09c1ce866c5ce8b3f19052e7be1b1d",
+                "responses": {
+                    "200": {
+                        "description": "Dashboard stats and recent actions"
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/moderation/flagged": {
+            "get": {
+                "tags": [
+                    "Moderation"
+                ],
+                "summary": "Flagged content queue",
+                "description": "Get flagged content for review.",
+                "operationId": "a943ff05019c4bbc71fce66108df85ab",
+                "responses": {
+                    "200": {
+                        "description": "Paginated flagged content"
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/moderation/flags/{artifactId}/review": {
+            "post": {
+                "tags": [
+                    "Moderation"
+                ],
+                "summary": "Review flagged content",
+                "description": "Review and take action on flagged content.",
+                "operationId": "77dcf7f0d9585bca47894d79c920a3f0",
+                "parameters": [
+                    {
+                        "name": "artifactId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "action",
+                                    "reason"
+                                ],
+                                "properties": {
+                                    "action": {
+                                        "type": "string",
+                                        "enum": [
+                                            "approve",
+                                            "remove",
+                                            "throttle_user",
+                                            "ban_user"
+                                        ]
+                                    },
+                                    "reason": {
+                                        "type": "string",
+                                        "maxLength": 500
+                                    },
+                                    "throttle_severity": {
+                                        "type": "integer",
+                                        "maximum": 5,
+                                        "minimum": 1
+                                    },
+                                    "throttle_duration_hours": {
+                                        "type": "integer",
+                                        "minimum": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Action completed"
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/moderation/spoof-detections": {
+            "get": {
+                "tags": [
+                    "Moderation"
+                ],
+                "summary": "Geo-spoof detections",
+                "description": "Get suspicious geo-spoof detections.",
+                "operationId": "26a735929d96f6ff6907d1b33060786c",
+                "responses": {
+                    "200": {
+                        "description": "Paginated detections"
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/moderation/spoof-detections/{detectionId}/review": {
+            "post": {
+                "tags": [
+                    "Moderation"
+                ],
+                "summary": "Review geo-spoof detection",
+                "description": "Review geo-spoof detection.",
+                "operationId": "da9a7797890724cb9aa3b24379a6dc5c",
+                "parameters": [
+                    {
+                        "name": "detectionId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "action",
+                                    "reason"
+                                ],
+                                "properties": {
+                                    "action": {
+                                        "type": "string",
+                                        "enum": [
+                                            "confirm",
+                                            "dismiss"
+                                        ]
+                                    },
+                                    "reason": {
+                                        "type": "string",
+                                        "maxLength": 500
+                                    },
+                                    "apply_throttle": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Review completed"
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/moderation/throttles": {
+            "get": {
+                "tags": [
+                    "Moderation"
+                ],
+                "summary": "Active shadow throttles",
+                "description": "Get active shadow throttles.",
+                "operationId": "96dcfcc44bed0bf88774666be70e8cb6",
+                "responses": {
+                    "200": {
+                        "description": "Paginated throttles"
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/moderation/throttles/{throttleId}": {
+            "delete": {
+                "tags": [
+                    "Moderation"
+                ],
+                "summary": "Remove shadow throttle",
+                "description": "Remove shadow throttle.",
+                "operationId": "0273ba6a9d5c2640a09487bdea575937",
+                "parameters": [
+                    {
+                        "name": "throttleId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Throttle removed"
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/moderation/actions": {
+            "get": {
+                "tags": [
+                    "Moderation"
+                ],
+                "summary": "Moderation action history",
+                "description": "Get moderation action history.",
+                "operationId": "acf34d225f04ef63c1bc4347a7a93ba7",
+                "responses": {
+                    "200": {
+                        "description": "Paginated actions"
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/moderation/users/{userId}": {
+            "get": {
+                "tags": [
+                    "Moderation"
+                ],
+                "summary": "User moderation profile",
+                "description": "Get user moderation profile.",
+                "operationId": "b2b79034ac2a24abc0f5ec0956a88dd5",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User moderation profile"
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/profile": {
             "get": {
                 "tags": [
@@ -3988,6 +4918,1150 @@
                     }
                 ]
             }
+        },
+        "/proximity-chatrooms/nearby": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Find nearby proximity chatrooms",
+                "description": "Find nearby proximity chatrooms",
+                "operationId": "089529d849e32b70a9f225f297de291b",
+                "parameters": [
+                    {
+                        "name": "latitude",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float",
+                            "maximum": 90,
+                            "minimum": -90
+                        }
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float",
+                            "maximum": 180,
+                            "minimum": -180
+                        }
+                    },
+                    {
+                        "name": "radius_meters",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 5000,
+                            "minimum": 50
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "conference",
+                                "event",
+                                "venue",
+                                "area",
+                                "temporary"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "venue_type",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Nearby rooms"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/proximity-chatrooms": {
+            "post": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Create proximity chatroom",
+                "description": "Create a proximity chatroom",
+                "operationId": "87d2bf8e9cf0a1cf2c28252e801e8c82",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "type",
+                                    "latitude",
+                                    "longitude"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 100
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maxLength": 500
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "conference",
+                                            "event",
+                                            "venue",
+                                            "area",
+                                            "temporary"
+                                        ]
+                                    },
+                                    "venue_name": {
+                                        "type": "string"
+                                    },
+                                    "venue_type": {
+                                        "type": "string"
+                                    },
+                                    "event_name": {
+                                        "type": "string"
+                                    },
+                                    "event_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "event_start_time": {
+                                        "type": "string",
+                                        "format": "time"
+                                    },
+                                    "event_end_time": {
+                                        "type": "string",
+                                        "format": "time"
+                                    },
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "float"
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "float"
+                                    },
+                                    "radius_meters": {
+                                        "type": "integer"
+                                    },
+                                    "city": {
+                                        "type": "string"
+                                    },
+                                    "neighborhood": {
+                                        "type": "string"
+                                    },
+                                    "address": {
+                                        "type": "string"
+                                    },
+                                    "tags": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "max_members": {
+                                        "type": "integer"
+                                    },
+                                    "requires_approval": {
+                                        "type": "boolean"
+                                    },
+                                    "expires_at": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/proximity-chatrooms/{id}": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Get proximity chatroom",
+                "description": "Get a specific proximity chatroom",
+                "operationId": "7d46497afccd7d318f797e9cc7068aba",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "latitude",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Chatroom"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/proximity-chatrooms/{id}/join": {
+            "post": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Join proximity chatroom",
+                "description": "Join a proximity chatroom",
+                "operationId": "f435d0fe9059f94a65b04f0b5b0bf855",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "latitude",
+                                    "longitude"
+                                ],
+                                "properties": {
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "float"
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "float"
+                                    },
+                                    "is_networking": {
+                                        "type": "boolean"
+                                    },
+                                    "is_social": {
+                                        "type": "boolean"
+                                    },
+                                    "professional_info": {
+                                        "type": "object"
+                                    },
+                                    "interests": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Joined"
+                    },
+                    "403": {
+                        "description": "Outside proximity/Banned/Full"
+                    },
+                    "400": {
+                        "description": "Already member"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/proximity-chatrooms/{id}/leave": {
+            "post": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Leave proximity chatroom",
+                "description": "Leave a proximity chatroom",
+                "operationId": "ec57b4c492bac88f5c2b7fa5e20857c0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Left"
+                    },
+                    "400": {
+                        "description": "Not a member"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/proximity-chatrooms/{id}/location": {
+            "post": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Update member location",
+                "description": "Update member location",
+                "operationId": "d3f9ffaa0d3c38ce650443ef19d45f05",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "latitude",
+                                    "longitude"
+                                ],
+                                "properties": {
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "float"
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "float"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/proximity-chatrooms/{id}/members": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Members",
+                "description": "Get proximity chatroom members",
+                "operationId": "0875720e539f6b54dbf08eb0a3b10fde",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "networking_only",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "social_only",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated members"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/proximity-chatrooms/{id}/networking": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Nearby networking members",
+                "description": "Get nearby networking members",
+                "operationId": "bd40c200d39180e43e5f207597ce6a9d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "latitude",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "radius_meters",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Members within radius"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/proximity-chatrooms/{id}/analytics": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Analytics (moderators)",
+                "description": "Get proximity chatroom analytics",
+                "operationId": "facb9984e3ea80d363cc46f0be9246b9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Analytics data"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/proximity-chatrooms/{chatroomId}/messages": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "List proximity chatroom messages",
+                "description": "Get messages for a proximity chatroom",
+                "operationId": "a004d6457f7663258d0f419e72737000",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "networking_only",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "social_only",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "pinned",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "announcements",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated messages"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Send proximity message",
+                "description": "Send a message to a proximity chatroom",
+                "operationId": "eb213a01ebcbd580af5c68d83a482131",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "content"
+                                ],
+                                "properties": {
+                                    "content": {
+                                        "type": "string",
+                                        "maxLength": 2000
+                                    },
+                                    "message_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "text",
+                                            "image",
+                                            "file",
+                                            "announcement"
+                                        ]
+                                    },
+                                    "parent_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "is_networking": {
+                                        "type": "boolean"
+                                    },
+                                    "is_social": {
+                                        "type": "boolean"
+                                    },
+                                    "metadata": {
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "403": {
+                        "description": "Muted/Not member"
+                    },
+                    "422": {
+                        "description": "Moderation blocked"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/proximity-chatrooms/{chatroomId}/messages/{messageId}": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Get proximity message",
+                "description": "Get a specific message",
+                "operationId": "7406b2e140776d2657270c25d472bc65",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Edit proximity message",
+                "description": "Edit a message",
+                "operationId": "97330cf999ecec7c595ef583302b19f5",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "content"
+                                ],
+                                "properties": {
+                                    "content": {
+                                        "type": "string",
+                                        "maxLength": 2000
+                                    },
+                                    "is_networking": {
+                                        "type": "boolean"
+                                    },
+                                    "is_social": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Moderation blocked"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Delete proximity message",
+                "description": "Delete a message",
+                "operationId": "550f7a9b4e66c9263896871f469463be",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/proximity-chatrooms/{chatroomId}/messages/{messageId}/reactions": {
+            "post": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Add reaction (proximity)",
+                "description": "Add reaction to a message",
+                "operationId": "6fc6908e60c921c22159af75f6b31480",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "emoji"
+                                ],
+                                "properties": {
+                                    "emoji": {
+                                        "type": "string",
+                                        "maxLength": 10
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Added"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Remove reaction (proximity)",
+                "description": "Remove reaction from a message",
+                "operationId": "d9e79008d0a8c36ddb9179b696e1171e",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "emoji"
+                                ],
+                                "properties": {
+                                    "emoji": {
+                                        "type": "string",
+                                        "maxLength": 10
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Removed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/proximity-chatrooms/{chatroomId}/messages/{messageId}/pin": {
+            "post": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Pin proximity message",
+                "description": "Pin a message (moderator only)",
+                "operationId": "bdd81eabfbdb729e718fb76daf3358ff",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pinned"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Unpin proximity message",
+                "description": "Unpin a message (moderator only)",
+                "operationId": "0610818f900611b904f4830234dbe3d4",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Unpinned"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/proximity-chatrooms/{chatroomId}/messages/pinned": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Pinned proximity messages",
+                "description": "Get pinned messages for a proximity chatroom",
+                "operationId": "0d5e9c1728a1a550b65a77e2bfb858f3",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/proximity-chatrooms/{chatroomId}/messages/{messageId}/replies": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Proximity message replies",
+                "description": "Get message replies",
+                "operationId": "7bd237690710dc2b34f90be7ed3440da",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/proximity-chatrooms/{chatroomId}/messages/networking": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Networking messages",
+                "description": "Get networking messages",
+                "operationId": "73a00d0693f3217ba23eec89c6a4b6e8",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated messages"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/proximity-chatrooms/{chatroomId}/messages/social": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Social messages",
+                "description": "Get social messages",
+                "operationId": "9484ebb9fdf326f1a669305f0f3a2ea3",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated messages"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -4102,6 +6176,14 @@
         {
             "name": "Health",
             "description": "System health and monitoring endpoints"
+        },
+        {
+            "name": "Analytics",
+            "description": "Platform analytics, trends, and real-time metrics"
+        },
+        {
+            "name": "Moderation",
+            "description": "Moderator tools for reviewing content and enforcing policy"
         },
         {
             "name": "Location",

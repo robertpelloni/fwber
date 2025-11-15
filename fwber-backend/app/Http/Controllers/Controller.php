@@ -89,6 +89,16 @@ namespace App\Http\Controllers;
  *     name="Health",
  *     description="System health and monitoring endpoints"
  * )
+ * 
+ * @OA\Tag(
+ *     name="Analytics",
+ *     description="Platform analytics, trends, and real-time metrics"
+ * )
+ * 
+ * @OA\Tag(
+ *     name="Moderation",
+ *     description="Moderator tools for reviewing content and enforcing policy"
+ * )
  */
 abstract class Controller
 {

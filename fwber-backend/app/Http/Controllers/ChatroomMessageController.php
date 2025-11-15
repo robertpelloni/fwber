@@ -26,6 +26,20 @@ class ChatroomMessageController extends Controller
 
     /**
      * Get messages for a chatroom
+     *
+     * @OA\Get(
+     *   path="/chatrooms/{chatroomId}/messages",
+     *   tags={"Chatrooms"},
+     *   summary="List chatroom messages",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="type", in="query", required=false, @OA\Schema(type="string")),
+     *   @OA\Parameter(name="user_id", in="query", required=false, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="pinned", in="query", required=false, @OA\Schema(type="boolean")),
+     *   @OA\Parameter(name="announcements", in="query", required=false, @OA\Schema(type="boolean")),
+     *   @OA\Response(response=200, description="Paginated messages"),
+     *   @OA\Response(response=403, description="Not a member")
+     * )
      */
     public function index(Request $request, int $chatroomId): JsonResponse
     {
@@ -66,6 +80,24 @@ class ChatroomMessageController extends Controller
 
     /**
      * Send a message to a chatroom
+     *
+     * @OA\Post(
+     *   path="/chatrooms/{chatroomId}/messages",
+     *   tags={"Chatrooms"},
+     *   summary="Send message",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(required=true, @OA\JsonContent(
+     *     required={"content"},
+     *     @OA\Property(property="content", type="string", maxLength=2000),
+     *     @OA\Property(property="type", type="string", enum={"text","image","file","announcement"}),
+     *     @OA\Property(property="parent_id", type="integer", nullable=true),
+     *     @OA\Property(property="metadata", type="object")
+     *   )),
+     *   @OA\Response(response=201, description="Created"),
+     *   @OA\Response(response=403, description="Muted/Not member"),
+     *   @OA\Response(response=422, description="Moderation blocked")
+     * )
      */
     public function store(Request $request, int $chatroomId): JsonResponse
     {
@@ -161,6 +193,18 @@ class ChatroomMessageController extends Controller
 
     /**
      * Get a specific message
+     *
+     * @OA\Get(
+     *   path="/chatrooms/{chatroomId}/messages/{messageId}",
+     *   tags={"Chatrooms"},
+     *   summary="Get message",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Message"),
+     *   @OA\Response(response=403, description="Not a member"),
+     *   @OA\Response(response=404, description="Not found")
+     * )
      */
     public function show(int $chatroomId, int $messageId): JsonResponse
     {
@@ -179,6 +223,22 @@ class ChatroomMessageController extends Controller
 
     /**
      * Edit a message
+     *
+     * @OA\Put(
+     *   path="/chatrooms/{chatroomId}/messages/{messageId}",
+     *   tags={"Chatrooms"},
+     *   summary="Edit message",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(required=true, @OA\JsonContent(
+     *     required={"content"},
+     *     @OA\Property(property="content", type="string", maxLength=2000)
+     *   )),
+     *   @OA\Response(response=200, description="Updated"),
+     *   @OA\Response(response=403, description="Forbidden"),
+     *   @OA\Response(response=422, description="Moderation blocked")
+     * )
      */
     public function update(Request $request, int $chatroomId, int $messageId): JsonResponse
     {
@@ -227,6 +287,17 @@ class ChatroomMessageController extends Controller
 
     /**
      * Delete a message
+     *
+     * @OA\Delete(
+     *   path="/chatrooms/{chatroomId}/messages/{messageId}",
+     *   tags={"Chatrooms"},
+     *   summary="Delete message",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Deleted"),
+     *   @OA\Response(response=403, description="Forbidden")
+     * )
      */
     public function destroy(int $chatroomId, int $messageId): JsonResponse
     {
@@ -256,6 +327,20 @@ class ChatroomMessageController extends Controller
 
     /**
      * Add reaction to a message
+     *
+     * @OA\Post(
+     *   path="/chatrooms/{chatroomId}/messages/{messageId}/reactions",
+     *   tags={"Chatrooms"},
+     *   summary="Add reaction",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(required=true, @OA\JsonContent(
+     *     required={"emoji"},
+     *     @OA\Property(property="emoji", type="string", maxLength=10)
+     *   )),
+     *   @OA\Response(response=200, description="Added")
+     * )
      */
     public function addReaction(Request $request, int $chatroomId, int $messageId): JsonResponse
     {
@@ -278,6 +363,20 @@ class ChatroomMessageController extends Controller
 
     /**
      * Remove reaction from a message
+     *
+     * @OA\Delete(
+     *   path="/chatrooms/{chatroomId}/messages/{messageId}/reactions",
+     *   tags={"Chatrooms"},
+     *   summary="Remove reaction",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(required=true, @OA\JsonContent(
+     *     required={"emoji"},
+     *     @OA\Property(property="emoji", type="string", maxLength=10)
+     *   )),
+     *   @OA\Response(response=200, description="Removed")
+     * )
      */
     public function removeReaction(Request $request, int $chatroomId, int $messageId): JsonResponse
     {
@@ -300,6 +399,16 @@ class ChatroomMessageController extends Controller
 
     /**
      * Pin a message (moderator only)
+     *
+     * @OA\Post(
+     *   path="/chatrooms/{chatroomId}/messages/{messageId}/pin",
+     *   tags={"Chatrooms"},
+     *   summary="Pin message",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Pinned")
+     * )
      */
     public function pin(int $chatroomId, int $messageId): JsonResponse
     {
@@ -317,6 +426,16 @@ class ChatroomMessageController extends Controller
 
     /**
      * Unpin a message (moderator only)
+     *
+     * @OA\Delete(
+     *   path="/chatrooms/{chatroomId}/messages/{messageId}/pin",
+     *   tags={"Chatrooms"},
+     *   summary="Unpin message",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Unpinned")
+     * )
      */
     public function unpin(int $chatroomId, int $messageId): JsonResponse
     {
@@ -334,6 +453,15 @@ class ChatroomMessageController extends Controller
 
     /**
      * Get pinned messages for a chatroom
+     *
+     * @OA\Get(
+     *   path="/chatrooms/{chatroomId}/messages/pinned",
+     *   tags={"Chatrooms"},
+     *   summary="Pinned messages",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="List")
+     * )
      */
     public function pinned(int $chatroomId): JsonResponse
     {
@@ -354,6 +482,16 @@ class ChatroomMessageController extends Controller
 
     /**
      * Get message replies
+     *
+     * @OA\Get(
+     *   path="/chatrooms/{chatroomId}/messages/{messageId}/replies",
+     *   tags={"Chatrooms"},
+     *   summary="Message replies",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="List")
+     * )
      */
     public function replies(int $chatroomId, int $messageId): JsonResponse
     {
