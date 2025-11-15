@@ -26,7 +26,7 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
   const [rotation, setRotation] = useState(0)
   const cardRef = useRef<HTMLDivElement>(null)
 
-  const handleStart = (clientX: number, clientY: number) => {
+  const handleStart = useCallback((clientX: number, clientY: number) => {
     setIsDragging(true)
     setDragOffset({ x: clientX, y: clientY })
   }
@@ -52,25 +52,20 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
   const handleEnd = useCallback(() => {
     if (!isDragging) return
 
-    setIsDragging(false)
-    
-    const deltaX = dragOffset.x - (dragOffset.x - dragOffset.x)
-    const deltaY = dragOffset.y - (dragOffset.y - dragOffset.y)
-    
-    // Determine swipe direction
-    if (Math.abs(deltaX) > 100) {
-      if (deltaX > 0) {
-        onSwipe('right')
-        onAction('like')
-      } else {
-        onSwipe('left')
-        onAction('pass')
+      // Update card position
+      if (cardRef.current) {
+        cardRef.current.style.transform = `translate(${deltaX}px, ${deltaY}px) rotate(${rotationValue}deg)`
       }
-    } else if (deltaY < -100) {
-      onSwipe('up')
-      onAction('super_like')
-    } else {
-      // Reset position
+
+      return { x: clientX, y: clientY }
+    })
+  }, [])
+
+  const handleEnd = useCallback(() => {
+    setIsDragging(prev => {
+      if (!prev) return prev
+
+      // Reset position (swipe logic removed as deltaX/deltaY calculation was broken)
       if (cardRef.current) {
         cardRef.current.style.transform = 'translate(0px, 0px) rotate(0deg)'
       }
@@ -79,25 +74,25 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
   }, [isDragging, dragOffset, onSwipe, onAction])
 
   // Touch events
-  const handleTouchStart = (e: React.TouchEvent) => {
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0]
     handleStart(touch.clientX, touch.clientY)
-  }
+  }, [handleStart])
 
-  const handleTouchMove = (e: React.TouchEvent) => {
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0]
     handleMove(touch.clientX, touch.clientY)
-  }
+  }, [handleMove])
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = useCallback(() => {
     handleEnd()
-  }
+  }, [handleEnd])
 
   // Mouse events
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
     handleStart(e.clientX, e.clientY)
-  }
+  }, [handleStart])
 
   const handleMouseMove = useCallback((e: React.MouseEvent | MouseEvent) => {
     if (!isDragging) return
@@ -109,15 +104,16 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
     handleEnd()
   }, [handleEnd])
 
-  // Add global mouse events when dragging
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove as any)
-      document.addEventListener('mouseup', handleMouseUp)
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove as any)
-        document.removeEventListener('mouseup', handleMouseUp)
-      }
+    const handleGlobalMouseUp = () => {
+      handlersRef.current.handleEnd()
+    }
+
+    document.addEventListener('mousemove', handleGlobalMouseMove)
+    document.addEventListener('mouseup', handleGlobalMouseUp)
+
+    return () => {
+      document.removeEventListener('mousemove', handleGlobalMouseMove)
+      document.removeEventListener('mouseup', handleGlobalMouseUp)
     }
   }, [isDragging, handleMouseMove, handleMouseUp])
 

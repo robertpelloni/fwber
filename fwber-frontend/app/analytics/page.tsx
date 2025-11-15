@@ -60,7 +60,7 @@ export default function AnalyticsPage() {
           'Authorization': `Bearer ${token}`,
         },
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setAnalytics(data);

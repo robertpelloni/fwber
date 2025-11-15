@@ -44,12 +44,12 @@ export function useLocation(options: UseLocationOptions = {}): UseLocationReturn
     watch = false,
   } = options;
 
-  const handleSuccess = (position: GeolocationPosition) => {
+  const handleSuccess = useCallback((position: GeolocationPosition) => {
     const coords = {
       latitude: position.coords.latitude,
       longitude: position.coords.longitude,
     };
-    
+
     setLocation({
       ...coords,
       accuracy: position.coords.accuracy,
@@ -60,24 +60,24 @@ export function useLocation(options: UseLocationOptions = {}): UseLocationReturn
     });
     setError(null);
     setLoading(false);
-    
-    logLocation.permissionGranted(coords);
-  };
 
-  const handleError = (err: GeolocationPositionError) => {
+    logLocation.permissionGranted(coords);
+  }, []);
+
+  const handleError = useCallback((err: GeolocationPositionError) => {
     const error = {
       code: err.code,
       message: err.message,
     };
-    
+
     setError(error);
     setLocation(null);
     setLoading(false);
-    
-    logLocation.permissionDenied(error);
-  };
 
-  const refetch = () => {
+    logLocation.permissionDenied(error);
+  }, []);
+
+  const refetch = useCallback(() => {
     setLoading(true);
     setError(null);
 
@@ -110,12 +110,11 @@ export function useLocation(options: UseLocationOptions = {}): UseLocationReturn
         geoOptions
       );
     }
-  };
+  }, [enableHighAccuracy, timeout, maximumAge, watch, handleSuccess, handleError]);
 
   useEffect(() => {
     refetch();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enableHighAccuracy, timeout, maximumAge, watch]);
+  }, [refetch]);
 
   return { location, error, loading, refetch };
 }
