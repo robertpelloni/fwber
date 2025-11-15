@@ -70,6 +70,10 @@ return [
                     base_path('app/Http/Controllers/Api/ReportController.php'),
                     base_path('app/Http/Controllers/Api/GroupMessageController.php'),
                     base_path('app/Http/Controllers/RecommendationController.php'),
+                    base_path('app/Http/Controllers/WebSocketController.php'),
+                    base_path('app/Http/Controllers/MercureAuthController.php'),
+                    base_path('app/Http/Controllers/ContentGenerationController.php'),
+                    base_path('app/Http/Controllers/RateLimitController.php'),
                 ],
                 
                 /*

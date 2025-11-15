@@ -3671,6 +3671,516 @@
                 ]
             }
         },
+        "/content-generation/profile": {
+            "post": {
+                "tags": [
+                    "Content Generation"
+                ],
+                "summary": "Generate profile content",
+                "description": "AI-generated profile bio, about section, and interests based on user preferences",
+                "operationId": "3076ebc75f434e8f60da132c70ce2cd7",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "personality": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Outgoing and adventurous"
+                                    },
+                                    "interests": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "goals": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "example": "Looking for meaningful connections"
+                                    },
+                                    "style": {
+                                        "type": "string",
+                                        "enum": [
+                                            "casual",
+                                            "professional",
+                                            "humorous",
+                                            "romantic"
+                                        ],
+                                        "example": "casual"
+                                    },
+                                    "target_audience": {
+                                        "type": "string",
+                                        "example": "25-35 year olds"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profile content generated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "user_id": {
+                                            "type": "integer"
+                                        },
+                                        "generated_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/content-generation/posts/{boardId}/suggestions": {
+            "post": {
+                "tags": [
+                    "Content Generation"
+                ],
+                "summary": "Generate post suggestions",
+                "description": "AI-generated post ideas for a bulletin board based on context",
+                "operationId": "5c7e7ba0fb924292e0cb35d235c7ca1f",
+                "parameters": [
+                    {
+                        "name": "boardId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "context": {
+                                        "properties": {
+                                            "location": {
+                                                "type": "object"
+                                            },
+                                            "time": {
+                                                "type": "string"
+                                            },
+                                            "topics": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Post suggestions generated"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "404": {
+                        "description": "Bulletin board not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/content-generation/conversation-starters": {
+            "post": {
+                "tags": [
+                    "Content Generation"
+                ],
+                "summary": "Generate conversation starters",
+                "description": "AI-generated conversation openers based on context and match data",
+                "operationId": "e7a467147966ee751880922fb56cc2bc",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "context": {
+                                        "properties": {
+                                            "type": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "general",
+                                                    "romantic",
+                                                    "casual",
+                                                    "professional"
+                                                ]
+                                            },
+                                            "target_user": {
+                                                "type": "object"
+                                            },
+                                            "previous_messages": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "hints": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Conversation starters generated"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/content-generation/optimize": {
+            "post": {
+                "tags": [
+                    "Content Generation"
+                ],
+                "summary": "Optimize content",
+                "description": "AI-powered content optimization for engagement, clarity, safety, and relevance",
+                "operationId": "4812898876a2008c0d72957d4ba78f4c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "content"
+                                ],
+                                "properties": {
+                                    "content": {
+                                        "type": "string",
+                                        "maxLength": 2000,
+                                        "example": "Original content to optimize"
+                                    },
+                                    "context": {
+                                        "type": "object"
+                                    },
+                                    "optimization_types": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "enum": [
+                                                "engagement",
+                                                "clarity",
+                                                "safety",
+                                                "relevance"
+                                            ]
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Content optimized"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/content-generation/stats": {
+            "get": {
+                "tags": [
+                    "Content Generation"
+                ],
+                "summary": "Get generation statistics",
+                "description": "Retrieve statistics about AI content generation usage and performance",
+                "operationId": "21b2f3a040ba5c63ee1a8428b37d7df3",
+                "responses": {
+                    "200": {
+                        "description": "Generation statistics",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "total_generations": {
+                                                    "type": "integer"
+                                                },
+                                                "successful_generations": {
+                                                    "type": "integer"
+                                                },
+                                                "failed_generations": {
+                                                    "type": "integer"
+                                                },
+                                                "average_generation_time": {
+                                                    "type": "number"
+                                                },
+                                                "most_popular_types": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "user_satisfaction": {
+                                                    "type": "number"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/content-generation/optimization-stats": {
+            "get": {
+                "tags": [
+                    "Content Generation"
+                ],
+                "summary": "Get optimization statistics",
+                "description": "Retrieve statistics about content optimization usage and improvements",
+                "operationId": "b96de608df98647d17062569000a8e3d",
+                "responses": {
+                    "200": {
+                        "description": "Optimization statistics"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/content-generation/feedback": {
+            "post": {
+                "tags": [
+                    "Content Generation"
+                ],
+                "summary": "Submit content feedback",
+                "description": "Provide feedback on AI-generated content to improve future suggestions",
+                "operationId": "16d8c9403e1a2c7a6506a3ac6d45130a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "suggestion_id",
+                                    "content_type",
+                                    "rating"
+                                ],
+                                "properties": {
+                                    "suggestion_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "content_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "profile",
+                                            "post_suggestion",
+                                            "conversation_starter"
+                                        ]
+                                    },
+                                    "rating": {
+                                        "type": "integer",
+                                        "maximum": 5,
+                                        "minimum": 1,
+                                        "example": 4
+                                    },
+                                    "feedback": {
+                                        "type": "string",
+                                        "maxLength": 1000
+                                    },
+                                    "improvements": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Feedback submitted"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/content-generation/history": {
+            "get": {
+                "tags": [
+                    "Content Generation"
+                ],
+                "summary": "Get generation history",
+                "description": "Retrieve user's AI content generation history with pagination",
+                "operationId": "16e1ea75fc0f6c89cd2651aae77afd15",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 10,
+                            "maximum": 100
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Generation history retrieved"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/content-generation/content/{contentId}": {
+            "delete": {
+                "tags": [
+                    "Content Generation"
+                ],
+                "summary": "Delete generated content",
+                "description": "Remove AI-generated content from history",
+                "operationId": "facb1bfc3c6725e324525a7fe1051447",
+                "parameters": [
+                    {
+                        "name": "contentId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Content deleted successfully"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/dashboard/stats": {
             "get": {
                 "tags": [
@@ -4554,6 +5064,99 @@
                                 }
                             }
                         }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/mercure/cookie": {
+            "get": {
+                "tags": [
+                    "Mercure"
+                ],
+                "summary": "Get Mercure authorization cookie",
+                "description": "Set an authorization cookie for subscribing to Mercure SSE topics",
+                "operationId": "327f917a4e07331dfe360fa58fac5acb",
+                "responses": {
+                    "200": {
+                        "description": "Authorization cookie set",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "topics": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "expires_in": {
+                                            "type": "integer",
+                                            "example": 3600
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/mercure/status": {
+            "get": {
+                "tags": [
+                    "Mercure"
+                ],
+                "summary": "Get Mercure authorization status",
+                "description": "Check current Mercure authorization status and available topics",
+                "operationId": "86b0e48ced25aebcb00d3c951d341eec",
+                "responses": {
+                    "200": {
+                        "description": "Authorization status",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "authorized": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "user_id": {
+                                            "type": "integer"
+                                        },
+                                        "topics": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "mercure_url": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
                     }
                 },
                 "security": [
@@ -7165,6 +7768,261 @@
                 ]
             }
         },
+        "/rate-limits/status/{action}": {
+            "get": {
+                "tags": [
+                    "Rate Limiting"
+                ],
+                "summary": "Get rate limit status",
+                "description": "Check current rate limit status for a specific action",
+                "operationId": "9d8d5017221f7280015be0bcf81655c3",
+                "parameters": [
+                    {
+                        "name": "action",
+                        "in": "path",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "api_call"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rate limit status",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "action": {
+                                            "type": "string"
+                                        },
+                                        "status": {
+                                            "type": "object"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/rate-limits/all-status": {
+            "get": {
+                "tags": [
+                    "Rate Limiting"
+                ],
+                "summary": "Get all rate limit statuses",
+                "description": "Check rate limit status for all tracked actions",
+                "operationId": "801a932dc41a1d8cbf7f0e188e893a32",
+                "responses": {
+                    "200": {
+                        "description": "All rate limit statuses",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user_id": {
+                                            "type": "integer"
+                                        },
+                                        "statuses": {
+                                            "type": "object"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/rate-limits/reset/{action}": {
+            "post": {
+                "tags": [
+                    "Rate Limiting"
+                ],
+                "summary": "Reset rate limit",
+                "description": "Reset rate limit for a specific action (admin only)",
+                "operationId": "6e8a77a05e9d4560c852508a10389364",
+                "parameters": [
+                    {
+                        "name": "action",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rate limit reset"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden - Admin only"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/rate-limits/stats/{timeframe}": {
+            "get": {
+                "tags": [
+                    "Rate Limiting"
+                ],
+                "summary": "Get rate limit statistics",
+                "description": "Retrieve rate limiting statistics for a timeframe (admin only)",
+                "operationId": "adf57e6d812d2dda995c7cabc2e6b191",
+                "parameters": [
+                    {
+                        "name": "timeframe",
+                        "in": "path",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "1h",
+                            "example": "1h"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rate limit statistics"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden - Admin only"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/rate-limits/suspicious-activity": {
+            "get": {
+                "tags": [
+                    "Rate Limiting"
+                ],
+                "summary": "Check suspicious activity",
+                "description": "Detect suspicious rate limit patterns for the authenticated user",
+                "operationId": "ebdf3b612a092560a71e869953bc75b2",
+                "responses": {
+                    "200": {
+                        "description": "Suspicious activity check",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user_id": {
+                                            "type": "integer"
+                                        },
+                                        "suspicious_activity": {
+                                            "type": "object"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/rate-limits/cleanup": {
+            "post": {
+                "tags": [
+                    "Rate Limiting"
+                ],
+                "summary": "Clean up expired entries",
+                "description": "Remove expired rate limit entries from storage (admin only)",
+                "operationId": "e04b8539cba71a63f1e60c51e865294c",
+                "responses": {
+                    "200": {
+                        "description": "Cleanup completed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "cleaned_entries": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden - Admin only"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/recommendations": {
             "get": {
                 "tags": [
@@ -7760,6 +8618,361 @@
                     }
                 ]
             }
+        },
+        "/websocket/connect": {
+            "post": {
+                "tags": [
+                    "WebSocket"
+                ],
+                "summary": "Connect to WebSocket",
+                "description": "Establish a WebSocket connection for real-time communication",
+                "operationId": "0d66527c18011bd4e00288f75a3d4378",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "connection_data": {
+                                        "properties": {
+                                            "user_agent": {
+                                                "type": "string",
+                                                "example": "Mozilla/5.0..."
+                                            },
+                                            "ip_address": {
+                                                "type": "string",
+                                                "example": "192.168.1.1"
+                                            },
+                                            "device_type": {
+                                                "type": "string",
+                                                "example": "mobile"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Connection established",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "connection_id": {
+                                            "type": "string"
+                                        },
+                                        "user_id": {
+                                            "type": "integer"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/websocket/disconnect": {
+            "post": {
+                "tags": [
+                    "WebSocket"
+                ],
+                "summary": "Disconnect from WebSocket",
+                "description": "Close an active WebSocket connection",
+                "operationId": "9d04e17dd01d202f00bc037dd0955a2b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "connection_id"
+                                ],
+                                "properties": {
+                                    "connection_id": {
+                                        "type": "string",
+                                        "example": "conn_abc123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Disconnected successfully"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/websocket/message": {
+            "post": {
+                "tags": [
+                    "WebSocket"
+                ],
+                "summary": "Send WebSocket message",
+                "description": "Send a real-time message to another user",
+                "operationId": "17c380294321f7b91c1528b181b17564",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "recipient_id",
+                                    "message"
+                                ],
+                                "properties": {
+                                    "recipient_id": {
+                                        "type": "string",
+                                        "example": "user_123"
+                                    },
+                                    "message": {
+                                        "required": [
+                                            "type",
+                                            "content"
+                                        ],
+                                        "properties": {
+                                            "type": {
+                                                "type": "string",
+                                                "example": "text"
+                                            },
+                                            "content": {
+                                                "type": "string",
+                                                "example": "Hello there!"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Message sent successfully"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/websocket/typing": {
+            "post": {
+                "tags": [
+                    "WebSocket"
+                ],
+                "summary": "Send typing indicator",
+                "description": "Notify another user that you are typing",
+                "operationId": "a8cfb6797ad5cc484122441c158437e7",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "recipient_id",
+                                    "is_typing"
+                                ],
+                                "properties": {
+                                    "recipient_id": {
+                                        "type": "string",
+                                        "example": "user_123"
+                                    },
+                                    "is_typing": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Typing indicator sent"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/websocket/presence": {
+            "post": {
+                "tags": [
+                    "WebSocket"
+                ],
+                "summary": "Update presence status",
+                "description": "Update your online/away/busy/offline status",
+                "operationId": "e2f867a414ff6a30c94b8273ef2de832",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "online",
+                                            "away",
+                                            "busy",
+                                            "offline"
+                                        ],
+                                        "example": "online"
+                                    },
+                                    "metadata": {
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Presence updated successfully"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/websocket/notification": {
+            "post": {
+                "tags": [
+                    "WebSocket"
+                ],
+                "summary": "Send real-time notification",
+                "description": "Send a push notification to another user via WebSocket",
+                "operationId": "7f112ac3c4b9cc65ecf3138bb221378c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "recipient_id",
+                                    "notification"
+                                ],
+                                "properties": {
+                                    "recipient_id": {
+                                        "type": "string",
+                                        "example": "user_123"
+                                    },
+                                    "notification": {
+                                        "required": [
+                                            "title",
+                                            "body"
+                                        ],
+                                        "properties": {
+                                            "title": {
+                                                "type": "string",
+                                                "example": "New Match!"
+                                            },
+                                            "body": {
+                                                "type": "string",
+                                                "example": "You have a new match nearby"
+                                            },
+                                            "type": {
+                                                "type": "string",
+                                                "example": "match"
+                                            },
+                                            "data": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Notification sent successfully"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -8102,6 +9315,22 @@
         {
             "name": "Recommendations",
             "description": "AI-powered personalized recommendations"
+        },
+        {
+            "name": "WebSocket",
+            "description": "Real-time bidirectional communication"
+        },
+        {
+            "name": "Mercure",
+            "description": "Server-Sent Events (SSE) for real-time updates"
+        },
+        {
+            "name": "Content Generation",
+            "description": "AI-powered content creation and optimization"
+        },
+        {
+            "name": "Rate Limiting",
+            "description": "Rate limit management and monitoring"
         },
         {
             "name": "Location",

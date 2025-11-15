@@ -124,6 +124,26 @@ namespace App\Http\Controllers;
  *     name="Recommendations",
  *     description="AI-powered personalized recommendations"
  * )
+ * 
+ * @OA\Tag(
+ *     name="WebSocket",
+ *     description="Real-time bidirectional communication"
+ * )
+ * 
+ * @OA\Tag(
+ *     name="Mercure",
+ *     description="Server-Sent Events (SSE) for real-time updates"
+ * )
+ * 
+ * @OA\Tag(
+ *     name="Content Generation",
+ *     description="AI-powered content creation and optimization"
+ * )
+ * 
+ * @OA\Tag(
+ *     name="Rate Limiting",
+ *     description="Rate limit management and monitoring"
+ * )
  */
 abstract class Controller
 {
