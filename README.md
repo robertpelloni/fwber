@@ -233,6 +233,21 @@ fwber-frontend/
 
 ## Development
 
+### Agents & development workflow
+
+To keep AI assistants aligned and shipping the MVP first, see:
+
+- Agents quick launcher: [`README-agents.md`](README-agents.md)
+- Repository standards & guardrails: [`AGENTS.md`](AGENTS.md)
+- Copilot project instructions: [`copilot-instructions.md`](copilot-instructions.md)
+- Claude model guide: [`docs/ai-models/CLAUDE.md`](docs/ai-models/CLAUDE.md)
+- Feature flags reference: [`docs/FEATURE_FLAGS.md`](docs/FEATURE_FLAGS.md)
+
+Key principles:
+- Keep non‑MVP features behind feature flags (404 when disabled).
+- Make small, targeted, reversible patches.
+- Validate routes (`php artisan route:list`) and regenerate OpenAPI docs (`php artisan l5-swagger:generate`) for API changes.
+
 ### Running Tests
 
 **Backend:**
