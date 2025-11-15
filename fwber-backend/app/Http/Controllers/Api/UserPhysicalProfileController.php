@@ -75,7 +75,7 @@ class UserPhysicalProfileController extends Controller
      *       @OA\Property(property="data", type="object")
      *     )
      *   ),
-     *   @OA\Response(response=422, description="Validation error"),
+    *   @OA\Response(response=422, ref="#/components/responses/ValidationError"),
      *   @OA\Response(response=401, description="Unauthenticated")
      * )
      */
@@ -119,8 +119,8 @@ class UserPhysicalProfileController extends Controller
      *         @OA\Property(property="avatar_status", type="string", example="requested")
      *       )
      *     )
-     *   ),
-     *   @OA\Response(response=422, description="Set avatar_prompt first"),
+    *   ),
+    *   @OA\Response(response=422, ref="#/components/responses/ValidationError"),
      *   @OA\Response(response=401, description="Unauthenticated")
      * )
      */

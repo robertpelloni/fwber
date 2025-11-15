@@ -87,8 +87,8 @@ class ReportController extends Controller
      *       @OA\Property(property="resolution_notes", type="string", maxLength=5000)
      *     )
      *   ),
-     *   @OA\Response(response=200, description="Report updated"),
-     *   @OA\Response(response=403, description="Forbidden")
+    *   @OA\Response(response=200, description="Report updated"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function update(Request $request, int $reportId)

@@ -107,7 +107,7 @@ class ProximityChatroomMessageController extends Controller
      *   )),
     *   @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/ChatMessage")),
     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-     *   @OA\Response(response=422, description="Moderation blocked")
+     *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function store(Request $request, int $chatroomId): JsonResponse
@@ -235,7 +235,7 @@ class ProximityChatroomMessageController extends Controller
      *   )),
     *   @OA\Response(response=200, description="Updated", @OA\JsonContent(ref="#/components/schemas/ChatMessage")),
     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-     *   @OA\Response(response=422, description="Moderation blocked")
+     *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function update(Request $request, int $chatroomId, int $messageId): JsonResponse

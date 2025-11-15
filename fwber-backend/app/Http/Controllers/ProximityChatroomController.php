@@ -246,7 +246,7 @@ class ProximityChatroomController extends Controller
      *     @OA\Property(property="interests", type="array", @OA\Items(type="string"))
      *   )),
      *   @OA\Response(response=200, description="Joined"),
-     *   @OA\Response(response=403, description="Outside proximity/Banned/Full"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
      *   @OA\Response(response=400, description="Already member")
      * )
      */
@@ -352,7 +352,7 @@ class ProximityChatroomController extends Controller
      *     @OA\Property(property="longitude", type="number", format="float")
      *   )),
      *   @OA\Response(response=200, description="Updated"),
-     *   @OA\Response(response=403, description="Forbidden")
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function updateLocation(Request $request, int $id): JsonResponse
@@ -501,7 +501,7 @@ class ProximityChatroomController extends Controller
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Response(response=200, description="Analytics data"),
-     *   @OA\Response(response=403, description="Forbidden")
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function analytics(Request $request, int $id): JsonResponse

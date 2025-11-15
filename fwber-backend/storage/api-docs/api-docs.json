@@ -1790,7 +1790,7 @@
                         "description": "Report updated"
                     },
                     "403": {
-                        "description": "Forbidden"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -1991,7 +1991,7 @@
                         }
                     },
                     "422": {
-                        "description": "Validation error"
+                        "$ref": "#/components/responses/ValidationError"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -2035,7 +2035,7 @@
                         }
                     },
                     "422": {
-                        "description": "Set avatar_prompt first"
+                        "$ref": "#/components/responses/ValidationError"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -7022,7 +7022,7 @@
                         "description": "Joined"
                     },
                     "403": {
-                        "description": "Outside proximity/Banned/Full"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "400": {
                         "description": "Already member"
@@ -7115,7 +7115,7 @@
                         "description": "Updated"
                     },
                     "403": {
-                        "description": "Forbidden"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -7250,7 +7250,7 @@
                         "description": "Analytics data"
                     },
                     "403": {
-                        "description": "Forbidden"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -7417,7 +7417,7 @@
                         "$ref": "#/components/responses/Forbidden"
                     },
                     "422": {
-                        "description": "Moderation blocked"
+                        "$ref": "#/components/responses/ValidationError"
                     }
                 },
                 "security": [
@@ -7536,7 +7536,7 @@
                         "$ref": "#/components/responses/Forbidden"
                     },
                     "422": {
-                        "description": "Moderation blocked"
+                        "$ref": "#/components/responses/ValidationError"
                     }
                 },
                 "security": [
