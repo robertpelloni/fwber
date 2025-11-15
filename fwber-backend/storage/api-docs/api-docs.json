@@ -24,6 +24,529 @@
         }
     ],
     "paths": {
+        "/groups": {
+            "get": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "List groups the authenticated user belongs to",
+                "description": "List user's groups",
+                "operationId": "9f3cf539f31741c17836ae43fe826785",
+                "responses": {
+                    "200": {
+                        "description": "List of groups",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "groups": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    },
+                                                    "visibility": {
+                                                        "type": "string",
+                                                        "example": "public"
+                                                    },
+                                                    "max_members": {
+                                                        "type": "integer"
+                                                    },
+                                                    "is_active": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "active_members_count": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "0": {
+                            "bearerAuth": []
+                        }
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Create a new group",
+                "description": "Create a new group",
+                "operationId": "e8cd2fcb089637601ce70d7276c6a4a6",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 100
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "nullable": true
+                                    },
+                                    "visibility": {
+                                        "type": "string",
+                                        "enum": [
+                                            "public",
+                                            "private"
+                                        ]
+                                    },
+                                    "max_members": {
+                                        "type": "integer",
+                                        "maximum": 500,
+                                        "minimum": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Group created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "group": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "visibility": {
+                                                    "type": "string"
+                                                },
+                                                "max_members": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "0": {
+                            "bearerAuth": []
+                        }
+                    }
+                ]
+            }
+        },
+        "/groups/{groupId}": {
+            "get": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Get group details",
+                "description": "Get group details",
+                "operationId": "7a977a8d0b0edb3d0346d0549768c724",
+                "parameters": [
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Group details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "group": {
+                                            "type": "object"
+                                        },
+                                        "is_member": {
+                                            "type": "boolean"
+                                        },
+                                        "user_role": {
+                                            "type": "string",
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Group not found"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "0": {
+                            "bearerAuth": []
+                        }
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Update group settings",
+                "description": "Update group",
+                "operationId": "3b49931f83e9ea1fa3e34ad270d7919d",
+                "parameters": [
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "visibility": {
+                                        "type": "string",
+                                        "enum": [
+                                            "public",
+                                            "private"
+                                        ]
+                                    },
+                                    "max_members": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "group": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "0": {
+                            "bearerAuth": []
+                        }
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Deactivate a group (owner only)",
+                "description": "Delete/deactivate group",
+                "operationId": "ba214b6cc5c0259e70cf1fcae21df9e3",
+                "parameters": [
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deactivated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Only owner can delete"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "0": {
+                            "bearerAuth": []
+                        }
+                    }
+                ]
+            }
+        },
+        "/groups/{groupId}/join": {
+            "post": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Join a public group",
+                "description": "Join a group",
+                "operationId": "0f307a8d301e0f62df1c72627663788f",
+                "parameters": [
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Joined"
+                    },
+                    "400": {
+                        "description": "Already a member or full"
+                    },
+                    "403": {
+                        "description": "Cannot join private group or banned"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "0": {
+                            "bearerAuth": []
+                        }
+                    }
+                ]
+            }
+        },
+        "/groups/{groupId}/leave": {
+            "post": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Leave a group",
+                "description": "Leave a group",
+                "operationId": "aaca6007eb8b07900b5a3810db0156bf",
+                "parameters": [
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Left group"
+                    },
+                    "400": {
+                        "description": "Not a member or owner cannot leave"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "0": {
+                            "bearerAuth": []
+                        }
+                    }
+                ]
+            }
+        },
+        "/groups/{groupId}/stats": {
+            "get": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Group statistics (admin/owner)",
+                "description": "Simple analytics endpoint for group (owner/admin only).",
+                "operationId": "2e4ae1abc1590f04a34cb8ff0ef9f3d3",
+                "parameters": [
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Stats",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "group_id": {
+                                            "type": "integer"
+                                        },
+                                        "roles": {
+                                            "type": "object"
+                                        },
+                                        "total_messages": {
+                                            "type": "integer"
+                                        },
+                                        "banned_members": {
+                                            "type": "integer"
+                                        },
+                                        "muted_members": {
+                                            "type": "integer"
+                                        },
+                                        "max_members": {
+                                            "type": "integer"
+                                        },
+                                        "is_full": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "0": {
+                            "bearerAuth": []
+                        }
+                    }
+                ]
+            }
+        },
+        "/groups/discover": {
+            "get": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Discover public groups",
+                "description": "Discover public groups",
+                "operationId": "992a59373957baa5b18005e5a2162d6e",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 50,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated groups list"
+                    }
+                },
+                "security": [
+                    {
+                        "0": {
+                            "bearerAuth": []
+                        }
+                    }
+                ]
+            }
+        },
         "/messages": {
             "post": {
                 "tags": [
@@ -176,6 +699,260 @@
                 "security": [
                     {
                         "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/physical-profile": {
+            "get": {
+                "tags": [
+                    "Physical Profile"
+                ],
+                "summary": "Get physical profile",
+                "description": "Get the authenticated user's physical profile",
+                "operationId": "da69e43d1596aef74dddf808107adcc9",
+                "responses": {
+                    "200": {
+                        "description": "Profile",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "height_cm": {
+                                                    "type": "integer",
+                                                    "nullable": true
+                                                },
+                                                "body_type": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "hair_color": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "eye_color": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "skin_tone": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "ethnicity": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "facial_hair": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "tattoos": {
+                                                    "type": "boolean",
+                                                    "nullable": true
+                                                },
+                                                "piercings": {
+                                                    "type": "boolean",
+                                                    "nullable": true
+                                                },
+                                                "dominant_hand": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "left",
+                                                        "right",
+                                                        "ambi"
+                                                    ],
+                                                    "nullable": true
+                                                },
+                                                "fitness_level": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "low",
+                                                        "average",
+                                                        "fit",
+                                                        "athletic"
+                                                    ],
+                                                    "nullable": true
+                                                },
+                                                "clothing_style": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "avatar_prompt": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "avatar_status": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "0": {
+                            "bearerAuth": []
+                        }
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Physical Profile"
+                ],
+                "summary": "Upsert physical profile",
+                "description": "Create or update the authenticated user's physical profile",
+                "operationId": "0f5417b826e2de355484dfa9c7f698f5",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "height_cm": {
+                                        "type": "integer",
+                                        "maximum": 250,
+                                        "minimum": 80
+                                    },
+                                    "body_type": {
+                                        "type": "string"
+                                    },
+                                    "hair_color": {
+                                        "type": "string"
+                                    },
+                                    "eye_color": {
+                                        "type": "string"
+                                    },
+                                    "skin_tone": {
+                                        "type": "string"
+                                    },
+                                    "ethnicity": {
+                                        "type": "string"
+                                    },
+                                    "facial_hair": {
+                                        "type": "string"
+                                    },
+                                    "tattoos": {
+                                        "type": "boolean"
+                                    },
+                                    "piercings": {
+                                        "type": "boolean"
+                                    },
+                                    "dominant_hand": {
+                                        "type": "string",
+                                        "enum": [
+                                            "left",
+                                            "right",
+                                            "ambi"
+                                        ]
+                                    },
+                                    "fitness_level": {
+                                        "type": "string",
+                                        "enum": [
+                                            "low",
+                                            "average",
+                                            "fit",
+                                            "athletic"
+                                        ]
+                                    },
+                                    "clothing_style": {
+                                        "type": "string"
+                                    },
+                                    "avatar_prompt": {
+                                        "type": "string",
+                                        "maxLength": 500
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Upserted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "0": {
+                            "bearerAuth": []
+                        }
+                    }
+                ]
+            }
+        },
+        "/physical-profile/avatar/request": {
+            "post": {
+                "tags": [
+                    "Physical Profile"
+                ],
+                "summary": "Request avatar generation",
+                "description": "Request avatar generation using the saved avatar_prompt",
+                "operationId": "92194b031a2d58df173881d60ed56ea5",
+                "responses": {
+                    "200": {
+                        "description": "Requested",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "avatar_status": {
+                                                    "type": "string",
+                                                    "example": "requested"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Set avatar_prompt first"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "0": {
+                            "bearerAuth": []
+                        }
                     }
                 ]
             }
@@ -659,6 +1436,143 @@
                         "bearerAuth": []
                     }
                 ]
+            }
+        },
+        "/health": {
+            "get": {
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Comprehensive health check",
+                "description": "Checks database, Redis, cache, storage and queue configuration. Returns 503 if any critical service is down.",
+                "operationId": "3df294c08511d852c4f7faffe2cbcb44",
+                "responses": {
+                    "200": {
+                        "description": "All systems healthy",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "healthy"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "version": {
+                                            "type": "string",
+                                            "example": "1.0.0"
+                                        },
+                                        "environment": {
+                                            "type": "string",
+                                            "example": "local"
+                                        },
+                                        "checks": {
+                                            "type": "object"
+                                        },
+                                        "metrics": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "One or more services unhealthy",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "unhealthy"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/health/liveness": {
+            "get": {
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Liveness probe",
+                "description": "Returns 200 when the application process is alive.",
+                "operationId": "a29b8ab451db693cc55c8695fdbd2e6c",
+                "responses": {
+                    "200": {
+                        "description": "Service is alive",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "alive"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/health/readiness": {
+            "get": {
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Readiness probe",
+                "description": "Checks critical dependencies and returns 200 when the service is ready to receive traffic.",
+                "operationId": "e36693e62099a58bf3981cba2990990c",
+                "responses": {
+                    "200": {
+                        "description": "Service is ready",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "ready"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Service not ready",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "not_ready"
+                                        },
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/matches": {
@@ -1529,8 +2443,20 @@
             "description": "Direct messaging between matched users"
         },
         {
+            "name": "Physical Profile",
+            "description": "AI avatar generation and physical attributes"
+        },
+        {
             "name": "Profile Views",
             "description": "Track and manage profile view analytics"
+        },
+        {
+            "name": "Groups",
+            "description": "Community groups and group messaging"
+        },
+        {
+            "name": "Health",
+            "description": "System health and monitoring endpoints"
         }
     ]
 }

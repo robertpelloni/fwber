@@ -12,6 +12,34 @@ class HealthController extends Controller
     /**
      * Comprehensive health check endpoint.
      * Returns 200 if all systems healthy, 503 if any critical service is down.
+    *
+    * @OA\Get(
+    *   path="/health",
+    *   tags={"Health"},
+    *   summary="Comprehensive health check",
+    *   description="Checks database, Redis, cache, storage and queue configuration. Returns 503 if any critical service is down.",
+    *   @OA\Response(
+    *     response=200,
+    *     description="All systems healthy",
+    *     @OA\JsonContent(
+    *       type="object",
+    *       @OA\Property(property="status", type="string", example="healthy"),
+    *       @OA\Property(property="timestamp", type="string", format="date-time"),
+    *       @OA\Property(property="version", type="string", example="1.0.0"),
+    *       @OA\Property(property="environment", type="string", example="local"),
+    *       @OA\Property(property="checks", type="object"),
+    *       @OA\Property(property="metrics", type="object")
+    *     )
+    *   ),
+    *   @OA\Response(
+    *     response=503,
+    *     description="One or more services unhealthy",
+    *     @OA\JsonContent(
+    *       type="object",
+    *       @OA\Property(property="status", type="string", example="unhealthy")
+    *     )
+    *   )
+    * )
      */
     public function check(): JsonResponse
     {
@@ -114,6 +142,21 @@ class HealthController extends Controller
     /**
      * Simplified liveness probe (for Kubernetes/Docker).
      * Returns 200 if application is running.
+     *
+     * @OA\Get(
+     *   path="/health/liveness",
+     *   tags={"Health"},
+     *   summary="Liveness probe",
+     *   description="Returns 200 when the application process is alive.",
+     *   @OA\Response(
+     *     response=200,
+     *     description="Service is alive",
+     *     @OA\JsonContent(
+     *       type="object",
+     *       @OA\Property(property="status", type="string", example="alive")
+     *     )
+     *   )
+     * )
      */
     public function liveness(): JsonResponse
     {
@@ -123,6 +166,30 @@ class HealthController extends Controller
     /**
      * Readiness probe (for Kubernetes/Docker).
      * Returns 200 if application is ready to serve traffic.
+        *
+        * @OA\Get(
+        *   path="/health/readiness",
+        *   tags={"Health"},
+        *   summary="Readiness probe",
+        *   description="Checks critical dependencies and returns 200 when the service is ready to receive traffic.",
+        *   @OA\Response(
+        *     response=200,
+        *     description="Service is ready",
+        *     @OA\JsonContent(
+        *       type="object",
+        *       @OA\Property(property="status", type="string", example="ready")
+        *     )
+        *   ),
+        *   @OA\Response(
+        *     response=503,
+        *     description="Service not ready",
+        *     @OA\JsonContent(
+        *       type="object",
+        *       @OA\Property(property="status", type="string", example="not_ready"),
+        *       @OA\Property(property="error", type="string")
+        *     )
+        *   )
+        * )
      */
     public function readiness(): JsonResponse
     {

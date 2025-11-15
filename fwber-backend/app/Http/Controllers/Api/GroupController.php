@@ -24,6 +24,34 @@ class GroupController extends Controller
 {
     /**
      * List user's groups
+    *
+    * @OA\Get(
+    *   path="/groups",
+    *   tags={"Groups"},
+    *   summary="List groups the authenticated user belongs to",
+    *   security={{{"bearerAuth":{}}}},
+    *   @OA\Response(
+    *     response=200,
+    *     description="List of groups",
+    *     @OA\JsonContent(
+    *       type="object",
+    *       @OA\Property(
+    *         property="groups",
+    *         type="array",
+    *         @OA\Items(type="object",
+    *           @OA\Property(property="id", type="integer"),
+    *           @OA\Property(property="name", type="string"),
+    *           @OA\Property(property="description", type="string", nullable=true),
+    *           @OA\Property(property="visibility", type="string", example="public"),
+    *           @OA\Property(property="max_members", type="integer"),
+    *           @OA\Property(property="is_active", type="boolean"),
+    *           @OA\Property(property="active_members_count", type="integer")
+    *         )
+    *       )
+    *     )
+    *   ),
+    *   @OA\Response(response=401, description="Unauthenticated")
+    * )
      */
     public function index(): JsonResponse
     {
@@ -43,6 +71,37 @@ class GroupController extends Controller
 
     /**
      * Create a new group
+        *
+        * @OA\Post(
+        *   path="/groups",
+        *   tags={"Groups"},
+        *   summary="Create a new group",
+        *   security={{{"bearerAuth":{}}}},
+        *   @OA\RequestBody(
+        *     required=true,
+        *     @OA\JsonContent(
+        *       required={"name"},
+        *       @OA\Property(property="name", type="string", maxLength=100),
+        *       @OA\Property(property="description", type="string", nullable=true, maxLength=1000),
+        *       @OA\Property(property="visibility", type="string", enum={"public","private"}),
+        *       @OA\Property(property="max_members", type="integer", minimum=2, maximum=500)
+        *     )
+        *   ),
+        *   @OA\Response(
+        *     response=201,
+        *     description="Group created",
+        *     @OA\JsonContent(type="object",
+        *       @OA\Property(property="group", type="object",
+        *         @OA\Property(property="id", type="integer"),
+        *         @OA\Property(property="name", type="string"),
+        *         @OA\Property(property="visibility", type="string"),
+        *         @OA\Property(property="max_members", type="integer")
+        *       )
+        *     )
+        *   ),
+        *   @OA\Response(response=422, description="Validation error"),
+        *   @OA\Response(response=401, description="Unauthenticated")
+        * )
      */
     public function store(Request $request): JsonResponse
     {
@@ -86,6 +145,23 @@ class GroupController extends Controller
 
     /**
      * Get group details
+        *
+        * @OA\Get(
+        *   path="/groups/{groupId}",
+        *   tags={"Groups"},
+        *   summary="Get group details",
+        *   security={{{"bearerAuth":{}}}},
+        *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
+        *   @OA\Response(response=200, description="Group details",
+        *     @OA\JsonContent(type="object",
+        *       @OA\Property(property="group", type="object"),
+        *       @OA\Property(property="is_member", type="boolean"),
+        *       @OA\Property(property="user_role", type="string", nullable=true)
+        *     )
+        *   ),
+        *   @OA\Response(response=404, description="Group not found"),
+        *   @OA\Response(response=401, description="Unauthenticated")
+        * )
      */
     public function show(int $groupId): JsonResponse
     {
@@ -109,6 +185,27 @@ class GroupController extends Controller
 
     /**
      * Update group
+        *
+        * @OA\Put(
+        *   path="/groups/{groupId}",
+        *   tags={"Groups"},
+        *   summary="Update group settings",
+        *   security={{{"bearerAuth":{}}}},
+        *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
+        *   @OA\RequestBody(@OA\JsonContent(
+        *     @OA\Property(property="name", type="string"),
+        *     @OA\Property(property="description", type="string", nullable=true),
+        *     @OA\Property(property="visibility", type="string", enum={"public","private"}),
+        *     @OA\Property(property="max_members", type="integer")
+        *   )),
+        *   @OA\Response(response=200, description="Updated",
+        *     @OA\JsonContent(type="object",
+        *       @OA\Property(property="group", type="object")
+        *     )
+        *   ),
+        *   @OA\Response(response=403, description="Unauthorized"),
+        *   @OA\Response(response=401, description="Unauthenticated")
+        * )
      */
     public function update(Request $request, int $groupId): JsonResponse
     {
@@ -135,6 +232,21 @@ class GroupController extends Controller
 
     /**
      * Delete/deactivate group
+        *
+        * @OA\Delete(
+        *   path="/groups/{groupId}",
+        *   tags={"Groups"},
+        *   summary="Deactivate a group (owner only)",
+        *   security={{{"bearerAuth":{}}}},
+        *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
+        *   @OA\Response(response=200, description="Deactivated",
+        *     @OA\JsonContent(type="object",
+        *       @OA\Property(property="message", type="string")
+        *     )
+        *   ),
+        *   @OA\Response(response=403, description="Only owner can delete"),
+        *   @OA\Response(response=401, description="Unauthenticated")
+        * )
      */
     public function destroy(int $groupId): JsonResponse
     {
@@ -155,6 +267,18 @@ class GroupController extends Controller
 
     /**
      * Join a group
+        *
+        * @OA\Post(
+        *   path="/groups/{groupId}/join",
+        *   tags={"Groups"},
+        *   summary="Join a public group",
+        *   security={{{"bearerAuth":{}}}},
+        *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
+        *   @OA\Response(response=200, description="Joined"),
+        *   @OA\Response(response=400, description="Already a member or full"),
+        *   @OA\Response(response=403, description="Cannot join private group or banned"),
+        *   @OA\Response(response=401, description="Unauthenticated")
+        * )
      */
     public function join(int $groupId): JsonResponse
     {
@@ -207,6 +331,17 @@ class GroupController extends Controller
 
     /**
      * Leave a group
+        *
+        * @OA\Post(
+        *   path="/groups/{groupId}/leave",
+        *   tags={"Groups"},
+        *   summary="Leave a group",
+        *   security={{{"bearerAuth":{}}}},
+        *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
+        *   @OA\Response(response=200, description="Left group"),
+        *   @OA\Response(response=400, description="Not a member or owner cannot leave"),
+        *   @OA\Response(response=401, description="Unauthenticated")
+        * )
      */
     public function leave(int $groupId): JsonResponse
     {
@@ -540,6 +675,27 @@ class GroupController extends Controller
 
     /**
      * Simple analytics endpoint for group (owner/admin only).
+        *
+        * @OA\Get(
+        *   path="/groups/{groupId}/stats",
+        *   tags={"Groups"},
+        *   summary="Group statistics (admin/owner)",
+        *   security={{{"bearerAuth":{}}}},
+        *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
+        *   @OA\Response(response=200, description="Stats",
+        *     @OA\JsonContent(type="object",
+        *       @OA\Property(property="group_id", type="integer"),
+        *       @OA\Property(property="roles", type="object"),
+        *       @OA\Property(property="total_messages", type="integer"),
+        *       @OA\Property(property="banned_members", type="integer"),
+        *       @OA\Property(property="muted_members", type="integer"),
+        *       @OA\Property(property="max_members", type="integer"),
+        *       @OA\Property(property="is_full", type="boolean")
+        *     )
+        *   ),
+        *   @OA\Response(response=403, description="Unauthorized"),
+        *   @OA\Response(response=401, description="Unauthenticated")
+        * )
      */
     public function stats(int $groupId): JsonResponse
     {
@@ -610,6 +766,16 @@ class GroupController extends Controller
 
     /**
      * Discover public groups
+        *
+        * @OA\Get(
+        *   path="/groups/discover",
+        *   tags={"Groups"},
+        *   summary="Discover public groups",
+        *   security={{{"bearerAuth":{}}}},
+        *   @OA\Parameter(name="search", in="query", required=false, @OA\Schema(type="string")),
+        *   @OA\Parameter(name="per_page", in="query", required=false, @OA\Schema(type="integer", minimum=1, maximum=50)),
+        *   @OA\Response(response=200, description="Paginated groups list")
+        * )
      */
     public function discover(Request $request): JsonResponse
     {

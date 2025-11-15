@@ -48,10 +48,13 @@ return [
                     base_path('app/Http/Controllers/Schemas.php'),
                     base_path('app/Http/Controllers/AuthController.php'),
                     base_path('app/Http/Controllers/ProfileController.php'),
+                    base_path('app/Http/Controllers/HealthController.php'),
                     base_path('app/Http/Controllers/DashboardController.php'),
                     base_path('app/Http/Controllers/ProfileViewController.php'),
                     base_path('app/Http/Controllers/MatchController.php'),
                     base_path('app/Http/Controllers/Api/MessageController.php'),
+                    base_path('app/Http/Controllers/Api/GroupController.php'),
+                    base_path('app/Http/Controllers/Api/UserPhysicalProfileController.php'),
                 ],
                 
                 /*
