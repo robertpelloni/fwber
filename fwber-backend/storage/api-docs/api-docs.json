@@ -3972,38 +3972,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "total_generations": {
-                                                    "type": "integer"
-                                                },
-                                                "successful_generations": {
-                                                    "type": "integer"
-                                                },
-                                                "failed_generations": {
-                                                    "type": "integer"
-                                                },
-                                                "average_generation_time": {
-                                                    "type": "number"
-                                                },
-                                                "most_popular_types": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string"
-                                                    }
-                                                },
-                                                "user_satisfaction": {
-                                                    "type": "number"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/GenerationStatsResponse"
                                 }
                             }
                         }
@@ -4029,7 +3998,14 @@
                 "operationId": "b96de608df98647d17062569000a8e3d",
                 "responses": {
                     "200": {
-                        "description": "Optimization statistics"
+                        "description": "Optimization statistics",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OptimizationStatsResponse"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "$ref": "#/components/responses/Unauthorized"
@@ -8598,7 +8574,14 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Message sent successfully"
+                        "description": "Message sent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SimpleMessageResponse"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "$ref": "#/components/responses/Unauthorized"
@@ -8648,7 +8631,14 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Typing indicator sent"
+                        "description": "Typing indicator sent",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SimpleMessageResponse"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "$ref": "#/components/responses/Unauthorized"
@@ -8702,7 +8692,14 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Presence updated successfully"
+                        "description": "Presence updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SimpleMessageResponse"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "$ref": "#/components/responses/Unauthorized"
@@ -8772,7 +8769,14 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Notification sent successfully"
+                        "description": "Notification sent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SimpleMessageResponse"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "$ref": "#/components/responses/Unauthorized"
@@ -9372,6 +9376,96 @@
                     "optimized_at": {
                         "type": "string",
                         "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "SimpleMessageResponse": {
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "Operation completed successfully"
+                    }
+                },
+                "type": "object"
+            },
+            "GenerationStatsResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "data": {
+                        "properties": {
+                            "total_generations": {
+                                "type": "integer"
+                            },
+                            "successful_generations": {
+                                "type": "integer"
+                            },
+                            "failed_generations": {
+                                "type": "integer"
+                            },
+                            "average_generation_time": {
+                                "type": "number"
+                            },
+                            "most_popular_types": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "user_satisfaction": {
+                                "type": "number"
+                            },
+                            "generated_at": {
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "OptimizationStatsResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "data": {
+                        "properties": {
+                            "total_optimizations": {
+                                "type": "integer"
+                            },
+                            "successful_optimizations": {
+                                "type": "integer"
+                            },
+                            "failed_optimizations": {
+                                "type": "integer"
+                            },
+                            "average_improvement_score": {
+                                "type": "number"
+                            },
+                            "most_common_improvements": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "optimization_types_usage": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "generated_at": {
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        },
+                        "type": "object"
                     }
                 },
                 "type": "object"

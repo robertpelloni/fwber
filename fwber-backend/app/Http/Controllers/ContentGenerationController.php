@@ -310,19 +310,9 @@ class ContentGenerationController extends Controller
      *     summary="Get generation statistics",
      *     description="Retrieve statistics about AI content generation usage and performance",
      *     security={{"bearerAuth":{}}},
-     *     @OA\Response(response=200, description="Generation statistics",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean"),
-     *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="total_generations", type="integer"),
-     *                 @OA\Property(property="successful_generations", type="integer"),
-     *                 @OA\Property(property="failed_generations", type="integer"),
-     *                 @OA\Property(property="average_generation_time", type="number"),
-     *                 @OA\Property(property="most_popular_types", type="array", @OA\Items(type="string")),
-     *                 @OA\Property(property="user_satisfaction", type="number")
-     *             )
-     *         )
-     *     ),
+    *     @OA\Response(response=200, description="Generation statistics",
+    *         @OA\JsonContent(ref="#/components/schemas/GenerationStatsResponse")
+    *     ),
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
      * )
      */
@@ -360,7 +350,9 @@ class ContentGenerationController extends Controller
      *     summary="Get optimization statistics",
      *     description="Retrieve statistics about content optimization usage and improvements",
      *     security={{"bearerAuth":{}}},
-     *     @OA\Response(response=200, description="Optimization statistics"),
+    *     @OA\Response(response=200, description="Optimization statistics",
+    *         @OA\JsonContent(ref="#/components/schemas/OptimizationStatsResponse")
+    *     ),
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
      * )
      */

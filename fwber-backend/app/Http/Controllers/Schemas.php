@@ -252,6 +252,42 @@ namespace App\Http\Controllers;
  *   @OA\Property(property="user_id", type="integer"),
  *   @OA\Property(property="optimized_at", type="string", format="date-time")
  * )
+ * 
+ * @OA\Schema(
+ *   schema="SimpleMessageResponse",
+ *   type="object",
+ *   @OA\Property(property="message", type="string", example="Operation completed successfully")
+ * )
+ * 
+ * @OA\Schema(
+ *   schema="GenerationStatsResponse",
+ *   type="object",
+ *   @OA\Property(property="success", type="boolean", example=true),
+ *   @OA\Property(property="data", type="object",
+ *     @OA\Property(property="total_generations", type="integer"),
+ *     @OA\Property(property="successful_generations", type="integer"),
+ *     @OA\Property(property="failed_generations", type="integer"),
+ *     @OA\Property(property="average_generation_time", type="number"),
+ *     @OA\Property(property="most_popular_types", type="array", @OA\Items(type="string")),
+ *     @OA\Property(property="user_satisfaction", type="number"),
+ *     @OA\Property(property="generated_at", type="string", format="date-time")
+ *   )
+ * )
+ * 
+ * @OA\Schema(
+ *   schema="OptimizationStatsResponse",
+ *   type="object",
+ *   @OA\Property(property="success", type="boolean", example=true),
+ *   @OA\Property(property="data", type="object",
+ *     @OA\Property(property="total_optimizations", type="integer"),
+ *     @OA\Property(property="successful_optimizations", type="integer"),
+ *     @OA\Property(property="failed_optimizations", type="integer"),
+ *     @OA\Property(property="average_improvement_score", type="number"),
+ *     @OA\Property(property="most_common_improvements", type="array", @OA\Items(type="string")),
+ *     @OA\Property(property="optimization_types_usage", type="array", @OA\Items(type="string")),
+ *     @OA\Property(property="generated_at", type="string", format="date-time")
+ *   )
+ * )
  */
 class Schemas
 {

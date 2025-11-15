@@ -164,7 +164,9 @@ class WebSocketController extends Controller
      *             )
      *         )
      *     ),
-     *     @OA\Response(response=200, description="Message sent successfully"),
+    *     @OA\Response(response=200, description="Message sent successfully",
+    *         @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")
+    *     ),
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
      *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
@@ -229,7 +231,9 @@ class WebSocketController extends Controller
      *             @OA\Property(property="is_typing", type="boolean", example=true)
      *         )
      *     ),
-     *     @OA\Response(response=200, description="Typing indicator sent"),
+    *     @OA\Response(response=200, description="Typing indicator sent",
+    *         @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")
+    *     ),
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
      *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
@@ -292,7 +296,9 @@ class WebSocketController extends Controller
      *             @OA\Property(property="metadata", type="object")
      *         )
      *     ),
-     *     @OA\Response(response=200, description="Presence updated successfully"),
+    *     @OA\Response(response=200, description="Presence updated successfully",
+    *         @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")
+    *     ),
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
      *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
@@ -361,7 +367,9 @@ class WebSocketController extends Controller
      *             )
      *         )
      *     ),
-     *     @OA\Response(response=200, description="Notification sent successfully"),
+    *     @OA\Response(response=200, description="Notification sent successfully",
+    *         @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")
+    *     ),
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
      *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
