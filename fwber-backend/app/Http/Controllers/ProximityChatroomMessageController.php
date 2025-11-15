@@ -34,7 +34,11 @@ class ProximityChatroomMessageController extends Controller
      *   @OA\Parameter(name="social_only", in="query", required=false, @OA\Schema(type="boolean")),
      *   @OA\Parameter(name="pinned", in="query", required=false, @OA\Schema(type="boolean")),
      *   @OA\Parameter(name="announcements", in="query", required=false, @OA\Schema(type="boolean")),
-     *   @OA\Response(response=200, description="Paginated messages")
+    *   @OA\Response(
+    *     response=200,
+    *     description="Paginated messages",
+    *     @OA\JsonContent(ref="#/components/schemas/PaginatedChatMessages")
+    *   )
      * )
      */
     public function index(Request $request, int $chatroomId): JsonResponse
@@ -101,7 +105,7 @@ class ProximityChatroomMessageController extends Controller
      *     @OA\Property(property="is_social", type="boolean"),
      *     @OA\Property(property="metadata", type="object")
      *   )),
-     *   @OA\Response(response=201, description="Created"),
+    *   @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/ChatMessage")),
      *   @OA\Response(response=403, description="Muted/Not member"),
      *   @OA\Response(response=422, description="Moderation blocked")
      * )
@@ -195,7 +199,7 @@ class ProximityChatroomMessageController extends Controller
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="Message")
+    *   @OA\Response(response=200, description="Message", @OA\JsonContent(ref="#/components/schemas/ChatMessage"))
      * )
      */
     public function show(int $chatroomId, int $messageId): JsonResponse
@@ -229,7 +233,7 @@ class ProximityChatroomMessageController extends Controller
      *     @OA\Property(property="is_networking", type="boolean"),
      *     @OA\Property(property="is_social", type="boolean")
      *   )),
-     *   @OA\Response(response=200, description="Updated"),
+    *   @OA\Response(response=200, description="Updated", @OA\JsonContent(ref="#/components/schemas/ChatMessage")),
      *   @OA\Response(response=403, description="Forbidden"),
      *   @OA\Response(response=422, description="Moderation blocked")
      * )
@@ -464,7 +468,7 @@ class ProximityChatroomMessageController extends Controller
      *   summary="Pinned proximity messages",
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="List")
+    *   @OA\Response(response=200, description="List", @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ChatMessage")))
      * )
      */
     public function pinned(int $chatroomId): JsonResponse
@@ -494,7 +498,7 @@ class ProximityChatroomMessageController extends Controller
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="List")
+    *   @OA\Response(response=200, description="List", @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ChatMessage")))
      * )
      */
     public function replies(int $chatroomId, int $messageId): JsonResponse
@@ -523,7 +527,7 @@ class ProximityChatroomMessageController extends Controller
      *   summary="Networking messages",
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="Paginated messages")
+    *   @OA\Response(response=200, description="Paginated messages", @OA\JsonContent(ref="#/components/schemas/PaginatedChatMessages"))
      * )
      */
     public function networking(int $chatroomId): JsonResponse
@@ -553,7 +557,7 @@ class ProximityChatroomMessageController extends Controller
      *   summary="Social messages",
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="Paginated messages")
+    *   @OA\Response(response=200, description="Paginated messages", @OA\JsonContent(ref="#/components/schemas/PaginatedChatMessages"))
      * )
      */
     public function social(int $chatroomId): JsonResponse

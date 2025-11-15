@@ -5523,7 +5523,14 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Paginated messages"
+                        "description": "Paginated messages",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedChatMessages"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -5592,7 +5599,14 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ChatMessage"
+                                }
+                            }
+                        }
                     },
                     "403": {
                         "description": "Muted/Not member"
@@ -5636,7 +5650,14 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Message"
+                        "description": "Message",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ChatMessage"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -5697,7 +5718,14 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Updated"
+                        "description": "Updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ChatMessage"
+                                }
+                            }
+                        }
                     },
                     "403": {
                         "description": "Forbidden"
@@ -5955,7 +5983,17 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "List"
+                        "description": "List",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ChatMessage"
+                                    }
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -5993,7 +6031,17 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "List"
+                        "description": "List",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ChatMessage"
+                                    }
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -6023,7 +6071,14 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Paginated messages"
+                        "description": "Paginated messages",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedChatMessages"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -6053,7 +6108,14 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Paginated messages"
+                        "description": "Paginated messages",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedChatMessages"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -6118,6 +6180,184 @@
                     "message": {
                         "type": "string",
                         "example": "Unauthenticated"
+                    }
+                },
+                "type": "object"
+            },
+            "Reaction": {
+                "properties": {
+                    "user_id": {
+                        "type": "integer",
+                        "example": 42
+                    },
+                    "emoji": {
+                        "type": "string",
+                        "example": "👍"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "ChatMessage": {
+                "required": [
+                    "id",
+                    "content",
+                    "message_type",
+                    "user"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/User"
+                    },
+                    "parent_id": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "content": {
+                        "type": "string",
+                        "example": "Hello there!"
+                    },
+                    "message_type": {
+                        "type": "string",
+                        "example": "text"
+                    },
+                    "metadata": {
+                        "type": "object"
+                    },
+                    "is_edited": {
+                        "type": "boolean"
+                    },
+                    "is_deleted": {
+                        "type": "boolean"
+                    },
+                    "is_pinned": {
+                        "type": "boolean"
+                    },
+                    "is_announcement": {
+                        "type": "boolean"
+                    },
+                    "is_networking": {
+                        "type": "boolean"
+                    },
+                    "is_social": {
+                        "type": "boolean"
+                    },
+                    "reaction_count": {
+                        "type": "integer"
+                    },
+                    "reply_count": {
+                        "type": "integer"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "PaginationMeta": {
+                "properties": {
+                    "current_page": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "per_page": {
+                        "type": "integer",
+                        "example": 50
+                    },
+                    "total": {
+                        "type": "integer",
+                        "example": 1234
+                    },
+                    "last_page": {
+                        "type": "integer",
+                        "example": 25
+                    }
+                },
+                "type": "object"
+            },
+            "PaginatedChatMessages": {
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ChatMessage"
+                        }
+                    },
+                    "meta": {
+                        "$ref": "#/components/schemas/PaginationMeta"
+                    }
+                },
+                "type": "object"
+            },
+            "ModerationAction": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "action_type": {
+                        "type": "string",
+                        "example": "shadow_throttle"
+                    },
+                    "reason": {
+                        "type": "string"
+                    },
+                    "moderator": {
+                        "$ref": "#/components/schemas/User"
+                    },
+                    "target_user_id": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "target_artifact_id": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "metadata": {
+                        "type": "object"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "ShadowThrottle": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "user_id": {
+                        "type": "integer"
+                    },
+                    "severity": {
+                        "type": "integer",
+                        "maximum": 5,
+                        "minimum": 1
+                    },
+                    "started_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "expires_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "reason": {
+                        "type": "string"
                     }
                 },
                 "type": "object"
