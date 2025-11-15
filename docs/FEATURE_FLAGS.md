@@ -74,6 +74,33 @@ php artisan config:clear
 php artisan config:cache
 ```
 
+> Note: `php artisan route:list` will still display gated routes even when a flag is disabled. Actual requests will return 404 due to the middleware.
+
+## Testing your flag changes
+
+1. Toggle the desired flag in `.env` (e.g., `FEATURE_CHATROOMS=true`).
+2. Clear and rebuild Laravel config cache:
+
+   ```bash
+   php artisan config:clear
+   php artisan config:cache
+   ```
+
+3. Make a request to a gated route (e.g., `GET /api/chatrooms`).
+   - Enabled: expect normal 2xx/4xx from controller policies.
+   - Disabled: expect `404 {"error":"Not Found"}` from the `feature` middleware.
+
+## Troubleshooting
+
+- I enabled a flag but still get 404
+  - Ensure you ran `php artisan config:clear` followed by `php artisan config:cache`.
+  - Verify the flag name matches `config/features.php` (e.g., `FEATURE_PROXIMITY_CHATROOMS`).
+  - Check for typos or whitespace in `.env`.
+
+- I don’t see my new flag taking effect
+  - Confirm you added the key in `config/features.php` and used the same key in the route middleware: `->middleware('feature:<key>')`.
+  - If using a deployment cache, make sure application and opcache are refreshed.
+
 ## Adding a new feature flag
 
 1. Add a key in `fwber-backend/config/features.php`:

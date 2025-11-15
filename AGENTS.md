@@ -41,6 +41,12 @@ This document establishes shared standards for all AI assistants and tools worki
 - Follow: `docs/guides/WORKFLOW_GUIDE.md` for multi-model processes.
 - Be explicit: When you diverge from MVP scope, record justification and toggle via feature flags.
 
+## Adding a new feature flag
+See `docs/FEATURE_FLAGS.md` for the authoritative guide. In short:
+- Add a key in `fwber-backend/config/features.php`, e.g. `'new_feature' => env('FEATURE_NEW_FEATURE', false)`
+- Gate routes with `->middleware('feature:new_feature')` in `fwber-backend/routes/api.php`
+- Extend `fwber-backend/.env.example` with `FEATURE_NEW_FEATURE=false` and document it in `docs/FEATURE_FLAGS.md`
+
 ## Model-specific guidance
 - Copilot: see `copilot-instructions.md`
 - Claude: see `docs/ai-models/CLAUDE.md`

@@ -1,5 +1,7 @@
 # fwber – Privacy-First Proximity Dating
 
+[![Agents & Docs](https://img.shields.io/badge/Agents-Docs-blue)](README-agents.md)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![PHP 8.4+](https://img.shields.io/badge/PHP-8.4+-777BB4?logo=php)](https://www.php.net/)
 [![Laravel 12](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel)](https://laravel.com/)
