@@ -36,12 +36,12 @@ Route::middleware("api")->group(function (): void {
     Route::get('/health/liveness', [HealthController::class, 'liveness']);
     Route::get('/health/readiness', [HealthController::class, 'readiness']);
     
-    Route::middleware('throttle:auth')->group(function () {
+    Route::middleware(['throttle:auth', 'feature:rate_limits', 'rate.limit:auth_attempt'])->group(function () {
         Route::post("/auth/register", [AuthController::class, "register"]);
         Route::post("/auth/login", [AuthController::class, "login"]);
     });
 
-    Route::middleware("auth.api")->group(function (): void {
+    Route::middleware(["auth.api", 'feature:rate_limits', 'rate.limit:api_call'])->group(function (): void {
         // Profile routes (Phase 3A - Multi-AI Implementation)
         Route::get("/user", [ProfileController::class, "show"]);
         Route::put("/user", [ProfileController::class, "update"]);
