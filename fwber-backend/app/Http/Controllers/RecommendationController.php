@@ -63,27 +63,11 @@ class RecommendationController extends Controller
      *         required=false,
      *         @OA\Schema(type="integer", minimum=100, maximum=50000)
      *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Recommendations retrieved successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="recommendations", type="array", @OA\Items(
-     *                 @OA\Property(property="id", type="string"),
-     *                 @OA\Property(property="type", type="string", enum={"content","collaborative","ai","location"}),
-     *                 @OA\Property(property="title", type="string"),
-     *                 @OA\Property(property="description", type="string"),
-     *                 @OA\Property(property="score", type="number", format="float"),
-     *                 @OA\Property(property="reason", type="string")
-     *             )),
-     *             @OA\Property(property="metadata", type="object",
-     *                 @OA\Property(property="total", type="integer"),
-     *                 @OA\Property(property="types", type="array", @OA\Items(type="string")),
-     *                 @OA\Property(property="context", type="object"),
-     *                 @OA\Property(property="generated_at", type="string", format="date-time"),
-     *                 @OA\Property(property="cache_hit", type="boolean")
-     *             )
-     *         )
-     *     ),
+    *     @OA\Response(
+    *         response=200,
+    *         description="Recommendations retrieved successfully",
+    *         @OA\JsonContent(ref="#/components/schemas/RecommendationList")
+    *     ),
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
      *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
@@ -233,24 +217,11 @@ class RecommendationController extends Controller
      *         required=false,
      *         @OA\Schema(type="string", enum={"24h","7d","30d"}, default="24h")
      *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Trending recommendations retrieved successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="trending", type="array", @OA\Items(
-     *                 @OA\Property(property="id", type="string"),
-     *                 @OA\Property(property="type", type="string"),
-     *                 @OA\Property(property="title", type="string"),
-     *                 @OA\Property(property="engagement_score", type="number", format="float"),
-     *                 @OA\Property(property="trending_since", type="string", format="date-time")
-     *             )),
-     *             @OA\Property(property="metadata", type="object",
-     *                 @OA\Property(property="timeframe", type="string"),
-     *                 @OA\Property(property="total", type="integer"),
-     *                 @OA\Property(property="generated_at", type="string", format="date-time")
-     *             )
-     *         )
-     *     ),
+    *     @OA\Response(
+    *         response=200,
+    *         description="Trending recommendations retrieved successfully",
+    *         @OA\JsonContent(ref="#/components/schemas/TrendingList")
+    *     ),
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
      * )
      */
@@ -315,29 +286,11 @@ class RecommendationController extends Controller
      *         required=false,
      *         @OA\Schema(type="integer", minimum=1, maximum=50, default=20)
      *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Personalized feed retrieved successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="feed", type="array", @OA\Items(
-     *                 @OA\Property(property="id", type="string"),
-     *                 @OA\Property(property="type", type="string"),
-     *                 @OA\Property(property="content", type="string"),
-     *                 @OA\Property(property="score", type="number", format="float"),
-     *                 @OA\Property(property="timestamp", type="string", format="date-time")
-     *             )),
-     *             @OA\Property(property="pagination", type="object",
-     *                 @OA\Property(property="current_page", type="integer"),
-     *                 @OA\Property(property="per_page", type="integer"),
-     *                 @OA\Property(property="total", type="integer"),
-     *                 @OA\Property(property="has_more", type="boolean")
-     *             ),
-     *             @OA\Property(property="metadata", type="object",
-     *                 @OA\Property(property="generated_at", type="string", format="date-time"),
-     *                 @OA\Property(property="user_id", type="integer")
-     *             )
-     *         )
-     *     ),
+    *     @OA\Response(
+    *         response=200,
+    *         description="Personalized feed retrieved successfully",
+    *         @OA\JsonContent(ref="#/components/schemas/FeedResponse")
+    *     ),
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
      * )
      */

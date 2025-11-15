@@ -42,11 +42,15 @@ If the command fails, check the Troubleshooting section below.
 Postman can import OpenAPI 3.0 directly:
 
 1. Open Postman → Import
-2. Select the file `fwber-backend/storage/api-docs/api-docs.json`
+2. Select the file `fwber-backend/storage/api-docs/api-docs.json` (or the copy in `docs/postman/fwber-openapi.json`)
 3. Choose "Generate collection"
 4. Save. You can now send requests from the generated collection.
 
 Tip: If feature flags are disabled, some routes will return 404. See the next section to enable them for testing.
+
+See also:
+- `docs/postman/README.md` for a ready-to-import OpenAPI JSON and quick copy command
+- `docs/testing/SMOKE_TESTS.md` for fast manual smoke checks
 
 ## Annotation conventions
 - Reusable schemas go in a single file-level docblock in:

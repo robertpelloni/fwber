@@ -115,6 +115,110 @@ namespace App\Http\Controllers;
  *   @OA\Property(property="expires_at", type="string", format="date-time", nullable=true),
  *   @OA\Property(property="reason", type="string")
  * )
+ * 
+ * @OA\Schema(
+ *   schema="RecommendationItem",
+ *   type="object",
+ *   required={"id","type","title"},
+ *   @OA\Property(property="id", type="string", example="rec_123"),
+ *   @OA\Property(property="type", type="string", enum={"content","collaborative","ai","location"}),
+ *   @OA\Property(property="title", type="string", example="Suggested Post"),
+ *   @OA\Property(property="description", type="string", nullable=true),
+ *   @OA\Property(property="score", type="number", format="float", example=0.91, nullable=true),
+ *   @OA\Property(property="reason", type="string", example="Based on your interests", nullable=true),
+ *   @OA\Property(property="metadata", type="object", nullable=true)
+ * )
+ * 
+ * @OA\Schema(
+ *   schema="RecommendationList",
+ *   type="object",
+ *   @OA\Property(property="recommendations", type="array", @OA\Items(ref="#/components/schemas/RecommendationItem")),
+ *   @OA\Property(property="metadata", type="object",
+ *     @OA\Property(property="total", type="integer", example=10),
+ *     @OA\Property(property="types", type="array", @OA\Items(type="string")),
+ *     @OA\Property(property="context", type="object"),
+ *     @OA\Property(property="generated_at", type="string", format="date-time"),
+ *     @OA\Property(property="cache_hit", type="boolean", example=false)
+ *   )
+ * )
+ * 
+ * @OA\Schema(
+ *   schema="TrendingItem",
+ *   type="object",
+ *   required={"id","type","title","engagement_score"},
+ *   @OA\Property(property="id", type="string", example="trending_1"),
+ *   @OA\Property(property="type", type="string", example="bulletin_board"),
+ *   @OA\Property(property="title", type="string"),
+ *   @OA\Property(property="description", type="string", nullable=true),
+ *   @OA\Property(property="engagement_score", type="number", format="float", example=0.95),
+ *   @OA\Property(property="trending_since", type="string", format="date-time", nullable=true)
+ * )
+ * 
+ * @OA\Schema(
+ *   schema="TrendingList",
+ *   type="object",
+ *   @OA\Property(property="trending", type="array", @OA\Items(ref="#/components/schemas/TrendingItem")),
+ *   @OA\Property(property="metadata", type="object",
+ *     @OA\Property(property="timeframe", type="string", example="24h"),
+ *     @OA\Property(property="total", type="integer", example=10),
+ *     @OA\Property(property="generated_at", type="string", format="date-time")
+ *   )
+ * )
+ * 
+ * @OA\Schema(
+ *   schema="FeedItem",
+ *   type="object",
+ *   required={"id","type"},
+ *   @OA\Property(property="id", type="string", example="feed_1"),
+ *   @OA\Property(property="type", type="string", example="recommendation"),
+ *   @OA\Property(property="content", type="string", nullable=true),
+ *   @OA\Property(property="score", type="number", format="float", nullable=true),
+ *   @OA\Property(property="reason", type="string", nullable=true),
+ *   @OA\Property(property="timestamp", type="string", format="date-time", nullable=true)
+ * )
+ * 
+ * @OA\Schema(
+ *   schema="FeedResponse",
+ *   type="object",
+ *   @OA\Property(property="feed", type="array", @OA\Items(ref="#/components/schemas/FeedItem")),
+ *   @OA\Property(property="pagination", type="object",
+ *     @OA\Property(property="current_page", type="integer"),
+ *     @OA\Property(property="per_page", type="integer"),
+ *     @OA\Property(property="total", type="integer"),
+ *     @OA\Property(property="has_more", type="boolean")
+ *   ),
+ *   @OA\Property(property="metadata", type="object",
+ *     @OA\Property(property="generated_at", type="string", format="date-time"),
+ *     @OA\Property(property="user_id", type="integer")
+ *   )
+ * )
+ * 
+ * @OA\Schema(
+ *   schema="WebSocketStatus",
+ *   type="object",
+ *   @OA\Property(property="status", type="string", example="connected"),
+ *   @OA\Property(property="connection_id", type="string", example="ws_abc123", nullable=true),
+ *   @OA\Property(property="timestamp", type="string", format="date-time")
+ * )
+ * 
+ * @OA\Schema(
+ *   schema="RateLimitStatus",
+ *   type="object",
+ *   @OA\Property(property="action", type="string", example="message_send"),
+ *   @OA\Property(property="allowed", type="boolean"),
+ *   @OA\Property(property="remaining", type="integer"),
+ *   @OA\Property(property="limit", type="integer"),
+ *   @OA\Property(property="reset_in_seconds", type="integer")
+ * )
+ * 
+ * @OA\Schema(
+ *   schema="ContentOptimizationResult",
+ *   type="object",
+ *   @OA\Property(property="original", type="string"),
+ *   @OA\Property(property="optimized", type="string"),
+ *   @OA\Property(property="notes", type="array", @OA\Items(type="string")),
+ *   @OA\Property(property="score", type="number", format="float")
+ * )
  */
 class Schemas
 {
