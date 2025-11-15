@@ -37,8 +37,9 @@ class ChatroomMessageController extends Controller
      *   @OA\Parameter(name="user_id", in="query", required=false, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="pinned", in="query", required=false, @OA\Schema(type="boolean")),
      *   @OA\Parameter(name="announcements", in="query", required=false, @OA\Schema(type="boolean")),
-     *   @OA\Response(response=200, description="Paginated messages"),
-     *   @OA\Response(response=403, description="Not a member")
+    *   @OA\Response(response=200, description="Paginated messages", @OA\JsonContent(ref="#/components/schemas/PaginatedChatMessages")),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function index(Request $request, int $chatroomId): JsonResponse
@@ -94,9 +95,10 @@ class ChatroomMessageController extends Controller
      *     @OA\Property(property="parent_id", type="integer", nullable=true),
      *     @OA\Property(property="metadata", type="object")
      *   )),
-     *   @OA\Response(response=201, description="Created"),
-     *   @OA\Response(response=403, description="Muted/Not member"),
-     *   @OA\Response(response=422, description="Moderation blocked")
+    *   @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/ChatMessage")),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+    *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function store(Request $request, int $chatroomId): JsonResponse
@@ -201,9 +203,9 @@ class ChatroomMessageController extends Controller
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="Message"),
-     *   @OA\Response(response=403, description="Not a member"),
-     *   @OA\Response(response=404, description="Not found")
+    *   @OA\Response(response=200, description="Message", @OA\JsonContent(ref="#/components/schemas/ChatMessage")),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function show(int $chatroomId, int $messageId): JsonResponse
@@ -235,9 +237,10 @@ class ChatroomMessageController extends Controller
      *     required={"content"},
      *     @OA\Property(property="content", type="string", maxLength=2000)
      *   )),
-     *   @OA\Response(response=200, description="Updated"),
-     *   @OA\Response(response=403, description="Forbidden"),
-     *   @OA\Response(response=422, description="Moderation blocked")
+    *   @OA\Response(response=200, description="Updated", @OA\JsonContent(ref="#/components/schemas/ChatMessage")),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+    *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function update(Request $request, int $chatroomId, int $messageId): JsonResponse
@@ -295,8 +298,9 @@ class ChatroomMessageController extends Controller
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="Deleted"),
-     *   @OA\Response(response=403, description="Forbidden")
+    *   @OA\Response(response=200, description="Deleted", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function destroy(int $chatroomId, int $messageId): JsonResponse
@@ -339,7 +343,10 @@ class ChatroomMessageController extends Controller
      *     required={"emoji"},
      *     @OA\Property(property="emoji", type="string", maxLength=10)
      *   )),
-     *   @OA\Response(response=200, description="Added")
+    *   @OA\Response(response=200, description="Added", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+    *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function addReaction(Request $request, int $chatroomId, int $messageId): JsonResponse
@@ -375,7 +382,10 @@ class ChatroomMessageController extends Controller
      *     required={"emoji"},
      *     @OA\Property(property="emoji", type="string", maxLength=10)
      *   )),
-     *   @OA\Response(response=200, description="Removed")
+    *   @OA\Response(response=200, description="Removed", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+    *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function removeReaction(Request $request, int $chatroomId, int $messageId): JsonResponse
@@ -407,7 +417,9 @@ class ChatroomMessageController extends Controller
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="Pinned")
+    *   @OA\Response(response=200, description="Pinned", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function pin(int $chatroomId, int $messageId): JsonResponse
@@ -434,7 +446,9 @@ class ChatroomMessageController extends Controller
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="Unpinned")
+    *   @OA\Response(response=200, description="Unpinned", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function unpin(int $chatroomId, int $messageId): JsonResponse
@@ -460,7 +474,9 @@ class ChatroomMessageController extends Controller
      *   summary="Pinned messages",
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="List")
+    *   @OA\Response(response=200, description="List", @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ChatMessage"))),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function pinned(int $chatroomId): JsonResponse
@@ -490,7 +506,9 @@ class ChatroomMessageController extends Controller
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="List")
+    *   @OA\Response(response=200, description="List", @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ChatMessage"))),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function replies(int $chatroomId, int $messageId): JsonResponse

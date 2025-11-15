@@ -74,6 +74,7 @@ See also:
   - `ValidationError` → `ValidationError` schema (422)
   - `BadRequest` → `ValidationError` schema (400)
   - `Forbidden` → `ForbiddenError` schema (403)
+  - `NotFound` → `NotFoundError` schema (404)
 - Common data schemas (components.schemas):
   - `SimpleMessageResponse` for simple success messages
   - `RecommendationList`, `TrendingList`, `FeedResponse`

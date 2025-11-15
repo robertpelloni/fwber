@@ -27,6 +27,12 @@ namespace App\Http\Controllers;
  *     @OA\JsonContent(ref="#/components/schemas/ValidationError")
  * )
  * 
+ * @OA\Response(
+ *     response="NotFound",
+ *     description="Not found",
+ *     @OA\JsonContent(ref="#/components/schemas/NotFoundError")
+ * )
+ * 
  * @OA\Schema(
  *     schema="User",
  *     type="object",
@@ -56,6 +62,12 @@ namespace App\Http\Controllers;
  *     schema="ForbiddenError",
  *     type="object",
  *     @OA\Property(property="message", type="string", example="Forbidden")
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="NotFoundError",
+ *     type="object",
+ *     @OA\Property(property="message", type="string", example="Not Found")
  * )
  * 
  * @OA\Schema(

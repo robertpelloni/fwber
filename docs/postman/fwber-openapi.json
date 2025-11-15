@@ -3219,10 +3219,20 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Paginated messages"
+                        "description": "Paginated messages",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedChatMessages"
+                                }
+                            }
+                        }
                     },
                     "403": {
-                        "description": "Not a member"
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
                     }
                 },
                 "security": [
@@ -3285,13 +3295,23 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ChatMessage"
+                                }
+                            }
+                        }
                     },
                     "403": {
-                        "description": "Muted/Not member"
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
                     },
                     "422": {
-                        "description": "Moderation blocked"
+                        "$ref": "#/components/responses/ValidationError"
                     }
                 },
                 "security": [
@@ -3329,13 +3349,20 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Message"
+                        "description": "Message",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ChatMessage"
+                                }
+                            }
+                        }
                     },
                     "403": {
-                        "description": "Not a member"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "404": {
-                        "description": "Not found"
+                        "$ref": "#/components/responses/NotFound"
                     }
                 },
                 "security": [
@@ -3390,13 +3417,23 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Updated"
+                        "description": "Updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ChatMessage"
+                                }
+                            }
+                        }
                     },
                     "403": {
-                        "description": "Forbidden"
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
                     },
                     "422": {
-                        "description": "Moderation blocked"
+                        "$ref": "#/components/responses/ValidationError"
                     }
                 },
                 "security": [
@@ -3432,10 +3469,20 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Deleted"
+                        "description": "Deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SimpleMessageResponse"
+                                }
+                            }
+                        }
                     },
                     "403": {
-                        "description": "Forbidden"
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
                     }
                 },
                 "security": [
@@ -3492,7 +3539,23 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Added"
+                        "description": "Added",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SimpleMessageResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
                     }
                 },
                 "security": [
@@ -3547,7 +3610,23 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Removed"
+                        "description": "Removed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SimpleMessageResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
                     }
                 },
                 "security": [
@@ -3585,7 +3664,20 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Pinned"
+                        "description": "Pinned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SimpleMessageResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
                     }
                 },
                 "security": [
@@ -3621,7 +3713,20 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Unpinned"
+                        "description": "Unpinned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SimpleMessageResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
                     }
                 },
                 "security": [
@@ -3651,7 +3756,23 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "List"
+                        "description": "List",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ChatMessage"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
                     }
                 },
                 "security": [
@@ -3689,7 +3810,23 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "List"
+                        "description": "List",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ChatMessage"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
                     }
                 },
                 "security": [
@@ -8937,6 +9074,15 @@
                 },
                 "type": "object"
             },
+            "NotFoundError": {
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "Not Found"
+                    }
+                },
+                "type": "object"
+            },
             "Reaction": {
                 "properties": {
                     "user_id": {
@@ -9594,6 +9740,16 @@
                     "application/json": {
                         "schema": {
                             "$ref": "#/components/schemas/ValidationError"
+                        }
+                    }
+                }
+            },
+            "NotFound": {
+                "description": "Not found",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/NotFoundError"
                         }
                     }
                 }
