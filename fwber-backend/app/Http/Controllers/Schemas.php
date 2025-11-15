@@ -4,6 +4,12 @@ namespace App\Http\Controllers;
 
 /**
  * @OA\Response(
+ *     response="BadRequest",
+ *     description="Bad request",
+ *     @OA\JsonContent(ref="#/components/schemas/ValidationError")
+ * )
+ * 
+ * @OA\Response(
  *     response="Unauthorized",
  *     description="Unauthenticated",
  *     @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")

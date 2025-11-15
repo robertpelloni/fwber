@@ -3749,8 +3749,8 @@
                     "401": {
                         "$ref": "#/components/responses/Unauthorized"
                     },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationError"
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
                     }
                 },
                 "security": [
@@ -3879,8 +3879,8 @@
                     "401": {
                         "$ref": "#/components/responses/Unauthorized"
                     },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationError"
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
                     }
                 },
                 "security": [
@@ -3940,8 +3940,8 @@
                     "401": {
                         "$ref": "#/components/responses/Unauthorized"
                     },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationError"
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
                     }
                 },
                 "security": [
@@ -4095,8 +4095,8 @@
                     "401": {
                         "$ref": "#/components/responses/Unauthorized"
                     },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationError"
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
                     }
                 },
                 "security": [
@@ -9213,6 +9213,16 @@
             }
         },
         "responses": {
+            "BadRequest": {
+                "description": "Bad request",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        }
+                    }
+                }
+            },
             "Unauthorized": {
                 "description": "Unauthenticated",
                 "content": {

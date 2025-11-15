@@ -51,8 +51,8 @@ class ContentGenerationController extends Controller
      *             @OA\Property(property="generated_at", type="string", format="date-time")
      *         )
      *     ),
-     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
-     *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
+    *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+    *     @OA\Response(response=400, ref="#/components/responses/BadRequest")
      * )
      */
     public function generateProfileContent(Request $request): JsonResponse
@@ -184,9 +184,9 @@ class ContentGenerationController extends Controller
      *             )
      *         )
      *     ),
-     *     @OA\Response(response=200, description="Conversation starters generated"),
-     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
-     *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
+    *     @OA\Response(response=200, description="Conversation starters generated"),
+    *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+    *     @OA\Response(response=400, ref="#/components/responses/BadRequest")
      * )
      */
     public function generateConversationStarters(Request $request): JsonResponse
@@ -246,9 +246,9 @@ class ContentGenerationController extends Controller
      *             )
      *         )
      *     ),
-     *     @OA\Response(response=200, description="Content optimized"),
-     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
-     *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
+    *     @OA\Response(response=200, description="Content optimized"),
+    *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+    *     @OA\Response(response=400, ref="#/components/responses/BadRequest")
      * )
      */
     public function optimizeContent(Request $request): JsonResponse
@@ -407,9 +407,9 @@ class ContentGenerationController extends Controller
      *             @OA\Property(property="improvements", type="array", @OA\Items(type="string"))
      *         )
      *     ),
-     *     @OA\Response(response=200, description="Feedback submitted"),
-     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
-     *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
+    *     @OA\Response(response=200, description="Feedback submitted"),
+    *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+    *     @OA\Response(response=400, ref="#/components/responses/BadRequest")
      * )
      */
     public function submitContentFeedback(Request $request): JsonResponse
