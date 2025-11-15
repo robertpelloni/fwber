@@ -35,22 +35,10 @@ class GroupController extends Controller
     *     description="List of groups",
     *     @OA\JsonContent(
     *       type="object",
-    *       @OA\Property(
-    *         property="groups",
-    *         type="array",
-    *         @OA\Items(type="object",
-    *           @OA\Property(property="id", type="integer"),
-    *           @OA\Property(property="name", type="string"),
-    *           @OA\Property(property="description", type="string", nullable=true),
-    *           @OA\Property(property="visibility", type="string", example="public"),
-    *           @OA\Property(property="max_members", type="integer"),
-    *           @OA\Property(property="is_active", type="boolean"),
-    *           @OA\Property(property="active_members_count", type="integer")
-    *         )
-    *       )
+    *       @OA\Property(property="groups", type="array", @OA\Items(ref="#/components/schemas/Group"))
     *     )
     *   ),
-    *   @OA\Response(response=401, description="Unauthenticated")
+    *   @OA\Response(response=401, ref="#/components/responses/Unauthorized")
     * )
      */
     public function index(): JsonResponse
@@ -91,12 +79,7 @@ class GroupController extends Controller
         *     response=201,
         *     description="Group created",
         *     @OA\JsonContent(type="object",
-        *       @OA\Property(property="group", type="object",
-        *         @OA\Property(property="id", type="integer"),
-        *         @OA\Property(property="name", type="string"),
-        *         @OA\Property(property="visibility", type="string"),
-        *         @OA\Property(property="max_members", type="integer")
-        *       )
+        *       @OA\Property(property="group", ref="#/components/schemas/Group")
         *     )
         *   ),
         *   @OA\Response(response=422, ref="#/components/responses/ValidationError"),

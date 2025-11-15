@@ -188,32 +188,7 @@
                                         "groups": {
                                             "type": "array",
                                             "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer"
-                                                    },
-                                                    "name": {
-                                                        "type": "string"
-                                                    },
-                                                    "description": {
-                                                        "type": "string",
-                                                        "nullable": true
-                                                    },
-                                                    "visibility": {
-                                                        "type": "string",
-                                                        "example": "public"
-                                                    },
-                                                    "max_members": {
-                                                        "type": "integer"
-                                                    },
-                                                    "is_active": {
-                                                        "type": "boolean"
-                                                    },
-                                                    "active_members_count": {
-                                                        "type": "integer"
-                                                    }
-                                                },
-                                                "type": "object"
+                                                "$ref": "#/components/schemas/Group"
                                             }
                                         }
                                     },
@@ -223,7 +198,7 @@
                         }
                     },
                     "401": {
-                        "description": "Unauthenticated"
+                        "$ref": "#/components/responses/Unauthorized"
                     }
                 },
                 "security": [
@@ -283,21 +258,7 @@
                                 "schema": {
                                     "properties": {
                                         "group": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer"
-                                                },
-                                                "name": {
-                                                    "type": "string"
-                                                },
-                                                "visibility": {
-                                                    "type": "string"
-                                                },
-                                                "max_members": {
-                                                    "type": "integer"
-                                                }
-                                            },
-                                            "type": "object"
+                                            "$ref": "#/components/schemas/Group"
                                         }
                                     },
                                     "type": "object"
@@ -1410,27 +1371,14 @@
                                         "messages": {
                                             "type": "array",
                                             "items": {
-                                                "type": "object"
+                                                "$ref": "#/components/schemas/DirectMessage"
                                             }
                                         },
                                         "pagination": {
                                             "type": "object"
                                         },
                                         "other_user": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer"
-                                                },
-                                                "name": {
-                                                    "type": "string"
-                                                },
-                                                "last_seen_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "nullable": true
-                                                }
-                                            },
-                                            "type": "object"
+                                            "$ref": "#/components/schemas/User"
                                         }
                                     },
                                     "type": "object"
@@ -1445,7 +1393,7 @@
                         "$ref": "#/components/responses/NotFound"
                     },
                     "401": {
-                        "description": "Unauthenticated"
+                        "$ref": "#/components/responses/Unauthorized"
                     }
                 },
                 "security": [
@@ -2012,6 +1960,28 @@
                 "summary": "Request avatar generation",
                 "description": "Request avatar generation using the saved avatar_prompt",
                 "operationId": "92194b031a2d58df173881d60ed56ea5",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "style": {
+                                        "type": "string",
+                                        "enum": [
+                                            "realistic",
+                                            "anime",
+                                            "fantasy",
+                                            "sci-fi",
+                                            "cartoon",
+                                            "pixel-art"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Requested",
@@ -5743,7 +5713,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "type": "object"
+                                                "$ref": "#/components/schemas/Photo"
                                             }
                                         }
                                     },
@@ -5753,7 +5723,7 @@
                         }
                     },
                     "401": {
-                        "$ref": "#/components/schemas/UnauthorizedError"
+                        "$ref": "#/components/responses/Unauthorized"
                     }
                 },
                 "security": [
@@ -6536,7 +6506,7 @@
                                         "artifacts": {
                                             "type": "array",
                                             "items": {
-                                                "type": "object"
+                                                "$ref": "#/components/schemas/ProximityArtifact"
                                             }
                                         }
                                     },
@@ -9870,6 +9840,241 @@
                         "format": "date-time"
                     },
                     "settings": {
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Photo": {
+                "required": [
+                    "id",
+                    "filename",
+                    "url"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 42
+                    },
+                    "filename": {
+                        "type": "string",
+                        "example": "photo_abc123.jpg"
+                    },
+                    "original_filename": {
+                        "type": "string",
+                        "example": "my_photo.jpg",
+                        "nullable": true
+                    },
+                    "url": {
+                        "type": "string",
+                        "example": "https://cdn.fwber.com/photos/abc123.jpg"
+                    },
+                    "thumbnail_url": {
+                        "type": "string",
+                        "example": "https://cdn.fwber.com/photos/thumb_abc123.jpg",
+                        "nullable": true
+                    },
+                    "mime_type": {
+                        "type": "string",
+                        "example": "image/jpeg"
+                    },
+                    "file_size": {
+                        "type": "integer",
+                        "example": 245678
+                    },
+                    "width": {
+                        "type": "integer",
+                        "example": 1920,
+                        "nullable": true
+                    },
+                    "height": {
+                        "type": "integer",
+                        "example": 1080,
+                        "nullable": true
+                    },
+                    "is_primary": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "is_private": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "sort_order": {
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Group": {
+                "required": [
+                    "id",
+                    "name",
+                    "created_by"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 15
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Running Club"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Weekly running meetups",
+                        "nullable": true
+                    },
+                    "created_by": {
+                        "type": "integer",
+                        "example": 8
+                    },
+                    "member_count": {
+                        "type": "integer",
+                        "example": 32
+                    },
+                    "is_public": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "settings": {
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "ProximityArtifact": {
+                "required": [
+                    "id",
+                    "user_id",
+                    "artifact_type",
+                    "content"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 78
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "artifact_type": {
+                        "type": "string",
+                        "example": "status"
+                    },
+                    "content": {
+                        "type": "string",
+                        "example": "Looking for coffee recommendations nearby"
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 40.7128
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": -74.006
+                    },
+                    "radius_meters": {
+                        "type": "integer",
+                        "example": 500
+                    },
+                    "expires_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "visibility": {
+                        "type": "string",
+                        "example": "public"
+                    },
+                    "metadata": {
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "DirectMessage": {
+                "required": [
+                    "id",
+                    "sender_id",
+                    "recipient_id",
+                    "content"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 456
+                    },
+                    "sender_id": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "recipient_id": {
+                        "type": "integer",
+                        "example": 20
+                    },
+                    "content": {
+                        "type": "string",
+                        "example": "Hey, how are you?"
+                    },
+                    "message_type": {
+                        "type": "string",
+                        "example": "text"
+                    },
+                    "is_read": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "read_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "metadata": {
                         "type": "object",
                         "nullable": true
                     },

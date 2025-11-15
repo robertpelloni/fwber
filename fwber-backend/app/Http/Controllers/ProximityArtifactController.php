@@ -31,7 +31,7 @@ class ProximityArtifactController extends Controller
      *     response=200,
      *     description="Proximity artifacts",
      *     @OA\JsonContent(
-     *       @OA\Property(property="artifacts", type="array", @OA\Items(type="object"))
+     *       @OA\Property(property="artifacts", type="array", @OA\Items(ref="#/components/schemas/ProximityArtifact"))
      *     )
      *   ),
     *   @OA\Response(response=422, ref="#/components/responses/ValidationError")

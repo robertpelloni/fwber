@@ -61,10 +61,10 @@ class PhotoController extends Controller
      *       @OA\Property(property="success", type="boolean", example=true),
      *       @OA\Property(property="count", type="integer"),
      *       @OA\Property(property="max_photos", type="integer", example=10),
-     *       @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *       @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Photo"))
      *     )
      *   ),
-     *   @OA\Response(response=401, ref="#/components/schemas/UnauthorizedError")
+     *   @OA\Response(response=401, ref="#/components/responses/Unauthorized")
      * )
      * 
      * @param Request $request
