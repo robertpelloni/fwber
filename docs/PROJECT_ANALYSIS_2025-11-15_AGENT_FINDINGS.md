@@ -18,7 +18,7 @@ This document contains a detailed summary of the "fwber" project, including an a
 
 fwber is built on a modern, robust technology stack:
 
-*   **Backend:** The core of the application is a powerful RESTful API built with **Laravel 12** and **PHP 8.4**. It handles all business logic, including user authentication, matching, and real-time communication.
+*   **Backend:** The core of the application is a powerful RESTful API built with **Laravel 12** and **PHP ^8.2**. It handles all business logic, including user authentication, matching, and real-time communication.
 *   **Frontend:** The user interface is a responsive and interactive single-page application built with **Next.js 14**, **React 18**, and **TypeScript**.
 *   **Real-time Features:** The application uses **Mercure**, a modern, high-performance protocol built on Server-Sent Events (SSE), to power real-time features like chat, notifications, and live location updates.
 *   **Database:** The primary database is **MySQL 8.0**, with **SQLite** used for local development.
