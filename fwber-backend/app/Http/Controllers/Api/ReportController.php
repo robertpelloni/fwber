@@ -10,6 +10,26 @@ use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
 {
+    /**
+     * @OA\Post(
+     *   path="/reports",
+     *   tags={"Safety"},
+     *   summary="Report a user",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"accused_id", "reason"},
+     *       @OA\Property(property="accused_id", type="integer"),
+     *       @OA\Property(property="message_id", type="integer"),
+     *       @OA\Property(property="reason", type="string", maxLength=100),
+     *       @OA\Property(property="details", type="string", maxLength=2000)
+     *     )
+     *   ),
+     *   @OA\Response(response=201, description="Report created"),
+     *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
+     * )
+     */
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -32,7 +52,16 @@ class ReportController extends Controller
         return response()->json(['data' => $report], 201);
     }
 
-    // List reports (moderator/admin only). For now simple role check on user->is_moderator flag.
+    /**
+     * @OA\Get(
+     *   path="/reports",
+     *   tags={"Safety"},
+     *   summary="List reports (moderator only)",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="Reports list (paginated)"),
+     *   @OA\Response(response=403, description="Forbidden")
+     * )
+     */
     public function index()
     {
         $user = Auth::user();
@@ -43,7 +72,25 @@ class ReportController extends Controller
         return response()->json(['data' => $reports]);
     }
 
-    // Update report status & optional resolution notes (moderator only)
+    /**
+     * @OA\Put(
+     *   path="/reports/{reportId}",
+     *   tags={"Safety"},
+     *   summary="Update report status (moderator only)",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="reportId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"status"},
+     *       @OA\Property(property="status", type="string", enum={"open", "reviewing", "resolved", "dismissed"}),
+     *       @OA\Property(property="resolution_notes", type="string", maxLength=5000)
+     *     )
+     *   ),
+     *   @OA\Response(response=200, description="Report updated"),
+     *   @OA\Response(response=403, description="Forbidden")
+     * )
+     */
     public function update(Request $request, int $reportId)
     {
         $user = Auth::user();

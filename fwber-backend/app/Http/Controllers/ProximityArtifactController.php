@@ -17,6 +17,26 @@ class ProximityArtifactController extends Controller
         private GeoSpoofDetectionService $geoSpoofService,
         private MercurePublisher $mercurePublisher
     ) {}
+    /**
+     * @OA\Get(
+     *   path="/proximity/feed",
+     *   tags={"Proximity Artifacts"},
+     *   summary="Get proximity artifacts feed",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="lat", in="query", required=true, @OA\Schema(type="number")),
+     *   @OA\Parameter(name="lng", in="query", required=true, @OA\Schema(type="number")),
+     *   @OA\Parameter(name="radius", in="query", @OA\Schema(type="integer", minimum=100, maximum=10000)),
+     *   @OA\Parameter(name="type", in="query", @OA\Schema(type="string", enum={"chat", "board_post", "announce"})),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Proximity artifacts",
+     *     @OA\JsonContent(
+     *       @OA\Property(property="artifacts", type="array", @OA\Items(type="object"))
+     *     )
+     *   ),
+     *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
+     * )
+     */
     public function index(Request $request): JsonResponse
     {
         $user = auth()->user();
@@ -55,6 +75,27 @@ class ProximityArtifactController extends Controller
         return response()->json(['artifacts' => $artifacts]);
     }
 
+    /**
+     * @OA\Post(
+     *   path="/proximity/artifacts",
+     *   tags={"Proximity Artifacts"},
+     *   summary="Create proximity artifact",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"type", "content", "lat", "lng"},
+     *       @OA\Property(property="type", type="string", enum={"chat", "board_post", "announce"}),
+     *       @OA\Property(property="content", type="string"),
+     *       @OA\Property(property="lat", type="number"),
+     *       @OA\Property(property="lng", type="number"),
+     *       @OA\Property(property="radius", type="integer", minimum=100, maximum=10000)
+     *     )
+     *   ),
+     *   @OA\Response(response=201, description="Artifact created"),
+     *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
+     * )
+     */
     public function store(Request $request, ProximityArtifactService $service): JsonResponse
     {
         $user = auth()->user();
@@ -118,6 +159,17 @@ class ProximityArtifactController extends Controller
         ]], 201);
     }
 
+    /**
+     * @OA\Get(
+     *   path="/proximity/artifacts/{id}",
+     *   tags={"Proximity Artifacts"},
+     *   summary="Get single artifact",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Artifact details"),
+     *   @OA\Response(response=404, description="Artifact not found")
+     * )
+     */
     public function show(int $id): JsonResponse
     {
         $artifact = ProximityArtifact::active()->findOrFail($id);
@@ -135,6 +187,17 @@ class ProximityArtifactController extends Controller
         ]]);
     }
 
+    /**
+     * @OA\Post(
+     *   path="/proximity/artifacts/{id}/flag",
+     *   tags={"Proximity Artifacts"},
+     *   summary="Flag artifact for moderation",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Flag recorded"),
+     *   @OA\Response(response=404, description="Artifact not found")
+     * )
+     */
     public function flag(int $id, Request $request, ProximityArtifactService $service): JsonResponse
     {
         $user = auth()->user();
@@ -163,6 +226,18 @@ class ProximityArtifactController extends Controller
         return response()->json(['message' => 'Flag recorded']);
     }
 
+    /**
+     * @OA\Delete(
+     *   path="/proximity/artifacts/{id}",
+     *   tags={"Proximity Artifacts"},
+     *   summary="Remove artifact (owner only)",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Artifact removed"),
+     *   @OA\Response(response=403, description="Forbidden"),
+     *   @OA\Response(response=404, description="Artifact not found")
+     * )
+     */
     public function destroy(int $id): JsonResponse
     {
         $user = auth()->user();
@@ -198,6 +273,26 @@ class ProximityArtifactController extends Controller
     /**
      * Local Pulse - Merged feed of proximity artifacts + nearby match candidates
      * This combines the draw of hyperlocal ephemeral content with mutual-match discovery
+     * 
+     * @OA\Get(
+     *   path="/proximity/local-pulse",
+     *   tags={"Proximity Artifacts"},
+     *   summary="Local Pulse: ephemeral content + nearby matches",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="lat", in="query", required=true, @OA\Schema(type="number")),
+     *   @OA\Parameter(name="lng", in="query", required=true, @OA\Schema(type="number")),
+     *   @OA\Parameter(name="radius", in="query", @OA\Schema(type="integer", minimum=100, maximum=10000)),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Local pulse feed",
+     *     @OA\JsonContent(
+     *       @OA\Property(property="artifacts", type="array", @OA\Items(type="object")),
+     *       @OA\Property(property="candidates", type="array", @OA\Items(type="object")),
+     *       @OA\Property(property="meta", type="object")
+     *     )
+     *   ),
+     *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
+     * )
      * 
      * @param Request $request
      * @return JsonResponse

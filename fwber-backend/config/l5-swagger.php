@@ -63,6 +63,11 @@ return [
                     base_path('app/Http/Controllers/ProximityChatroomMessageController.php'),
                     base_path('app/Http/Controllers/AnalyticsController.php'),
                     base_path('app/Http/Controllers/ModerationController.php'),
+                    base_path('app/Http/Controllers/PhotoController.php'),
+                    base_path('app/Http/Controllers/ProximityArtifactController.php'),
+                    base_path('app/Http/Controllers/Api/RelationshipTierController.php'),
+                    base_path('app/Http/Controllers/Api/BlockController.php'),
+                    base_path('app/Http/Controllers/Api/ReportController.php'),
                 ],
                 
                 /*

@@ -99,6 +99,26 @@ namespace App\Http\Controllers;
  *     name="Moderation",
  *     description="Moderator tools for reviewing content and enforcing policy"
  * )
+ * 
+ * @OA\Tag(
+ *     name="Photos",
+ *     description="Photo upload and management"
+ * )
+ * 
+ * @OA\Tag(
+ *     name="Proximity Artifacts",
+ *     description="Ephemeral location-based content (Local Pulse)"
+ * )
+ * 
+ * @OA\Tag(
+ *     name="Relationship Tiers",
+ *     description="Progressive photo unlock system for matches"
+ * )
+ * 
+ * @OA\Tag(
+ *     name="Safety",
+ *     description="User blocking and reporting"
+ * )
  */
 abstract class Controller
 {

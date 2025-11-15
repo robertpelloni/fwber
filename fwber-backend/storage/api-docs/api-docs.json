@@ -101,6 +101,75 @@
                 ]
             }
         },
+        "/blocks": {
+            "post": {
+                "tags": [
+                    "Safety"
+                ],
+                "summary": "Block a user",
+                "operationId": "648b4c7499931491263f1db724f7c783",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "blocked_id"
+                                ],
+                                "properties": {
+                                    "blocked_id": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User blocked"
+                    },
+                    "422": {
+                        "$ref": "#/components/schemas/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/blocks/{blockedId}": {
+            "delete": {
+                "tags": [
+                    "Safety"
+                ],
+                "summary": "Unblock a user",
+                "operationId": "e5a19499f470aec8d6610325750e268e",
+                "parameters": [
+                    {
+                        "name": "blockedId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User unblocked"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/groups": {
             "get": {
                 "tags": [
@@ -1290,6 +1359,276 @@
                     },
                     "401": {
                         "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/matches/{matchId}/tier": {
+            "get": {
+                "tags": [
+                    "Relationship Tiers"
+                ],
+                "summary": "Get match tier progress",
+                "description": "Get tier progress for a specific match",
+                "operationId": "b07dfd04fb33f39713659d88ef965ea5",
+                "parameters": [
+                    {
+                        "name": "matchId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tier progress"
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Match not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Relationship Tiers"
+                ],
+                "summary": "Update tier metrics",
+                "description": "Update tier metrics",
+                "operationId": "5c38faa3c2edbc239b94adee43c27c6d",
+                "parameters": [
+                    {
+                        "name": "matchId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "increment_messages": {
+                                        "type": "boolean"
+                                    },
+                                    "mark_met_in_person": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tier updated"
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/matches/{matchId}/tier/photos": {
+            "get": {
+                "tags": [
+                    "Relationship Tiers"
+                ],
+                "summary": "Get tier-based photos (progressive unlock)",
+                "description": "Get photos for a match based on current tier",
+                "operationId": "74bab3e6d4c19884ef73206972380984",
+                "parameters": [
+                    {
+                        "name": "matchId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Photos visible at current tier",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ai_photos": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "real_photos": {
+                                            "type": "object"
+                                        },
+                                        "unlock_requirements": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/reports": {
+            "get": {
+                "tags": [
+                    "Safety"
+                ],
+                "summary": "List reports (moderator only)",
+                "operationId": "81a8afd2aa3c69c6b5565682c3a78dd7",
+                "responses": {
+                    "200": {
+                        "description": "Reports list (paginated)"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Safety"
+                ],
+                "summary": "Report a user",
+                "operationId": "39a2e936857d7fa55026c1daac0f01d0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "accused_id",
+                                    "reason"
+                                ],
+                                "properties": {
+                                    "accused_id": {
+                                        "type": "integer"
+                                    },
+                                    "message_id": {
+                                        "type": "integer"
+                                    },
+                                    "reason": {
+                                        "type": "string",
+                                        "maxLength": 100
+                                    },
+                                    "details": {
+                                        "type": "string",
+                                        "maxLength": 2000
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Report created"
+                    },
+                    "422": {
+                        "$ref": "#/components/schemas/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/reports/{reportId}": {
+            "put": {
+                "tags": [
+                    "Safety"
+                ],
+                "summary": "Update report status (moderator only)",
+                "operationId": "c96abd77d6acae7b73c0331db7e00295",
+                "parameters": [
+                    {
+                        "name": "reportId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "open",
+                                            "reviewing",
+                                            "resolved",
+                                            "dismissed"
+                                        ]
+                                    },
+                                    "resolution_notes": {
+                                        "type": "string",
+                                        "maxLength": 5000
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Report updated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
                     }
                 },
                 "security": [
@@ -4383,6 +4722,236 @@
                 ]
             }
         },
+        "/photos": {
+            "get": {
+                "tags": [
+                    "Photos"
+                ],
+                "summary": "List user photos",
+                "description": "Get authenticated user's photos",
+                "operationId": "079f6213f018a45e1820798830065757",
+                "responses": {
+                    "200": {
+                        "description": "User photos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "count": {
+                                            "type": "integer"
+                                        },
+                                        "max_photos": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/schemas/UnauthorizedError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Photos"
+                ],
+                "summary": "Upload photo",
+                "description": "Upload a new photo",
+                "operationId": "4331303a20951bd23e2ede83046c8e48",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "photo"
+                                ],
+                                "properties": {
+                                    "photo": {
+                                        "description": "Image file (JPEG, PNG, GIF, WebP, max 5MB)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "is_private": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Photo uploaded"
+                    },
+                    "403": {
+                        "description": "Uploads disabled or avatar-only mode"
+                    },
+                    "422": {
+                        "$ref": "#/components/schemas/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/photos/{id}": {
+            "put": {
+                "tags": [
+                    "Photos"
+                ],
+                "summary": "Update photo",
+                "description": "Update photo properties (privacy, primary status)",
+                "operationId": "f828be90d082c2c242cd99f0e591e652",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "is_primary": {
+                                        "type": "boolean"
+                                    },
+                                    "is_private": {
+                                        "type": "boolean"
+                                    },
+                                    "sort_order": {
+                                        "type": "integer",
+                                        "minimum": 0
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Photo updated"
+                    },
+                    "404": {
+                        "description": "Photo not found"
+                    },
+                    "422": {
+                        "$ref": "#/components/schemas/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Photos"
+                ],
+                "summary": "Delete photo",
+                "description": "Delete a photo",
+                "operationId": "0e1387c80eb05cb3059266b8ae46dca0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Photo deleted"
+                    },
+                    "404": {
+                        "description": "Photo not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/photos/reorder": {
+            "post": {
+                "tags": [
+                    "Photos"
+                ],
+                "summary": "Reorder photos",
+                "description": "Reorder photos",
+                "operationId": "6c991edabeaa3844a792f5c99693fb25",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "photo_ids"
+                                ],
+                                "properties": {
+                                    "photo_ids": {
+                                        "description": "Ordered array of photo IDs",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Photos reordered"
+                    },
+                    "422": {
+                        "$ref": "#/components/schemas/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/profile": {
             "get": {
                 "tags": [
@@ -4910,6 +5479,315 @@
                                 }
                             }
                         }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/proximity/feed": {
+            "get": {
+                "tags": [
+                    "Proximity Artifacts"
+                ],
+                "summary": "Get proximity artifacts feed",
+                "operationId": "acda687a192bb92e189f3ea06e801d58",
+                "parameters": [
+                    {
+                        "name": "lat",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "lng",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "radius",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 10000,
+                            "minimum": 100
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "chat",
+                                "board_post",
+                                "announce"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Proximity artifacts",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "artifacts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/schemas/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/proximity/artifacts": {
+            "post": {
+                "tags": [
+                    "Proximity Artifacts"
+                ],
+                "summary": "Create proximity artifact",
+                "operationId": "3bf7e59e0924c1854052f3538bffcc33",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "type",
+                                    "content",
+                                    "lat",
+                                    "lng"
+                                ],
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "chat",
+                                            "board_post",
+                                            "announce"
+                                        ]
+                                    },
+                                    "content": {
+                                        "type": "string"
+                                    },
+                                    "lat": {
+                                        "type": "number"
+                                    },
+                                    "lng": {
+                                        "type": "number"
+                                    },
+                                    "radius": {
+                                        "type": "integer",
+                                        "maximum": 10000,
+                                        "minimum": 100
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Artifact created"
+                    },
+                    "422": {
+                        "$ref": "#/components/schemas/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/proximity/artifacts/{id}": {
+            "get": {
+                "tags": [
+                    "Proximity Artifacts"
+                ],
+                "summary": "Get single artifact",
+                "operationId": "c261fe77a677deccc3b4dd2535c6b4be",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Artifact details"
+                    },
+                    "404": {
+                        "description": "Artifact not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Proximity Artifacts"
+                ],
+                "summary": "Remove artifact (owner only)",
+                "operationId": "07441f62627b20328417bd68bc533fb2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Artifact removed"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Artifact not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/proximity/artifacts/{id}/flag": {
+            "post": {
+                "tags": [
+                    "Proximity Artifacts"
+                ],
+                "summary": "Flag artifact for moderation",
+                "operationId": "628a3587774fb62a04a2124d7ebfaa26",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Flag recorded"
+                    },
+                    "404": {
+                        "description": "Artifact not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/proximity/local-pulse": {
+            "get": {
+                "tags": [
+                    "Proximity Artifacts"
+                ],
+                "summary": "Local Pulse: ephemeral content + nearby matches",
+                "description": "Local Pulse - Merged feed of proximity artifacts + nearby match candidates\nThis combines the draw of hyperlocal ephemeral content with mutual-match discovery",
+                "operationId": "14cde68a701e79fff1c6e48f4fd62628",
+                "parameters": [
+                    {
+                        "name": "lat",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "lng",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "radius",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 10000,
+                            "minimum": 100
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Local pulse feed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "artifacts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "candidates": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/schemas/ValidationError"
                     }
                 },
                 "security": [
@@ -6424,6 +7302,22 @@
         {
             "name": "Moderation",
             "description": "Moderator tools for reviewing content and enforcing policy"
+        },
+        {
+            "name": "Photos",
+            "description": "Photo upload and management"
+        },
+        {
+            "name": "Proximity Artifacts",
+            "description": "Ephemeral location-based content (Local Pulse)"
+        },
+        {
+            "name": "Relationship Tiers",
+            "description": "Progressive photo unlock system for matches"
+        },
+        {
+            "name": "Safety",
+            "description": "User blocking and reporting"
         },
         {
             "name": "Location",
