@@ -286,8 +286,8 @@ class MessageController extends Controller
         *       )
         *     )
         *   ),
-        *   @OA\Response(response=403, description="Conversation access blocked"),
-        *   @OA\Response(response=404, description="No active match"),
+        *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+        *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */
@@ -343,8 +343,8 @@ class MessageController extends Controller
         *   security={{"bearerAuth":{}}},
         *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
         *   @OA\Response(response=200, description="Marked read"),
-        *   @OA\Response(response=403, description="Only receiver can mark"),
-        *   @OA\Response(response=404, description="Message not found"),
+        *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+        *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */

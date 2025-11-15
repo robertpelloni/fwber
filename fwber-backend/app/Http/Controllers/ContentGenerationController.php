@@ -116,7 +116,7 @@ class ContentGenerationController extends Controller
      *     ),
      *     @OA\Response(response=200, description="Post suggestions generated"),
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
-     *     @OA\Response(response=404, description="Bulletin board not found")
+    *     @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function generatePostSuggestions(Request $request, int $boardId): JsonResponse

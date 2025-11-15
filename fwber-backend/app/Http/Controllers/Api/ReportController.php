@@ -59,7 +59,7 @@ class ReportController extends Controller
      *   summary="List reports (moderator only)",
      *   security={{"bearerAuth":{}}},
      *   @OA\Response(response=200, description="Reports list (paginated)"),
-     *   @OA\Response(response=403, description="Forbidden")
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function index()

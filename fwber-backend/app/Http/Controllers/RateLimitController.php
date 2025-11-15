@@ -88,7 +88,7 @@ class RateLimitController extends Controller
      *     @OA\Parameter(name="action", in="path", required=true, @OA\Schema(type="string")),
      *     @OA\Response(response=200, description="Rate limit reset"),
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
-     *     @OA\Response(response=403, description="Forbidden - Admin only")
+    *     @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function reset(Request $request, string $action): JsonResponse
@@ -116,7 +116,7 @@ class RateLimitController extends Controller
      *     @OA\Parameter(name="timeframe", in="path", required=false, @OA\Schema(type="string", default="1h", example="1h")),
      *     @OA\Response(response=200, description="Rate limit statistics"),
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
-     *     @OA\Response(response=403, description="Forbidden - Admin only")
+    *     @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function getStats(Request $request, string $timeframe = '1h'): JsonResponse
@@ -178,7 +178,7 @@ class RateLimitController extends Controller
      *         )
      *     ),
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
-     *     @OA\Response(response=403, description="Forbidden - Admin only")
+    *     @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function cleanup(Request $request): JsonResponse

@@ -35,7 +35,7 @@ class GroupMessageController extends Controller
      *     )
      *   ),
      *   @OA\Response(response=201, description="Message created"),
-     *   @OA\Response(response=403, description="Not a member or muted"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
      *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
      * )
      */
@@ -186,7 +186,7 @@ class GroupMessageController extends Controller
      *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="page", in="query", @OA\Schema(type="integer", minimum=1)),
      *   @OA\Response(response=200, description="Messages returned"),
-     *   @OA\Response(response=403, description="Not a member")
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function index(int $groupId): JsonResponse
@@ -226,7 +226,7 @@ class GroupMessageController extends Controller
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Response(response=200, description="Read status updated"),
-     *   @OA\Response(response=403, description="Not a member")
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function markAsRead(int $messageId): JsonResponse

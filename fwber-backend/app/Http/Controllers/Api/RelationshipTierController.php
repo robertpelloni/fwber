@@ -22,8 +22,8 @@ class RelationshipTierController extends Controller
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="matchId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Response(response=200, description="Tier progress"),
-     *   @OA\Response(response=403, description="Unauthorized"),
-     *   @OA\Response(response=404, description="Match not found")
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function show(int $matchId): JsonResponse
@@ -78,7 +78,7 @@ class RelationshipTierController extends Controller
      *     )
      *   ),
      *   @OA\Response(response=200, description="Tier updated"),
-     *   @OA\Response(response=403, description="Unauthorized")
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function update(Request $request, int $matchId): JsonResponse
@@ -144,7 +144,7 @@ class RelationshipTierController extends Controller
      *       @OA\Property(property="unlock_requirements", type="object")
      *     )
      *   ),
-     *   @OA\Response(response=403, description="Unauthorized")
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function getPhotos(int $matchId): JsonResponse

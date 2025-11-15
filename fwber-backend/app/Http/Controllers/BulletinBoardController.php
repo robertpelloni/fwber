@@ -91,8 +91,8 @@ class BulletinBoardController extends Controller
      *       @OA\Property(property="messages", type="array", @OA\Items(type="object"))
      *     )
      *   ),
-     *   @OA\Response(response=403, description="Outside board area"),
-     *   @OA\Response(response=404, description="Not found")
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function show(Request $request, int $id): JsonResponse
@@ -209,7 +209,7 @@ class BulletinBoardController extends Controller
      *       @OA\Property(property="board", type="object")
      *     )
      *   ),
-     *   @OA\Response(response=403, description="Outside board area"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
      *   @OA\Response(response=400, description="Validation error"),
      *   @OA\Response(response=401, description="Unauthenticated")
      * )
@@ -283,7 +283,7 @@ class BulletinBoardController extends Controller
      *       @OA\Property(property="board", type="object")
      *     )
      *   ),
-     *   @OA\Response(response=404, description="Board not found")
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function getMessages(Request $request, int $boardId): JsonResponse

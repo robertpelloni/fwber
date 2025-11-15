@@ -99,7 +99,7 @@ class GroupController extends Controller
         *       )
         *     )
         *   ),
-        *   @OA\Response(response=422, description="Validation error"),
+        *   @OA\Response(response=422, ref="#/components/responses/ValidationError"),
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */
@@ -159,7 +159,7 @@ class GroupController extends Controller
         *       @OA\Property(property="user_role", type="string", nullable=true)
         *     )
         *   ),
-        *   @OA\Response(response=404, description="Group not found"),
+        *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */
@@ -203,7 +203,7 @@ class GroupController extends Controller
         *       @OA\Property(property="group", type="object")
         *     )
         *   ),
-        *   @OA\Response(response=403, description="Unauthorized"),
+        *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */
@@ -244,7 +244,7 @@ class GroupController extends Controller
         *       @OA\Property(property="message", type="string")
         *     )
         *   ),
-        *   @OA\Response(response=403, description="Only owner can delete"),
+        *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */
@@ -276,7 +276,7 @@ class GroupController extends Controller
         *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
         *   @OA\Response(response=200, description="Joined"),
         *   @OA\Response(response=400, description="Already a member or full"),
-        *   @OA\Response(response=403, description="Cannot join private group or banned"),
+        *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */
@@ -380,8 +380,8 @@ class GroupController extends Controller
         *     @OA\Property(property="role", type="string", enum={"admin","moderator","member"})
         *   )),
         *   @OA\Response(response=200, description="Role updated or unchanged"),
-        *   @OA\Response(response=403, description="Unauthorized"),
-        *   @OA\Response(response=404, description="Member not found"),
+        *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+        *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
         *   @OA\Response(response=400, description="Cannot change owner role or invalid assignment"),
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
@@ -470,7 +470,7 @@ class GroupController extends Controller
         *     @OA\Property(property="new_owner_user_id", type="integer")
         *   )),
         *   @OA\Response(response=200, description="Ownership transferred"),
-        *   @OA\Response(response=403, description="Only owner can transfer"),
+        *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
         *   @OA\Response(response=400, description="Target not active member or already owner"),
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
@@ -531,8 +531,8 @@ class GroupController extends Controller
         *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
         *   @OA\Parameter(name="memberUserId", in="path", required=true, @OA\Schema(type="integer")),
         *   @OA\Response(response=200, description="Member banned or already banned"),
-        *   @OA\Response(response=403, description="Unauthorized or cannot ban owner"),
-        *   @OA\Response(response=404, description="Member not found"),
+        *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+        *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */
@@ -590,8 +590,8 @@ class GroupController extends Controller
         *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
         *   @OA\Parameter(name="memberUserId", in="path", required=true, @OA\Schema(type="integer")),
         *   @OA\Response(response=200, description="Member unbanned or not banned"),
-        *   @OA\Response(response=403, description="Unauthorized"),
-        *   @OA\Response(response=404, description="Member not found"),
+        *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+        *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */
@@ -648,8 +648,8 @@ class GroupController extends Controller
         *     @OA\Property(property="reason", type="string", maxLength=255)
         *   )),
         *   @OA\Response(response=200, description="Muted or unchanged"),
-        *   @OA\Response(response=403, description="Unauthorized or cannot mute owner"),
-        *   @OA\Response(response=404, description="Member not found"),
+        *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+        *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */
@@ -722,8 +722,8 @@ class GroupController extends Controller
         *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
         *   @OA\Parameter(name="memberUserId", in="path", required=true, @OA\Schema(type="integer")),
         *   @OA\Response(response=200, description="Unmuted or not muted"),
-        *   @OA\Response(response=403, description="Unauthorized"),
-        *   @OA\Response(response=404, description="Member not found"),
+        *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+        *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */
@@ -784,7 +784,7 @@ class GroupController extends Controller
         *       @OA\Property(property="is_full", type="boolean")
         *     )
         *   ),
-        *   @OA\Response(response=403, description="Unauthorized"),
+        *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */
@@ -828,8 +828,8 @@ class GroupController extends Controller
         *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
         *   @OA\Parameter(name="memberUserId", in="path", required=true, @OA\Schema(type="integer")),
         *   @OA\Response(response=200, description="Member removed"),
-        *   @OA\Response(response=403, description="Unauthorized or cannot kick owner"),
-        *   @OA\Response(response=404, description="Member not found or inactive"),
+        *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+        *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */

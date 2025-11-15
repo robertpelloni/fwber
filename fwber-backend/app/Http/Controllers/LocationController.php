@@ -41,7 +41,7 @@ class LocationController extends Controller
     *     )
     *   ),
     *   @OA\Response(response=200, description="Updated"),
-    *   @OA\Response(response=422, description="Validation failed"),
+    *   @OA\Response(response=422, ref="#/components/responses/ValidationError"),
     *   @OA\Response(response=401, description="Unauthenticated")
     * )
      */
@@ -144,7 +144,7 @@ class LocationController extends Controller
         *   @OA\Parameter(name="radius", in="query", required=false, @OA\Schema(type="integer", minimum=100, maximum=10000)),
         *   @OA\Parameter(name="limit", in="query", required=false, @OA\Schema(type="integer", minimum=1, maximum=100)),
         *   @OA\Response(response=200, description="Nearby users list"),
-        *   @OA\Response(response=422, description="Validation failed"),
+        *   @OA\Response(response=422, ref="#/components/responses/ValidationError"),
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */
@@ -258,8 +258,8 @@ class LocationController extends Controller
         *     )
         *   ),
         *   @OA\Response(response=200, description="Updated"),
-        *   @OA\Response(response=404, description="No location data"),
-        *   @OA\Response(response=422, description="Validation failed"),
+        *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+        *   @OA\Response(response=422, ref="#/components/responses/ValidationError"),
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */
@@ -331,7 +331,7 @@ class LocationController extends Controller
         *   summary="Clear current location",
         *   security={{"bearerAuth":{}}},
         *   @OA\Response(response=200, description="Cleared"),
-        *   @OA\Response(response=404, description="No location data"),
+        *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */
@@ -386,7 +386,7 @@ class LocationController extends Controller
         *   summary="Get current user's location",
         *   security={{"bearerAuth":{}}},
         *   @OA\Response(response=200, description="Location"),
-        *   @OA\Response(response=404, description="No location data"),
+        *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */

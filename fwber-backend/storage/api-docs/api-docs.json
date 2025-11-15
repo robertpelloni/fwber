@@ -306,7 +306,7 @@
                         }
                     },
                     "422": {
-                        "description": "Validation error"
+                        "$ref": "#/components/responses/ValidationError"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -361,7 +361,7 @@
                         }
                     },
                     "404": {
-                        "description": "Group not found"
+                        "$ref": "#/components/responses/NotFound"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -435,7 +435,7 @@
                         }
                     },
                     "403": {
-                        "description": "Unauthorized"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -481,7 +481,7 @@
                         }
                     },
                     "403": {
-                        "description": "Only owner can delete"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -520,7 +520,7 @@
                         "description": "Already a member or full"
                     },
                     "403": {
-                        "description": "Cannot join private group or banned"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -623,10 +623,10 @@
                         "description": "Role updated or unchanged"
                     },
                     "403": {
-                        "description": "Unauthorized"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "404": {
-                        "description": "Member not found"
+                        "$ref": "#/components/responses/NotFound"
                     },
                     "400": {
                         "description": "Cannot change owner role or invalid assignment"
@@ -683,7 +683,7 @@
                         "description": "Ownership transferred"
                     },
                     "403": {
-                        "description": "Only owner can transfer"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "400": {
                         "description": "Target not active member or already owner"
@@ -730,10 +730,10 @@
                         "description": "Member banned or already banned"
                     },
                     "403": {
-                        "description": "Unauthorized or cannot ban owner"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "404": {
-                        "description": "Member not found"
+                        "$ref": "#/components/responses/NotFound"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -777,10 +777,10 @@
                         "description": "Member unbanned or not banned"
                     },
                     "403": {
-                        "description": "Unauthorized"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "404": {
-                        "description": "Member not found"
+                        "$ref": "#/components/responses/NotFound"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -848,10 +848,10 @@
                         "description": "Muted or unchanged"
                     },
                     "403": {
-                        "description": "Unauthorized or cannot mute owner"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "404": {
-                        "description": "Member not found"
+                        "$ref": "#/components/responses/NotFound"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -895,10 +895,10 @@
                         "description": "Unmuted or not muted"
                     },
                     "403": {
-                        "description": "Unauthorized"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "404": {
-                        "description": "Member not found"
+                        "$ref": "#/components/responses/NotFound"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -964,7 +964,7 @@
                         }
                     },
                     "403": {
-                        "description": "Unauthorized"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -1008,10 +1008,10 @@
                         "description": "Member removed"
                     },
                     "403": {
-                        "description": "Unauthorized or cannot kick owner"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "404": {
-                        "description": "Member not found or inactive"
+                        "$ref": "#/components/responses/NotFound"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -1095,7 +1095,7 @@
                         "description": "Messages returned"
                     },
                     "403": {
-                        "description": "Not a member"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -1160,7 +1160,7 @@
                         "description": "Message created"
                     },
                     "403": {
-                        "description": "Not a member or muted"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "422": {
                         "$ref": "#/components/schemas/ValidationError"
@@ -1196,7 +1196,7 @@
                         "description": "Read status updated"
                     },
                     "403": {
-                        "description": "Not a member"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -1439,10 +1439,10 @@
                         }
                     },
                     "403": {
-                        "description": "Conversation access blocked"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "404": {
-                        "description": "No active match"
+                        "$ref": "#/components/responses/NotFound"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -1478,10 +1478,10 @@
                         "description": "Marked read"
                     },
                     "403": {
-                        "description": "Only receiver can mark"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "404": {
-                        "description": "Message not found"
+                        "$ref": "#/components/responses/NotFound"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -1553,10 +1553,10 @@
                         "description": "Tier progress"
                     },
                     "403": {
-                        "description": "Unauthorized"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "404": {
-                        "description": "Match not found"
+                        "$ref": "#/components/responses/NotFound"
                     }
                 },
                 "security": [
@@ -1604,7 +1604,7 @@
                         "description": "Tier updated"
                     },
                     "403": {
-                        "description": "Unauthorized"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -1658,7 +1658,7 @@
                         }
                     },
                     "403": {
-                        "description": "Unauthorized"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -1680,7 +1680,7 @@
                         "description": "Reports list (paginated)"
                     },
                     "403": {
-                        "description": "Forbidden"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -2456,10 +2456,10 @@
                         }
                     },
                     "403": {
-                        "description": "Outside board area"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "404": {
-                        "description": "Not found"
+                        "$ref": "#/components/responses/NotFound"
                     }
                 }
             }
@@ -2521,7 +2521,7 @@
                         }
                     },
                     "404": {
-                        "description": "Board not found"
+                        "$ref": "#/components/responses/NotFound"
                     }
                 }
             },
@@ -2597,7 +2597,7 @@
                         }
                     },
                     "403": {
-                        "description": "Outside board area"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "400": {
                         "description": "Validation error"
@@ -2819,7 +2819,7 @@
                         "$ref": "#/components/responses/Forbidden"
                     },
                     "404": {
-                        "description": "Not found"
+                        "$ref": "#/components/responses/NotFound"
                     }
                 },
                 "security": [
@@ -3979,7 +3979,7 @@
                         "$ref": "#/components/responses/Unauthorized"
                     },
                     "404": {
-                        "description": "Bulletin board not found"
+                        "$ref": "#/components/responses/NotFound"
                     }
                 },
                 "security": [
@@ -4751,7 +4751,7 @@
                         "description": "Location"
                     },
                     "404": {
-                        "description": "No location data"
+                        "$ref": "#/components/responses/NotFound"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -4825,7 +4825,7 @@
                         "description": "Updated"
                     },
                     "422": {
-                        "description": "Validation failed"
+                        "$ref": "#/components/responses/ValidationError"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -4849,7 +4849,7 @@
                         "description": "Cleared"
                     },
                     "404": {
-                        "description": "No location data"
+                        "$ref": "#/components/responses/NotFound"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -4915,7 +4915,7 @@
                         "description": "Nearby users list"
                     },
                     "422": {
-                        "description": "Validation failed"
+                        "$ref": "#/components/responses/ValidationError"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -4964,10 +4964,10 @@
                         "description": "Updated"
                     },
                     "404": {
-                        "description": "No location data"
+                        "$ref": "#/components/responses/NotFound"
                     },
                     "422": {
-                        "description": "Validation failed"
+                        "$ref": "#/components/responses/ValidationError"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -5718,7 +5718,7 @@
                         "description": "Photo uploaded"
                     },
                     "403": {
-                        "description": "Uploads disabled or avatar-only mode"
+                        "$ref": "#/components/responses/Forbidden"
                     },
                     "422": {
                         "$ref": "#/components/schemas/ValidationError"
@@ -5776,7 +5776,7 @@
                         "description": "Photo updated"
                     },
                     "404": {
-                        "description": "Photo not found"
+                        "$ref": "#/components/responses/NotFound"
                     },
                     "422": {
                         "$ref": "#/components/schemas/ValidationError"
@@ -5810,7 +5810,7 @@
                         "description": "Photo deleted"
                     },
                     "404": {
-                        "description": "Photo not found"
+                        "$ref": "#/components/responses/NotFound"
                     }
                 },
                 "security": [
@@ -6561,7 +6561,7 @@
                         "description": "Artifact details"
                     },
                     "404": {
-                        "description": "Artifact not found"
+                        "$ref": "#/components/responses/NotFound"
                     }
                 },
                 "security": [
@@ -6601,7 +6601,7 @@
                         "$ref": "#/components/responses/Forbidden"
                     },
                     "404": {
-                        "description": "Artifact not found"
+                        "$ref": "#/components/responses/NotFound"
                     }
                 },
                 "security": [
@@ -6640,7 +6640,7 @@
                         }
                     },
                     "404": {
-                        "description": "Artifact not found"
+                        "$ref": "#/components/responses/NotFound"
                     }
                 },
                 "security": [
@@ -8062,7 +8062,7 @@
                         "$ref": "#/components/responses/Unauthorized"
                     },
                     "403": {
-                        "description": "Forbidden - Admin only"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -8100,7 +8100,7 @@
                         "$ref": "#/components/responses/Unauthorized"
                     },
                     "403": {
-                        "description": "Forbidden - Admin only"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -8186,7 +8186,7 @@
                         "$ref": "#/components/responses/Unauthorized"
                     },
                     "403": {
-                        "description": "Forbidden - Admin only"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -8625,7 +8625,7 @@
                         "$ref": "#/components/responses/Unauthorized"
                     },
                     "403": {
-                        "description": "Forbidden - Admin access required"
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [

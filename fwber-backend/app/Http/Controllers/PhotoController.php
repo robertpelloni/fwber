@@ -142,7 +142,7 @@ class PhotoController extends Controller
      *     )
      *   ),
      *   @OA\Response(response=201, description="Photo uploaded"),
-     *   @OA\Response(response=403, description="Uploads disabled or avatar-only mode"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
      *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
      * )
      * 
@@ -308,7 +308,7 @@ class PhotoController extends Controller
      *     )
      *   ),
      *   @OA\Response(response=200, description="Photo updated"),
-     *   @OA\Response(response=404, description="Photo not found"),
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
      * )
      * 
@@ -402,7 +402,7 @@ class PhotoController extends Controller
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Response(response=200, description="Photo deleted"),
-     *   @OA\Response(response=404, description="Photo not found")
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      * 
      * @param int $id

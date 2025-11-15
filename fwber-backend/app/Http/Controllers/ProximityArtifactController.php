@@ -167,7 +167,7 @@ class ProximityArtifactController extends Controller
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Response(response=200, description="Artifact details"),
-     *   @OA\Response(response=404, description="Artifact not found")
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function show(int $id): JsonResponse
@@ -195,7 +195,7 @@ class ProximityArtifactController extends Controller
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
     *   @OA\Response(response=200, description="Flag recorded", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
-     *   @OA\Response(response=404, description="Artifact not found")
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function flag(int $id, Request $request, ProximityArtifactService $service): JsonResponse
@@ -235,7 +235,7 @@ class ProximityArtifactController extends Controller
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
     *   @OA\Response(response=200, description="Artifact removed", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-     *   @OA\Response(response=404, description="Artifact not found")
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function destroy(int $id): JsonResponse

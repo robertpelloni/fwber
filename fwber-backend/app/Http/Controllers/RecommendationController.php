@@ -446,7 +446,7 @@ class RecommendationController extends Controller
      *         )
      *     ),
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
-     *     @OA\Response(response=403, description="Forbidden - Admin access required")
+    *     @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function analytics(Request $request): JsonResponse

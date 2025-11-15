@@ -100,7 +100,7 @@ class ChatroomController extends Controller
      *     )
      *   ),
     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-     *   @OA\Response(response=404, description="Not found")
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function show(Request $request, int $id): JsonResponse
