@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Heart, X, Star } from 'lucide-react'
@@ -28,16 +29,28 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
   const handleStart = useCallback((clientX: number, clientY: number) => {
     setIsDragging(true)
     setDragOffset({ x: clientX, y: clientY })
-  }, [])
+  }
 
   const handleMove = useCallback((clientX: number, clientY: number) => {
-    setDragOffset(prev => {
-      const deltaX = clientX - prev.x
-      const deltaY = clientY - prev.y
+    if (!isDragging) return
 
-      // Calculate rotation based on horizontal movement
-      const rotationValue = Math.min(Math.max(deltaX * 0.1, -15), 15)
-      setRotation(rotationValue)
+    const deltaX = clientX - dragOffset.x
+    const deltaY = clientY - dragOffset.y
+    
+    setDragOffset({ x: clientX, y: clientY })
+    
+    // Calculate rotation based on horizontal movement
+    const rotationValue = Math.min(Math.max(deltaX * 0.1, -15), 15)
+    setRotation(rotationValue)
+
+    // Update card position
+    if (cardRef.current) {
+      cardRef.current.style.transform = `translate(${deltaX}px, ${deltaY}px) rotate(${rotationValue}deg)`
+    }
+  }, [isDragging, dragOffset])
+
+  const handleEnd = useCallback(() => {
+    if (!isDragging) return
 
       // Update card position
       if (cardRef.current) {
@@ -57,16 +70,8 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
         cardRef.current.style.transform = 'translate(0px, 0px) rotate(0deg)'
       }
       setRotation(0)
-
-      return false
-    })
-  }, [])
-
-  // Store callback refs to avoid recreating event listeners
-  const handlersRef = useRef({ handleMove, handleEnd })
-  useEffect(() => {
-    handlersRef.current = { handleMove, handleEnd }
-  }, [handleMove, handleEnd])
+    }
+  }, [isDragging, dragOffset, onSwipe, onAction])
 
   // Touch events
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -89,13 +94,15 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
     handleStart(e.clientX, e.clientY)
   }, [handleStart])
 
-  // Add global mouse events when dragging
-  useEffect(() => {
+  const handleMouseMove = useCallback((e: React.MouseEvent | MouseEvent) => {
     if (!isDragging) return
+    handleMove('clientX' in e ? e.clientX : (e as MouseEvent).clientX, 
+               'clientY' in e ? e.clientY : (e as MouseEvent).clientY)
+  }, [isDragging, handleMove])
 
-    const handleGlobalMouseMove = (e: MouseEvent) => {
-      handlersRef.current.handleMove(e.clientX, e.clientY)
-    }
+  const handleMouseUp = useCallback(() => {
+    handleEnd()
+  }, [handleEnd])
 
     const handleGlobalMouseUp = () => {
       handlersRef.current.handleEnd()
@@ -108,7 +115,7 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
       document.removeEventListener('mousemove', handleGlobalMouseMove)
       document.removeEventListener('mouseup', handleGlobalMouseUp)
     }
-  }, [isDragging])
+  }, [isDragging, handleMouseMove, handleMouseUp])
 
   return (
     <div className="relative w-full max-w-sm mx-auto">
@@ -128,10 +135,11 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
         <CardHeader className="relative">
           <div className="aspect-square w-full bg-gray-200 rounded-lg flex items-center justify-center mb-4">
             {user.photos && user.photos.length > 0 ? (
-              <img
+              <Image
                 src={user.photos[0]}
                 alt={user.name}
-                className="w-full h-full object-cover rounded-lg"
+                fill
+                className="object-cover rounded-lg"
               />
             ) : (
               <span className="text-4xl font-semibold text-gray-600">

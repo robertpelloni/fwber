@@ -23,6 +23,19 @@ class ProximityChatroomController extends Controller
 
     /**
      * Find nearby proximity chatrooms
+     *
+     * @OA\Get(
+     *   path="/proximity-chatrooms/nearby",
+     *   tags={"Chatrooms"},
+     *   summary="Find nearby proximity chatrooms",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="latitude", in="query", required=true, @OA\Schema(type="number", format="float", minimum=-90, maximum=90)),
+     *   @OA\Parameter(name="longitude", in="query", required=true, @OA\Schema(type="number", format="float", minimum=-180, maximum=180)),
+     *   @OA\Parameter(name="radius_meters", in="query", required=false, @OA\Schema(type="integer", minimum=50, maximum=5000)),
+     *   @OA\Parameter(name="type", in="query", required=false, @OA\Schema(type="string", enum={"conference","event","venue","area","temporary"})),
+     *   @OA\Parameter(name="venue_type", in="query", required=false, @OA\Schema(type="string")),
+     *   @OA\Response(response=200, description="Nearby rooms")
+     * )
      */
     public function findNearby(Request $request): JsonResponse
     {
@@ -79,6 +92,36 @@ class ProximityChatroomController extends Controller
 
     /**
      * Create a proximity chatroom
+     *
+     * @OA\Post(
+     *   path="/proximity-chatrooms",
+     *   tags={"Chatrooms"},
+     *   summary="Create proximity chatroom",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\RequestBody(required=true, @OA\JsonContent(
+     *     required={"name","type","latitude","longitude"},
+     *     @OA\Property(property="name", type="string", maxLength=100),
+     *     @OA\Property(property="description", type="string", maxLength=500),
+     *     @OA\Property(property="type", type="string", enum={"conference","event","venue","area","temporary"}),
+     *     @OA\Property(property="venue_name", type="string"),
+     *     @OA\Property(property="venue_type", type="string"),
+     *     @OA\Property(property="event_name", type="string"),
+     *     @OA\Property(property="event_date", type="string", format="date"),
+     *     @OA\Property(property="event_start_time", type="string", format="time"),
+     *     @OA\Property(property="event_end_time", type="string", format="time"),
+     *     @OA\Property(property="latitude", type="number", format="float"),
+     *     @OA\Property(property="longitude", type="number", format="float"),
+     *     @OA\Property(property="radius_meters", type="integer"),
+     *     @OA\Property(property="city", type="string"),
+     *     @OA\Property(property="neighborhood", type="string"),
+     *     @OA\Property(property="address", type="string"),
+     *     @OA\Property(property="tags", type="array", @OA\Items(type="string")),
+     *     @OA\Property(property="max_members", type="integer"),
+     *     @OA\Property(property="requires_approval", type="boolean"),
+     *     @OA\Property(property="expires_at", type="string", format="date-time")
+     *   )),
+     *   @OA\Response(response=201, description="Created")
+     * )
      */
     public function create(Request $request): JsonResponse
     {
@@ -155,6 +198,17 @@ class ProximityChatroomController extends Controller
 
     /**
      * Get a specific proximity chatroom
+     *
+     * @OA\Get(
+     *   path="/proximity-chatrooms/{id}",
+     *   tags={"Chatrooms"},
+     *   summary="Get proximity chatroom",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="latitude", in="query", required=false, @OA\Schema(type="number")),
+     *   @OA\Parameter(name="longitude", in="query", required=false, @OA\Schema(type="number")),
+     *   @OA\Response(response=200, description="Chatroom")
+     * )
      */
     public function show(Request $request, int $id): JsonResponse
     {
@@ -175,6 +229,26 @@ class ProximityChatroomController extends Controller
 
     /**
      * Join a proximity chatroom
+     *
+     * @OA\Post(
+     *   path="/proximity-chatrooms/{id}/join",
+     *   tags={"Chatrooms"},
+     *   summary="Join proximity chatroom",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(required=true, @OA\JsonContent(
+     *     required={"latitude","longitude"},
+     *     @OA\Property(property="latitude", type="number", format="float"),
+     *     @OA\Property(property="longitude", type="number", format="float"),
+     *     @OA\Property(property="is_networking", type="boolean"),
+     *     @OA\Property(property="is_social", type="boolean"),
+     *     @OA\Property(property="professional_info", type="object"),
+     *     @OA\Property(property="interests", type="array", @OA\Items(type="string"))
+     *   )),
+     *   @OA\Response(response=200, description="Joined"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=400, description="Already member")
+     * )
      */
     public function join(Request $request, int $id): JsonResponse
     {
@@ -234,6 +308,16 @@ class ProximityChatroomController extends Controller
 
     /**
      * Leave a proximity chatroom
+     *
+     * @OA\Post(
+     *   path="/proximity-chatrooms/{id}/leave",
+     *   tags={"Chatrooms"},
+     *   summary="Leave proximity chatroom",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Left"),
+     *   @OA\Response(response=400, description="Not a member")
+     * )
      */
     public function leave(Request $request, int $id): JsonResponse
     {
@@ -255,6 +339,21 @@ class ProximityChatroomController extends Controller
 
     /**
      * Update member location
+     *
+     * @OA\Post(
+     *   path="/proximity-chatrooms/{id}/location",
+     *   tags={"Chatrooms"},
+     *   summary="Update member location",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(required=true, @OA\JsonContent(
+     *     required={"latitude","longitude"},
+     *     @OA\Property(property="latitude", type="number", format="float"),
+     *     @OA\Property(property="longitude", type="number", format="float")
+     *   )),
+     *   @OA\Response(response=200, description="Updated"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
+     * )
      */
     public function updateLocation(Request $request, int $id): JsonResponse
     {
@@ -288,6 +387,17 @@ class ProximityChatroomController extends Controller
 
     /**
      * Get proximity chatroom members
+     *
+     * @OA\Get(
+     *   path="/proximity-chatrooms/{id}/members",
+     *   tags={"Chatrooms"},
+     *   summary="Members",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="networking_only", in="query", required=false, @OA\Schema(type="boolean")),
+     *   @OA\Parameter(name="social_only", in="query", required=false, @OA\Schema(type="boolean")),
+     *   @OA\Response(response=200, description="Paginated members")
+     * )
      */
     public function members(Request $request, int $id): JsonResponse
     {
@@ -317,6 +427,18 @@ class ProximityChatroomController extends Controller
 
     /**
      * Get nearby networking members
+     *
+     * @OA\Get(
+     *   path="/proximity-chatrooms/{id}/networking",
+     *   tags={"Chatrooms"},
+     *   summary="Nearby networking members",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="latitude", in="query", required=true, @OA\Schema(type="number", format="float")),
+     *   @OA\Parameter(name="longitude", in="query", required=true, @OA\Schema(type="number", format="float")),
+     *   @OA\Parameter(name="radius_meters", in="query", required=false, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Members within radius")
+     * )
      */
     public function nearbyNetworking(Request $request, int $id): JsonResponse
     {
@@ -371,6 +493,16 @@ class ProximityChatroomController extends Controller
 
     /**
      * Get proximity chatroom analytics
+     *
+     * @OA\Get(
+     *   path="/proximity-chatrooms/{id}/analytics",
+     *   tags={"Chatrooms"},
+     *   summary="Analytics (moderators)",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Analytics data"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
+     * )
      */
     public function analytics(Request $request, int $id): JsonResponse
     {

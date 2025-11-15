@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import { getUserProfile, updateUserProfile, getProfileCompleteness, type UserProfile, type ProfileUpdateData } from '@/lib/api/profile'
@@ -130,21 +130,7 @@ export default function ProfilePage() {
     photos
   ]);
 
-  useEffect(() => {
-    // Check for dev token as fallback
-    const hasDevToken = typeof window !== 'undefined' && localStorage.getItem('fwber_token') === 'dev'
-    
-    if (!authLoading && !isAuthenticated && !hasDevToken) {
-      router.push('/login')
-      return
-    }
-
-    if ((isAuthenticated || hasDevToken) && effectiveToken) {
-      loadProfile()
-    }
-  }, [isAuthenticated, authLoading, token, router, effectiveToken])
-
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     if (!effectiveToken) return
 
     try {
@@ -216,7 +202,21 @@ export default function ProfilePage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [effectiveToken])
+
+  useEffect(() => {
+    // Check for dev token as fallback
+    const hasDevToken = typeof window !== 'undefined' && localStorage.getItem('fwber_token') === 'dev'
+    
+    if (!authLoading && !isAuthenticated && !hasDevToken) {
+      router.push('/login')
+      return
+    }
+
+    if ((isAuthenticated || hasDevToken) && effectiveToken) {
+      loadProfile()
+    }
+  }, [isAuthenticated, authLoading, token, router, effectiveToken, loadProfile])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

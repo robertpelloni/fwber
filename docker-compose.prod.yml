@@ -11,8 +11,7 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    ports:
-      - "3306:3306"
+    # Do not expose MySQL in production
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
@@ -26,8 +25,7 @@ services:
       dockerfile: Dockerfile.prod
     container_name: fwber-laravel-prod
     restart: unless-stopped
-    ports:
-      - "8000:8000"
+    # PHP-FPM listens on 9000 internally; proxied by nginx
     environment:
       - APP_ENV=production
       - APP_DEBUG=false
@@ -57,8 +55,7 @@ services:
       dockerfile: Dockerfile.prod
     container_name: fwber-nextjs-prod
     restart: unless-stopped
-    ports:
-      - "3000:3000"
+    # Not exposed publicly; proxied by nginx
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
@@ -73,8 +70,7 @@ services:
     image: dunglas/mercure:latest
     container_name: fwber-mercure-prod
     restart: unless-stopped
-    ports:
-      - "3001:80"
+    # Proxied by nginx - no direct external access
     environment:
       SERVER_NAME: ":80"
       MERCURE_PUBLISHER_JWT_KEY: ${MERCURE_PUBLISHER_JWT_KEY}
@@ -95,8 +91,7 @@ services:
     image: redis:7-alpine
     container_name: fwber-redis-prod
     restart: unless-stopped
-    ports:
-      - "6379:6379"
+    # Do not expose Redis in production
     volumes:
       - redis_data:/data
     networks:

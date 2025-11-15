@@ -2,7 +2,7 @@
 
 import { RelationshipTier, getTierInfo } from '@/lib/relationshipTiers'
 import { CheckCircle, Sparkles, X } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 interface TierUpgradeNotificationProps {
   previousTier: RelationshipTier
@@ -21,28 +21,25 @@ export default function TierUpgradeNotification({
   const tierInfo = getTierInfo(newTier)
   const previousTierInfo = getTierInfo(previousTier)
 
-  // Don't show if tiers are the same (prevents showing on initial render)
-  if (previousTier === newTier) {
-    return null
-  }
+  const shouldHide = previousTier === newTier
+
+  const handleClose = useCallback(() => {
+    setIsVisible(false)
+    setTimeout(onClose, 300) // Wait for fade out animation
+  }, [onClose])
 
   useEffect(() => {
     // Fade in animation
-    setTimeout(() => setIsVisible(true), 100)
+    const openTimer = setTimeout(() => setIsVisible(true), 100)
 
     // Auto close
     if (autoCloseMs > 0) {
       const timer = setTimeout(() => {
         handleClose()
       }, autoCloseMs)
-      return () => clearTimeout(timer)
+      return () => { clearTimeout(timer); clearTimeout(openTimer) }
     }
-  }, [autoCloseMs])
-
-  const handleClose = () => {
-    setIsVisible(false)
-    setTimeout(onClose, 300) // Wait for fade out animation
-  }
+  }, [autoCloseMs, handleClose])
 
   const colorClasses = {
     gray: 'from-gray-400 to-gray-600',
@@ -50,6 +47,10 @@ export default function TierUpgradeNotification({
     purple: 'from-purple-400 to-purple-600',
     pink: 'from-pink-400 to-pink-600',
     green: 'from-green-400 to-green-600'
+  }
+
+  if (shouldHide) {
+    return null
   }
 
   return (
@@ -70,6 +71,8 @@ export default function TierUpgradeNotification({
         <button
           onClick={handleClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+          aria-label="Close notification"
+          title="Close"
         >
           <X className="w-5 h-5" />
         </button>

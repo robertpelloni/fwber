@@ -49,6 +49,24 @@ class PhotoController extends Controller
     /**
      * Get authenticated user's photos
      * 
+     * @OA\Get(
+     *   path="/photos",
+     *   tags={"Photos"},
+     *   summary="List user photos",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(
+     *     response=200,
+     *     description="User photos",
+     *     @OA\JsonContent(
+     *       @OA\Property(property="success", type="boolean", example=true),
+     *       @OA\Property(property="count", type="integer"),
+     *       @OA\Property(property="max_photos", type="integer", example=10),
+     *       @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *     )
+     *   ),
+     *   @OA\Response(response=401, ref="#/components/schemas/UnauthorizedError")
+     * )
+     * 
      * @param Request $request
      * @return JsonResponse
      */
@@ -107,6 +125,27 @@ class PhotoController extends Controller
     /**
      * Upload a new photo
      * 
+     * @OA\Post(
+     *   path="/photos",
+     *   tags={"Photos"},
+     *   summary="Upload photo",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\MediaType(
+     *       mediaType="multipart/form-data",
+     *       @OA\Schema(
+     *         required={"photo"},
+     *         @OA\Property(property="photo", type="string", format="binary", description="Image file (JPEG, PNG, GIF, WebP, max 5MB)"),
+     *         @OA\Property(property="is_private", type="boolean")
+     *       )
+     *     )
+     *   ),
+     *   @OA\Response(response=201, description="Photo uploaded"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
+     * )
+     * 
      * @param Request $request
      * @return JsonResponse
      */
@@ -117,6 +156,14 @@ class PhotoController extends Controller
             
             if (!$user) {
                 return response()->json(['message' => 'Unauthenticated'], 401);
+            }
+            
+            // Enforce generated-avatars-only mode for MVP
+            if (config('app.avatar_mode', 'generated-only') === 'generated-only') {
+                return response()->json([
+                    'message' => 'Photo uploads disabled. Using generated avatars only.',
+                    'avatar_mode' => 'generated-only',
+                ], 403);
             }
             
             // Check photo limit
@@ -246,6 +293,25 @@ class PhotoController extends Controller
     /**
      * Update photo properties (privacy, primary status)
      * 
+     * @OA\Put(
+     *   path="/photos/{id}",
+     *   tags={"Photos"},
+     *   summary="Update photo",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       @OA\Property(property="is_primary", type="boolean"),
+     *       @OA\Property(property="is_private", type="boolean"),
+     *       @OA\Property(property="sort_order", type="integer", minimum=0)
+     *     )
+     *   ),
+     *   @OA\Response(response=200, description="Photo updated"),
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
+     * )
+     * 
      * @param Request $request
      * @param int $id
      * @return JsonResponse
@@ -329,6 +395,16 @@ class PhotoController extends Controller
     /**
      * Delete a photo
      * 
+     * @OA\Delete(
+     *   path="/photos/{id}",
+     *   tags={"Photos"},
+     *   summary="Delete photo",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Photo deleted"),
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     * )
+     * 
      * @param int $id
      * @return JsonResponse
      */
@@ -388,6 +464,22 @@ class PhotoController extends Controller
 
     /**
      * Reorder photos
+     * 
+     * @OA\Post(
+     *   path="/photos/reorder",
+     *   tags={"Photos"},
+     *   summary="Reorder photos",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"photo_ids"},
+     *       @OA\Property(property="photo_ids", type="array", @OA\Items(type="integer"), description="Ordered array of photo IDs")
+     *     )
+     *   ),
+     *   @OA\Response(response=200, description="Photos reordered"),
+     *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
+     * )
      * 
      * @param Request $request
      * @return JsonResponse

@@ -21,6 +21,25 @@ class ProximityChatroomMessageController extends Controller
 
     /**
      * Get messages for a proximity chatroom
+     *
+     * @OA\Get(
+     *   path="/proximity-chatrooms/{chatroomId}/messages",
+     *   tags={"Chatrooms"},
+     *   summary="List proximity chatroom messages",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="type", in="query", required=false, @OA\Schema(type="string")),
+     *   @OA\Parameter(name="user_id", in="query", required=false, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="networking_only", in="query", required=false, @OA\Schema(type="boolean")),
+     *   @OA\Parameter(name="social_only", in="query", required=false, @OA\Schema(type="boolean")),
+     *   @OA\Parameter(name="pinned", in="query", required=false, @OA\Schema(type="boolean")),
+     *   @OA\Parameter(name="announcements", in="query", required=false, @OA\Schema(type="boolean")),
+    *   @OA\Response(
+    *     response=200,
+    *     description="Paginated messages",
+    *     @OA\JsonContent(ref="#/components/schemas/PaginatedChatMessages")
+    *   )
+     * )
      */
     public function index(Request $request, int $chatroomId): JsonResponse
     {
@@ -70,6 +89,26 @@ class ProximityChatroomMessageController extends Controller
 
     /**
      * Send a message to a proximity chatroom
+     *
+     * @OA\Post(
+     *   path="/proximity-chatrooms/{chatroomId}/messages",
+     *   tags={"Chatrooms"},
+     *   summary="Send proximity message",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(required=true, @OA\JsonContent(
+     *     required={"content"},
+     *     @OA\Property(property="content", type="string", maxLength=2000),
+     *     @OA\Property(property="message_type", type="string", enum={"text","image","file","announcement"}),
+     *     @OA\Property(property="parent_id", type="integer", nullable=true),
+     *     @OA\Property(property="is_networking", type="boolean"),
+     *     @OA\Property(property="is_social", type="boolean"),
+     *     @OA\Property(property="metadata", type="object")
+     *   )),
+    *   @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/ChatMessage")),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=422, ref="#/components/responses/ModerationError")
+     * )
      */
     public function store(Request $request, int $chatroomId): JsonResponse
     {
@@ -152,6 +191,16 @@ class ProximityChatroomMessageController extends Controller
 
     /**
      * Get a specific message
+     *
+     * @OA\Get(
+     *   path="/proximity-chatrooms/{chatroomId}/messages/{messageId}",
+     *   tags={"Chatrooms"},
+     *   summary="Get proximity message",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+    *   @OA\Response(response=200, description="Message", @OA\JsonContent(ref="#/components/schemas/ChatMessage"))
+     * )
      */
     public function show(int $chatroomId, int $messageId): JsonResponse
     {
@@ -170,6 +219,24 @@ class ProximityChatroomMessageController extends Controller
 
     /**
      * Edit a message
+     *
+     * @OA\Put(
+     *   path="/proximity-chatrooms/{chatroomId}/messages/{messageId}",
+     *   tags={"Chatrooms"},
+     *   summary="Edit proximity message",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(required=true, @OA\JsonContent(
+     *     required={"content"},
+     *     @OA\Property(property="content", type="string", maxLength=2000),
+     *     @OA\Property(property="is_networking", type="boolean"),
+     *     @OA\Property(property="is_social", type="boolean")
+     *   )),
+    *   @OA\Response(response=200, description="Updated", @OA\JsonContent(ref="#/components/schemas/ChatMessage")),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=422, ref="#/components/responses/ModerationError")
+     * )
      */
     public function update(Request $request, int $chatroomId, int $messageId): JsonResponse
     {
@@ -229,6 +296,16 @@ class ProximityChatroomMessageController extends Controller
 
     /**
      * Delete a message
+     *
+     * @OA\Delete(
+     *   path="/proximity-chatrooms/{chatroomId}/messages/{messageId}",
+     *   tags={"Chatrooms"},
+     *   summary="Delete proximity message",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+    *   @OA\Response(response=200, description="Deleted", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse"))
+     * )
      */
     public function destroy(int $chatroomId, int $messageId): JsonResponse
     {
@@ -258,6 +335,20 @@ class ProximityChatroomMessageController extends Controller
 
     /**
      * Add reaction to a message
+     *
+     * @OA\Post(
+     *   path="/proximity-chatrooms/{chatroomId}/messages/{messageId}/reactions",
+     *   tags={"Chatrooms"},
+     *   summary="Add reaction (proximity)",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(required=true, @OA\JsonContent(
+     *     required={"emoji"},
+     *     @OA\Property(property="emoji", type="string", maxLength=10)
+     *   )),
+    *   @OA\Response(response=200, description="Added", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse"))
+     * )
      */
     public function addReaction(Request $request, int $chatroomId, int $messageId): JsonResponse
     {
@@ -280,6 +371,20 @@ class ProximityChatroomMessageController extends Controller
 
     /**
      * Remove reaction from a message
+     *
+     * @OA\Delete(
+     *   path="/proximity-chatrooms/{chatroomId}/messages/{messageId}/reactions",
+     *   tags={"Chatrooms"},
+     *   summary="Remove reaction (proximity)",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(required=true, @OA\JsonContent(
+     *     required={"emoji"},
+     *     @OA\Property(property="emoji", type="string", maxLength=10)
+     *   )),
+    *   @OA\Response(response=200, description="Removed", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse"))
+     * )
      */
     public function removeReaction(Request $request, int $chatroomId, int $messageId): JsonResponse
     {
@@ -302,6 +407,16 @@ class ProximityChatroomMessageController extends Controller
 
     /**
      * Pin a message (moderator only)
+     *
+     * @OA\Post(
+     *   path="/proximity-chatrooms/{chatroomId}/messages/{messageId}/pin",
+     *   tags={"Chatrooms"},
+     *   summary="Pin proximity message",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+    *   @OA\Response(response=200, description="Pinned", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse"))
+     * )
      */
     public function pin(int $chatroomId, int $messageId): JsonResponse
     {
@@ -319,6 +434,16 @@ class ProximityChatroomMessageController extends Controller
 
     /**
      * Unpin a message (moderator only)
+     *
+     * @OA\Delete(
+     *   path="/proximity-chatrooms/{chatroomId}/messages/{messageId}/pin",
+     *   tags={"Chatrooms"},
+     *   summary="Unpin proximity message",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+    *   @OA\Response(response=200, description="Unpinned", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse"))
+     * )
      */
     public function unpin(int $chatroomId, int $messageId): JsonResponse
     {
@@ -336,6 +461,15 @@ class ProximityChatroomMessageController extends Controller
 
     /**
      * Get pinned messages for a proximity chatroom
+     *
+     * @OA\Get(
+     *   path="/proximity-chatrooms/{chatroomId}/messages/pinned",
+     *   tags={"Chatrooms"},
+     *   summary="Pinned proximity messages",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+    *   @OA\Response(response=200, description="List", @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ChatMessage")))
+     * )
      */
     public function pinned(int $chatroomId): JsonResponse
     {
@@ -356,6 +490,16 @@ class ProximityChatroomMessageController extends Controller
 
     /**
      * Get message replies
+     *
+     * @OA\Get(
+     *   path="/proximity-chatrooms/{chatroomId}/messages/{messageId}/replies",
+     *   tags={"Chatrooms"},
+     *   summary="Proximity message replies",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+    *   @OA\Response(response=200, description="List", @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ChatMessage")))
+     * )
      */
     public function replies(int $chatroomId, int $messageId): JsonResponse
     {
@@ -376,6 +520,15 @@ class ProximityChatroomMessageController extends Controller
 
     /**
      * Get networking messages
+     *
+     * @OA\Get(
+     *   path="/proximity-chatrooms/{chatroomId}/messages/networking",
+     *   tags={"Chatrooms"},
+     *   summary="Networking messages",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+    *   @OA\Response(response=200, description="Paginated messages", @OA\JsonContent(ref="#/components/schemas/PaginatedChatMessages"))
+     * )
      */
     public function networking(int $chatroomId): JsonResponse
     {
@@ -397,6 +550,15 @@ class ProximityChatroomMessageController extends Controller
 
     /**
      * Get social messages
+     *
+     * @OA\Get(
+     *   path="/proximity-chatrooms/{chatroomId}/messages/social",
+     *   tags={"Chatrooms"},
+     *   summary="Social messages",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+    *   @OA\Response(response=200, description="Paginated messages", @OA\JsonContent(ref="#/components/schemas/PaginatedChatMessages"))
+     * )
      */
     public function social(int $chatroomId): JsonResponse
     {

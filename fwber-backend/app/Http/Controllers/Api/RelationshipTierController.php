@@ -41,6 +41,17 @@ class RelationshipTierController extends Controller
 
     /**
      * Get tier progress for a specific match
+     * 
+     * @OA\Get(
+     *   path="/matches/{matchId}/tier",
+     *   tags={"Relationship Tiers"},
+     *   summary="Get match tier progress",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="matchId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Tier progress"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     * )
      */
     public function show(int $matchId): JsonResponse
     {
@@ -64,6 +75,22 @@ class RelationshipTierController extends Controller
 
     /**
      * Update tier metrics
+     * 
+     * @OA\Put(
+     *   path="/matches/{matchId}/tier",
+     *   tags={"Relationship Tiers"},
+     *   summary="Update tier metrics",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="matchId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(
+     *     @OA\JsonContent(
+     *       @OA\Property(property="increment_messages", type="boolean"),
+     *       @OA\Property(property="mark_met_in_person", type="boolean")
+     *     )
+     *   ),
+     *   @OA\Response(response=200, description="Tier updated"),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
+     * )
      */
     public function update(Request $request, int $matchId): JsonResponse
     {
@@ -101,6 +128,24 @@ class RelationshipTierController extends Controller
 
     /**
      * Get photos for a match based on current tier
+     * 
+     * @OA\Get(
+     *   path="/matches/{matchId}/tier/photos",
+     *   tags={"Relationship Tiers"},
+     *   summary="Get tier-based photos (progressive unlock)",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="matchId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Photos visible at current tier",
+     *     @OA\JsonContent(
+     *       @OA\Property(property="ai_photos", type="array", @OA\Items(type="object")),
+     *       @OA\Property(property="real_photos", type="object"),
+     *       @OA\Property(property="unlock_requirements", type="object")
+     *     )
+     *   ),
+    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
+     * )
      */
     public function getPhotos(int $matchId): JsonResponse
     {

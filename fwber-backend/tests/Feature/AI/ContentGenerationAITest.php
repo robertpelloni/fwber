@@ -9,10 +9,10 @@ use App\Services\ContentGenerationService;
 use App\Services\ContentOptimizationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
- * @group ai
- * 
  * These tests make real API calls to AI providers.
  * Run with: php artisan test --group=ai
  * 
@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Cache;
  * - OpenAI_API_KEY
  * - GEMINI_API_KEY
  */
+#[Group('ai')]
 class ContentGenerationAITest extends TestCase
 {
     use RefreshDatabase;
@@ -41,7 +42,7 @@ class ContentGenerationAITest extends TestCase
         $this->contentOptimizationService = app(ContentOptimizationService::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_generates_profile_content_with_real_openai()
     {
         $user = User::factory()->create([
@@ -86,7 +87,7 @@ class ContentGenerationAITest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_generates_profile_content_with_real_gemini()
     {
         $user = User::factory()->create([
@@ -126,7 +127,7 @@ class ContentGenerationAITest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_generates_bulletin_board_post_suggestions()
     {
         $user = User::factory()->create([
@@ -165,7 +166,7 @@ class ContentGenerationAITest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_generates_conversation_starters()
     {
         $user = User::factory()->create([
@@ -203,7 +204,7 @@ class ContentGenerationAITest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_optimizes_content_with_real_ai_providers()
     {
         $originalContent = "hey, i like hiking and stuff. want to hang out sometime?";
@@ -232,7 +233,7 @@ class ContentGenerationAITest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_adversarial_inputs_safely()
     {
         $user = User::factory()->create([
@@ -270,7 +271,7 @@ class ContentGenerationAITest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_minimal_user_data()
     {
         $user = User::factory()->create([
@@ -293,7 +294,7 @@ class ContentGenerationAITest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_unicode_and_emoji_inputs()
     {
         $user = User::factory()->create([
@@ -321,7 +322,7 @@ class ContentGenerationAITest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_measures_performance_metrics()
     {
         $user = User::factory()->create();
@@ -347,7 +348,7 @@ class ContentGenerationAITest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_tracks_generation_analytics()
     {
         $user = User::factory()->create();

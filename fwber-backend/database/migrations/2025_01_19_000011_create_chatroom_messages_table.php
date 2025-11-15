@@ -21,21 +21,30 @@ return new class extends Migration
             $table->string('file_name')->nullable();
             $table->string('file_size')->nullable();
             $table->string('file_type')->nullable();
-            $table->unsignedBigInteger('reply_to')->nullable(); // For threaded conversations
+            // Threaded conversation parent message reference
+            $table->unsignedBigInteger('parent_id')->nullable(); // For threaded conversations
             $table->boolean('is_edited')->default(false);
             $table->timestamp('edited_at')->nullable();
             $table->boolean('is_deleted')->default(false);
             $table->timestamp('deleted_at')->nullable();
             $table->json('reactions')->nullable(); // User reactions to the message
             $table->json('metadata')->nullable(); // Additional message metadata
+            // Additional message state and denormalized counts used by controller/model logic
+            $table->boolean('is_pinned')->default(false);
+            $table->boolean('is_announcement')->default(false);
+            $table->unsignedInteger('reaction_count')->default(0);
+            $table->unsignedInteger('reply_count')->default(0);
             $table->timestamps();
             
             $table->foreign('chatroom_id')->references('id')->on('chatrooms')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('reply_to')->references('id')->on('chatroom_messages')->onDelete('set null');
+            $table->foreign('parent_id')->references('id')->on('chatroom_messages')->onDelete('set null');
             $table->index(['chatroom_id', 'created_at']);
             $table->index(['user_id', 'created_at']);
             $table->index(['type', 'created_at']);
+            $table->index(['parent_id', 'created_at']);
+            $table->index(['is_pinned', 'created_at']);
+            $table->index(['is_announcement', 'created_at']);
         });
     }
 

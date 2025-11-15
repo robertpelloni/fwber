@@ -1,6 +1,4 @@
-import { enhancedFetch } from './apiErrorHandling'
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+import { apiClient } from './client'
 
 export interface TierResponse {
   match_id: number
@@ -62,35 +60,11 @@ export interface PhotoResponse {
 }
 
 /**
- * Get authentication token from localStorage
- */
-function getAuthToken(): string | null {
-  if (typeof window === 'undefined') return null
-  return localStorage.getItem('auth_token')
-}
-
-/**
- * Build authenticated request headers
- */
-function getAuthHeaders(): HeadersInit {
-  const token = getAuthToken()
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` })
-  }
-}
-
-/**
  * Get relationship tier progress for a match
  */
 export async function getMatchTier(matchId: number): Promise<TierResponse> {
-  return enhancedFetch<TierResponse>(
-    `${API_BASE_URL}/matches/${matchId}/tier`,
-    {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    }
-  )
+  const { data } = await apiClient.get<TierResponse>(`/matches/${matchId}/tier`)
+  return data
 }
 
 /**
@@ -103,27 +77,16 @@ export async function updateMatchTier(
     mark_met_in_person?: boolean
   }
 ): Promise<TierUpdateResponse> {
-  return enhancedFetch<TierUpdateResponse>(
-    `${API_BASE_URL}/matches/${matchId}/tier/update`,
-    {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(data),
-    }
-  )
+  const response = await apiClient.post<TierUpdateResponse>(`/matches/${matchId}/tier/update`, data)
+  return response.data
 }
 
 /**
  * Get photos for a match filtered by current tier
  */
 export async function getMatchPhotos(matchId: number): Promise<PhotoResponse> {
-  return enhancedFetch<PhotoResponse>(
-    `${API_BASE_URL}/matches/${matchId}/photos`,
-    {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    }
-  )
+  const { data } = await apiClient.get<PhotoResponse>(`/matches/${matchId}/photos`)
+  return data
 }
 
 /**

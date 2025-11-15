@@ -5,12 +5,77 @@ namespace App\Http\Controllers;
 use App\Http\Resources\MatchResource;
 use App\Models\User;
 use App\Models\UserProfile;
+use App\Models\ProximityArtifact;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class MatchController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/matches",
+     *     tags={"Matches"},
+     *     summary="Get potential matches",
+     *     description="Retrieve a feed of potential matches based on user preferences, location, and filters. Results are cached for 60 seconds per user.",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="age_min",
+     *         in="query",
+     *         description="Minimum age filter",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=18, maximum=100, example=25)
+     *     ),
+     *     @OA\Parameter(
+     *         name="age_max",
+     *         in="query",
+     *         description="Maximum age filter",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=18, maximum=100, example=40)
+     *     ),
+     *     @OA\Parameter(
+     *         name="max_distance",
+     *         in="query",
+     *         description="Maximum distance in miles",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=1, maximum=500, default=50, example=25)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Matches retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="matches",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=42),
+     *                     @OA\Property(property="name", type="string", example="Jane Smith"),
+     *                     @OA\Property(property="age", type="integer", example=28),
+     *                     @OA\Property(property="bio", type="string", example="Love hiking and coffee"),
+     *                     @OA\Property(property="distance", type="number", format="float", example=5.3),
+     *                     @OA\Property(property="match_score", type="integer", example=85),
+     *                     @OA\Property(property="avatar_url", type="string", nullable=true)
+     *                 )
+     *             ),
+     *             @OA\Property(property="total", type="integer", example=15)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Profile not complete",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Profile not found. Please complete your profile first.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
+     *     )
+     * )
+     */
     public function index(Request $request): JsonResponse
     {
         $user = auth()->user();
@@ -22,7 +87,26 @@ class MatchController extends Controller
             ], 400);
         }
 
-        $matches = $this->findMatches($user, $profile, $request);
+        // Validate filter parameters
+        $request->validate([
+            'age_min' => 'nullable|integer|min:18|max:100',
+            'age_max' => 'nullable|integer|min:18|max:100',
+            'max_distance' => 'nullable|integer|min:1|max:500',
+        ]);
+
+        // Cache feed for 60 seconds per user with filter params
+        $cacheKey = "feed:user_{$user->id}:" . md5($request->getQueryString() ?? '');
+        
+        $matches = Cache::remember($cacheKey, 60, function () use ($user, $profile, $request) {
+            return $this->findMatches($user, $profile, $request);
+        });
+
+        // Emit telemetry
+        app(\App\Services\TelemetryService::class)->emit('feed.viewed', [
+            'user_id' => $user->id,
+            'count' => $matches->count(),
+            'filters_applied' => !empty($request->query()),
+        ]);
 
         return response()->json([
             "matches" => MatchResource::collection($matches)->toArray(request()),
@@ -30,6 +114,49 @@ class MatchController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/matches/action",
+     *     tags={"Matches"},
+     *     summary="Perform match action",
+     *     description="Like, pass, or super like a potential match. Returns whether action resulted in a mutual match.",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"action", "target_user_id"},
+     *             @OA\Property(property="action", type="string", enum={"like", "pass", "super_like"}, example="like"),
+     *             @OA\Property(property="target_user_id", type="integer", example=42)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Action recorded successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="action", type="string", example="like"),
+     *             @OA\Property(property="is_match", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="It's a match!")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid action or user not accessible",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Cannot perform action on yourself")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     )
+     * )
+     */
     public function action(Request $request): JsonResponse
     {
         $request->validate([
@@ -96,16 +223,17 @@ class MatchController extends Controller
             });
         }
 
-        // Age filter
-        if ($profile->preferences && isset($profile->preferences['age_range'])) {
-            $ageRange = $profile->preferences['age_range'];
-            $query->whereHas('profile', function ($q) use ($ageRange) {
-                $q->whereRaw('TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN ? AND ?', [
-                    $ageRange['min'] ?? 18,
-                    $ageRange['max'] ?? 100
-                ]);
-            });
-        }
+        // Age filter (request params override preferences)
+        $ageMin = (int) $request->get('age_min', $profile->preferences['age_range']['min'] ?? 18);
+        $ageMax = (int) $request->get('age_max', $profile->preferences['age_range']['max'] ?? 100);
+        
+        $query->whereHas('profile', function ($q) use ($ageMin, $ageMax) {
+            // SQLite-compatible age calculation
+            $q->whereRaw("(julianday('now') - julianday(date_of_birth)) / 365.25 BETWEEN ? AND ?", [
+                $ageMin,
+                $ageMax
+            ]);
+        });
 
         // Exclude users already interacted with
         $excludedIds = DB::table('match_actions')
@@ -160,7 +288,42 @@ class MatchController extends Controller
         // Preference compatibility (40 points)
         $score += $this->calculatePreferenceCompatibility($userProfile, $candidateProfile);
 
+        // Freshness/recency boost (up to 5 points)
+        $score += $this->calculateFreshnessBoost($candidateProfile->user);
+
+        // Saturation penalty for heavy proximity posting (up to -5 points)
+        $score -= $this->calculateProximitySaturationPenalty($candidateProfile->user);
+
         return min($maxScore, max(0, $score));
+    }
+
+    private function calculateFreshnessBoost(User $candidate): int
+    {
+        if (!$candidate->last_seen_at) {
+            return 0;
+        }
+
+        $hoursSinceActive = now()->diffInHours($candidate->last_seen_at);
+        
+        if ($hoursSinceActive < 1) {
+            return 5; // Very recent activity
+        } elseif ($hoursSinceActive < 24) {
+            return 3; // Active today
+        } elseif ($hoursSinceActive < 168) {
+            return 1; // Active this week
+        }
+        
+        return 0;
+    }
+
+    private function calculateProximitySaturationPenalty(User $candidate): int
+    {
+        // Count artifacts created by candidate in last 24 hours
+        $count = ProximityArtifact::where('user_id', $candidate->id)
+            ->where('created_at', '>=', now()->subDay())
+            ->count();
+        // Each 10 artifacts -> 1 point penalty, capped at 5
+        return (int) min(5, floor($count / 10));
     }
 
     private function calculateDistance(UserProfile $profile1, UserProfile $profile2): float
@@ -268,15 +431,85 @@ class MatchController extends Controller
             ->exists();
 
         if ($mutualLike) {
-            // Create match record
-            DB::table('matches')->insert([
-                'user1_id' => min($userId, $targetUserId),
-                'user2_id' => max($userId, $targetUserId),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            $user1 = min($userId, $targetUserId);
+            $user2 = max($userId, $targetUserId);
+
+            // Create match record (idempotent: skip if exists)
+            $existing = DB::table('matches')
+                ->where('user1_id', $user1)
+                ->where('user2_id', $user2)
+                ->exists();
+
+            if (!$existing) {
+                DB::table('matches')->insert([
+                    'user1_id' => $user1,
+                    'user2_id' => $user2,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                // Send email notifications to both users
+                $emailService = app(\App\Services\EmailNotificationService::class);
+                $userA = User::find($user1);
+                $userB = User::find($user2);
+                
+                if ($userA && $userB) {
+                    $emailService->sendNewMatchNotification($userA, $userB);
+                    $emailService->sendNewMatchNotification($userB, $userA);
+                }
+            }
+
+            // Auto chat creation under feature flag
+            $flags = app(\App\Services\FeatureFlagService::class);
+            if ($flags->isEnabled('auto_chat_on_match')) {
+                $this->createAutoChatIfMissing($user1, $user2);
+            }
         }
 
         return $mutualLike;
+    }
+
+    /**
+     * Create a private chatroom for a matched pair if one doesn't exist; insert system message.
+     */
+    private function createAutoChatIfMissing(int $user1, int $user2): void
+    {
+        // Deterministic unique name for pair
+        $pairName = "match_{$user1}_{$user2}";
+
+        // Look for existing private chatroom with both members
+        $existing = \App\Models\Chatroom::query()
+            ->where('type', 'private')
+            ->where('name', $pairName)
+            ->first();
+
+        if (!$existing) {
+            $chatroom = \App\Models\Chatroom::create([
+                'name' => $pairName,
+                'description' => 'Private chat for matched users',
+                'type' => 'private',
+                'created_by' => $user1,
+                'is_public' => false,
+                'is_active' => true,
+                'member_count' => 0,
+                'message_count' => 0,
+            ]);
+
+            // Attach members
+            $chatroom->addMember(\App\Models\User::find($user1));
+            $chatroom->addMember(\App\Models\User::find($user2));
+
+            // System message
+            \App\Models\ChatroomMessage::create([
+                'chatroom_id' => $chatroom->id,
+                'user_id' => $user1, // attribute to first user for simplicity
+                'content' => "It's a match! Start your conversation.",
+                'type' => 'system',
+                'is_edited' => false,
+                'is_deleted' => false,
+            ]);
+
+            $chatroom->update(['message_count' => 1, 'last_activity_at' => now()]);
+        }
     }
 }

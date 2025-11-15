@@ -22,6 +22,15 @@ class AnalyticsController extends Controller
 
     /**
      * Get comprehensive analytics data
+     *
+     * @OA\Get(
+     *   path="/analytics",
+     *   tags={"Analytics"},
+     *   summary="Platform analytics overview",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="range", in="query", required=false, description="Time range (1d, 7d, 30d, 90d)", @OA\Schema(type="string", enum={"1d","7d","30d","90d"})),
+     *   @OA\Response(response=200, description="Analytics payload")
+     * )
      */
     public function index(Request $request): JsonResponse
     {
@@ -260,6 +269,14 @@ class AnalyticsController extends Controller
 
     /**
      * Get real-time metrics
+     *
+     * @OA\Get(
+     *   path="/analytics/realtime",
+     *   tags={"Analytics"},
+     *   summary="Real-time metrics",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="Realtime metrics payload")
+     * )
      */
     public function realtime(): JsonResponse
     {
@@ -279,6 +296,14 @@ class AnalyticsController extends Controller
 
     /**
      * Get moderation insights
+     *
+     * @OA\Get(
+     *   path="/analytics/moderation",
+     *   tags={"Analytics"},
+     *   summary="Moderation insights",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="Moderation insights payload")
+     * )
      */
     public function moderation(): JsonResponse
     {

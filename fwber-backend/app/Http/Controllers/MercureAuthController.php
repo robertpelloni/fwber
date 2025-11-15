@@ -6,6 +6,7 @@ use App\Services\MercurePublisher;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use OpenApi\Attributes as OA;
 
 class MercureAuthController extends Controller
 {
@@ -18,6 +19,22 @@ class MercureAuthController extends Controller
 
     /**
      * Set Mercure authorization cookie for authenticated user
+     * 
+     * @OA\Get(
+     *     path="/mercure/cookie",
+     *     tags={"Mercure"},
+     *     summary="Get Mercure authorization cookie",
+     *     description="Set an authorization cookie for subscribing to Mercure SSE topics",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(response=200, description="Authorization cookie set",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="topics", type="array", @OA\Items(type="string")),
+     *             @OA\Property(property="expires_in", type="integer", example=3600)
+     *         )
+     *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
+     * )
      */
     public function cookie(Request $request): JsonResponse
     {
@@ -83,6 +100,23 @@ class MercureAuthController extends Controller
 
     /**
      * Get current Mercure authorization status
+     * 
+     * @OA\Get(
+     *     path="/mercure/status",
+     *     tags={"Mercure"},
+     *     summary="Get Mercure authorization status",
+     *     description="Check current Mercure authorization status and available topics",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(response=200, description="Authorization status",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="authorized", type="boolean", example=true),
+     *             @OA\Property(property="user_id", type="integer"),
+     *             @OA\Property(property="topics", type="array", @OA\Items(type="string")),
+     *             @OA\Property(property="mercure_url", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
+     * )
      */
     public function status(Request $request): JsonResponse
     {

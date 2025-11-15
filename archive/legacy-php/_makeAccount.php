@@ -77,10 +77,15 @@
         exit();
     }
 
-    // Note: $reCaptchaSecretKey needs to be defined in _secrets.php
-    include('_secrets.php');
+    // Use reCAPTCHA secret from environment
+    $reCaptchaSecretKey = $_ENV['RECAPTCHA_SECRET'] ?? '';
     $ip = $_SERVER['REMOTE_ADDR'];
     // post request to server
+    if (empty($reCaptchaSecretKey)) {
+        // If not configured, deny gracefully
+        header("Location: ".getSiteURL()."/join");
+        exit();
+    }
     $url = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($reCaptchaSecretKey) .  '&response=' . urlencode($captcha);
     $response = file_get_contents($url);
     $responseKeys = json_decode($response,true);

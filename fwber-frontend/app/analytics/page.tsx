@@ -79,11 +79,11 @@ export default function AnalyticsPage() {
     }
 
     fetchAnalytics();
-
+    
     // Set up auto-refresh
     const interval = setInterval(fetchAnalytics, refreshInterval);
     return () => clearInterval(interval);
-  }, [user, router, fetchAnalytics, refreshInterval]);
+  }, [user, timeRange, refreshInterval, fetchAnalytics, router]);
 
   if (!user) {
     return null;

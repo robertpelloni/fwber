@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use OpenApi\Attributes as OA;
 
 class ContentGenerationController extends Controller
 {
@@ -26,6 +27,33 @@ class ContentGenerationController extends Controller
 
     /**
      * Generate profile content for the authenticated user
+     * 
+     * @OA\Post(
+     *     path="/content-generation/profile",
+     *     tags={"Content Generation"},
+     *     summary="Generate profile content",
+     *     description="AI-generated profile bio, about section, and interests based on user preferences",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         @OA\JsonContent(
+     *             @OA\Property(property="personality", type="string", maxLength=255, example="Outgoing and adventurous"),
+     *             @OA\Property(property="interests", type="array", @OA\Items(type="string")),
+     *             @OA\Property(property="goals", type="string", maxLength=1000, example="Looking for meaningful connections"),
+     *             @OA\Property(property="style", type="string", enum={"casual", "professional", "humorous", "romantic"}, example="casual"),
+     *             @OA\Property(property="target_audience", type="string", example="25-35 year olds")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Profile content generated",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean"),
+     *             @OA\Property(property="data", type="object"),
+     *             @OA\Property(property="user_id", type="integer"),
+     *             @OA\Property(property="generated_at", type="string", format="date-time")
+     *         )
+     *     ),
+    *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+    *     @OA\Response(response=400, ref="#/components/responses/BadRequest")
+     * )
      */
     public function generateProfileContent(Request $request): JsonResponse
     {
@@ -69,6 +97,27 @@ class ContentGenerationController extends Controller
 
     /**
      * Generate post suggestions for a bulletin board
+     * 
+     * @OA\Post(
+     *     path="/content-generation/posts/{boardId}/suggestions",
+     *     tags={"Content Generation"},
+     *     summary="Generate post suggestions",
+     *     description="AI-generated post ideas for a bulletin board based on context",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(name="boardId", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\RequestBody(
+     *         @OA\JsonContent(
+     *             @OA\Property(property="context", type="object",
+     *                 @OA\Property(property="location", type="object"),
+     *                 @OA\Property(property="time", type="string"),
+     *                 @OA\Property(property="topics", type="array", @OA\Items(type="string"))
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Post suggestions generated"),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+    *     @OA\Response(response=404, ref="#/components/responses/NotFound")
+     * )
      */
     public function generatePostSuggestions(Request $request, int $boardId): JsonResponse
     {
@@ -118,6 +167,27 @@ class ContentGenerationController extends Controller
 
     /**
      * Generate conversation starters
+     * 
+     * @OA\Post(
+     *     path="/content-generation/conversation-starters",
+     *     tags={"Content Generation"},
+     *     summary="Generate conversation starters",
+     *     description="AI-generated conversation openers based on context and match data",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         @OA\JsonContent(
+     *             @OA\Property(property="context", type="object",
+     *                 @OA\Property(property="type", type="string", enum={"general", "romantic", "casual", "professional"}),
+     *                 @OA\Property(property="target_user", type="object"),
+     *                 @OA\Property(property="previous_messages", type="array", @OA\Items(type="object")),
+     *                 @OA\Property(property="hints", type="array", @OA\Items(type="string"))
+     *             )
+     *         )
+     *     ),
+    *     @OA\Response(response=200, description="Conversation starters generated"),
+    *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+    *     @OA\Response(response=400, ref="#/components/responses/BadRequest")
+     * )
      */
     public function generateConversationStarters(Request $request): JsonResponse
     {
@@ -158,6 +228,30 @@ class ContentGenerationController extends Controller
 
     /**
      * Optimize content for better engagement, clarity, safety, and relevance
+     * 
+     * @OA\Post(
+     *     path="/content-generation/optimize",
+     *     tags={"Content Generation"},
+     *     summary="Optimize content",
+     *     description="AI-powered content optimization for engagement, clarity, safety, and relevance",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"content"},
+     *             @OA\Property(property="content", type="string", maxLength=2000, example="Original content to optimize"),
+     *             @OA\Property(property="context", type="object"),
+     *             @OA\Property(property="optimization_types", type="array",
+     *                 @OA\Items(type="string", enum={"engagement", "clarity", "safety", "relevance"})
+     *             )
+     *         )
+     *     ),
+    *     @OA\Response(response=200, description="Content optimized",
+    *         @OA\JsonContent(ref="#/components/schemas/ContentOptimizationResponse")
+    *     ),
+    *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+    *     @OA\Response(response=400, ref="#/components/responses/BadRequest")
+     * )
      */
     public function optimizeContent(Request $request): JsonResponse
     {
@@ -209,6 +303,18 @@ class ContentGenerationController extends Controller
 
     /**
      * Get content generation statistics
+     * 
+     * @OA\Get(
+     *     path="/content-generation/stats",
+     *     tags={"Content Generation"},
+     *     summary="Get generation statistics",
+     *     description="Retrieve statistics about AI content generation usage and performance",
+     *     security={{"bearerAuth":{}}},
+    *     @OA\Response(response=200, description="Generation statistics",
+    *         @OA\JsonContent(ref="#/components/schemas/GenerationStatsResponse")
+    *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
+     * )
      */
     public function getGenerationStats(): JsonResponse
     {
@@ -237,6 +343,18 @@ class ContentGenerationController extends Controller
 
     /**
      * Get content optimization statistics
+     * 
+     * @OA\Get(
+     *     path="/content-generation/optimization-stats",
+     *     tags={"Content Generation"},
+     *     summary="Get optimization statistics",
+     *     description="Retrieve statistics about content optimization usage and improvements",
+     *     security={{"bearerAuth":{}}},
+    *     @OA\Response(response=200, description="Optimization statistics",
+    *         @OA\JsonContent(ref="#/components/schemas/OptimizationStatsResponse")
+    *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
+     * )
      */
     public function getOptimizationStats(): JsonResponse
     {
@@ -265,6 +383,28 @@ class ContentGenerationController extends Controller
 
     /**
      * Provide feedback on generated content
+     * 
+     * @OA\Post(
+     *     path="/content-generation/feedback",
+     *     tags={"Content Generation"},
+     *     summary="Submit content feedback",
+     *     description="Provide feedback on AI-generated content to improve future suggestions",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"suggestion_id", "content_type", "rating"},
+     *             @OA\Property(property="suggestion_id", type="string", format="uuid"),
+     *             @OA\Property(property="content_type", type="string", enum={"profile", "post_suggestion", "conversation_starter"}),
+     *             @OA\Property(property="rating", type="integer", minimum=1, maximum=5, example=4),
+     *             @OA\Property(property="feedback", type="string", maxLength=1000),
+     *             @OA\Property(property="improvements", type="array", @OA\Items(type="string"))
+     *         )
+     *     ),
+    *     @OA\Response(response=200, description="Feedback submitted"),
+    *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+    *     @OA\Response(response=400, ref="#/components/responses/BadRequest")
+     * )
      */
     public function submitContentFeedback(Request $request): JsonResponse
     {
@@ -315,6 +455,18 @@ class ContentGenerationController extends Controller
 
     /**
      * Get user's content generation history
+     * 
+     * @OA\Get(
+     *     path="/content-generation/history",
+     *     tags={"Content Generation"},
+     *     summary="Get generation history",
+     *     description="Retrieve user's AI content generation history with pagination",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(name="page", in="query", @OA\Schema(type="integer", default=1)),
+     *     @OA\Parameter(name="per_page", in="query", @OA\Schema(type="integer", default=10, maximum=100)),
+     *     @OA\Response(response=200, description="Generation history retrieved"),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
+     * )
      */
     public function getGenerationHistory(Request $request): JsonResponse
     {
@@ -349,6 +501,24 @@ class ContentGenerationController extends Controller
 
     /**
      * Delete generated content
+     * 
+     * @OA\Delete(
+     *     path="/content-generation/content/{contentId}",
+     *     tags={"Content Generation"},
+     *     summary="Delete generated content",
+     *     description="Remove AI-generated content from history",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(name="contentId", in="path", required=true, @OA\Schema(type="string")),
+     *     @OA\Response(response=200, description="Content deleted successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Content deleted successfully"),
+     *             @OA\Property(property="content_id", type="string", example="gen_abc123"),
+     *             @OA\Property(property="deleted_at", type="string", format="date-time")
+     *         )
+     *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
+     * )
      */
     public function deleteGeneratedContent(Request $request, string $contentId): JsonResponse
     {

@@ -15,6 +15,10 @@ class Message extends Model
         'receiver_id',
         'content',
         'message_type',
+        'media_url',
+        'media_type',
+        'media_duration',
+        'thumbnail_url',
         'is_read',
         'sent_at',
         'read_at',
@@ -24,6 +28,7 @@ class Message extends Model
         'sent_at' => 'datetime',
         'read_at' => 'datetime',
         'is_read' => 'boolean',
+        'media_duration' => 'integer',
     ];
 
     public function sender(): BelongsTo

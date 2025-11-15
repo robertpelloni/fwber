@@ -21,6 +21,7 @@ class MatchResource extends JsonResource
             "bio" => $profile?->bio,
             "locationDescription" => $profile?->location_description,
             "compatibilityScore" => (int) ($this->compatibility_score ?? 0),
+            "lastSeenAt" => optional($this->last_seen_at)->toIso8601String(),
         ];
     }
 }

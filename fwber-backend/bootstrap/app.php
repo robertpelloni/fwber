@@ -20,10 +20,16 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'auth.api' => AuthenticateApi::class,
+            'profile.complete' => \App\Http\Middleware\EnsureProfileComplete::class,
+            'presence.update' => \App\Http\Middleware\UpdateLastSeen::class,
+            'auth.moderator' => \App\Http\Middleware\EnsureModerator::class,
+            'feature' => \App\Http\Middleware\FeatureEnabled::class,
         ]);
 
-        $middleware->group('api', [
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        // Enable CORS for API routes
+        $middleware->api(prepend: [
+            \App\Http\Middleware\CorsMiddleware::class,
+            \App\Http\Middleware\UpdateLastSeen::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

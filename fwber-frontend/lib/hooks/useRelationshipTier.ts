@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { RelationshipTier, calculateRelationshipTier } from '@/lib/relationshipTiers'
+import { RelationshipTier } from '@/lib/relationshipTiers'
+import { getMatchTier, incrementMatchMessages, markMatchMetInPerson } from '@/lib/api/tierApi'
 
 export interface UserTierData {
   tier: RelationshipTier
@@ -32,31 +33,16 @@ export function useRelationshipTier(userId: number | null, matchId: number | nul
       setIsLoading(true)
       setError(null)
 
-      // TODO: Replace with actual API call
-      // const response = await fetch(`/api/matches/${matchId}/tier`)
-      // const data = await response.json()
-
-      // Simulated data for now
-      const isMatched = true
-      const messagesExchanged = Math.floor(Math.random() * 100)
-      const daysConnected = Math.floor(Math.random() * 30)
-      const hasMetInPerson = Math.random() > 0.8
-
-      const tier = calculateRelationshipTier(
-        isMatched,
-        messagesExchanged,
-        daysConnected,
-        hasMetInPerson
-      )
+      const response = await getMatchTier(matchId)
 
       setTierData({
-        tier,
-        isMatched,
-        messagesExchanged,
-        daysConnected,
-        hasMetInPerson,
-        lastTierUpgrade: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
-        canUpgrade: tier < RelationshipTier.VERIFIED
+        tier: response.current_tier as RelationshipTier,
+        isMatched: true,
+        messagesExchanged: response.messages_exchanged,
+        daysConnected: response.days_connected,
+        hasMetInPerson: response.has_met_in_person,
+        lastTierUpgrade: new Date(response.updated_at),
+        canUpgrade: response.current_tier !== 'verified'
       })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load tier data')
@@ -75,42 +61,38 @@ export function useRelationshipTier(userId: number | null, matchId: number | nul
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, matchId])
 
-  const incrementMessages = () => {
-    if (!tierData) return
+  const incrementMessages = async () => {
+    if (!tierData || !matchId) return false
     
-    const newMessagesCount = tierData.messagesExchanged + 1
-    const newTier = calculateRelationshipTier(
-      tierData.isMatched,
-      newMessagesCount,
-      tierData.daysConnected,
-      tierData.hasMetInPerson
-    )
+    try {
+      const response = await incrementMatchMessages(matchId)
+      
+      const hadUpgrade = response.tier_upgraded
 
-    const hadUpgrade = newTier > tierData.tier
+      setTierData({
+        ...tierData,
+        messagesExchanged: response.messages_exchanged,
+        tier: response.current_tier as RelationshipTier,
+        lastTierUpgrade: hadUpgrade ? new Date() : tierData.lastTierUpgrade
+      })
 
-    setTierData({
-      ...tierData,
-      messagesExchanged: newMessagesCount,
-      tier: newTier,
-      lastTierUpgrade: hadUpgrade ? new Date() : tierData.lastTierUpgrade
-    })
-
-    return hadUpgrade
+      return hadUpgrade
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update message count')
+      return false
+    }
   }
 
   const markAsMetInPerson = async () => {
     if (!tierData || !matchId) return false
 
     try {
-      // TODO: Replace with actual API call
-      // await fetch(`/api/matches/${matchId}/met-in-person`, { method: 'POST' })
-
-      const newTier = RelationshipTier.VERIFIED
+      const response = await markMatchMetInPerson(matchId)
 
       setTierData({
         ...tierData,
-        hasMetInPerson: true,
-        tier: newTier,
+        hasMetInPerson: response.has_met_in_person,
+        tier: response.current_tier as RelationshipTier,
         lastTierUpgrade: new Date()
       })
 

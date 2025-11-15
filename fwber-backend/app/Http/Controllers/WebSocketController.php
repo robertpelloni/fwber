@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use App\Services\WebSocketService;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use OpenApi\Attributes as OA;
 
 class WebSocketController extends Controller
 {
@@ -19,6 +20,28 @@ class WebSocketController extends Controller
 
     /**
      * Handle WebSocket connection
+     * 
+     * @OA\Post(
+     *     path="/websocket/connect",
+     *     tags={"WebSocket"},
+     *     summary="Connect to WebSocket",
+     *     description="Establish a WebSocket connection for real-time communication",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         @OA\JsonContent(
+     *             @OA\Property(property="connection_data", type="object",
+     *                 @OA\Property(property="user_agent", type="string", example="Mozilla/5.0..."),
+     *                 @OA\Property(property="ip_address", type="string", example="192.168.1.1"),
+     *                 @OA\Property(property="device_type", type="string", example="mobile")
+     *             )
+     *         )
+     *     ),
+    *     @OA\Response(response=200, description="Connection established",
+    *         @OA\JsonContent(ref="#/components/schemas/WebSocketConnectionEstablished")
+    *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+     *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     * )
      */
     public function connect(Request $request): JsonResponse
     {
@@ -63,6 +86,24 @@ class WebSocketController extends Controller
 
     /**
      * Handle WebSocket disconnection
+     * 
+     * @OA\Post(
+     *     path="/websocket/disconnect",
+     *     tags={"WebSocket"},
+     *     summary="Disconnect from WebSocket",
+     *     description="Close an active WebSocket connection",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"connection_id"},
+     *             @OA\Property(property="connection_id", type="string", example="conn_abc123")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Disconnected successfully"),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+     *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     * )
      */
     public function disconnect(Request $request): JsonResponse
     {
@@ -104,6 +145,31 @@ class WebSocketController extends Controller
 
     /**
      * Send message to user
+     * 
+     * @OA\Post(
+     *     path="/websocket/message",
+     *     tags={"WebSocket"},
+     *     summary="Send WebSocket message",
+     *     description="Send a real-time message to another user",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"recipient_id", "message"},
+     *             @OA\Property(property="recipient_id", type="string", example="user_123"),
+     *             @OA\Property(property="message", type="object",
+     *                 required={"type", "content"},
+     *                 @OA\Property(property="type", type="string", example="text"),
+     *                 @OA\Property(property="content", type="string", example="Hello there!")
+     *             )
+     *         )
+     *     ),
+    *     @OA\Response(response=200, description="Message sent successfully",
+    *         @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")
+    *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+     *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     * )
      */
     public function sendMessage(Request $request): JsonResponse
     {
@@ -150,6 +216,27 @@ class WebSocketController extends Controller
 
     /**
      * Send typing indicator
+     * 
+     * @OA\Post(
+     *     path="/websocket/typing",
+     *     tags={"WebSocket"},
+     *     summary="Send typing indicator",
+     *     description="Notify another user that you are typing",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"recipient_id", "is_typing"},
+     *             @OA\Property(property="recipient_id", type="string", example="user_123"),
+     *             @OA\Property(property="is_typing", type="boolean", example=true)
+     *         )
+     *     ),
+    *     @OA\Response(response=200, description="Typing indicator sent",
+    *         @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")
+    *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+     *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     * )
      */
     public function sendTypingIndicator(Request $request): JsonResponse
     {
@@ -194,6 +281,27 @@ class WebSocketController extends Controller
 
     /**
      * Update presence status
+     * 
+     * @OA\Post(
+     *     path="/websocket/presence",
+     *     tags={"WebSocket"},
+     *     summary="Update presence status",
+     *     description="Update your online/away/busy/offline status",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"status"},
+     *             @OA\Property(property="status", type="string", enum={"online", "away", "busy", "offline"}, example="online"),
+     *             @OA\Property(property="metadata", type="object")
+     *         )
+     *     ),
+    *     @OA\Response(response=200, description="Presence updated successfully",
+    *         @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")
+    *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+     *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     * )
      */
     public function updatePresence(Request $request): JsonResponse
     {
@@ -238,6 +346,33 @@ class WebSocketController extends Controller
 
     /**
      * Send notification
+     * 
+     * @OA\Post(
+     *     path="/websocket/notification",
+     *     tags={"WebSocket"},
+     *     summary="Send real-time notification",
+     *     description="Send a push notification to another user via WebSocket",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"recipient_id", "notification"},
+     *             @OA\Property(property="recipient_id", type="string", example="user_123"),
+     *             @OA\Property(property="notification", type="object",
+     *                 required={"title", "body"},
+     *                 @OA\Property(property="title", type="string", example="New Match!"),
+     *                 @OA\Property(property="body", type="string", example="You have a new match nearby"),
+     *                 @OA\Property(property="type", type="string", example="match"),
+     *                 @OA\Property(property="data", type="object")
+     *             )
+     *         )
+     *     ),
+    *     @OA\Response(response=200, description="Notification sent successfully",
+    *         @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")
+    *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+     *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     * )
      */
     public function sendNotification(Request $request): JsonResponse
     {

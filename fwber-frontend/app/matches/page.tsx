@@ -1,7 +1,8 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useAuth } from '@/lib/auth-context'
+import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
+import { useAuth } from '@/lib/auth-context';
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { getMatches, performMatchAction, type Match, type MatchAction } from '@/lib/api/matches'
 import { RelationshipTier } from '@/lib/relationshipTiers'
@@ -24,13 +25,7 @@ export default function MatchesPage() {
     return RelationshipTier.DISCOVERY
   }
 
-  useEffect(() => {
-    if (isAuthenticated && token) {
-      loadMatches()
-    }
-  }, [isAuthenticated, token])
-
-  const loadMatches = async () => {
+  const loadMatches = useCallback(async () => {
     if (!token) return
 
     try {
@@ -44,7 +39,13 @@ export default function MatchesPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [token])
+
+  useEffect(() => {
+    if (isAuthenticated && token) {
+      loadMatches()
+    }
+  }, [isAuthenticated, token, loadMatches])
 
   const handleMatchAction = async (action: MatchAction) => {
     if (!token || currentMatchIndex >= matches.length) return
@@ -174,10 +175,11 @@ export default function MatchesPage() {
                 <div className="aspect-w-3 aspect-h-4 bg-gray-200">
                   <div className="w-full h-96 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center relative">
                     {currentMatch.profile?.photos?.[0] ? (
-                      <img
+                      <Image
                         src={currentMatch.profile.photos[0].url}
                         alt={currentMatch.profile.display_name || 'Profile'}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
                       />
                     ) : (
                       <div className="text-white text-6xl">
