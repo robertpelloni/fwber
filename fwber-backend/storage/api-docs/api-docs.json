@@ -3935,7 +3935,14 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Content optimized"
+                        "description": "Content optimized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ContentOptimizationResponse"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "$ref": "#/components/responses/Unauthorized"
@@ -7793,19 +7800,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "action": {
-                                            "type": "string"
-                                        },
-                                        "status": {
-                                            "type": "object"
-                                        },
-                                        "timestamp": {
-                                            "type": "string",
-                                            "format": "date-time"
-                                        }
-                                    },
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/RateLimitStatusResponse"
                                 }
                             }
                         }
@@ -7835,19 +7830,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "user_id": {
-                                            "type": "integer"
-                                        },
-                                        "statuses": {
-                                            "type": "object"
-                                        },
-                                        "timestamp": {
-                                            "type": "string",
-                                            "format": "date-time"
-                                        }
-                                    },
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/AllRateLimitStatusesResponse"
                                 }
                             }
                         }
@@ -8504,19 +8487,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "connection_id": {
-                                            "type": "string"
-                                        },
-                                        "user_id": {
-                                            "type": "integer"
-                                        },
-                                        "timestamp": {
-                                            "type": "string",
-                                            "format": "date-time"
-                                        }
-                                    },
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/WebSocketConnectionEstablished"
                                 }
                             }
                         }
@@ -9294,6 +9265,23 @@
                 },
                 "type": "object"
             },
+            "WebSocketConnectionEstablished": {
+                "properties": {
+                    "connection_id": {
+                        "type": "string",
+                        "example": "conn_abc123"
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 42
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "RateLimitStatus": {
                 "properties": {
                     "action": {
@@ -9315,6 +9303,39 @@
                 },
                 "type": "object"
             },
+            "RateLimitStatusResponse": {
+                "properties": {
+                    "action": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/RateLimitStatus"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "AllRateLimitStatusesResponse": {
+                "properties": {
+                    "user_id": {
+                        "type": "integer"
+                    },
+                    "statuses": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/RateLimitStatus"
+                        }
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "ContentOptimizationResult": {
                 "properties": {
                     "original": {
@@ -9332,6 +9353,25 @@
                     "score": {
                         "type": "number",
                         "format": "float"
+                    }
+                },
+                "type": "object"
+            },
+            "ContentOptimizationResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/ContentOptimizationResult"
+                    },
+                    "user_id": {
+                        "type": "integer"
+                    },
+                    "optimized_at": {
+                        "type": "string",
+                        "format": "date-time"
                     }
                 },
                 "type": "object"

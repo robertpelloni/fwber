@@ -246,7 +246,9 @@ class ContentGenerationController extends Controller
      *             )
      *         )
      *     ),
-    *     @OA\Response(response=200, description="Content optimized"),
+    *     @OA\Response(response=200, description="Content optimized",
+    *         @OA\JsonContent(ref="#/components/schemas/ContentOptimizationResponse")
+    *     ),
     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
     *     @OA\Response(response=400, ref="#/components/responses/BadRequest")
      * )

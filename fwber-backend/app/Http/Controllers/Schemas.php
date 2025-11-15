@@ -202,6 +202,14 @@ namespace App\Http\Controllers;
  * )
  * 
  * @OA\Schema(
+ *   schema="WebSocketConnectionEstablished",
+ *   type="object",
+ *   @OA\Property(property="connection_id", type="string", example="conn_abc123"),
+ *   @OA\Property(property="user_id", type="integer", example=42),
+ *   @OA\Property(property="timestamp", type="string", format="date-time")
+ * )
+ * 
+ * @OA\Schema(
  *   schema="RateLimitStatus",
  *   type="object",
  *   @OA\Property(property="action", type="string", example="message_send"),
@@ -212,12 +220,37 @@ namespace App\Http\Controllers;
  * )
  * 
  * @OA\Schema(
+ *   schema="RateLimitStatusResponse",
+ *   type="object",
+ *   @OA\Property(property="action", type="string"),
+ *   @OA\Property(property="status", ref="#/components/schemas/RateLimitStatus"),
+ *   @OA\Property(property="timestamp", type="string", format="date-time")
+ * )
+ * 
+ * @OA\Schema(
+ *   schema="AllRateLimitStatusesResponse",
+ *   type="object",
+ *   @OA\Property(property="user_id", type="integer"),
+ *   @OA\Property(property="statuses", type="object", additionalProperties={"$ref":"#/components/schemas/RateLimitStatus"}),
+ *   @OA\Property(property="timestamp", type="string", format="date-time")
+ * )
+ * 
+ * @OA\Schema(
  *   schema="ContentOptimizationResult",
  *   type="object",
  *   @OA\Property(property="original", type="string"),
  *   @OA\Property(property="optimized", type="string"),
  *   @OA\Property(property="notes", type="array", @OA\Items(type="string")),
  *   @OA\Property(property="score", type="number", format="float")
+ * )
+ * 
+ * @OA\Schema(
+ *   schema="ContentOptimizationResponse",
+ *   type="object",
+ *   @OA\Property(property="success", type="boolean", example=true),
+ *   @OA\Property(property="data", ref="#/components/schemas/ContentOptimizationResult"),
+ *   @OA\Property(property="user_id", type="integer"),
+ *   @OA\Property(property="optimized_at", type="string", format="date-time")
  * )
  */
 class Schemas

@@ -36,13 +36,9 @@ class WebSocketController extends Controller
      *             )
      *         )
      *     ),
-     *     @OA\Response(response=200, description="Connection established",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="connection_id", type="string"),
-     *             @OA\Property(property="user_id", type="integer"),
-     *             @OA\Property(property="timestamp", type="string", format="date-time")
-     *         )
-     *     ),
+    *     @OA\Response(response=200, description="Connection established",
+    *         @OA\JsonContent(ref="#/components/schemas/WebSocketConnectionEstablished")
+    *     ),
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
      *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )

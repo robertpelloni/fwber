@@ -26,13 +26,9 @@ class RateLimitController extends Controller
      *     description="Check current rate limit status for a specific action",
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(name="action", in="path", required=false, @OA\Schema(type="string", default="api_call")),
-     *     @OA\Response(response=200, description="Rate limit status",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="action", type="string"),
-     *             @OA\Property(property="status", type="object"),
-     *             @OA\Property(property="timestamp", type="string", format="date-time")
-     *         )
-     *     ),
+    *     @OA\Response(response=200, description="Rate limit status",
+    *         @OA\JsonContent(ref="#/components/schemas/RateLimitStatusResponse")
+    *     ),
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
      * )
      */
@@ -57,13 +53,9 @@ class RateLimitController extends Controller
      *     summary="Get all rate limit statuses",
      *     description="Check rate limit status for all tracked actions",
      *     security={{"bearerAuth":{}}},
-     *     @OA\Response(response=200, description="All rate limit statuses",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="user_id", type="integer"),
-     *             @OA\Property(property="statuses", type="object"),
-     *             @OA\Property(property="timestamp", type="string", format="date-time")
-     *         )
-     *     ),
+    *     @OA\Response(response=200, description="All rate limit statuses",
+    *         @OA\JsonContent(ref="#/components/schemas/AllRateLimitStatusesResponse")
+    *     ),
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
      * )
      */

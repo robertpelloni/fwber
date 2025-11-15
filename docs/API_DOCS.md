@@ -38,6 +38,15 @@ php artisan l5-swagger:generate
 
 If the command fails, check the Troubleshooting section below.
 
+Optional helper (Windows/PowerShell):
+
+```powershell
+# From repo root
+powershell -ExecutionPolicy Bypass -File .\tools\update-openapi.ps1
+# Or skip copying to docs/postman
+powershell -ExecutionPolicy Bypass -File .\tools\update-openapi.ps1 -SkipCopy
+```
+
 ## Import into Postman
 Postman can import OpenAPI 3.0 directly:
 
