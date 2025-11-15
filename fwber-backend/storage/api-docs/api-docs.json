@@ -2702,7 +2702,34 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Paginated chatrooms list"
+                        "description": "Paginated chatrooms list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Chatroom"
+                                            }
+                                        },
+                                        "current_page": {
+                                            "type": "integer"
+                                        },
+                                        "last_page": {
+                                            "type": "integer"
+                                        },
+                                        "per_page": {
+                                            "type": "integer"
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -2768,7 +2795,14 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Chatroom"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -2804,10 +2838,10 @@
                                 "schema": {
                                     "properties": {
                                         "chatroom": {
-                                            "type": "object"
+                                            "$ref": "#/components/schemas/Chatroom"
                                         },
                                         "messages": {
-                                            "type": "object"
+                                            "$ref": "#/components/schemas/PaginatedChatMessages"
                                         }
                                     },
                                     "type": "object"
@@ -2872,11 +2906,11 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Updated",
+                        "description": "Updated chatroom",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/SimpleMessageResponse"
+                                    "$ref": "#/components/schemas/Chatroom"
                                 }
                             }
                         }
@@ -3056,7 +3090,17 @@
                 "operationId": "93c7621ecb4e83021e49764d8e599ccb",
                 "responses": {
                     "200": {
-                        "description": "List"
+                        "description": "List",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Chatroom"
+                                    }
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -3076,7 +3120,17 @@
                 "operationId": "73072033f79437354d610a4a78843d9f",
                 "responses": {
                     "200": {
-                        "description": "List"
+                        "description": "List",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Chatroom"
+                                    }
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -9716,6 +9770,91 @@
                             }
                         },
                         "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "Chatroom": {
+                "required": [
+                    "id",
+                    "name",
+                    "type",
+                    "created_by"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 101
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "NYC Tech Founders"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "A place for NYC tech founders to connect",
+                        "nullable": true
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "interest",
+                            "city",
+                            "event",
+                            "private"
+                        ],
+                        "example": "interest"
+                    },
+                    "category": {
+                        "type": "string",
+                        "example": "technology",
+                        "nullable": true
+                    },
+                    "city": {
+                        "type": "string",
+                        "example": "New York",
+                        "nullable": true
+                    },
+                    "neighborhood": {
+                        "type": "string",
+                        "example": "Brooklyn",
+                        "nullable": true
+                    },
+                    "created_by": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "member_count": {
+                        "type": "integer",
+                        "example": 245
+                    },
+                    "message_count": {
+                        "type": "integer",
+                        "example": 1387
+                    },
+                    "is_public": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "last_activity_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "settings": {
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
                     }
                 },
                 "type": "object"

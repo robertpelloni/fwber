@@ -326,6 +326,28 @@ namespace App\Http\Controllers;
  *     @OA\Property(property="generated_at", type="string", format="date-time")
  *   )
  * )
+ * 
+ * @OA\Schema(
+ *   schema="Chatroom",
+ *   type="object",
+ *   required={"id","name","type","created_by"},
+ *   @OA\Property(property="id", type="integer", example=101),
+ *   @OA\Property(property="name", type="string", example="NYC Tech Founders"),
+ *   @OA\Property(property="description", type="string", nullable=true, example="A place for NYC tech founders to connect"),
+ *   @OA\Property(property="type", type="string", example="interest", enum={"interest","city","event","private"}),
+ *   @OA\Property(property="category", type="string", nullable=true, example="technology"),
+ *   @OA\Property(property="city", type="string", nullable=true, example="New York"),
+ *   @OA\Property(property="neighborhood", type="string", nullable=true, example="Brooklyn"),
+ *   @OA\Property(property="created_by", type="integer", example=5),
+ *   @OA\Property(property="member_count", type="integer", example=245),
+ *   @OA\Property(property="message_count", type="integer", example=1387),
+ *   @OA\Property(property="is_public", type="boolean", example=true),
+ *   @OA\Property(property="is_active", type="boolean", example=true),
+ *   @OA\Property(property="last_activity_at", type="string", format="date-time"),
+ *   @OA\Property(property="settings", type="object", nullable=true),
+ *   @OA\Property(property="created_at", type="string", format="date-time"),
+ *   @OA\Property(property="updated_at", type="string", format="date-time")
+ * )
  */
 class Schemas
 {
