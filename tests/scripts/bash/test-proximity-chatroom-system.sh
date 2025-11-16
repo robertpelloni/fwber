@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Test script for FWBer Proximity Chatroom System
+# Test script for FWBer.me Proximity Chatroom System
 # This script tests the complete proximity chatroom functionality
 
 set -e
 
-echo "🚀 Starting FWBer Proximity Chatroom System Tests"
+echo "🚀 Starting FWBer.me Proximity Chatroom System Tests"
 echo "=================================================="
 
 # Colors for output

@@ -7,7 +7,7 @@ require_once '_init.php';
 require_once 'ProfileManager.php';
 require_once '_getMatches.php';
 
-echo "<h1>FWBer Matching Algorithm Test</h1>\n";
+echo "<h1>FWBer.me Matching Algorithm Test</h1>\n";
 echo "<h2>Testing with New Profile Fields</h2>\n";
 
 try {

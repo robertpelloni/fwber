@@ -1,7 +1,7 @@
-# FWBer Development Environment Test Script
+# FWBer.me Development Environment Test Script
 # Run this in PowerShell to check your XAMPP setup
 
-Write-Host "=== FWBer Environment Check ===" -ForegroundColor Green
+Write-Host "=== FWBer.me Environment Check ===" -ForegroundColor Green
 
 # Check if XAMPP processes are running
 Write-Host "`nChecking XAMPP Services..." -ForegroundColor Yellow

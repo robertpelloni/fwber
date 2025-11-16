@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * FWBer Photo Upload System Test Suite
+ * FWBer.me Photo Upload System Test Suite
  * 
  * Tests the complete photo upload functionality
  * Validates UI components, API integration, and user experience
@@ -144,7 +144,7 @@ async function testPhotoManagementIntegration() {
 
 // Main test runner
 async function runTests() {
-  console.log('🚀 Starting FWBer Photo Upload System Tests\n');
+  console.log('🚀 Starting FWBer.me Photo Upload System Tests\n');
   console.log('=' .repeat(60));
   
   // Run all tests

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * FWBer End-to-End Test Suite
+ * FWBer.me End-to-End Test Suite
  * 
  * Tests the complete user journey from authentication to profile completion
  * Validates frontend-backend integration and data persistence
@@ -157,7 +157,7 @@ async function testEnvironmentConfiguration() {
 
 // Main test runner
 async function runTests() {
-  console.log('🚀 Starting FWBer End-to-End Tests\n');
+  console.log('🚀 Starting FWBer.me End-to-End Tests\n');
   console.log('=' .repeat(50));
   
   // Run all tests

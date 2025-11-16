@@ -1,4 +1,4 @@
-# FWBer Project Documentation
+# FWBer.me Project Documentation
 
 > Quick links: [API Docs Quickstart](API_DOCS.md) · [Feature Flags](FEATURE_FLAGS.md) · [Agents & Workflow](../README-agents.md)
 

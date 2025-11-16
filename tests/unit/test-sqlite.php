@@ -1,6 +1,6 @@
 <?php
 /**
- * SQLite Database Adapter for FWBer Testing
+ * SQLite Database Adapter for FWBer.me Testing
  * Provides SQLite-compatible database schema and connection
  */
 

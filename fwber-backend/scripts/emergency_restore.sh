@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ################################################################################
 # Emergency Database Restore Script
-# Fwber Backend - Laravel Application
+# FWBer.me - Laravel Application
 #
 # Purpose: Rapidly restore database from most recent backup in disaster scenarios
 # Use Case: Complete database loss, critical data corruption, production emergency
@@ -25,7 +25,7 @@
 #   3 - Database error
 #   4 - Decompression error
 #
-# Author: Fwber Development Team
+# Author: FWBer.me Development Team
 # Date: November 15, 2025
 ################################################################################
 

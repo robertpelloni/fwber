@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * FWBer Performance Test Suite
+ * FWBer.me Performance Test Suite
  * 
  * Tests performance optimizations and measures Core Web Vitals
  * Validates bundle size, loading times, and user experience metrics
@@ -260,7 +260,7 @@ async function testAPIPerformance() {
 
 // Main test runner
 async function runTests() {
-  console.log('🚀 Starting FWBer Performance Tests\n');
+  console.log('🚀 Starting FWBer.me Performance Tests\n');
   console.log('=' .repeat(60));
   
   // Run all tests

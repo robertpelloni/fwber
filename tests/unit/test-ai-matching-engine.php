@@ -7,7 +7,7 @@ require_once '_init.php';
 require_once 'ai-matching-engine.php';
 require_once 'ProfileManager.php';
 
-echo "<h1>FWBer AI Matching Engine Test</h1>\n";
+echo "<h1>FWBer.me AI Matching Engine Test</h1>\n";
 echo "<h2>Testing Modern Matching System</h2>\n";
 
 try {

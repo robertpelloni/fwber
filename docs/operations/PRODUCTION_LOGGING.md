@@ -1,6 +1,6 @@
 # Production Logging Configuration
 
-Purpose: Configure structured, secure, and observable logging for FWBER production.
+Purpose: Configure structured, secure, and observable logging for FWBer.me production.
 
 Last updated: 2025-11-15
 

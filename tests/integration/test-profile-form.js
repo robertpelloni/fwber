@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * FWBer Profile Form End-to-End Test
+ * FWBer.me Profile Form End-to-End Test
  * 
  * Tests the complete profile form functionality
  * Focuses on frontend-backend integration and data persistence
@@ -150,7 +150,7 @@ async function testStaticAssets() {
 
 // Main test runner
 async function runTests() {
-  console.log('🚀 Starting FWBer Profile Form End-to-End Tests\n');
+  console.log('🚀 Starting FWBer.me Profile Form End-to-End Tests\n');
   console.log('=' .repeat(60));
   
   // Run all tests

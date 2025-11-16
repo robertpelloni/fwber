@@ -3,7 +3,7 @@
  * Test database connection and basic operations
  */
 
-echo "<h1>FWBer Database Connection Test</h1>\n";
+echo "<h1>FWBer.me Database Connection Test</h1>\n";
 
 try {
     require_once '_init.php';

@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# FWBer Chatroom System E2E Test Script
+# FWBer.me Chatroom System E2E Test Script
 # Tests the complete chatroom functionality including real-time messaging
 
 set -e
 
-echo "🚀 Starting FWBer Chatroom System E2E Test..."
+echo "🚀 Starting FWBer.me Chatroom System E2E Test..."
 echo "=============================================="
 
 # Colors for output

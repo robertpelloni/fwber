@@ -8,7 +8,7 @@ require_once('_init.php');
 require_once('avatar-generator.php');
 require_once('ProfileManager.php');
 
-echo "<h1>FWBer Avatar Generation Test</h1>\n";
+echo "<h1>FWBer.me Avatar Generation Test</h1>\n";
 
 // Test 1: Check if AvatarGenerator can be instantiated
 echo "<h2>Test 1: AvatarGenerator Instantiation</h2>\n";

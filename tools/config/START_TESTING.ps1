@@ -1,7 +1,7 @@
-# FWBer Quick Start Testing Script
+# FWBer.me Quick Start Testing Script
 # Run this in PowerShell to start testing immediately
 
-Write-Host "🚀 FWBer Testing Quick Start" -ForegroundColor Green
+Write-Host "🚀 FWBer.me Testing Quick Start" -ForegroundColor Green
 Write-Host "============================`n" -ForegroundColor Green
 
 # 1. Find PHP

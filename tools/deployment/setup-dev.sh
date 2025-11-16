@@ -1,10 +1,10 @@
 #!/bin/bash
 
 ################################################################################
-# FWBer Development Environment Setup Script
+# FWBer.me Development Environment Setup Script
 ################################################################################
 #
-# This script automates the setup of the FWBer development environment for both
+# This script automates the setup of the FWBer.me development environment for both
 # frontend (Next.js) and backend (Laravel) applications.
 #
 # Prerequisites:

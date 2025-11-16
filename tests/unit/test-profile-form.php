@@ -7,7 +7,7 @@
 require_once('_init.php');
 require_once('ProfileManager.php');
 
-echo "<h1>FWBer Profile Form Test</h1>\n";
+echo "<h1>FWBer.me Profile Form Test</h1>\n";
 
 // Test 1: Check if ProfileManager can be instantiated
 echo "<h2>Test 1: ProfileManager Instantiation</h2>\n";

@@ -6,7 +6,7 @@
 require_once '_init.php';
 require_once 'security-manager.php';
 
-echo "<h1>FWBer Authentication Test</h1>\n";
+echo "<h1>FWBer.me Authentication Test</h1>\n";
 echo "<h2>Testing Security Manager</h2>\n";
 
 try {
