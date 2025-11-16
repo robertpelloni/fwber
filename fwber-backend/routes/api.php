@@ -45,6 +45,9 @@ Route::middleware("api")->group(function (): void {
         // Profile routes (Phase 3A - Multi-AI Implementation)
         Route::get("/user", [ProfileController::class, "show"]);
         Route::put("/user", [ProfileController::class, "update"]);
+        // Aliases to align with OpenAPI docs while preserving existing routes
+        Route::get("/profile", [ProfileController::class, "show"]);
+        Route::put("/profile", [ProfileController::class, "update"]);
         Route::get("/profile/completeness", [ProfileController::class, "completeness"]);
         
         // Dashboard routes

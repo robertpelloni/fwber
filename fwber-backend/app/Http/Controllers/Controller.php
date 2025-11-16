@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 /**
  * @OA\Info(
  *     version="1.0.0",
- *     title="FWBer API Documentation",
- *     description="Comprehensive API documentation for FWBer - A proximity-based dating platform with real-time features, AI-powered matching, and privacy-first design.",
+ *     title="FWBer.me API Documentation",
+ *     description="Comprehensive API documentation for FWBer.me – a proximity-based dating platform with real-time features, AI-powered matching, and privacy-first design.",
  *     @OA\Contact(
- *         name="FWBer Team",
+ *         name="FWBer.me Team",
  *         email="support@fwber.com"
  *     ),
  *     @OA\License(

@@ -1,10 +1,10 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "FWBer API Documentation",
-        "description": "Comprehensive API documentation for FWBer - A proximity-based dating platform with real-time features, AI-powered matching, and privacy-first design.",
+        "title": "FWBer.me API Documentation",
+        "description": "Comprehensive API documentation for FWBer.me – a proximity-based dating platform with real-time features, AI-powered matching, and privacy-first design.",
         "contact": {
-            "name": "FWBer Team",
+            "name": "FWBer.me Team",
             "email": "support@fwber.com"
         },
         "license": {

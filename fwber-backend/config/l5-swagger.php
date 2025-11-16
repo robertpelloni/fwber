@@ -5,7 +5,7 @@ return [
     'documentations' => [
         'default' => [
             'api' => [
-                'title' => 'FWBer API Documentation',
+                'title' => 'FWBer.me API Documentation',
             ],
 
             'routes' => [
@@ -202,8 +202,14 @@ return [
         /*
          * API security definitions. Will be generated into documentation file.
         */
-        'securityDefinitions' => [
+            'securityDefinitions' => [
             'securitySchemes' => [
+                    'bearerAuth' => [
+                        'type' => 'http',
+                        'description' => 'Enter token in format (Bearer <token>)',
+                        'scheme' => 'bearer',
+                        'bearerFormat' => 'JWT',
+                    ],
                 /*
                  * Examples of Security schemes
                  */
