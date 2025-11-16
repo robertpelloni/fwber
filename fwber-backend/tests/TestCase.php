@@ -17,7 +17,10 @@ abstract class TestCase extends BaseTestCase
     protected function ensureDatabaseReady(): void
     {
         try {
-            $this->artisan("migrate:fresh");
+            // Ensure app runs in testing context to avoid production confirmations
+            config(['app.env' => 'testing']);
+            // Bypass interactive console prompts in tests
+            \Illuminate\Support\Facades\Artisan::call('migrate:fresh', ['--force' => true]);
         } catch (\Throwable $exception) {
             $message = strtolower($exception->getMessage());
 
