@@ -46,6 +46,10 @@ When a feature is disabled, its routes still register but requests return HTTP 4
 - FEATURE_ANALYTICS (default: false)
   - Scope: Admin analytics
   - Routes (gated): `/api/analytics*`
+- FEATURE_MODERATION (default: false)
+  - Scope: Advanced moderation tools (shadow throttling, geo-spoof detection, moderation dashboard)
+  - Routes (gated): `/api/moderation/*`
+  - Note: Requires users with `is_moderator` flag; includes dashboard, flagged content review, spoof detection, shadow throttle management
 
 ## Enabling or disabling features
 
@@ -65,6 +69,9 @@ FEATURE_WEBSOCKET=false
 FEATURE_CONTENT_GENERATION=false
 FEATURE_RATE_LIMITS=false
 FEATURE_ANALYTICS=false
+
+# Moderation and safety (Phase 2)
+FEATURE_MODERATION=false
 ```
 
 After changing `.env`, clear Laravel config cache in production:

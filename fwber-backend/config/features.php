@@ -8,6 +8,9 @@ return [
     'chatrooms' => env('FEATURE_CHATROOMS', false),
     'proximity_chatrooms' => env('FEATURE_PROXIMITY_CHATROOMS', false),
 
+    // Moderation and safety (Phase 2)
+    'moderation' => env('FEATURE_MODERATION', false),
+
     // Advanced/optional features
     'recommendations' => env('FEATURE_RECOMMENDATIONS', false),
     'websocket' => env('FEATURE_WEBSOCKET', false),

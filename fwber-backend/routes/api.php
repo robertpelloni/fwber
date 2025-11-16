@@ -156,7 +156,7 @@ Route::middleware("api")->group(function (): void {
         });
 
         // Moderation routes (Phase 2: Safety Features)
-        Route::prefix('moderation')->middleware('auth.moderator')->group(function (): void {
+        Route::prefix('moderation')->middleware(['feature:moderation', 'auth.moderator'])->group(function (): void {
             Route::get('/dashboard', [ModerationController::class, 'dashboard']);
             Route::get('/flagged-content', [ModerationController::class, 'flaggedContent']);
             Route::post('/flags/{artifactId}/review', [ModerationController::class, 'reviewFlag']);
