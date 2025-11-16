@@ -17,18 +17,20 @@ return [
 
     'paths' => ['api/*', 'sanctum/csrf-cookie', 'up'],
 
-    'allowed_methods' => ['*'],
+    'allowed_methods' => explode(',', (string) env('CORS_ALLOWED_METHODS', '*')),
 
-    'allowed_origins' => ['*'], // Allow all origins in development
+    // In production, set CORS_ALLOWED_ORIGINS to a comma-separated list of trusted origins
+    // Example: https://app.fwber.me,https://admin.fwber.me
+    'allowed_origins' => array_filter(array_map('trim', explode(',', (string) env('CORS_ALLOWED_ORIGINS', '*')))),
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['*'],
+    'allowed_headers' => explode(',', (string) env('CORS_ALLOWED_HEADERS', '*')),
 
     'exposed_headers' => [],
 
     'max_age' => 0,
 
-    'supports_credentials' => false,
+    'supports_credentials' => (bool) env('CORS_SUPPORTS_CREDENTIALS', false),
 
 ];

@@ -37,17 +37,28 @@ class SecurityHeaders
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
         // Content Security Policy (CSP)
-        // Adjust based on your application's needs
+        // Strict by default in production; relaxed in non-production or when explicitly allowed via env
+        $isProd = app()->environment('production');
+        $relaxed = (bool) env('CSP_RELAXED', !$isProd);
+
+        $scriptDirectives = $relaxed
+            ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+            : "script-src 'self'";
+
+        $styleDirectives = $relaxed
+            ? "style-src 'self' 'unsafe-inline'"
+            : "style-src 'self'";
+
         $csp = implode('; ', [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Adjust for production
-            "style-src 'self' 'unsafe-inline'",
+            $scriptDirectives,
+            $styleDirectives,
             "img-src 'self' data: https:",
             "font-src 'self' data:",
             "connect-src 'self'",
             "frame-ancestors 'self'",
             "base-uri 'self'",
-            "form-action 'self'"
+            "form-action 'self'",
         ]);
         $response->headers->set('Content-Security-Policy', $csp);
 
