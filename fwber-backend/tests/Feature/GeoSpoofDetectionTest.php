@@ -5,13 +5,13 @@ namespace Tests\Feature;
 use App\Models\User;
 use App\Models\GeoSpoofDetection;
 use App\Services\GeoSpoofDetectionService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\RefreshDatabaseSilently;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class GeoSpoofDetectionTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabaseSilently;
 
     private GeoSpoofDetectionService $service;
     private User $user;

@@ -6,13 +6,13 @@ use App\Models\ApiToken;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Services\MercurePublisher;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\RefreshDatabaseSilently;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class LocalPulseRealtimeTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabaseSilently;
 
     private User $user;
     private string $token;

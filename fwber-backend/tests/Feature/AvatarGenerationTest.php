@@ -4,12 +4,12 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Models\ApiToken;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\RefreshDatabaseSilently;
 use Tests\TestCase;
 
 class AvatarGenerationTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabaseSilently;
 
     public function test_request_avatar_generates_placeholder()
     {

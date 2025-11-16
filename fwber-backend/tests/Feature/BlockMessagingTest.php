@@ -5,12 +5,12 @@ namespace Tests\Feature;
 use App\Models\User;
 use App\Models\Block;
 use App\Models\ApiToken;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\RefreshDatabaseSilently;
 use Tests\TestCase;
 
 class BlockMessagingTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabaseSilently;
 
     protected function setUp(): void
     {

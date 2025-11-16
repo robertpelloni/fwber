@@ -7,32 +7,12 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->ensureDatabaseReady();
-    }
-
-    protected function ensureDatabaseReady(): void
-    {
-        try {
-            // Ensure app runs in testing context to avoid production confirmations
-            config(['app.env' => 'testing']);
-            // Bypass interactive console prompts in tests
-            \Illuminate\Support\Facades\Artisan::call('migrate:fresh', ['--force' => true]);
-        } catch (\Throwable $exception) {
-            $message = strtolower($exception->getMessage());
-
-            if (str_contains($message, "could not find driver")) {
-                $this->markTestSkipped("Database driver unavailable: " . $exception->getMessage());
-
-                return;
-            }
-
-            throw $exception;
-        }
-    }
+    /**
+     * Indicates whether the default seeder should run before each test.
+     *
+     * @var bool
+     */
+    protected $seed = false;
 
     public function createApplication()
     {
@@ -41,5 +21,22 @@ abstract class TestCase extends BaseTestCase
         $app->make(Kernel::class)->bootstrap();
 
         return $app;
+    }
+
+    /**
+     * Setup the test environment.
+     */
+    protected function setUp(): void
+    {
+        // Prevent prompts during testing by setting non-interactive mode
+        if (!defined('ARTISAN_BINARY')) {
+            define('ARTISAN_BINARY', 'artisan');
+        }
+        
+        // This disables the production environment confirmation
+        $_ENV['APP_ENV'] = 'testing';
+        putenv('APP_ENV=testing');
+
+        parent::setUp();
     }
 }

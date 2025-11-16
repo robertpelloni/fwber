@@ -6,13 +6,13 @@ use App\Models\ApiToken;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Models\UserMatch;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\RefreshDatabaseSilently;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class PresenceExposureTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabaseSilently;
 
     #[Test]
     public function last_seen_exposed_in_match_feed(): void

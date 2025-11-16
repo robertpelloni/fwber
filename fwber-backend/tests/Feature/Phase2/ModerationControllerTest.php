@@ -14,11 +14,22 @@ use Tests\TestCase;
 
 class ModerationControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase {
+        refreshDatabase as baseRefreshDatabase;
+    }
 
     private User $moderator;
     private User $regularUser;
     private string $moderatorToken;
+
+    /**
+     * Override refreshDatabase to run migrations without confirmation.
+     */
+    protected function refreshDatabase(): void
+    {
+        // Run migrations programmatically without console confirmation
+        $this->artisan('migrate:fresh', ['--force' => true])->run();
+    }
 
     protected function setUp(): void
     {

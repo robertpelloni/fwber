@@ -8,13 +8,13 @@ use App\Models\GroupMember;
 use App\Models\GroupMessage;
 use App\Models\User;
 use App\Models\UserProfile;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\RefreshDatabaseSilently;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class GroupModerationTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabaseSilently;
 
     private User $owner;
     private User $member;

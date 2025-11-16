@@ -10,7 +10,7 @@ use App\Models\UserProfile;
 use App\Models\UserMatch;
 use App\Models\Message;
 use App\Services\EmailNotificationService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\RefreshDatabaseSilently;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
@@ -19,7 +19,7 @@ use Tests\TestCase;
 
 class EmailNotificationTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabaseSilently;
 
     private EmailNotificationService $service;
 

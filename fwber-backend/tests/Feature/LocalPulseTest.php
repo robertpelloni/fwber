@@ -5,12 +5,12 @@ namespace Tests\Feature;
 use App\Models\ProximityArtifact;
 use App\Models\User;
 use App\Models\UserProfile;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\RefreshDatabaseSilently;
 use Tests\TestCase;
 
 class LocalPulseTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabaseSilently;
 
     public function test_local_pulse_returns_artifacts_and_candidates(): void
     {
