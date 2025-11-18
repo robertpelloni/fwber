@@ -1,0 +1,74 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\DeviceToken;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class DeviceTokenController extends Controller
+{
+    /**
+     * @OA\Post(
+     *     path="/api/device-tokens",
+     *     summary="Register a new device token",
+     *     tags={"Push Notifications"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"token"},
+     *             @OA\Property(property="token", type="string", description="The device token"),
+     *             @OA\Property(property="type", type="string", description="The device type (e.g., 'web', 'ios', 'android')")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Device token registered successfully"
+     *     )
+     * )
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'token' => 'required|string',
+            'type' => 'nullable|string',
+        ]);
+
+        $deviceToken = DeviceToken::updateOrCreate(
+            ['token' => $request->token],
+            [
+                'user_id' => Auth::id(),
+                'type' => $request->type,
+            ]
+        );
+
+        return response()->json(['message' => 'Device token registered successfully'], 201);
+    }
+
+    /**
+     * @OA\Delete(
+     *     path="/api/device-tokens/{token}",
+     *     summary="Delete a device token",
+     *     tags={"Push Notifications"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="token",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=204,
+     *         description="Device token deleted successfully"
+     *     )
+     * )
+     */
+    public function destroy($token)
+    {
+        DeviceToken::where('token', $token)->where('user_id', Auth::id())->delete();
+
+        return response()->json(null, 204);
+    }
+}

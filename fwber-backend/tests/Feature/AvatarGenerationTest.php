@@ -24,9 +24,7 @@ class AvatarGenerationTest extends TestCase
             ->assertJsonStructure(['data' => ['avatar_prompt']]);
 
         $this->withHeaders($headers)
-            ->postJson('/api/physical-profile/avatar/request', [
-                'style' => 'realistic'
-            ])
+            ->postJson('/api/physical-profile/avatar/request')
             ->assertStatus(200)
             ->assertJsonStructure(['data' => ['avatar_status']]);
 
@@ -43,28 +41,9 @@ class AvatarGenerationTest extends TestCase
         $user = User::factory()->create();
         $headers = $this->apiHeaderFor($user);
         $this->withHeaders($headers)
-            ->postJson('/api/physical-profile/avatar/request', [
-                'style' => 'realistic'
-            ])
-            ->assertStatus(422)
-            ->assertJson(['error' => 'Set avatar_prompt first']);
-    }
-
-    public function test_request_avatar_without_style_fails()
-    {
-        $user = User::factory()->create();
-        $headers = $this->apiHeaderFor($user);
-        
-        $this->withHeaders($headers)
-            ->putJson('/api/physical-profile', [
-                'avatar_prompt' => 'Stylized portrait in synthwave neon style'
-            ])
-            ->assertStatus(200);
-
-        $this->withHeaders($headers)
             ->postJson('/api/physical-profile/avatar/request')
             ->assertStatus(422)
-            ->assertJsonValidationErrors(['style']);
+            ->assertJson(['error' => 'Set avatar_prompt first']);
     }
 
     private function apiHeaderFor(User $user): array

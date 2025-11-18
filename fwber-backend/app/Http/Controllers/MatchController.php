@@ -10,6 +10,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use App\Services\PushNotificationService;
 
 class MatchController extends Controller
 {
@@ -456,6 +458,17 @@ class MatchController extends Controller
                 if ($userA && $userB) {
                     $emailService->sendNewMatchNotification($userA, $userB);
                     $emailService->sendNewMatchNotification($userB, $userA);
+
+                    // Send push notifications to both users
+                    $pushService = app(PushNotificationService::class);
+                    $pushService->send($userA, [
+                        'title' => 'It\'s a match!',
+                        'body' => "You've matched with {$userB->name}!",
+                    ]);
+                    $pushService->send($userB, [
+                        'title' => 'It\'s a match!',
+                        'body' => "You've matched with {$userA->name}!",
+                    ]);
                 }
             }
 

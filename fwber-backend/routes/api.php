@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\GroupMessageController;
 use App\Http\Controllers\WebSocketController;
 use App\Http\Controllers\ProximityArtifactController;
 use App\Http\Controllers\ModerationController;
+use App\Http\Controllers\Api\DeviceTokenController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware("api")->group(function (): void {
@@ -113,6 +114,12 @@ Route::middleware("api")->group(function (): void {
             Route::get('/', [UserPhysicalProfileController::class, 'show']);
             Route::put('/', [UserPhysicalProfileController::class, 'upsert']);
             Route::post('/avatar/request', [UserPhysicalProfileController::class, 'requestAvatar']);
+        });
+
+        // Device Token routes for Push Notifications
+        Route::prefix('device-tokens')->group(function (): void {
+            Route::post('/', [DeviceTokenController::class, 'store']);
+            Route::delete('/{token}', [DeviceTokenController::class, 'destroy']);
         });
 
         // Block routes
