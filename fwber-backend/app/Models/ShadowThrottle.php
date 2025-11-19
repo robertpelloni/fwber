@@ -29,6 +29,26 @@ class ShadowThrottle extends Model
     ];
 
     /**
+     * Normalize reason to fit enum constraints while preserving free-text in notes.
+     * If an unknown reason is provided, map it to 'manual' and store the original
+     * reason in notes (appending if notes already set).
+     */
+    public function setReasonAttribute(string $value): void
+    {
+        $allowed = ['spam', 'flagged_content', 'geo_spoof', 'rapid_posting', 'manual'];
+        if (!in_array($value, $allowed, true)) {
+            // Preserve original in notes
+            $original = trim($value);
+            $notes = (string) ($this->attributes['notes'] ?? '');
+            $this->attributes['notes'] = trim($notes !== '' ? ($notes . ' | reason: ' . $original) : ('reason: ' . $original));
+            $this->attributes['reason'] = 'manual';
+            return;
+        }
+
+        $this->attributes['reason'] = $value;
+    }
+
+    /**
      * Get the user being throttled.
      */
     public function user(): BelongsTo

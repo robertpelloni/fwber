@@ -42,8 +42,12 @@ class ModerationControllerTest extends TestCase
         // Generate auth token for moderator using custom ApiToken
         $this->moderatorToken = ApiToken::generateForUser($this->moderator, 'test');
 
-        // Enable moderation feature flag for these tests
-        config(['features.moderation' => true]);
+        // Enable required feature flags for these tests
+        config([
+            'features.moderation' => true,
+            // Authenticated API routes are wrapped with rate limit feature middleware
+            'features.rate_limits' => true,
+        ]);
     }
 
     public function test_moderation_routes_return_404_when_feature_disabled(): void
