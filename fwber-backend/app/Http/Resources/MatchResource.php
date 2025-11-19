@@ -20,6 +20,7 @@ class MatchResource extends JsonResource
             "avatarUrl" => $profile?->avatar_url,
             "bio" => $profile?->bio,
             "locationDescription" => $profile?->location_description,
+            "distance" => (float) ($this->distance ?? 0),
             "compatibilityScore" => (int) ($this->compatibility_score ?? 0),
             "lastSeenAt" => optional($this->last_seen_at)->toIso8601String(),
         ];

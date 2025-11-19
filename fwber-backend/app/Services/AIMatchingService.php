@@ -19,11 +19,13 @@ class AIMatchingService
         'match' => 0.6,
     ];
 
-    public function findAdvancedMatches(User $user, int $limit = 20): array
+    public function findAdvancedMatches(User $user, array $filters = [], int $limit = 20): array
     {
-        $cacheKey = "ai_matches_{$user->id}";
+        // Include filters in cache key to ensure unique results for different filter sets
+        $filterHash = md5(serialize($filters));
+        $cacheKey = "ai_matches_{$user->id}_{$filterHash}";
         
-        return Cache::remember($cacheKey, 300, function () use ($user, $limit) {
+        return Cache::remember($cacheKey, 300, function () use ($user, $filters, $limit) {
             $userProfile = $user->profile;
             if (!$userProfile) {
                 return [];
@@ -33,7 +35,7 @@ class AIMatchingService
             $behavioralPrefs = $this->analyzeUserBehavior($user);
             
             // Get candidates with basic filters
-            $candidates = $this->getCandidates($user, $userProfile);
+            $candidates = $this->getCandidates($user, $userProfile, $filters);
             
             // Score each candidate
             $scoredCandidates = $candidates->map(function ($candidate) use ($user, $userProfile, $behavioralPrefs) {
@@ -47,7 +49,7 @@ class AIMatchingService
                 ->sortByDesc('ai_score')
                 ->take($limit)
                 ->values()
-                ->toArray();
+                ->all();
         });
     }
 
@@ -100,7 +102,7 @@ class AIMatchingService
         return $behavioralPrefs;
     }
 
-    private function getCandidates(User $user, UserProfile $userProfile)
+    private function getCandidates(User $user, UserProfile $userProfile, array $filters = [])
     {
         $query = User::query()
             ->whereKeyNot($user->id)
@@ -109,7 +111,7 @@ class AIMatchingService
 
         // Basic distance filter
         if ($userProfile->location_latitude && $userProfile->location_longitude) {
-            $maxDistance = 50; // Default 50 miles
+            $maxDistance = $filters['max_distance'] ?? 50; // Default 50 miles
             $query->whereHas('profile', function ($q) use ($userProfile, $maxDistance) {
                 $latDist = (1.1 * $maxDistance) / 49.1;
                 $lonDist = (1.1 * $maxDistance) / 69.1;
@@ -120,6 +122,20 @@ class AIMatchingService
                 ])->whereBetween('location_longitude', [
                     $userProfile->location_longitude - $lonDist,
                     $userProfile->location_longitude + $lonDist
+                ]);
+            });
+        }
+
+        // Age filter
+        if (isset($filters['age_min']) || isset($filters['age_max'])) {
+            $ageMin = (int) ($filters['age_min'] ?? 18);
+            $ageMax = (int) ($filters['age_max'] ?? 100);
+            
+            $query->whereHas('profile', function ($q) use ($ageMin, $ageMax) {
+                // SQLite-compatible age calculation
+                $q->whereRaw("(julianday('now') - julianday(date_of_birth)) / 365.25 BETWEEN ? AND ?", [
+                    $ageMin,
+                    $ageMax
                 ]);
             });
         }
