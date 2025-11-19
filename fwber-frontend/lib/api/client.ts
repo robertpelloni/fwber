@@ -215,7 +215,7 @@ async function request<T>(
 
     } catch (error) {
       // Network errors (fetch failed)
-      if (error instanceof TypeError || error.message === 'Failed to fetch') {
+      if (error instanceof TypeError || (error instanceof Error && error.message === 'Failed to fetch')) {
         const networkError = new NetworkError();
         lastError = networkError;
 

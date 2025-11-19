@@ -41,12 +41,12 @@ export default function Error({
 
   const getErrorDescription = () => {
     if (isNetworkError) {
-      return 'We\'re having trouble connecting to our servers. Please check your internet connection and try again.'
+      return 'We&apos;re having trouble connecting to our servers. Please check your internet connection and try again.'
     }
     if (isAuthError) {
       return 'Your session may have expired. Please log in again to continue.'
     }
-    return 'An unexpected error occurred while loading this page. Don\'t worry, we\'ve been notified and are looking into it.'
+    return 'An unexpected error occurred while loading this page. Don&apos;t worry, we&apos;ve been notified and are looking into it.'
   }
 
   const handleGoHome = () => {
@@ -97,7 +97,7 @@ export default function Error({
               <p className="font-semibold mb-1">Quick fixes to try:</p>
               <ul className="list-disc list-inside space-y-1 text-xs">
                 <li>Check your internet connection</li>
-                <li>Disable VPN if you're using one</li>
+                <li>Disable VPN if you&apos;re using one</li>
                 <li>Try a different network</li>
                 <li>Wait a moment and try again</li>
               </ul>

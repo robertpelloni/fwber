@@ -91,7 +91,7 @@ export default function DashboardPage() {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 Dashboard
               </h2>
-              <p className="text-gray-600">Here's what's happening with your matches.</p>
+              <p className="text-gray-600">Here&apos;s what&apos;s happening with your matches.</p>
             </div>
 
             {/* Stats Grid */}

@@ -342,7 +342,7 @@ export default function AvatarGenerationFlow({
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Your New Avatar</h2>
             <p className="text-gray-600">
-              Review your AI-generated avatar. You can regenerate if you'd like a different result.
+              Review your AI-generated avatar. You can regenerate if you&apos;d like a different result.
             </p>
           </div>
 

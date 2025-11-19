@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tantml:react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { 
   User, Mail, MapPin, Calendar, Heart, MessageSquare, 
   Save, Loader2, CheckCircle2, AlertCircle, Info, Eye, EyeOff 
@@ -472,8 +472,8 @@ export default function EnhancedProfileEditor() {
                 <option value="">Select</option>
                 <option value="high-school">High School</option>
                 <option value="some-college">Some College</option>
-                <option value="bachelors">Bachelor's Degree</option>
-                <option value="masters">Master's Degree</option>
+                <option value="bachelors">Bachelor&apos;s Degree</option>
+                <option value="masters">Master&apos;s Degree</option>
                 <option value="phd">PhD</option>
               </select>
             </FormField>

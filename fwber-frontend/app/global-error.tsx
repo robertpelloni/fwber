@@ -29,7 +29,7 @@ export default function GlobalError({
 
   const getErrorDescription = () => {
     if (isNetworkError) {
-      return 'We\'re having trouble connecting to our servers. Please check your internet connection and try again.'
+      return 'We&apos;re having trouble connecting to our servers. Please check your internet connection and try again.'
     }
     return 'A critical error occurred while loading the application. Our team has been notified and is working on a fix.'
   }
@@ -109,7 +109,7 @@ export default function GlobalError({
                 <p>Quick fixes to try:</p>
                 <ul>
                   <li>Check your internet connection</li>
-                  <li>Disable VPN if you're using one</li>
+                  <li>Disable VPN if you&apos;re using one</li>
                   <li>Try a different network</li>
                   <li>Wait a moment and try again</li>
                 </ul>
