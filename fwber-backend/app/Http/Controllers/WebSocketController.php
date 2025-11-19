@@ -421,6 +421,22 @@ class WebSocketController extends Controller
 
     /**
      * Get online users
+     * 
+     * @OA\Get(
+     *     path="/websocket/online-users",
+     *     tags={"WebSocket"},
+     *     summary="Get online users",
+     *     description="Retrieve a list of currently online users",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(response=200, description="List of online users",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="online_users", type="array", @OA\Items(type="string")),
+     *             @OA\Property(property="total", type="integer"),
+     *             @OA\Property(property="timestamp", type="string", format="date-time")
+     *         )
+     *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
+     * )
      */
     public function getOnlineUsers(Request $request): JsonResponse
     {
@@ -450,6 +466,22 @@ class WebSocketController extends Controller
 
     /**
      * Get user connections
+     * 
+     * @OA\Get(
+     *     path="/websocket/connections",
+     *     tags={"WebSocket"},
+     *     summary="Get user connections",
+     *     description="Retrieve active WebSocket connections for the authenticated user",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(response=200, description="User connections",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="connections", type="array", @OA\Items(type="object")),
+     *             @OA\Property(property="total", type="integer"),
+     *             @OA\Property(property="timestamp", type="string", format="date-time")
+     *         )
+     *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
+     * )
      */
     public function getUserConnections(Request $request): JsonResponse
     {
@@ -479,6 +511,35 @@ class WebSocketController extends Controller
 
     /**
      * Broadcast message to multiple users
+     * 
+     * @OA\Post(
+     *     path="/websocket/broadcast",
+     *     tags={"WebSocket"},
+     *     summary="Broadcast message",
+     *     description="Send a message to multiple users (Admin only)",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"user_ids", "message"},
+     *             @OA\Property(property="user_ids", type="array", @OA\Items(type="string")),
+     *             @OA\Property(property="message", type="object",
+     *                 required={"type", "content"},
+     *                 @OA\Property(property="type", type="string"),
+     *                 @OA\Property(property="content", type="string")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Broadcast sent",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="recipients", type="integer")
+     *         )
+     *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
+     *     @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     * )
      */
     public function broadcast(Request $request): JsonResponse
     {
@@ -529,6 +590,23 @@ class WebSocketController extends Controller
 
     /**
      * Get WebSocket status
+     * 
+     * @OA\Get(
+     *     path="/websocket/status",
+     *     tags={"WebSocket"},
+     *     summary="Get WebSocket status",
+     *     description="Check the status of the WebSocket service",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(response=200, description="WebSocket status",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="websocket_enabled", type="boolean"),
+     *             @OA\Property(property="user_connections", type="integer"),
+     *             @OA\Property(property="total_online_users", type="integer"),
+     *             @OA\Property(property="timestamp", type="string", format="date-time")
+     *         )
+     *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
+     * )
      */
     public function status(Request $request): JsonResponse
     {

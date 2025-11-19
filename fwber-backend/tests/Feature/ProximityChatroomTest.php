@@ -21,6 +21,16 @@ class ProximityChatroomTest extends TestCase
     {
         parent::setUp();
         
+        if (\Illuminate\Support\Facades\DB::connection()->getDriverName() === 'sqlite') {
+            $db = \Illuminate\Support\Facades\DB::connection()->getPdo();
+            $db->sqliteCreateFunction('acos', 'acos', 1);
+            $db->sqliteCreateFunction('cos', 'cos', 1);
+            $db->sqliteCreateFunction('radians', function ($deg) {
+                return deg2rad($deg);
+            }, 1);
+            $db->sqliteCreateFunction('sin', 'sin', 1);
+        }
+
         // Enable feature flag
         config(['features.proximity_chatrooms' => true]);
 

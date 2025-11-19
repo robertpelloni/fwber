@@ -164,7 +164,7 @@ class ProximityChatroom extends Model
      */
     public function addMember(User $user, array $location = [], array $preferences = []): void
     {
-        $this->members()->attach($user->id, array_merge([
+        $attributes = array_merge([
             'role' => 'member',
             'joined_at' => now(),
             'last_seen_at' => now(),
@@ -172,7 +172,22 @@ class ProximityChatroom extends Model
             'is_visible' => true,
             'is_networking' => false,
             'is_social' => true,
-        ], $location, $preferences));
+        ], $location, $preferences);
+
+        // Ensure array fields are JSON encoded for storage
+        if (isset($attributes['professional_info']) && is_array($attributes['professional_info'])) {
+            $attributes['professional_info'] = json_encode($attributes['professional_info']);
+        }
+        
+        if (isset($attributes['interests']) && is_array($attributes['interests'])) {
+            $attributes['interests'] = json_encode($attributes['interests']);
+        }
+
+        if (isset($attributes['preferences']) && is_array($attributes['preferences'])) {
+            $attributes['preferences'] = json_encode($attributes['preferences']);
+        }
+
+        $this->members()->attach($user->id, $attributes);
 
         $this->increment('current_members');
     }
@@ -228,14 +243,17 @@ class ProximityChatroom extends Model
     public static function findNearby(float $latitude, float $longitude, int $radiusMeters = 1000): \Illuminate\Database\Eloquent\Collection
     {
         $earthRadius = 6371000; // Earth's radius in meters
+        $haversine = "({$earthRadius} * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude))))";
         
         return static::select('*')
-            ->selectRaw("({$earthRadius} * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [
+            ->selectRaw("{$haversine} AS distance", [
                 $latitude, $longitude, $latitude
             ])
             ->where('is_active', true)
             ->where('is_public', true)
-            ->having('distance', '<=', $radiusMeters)
+            ->whereRaw("{$haversine} <= ?", [
+                $latitude, $longitude, $latitude, $radiusMeters
+            ])
             ->orderBy('distance')
             ->get();
     }
@@ -340,11 +358,15 @@ class ProximityChatroom extends Model
     public function scopeWithinRadius($query, float $latitude, float $longitude, int $radiusMeters)
     {
         $earthRadius = 6371000;
+        $haversine = "({$earthRadius} * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude))))";
         
-        return $query->selectRaw("({$earthRadius} * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [
+        return $query->select('*')
+        ->selectRaw("{$haversine} AS distance", [
             $latitude, $longitude, $latitude
         ])
-        ->having('distance', '<=', $radiusMeters)
+        ->whereRaw("{$haversine} <= ?", [
+            $latitude, $longitude, $latitude, $radiusMeters
+        ])
         ->orderBy('distance');
     }
 }

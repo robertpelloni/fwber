@@ -407,7 +407,8 @@ class RecommendationService
                "User Profile: " . json_encode($userProfile) . "\n" .
                "User Behavior: " . json_encode($userBehavior) . "\n" .
                "Context: " . json_encode($contextualData) . "\n\n" .
-               "Provide 5 personalized recommendations with explanations. Focus on location-based social content that matches their interests and activity patterns.";
+               "Provide 5 personalized recommendations with explanations. Focus on location-based social content that matches their interests and activity patterns.\n" .
+               "Return the response in strict JSON format as an array of objects with keys: 'type' (string), 'content' (object with 'title', 'description'), 'score' (float 0-1), 'reason' (string).";
     }
 
     /**
@@ -419,7 +420,8 @@ class RecommendationService
                "Profile: " . json_encode($userProfile) . "\n" .
                "Behavior: " . json_encode($userBehavior) . "\n" .
                "Context: " . json_encode($contextualData) . "\n\n" .
-               "Suggest 5 personalized recommendations with reasoning. Consider their location, interests, and recent activity patterns.";
+               "Suggest 5 personalized recommendations with reasoning. Consider their location, interests, and recent activity patterns.\n" .
+               "Return the response in strict JSON format as an array of objects with keys: 'type' (string), 'content' (object with 'title', 'description'), 'score' (float 0-1), 'reason' (string).";
     }
 
     /**
@@ -427,9 +429,36 @@ class RecommendationService
      */
     private function parseAIRecommendations(string $content, string $provider): array
     {
-        // This would parse the AI response and convert to recommendation format
-        // For now, return empty array - would need to implement parsing logic
-        return [];
+        try {
+            // Clean up markdown code blocks if present
+            $jsonContent = preg_replace('/^```json\s*|\s*```$/', '', trim($content));
+            
+            $recommendations = json_decode($jsonContent, true);
+            
+            if (!is_array($recommendations)) {
+                Log::warning("Failed to parse AI recommendations JSON from {$provider}", ['content' => $content]);
+                return [];
+            }
+
+            $parsed = [];
+            foreach ($recommendations as $rec) {
+                if (isset($rec['content'], $rec['reason'])) {
+                    $parsed[] = [
+                        'type' => 'ai',
+                        'content' => $rec['content'],
+                        'score' => isset($rec['score']) ? (float)$rec['score'] : 0.8,
+                        'reason' => $rec['reason'],
+                        'provider' => $provider,
+                    ];
+                }
+            }
+            
+            return $parsed;
+
+        } catch (\Exception $e) {
+            Log::error("Error parsing AI recommendations from {$provider}", ['error' => $e->getMessage()]);
+            return [];
+        }
     }
 
     /**

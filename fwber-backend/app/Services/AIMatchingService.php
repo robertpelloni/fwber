@@ -145,23 +145,168 @@ class AIMatchingService
             return 0;
         }
 
-        // Base compatibility score (40%)
+        // Base compatibility score (25%)
         $baseScore = $this->calculateBaseCompatibility($userProfile, $candidateProfile);
-        $score += $baseScore * 0.4;
+        $score += $baseScore * 0.25;
 
-        // Behavioral matching score (30%)
+        // Detailed Preference Matching (35%) - New detailed scoring
+        $preferenceScore = $this->calculateDetailedPreferenceScore($userProfile, $candidateProfile);
+        $score += $preferenceScore * 0.35;
+
+        // Behavioral matching score (20%)
         $behavioralScore = $this->calculateBehavioralScore($candidateProfile, $behavioralPrefs);
-        $score += $behavioralScore * 0.3;
+        $score += $behavioralScore * 0.20;
 
-        // Communication style similarity (20%)
+        // Communication style similarity (10%)
         $communicationScore = $this->calculateCommunicationScore($userProfile, $candidateProfile);
-        $score += $communicationScore * 0.2;
+        $score += $communicationScore * 0.10;
 
         // Mutual interest score (10%)
         $mutualScore = $this->calculateMutualInterestScore($user, $candidate);
-        $score += $mutualScore * 0.1;
+        $score += $mutualScore * 0.10;
 
         return min(100, max(0, $score));
+    }
+
+    private function calculateDetailedPreferenceScore(UserProfile $userProfile, UserProfile $candidateProfile): float
+    {
+        $scores = [
+            'physical' => $this->calculatePhysicalScore($userProfile, $candidateProfile),
+            'sexual' => $this->calculateSexualScore($userProfile, $candidateProfile),
+            'lifestyle' => $this->calculateLifestyleScore($userProfile, $candidateProfile),
+            'personality' => $this->calculatePersonalityScore($userProfile, $candidateProfile),
+        ];
+
+        // Weights for detailed preferences
+        $weights = [
+            'physical' => 0.25,
+            'sexual' => 0.35, // Higher weight for sexual compatibility in this context
+            'lifestyle' => 0.20,
+            'personality' => 0.20,
+        ];
+
+        $totalScore = 0;
+        foreach ($scores as $category => $score) {
+            $totalScore += $score * $weights[$category];
+        }
+
+        return $totalScore;
+    }
+
+    private function calculatePhysicalScore(UserProfile $userProfile, UserProfile $candidateProfile): float
+    {
+        $score = 0;
+        $maxScore = 0;
+        $userPrefs = $userProfile->preferences ?? [];
+        $candidatePrefs = $candidateProfile->preferences ?? [];
+
+        // Body Type
+        $bodyTypes = ['Tiny', 'Slim', 'Average', 'Muscular', 'Curvy', 'Thick', 'BBW'];
+        foreach ($bodyTypes as $type) {
+            $preference = $userPrefs['want_body_' . strtolower($type)] ?? 0;
+            if ($preference) {
+                $maxScore += 20;
+                if (($candidatePrefs['body_type'] ?? '') === strtolower($type)) {
+                    $score += 20 * ($preference / 10); // preference is 1-10
+                }
+            }
+        }
+
+        // Ethnicity
+        $ethnicities = ['White', 'Asian', 'Latino', 'Indian', 'Black', 'Other'];
+        foreach ($ethnicities as $ethnicity) {
+            $preference = $userPrefs['want_ethnicity_' . strtolower($ethnicity)] ?? 0;
+            if ($preference) {
+                $maxScore += 15;
+                if (($candidatePrefs['ethnicity'] ?? '') === strtolower($ethnicity)) {
+                    $score += 15 * ($preference / 10);
+                }
+            }
+        }
+
+        // Height & Weight (Simplified)
+        // ... implementation ...
+
+        return $maxScore > 0 ? ($score / $maxScore) * 100 : 50;
+    }
+
+    private function calculateSexualScore(UserProfile $userProfile, UserProfile $candidateProfile): float
+    {
+        $score = 0;
+        $total = 0;
+        $userPrefs = $userProfile->preferences ?? [];
+        $candidatePrefs = $candidateProfile->preferences ?? [];
+
+        $sexualActs = [
+            'safe_sex', 'bareback', 'oral_give', 'oral_receive',
+            'anal_top', 'anal_bottom', 'roleplay', 'dom', 'sub', 
+            'kink_spanking', 'kink_bondage'
+        ];
+
+        foreach ($sexualActs as $act) {
+            $iWant = $userPrefs['want_' . $act] ?? 0;
+            $theyWant = $candidatePrefs['want_' . $act] ?? 0;
+
+            if ($iWant || $theyWant) {
+                $total++;
+                if ($iWant && $theyWant) {
+                    $score += 15; // Perfect match
+                } elseif ($iWant || $theyWant) {
+                    $score += 5; // Partial match
+                }
+            }
+        }
+
+        // Kink Compatibility Bonus
+        $kinkMatches = 0;
+        $kinks = ['dom', 'sub', 'spanking', 'bondage', 'roleplay'];
+        foreach ($kinks as $kink) {
+            if (($userPrefs['want_' . $kink] ?? 0) && ($candidatePrefs['want_' . $kink] ?? 0)) {
+                $kinkMatches++;
+            }
+        }
+        $score += ($kinkMatches * 5);
+
+        return min(100, $total > 0 ? ($score / max($total * 10, 1)) * 100 : 50);
+    }
+
+    private function calculateLifestyleScore(UserProfile $userProfile, UserProfile $candidateProfile): float
+    {
+        $score = 50; // Base
+        $penalties = 0;
+        $userPrefs = $userProfile->preferences ?? [];
+        $candidatePrefs = $candidateProfile->preferences ?? [];
+
+        // Smoking
+        if (($userPrefs['smoke'] ?? 0) && ($candidatePrefs['no_smoke'] ?? 0)) $penalties += 20;
+        
+        // Drinking
+        if (($userPrefs['heavy_drink'] ?? 0) && ($candidatePrefs['no_heavy_drink'] ?? 0)) $penalties += 15;
+
+        // Drugs
+        if (($userPrefs['drugs'] ?? 0) && ($candidatePrefs['no_drugs'] ?? 0)) $penalties += 25;
+
+        return max(0, $score - $penalties);
+    }
+
+    private function calculatePersonalityScore(UserProfile $userProfile, UserProfile $candidateProfile): float
+    {
+        $score = 50;
+        $userPrefs = $userProfile->preferences ?? [];
+        $candidatePrefs = $candidateProfile->preferences ?? [];
+
+        // Bedroom Personality (Complementary matching)
+        $bedroomMap = ['passive' => 1, 'shy' => 2, 'confident' => 3, 'aggressive' => 4];
+        $myStyle = $bedroomMap[$userPrefs['bedroom_personality'] ?? 'confident'] ?? 3;
+        $theirStyle = $bedroomMap[$candidatePrefs['bedroom_personality'] ?? 'confident'] ?? 3;
+
+        if (($myStyle <= 2 && $theirStyle >= 3) || ($myStyle >= 3 && $theirStyle <= 2)) {
+            $score += 20; // Opposites attract
+        } elseif (abs($myStyle - $theirStyle) <= 1) {
+            $score += 10; // Similar
+        }
+
+        return min(100, $score);
     }
 
     private function calculateBaseCompatibility(UserProfile $userProfile, UserProfile $candidateProfile): float
