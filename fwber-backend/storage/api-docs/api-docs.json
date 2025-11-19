@@ -9054,6 +9054,222 @@
                     }
                 ]
             }
+        },
+        "/websocket/online-users": {
+            "get": {
+                "tags": [
+                    "WebSocket"
+                ],
+                "summary": "Get online users",
+                "description": "Retrieve a list of currently online users",
+                "operationId": "bec420af903044669c768653407a28c9",
+                "responses": {
+                    "200": {
+                        "description": "List of online users",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "online_users": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/websocket/connections": {
+            "get": {
+                "tags": [
+                    "WebSocket"
+                ],
+                "summary": "Get user connections",
+                "description": "Retrieve active WebSocket connections for the authenticated user",
+                "operationId": "4ffaa6940498aa6ead1298db1594b73c",
+                "responses": {
+                    "200": {
+                        "description": "User connections",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "connections": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/websocket/broadcast": {
+            "post": {
+                "tags": [
+                    "WebSocket"
+                ],
+                "summary": "Broadcast message",
+                "description": "Send a message to multiple users (Admin only)",
+                "operationId": "52b60435faf2db07c32448bd93fb44ed",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_ids",
+                                    "message"
+                                ],
+                                "properties": {
+                                    "user_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "message": {
+                                        "required": [
+                                            "type",
+                                            "content"
+                                        ],
+                                        "properties": {
+                                            "type": {
+                                                "type": "string"
+                                            },
+                                            "content": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Broadcast sent",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "recipients": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/websocket/status": {
+            "get": {
+                "tags": [
+                    "WebSocket"
+                ],
+                "summary": "Get WebSocket status",
+                "description": "Check the status of the WebSocket service",
+                "operationId": "aed73ecd6e8db8803b49cadbc2704159",
+                "responses": {
+                    "200": {
+                        "description": "WebSocket status",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "websocket_enabled": {
+                                            "type": "boolean"
+                                        },
+                                        "user_connections": {
+                                            "type": "integer"
+                                        },
+                                        "total_online_users": {
+                                            "type": "integer"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -10155,9 +10371,9 @@
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
-                "description": "Enter your bearer token in the format: Bearer {token}",
-                "bearerFormat": "JWT",
-                "scheme": "bearer"
+                "description": "Enter token in format (Bearer <token>)",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
             }
         }
     },
