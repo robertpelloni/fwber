@@ -66,8 +66,7 @@ class Photo extends Model
      */
     public function getUrlAttribute(): string
     {
-        $base = rtrim((string) config('app.url'), '/');
-        return $base . '/files/' . ltrim($this->file_path, '/');
+        return Storage::disk('public')->url($this->file_path);
     }
 
     /**
@@ -76,8 +75,7 @@ class Photo extends Model
     public function getThumbnailUrlAttribute(): string
     {
         $path = $this->thumbnail_path ?: $this->file_path;
-        $base = rtrim((string) config('app.url'), '/');
-        return $base . '/files/' . ltrim($path, '/');
+        return Storage::disk('public')->url($path);
     }
 
     /**
