@@ -8,10 +8,23 @@ Date: 2025-11-20
 - Telemetry: log `quote_impression` with quote ID to measure engagement.
 
 ## Client-Side Face Blurring
-- Library candidates: `@vladmandic/face-api`, `@tensorflow-models/face-landmarks-detection`, `mediapipe`.
-- Flow: user selects image → canvas preview renders → faces detected → blur applied via stack blur → encrypted vault receives blurred bitmap.
-- Feature flag: `FEATURE_CLIENT_FACE_BLUR` (default off until QA complete).
-- QA items: confirm <500ms processing on M1 laptop, fallback message when WebGL unavailable.
+- **Implementation status:** MVP landed in `fwber-frontend` (see `components/PhotoUpload.tsx`, `lib/faceBlur.ts`, `lib/featureFlags.ts`). Additional upload surfaces now show a ShieldCheck banner when blur is active.
+- **Library choice:** `@vladmandic/face-api` (TinyFaceDetector) with automatic backend selection (WebGL → CPU fallback). Models currently load from `https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/`.
+- **Feature flag:**
+  - Frontend: `NEXT_PUBLIC_FEATURE_CLIENT_FACE_BLUR` (documented in `.env.example`). Enables blur processing + UX messaging.
+  - Backend (future): `FEATURE_CLIENT_FACE_BLUR` middleware toggle once API routes enforce storage rules.
+- **Current flow:** user selects image → `faceBlur.ts` ensures models + draws to canvas → detected bounding boxes expanded 15% → blurred region replaced in-place via canvas filter → resulting blob uploaded with `-blurred` suffix. Per-file badges display detected face counts.
+- **Fallback handling:**
+  - Any `FaceBlurError` downgrades gracefully (upload proceeds but warning pill appears in the UI and the file remains unaltered).
+  - If no faces detected, we notify the user that the image may continue unblurred.
+- **QA items:**
+  - Confirm <500 ms processing on M1 / Ryzen 7 for 1080p inputs.
+  - Verify warnings render when WebGL is unavailable (force `tf.setBackend('cpu')`).
+  - Ensure Photo Management + Profile screens display the banner only when the flag is on.
+- **Next steps:**
+  1. Wire the same helper into any future uploaders (e.g., onboarding wizard, DM attachment composer).
+  2. Add telemetry (`face_blur_applied`, `face_blur_skipped_reason`).
+  3. Coordinate with backend to reject unblurred uploads once the feature graduates from beta.
 
 ## Auto-Reply Photo Game
 - Goal: increase authenticity of uploads by mirroring content back to the sender.
