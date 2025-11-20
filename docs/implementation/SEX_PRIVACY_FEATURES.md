@@ -8,7 +8,7 @@ Date: 2025-11-20
 - Telemetry: log `quote_impression` with quote ID to measure engagement.
 
 ## Client-Side Face Blurring
-- **Implementation status:** MVP landed in `fwber-frontend` (see `components/PhotoUpload.tsx`, `lib/faceBlur.ts`, `lib/featureFlags.ts`). Additional upload surfaces now show a ShieldCheck banner when blur is active.
+- **Implementation status:** MVP landed in `fwber-frontend` (see `components/PhotoUpload.tsx`, `lib/faceBlur.ts`, `lib/featureFlags.ts`). Additional upload surfaces now show a ShieldCheck banner when blur is active, and telemetry now captures client results for each upload.
 - **Library choice:** `@vladmandic/face-api` (TinyFaceDetector) with automatic backend selection (WebGL → CPU fallback). Models currently load from `https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/`.
 - **Feature flag:**
   - Frontend: `NEXT_PUBLIC_FEATURE_CLIENT_FACE_BLUR` (documented in `.env.example`). Enables blur processing + UX messaging.
@@ -21,10 +21,11 @@ Date: 2025-11-20
   - Confirm <500 ms processing on M1 / Ryzen 7 for 1080p inputs.
   - Verify warnings render when WebGL is unavailable (force `tf.setBackend('cpu')`).
   - Ensure Photo Management + Profile screens display the banner only when the flag is on.
+- **Telemetry:** Every upload now ships metadata from the client to the backend. `PhotoController` emits `face_blur_applied` (fields: `faces_detected`, `processing_ms`, `client_backend`, filenames) whenever the helper actually blurs faces, and `face_blur_skipped_reason` capturing reasons like `no_faces_detected`, `model_load_failed`, or runtime fallbacks. Events flow through `TelemetryService` and are defined in `config/telemetry.php` + `EVENT_SCHEMA_V0_2025-11-08.md`.
+
 - **Next steps:**
   1. Wire the same helper into any future uploaders (e.g., onboarding wizard, DM attachment composer).
-  2. Add telemetry (`face_blur_applied`, `face_blur_skipped_reason`).
-  3. Coordinate with backend to reject unblurred uploads once the feature graduates from beta.
+  2. Coordinate with backend to reject unblurred uploads once the feature graduates from beta.
 
 ## Auto-Reply Photo Game
 - Goal: increase authenticity of uploads by mirroring content back to the sender.

@@ -37,5 +37,22 @@ return [
             'user_id' => 'required|integer',
             'action' => 'required|string|in:reject,review,flag,approve',
         ],
+        'face_blur_applied' => [
+            'user_id' => 'required|integer',
+            'photo_filename' => 'required|string',
+            'original_filename' => 'required|string',
+            'faces_detected' => 'required|integer|min:0',
+            'processing_ms' => 'nullable|integer|min:0',
+            'client_backend' => 'required|string|in:client,server',
+            'warning' => 'nullable|string',
+        ],
+        'face_blur_skipped_reason' => [
+            'user_id' => 'required|integer',
+            'photo_filename' => 'required|string',
+            'original_filename' => 'required|string',
+            'reason' => 'required|string',
+            'faces_detected' => 'nullable|integer|min:0',
+            'warning' => 'nullable|string',
+        ],
     ],
 ];

@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { Upload, X, Camera, RotateCcw, Download, Eye, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react'
 import { blurFacesOnFile, FaceBlurError } from '@/lib/faceBlur'
 import { isFeatureEnabled } from '@/lib/featureFlags'
+import { attachFaceBlurMetadata, FileWithFaceBlurMetadata } from '@/lib/faceBlurTelemetry'
 
 const generatePreviewId = () =>
   typeof crypto !== 'undefined' && crypto.randomUUID
@@ -22,7 +23,7 @@ interface PhotoUploadProps {
 }
 
 interface PhotoPreview {
-  file: File
+  file: FileWithFaceBlurMetadata
   preview: string
   id: string
   facesDetected?: number
@@ -59,7 +60,7 @@ export default function PhotoUpload({
 
       if (!faceBlurEnabled) {
         return files.map((file) => ({
-          file,
+          file: file as FileWithFaceBlurMetadata,
           preview: URL.createObjectURL(file),
           id: generatePreviewId(),
         }))
@@ -73,25 +74,50 @@ export default function PhotoUpload({
         for (const file of files) {
           try {
             const result = await blurFacesOnFile(file)
+            const metadata = {
+              facesDetected: result.facesFound,
+              blurApplied: result.blurred,
+              processingTimeMs: result.processingTimeMs,
+              originalFileName: file.name,
+              processedFileName: result.file.name,
+            }
+
+            let processedFile = attachFaceBlurMetadata(result.file, metadata)
+            if (!result.blurred) {
+              const warning = `No faces detected in ${file.name}; upload will continue unblurred.`
+              warnings.push(warning)
+              processedFile = attachFaceBlurMetadata(result.file, {
+                ...metadata,
+                skippedReason: 'no_faces_detected',
+                warningMessage: warning,
+              })
+            }
+
             processed.push({
-              file: result.file,
+              file: processedFile,
               preview: URL.createObjectURL(result.file),
               id: generatePreviewId(),
               facesDetected: result.facesFound,
               blurApplied: result.blurred,
             })
-
-            if (!result.blurred) {
-              warnings.push(`No faces detected in ${file.name}; upload will continue unblurred.`)
-            }
           } catch (error) {
             const message =
               error instanceof FaceBlurError
                 ? error.message
                 : 'Unexpected error while applying face blur.'
-            warnings.push(`Face blur skipped for ${file.name}: ${message}`)
+            const warning = `Face blur skipped for ${file.name}: ${message}`
+            warnings.push(warning)
+            const skippedReason = error instanceof FaceBlurError ? error.code.toLowerCase() : 'processing_failed'
+            const processedFile = attachFaceBlurMetadata(file, {
+              facesDetected: 0,
+              blurApplied: false,
+              skippedReason,
+              originalFileName: file.name,
+              processedFileName: file.name,
+              warningMessage: warning,
+            })
             processed.push({
-              file,
+              file: processedFile,
               preview: URL.createObjectURL(file),
               id: generatePreviewId(),
               facesDetected: 0,

@@ -32,6 +32,7 @@ export interface FaceBlurResult {
   file: File
   facesFound: number
   blurred: boolean
+  processingTimeMs: number
 }
 
 let modelLoadPromise: Promise<void> | null = null
@@ -165,6 +166,10 @@ export const blurFacesOnFile = async (file: File, options?: FaceBlurOptions): Pr
     throw new FaceBlurError('Only browser File objects are supported.', 'PROCESSING_FAILED')
   }
 
+  const startedAt = typeof performance !== 'undefined' && typeof performance.now === 'function'
+    ? performance.now()
+    : Date.now()
+
   try {
     await ensureModelsLoaded(options?.modelUrl)
   } catch (error) {
@@ -195,8 +200,12 @@ export const blurFacesOnFile = async (file: File, options?: FaceBlurOptions): Pr
       })
     )
 
+    const processingTimeMs = Math.max(0, Math.round(((typeof performance !== 'undefined' && typeof performance.now === 'function'
+      ? performance.now()
+      : Date.now()) - startedAt)))
+
     if (!detections.length) {
-      return { file, facesFound: 0, blurred: false }
+      return { file, facesFound: 0, blurred: false, processingTimeMs }
     }
 
     detections.forEach((detection) => {
@@ -206,7 +215,7 @@ export const blurFacesOnFile = async (file: File, options?: FaceBlurOptions): Pr
 
     const blob = await canvasToBlob(canvas, file.type || 'image/jpeg')
     const blurredFile = new File([blob], withSuffix(file.name, '-blurred'), { type: blob.type })
-    return { file: blurredFile, facesFound: detections.length, blurred: true }
+    return { file: blurredFile, facesFound: detections.length, blurred: true, processingTimeMs }
   } catch (error) {
     if (error instanceof FaceBlurError) {
       throw error

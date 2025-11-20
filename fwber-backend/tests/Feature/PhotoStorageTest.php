@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -74,5 +75,65 @@ class PhotoStorageTest extends TestCase
         $modelUrl = $photo->url;
 
         $this->assertEquals($storageUrl, $modelUrl);
+    }
+
+    public function test_face_blur_applied_event_emitted_with_metadata()
+    {
+        Log::spy();
+
+        $user = User::factory()->create();
+        $file = UploadedFile::fake()->image('blurred.jpg', 800, 800);
+
+        $metadata = [
+            'facesDetected' => 2,
+            'blurApplied' => true,
+            'processingTimeMs' => 120,
+            'originalFileName' => 'blurred.jpg',
+        ];
+
+        $response = $this->actingAs($user)
+            ->postJson('/api/photos', [
+                'photo' => $file,
+                'face_blur_metadata' => json_encode($metadata),
+            ]);
+
+        $response->assertStatus(201);
+
+        Log::shouldHaveReceived('info')->withArgs(function ($message, $context) use ($user) {
+            return $message === 'Telemetry event'
+                && ($context['event'] ?? null) === 'face_blur_applied'
+                && ($context['payload']['user_id'] ?? null) === $user->id
+                && ($context['payload']['faces_detected'] ?? null) === 2;
+        });
+    }
+
+    public function test_face_blur_skipped_event_emitted_when_reason_provided()
+    {
+        Log::spy();
+
+        $user = User::factory()->create();
+        $file = UploadedFile::fake()->image('original.jpg', 800, 800);
+
+        $metadata = [
+            'facesDetected' => 0,
+            'blurApplied' => false,
+            'skippedReason' => 'no_faces_detected',
+            'originalFileName' => 'original.jpg',
+        ];
+
+        $response = $this->actingAs($user)
+            ->postJson('/api/photos', [
+                'photo' => $file,
+                'face_blur_metadata' => json_encode($metadata),
+            ]);
+
+        $response->assertStatus(201);
+
+        Log::shouldHaveReceived('info')->withArgs(function ($message, $context) use ($user) {
+            return $message === 'Telemetry event'
+                && ($context['event'] ?? null) === 'face_blur_skipped_reason'
+                && ($context['payload']['user_id'] ?? null) === $user->id
+                && ($context['payload']['reason'] ?? null) === 'no_faces_detected';
+        });
     }
 }

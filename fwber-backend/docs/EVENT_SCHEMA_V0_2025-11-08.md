@@ -11,6 +11,8 @@ Canonical definitions for initial telemetry events. Enforced by `TelemetryServic
 | message.received | Delivery confirmation | from_user_id:int, to_user_id:int, message_id?:string | Emitted when receiver client ack processed |
 | moderation.flagged | AI or rule flagged content | user_id:int, category:string, confidence:float | category e.g. harassment |
 | moderation.actioned | Final moderation decision | user_id:int, action:string(in:reject,review,flag,approve) | Action after aggregation |
+| face_blur_applied | Successful client blur prior to upload | user_id:int, photo_filename:string, original_filename:string, faces_detected:int, processing_ms?:int, client_backend:string, warning?:string | client_backend currently `client`; warning populated when degraded blur runs |
+| face_blur_skipped_reason | Blur skipped or failed client-side | user_id:int, photo_filename:string, original_filename:string, reason:string, faces_detected?:int, warning?:string | reason values include `no_faces_detected`, `model_load_failed`, `processing_failed`, `unsupported_env` |
 
 ## Versioning
 - v0: Flat events, minimal required fields

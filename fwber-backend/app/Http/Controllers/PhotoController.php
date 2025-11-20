@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Photo;
 use App\Models\User;
+use App\Services\TelemetryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -189,6 +190,7 @@ class PhotoController extends Controller
             }
             
             $file = $request->file('photo');
+            $faceBlurMetadata = $this->parseFaceBlurMetadata($request->input('face_blur_metadata'));
             
             // Additional validation
             if (!in_array($file->getMimeType(), self::ALLOWED_MIME_TYPES)) {
@@ -249,6 +251,8 @@ class PhotoController extends Controller
                 ],
             ]);
             
+            $this->emitFaceBlurTelemetry($user, $filename, $originalFilename, $faceBlurMetadata);
+
             Log::info('Photo uploaded', [
                 'user_id' => $user->id,
                 'photo_id' => $photo->id,
@@ -539,6 +543,93 @@ class PhotoController extends Controller
                 'message' => 'Error reordering photos',
                 'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
             ], 500);
+        }
+    }
+
+    private function parseFaceBlurMetadata($metadata): ?array
+    {
+        if (!$metadata || !is_string($metadata)) {
+            return null;
+        }
+
+        $decoded = json_decode($metadata, true);
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
+            Log::warning('Invalid face blur metadata payload', [
+                'metadata' => $metadata,
+            ]);
+            return null;
+        }
+
+        $allowedKeys = [
+            'facesDetected',
+            'blurApplied',
+            'processingTimeMs',
+            'skippedReason',
+            'originalFileName',
+            'processedFileName',
+            'warningMessage',
+        ];
+
+        $filtered = array_intersect_key($decoded, array_flip($allowedKeys));
+
+        if (isset($filtered['facesDetected'])) {
+            $filtered['facesDetected'] = (int) $filtered['facesDetected'];
+        }
+
+        if (isset($filtered['processingTimeMs'])) {
+            $filtered['processingTimeMs'] = max(0, (int) $filtered['processingTimeMs']);
+        }
+
+        if (isset($filtered['blurApplied'])) {
+            $filtered['blurApplied'] = (bool) $filtered['blurApplied'];
+        }
+
+        if (isset($filtered['skippedReason'])) {
+            $filtered['skippedReason'] = (string) $filtered['skippedReason'];
+        }
+
+        if (isset($filtered['warningMessage'])) {
+            $filtered['warningMessage'] = (string) $filtered['warningMessage'];
+        }
+
+        if (isset($filtered['originalFileName'])) {
+            $filtered['originalFileName'] = (string) $filtered['originalFileName'];
+        }
+
+        return $filtered;
+    }
+
+    private function emitFaceBlurTelemetry(User $user, string $storedFilename, string $originalFilename, ?array $metadata): void
+    {
+        if (!$metadata) {
+            return;
+        }
+
+        /** @var TelemetryService $telemetry */
+        $telemetry = app(TelemetryService::class);
+
+        if (!empty($metadata['blurApplied'])) {
+            $telemetry->emit('face_blur_applied', [
+                'user_id' => $user->id,
+                'photo_filename' => $storedFilename,
+                'original_filename' => $metadata['originalFileName'] ?? $originalFilename,
+                'faces_detected' => (int) ($metadata['facesDetected'] ?? 0),
+                'processing_ms' => $metadata['processingTimeMs'] ?? null,
+                'client_backend' => 'client',
+                'warning' => $metadata['warningMessage'] ?? null,
+            ]);
+            return;
+        }
+
+        if (!empty($metadata['skippedReason'])) {
+            $telemetry->emit('face_blur_skipped_reason', [
+                'user_id' => $user->id,
+                'photo_filename' => $storedFilename,
+                'original_filename' => $metadata['originalFileName'] ?? $originalFilename,
+                'reason' => (string) $metadata['skippedReason'],
+                'faces_detected' => isset($metadata['facesDetected']) ? (int) $metadata['facesDetected'] : null,
+                'warning' => $metadata['warningMessage'] ?? null,
+            ]);
         }
     }
 }
