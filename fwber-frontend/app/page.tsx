@@ -4,6 +4,7 @@ import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import Link from 'next/link'
+import SexQuote from '@/components/SexQuote'
 
 export default function HomePage() {
   const { isAuthenticated, isLoading } = useAuth()
@@ -37,6 +38,9 @@ export default function HomePage() {
           <p className="text-2xl text-orange-600 font-semibold italic mb-4">
             "Everybody wants to get laid."
           </p>
+          <div className="w-full max-w-2xl">
+            <SexQuote />
+          </div>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl">
             A modern adult dating platform with advanced matching algorithms. 
             Connect with compatible people and build meaningful relationships.
