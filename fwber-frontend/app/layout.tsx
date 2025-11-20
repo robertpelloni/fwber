@@ -70,7 +70,10 @@ export default function RootLayout({
         {/* Preload critical resources */}
         <link rel="preload" href="/_next/static/css/app/layout.css" as="style" />
       </head>
-      <body className="min-h-screen bg-background font-sans antialiased text-optimized">
+      <body
+        className="min-h-screen bg-background font-sans antialiased text-optimized"
+        suppressHydrationWarning
+      >
         <QueryProvider>
           <AuthProvider>
             <ToastProvider>
