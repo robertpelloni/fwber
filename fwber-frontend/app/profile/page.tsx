@@ -7,9 +7,10 @@ import { getUserProfile, updateUserProfile, getProfileCompleteness, type UserPro
 import { usePhotos } from '@/lib/api/photos'
 import PhotoUpload from '@/components/PhotoUpload'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Camera, Star } from 'lucide-react'
+import { Camera, ShieldCheck, Star } from 'lucide-react'
 import { ProfileCompletenessBar, ProfileCompletenessChecklist, calculateProfileCompleteness, type ProfileField } from '@/lib/profileCompleteness'
 import PhysicalProfileEditor from '@/components/PhysicalProfileEditor'
+import { isFeatureEnabled } from '@/lib/featureFlags'
 
 export default function ProfilePage() {
   const { isAuthenticated, user, token, isLoading: authLoading } = useAuth()
@@ -26,6 +27,7 @@ export default function ProfilePage() {
   
   // Photo management
   const { photos, uploadPhotos, deletePhoto, setPrimaryPhoto } = usePhotos()
+  const faceBlurEnabled = isFeatureEnabled('clientFaceBlur')
 
   // Local form type: ensure location, looking_for, and key array prefs are present for UI binding
   type BasePrefs = NonNullable<ProfileUpdateData['preferences']>
@@ -410,6 +412,17 @@ export default function ProfilePage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
+                {faceBlurEnabled && (
+                  <div className="mb-4 flex items-start gap-3 rounded-lg border border-primary/30 bg-primary/5 p-4 text-sm text-primary-900">
+                    <ShieldCheck className="h-5 w-5 text-primary" />
+                    <div>
+                      <p className="font-semibold">Client-side face blur is active</p>
+                      <p className="text-xs text-primary-800">
+                        New uploads blur detected faces locally before they leave your device so only redacted images reach FWBer servers.
+                      </p>
+                    </div>
+                  </div>
+                )}
                 <PhotoUpload
                   onUpload={handlePhotoUpload}
                   onRemove={handlePhotoRemove}

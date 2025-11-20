@@ -35,7 +35,7 @@ export default function SexQuote() {
       <div className="flex items-start gap-3">
         <Quote className="h-6 w-6 text-orange-400 flex-shrink-0" />
         <p className="text-orange-800 italic font-medium text-lg leading-relaxed">
-          "{quote}"
+          &ldquo;{quote}&rdquo;
         </p>
       </div>
     </div>

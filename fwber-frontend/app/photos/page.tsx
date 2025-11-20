@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { 
   Camera, 
+  ShieldCheck,
   Star, 
   Trash2, 
   Eye, 
@@ -20,6 +21,7 @@ import {
   CheckCircle2,
   GripVertical
 } from 'lucide-react'
+import { isFeatureEnabled } from '@/lib/featureFlags'
 
 // Sortable Photo Item Component
 function SortablePhotoItem({ 
@@ -401,6 +403,8 @@ export default function PhotoManagementPage() {
     }
   }
 
+  const faceBlurEnabled = isFeatureEnabled('clientFaceBlur')
+
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event
 
@@ -549,6 +553,17 @@ export default function PhotoManagementPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
+            {faceBlurEnabled && (
+              <div className="mb-4 flex items-start gap-3 rounded-lg border border-primary/30 bg-primary/5 p-4 text-sm text-primary-900">
+                <ShieldCheck className="h-5 w-5 text-primary" />
+                <div>
+                  <p className="font-semibold">Local face blur is turned on</p>
+                  <p className="text-xs text-primary-800">
+                    We detect and blur faces in new uploads directly on your device before any data reaches our servers.
+                  </p>
+                </div>
+              </div>
+            )}
             <PhotoUpload
               onUpload={handleUpload}
               onRemove={(index: number) => {

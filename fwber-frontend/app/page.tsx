@@ -36,7 +36,7 @@ export default function HomePage() {
             Welcome to <span className="text-blue-600">FWBer.me</span>
           </h1>
           <p className="text-2xl text-orange-600 font-semibold italic mb-4">
-            "Everybody wants to get laid."
+            &ldquo;Everybody wants to get laid.&rdquo;
           </p>
           <div className="w-full max-w-2xl">
             <SexQuote />
