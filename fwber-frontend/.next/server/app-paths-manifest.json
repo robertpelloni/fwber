@@ -1,3 +1,4 @@
 {
-  "/matches/page": "app/matches/page.js"
+  "/matches/page": "app/matches/page.js",
+  "/messages/page": "app/messages/page.js"
 }
