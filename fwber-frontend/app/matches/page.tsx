@@ -200,7 +200,9 @@ export default function MatchesPage() {
                         src={currentMatch.profile.photos[0].url}
                         alt={currentMatch.profile.display_name || 'Profile'}
                         fill
+                        sizes="(max-width: 768px) 100vw, 600px"
                         className="object-cover"
+                        priority
                       />
                     ) : (
                       <div className="text-white text-6xl">

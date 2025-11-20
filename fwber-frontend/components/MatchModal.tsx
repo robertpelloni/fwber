@@ -64,6 +64,7 @@ export default function MatchModal({ isOpen, onClose, matchedUser, currentUser }
                   src={currentUser.photoUrl || '/placeholder-user.jpg'}
                   alt="You"
                   fill
+                  sizes="(max-width: 640px) 96px, 128px"
                   className="object-cover"
                 />
               </div>
@@ -81,6 +82,7 @@ export default function MatchModal({ isOpen, onClose, matchedUser, currentUser }
                   src={matchedUser.photoUrl || '/placeholder-user.jpg'}
                   alt={matchedUser.name}
                   fill
+                  sizes="(max-width: 640px) 96px, 128px"
                   className="object-cover"
                 />
               </div>

@@ -146,7 +146,9 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
                 src={user.photos[0]}
                 alt={user.name}
                 fill
+                sizes="(max-width: 768px) 100vw, 400px"
                 className="object-cover rounded-lg"
+                priority
               />
             ) : (
               <span className="text-4xl font-semibold text-gray-600">
