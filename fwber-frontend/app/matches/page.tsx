@@ -8,9 +8,10 @@ import { getMatches, performMatchAction, type Match, type MatchAction } from '@/
 import { RelationshipTier } from '@/lib/relationshipTiers'
 import RelationshipTierBadge from '@/components/RelationshipTierBadge'
 import PhotoRevealGate from '@/components/PhotoRevealGate'
+import MatchModal from '@/components/MatchModal'
 
 export default function MatchesPage() {
-  const { token, isAuthenticated } = useAuth()
+  const { token, isAuthenticated, user } = useAuth()
   const [matches, setMatches] = useState<Match[]>([])
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
@@ -18,6 +19,10 @@ export default function MatchesPage() {
   const [error, setError] = useState<string | null>(null)
   const [showMatchDetails, setShowMatchDetails] = useState(false)
   const [showTierInfo, setShowTierInfo] = useState(true)
+  
+  // Match Modal State
+  const [isMatchModalOpen, setIsMatchModalOpen] = useState(false)
+  const [matchedUserProfile, setMatchedUserProfile] = useState<{name: string, photoUrl: string} | null>(null)
 
   // Simulated tier data - in real app, fetch from API
   const getCurrentTier = (match: Match): RelationshipTier => {
@@ -47,6 +52,15 @@ export default function MatchesPage() {
     }
   }, [isAuthenticated, token, loadMatches])
 
+  const advanceToNextMatch = useCallback(() => {
+    if (currentMatchIndex < matches.length - 1) {
+      setCurrentMatchIndex(prev => prev + 1)
+    } else {
+      // No more matches, reload
+      loadMatches()
+    }
+  }, [currentMatchIndex, matches.length, loadMatches])
+
   const handleMatchAction = async (action: MatchAction) => {
     if (!token || currentMatchIndex >= matches.length) return
 
@@ -56,20 +70,27 @@ export default function MatchesPage() {
       setIsPerformingAction(true)
       setError(null)
 
-      await performMatchAction(token, currentMatch.id, action)
+      const response = await performMatchAction(token, currentMatch.id, action)
       
-      // Move to next match
-      if (currentMatchIndex < matches.length - 1) {
-        setCurrentMatchIndex(prev => prev + 1)
+      if (response.match_created) {
+        setMatchedUserProfile({
+          name: currentMatch.profile?.display_name || 'Match',
+          photoUrl: currentMatch.profile?.photos?.[0]?.url || '/placeholder-user.jpg'
+        })
+        setIsMatchModalOpen(true)
       } else {
-        // No more matches, reload
-        await loadMatches()
+        advanceToNextMatch()
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to perform action')
     } finally {
       setIsPerformingAction(false)
     }
+  }
+
+  const handleCloseModal = () => {
+    setIsMatchModalOpen(false)
+    advanceToNextMatch()
   }
 
   const currentMatch = matches[currentMatchIndex]
@@ -351,6 +372,18 @@ export default function MatchesPage() {
             </div>
           )}
         </main>
+
+        {/* Match Modal */}
+        {matchedUserProfile && (
+          <MatchModal
+            isOpen={isMatchModalOpen}
+            onClose={handleCloseModal}
+            matchedUser={matchedUserProfile}
+            currentUser={{
+              photoUrl: user?.profile?.avatarUrl || '/placeholder-user.jpg'
+            }}
+          />
+        )}
       </div>
     </ProtectedRoute>
   )
