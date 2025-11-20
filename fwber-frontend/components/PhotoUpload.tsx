@@ -22,9 +22,17 @@ interface PhotoUploadProps {
   className?: string
 }
 
+type PreviewView = 'original' | 'processed'
+
+interface PreviewUrls {
+  original: string
+  processed?: string
+}
+
 interface PhotoPreview {
   file: FileWithFaceBlurMetadata
-  preview: string
+  previewUrls: PreviewUrls
+  activeView: PreviewView
   id: string
   facesDetected?: number
   blurApplied?: boolean
@@ -52,7 +60,26 @@ export default function PhotoUpload({
   const [clientProcessingMessage, setClientProcessingMessage] = useState<string | null>(null)
   const [processingWarnings, setProcessingWarnings] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const previewsRef = useRef<PhotoPreview[]>([])
   const faceBlurEnabled = isFeatureEnabled('clientFaceBlur')
+
+  const revokePreviewUrls = useCallback((preview: PhotoPreview) => {
+    if (!preview?.previewUrls) return
+    URL.revokeObjectURL(preview.previewUrls.original)
+    if (preview.previewUrls.processed && preview.previewUrls.processed !== preview.previewUrls.original) {
+      URL.revokeObjectURL(preview.previewUrls.processed)
+    }
+  }, [])
+
+  useEffect(() => {
+    previewsRef.current = previews
+  }, [previews])
+
+  useEffect(() => {
+    return () => {
+      previewsRef.current.forEach(revokePreviewUrls)
+    }
+  }, [revokePreviewUrls])
 
   const processFilesForPreview = useCallback(
     async (files: File[]) => {
@@ -61,7 +88,10 @@ export default function PhotoUpload({
       if (!faceBlurEnabled) {
         return files.map((file) => ({
           file: file as FileWithFaceBlurMetadata,
-          preview: URL.createObjectURL(file),
+          previewUrls: {
+            original: URL.createObjectURL(file),
+          },
+          activeView: 'original' as PreviewView,
           id: generatePreviewId(),
         }))
       }
@@ -72,6 +102,7 @@ export default function PhotoUpload({
       try {
         const processed: PhotoPreview[] = []
         for (const file of files) {
+          const originalPreviewUrl = URL.createObjectURL(file)
           try {
             const result = await blurFacesOnFile(file)
             const metadata = {
@@ -83,6 +114,10 @@ export default function PhotoUpload({
             }
 
             let processedFile = attachFaceBlurMetadata(result.file, metadata)
+            let processedPreviewUrl: string | undefined
+            if (result.blurred) {
+              processedPreviewUrl = URL.createObjectURL(result.file)
+            }
             if (!result.blurred) {
               const warning = `No faces detected in ${file.name}; upload will continue unblurred.`
               warnings.push(warning)
@@ -95,7 +130,11 @@ export default function PhotoUpload({
 
             processed.push({
               file: processedFile,
-              preview: URL.createObjectURL(result.file),
+              previewUrls: {
+                original: originalPreviewUrl,
+                processed: processedPreviewUrl,
+              },
+              activeView: result.blurred && processedPreviewUrl ? 'processed' : 'original',
               id: generatePreviewId(),
               facesDetected: result.facesFound,
               blurApplied: result.blurred,
@@ -118,7 +157,10 @@ export default function PhotoUpload({
             })
             processed.push({
               file: processedFile,
-              preview: URL.createObjectURL(file),
+              previewUrls: {
+                original: originalPreviewUrl,
+              },
+              activeView: 'original',
               id: generatePreviewId(),
               facesDetected: 0,
               blurApplied: false,
@@ -213,10 +255,11 @@ export default function PhotoUpload({
       })
       
       // Clean up previews and object URLs after upload
+      const uploadedPreviewIds = new Set(newPreviews.map(preview => preview.id))
       newPreviews.forEach(preview => {
-        URL.revokeObjectURL(preview.preview)
+        revokePreviewUrls(preview)
       })
-      setPreviews([])
+      setPreviews(prev => prev.filter(preview => !uploadedPreviewIds.has(preview.id)))
       
       setTimeout(() => {
         setIsUploading(false)
@@ -246,7 +289,7 @@ export default function PhotoUpload({
         setUploadProgress(new Map())
       }, 2000)
     }
-  }, [maxSize, onUpload, processFilesForPreview])
+  }, [maxSize, onUpload, processFilesForPreview, revokePreviewUrls])
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop,
@@ -305,16 +348,29 @@ export default function PhotoUpload({
   
 
   const removePreview = (id: string) => {
-    const preview = previews.find(p => p.id === id)
-    if (preview) {
-      URL.revokeObjectURL(preview.preview)
-    }
-    setPreviews(prev => prev.filter(p => p.id !== id))
+    setPreviews(prev => {
+      const previewToRemove = prev.find(p => p.id === id)
+      if (previewToRemove) {
+        revokePreviewUrls(previewToRemove)
+      }
+      return prev.filter(p => p.id !== id)
+    })
   }
 
   const removePhoto = (index: number) => {
     onRemove(index)
   }
+
+  const togglePreviewView = useCallback((id: string, view: PreviewView) => {
+    setPreviews(prev =>
+      prev.map(preview => {
+        if (preview.id !== id) return preview
+        if (view === 'processed' && !preview.previewUrls.processed) return preview
+        if (preview.activeView === view) return preview
+        return { ...preview, activeView: view }
+      })
+    )
+  }, [])
 
   const totalPhotos = photos.length + previews.length
 
@@ -559,12 +615,16 @@ export default function PhotoUpload({
               const isUploadingPhoto = status === 'uploading'
               const isCompleted = status === 'completed'
               const isError = status === 'error'
+              const previewSrc =
+                preview.activeView === 'processed' && preview.previewUrls.processed
+                  ? preview.previewUrls.processed
+                  : preview.previewUrls.original
               
               return (
                 <div key={preview.id} className="relative group">
                   <div className="aspect-square rounded-lg overflow-hidden bg-muted">
                     <Image
-                      src={preview.preview}
+                      src={previewSrc}
                       alt="Preview"
                       width={200}
                       height={200}
@@ -628,6 +688,41 @@ export default function PhotoUpload({
                   {preview.blurApplied && (
                     <div className="absolute bottom-2 left-2 bg-black/70 text-white text-[10px] px-2 py-0.5 rounded-full">
                       Faces blurred{typeof preview.facesDetected === 'number' ? ` (${preview.facesDetected})` : ''}
+                    </div>
+                  )}
+
+                  {preview.blurApplied && preview.previewUrls.processed && (
+                    <div className="absolute bottom-2 right-2 z-20 flex items-center gap-1 rounded-full bg-black/60 px-1.5 py-0.5 text-[10px] text-white shadow-lg backdrop-blur pointer-events-auto">
+                      <button
+                        type="button"
+                        aria-pressed={preview.activeView === 'processed' ? 'true' : 'false'}
+                        className={`px-2 py-0.5 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 ${
+                          preview.activeView === 'processed'
+                            ? 'bg-white text-black'
+                            : 'text-white/80 hover:text-white'
+                        }`}
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          togglePreviewView(preview.id, 'processed')
+                        }}
+                      >
+                        Blurred
+                      </button>
+                      <button
+                        type="button"
+                        aria-pressed={preview.activeView === 'original' ? 'true' : 'false'}
+                        className={`px-2 py-0.5 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 ${
+                          preview.activeView === 'original'
+                            ? 'bg-white text-black'
+                            : 'text-white/80 hover:text-white'
+                        }`}
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          togglePreviewView(preview.id, 'original')
+                        }}
+                      >
+                        Original
+                      </button>
                     </div>
                   )}
                 </div>

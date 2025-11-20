@@ -14,6 +14,15 @@ Date: 2025-11-20
   - Frontend: `NEXT_PUBLIC_FEATURE_CLIENT_FACE_BLUR` (documented in `.env.example`). Enables blur processing + UX messaging.
   - Backend (future): `FEATURE_CLIENT_FACE_BLUR` middleware toggle once API routes enforce storage rules.
 - **Current flow:** user selects image → `faceBlur.ts` ensures models + draws to canvas → detected bounding boxes expanded 15% → blurred region replaced in-place via canvas filter → resulting blob uploaded with `-blurred` suffix. Per-file badges display detected face counts.
+- **Preview comparison workflow (2025-11-20):**
+  - `PhotoUpload` now caches both the original object URL and a blurred derivative for every processed file.
+  - A floating Blurred/Original toggle appears on each preview (only when blur actually ran) so QA can visually confirm the transformation before the upload finishes.
+  - We default to the blurred view, remember the user’s choice per preview, and simultaneously clean up both object URLs whenever the preview is removed, the upload completes, or the component unmounts.
+  - ⚙️ Enablement steps:
+    1. Set `NEXT_PUBLIC_FEATURE_CLIENT_FACE_BLUR=true` in `fwber-frontend/.env.local` (already listed in `.env.example`).
+    2. Run `npm run dev` (or the Cypress suite) so the App Router sees the flag at build time.
+    3. Visit any screen using `PhotoUpload` (profile editor, onboarding) → drop/import photos → use the new toggle to compare.
+    4. Watch the inline “Face blur notices” list for warnings such as `no_faces_detected`—they mirror the metadata sent to the backend.
 - **Fallback handling:**
   - Any `FaceBlurError` downgrades gracefully (upload proceeds but warning pill appears in the UI and the file remains unaltered).
   - If no faces detected, we notify the user that the image may continue unblurred.
