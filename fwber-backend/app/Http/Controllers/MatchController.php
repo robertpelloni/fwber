@@ -43,6 +43,34 @@ class MatchController extends Controller
      *         required=false,
      *         @OA\Schema(type="integer", minimum=1, maximum=500, default=50, example=25)
      *     ),
+     *     @OA\Parameter(
+     *         name="smoking",
+     *         in="query",
+     *         description="Filter by smoking preference",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"non-smoker", "occasional", "regular", "social", "trying-to-quit"})
+     *     ),
+     *     @OA\Parameter(
+     *         name="drinking",
+     *         in="query",
+     *         description="Filter by drinking preference",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"non-drinker", "occasional", "regular", "social", "sober"})
+     *     ),
+     *     @OA\Parameter(
+     *         name="body_type",
+     *         in="query",
+     *         description="Filter by body type",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"slim", "athletic", "average", "curvy", "plus-size", "muscular"})
+     *     ),
+     *     @OA\Parameter(
+     *         name="height_min",
+     *         in="query",
+     *         description="Minimum height in centimeters",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=120, maximum=250)
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Matches retrieved successfully",
@@ -94,6 +122,10 @@ class MatchController extends Controller
             'age_min' => 'nullable|integer|min:18|max:100',
             'age_max' => 'nullable|integer|min:18|max:100',
             'max_distance' => 'nullable|integer|min:1|max:500',
+            'smoking' => 'nullable|string|in:non-smoker,occasional,regular,social,trying-to-quit',
+            'drinking' => 'nullable|string|in:non-drinker,occasional,regular,social,sober',
+            'body_type' => 'nullable|string|in:slim,athletic,average,curvy,plus-size,muscular',
+            'height_min' => 'nullable|integer|min:120|max:250',
         ]);
 
         // Cache feed for 60 seconds per user with filter params
@@ -236,6 +268,20 @@ class MatchController extends Controller
                 $ageMax
             ]);
         });
+
+        // Advanced filters
+        if ($request->has('smoking')) {
+            $query->whereHas('profile', fn ($q) => $q->where('preferences->smoking', $request->smoking));
+        }
+        if ($request->has('drinking')) {
+            $query->whereHas('profile', fn ($q) => $q->where('preferences->drinking', $request->drinking));
+        }
+        if ($request->has('body_type')) {
+            $query->whereHas('profile', fn ($q) => $q->where('preferences->body_type', $request->body_type));
+        }
+        if ($request->has('height_min')) {
+            $query->whereHas('profile', fn ($q) => $q->where('height_cm', '>=', $request->height_min));
+        }
 
         // Exclude users already interacted with
         $excludedIds = DB::table('match_actions')

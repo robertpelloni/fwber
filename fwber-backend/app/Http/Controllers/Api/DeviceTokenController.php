@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\DeviceToken;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -70,5 +71,26 @@ class DeviceTokenController extends Controller
         DeviceToken::where('token', $token)->where('user_id', Auth::id())->delete();
 
         return response()->json(null, 204);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/notifications",
+     *     summary="Get all notifications for the authenticated user",
+     *     tags={"Push Notifications"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="A list of notifications"
+     *     )
+     * )
+     */
+    public function index()
+    {
+        $notifications = Notification::where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($notifications);
     }
 }

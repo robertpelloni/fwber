@@ -8,6 +8,7 @@ import { getMatches, performMatchAction, type Match, type MatchAction } from '@/
 import { RelationshipTier } from '@/lib/relationshipTiers'
 import RelationshipTierBadge from '@/components/RelationshipTierBadge'
 import PhotoRevealGate from '@/components/PhotoRevealGate'
+import MatchFilter from '@/components/MatchFilter'
 
 export default function MatchesPage() {
   const { token, isAuthenticated } = useAuth()
@@ -18,6 +19,7 @@ export default function MatchesPage() {
   const [error, setError] = useState<string | null>(null)
   const [showMatchDetails, setShowMatchDetails] = useState(false)
   const [showTierInfo, setShowTierInfo] = useState(true)
+  const [filters, setFilters] = useState({});
 
   // Simulated tier data - in real app, fetch from API
   const getCurrentTier = (match: Match): RelationshipTier => {
@@ -25,13 +27,13 @@ export default function MatchesPage() {
     return RelationshipTier.DISCOVERY
   }
 
-  const loadMatches = useCallback(async () => {
+  const loadMatches = useCallback(async (newFilters = {}) => {
     if (!token) return
 
     try {
       setIsLoading(true)
       setError(null)
-      const matchesData = await getMatches(token)
+      const matchesData = await getMatches(token, newFilters)
       setMatches(matchesData)
       setCurrentMatchIndex(0)
     } catch (err) {
@@ -43,9 +45,9 @@ export default function MatchesPage() {
 
   useEffect(() => {
     if (isAuthenticated && token) {
-      loadMatches()
+      loadMatches(filters)
     }
-  }, [isAuthenticated, token, loadMatches])
+  }, [isAuthenticated, token, loadMatches, filters])
 
   const handleMatchAction = async (action: MatchAction) => {
     if (!token || currentMatchIndex >= matches.length) return
@@ -167,8 +169,9 @@ export default function MatchesPage() {
 
         {/* Main Content */}
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <MatchFilter onFilterChange={(newFilters) => setFilters(newFilters)} />
           {currentMatch && (
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden mt-8">
               {/* Match Card */}
               <div className="relative">
                 {/* Profile Photo with Tier-based Reveal */}

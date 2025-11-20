@@ -122,6 +122,9 @@ Route::middleware("api")->group(function (): void {
             Route::delete('/{token}', [DeviceTokenController::class, 'destroy']);
         });
 
+        // Notification routes
+        Route::get('/notifications', [DeviceTokenController::class, 'index']);
+
         // Block routes
         Route::prefix('blocks')->group(function (): void {
             Route::post('/', [BlockController::class, 'store']);
