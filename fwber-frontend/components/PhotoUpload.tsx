@@ -7,6 +7,7 @@ import { Upload, X, Camera, RotateCcw, Download, Eye, ChevronLeft, ChevronRight,
 import { blurFacesOnFile, FaceBlurError } from '@/lib/faceBlur'
 import { isFeatureEnabled } from '@/lib/featureFlags'
 import { attachFaceBlurMetadata, FileWithFaceBlurMetadata } from '@/lib/faceBlurTelemetry'
+import { usePreviewTelemetry } from '@/lib/previewTelemetry'
 
 const generatePreviewId = () =>
   typeof crypto !== 'undefined' && crypto.randomUUID
@@ -62,6 +63,7 @@ export default function PhotoUpload({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const previewsRef = useRef<PhotoPreview[]>([])
   const faceBlurEnabled = isFeatureEnabled('clientFaceBlur')
+  const { trackPreviewReady, trackPreviewToggled, trackPreviewDiscarded, flushTelemetryQueue } = usePreviewTelemetry({ enabled: faceBlurEnabled })
 
   const revokePreviewUrls = useCallback((preview: PhotoPreview) => {
     if (!preview?.previewUrls) return
@@ -70,6 +72,24 @@ export default function PhotoUpload({
       URL.revokeObjectURL(preview.previewUrls.processed)
     }
   }, [])
+
+  const emitPreviewReady = useCallback(
+    (previewId: string, file: FileWithFaceBlurMetadata) => {
+      if (!file?.faceBlurMetadata) return
+      const metadata = file.faceBlurMetadata
+      trackPreviewReady({
+        previewId,
+        fileName: metadata.originalFileName ?? file.name,
+        facesDetected: metadata.facesDetected,
+        blurApplied: Boolean(metadata.blurApplied),
+        processingTimeMs: metadata.processingTimeMs,
+        backend: 'client',
+        warning: metadata.warningMessage,
+        skippedReason: metadata.skippedReason,
+      })
+    },
+    [trackPreviewReady]
+  )
 
   useEffect(() => {
     previewsRef.current = previews
@@ -103,6 +123,7 @@ export default function PhotoUpload({
         const processed: PhotoPreview[] = []
         for (const file of files) {
           const originalPreviewUrl = URL.createObjectURL(file)
+          const previewId = generatePreviewId()
           try {
             const result = await blurFacesOnFile(file)
             const metadata = {
@@ -135,10 +156,11 @@ export default function PhotoUpload({
                 processed: processedPreviewUrl,
               },
               activeView: result.blurred && processedPreviewUrl ? 'processed' : 'original',
-              id: generatePreviewId(),
+              id: previewId,
               facesDetected: result.facesFound,
               blurApplied: result.blurred,
             })
+            emitPreviewReady(previewId, processedFile)
           } catch (error) {
             const message =
               error instanceof FaceBlurError
@@ -161,10 +183,11 @@ export default function PhotoUpload({
                 original: originalPreviewUrl,
               },
               activeView: 'original',
-              id: generatePreviewId(),
+              id: previewId,
               facesDetected: 0,
               blurApplied: false,
             })
+            emitPreviewReady(previewId, processedFile)
           }
         }
 
@@ -180,7 +203,7 @@ export default function PhotoUpload({
         setClientProcessingMessage(null)
       }
     },
-    [faceBlurEnabled]
+    [faceBlurEnabled, emitPreviewReady]
   )
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
@@ -240,6 +263,7 @@ export default function PhotoUpload({
         })
       }
 
+      void flushTelemetryQueue()
       await onUpload(newPreviews.map(p => p.file), progressCallback)
       
       // Mark all as completed
@@ -289,7 +313,7 @@ export default function PhotoUpload({
         setUploadProgress(new Map())
       }, 2000)
     }
-  }, [maxSize, onUpload, processFilesForPreview, revokePreviewUrls])
+  }, [flushTelemetryQueue, maxSize, onUpload, processFilesForPreview, revokePreviewUrls])
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop,
@@ -348,10 +372,24 @@ export default function PhotoUpload({
   
 
   const removePreview = (id: string) => {
+    const previewToRemove = previewsRef.current.find(p => p.id === id)
+    if (previewToRemove) {
+      const metadata = previewToRemove.file.faceBlurMetadata
+      if (metadata) {
+        trackPreviewDiscarded({
+          previewId: id,
+          facesDetected: metadata.facesDetected ?? previewToRemove.facesDetected,
+          blurApplied: metadata.blurApplied ?? previewToRemove.blurApplied,
+          discardReason: 'user_removed',
+          warning: metadata.warningMessage,
+        })
+      }
+    }
+
     setPreviews(prev => {
-      const previewToRemove = prev.find(p => p.id === id)
-      if (previewToRemove) {
-        revokePreviewUrls(previewToRemove)
+      const preview = prev.find(p => p.id === id)
+      if (preview) {
+        revokePreviewUrls(preview)
       }
       return prev.filter(p => p.id !== id)
     })
@@ -362,15 +400,29 @@ export default function PhotoUpload({
   }
 
   const togglePreviewView = useCallback((id: string, view: PreviewView) => {
+    const preview = previewsRef.current.find(p => p.id === id)
+    if (!preview) return
+    if (view === 'processed' && !preview.previewUrls.processed) return
+    if (preview.activeView === view) return
+
+    const metadata = preview.file.faceBlurMetadata
+    trackPreviewToggled({
+      previewId: id,
+      view,
+      facesDetected: metadata?.facesDetected ?? preview.facesDetected,
+      blurApplied: metadata?.blurApplied ?? preview.blurApplied,
+      warning: metadata?.warningMessage,
+    })
+
     setPreviews(prev =>
-      prev.map(preview => {
-        if (preview.id !== id) return preview
-        if (view === 'processed' && !preview.previewUrls.processed) return preview
-        if (preview.activeView === view) return preview
-        return { ...preview, activeView: view }
+      prev.map(current => {
+        if (current.id !== id) return current
+        if (view === 'processed' && !current.previewUrls.processed) return current
+        if (current.activeView === view) return current
+        return { ...current, activeView: view }
       })
     )
-  }, [])
+  }, [trackPreviewToggled])
 
   const totalPhotos = photos.length + previews.length
 
