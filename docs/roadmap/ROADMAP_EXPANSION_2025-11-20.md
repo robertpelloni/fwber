@@ -7,7 +7,10 @@ Date: 2025-11-20
 - Create a `SexQuote` component.
 - Maintain a list of quotes in a constant file.
 - Randomly select one on mount (client-side) or render (server-side).
-- **Content**: Include quotes like "Even the Queen of England was a slut in heat" and taglines like "Everybody wants to get laid".
+- **Content**: Include quotes like "Even the Queen of England was a slut in heat" and taglines like:
+  - "Everybody wants to get laid"
+  - "Every body likes sex"
+  - "Every body gets horny"
 - **Status**: Implemented in `components/SexQuote.tsx`.
 
 ## 2. Client-Side Face Blurring

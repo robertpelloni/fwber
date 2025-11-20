@@ -34,6 +34,9 @@ export default function HomePage() {
           <h1 className="text-6xl font-bold text-gray-900 mb-6">
             Welcome to <span className="text-blue-600">FWBer.me</span>
           </h1>
+          <p className="text-2xl text-orange-600 font-semibold italic mb-4">
+            "Everybody wants to get laid."
+          </p>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl">
             A modern adult dating platform with advanced matching algorithms. 
             Connect with compatible people and build meaningful relationships.

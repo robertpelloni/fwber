@@ -13,7 +13,10 @@ const QUOTES = [
   "Intimacy is the capacity to be rather weird with someone - and finding that that's ok with them. — Alain de Botton",
   "Sexuality is the most powerful force in the universe. — Unknown",
   "Good sex is like good bridge. If you don't have a good partner, you'd better have a good hand. — Mae West",
-  "Even the Queen of England was a slut in heat. — Unknown"
+  "Even the Queen of England was a slut in heat. — Unknown",
+  "Everybody wants to get laid.",
+  "Every body likes sex.",
+  "Every body gets horny."
 ];
 
 export default function SexQuote() {
