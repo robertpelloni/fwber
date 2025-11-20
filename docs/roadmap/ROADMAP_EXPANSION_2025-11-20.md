@@ -11,9 +11,9 @@ Date: 2025-11-20
   - "Everybody wants to get laid"
   - "Every body likes sex"
   - "Every body gets horny"
-- **Status**: Implemented in `components/SexQuote.tsx`.
+- **Status**: Implemented in `components/SexQuote.tsx` and rendered on hero + proximity surfaces.
 - **Display Targets**: Homepage hero tagline, Pulse/Proximity screens (already mounted), future dashboard surfaces.
-- **Next Actions**: Externalize quotes to CMS/JSON for easier moderation, add analytics event for quote impressions.
+- **Next Actions**: Externalize quotes to CMS/JSON for easier moderation, add analytics event for quote impressions, document governance in upcoming storytelling guide.
 
 ## 2. Client-Side Face Blurring
 **Goal**: Automatically detect and blur faces in user-uploaded photos before they are saved or shared.
@@ -29,7 +29,15 @@ Date: 2025-11-20
   3. Render preview canvas showing blurred/unblurred comparison.
   4. Persist blurred bitmap locally; upload only if user explicitly shares.
 - **Open Questions**: Performance on low-end devices, fallback UX when detection fails, guideline for multi-face images.
-**Status**: Researching libraries.
+- **Status**: **Beta** behind `NEXT_PUBLIC_FEATURE_CLIENT_FACE_BLUR`. `components/PhotoUpload.tsx` processes files via `lib/faceBlur.ts`, attaches telemetry, and uploads blurred files by default.
+- **Current Coverage**:
+  - Metadata: `face_blur_metadata` appended client-side and consumed by `PhotoController::emitFaceBlurTelemetry()`.
+  - UX: warnings surface when faces are missing or blur fails; Cypress tests still cover default (non-blur) path.
+- **Next Actions**:
+  1. Add blurred vs. original preview comparison (in progress).
+  2. Cache detection models per browser session to reduce first-load latency.
+  3. Emit telemetry for preview deletions / skipped uploads so privacy metrics stay accurate.
+  4. Publish beta enablement instructions in docs/testing once compare UX lands.
 
 ## 3. "Face Reveal" Game & Auto-Reply
 **Goal**: Gamify photo sharing.
@@ -64,5 +72,6 @@ Date: 2025-11-20
 - **Risks**: Backup complexity, quota limits (~2GB desktop, ~50MB mobile), accessibility when user clears site data.
 
 ## Immediate Next Steps
-1. Implement `SexQuote` component.
-2. Prototype Client-Side Face Blurring.
+1. Finalize client-side face blur beta compare UX + model caching.
+2. Outline Face Reveal + Auto-Reply experiment scope and feature flag requirements.
+3. Draft Local Media Vault spike (encryption + storage constraints) for upcoming sprint.
