@@ -19,7 +19,7 @@ describe('Physical Profile Editor', () => {
       locationDescription: 'New York, NY',
       stiStatus: 'negative',
       preferences: {},
-      avatarUrl: 'https://via.placeholder.com/150',
+      avatarUrl: '/images/test-avatar.svg',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }

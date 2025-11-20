@@ -19,7 +19,7 @@ describe('Messaging Flow', () => {
       locationDescription: 'New York, NY',
       stiStatus: 'negative',
       preferences: {},
-      avatarUrl: 'https://via.placeholder.com/150',
+      avatarUrl: '/images/test-avatar.svg',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }
@@ -56,7 +56,7 @@ describe('Messaging Flow', () => {
               age: 25,
               bio: 'I like hiking',
               location: { city: 'New York', state: 'NY' },
-              photos: [{ url: 'https://via.placeholder.com/150' }]
+              photos: [{ url: '/images/test-avatar.svg' }]
             }
           }
         ]
@@ -90,7 +90,7 @@ describe('Messaging Flow', () => {
               profile: {
                 display_name: 'Future Partner',
                 age: 25,
-                photos: [{ url: 'https://via.placeholder.com/150' }]
+                photos: [{ url: '/images/test-avatar.svg' }]
               }
             }
           }

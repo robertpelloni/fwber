@@ -24,6 +24,7 @@ This guide provides comprehensive testing procedures for the FWBer frontend appl
 ### Test Data Requirements
 - Multiple user accounts for testing matches/messages
 - Test images for profile photos (various sizes: small, large, invalid formats)
+- Local placeholder asset: `/images/test-avatar.svg` (used by Cypress mocks to avoid external fetches)
 - Location services enabled for geolocation features
 - WebSocket connection capabilities
 

@@ -34,7 +34,7 @@ describe('Matching Flow', () => {
                 state: 'NY'
               },
               photos: [
-                { url: 'https://via.placeholder.com/150' }
+                { url: '/images/test-avatar.svg' }
               ]
             }
           },
@@ -50,7 +50,7 @@ describe('Matching Flow', () => {
                 state: 'NY'
               },
               photos: [
-                { url: 'https://via.placeholder.com/150' }
+                { url: '/images/test-avatar.svg' }
               ]
             }
           }
@@ -89,7 +89,7 @@ describe('Matching Flow', () => {
       locationDescription: 'New York, NY',
       stiStatus: 'negative',
       preferences: {},
-      avatarUrl: 'https://via.placeholder.com/150',
+      avatarUrl: '/images/test-avatar.svg',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }

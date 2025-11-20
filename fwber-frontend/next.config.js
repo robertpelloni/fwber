@@ -28,7 +28,6 @@ const nextConfig = {
   
   // Image optimization
   images: {
-    domains: ['localhost', 'fwber.me'],
     remotePatterns: [
       {
         protocol: 'https',
