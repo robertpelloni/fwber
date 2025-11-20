@@ -7,6 +7,8 @@ return [
     'proximity_artifacts' => env('FEATURE_PROXIMITY_ARTIFACTS', true),
     'chatrooms' => env('FEATURE_CHATROOMS', true),
     'proximity_chatrooms' => env('FEATURE_PROXIMITY_CHATROOMS', false),
+    'face_reveal' => env('FEATURE_FACE_REVEAL', false),
+    'local_media_vault' => env('FEATURE_LOCAL_MEDIA_VAULT', false),
 
     // Moderation and safety (Phase 2)
     'moderation' => env('FEATURE_MODERATION', false),

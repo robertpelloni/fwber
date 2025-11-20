@@ -46,6 +46,14 @@ When a feature is disabled, its routes still register but requests return HTTP 4
 - FEATURE_ANALYTICS (default: false)
   - Scope: Admin analytics
   - Routes (gated): `/api/analytics*`
+- FEATURE_FACE_REVEAL (default: false)
+  - Scope: Upcoming “Face Reveal” / auto-reply experiments
+  - Routes (future): `/api/face-reveal/*`, `/api/auto-reply/*` once defined
+  - Notes: Keep disabled until the spike graduates; use this to protect any matchmaking/gameplay endpoints during testing.
+- FEATURE_LOCAL_MEDIA_VAULT (default: false)
+  - Scope: Local-first encrypted media vault services
+  - Routes (future): `/api/vault/*` plus any vault sync/download endpoints
+  - Notes: Gating ensures zero-knowledge storage work does not leak into production until policies are finalized.
 - FEATURE_MODERATION (default: false)
   - Scope: Advanced moderation tools (shadow throttling, geo-spoof detection, moderation dashboard)
   - Routes (gated): `/api/moderation/*`
@@ -59,6 +67,12 @@ Some privacy experiments gate their UI in the Next.js app through `NEXT_PUBLIC_*
   - Scope: Enables client-side face detection/blurring before uploads leave the browser.
   - Surfaces: `PhotoUpload` component and any flows that reuse it.
   - Notes: When disabled, uploads proceed without local pre-processing even if the backend flag is enabled. Turn this on in `.env.local` once QA signs off.
+- NEXT_PUBLIC_FEATURE_FACE_REVEAL (default: `false`)
+  - Scope: Renders the Face Reveal experiment UI (streak prompts, auto-reply controls) once backend APIs are ready.
+  - Notes: Requires `FEATURE_FACE_REVEAL` server-side; keep disabled in production until the experiment is staffed.
+- NEXT_PUBLIC_FEATURE_LOCAL_MEDIA_VAULT (default: `false`)
+  - Scope: Unlocks the Local Media Vault onboarding wizard and vault gallery components.
+  - Notes: Combine with `FEATURE_LOCAL_MEDIA_VAULT` and document strong warnings when enabling locally.
 
 ## Enabling or disabling features
 

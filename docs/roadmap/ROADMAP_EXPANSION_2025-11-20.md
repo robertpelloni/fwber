@@ -52,6 +52,7 @@ Date: 2025-11-20
   - Auto-reply bot pulls from anonymized stock selfies (faces blurred) that match the detected category.
   - Reward loop: streak counter, badge, and push/email nudges when the user fails to reciprocate.
   - Future mutual face trade: double-consent workflow + encrypted blob swap (requires Section 4 infra).
+- **Spike Doc**: `docs/implementation/spikes/FACE_REVEAL_EXPERIMENT_SPIKE_2025-11-20.md` captures detailed tech considerations, telemetry, and open questions.
 - **Metrics**: replies per photo, number of blurred uploads, conversion to mutual trade.
 
 ## 4. Local-First Encrypted Media Storage
@@ -70,6 +71,7 @@ Date: 2025-11-20
   3. Update upload flow to blur faces (Section 2) before encryption step.
   4. Provide recovery UX warning + manual export/import JSON bundle.
 - **Risks**: Backup complexity, quota limits (~2GB desktop, ~50MB mobile), accessibility when user clears site data.
+- **Spike Doc**: `docs/implementation/spikes/LOCAL_MEDIA_VAULT_SPIKE_2025-11-20.md` outlines architecture + constraints for the beta.
 
 ## Immediate Next Steps
 1. Finalize client-side face blur beta compare UX + model caching.

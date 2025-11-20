@@ -6,6 +6,8 @@ const parseBoolean = (value: string | undefined, fallback = false) => {
 
 const featureFlags = {
   clientFaceBlur: parseBoolean(process.env.NEXT_PUBLIC_FEATURE_CLIENT_FACE_BLUR, false),
+  faceReveal: parseBoolean(process.env.NEXT_PUBLIC_FEATURE_FACE_REVEAL, false),
+  localMediaVault: parseBoolean(process.env.NEXT_PUBLIC_FEATURE_LOCAL_MEDIA_VAULT, false),
 }
 
 export type FeatureFlagKey = keyof typeof featureFlags
