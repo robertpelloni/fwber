@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth-context';
 import { proximityApi } from '@/lib/api/proximity';
 import type { ProximityArtifact } from '@/types/proximity';
 import { MapPin, Send, AlertTriangle, Trash2, Clock, User } from 'lucide-react';
+import SexQuote from './SexQuote';
 
 export default function ProximityFeed() {
   const { token: authToken, user } = useAuth();
@@ -140,6 +141,7 @@ export default function ProximityFeed() {
 
   return (
     <div className="max-w-2xl mx-auto">
+      <SexQuote />
       {/* Post Input */}
       <div className="bg-white shadow rounded-lg p-4 mb-6">
         <form onSubmit={handlePost}>
