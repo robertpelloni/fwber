@@ -40,6 +40,10 @@ This directory contains all project documentation organized by category:
 - **001-adopt-laravel-nextjs-stack.md** - Decision to adopt Laravel/Next.js stack
 - **LEGACY_DEPRECATION_PLAN.md** - Legacy system deprecation plan
 
+### 🗺️ Roadmap (`docs/roadmap/`)
+- **PROJECT_ANALYSIS_AND_ROADMAP_2025-11-15.md** - Initial project analysis and roadmap.
+- **ROADMAP_EXPANSION_2025-11-20.md** - Expanded roadmap including Privacy, Gamification, and Content features.
+
 ## 🎯 Quick Start
 
 ### For AI Model Usage:

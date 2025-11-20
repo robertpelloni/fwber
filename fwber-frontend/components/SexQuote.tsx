@@ -12,7 +12,8 @@ const QUOTES = [
   "Sex is emotion in motion. — Mae West",
   "Intimacy is the capacity to be rather weird with someone - and finding that that's ok with them. — Alain de Botton",
   "Sexuality is the most powerful force in the universe. — Unknown",
-  "Good sex is like good bridge. If you don't have a good partner, you'd better have a good hand. — Mae West"
+  "Good sex is like good bridge. If you don't have a good partner, you'd better have a good hand. — Mae West",
+  "Even the Queen of England was a slut in heat. — Unknown"
 ];
 
 export default function SexQuote() {

@@ -7,7 +7,8 @@ Date: 2025-11-20
 - Create a `SexQuote` component.
 - Maintain a list of quotes in a constant file.
 - Randomly select one on mount (client-side) or render (server-side).
-- **Status**: Ready to implement.
+- **Content**: Include quotes like "Even the Queen of England was a slut in heat" and taglines like "Everybody wants to get laid".
+- **Status**: Implemented in `components/SexQuote.tsx`.
 
 ## 2. Client-Side Face Blurring
 **Goal**: Automatically detect and blur faces in user-uploaded photos before they are saved or shared.
