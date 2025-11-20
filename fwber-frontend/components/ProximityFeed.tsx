@@ -7,7 +7,10 @@ import type { ProximityArtifact } from '@/types/proximity';
 import { MapPin, Send, AlertTriangle, Trash2, Clock, User } from 'lucide-react';
 
 export default function ProximityFeed() {
-  const { token, user } = useAuth();
+  const { token: authToken, user } = useAuth();
+  // Allow mock token for testing
+  const token = authToken || (typeof window !== 'undefined' ? localStorage.getItem('mock_auth_token') : null);
+  
   const [artifacts, setArtifacts] = useState<ProximityArtifact[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -17,6 +20,12 @@ export default function ProximityFeed() {
 
   // Get user location
   useEffect(() => {
+    // Dev/Test bypass
+    if (typeof window !== 'undefined' && localStorage.getItem('mock_geo')) {
+      setLocation({ lat: 40.7128, lng: -74.0060 });
+      return;
+    }
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -119,7 +128,14 @@ export default function ProximityFeed() {
   }
 
   if (isLoading && !artifacts.length) {
-    return <div className="p-8 text-center text-gray-500">Finding local pulse...</div>;
+    return (
+      <div className="p-8 text-center text-gray-500">
+        Finding local pulse...
+        <div data-testid="debug-info" className="hidden">
+          {JSON.stringify({ hasToken: !!token, hasLocation: !!location, isLoading })}
+        </div>
+      </div>
+    );
   }
 
   return (

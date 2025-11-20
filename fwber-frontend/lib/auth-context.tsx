@@ -178,6 +178,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           dispatch({ type: 'INITIALIZE_END' })
         }
       } else {
+        console.log('AuthContext: No token or user in localStorage', { token, userStr })
         dispatch({ type: 'INITIALIZE_END' })
       }
     } else {

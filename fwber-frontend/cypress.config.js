@@ -14,6 +14,12 @@ module.exports = defineConfig({
     responseTimeout: 10000,
     chromeWebSecurity: false,
     setupNodeEvents(on, config) {
+      on('task', {
+        log(message) {
+          console.log(message)
+          return null
+        },
+      })
       // Mock geolocation
       on('before:browser:launch', (browser, launchOptions) => {
         if (browser.name === 'chrome') {
