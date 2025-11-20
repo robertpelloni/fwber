@@ -161,17 +161,17 @@ class AIMatchingService
             return 0;
         }
 
-        // Base compatibility score (25%)
+        // Base compatibility score (20%)
         $baseScore = $this->calculateBaseCompatibility($userProfile, $candidateProfile);
-        $score += $baseScore * 0.25;
+        $score += $baseScore * 0.20;
 
-        // Detailed Preference Matching (35%) - New detailed scoring
+        // Detailed Preference Matching (30%) - New detailed scoring
         $preferenceScore = $this->calculateDetailedPreferenceScore($userProfile, $candidateProfile);
-        $score += $preferenceScore * 0.35;
+        $score += $preferenceScore * 0.30;
 
-        // Behavioral matching score (20%)
+        // Behavioral matching score (15%)
         $behavioralScore = $this->calculateBehavioralScore($candidateProfile, $behavioralPrefs);
-        $score += $behavioralScore * 0.20;
+        $score += $behavioralScore * 0.15;
 
         // Communication style similarity (10%)
         $communicationScore = $this->calculateCommunicationScore($userProfile, $candidateProfile);
@@ -181,7 +181,32 @@ class AIMatchingService
         $mutualScore = $this->calculateMutualInterestScore($user, $candidate);
         $score += $mutualScore * 0.10;
 
+        // Recency score (15%)
+        $recencyScore = $this->calculateRecencyScore($candidate);
+        $score += $recencyScore * 0.15;
+
         return min(100, max(0, $score));
+    }
+
+    private function calculateRecencyScore(User $candidate): float
+    {
+        if (!$candidate->last_seen_at) {
+            return 0;
+        }
+
+        $minutesAgo = $candidate->last_seen_at->diffInMinutes(now());
+
+        if ($minutesAgo < 60) { // < 1 hour
+            return 100;
+        } elseif ($minutesAgo < 1440) { // < 24 hours
+            return 80;
+        } elseif ($minutesAgo < 10080) { // < 7 days
+            return 50;
+        } elseif ($minutesAgo < 43200) { // < 30 days
+            return 20;
+        }
+
+        return 0;
     }
 
     private function calculateDetailedPreferenceScore(UserProfile $userProfile, UserProfile $candidateProfile): float

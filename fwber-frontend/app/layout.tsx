@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/lib/auth-context'
@@ -11,6 +11,13 @@ const inter = Inter({
   subsets: ['latin'],
   display: 'swap', // Optimize font loading
 })
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#f97316',
+}
 
 export const metadata: Metadata = {
   title: 'FWBer.me - Adult Dating Platform',
@@ -42,12 +49,6 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-  },
-  themeColor: '#f97316',
   // Performance optimizations
   other: {
     'X-DNS-Prefetch-Control': 'on',
