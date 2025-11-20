@@ -51,6 +51,15 @@ When a feature is disabled, its routes still register but requests return HTTP 4
   - Routes (gated): `/api/moderation/*`
   - Note: Requires users with `is_moderator` flag; includes dashboard, flagged content review, spoof detection, shadow throttle management
 
+### Frontend-only toggles
+
+Some privacy experiments gate their UI in the Next.js app through `NEXT_PUBLIC_*` variables. These do **not** enforce server-side access but control whether the client surfaces the feature.
+
+- NEXT_PUBLIC_FEATURE_CLIENT_FACE_BLUR (default: `false`)
+  - Scope: Enables client-side face detection/blurring before uploads leave the browser.
+  - Surfaces: `PhotoUpload` component and any flows that reuse it.
+  - Notes: When disabled, uploads proceed without local pre-processing even if the backend flag is enabled. Turn this on in `.env.local` once QA signs off.
+
 ## Enabling or disabling features
 
 Prefer environment variables in `.env`:

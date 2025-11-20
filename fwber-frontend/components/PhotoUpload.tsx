@@ -4,6 +4,13 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import Image from 'next/image'
 import { Upload, X, Camera, RotateCcw, Download, Eye, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react'
+import { blurFacesOnFile, FaceBlurError } from '@/lib/faceBlur'
+import { isFeatureEnabled } from '@/lib/featureFlags'
+
+const generatePreviewId = () =>
+  typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID()
+    : Math.random().toString(36).substring(2, 11)
 
 interface PhotoUploadProps {
   onUpload: (photos: File[], onProgress?: (fileIndex: number, progress: number, fileName: string) => void) => Promise<void>
@@ -18,6 +25,8 @@ interface PhotoPreview {
   file: File
   preview: string
   id: string
+  facesDetected?: number
+  blurApplied?: boolean
 }
 
 interface UploadProgress {
@@ -39,7 +48,72 @@ export default function PhotoUpload({
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState<Map<string, UploadProgress>>(new Map())
   const [dragActive, setDragActive] = useState(false)
+  const [clientProcessingMessage, setClientProcessingMessage] = useState<string | null>(null)
+  const [processingWarnings, setProcessingWarnings] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const faceBlurEnabled = isFeatureEnabled('clientFaceBlur')
+
+  const processFilesForPreview = useCallback(
+    async (files: File[]) => {
+      if (files.length === 0) return []
+
+      if (!faceBlurEnabled) {
+        return files.map((file) => ({
+          file,
+          preview: URL.createObjectURL(file),
+          id: generatePreviewId(),
+        }))
+      }
+
+      setClientProcessingMessage('Detecting faces locally and applying blur...')
+      const warnings: string[] = []
+
+      try {
+        const processed: PhotoPreview[] = []
+        for (const file of files) {
+          try {
+            const result = await blurFacesOnFile(file)
+            processed.push({
+              file: result.file,
+              preview: URL.createObjectURL(result.file),
+              id: generatePreviewId(),
+              facesDetected: result.facesFound,
+              blurApplied: result.blurred,
+            })
+
+            if (!result.blurred) {
+              warnings.push(`No faces detected in ${file.name}; upload will continue unblurred.`)
+            }
+          } catch (error) {
+            const message =
+              error instanceof FaceBlurError
+                ? error.message
+                : 'Unexpected error while applying face blur.'
+            warnings.push(`Face blur skipped for ${file.name}: ${message}`)
+            processed.push({
+              file,
+              preview: URL.createObjectURL(file),
+              id: generatePreviewId(),
+              facesDetected: 0,
+              blurApplied: false,
+            })
+          }
+        }
+
+        if (warnings.length > 0) {
+          setProcessingWarnings((prev) => {
+            const combined = [...prev, ...warnings]
+            return combined.slice(-4)
+          })
+        }
+
+        return processed
+      } finally {
+        setClientProcessingMessage(null)
+      }
+    },
+    [faceBlurEnabled]
+  )
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const validFiles = acceptedFiles.filter(file => {
@@ -61,12 +135,8 @@ export default function PhotoUpload({
 
     if (validFiles.length === 0) return
 
-    // Create previews for immediate feedback
-    const newPreviews: PhotoPreview[] = validFiles.map(file => ({
-      file,
-      preview: URL.createObjectURL(file),
-      id: Math.random().toString(36).substr(2, 9)
-    }))
+    const newPreviews = await processFilesForPreview(validFiles)
+    if (newPreviews.length === 0) return
 
     setPreviews(prev => [...prev, ...newPreviews])
 
@@ -150,7 +220,7 @@ export default function PhotoUpload({
         setUploadProgress(new Map())
       }, 2000)
     }
-  }, [maxSize, onUpload])
+  }, [maxSize, onUpload, processFilesForPreview])
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop,
@@ -298,8 +368,40 @@ export default function PhotoUpload({
           <div className="text-xs text-muted-foreground">
             Supported: JPEG, PNG, WebP, GIF
           </div>
+
+          {faceBlurEnabled && (
+            <div className="mt-3 text-xs font-medium text-primary">
+              Client-side face blur active
+            </div>
+          )}
         </div>
       </div>
+
+      {clientProcessingMessage && (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <RotateCcw className="w-4 h-4 animate-spin" />
+          {clientProcessingMessage}
+        </div>
+      )}
+
+      {processingWarnings.length > 0 && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold">Face blur notices</span>
+            <button
+              onClick={() => setProcessingWarnings([])}
+              className="text-xs underline decoration-dotted"
+            >
+              Clear
+            </button>
+          </div>
+          <ul className="space-y-1 text-xs list-disc list-inside">
+            {processingWarnings.map((warning, index) => (
+              <li key={`${warning}-${index}`}>{warning}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Batch Upload Progress */}
       {isUploading && uploadProgress.size > 0 && (
@@ -496,6 +598,12 @@ export default function PhotoUpload({
                   }`}>
                     {isError ? 'Failed' : isCompleted ? 'Complete' : isUploadingPhoto ? 'Uploading...' : 'Pending'}
                   </div>
+
+                  {preview.blurApplied && (
+                    <div className="absolute bottom-2 left-2 bg-black/70 text-white text-[10px] px-2 py-0.5 rounded-full">
+                      Faces blurred{typeof preview.facesDetected === 'number' ? ` (${preview.facesDetected})` : ''}
+                    </div>
+                  )}
                 </div>
               )
             })}

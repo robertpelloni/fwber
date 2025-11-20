@@ -21,6 +21,7 @@
     "@radix-ui/react-tooltip": "1.0.7",
     "@sentry/nextjs": "^10.22.0",
     "@tanstack/react-query": "^5.90.5",
+    "@vladmandic/face-api": "^1.7.15",
     "axios": "1.6.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
