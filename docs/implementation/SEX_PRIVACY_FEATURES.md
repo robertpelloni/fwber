@@ -23,6 +23,11 @@ Date: 2025-11-20
     2. Run `npm run dev` (or the Cypress suite) so the App Router sees the flag at build time.
     3. Visit any screen using `PhotoUpload` (profile editor, onboarding) → drop/import photos → use the new toggle to compare.
     4. Watch the inline “Face blur notices” list for warnings such as `no_faces_detected`—they mirror the metadata sent to the backend.
+- **Model caching prototype (2025-11-20):**
+  - `lib/faceBlur.ts` now patches `faceapi`’s fetch routine to store TinyFaceDetector weights inside the browser Cache Storage (`face-blur-models-v1`).
+  - On subsequent visits (or offline refreshes), weight requests short-circuit to the cache before hitting the CDN, trimming cold-start latency.
+  - Set `MODEL_CACHE_NAME` or bump the cache version to invalidate weights after upstream updates.
+  - Safari private browsing (or any UA where `caches` is unavailable) automatically falls back to normal network fetches.
 - **Fallback handling:**
   - Any `FaceBlurError` downgrades gracefully (upload proceeds but warning pill appears in the UI and the file remains unaltered).
   - If no faces detected, we notify the user that the image may continue unblurred.
@@ -32,9 +37,23 @@ Date: 2025-11-20
   - Ensure Photo Management + Profile screens display the banner only when the flag is on.
 - **Telemetry:** Every upload now ships metadata from the client to the backend. `PhotoController` emits `face_blur_applied` (fields: `faces_detected`, `processing_ms`, `client_backend`, filenames) whenever the helper actually blurs faces, and `face_blur_skipped_reason` capturing reasons like `no_faces_detected`, `model_load_failed`, or runtime fallbacks. Events flow through `TelemetryService` and are defined in `config/telemetry.php` + `EVENT_SCHEMA_V0_2025-11-08.md`.
 
+### Pre-upload telemetry roadmap (preview stage)
+| Event | Trigger | Payload | Destination |
+| --- | --- | --- | --- |
+| `face_blur_preview_ready` | After `blurFacesOnFile` resolves, before upload begins | `faces_detected`, `blur_applied`, `processing_ms`, `file_name`, `preview_id`, `backend` | Batched client event → `/api/telemetry` (or `TelemetryService::ingestClient()` once exposed)
+| `face_blur_preview_toggled` | User taps the Blurred/Original toggle in `PhotoUpload` | `preview_id`, `view` (`original`/`processed`), `faces_detected`, `warning?` | Same as above; useful to verify trust-building UX is used |
+| `face_blur_preview_discarded` | User removes a preview before upload | `preview_id`, `faces_detected`, `blur_applied`, `discard_reason` (`user_removed`/`validation_failed`) | Allows counting opt-outs that never reach `face_blur_applied`
+
+Implementation notes:
+- Emit these events via an upcoming `useTelemetry()` hook in the frontend; queue locally when offline and flush on next upload request.
+- Backend side simply logs them for now (via `TelemetryService::enqueueClientEvent`) so we have observability even before productizing the data.
+- These events **must not** include binary data—only metadata already captured in `face_blur_metadata` to stay GDPR-safe.
+- Once wired, update `config/telemetry.php` and `docs/EVENT_SCHEMA_V0` with the new schemas before enabling the flag in staging.
+
 - **Next steps:**
   1. Wire the same helper into any future uploaders (e.g., onboarding wizard, DM attachment composer).
   2. Coordinate with backend to reject unblurred uploads once the feature graduates from beta.
+  3. Implement the preview-stage telemetry events above so that product can measure drop-offs before upload.
 
 ## Auto-Reply Photo Game
 - Goal: increase authenticity of uploads by mirroring content back to the sender.

@@ -1,6 +1,74 @@
 import * as faceapi from '@vladmandic/face-api'
 
 const DEFAULT_MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/'
+const MODEL_CACHE_NAME = 'face-blur-models-v1'
+
+const normalizeModelRoot = (url: string) => {
+  if (!url) return DEFAULT_MODEL_URL
+  return url.endsWith('/') ? url : `${url}/`
+}
+
+const cachedModelRoots = new Set<string>()
+let fetchPatched = false
+
+const shouldCacheRequest = (requestUrl: string) => {
+  if (!requestUrl) return false
+  for (const root of cachedModelRoots) {
+    if (requestUrl.startsWith(root)) {
+      return true
+    }
+  }
+  return false
+}
+
+const patchModelFetch = async (modelUrl: string) => {
+  if (typeof window === 'undefined' || typeof caches === 'undefined') {
+    return
+  }
+
+  const normalizedUrl = normalizeModelRoot(modelUrl)
+  cachedModelRoots.add(normalizedUrl)
+
+  if (fetchPatched) return
+
+  const originalFetch: typeof fetch = (faceapi.env.fetch as typeof fetch) || fetch
+
+  const cachingFetch: typeof fetch = async (input, init) => {
+    if (typeof caches === 'undefined') {
+      return originalFetch(input as RequestInfo, init)
+    }
+
+    const request = typeof input === 'string' || input instanceof URL
+      ? new Request(input, init)
+      : input instanceof Request
+        ? input
+        : new Request(String(input), init)
+
+    if (request.method !== 'GET' || !shouldCacheRequest(request.url)) {
+      return originalFetch(input as RequestInfo, init)
+    }
+
+    try {
+      const cache = await caches.open(MODEL_CACHE_NAME)
+      const cachedResponse = await cache.match(request)
+      if (cachedResponse) {
+        return cachedResponse.clone()
+      }
+
+      const networkResponse = await originalFetch(request, init)
+      if (networkResponse && networkResponse.ok) {
+        await cache.put(request, networkResponse.clone())
+      }
+      return networkResponse
+    } catch (error) {
+      console.warn('[face-blur] cache fetch failed, falling back to network', error)
+      return originalFetch(request, init)
+    }
+  }
+
+  faceapi.env.monkeyPatch({ fetch: cachingFetch })
+  fetchPatched = true
+}
 
 export type FaceBlurErrorCode = 'UNSUPPORTED_ENV' | 'MODEL_LOAD_FAILED' | 'PROCESSING_FAILED'
 
@@ -62,7 +130,14 @@ const ensureModelsLoaded = async (modelUrl = DEFAULT_MODEL_URL) => {
       await tf.ready?.()
     }
 
-    await faceapi.nets.tinyFaceDetector.loadFromUri(modelUrl)
+    const normalizedModelUrl = normalizeModelRoot(modelUrl)
+    try {
+      await patchModelFetch(normalizedModelUrl)
+    } catch (error) {
+      console.warn('[face-blur] model caching disabled', error)
+    }
+
+    await faceapi.nets.tinyFaceDetector.loadFromUri(normalizedModelUrl)
   })()
 
   return modelLoadPromise
