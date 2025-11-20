@@ -17,6 +17,7 @@ This guide provides comprehensive testing procedures for the FWBer frontend appl
 ### Development Environment
 - Node.js 18+ installed
 - Backend API running on `http://localhost:8000` (or configured API endpoint)
+- Port `3005` available locally (Next.js dev server + Cypress e2e rely on it)
 - Test user accounts with different roles/permissions
 - Browser DevTools familiarity (Console, Network, Application tabs)
 
@@ -612,14 +613,20 @@ npm run test:coverage
 ### Integration Tests
 
 ```bash
-# If using Playwright or Cypress
+# Cypress E2E suite (auto-starts Next.js dev server on http://localhost:3005)
 npm run test:e2e
 
-# Key flows to test:
+# Targeted specs
+npm run test:e2e:pulse
+npm run test:e2e:matching
+
+# Key flows to observe in any run:
 # - Complete registration → profile setup → discovery
 # - Match creation → messaging
 # - Photo upload → tier progression → photo access
 ```
+
+> **Note:** The scripts above use `start-server-and-test` to launch `npm run dev:3005` and wait for `http://localhost:3005` before executing Cypress. Make sure the Laravel API is reachable at `http://localhost:8000` (or adjust `NEXT_PUBLIC_API_URL`).
 
 ### Visual Regression Tests
 
@@ -683,6 +690,6 @@ When you find a bug, report it with:
 
 ---
 
-**Last Updated:** November 4, 2025
+**Last Updated:** November 20, 2025
 
 For questions or suggestions about this testing guide, please contact the development team.
