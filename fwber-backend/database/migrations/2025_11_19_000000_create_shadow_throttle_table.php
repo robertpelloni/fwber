@@ -47,30 +47,6 @@ return new class extends Migration
             $table->index(['suspicion_score', 'is_confirmed_spoof']);
             $table->index('ip_address');
         });
-
-        Schema::create('moderation_actions', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('moderator_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('target_user_id')->nullable()->constrained('users')->onDelete('cascade');
-            $table->foreignId('target_artifact_id')->nullable()->constrained('proximity_artifacts')->onDelete('cascade');
-            $table->enum('action_type', [
-                'flag_review',
-                'content_removal',
-                'shadow_throttle',
-                'warning_issued',
-                'account_suspension',
-                'account_ban',
-                'geo_spoof_confirm',
-                'geo_spoof_dismiss'
-            ]);
-            $table->text('reason');
-            $table->json('metadata')->nullable(); // Additional context data
-            $table->timestamps();
-
-            $table->index(['moderator_id', 'created_at']);
-            $table->index(['target_user_id', 'action_type']);
-            $table->index('created_at');
-        });
     }
 
     /**
@@ -78,7 +54,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('moderation_actions');
         Schema::dropIfExists('geo_spoof_detections');
         Schema::dropIfExists('shadow_throttles');
     }

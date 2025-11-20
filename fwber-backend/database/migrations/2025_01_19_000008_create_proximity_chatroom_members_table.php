@@ -35,9 +35,9 @@ return new class extends Migration
             $table->foreign('proximity_chatroom_id')->references('id')->on('proximity_chatrooms')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->unique(['proximity_chatroom_id', 'user_id']);
-            $table->index(['proximity_chatroom_id', 'is_visible']);
-            $table->index(['proximity_chatroom_id', 'is_networking']);
-            $table->index(['proximity_chatroom_id', 'is_social']);
+            $table->index(['proximity_chatroom_id', 'is_visible'], 'pcm_room_visible_idx');
+            $table->index(['proximity_chatroom_id', 'is_networking'], 'pcm_room_networking_idx');
+            $table->index(['proximity_chatroom_id', 'is_social'], 'pcm_room_social_idx');
             $table->index('last_seen_at');
             $table->index('last_location_update');
         });

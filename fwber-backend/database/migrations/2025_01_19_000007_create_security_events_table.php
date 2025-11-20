@@ -19,8 +19,7 @@ return new class extends Migration
             $table->text('user_agent')->nullable();
             $table->enum('severity', ['low', 'medium', 'high', 'critical'])->default('low');
             $table->json('context')->nullable();
-            $table->timestamp('created_at');
-            $table->timestamp('updated_at');
+            $table->timestamps();
             
             $table->index(['event', 'created_at']);
             $table->index(['user_id', 'created_at']);
