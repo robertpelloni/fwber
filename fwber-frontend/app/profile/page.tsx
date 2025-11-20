@@ -9,6 +9,7 @@ import PhotoUpload from '@/components/PhotoUpload'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Camera, Star } from 'lucide-react'
 import { ProfileCompletenessBar, ProfileCompletenessChecklist, calculateProfileCompleteness, type ProfileField } from '@/lib/profileCompleteness'
+import PhysicalProfileEditor from '@/components/PhysicalProfileEditor'
 
 export default function ProfilePage() {
   const { isAuthenticated, user, token, isLoading: authLoading } = useAuth()
@@ -1048,6 +1049,11 @@ export default function ProfilePage() {
               </button>
             </div>
           </form>
+        </div>
+
+        {/* Physical Profile Section */}
+        <div className="mt-8">
+          <PhysicalProfileEditor />
         </div>
       </div>
     </div>

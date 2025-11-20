@@ -4,6 +4,8 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { getConversations, getMessages, sendMessage, type Conversation, type Message } from '@/lib/api/messages'
+import ReportModal from '@/components/ReportModal'
+import { blockUser, reportUser } from '@/lib/api/safety'
 
 export default function MessagesPage() {
   const { token, isAuthenticated, user } = useAuth()
@@ -14,6 +16,8 @@ export default function MessagesPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false)
+  const [showSafetyMenu, setShowSafetyMenu] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const loadConversations = useCallback(async () => {
@@ -79,6 +83,35 @@ export default function MessagesPage() {
     } finally {
       setIsSending(false)
     }
+  }
+
+  const handleBlock = async () => {
+    if (!token || !selectedConversation || !confirm('Are you sure you want to block this user? You will no longer see their messages or profile.')) return
+    
+    try {
+      await blockUser(token, selectedConversation.other_user.id)
+      setConversations(prev => prev.filter(c => c.id !== selectedConversation.id))
+      setSelectedConversation(null)
+      setShowSafetyMenu(false)
+    } catch (err) {
+      alert('Failed to block user')
+    }
+  }
+
+  const handleReport = async (reason: string, details: string) => {
+    if (!token || !selectedConversation) return
+    await reportUser(token, selectedConversation.other_user.id, reason, details)
+    
+    if (confirm('Report submitted. Do you want to block this user as well?')) {
+      try {
+        await blockUser(token, selectedConversation.other_user.id)
+        setConversations(prev => prev.filter(c => c.id !== selectedConversation.id))
+        setSelectedConversation(null)
+      } catch (err) {
+        console.error('Failed to block after report', err)
+      }
+    }
+    setShowSafetyMenu(false)
   }
 
   const formatMessageTime = (timestamp: string) => {
@@ -212,7 +245,7 @@ export default function MessagesPage() {
                 {selectedConversation ? (
                   <>
                     {/* Chat Header */}
-                    <div className="p-4 border-b">
+                    <div className="p-4 border-b flex justify-between items-center">
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
                           {selectedConversation.other_user?.profile?.display_name?.[0] || '?'}
@@ -227,6 +260,40 @@ export default function MessagesPage() {
                             }
                           </p>
                         </div>
+                      </div>
+                      
+                      <div className="relative">
+                        <button
+                          onClick={() => setShowSafetyMenu(!showSafetyMenu)}
+                          className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100"
+                          aria-label="Chat options"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                          </svg>
+                        </button>
+                        
+                        {showSafetyMenu && (
+                          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
+                            <div className="py-1">
+                              <button
+                                onClick={() => {
+                                  setIsReportModalOpen(true)
+                                  setShowSafetyMenu(false)
+                                }}
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              >
+                                Report User
+                              </button>
+                              <button
+                                onClick={handleBlock}
+                                className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                              >
+                                Block User
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -290,6 +357,15 @@ export default function MessagesPage() {
           )}
         </div>
       </div>
+      
+      {selectedConversation && (
+        <ReportModal
+          isOpen={isReportModalOpen}
+          onClose={() => setIsReportModalOpen(false)}
+          onSubmit={handleReport}
+          userName={selectedConversation.other_user?.profile?.display_name || 'User'}
+        />
+      )}
     </ProtectedRoute>
   )
 }
