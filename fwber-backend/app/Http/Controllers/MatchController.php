@@ -170,7 +170,7 @@ class MatchController extends Controller
             return $match->user1_id === $user->id ? $match->user2_id : $match->user1_id;
         });
 
-        $users = User::with('profile.photos')->whereIn('id', $userIds)->get();
+        $users = User::with(['profile', 'photos'])->whereIn('id', $userIds)->get();
 
         // Format as "Conversation" objects for frontend compatibility
         $conversations = $users->map(function ($otherUser) use ($user, $matches) {

@@ -284,7 +284,7 @@ export default function MatchesDashboardPage() {
                         )}
                       </div>
                       <div className="text-sm font-semibold text-purple-600 dark:text-purple-400">
-                        {Math.round(match.compatibility_score * 100)}%
+                        {Math.round(match.compatibilityScore * 100)}%
                       </div>
                     </div>
 
@@ -314,13 +314,13 @@ export default function MatchesDashboardPage() {
                     {/* Actions */}
                     <div className="flex gap-2">
                       <Link
-                        href={`/messages?userId=${match.matched_user_id}`}
+                        href={`/messages?userId=${match.id}`}
                         className="flex-1 bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium text-center"
                       >
                         Message
                       </Link>
                       <Link
-                        href={`/profile/${match.matched_user_id}`}
+                        href={`/profile/${match.id}`}
                         className="flex-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm font-medium text-center"
                       >
                         View Profile

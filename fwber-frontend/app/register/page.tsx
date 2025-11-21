@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { blurFacesOnFile } from '@/lib/faceBlur'
 import { isFeatureEnabled } from '@/lib/featureFlags'
 
@@ -15,6 +16,7 @@ export default function RegisterPage() {
     passwordConfirmation: '',
   })
   const [avatar, setAvatar] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [validationError, setValidationError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
@@ -37,9 +39,23 @@ export default function RegisterPage() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setAvatar(e.target.files[0])
+      const file = e.target.files[0]
+      setAvatar(file)
+      
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+      }
+      setPreviewUrl(URL.createObjectURL(file))
     }
   }
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+      }
+    }
+  }, [previewUrl])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -157,6 +173,19 @@ export default function RegisterPage() {
                   hover:file:bg-blue-100"
                 onChange={handleFileChange}
               />
+              {previewUrl && (
+                <div className="mt-4">
+                  <p className="text-sm text-gray-500 mb-2">Preview:</p>
+                  <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-gray-200">
+                    <Image
+                      src={previewUrl}
+                      alt="Avatar preview"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
             
             <div>

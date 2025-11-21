@@ -77,7 +77,7 @@ export default function MatchesPage() {
 
       const response = await performMatchAction(token, currentMatch.id, action)
       
-      if (response.match_created) {
+      if (response.is_match) {
         setMatchedUserProfile({
           name: currentMatch.profile?.display_name || 'Match',
           photoUrl: currentMatch.profile?.photos?.[0]?.url || '/placeholder-user.jpg'
@@ -102,7 +102,7 @@ export default function MatchesPage() {
     if (!token || !currentMatch) return
     
     // Use matched_user_id as the target
-    const targetUserId = currentMatch.matched_user_id
+    const targetUserId = currentMatch.id
     
     await reportUser(token, targetUserId, reason, details)
     
@@ -263,7 +263,7 @@ export default function MatchesPage() {
                 <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
                   <div className="bg-white bg-opacity-90 rounded-full px-3 py-1">
                     <span className="text-sm font-semibold text-gray-900">
-                      {Math.round(currentMatch.compatibility_score * 100)}% Match
+                      {Math.round(currentMatch.compatibilityScore * 100)}% Match
                     </span>
                   </div>
                   <RelationshipTierBadge
@@ -392,7 +392,7 @@ export default function MatchesPage() {
                       <div>
                         <span className="font-medium text-gray-700">Compatibility Score:</span>
                         <span className="ml-2 text-gray-600">
-                          {Math.round(currentMatch.compatibility_score * 100)}%
+                          {Math.round(currentMatch.compatibilityScore * 100)}%
                         </span>
                       </div>
                       <div>
