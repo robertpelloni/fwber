@@ -11,9 +11,12 @@ Date: 2025-11-20
   - "Everybody wants to get laid"
   - "Every body likes sex"
   - "Every body gets horny"
-- **Status**: Implemented in `components/SexQuote.tsx` and rendered on hero + proximity surfaces.
+- **Status**: ✅ Implemented in `components/SexQuote.tsx` and rendered on hero + proximity surfaces (homepage hero + proximity feed).
 - **Display Targets**: Homepage hero tagline, Pulse/Proximity screens (already mounted), future dashboard surfaces.
-- **Next Actions**: Externalize quotes to CMS/JSON for easier moderation, add analytics event for quote impressions, document governance in upcoming storytelling guide.
+- **Next Actions**:
+  1. Externalize quotes to CMS/JSON for easier moderation.
+  2. Add an analytics event for quote impressions (`quote_impression`).
+  3. Document governance + storytelling guidelines in the content strategy doc.
 
 ## 2. Client-Side Face Blurring
 **Goal**: Automatically detect and blur faces in user-uploaded photos before they are saved or shared.
@@ -29,15 +32,14 @@ Date: 2025-11-20
   3. Render preview canvas showing blurred/unblurred comparison.
   4. Persist blurred bitmap locally; upload only if user explicitly shares.
 - **Open Questions**: Performance on low-end devices, fallback UX when detection fails, guideline for multi-face images.
-- **Status**: **Beta** behind `NEXT_PUBLIC_FEATURE_CLIENT_FACE_BLUR`. `components/PhotoUpload.tsx` processes files via `lib/faceBlur.ts`, attaches telemetry, and uploads blurred files by default.
+- **Status**: **Beta** behind `NEXT_PUBLIC_FEATURE_CLIENT_FACE_BLUR`. `components/PhotoUpload.tsx` processes files via `lib/faceBlur.ts`, attaches telemetry, uploads blurred files by default, and now exposes both inline toggles and a modal slider for before/after comparison while revoking object URLs on cleanup.
 - **Current Coverage**:
   - Metadata: `face_blur_metadata` appended client-side and consumed by `PhotoController::emitFaceBlurTelemetry()`.
-  - UX: warnings surface when faces are missing or blur fails; Cypress tests still cover default (non-blur) path.
-- **Next Actions**:
-  1. Add blurred vs. original preview comparison (in progress).
-  2. Cache detection models per browser session to reduce first-load latency.
-  3. Emit telemetry for preview deletions / skipped uploads so privacy metrics stay accurate.
-  4. Publish beta enablement instructions in docs/testing once compare UX lands.
+  - UX: warnings surface when faces are missing or blur fails; compare toggle + slider modal shipping in `PhotoUpload`; Cypress tests still cover default (non-blur) path.
+- **Next Actions (2025-11-22)**:
+  1. Cache detection models per browser session to reduce first-load latency (Cache Storage + IndexedDB hardening).
+  2. Emit telemetry for preview deletions / skipped uploads so privacy metrics capture opt-outs.
+  3. Publish beta enablement instructions (flag settings, warnings, slider usage) in docs/testing now that compare UX is live.
 
 ## 3. "Face Reveal" Game & Auto-Reply
 **Goal**: Gamify photo sharing.
@@ -73,7 +75,7 @@ Date: 2025-11-20
 - **Risks**: Backup complexity, quota limits (~2GB desktop, ~50MB mobile), accessibility when user clears site data.
 - **Spike Doc**: `docs/implementation/spikes/LOCAL_MEDIA_VAULT_SPIKE_2025-11-20.md` outlines architecture + constraints for the beta.
 
-## Immediate Next Steps
-1. Finalize client-side face blur beta compare UX + model caching.
+## Immediate Next Steps (Late November 2025)
+1. Harden client-side face blur beta: ship model caching + preview telemetry visibility and document enablement instructions.
 2. Outline Face Reveal + Auto-Reply experiment scope and feature flag requirements.
 3. Draft Local Media Vault spike (encryption + storage constraints) for upcoming sprint.

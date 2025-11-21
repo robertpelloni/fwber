@@ -17,8 +17,22 @@ Date: 2025-11-20
 - **Preview comparison workflow (2025-11-22):**
   - `PhotoUpload` caches both the original object URL and a blurred derivative for every processed file and keeps them in sync with `face_blur_metadata.previewId`.
   - A floating Blurred/Original toggle appears on each preview (only when blur actually ran) so QA can quickly confirm the applied transformation.
-  - A dedicated “Compare blur” overlay exposes an interactive before/after slider (original on the left, blurred on the right) so privacy reviewers can drag the handle and inspect small regions before approving the upload.
+  - A dedicated “Compare blur” overlay exposes an interactive before/after slider (original on the left, blurred on the right) so privacy reviewers can drag the handle and inspect small regions before approving the upload. The overlay closes via ✕ or `Esc`, and we reset the slider to 50/50 every time it opens.
   - We default to the blurred view, remember the user’s choice per preview, and simultaneously clean up both object URLs whenever the preview is removed, the upload completes, or the component unmounts.
+
+### Beta enablement + QA checklist (2025-11-22)
+1. Set `NEXT_PUBLIC_FEATURE_CLIENT_FACE_BLUR=true` in `fwber-frontend/.env.local` (already mirrored in `.env.example`).
+2. Restart the Next.js dev server (`npm run dev`) or rebuild before launching Cypress so the App Router picks up the flag.
+3. Visit any screen that uses `PhotoUpload` (profile editor, onboarding, DM attachment composer once wired), drag in at least two photos, and confirm:
+  - Shield banner announces the blur beta.
+  - Blurred previews default on, with the Blurred/Original pill + the new "Compare blur" overlay accessible from the hover action.
+  - Face blur notices surface warnings (e.g., `no_faces_detected`, `model_init_failed`) that match `face_blur_metadata.warningMessage`.
+4. Telemetry expectations while the beta flag is on:
+  - `face_blur_preview_ready` fires after local processing with `previewId`, `faces_detected`, `blur_applied`, `processing_ms`, `backend`, and any warning/skipped reason.
+  - `face_blur_preview_toggled` fires when a user taps the Blurred/Original pill or slider entry point, including `previewId`, `view`, and warning context.
+  - `face_blur_preview_discarded` fires whenever a preview is removed before upload with `discard_reason` + detection metadata.
+  - All three events batch through `/api/telemetry/client-events` (authenticated) and piggyback on `TelemetryService::enqueueClientEvent()`; uploads still emit `face_blur_applied` or `face_blur_skipped_reason` once `PhotoController` receives the file.
+5. Clean up: removing a preview or completing an upload should revoke both object URLs—verify via DevTools `chrome://blob-internals` or memory snapshot if needed.
   - ⚙️ Enablement steps:
     1. Set `NEXT_PUBLIC_FEATURE_CLIENT_FACE_BLUR=true` in `fwber-frontend/.env.local` (already listed in `.env.example`).
     2. Run `npm run dev` (or the Cypress suite) so the App Router sees the flag at build time.

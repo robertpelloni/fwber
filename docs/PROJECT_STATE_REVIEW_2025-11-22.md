@@ -30,7 +30,7 @@ _Primary author: GitHub Copilot (GPT-5.1-Codex)_
 ## 4. Gap Analysis & Risks
 | Area | Gap | Recommended Mitigation |
 | --- | --- | --- |
-| Face blur UX | Users cannot compare blurred vs. original previews, making trust-building difficult for the beta. | Add dual preview URLs + toggle controls inside `PhotoUpload`. Surface warnings inline.
+| Face blur docs & enablement | Beta flag steps and reviewer expectations are easy to miss during onboarding. | Publish and maintain a checklist covering flag setup, compare overlay usage, and warning interpretation (see Section 2 + `/docs/implementation/SEX_PRIVACY_FEATURES.md`).
 | Telemetry visibility | Only successful uploads produce events; skipped previews that users delete are invisible. | Extend telemetry plan to emit client-side events (or collect counts) before upload completion.
 | Roadmap alignment | Roadmap doc still lists face blur as "Researching" and lacks up-to-date statuses. | Refresh `docs/roadmap/ROADMAP_EXPANSION_2025-11-20.md` with new reality + next milestones.
 | Future features | No technical spikes yet for "Face Reveal" or "Local-First Vault". | Schedule research tickets following blur UX improvements; define feature flags now to reduce later churn.
@@ -40,7 +40,7 @@ _Primary author: GitHub Copilot (GPT-5.1-Codex)_
    - ✅ Capture both original and blurred object URLs per preview.
    - ✅ Provide a unified before/after comparison (thumbnail toggle + slider modal) so users can visually verify the blur.
    - ✅ Revoke all object URLs on cleanup to avoid leaks.
-   - Document how to enable the beta and interpret warnings.
+   - ✅ Document how to enable the beta and interpret warnings.
 2. **Update roadmap + docs (Current sprint)**
    - Mark SexQuote as complete, face blur as "Beta behind env flag".
    - Add follow-up tasks: client telemetry enhancements, model caching, preview comparison.
@@ -51,7 +51,7 @@ _Primary author: GitHub Copilot (GPT-5.1-Codex)_
 ## 6. Action Items Logged
 - [x] Implement blur comparison UX in `PhotoUpload` (see Section 5.1).
 - [ ] Update roadmap doc per Section 5.2.
-- [ ] Add beta documentation describing enabling `NEXT_PUBLIC_FEATURE_CLIENT_FACE_BLUR` and expected telemetry signals.
+- [x] Add beta documentation describing enabling `NEXT_PUBLIC_FEATURE_CLIENT_FACE_BLUR` and expected telemetry signals.
 - [ ] Prepare spike outlines for Face Reveal game + encrypted vault (post-beta).
 
 _This review supersedes the November 15 agent findings and should be revisited after the blur beta ships to production testers._
