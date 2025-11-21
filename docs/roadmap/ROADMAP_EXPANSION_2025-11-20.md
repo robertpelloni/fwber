@@ -36,6 +36,7 @@ Date: 2025-11-20
 - **Current Coverage**:
   - Metadata: `face_blur_metadata` appended client-side and consumed by `PhotoController::emitFaceBlurTelemetry()`.
   - UX: warnings surface when faces are missing or blur fails; compare toggle + slider modal shipping in `PhotoUpload`; Cypress tests still cover default (non-blur) path.
+  - **Note**: Telemetry expansion to Messaging and Registration is currently blocked as those features do not yet support file uploads.
 - **Next Actions (2025-11-22)**:
   1. Cache detection models per browser session to reduce first-load latency (Cache Storage + IndexedDB hardening).
   2. Emit telemetry for preview deletions / skipped uploads so privacy metrics capture opt-outs.

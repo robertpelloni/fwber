@@ -29,11 +29,14 @@ The FWBer project has reached a stable milestone. Both the Laravel backend and N
 - **Language:** TypeScript
 - **Build Status:** Passing (`npm run build`)
 - **Type Check:** Passing (`npm run type-check`)
+- **Test Status:**
+  - **Proximity Feed:** Cypress tests passing (`npm run test:e2e:pulse`).
 - **Recent Fixes:**
   - **`components/SwipeableCard.tsx`**: Rewrote broken component logic (syntax errors, event handling).
   - **`components/EnhancedProfileEditor.tsx`**: Fixed import typos (`@tanstack/react-query`) and JSX escaping.
   - **`lib/api/client.ts`**: Improved error type safety.
   - **General**: Resolved ESLint errors across multiple files (`react/no-unescaped-entities`).
+  - **Telemetry**: `usePreviewTelemetry` integrated into `PhotoUpload.tsx` (Profile/Photos).
 
 ## 3. Integration & Configuration
 - **Frontend API URL:** Configured to `http://localhost:8010/api` in `.env.local`.
@@ -41,6 +44,9 @@ The FWBer project has reached a stable milestone. Both the Laravel backend and N
 - **Authentication:** Frontend configured to use NextAuth with Laravel Sanctum.
 
 ## 4. Known Issues / Notes
+- **Missing Features:**
+  - **Messaging:** Text-only; no file/image attachment support yet.
+  - **Registration:** Text-only; no avatar upload step during sign-up.
 - **Legacy Feature Cards:** The dashboard contains a "Show all features" toggle for legacy/dev features.
 - **Images:** Some components use `<img>` tags instead of `next/image`. This generates warnings but does not break the build.
 - **Metadata:** Some pages have metadata warnings (viewport/themeColor) that should be moved to `generateViewport` in a future refactor.
