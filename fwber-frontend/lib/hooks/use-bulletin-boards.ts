@@ -71,21 +71,10 @@ export function usePostMessage() {
       return api.postMessage(boardId, content, location, options);
     },
     onSuccess: (data, variables) => {
-      // Optimistically update the messages cache
-      queryClient.setQueryData(
-        ['bulletin-board-messages', variables.boardId],
-        (old: any) => {
-          if (!old) return old;
-          return {
-            ...old,
-            messages: {
-              ...old.messages,
-              data: [data.message, ...old.messages.data],
-              total: old.messages.total + 1,
-            }
-          };
-        }
-      );
+      // Invalidate messages for this board to trigger a re-fetch
+      queryClient.invalidateQueries({
+        queryKey: ['bulletin-board-messages', variables.boardId],
+      });
       
       // Invalidate and refetch nearby boards to update activity
       queryClient.invalidateQueries({

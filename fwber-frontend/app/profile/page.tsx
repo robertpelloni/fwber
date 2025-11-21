@@ -825,11 +825,11 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label htmlFor="body_type" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="pref_body_type" className="block text-sm font-medium text-gray-700">
                     Body Type Preference
                   </label>
                   <select
-                    id="body_type"
+                    id="pref_body_type"
                     value={formData.preferences.body_type}
                     onChange={(e) => handlePreferenceChange('body_type', e.target.value)}
                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"

@@ -26,10 +26,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/not-found.js"
     ],
-    "/pulse/page": [
+    "/bulletin-boards/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/pulse/page.js"
+      "static/chunks/app/bulletin-boards/page.js"
     ]
   }
 }
