@@ -6,6 +6,7 @@ export interface FaceBlurTelemetryMetadata {
   originalFileName?: string
   processedFileName?: string
   warningMessage?: string
+  previewId?: string
 }
 
 export type FileWithFaceBlurMetadata = File & {

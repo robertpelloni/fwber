@@ -77,8 +77,9 @@ export default function PhotoUpload({
     (previewId: string, file: FileWithFaceBlurMetadata) => {
       if (!file?.faceBlurMetadata) return
       const metadata = file.faceBlurMetadata
+      const resolvedPreviewId = metadata.previewId ?? previewId
       trackPreviewReady({
-        previewId,
+        previewId: resolvedPreviewId,
         fileName: metadata.originalFileName ?? file.name,
         facesDetected: metadata.facesDetected,
         blurApplied: Boolean(metadata.blurApplied),
@@ -127,6 +128,7 @@ export default function PhotoUpload({
           try {
             const result = await blurFacesOnFile(file)
             const metadata = {
+              previewId,
               facesDetected: result.facesFound,
               blurApplied: result.blurred,
               processingTimeMs: result.processingTimeMs,
@@ -143,6 +145,7 @@ export default function PhotoUpload({
               const warning = `No faces detected in ${file.name}; upload will continue unblurred.`
               warnings.push(warning)
               processedFile = attachFaceBlurMetadata(result.file, {
+                previewId,
                 ...metadata,
                 skippedReason: 'no_faces_detected',
                 warningMessage: warning,
@@ -170,6 +173,7 @@ export default function PhotoUpload({
             warnings.push(warning)
             const skippedReason = error instanceof FaceBlurError ? error.code.toLowerCase() : 'processing_failed'
             const processedFile = attachFaceBlurMetadata(file, {
+              previewId,
               facesDetected: 0,
               blurApplied: false,
               skippedReason,

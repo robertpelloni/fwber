@@ -568,6 +568,7 @@ class PhotoController extends Controller
             'originalFileName',
             'processedFileName',
             'warningMessage',
+            'previewId',
         ];
 
         $filtered = array_intersect_key($decoded, array_flip($allowedKeys));
@@ -596,6 +597,10 @@ class PhotoController extends Controller
             $filtered['originalFileName'] = (string) $filtered['originalFileName'];
         }
 
+        if (isset($filtered['previewId'])) {
+            $filtered['previewId'] = (string) $filtered['previewId'];
+        }
+
         return $filtered;
     }
 
@@ -617,6 +622,7 @@ class PhotoController extends Controller
                 'processing_ms' => $metadata['processingTimeMs'] ?? null,
                 'client_backend' => 'client',
                 'warning' => $metadata['warningMessage'] ?? null,
+                'preview_id' => $metadata['previewId'] ?? null,
             ]);
             return;
         }
@@ -629,6 +635,7 @@ class PhotoController extends Controller
                 'reason' => (string) $metadata['skippedReason'],
                 'faces_detected' => isset($metadata['facesDetected']) ? (int) $metadata['facesDetected'] : null,
                 'warning' => $metadata['warningMessage'] ?? null,
+                'preview_id' => $metadata['previewId'] ?? null,
             ]);
         }
     }

@@ -45,6 +45,7 @@ return [
             'processing_ms' => 'nullable|integer|min:0',
             'client_backend' => 'required|string|in:client,server',
             'warning' => 'nullable|string',
+            'preview_id' => 'nullable|string',
         ],
         'face_blur_skipped_reason' => [
             'user_id' => 'required|integer',
@@ -53,6 +54,7 @@ return [
             'reason' => 'required|string',
             'faces_detected' => 'nullable|integer|min:0',
             'warning' => 'nullable|string',
+            'preview_id' => 'nullable|string',
         ],
         'face_blur_preview_ready' => [
             'user_id' => 'required|integer',
