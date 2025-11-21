@@ -89,9 +89,9 @@ export async function getMatches(token: string): Promise<Match[]> {
     profile: {
       display_name: m.name,
       bio: m.bio,
-      age: null, // Not returned by MatchResource currently
-      gender: null,
-      looking_for: [],
+      age: m.age || null,
+      gender: m.gender || null,
+      looking_for: m.looking_for || [],
       location: {
         latitude: null,
         longitude: null,

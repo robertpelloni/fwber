@@ -46,10 +46,10 @@ describe('Proximity Feed (Local Pulse)', () => {
           {
             id: 101,
             user_id: 2,
-            type: 'text',
+            type: 'board_post',
             content: 'Anyone want to play frisbee?',
-            latitude: 40.7128,
-            longitude: -74.0060,
+            lat: 40.7128,
+            lng: -74.0060,
             created_at: new Date().toISOString(),
             expires_at: new Date(Date.now() + 86400000).toISOString(),
             distance: 50
@@ -65,10 +65,10 @@ describe('Proximity Feed (Local Pulse)', () => {
         data: {
           id: 102,
           user_id: 1,
-          type: 'text',
+          type: 'board_post',
           content: 'New post content',
-          latitude: 40.7128,
-          longitude: -74.0060,
+          lat: 40.7128,
+          lng: -74.0060,
           created_at: new Date().toISOString(),
           expires_at: new Date(Date.now() + 86400000).toISOString(),
           distance: 0
@@ -109,7 +109,8 @@ describe('Proximity Feed (Local Pulse)', () => {
 
     // Check for existing artifact
     cy.contains('Anyone want to play frisbee?', { timeout: 10000 }).should('be.visible');
-    cy.contains('50m away').should('be.visible');
+    // Since we calculate distance locally and coordinates are identical in mock, it should be 0m
+    cy.contains('0m away').should('be.visible');
 
     // Post new artifact
     cy.get('textarea[placeholder*="What\'s happening"]').type('New post content');
@@ -117,7 +118,7 @@ describe('Proximity Feed (Local Pulse)', () => {
 
     cy.wait('@createArtifact').its('request.body').should('include', {
       content: 'New post content',
-      type: 'text'
+      type: 'board_post'
     });
   });
 });

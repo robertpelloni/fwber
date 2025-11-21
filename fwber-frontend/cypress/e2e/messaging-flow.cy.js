@@ -43,21 +43,20 @@ describe('Messaging Flow', () => {
       }
     }).as('getUser');
 
-    // Mock matches feed
+    // Mock matches feed (Flat structure as per API)
     cy.intercept('GET', '**/api/matches*', {
       statusCode: 200,
       body: {
-        data: [
+        matches: [
           {
             id: 2,
-            compatibility_score: 0.9,
-            profile: {
-              display_name: 'Future Partner',
-              age: 25,
-              bio: 'I like hiking',
-              location: { city: 'New York', state: 'NY' },
-              photos: [{ url: '/images/test-avatar.svg' }]
-            }
+            name: 'Future Partner',
+            bio: 'I like hiking',
+            age: 25,
+            locationDescription: 'New York, NY',
+            avatarUrl: '/images/test-avatar.svg',
+            compatibilityScore: 0.9,
+            distance: 5
           }
         ]
       }
@@ -68,13 +67,13 @@ describe('Messaging Flow', () => {
       statusCode: 200,
       body: {
         action: 'like',
-        match_created: true,
+        is_match: true,
         message: "It's a match!"
       }
     }).as('mutualMatch');
 
-    // Mock conversations list
-    cy.intercept('GET', '**/api/conversations', {
+    // Mock conversations list (matches/established)
+    cy.intercept('GET', '**/api/matches/established', {
       statusCode: 200,
       body: {
         data: [
@@ -87,10 +86,13 @@ describe('Messaging Flow', () => {
             other_user: {
               id: 2,
               email: 'partner@example.com',
+              name: 'Future Partner',
               profile: {
                 display_name: 'Future Partner',
                 age: 25,
-                photos: [{ url: '/images/test-avatar.svg' }]
+                bio: 'I like hiking',
+                location_description: 'New York, NY',
+                avatar_url: '/images/test-avatar.svg'
               }
             }
           }
@@ -98,23 +100,31 @@ describe('Messaging Flow', () => {
       }
     }).as('getConversations');
 
-    // Mock messages for conversation 101
-    cy.intercept('GET', '**/api/conversations/101/messages', {
+    // Mock messages for user 2
+    cy.intercept('GET', '**/api/messages/2', {
       statusCode: 200,
       body: {
-        data: []
+        messages: []
       }
     }).as('getMessages');
 
+    // Mock mark as read
+    cy.intercept('POST', '**/api/messages/mark-all-read/2', {
+      statusCode: 200,
+      body: { success: true }
+    }).as('markRead');
+
     // Mock sending message
-    cy.intercept('POST', '**/api/conversations/101/messages', {
+    cy.intercept('POST', '**/api/messages', {
       statusCode: 201,
       body: {
-        data: {
+        message: {
           id: 1,
           conversation_id: 101,
           sender_id: 1,
+          receiver_id: 2,
           content: 'Hello!',
+          message_type: 'text',
           created_at: new Date().toISOString()
         }
       }

@@ -21,38 +21,26 @@ describe('Matching Flow', () => {
     cy.intercept('GET', '**/api/matches*', {
       statusCode: 200,
       body: {
-        data: [
+        matches: [
           {
             id: 2,
-            compatibility_score: 0.9,
-            profile: {
-              display_name: 'Potential Match',
-              age: 25,
-              bio: 'I like hiking',
-              location: {
-                city: 'New York',
-                state: 'NY'
-              },
-              photos: [
-                { url: '/images/test-avatar.svg' }
-              ]
-            }
+            name: 'Potential Match',
+            bio: 'I like hiking',
+            age: 25,
+            locationDescription: 'New York, NY',
+            avatarUrl: '/images/test-avatar.svg',
+            compatibilityScore: 0.9,
+            distance: 5
           },
           {
             id: 3,
-            compatibility_score: 0.85,
-            profile: {
-              display_name: 'Another Match',
-              age: 28,
-              bio: 'Coffee lover',
-              location: {
-                city: 'Brooklyn',
-                state: 'NY'
-              },
-              photos: [
-                { url: '/images/test-avatar.svg' }
-              ]
-            }
+            name: 'Another Match',
+            bio: 'Coffee lover',
+            age: 28,
+            locationDescription: 'Brooklyn, NY',
+            avatarUrl: '/images/test-avatar.svg',
+            compatibilityScore: 0.85,
+            distance: 10
           }
         ]
       }
@@ -130,7 +118,7 @@ describe('Matching Flow', () => {
     // Verify API call
     cy.wait('@matchAction').its('request.body').should('deep.equal', {
       action: 'like',
-      match_id: 2
+      target_user_id: 2
     });
 
     // Verify next card appears
@@ -142,7 +130,7 @@ describe('Matching Flow', () => {
       statusCode: 200,
       body: {
         action: 'like',
-        match_created: true,
+        is_match: true,
         message: "It's a match!"
       }
     }).as('mutualMatch');

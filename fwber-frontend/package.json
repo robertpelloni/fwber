@@ -11,7 +11,10 @@
     "type-check": "tsc --noEmit",
     "test:e2e": "start-server-and-test \"npm run dev:3005\" http://localhost:3005 \"cypress run\"",
     "test:e2e:matching": "start-server-and-test \"npm run dev:3005\" http://localhost:3005 \"cypress run --spec cypress/e2e/matching-flow.cy.js\"",
-    "test:e2e:pulse": "start-server-and-test \"npm run dev:3005\" http://localhost:3005 \"cypress run --spec cypress/e2e/proximity-feed.cy.js\""
+    "test:e2e:pulse": "start-server-and-test \"npm run dev:3005\" http://localhost:3005 \"cypress run --spec cypress/e2e/proximity-feed.cy.js\"",
+    "test:e2e:nearby": "start-server-and-test \"npm run dev:3005\" http://localhost:3005 \"cypress run --spec cypress/e2e/nearby-users.cy.js\"",
+    "test:e2e:chatrooms": "start-server-and-test \"npm run dev:3005\" http://localhost:3005 \"cypress run --spec cypress/e2e/proximity-chatrooms.cy.js\"",
+    "test:e2e:messaging": "start-server-and-test \"npm run dev:3005\" http://localhost:3005 \"cypress run --spec cypress/e2e/messaging-flow.cy.js\""
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

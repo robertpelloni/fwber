@@ -61,7 +61,7 @@ export default function ProximityChatroomsPage() {
     latitude: location.latitude || 0,
     longitude: location.longitude || 0,
     radius_meters: radius,
-    type: (['conference','event','venue','area','temporary'] as const).includes(selectedType as any) ? (selectedType as 'conference' | 'event' | 'venue' | 'area' | 'temporary') : undefined,
+    type: selectedType === 'all' ? undefined : selectedType,
     search: searchTerm || undefined,
   });
 
@@ -78,9 +78,7 @@ export default function ProximityChatroomsPage() {
         latitude: location.latitude,
         longitude: location.longitude,
         radius_meters: formData.radius_meters || 500,
-        type: (['conference','event','venue','area','temporary'] as readonly string[]).includes((formData.type as string))
-          ? (formData.type as 'conference' | 'event' | 'venue' | 'area' | 'temporary')
-          : 'temporary',
+        type: formData.type,
         is_public: formData.is_public !== false,
       });
 
