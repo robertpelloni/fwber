@@ -127,7 +127,7 @@ class ProximityFlowTest extends TestCase
             'location_lng' => -74.0060,
             'visibility_radius_m' => 1000,
             'expires_at' => now()->addHour(),
-            'moderation_status' => 'approved',
+            'moderation_status' => 'clean',
         ]);
 
         $response = $this->actingAs($user)->getJson('/api/proximity/local-pulse?lat=40.7128&lng=-74.0060&radius=1000');
