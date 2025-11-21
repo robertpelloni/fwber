@@ -60,6 +60,8 @@ export default function PhotoUpload({
   const [dragActive, setDragActive] = useState(false)
   const [clientProcessingMessage, setClientProcessingMessage] = useState<string | null>(null)
   const [processingWarnings, setProcessingWarnings] = useState<string[]>([])
+  const [comparisonPreviewId, setComparisonPreviewId] = useState<string | null>(null)
+  const [comparisonSliderValue, setComparisonSliderValue] = useState(50)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const previewsRef = useRef<PhotoPreview[]>([])
   const faceBlurEnabled = isFeatureEnabled('clientFaceBlur')
@@ -101,6 +103,32 @@ export default function PhotoUpload({
       previewsRef.current.forEach(revokePreviewUrls)
     }
   }, [revokePreviewUrls])
+
+  useEffect(() => {
+    if (!comparisonPreviewId) {
+      setComparisonSliderValue(50)
+      return
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setComparisonPreviewId(null)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [comparisonPreviewId])
+
+  useEffect(() => {
+    if (!comparisonPreviewId) return
+    const stillExists = previews.some(preview => preview.id === comparisonPreviewId)
+    if (!stillExists) {
+      setComparisonPreviewId(null)
+    }
+  }, [comparisonPreviewId, previews])
 
   const processFilesForPreview = useCallback(
     async (files: File[]) => {
@@ -429,6 +457,7 @@ export default function PhotoUpload({
   }, [trackPreviewToggled])
 
   const totalPhotos = photos.length + previews.length
+  const comparisonPreview = comparisonPreviewId ? previews.find(p => p.id === comparisonPreviewId) : null
 
   return (
     <div className={`space-y-6 ${className}`}>
@@ -724,6 +753,19 @@ export default function PhotoUpload({
                         >
                           <X className="w-4 h-4" />
                         </button>
+                        {preview.blurApplied && preview.previewUrls.processed && (
+                          <button
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              setComparisonPreviewId(preview.id)
+                              setComparisonSliderValue(50)
+                            }}
+                            className="p-2 bg-white/80 text-gray-900 rounded-full hover:bg-white transition-colors"
+                            title="Compare blur"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     </div>
                   )}
@@ -786,6 +828,90 @@ export default function PhotoUpload({
             })}
           </div>
         </div>
+      )}
+
+      {comparisonPreview && comparisonPreview.previewUrls.processed && (
+        (() => {
+          const facesLabel = typeof comparisonPreview.facesDetected === 'number'
+            ? `${comparisonPreview.facesDetected} face${comparisonPreview.facesDetected === 1 ? '' : 's'} detected`
+            : 'Face blur applied'
+          return (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/75 p-4">
+              <div className="relative w-full max-w-4xl rounded-2xl bg-background p-6 shadow-2xl">
+                <button
+                  type="button"
+                  className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-black/10 text-foreground transition hover:bg-black/20"
+                  onClick={() => setComparisonPreviewId(null)}
+                >
+                  <X className="h-5 w-5" />
+                  <span className="sr-only">Close comparison</span>
+                </button>
+
+                <div className="mb-4 flex flex-col gap-1">
+                  <h3 className="text-lg font-semibold">Compare blur</h3>
+                  <p className="text-sm text-muted-foreground">{facesLabel}</p>
+                </div>
+
+                <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-xl bg-black">
+                  <Image
+                    src={comparisonPreview.previewUrls.original}
+                    alt="Original preview"
+                    fill
+                    className="object-contain"
+                    sizes="100vw"
+                    priority
+                  />
+                  <div
+                    className="absolute inset-y-0 left-0 overflow-hidden"
+                    style={{ width: `${comparisonSliderValue}%` }}
+                  >
+                    <div className="relative h-full w-full">
+                      <Image
+                        src={comparisonPreview.previewUrls.processed}
+                        alt="Blurred preview"
+                        fill
+                        className="object-contain"
+                        sizes="100vw"
+                        priority
+                      />
+                    </div>
+                  </div>
+                  <div
+                    className="pointer-events-none absolute inset-y-0"
+                    style={{ left: `calc(${comparisonSliderValue}% - 1px)` }}
+                  >
+                    <div className="relative h-full w-px bg-white/70">
+                      <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-xs font-medium text-gray-900">
+                        <ChevronLeft className="h-4 w-4" />
+                        <span>Drag</span>
+                        <ChevronRight className="h-4 w-4" />
+                      </div>
+                    </div>
+                  </div>
+                  <span className="absolute bottom-3 left-3 rounded-full bg-black/70 px-2 py-1 text-xs font-medium text-white">Original</span>
+                  <span className="absolute bottom-3 right-3 rounded-full bg-black/70 px-2 py-1 text-xs font-medium text-white">Blurred</span>
+                </div>
+
+                <label className="mb-1 block text-xs font-medium text-muted-foreground" htmlFor="comparison-slider">
+                  Adjust slider to reveal more of each version
+                </label>
+                <input
+                  id="comparison-slider"
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={comparisonSliderValue}
+                  onChange={(event) => setComparisonSliderValue(Number(event.target.value))}
+                  className="w-full accent-primary"
+                />
+                <div className="mt-2 flex justify-between text-[11px] uppercase tracking-wide text-muted-foreground">
+                  <span>Original</span>
+                  <span>Blurred</span>
+                </div>
+              </div>
+            </div>
+          )
+        })()
       )}
 
 

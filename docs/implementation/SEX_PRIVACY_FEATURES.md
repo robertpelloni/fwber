@@ -14,9 +14,10 @@ Date: 2025-11-20
   - Frontend: `NEXT_PUBLIC_FEATURE_CLIENT_FACE_BLUR` (documented in `.env.example`). Enables blur processing + UX messaging.
   - Backend (future): `FEATURE_CLIENT_FACE_BLUR` middleware toggle once API routes enforce storage rules.
 - **Current flow:** user selects image → `faceBlur.ts` ensures models + draws to canvas → detected bounding boxes expanded 15% → blurred region replaced in-place via canvas filter → resulting blob uploaded with `-blurred` suffix. Per-file badges display detected face counts.
-- **Preview comparison workflow (2025-11-20):**
-  - `PhotoUpload` now caches both the original object URL and a blurred derivative for every processed file.
-  - A floating Blurred/Original toggle appears on each preview (only when blur actually ran) so QA can visually confirm the transformation before the upload finishes.
+- **Preview comparison workflow (2025-11-22):**
+  - `PhotoUpload` caches both the original object URL and a blurred derivative for every processed file and keeps them in sync with `face_blur_metadata.previewId`.
+  - A floating Blurred/Original toggle appears on each preview (only when blur actually ran) so QA can quickly confirm the applied transformation.
+  - A dedicated “Compare blur” overlay exposes an interactive before/after slider (original on the left, blurred on the right) so privacy reviewers can drag the handle and inspect small regions before approving the upload.
   - We default to the blurred view, remember the user’s choice per preview, and simultaneously clean up both object URLs whenever the preview is removed, the upload completes, or the component unmounts.
   - ⚙️ Enablement steps:
     1. Set `NEXT_PUBLIC_FEATURE_CLIENT_FACE_BLUR=true` in `fwber-frontend/.env.local` (already listed in `.env.example`).
