@@ -26,8 +26,9 @@ export default function AvatarGenerationFlow({
   currentAvatarUrl,
   onComplete 
 }: AvatarGenerationProps) {
-  const [step, setStep] = useState<'profile' | 'generating' | 'preview' | 'complete'>('profile');
+  const [step, setStep] = useState<'profile' | 'style' | 'generating' | 'preview' | 'complete'>('profile');
   const [profile, setProfile] = useState<PhysicalProfile>({});
+  const [style, setStyle] = useState<string>('realistic');
   const [generatedAvatar, setGeneratedAvatar] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const queryClient = useQueryClient();
@@ -37,7 +38,7 @@ export default function AvatarGenerationFlow({
       const token = localStorage.getItem('auth_token');
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/physical-profile/avatar/request`,
-        profileData,
+        { ...profileData, style },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       return response.data;
@@ -77,6 +78,10 @@ export default function AvatarGenerationFlow({
     generateMutation.mutate(profile);
   };
 
+  const handleProfileSubmit = () => {
+    setStep('style');
+  };
+
   const handleRegenerate = () => {
     setStep('generating');
     generateMutation.mutate(profile);
@@ -105,6 +110,12 @@ export default function AvatarGenerationFlow({
           <div className="flex-1 h-0.5 bg-gray-200 mx-2">
             <div className={`h-full bg-purple-600 transition-all duration-300 ${
               step !== 'profile' ? 'w-full' : 'w-0'
+            }`} />
+          </div>
+          <StepIndicator active={step === 'style'} completed={step === 'generating' || step === 'preview' || step === 'complete'} label="Style" />
+          <div className="flex-1 h-0.5 bg-gray-200 mx-2">
+            <div className={`h-full bg-purple-600 transition-all duration-300 ${
+              step === 'generating' || step === 'preview' || step === 'complete' ? 'w-full' : 'w-0'
             }`} />
           </div>
           <StepIndicator active={step === 'generating'} completed={step === 'preview' || step === 'complete'} label="Generate" />
@@ -251,12 +262,12 @@ export default function AvatarGenerationFlow({
           </div>
 
           <button
-            onClick={handleGenerate}
+            onClick={handleProfileSubmit}
             disabled={!isProfileComplete()}
             className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-medium"
           >
             <Sparkles className="w-5 h-5" />
-            Generate Avatar
+            Continue to Style Selection
           </button>
 
           <p className="text-xs text-gray-500 text-center">
@@ -265,7 +276,51 @@ export default function AvatarGenerationFlow({
         </div>
       )}
 
-      {/* Step 2: Generating */}
+      {/* Step 2: Style Selection */}
+      {step === 'style' && (
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose an Avatar Style</h2>
+            <p className="text-gray-600">
+              Select an artistic style for your generated avatar.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {['realistic', 'anime', 'fantasy', 'sci-fi', 'cartoon', 'pixel-art'].map((s) => (
+              <div
+                key={s}
+                onClick={() => setStyle(s)}
+                className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                  style === s ? 'border-purple-600 bg-purple-50' : 'border-gray-300'
+                }`}
+              >
+                <div className="w-full h-24 bg-gray-200 rounded-md mb-2 flex items-center justify-center">
+                  <span className="text-gray-500 text-sm">{s.replace('-', ' ')}</span>
+                </div>
+                <p className="text-center font-medium capitalize">{s.replace('-', ' ')}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-between">
+            <button
+              onClick={() => setStep('profile')}
+              className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:border-purple-600 hover:text-purple-600 transition-colors font-medium"
+            >
+              Back
+            </button>
+            <button
+              onClick={handleGenerate}
+              className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Step 3: Generating */}
       {step === 'generating' && (
         <div className="text-center py-12">
           <Loader2 className="w-16 h-16 text-purple-600 animate-spin mx-auto mb-4" />
@@ -368,7 +423,7 @@ function StepIndicator({ active, completed, label }: { active: boolean; complete
           <Check className="w-5 h-5 text-white" />
         ) : (
           <span className={`text-sm font-semibold ${active ? 'text-purple-600' : 'text-gray-400'}`}>
-            {label === 'Profile' ? '1' : label === 'Generate' ? '2' : '3'}
+            {label === 'Profile' ? '1' : label === 'Style' ? '2' : label === 'Generate' ? '3' : '4'}
           </span>
         )}
       </div>
