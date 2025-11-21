@@ -14,9 +14,16 @@ export interface Message {
   id: number;
   conversation_id: number;
   sender_id: number;
+  receiver_id: number;
   content: string;
+  message_type: 'text' | 'image' | 'video' | 'audio' | 'file';
+  media_url?: string;
+  thumbnail_url?: string;
+  media_duration?: number;
   created_at: string;
   updated_at: string;
+  is_read?: boolean;
+  read_at?: string;
 }
 
 export interface Conversation {

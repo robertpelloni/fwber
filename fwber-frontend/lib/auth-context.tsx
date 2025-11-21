@@ -49,7 +49,7 @@ type AuthAction =
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>
-  register: (name: string, email: string, password: string, passwordConfirmation: string) => Promise<void>
+  register: (name: string, email: string, password: string, passwordConfirmation: string, avatar?: File | null) => Promise<void>
   logout: () => void
   clearError: () => void
   updateUser: (user: User) => void
@@ -245,22 +245,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   // Register function
-  const register = async (name: string, email: string, password: string, passwordConfirmation: string) => {
+  const register = async (name: string, email: string, password: string, passwordConfirmation: string, avatar?: File | null) => {
     dispatch({ type: 'AUTH_START' })
     
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({ 
+      let body: any;
+      let headers: Record<string, string> = {
+        'Accept': 'application/json',
+      };
+
+      if (avatar) {
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('email', email);
+        formData.append('password', password);
+        formData.append('password_confirmation', passwordConfirmation);
+        formData.append('avatar', avatar);
+        body = formData;
+      } else {
+        headers['Content-Type'] = 'application/json';
+        body = JSON.stringify({ 
           name, 
           email, 
           password, 
           password_confirmation: passwordConfirmation 
-        }),
+        });
+      }
+
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+        method: 'POST',
+        headers: headers,
+        body: body,
       })
 
       const data = await response.json()

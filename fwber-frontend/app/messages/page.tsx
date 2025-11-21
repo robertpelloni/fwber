@@ -21,6 +21,8 @@ export default function MessagesPage() {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false)
   const [showSafetyMenu, setShowSafetyMenu] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  
+  const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:8000'
 
   const loadConversations = useCallback(async () => {
     if (!token) return
@@ -329,11 +331,44 @@ export default function MessagesPage() {
                                 : 'bg-gray-200 text-gray-900'
                             }`}
                           >
-                            {/* Display media if present (assuming message structure has media_url or similar) */}
-                            {/* Note: The Message interface in messages.ts might need update to include media fields if we want to display them */}
-                            {/* For now, we just send. Displaying requires updating Message interface and backend response */}
+                            {message.media_url && (
+                              <div className="mb-2">
+                                {message.message_type === 'image' ? (
+                                  <img 
+                                    src={message.media_url.startsWith('http') ? message.media_url : `${BACKEND_URL}${message.media_url}`} 
+                                    alt="Attachment" 
+                                    className="max-w-full rounded-lg"
+                                    loading="lazy"
+                                  />
+                                ) : message.message_type === 'video' ? (
+                                  <video 
+                                    src={message.media_url.startsWith('http') ? message.media_url : `${BACKEND_URL}${message.media_url}`} 
+                                    controls 
+                                    className="max-w-full rounded-lg"
+                                  />
+                                ) : message.message_type === 'audio' ? (
+                                  <audio 
+                                    src={message.media_url.startsWith('http') ? message.media_url : `${BACKEND_URL}${message.media_url}`} 
+                                    controls 
+                                    className="w-full"
+                                  />
+                                ) : (
+                                  <a 
+                                    href={message.media_url.startsWith('http') ? message.media_url : `${BACKEND_URL}${message.media_url}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={`flex items-center gap-2 underline ${message.sender_id === user?.id ? 'text-blue-100' : 'text-blue-600'}`}
+                                  >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    Download File
+                                  </a>
+                                )}
+                              </div>
+                            )}
                             
-                            <p className="text-sm">{message.content}</p>
+                            {message.content && <p className="text-sm">{message.content}</p>}
                             <p className={`text-xs mt-1 ${
                               message.sender_id === user?.id ? 'text-blue-100' : 'text-gray-500'
                             }`}>
