@@ -16,6 +16,7 @@ use App\Http\Controllers\ProfileViewController;
 use App\Http\Controllers\ProximityChatroomController;
 use App\Http\Controllers\ProximityChatroomMessageController;
 use App\Http\Controllers\TelemetryController;
+use App\Http\Controllers\TelemetryReportController;
 use App\Http\Controllers\RateLimitController;
 use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\HealthController;
@@ -63,6 +64,10 @@ Route::middleware("api")->group(function (): void {
         Route::post("/auth/logout", [AuthController::class, "logout"]);
 
         Route::post('/telemetry/client-events', [TelemetryController::class, 'storeClientEvents']);
+
+        Route::middleware(['feature:analytics', 'auth.moderator'])->group(function (): void {
+            Route::get('/telemetry/preview-summary', [TelemetryReportController::class, 'previewSummary']);
+        });
         
         // Matching routes (require complete profile)
         Route::middleware('profile.complete')->group(function (): void {

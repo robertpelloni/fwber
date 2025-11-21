@@ -74,6 +74,18 @@ Implementation notes:
   2. Coordinate with backend to reject unblurred uploads once the feature graduates from beta.
   3. Implement the preview-stage telemetry events above so that product can measure drop-offs before upload.
 
+### Preview telemetry analytics (2025-11-20)
+- **Endpoint:** `GET /api/telemetry/preview-summary`
+  - Returns aggregated counts for `face_blur_preview_*` + upload events (total previews, blur adoption %, discard reasons, top warnings, toggle engagement).
+  - Query parameter `range` accepts `1d`, `7d` (default), `30d`, `90d`.
+- **Access controls:** requires authenticated moderator (`is_moderator=true`) and the `FEATURE_ANALYTICS` flag enabled (`feature:analytics` middleware).
+- **Caching:** responses are cached for 60 seconds per range to keep MySQL load minimal.
+- **Usage:** ideal for privacy reviewers to confirm blur opt-in rates before promoting the beta or turning on stricter upload enforcement. Pair with `TELEMETRY_STORE_EVENTS=true` to persist data.
+- **Enablement checklist:**
+  1. In `fwber-backend/.env`, set `FEATURE_ANALYTICS=true` (temporarily) and run `php artisan config:clear`.
+  2. Authenticate as a moderator account and `GET /api/telemetry/preview-summary?range=7d`.
+  3. Review `preview_ready`, `toggles`, `discarded`, and `uploads` sections; export JSON for dashboard prototypes if needed.
+
 ## Auto-Reply Photo Game
 - Goal: increase authenticity of uploads by mirroring content back to the sender.
 - Detection tiering:

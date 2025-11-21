@@ -45,7 +45,7 @@ When a feature is disabled, its routes still register but requests return HTTP 4
   - Routes (gated): `/api/rate-limits/*`
 - FEATURE_ANALYTICS (default: false)
   - Scope: Admin analytics
-  - Routes (gated): `/api/analytics*`
+  - Routes (gated): `/api/analytics*`, `GET /api/telemetry/preview-summary`
 - FEATURE_FACE_REVEAL (default: false)
   - Scope: Upcoming “Face Reveal” / auto-reply experiments
   - Routes (future): `/api/face-reveal/*`, `/api/auto-reply/*` once defined
