@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import ProtectedRoute from '@/components/ProtectedRoute'
-import { getConversations, getMessages, sendMessage, type Conversation, type Message } from '@/lib/api/messages'
+import { getConversations, getMessages, sendMessage, markMessagesAsRead, type Conversation, type Message } from '@/lib/api/messages'
 import ReportModal from '@/components/ReportModal'
 import { blockUser, reportUser } from '@/lib/api/safety'
 
@@ -47,6 +47,9 @@ export default function MessagesPage() {
       // Use other_user.id instead of conversationId (which is match ID)
       const messagesData = await getMessages(token, selectedConversation.other_user.id)
       setMessages(messagesData)
+      
+      // Mark messages as read
+      await markMessagesAsRead(token, selectedConversation.other_user.id)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load messages')
     }

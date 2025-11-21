@@ -373,6 +373,31 @@ class MessageController extends Controller
     }
 
     /**
+     * Mark all messages from a sender as read
+     *
+     * @OA\Post(
+     *   path="/messages/mark-all-read/{senderId}",
+     *   tags={"Messages"},
+     *   summary="Mark all messages from a sender as read",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="senderId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Marked all read"),
+     *   @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
+    public function markAllAsRead(int $senderId): JsonResponse
+    {
+        $currentUserId = Auth::id();
+        
+        Message::where('sender_id', $senderId)
+            ->where('receiver_id', $currentUserId)
+            ->where('is_read', false)
+            ->update(['is_read' => true, 'read_at' => now()]);
+
+        return response()->json(['message' => 'All messages marked as read']);
+    }
+
+    /**
      * Get unread message count
         *
         * @OA\Get(

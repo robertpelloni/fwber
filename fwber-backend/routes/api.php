@@ -82,6 +82,7 @@ Route::middleware("api")->group(function (): void {
             Route::get("/{userId}", [MessageController::class, "index"]);
             Route::post("/", [MessageController::class, "store"]);
             Route::post("/{messageId}/read", [MessageController::class, "markAsRead"]);
+            Route::post("/mark-all-read/{senderId}", [MessageController::class, "markAllAsRead"]);
         });
         
             // Group routes

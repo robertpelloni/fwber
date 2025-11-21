@@ -99,7 +99,7 @@ export async function getMessages(token: string, userId: number): Promise<Messag
   }
 
   const data = await response.json();
-  return data.data || data;
+  return data.messages || data.data || data;
 }
 
 /**
@@ -135,33 +135,7 @@ export async function sendMessage(
   }
 
   const data = await response.json();
-  return data.data || data;
-}
-
-/**
- * Create a new conversation with a matched user
- */
-export async function createConversation(
-  token: string, 
-  userId: number
-): Promise<Conversation> {
-  const response = await fetch(`${API_BASE_URL}/conversations`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-    body: JSON.stringify({ user_id: userId }),
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to create conversation' }));
-    throw new Error(error.message || 'Failed to create conversation');
-  }
-
-  const data = await response.json();
-  return data.data || data;
+  return data.message || data.data || data;
 }
 
 /**
@@ -169,9 +143,9 @@ export async function createConversation(
  */
 export async function markMessagesAsRead(
   token: string, 
-  conversationId: number
+  userId: number
 ): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/conversations/${conversationId}/read`, {
+  const response = await fetch(`${API_BASE_URL}/messages/mark-all-read/${userId}`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -205,5 +179,5 @@ export async function getUnreadCount(token: string): Promise<number> {
   }
 
   const data = await response.json();
-  return data.count || 0;
+  return data.unread_count || data.count || 0;
 }
