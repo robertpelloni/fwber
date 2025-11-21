@@ -3,6 +3,7 @@
 return [
     // Whether emitting telemetry is enabled
     'enabled' => env('TELEMETRY_ENABLED', true),
+    'store_events' => env('TELEMETRY_STORE_EVENTS', true),
 
     // Map of event name => validation rules
     'schemas' => [

@@ -2,24 +2,28 @@
 
 namespace App\Services;
 
+use App\Models\TelemetryEvent;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Cache;
 
 class TelemetryService
 {
     private bool $enabled;
     private array $schemas;
+    private bool $storeEvents;
 
     public function __construct()
     {
         $config = Config::get('telemetry', [
             'enabled' => true,
             'schemas' => [],
+            'store_events' => true,
         ]);
         $this->enabled = (bool)($config['enabled'] ?? true);
         $this->schemas = (array)($config['schemas'] ?? []);
+        $this->storeEvents = (bool)($config['store_events'] ?? true);
     }
 
     public function emit(string $event, array $payload): bool
@@ -47,6 +51,7 @@ class TelemetryService
         ]);
 
         $this->aggregate($event, $payload);
+        $this->persist($event, $payload);
         return true;
     }
 
@@ -56,6 +61,27 @@ class TelemetryService
         $counts = Cache::get($key, []);
         $counts[$event] = ($counts[$event] ?? 0) + 1;
         Cache::put($key, $counts, 3600);
+    }
+
+    private function persist(string $event, array $payload): void
+    {
+        if (! $this->storeEvents) {
+            return;
+        }
+
+        try {
+            TelemetryEvent::create([
+                'user_id' => $payload['user_id'] ?? null,
+                'event' => $event,
+                'payload' => $payload,
+                'recorded_at' => now(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Failed to persist telemetry event', [
+                'event' => $event,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function getCounts(): array

@@ -6,7 +6,7 @@ _Primary author: GitHub Copilot (GPT-5.1-Codex)_
 - **MVP scope** (Auth, Profile, Dashboard, Matches, Direct Messages, Photos, Safety, Physical Profile, Location, Proximity Artifacts) remains stable and continues to pass the latest manual checks.
 - **Recent accomplishments** include the dynamic `SexQuote` surface (`fwber-frontend/components/SexQuote.tsx`), Cypress coverage for core journeys (matching, messaging, physical profile, proximity feed), a local SVG avatar for deterministic tests (`fwber-frontend/public/images/test-avatar.svg`), and a Sentry migration to modern App Router instrumentation (`fwber-frontend/instrumentation.ts`).
 - **Privacy focus**: A client-side face blur beta now runs behind `NEXT_PUBLIC_FEATURE_CLIENT_FACE_BLUR`, enriching uploads with structured metadata that the backend ingests via `PhotoController::emitFaceBlurTelemetry()`.
-- **Primary risks**: (1) Face-blur telemetry only fires when uploads finish—no visibility into opt-outs or failures; (2) Phase-3 roadmap items (Face Reveal game, encrypted vault) still lack spikes.
+- **Primary risks**: (1) Preview telemetry now persists server-side but still lacks dashboards/alerts tying into privacy KPIs; (2) Phase-3 roadmap items (Face Reveal game, encrypted vault) still lack spikes.
 
 ## 2. Core Pillar Status
 | Pillar | Status | Evidence / Notes |
@@ -31,7 +31,7 @@ _Primary author: GitHub Copilot (GPT-5.1-Codex)_
 | Area | Gap | Recommended Mitigation |
 | --- | --- | --- |
 | Face blur docs & enablement | Beta flag steps and reviewer expectations are easy to miss during onboarding. | Publish and maintain a checklist covering flag setup, compare overlay usage, and warning interpretation (see Section 2 + `/docs/implementation/SEX_PRIVACY_FEATURES.md`).
-| Telemetry visibility | Only successful uploads produce events; skipped previews that users delete are invisible. | Extend telemetry plan to emit client-side events (or collect counts) before upload completion.
+| Telemetry visibility | Raw preview telemetry now persists in `telemetry_events`, but no dashboards analyze opt-out trends yet. | Build analytics views/dashboards once data backfills; continue wiring additional preview emitters.
 | Roadmap alignment | Roadmap doc still lists face blur as "Researching" and lacks up-to-date statuses. | Refresh `docs/roadmap/ROADMAP_EXPANSION_2025-11-20.md` with new reality + next milestones.
 | Future features | No technical spikes yet for "Face Reveal" or "Local-First Vault". | Schedule research tickets following blur UX improvements; define feature flags now to reduce later churn.
 
@@ -50,7 +50,7 @@ _Primary author: GitHub Copilot (GPT-5.1-Codex)_
 
 ## 6. Action Items Logged
 - [x] Implement blur comparison UX in `PhotoUpload` (see Section 5.1).
-- [ ] Update roadmap doc per Section 5.2.
+- [x] Update roadmap doc per Section 5.2.
 - [x] Add beta documentation describing enabling `NEXT_PUBLIC_FEATURE_CLIENT_FACE_BLUR` and expected telemetry signals.
 - [ ] Prepare spike outlines for Face Reveal game + encrypted vault (post-beta).
 

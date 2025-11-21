@@ -65,6 +65,7 @@ Implementation notes:
 - These events **must not** include binary data—only metadata already captured in `face_blur_metadata` to stay GDPR-safe.
 - Once wired, update `config/telemetry.php` and `docs/EVENT_SCHEMA_V0` with the new schemas before enabling the flag in staging.
 - Preview IDs now travel end-to-end (`face_blur_metadata.previewId` → `/api/photos` → `face_blur_applied/face_blur_skipped_reason`), so data science can correlate preview drop-offs with final uploads without guessing.
+- Persisted storage: `TelemetryService` now records every preview event into the `telemetry_events` table (gated by `TELEMETRY_STORE_EVENTS`), so privacy reviewers can backfill opt-out metrics without scraping logs.
 
 🚀 **Status (2025-11-21):** `lib/previewTelemetry.ts` now provides `usePreviewTelemetry()` that batches preview events, flushes when uploads begin, and retries when offline. `PhotoUpload` emits `ready`, `toggled`, and `discarded` automatically, passing the same metadata we attach to files. On the backend, `POST /api/telemetry/client-events` (auth required) whitelists those events, injects the current `user_id`, and forwards everything through `TelemetryService`, with schemas codified in `config/telemetry.php` + `docs/EVENT_SCHEMA_V0`. No binary or PII beyond the existing metadata leaves the client.
 
