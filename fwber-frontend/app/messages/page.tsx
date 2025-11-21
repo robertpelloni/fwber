@@ -102,11 +102,12 @@ export default function MessagesPage() {
   }
 
   const handleBlock = async () => {
-    if (!token || !selectedConversation?.other_user || !confirm('Are you sure you want to block this user? You will no longer see their messages or profile.')) return
+    const otherUser = selectedConversation?.other_user
+    if (!token || !otherUser || !confirm('Are you sure you want to block this user? You will no longer see their messages or profile.')) return
     
     try {
-      await blockUser(token, selectedConversation.other_user.id)
-      setConversations(prev => prev.filter(c => c.id !== selectedConversation.id))
+      await blockUser(token, otherUser.id)
+      setConversations(prev => prev.filter(c => c.id !== selectedConversation!.id))
       setSelectedConversation(null)
       setShowSafetyMenu(false)
     } catch (err) {
@@ -115,13 +116,14 @@ export default function MessagesPage() {
   }
 
   const handleReport = async (reason: string, details: string) => {
-    if (!token || !selectedConversation?.other_user) return
-    await reportUser(token, selectedConversation.other_user.id, reason, details)
+    const otherUser = selectedConversation?.other_user
+    if (!token || !otherUser) return
+    await reportUser(token, otherUser.id, reason, details)
     
     if (confirm('Report submitted. Do you want to block this user as well?')) {
       try {
-        await blockUser(token, selectedConversation.other_user.id)
-        setConversations(prev => prev.filter(c => c.id !== selectedConversation.id))
+        await blockUser(token, otherUser.id)
+        setConversations(prev => prev.filter(c => c.id !== selectedConversation!.id))
         setSelectedConversation(null)
       } catch (err) {
         console.error('Failed to block after report', err)

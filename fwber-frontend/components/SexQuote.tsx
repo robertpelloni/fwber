@@ -16,7 +16,27 @@ const QUOTES = [
   "Even the Queen of England was a slut in heat. — Unknown",
   "Everybody wants to get laid.",
   "Every body likes sex.",
-  "Every body gets horny."
+  "Every body gets horny.",
+  "Sex is a part of nature. I go along with nature. — Marilyn Monroe",
+  "I don't know the question, but sex is definitely the answer. — Woody Allen",
+  "Sex is like air; it's not important unless you aren't getting any. — John Callahan",
+  "The only way to get rid of a temptation is to yield to it. — Oscar Wilde",
+  "Sexiness is a state of mind. — Priyanka Chopra",
+  "I believe in long, slow, deep, soft, wet kisses that last three days. — Bull Durham",
+  "Sex is the most fun you can have without laughing. — Woody Allen",
+  "Love is the answer, but while you're waiting for the answer, sex raises some pretty interesting questions. — Woody Allen",
+  "Is it dirty? Only if it's done right. — Woody Allen",
+  "Chemistry is you touching my arm and setting fire to my mind. — Nayyirah Waheed",
+  "Sex is the art of controlling lack of control. — Paulo Coelho",
+  "Sex is a conversation carried out by other means. — Peter Ustinov",
+  "I need sex for a clear complexion, but I'd rather do it for love. — Joan Crawford",
+  "Sex is the nature of the human being. — Marlon Brando",
+  "A liberated woman is one who has sex before marriage and a job after. — Gloria Steinem",
+  "Sex: the thing that takes up the least amount of time and causes the most amount of trouble. — John Barrymore",
+  "Biologically speaking, if something bites you it's more likely to be female. — Desmond Morris",
+  "I've been on so many blind dates, I should get a free dog. — Wendy Liebman",
+  "My mother told me to be a lady. And for her, that meant be your own person, be independent. — Ruth Bader Ginsburg",
+  "Sex is one of the nine reasons for reincarnation. The other eight are unimportant. — Henry Miller"
 ];
 
 export default function SexQuote() {
