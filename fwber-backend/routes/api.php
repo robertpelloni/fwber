@@ -175,7 +175,6 @@ Route::middleware("api")->group(function (): void {
             Route::post("/bulletin-boards/{id}/messages", [BulletinBoardController::class, "postMessage"]);
         });
         Route::get("/bulletin-boards/{id}/messages", [BulletinBoardController::class, "getMessages"]);
-        Route::get("/bulletin-boards/{id}/stream", [BulletinBoardController::class, "stream"]);
         
         // Chatroom routes (Phase 6A - Real-time Location-Based Chatrooms)
         Route::prefix("chatrooms")->middleware('feature:chatrooms')->group(function (): void {

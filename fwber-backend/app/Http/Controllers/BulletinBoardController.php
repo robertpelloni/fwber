@@ -9,7 +9,6 @@ use App\Services\MercurePublisher;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 
 class BulletinBoardController extends Controller
@@ -311,72 +310,7 @@ class BulletinBoardController extends Controller
         ]);
     }
 
-    /**
-     * Server-Sent Events endpoint for real-time message updates
-     *
-     * @OA\Get(
-     *   path="/bulletin-boards/{boardId}/stream",
-     *   tags={"Bulletin Boards"},
-     *   summary="SSE: stream real-time updates",
-     *   @OA\Parameter(name="boardId", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="Event stream (text/event-stream)")
-     * )
-     */
-    public function stream(Request $request, int $boardId)
-    {
-        $board = BulletinBoard::findOrFail($boardId);
-        
-        // Set SSE headers
-        $response = response()->stream(function () use ($board, $request) {
-            $lastEventId = $request->header('Last-Event-ID');
-            $redis = Redis::connection();
-            
-            // Subscribe to Redis channel for this board
-            $channel = "bulletin_board:{$boardId}";
-            
-            // Send initial connection message
-            echo "data: " . json_encode([
-                'type' => 'connected',
-                'board_id' => $boardId,
-                'timestamp' => now()->toISOString(),
-            ]) . "\n\n";
-            
-            // Send recent messages if resuming
-            if ($lastEventId) {
-                $recentMessages = $board->messages()
-                    ->where('created_at', '>', $lastEventId)
-                    ->notExpired()
-                    ->notModerated()
-                    ->with('user')
-                    ->orderBy('created_at', 'asc')
-                    ->get();
-                
-                foreach ($recentMessages as $message) {
-                    echo "data: " . json_encode([
-                        'type' => 'message',
-                        'data' => $message,
-                        'id' => $message->created_at->timestamp,
-                    ]) . "\n\n";
-                }
-            }
-            
-            // Listen for new messages
-            $redis->subscribe([$channel], function ($message) {
-                echo "data: " . $message . "\n\n";
-                ob_flush();
-                flush();
-            });
-            
-        }, 200, [
-            'Content-Type' => 'text/event-stream',
-            'Cache-Control' => 'no-cache',
-            'Connection' => 'keep-alive',
-            'Access-Control-Allow-Origin' => '*',
-            'Access-Control-Allow-Headers' => 'Cache-Control',
-        ]);
 
-        return $response;
-    }
 
     /**
      * Generate geohash for a location

@@ -19,10 +19,11 @@ The FWBer project has reached a stable milestone. Both the Laravel backend and N
   - Real-time Chat (Mercure/WebSocket)
   - Safety & Moderation
   - AI Content Generation
-- **Recent Fixes:**
+- **Recent Fixes & Refactoring:**
   - Cleaned up `routes/api.php`.
   - Standardized Controller annotations.
   - Removed deprecated/unused endpoints.
+  - **GroupController Refactor:** Extracted business logic into `App\Services\GroupService` to reduce controller size and improve testability.
 
 ## 2. Frontend Status (fwber-frontend)
 - **Framework:** Next.js 14 (App Router)

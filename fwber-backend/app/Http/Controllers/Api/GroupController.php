@@ -4,24 +4,20 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Group;
-use App\Models\GroupMember;
-use App\Models\GroupMessage;
-use App\Models\GroupMessageRead;
-use App\Models\GroupModerationEvent;
-use App\Events\GroupRoleChanged;
-use App\Events\GroupOwnershipTransferred;
-use App\Events\GroupMemberBanned;
-use App\Events\GroupMemberUnbanned;
-use App\Events\GroupMemberMuted;
-use App\Events\GroupMemberUnmuted;
-use App\Events\GroupMemberKicked;
+use App\Services\GroupService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class GroupController extends Controller
 {
+    protected GroupService $groupService;
+
+    public function __construct(GroupService $groupService)
+    {
+        $this->groupService = $groupService;
+    }
+
     /**
      * List user's groups
     *
@@ -95,33 +91,10 @@ class GroupController extends Controller
             'max_members' => 'sometimes|integer|min:2|max:500',
         ]);
 
-        $userId = Auth::id();
-
-        DB::beginTransaction();
         try {
-            $group = Group::create([
-                'name' => $validated['name'],
-                'description' => $validated['description'] ?? null,
-                'visibility' => $validated['visibility'] ?? 'public',
-                'creator_id' => $userId,
-                'max_members' => $validated['max_members'] ?? 100,
-                'is_active' => true,
-            ]);
-
-            // Add creator as owner
-            GroupMember::create([
-                'group_id' => $group->id,
-                'user_id' => $userId,
-                'role' => 'owner',
-                'is_active' => true,
-                'joined_at' => now(),
-            ]);
-
-            DB::commit();
-
+            $group = $this->groupService->createGroup(Auth::id(), $validated);
             return response()->json(['group' => $group->load('creator', 'activeMembers')], 201);
         } catch (\Exception $e) {
-            DB::rollBack();
             return response()->json(['error' => 'Failed to create group'], 500);
         }
     }
@@ -266,50 +239,12 @@ class GroupController extends Controller
     public function join(int $groupId): JsonResponse
     {
         $group = Group::findOrFail($groupId);
-        $userId = Auth::id();
-
-        if ($group->visibility === 'private') {
-            return response()->json(['error' => 'Cannot join private group'], 403);
+        try {
+            $this->groupService->joinGroup($group, Auth::id());
+            return response()->json(['message' => 'Joined group successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 400);
         }
-
-        // If user was banned previously, prevent joining
-        $existing = $group->members()->where('user_id', $userId)->orderByDesc('id')->first();
-        if ($existing && ($existing->is_banned ?? false)) {
-            return response()->json(['error' => 'You are banned from this group'], 403);
-        }
-
-        // If already an active member, block duplicate join
-        if ($group->hasMember($userId)) {
-            return response()->json(['error' => 'Already a member'], 400);
-        }
-
-        if ($group->isFull()) {
-            return response()->json(['error' => 'Group is full'], 400);
-        }
-
-        // If there is a historical membership record (e.g., left, kicked, or previously banned but now unbanned), reactivate it
-        if ($existing) {
-            $existing->is_active = true;
-            $existing->is_banned = false; // ensure cleared
-            $existing->left_at = null;
-            $existing->joined_at = now();
-            // Preserve prior role if present; default to member if missing
-            if (empty($existing->role)) {
-                $existing->role = 'member';
-            }
-            $existing->save();
-        } else {
-            // No prior record exists; create fresh membership
-            GroupMember::create([
-                'group_id' => $group->id,
-                'user_id' => $userId,
-                'role' => 'member',
-                'is_active' => true,
-                'joined_at' => now(),
-            ]);
-        }
-
-        return response()->json(['message' => 'Joined group successfully']);
     }
 
     /**
@@ -329,23 +264,12 @@ class GroupController extends Controller
     public function leave(int $groupId): JsonResponse
     {
         $group = Group::findOrFail($groupId);
-        $userId = Auth::id();
-
-        $member = $group->activeMembers()->where('user_id', $userId)->first();
-
-        if (!$member) {
-            return response()->json(['error' => 'Not a member'], 400);
+        try {
+            $this->groupService->leaveGroup($group, Auth::id());
+            return response()->json(['message' => 'Left group successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 400);
         }
-
-        if ($member->isOwner()) {
-            return response()->json(['error' => 'Owner cannot leave. Transfer ownership or delete group.'], 400);
-        }
-
-        $member->is_active = false;
-        $member->left_at = now();
-        $member->save();
-
-        return response()->json(['message' => 'Left group successfully']);
     }
 
     /**
@@ -376,67 +300,12 @@ class GroupController extends Controller
         ]);
 
         $group = Group::findOrFail($groupId);
-        $actorId = Auth::id();
-
-        $actor = $group->activeMembers()->where('user_id', $actorId)->first();
-        if (!$actor) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
-        $target = $group->activeMembers()->where('user_id', $memberUserId)->first();
-        if (!$target) {
-            return response()->json(['error' => 'Member not found or inactive'], 404);
-        }
-
-        if ($target->isOwner()) {
-            return response()->json(['error' => 'Cannot change owner role'], 400);
-        }
-
-        // Permissions: owner can set any role; admin can set moderator/member only
-        if ($actor->isOwner()) {
-            if ($target->role === $validated['role']) {
-                return response()->json(['message' => 'Role unchanged']);
-            }
-            $target->role = $validated['role'];
-            $target->role_changed_at = now();
-            $target->save();
-            GroupModerationEvent::create([
-                'group_id' => $group->id,
-                'actor_user_id' => $actorId,
-                'target_user_id' => $memberUserId,
-                'action' => 'role_change',
-                'reason' => null,
-                'metadata' => ['new_role' => $validated['role']],
-                'occurred_at' => now(),
-            ]);
-            event(new GroupRoleChanged($group->id, $actorId, $memberUserId, $validated['role']));
+        try {
+            $this->groupService->setMemberRole($group, Auth::id(), $memberUserId, $validated['role']);
             return response()->json(['message' => 'Role updated']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 400);
         }
-
-        if ($actor->role === 'admin') {
-            if (in_array($validated['role'], ['moderator', 'member'], true)) {
-                if ($target->role === $validated['role']) {
-                    return response()->json(['message' => 'Role unchanged']);
-                }
-                $target->role = $validated['role'];
-                $target->role_changed_at = now();
-                $target->save();
-                GroupModerationEvent::create([
-                    'group_id' => $group->id,
-                    'actor_user_id' => $actorId,
-                    'target_user_id' => $memberUserId,
-                    'action' => 'role_change',
-                    'reason' => null,
-                    'metadata' => ['new_role' => $validated['role']],
-                    'occurred_at' => now(),
-                ]);
-                event(new GroupRoleChanged($group->id, $actorId, $memberUserId, $validated['role']));
-                return response()->json(['message' => 'Role updated']);
-            }
-            return response()->json(['error' => 'Admins cannot assign admin role'], 403);
-        }
-
-        return response()->json(['error' => 'Unauthorized'], 403);
     }
 
     /**
@@ -465,42 +334,12 @@ class GroupController extends Controller
         ]);
 
         $group = Group::findOrFail($groupId);
-        $actorId = Auth::id();
-        $actor = $group->activeMembers()->where('user_id', $actorId)->first();
-        if (!$actor || !$actor->isOwner()) {
-            return response()->json(['error' => 'Only owner can transfer ownership'], 403);
+        try {
+            $this->groupService->transferOwnership($group, Auth::id(), $validated['new_owner_user_id']);
+            return response()->json(['message' => 'Ownership transferred']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 400);
         }
-
-        $target = $group->activeMembers()->where('user_id', $validated['new_owner_user_id'])->first();
-        if (!$target) {
-            return response()->json(['error' => 'Target user is not an active member'], 400);
-        }
-
-        if ($target->isOwner()) {
-            return response()->json(['message' => 'Already owner']);
-        }
-
-        // Perform transfer: target -> owner, actor (current owner) -> admin
-        $target->role = 'owner';
-        $target->role_changed_at = now();
-        $target->save();
-
-        $actor->role = 'admin';
-        $actor->role_changed_at = now();
-        $actor->save();
-
-        GroupModerationEvent::create([
-            'group_id' => $group->id,
-            'actor_user_id' => $actorId,
-            'target_user_id' => $target->user_id,
-            'action' => 'ownership_transfer',
-            'reason' => null,
-            'metadata' => ['from' => $actorId, 'to' => $target->user_id],
-            'occurred_at' => now(),
-        ]);
-        event(new GroupOwnershipTransferred($group->id, $actorId, $target->user_id));
-
-        return response()->json(['message' => 'Ownership transferred']);
     }
 
     /**
@@ -522,44 +361,12 @@ class GroupController extends Controller
     public function banMember(int $groupId, int $memberUserId): JsonResponse
     {
         $group = Group::findOrFail($groupId);
-        $actorId = Auth::id();
-        $actor = $group->activeMembers()->where('user_id', $actorId)->first();
-        if (!$actor || !$actor->isAdmin()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        try {
+            $this->groupService->banMember($group, Auth::id(), $memberUserId, request()->input('reason'));
+            return response()->json(['message' => 'Member banned']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 400);
         }
-
-        $target = $group->members()->where('user_id', $memberUserId)->orderByDesc('id')->first();
-        if (!$target) {
-            return response()->json(['error' => 'Member not found'], 404);
-        }
-        if ($target->isOwner()) {
-            return response()->json(['error' => 'Cannot ban owner'], 400);
-        }
-
-        $reason = request()->input('reason');
-        if ($target->is_banned) {
-            return response()->json(['message' => 'Already banned']);
-        }
-        $target->is_banned = true;
-        $target->is_active = false;
-        $target->left_at = now();
-        $target->banned_reason = $reason;
-        $target->banned_at = now();
-        $target->banned_by_user_id = $actorId;
-        $target->save();
-
-        GroupModerationEvent::create([
-            'group_id' => $group->id,
-            'actor_user_id' => $actorId,
-            'target_user_id' => $memberUserId,
-            'action' => 'ban',
-            'reason' => $reason,
-            'metadata' => null,
-            'occurred_at' => now(),
-        ]);
-        event(new GroupMemberBanned($group->id, $actorId, $memberUserId, $reason));
-
-        return response()->json(['message' => 'Member banned']);
     }
 
     /**
@@ -581,38 +388,12 @@ class GroupController extends Controller
     public function unbanMember(int $groupId, int $memberUserId): JsonResponse
     {
         $group = Group::findOrFail($groupId);
-        $actorId = Auth::id();
-        $actor = $group->activeMembers()->where('user_id', $actorId)->first();
-        if (!$actor || !$actor->isAdmin()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        try {
+            $this->groupService->unbanMember($group, Auth::id(), $memberUserId);
+            return response()->json(['message' => 'Member unbanned']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 400);
         }
-
-        $target = $group->members()->where('user_id', $memberUserId)->orderByDesc('id')->first();
-        if (!$target) {
-            return response()->json(['error' => 'Member not found'], 404);
-        }
-
-        if (!$target->is_banned) {
-            return response()->json(['message' => 'Not banned']);
-        }
-        $target->is_banned = false;
-        $target->banned_reason = null;
-        $target->banned_at = null;
-        $target->banned_by_user_id = null;
-        $target->save();
-
-        GroupModerationEvent::create([
-            'group_id' => $group->id,
-            'actor_user_id' => $actorId,
-            'target_user_id' => $memberUserId,
-            'action' => 'unban',
-            'reason' => null,
-            'metadata' => null,
-            'occurred_at' => now(),
-        ]);
-        event(new GroupMemberUnbanned($group->id, $actorId, $memberUserId));
-
-        return response()->json(['message' => 'Member unbanned']);
     }
 
     /**
@@ -638,60 +419,26 @@ class GroupController extends Controller
      */
     public function muteMember(int $groupId, int $memberUserId): JsonResponse
     {
-        $group = Group::findOrFail($groupId);
-        $actorId = Auth::id();
-        $actor = $group->activeMembers()->where('user_id', $actorId)->first();
-        if (!$actor || !$actor->isAdmin()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
-        $target = $group->activeMembers()->where('user_id', $memberUserId)->first();
-        if (!$target) {
-            return response()->json(['error' => 'Member not found or inactive'], 404);
-        }
-        if ($target->isOwner()) {
-            return response()->json(['error' => 'Cannot mute owner'], 400);
-        }
-
         $validated = request()->validate([
             'duration_minutes' => 'nullable|integer|min:1|max:10080', // up to 7 days
             'until' => 'nullable|date',
             'reason' => 'nullable|string|max:255',
         ]);
 
-        $until = null;
-        if (!empty($validated['until'])) {
-            $until = \Carbon\Carbon::parse($validated['until']);
-        } elseif (!empty($validated['duration_minutes'])) {
-            $until = now()->addMinutes($validated['duration_minutes']);
+        $group = Group::findOrFail($groupId);
+        try {
+            $mutedUntil = $this->groupService->muteMember(
+                $group, 
+                Auth::id(), 
+                $memberUserId, 
+                $validated['duration_minutes'] ?? null, 
+                $validated['until'] ?? null, 
+                $validated['reason'] ?? null
+            );
+            return response()->json(['message' => 'Member muted', 'muted_until' => $mutedUntil]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 400);
         }
-
-        if (!$until) {
-            $until = now()->addHour(); // default 1 hour
-        }
-
-        // No-op suppression: if already muted until a later time or equal and same reason
-        if ($target->is_muted && $target->muted_until && $until && $target->muted_until >= $until && (($target->mute_reason ?? null) === ($validated['reason'] ?? null))) {
-            return response()->json(['message' => 'Mute unchanged', 'muted_until' => $target->muted_until->toIso8601String()]);
-        }
-        $target->is_muted = true;
-        $target->muted_until = $until;
-        $target->mute_reason = $validated['reason'] ?? null;
-        $target->muted_by_user_id = $actorId;
-        $target->save();
-
-        GroupModerationEvent::create([
-            'group_id' => $group->id,
-            'actor_user_id' => $actorId,
-            'target_user_id' => $memberUserId,
-            'action' => 'mute',
-            'reason' => $validated['reason'] ?? null,
-            'metadata' => ['muted_until' => $until->toIso8601String()],
-            'occurred_at' => now(),
-        ]);
-        event(new GroupMemberMuted($group->id, $actorId, $memberUserId, $until->toIso8601String(), $validated['reason'] ?? null));
-
-        return response()->json(['message' => 'Member muted', 'muted_until' => $until->toIso8601String()]);
     }
 
     /**
@@ -713,38 +460,12 @@ class GroupController extends Controller
     public function unmuteMember(int $groupId, int $memberUserId): JsonResponse
     {
         $group = Group::findOrFail($groupId);
-        $actorId = Auth::id();
-        $actor = $group->activeMembers()->where('user_id', $actorId)->first();
-        if (!$actor || !$actor->isAdmin()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        try {
+            $this->groupService->unmuteMember($group, Auth::id(), $memberUserId);
+            return response()->json(['message' => 'Member unmuted']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 400);
         }
-
-        $target = $group->members()->where('user_id', $memberUserId)->orderByDesc('id')->first();
-        if (!$target) {
-            return response()->json(['error' => 'Member not found'], 404);
-        }
-
-        if (!$target->is_muted) {
-            return response()->json(['message' => 'Not muted']);
-        }
-        $target->is_muted = false;
-        $target->muted_until = null;
-        $target->mute_reason = null;
-        $target->muted_by_user_id = null;
-        $target->save();
-
-        GroupModerationEvent::create([
-            'group_id' => $group->id,
-            'actor_user_id' => $actorId,
-            'target_user_id' => $memberUserId,
-            'action' => 'unmute',
-            'reason' => null,
-            'metadata' => null,
-            'occurred_at' => now(),
-        ]);
-        event(new GroupMemberUnmuted($group->id, $actorId, $memberUserId));
-
-        return response()->json(['message' => 'Member unmuted']);
     }
 
     /**
@@ -819,36 +540,12 @@ class GroupController extends Controller
     public function kickMember(int $groupId, int $memberUserId): JsonResponse
     {
         $group = Group::findOrFail($groupId);
-        $actorId = Auth::id();
-        $actor = $group->activeMembers()->where('user_id', $actorId)->first();
-        if (!$actor || !$actor->isAdmin()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        try {
+            $this->groupService->kickMember($group, Auth::id(), $memberUserId);
+            return response()->json(['message' => 'Member removed']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 400);
         }
-
-        $target = $group->activeMembers()->where('user_id', $memberUserId)->first();
-        if (!$target) {
-            return response()->json(['error' => 'Member not found or inactive'], 404);
-        }
-        if ($target->isOwner()) {
-            return response()->json(['error' => 'Cannot kick owner'], 400);
-        }
-
-        $target->is_active = false;
-        $target->left_at = now();
-        $target->save();
-
-        GroupModerationEvent::create([
-            'group_id' => $group->id,
-            'actor_user_id' => $actorId,
-            'target_user_id' => $memberUserId,
-            'action' => 'kick',
-            'reason' => null,
-            'metadata' => null,
-            'occurred_at' => now(),
-        ]);
-        event(new GroupMemberKicked($group->id, $actorId, $memberUserId));
-
-        return response()->json(['message' => 'Member removed']);
     }
 
     /**
