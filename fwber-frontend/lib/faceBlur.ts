@@ -1,4 +1,13 @@
-import * as faceapi from '@vladmandic/face-api'
+import type * as FaceApi from '@vladmandic/face-api'
+
+let faceapi: typeof FaceApi | null = null
+
+const loadFaceApi = async () => {
+  if (!faceapi) {
+    faceapi = await import('@vladmandic/face-api')
+  }
+  return faceapi
+}
 
 const DEFAULT_MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/'
 const MODEL_CACHE_NAME = 'face-blur-models-v1'
@@ -31,7 +40,8 @@ const patchModelFetch = async (modelUrl: string) => {
 
   if (fetchPatched) return
 
-  const originalFetch: typeof fetch = (faceapi.env.fetch as typeof fetch) || fetch
+  const faceapi = await loadFaceApi()
+  const originalFetch: typeof fetch = ((faceapi.env as any).fetch as typeof fetch) || fetch
 
   const cachingFetch: typeof fetch = async (input, init) => {
     if (typeof caches === 'undefined') {
@@ -115,7 +125,8 @@ const ensureModelsLoaded = async (modelUrl = DEFAULT_MODEL_URL) => {
   }
 
   modelLoadPromise = (async () => {
-    const tf = faceapi.tf as typeof import('@tensorflow/tfjs-core') | undefined
+    const faceapi = await loadFaceApi()
+    const tf = faceapi.tf as any
     if (!tf) {
       throw new FaceBlurError('Tensorflow backend unavailable for face blur.', 'MODEL_LOAD_FAILED')
     }
@@ -267,6 +278,7 @@ export const blurFacesOnFile = async (file: File, options?: FaceBlurOptions): Pr
 
     ctx.drawImage(source, 0, 0, width, height)
 
+    const faceapi = await loadFaceApi()
     const detections = await faceapi.detectAllFaces(
       canvas,
       new faceapi.TinyFaceDetectorOptions({
@@ -300,3 +312,4 @@ export const blurFacesOnFile = async (file: File, options?: FaceBlurOptions): Pr
     cleanup()
   }
 }
+

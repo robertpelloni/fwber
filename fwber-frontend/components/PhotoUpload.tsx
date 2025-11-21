@@ -173,7 +173,6 @@ export default function PhotoUpload({
               const warning = `No faces detected in ${file.name}; upload will continue unblurred.`
               warnings.push(warning)
               processedFile = attachFaceBlurMetadata(result.file, {
-                previewId,
                 ...metadata,
                 skippedReason: 'no_faces_detected',
                 warningMessage: warning,

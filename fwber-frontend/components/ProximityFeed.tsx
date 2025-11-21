@@ -77,11 +77,10 @@ export default function ProximityFeed() {
     try {
       setIsPosting(true);
       await proximityApi.createArtifact({
-        type: 'text',
+        type: 'board_post',
         content: newArtifactContent,
-        latitude: location.lat,
-        longitude: location.lng,
-        duration_minutes: 60 * 24, // 24 hours
+        lat: location.lat,
+        lng: location.lng,
       }, token);
       setNewArtifactContent('');
       loadFeed(); // Reload feed
@@ -215,7 +214,7 @@ export default function ProximityFeed() {
               <div className="text-xs text-gray-500 flex items-center gap-4">
                 <span className="flex items-center gap-1">
                   <MapPin className="h-3 w-3" />
-                  {artifact.distance ? `${Math.round(artifact.distance)}m away` : 'Nearby'}
+                  {location ? `${Math.round(getDistanceFromLatLonInM(location.lat, location.lng, artifact.lat, artifact.lng))}m away` : 'Nearby'}
                 </span>
                 <span>Expires {new Date(artifact.expires_at).toLocaleDateString()}</span>
               </div>
@@ -225,4 +224,21 @@ export default function ProximityFeed() {
       </div>
     </div>
   );
+}
+
+function getDistanceFromLatLonInM(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const R = 6371; // Radius of the earth in km
+  const dLat = deg2rad(lat2 - lat1);
+  const dLon = deg2rad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const d = R * c; // Distance in km
+  return d * 1000;
+}
+
+function deg2rad(deg: number) {
+  return deg * (Math.PI / 180);
 }

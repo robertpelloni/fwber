@@ -6,7 +6,7 @@ import { physicalProfileApi, type PhysicalProfile } from '@/lib/api/physical-pro
 import { Ruler, User, Palette, Shirt, Activity, Wand2 } from 'lucide-react';
 
 export default function PhysicalProfileEditor() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [profile, setProfile] = useState<PhysicalProfile>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -19,7 +19,7 @@ export default function PhysicalProfileEditor() {
     const parts = [];
     
     // Basic
-    if (profile.gender) parts.push(profile.gender);
+    if (user?.profile?.gender) parts.push(user.profile.gender);
     if (profile.ethnicity) parts.push(profile.ethnicity);
     
     // Body
