@@ -14,6 +14,42 @@ export default function PhysicalProfileEditor() {
   const [avatarStyle, setAvatarStyle] = useState('realistic');
   const [isGeneratingAvatar, setIsGeneratingAvatar] = useState(false);
 
+  // Auto-generate prompt from physical attributes
+  const generatePromptFromAttributes = useCallback(() => {
+    const parts = [];
+    
+    // Basic
+    if (profile.gender) parts.push(profile.gender);
+    if (profile.ethnicity) parts.push(profile.ethnicity);
+    
+    // Body
+    if (profile.height_cm) parts.push(`${profile.height_cm}cm tall`);
+    if (profile.body_type) parts.push(`${profile.body_type} build`);
+    
+    // Face
+    if (profile.hair_color) parts.push(`${profile.hair_color} hair`);
+    if (profile.eye_color) parts.push(`${profile.eye_color} eyes`);
+    if (profile.skin_tone) parts.push(`${profile.skin_tone} skin`);
+    if (profile.facial_hair) parts.push(profile.facial_hair);
+    
+    // Style
+    if (profile.clothing_style) parts.push(`wearing ${profile.clothing_style} clothes`);
+    if (profile.tattoos) parts.push('visible tattoos');
+    if (profile.piercings) parts.push('piercings');
+    
+    return parts.join(', ');
+  }, [profile]);
+
+  // Update prompt when attributes change if prompt is empty or matches previous auto-generation
+  useEffect(() => {
+    if (!profile.avatar_prompt) {
+      const autoPrompt = generatePromptFromAttributes();
+      if (autoPrompt) {
+        setProfile(prev => ({ ...prev, avatar_prompt: autoPrompt }));
+      }
+    }
+  }, [profile, generatePromptFromAttributes]);
+
   const loadProfile = useCallback(async () => {
     if (!token) return;
     try {
@@ -56,6 +92,21 @@ export default function PhysicalProfileEditor() {
     try {
       setIsGeneratingAvatar(true);
       setMessage(null);
+      
+      // Ensure prompt is up to date before sending
+      const promptToSend = profile.avatar_prompt || generatePromptFromAttributes();
+      
+      // If we generated a new prompt, update state first
+      if (promptToSend !== profile.avatar_prompt) {
+        setProfile(prev => ({ ...prev, avatar_prompt: promptToSend }));
+        // We need to save the profile with the new prompt first? 
+        // Actually requestAvatar likely takes the prompt from the backend DB or we should send it.
+        // The current API likely uses the stored profile. Let's check the API call.
+        // physicalProfileApi.requestAvatar(token, avatarStyle) only takes style.
+        // So we must save the profile first if the prompt changed.
+        await physicalProfileApi.upsert(token, { ...profile, avatar_prompt: promptToSend });
+      }
+
       await physicalProfileApi.requestAvatar(token, avatarStyle);
       setMessage({ type: 'success', text: 'Avatar generation requested!' });
       loadProfile(); // Reload to get status
@@ -265,7 +316,16 @@ export default function PhysicalProfileEditor() {
           
           <div className="bg-purple-50 p-4 rounded-md mb-4">
             <label htmlFor="avatar_prompt" className="block text-sm font-medium text-purple-900 mb-1">Avatar Prompt</label>
-            <p className="text-xs text-purple-700 mb-2">Describe yourself for the AI generator. This will be used to create your avatar.</p>
+            <div className="flex justify-between items-center mb-2">
+              <p className="text-xs text-purple-700">Describe yourself for the AI generator.</p>
+              <button 
+                type="button"
+                onClick={() => setProfile(prev => ({ ...prev, avatar_prompt: generatePromptFromAttributes() }))}
+                className="text-xs text-purple-600 hover:text-purple-800 underline"
+              >
+                Regenerate from attributes
+              </button>
+            </div>
             <textarea
               id="avatar_prompt"
               rows={3}

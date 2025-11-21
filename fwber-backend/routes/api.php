@@ -71,6 +71,7 @@ Route::middleware("api")->group(function (): void {
         
         // Matching routes (require complete profile)
         Route::middleware('profile.complete')->group(function (): void {
+            Route::get("/matches/established", [MatchController::class, "establishedMatches"]);
             Route::get("/matches", [MatchController::class, "index"]);
             Route::post("/matches/action", [MatchController::class, "action"]);
         });

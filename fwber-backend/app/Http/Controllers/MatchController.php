@@ -142,6 +142,66 @@ class MatchController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/matches/established",
+     *     tags={"Matches"},
+     *     summary="Get established matches",
+     *     description="Retrieve a list of users the authenticated user has matched with.",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Matches retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *         )
+     *     )
+     * )
+     */
+    public function establishedMatches(Request $request): JsonResponse
+    {
+        $user = auth()->user();
+        
+        $matches = DB::table('matches')
+            ->where('user1_id', $user->id)
+            ->orWhere('user2_id', $user->id)
+            ->get();
+
+        $userIds = $matches->map(function ($match) use ($user) {
+            return $match->user1_id === $user->id ? $match->user2_id : $match->user1_id;
+        });
+
+        $users = User::with('profile.photos')->whereIn('id', $userIds)->get();
+
+        // Format as "Conversation" objects for frontend compatibility
+        $conversations = $users->map(function ($otherUser) use ($user, $matches) {
+            // Find the match record
+            $match = $matches->first(function ($m) use ($user, $otherUser) {
+                return ($m->user1_id === $user->id && $m->user2_id === $otherUser->id) ||
+                       ($m->user1_id === $otherUser->id && $m->user2_id === $user->id);
+            });
+
+            // Get last message
+            $lastMessage = \App\Models\Message::where(function ($q) use ($user, $otherUser) {
+                $q->where('sender_id', $user->id)->where('receiver_id', $otherUser->id);
+            })->orWhere(function ($q) use ($user, $otherUser) {
+                $q->where('sender_id', $otherUser->id)->where('receiver_id', $user->id);
+            })->latest()->first();
+
+            return [
+                'id' => $match->id, // Match ID acts as conversation ID
+                'user1_id' => $match->user1_id,
+                'user2_id' => $match->user2_id,
+                'created_at' => $match->created_at,
+                'updated_at' => $match->updated_at,
+                'last_message' => $lastMessage,
+                'other_user' => $otherUser,
+            ];
+        });
+
+        return response()->json(['data' => $conversations]);
+    }
+
+    /**
      * @OA\Post(
      *     path="/matches/action",
      *     tags={"Matches"},

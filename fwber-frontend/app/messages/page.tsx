@@ -13,6 +13,8 @@ export default function MessagesPage() {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState('')
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -36,16 +38,17 @@ export default function MessagesPage() {
   }, [token])
 
   const loadMessages = useCallback(async (conversationId: number) => {
-    if (!token) return
+    if (!token || !selectedConversation?.other_user?.id) return
 
     try {
       setError(null)
-      const messagesData = await getMessages(token, conversationId)
+      // Use other_user.id instead of conversationId (which is match ID)
+      const messagesData = await getMessages(token, selectedConversation.other_user.id)
       setMessages(messagesData)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load messages')
     }
-  }, [token])
+  }, [token, selectedConversation])
 
   useEffect(() => {
     if (isAuthenticated && token) {
@@ -67,17 +70,30 @@ export default function MessagesPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0])
+    }
+  }
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!token || !selectedConversation || !newMessage.trim()) return
+    if (!token || !selectedConversation?.other_user?.id || (!newMessage.trim() && !selectedFile)) return
 
     try {
       setIsSending(true)
       setError(null)
 
-      const message = await sendMessage(token, selectedConversation.id, newMessage.trim())
+      const message = await sendMessage(
+        token, 
+        selectedConversation.other_user.id, 
+        newMessage.trim(),
+        selectedFile
+      )
       setMessages(prev => [...prev, message])
       setNewMessage('')
+      setSelectedFile(null)
+      if (fileInputRef.current) fileInputRef.current.value = ''
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send message')
     } finally {
@@ -86,7 +102,7 @@ export default function MessagesPage() {
   }
 
   const handleBlock = async () => {
-    if (!token || !selectedConversation || !confirm('Are you sure you want to block this user? You will no longer see their messages or profile.')) return
+    if (!token || !selectedConversation?.other_user || !confirm('Are you sure you want to block this user? You will no longer see their messages or profile.')) return
     
     try {
       await blockUser(token, selectedConversation.other_user.id)
@@ -99,7 +115,7 @@ export default function MessagesPage() {
   }
 
   const handleReport = async (reason: string, details: string) => {
-    if (!token || !selectedConversation) return
+    if (!token || !selectedConversation?.other_user) return
     await reportUser(token, selectedConversation.other_user.id, reason, details)
     
     if (confirm('Report submitted. Do you want to block this user as well?')) {
@@ -311,6 +327,10 @@ export default function MessagesPage() {
                                 : 'bg-gray-200 text-gray-900'
                             }`}
                           >
+                            {/* Display media if present (assuming message structure has media_url or similar) */}
+                            {/* Note: The Message interface in messages.ts might need update to include media fields if we want to display them */}
+                            {/* For now, we just send. Displaying requires updating Message interface and backend response */}
+                            
                             <p className="text-sm">{message.content}</p>
                             <p className={`text-xs mt-1 ${
                               message.sender_id === user?.id ? 'text-blue-100' : 'text-gray-500'
@@ -325,7 +345,39 @@ export default function MessagesPage() {
 
                     {/* Message Input */}
                     <div className="p-4 border-t">
+                      {selectedFile && (
+                        <div className="mb-2 px-3 py-1 bg-gray-100 rounded flex justify-between items-center">
+                          <span className="text-sm text-gray-600 truncate max-w-xs">{selectedFile.name}</span>
+                          <button 
+                            onClick={() => {
+                              setSelectedFile(null)
+                              if (fileInputRef.current) fileInputRef.current.value = ''
+                            }}
+                            className="text-gray-500 hover:text-red-500"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      )}
                       <form onSubmit={handleSendMessage} className="flex space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="p-2 text-gray-500 hover:text-blue-600 hover:bg-gray-100 rounded-full transition-colors"
+                          title="Attach file"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                          </svg>
+                        </button>
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          onChange={handleFileSelect}
+                          className="hidden"
+                          accept="image/*,video/*,audio/*"
+                          title="Attach file"
+                        />
                         <input
                           type="text"
                           value={newMessage}
@@ -336,7 +388,7 @@ export default function MessagesPage() {
                         />
                         <button
                           type="submit"
-                          disabled={isSending || !newMessage.trim()}
+                          disabled={isSending || (!newMessage.trim() && !selectedFile)}
                           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {isSending ? 'Sending...' : 'Send'}
