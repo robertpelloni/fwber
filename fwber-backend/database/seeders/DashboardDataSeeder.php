@@ -13,11 +13,11 @@ class DashboardDataSeeder extends Seeder
      */
     public function run(): void
     {
-        // Get or create test users
-        $user1Email = 'test1@fwber.com';
-        $user2Email = 'test2@fwber.com';
+                // Create two users with messages
+        $user1Email = 'test1@fwber.me';
+        $user2Email = 'test2@fwber.me';
         
-        $user1 = DB::table('users')->where('email', $user1Email)->first();
+        $user1 = User::firstOrCreate(
         if (!$user1) {
             $user1Id = DB::table('users')->insertGetId([
                 'name' => 'Test User 1',

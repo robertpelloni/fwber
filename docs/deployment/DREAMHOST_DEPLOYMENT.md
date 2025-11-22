@@ -5,7 +5,7 @@ This guide walks you through deploying FWBer (Laravel Backend + Next.js Frontend
 ## Prerequisites
 
 1.  **SSH Access**: Ensure you have enabled Shell Access (SSH) for your user in the DreamHost Panel.
-2.  **Domain Setup**: You should have a domain (e.g., `api.fwber.com` for backend, `fwber.com` for frontend) configured in DreamHost.
+2.  **Domain Setup**: You should have a domain (e.g., `api.fwber.me` for backend, `fwber.me` for frontend) configured in DreamHost.
 3.  **Database**: Create a MySQL database in the DreamHost Panel. Note the Hostname, Database Name, Username, and Password.
 
 ## Step 1: Connect to Server
@@ -46,7 +46,7 @@ nano .env
 ```
 
 **Update the following in `.env`:**
--   `APP_URL`: Your API domain (e.g., `https://api.fwber.com`)
+-   `APP_URL`: Your API domain (e.g., `https://api.fwber.me`)
 -   `DB_HOST`: Your DreamHost database hostname (usually `mysql.yourdomain.com`)
 -   `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`: From DreamHost Panel.
 -   `APP_KEY`: Generate one locally (`php artisan key:generate --show`) and paste it here, or run the command on the server if possible.
@@ -68,7 +68,7 @@ bash deploy.sh --env=production
 
 In the DreamHost Panel:
 1.  Go to **Domains** > **Manage Domains**.
-2.  Edit your API domain (e.g., `api.fwber.com`).
+2.  Edit your API domain (e.g., `api.fwber.me`).
 3.  Change the **Web Directory** to: `/home/username/fwber/fwber-backend/public`
 4.  Save changes.
 
@@ -93,7 +93,7 @@ In the DreamHost Panel:
     cp .env.example .env.local
     nano .env.local
     ```
-    Update `NEXT_PUBLIC_API_URL` to point to your backend (e.g., `https://api.fwber.com`).
+    Update `NEXT_PUBLIC_API_URL` to point to your backend (e.g., `https://api.fwber.me`).
 
 3.  **Run Deployment**:
     ```bash
@@ -120,5 +120,5 @@ If your Next.js app can be static (no SSR), you can export it.
 
 ## Step 5: Verification
 
-1.  Visit your API URL (`https://api.fwber.com/api/documentation`) to see Swagger docs.
+1.  Visit your API URL (`https://api.fwber.me/api/documentation`) to see Swagger docs.
 2.  Visit your Frontend URL to see the app.
