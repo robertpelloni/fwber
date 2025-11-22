@@ -38,7 +38,7 @@ describe('Proximity Feed (Local Pulse)', () => {
       body: { data: user }
     }).as('getUser');
 
-    // Mock proximity feed
+    // Mock proximity feed (artifacts)
     cy.intercept('GET', '**/api/proximity/feed*', {
       statusCode: 200,
       body: {
@@ -57,6 +57,31 @@ describe('Proximity Feed (Local Pulse)', () => {
         ]
       }
     }).as('getFeed');
+
+    // Mock nearby chatrooms
+    cy.intercept('GET', '**/api/proximity-chatrooms/nearby*', {
+      statusCode: 200,
+      body: {
+        chatrooms: [
+          {
+            id: 201,
+            name: 'Central Park Meetup',
+            type: 'event',
+            distance_meters: 100,
+            current_members: 5,
+            max_members: 20,
+            lat: 40.7128,
+            lng: -74.0060
+          }
+        ]
+      }
+    }).as('getChatrooms');
+
+    // Mock join chatroom
+    cy.intercept('POST', '**/api/proximity-chatrooms/201/join', {
+      statusCode: 200,
+      body: { message: 'Successfully joined proximity chatroom' }
+    }).as('joinChatroom');
 
     // Mock create artifact
     cy.intercept('POST', '**/api/proximity/artifacts', {
@@ -120,5 +145,12 @@ describe('Proximity Feed (Local Pulse)', () => {
       content: 'New post content',
       type: 'board_post'
     });
+
+    // Check for chatroom and join
+    cy.contains('Central Park Meetup').should('be.visible');
+    cy.contains('button', 'Join Room').click();
+    
+    // Verify navigation
+    cy.url().should('include', '/proximity-chatrooms/201');
   });
 });

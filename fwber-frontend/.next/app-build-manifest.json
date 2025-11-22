@@ -26,10 +26,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/not-found.js"
     ],
-    "/bulletin-boards/page": [
+    "/messages/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/bulletin-boards/page.js"
+      "static/chunks/app/messages/page.js"
+    ],
+    "/messages/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/messages/layout.js"
     ]
   }
 }

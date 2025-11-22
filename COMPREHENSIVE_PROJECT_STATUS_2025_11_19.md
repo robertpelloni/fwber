@@ -32,6 +32,7 @@ The FWBer project has reached a stable milestone. Both the Laravel backend and N
 - **Type Check:** Passing (`npm run type-check`)
 - **Test Status:**
   - **Proximity Feed:** Cypress tests passing (`npm run test:e2e:pulse`).
+  - **Media Messaging:** Cypress tests passing (`npm run test:e2e:media`).
 - **Recent Fixes:**
   - **`components/SwipeableCard.tsx`**: Rewrote broken component logic (syntax errors, event handling).
   - **`components/EnhancedProfileEditor.tsx`**: Fixed import typos (`@tanstack/react-query`) and JSX escaping.
@@ -41,6 +42,7 @@ The FWBer project has reached a stable milestone. Both the Laravel backend and N
   - **Face Blurring**: Hardened model caching in `lib/faceBlur.ts` and added telemetry for skipped uploads.
   - **Face Reveal**: Implemented progressive unblur logic in `components/FaceReveal.tsx` and integrated into `components/PhotoRevealGate.tsx`.
   - **Proximity Chat**: Added chatroom discovery UI in `components/ProximityFeed.tsx` and API integration.
+  - **Media Messaging**: Implemented and verified media attachment support in chat.
 
 ## 3. Integration & Configuration
 - **Frontend API URL:** Configured to `http://localhost:8010/api` in `.env.local`.
@@ -49,7 +51,6 @@ The FWBer project has reached a stable milestone. Both the Laravel backend and N
 
 ## 4. Known Issues / Notes
 - **Missing Features:**
-  - **Messaging:** Text-only; no file/image attachment support yet.
   - **Registration:** Text-only; no avatar upload step during sign-up.
 - **Legacy Feature Cards:** The dashboard contains a "Show all features" toggle for legacy/dev features.
 - **Images:** Some components use `<img>` tags instead of `next/image`. This generates warnings but does not break the build.
