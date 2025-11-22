@@ -18,30 +18,32 @@ class DashboardDataSeeder extends Seeder
         $user2Email = 'test2@fwber.me';
         
         $user1 = User::firstOrCreate(
-        if (!$user1) {
-            $user1Id = DB::table('users')->insertGetId([
+            ['email' => $user1Email],
+            [
                 'name' => 'Test User 1',
-                'email' => $user1Email,
                 'password' => bcrypt('password123'),
                 'email_verified_at' => Carbon::now(),
                 'created_at' => Carbon::now()->subDays(30),
                 'updated_at' => Carbon::now(),
-            ]);
-            $user1 = DB::table('users')->find($user1Id);
+            ]
+        );
+
+        if ($user1->wasRecentlyCreated) {
             $this->command->info("✓ Created test user: {$user1Email}");
         }
         
-        $user2 = DB::table('users')->where('email', $user2Email)->first();
-        if (!$user2) {
-            $user2Id = DB::table('users')->insertGetId([
+        $user2 = User::firstOrCreate(
+            ['email' => $user2Email],
+            [
                 'name' => 'Test User 2',
-                'email' => $user2Email,
                 'password' => bcrypt('password123'),
                 'email_verified_at' => Carbon::now(),
                 'created_at' => Carbon::now()->subDays(25),
                 'updated_at' => Carbon::now(),
-            ]);
-            $user2 = DB::table('users')->find($user2Id);
+            ]
+        );
+
+        if ($user2->wasRecentlyCreated) {
             $this->command->info("✓ Created test user: {$user2Email}");
         }
         

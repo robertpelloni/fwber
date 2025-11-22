@@ -582,8 +582,8 @@ mysql -h localhost -u fwber -p fwber < db\migrations\2025-10-11-legacy-matcher-c
 - 📖 **Documentation:** [docs/](docs/)
 - 🐛 **Bug Reports:** [GitHub Issues](https://github.com/yourusername/fwber/issues)
 - 💬 **Discussions:** [GitHub Discussions](https://github.com/yourusername/fwber/discussions)
-- 📧 **Contact:** [your-email@example.com]
-- 🌐 **Website:** [fwber.me](https://fwber.me) / [fwber.com](https://fwber.com)
+- 📧 **Contact:** [support@fwber.me](mailto:support@fwber.me)
+- 🌐 **Website:** [fwber.me](https://fwber.me)
 
 ---
 

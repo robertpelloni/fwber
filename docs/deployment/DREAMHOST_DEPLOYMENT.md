@@ -59,6 +59,17 @@ php -v
 ```
 If it's older than 8.2, you may need to specify the path to a newer PHP version or update it in the panel.
 
+**Important: Composer Setup**
+DreamHost does not always have `composer` in the global path. If you see a "composer not found" error:
+1.  Install it locally:
+    ```bash
+    curl -sS https://getcomposer.org/installer | php
+    mv composer.phar composer
+    chmod +x composer
+    ```
+2.  Or use the full path if it's already installed (e.g., `php composer.phar`).
+3.  **Quick Fix**: Edit `deploy.sh` to use `./composer` if you installed it locally, or ensure `composer` is in your `$PATH`.
+
 Run the deploy script:
 ```bash
 bash deploy.sh --env=production
