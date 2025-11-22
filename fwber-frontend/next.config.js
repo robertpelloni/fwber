@@ -57,6 +57,12 @@ const nextConfig = {
         port: '8002',
         pathname: '/storage/**',
       },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '8000',
+        pathname: '/**',
+      },
     ],
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 60,

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import Image from 'next/image'
 import { useAuth } from '@/lib/auth-context'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { getConversations, getMessages, sendMessage, markMessagesAsRead, type Conversation, type Message } from '@/lib/api/messages'
@@ -347,10 +348,13 @@ export default function MessagesPage() {
                             {message.media_url && (
                               <div className="mb-2">
                                 {message.message_type === 'image' ? (
-                                  <img 
+                                  <Image 
                                     src={message.media_url.startsWith('http') ? message.media_url : `${BACKEND_URL}${message.media_url}`} 
                                     alt="Attachment" 
-                                    className="max-w-full rounded-lg"
+                                    width={0}
+                                    height={0}
+                                    sizes="100vw"
+                                    className="w-full h-auto rounded-lg"
                                     loading="lazy"
                                   />
                                 ) : message.message_type === 'video' ? (

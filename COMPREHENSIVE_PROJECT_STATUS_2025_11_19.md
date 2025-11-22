@@ -33,6 +33,10 @@ The FWBer project has reached a stable milestone. Both the Laravel backend and N
 - **Test Status:**
   - **Proximity Feed:** Cypress tests passing (`npm run test:e2e:pulse`).
   - **Media Messaging:** Cypress tests passing (`npm run test:e2e:media`).
+  - **Matching Flow:** Cypress tests passing (`npm run test:e2e:matching`).
+  - **Nearby Users:** Cypress tests passing (`npm run test:e2e:nearby`).
+  - **Chatrooms:** Cypress tests passing (`npm run test:e2e:chatrooms`).
+  - **Messaging:** Cypress tests passing (`npm run test:e2e:messaging`).
 - **Recent Fixes:**
   - **`components/SwipeableCard.tsx`**: Rewrote broken component logic (syntax errors, event handling).
   - **`components/EnhancedProfileEditor.tsx`**: Fixed import typos (`@tanstack/react-query`) and JSX escaping.
@@ -43,6 +47,7 @@ The FWBer project has reached a stable milestone. Both the Laravel backend and N
   - **Face Reveal**: Implemented progressive unblur logic in `components/FaceReveal.tsx` and integrated into `components/PhotoRevealGate.tsx`.
   - **Proximity Chat**: Added chatroom discovery UI in `components/ProximityFeed.tsx` and API integration.
   - **Media Messaging**: Implemented and verified media attachment support in chat.
+  - **Image Optimization**: Replaced `<img>` tags with `next/image` in `app/messages/page.tsx` and configured `next.config.js` to allow backend images.
 
 ## 3. Integration & Configuration
 - **Frontend API URL:** Configured to `http://localhost:8010/api` in `.env.local`.
@@ -53,7 +58,6 @@ The FWBer project has reached a stable milestone. Both the Laravel backend and N
 - **Missing Features:**
   - **Registration:** Text-only; no avatar upload step during sign-up.
 - **Legacy Feature Cards:** The dashboard contains a "Show all features" toggle for legacy/dev features.
-- **Images:** Some components use `<img>` tags instead of `next/image`. This generates warnings but does not break the build.
 - **Metadata:** Some pages have metadata warnings (viewport/themeColor) that should be moved to `generateViewport` in a future refactor.
 
 ## 5. Next Steps
@@ -61,10 +65,8 @@ The FWBer project has reached a stable milestone. Both the Laravel backend and N
    - Deploy Backend to production server (ensure `.env` is configured).
    - Deploy Frontend to Vercel or similar (set `NEXT_PUBLIC_API_URL`).
 2. **Testing:**
-   - Perform end-to-end testing of the Matching Flow.
    - Verify Real-time Chat functionality in a live environment.
 3. **Refinement:**
-   - Address `next/image` optimization warnings.
    - Refactor metadata to comply with Next.js 14 standards.
 
 ---
