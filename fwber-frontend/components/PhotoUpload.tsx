@@ -465,8 +465,7 @@ export default function PhotoUpload({
       {dragActive && (
         <div 
           {...getRootProps()}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-primary/10 backdrop-blur-sm"
-          style={{ pointerEvents: 'auto' }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-primary/10 backdrop-blur-sm pointer-events-auto"
         >
           <input {...getInputProps()} />
           <div className="bg-white dark:bg-gray-800 rounded-lg p-8 shadow-2xl border-4 border-dashed border-primary">
@@ -489,32 +488,23 @@ export default function PhotoUpload({
       <div
         className={`
           relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer
-          transition-all duration-200 ease-in-out
+          transition-all duration-200 ease-in-out select-none min-h-[200px]
           ${isDragActive || dragActive 
             ? 'border-primary bg-primary/5' 
             : 'border-muted-foreground/25 hover:border-primary/50'
           }
-          ${totalPhotos >= maxPhotos ? 'opacity-50 cursor-not-allowed' : ''}
+          ${totalPhotos >= maxPhotos ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'pointer-events-auto'}
         `}
         onClick={() => {
           if (totalPhotos < maxPhotos) {
             open()
           }
         }}
-        style={{
-          pointerEvents: totalPhotos >= maxPhotos ? 'none' : 'auto',
-          userSelect: 'none',
-          WebkitUserSelect: 'none',
-          minHeight: '200px',
-        }}
       >
-        <input {...getInputProps()} ref={fileInputRef} style={{ display: 'none' }} />
+        <input {...getInputProps()} ref={fileInputRef} className="hidden" />
         
         <div 
-          className="flex flex-col items-center space-y-4"
-          style={{
-            pointerEvents: 'none', // Make inner content not interfere with drag events
-          }}
+          className="flex flex-col items-center space-y-4 pointer-events-none"
         >
           <div className="p-4 rounded-full bg-primary/10">
             <Camera className="w-8 h-8 text-primary" />
@@ -793,7 +783,7 @@ export default function PhotoUpload({
                     <div className="absolute bottom-2 right-2 z-20 flex items-center gap-1 rounded-full bg-black/60 px-1.5 py-0.5 text-[10px] text-white shadow-lg backdrop-blur pointer-events-auto">
                       <button
                         type="button"
-                        aria-pressed={preview.activeView === 'processed' ? 'true' : 'false'}
+                        aria-pressed={preview.activeView === 'processed'}
                         className={`px-2 py-0.5 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 ${
                           preview.activeView === 'processed'
                             ? 'bg-white text-black'
@@ -808,7 +798,7 @@ export default function PhotoUpload({
                       </button>
                       <button
                         type="button"
-                        aria-pressed={preview.activeView === 'original' ? 'true' : 'false'}
+                        aria-pressed={preview.activeView === 'original'}
                         className={`px-2 py-0.5 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 ${
                           preview.activeView === 'original'
                             ? 'bg-white text-black'
@@ -990,107 +980,37 @@ export function PhotoGallery({
 
   return (
     <div 
-      className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center"
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.95)',
-        zIndex: 9999,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95"
       onClick={onClose}
     >
       <div 
-        className="relative w-full h-full p-4"
-        style={{
-          position: 'relative',
-          width: '100%',
-          height: '100%',
-          padding: '1rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
+        className="relative w-full h-full p-4 flex items-center justify-center"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          style={{
-            position: 'absolute',
-            top: '1.5rem',
-            right: '1.5rem',
-            zIndex: 10,
-            padding: '0.75rem',
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            color: 'white',
-            borderRadius: '50%',
-            border: '2px solid rgba(255, 255, 255, 0.3)',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.9)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'
-          }}
+          className="absolute top-6 right-6 z-10 p-3 bg-black/70 text-white rounded-full border-2 border-white/30 flex items-center justify-center hover:bg-black/90 transition-colors"
+          aria-label="Close gallery"
         >
-          <X style={{ width: '24px', height: '24px', color: 'white' }} />
+          <X className="w-6 h-6 text-white" />
         </button>
 
         {/* Delete Button */}
         {onDelete && photoIds && photoIds[currentIndex] && (
           <button
             onClick={handleDelete}
-            style={{
-              position: 'absolute',
-              top: '1.5rem',
-              right: '5rem',
-              zIndex: 10,
-              padding: '0.75rem',
-              backgroundColor: 'rgba(239, 68, 68, 0.8)',
-              color: 'white',
-              borderRadius: '50%',
-              border: '2px solid rgba(255, 255, 255, 0.3)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 1)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.8)'
-            }}
+            className="absolute top-6 right-20 z-10 p-3 bg-red-500/80 text-white rounded-full border-2 border-white/30 flex items-center justify-center hover:bg-red-500 transition-colors"
             title="Delete photo"
+            aria-label="Delete photo"
           >
-            <Trash2 style={{ width: '24px', height: '24px', color: 'white' }} />
+            <Trash2 className="w-6 h-6 text-white" />
           </button>
         )}
 
         {/* Photo */}
-        <div 
-          className="relative flex items-center justify-center"
-          style={{
-            width: '100vw',
-            height: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '2rem',
-            boxSizing: 'border-box',
-          }}
-        >
-          <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+        <div className="relative w-screen h-screen flex items-center justify-center p-8">
+          <div className="relative w-full h-full">
             <Image
               src={photos[currentIndex]}
               alt={`Photo ${currentIndex + 1}`}
@@ -1107,82 +1027,24 @@ export function PhotoGallery({
           <>
             <button
               onClick={prevPhoto}
-              style={{
-                position: 'absolute',
-                left: '2rem',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                zIndex: 10,
-                padding: '1rem',
-                backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                color: 'white',
-                borderRadius: '50%',
-                border: '2px solid rgba(255, 255, 255, 0.3)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.9)'
-                e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'
-                e.currentTarget.style.transform = 'translateY(-50%) scale(1)'
-              }}
+              className="absolute left-8 top-1/2 -translate-y-1/2 z-10 p-4 bg-black/70 text-white rounded-full border-2 border-white/30 flex items-center justify-center hover:bg-black/90 hover:scale-110 transition-all"
+              aria-label="Previous photo"
             >
-              <ChevronLeft style={{ width: '32px', height: '32px', color: 'white' }} />
+              <ChevronLeft className="w-8 h-8 text-white" />
             </button>
             
             <button
               onClick={nextPhoto}
-              style={{
-                position: 'absolute',
-                right: '2rem',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                zIndex: 10,
-                padding: '1rem',
-                backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                color: 'white',
-                borderRadius: '50%',
-                border: '2px solid rgba(255, 255, 255, 0.3)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.9)'
-                e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'
-                e.currentTarget.style.transform = 'translateY(-50%) scale(1)'
-              }}
+              className="absolute right-8 top-1/2 -translate-y-1/2 z-10 p-4 bg-black/70 text-white rounded-full border-2 border-white/30 flex items-center justify-center hover:bg-black/90 hover:scale-110 transition-all"
+              aria-label="Next photo"
             >
-              <ChevronRight style={{ width: '32px', height: '32px', color: 'white' }} />
+              <ChevronRight className="w-8 h-8 text-white" />
             </button>
           </>
         )}
 
         {/* Photo Counter */}
-        <div style={{
-          position: 'absolute',
-          bottom: '2rem',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          backgroundColor: 'rgba(0, 0, 0, 0.7)',
-          color: 'white',
-          padding: '0.5rem 1rem',
-          borderRadius: '9999px',
-          fontSize: '0.875rem',
-          border: '2px solid rgba(255, 255, 255, 0.3)',
-          zIndex: 10,
-        }}>
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm border-2 border-white/30 z-10">
           {currentIndex + 1} / {photos.length}
         </div>
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { proximityApi } from '@/lib/api/proximity';
 import type { ProximityArtifact, ProximityChatroom } from '@/types/proximity';
@@ -8,6 +9,7 @@ import { MapPin, Send, AlertTriangle, Trash2, Clock, User, MessageSquare } from 
 import SexQuote from './SexQuote';
 
 export default function ProximityFeed() {
+  const router = useRouter();
   const { token: authToken, user } = useAuth();
   // Allow mock token for testing
   const token = authToken || (typeof window !== 'undefined' ? localStorage.getItem('mock_auth_token') : null);
@@ -195,10 +197,16 @@ export default function ProximityFeed() {
               <div key={room.id} className="bg-white shadow rounded-lg p-4 border-l-4 border-purple-500 hover:shadow-md transition-shadow cursor-pointer">
                 <h4 className="font-bold text-gray-900">{room.name}</h4>
                 {room.description && <p className="text-sm text-gray-600 mb-2">{room.description}</p>}
-                <div className="flex justify-between items-center text-xs text-gray-500">
+                <div className="flex justify-between items-center text-xs text-gray-500 mb-3">
                   <span>{room.active_members_count} active</span>
                   <span>{location ? `${Math.round(getDistanceFromLatLonInM(location.lat, location.lng, room.lat, room.lng))}m away` : 'Nearby'}</span>
                 </div>
+                <button
+                  onClick={() => router.push(`/proximity-chatrooms/${room.id}`)}
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium py-2 px-4 rounded transition-colors flex items-center justify-center gap-2"
+                >
+                  Join Room
+                </button>
               </div>
             ))}
           </div>

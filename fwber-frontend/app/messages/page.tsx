@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth-context'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { getConversations, getMessages, sendMessage, markMessagesAsRead, type Conversation, type Message } from '@/lib/api/messages'
 import ReportModal from '@/components/ReportModal'
+import ProfileViewModal from '@/components/ProfileViewModal'
 import { blockUser, reportUser } from '@/lib/api/safety'
 
 export default function MessagesPage() {
@@ -19,6 +20,7 @@ export default function MessagesPage() {
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isReportModalOpen, setIsReportModalOpen] = useState(false)
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const [showSafetyMenu, setShowSafetyMenu] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   
@@ -277,11 +279,19 @@ export default function MessagesPage() {
                           <h3 className="text-lg font-semibold text-gray-900">
                             {selectedConversation.other_user?.profile?.display_name || 'Anonymous'}
                           </h3>
-                          <p className="text-sm text-gray-500">
-                            {selectedConversation.other_user?.profile?.age && 
-                              `${selectedConversation.other_user.profile.age} years old`
-                            }
-                          </p>
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm text-gray-500">
+                              {selectedConversation.other_user?.profile?.age && 
+                                `${selectedConversation.other_user.profile.age} years old`
+                              }
+                            </p>
+                            <button
+                              onClick={() => setIsProfileModalOpen(true)}
+                              className="text-xs text-blue-600 hover:text-blue-800 font-medium hover:underline"
+                            >
+                              View Profile
+                            </button>
+                          </div>
                         </div>
                       </div>
                       
@@ -456,6 +466,15 @@ export default function MessagesPage() {
           onClose={() => setIsReportModalOpen(false)}
           onSubmit={handleReport}
           userName={selectedConversation.other_user?.profile?.display_name || 'User'}
+        />
+      )}
+
+      {selectedConversation && selectedConversation.other_user && (
+        <ProfileViewModal
+          isOpen={isProfileModalOpen}
+          onClose={() => setIsProfileModalOpen(false)}
+          user={selectedConversation.other_user}
+          messagesExchanged={messages.length}
         />
       )}
     </ProtectedRoute>
