@@ -38,6 +38,9 @@ The FWBer project has reached a stable milestone. Both the Laravel backend and N
   - **`lib/api/client.ts`**: Improved error type safety.
   - **General**: Resolved ESLint errors across multiple files (`react/no-unescaped-entities`).
   - **Telemetry**: `usePreviewTelemetry` integrated into `PhotoUpload.tsx` (Profile/Photos).
+  - **Face Blurring**: Hardened model caching in `lib/faceBlur.ts` and added telemetry for skipped uploads.
+  - **Face Reveal**: Implemented progressive unblur logic in `components/FaceReveal.tsx` and integrated into `components/PhotoRevealGate.tsx`.
+  - **Proximity Chat**: Added chatroom discovery UI in `components/ProximityFeed.tsx` and API integration.
 
 ## 3. Integration & Configuration
 - **Frontend API URL:** Configured to `http://localhost:8010/api` in `.env.local`.

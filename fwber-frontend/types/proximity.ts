@@ -48,3 +48,15 @@ export interface LocalPulseParams {
   lng: number;
   radius?: number;
 }
+
+export interface ProximityChatroom {
+  id: number;
+  name: string;
+  description?: string;
+  lat: number;
+  lng: number;
+  radius: number;
+  active_members_count: number;
+  created_at: string;
+  expires_at?: string;
+}

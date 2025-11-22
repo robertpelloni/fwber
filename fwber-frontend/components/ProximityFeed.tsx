@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { proximityApi } from '@/lib/api/proximity';
-import type { ProximityArtifact } from '@/types/proximity';
-import { MapPin, Send, AlertTriangle, Trash2, Clock, User } from 'lucide-react';
+import type { ProximityArtifact, ProximityChatroom } from '@/types/proximity';
+import { MapPin, Send, AlertTriangle, Trash2, Clock, User, MessageSquare } from 'lucide-react';
 import SexQuote from './SexQuote';
 
 export default function ProximityFeed() {
@@ -13,6 +13,7 @@ export default function ProximityFeed() {
   const token = authToken || (typeof window !== 'undefined' ? localStorage.getItem('mock_auth_token') : null);
   
   const [artifacts, setArtifacts] = useState<ProximityArtifact[]>([]);
+  const [chatrooms, setChatrooms] = useState<ProximityChatroom[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -52,9 +53,24 @@ export default function ProximityFeed() {
 
     try {
       setIsLoading(true);
-      // Using getArtifactsFeed for now, but could use getLocalPulse for mixed content
-      const res = await proximityApi.getArtifactsFeed(location.lat, location.lng, 5000, undefined, token);
-      setArtifacts(res.artifacts);
+      
+      const [artifactsRes, chatroomsRes] = await Promise.allSettled([
+        proximityApi.getArtifactsFeed(location.lat, location.lng, 5000, undefined, token),
+        proximityApi.findNearbyChatrooms(location.lat, location.lng, 5000, token)
+      ]);
+
+      if (artifactsRes.status === 'fulfilled') {
+        setArtifacts(artifactsRes.value.artifacts);
+      } else {
+        console.error("Failed to load artifacts", artifactsRes.reason);
+      }
+
+      if (chatroomsRes.status === 'fulfilled') {
+        setChatrooms(chatroomsRes.value.chatrooms);
+      } else {
+        console.warn("Failed to load chatrooms", chatroomsRes.reason);
+      }
+
       setError(null);
     } catch (err) {
       console.error(err);
@@ -166,6 +182,28 @@ export default function ProximityFeed() {
           </div>
         </form>
       </div>
+
+      {/* Chatrooms Section */}
+      {chatrooms.length > 0 && (
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <MessageSquare className="h-5 w-5 text-purple-600" />
+            Nearby Chatrooms
+          </h3>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {chatrooms.map(room => (
+              <div key={room.id} className="bg-white shadow rounded-lg p-4 border-l-4 border-purple-500 hover:shadow-md transition-shadow cursor-pointer">
+                <h4 className="font-bold text-gray-900">{room.name}</h4>
+                {room.description && <p className="text-sm text-gray-600 mb-2">{room.description}</p>}
+                <div className="flex justify-between items-center text-xs text-gray-500">
+                  <span>{room.active_members_count} active</span>
+                  <span>{location ? `${Math.round(getDistanceFromLatLonInM(location.lat, location.lng, room.lat, room.lng))}m away` : 'Nearby'}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Feed */}
       <div className="space-y-4">

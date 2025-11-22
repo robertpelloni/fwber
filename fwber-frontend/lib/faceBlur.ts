@@ -30,6 +30,24 @@ const shouldCacheRequest = (requestUrl: string) => {
   return false
 }
 
+const cleanupOldCaches = async () => {
+  if (typeof caches === 'undefined') return
+  try {
+    const keys = await caches.keys()
+    await Promise.all(
+      keys.map(key => {
+        if (key.startsWith('face-blur-models-') && key !== MODEL_CACHE_NAME) {
+          console.debug('[face-blur] Removing old cache:', key)
+          return caches.delete(key)
+        }
+        return Promise.resolve()
+      })
+    )
+  } catch (err) {
+    console.warn('[face-blur] Cache cleanup failed:', err)
+  }
+}
+
 const patchModelFetch = async (modelUrl: string) => {
   if (typeof window === 'undefined' || typeof caches === 'undefined') {
     return
@@ -39,6 +57,9 @@ const patchModelFetch = async (modelUrl: string) => {
   cachedModelRoots.add(normalizedUrl)
 
   if (fetchPatched) return
+
+  // Clean up old caches on initialization
+  void cleanupOldCaches()
 
   const faceapi = await loadFaceApi()
   const originalFetch: typeof fetch = ((faceapi.env as any).fetch as typeof fetch) || fetch

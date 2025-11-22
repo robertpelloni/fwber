@@ -413,6 +413,7 @@ export default function PhotoUpload({
           blurApplied: metadata.blurApplied ?? previewToRemove.blurApplied,
           discardReason: 'user_removed',
           warning: metadata.warningMessage,
+          skippedReason: metadata.skippedReason,
         })
       }
     }

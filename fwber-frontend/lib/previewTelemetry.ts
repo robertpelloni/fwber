@@ -40,6 +40,7 @@ export interface PreviewDiscardedPayload {
   blurApplied?: boolean
   discardReason: 'user_removed' | 'validation_failed'
   warning?: string
+  skippedReason?: string
 }
 
 const pendingEvents: PendingTelemetryEvent[] = []
@@ -110,6 +111,7 @@ const toDiscardedPayload = (payload: PreviewDiscardedPayload) =>
     blur_applied: payload.blurApplied,
     discard_reason: payload.discardReason,
     warning: payload.warning,
+    skipped_reason: payload.skippedReason,
   })
 
 const enqueueEvent = (name: PreviewTelemetryEventName, payload: Record<string, unknown>) => {
