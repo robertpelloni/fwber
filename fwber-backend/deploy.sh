@@ -116,6 +116,14 @@ echo ""
 
 # Check required commands
 log_info "Checking required commands..."
+
+# Add local composer to PATH if exists
+if [ -f "$PWD/composer" ]; then
+    export PATH=$PWD:$PATH
+elif [ -f "$HOME/composer" ]; then
+    export PATH=$HOME:$PATH
+fi
+
 check_command php
 check_command composer
 check_command git
@@ -252,7 +260,7 @@ if [ "$SKIP_MIGRATIONS" = false ]; then
     
     # Check for pending migrations
     if [ "$DRY_RUN" = false ]; then
-        PENDING_MIGRATIONS=$(php artisan migrate:status | grep -c "Pending" || echo "0")
+        PENDING_MIGRATIONS=$(php artisan migrate:status | grep -c "Pending" || true)
         
         if [ "$PENDING_MIGRATIONS" -gt 0 ]; then
             log_warning "Found $PENDING_MIGRATIONS pending migration(s)"
@@ -351,12 +359,12 @@ echo ""
 
 log_info "Running health check..."
 if [ "$DRY_RUN" = false ]; then
-    HEALTH_STATUS=$(php artisan tinker --execute="echo app(\App\Services\HealthCheckService::class)->check()['status'] ?? 'unknown';" 2>/dev/null || echo "error")
-    
-    if [ "$HEALTH_STATUS" = "healthy" ] || [ "$HEALTH_STATUS" = "unknown" ]; then
-        log_success "Application health check passed"
+    # Simple check if the application can boot
+    if php artisan about > /dev/null 2>&1; then
+        log_success "Application boot check passed"
     else
-        log_warning "Health check returned: $HEALTH_STATUS"
+        log_error "Application failed to boot"
+        exit 1
     fi
 else
     log_info "[DRY RUN] Would run health check"
