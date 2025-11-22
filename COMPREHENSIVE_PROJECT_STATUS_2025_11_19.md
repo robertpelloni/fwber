@@ -48,6 +48,8 @@ The FWBer project has reached a stable milestone. Both the Laravel backend and N
   - **Proximity Chat**: Added chatroom discovery UI in `components/ProximityFeed.tsx` and API integration.
   - **Media Messaging**: Implemented and verified media attachment support in chat.
   - **Image Optimization**: Replaced `<img>` tags with `next/image` in `app/messages/page.tsx` and configured `next.config.js` to allow backend images.
+  - **Linting**: Fixed `useCallback` dependency warning in `components/PhysicalProfileEditor.tsx`.
+  - **Metadata**: Verified `app/layout.tsx` uses the correct Next.js 14 `viewport` export.
 
 ## 3. Integration & Configuration
 - **Frontend API URL:** Configured to `http://localhost:8010/api` in `.env.local`.
@@ -58,7 +60,6 @@ The FWBer project has reached a stable milestone. Both the Laravel backend and N
 - **Missing Features:**
   - **Registration:** Text-only; no avatar upload step during sign-up.
 - **Legacy Feature Cards:** The dashboard contains a "Show all features" toggle for legacy/dev features.
-- **Metadata:** Some pages have metadata warnings (viewport/themeColor) that should be moved to `generateViewport` in a future refactor.
 
 ## 5. Next Steps
 1. **Deployment:**
@@ -66,8 +67,6 @@ The FWBer project has reached a stable milestone. Both the Laravel backend and N
    - Deploy Frontend to Vercel or similar (set `NEXT_PUBLIC_API_URL`).
 2. **Testing:**
    - Verify Real-time Chat functionality in a live environment.
-3. **Refinement:**
-   - Refactor metadata to comply with Next.js 14 standards.
 
 ---
 **Signed off by:** GitHub Copilot (Agent)

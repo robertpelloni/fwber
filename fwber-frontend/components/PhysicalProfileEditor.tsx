@@ -38,7 +38,7 @@ export default function PhysicalProfileEditor() {
     if (profile.piercings) parts.push('piercings');
     
     return parts.join(', ');
-  }, [profile]);
+  }, [profile, user?.profile?.gender]);
 
   // Update prompt when attributes change if prompt is empty or matches previous auto-generation
   useEffect(() => {
