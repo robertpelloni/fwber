@@ -68,7 +68,7 @@ export default function RootLayout({
         <link rel="preconnect" href="http://localhost:8001" />
         
         {/* Preload critical resources */}
-        <link rel="preload" href="/_next/static/css/app/layout.css" as="style" />
+        {/* <link rel="preload" href="/_next/static/css/app/layout.css" as="style" /> */}
       </head>
       <body
         className="min-h-screen bg-background font-sans antialiased text-optimized"
