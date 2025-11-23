@@ -8,6 +8,7 @@ import { getMatches, performMatchAction, type Match, type MatchAction } from '@/
 import { RelationshipTier } from '@/lib/relationshipTiers'
 import RelationshipTierBadge from '@/components/RelationshipTierBadge'
 import PhotoRevealGate from '@/components/PhotoRevealGate'
+import MatchFilter from '@/components/MatchFilter'
 import MatchModal from '@/components/MatchModal'
 import ReportModal from '@/components/ReportModal'
 import { reportUser, blockUser } from '@/lib/api/safety'
@@ -21,6 +22,7 @@ export default function MatchesPage() {
   const [error, setError] = useState<string | null>(null)
   const [showMatchDetails, setShowMatchDetails] = useState(false)
   const [showTierInfo, setShowTierInfo] = useState(true)
+  const [filters, setFilters] = useState({});
   
   // Match Modal State
   const [isMatchModalOpen, setIsMatchModalOpen] = useState(false)
@@ -35,13 +37,13 @@ export default function MatchesPage() {
     return RelationshipTier.DISCOVERY
   }
 
-  const loadMatches = useCallback(async () => {
+  const loadMatches = useCallback(async (newFilters = {}) => {
     if (!token) return
 
     try {
       setIsLoading(true)
       setError(null)
-      const matchesData = await getMatches(token)
+      const matchesData = await getMatches(token, newFilters)
       setMatches(matchesData)
       setCurrentMatchIndex(0)
     } catch (err) {
@@ -53,9 +55,9 @@ export default function MatchesPage() {
 
   useEffect(() => {
     if (isAuthenticated && token) {
-      loadMatches()
+      loadMatches(filters)
     }
-  }, [isAuthenticated, token, loadMatches])
+  }, [isAuthenticated, token, loadMatches, filters])
 
   const advanceToNextMatch = useCallback(() => {
     if (currentMatchIndex < matches.length - 1) {
@@ -200,6 +202,12 @@ export default function MatchesPage() {
                   Refresh
                 </button>
                 <a
+                  href="/friends"
+                  className="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700"
+                >
+                  Friends
+                </a>
+                <a
                   href="/dashboard"
                   className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
                 >
@@ -212,8 +220,9 @@ export default function MatchesPage() {
 
         {/* Main Content */}
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <MatchFilter onFilterChange={(newFilters) => setFilters(newFilters)} />
           {currentMatch && (
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden mt-8">
               {/* Match Card */}
               <div className="relative">
                 {/* Profile Photo with Tier-based Reveal */}

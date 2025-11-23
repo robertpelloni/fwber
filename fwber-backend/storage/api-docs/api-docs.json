@@ -5087,6 +5087,66 @@
                             "minimum": 1,
                             "example": 25
                         }
+                    },
+                    {
+                        "name": "smoking",
+                        "in": "query",
+                        "description": "Filter by smoking preference",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "non-smoker",
+                                "occasional",
+                                "regular",
+                                "social",
+                                "trying-to-quit"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "drinking",
+                        "in": "query",
+                        "description": "Filter by drinking preference",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "non-drinker",
+                                "occasional",
+                                "regular",
+                                "social",
+                                "sober"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "body_type",
+                        "in": "query",
+                        "description": "Filter by body type",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "slim",
+                                "athletic",
+                                "average",
+                                "curvy",
+                                "plus-size",
+                                "muscular"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "height_min",
+                        "in": "query",
+                        "description": "Minimum height in centimeters",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 250,
+                            "minimum": 120
+                        }
                     }
                 ],
                 "responses": {

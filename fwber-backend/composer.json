@@ -57,6 +57,9 @@
         "test": [
             "@php artisan config:clear --ansi",
             "@php artisan test"
+        ],
+        "test-file": [
+            "@php artisan test --"
         ]
     },
     "extra": {

@@ -398,6 +398,17 @@ export default function ProfilePage() {
         {/* Profile Form */}
         <div className="bg-white shadow rounded-lg">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            <ProfileTabs
+              formData={formData}
+              handleInputChange={handleInputChange}
+              handleLocationChange={handleLocationChange}
+              handleLookingForChange={handleLookingForChange}
+              handlePreferenceChange={handlePreferenceChange}
+              handleArrayPreferenceChange={handleArrayPreferenceChange}
+              photos={photos}
+              uploadPhotos={handlePhotoUpload}
+              deletePhoto={handlePhotoRemove}
+            />
             {/* Photo Upload Section */}
             <Card id="photos">
               <CardHeader>
@@ -1070,5 +1081,5 @@ export default function ProfilePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

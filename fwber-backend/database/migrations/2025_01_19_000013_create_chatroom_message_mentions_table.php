@@ -21,7 +21,7 @@ return new class extends Migration
 
             $table->foreign('chatroom_message_id')->references('id')->on('chatroom_messages')->onDelete('cascade');
             $table->foreign('mentioned_user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->index(['chatroom_message_id', 'mentioned_user_id'], 'cmm_message_user_idx');
+            $table->index(['chatroom_message_id', 'mentioned_user_id'], 'chat_msg_mentions_msg_id_user_id_idx');
         });
     }
 

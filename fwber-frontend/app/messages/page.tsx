@@ -203,6 +203,12 @@ export default function MessagesPage() {
                   Refresh
                 </button>
                 <a
+                  href="/friends"
+                  className="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700"
+                >
+                  Friends
+                </a>
+                <a
                   href="/dashboard"
                   className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
                 >
