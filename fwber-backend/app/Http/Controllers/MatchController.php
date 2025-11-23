@@ -11,6 +11,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use App\Services\PushNotificationService;
 
 class MatchController extends Controller
 {
@@ -47,6 +49,34 @@ class MatchController extends Controller
      *         description="Maximum distance in miles",
      *         required=false,
      *         @OA\Schema(type="integer", minimum=1, maximum=500, default=50, example=25)
+     *     ),
+     *     @OA\Parameter(
+     *         name="smoking",
+     *         in="query",
+     *         description="Filter by smoking preference",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"non-smoker", "occasional", "regular", "social", "trying-to-quit"})
+     *     ),
+     *     @OA\Parameter(
+     *         name="drinking",
+     *         in="query",
+     *         description="Filter by drinking preference",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"non-drinker", "occasional", "regular", "social", "sober"})
+     *     ),
+     *     @OA\Parameter(
+     *         name="body_type",
+     *         in="query",
+     *         description="Filter by body type",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"slim", "athletic", "average", "curvy", "plus-size", "muscular"})
+     *     ),
+     *     @OA\Parameter(
+     *         name="height_min",
+     *         in="query",
+     *         description="Minimum height in centimeters",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=120, maximum=250)
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -99,6 +129,10 @@ class MatchController extends Controller
             'age_min' => 'nullable|integer|min:18|max:100',
             'age_max' => 'nullable|integer|min:18|max:100',
             'max_distance' => 'nullable|integer|min:1|max:500',
+            'smoking' => 'nullable|string|in:non-smoker,occasional,regular,social,trying-to-quit',
+            'drinking' => 'nullable|string|in:non-drinker,occasional,regular,social,sober',
+            'body_type' => 'nullable|string|in:slim,athletic,average,curvy,plus-size,muscular',
+            'height_min' => 'nullable|integer|min:120|max:250',
         ]);
 
         // Cache feed for 60 seconds per user with filter params
@@ -278,6 +312,155 @@ class MatchController extends Controller
         ]);
     }
 
+    private function findMatches(User $user, UserProfile $profile, Request $request)
+    {
+        $query = User::query()
+            ->whereKeyNot($user->id)
+            ->whereHas('profile')
+            ->with(['profile']);
+
+        // Distance filter
+        if ($profile->location_latitude && $profile->location_longitude) {
+            $maxDistance = $request->get('max_distance', 50); // Default 50 miles
+            $query->whereHas('profile', function ($q) use ($profile, $maxDistance) {
+                $latDist = (1.1 * $maxDistance) / 49.1;
+                $lonDist = (1.1 * $maxDistance) / 69.1;
+                
+                $q->whereBetween('location_latitude', [
+                    $profile->location_latitude - $latDist,
+                    $profile->location_latitude + $latDist
+                ])->whereBetween('location_longitude', [
+                    $profile->location_longitude - $lonDist,
+                    $profile->location_longitude + $lonDist
+                ]);
+            });
+        }
+
+        // Gender preference filter
+        if ($profile->preferences && isset($profile->preferences['gender_preferences'])) {
+            $genderPrefs = $profile->preferences['gender_preferences'];
+            $query->whereHas('profile', function ($q) use ($genderPrefs) {
+                $q->whereIn('gender', array_keys(array_filter($genderPrefs)));
+            });
+        }
+
+        // Age filter (request params override preferences)
+        $ageMin = (int) $request->get('age_min', $profile->preferences['age_range']['min'] ?? 18);
+        $ageMax = (int) $request->get('age_max', $profile->preferences['age_range']['max'] ?? 100);
+        
+        $query->whereHas('profile', function ($q) use ($ageMin, $ageMax) {
+            // SQLite-compatible age calculation
+            $q->whereRaw("(julianday('now') - julianday(date_of_birth)) / 365.25 BETWEEN ? AND ?", [
+                $ageMin,
+                $ageMax
+            ]);
+        });
+
+        // Advanced filters
+        if ($request->has('smoking')) {
+            $query->whereHas('profile', fn ($q) => $q->where('preferences->smoking', $request->smoking));
+        }
+        if ($request->has('drinking')) {
+            $query->whereHas('profile', fn ($q) => $q->where('preferences->drinking', $request->drinking));
+        }
+        if ($request->has('body_type')) {
+            $query->whereHas('profile', fn ($q) => $q->where('preferences->body_type', $request->body_type));
+        }
+        if ($request->has('height_min')) {
+            $query->whereHas('profile', fn ($q) => $q->where('height_cm', '>=', $request->height_min));
+        }
+
+        // Exclude users already interacted with
+        $excludedIds = DB::table('match_actions')
+            ->where('user_id', $user->id)
+            ->pluck('target_user_id')
+            ->toArray();
+        
+        if (!empty($excludedIds)) {
+            $query->whereNotIn('id', $excludedIds);
+        }
+
+        $matches = $query->limit(20)->get();
+
+        // Calculate compatibility scores and sort
+        return $matches->map(function (User $candidate) use ($user, $profile) {
+            $candidate->setAttribute(
+                'compatibility_score',
+                $this->calculateCompatibilityScore($profile, $candidate->profile)
+            );
+            $candidate->setAttribute(
+                'distance',
+                $this->calculateDistance($profile, $candidate->profile)
+            );
+            return $candidate;
+        })->sortByDesc('compatibility_score')->values();
+    }
+
+    private function calculateCompatibilityScore(UserProfile $userProfile, UserProfile $candidateProfile): int
+    {
+        $score = 0;
+        $maxScore = 100;
+
+        // Location compatibility (20 points)
+        if ($userProfile->location_latitude && $candidateProfile->location_latitude) {
+            $distance = $this->calculateDistance($userProfile, $candidateProfile);
+            $score += max(0, 20 - ($distance / 5)); // Decrease by 1 point per 5 miles
+        }
+
+        // Age compatibility (15 points)
+        if ($userProfile->date_of_birth && $candidateProfile->date_of_birth) {
+            $userAge = $userProfile->date_of_birth->diffInYears(now());
+            $candidateAge = $candidateProfile->date_of_birth->diffInYears(now());
+            $ageDiff = abs($userAge - $candidateAge);
+            $score += max(0, 15 - $ageDiff);
+        }
+
+        // Gender compatibility (25 points)
+        if ($this->checkGenderCompatibility($userProfile, $candidateProfile)) {
+            $score += 25;
+        }
+
+        // Preference compatibility (40 points)
+        $score += $this->calculatePreferenceCompatibility($userProfile, $candidateProfile);
+
+        // Freshness/recency boost (up to 5 points)
+        $score += $this->calculateFreshnessBoost($candidateProfile->user);
+
+        // Saturation penalty for heavy proximity posting (up to -5 points)
+        $score -= $this->calculateProximitySaturationPenalty($candidateProfile->user);
+
+        return min($maxScore, max(0, $score));
+    }
+
+    private function calculateFreshnessBoost(User $candidate): int
+    {
+        if (!$candidate->last_seen_at) {
+            return 0;
+        }
+
+        $hoursSinceActive = now()->diffInHours($candidate->last_seen_at);
+        
+        if ($hoursSinceActive < 1) {
+            return 5; // Very recent activity
+        } elseif ($hoursSinceActive < 24) {
+            return 3; // Active today
+        } elseif ($hoursSinceActive < 168) {
+            return 1; // Active this week
+        }
+        
+        return 0;
+    }
+
+    private function calculateProximitySaturationPenalty(User $candidate): int
+    {
+        // Count artifacts created by candidate in last 24 hours
+        $count = ProximityArtifact::where('user_id', $candidate->id)
+            ->where('created_at', '>=', now()->subDay())
+            ->count();
+        // Each 10 artifacts -> 1 point penalty, capped at 5
+        return (int) min(5, floor($count / 10));
+    }
+
     private function calculateDistance(UserProfile $profile1, UserProfile $profile2): float
     {
         if (!$profile1->location_latitude || !$profile2->location_latitude) {
@@ -385,6 +568,17 @@ class MatchController extends Controller
                 if ($userA && $userB) {
                     $emailService->sendNewMatchNotification($userA, $userB);
                     $emailService->sendNewMatchNotification($userB, $userA);
+
+                    // Send push notifications to both users
+                    $pushService = app(PushNotificationService::class);
+                    $pushService->send($userA, [
+                        'title' => 'It\'s a match!',
+                        'body' => "You've matched with {$userB->name}!",
+                    ]);
+                    $pushService->send($userB, [
+                        'title' => 'It\'s a match!',
+                        'body' => "You've matched with {$userA->name}!",
+                    ]);
                 }
             }
 
