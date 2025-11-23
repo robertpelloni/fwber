@@ -24,7 +24,7 @@ export default function ProfileCompletenessWidget() {
   const { data, isLoading } = useQuery({
     queryKey: ['profile-completeness'],
     queryFn: async () => {
-      const token = localStorage.getItem('auth_token');
+      const token = localStorage.getItem('fwber_token');
       const response = await axios.get<CompletenessData>(
         `${process.env.NEXT_PUBLIC_API_URL}/profile/completeness`,
         { headers: { Authorization: `Bearer ${token}` } }

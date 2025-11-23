@@ -36,7 +36,7 @@ export default function AvatarGenerationFlow({
 
   const generateMutation = useMutation({
     mutationFn: async (profileData: PhysicalProfile) => {
-      const token = localStorage.getItem('auth_token');
+      const token = localStorage.getItem('fwber_token');
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/physical-profile/avatar/request`,
         { ...profileData, style },
@@ -57,7 +57,7 @@ export default function AvatarGenerationFlow({
 
   const acceptMutation = useMutation({
     mutationFn: async () => {
-      const token = localStorage.getItem('auth_token');
+      const token = localStorage.getItem('fwber_token');
       await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/physical-profile`,
         { ...profile, avatar_url: generatedAvatar },

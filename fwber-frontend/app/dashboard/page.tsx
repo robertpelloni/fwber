@@ -39,7 +39,7 @@ export default function DashboardPage() {
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
-      const token = localStorage.getItem('auth_token');
+      const token = localStorage.getItem('fwber_token');
       const response = await axios.get<DashboardStats>(
         `${process.env.NEXT_PUBLIC_API_URL}/dashboard/stats`,
         { headers: { Authorization: `Bearer ${token}` } }
@@ -51,7 +51,7 @@ export default function DashboardPage() {
   const { data: activity, isLoading: activityLoading } = useQuery({
     queryKey: ['recent-activity'],
     queryFn: async () => {
-      const token = localStorage.getItem('auth_token');
+      const token = localStorage.getItem('fwber_token');
       const response = await axios.get<RecentActivity[]>(
         `${process.env.NEXT_PUBLIC_API_URL}/dashboard/activity`,
         { headers: { Authorization: `Bearer ${token}` } }

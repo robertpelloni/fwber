@@ -52,7 +52,7 @@ export default function EnhancedProfileEditor() {
   const { data: currentProfile, isLoading } = useQuery({
     queryKey: ['user-profile'],
     queryFn: async () => {
-      const token = localStorage.getItem('auth_token');
+      const token = localStorage.getItem('fwber_token');
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/user`,
         { headers: { Authorization: `Bearer ${token}` } }
@@ -109,7 +109,7 @@ export default function EnhancedProfileEditor() {
 
   const updateMutation = useMutation({
     mutationFn: async (updatedProfile: UserProfile) => {
-      const token = localStorage.getItem('auth_token');
+      const token = localStorage.getItem('fwber_token');
       const response = await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/user`,
         updatedProfile,
