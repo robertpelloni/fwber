@@ -53,15 +53,9 @@ class AuthenticateApi
         }
 
         $hashed = hash('sha256', $plainToken);
-        \Illuminate\Support\Facades\Log::info('Auth Check', [
-            'header' => $header,
-            'plain' => $plainToken,
-            'hashed' => $hashed,
-        ]);
         $apiToken = ApiToken::query()->with('user')->where('token', $hashed)->first();
 
         if (! $apiToken || ! $apiToken->user) {
-            \Illuminate\Support\Facades\Log::warning('Auth Failed', ['hashed' => $hashed]);
             return $this->unauthorized();
         }
 

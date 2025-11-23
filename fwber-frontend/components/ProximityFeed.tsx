@@ -11,8 +11,8 @@ import SexQuote from './SexQuote';
 export default function ProximityFeed() {
   const router = useRouter();
   const { token: authToken, user } = useAuth();
-  // Allow mock token for testing
-  const token = authToken || (typeof window !== 'undefined' ? localStorage.getItem('mock_auth_token') : null);
+  // Allow mock token for testing or fallback to stored token
+  const token = authToken || (typeof window !== 'undefined' ? (localStorage.getItem('fwber_token') || localStorage.getItem('mock_auth_token')) : null);
   
   const [artifacts, setArtifacts] = useState<ProximityArtifact[]>([]);
   const [chatrooms, setChatrooms] = useState<ProximityChatroom[]>([]);
