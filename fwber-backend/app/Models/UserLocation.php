@@ -72,6 +72,15 @@ class UserLocation extends Model
      */
     public function scopeWithinRadius($query, $latitude, $longitude, $radiusMeters)
     {
+        // SQLite support for testing
+        if ($query->getConnection()->getDriverName() === 'sqlite') {
+            $latDelta = $radiusMeters / 111000;
+            $lonDelta = $radiusMeters / (111000 * cos(deg2rad($latitude)));
+            
+            return $query->whereBetween('latitude', [$latitude - $latDelta, $latitude + $latDelta])
+                         ->whereBetween('longitude', [$longitude - $lonDelta, $longitude + $lonDelta]);
+        }
+
         // Using Haversine formula for distance calculation
         $earthRadius = 6371000; // Earth's radius in meters
         

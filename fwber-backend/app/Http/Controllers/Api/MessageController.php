@@ -277,18 +277,14 @@ class MessageController extends Controller
         *     response=200,
         *     description="Conversation",
         *     @OA\JsonContent(type="object",
-        *       @OA\Property(property="messages", type="array", @OA\Items(type="object")),
+        *       @OA\Property(property="messages", type="array", @OA\Items(ref="#/components/schemas/DirectMessage")),
         *       @OA\Property(property="pagination", type="object"),
-        *       @OA\Property(property="other_user", type="object",
-        *         @OA\Property(property="id", type="integer"),
-        *         @OA\Property(property="name", type="string"),
-        *         @OA\Property(property="last_seen_at", type="string", format="date-time", nullable=true)
-        *       )
+        *       @OA\Property(property="other_user", ref="#/components/schemas/User")
         *     )
         *   ),
         *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
         *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
-        *   @OA\Response(response=401, description="Unauthenticated")
+        *   @OA\Response(response=401, ref="#/components/responses/Unauthorized")
         * )
      */
     public function index(Request $request, int $userId): JsonResponse
@@ -374,6 +370,31 @@ class MessageController extends Controller
                 'read_at' => $message->read_at?->toISOString(),
             ],
         ]);
+    }
+
+    /**
+     * Mark all messages from a sender as read
+     *
+     * @OA\Post(
+     *   path="/messages/mark-all-read/{senderId}",
+     *   tags={"Messages"},
+     *   summary="Mark all messages from a sender as read",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="senderId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Marked all read"),
+     *   @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
+    public function markAllAsRead(int $senderId): JsonResponse
+    {
+        $currentUserId = Auth::id();
+        
+        Message::where('sender_id', $senderId)
+            ->where('receiver_id', $currentUserId)
+            ->where('is_read', false)
+            ->update(['is_read' => true, 'read_at' => now()]);
+
+        return response()->json(['message' => 'All messages marked as read']);
     }
 
     /**

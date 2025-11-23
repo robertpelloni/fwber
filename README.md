@@ -478,46 +478,20 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for deta
 
 ## Roadmap
 
-See [docs/ROADMAP.md](docs/ROADMAP.md) for the complete development roadmap.
+**Current Status:** v1.0.0-rc1 (Release Candidate)
 
-**Phase 1 (✅ Complete):** MVP Foundation
-- Avatar-only enforcement
-- Proximity artifacts with TTL
-- Local Pulse merged feed
-- Comprehensive test coverage
+We follow [Semantic Versioning](https://semver.org/).
 
-**Phase 2 (✅ Complete):** Hardening & Safety
-- ✅ Shadow throttling system (progressive penalties)
-- ✅ Geo-spoof detection (velocity & distance checks)
-- ✅ WebSocket/SSE real-time updates (Mercure integrated)
-- ✅ Enhanced moderation dashboard (flagging, throttles, spoofs)
-- ✅ SSL/HTTPS configuration (nginx ready)
-- ✅ Health checks & monitoring setup (Sentry, Prometheus guides)
-- ✅ Production deployment automation (one-command init script)
+- **v1.0.0 (Current):** MVP + Hardening
+  - ✅ **Phase 1:** Core Features (Avatar Mode, Proximity, Local Pulse)
+  - ✅ **Phase 2:** Safety & Production Readiness (Shadow throttling, Geo-spoof detection, SSL, Monitoring)
 
-**Phase 3:** UX & Polish
-- Avatar generation UI flow
-- Enhanced profile editor
-- Mobile app (React Native)
-- Push notifications
+- **Next Steps (Post-MVP):**
+  - 🚀 **Phase 3:** [Scale, Security & Observability](docs/roadmap/PHASE_2_SCALE_AND_SECURITY.md) (Redis, Queues, SSO, OpenTelemetry)
+  - 🎨 **Phase 4:** UX Polish & Mobile App (React Native)
+  - 🌍 **Phase 5:** Community & Growth
 
-**Phase 4:** Documentation & Community
-- Enhanced API documentation
-- Video tutorials
-- Community forums
-- Bug bounty program
-
-**Phase 5:** Growth Features
-- Social features (friend lists, groups)
-- Advanced filters and preferences
-- Event planning tools
-- User verification badges
-
-**Phase 6:** Monetization
-- Premium subscriptions
-- Boost visibility features
-- Ad-free experience
-- White-label licensing
+See [docs/roadmap/](docs/roadmap/) for detailed plans.
 
 ---
 
@@ -608,8 +582,8 @@ mysql -h localhost -u fwber -p fwber < db\migrations\2025-10-11-legacy-matcher-c
 - 📖 **Documentation:** [docs/](docs/)
 - 🐛 **Bug Reports:** [GitHub Issues](https://github.com/yourusername/fwber/issues)
 - 💬 **Discussions:** [GitHub Discussions](https://github.com/yourusername/fwber/discussions)
-- 📧 **Contact:** [your-email@example.com]
-- 🌐 **Website:** [fwber.me](https://fwber.me) / [fwber.com](https://fwber.com)
+- 📧 **Contact:** [support@fwber.me](mailto:support@fwber.me)
+- 🌐 **Website:** [fwber.me](https://fwber.me)
 
 ---
 

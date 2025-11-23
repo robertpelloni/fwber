@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import type { FileWithFaceBlurMetadata } from '@/lib/faceBlurTelemetry'
 
 export interface Photo {
   id: string
@@ -86,12 +87,16 @@ class PhotoAPI {
     // Upload files sequentially since backend expects single photo per request
     for (let i = 0; i < files.length; i++) {
       const file = files[i]
+      const fileWithMetadata = file as FileWithFaceBlurMetadata
       
       // Report progress start
       if (onProgress) onProgress(i, 0, file.name)
       
       const formData = new FormData()
       formData.append('photo', file) // Backend expects 'photo', not 'photos[...]'
+      if (fileWithMetadata.faceBlurMetadata) {
+        formData.append('face_blur_metadata', JSON.stringify(fileWithMetadata.faceBlurMetadata))
+      }
       
       const url = `${this.baseUrl}/photos`
       const token = localStorage.getItem('fwber_token')

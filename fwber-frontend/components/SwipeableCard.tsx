@@ -22,22 +22,24 @@ interface SwipeableCardProps {
 
 export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCardProps) {
   const [isDragging, setIsDragging] = useState(false)
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const [startPos, setStartPos] = useState({ x: 0, y: 0 })
+  const [currentPos, setCurrentPos] = useState({ x: 0, y: 0 })
   const [rotation, setRotation] = useState(0)
   const cardRef = useRef<HTMLDivElement>(null)
 
-  const handleStart = (clientX: number, clientY: number) => {
+  const handleStart = useCallback((clientX: number, clientY: number) => {
     setIsDragging(true)
-    setDragOffset({ x: clientX, y: clientY })
-  }
+    setStartPos({ x: clientX, y: clientY })
+    setCurrentPos({ x: clientX, y: clientY })
+  }, [])
 
   const handleMove = useCallback((clientX: number, clientY: number) => {
     if (!isDragging) return
 
-    const deltaX = clientX - dragOffset.x
-    const deltaY = clientY - dragOffset.y
+    const deltaX = clientX - startPos.x
+    const deltaY = clientY - startPos.y
     
-    setDragOffset({ x: clientX, y: clientY })
+    setCurrentPos({ x: clientX, y: clientY })
     
     // Calculate rotation based on horizontal movement
     const rotationValue = Math.min(Math.max(deltaX * 0.1, -15), 15)
@@ -47,28 +49,28 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
     if (cardRef.current) {
       cardRef.current.style.transform = `translate(${deltaX}px, ${deltaY}px) rotate(${rotationValue}deg)`
     }
-  }, [isDragging, dragOffset])
+  }, [isDragging, startPos])
 
   const handleEnd = useCallback(() => {
     if (!isDragging) return
-
+    
     setIsDragging(false)
     
-    const deltaX = dragOffset.x - (dragOffset.x - dragOffset.x)
-    const deltaY = dragOffset.y - (dragOffset.y - dragOffset.y)
-    
-    // Determine swipe direction
-    if (Math.abs(deltaX) > 100) {
+    const deltaX = currentPos.x - startPos.x
+    const deltaY = currentPos.y - startPos.y
+    const threshold = 100 // Minimum distance to trigger swipe
+
+    if (Math.abs(deltaX) > threshold) {
       if (deltaX > 0) {
-        onSwipe('right')
         onAction('like')
+        onSwipe('right')
       } else {
-        onSwipe('left')
         onAction('pass')
+        onSwipe('left')
       }
-    } else if (deltaY < -100) {
-      onSwipe('up')
+    } else if (deltaY < -threshold) {
       onAction('super_like')
+      onSwipe('up')
     } else {
       // Reset position
       if (cardRef.current) {
@@ -76,50 +78,50 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
       }
       setRotation(0)
     }
-  }, [isDragging, dragOffset, onSwipe, onAction])
+  }, [isDragging, currentPos, startPos, onAction, onSwipe])
 
   // Touch events
-  const handleTouchStart = (e: React.TouchEvent) => {
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0]
     handleStart(touch.clientX, touch.clientY)
-  }
+  }, [handleStart])
 
-  const handleTouchMove = (e: React.TouchEvent) => {
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0]
     handleMove(touch.clientX, touch.clientY)
-  }
+  }, [handleMove])
 
-  const handleTouchEnd = () => {
-    handleEnd()
-  }
-
-  // Mouse events
-  const handleMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault()
-    handleStart(e.clientX, e.clientY)
-  }
-
-  const handleMouseMove = useCallback((e: React.MouseEvent | MouseEvent) => {
-    if (!isDragging) return
-    handleMove('clientX' in e ? e.clientX : (e as MouseEvent).clientX, 
-               'clientY' in e ? e.clientY : (e as MouseEvent).clientY)
-  }, [isDragging, handleMove])
-
-  const handleMouseUp = useCallback(() => {
+  const handleTouchEnd = useCallback(() => {
     handleEnd()
   }, [handleEnd])
 
-  // Add global mouse events when dragging
+  // Mouse events
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    handleStart(e.clientX, e.clientY)
+  }, [handleStart])
+
   useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove as any)
-      document.addEventListener('mouseup', handleMouseUp)
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove as any)
-        document.removeEventListener('mouseup', handleMouseUp)
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      if (isDragging) {
+        handleMove(e.clientX, e.clientY)
       }
     }
-  }, [isDragging, handleMouseMove, handleMouseUp])
+
+    const handleGlobalMouseUp = () => {
+      if (isDragging) {
+        handleEnd()
+      }
+    }
+
+    document.addEventListener('mousemove', handleGlobalMouseMove)
+    document.addEventListener('mouseup', handleGlobalMouseUp)
+
+    return () => {
+      document.removeEventListener('mousemove', handleGlobalMouseMove)
+      document.removeEventListener('mouseup', handleGlobalMouseUp)
+    }
+  }, [isDragging, handleMove, handleEnd])
 
   return (
     <div className="relative w-full max-w-sm mx-auto">
@@ -133,7 +135,8 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
         onTouchEnd={handleTouchEnd}
         onMouseDown={handleMouseDown}
         style={{
-          transform: `translate(${dragOffset.x - dragOffset.x}px, ${dragOffset.y - dragOffset.y}px) rotate(${rotation}deg)`,
+          // Initial transform is handled by state/ref, but we can set a default here if needed
+          transform: !isDragging ? 'translate(0px, 0px) rotate(0deg)' : undefined
         }}
       >
         <CardHeader className="relative">
@@ -143,7 +146,9 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
                 src={user.photos[0]}
                 alt={user.name}
                 fill
+                sizes="(max-width: 768px) 100vw, 400px"
                 className="object-cover rounded-lg"
+                priority
               />
             ) : (
               <span className="text-4xl font-semibold text-gray-600">

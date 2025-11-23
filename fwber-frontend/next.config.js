@@ -28,7 +28,6 @@ const nextConfig = {
   
   // Image optimization
   images: {
-    domains: ['localhost', 'fwber.me'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -57,6 +56,12 @@ const nextConfig = {
         hostname: 'localhost',
         port: '8002',
         pathname: '/storage/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '8000',
+        pathname: '/**',
       },
     ],
     formats: ['image/webp', 'image/avif'],

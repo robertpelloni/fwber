@@ -4,10 +4,17 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:3005": "next dev -p 3005",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test:e2e": "start-server-and-test \"npm run dev:3005\" http://localhost:3005 \"cypress run\"",
+    "test:e2e:matching": "start-server-and-test \"npm run dev:3005\" http://localhost:3005 \"cypress run --spec cypress/e2e/matching-flow.cy.js\"",
+    "test:e2e:pulse": "start-server-and-test \"npm run dev:3005\" http://localhost:3005 \"cypress run --spec cypress/e2e/proximity-feed.cy.js\"",
+    "test:e2e:nearby": "start-server-and-test \"npm run dev:3005\" http://localhost:3005 \"cypress run --spec cypress/e2e/nearby-users.cy.js\"",
+    "test:e2e:chatrooms": "start-server-and-test \"npm run dev:3005\" http://localhost:3005 \"cypress run --spec cypress/e2e/proximity-chatrooms.cy.js\"",
+    "test:e2e:messaging": "start-server-and-test \"npm run dev:3005\" http://localhost:3005 \"cypress run --spec cypress/e2e/messaging-flow.cy.js\""
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -21,6 +28,7 @@
     "@radix-ui/react-tooltip": "1.0.7",
     "@sentry/nextjs": "^10.22.0",
     "@tanstack/react-query": "^5.90.5",
+    "@vladmandic/face-api": "^1.7.15",
     "axios": "1.6.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
@@ -36,17 +44,20 @@
     "zustand": "4.4.7"
   },
   "devDependencies": {
+    "@tailwindcss/aspect-ratio": "^0.4.2",
     "@types/node": "20.10.5",
     "@types/react": "18.2.45",
     "@types/react-dom": "18.2.18",
     "@typescript-eslint/eslint-plugin": "6.15.0",
     "@typescript-eslint/parser": "6.15.0",
     "autoprefixer": "10.4.16",
+    "cypress": "^15.7.0",
     "eslint": "8.56.0",
     "eslint-config-next": "14.2.5",
     "postcss": "8.4.32",
     "prettier": "3.1.1",
     "prettier-plugin-tailwindcss": "0.5.9",
+    "start-server-and-test": "^2.1.3",
     "tailwindcss": "3.4.0",
     "typescript": "5.3.3"
   }

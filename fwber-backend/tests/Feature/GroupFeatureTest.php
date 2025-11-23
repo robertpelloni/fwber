@@ -8,7 +8,7 @@ use App\Models\GroupMember;
 use App\Models\GroupMessage;
 use App\Models\User;
 use App\Models\UserProfile;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\RefreshDatabaseSilently;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
@@ -16,7 +16,7 @@ use Tests\TestCase;
 
 class GroupFeatureTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabaseSilently;
 
     private User $user;
     private User $user2;

@@ -1,6 +1,6 @@
 # Test Results Directory
 
-This directory contains end-to-end test results for the FWBer profile form and venue check-in features.
+This directory contains end-to-end test results for the FWBer.me profile form and venue check-in features.
 
 ## Directory Structure
 

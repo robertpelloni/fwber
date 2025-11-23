@@ -35,7 +35,15 @@ class ChatroomController extends Controller
      *   @OA\Parameter(name="city", in="query", required=false, @OA\Schema(type="string")),
      *   @OA\Parameter(name="search", in="query", required=false, @OA\Schema(type="string")),
      *   @OA\Parameter(name="sort", in="query", required=false, @OA\Schema(type="string", enum={"activity","newest","most_active","most_members"})),
-     *   @OA\Response(response=200, description="Paginated chatrooms list")
+    *   @OA\Response(response=200, description="Paginated chatrooms list",
+    *     @OA\JsonContent(type="object",
+    *       @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Chatroom")),
+    *       @OA\Property(property="current_page", type="integer"),
+    *       @OA\Property(property="last_page", type="integer"),
+    *       @OA\Property(property="per_page", type="integer"),
+    *       @OA\Property(property="total", type="integer")
+    *     )
+    *   )
      * )
      */
     public function index(Request $request): JsonResponse
@@ -93,12 +101,12 @@ class ChatroomController extends Controller
      *   summary="Get a chatroom",
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="Chatroom and recent messages",
-     *     @OA\JsonContent(type="object",
-     *       @OA\Property(property="chatroom", type="object"),
-     *       @OA\Property(property="messages", type="object")
-     *     )
-     *   ),
+    *   @OA\Response(response=200, description="Chatroom and recent messages",
+    *     @OA\JsonContent(type="object",
+    *       @OA\Property(property="chatroom", ref="#/components/schemas/Chatroom"),
+    *       @OA\Property(property="messages", ref="#/components/schemas/PaginatedChatMessages")
+    *     )
+    *   ),
     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
     *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
@@ -144,7 +152,7 @@ class ChatroomController extends Controller
      *     @OA\Property(property="is_public", type="boolean"),
      *     @OA\Property(property="settings", type="object")
      *   )),
-     *   @OA\Response(response=201, description="Created")
+    *   @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/Chatroom"))
      * )
      */
     public function store(Request $request): JsonResponse
@@ -302,7 +310,7 @@ class ChatroomController extends Controller
      *     @OA\Property(property="is_public", type="boolean"),
      *     @OA\Property(property="settings", type="object")
      *   )),
-    *   @OA\Response(response=200, description="Updated", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
+    *   @OA\Response(response=200, description="Updated chatroom", @OA\JsonContent(ref="#/components/schemas/Chatroom")),
     *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
@@ -365,7 +373,9 @@ class ChatroomController extends Controller
      *   tags={"Chatrooms"},
      *   summary="My chatrooms",
      *   security={{"bearerAuth":{}}},
-     *   @OA\Response(response=200, description="List")
+    *   @OA\Response(response=200, description="List",
+    *     @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Chatroom"))
+    *   )
      * )
      */
     public function myChatrooms(): JsonResponse
@@ -388,7 +398,9 @@ class ChatroomController extends Controller
      *   tags={"Chatrooms"},
      *   summary="Categories",
      *   security={{"bearerAuth":{}}},
-     *   @OA\Response(response=200, description="List")
+    *   @OA\Response(response=200, description="List",
+    *     @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Chatroom"))
+    *   )
      * )
      */
     public function categories(): JsonResponse

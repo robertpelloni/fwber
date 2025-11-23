@@ -71,6 +71,8 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => env('LOG_DAILY_DAYS', 14),
             'replace_placeholders' => true,
+            // Apply JSON formatting when LOG_FORMAT=json (handled by tap class)
+            'tap' => [App\Logging\JsonFormatterTap::class],
         ],
 
         'slack' => [
@@ -103,6 +105,8 @@ return [
             ],
             'formatter' => env('LOG_STDERR_FORMATTER'),
             'processors' => [PsrLogMessageProcessor::class],
+            // Apply JSON formatting when LOG_FORMAT=json (handled by tap class)
+            'tap' => [App\Logging\JsonFormatterTap::class],
         ],
 
         'syslog' => [
@@ -125,6 +129,16 @@ return [
 
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
+        ],
+
+        // Dedicated security audit log channel
+        'security' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/security.log'),
+            'level' => env('LOG_SECURITY_LEVEL', 'info'),
+            'days' => env('LOG_SECURITY_DAYS', 90),
+            'replace_placeholders' => true,
+            'tap' => [App\Logging\JsonFormatterTap::class],
         ],
 
     ],

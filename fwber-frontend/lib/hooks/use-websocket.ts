@@ -146,139 +146,131 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   const wsUrl = options.wsUrl || process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8080';
   const token = user?.token || '';
 
-  // Event handlers (defined before useEffect to avoid hoisting issues)
-  const handleConnection = useCallback((data: any) => {
-    logWebSocket.connected(data.connectionId)
-    setConnectionStatus(prev => ({
-      ...prev,
-      connected: true,
-      connectionId: data.connectionId,
-      userId: data.userId,
-      reconnectAttempts: 0,
-    }));
-  }, []);
+  // Use refs for event handlers to avoid dependency issues and unnecessary re-renders
+  const handlersRef = useRef({
+    handleConnection: (data: any) => {
+      logWebSocket.connected(data.connectionId)
+      setConnectionStatus(prev => ({
+        ...prev,
+        connected: true,
+        connectionId: data.connectionId,
+        userId: data.userId,
+        reconnectAttempts: 0,
+      }));
+    },
+    handleDisconnection: (data: any) => {
+      logWebSocket.disconnected(data.reason)
+      setConnectionStatus(prev => ({
+        ...prev,
+        connected: false,
+      }));
+    },
+    handleReconnecting: (data: any) => {
+      logWebSocket.reconnecting(data.attempt, data.maxAttempts, data.delay);
+      setConnectionStatus(prev => ({
+        ...prev,
+        reconnectAttempts: data.attempt,
+      }));
+    },
+    handleReconnectFailed: (data: any) => {
+      logWebSocket.reconnectFailed(data.attempts);
+    },
+    handleMessage: (message: WebSocketMessage) => {
+      console.log('WebSocket message received:', message);
+      setMessages(prev => [...prev.slice(-99), message]); // Keep last 100 messages
+    },
+    handlePresenceUpdate: (data: PresenceUpdate) => {
+      console.log('Presence update:', data);
+      setPresenceUpdates(prev => [...prev.slice(-49), data]); // Keep last 50 updates
 
-  const handleDisconnection = useCallback((data: any) => {
-    logWebSocket.disconnected(data.reason)
-    setConnectionStatus(prev => ({
-      ...prev,
-      connected: false,
-    }));
-  }, []);
+      // Update online users if this is a status change
+      if (data.status) {
+        setOnlineUsers(prev => {
+          const existingIndex = prev.findIndex(user => user.user_id === data.user_id);
+          if (existingIndex >= 0) {
+            const updated = [...prev];
+            updated[existingIndex] = { ...updated[existingIndex], ...data };
+            return updated;
+          } else {
+            return [...prev, { user_id: data.user_id, status: data.status, last_seen: data.timestamp, metadata: data.metadata }];
+          }
+        });
+      }
+    },
+    handleNotification: (data: NotificationPayload) => {
+      console.log('Notification received:', data);
+      setNotifications(prev => [...prev.slice(-49), data]); // Keep last 50 notifications
+    },
+    handleChatMessage: (data: ChatMessage) => {
+      logWebSocket.messageReceived('chat_message', data.from_user_id)
+      // Set initial status for received messages
+      const messageWithStatus: ChatMessage = {
+        ...data,
+        status: 'delivered',
+        delivered_at: new Date().toISOString(),
+      };
+      setChatMessages(prev => [...prev.slice(-99), messageWithStatus]); // Keep last 100 messages
 
-  const handleReconnecting = useCallback((data: any) => {
-    logWebSocket.reconnecting(data.attempt, data.maxAttempts, data.delay);
-    setConnectionStatus(prev => ({
-      ...prev,
-      reconnectAttempts: data.attempt,
-    }));
-  }, []);
-
-  const handleReconnectFailed = useCallback((data: any) => {
-    logWebSocket.reconnectFailed(data.attempts);
-  }, []);
-
-  const handleMessage = useCallback((message: WebSocketMessage) => {
-    console.log('WebSocket message received:', message);
-    setMessages(prev => [...prev.slice(-99), message]); // Keep last 100 messages
-  }, []);
-
-  const handlePresenceUpdate = useCallback((data: PresenceUpdate) => {
-    console.log('Presence update:', data);
-    setPresenceUpdates(prev => [...prev.slice(-49), data]); // Keep last 50 updates
-    
-    // Update online users if this is a status change
-    if (data.status) {
-      setOnlineUsers(prev => {
-        const existingIndex = prev.findIndex(user => user.user_id === data.user_id);
-        if (existingIndex >= 0) {
-          const updated = [...prev];
-          updated[existingIndex] = { ...updated[existingIndex], ...data };
-          return updated;
-        } else {
-          return [...prev, { user_id: data.user_id, status: data.status, last_seen: data.timestamp, metadata: data.metadata }];
-        }
-      });
-    }
-  }, []);
-
-  const handleNotification = useCallback((data: NotificationPayload) => {
-    console.log('Notification received:', data);
-    setNotifications(prev => [...prev.slice(-49), data]); // Keep last 50 notifications
-  }, []);
-
-  const handleChatMessage = useCallback((data: ChatMessage) => {
-    logWebSocket.messageReceived('chat_message', data.from_user_id)
-    // Set initial status for received messages
-    const messageWithStatus: ChatMessage = {
-      ...data,
-      status: 'delivered',
-      delivered_at: new Date().toISOString(),
-    };
-    setChatMessages(prev => [...prev.slice(-99), messageWithStatus]); // Keep last 100 messages
-    
-    // Store message in IndexedDB for offline access
-    storeMessage(messageWithStatus).catch(err => 
-      console.error('Failed to store message:', err)
-    );
-  }, []);
-
-  const handleMessageDelivered = useCallback((data: { message_id: string; delivered_at: string }) => {
-    setChatMessages(prev => prev.map(msg => 
-      (msg.message_id === data.message_id || msg.id === data.message_id)
-        ? { ...msg, status: 'delivered' as MessageStatus, delivered_at: data.delivered_at }
-        : msg
-    ));
-    
-    // Update status in IndexedDB
-    updateMessageStatus(data.message_id, 'delivered', data.delivered_at).catch(err =>
-      console.error('Failed to update message status:', err)
-    );
-  }, []);
-
-  const handleMessageRead = useCallback((data: { message_id: string; read_at: string }) => {
-    setChatMessages(prev => prev.map(msg => 
-      (msg.message_id === data.message_id || msg.id === data.message_id)
-        ? { ...msg, status: 'read' as MessageStatus, read_at: data.read_at }
-        : msg
-    ));
-    
-    // Update status in IndexedDB
-    updateMessageStatus(data.message_id, 'read', data.read_at).catch(err =>
-      console.error('Failed to update message status:', err)
-    );
-  }, []);
-
-  const handleMessageFailed = useCallback((data: { messageId: string }) => {
-    setChatMessages(prev => prev.map(msg => 
-      (msg.message_id === data.messageId || msg.id === data.messageId)
-        ? { ...msg, status: 'failed' as MessageStatus }
-        : msg
-    ));
-    
-    // Update status in IndexedDB
-    updateMessageStatus(data.messageId, 'failed').catch(err =>
-      console.error('Failed to update message status:', err)
-    );
-  }, []);
-
-  const handleTypingIndicator = useCallback((data: TypingIndicator) => {
-    console.log('Typing indicator:', data);
-    setTypingIndicators(prev => {
-      const filtered = prev.filter(item => 
-        !(item.from_user_id === data.from_user_id && item.to_user_id === data.to_user_id)
+      // Store message in IndexedDB for offline access
+      storeMessage(messageWithStatus).catch(err =>
+        console.error('Failed to store message:', err)
       );
-      return [...filtered, data].slice(-20); // Keep last 20 indicators
-    });
-  }, []);
+    },
+    handleMessageDelivered: (data: { message_id: string; delivered_at: string }) => {
+      setChatMessages(prev => prev.map(msg =>
+        (msg.message_id === data.message_id || msg.id === data.message_id)
+          ? { ...msg, status: 'delivered' as MessageStatus, delivered_at: data.delivered_at }
+          : msg
+      ));
 
-  const handleError = useCallback((error: any) => {
-    logWebSocket.error(error)
-  }, []);
+      // Update status in IndexedDB
+      updateMessageStatus(data.message_id, 'delivered', data.delivered_at).catch(err =>
+        console.error('Failed to update message status:', err)
+      );
+    },
+    handleMessageRead: (data: { message_id: string; read_at: string }) => {
+      setChatMessages(prev => prev.map(msg =>
+        (msg.message_id === data.message_id || msg.id === data.message_id)
+          ? { ...msg, status: 'read' as MessageStatus, read_at: data.read_at }
+          : msg
+      ));
+
+      // Update status in IndexedDB
+      updateMessageStatus(data.message_id, 'read', data.read_at).catch(err =>
+        console.error('Failed to update message status:', err)
+      );
+    },
+    handleMessageFailed: (data: { messageId: string }) => {
+      setChatMessages(prev => prev.map(msg =>
+        (msg.message_id === data.messageId || msg.id === data.messageId)
+          ? { ...msg, status: 'failed' as MessageStatus }
+          : msg
+      ));
+
+      // Update status in IndexedDB
+      updateMessageStatus(data.messageId, 'failed').catch(err =>
+        console.error('Failed to update message status:', err)
+      );
+    },
+    handleTypingIndicator: (data: TypingIndicator) => {
+      console.log('Typing indicator:', data);
+      setTypingIndicators(prev => {
+        const filtered = prev.filter(item =>
+          !(item.from_user_id === data.from_user_id && item.to_user_id === data.to_user_id)
+        );
+        return [...filtered, data].slice(-20); // Keep last 20 indicators
+      });
+    },
+    handleError: (error: any) => {
+      logWebSocket.error(error)
+    },
+  });
 
   // Initialize WebSocket client
   useEffect(() => {
     if (isAuthenticated && user?.token && options.autoConnect !== false) {
+      const handlers = handlersRef.current;
+
       const wsClient = createWebSocketClient(wsUrl, token, {
         autoConnect: true,
         heartbeatInterval: options.heartbeatInterval || 30000,
@@ -288,35 +280,35 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
       setClient(wsClient);
 
-      // Set up event listeners
-      wsClient.on('connection', handleConnection);
-      wsClient.on('disconnection', handleDisconnection);
-      wsClient.on('reconnecting', handleReconnecting);
-      wsClient.on('max_reconnect_attempts', handleReconnectFailed);
-      wsClient.on('message', handleMessage);
-      wsClient.on('presence_update', handlePresenceUpdate);
-      wsClient.on('notification', handleNotification);
-      wsClient.on('chat_message', handleChatMessage);
-      wsClient.on('message_delivered', handleMessageDelivered);
-      wsClient.on('message_read', handleMessageRead);
-      wsClient.on('message_failed', handleMessageFailed);
-      wsClient.on('typing_indicator', handleTypingIndicator);
-      wsClient.on('error', handleError);
+      // Set up event listeners using refs
+      wsClient.on('connection', handlers.handleConnection);
+      wsClient.on('disconnection', handlers.handleDisconnection);
+      wsClient.on('reconnecting', handlers.handleReconnecting);
+      wsClient.on('max_reconnect_attempts', handlers.handleReconnectFailed);
+      wsClient.on('message', handlers.handleMessage);
+      wsClient.on('presence_update', handlers.handlePresenceUpdate);
+      wsClient.on('notification', handlers.handleNotification);
+      wsClient.on('chat_message', handlers.handleChatMessage);
+      wsClient.on('message_delivered', handlers.handleMessageDelivered);
+      wsClient.on('message_read', handlers.handleMessageRead);
+      wsClient.on('message_failed', handlers.handleMessageFailed);
+      wsClient.on('typing_indicator', handlers.handleTypingIndicator);
+      wsClient.on('error', handlers.handleError);
 
       return () => {
-        wsClient.off('connection', handleConnection);
-        wsClient.off('disconnection', handleDisconnection);
-        wsClient.off('reconnecting', handleReconnecting);
-        wsClient.off('max_reconnect_attempts', handleReconnectFailed);
-        wsClient.off('message', handleMessage);
-        wsClient.off('presence_update', handlePresenceUpdate);
-        wsClient.off('notification', handleNotification);
-        wsClient.off('chat_message', handleChatMessage);
-        wsClient.off('message_delivered', handleMessageDelivered);
-        wsClient.off('message_read', handleMessageRead);
-        wsClient.off('message_failed', handleMessageFailed);
-        wsClient.off('typing_indicator', handleTypingIndicator);
-        wsClient.off('error', handleError);
+        wsClient.off('connection', handlers.handleConnection);
+        wsClient.off('disconnection', handlers.handleDisconnection);
+        wsClient.off('reconnecting', handlers.handleReconnecting);
+        wsClient.off('max_reconnect_attempts', handlers.handleReconnectFailed);
+        wsClient.off('message', handlers.handleMessage);
+        wsClient.off('presence_update', handlers.handlePresenceUpdate);
+        wsClient.off('notification', handlers.handleNotification);
+        wsClient.off('chat_message', handlers.handleChatMessage);
+        wsClient.off('message_delivered', handlers.handleMessageDelivered);
+        wsClient.off('message_read', handlers.handleMessageRead);
+        wsClient.off('message_failed', handlers.handleMessageFailed);
+        wsClient.off('typing_indicator', handlers.handleTypingIndicator);
+        wsClient.off('error', handlers.handleError);
         wsClient.disconnect();
       };
     }
@@ -329,19 +321,6 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     options.heartbeatInterval,
     options.maxReconnectAttempts,
     options.reconnectDelay,
-    handleConnection,
-    handleDisconnection,
-    handleReconnecting,
-    handleReconnectFailed,
-    handleMessage,
-    handlePresenceUpdate,
-    handleNotification,
-    handleChatMessage,
-    handleMessageDelivered,
-    handleMessageRead,
-    handleMessageFailed,
-    handleTypingIndicator,
-    handleError,
   ]);
 
   // WebSocket actions

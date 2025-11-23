@@ -45,6 +45,7 @@ class RegisterRequest extends FormRequest
             "profile.sti_status" => ["nullable", "array"],
             "profile.preferences" => ["nullable", "array"],
             "profile.avatar_url" => ["nullable", "string", "max:2048"],
+            "avatar" => ["nullable", "image", "max:10240"], // Max 10MB
         ];
     }
 }

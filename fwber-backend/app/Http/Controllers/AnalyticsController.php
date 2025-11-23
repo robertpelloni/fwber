@@ -164,39 +164,52 @@ class AnalyticsController extends Controller
      */
     private function getTrendAnalytics(array $dateRange): array
     {
-        // Hourly activity for the last 24 hours
+        // Hourly activity for the last 24 hours (Optimized)
+        $start24h = now()->subHours(24);
+        
+        $messagesByHour = BulletinMessage::selectRaw('DATE_FORMAT(created_at, "%Y-%m-%d %H") as hour_key, COUNT(*) as count')
+            ->where('created_at', '>=', $start24h)
+            ->groupBy('hour_key')
+            ->pluck('count', 'hour_key');
+            
+        $usersByHour = User::selectRaw('DATE_FORMAT(last_seen_at, "%Y-%m-%d %H") as hour_key, COUNT(*) as count')
+            ->where('last_seen_at', '>=', $start24h)
+            ->groupBy('hour_key')
+            ->pluck('count', 'hour_key');
+
         $hourlyActivity = [];
         for ($i = 0; $i < 24; $i++) {
             $hour = now()->subHours(23 - $i);
-            $messages = BulletinMessage::whereBetween('created_at', [
-                $hour->copy()->startOfHour(),
-                $hour->copy()->endOfHour()
-            ])->count();
-            
-            $users = User::whereBetween('last_seen_at', [
-                $hour->copy()->startOfHour(),
-                $hour->copy()->endOfHour()
-            ])->count();
+            $key = $hour->format('Y-m-d H');
             
             $hourlyActivity[] = [
                 'hour' => $hour->hour,
-                'messages' => $messages,
-                'users' => $users,
+                'messages' => $messagesByHour[$key] ?? 0,
+                'users' => $usersByHour[$key] ?? 0,
             ];
         }
 
-        // Daily activity for the date range
+        // Daily activity for the date range (Optimized)
+        $messagesByDay = BulletinMessage::selectRaw('DATE(created_at) as date_key, COUNT(*) as count')
+            ->where('created_at', '>=', $dateRange['start'])
+            ->groupBy('date_key')
+            ->pluck('count', 'date_key');
+            
+        $usersByDay = User::selectRaw('DATE(last_seen_at) as date_key, COUNT(*) as count')
+            ->where('last_seen_at', '>=', $dateRange['start'])
+            ->groupBy('date_key')
+            ->pluck('count', 'date_key');
+
         $dailyActivity = [];
         $days = $dateRange['days'];
         for ($i = 0; $i < $days; $i++) {
             $date = now()->subDays($days - 1 - $i);
-            $messages = BulletinMessage::whereDate('created_at', $date)->count();
-            $users = User::whereDate('last_seen_at', $date)->count();
+            $key = $date->format('Y-m-d');
             
             $dailyActivity[] = [
-                'date' => $date->format('Y-m-d'),
-                'messages' => $messages,
-                'users' => $users,
+                'date' => $key,
+                'messages' => $messagesByDay[$key] ?? 0,
+                'users' => $usersByDay[$key] ?? 0,
             ];
         }
 

@@ -5,12 +5,12 @@ namespace Tests\Feature;
 use App\Models\User;
 use App\Models\ShadowThrottle;
 use App\Services\ShadowThrottleService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\RefreshDatabaseSilently;
 use Tests\TestCase;
 
 class ShadowThrottleTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabaseSilently;
 
     private ShadowThrottleService $service;
     private User $user;

@@ -15,6 +15,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfileViewController;
 use App\Http\Controllers\ProximityChatroomController;
 use App\Http\Controllers\ProximityChatroomMessageController;
+use App\Http\Controllers\TelemetryController;
+use App\Http\Controllers\TelemetryReportController;
 use App\Http\Controllers\RateLimitController;
 use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\HealthController;
@@ -38,15 +40,18 @@ Route::middleware("api")->group(function (): void {
     Route::get('/health/liveness', [HealthController::class, 'liveness']);
     Route::get('/health/readiness', [HealthController::class, 'readiness']);
     
-    Route::middleware('throttle:auth')->group(function () {
+    Route::middleware(['throttle:auth'])->group(function () {
         Route::post("/auth/register", [AuthController::class, "register"]);
         Route::post("/auth/login", [AuthController::class, "login"]);
     });
 
-    Route::middleware("auth.api")->group(function (): void {
+    Route::middleware(["auth.api"])->group(function (): void {
         // Profile routes (Phase 3A - Multi-AI Implementation)
         Route::get("/user", [ProfileController::class, "show"]);
         Route::put("/user", [ProfileController::class, "update"]);
+        // Aliases to align with OpenAPI docs while preserving existing routes
+        Route::get("/profile", [ProfileController::class, "show"]);
+        Route::put("/profile", [ProfileController::class, "update"]);
         Route::get("/profile/completeness", [ProfileController::class, "completeness"]);
         
         // Dashboard routes
@@ -59,9 +64,16 @@ Route::middleware("api")->group(function (): void {
         Route::get("/profile/{userId}/views/stats", [ProfileViewController::class, "getStats"]);
         
         Route::post("/auth/logout", [AuthController::class, "logout"]);
+
+        Route::post('/telemetry/client-events', [TelemetryController::class, 'storeClientEvents']);
+
+        Route::middleware(['feature:analytics', 'auth.moderator'])->group(function (): void {
+            Route::get('/telemetry/preview-summary', [TelemetryReportController::class, 'previewSummary']);
+        });
         
         // Matching routes (require complete profile)
         Route::middleware('profile.complete')->group(function (): void {
+            Route::get("/matches/established", [MatchController::class, "establishedMatches"]);
             Route::get("/matches", [MatchController::class, "index"]);
             Route::post("/matches/action", [MatchController::class, "action"]);
         });
@@ -72,6 +84,7 @@ Route::middleware("api")->group(function (): void {
             Route::get("/{userId}", [MessageController::class, "index"]);
             Route::post("/", [MessageController::class, "store"]);
             Route::post("/{messageId}/read", [MessageController::class, "markAsRead"]);
+            Route::post("/mark-all-read/{senderId}", [MessageController::class, "markAllAsRead"]);
         });
         
             // Group routes
@@ -173,18 +186,7 @@ Route::middleware("api")->group(function (): void {
             Route::delete('/artifacts/{id}', [ProximityArtifactController::class, 'destroy']);
         });
 
-        // Moderation routes (Phase 2: Safety Features)
-        Route::prefix('moderation')->middleware('auth.moderator')->group(function (): void {
-            Route::get('/dashboard', [ModerationController::class, 'dashboard']);
-            Route::get('/flagged-content', [ModerationController::class, 'flaggedContent']);
-            Route::post('/flags/{artifactId}/review', [ModerationController::class, 'reviewFlag']);
-            Route::get('/spoof-detections', [ModerationController::class, 'spoofDetections']);
-            Route::post('/spoofs/{detectionId}/review', [ModerationController::class, 'reviewSpoof']);
-            Route::get('/throttles', [ModerationController::class, 'activeThrottles']);
-            Route::delete('/throttles/{throttleId}', [ModerationController::class, 'removeThrottle']);
-            Route::get('/actions', [ModerationController::class, 'actionHistory']);
-            Route::get('/users/{userId}', [ModerationController::class, 'userProfile']);
-        });
+        // (moved) Moderation routes defined outside the rate-limited group below
         
         // Bulletin Board routes (Phase 5B - Location-Based Bulletin Board System)
         Route::get("/bulletin-boards", [BulletinBoardController::class, "index"]);
@@ -194,7 +196,6 @@ Route::middleware("api")->group(function (): void {
             Route::post("/bulletin-boards/{id}/messages", [BulletinBoardController::class, "postMessage"]);
         });
         Route::get("/bulletin-boards/{id}/messages", [BulletinBoardController::class, "getMessages"]);
-        Route::get("/bulletin-boards/{id}/stream", [BulletinBoardController::class, "stream"]);
         
         // Chatroom routes (Phase 6A - Real-time Location-Based Chatrooms)
         Route::prefix("chatrooms")->middleware('feature:chatrooms')->group(function (): void {
@@ -315,5 +316,21 @@ Route::middleware("api")->group(function (): void {
                 Route::get("/suspicious-activity", [RateLimitController::class, "checkSuspiciousActivity"]);
                 Route::post("/cleanup", [RateLimitController::class, "cleanup"]);
             });
+    });
+    
+    // Moderation routes (Phase 2: Safety Features)
+    // Define outside the general rate-limited group so that feature:moderation
+    // executes before any advanced rate limiting middleware. This prevents
+    // Redis access during tests when the moderation feature is disabled.
+    Route::middleware(['auth.api', 'feature:moderation', 'auth.moderator'])->prefix('moderation')->group(function (): void {
+        Route::get('/dashboard', [ModerationController::class, 'dashboard']);
+        Route::get('/flagged-content', [ModerationController::class, 'flaggedContent']);
+        Route::post('/flags/{artifactId}/review', [ModerationController::class, 'reviewFlag']);
+        Route::get('/spoof-detections', [ModerationController::class, 'spoofDetections']);
+        Route::post('/spoofs/{detectionId}/review', [ModerationController::class, 'reviewSpoof']);
+        Route::get('/throttles', [ModerationController::class, 'activeThrottles']);
+        Route::delete('/throttles/{throttleId}', [ModerationController::class, 'removeThrottle']);
+        Route::get('/actions', [ModerationController::class, 'actionHistory']);
+        Route::get('/users/{userId}', [ModerationController::class, 'userProfile']);
     });
 });

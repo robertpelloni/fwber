@@ -9,9 +9,12 @@ import { RelationshipTier } from '@/lib/relationshipTiers'
 import RelationshipTierBadge from '@/components/RelationshipTierBadge'
 import PhotoRevealGate from '@/components/PhotoRevealGate'
 import MatchFilter from '@/components/MatchFilter'
+import MatchModal from '@/components/MatchModal'
+import ReportModal from '@/components/ReportModal'
+import { reportUser, blockUser } from '@/lib/api/safety'
 
 export default function MatchesPage() {
-  const { token, isAuthenticated } = useAuth()
+  const { token, isAuthenticated, user } = useAuth()
   const [matches, setMatches] = useState<Match[]>([])
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
@@ -20,6 +23,13 @@ export default function MatchesPage() {
   const [showMatchDetails, setShowMatchDetails] = useState(false)
   const [showTierInfo, setShowTierInfo] = useState(true)
   const [filters, setFilters] = useState({});
+  
+  // Match Modal State
+  const [isMatchModalOpen, setIsMatchModalOpen] = useState(false)
+  const [matchedUserProfile, setMatchedUserProfile] = useState<{name: string, photoUrl: string} | null>(null)
+  
+  // Report Modal State
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false)
 
   // Simulated tier data - in real app, fetch from API
   const getCurrentTier = (match: Match): RelationshipTier => {
@@ -49,6 +59,15 @@ export default function MatchesPage() {
     }
   }, [isAuthenticated, token, loadMatches, filters])
 
+  const advanceToNextMatch = useCallback(() => {
+    if (currentMatchIndex < matches.length - 1) {
+      setCurrentMatchIndex(prev => prev + 1)
+    } else {
+      // No more matches, reload
+      loadMatches()
+    }
+  }, [currentMatchIndex, matches.length, loadMatches])
+
   const handleMatchAction = async (action: MatchAction) => {
     if (!token || currentMatchIndex >= matches.length) return
 
@@ -58,19 +77,45 @@ export default function MatchesPage() {
       setIsPerformingAction(true)
       setError(null)
 
-      await performMatchAction(token, currentMatch.id, action)
+      const response = await performMatchAction(token, currentMatch.id, action)
       
-      // Move to next match
-      if (currentMatchIndex < matches.length - 1) {
-        setCurrentMatchIndex(prev => prev + 1)
+      if (response.is_match) {
+        setMatchedUserProfile({
+          name: currentMatch.profile?.display_name || 'Match',
+          photoUrl: currentMatch.profile?.photos?.[0]?.url || '/placeholder-user.jpg'
+        })
+        setIsMatchModalOpen(true)
       } else {
-        // No more matches, reload
-        await loadMatches()
+        advanceToNextMatch()
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to perform action')
     } finally {
       setIsPerformingAction(false)
+    }
+  }
+
+  const handleCloseModal = () => {
+    setIsMatchModalOpen(false)
+    advanceToNextMatch()
+  }
+
+  const handleReport = async (reason: string, details: string) => {
+    if (!token || !currentMatch) return
+    
+    // Use matched_user_id as the target
+    const targetUserId = currentMatch.id
+    
+    await reportUser(token, targetUserId, reason, details)
+    
+    if (confirm('Report submitted. Do you want to block this user as well?')) {
+      try {
+        await blockUser(token, targetUserId)
+        // Move to next match
+        advanceToNextMatch()
+      } catch (err) {
+        console.error('Failed to block after report', err)
+      }
     }
   }
 
@@ -188,7 +233,9 @@ export default function MatchesPage() {
                         src={currentMatch.profile.photos[0].url}
                         alt={currentMatch.profile.display_name || 'Profile'}
                         fill
+                        sizes="(max-width: 768px) 100vw, 600px"
                         className="object-cover"
+                        priority
                       />
                     ) : (
                       <div className="text-white text-6xl">
@@ -222,16 +269,26 @@ export default function MatchesPage() {
                 </div>
 
                 {/* Compatibility Score & Tier Badge */}
-                <div className="absolute top-4 right-4 flex flex-col gap-2">
+                <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
                   <div className="bg-white bg-opacity-90 rounded-full px-3 py-1">
                     <span className="text-sm font-semibold text-gray-900">
-                      {Math.round(currentMatch.compatibility_score * 100)}% Match
+                      {Math.round(currentMatch.compatibilityScore * 100)}% Match
                     </span>
                   </div>
                   <RelationshipTierBadge
                     tier={getCurrentTier(currentMatch)}
                     compact={true}
                   />
+                  <button
+                    onClick={() => setIsReportModalOpen(true)}
+                    className="bg-white bg-opacity-90 rounded-full p-2 text-gray-500 hover:text-red-600 transition-colors"
+                    title="Report User"
+                    aria-label="Report User"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </button>
                 </div>
               </div>
 
@@ -344,7 +401,7 @@ export default function MatchesPage() {
                       <div>
                         <span className="font-medium text-gray-700">Compatibility Score:</span>
                         <span className="ml-2 text-gray-600">
-                          {Math.round(currentMatch.compatibility_score * 100)}%
+                          {Math.round(currentMatch.compatibilityScore * 100)}%
                         </span>
                       </div>
                       <div>
@@ -360,6 +417,27 @@ export default function MatchesPage() {
             </div>
           )}
         </main>
+
+        {/* Match Modal */}
+        {matchedUserProfile && (
+          <MatchModal
+            isOpen={isMatchModalOpen}
+            onClose={handleCloseModal}
+            matchedUser={matchedUserProfile}
+            currentUser={{
+              photoUrl: user?.profile?.avatarUrl || '/placeholder-user.jpg'
+            }}
+          />
+        )}
+
+        {currentMatch && (
+          <ReportModal
+            isOpen={isReportModalOpen}
+            onClose={() => setIsReportModalOpen(false)}
+            onSubmit={handleReport}
+            userName={currentMatch.profile?.display_name || 'User'}
+          />
+        )}
       </div>
     </ProtectedRoute>
   )

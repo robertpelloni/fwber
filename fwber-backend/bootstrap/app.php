@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Middleware\AuthenticateApi;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Http\Middleware\AdvancedRateLimiting;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -14,12 +16,16 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: 'api'
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Add security headers to all requests
+        $middleware->append(SecurityHeaders::class);
+
         $middleware->alias([
             'auth.api' => AuthenticateApi::class,
             'profile.complete' => \App\Http\Middleware\EnsureProfileComplete::class,
             'presence.update' => \App\Http\Middleware\UpdateLastSeen::class,
             'auth.moderator' => \App\Http\Middleware\EnsureModerator::class,
             'feature' => \App\Http\Middleware\FeatureEnabled::class,
+            'rate.limit' => AdvancedRateLimiting::class,
         ]);
 
         // Enable CORS for API routes

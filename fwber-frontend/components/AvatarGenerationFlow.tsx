@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Loader2, Sparkles, RefreshCw, Check, X } from 'lucide-react';
+import Image from 'next/image';
 import axios from 'axios';
 
 interface AvatarGenerationProps {
@@ -342,15 +343,17 @@ export default function AvatarGenerationFlow({
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Your New Avatar</h2>
             <p className="text-gray-600">
-              Review your AI-generated avatar. You can regenerate if you'd like a different result.
+              Review your AI-generated avatar. You can regenerate if you&apos;d like a different result.
             </p>
           </div>
 
           <div className="flex justify-center">
             <div className="relative">
-              <img
+              <Image
                 src={generatedAvatar}
                 alt="Generated avatar"
+                width={256}
+                height={256}
                 className="w-64 h-64 rounded-full object-cover border-4 border-purple-200 shadow-lg"
               />
               <div className="absolute -bottom-2 -right-2 bg-purple-600 text-white p-2 rounded-full">
@@ -399,9 +402,11 @@ export default function AvatarGenerationFlow({
             Your AI-generated avatar is now active on your profile.
           </p>
           {generatedAvatar && (
-            <img
+            <Image
               src={generatedAvatar}
               alt="Your avatar"
+              width={128}
+              height={128}
               className="w-32 h-32 rounded-full object-cover mx-auto border-4 border-green-200"
             />
           )}

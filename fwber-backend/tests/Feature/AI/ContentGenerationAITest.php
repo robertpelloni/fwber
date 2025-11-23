@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Models\BulletinBoard;
 use App\Services\ContentGenerationService;
 use App\Services\ContentOptimizationService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\RefreshDatabaseSilently;
 use Illuminate\Support\Facades\Cache;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
@@ -24,7 +24,7 @@ use PHPUnit\Framework\Attributes\Test;
 #[Group('ai')]
 class ContentGenerationAITest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabaseSilently;
 
     protected ContentGenerationService $contentGenerationService;
     protected ContentOptimizationService $contentOptimizationService;

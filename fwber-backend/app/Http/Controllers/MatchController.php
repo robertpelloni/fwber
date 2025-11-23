@@ -6,6 +6,7 @@ use App\Http\Resources\MatchResource;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Models\ProximityArtifact;
+use App\Services\AIMatchingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +16,12 @@ use App\Services\PushNotificationService;
 
 class MatchController extends Controller
 {
+    private AIMatchingService $matchingService;
+
+    public function __construct(AIMatchingService $matchingService)
+    {
+        $this->matchingService = $matchingService;
+    }
     /**
      * @OA\Get(
      *     path="/matches",
@@ -132,7 +139,27 @@ class MatchController extends Controller
         $cacheKey = "feed:user_{$user->id}:" . md5($request->getQueryString() ?? '');
         
         $matches = Cache::remember($cacheKey, 60, function () use ($user, $profile, $request) {
-            return $this->findMatches($user, $profile, $request);
+            $filters = [
+                'age_min' => $request->get('age_min'),
+                'age_max' => $request->get('age_max'),
+                'max_distance' => $request->get('max_distance'),
+            ];
+
+            $candidates = $this->matchingService->findAdvancedMatches($user, $filters);
+            
+            // Convert array back to collection and map attributes for resource
+            return collect($candidates)->map(function ($candidate) use ($profile) {
+                // Map ai_score to compatibility_score for the resource
+                $candidate->setAttribute('compatibility_score', $candidate->ai_score);
+                
+                // Calculate distance for display (service uses it for scoring but doesn't return it)
+                $candidate->setAttribute(
+                    'distance',
+                    $this->calculateDistance($profile, $candidate->profile)
+                );
+                
+                return $candidate;
+            });
         });
 
         // Emit telemetry
@@ -146,6 +173,66 @@ class MatchController extends Controller
             "matches" => MatchResource::collection($matches)->toArray(request()),
             "total" => $matches->count(),
         ]);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/matches/established",
+     *     tags={"Matches"},
+     *     summary="Get established matches",
+     *     description="Retrieve a list of users the authenticated user has matched with.",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Matches retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *         )
+     *     )
+     * )
+     */
+    public function establishedMatches(Request $request): JsonResponse
+    {
+        $user = auth()->user();
+        
+        $matches = DB::table('matches')
+            ->where('user1_id', $user->id)
+            ->orWhere('user2_id', $user->id)
+            ->get();
+
+        $userIds = $matches->map(function ($match) use ($user) {
+            return $match->user1_id === $user->id ? $match->user2_id : $match->user1_id;
+        });
+
+        $users = User::with(['profile', 'photos'])->whereIn('id', $userIds)->get();
+
+        // Format as "Conversation" objects for frontend compatibility
+        $conversations = $users->map(function ($otherUser) use ($user, $matches) {
+            // Find the match record
+            $match = $matches->first(function ($m) use ($user, $otherUser) {
+                return ($m->user1_id === $user->id && $m->user2_id === $otherUser->id) ||
+                       ($m->user1_id === $otherUser->id && $m->user2_id === $user->id);
+            });
+
+            // Get last message
+            $lastMessage = \App\Models\Message::where(function ($q) use ($user, $otherUser) {
+                $q->where('sender_id', $user->id)->where('receiver_id', $otherUser->id);
+            })->orWhere(function ($q) use ($user, $otherUser) {
+                $q->where('sender_id', $otherUser->id)->where('receiver_id', $user->id);
+            })->latest()->first();
+
+            return [
+                'id' => $match->id, // Match ID acts as conversation ID
+                'user1_id' => $match->user1_id,
+                'user2_id' => $match->user2_id,
+                'created_at' => $match->created_at,
+                'updated_at' => $match->updated_at,
+                'last_message' => $lastMessage,
+                'other_user' => $otherUser,
+            ];
+        });
+
+        return response()->json(['data' => $conversations]);
     }
 
     /**
@@ -413,29 +500,6 @@ class MatchController extends Controller
                              $candidateGenderPrefs[$userProfile->gender];
 
         return $userWantsCandidate && $candidateWantsUser;
-    }
-
-    private function calculatePreferenceCompatibility(UserProfile $userProfile, UserProfile $candidateProfile): int
-    {
-        $score = 0;
-        $maxScore = 40;
-
-        if (!$userProfile->preferences || !$candidateProfile->preferences) {
-            return $maxScore / 2; // Default score if no preferences
-        }
-
-        // Compare various preferences
-        $preferenceKeys = ['relationship_style', 'sexual_orientation', 'sti_status'];
-        
-        foreach ($preferenceKeys as $key) {
-            if (isset($userProfile->preferences[$key]) && isset($candidateProfile->preferences[$key])) {
-                if ($userProfile->preferences[$key] === $candidateProfile->preferences[$key]) {
-                    $score += $maxScore / count($preferenceKeys);
-                }
-            }
-        }
-
-        return $score;
     }
 
     private function isUserAccessible(User $user, int $targetUserId): bool

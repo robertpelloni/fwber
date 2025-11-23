@@ -4,20 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 
 class ProximityArtifact extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'user_id', 'type', 'content', 'location_lat', 'location_lng',
         'visibility_radius_m', 'moderation_status', 'meta', 'expires_at',
+        'is_flagged', 'flag_count',
     ];
 
     protected $casts = [
         'meta' => 'array',
         'expires_at' => 'datetime',
+        'is_flagged' => 'boolean',
+        'flag_count' => 'integer',
     ];
 
     protected $appends = ['fuzzed_latitude', 'fuzzed_longitude'];
@@ -59,5 +63,10 @@ class ProximityArtifact extends Model
         mt_srand($seed);
         $offset = (mt_rand() / mt_getrandmax()) * (2 * $delta) - $delta;
         return round($value + $offset, 7);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

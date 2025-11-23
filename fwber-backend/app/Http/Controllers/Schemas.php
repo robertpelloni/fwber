@@ -33,6 +33,12 @@ namespace App\Http\Controllers;
  *     @OA\JsonContent(ref="#/components/schemas/NotFoundError")
  * )
  * 
+ * @OA\Response(
+ *     response="ModerationError",
+ *     description="Moderation blocked",
+ *     @OA\JsonContent(ref="#/components/schemas/ModerationError")
+ * )
+ * 
  * @OA\Schema(
  *     schema="User",
  *     type="object",
@@ -68,6 +74,14 @@ namespace App\Http\Controllers;
  *     schema="NotFoundError",
  *     type="object",
  *     @OA\Property(property="message", type="string", example="Not Found")
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="ModerationError",
+ *     type="object",
+ *     @OA\Property(property="message", type="string", example="Message blocked by content moderation"),
+ *     @OA\Property(property="reason", type="string", example="Inappropriate content"),
+ *     @OA\Property(property="category", type="string", nullable=true, example="toxicity")
  * )
  * 
  * @OA\Schema(
@@ -311,6 +325,98 @@ namespace App\Http\Controllers;
  *     @OA\Property(property="optimization_types_usage", type="array", @OA\Items(type="string")),
  *     @OA\Property(property="generated_at", type="string", format="date-time")
  *   )
+ * )
+ * 
+ * @OA\Schema(
+ *   schema="Chatroom",
+ *   type="object",
+ *   required={"id","name","type","created_by"},
+ *   @OA\Property(property="id", type="integer", example=101),
+ *   @OA\Property(property="name", type="string", example="NYC Tech Founders"),
+ *   @OA\Property(property="description", type="string", nullable=true, example="A place for NYC tech founders to connect"),
+ *   @OA\Property(property="type", type="string", example="interest", enum={"interest","city","event","private"}),
+ *   @OA\Property(property="category", type="string", nullable=true, example="technology"),
+ *   @OA\Property(property="city", type="string", nullable=true, example="New York"),
+ *   @OA\Property(property="neighborhood", type="string", nullable=true, example="Brooklyn"),
+ *   @OA\Property(property="created_by", type="integer", example=5),
+ *   @OA\Property(property="member_count", type="integer", example=245),
+ *   @OA\Property(property="message_count", type="integer", example=1387),
+ *   @OA\Property(property="is_public", type="boolean", example=true),
+ *   @OA\Property(property="is_active", type="boolean", example=true),
+ *   @OA\Property(property="last_activity_at", type="string", format="date-time"),
+ *   @OA\Property(property="settings", type="object", nullable=true),
+ *   @OA\Property(property="created_at", type="string", format="date-time"),
+ *   @OA\Property(property="updated_at", type="string", format="date-time")
+ * )
+ * 
+ * @OA\Schema(
+ *   schema="Photo",
+ *   type="object",
+ *   required={"id","filename","url"},
+ *   @OA\Property(property="id", type="integer", example=42),
+ *   @OA\Property(property="filename", type="string", example="photo_abc123.jpg"),
+ *   @OA\Property(property="original_filename", type="string", nullable=true, example="my_photo.jpg"),
+ *   @OA\Property(property="url", type="string", example="https://cdn.fwber.com/photos/abc123.jpg"),
+ *   @OA\Property(property="thumbnail_url", type="string", nullable=true, example="https://cdn.fwber.com/photos/thumb_abc123.jpg"),
+ *   @OA\Property(property="mime_type", type="string", example="image/jpeg"),
+ *   @OA\Property(property="file_size", type="integer", example=245678),
+ *   @OA\Property(property="width", type="integer", nullable=true, example=1920),
+ *   @OA\Property(property="height", type="integer", nullable=true, example=1080),
+ *   @OA\Property(property="is_primary", type="boolean", example=false),
+ *   @OA\Property(property="is_private", type="boolean", example=false),
+ *   @OA\Property(property="sort_order", type="integer", example=0),
+ *   @OA\Property(property="created_at", type="string", format="date-time"),
+ *   @OA\Property(property="updated_at", type="string", format="date-time")
+ * )
+ * 
+ * @OA\Schema(
+ *   schema="Group",
+ *   type="object",
+ *   required={"id","name","created_by"},
+ *   @OA\Property(property="id", type="integer", example=15),
+ *   @OA\Property(property="name", type="string", example="Running Club"),
+ *   @OA\Property(property="description", type="string", nullable=true, example="Weekly running meetups"),
+ *   @OA\Property(property="created_by", type="integer", example=8),
+ *   @OA\Property(property="member_count", type="integer", example=32),
+ *   @OA\Property(property="is_public", type="boolean", example=true),
+ *   @OA\Property(property="is_active", type="boolean", example=true),
+ *   @OA\Property(property="settings", type="object", nullable=true),
+ *   @OA\Property(property="created_at", type="string", format="date-time"),
+ *   @OA\Property(property="updated_at", type="string", format="date-time")
+ * )
+ * 
+ * @OA\Schema(
+ *   schema="ProximityArtifact",
+ *   type="object",
+ *   required={"id","user_id","artifact_type","content"},
+ *   @OA\Property(property="id", type="integer", example=78),
+ *   @OA\Property(property="user_id", type="integer", example=12),
+ *   @OA\Property(property="artifact_type", type="string", example="status"),
+ *   @OA\Property(property="content", type="string", example="Looking for coffee recommendations nearby"),
+ *   @OA\Property(property="latitude", type="number", format="float", example=40.7128),
+ *   @OA\Property(property="longitude", type="number", format="float", example=-74.0060),
+ *   @OA\Property(property="radius_meters", type="integer", example=500),
+ *   @OA\Property(property="expires_at", type="string", format="date-time", nullable=true),
+ *   @OA\Property(property="visibility", type="string", example="public"),
+ *   @OA\Property(property="metadata", type="object", nullable=true),
+ *   @OA\Property(property="created_at", type="string", format="date-time"),
+ *   @OA\Property(property="updated_at", type="string", format="date-time")
+ * )
+ * 
+ * @OA\Schema(
+ *   schema="DirectMessage",
+ *   type="object",
+ *   required={"id","sender_id","recipient_id","content"},
+ *   @OA\Property(property="id", type="integer", example=456),
+ *   @OA\Property(property="sender_id", type="integer", example=10),
+ *   @OA\Property(property="recipient_id", type="integer", example=20),
+ *   @OA\Property(property="content", type="string", example="Hey, how are you?"),
+ *   @OA\Property(property="message_type", type="string", example="text"),
+ *   @OA\Property(property="is_read", type="boolean", example=false),
+ *   @OA\Property(property="read_at", type="string", format="date-time", nullable=true),
+ *   @OA\Property(property="metadata", type="object", nullable=true),
+ *   @OA\Property(property="created_at", type="string", format="date-time"),
+ *   @OA\Property(property="updated_at", type="string", format="date-time")
  * )
  */
 class Schemas

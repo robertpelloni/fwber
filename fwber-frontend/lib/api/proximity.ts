@@ -4,6 +4,7 @@ import type {
   ProximityArtifact,
   CreateArtifactRequest,
   LocalPulseParams,
+  ProximityChatroom,
 } from '@/types/proximity';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
@@ -84,6 +85,22 @@ export const proximityApi = {
    */
   deleteArtifact: async (id: number, token: string): Promise<{ message: string }> => {
     const response = await axios.delete(`${API_BASE_URL}/proximity/artifacts/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  /**
+   * Find nearby proximity chatrooms
+   */
+  findNearbyChatrooms: async (
+    lat: number,
+    lng: number,
+    radius: number = 1000,
+    token: string
+  ): Promise<{ chatrooms: ProximityChatroom[] }> => {
+    const response = await axios.get(`${API_BASE_URL}/proximity-chatrooms/nearby`, {
+      params: { lat, lng, radius },
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;

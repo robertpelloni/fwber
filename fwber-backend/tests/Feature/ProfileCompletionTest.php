@@ -6,12 +6,12 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Models\ApiToken;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\RefreshDatabaseSilently;
 use PHPUnit\Framework\Attributes\Test;
 
 class ProfileCompletionTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabaseSilently;
 
     #[Test]
     public function incomplete_profile_blocked_from_matches()

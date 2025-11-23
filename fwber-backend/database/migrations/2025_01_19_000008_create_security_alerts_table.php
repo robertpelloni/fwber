@@ -21,8 +21,7 @@ return new class extends Migration
             $table->boolean('resolved')->default(false);
             $table->text('resolution')->nullable();
             $table->timestamp('resolved_at')->nullable();
-            $table->timestamp('created_at');
-            $table->timestamp('updated_at');
+            $table->timestamps();
             
             $table->index(['pattern', 'created_at']);
             $table->index(['severity', 'created_at']);

@@ -1,9 +1,13 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import Image from 'next/image'
 import { useAuth } from '@/lib/auth-context'
 import ProtectedRoute from '@/components/ProtectedRoute'
-import { getConversations, getMessages, sendMessage, type Conversation, type Message } from '@/lib/api/messages'
+import { getConversations, getMessages, sendMessage, markMessagesAsRead, type Conversation, type Message } from '@/lib/api/messages'
+import ReportModal from '@/components/ReportModal'
+import ProfileViewModal from '@/components/ProfileViewModal'
+import { blockUser, reportUser } from '@/lib/api/safety'
 
 export default function MessagesPage() {
   const { token, isAuthenticated, user } = useAuth()
@@ -11,10 +15,17 @@ export default function MessagesPage() {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState('')
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false)
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
+  const [showSafetyMenu, setShowSafetyMenu] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  
+  const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:8000'
 
   const loadConversations = useCallback(async () => {
     if (!token) return
@@ -32,16 +43,20 @@ export default function MessagesPage() {
   }, [token])
 
   const loadMessages = useCallback(async (conversationId: number) => {
-    if (!token) return
+    if (!token || !selectedConversation?.other_user?.id) return
 
     try {
       setError(null)
-      const messagesData = await getMessages(token, conversationId)
+      // Use other_user.id instead of conversationId (which is match ID)
+      const messagesData = await getMessages(token, selectedConversation.other_user.id)
       setMessages(messagesData)
+      
+      // Mark messages as read
+      await markMessagesAsRead(token, selectedConversation.other_user.id)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load messages')
     }
-  }, [token])
+  }, [token, selectedConversation])
 
   useEffect(() => {
     if (isAuthenticated && token) {
@@ -63,22 +78,66 @@ export default function MessagesPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0])
+    }
+  }
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!token || !selectedConversation || !newMessage.trim()) return
+    if (!token || !selectedConversation?.other_user?.id || (!newMessage.trim() && !selectedFile)) return
 
     try {
       setIsSending(true)
       setError(null)
 
-      const message = await sendMessage(token, selectedConversation.id, newMessage.trim())
+      const message = await sendMessage(
+        token, 
+        selectedConversation.other_user.id, 
+        newMessage.trim(),
+        selectedFile
+      )
       setMessages(prev => [...prev, message])
       setNewMessage('')
+      setSelectedFile(null)
+      if (fileInputRef.current) fileInputRef.current.value = ''
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send message')
     } finally {
       setIsSending(false)
     }
+  }
+
+  const handleBlock = async () => {
+    const otherUser = selectedConversation?.other_user
+    if (!token || !otherUser || !confirm('Are you sure you want to block this user? You will no longer see their messages or profile.')) return
+    
+    try {
+      await blockUser(token, otherUser.id)
+      setConversations(prev => prev.filter(c => c.id !== selectedConversation!.id))
+      setSelectedConversation(null)
+      setShowSafetyMenu(false)
+    } catch (err) {
+      alert('Failed to block user')
+    }
+  }
+
+  const handleReport = async (reason: string, details: string) => {
+    const otherUser = selectedConversation?.other_user
+    if (!token || !otherUser) return
+    await reportUser(token, otherUser.id, reason, details)
+    
+    if (confirm('Report submitted. Do you want to block this user as well?')) {
+      try {
+        await blockUser(token, otherUser.id)
+        setConversations(prev => prev.filter(c => c.id !== selectedConversation!.id))
+        setSelectedConversation(null)
+      } catch (err) {
+        console.error('Failed to block after report', err)
+      }
+    }
+    setShowSafetyMenu(false)
   }
 
   const formatMessageTime = (timestamp: string) => {
@@ -218,7 +277,7 @@ export default function MessagesPage() {
                 {selectedConversation ? (
                   <>
                     {/* Chat Header */}
-                    <div className="p-4 border-b">
+                    <div className="p-4 border-b flex justify-between items-center">
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
                           {selectedConversation.other_user?.profile?.display_name?.[0] || '?'}
@@ -227,12 +286,54 @@ export default function MessagesPage() {
                           <h3 className="text-lg font-semibold text-gray-900">
                             {selectedConversation.other_user?.profile?.display_name || 'Anonymous'}
                           </h3>
-                          <p className="text-sm text-gray-500">
-                            {selectedConversation.other_user?.profile?.age && 
-                              `${selectedConversation.other_user.profile.age} years old`
-                            }
-                          </p>
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm text-gray-500">
+                              {selectedConversation.other_user?.profile?.age && 
+                                `${selectedConversation.other_user.profile.age} years old`
+                              }
+                            </p>
+                            <button
+                              onClick={() => setIsProfileModalOpen(true)}
+                              className="text-xs text-blue-600 hover:text-blue-800 font-medium hover:underline"
+                            >
+                              View Profile
+                            </button>
+                          </div>
                         </div>
+                      </div>
+                      
+                      <div className="relative">
+                        <button
+                          onClick={() => setShowSafetyMenu(!showSafetyMenu)}
+                          className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100"
+                          aria-label="Chat options"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                          </svg>
+                        </button>
+                        
+                        {showSafetyMenu && (
+                          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
+                            <div className="py-1">
+                              <button
+                                onClick={() => {
+                                  setIsReportModalOpen(true)
+                                  setShowSafetyMenu(false)
+                                }}
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              >
+                                Report User
+                              </button>
+                              <button
+                                onClick={handleBlock}
+                                className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                              >
+                                Block User
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -250,7 +351,47 @@ export default function MessagesPage() {
                                 : 'bg-gray-200 text-gray-900'
                             }`}
                           >
-                            <p className="text-sm">{message.content}</p>
+                            {message.media_url && (
+                              <div className="mb-2">
+                                {message.message_type === 'image' ? (
+                                  <Image 
+                                    src={message.media_url.startsWith('http') ? message.media_url : `${BACKEND_URL}${message.media_url}`} 
+                                    alt="Attachment" 
+                                    width={0}
+                                    height={0}
+                                    sizes="100vw"
+                                    className="w-full h-auto rounded-lg"
+                                    loading="lazy"
+                                  />
+                                ) : message.message_type === 'video' ? (
+                                  <video 
+                                    src={message.media_url.startsWith('http') ? message.media_url : `${BACKEND_URL}${message.media_url}`} 
+                                    controls 
+                                    className="max-w-full rounded-lg"
+                                  />
+                                ) : message.message_type === 'audio' ? (
+                                  <audio 
+                                    src={message.media_url.startsWith('http') ? message.media_url : `${BACKEND_URL}${message.media_url}`} 
+                                    controls 
+                                    className="w-full"
+                                  />
+                                ) : (
+                                  <a 
+                                    href={message.media_url.startsWith('http') ? message.media_url : `${BACKEND_URL}${message.media_url}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={`flex items-center gap-2 underline ${message.sender_id === user?.id ? 'text-blue-100' : 'text-blue-600'}`}
+                                  >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    Download File
+                                  </a>
+                                )}
+                              </div>
+                            )}
+                            
+                            {message.content && <p className="text-sm">{message.content}</p>}
                             <p className={`text-xs mt-1 ${
                               message.sender_id === user?.id ? 'text-blue-100' : 'text-gray-500'
                             }`}>
@@ -264,7 +405,39 @@ export default function MessagesPage() {
 
                     {/* Message Input */}
                     <div className="p-4 border-t">
+                      {selectedFile && (
+                        <div className="mb-2 px-3 py-1 bg-gray-100 rounded flex justify-between items-center">
+                          <span className="text-sm text-gray-600 truncate max-w-xs">{selectedFile.name}</span>
+                          <button 
+                            onClick={() => {
+                              setSelectedFile(null)
+                              if (fileInputRef.current) fileInputRef.current.value = ''
+                            }}
+                            className="text-gray-500 hover:text-red-500"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      )}
                       <form onSubmit={handleSendMessage} className="flex space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="p-2 text-gray-500 hover:text-blue-600 hover:bg-gray-100 rounded-full transition-colors"
+                          title="Attach file"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                          </svg>
+                        </button>
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          onChange={handleFileSelect}
+                          className="hidden"
+                          accept="image/*,video/*,audio/*"
+                          title="Attach file"
+                        />
                         <input
                           type="text"
                           value={newMessage}
@@ -275,7 +448,7 @@ export default function MessagesPage() {
                         />
                         <button
                           type="submit"
-                          disabled={isSending || !newMessage.trim()}
+                          disabled={isSending || (!newMessage.trim() && !selectedFile)}
                           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {isSending ? 'Sending...' : 'Send'}
@@ -296,6 +469,24 @@ export default function MessagesPage() {
           )}
         </div>
       </div>
+      
+      {selectedConversation && (
+        <ReportModal
+          isOpen={isReportModalOpen}
+          onClose={() => setIsReportModalOpen(false)}
+          onSubmit={handleReport}
+          userName={selectedConversation.other_user?.profile?.display_name || 'User'}
+        />
+      )}
+
+      {selectedConversation && selectedConversation.other_user && (
+        <ProfileViewModal
+          isOpen={isProfileModalOpen}
+          onClose={() => setIsProfileModalOpen(false)}
+          user={selectedConversation.other_user}
+          messagesExchanged={messages.length}
+        />
+      )}
     </ProtectedRoute>
   )
 }

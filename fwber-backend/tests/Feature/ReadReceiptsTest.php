@@ -8,12 +8,12 @@ use App\Models\UserProfile;
 use App\Models\UserMatch;
 use App\Models\ApiToken;
 use App\Models\Message;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\RefreshDatabaseSilently;
 use PHPUnit\Framework\Attributes\Test;
 
 class ReadReceiptsTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabaseSilently;
 
     private User $a;
     private User $b;

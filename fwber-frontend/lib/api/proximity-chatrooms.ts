@@ -4,7 +4,7 @@ export interface ProximityChatroom {
   id: number;
   name: string;
   description?: string;
-  type: 'conference' | 'event' | 'venue' | 'area' | 'temporary';
+  type: 'conference' | 'event' | 'venue' | 'area' | 'temporary' | 'networking' | 'social' | 'dating' | 'professional' | 'casual';
   venue_name?: string;
   venue_type?: string;
   event_name?: string;
@@ -138,7 +138,7 @@ export interface ProximityChatroomMessageMention {
 export interface CreateProximityChatroomRequest {
   name: string;
   description?: string;
-  type: 'conference' | 'event' | 'venue' | 'area' | 'temporary';
+  type: 'conference' | 'event' | 'venue' | 'area' | 'temporary' | 'networking' | 'social' | 'dating' | 'professional' | 'casual';
   venue_name?: string;
   venue_type?: string;
   event_name?: string;
@@ -184,7 +184,7 @@ export interface FindNearbyRequest {
   latitude: number;
   longitude: number;
   radius_meters?: number;
-  type?: 'conference' | 'event' | 'venue' | 'area' | 'temporary';
+  type?: 'conference' | 'event' | 'venue' | 'area' | 'temporary' | 'networking' | 'social' | 'dating' | 'professional' | 'casual';
   venue_type?: string;
   tags?: string[];
   search?: string;

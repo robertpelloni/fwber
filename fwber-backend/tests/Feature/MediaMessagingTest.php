@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Models\UserProfile;
 use App\Models\UserMatch;
 use App\Models\Message;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\RefreshDatabaseSilently;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
@@ -15,7 +15,7 @@ use Tests\TestCase;
 
 class MediaMessagingTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabaseSilently;
 
     private User $sender;
     private User $receiver;

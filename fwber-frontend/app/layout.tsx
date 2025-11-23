@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/lib/auth-context'
@@ -13,11 +13,28 @@ const inter = Inter({
   display: 'swap', // Optimize font loading
 })
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#f97316',
+}
+
 export const metadata: Metadata = {
   title: 'FWBer.me - Adult Dating Platform',
   description: 'A modern adult dating platform with advanced matching algorithms',
   keywords: ['dating', 'adult', 'matching', 'relationships'],
   authors: [{ name: 'FWBer.me Team' }],
+  manifest: '/manifest.json',
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/icon.svg', type: 'image/svg+xml', sizes: 'any' },
+    ],
+    apple: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+    ],
+  },
   openGraph: {
     title: 'FWBer.me - Adult Dating Platform',
     description: 'A modern adult dating platform with advanced matching algorithms',
@@ -52,9 +69,12 @@ export default function RootLayout({
         <link rel="preconnect" href="http://localhost:8001" />
         
         {/* Preload critical resources */}
-        <link rel="preload" href="/_next/static/css/app/layout.css" as="style" />
+        {/* <link rel="preload" href="/_next/static/css/app/layout.css" as="style" /> */}
       </head>
-      <body className="min-h-screen bg-background font-sans antialiased text-optimized">
+      <body
+        className="min-h-screen bg-background font-sans antialiased text-optimized"
+        suppressHydrationWarning
+      >
         <QueryProvider>
           <AuthProvider>
             <NotificationPermissionHandler />

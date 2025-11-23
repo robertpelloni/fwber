@@ -63,5 +63,13 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(User::class, 'friends', 'user_id', 'friend_id')
             ->wherePivot('status', 'accepted');
+    public function matchesAsUser1()
+    {
+        return $this->hasMany(UserMatch::class, 'user1_id');
+    }
+
+    public function matchesAsUser2()
+    {
+        return $this->hasMany(UserMatch::class, 'user2_id');
     }
 }

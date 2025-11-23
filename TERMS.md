@@ -4,14 +4,14 @@
 
 ## 1. Acceptance of Terms
 
-By accessing or using fwber ("the Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not use the Service.
+By accessing or using FWBer.me ("the Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not use the Service.
 
-**These Terms constitute a legally binding agreement between you and fwber.**
+**These Terms constitute a legally binding agreement between you and FWBer.me.**
 
 ## 2. Eligibility
 
 ### Age Requirement
-- You must be **18 years of age or older** to use fwber
+- You must be **18 years of age or older** to use FWBer.me
 - By creating an account, you represent that you meet this requirement
 - We reserve the right to request proof of age at any time
 - Violation of age requirements will result in immediate account termination
@@ -96,14 +96,14 @@ You may NOT:
 
 ### Our Intellectual Property
 
-- The Service, including software, design, and branding, is owned by fwber
+- The Service, including software, design, and branding, is owned by FWBer.me
 - You may not copy, modify, or reverse engineer our platform
-- "fwber" and related marks are our trademarks
+- "FWBer.me" and related marks are our trademarks
 - Unauthorized use of our intellectual property is prohibited
 
 ### DMCA and Copyright
 
-If you believe content on fwber infringes your copyright:
+If you believe content on FWBer.me infringes your copyright:
 - Send a DMCA notice to [dmca@fwber.example.com]
 - Include: description of copyrighted work, infringing content URL, contact information, good faith statement, accuracy statement, signature
 
@@ -163,7 +163,7 @@ Appeals can be submitted to [appeals@fwber.example.com].
 
 ### Privacy Policy
 
-Your use of fwber is also governed by our Privacy Policy, which explains:
+Your use of FWBer.me is also governed by our Privacy Policy, which explains:
 - What data we collect
 - How we use your information
 - Your privacy rights
@@ -179,7 +179,7 @@ While we implement industry-standard security measures, we cannot guarantee abso
 
 ### External Links
 
-- fwber may contain links to third-party websites or services
+- FWBer.me may contain links to third-party websites or services
 - We are not responsible for third-party content or practices
 - Use of third-party services is at your own risk
 
@@ -192,7 +192,7 @@ While we implement industry-standard security measures, we cannot guarantee abso
 
 ### Service Availability
 
-- fwber is provided "AS IS" and "AS AVAILABLE"
+- FWBer.me is provided "AS IS" and "AS AVAILABLE"
 - We do not guarantee uninterrupted or error-free service
 - We may modify, suspend, or discontinue features at any time
 - Scheduled maintenance will be announced when possible
@@ -221,7 +221,7 @@ TO THE MAXIMUM EXTENT PERMITTED BY LAW:
 
 ## 11. Indemnification
 
-You agree to indemnify and hold harmless fwber, its officers, directors, employees, and agents from any claims, damages, losses, liabilities, and expenses (including legal fees) arising from:
+You agree to indemnify and hold harmless FWBer.me, its officers, directors, employees, and agents from any claims, damages, losses, liabilities, and expenses (including legal fees) arising from:
 - Your use of the Service
 - Your violation of these Terms
 - Your violation of any rights of others
@@ -240,7 +240,7 @@ Disputes shall be resolved through binding arbitration, except:
 - Injunctive or equitable relief
 - Intellectual property claims
 
-**By using fwber, you waive your right to a jury trial.**
+**By using FWBer.me, you waive your right to a jury trial.**
 
 ### Class Action Waiver
 
@@ -261,7 +261,7 @@ We may modify these Terms at any time. Changes will be effective:
 
 ### Acceptance
 
-Continued use of fwber after changes constitutes acceptance of modified Terms. If you do not agree to changes, you must stop using the Service and may delete your account.
+Continued use of FWBer.me after changes constitutes acceptance of modified Terms. If you do not agree to changes, you must stop using the Service and may delete your account.
 
 ## 14. Account Termination
 
@@ -288,7 +288,7 @@ Upon termination:
 
 ### Entire Agreement
 
-These Terms, together with the Privacy Policy, constitute the entire agreement between you and fwber.
+These Terms, together with the Privacy Policy, constitute the entire agreement between you and FWBer.me.
 
 ### Severability
 
@@ -314,8 +314,8 @@ For questions about these Terms, contact us at:
 
 ## 16. Acknowledgment
 
-**By creating an account or using fwber, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service and our Privacy Policy.**
+**By creating an account or using FWBer.me, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service and our Privacy Policy.**
 
 ---
 
-**Thank you for using fwber responsibly. Together, we can build a safe and vibrant community.**
+**Thank you for using FWBer.me responsibly. Together, we can build a safe and vibrant community.**

@@ -4,6 +4,15 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import Image from 'next/image'
 import { Upload, X, Camera, RotateCcw, Download, Eye, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react'
+import { blurFacesOnFile, FaceBlurError } from '@/lib/faceBlur'
+import { isFeatureEnabled } from '@/lib/featureFlags'
+import { attachFaceBlurMetadata, FileWithFaceBlurMetadata } from '@/lib/faceBlurTelemetry'
+import { usePreviewTelemetry } from '@/lib/previewTelemetry'
+
+const generatePreviewId = () =>
+  typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID()
+    : Math.random().toString(36).substring(2, 11)
 
 interface PhotoUploadProps {
   onUpload: (photos: File[], onProgress?: (fileIndex: number, progress: number, fileName: string) => void) => Promise<void>
@@ -14,10 +23,20 @@ interface PhotoUploadProps {
   className?: string
 }
 
+type PreviewView = 'original' | 'processed'
+
+interface PreviewUrls {
+  original: string
+  processed?: string
+}
+
 interface PhotoPreview {
-  file: File
-  preview: string
+  file: FileWithFaceBlurMetadata
+  previewUrls: PreviewUrls
+  activeView: PreviewView
   id: string
+  facesDetected?: number
+  blurApplied?: boolean
 }
 
 interface UploadProgress {
@@ -39,7 +58,184 @@ export default function PhotoUpload({
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState<Map<string, UploadProgress>>(new Map())
   const [dragActive, setDragActive] = useState(false)
+  const [clientProcessingMessage, setClientProcessingMessage] = useState<string | null>(null)
+  const [processingWarnings, setProcessingWarnings] = useState<string[]>([])
+  const [comparisonPreviewId, setComparisonPreviewId] = useState<string | null>(null)
+  const [comparisonSliderValue, setComparisonSliderValue] = useState(50)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const previewsRef = useRef<PhotoPreview[]>([])
+  const faceBlurEnabled = isFeatureEnabled('clientFaceBlur')
+  const { trackPreviewReady, trackPreviewToggled, trackPreviewDiscarded, flushTelemetryQueue } = usePreviewTelemetry({ enabled: faceBlurEnabled })
+
+  const revokePreviewUrls = useCallback((preview: PhotoPreview) => {
+    if (!preview?.previewUrls) return
+    URL.revokeObjectURL(preview.previewUrls.original)
+    if (preview.previewUrls.processed && preview.previewUrls.processed !== preview.previewUrls.original) {
+      URL.revokeObjectURL(preview.previewUrls.processed)
+    }
+  }, [])
+
+  const emitPreviewReady = useCallback(
+    (previewId: string, file: FileWithFaceBlurMetadata) => {
+      if (!file?.faceBlurMetadata) return
+      const metadata = file.faceBlurMetadata
+      const resolvedPreviewId = metadata.previewId ?? previewId
+      trackPreviewReady({
+        previewId: resolvedPreviewId,
+        fileName: metadata.originalFileName ?? file.name,
+        facesDetected: metadata.facesDetected,
+        blurApplied: Boolean(metadata.blurApplied),
+        processingTimeMs: metadata.processingTimeMs,
+        backend: 'client',
+        warning: metadata.warningMessage,
+        skippedReason: metadata.skippedReason,
+      })
+    },
+    [trackPreviewReady]
+  )
+
+  useEffect(() => {
+    previewsRef.current = previews
+  }, [previews])
+
+  useEffect(() => {
+    return () => {
+      previewsRef.current.forEach(revokePreviewUrls)
+    }
+  }, [revokePreviewUrls])
+
+  useEffect(() => {
+    if (!comparisonPreviewId) {
+      setComparisonSliderValue(50)
+      return
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setComparisonPreviewId(null)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [comparisonPreviewId])
+
+  useEffect(() => {
+    if (!comparisonPreviewId) return
+    const stillExists = previews.some(preview => preview.id === comparisonPreviewId)
+    if (!stillExists) {
+      setComparisonPreviewId(null)
+    }
+  }, [comparisonPreviewId, previews])
+
+  const processFilesForPreview = useCallback(
+    async (files: File[]) => {
+      if (files.length === 0) return []
+
+      if (!faceBlurEnabled) {
+        return files.map((file) => ({
+          file: file as FileWithFaceBlurMetadata,
+          previewUrls: {
+            original: URL.createObjectURL(file),
+          },
+          activeView: 'original' as PreviewView,
+          id: generatePreviewId(),
+        }))
+      }
+
+      setClientProcessingMessage('Detecting faces locally and applying blur...')
+      const warnings: string[] = []
+
+      try {
+        const processed: PhotoPreview[] = []
+        for (const file of files) {
+          const originalPreviewUrl = URL.createObjectURL(file)
+          const previewId = generatePreviewId()
+          try {
+            const result = await blurFacesOnFile(file)
+            const metadata = {
+              previewId,
+              facesDetected: result.facesFound,
+              blurApplied: result.blurred,
+              processingTimeMs: result.processingTimeMs,
+              originalFileName: file.name,
+              processedFileName: result.file.name,
+            }
+
+            let processedFile = attachFaceBlurMetadata(result.file, metadata)
+            let processedPreviewUrl: string | undefined
+            if (result.blurred) {
+              processedPreviewUrl = URL.createObjectURL(result.file)
+            }
+            if (!result.blurred) {
+              const warning = `No faces detected in ${file.name}; upload will continue unblurred.`
+              warnings.push(warning)
+              processedFile = attachFaceBlurMetadata(result.file, {
+                ...metadata,
+                skippedReason: 'no_faces_detected',
+                warningMessage: warning,
+              })
+            }
+
+            processed.push({
+              file: processedFile,
+              previewUrls: {
+                original: originalPreviewUrl,
+                processed: processedPreviewUrl,
+              },
+              activeView: result.blurred && processedPreviewUrl ? 'processed' : 'original',
+              id: previewId,
+              facesDetected: result.facesFound,
+              blurApplied: result.blurred,
+            })
+            emitPreviewReady(previewId, processedFile)
+          } catch (error) {
+            const message =
+              error instanceof FaceBlurError
+                ? error.message
+                : 'Unexpected error while applying face blur.'
+            const warning = `Face blur skipped for ${file.name}: ${message}`
+            warnings.push(warning)
+            const skippedReason = error instanceof FaceBlurError ? error.code.toLowerCase() : 'processing_failed'
+            const processedFile = attachFaceBlurMetadata(file, {
+              previewId,
+              facesDetected: 0,
+              blurApplied: false,
+              skippedReason,
+              originalFileName: file.name,
+              processedFileName: file.name,
+              warningMessage: warning,
+            })
+            processed.push({
+              file: processedFile,
+              previewUrls: {
+                original: originalPreviewUrl,
+              },
+              activeView: 'original',
+              id: previewId,
+              facesDetected: 0,
+              blurApplied: false,
+            })
+            emitPreviewReady(previewId, processedFile)
+          }
+        }
+
+        if (warnings.length > 0) {
+          setProcessingWarnings((prev) => {
+            const combined = [...prev, ...warnings]
+            return combined.slice(-4)
+          })
+        }
+
+        return processed
+      } finally {
+        setClientProcessingMessage(null)
+      }
+    },
+    [faceBlurEnabled, emitPreviewReady]
+  )
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const validFiles = acceptedFiles.filter(file => {
@@ -61,12 +257,8 @@ export default function PhotoUpload({
 
     if (validFiles.length === 0) return
 
-    // Create previews for immediate feedback
-    const newPreviews: PhotoPreview[] = validFiles.map(file => ({
-      file,
-      preview: URL.createObjectURL(file),
-      id: Math.random().toString(36).substr(2, 9)
-    }))
+    const newPreviews = await processFilesForPreview(validFiles)
+    if (newPreviews.length === 0) return
 
     setPreviews(prev => [...prev, ...newPreviews])
 
@@ -102,6 +294,7 @@ export default function PhotoUpload({
         })
       }
 
+      void flushTelemetryQueue()
       await onUpload(newPreviews.map(p => p.file), progressCallback)
       
       // Mark all as completed
@@ -117,10 +310,11 @@ export default function PhotoUpload({
       })
       
       // Clean up previews and object URLs after upload
+      const uploadedPreviewIds = new Set(newPreviews.map(preview => preview.id))
       newPreviews.forEach(preview => {
-        URL.revokeObjectURL(preview.preview)
+        revokePreviewUrls(preview)
       })
-      setPreviews([])
+      setPreviews(prev => prev.filter(preview => !uploadedPreviewIds.has(preview.id)))
       
       setTimeout(() => {
         setIsUploading(false)
@@ -150,7 +344,7 @@ export default function PhotoUpload({
         setUploadProgress(new Map())
       }, 2000)
     }
-  }, [maxSize, onUpload])
+  }, [flushTelemetryQueue, maxSize, onUpload, processFilesForPreview, revokePreviewUrls])
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop,
@@ -209,18 +403,61 @@ export default function PhotoUpload({
   
 
   const removePreview = (id: string) => {
-    const preview = previews.find(p => p.id === id)
-    if (preview) {
-      URL.revokeObjectURL(preview.preview)
+    const previewToRemove = previewsRef.current.find(p => p.id === id)
+    if (previewToRemove) {
+      const metadata = previewToRemove.file.faceBlurMetadata
+      if (metadata) {
+        trackPreviewDiscarded({
+          previewId: id,
+          facesDetected: metadata.facesDetected ?? previewToRemove.facesDetected,
+          blurApplied: metadata.blurApplied ?? previewToRemove.blurApplied,
+          discardReason: 'user_removed',
+          warning: metadata.warningMessage,
+          skippedReason: metadata.skippedReason,
+        })
+      }
     }
-    setPreviews(prev => prev.filter(p => p.id !== id))
+
+    setPreviews(prev => {
+      const preview = prev.find(p => p.id === id)
+      if (preview) {
+        revokePreviewUrls(preview)
+      }
+      return prev.filter(p => p.id !== id)
+    })
   }
 
   const removePhoto = (index: number) => {
     onRemove(index)
   }
 
+  const togglePreviewView = useCallback((id: string, view: PreviewView) => {
+    const preview = previewsRef.current.find(p => p.id === id)
+    if (!preview) return
+    if (view === 'processed' && !preview.previewUrls.processed) return
+    if (preview.activeView === view) return
+
+    const metadata = preview.file.faceBlurMetadata
+    trackPreviewToggled({
+      previewId: id,
+      view,
+      facesDetected: metadata?.facesDetected ?? preview.facesDetected,
+      blurApplied: metadata?.blurApplied ?? preview.blurApplied,
+      warning: metadata?.warningMessage,
+    })
+
+    setPreviews(prev =>
+      prev.map(current => {
+        if (current.id !== id) return current
+        if (view === 'processed' && !current.previewUrls.processed) return current
+        if (current.activeView === view) return current
+        return { ...current, activeView: view }
+      })
+    )
+  }, [trackPreviewToggled])
+
   const totalPhotos = photos.length + previews.length
+  const comparisonPreview = comparisonPreviewId ? previews.find(p => p.id === comparisonPreviewId) : null
 
   return (
     <div className={`space-y-6 ${className}`}>
@@ -228,8 +465,7 @@ export default function PhotoUpload({
       {dragActive && (
         <div 
           {...getRootProps()}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-primary/10 backdrop-blur-sm"
-          style={{ pointerEvents: 'auto' }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-primary/10 backdrop-blur-sm pointer-events-auto"
         >
           <input {...getInputProps()} />
           <div className="bg-white dark:bg-gray-800 rounded-lg p-8 shadow-2xl border-4 border-dashed border-primary">
@@ -252,32 +488,23 @@ export default function PhotoUpload({
       <div
         className={`
           relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer
-          transition-all duration-200 ease-in-out
+          transition-all duration-200 ease-in-out select-none min-h-[200px]
           ${isDragActive || dragActive 
             ? 'border-primary bg-primary/5' 
             : 'border-muted-foreground/25 hover:border-primary/50'
           }
-          ${totalPhotos >= maxPhotos ? 'opacity-50 cursor-not-allowed' : ''}
+          ${totalPhotos >= maxPhotos ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'pointer-events-auto'}
         `}
         onClick={() => {
           if (totalPhotos < maxPhotos) {
             open()
           }
         }}
-        style={{
-          pointerEvents: totalPhotos >= maxPhotos ? 'none' : 'auto',
-          userSelect: 'none',
-          WebkitUserSelect: 'none',
-          minHeight: '200px',
-        }}
       >
-        <input {...getInputProps()} ref={fileInputRef} style={{ display: 'none' }} />
+        <input {...getInputProps()} ref={fileInputRef} className="hidden" />
         
         <div 
-          className="flex flex-col items-center space-y-4"
-          style={{
-            pointerEvents: 'none', // Make inner content not interfere with drag events
-          }}
+          className="flex flex-col items-center space-y-4 pointer-events-none"
         >
           <div className="p-4 rounded-full bg-primary/10">
             <Camera className="w-8 h-8 text-primary" />
@@ -298,8 +525,40 @@ export default function PhotoUpload({
           <div className="text-xs text-muted-foreground">
             Supported: JPEG, PNG, WebP, GIF
           </div>
+
+          {faceBlurEnabled && (
+            <div className="mt-3 text-xs font-medium text-primary">
+              Client-side face blur active
+            </div>
+          )}
         </div>
       </div>
+
+      {clientProcessingMessage && (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <RotateCcw className="w-4 h-4 animate-spin" />
+          {clientProcessingMessage}
+        </div>
+      )}
+
+      {processingWarnings.length > 0 && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold">Face blur notices</span>
+            <button
+              onClick={() => setProcessingWarnings([])}
+              className="text-xs underline decoration-dotted"
+            >
+              Clear
+            </button>
+          </div>
+          <ul className="space-y-1 text-xs list-disc list-inside">
+            {processingWarnings.map((warning, index) => (
+              <li key={`${warning}-${index}`}>{warning}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Batch Upload Progress */}
       {isUploading && uploadProgress.size > 0 && (
@@ -431,12 +690,16 @@ export default function PhotoUpload({
               const isUploadingPhoto = status === 'uploading'
               const isCompleted = status === 'completed'
               const isError = status === 'error'
+              const previewSrc =
+                preview.activeView === 'processed' && preview.previewUrls.processed
+                  ? preview.previewUrls.processed
+                  : preview.previewUrls.original
               
               return (
                 <div key={preview.id} className="relative group">
                   <div className="aspect-square rounded-lg overflow-hidden bg-muted">
                     <Image
-                      src={preview.preview}
+                      src={previewSrc}
                       alt="Preview"
                       width={200}
                       height={200}
@@ -480,6 +743,19 @@ export default function PhotoUpload({
                         >
                           <X className="w-4 h-4" />
                         </button>
+                        {preview.blurApplied && preview.previewUrls.processed && (
+                          <button
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              setComparisonPreviewId(preview.id)
+                              setComparisonSliderValue(50)
+                            }}
+                            className="p-2 bg-white/80 text-gray-900 rounded-full hover:bg-white transition-colors"
+                            title="Compare blur"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     </div>
                   )}
@@ -496,11 +772,136 @@ export default function PhotoUpload({
                   }`}>
                     {isError ? 'Failed' : isCompleted ? 'Complete' : isUploadingPhoto ? 'Uploading...' : 'Pending'}
                   </div>
+
+                  {preview.blurApplied && (
+                    <div className="absolute bottom-2 left-2 bg-black/70 text-white text-[10px] px-2 py-0.5 rounded-full">
+                      Faces blurred{typeof preview.facesDetected === 'number' ? ` (${preview.facesDetected})` : ''}
+                    </div>
+                  )}
+
+                  {preview.blurApplied && preview.previewUrls.processed && (
+                    <div className="absolute bottom-2 right-2 z-20 flex items-center gap-1 rounded-full bg-black/60 px-1.5 py-0.5 text-[10px] text-white shadow-lg backdrop-blur pointer-events-auto">
+                      <button
+                        type="button"
+                        aria-pressed={preview.activeView === 'processed'}
+                        className={`px-2 py-0.5 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 ${
+                          preview.activeView === 'processed'
+                            ? 'bg-white text-black'
+                            : 'text-white/80 hover:text-white'
+                        }`}
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          togglePreviewView(preview.id, 'processed')
+                        }}
+                      >
+                        Blurred
+                      </button>
+                      <button
+                        type="button"
+                        aria-pressed={preview.activeView === 'original'}
+                        className={`px-2 py-0.5 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 ${
+                          preview.activeView === 'original'
+                            ? 'bg-white text-black'
+                            : 'text-white/80 hover:text-white'
+                        }`}
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          togglePreviewView(preview.id, 'original')
+                        }}
+                      >
+                        Original
+                      </button>
+                    </div>
+                  )}
                 </div>
               )
             })}
           </div>
         </div>
+      )}
+
+      {comparisonPreview && comparisonPreview.previewUrls.processed && (
+        (() => {
+          const facesLabel = typeof comparisonPreview.facesDetected === 'number'
+            ? `${comparisonPreview.facesDetected} face${comparisonPreview.facesDetected === 1 ? '' : 's'} detected`
+            : 'Face blur applied'
+          return (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/75 p-4">
+              <div className="relative w-full max-w-4xl rounded-2xl bg-background p-6 shadow-2xl">
+                <button
+                  type="button"
+                  className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-black/10 text-foreground transition hover:bg-black/20"
+                  onClick={() => setComparisonPreviewId(null)}
+                >
+                  <X className="h-5 w-5" />
+                  <span className="sr-only">Close comparison</span>
+                </button>
+
+                <div className="mb-4 flex flex-col gap-1">
+                  <h3 className="text-lg font-semibold">Compare blur</h3>
+                  <p className="text-sm text-muted-foreground">{facesLabel}</p>
+                </div>
+
+                <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-xl bg-black">
+                  <Image
+                    src={comparisonPreview.previewUrls.original}
+                    alt="Original preview"
+                    fill
+                    className="object-contain"
+                    sizes="100vw"
+                    priority
+                  />
+                  <div
+                    className="absolute inset-y-0 left-0 overflow-hidden"
+                    style={{ width: `${comparisonSliderValue}%` }}
+                  >
+                    <div className="relative h-full w-full">
+                      <Image
+                        src={comparisonPreview.previewUrls.processed}
+                        alt="Blurred preview"
+                        fill
+                        className="object-contain"
+                        sizes="100vw"
+                        priority
+                      />
+                    </div>
+                  </div>
+                  <div
+                    className="pointer-events-none absolute inset-y-0"
+                    style={{ left: `calc(${comparisonSliderValue}% - 1px)` }}
+                  >
+                    <div className="relative h-full w-px bg-white/70">
+                      <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-xs font-medium text-gray-900">
+                        <ChevronLeft className="h-4 w-4" />
+                        <span>Drag</span>
+                        <ChevronRight className="h-4 w-4" />
+                      </div>
+                    </div>
+                  </div>
+                  <span className="absolute bottom-3 left-3 rounded-full bg-black/70 px-2 py-1 text-xs font-medium text-white">Original</span>
+                  <span className="absolute bottom-3 right-3 rounded-full bg-black/70 px-2 py-1 text-xs font-medium text-white">Blurred</span>
+                </div>
+
+                <label className="mb-1 block text-xs font-medium text-muted-foreground" htmlFor="comparison-slider">
+                  Adjust slider to reveal more of each version
+                </label>
+                <input
+                  id="comparison-slider"
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={comparisonSliderValue}
+                  onChange={(event) => setComparisonSliderValue(Number(event.target.value))}
+                  className="w-full accent-primary"
+                />
+                <div className="mt-2 flex justify-between text-[11px] uppercase tracking-wide text-muted-foreground">
+                  <span>Original</span>
+                  <span>Blurred</span>
+                </div>
+              </div>
+            </div>
+          )
+        })()
       )}
 
 
@@ -556,16 +957,22 @@ export function PhotoGallery({
     }
   }
   
+  // Use ref to avoid onClose dependency issues
+  const onCloseRef = useRef(onClose)
+  useEffect(() => {
+    onCloseRef.current = onClose
+  }, [onClose])
+
   // Update current index when photos array changes (e.g., after deletion)
   useEffect(() => {
     if (photos.length === 0) {
       // If no photos left, close gallery
-      onClose()
+      onCloseRef.current()
     } else if (currentIndex >= photos.length) {
       // If current index is out of bounds, move to last photo
       setCurrentIndex(Math.max(0, photos.length - 1))
     }
-  }, [photos.length, currentIndex, onClose])
+  }, [photos.length, currentIndex])
 
   if (photos.length === 0) {
     return null
@@ -573,151 +980,46 @@ export function PhotoGallery({
 
   return (
     <div 
-      className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center"
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.95)',
-        zIndex: 9999,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95"
       onClick={onClose}
     >
       <div 
-        className="relative w-full h-full p-4"
-        style={{
-          position: 'relative',
-          width: '100%',
-          height: '100%',
-          padding: '1rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
+        className="relative w-full h-full p-4 flex items-center justify-center"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          style={{
-            position: 'absolute',
-            top: '1.5rem',
-            right: '1.5rem',
-            zIndex: 10,
-            padding: '0.75rem',
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            color: 'white',
-            borderRadius: '50%',
-            border: '2px solid rgba(255, 255, 255, 0.3)',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.9)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'
-          }}
+          className="absolute top-6 right-6 z-10 p-3 bg-black/70 text-white rounded-full border-2 border-white/30 flex items-center justify-center hover:bg-black/90 transition-colors"
+          aria-label="Close gallery"
         >
-          <X style={{ width: '24px', height: '24px', color: 'white' }} />
+          <X className="w-6 h-6 text-white" />
         </button>
 
         {/* Delete Button */}
         {onDelete && photoIds && photoIds[currentIndex] && (
           <button
             onClick={handleDelete}
-            style={{
-              position: 'absolute',
-              top: '1.5rem',
-              right: '5rem',
-              zIndex: 10,
-              padding: '0.75rem',
-              backgroundColor: 'rgba(239, 68, 68, 0.8)',
-              color: 'white',
-              borderRadius: '50%',
-              border: '2px solid rgba(255, 255, 255, 0.3)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 1)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.8)'
-            }}
+            className="absolute top-6 right-20 z-10 p-3 bg-red-500/80 text-white rounded-full border-2 border-white/30 flex items-center justify-center hover:bg-red-500 transition-colors"
             title="Delete photo"
+            aria-label="Delete photo"
           >
-            <Trash2 style={{ width: '24px', height: '24px', color: 'white' }} />
+            <Trash2 className="w-6 h-6 text-white" />
           </button>
         )}
 
         {/* Photo */}
-        <div 
-          className="relative flex items-center justify-center"
-          style={{
-            width: '100vw',
-            height: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '2rem',
-            boxSizing: 'border-box',
-          }}
-        >
-          <img
-            src={photos[currentIndex]}
-            alt={`Photo ${currentIndex + 1}`}
-            style={{
-              maxWidth: 'calc(100vw - 4rem)',
-              maxHeight: 'calc(100vh - 4rem)',
-              width: 'auto',
-              height: 'auto',
-              minWidth: 'min(50vw, 800px)', // Minimum size for small images
-              minHeight: 'min(50vh, 600px)', // Minimum size for small images
-              objectFit: 'contain',
-              display: 'block',
-            }}
-            onLoad={(e) => {
-              // For small images, scale them up proportionally but cap at 2x natural size to avoid pixelation
-              const img = e.currentTarget
-              const naturalWidth = img.naturalWidth
-              const naturalHeight = img.naturalHeight
-              const maxDisplayWidth = window.innerWidth - 64 // Account for padding
-              const maxDisplayHeight = window.innerHeight - 64
-              
-              // Only scale up if image is significantly smaller than viewport (less than 80%)
-              if (naturalWidth < maxDisplayWidth * 0.8 && naturalHeight < maxDisplayHeight * 0.8) {
-                // Scale up to fill at least 60% of viewport, but cap at 2x natural size to avoid pixelation
-                const targetWidth = Math.min(maxDisplayWidth * 0.6, naturalWidth * 2)
-                const targetHeight = Math.min(maxDisplayHeight * 0.6, naturalHeight * 2)
-                const aspectRatio = naturalWidth / naturalHeight
-                
-                // Determine which dimension should be used based on aspect ratio
-                if (targetWidth / targetHeight > aspectRatio) {
-                  // Height is the limiting factor
-                  img.style.width = 'auto'
-                  img.style.height = `${targetHeight}px`
-                } else {
-                  // Width is the limiting factor
-                  img.style.width = `${targetWidth}px`
-                  img.style.height = 'auto'
-                }
-              } else {
-                // Reset to auto sizing for larger images to use maxWidth/maxHeight constraints
-                img.style.width = 'auto'
-                img.style.height = 'auto'
-              }
-            }}
-          />
+        <div className="relative w-screen h-screen flex items-center justify-center p-8">
+          <div className="relative w-full h-full">
+            <Image
+              src={photos[currentIndex]}
+              alt={`Photo ${currentIndex + 1}`}
+              fill
+              className="object-contain"
+              sizes="100vw"
+              priority
+            />
+          </div>
         </div>
 
         {/* Navigation */}
@@ -725,82 +1027,24 @@ export function PhotoGallery({
           <>
             <button
               onClick={prevPhoto}
-              style={{
-                position: 'absolute',
-                left: '2rem',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                zIndex: 10,
-                padding: '1rem',
-                backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                color: 'white',
-                borderRadius: '50%',
-                border: '2px solid rgba(255, 255, 255, 0.3)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.9)'
-                e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'
-                e.currentTarget.style.transform = 'translateY(-50%) scale(1)'
-              }}
+              className="absolute left-8 top-1/2 -translate-y-1/2 z-10 p-4 bg-black/70 text-white rounded-full border-2 border-white/30 flex items-center justify-center hover:bg-black/90 hover:scale-110 transition-all"
+              aria-label="Previous photo"
             >
-              <ChevronLeft style={{ width: '32px', height: '32px', color: 'white' }} />
+              <ChevronLeft className="w-8 h-8 text-white" />
             </button>
             
             <button
               onClick={nextPhoto}
-              style={{
-                position: 'absolute',
-                right: '2rem',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                zIndex: 10,
-                padding: '1rem',
-                backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                color: 'white',
-                borderRadius: '50%',
-                border: '2px solid rgba(255, 255, 255, 0.3)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.9)'
-                e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'
-                e.currentTarget.style.transform = 'translateY(-50%) scale(1)'
-              }}
+              className="absolute right-8 top-1/2 -translate-y-1/2 z-10 p-4 bg-black/70 text-white rounded-full border-2 border-white/30 flex items-center justify-center hover:bg-black/90 hover:scale-110 transition-all"
+              aria-label="Next photo"
             >
-              <ChevronRight style={{ width: '32px', height: '32px', color: 'white' }} />
+              <ChevronRight className="w-8 h-8 text-white" />
             </button>
           </>
         )}
 
         {/* Photo Counter */}
-        <div style={{
-          position: 'absolute',
-          bottom: '2rem',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          backgroundColor: 'rgba(0, 0, 0, 0.7)',
-          color: 'white',
-          padding: '0.5rem 1rem',
-          borderRadius: '9999px',
-          fontSize: '0.875rem',
-          border: '2px solid rgba(255, 255, 255, 0.3)',
-          zIndex: 10,
-        }}>
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm border-2 border-white/30 z-10">
           {currentIndex + 1} / {photos.length}
         </div>
       </div>

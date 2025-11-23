@@ -3,6 +3,7 @@
 import { RelationshipTier, getVisiblePhotoCount } from '@/lib/relationshipTiers'
 import { Lock, Unlock, MessageCircle, Heart } from 'lucide-react'
 import Image from 'next/image'
+import FaceReveal from './FaceReveal'
 
 interface Photo {
   id: string
@@ -111,19 +112,16 @@ export default function PhotoRevealGate({
             className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group bg-gray-200 dark:bg-gray-800"
             onClick={onUnlockClick}
           >
-            <Image
+            <FaceReveal
               src={photo.url}
               alt="Blurred photo"
+              revealProgress={
+                currentTier === RelationshipTier.MATCHED 
+                  ? Math.min(95, (messagesExchanged / 10) * 100)
+                  : 0
+              }
               fill
-              className="object-cover blur-xl scale-110"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-center justify-center">
-              <div className="text-center text-white">
-                <Unlock className="w-8 h-8 mx-auto mb-2 group-hover:scale-110 transition-transform" />
-                <p className="text-xs font-semibold">Send messages</p>
-                <p className="text-xs opacity-80">to unlock</p>
-              </div>
-            </div>
           </div>
         ))}
 

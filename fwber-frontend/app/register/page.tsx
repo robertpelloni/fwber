@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
+import { blurFacesOnFile } from '@/lib/faceBlur'
+import { isFeatureEnabled } from '@/lib/featureFlags'
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -12,6 +15,8 @@ export default function RegisterPage() {
     password: '',
     passwordConfirmation: '',
   })
+  const [avatar, setAvatar] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [validationError, setValidationError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
@@ -31,6 +36,26 @@ export default function RegisterPage() {
       [e.target.name]: e.target.value,
     })
   }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0]
+      setAvatar(file)
+      
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+      }
+      setPreviewUrl(URL.createObjectURL(file))
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+      }
+    }
+  }, [previewUrl])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -53,7 +78,19 @@ export default function RegisterPage() {
     }
 
     try {
-      await register(formData.name, formData.email, formData.password, formData.passwordConfirmation)
+      let finalAvatar = avatar
+      if (finalAvatar && isFeatureEnabled('clientFaceBlur')) {
+        try {
+          const result = await blurFacesOnFile(finalAvatar)
+          if (result.blurred) {
+            finalAvatar = result.file
+          }
+        } catch (e) {
+          console.warn('Face blur failed, proceeding with original', e)
+        }
+      }
+
+      await register(formData.name, formData.email, formData.password, formData.passwordConfirmation, finalAvatar)
       setSuccessMessage('Account created successfully! Redirecting...')
       setTimeout(() => {
         router.push('/dashboard')
@@ -117,6 +154,38 @@ export default function RegisterPage() {
                 value={formData.email}
                 onChange={handleChange}
               />
+            </div>
+
+            <div>
+              <label htmlFor="avatar" className="block text-sm font-medium text-gray-700">
+                Profile Photo (Optional)
+              </label>
+              <input
+                id="avatar"
+                name="avatar"
+                type="file"
+                accept="image/*"
+                className="mt-1 block w-full text-sm text-gray-500
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-full file:border-0
+                  file:text-sm file:font-semibold
+                  file:bg-blue-50 file:text-blue-700
+                  hover:file:bg-blue-100"
+                onChange={handleFileChange}
+              />
+              {previewUrl && (
+                <div className="mt-4">
+                  <p className="text-sm text-gray-500 mb-2">Preview:</p>
+                  <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-gray-200">
+                    <Image
+                      src={previewUrl}
+                      alt="Avatar preview"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
             
             <div>

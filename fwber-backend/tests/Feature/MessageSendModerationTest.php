@@ -7,13 +7,13 @@ use App\Models\User;
 use App\Models\Chatroom;
 use App\Models\ApiToken;
 use App\Services\ContentModerationService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\RefreshDatabaseSilently;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 
 class MessageSendModerationTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabaseSilently;
 
     #[Test]
     public function message_blocked_by_content_moderation()

@@ -4,12 +4,12 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Models\ApiToken;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\RefreshDatabaseSilently;
 use Tests\TestCase;
 
 class AvatarGenerationTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabaseSilently;
 
     public function test_request_avatar_generates_placeholder()
     {
@@ -24,7 +24,9 @@ class AvatarGenerationTest extends TestCase
             ->assertJsonStructure(['data' => ['avatar_prompt']]);
 
         $this->withHeaders($headers)
-            ->postJson('/api/physical-profile/avatar/request')
+            ->postJson('/api/physical-profile/avatar/request', [
+                'style' => 'anime'
+            ])
             ->assertStatus(200)
             ->assertJsonStructure(['data' => ['avatar_status']]);
 
@@ -41,7 +43,9 @@ class AvatarGenerationTest extends TestCase
         $user = User::factory()->create();
         $headers = $this->apiHeaderFor($user);
         $this->withHeaders($headers)
-            ->postJson('/api/physical-profile/avatar/request')
+            ->postJson('/api/physical-profile/avatar/request', [
+                'style' => 'anime'
+            ])
             ->assertStatus(422)
             ->assertJson(['error' => 'Set avatar_prompt first']);
     }

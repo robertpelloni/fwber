@@ -45,10 +45,11 @@ type AuthAction =
   | { type: 'LOGOUT' }
   | { type: 'CLEAR_ERROR' }
   | { type: 'UPDATE_USER'; payload: User }
+  | { type: 'INITIALIZE_END' }
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>
-  register: (name: string, email: string, password: string, passwordConfirmation: string) => Promise<void>
+  register: (name: string, email: string, password: string, passwordConfirmation: string, avatar?: File | null) => Promise<void>
   logout: () => void
   clearError: () => void
   updateUser: (user: User) => void
@@ -108,6 +109,11 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
         ...state,
         user: action.payload,
       }
+    case 'INITIALIZE_END':
+      return {
+        ...state,
+        isLoading: false,
+      }
     default:
       return state
   }
@@ -118,7 +124,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 // Provider component
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(authReducer, initialState)
+  const [state, dispatch] = useReducer(authReducer, {
+    ...initialState,
+    isLoading: true,
+  })
 
   // Initialize auth state from localStorage
   useEffect(() => {
@@ -127,6 +136,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const userStr = localStorage.getItem('fwber_user')
       const devToken = localStorage.getItem('auth_token')
       
+      console.log('AuthContext Init:', { token, userStr, devToken }) // Debug log
+
       // Development bypass: if we have 'auth_token' = 'dev', treat as authenticated
       if (devToken === 'dev') {
         dispatch({ 
@@ -149,21 +160,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (token && userStr) {
         try {
           const user = JSON.parse(userStr)
+          console.log('AuthContext Restoring Session:', user) // Debug log
           dispatch({ type: 'AUTH_SUCCESS', payload: { user, token } })
-          setUserContext(user)
-          logAuth.sessionRestored(user.id)
+          
+          // Wrap side effects in try-catch so they don't break auth
+          try {
+            setUserContext(user)
+            logAuth.sessionRestored(user.id)
+          } catch (e) {
+            console.error('Logging/Sentry error:', e)
+          }
         } catch (error) {
+          console.error('AuthContext Restore Error:', error) // Debug log
           // Clear invalid data
           localStorage.removeItem('fwber_token')
           localStorage.removeItem('fwber_user')
+          dispatch({ type: 'INITIALIZE_END' })
         }
+      } else {
+        console.log('AuthContext: No token or user in localStorage', { token, userStr })
+        dispatch({ type: 'INITIALIZE_END' })
       }
+    } else {
+      dispatch({ type: 'INITIALIZE_END' })
     }
   }, [])
 
   // Save to localStorage when auth state changes
   useEffect(() => {
+    if (state.isLoading) return
+
     if (typeof window !== 'undefined') {
+      console.log('AuthContext Sync:', { isAuthenticated: state.isAuthenticated, token: state.token }) // Debug log
       if (state.isAuthenticated && state.token && state.user) {
         localStorage.setItem('fwber_token', state.token)
         localStorage.setItem('fwber_user', JSON.stringify(state.user))
@@ -172,7 +200,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem('fwber_user')
       }
     }
-  }, [state.isAuthenticated, state.token, state.user])
+  }, [state.isAuthenticated, state.token, state.user, state.isLoading])
 
   // API base URL
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
@@ -217,22 +245,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   // Register function
-  const register = async (name: string, email: string, password: string, passwordConfirmation: string) => {
+  const register = async (name: string, email: string, password: string, passwordConfirmation: string, avatar?: File | null) => {
     dispatch({ type: 'AUTH_START' })
     
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({ 
+      let body: any;
+      let headers: Record<string, string> = {
+        'Accept': 'application/json',
+      };
+
+      if (avatar) {
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('email', email);
+        formData.append('password', password);
+        formData.append('password_confirmation', passwordConfirmation);
+        formData.append('avatar', avatar);
+        body = formData;
+      } else {
+        headers['Content-Type'] = 'application/json';
+        body = JSON.stringify({ 
           name, 
           email, 
           password, 
           password_confirmation: passwordConfirmation 
-        }),
+        });
+      }
+
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+        method: 'POST',
+        headers: headers,
+        body: body,
       })
 
       const data = await response.json()

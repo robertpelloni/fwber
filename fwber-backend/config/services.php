@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'mercure' => [
+        'internal_url' => env('MERCURE_INTERNAL_URL', 'http://localhost:3000/.well-known/mercure'),
+        'public_url' => env('MERCURE_PUBLIC_URL', 'http://localhost:3000/.well-known/mercure'),
+        'publisher_key' => env('MERCURE_PUBLISHER_KEY'),
+        'subscriber_key' => env('MERCURE_SUBSCRIBER_KEY'),
+    ],
+
 ];

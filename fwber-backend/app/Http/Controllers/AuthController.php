@@ -7,8 +7,10 @@ use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Models\ApiToken;
 use App\Models\User;
+use App\Models\Photo;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
@@ -20,19 +22,23 @@ class AuthController extends Controller
      *     description="Create a new user account with email, password, and optional profile information. Automatically generates API token for immediate authentication.",
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(
-     *             required={"name", "email", "password", "password_confirmation"},
-     *             @OA\Property(property="name", type="string", maxLength=255, example="John Doe"),
-     *             @OA\Property(property="email", type="string", format="email", example="john@example.com"),
-     *             @OA\Property(property="password", type="string", format="password", minLength=8, example="SecurePass123!"),
-     *             @OA\Property(property="password_confirmation", type="string", format="password", example="SecurePass123!"),
-     *             @OA\Property(
-     *                 property="profile",
-     *                 type="object",
-     *                 description="Optional profile information",
-     *                 @OA\Property(property="date_of_birth", type="string", format="date", example="1990-05-15"),
-     *                 @OA\Property(property="gender", type="string", enum={"male", "female", "non-binary", "other"}, example="male"),
-     *                 @OA\Property(property="bio", type="string", maxLength=500, example="Software developer passionate about technology")
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"name", "email", "password", "password_confirmation"},
+     *                 @OA\Property(property="name", type="string", maxLength=255, example="John Doe"),
+     *                 @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *                 @OA\Property(property="password", type="string", format="password", minLength=8, example="SecurePass123!"),
+     *                 @OA\Property(property="password_confirmation", type="string", format="password", example="SecurePass123!"),
+     *                 @OA\Property(property="avatar", type="string", format="binary", description="Profile photo"),
+     *                 @OA\Property(
+     *                     property="profile",
+     *                     type="object",
+     *                     description="Optional profile information",
+     *                     @OA\Property(property="date_of_birth", type="string", format="date", example="1990-05-15"),
+     *                     @OA\Property(property="gender", type="string", enum={"male", "female", "non-binary", "other"}, example="male"),
+     *                     @OA\Property(property="bio", type="string", maxLength=500, example="Software developer passionate about technology")
+     *                 )
      *             )
      *         )
      *     ),
@@ -62,6 +68,35 @@ class AuthController extends Controller
         ]);
 
         $profileData = $data["profile"] ?? [];
+
+        if ($request->hasFile('avatar')) {
+            $file = $request->file('avatar');
+            $path = $file->store("photos/{$user->id}", 'public');
+            $url = Storage::url($path);
+            
+            $profileData['avatar_url'] = $url;
+
+            // Create Photo record
+            Photo::create([
+                'user_id' => $user->id,
+                'filename' => basename($path),
+                'original_filename' => $file->getClientOriginalName(),
+                'file_path' => $path,
+                'thumbnail_path' => $path,
+                'mime_type' => $file->getMimeType(),
+                'file_size' => $file->getSize(),
+                'width' => 0,
+                'height' => 0,
+                'is_primary' => true,
+                'is_private' => false,
+                'sort_order' => 0,
+                'metadata' => [
+                    'uploaded_at' => now()->toISOString(),
+                    'source' => 'registration',
+                ],
+            ]);
+        }
+
         $user->profile()->create($profileData);
 
         $token = ApiToken::generateForUser($user, "api");

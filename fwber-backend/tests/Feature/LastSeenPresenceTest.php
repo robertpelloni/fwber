@@ -6,12 +6,12 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Models\ApiToken;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\RefreshDatabaseSilently;
 use PHPUnit\Framework\Attributes\Test;
 
 class LastSeenPresenceTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabaseSilently;
 
     private User $user;
     private string $token;

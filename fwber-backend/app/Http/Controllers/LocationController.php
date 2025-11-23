@@ -187,9 +187,15 @@ class LocationController extends Controller
                         // Show friends-only locations to matched users
                         ->orWhere(function ($subQuery) use ($user) {
                             $subQuery->where('privacy_level', 'friends')
-                                ->whereHas('user.matches', function ($matchQuery) use ($user) {
-                                    $matchQuery->where('user1_id', $user->id)
-                                        ->orWhere('user2_id', $user->id);
+                                ->whereHas('user', function ($userQuery) use ($user) {
+                                    $userQuery->where(function ($q) use ($user) {
+                                        $q->whereHas('matchesAsUser1', function ($mq) use ($user) {
+                                            $mq->where('user2_id', $user->id);
+                                        })
+                                        ->orWhereHas('matchesAsUser2', function ($mq) use ($user) {
+                                            $mq->where('user1_id', $user->id);
+                                        });
+                                    });
                                 });
                         });
                 })
