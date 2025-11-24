@@ -413,5 +413,63 @@ media_duration: 30 (optional, for audio/video)
 
 ---
 
+## P4 Feature: AI Content Generation Routing
+
+**Status:** ✅ Completed
+
+### Overview
+
+The content generation service now supports a configurable routing strategy, allowing different AI providers (Claude, OpenAI, Gemini) to be prioritized for specific content types.
+
+### Configuration
+
+**Environment Variables:**
+
+```dotenv
+# Enable/Disable Feature
+FEATURE_CONTENT_GENERATION=true
+
+# Provider Configuration
+CONTENT_GENERATION_PROVIDERS=openai,gemini,claude
+OPENAI_API_KEY=sk-...
+GEMINI_API_KEY=...
+ANTHROPIC_API_KEY=sk-ant-...
+
+# Model Selection
+OPENAI_MODEL=gpt-4
+GEMINI_MODEL=gemini-pro
+CLAUDE_MODEL=claude-sonnet-4-5-20250929
+
+# Routing Strategy (Priority Order)
+# Default fallback chain if no specific route is defined
+CONTENT_GENERATION_DEFAULT_ROUTE=claude,openai,gemini
+
+# Specific routes per content type
+CONTENT_GENERATION_PROFILE_ROUTE=claude,openai
+CONTENT_GENERATION_POST_ROUTE=openai,claude,gemini
+CONTENT_GENERATION_CONVERSATION_ROUTE=claude,gemini
+```
+
+### Behavior
+
+1.  **Dynamic Routing:** The service checks the `routing` config for the requested content type (e.g., `profile`).
+2.  **Fallback Chain:** It iterates through the configured providers. If the first one fails (or is missing an API key), it automatically tries the next one.
+3.  **Graceful Degradation:** If all providers fail, it returns a baseline static suggestion to ensure the UI doesn't break.
+
+### Use Cases
+
+*   **Cost Optimization:** Use cheaper models (e.g., Gemini/GPT-3.5) for high-volume tasks like post suggestions.
+*   **Quality Optimization:** Use high-quality models (e.g., Claude Sonnet 4.5) for creative tasks like profile writing.
+*   **Reliability:** Ensure service continuity even if one provider has an outage.
+
+### Tests
+
+**Coverage:** `tests/Feature/ContentGenerationRoutingTest.php`
+*   ✓ Uses Claude as primary provider for profiles
+*   ✓ Falls back to secondary provider when primary fails
+*   ✓ Respects custom routing for different content types
+
+---
+
 **Last Updated:** November 10, 2025
 **Test Suite Status:** ✅ All Green (71 passed, 297 assertions)

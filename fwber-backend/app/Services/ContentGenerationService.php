@@ -93,10 +93,13 @@ class ContentGenerationService
     {
         $results = [];
 
-        // Provider order from config; default to OpenAI then Gemini
-        $providers = $this->generationConfig['providers'] ?? ['openai', 'gemini'];
+        // Determine providers based on routing config
+        $routing = $this->generationConfig['routing'] ?? [];
+        $providers = $routing[$type] ?? ($routing['default'] ?? ['claude', 'openai', 'gemini']);
 
         foreach ($providers as $provider) {
+            $provider = trim($provider);
+
             if ($provider === 'openai' && ($this->openaiApiKey !== '' || app()->environment('testing'))) {
                 $res = $this->generateWithOpenAI($context, $additionalContext, $type);
                 if (!empty($res['content'])) {
