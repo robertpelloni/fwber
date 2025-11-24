@@ -485,6 +485,7 @@ export default function MessagesPage() {
           onClose={() => setIsProfileModalOpen(false)}
           user={selectedConversation.other_user}
           messagesExchanged={messages.length}
+          matchId={selectedConversation.id}
         />
       )}
     </ProtectedRoute>

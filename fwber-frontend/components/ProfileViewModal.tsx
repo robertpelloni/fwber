@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
 import PhotoRevealGate from './PhotoRevealGate'
+import SecurePhotoReveal from './SecurePhotoReveal'
 import { RelationshipTier } from '@/lib/relationshipTiers'
 
 interface ProfileViewModalProps {
@@ -23,9 +24,10 @@ interface ProfileViewModalProps {
     }
   }
   messagesExchanged: number
+  matchId?: number
 }
 
-export default function ProfileViewModal({ isOpen, onClose, user, messagesExchanged }: ProfileViewModalProps) {
+export default function ProfileViewModal({ isOpen, onClose, user, messagesExchanged, matchId }: ProfileViewModalProps) {
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -93,12 +95,30 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
 
           <div className="mb-6">
             <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Photos</h3>
-            <PhotoRevealGate
-              photos={photos}
-              currentTier={RelationshipTier.MATCHED} // Assume matched since we are chatting
-              messagesExchanged={messagesExchanged}
-              daysConnected={1} // Mock
-            />
+            {matchId ? (
+              <div className="grid grid-cols-2 gap-4">
+                {user.profile?.photos?.map(photo => (
+                  <div key={photo.id} className="aspect-square relative">
+                    <SecurePhotoReveal
+                      photoId={photo.id.toString()}
+                      publicUrl={photo.url}
+                      matchId={matchId.toString()}
+                      className="w-full h-full"
+                    />
+                  </div>
+                ))}
+                {(!user.profile?.photos || user.profile.photos.length === 0) && (
+                  <p className="text-gray-500 italic col-span-2">No photos available.</p>
+                )}
+              </div>
+            ) : (
+              <PhotoRevealGate
+                photos={photos}
+                currentTier={RelationshipTier.MATCHED} // Assume matched since we are chatting
+                messagesExchanged={messagesExchanged}
+                daysConnected={1} // Mock
+              />
+            )}
           </div>
         </div>
 

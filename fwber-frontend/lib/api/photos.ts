@@ -258,6 +258,32 @@ class PhotoAPI {
       throw error
     }
   }
+
+  // Reveal photo to a match
+  async revealPhoto(photoId: string, matchId: string): Promise<{ success: boolean; status: string }> {
+    return this.request<{ success: boolean; status: string }>(`/photos/${photoId}/reveal`, {
+      method: 'POST',
+      body: JSON.stringify({ match_id: matchId }),
+    })
+  }
+
+  // Get original photo blob
+  async getOriginalPhoto(photoId: string): Promise<Blob> {
+    const url = `${this.baseUrl}/photos/${photoId}/original`
+    const token = localStorage.getItem('fwber_token')
+    
+    const response = await fetch(url, {
+      headers: {
+        ...(token && { 'Authorization': `Bearer ${token}` }),
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch original photo: ${response.status}`)
+    }
+
+    return await response.blob()
+  }
 }
 
 // Create singleton instance
