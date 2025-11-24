@@ -30,6 +30,15 @@ export default function SecurePhotoReveal({
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Cleanup object URL on unmount or when url changes
+  useEffect(() => {
+    return () => {
+      if (originalUrl) {
+        URL.revokeObjectURL(originalUrl)
+      }
+    }
+  }, [originalUrl])
+
   const handleReveal = async (e: React.MouseEvent) => {
     e.stopPropagation()
     setIsLoading(true)

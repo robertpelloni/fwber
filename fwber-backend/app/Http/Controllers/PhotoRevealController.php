@@ -19,10 +19,6 @@ class PhotoRevealController extends Controller
 
         $user = Auth::user();
 
-        if ($photo->user_id !== $user->id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
         // Verify match belongs to user
         $match = UserMatch::where('id', $request->match_id)
             ->where(function ($query) use ($user) {
@@ -30,6 +26,21 @@ class PhotoRevealController extends Controller
                       ->orWhere('user2_id', $user->id);
             })
             ->firstOrFail();
+
+        // Check if the photo belongs to the OTHER user in the match
+        // If I am user1, photo must belong to user2.
+        // If I am user2, photo must belong to user1.
+        // OR if I am the owner (user_id == photo->user_id), I can reveal it too (maybe to self? or just create the record)
+        
+        if ($photo->user_id !== $user->id) {
+            // I am not the owner. Check if I am in the match with the owner.
+            $isMatchWithPhotoOwner = ($match->user1_id === $user->id && $match->user2_id === $photo->user_id) ||
+                                     ($match->user2_id === $user->id && $match->user1_id === $photo->user_id);
+
+            if (!$isMatchWithPhotoOwner) {
+                 return response()->json(['error' => 'Unauthorized: Photo does not belong to match partner'], 403);
+            }
+        }
 
         $reveal = PhotoReveal::firstOrCreate([
             'user_id' => $user->id,
