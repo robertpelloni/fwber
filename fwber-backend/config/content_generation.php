@@ -2,7 +2,12 @@
 
 return [
     'enabled' => env('CONTENT_GENERATION_ENABLED', true),
-    'providers' => explode(',', env('CONTENT_GENERATION_PROVIDERS', 'openai,gemini')),
+    'providers' => explode(',', env('CONTENT_GENERATION_PROVIDERS', 'openai,gemini,claude')),
+    'models' => [
+        'openai' => env('OPENAI_MODEL', 'gpt-4'),
+        'gemini' => env('GEMINI_MODEL', 'gemini-pro'),
+        'claude' => env('CLAUDE_MODEL', 'claude-sonnet-4-5-20250929'),
+    ],
     'max_tokens' => env('CONTENT_GENERATION_MAX_TOKENS', 1000),
     'temperature' => env('CONTENT_GENERATION_TEMPERATURE', 0.7),
     'cache_ttl' => env('CONTENT_GENERATION_CACHE_TTL', 3600), // 1 hour

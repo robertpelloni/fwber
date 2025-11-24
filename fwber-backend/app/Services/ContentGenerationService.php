@@ -14,6 +14,7 @@ class ContentGenerationService
 {
     private string $openaiApiKey;
     private string $geminiApiKey;
+    private string $anthropicApiKey;
     private array $generationConfig;
 
     public function __construct()
@@ -21,9 +22,15 @@ class ContentGenerationService
         // Default to empty strings in test/dev when keys are not configured
         $this->openaiApiKey = (string) (config('services.openai.api_key') ?? '');
         $this->geminiApiKey = (string) (config('services.gemini.api_key') ?? '');
+        $this->anthropicApiKey = (string) (config('services.anthropic.api_key') ?? '');
         $this->generationConfig = config('content_generation', [
             'enabled' => true,
-            'providers' => ['openai', 'gemini'],
+            'providers' => ['openai', 'gemini', 'claude'],
+            'models' => [
+                'openai' => 'gpt-4',
+                'gemini' => 'gemini-pro',
+                'claude' => 'claude-sonnet-4-5-20250929',
+            ],
             'max_tokens' => 1000,
             'temperature' => 0.7,
             'cache_ttl' => 3600,
@@ -103,6 +110,14 @@ class ContentGenerationService
                 $res = $this->generateWithGemini($context, $additionalContext, $type);
                 if (!empty($res['content'])) {
                     $results['gemini'] = $res;
+                    break;
+                }
+            }
+
+            if ($provider === 'claude' && ($this->anthropicApiKey !== '' || app()->environment('testing'))) {
+                $res = $this->generateWithClaude($context, $additionalContext, $type);
+                if (!empty($res['content'])) {
+                    $results['claude'] = $res;
                     break;
                 }
             }
@@ -191,6 +206,47 @@ class ContentGenerationService
         }
 
         return ['content' => '', 'error' => 'Gemini generation unavailable'];
+    }
+
+    /**
+     * Generate content with Claude (Anthropic)
+     */
+    private function generateWithClaude(array $context, array $additionalContext, string $type): array
+    {
+        try {
+            $prompt = $this->buildOpenAIPrompt($context, $additionalContext, $type); // Reuse OpenAI prompt structure as it's chat-based
+            
+            $response = Http::withHeaders([
+                'x-api-key' => $this->anthropicApiKey,
+                'anthropic-version' => '2023-06-01',
+                'Content-Type' => 'application/json',
+            ])->post('https://api.anthropic.com/v1/messages', [
+                'model' => $this->generationConfig['models']['claude'] ?? 'claude-3-5-sonnet-20241022',
+                'max_tokens' => $this->generationConfig['max_tokens'],
+                'messages' => [
+                    ['role' => 'user', 'content' => $this->getSystemPrompt($type) . "\n\n" . $prompt]
+                ],
+                'temperature' => $this->generationConfig['temperature'],
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                $content = $data['content'][0]['text'] ?? '';
+                
+                return [
+                    'content' => $content,
+                    'provider' => 'claude',
+                    'confidence' => $this->calculateConfidence($content),
+                    'safety_score' => $this->calculateSafetyScore($content),
+                ];
+            } else {
+                Log::error('Claude content generation failed', ['status' => $response->status(), 'body' => $response->body()]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Claude content generation failed', ['error' => $e->getMessage()]);
+        }
+
+        return ['content' => '', 'error' => 'Claude generation unavailable'];
     }
 
     /**
