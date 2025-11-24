@@ -29,7 +29,7 @@ class AICoordinator:
                 "description": "GPT-based coding assistant"
             },
             "claude": {
-                "command": ["claude", "-p"],
+                "command": ["claude", "--model", "claude-sonnet-4-5-20250929", "-p"],
                 "strengths": ["architecture", "analysis", "documentation"],
                 "description": "Claude for system design"
             },

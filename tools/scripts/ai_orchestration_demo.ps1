@@ -31,7 +31,7 @@ $codexJob = Start-Job -ScriptBlock {
 Write-Host "Starting Claude analysis..." -ForegroundColor Cyan
 $claudeJob = Start-Job -ScriptBlock {
     param($task, $outputPath)
-    $result = claude -p "$task" 2>&1
+    $result = claude --model claude-sonnet-4-5-20250929 -p "$task" 2>&1
     $result | Out-File -FilePath $outputPath
 } -ArgumentList $task, "$outputDir\claude_result.txt"
 
@@ -88,7 +88,7 @@ if (Test-Path $step1Output) {
     $step2Prompt = "Based on this project analysis, suggest 3 specific improvements:`n`n$codexAnalysis"
     $step2Output = "$outputDir\step2_claude_suggestions.txt"
     
-    claude -p $step2Prompt | Out-File -FilePath $step2Output
+    claude --model claude-sonnet-4-5-20250929 -p $step2Prompt | Out-File -FilePath $step2Output
     
     if (Test-Path $step2Output) {
         Write-Host "✓ Step 2 completed" -ForegroundColor Green
