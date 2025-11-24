@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { proximityApi } from '@/lib/api/proximity';
 import type { ProximityArtifact, ProximityChatroom } from '@/types/proximity';
-import { MapPin, Send, AlertTriangle, Trash2, Clock, User, MessageSquare } from 'lucide-react';
+import { MapPin, Send, AlertTriangle, Trash2, Clock, User, MessageSquare, LogOut } from 'lucide-react';
 import SexQuote from './SexQuote';
 
 export default function ProximityFeed() {
@@ -136,6 +136,22 @@ export default function ProximityFeed() {
     }
   };
 
+  const handleLeaveRoom = async (e: React.MouseEvent, roomId: number) => {
+    e.stopPropagation(); // Prevent navigation
+    if (!token || !confirm("Are you sure you want to leave this chatroom?")) return;
+
+    try {
+      await proximityApi.leaveChatroom(roomId, token);
+      // Optimistically update UI
+      setChatrooms(prev => prev.map(room => 
+        room.id === roomId ? { ...room, is_member: false } : room
+      ));
+    } catch (err) {
+      console.error(err);
+      alert("Failed to leave room.");
+    }
+  };
+
   if (error) {
     return (
       <div className="p-8 text-center text-red-600 bg-red-50 rounded-lg">
@@ -201,16 +217,28 @@ export default function ProximityFeed() {
                   <span>{room.active_members_count} active</span>
                   <span>{location ? `${Math.round(getDistanceFromLatLonInM(location.lat, location.lng, room.lat, room.lng))}m away` : 'Nearby'}</span>
                 </div>
-                <button
-                  onClick={() => router.push(`/proximity-chatrooms/${room.id}`)}
-                  className={`w-full text-white text-sm font-medium py-2 px-4 rounded transition-colors flex items-center justify-center gap-2 ${
-                    room.is_member 
-                      ? 'bg-green-600 hover:bg-green-700' 
-                      : 'bg-purple-600 hover:bg-purple-700'
-                  }`}
-                >
-                  {room.is_member ? 'Enter Room' : 'Join Room'}
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => router.push(`/proximity-chatrooms/${room.id}`)}
+                    className={`flex-1 text-white text-sm font-medium py-2 px-4 rounded transition-colors flex items-center justify-center gap-2 ${
+                      room.is_member 
+                        ? 'bg-green-600 hover:bg-green-700' 
+                        : 'bg-purple-600 hover:bg-purple-700'
+                    }`}
+                  >
+                    {room.is_member ? 'Enter Room' : 'Join Room'}
+                  </button>
+                  
+                  {room.is_member && (
+                    <button
+                      onClick={(e) => handleLeaveRoom(e, room.id)}
+                      className="bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-600 py-2 px-3 rounded transition-colors border border-gray-200"
+                      title="Leave Room"
+                    >
+                      <LogOut className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>

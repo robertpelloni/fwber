@@ -105,4 +105,32 @@ export const proximityApi = {
     });
     return response.data;
   },
+
+  /**
+   * Join a proximity chatroom
+   */
+  joinChatroom: async (id: number, lat: number, lng: number, token: string): Promise<{ message: string }> => {
+    const response = await axios.post(
+      `${API_BASE_URL}/proximity-chatrooms/${id}/join`,
+      { latitude: lat, longitude: lng },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  },
+
+  /**
+   * Leave a proximity chatroom
+   */
+  leaveChatroom: async (id: number, token: string): Promise<{ message: string }> => {
+    const response = await axios.post(
+      `${API_BASE_URL}/proximity-chatrooms/${id}/leave`,
+      {},
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  },
 };

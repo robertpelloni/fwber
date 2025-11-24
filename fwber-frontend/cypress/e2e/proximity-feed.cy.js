@@ -95,6 +95,12 @@ describe('Proximity Feed (Local Pulse)', () => {
       body: { message: 'Successfully joined proximity chatroom' }
     }).as('joinChatroom');
 
+    // Mock leave chatroom
+    cy.intercept('POST', '**/api/proximity-chatrooms/202/leave', {
+      statusCode: 200,
+      body: { message: 'Successfully left proximity chatroom' }
+    }).as('leaveChatroom');
+
     // Mock create artifact
     cy.intercept('POST', '**/api/proximity/artifacts', {
       statusCode: 201,
@@ -192,9 +198,25 @@ describe('Proximity Feed (Local Pulse)', () => {
 
     // Check for joined room
     cy.contains('Joined Group').should('be.visible');
-    cy.contains('button', 'Enter Room')
-      .should('have.class', 'bg-green-600')
-      .click();
+    
+    // Test Leave functionality
+    cy.contains('Joined Group').parent().within(() => {
+      cy.get('button[title="Leave Room"]').click();
+    });
+    
+    // Handle confirm dialog automatically (Cypress defaults to auto-accept, but good to be explicit if needed)
+    // Note: Cypress auto-accepts confirms by default.
+
+    cy.wait('@leaveChatroom');
+
+    // Verify UI update (optimistic)
+    cy.contains('Joined Group').parent().within(() => {
+      cy.contains('button', 'Join Room').should('have.class', 'bg-purple-600');
+      cy.get('button[title="Leave Room"]').should('not.exist');
+    });
+
+    // Re-verify Enter Room navigation (now Join Room)
+    cy.contains('Joined Group').parent().contains('button', 'Join Room').click();
 
     // Verify navigation
     cy.url().should('include', '/proximity-chatrooms/202');
