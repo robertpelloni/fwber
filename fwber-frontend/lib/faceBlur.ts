@@ -1,15 +1,22 @@
+<<<<<<< HEAD
 import type * as FaceApi from '@vladmandic/face-api'
+=======
+>>>>>>> stuff2
 
-// Configuration
-const MODEL_BASE_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/'
+import { isFeatureEnabled } from './featureFlags'
 
+<<<<<<< HEAD
 // Cache for loaded models state
 let modelsLoaded = false
 let faceapi: typeof FaceApi | null = null
+=======
+// Dynamic import type for face-api
+type FaceApi = typeof import('@vladmandic/face-api')
+>>>>>>> stuff2
 
-const loadModels = async () => {
-  if (modelsLoaded) return
+let faceapi: FaceApi | null = null
 
+<<<<<<< HEAD
   try {
     if (!faceapi) {
       faceapi = await import('@vladmandic/face-api')
@@ -24,10 +31,21 @@ const loadModels = async () => {
   } catch (error) {
     console.error('Failed to load face-api models', error)
     throw new FaceBlurError('Failed to load face detection models', 'MODEL_LOAD_FAILED', error)
+=======
+async function getFaceApi(): Promise<FaceApi> {
+  if (faceapi) return faceapi
+  
+  if (typeof window === 'undefined') {
+    throw new Error('face-api can only be loaded in the browser')
+>>>>>>> stuff2
   }
+
+  // Dynamic import to avoid SSR issues
+  faceapi = await import('@vladmandic/face-api')
+  return faceapi
 }
 
-export type FaceBlurErrorCode = 'UNSUPPORTED_ENV' | 'MODEL_LOAD_FAILED' | 'PROCESSING_FAILED'
+export type FaceBlurErrorCode = 'UNSUPPORTED_ENV' | 'MODEL_LOAD_FAILED' | 'PROCESSING_FAILED' | 'CANVAS_ERROR' | 'BLOB_ERROR'
 
 export class FaceBlurError extends Error {
   code: FaceBlurErrorCode
@@ -47,6 +65,27 @@ export class FaceBlurError extends Error {
   }
 }
 
+let modelsLoaded = false
+const MODEL_BASE_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/'
+
+export async function loadModels() {
+  if (modelsLoaded) return
+
+  try {
+    const api = await getFaceApi()
+    
+    await Promise.all([
+      api.nets.ssdMobilenetv1.loadFromUri(MODEL_BASE_URL),
+      api.nets.faceLandmark68Net.loadFromUri(MODEL_BASE_URL),
+    ])
+    
+    modelsLoaded = true
+  } catch (error) {
+    console.error('Failed to load face detection models:', error)
+    throw new FaceBlurError('Failed to load face detection models', 'MODEL_LOAD_FAILED', error)
+  }
+}
+
 export interface FaceBlurOptions {
   blurRadius?: number
   scoreThreshold?: number
@@ -61,6 +100,15 @@ export interface FaceBlurResult {
 }
 
 export const blurFacesOnFile = async (file: File, options?: FaceBlurOptions): Promise<FaceBlurResult> => {
+  if (!isFeatureEnabled('clientFaceBlur')) {
+    return {
+      file,
+      facesFound: 0,
+      blurred: false,
+      processingTimeMs: 0
+    }
+  }
+
   const startTime = performance.now()
 
   if (typeof window === 'undefined') {
@@ -69,17 +117,18 @@ export const blurFacesOnFile = async (file: File, options?: FaceBlurOptions): Pr
 
   try {
     await loadModels()
+    const api = await getFaceApi()
 
     if (!faceapi) {
       throw new FaceBlurError('FaceAPI module not loaded', 'MODEL_LOAD_FAILED')
     }
 
     // Create an image element from the file
-    const img = await faceapi.bufferToImage(file)
+    const img = await api.bufferToImage(file)
     
     // Detect faces
     // ssdMobilenetv1 is slower but more accurate than tinyFaceDetector
-    const detections = await faceapi.detectAllFaces(img).withFaceLandmarks()
+    const detections = await api.detectAllFaces(img).withFaceLandmarks()
     
     const facesFound = detections.length
 
@@ -99,7 +148,7 @@ export const blurFacesOnFile = async (file: File, options?: FaceBlurOptions): Pr
     const ctx = canvas.getContext('2d')
     
     if (!ctx) {
-      throw new Error('Could not get canvas context')
+      throw new FaceBlurError('Could not get canvas context', 'CANVAS_ERROR')
     }
 
     // Draw original image
@@ -129,7 +178,7 @@ export const blurFacesOnFile = async (file: File, options?: FaceBlurOptions): Pr
     const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, file.type, 0.9))
     
     if (!blob) {
-      throw new Error('Failed to create blob from canvas')
+      throw new FaceBlurError('Failed to create blob from canvas', 'BLOB_ERROR')
     }
 
     const processedFile = new File([blob], file.name, { type: file.type, lastModified: Date.now() })
