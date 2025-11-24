@@ -1,3 +1,12 @@
+before(() => {
+    // Warm up the server to ensure compilation happens before tests
+    cy.request({
+      url: '/profile',
+      failOnStatusCode: false,
+      timeout: 120000
+    });
+  });
+
 describe('Physical Profile Editor', () => {
   const user = {
     id: 1,
@@ -24,6 +33,11 @@ describe('Physical Profile Editor', () => {
       sti_status: 'negative',
       preferences: {},
       avatar_url: '/images/test-avatar.svg',
+      photos: [
+        { id: 1, url: '/images/p1.jpg', is_primary: true },
+        { id: 2, url: '/images/p2.jpg', is_primary: false },
+        { id: 3, url: '/images/p3.jpg', is_primary: false }
+      ],
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     }
@@ -50,7 +64,8 @@ describe('Physical Profile Editor', () => {
       body: {
         data: {
           height_cm: 175,
-          body_type: 'average'
+          body_type: 'average',
+          avatar_prompt: 'test prompt'
         }
       }
     }).as('getPhysicalProfile');
@@ -77,6 +92,7 @@ describe('Physical Profile Editor', () => {
 
   it('loads existing data and updates profile', () => {
     cy.visit('/profile', {
+      timeout: 120000,
       onBeforeLoad: (win) => {
         // Use dev bypass for robust auth
         win.localStorage.setItem('auth_token', 'dev');
@@ -86,15 +102,27 @@ describe('Physical Profile Editor', () => {
     // Wait for profile fetch
     cy.wait('@getPhysicalProfile');
 
+    // Check for error message
+    cy.contains('Failed to load physical profile').should('not.exist');
+
     // Wait for profile to load
     cy.contains('Physical Attributes', { timeout: 10000 }).should('be.visible');
 
     // Verify initial data load
-    cy.get('select[id="body_type"]').should('have.value', 'average');
+    cy.get('input[id="height_cm"]').should('have.value', '175');
+    
+    // Target the select specifically within the Physical Profile Editor section to avoid ID collision
+    cy.contains('h2', 'Physical Attributes')
+      .parent()
+      .find('select[id="body_type"]')
+      .should('have.value', 'average');
 
     // Update values
     cy.get('input[id="height_cm"]').clear().type('180');
-    cy.get('select[id="body_type"]').select('Athletic');
+    cy.contains('h2', 'Physical Attributes')
+      .parent()
+      .find('select[id="body_type"]')
+      .select('Athletic');
 
     // Save
     cy.contains('button', 'Save Physical Profile').click();
@@ -109,6 +137,7 @@ describe('Physical Profile Editor', () => {
   
   it('requests avatar generation', () => {
       cy.visit('/profile', {
+        timeout: 120000,
         onBeforeLoad: (win) => {
           // Use dev bypass for robust auth
           win.localStorage.setItem('auth_token', 'dev');
