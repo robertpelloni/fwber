@@ -109,7 +109,7 @@ export default function PhotoRevealGate({
         {blurredRealPhotos.map((photo, index) => (
           <div 
             key={photo.id} 
-            className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group bg-gray-200 dark:bg-gray-800"
+            className="relative w-full pb-[100%] rounded-lg overflow-hidden cursor-pointer group bg-gray-200 dark:bg-gray-800"
             onClick={onUnlockClick}
           >
             <FaceReveal
@@ -121,6 +121,7 @@ export default function PhotoRevealGate({
                   : 0
               }
               fill
+              className="absolute inset-0 w-full h-full"
             />
           </div>
         ))}

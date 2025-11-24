@@ -54,7 +54,7 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
   })) || []
 
   return (
-    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
+    <div data-testid="profile-modal" className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/80 backdrop-blur-sm"
@@ -95,30 +95,12 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
 
           <div className="mb-6">
             <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Photos</h3>
-            {matchId ? (
-              <div className="grid grid-cols-2 gap-4">
-                {user.profile?.photos?.map(photo => (
-                  <div key={photo.id} className="aspect-square relative">
-                    <SecurePhotoReveal
-                      photoId={photo.id.toString()}
-                      publicUrl={photo.url}
-                      matchId={matchId.toString()}
-                      className="w-full h-full"
-                    />
-                  </div>
-                ))}
-                {(!user.profile?.photos || user.profile.photos.length === 0) && (
-                  <p className="text-gray-500 italic col-span-2">No photos available.</p>
-                )}
-              </div>
-            ) : (
-              <PhotoRevealGate
-                photos={photos}
-                currentTier={RelationshipTier.MATCHED} // Assume matched since we are chatting
-                messagesExchanged={messagesExchanged}
-                daysConnected={1} // Mock
-              />
-            )}
+            <PhotoRevealGate
+              photos={photos}
+              currentTier={RelationshipTier.MATCHED} // Assume matched since we are chatting
+              messagesExchanged={messagesExchanged}
+              daysConnected={1} // Mock
+            />
           </div>
         </div>
 

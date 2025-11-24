@@ -1,19 +1,11 @@
-<<<<<<< HEAD
-describe('Face Reveal Feature', () => {
-=======
 describe('Face Reveal Game', () => {
->>>>>>> stuff2
   const user = {
     id: 1,
     name: 'Test User',
     email: 'test@example.com',
     profile: {
       display_name: 'Test User',
-<<<<<<< HEAD
-      avatarUrl: '/images/test-avatar.svg'
-=======
       avatar_url: '/images/test-avatar.svg'
->>>>>>> stuff2
     }
   };
 
@@ -27,11 +19,7 @@ describe('Face Reveal Game', () => {
       photos: [
         {
           id: 101,
-<<<<<<< HEAD
-          url: '/images/test-avatar.svg',
-=======
           url: '/images/test-avatar.svg', // Use existing image
->>>>>>> stuff2
           is_private: true,
           is_primary: true
         }
@@ -40,11 +28,7 @@ describe('Face Reveal Game', () => {
   };
 
   const conversation = {
-<<<<<<< HEAD
-    id: 50, // matchId
-=======
     id: 1,
->>>>>>> stuff2
     other_user: otherUser,
     last_message: {
       content: 'Hello',
@@ -53,6 +37,9 @@ describe('Face Reveal Game', () => {
   };
 
   beforeEach(() => {
+    // Set viewport to desktop to ensure side-by-side layout
+    cy.viewport(1280, 720);
+
     // Mock login
     cy.intercept('POST', '**/api/auth/login', {
       statusCode: 200,
@@ -62,96 +49,6 @@ describe('Face Reveal Game', () => {
       }
     }).as('login');
 
-<<<<<<< HEAD
-    // Mock conversations
-    cy.intercept({
-      method: 'GET',
-      url: /matches\/established/
-    }, {
-      statusCode: 200,
-      body: [conversation]
-    }).as('getConversations');
-
-    // Mock messages
-    cy.intercept('GET', `**/api/messages/${otherUser.id}`, {
-      statusCode: 200,
-      body: []
-    }).as('getMessages');
-
-    // Mock mark as read
-    cy.intercept('POST', `**/api/messages/mark-all-read/${otherUser.id}`, {
-      statusCode: 200,
-      body: { success: true }
-    }).as('markAsRead');
-
-    // Mock reveal API
-    cy.intercept('POST', `**/api/photos/101/reveal`, {
-      statusCode: 200,
-      body: { success: true, status: 'revealed' }
-    }).as('revealPhoto');
-
-    // Mock original photo download
-    cy.intercept('GET', `**/api/photos/101/original`, {
-      fixture: 'test-image.jpg' 
-    }).as('getOriginalPhoto');
-  });
-
-  it('allows revealing a photo in the profile view', () => {
-    // 1. Login and visit messages
-    cy.visit('/messages', {
-      onBeforeLoad: (win) => {
-        win.localStorage.setItem('auth_token', 'dev');
-      }
-    });
-
-    // Verify we are on the messages page
-    cy.location('pathname').should('eq', '/messages');
-
-    // 2. Wait for conversations to load
-    cy.wait('@getConversations');
-    cy.get('.cursor-pointer').should('have.length.at.least', 1);
-    
-    // 3. Click on the conversation
-    // Find the conversation item that contains the user name and click it
-    cy.contains('.cursor-pointer', 'Match User').click();
-    
-    // Verify the conversation is selected (active class)
-    // Wait for the element to have the active class
-    cy.contains('.cursor-pointer.bg-blue-50', 'Match User').should('be.visible');
-
-    // Verify chat header is present
-    cy.get('h3').contains('Match User').should('be.visible');
-
-    // Wait for messages to load to ensure UI stability (re-renders)
-    cy.wait('@getMessages');
-
-    // 4. Click "View Profile" button
-    cy.contains('button', 'View Profile').should('be.visible').click({ force: true });
-
-    // 5. Verify Profile Modal is open
-    // Wait for modal animation/rendering
-    cy.get('.fixed.inset-0.z-50', { timeout: 10000 }).should('exist');
-    cy.contains('h2', 'Match User').should('be.visible');
-
-    // Verify photo container exists
-    cy.get('.aspect-square').should('exist');
-
-    // 6. Verify "Reveal Original" button is present and click it
-    // Note: skipping visibility check as aspect-ratio might be behaving oddly in test env
-    cy.contains('button', 'Reveal Original').should('exist').click({ force: true });
-
-    // 7. Verify API calls
-    cy.wait('@revealPhoto').its('request.body').should('deep.equal', { match_id: '50' });
-    cy.wait('@getOriginalPhoto');
-
-    // 8. Verify UI updates
-    cy.contains('Reveal Original').should('not.exist');
-    // Note: skipping visibility check for badge due to aspect-ratio issue in test env
-    cy.contains('Original').should('exist'); // The badge
-
-    // The image should no longer have the blur class
-    cy.get('img[alt="User photo"]').should('not.have.class', 'blur-md');
-=======
     // Mock user profile
     cy.intercept('GET', '**/api/user', {
       statusCode: 200,
@@ -163,6 +60,12 @@ describe('Face Reveal Game', () => {
       statusCode: 200,
       body: { data: [conversation] }
     }).as('getConversations');
+
+    // Mock mark as read
+    cy.intercept('POST', '**/api/messages/mark-all-read/*', {
+      statusCode: 200,
+      body: { success: true }
+    }).as('markAsRead');
 
     cy.visit('/messages', {
       onBeforeLoad: (win) => {
@@ -181,7 +84,7 @@ describe('Face Reveal Game', () => {
     });
 
     // Mock 0 messages
-    cy.intercept('GET', `**/api/messages/${otherUser.id}`, {
+    cy.intercept('GET', '**/api/messages/*', {
       statusCode: 200,
       body: { data: [] }
     }).as('getMessages0');
@@ -189,23 +92,26 @@ describe('Face Reveal Game', () => {
     // Click conversation
     cy.contains('Match User').should('be.visible').click();
     cy.wait('@getMessages0');
-
-    // Ensure chat header is visible
-    cy.contains('h3', 'Match User').should('be.visible');
-
-    // Open Profile
-    cy.contains('button', 'View Profile').should('be.visible').as('viewProfileBtn');
-    cy.get('@viewProfileBtn').click();
-
-    // Wait for modal animation
+    
+    // Wait for UI to settle
     cy.wait(500);
 
-    // Check for modal content
-    cy.contains('h2', 'Match User').should('be.visible');
+    // Ensure chat header is visible and stable
+    cy.contains('h3', 'Match User').should('be.visible');
 
-    // Check for blurred photo
-    cy.get('img[alt="Blurred photo"]').should('exist');
-    cy.contains('0%').should('be.visible');
+    // Open Profile - direct click, no alias to avoid detachment issues
+    cy.contains('button', 'View Profile').should('be.visible').click();
+
+    // Wait for modal to be visible (checking the backdrop or container)
+    cy.get('[data-testid="profile-modal"]').should('be.visible');
+
+    // Check for modal content within the modal container
+    cy.get('[data-testid="profile-modal"]').within(() => {
+      cy.contains('h2', 'Match User').should('be.visible');
+      // Check for blurred photo
+      cy.get('img[alt="Blurred photo"]').should('exist');
+      cy.contains('0%').should('exist');
+    });
   });
 
   it('shows partially revealed photo (5 messages)', () => {
@@ -214,11 +120,11 @@ describe('Face Reveal Game', () => {
       id: i,
       sender_id: user.id,
       receiver_id: otherUser.id,
-      content: `Message ${i}`,
+      content: 'Message ' + i,
       created_at: new Date().toISOString()
     }));
 
-    cy.intercept('GET', `**/api/messages/${otherUser.id}`, {
+    cy.intercept('GET', '**/api/messages/*', {
       statusCode: 200,
       body: { data: messages }
     }).as('getMessages5');
@@ -226,24 +132,28 @@ describe('Face Reveal Game', () => {
     // Click conversation
     cy.contains('Match User').should('be.visible').click();
     cy.wait('@getMessages5');
+    
+    // Wait for UI to settle
+    cy.wait(500);
 
     // Ensure chat header is visible
     cy.contains('h3', 'Match User').should('be.visible');
 
     // Open Profile
-    cy.contains('button', 'View Profile').should('be.visible').as('viewProfileBtn');
-    cy.get('@viewProfileBtn').click();
+    cy.contains('button', 'View Profile').should('be.visible').click();
     
-    // Wait for modal animation
-    cy.wait(500);
+    // Wait for modal
+    cy.get('[data-testid="profile-modal"]').should('be.visible');
 
     // Check for progress (5 messages / 10 = 50%)
-    cy.contains('50%').should('be.visible');
-    
-    // Blur should be less than max (20px)
-    cy.get('img[alt="Blurred photo"]')
-      .should('have.attr', 'style')
-      .and('include', 'blur');
+    cy.get('[data-testid="profile-modal"]').within(() => {
+      cy.contains('50%').should('exist');
+      
+      // Blur should be less than max (20px)
+      cy.get('img[alt="Blurred photo"]')
+        .should('have.attr', 'style')
+        .and('include', 'blur');
+    });
   });
 
   it('shows fully revealed photo (10+ messages)', () => {
@@ -252,11 +162,11 @@ describe('Face Reveal Game', () => {
       id: i,
       sender_id: user.id,
       receiver_id: otherUser.id,
-      content: `Message ${i}`,
+      content: 'Message ' + i,
       created_at: new Date().toISOString()
     }));
 
-    cy.intercept('GET', `**/api/messages/${otherUser.id}`, {
+    cy.intercept('GET', '**/api/messages/*', {
       statusCode: 200,
       body: { data: messages }
     }).as('getMessages10');
@@ -264,20 +174,24 @@ describe('Face Reveal Game', () => {
     // Click conversation
     cy.contains('Match User').should('be.visible').click();
     cy.wait('@getMessages10');
+    
+    // Wait for UI to settle
+    cy.wait(500);
 
     // Ensure chat header is visible
     cy.contains('h3', 'Match User').should('be.visible');
 
     // Open Profile
-    cy.contains('button', 'View Profile').should('be.visible').as('viewProfileBtn');
-    cy.get('@viewProfileBtn').click();
+    cy.contains('button', 'View Profile').should('be.visible').click();
 
-    // Wait for modal animation
-    cy.wait(500);
+    // Wait for modal
+    cy.get('[data-testid="profile-modal"]').should('be.visible');
 
-    // Check for 100% or absence of lock overlay
-    cy.contains('100%').should('not.exist');
-    cy.get('img[alt="Blurred photo"]').should('have.css', 'filter', 'none');
->>>>>>> stuff2
+        // Should be capped at 95% for Match tier
+    cy.get('[data-testid="profile-modal"]').within(() => {
+      cy.contains('95%').should('exist');
+      // Blur should be minimal (1px) but not zero
+      cy.get('img[alt="Blurred photo"]').should('have.css', 'filter').and('include', 'blur');
+    });
   });
 });

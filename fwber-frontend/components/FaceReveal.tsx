@@ -54,7 +54,7 @@ export default function FaceReveal({
         height={height}
         fill={fill}
         className={cn(
-          "object-cover transition-all duration-1000 ease-out",
+          "object-cover transition-all duration-1000 ease-out z-0",
           !isRevealed && "scale-110" // Prevent white edges when blurred
         )}
         style={{
@@ -63,7 +63,7 @@ export default function FaceReveal({
       />
       
       {!isRevealed && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none">
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none">
           <div className="bg-black/40 backdrop-blur-sm p-3 rounded-full mb-2">
             <Lock className="w-6 h-6 text-white/90" />
           </div>
