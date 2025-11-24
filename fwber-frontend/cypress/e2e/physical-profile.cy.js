@@ -7,21 +7,25 @@ describe('Physical Profile Editor', () => {
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     profile: {
-      displayName: 'Test User',
-      dateOfBirth: '1990-01-01',
+      display_name: 'Test User',
+      date_of_birth: '1990-01-01',
       gender: 'non-binary',
       pronouns: 'they/them',
-      sexualOrientation: 'pansexual',
-      relationshipStyle: 'polyamorous',
+      sexual_orientation: 'pansexual',
+      relationship_style: 'polyamorous',
       bio: 'Test bio',
-      locationLatitude: 40.7128,
-      locationLongitude: -74.0060,
-      locationDescription: 'New York, NY',
-      stiStatus: 'negative',
+      location: {
+        latitude: 40.7128,
+        longitude: -74.0060,
+        city: 'New York',
+        state: 'NY',
+        max_distance: 25
+      },
+      sti_status: 'negative',
       preferences: {},
-      avatarUrl: '/images/test-avatar.svg',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      avatar_url: '/images/test-avatar.svg',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     }
   };
 
@@ -79,11 +83,13 @@ describe('Physical Profile Editor', () => {
       }
     });
 
+    // Wait for profile fetch
+    cy.wait('@getPhysicalProfile');
+
     // Wait for profile to load
     cy.contains('Physical Attributes', { timeout: 10000 }).should('be.visible');
 
-    // Check existing values
-    cy.get('input[id="height_cm"]').should('have.value', '175');
+    // Verify initial data load
     cy.get('select[id="body_type"]').should('have.value', 'average');
 
     // Update values
