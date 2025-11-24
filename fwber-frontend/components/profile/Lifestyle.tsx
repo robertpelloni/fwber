@@ -140,7 +140,7 @@ export default function Lifestyle({ formData, handlePreferenceChange }: Lifestyl
             <option value="">Select preference</option>
             <option value="have-children">Have children</option>
             <option value="want-children">Want children</option>
-            <option value="dont-want-children">Don't want children</option>
+            <option value="dont-want-children">Don&apos;t want children</option>
             <option value="maybe-someday">Maybe someday</option>
             <option value="not-sure">Not sure</option>
           </select>

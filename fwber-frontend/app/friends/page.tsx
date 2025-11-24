@@ -7,14 +7,14 @@ import { getFriends, getFriendRequests, sendFriendRequest, respondToFriendReques
 import FriendList from '@/components/friends/FriendList';
 import FriendRequestList from '@/components/friends/FriendRequestList';
 import UserSearch from '@/components/friends/UserSearch';
-import { searchUsers } from '@/lib/api/profile';
+import { searchUsers, type UserProfile } from '@/lib/api/profile';
 
 export default function FriendsPage() {
   const { token, isAuthenticated } = useAuth();
-  const [friends, setFriends] = useState([]);
-  const [friendRequests, setFriendRequests] = useState([]);
+  const [friends, setFriends] = useState<any[]>([]);
+  const [friendRequests, setFriendRequests] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

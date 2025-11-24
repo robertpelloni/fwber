@@ -135,7 +135,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose FWBer?</h2>
-            <p className="text-xl text-gray-600">Everything you need to find exactly what you're looking for.</p>
+            <p className="text-xl text-gray-600">Everything you need to find exactly what you&apos;re looking for.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
@@ -180,7 +180,7 @@ export default function HomePage() {
               <h2 className="text-3xl md:text-4xl font-bold mb-6">Your Privacy Matters</h2>
               <p className="text-xl text-gray-300 mb-8 leading-relaxed">
                 We use state-of-the-art encryption and security measures to protect your data. 
-                You're in control of what you share and who sees it.
+                You&apos;re in control of what you share and who sees it.
               </p>
               <ul className="space-y-4">
                 <li className="flex items-center text-gray-300">

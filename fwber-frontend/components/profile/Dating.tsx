@@ -134,9 +134,9 @@ export default function Dating({ formData, handlePreferenceChange }: DatingProps
             <option value="">Select education</option>
             <option value="high-school">High School</option>
             <option value="some-college">Some College</option>
-            <option value="associates">Associate's Degree</option>
-            <option value="bachelors">Bachelor's Degree</option>
-            <option value="masters">Master's Degree</option>
+            <option value="associates">Associate&apos;s Degree</option>
+            <option value="bachelors">Bachelor&apos;s Degree</option>
+            <option value="masters">Master&apos;s Degree</option>
             <option value="phd">PhD</option>
             <option value="other">Other</option>
           </select>

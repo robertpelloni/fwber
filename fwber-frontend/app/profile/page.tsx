@@ -11,6 +11,7 @@ import { Camera, ShieldCheck, Star } from 'lucide-react'
 import { ProfileCompletenessBar, ProfileCompletenessChecklist, calculateProfileCompleteness, type ProfileField } from '@/lib/profileCompleteness'
 import PhysicalProfileEditor from '@/components/PhysicalProfileEditor'
 import { isFeatureEnabled } from '@/lib/featureFlags'
+import ProfileTabs from '@/components/profile/ProfileTabs'
 
 export default function ProfilePage() {
   const { isAuthenticated, user, token, isLoading: authLoading } = useAuth()
@@ -290,24 +291,25 @@ export default function ProfilePage() {
   type PreferenceKey = keyof ProfileFormData['preferences']
   type PreferenceArrayKey = Extract<PreferenceKey, 'hobbies' | 'music' | 'movies' | 'books' | 'sports' | 'ethnicity'>
 
-  const handlePreferenceChange = (field: PreferenceKey, value: any) => {
+  const handlePreferenceChange = (field: string, value: any) => {
     setFormData(prev => ({
       ...prev,
       preferences: {
         ...prev.preferences,
-        [field]: value
+        [field as PreferenceKey]: value
       }
     }))
   }
 
-  const handleArrayPreferenceChange = (field: PreferenceArrayKey, value: string, checked: boolean) => {
+  const handleArrayPreferenceChange = (field: string, value: string, checked: boolean) => {
+    const key = field as PreferenceArrayKey;
     setFormData(prev => ({
       ...prev,
       preferences: {
         ...prev.preferences,
-        [field]: checked 
-          ? ([...(prev.preferences[field] as string[] | undefined ?? []), value])
-          : ((prev.preferences[field] as string[] | undefined ?? []).filter((item: string) => item !== value))
+        [key]: checked 
+          ? ([...(prev.preferences[key] as string[] | undefined ?? []), value])
+          : ((prev.preferences[key] as string[] | undefined ?? []).filter((item: string) => item !== value))
       }
     }))
   }
