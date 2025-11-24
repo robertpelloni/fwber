@@ -116,6 +116,7 @@ export default function AIProfileBuilder({
                       type="radio"
                       name="personality"
                       value={type.value}
+                      data-testid={`personality-${type.value}`}
                       checked={preferences.personality === type.value}
                       onChange={(e) => setPreferences(prev => ({ ...prev, personality: e.target.value }))}
                       className="mt-1"
@@ -137,6 +138,7 @@ export default function AIProfileBuilder({
                   <label key={interest} className="flex items-center space-x-2 p-2 border border-gray-200 rounded cursor-pointer hover:bg-gray-50">
                     <input
                       type="checkbox"
+                      data-testid={`interest-${interest.toLowerCase().replace(/\s+/g, '-')}`}
                       checked={preferences.interests.includes(interest)}
                       onChange={(e) => {
                         if (e.target.checked) {
@@ -180,6 +182,7 @@ export default function AIProfileBuilder({
                       type="radio"
                       name="style"
                       value={style.value}
+                      data-testid={`style-${style.value}`}
                       checked={preferences.style === style.value}
                       onChange={(e) => setPreferences(prev => ({ ...prev, style: e.target.value as "casual" | "professional" | "humorous" | "romantic" }))}
                       className="mt-1"
@@ -209,9 +212,12 @@ export default function AIProfileBuilder({
             <button
               onClick={handleGenerateProfile}
               disabled={isGenerating || isLoading}
+              data-testid="generate-btn"
               className="w-full bg-blue-500 text-white py-3 px-6 rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {isGenerating || isLoading ? 'Generating Profile...' : 'Generate AI Profile'}
+              {isGenerating || isLoading ? (
+                <span data-testid="generation-loading">Generating Profile...</span>
+              ) : 'Generate AI Profile'}
             </button>
           </div>
         </div>
@@ -219,11 +225,12 @@ export default function AIProfileBuilder({
         {/* Generated Content */}
         <div className="space-y-6">
           {error && (
-            <div className="bg-red-50 p-4 rounded-lg">
+            <div className="bg-red-50 p-4 rounded-lg" data-testid="generation-error">
               <h3 className="font-semibold text-red-800 mb-2">Generation Failed</h3>
-              <p className="text-sm text-red-700">
+              <p className="text-sm text-red-700" data-testid="error-message">
                 {error.message || 'An error occurred while generating your profile.'}
               </p>
+              <button onClick={handleGenerateProfile} className="mt-2 text-sm text-red-600 hover:text-red-800 font-medium">Try Again</button>
             </div>
           )}
 
@@ -232,16 +239,16 @@ export default function AIProfileBuilder({
               <h2 className="text-xl font-semibold mb-4 text-gray-800">Generated Profile Content</h2>
               <div className="space-y-4">
                 {generatedContent.data?.suggestions?.map((suggestion: any, index: number) => (
-                  <div key={index} className="p-4 border border-gray-200 rounded-lg">
+                  <div key={index} className="p-4 border border-gray-200 rounded-lg" data-testid="suggestion-item">
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex items-center space-x-2">
-                        <span className="text-sm font-medium text-gray-600">
+                        <span className="text-sm font-medium text-gray-600" data-testid="provider-badge">
                           {suggestion.provider === 'openai' ? 'OpenAI' : 'Gemini'}
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-500" data-testid="confidence-score">
                           Confidence: {Math.round(suggestion.confidence * 100)}%
                         </span>
-                        <span className="text-xs text-green-600">
+                        <span className="text-xs text-green-600" data-testid="safety-score">
                           Safety: {Math.round(suggestion.safety_score * 100)}%
                         </span>
                       </div>
@@ -256,12 +263,13 @@ export default function AIProfileBuilder({
                         {selectedContent === suggestion.content ? 'Selected' : 'Select'}
                       </button>
                     </div>
-                    <p className="text-sm text-gray-700 mb-3">{suggestion.content}</p>
+                    <p className="text-sm text-gray-700 mb-3" data-testid="suggestion-content">{suggestion.content}</p>
                     <div className="flex space-x-2">
                       {[1, 2, 3, 4, 5].map(rating => (
                         <button
                           key={rating}
                           onClick={() => handleFeedback(suggestion.content, rating)}
+                          data-testid={`rating-${rating}`}
                           className="text-yellow-400 hover:text-yellow-500 text-lg"
                         >
                           ★
@@ -275,9 +283,9 @@ export default function AIProfileBuilder({
           )}
 
           {selectedContent && (
-            <div className="bg-green-50 p-4 rounded-lg">
+            <div className="bg-green-50 p-4 rounded-lg" data-testid="selected-profile">
               <h3 className="font-semibold text-green-800 mb-2">Selected Profile</h3>
-              <p className="text-sm text-green-700 mb-3">{selectedContent}</p>
+              <p className="text-sm text-green-700 mb-3" data-testid="selected-content">{selectedContent}</p>
               <button
                 onClick={() => setSelectedContent('')}
                 className="text-sm text-green-600 hover:text-green-800"
