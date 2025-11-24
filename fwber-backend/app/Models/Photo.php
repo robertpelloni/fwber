@@ -38,6 +38,8 @@ class Photo extends Model
         'is_private',
         'sort_order',
         'metadata',
+        'original_path',
+        'is_encrypted',
     ];
 
     /**
@@ -46,6 +48,7 @@ class Photo extends Model
     protected $casts = [
         'is_primary' => 'boolean',
         'is_private' => 'boolean',
+        'is_encrypted' => 'boolean',
         'metadata' => 'array',
         'file_size' => 'integer',
         'width' => 'integer',

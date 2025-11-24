@@ -32,6 +32,7 @@ use App\Http\Controllers\ProximityArtifactController;
 use App\Http\Controllers\ModerationController;
 use App\Http\Controllers\Api\DeviceTokenController;
 use App\Http\Controllers\Api\FriendController;
+use App\Http\Controllers\PhotoRevealController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware("api")->group(function (): void {
@@ -169,6 +170,10 @@ Route::middleware("api")->group(function (): void {
         Route::delete("/photos/{id}", [PhotoController::class, "destroy"]);
         Route::post("/photos/reorder", [PhotoController::class, "reorder"]);
         
+        // Photo Reveal routes
+        Route::post("/photos/{photo}/reveal", [PhotoRevealController::class, "reveal"]);
+        Route::get("/photos/{photo}/original", [PhotoRevealController::class, "original"]);
+
         // Location routes (Phase 5A - Location-Based Social Features)
         Route::get("/location", [LocationController::class, "show"]);
         Route::post("/location", [LocationController::class, "update"]);
