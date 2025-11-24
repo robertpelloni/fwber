@@ -203,9 +203,13 @@ export default function ProximityFeed() {
                 </div>
                 <button
                   onClick={() => router.push(`/proximity-chatrooms/${room.id}`)}
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium py-2 px-4 rounded transition-colors flex items-center justify-center gap-2"
+                  className={`w-full text-white text-sm font-medium py-2 px-4 rounded transition-colors flex items-center justify-center gap-2 ${
+                    room.is_member 
+                      ? 'bg-green-600 hover:bg-green-700' 
+                      : 'bg-purple-600 hover:bg-purple-700'
+                  }`}
                 >
-                  Join Room
+                  {room.is_member ? 'Enter Room' : 'Join Room'}
                 </button>
               </div>
             ))}

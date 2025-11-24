@@ -59,4 +59,5 @@ export interface ProximityChatroom {
   active_members_count: number;
   created_at: string;
   expires_at?: string;
+  is_member?: boolean;
 }

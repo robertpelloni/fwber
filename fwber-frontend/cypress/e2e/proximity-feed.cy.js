@@ -71,7 +71,19 @@ describe('Proximity Feed (Local Pulse)', () => {
             current_members: 5,
             max_members: 20,
             lat: 40.7128,
-            lng: -74.0060
+            lng: -74.0060,
+            is_member: false
+          },
+          {
+            id: 202,
+            name: 'Joined Group',
+            type: 'venue',
+            distance_meters: 50,
+            current_members: 10,
+            max_members: 50,
+            lat: 40.7128,
+            lng: -74.0060,
+            is_member: true
           }
         ]
       }
@@ -168,9 +180,23 @@ describe('Proximity Feed (Local Pulse)', () => {
 
     // Check for chatroom and join
     cy.contains('Central Park Meetup').should('be.visible');
-    cy.contains('button', 'Join Room').click();
+    cy.contains('button', 'Join Room')
+      .should('have.class', 'bg-purple-600')
+      .click();
     
     // Verify navigation
     cy.url().should('include', '/proximity-chatrooms/201');
+
+    // Go back
+    cy.go('back');
+
+    // Check for joined room
+    cy.contains('Joined Group').should('be.visible');
+    cy.contains('button', 'Enter Room')
+      .should('have.class', 'bg-green-600')
+      .click();
+
+    // Verify navigation
+    cy.url().should('include', '/proximity-chatrooms/202');
   });
 });

@@ -1,4 +1,5 @@
 {
-  "/page": "app/page.js",
-  "/messages/page": "app/messages/page.js"
+  "/proximity-chatrooms/[id]/page": "app/proximity-chatrooms/[id]/page.js",
+  "/pulse/page": "app/pulse/page.js",
+  "/page": "app/page.js"
 }

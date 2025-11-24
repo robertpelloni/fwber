@@ -70,6 +70,11 @@ class ProximityChatroomController extends Controller
             $query->whereJsonContains('tags', $tags);
         }
 
+        // Check if user is a member
+        $query->withExists(['members as is_member' => function ($q) {
+            $q->where('user_id', Auth::id());
+        }]);
+
         $chatrooms = $query->with(['creator', 'activeMembers'])
             ->orderBy('distance')
             ->limit(20)
