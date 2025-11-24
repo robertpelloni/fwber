@@ -1,19 +1,24 @@
-import * as faceapi from '@vladmandic/face-api'
+import type * as FaceApi from '@vladmandic/face-api'
 
 // Configuration
 const MODEL_BASE_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/'
 
 // Cache for loaded models state
 let modelsLoaded = false
+let faceapi: typeof FaceApi | null = null
 
 const loadModels = async () => {
   if (modelsLoaded) return
 
   try {
+    if (!faceapi) {
+      faceapi = await import('@vladmandic/face-api')
+    }
+
     // Load minimal models for performance
     await Promise.all([
-      faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_BASE_URL),
-      faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_BASE_URL)
+      faceapi!.nets.ssdMobilenetv1.loadFromUri(MODEL_BASE_URL),
+      faceapi!.nets.faceLandmark68Net.loadFromUri(MODEL_BASE_URL)
     ])
     modelsLoaded = true
   } catch (error) {
@@ -64,6 +69,10 @@ export const blurFacesOnFile = async (file: File, options?: FaceBlurOptions): Pr
 
   try {
     await loadModels()
+
+    if (!faceapi) {
+      throw new FaceBlurError('FaceAPI module not loaded', 'MODEL_LOAD_FAILED')
+    }
 
     // Create an image element from the file
     const img = await faceapi.bufferToImage(file)
