@@ -372,46 +372,78 @@ class ProfileController extends Controller
             if (!$profile) {
                 return response()->json([
                     'percentage' => 0,
-                    'missing_fields' => ['All profile fields missing'],
-                    'is_complete' => false,
+                    'required_complete' => false,
+                    'missing_required' => ['display_name', 'date_of_birth', 'gender', 'location', 'looking_for'],
+                    'missing_optional' => ['bio', 'pronouns', 'sexual_orientation', 'relationship_style', 'preferences'],
+                    'sections' => [
+                        'basic' => false,
+                        'location' => false,
+                        'preferences' => false,
+                        'interests' => false,
+                        'physical' => false,
+                        'lifestyle' => false,
+                    ],
                 ]);
             }
             
-            $allFields = [
-                'display_name' => 'Display Name',
-                'bio' => 'Bio',
-                'age' => 'Age',
-                'gender' => 'Gender',
-                'pronouns' => 'Pronouns',
-                'sexual_orientation' => 'Sexual Orientation',
-                'relationship_style' => 'Relationship Style',
-                'looking_for' => 'Looking For',
-                'location_latitude' => 'Location',
-                'location_longitude' => 'Location',
-                'preferences' => 'Preferences',
+            // Helper to check nested preferences
+            $hasPref = function($key) use ($profile) {
+                return !empty($profile->preferences) && !empty($profile->preferences[$key]);
+            };
+
+            // Check sections
+            $sections = [
+                'basic' => !empty($profile->display_name) && !empty($profile->date_of_birth) && !empty($profile->gender),
+                'location' => !empty($profile->location_latitude) && !empty($profile->location_longitude),
+                'preferences' => !empty($profile->looking_for) && count($profile->looking_for ?? []) > 0,
+                'interests' => $hasPref('hobbies') || $hasPref('music') || $hasPref('sports'),
+                'physical' => $hasPref('body_type'),
+                'lifestyle' => $hasPref('smoking') || $hasPref('drinking') || $hasPref('exercise'),
             ];
-            
-            $completed = 0;
-            $missing = [];
-            
-            foreach ($allFields as $field => $label) {
-                if (!empty($profile->$field)) {
-                    $completed++;
-                } else {
-                    if (!in_array($label, $missing)) {
-                        $missing[] = $label;
-                    }
+
+            // Required fields
+            $required = ['display_name', 'date_of_birth', 'gender', 'location_latitude', 'looking_for'];
+            $missingRequired = [];
+            foreach ($required as $field) {
+                if (empty($profile->$field)) {
+                    // Map DB field names to frontend friendly names if needed, or just use field name
+                    $missingRequired[] = $field;
+                }
+            }
+
+            // Optional fields
+            $optional = ['bio', 'pronouns', 'sexual_orientation', 'relationship_style'];
+            $missingOptional = [];
+            foreach ($optional as $field) {
+                if (empty($profile->$field)) {
+                    $missingOptional[] = $field;
                 }
             }
             
-            $percentage = round(($completed / count($allFields)) * 100);
+            // Check preferences for optional missing
+            if (!$sections['interests']) $missingOptional[] = 'interests_and_hobbies';
+            if (!$sections['physical']) $missingOptional[] = 'physical_attributes';
+            if (!$sections['lifestyle']) $missingOptional[] = 'lifestyle_habits';
+            
+            // Calculate percentage
+            // Basic: 30%, Location: 20%, Preferences: 20%, Bio: 10%, Interests: 10%, Lifestyle: 10%
+            $score = 0;
+            if ($sections['basic']) $score += 30;
+            if ($sections['location']) $score += 20;
+            if ($sections['preferences']) $score += 20;
+            if (!empty($profile->bio)) $score += 10;
+            if ($sections['interests']) $score += 10;
+            if ($sections['lifestyle']) $score += 10;
+
+            // Cap at 100
+            $percentage = min(100, $score);
             
             return response()->json([
                 'percentage' => $percentage,
-                'completed_fields' => $completed,
-                'total_fields' => count($allFields),
-                'missing_fields' => $missing,
-                'is_complete' => $this->isProfileComplete($profile),
+                'required_complete' => count($missingRequired) === 0,
+                'missing_required' => $missingRequired,
+                'missing_optional' => $missingOptional,
+                'sections' => $sections,
             ]);
             
         } catch (\Exception $e) {

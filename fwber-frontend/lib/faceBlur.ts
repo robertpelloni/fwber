@@ -1,43 +1,15 @@
-<<<<<<< HEAD
-import type * as FaceApi from '@vladmandic/face-api'
-=======
->>>>>>> stuff2
-
 import { isFeatureEnabled } from './featureFlags'
 
-<<<<<<< HEAD
-// Cache for loaded models state
-let modelsLoaded = false
-let faceapi: typeof FaceApi | null = null
-=======
 // Dynamic import type for face-api
 type FaceApi = typeof import('@vladmandic/face-api')
->>>>>>> stuff2
 
 let faceapi: FaceApi | null = null
 
-<<<<<<< HEAD
-  try {
-    if (!faceapi) {
-      faceapi = await import('@vladmandic/face-api')
-    }
-
-    // Load minimal models for performance
-    await Promise.all([
-      faceapi!.nets.ssdMobilenetv1.loadFromUri(MODEL_BASE_URL),
-      faceapi!.nets.faceLandmark68Net.loadFromUri(MODEL_BASE_URL)
-    ])
-    modelsLoaded = true
-  } catch (error) {
-    console.error('Failed to load face-api models', error)
-    throw new FaceBlurError('Failed to load face detection models', 'MODEL_LOAD_FAILED', error)
-=======
 async function getFaceApi(): Promise<FaceApi> {
   if (faceapi) return faceapi
   
   if (typeof window === 'undefined') {
     throw new Error('face-api can only be loaded in the browser')
->>>>>>> stuff2
   }
 
   // Dynamic import to avoid SSR issues
