@@ -1,7 +1,7 @@
 # fwber – Privacy-First Proximity Dating
 
 [![Agents & Docs](https://img.shields.io/badge/Agents-Docs-blue)](README-agents.md)
-
+[![Status: MVP Complete](https://img.shields.io/badge/Status-MVP%20Complete-green)](PROJECT_STATUS_2025-11-24.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![PHP 8.4+](https://img.shields.io/badge/PHP-8.4+-777BB4?logo=php)](https://www.php.net/)
 [![Laravel 12](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel)](https://laravel.com/)
@@ -16,6 +16,10 @@
 - 🔒 **Privacy-First:** Location fuzzing, no personal photos required, secure by design
 - 🛡️ **Safety-Focused:** Content moderation, flagging, shadow throttling, TTL expiry
 - 🚀 **Modern Stack:** Laravel 12 + Next.js 14 + TypeScript + React Query
+
+## 🟢 Project Status
+**Current Status: MVP Complete + Advanced Features**
+See [PROJECT_STATUS_2025-11-24.md](PROJECT_STATUS_2025-11-24.md) for the detailed breakdown of completed features and the active roadmap.
 
 ## Table of Contents
 - [Features](#features)
@@ -81,6 +85,11 @@ Support for all identities and preferences:
 - Extensible interest/fetish system
 - Community-driven feature additions
 
+### 🤖 AI & Advanced Systems (New!)
+- **AI Content Generation:** Profile bios, conversation starters, and post suggestions.
+- **Recommendations:** AI-powered and location-based matching.
+- **Proximity Chatrooms:** Real-time, location-gated group chats.
+
 ---
 
 ## Quick Start
@@ -145,7 +154,7 @@ docker-compose logs -f
 
 ## Architecture
 
-### Backend (Laravel 11)
+### Backend (Laravel 12)
 ```
 fwber-backend/
 ├── app/
@@ -195,7 +204,7 @@ fwber-frontend/
 
 | Layer | Technology |
 |-------|-----------|
-| **Backend** | Laravel 11, PHP 8.4 |
+| **Backend** | Laravel 12, PHP 8.4 |
 | **Frontend** | Next.js 14, React 18, TypeScript 5.3 |
 | **Database** | MySQL 8.0+ / SQLite (dev) |
 | **Caching** | Redis (planned) |
