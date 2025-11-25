@@ -36,7 +36,7 @@ export default function AIProfileBuilder({
     style: (['casual','professional','humorous','romantic'] as readonly string[]).includes(preferences.style)
       ? (preferences.style as 'casual' | 'professional' | 'humorous' | 'romantic')
       : undefined,
-  });
+  }, { enabled: false });
   const feedbackMutation = useContentFeedback();
 
   const handleGenerateProfile = async () => {
@@ -59,6 +59,8 @@ export default function AIProfileBuilder({
     }
   };
 
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState<string | null>(null);
+
   const handleFeedback = async (contentId: string, rating: number, feedback?: string) => {
     try {
       await feedbackMutation.mutateAsync({
@@ -67,6 +69,8 @@ export default function AIProfileBuilder({
         rating,
         feedback,
       });
+      setFeedbackSubmitted(contentId);
+      setTimeout(() => setFeedbackSubmitted(null), 3000);
     } catch (error) {
       console.error('Feedback submission failed:', error);
     }
@@ -276,6 +280,11 @@ export default function AIProfileBuilder({
                         </button>
                       ))}
                     </div>
+                    {feedbackSubmitted === suggestion.content && (
+                      <div className="mt-2 text-sm text-green-600" data-testid="feedback-success">
+                        Feedback submitted successfully!
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

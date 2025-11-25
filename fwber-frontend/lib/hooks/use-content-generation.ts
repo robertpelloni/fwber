@@ -65,11 +65,12 @@ export interface ContentOptimizationRequest {
 /**
  * Hook for generating profile content
  */
-export const useProfileContentGeneration = (preferences: ProfileContentRequest) => {
+export const useProfileContentGeneration = (preferences: ProfileContentRequest, options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: ['profileContentGeneration', preferences],
     queryFn: () => generateProfileContent(preferences),
-    enabled: Object.keys(preferences).length > 0,
+    enabled: options?.enabled ?? Object.keys(preferences).length > 0,
+    retry: 1,
     staleTime: 1000 * 60 * 30, // 30 minutes
     gcTime: 1000 * 60 * 60, // 1 hour
   });
