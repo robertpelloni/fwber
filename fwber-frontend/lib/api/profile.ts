@@ -203,3 +203,23 @@ export async function getProfileCompleteness(token: string): Promise<ProfileComp
   return response.json();
 }
 
+/**
+ * Search for users by name or email
+ */
+export async function searchUsers(token: string, searchTerm: string): Promise<UserProfile[]> {
+  const response = await fetch(`${API_BASE_URL}/users/search?q=${searchTerm}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to search for users');
+  }
+
+  const data = await response.json();
+  return data.data || data;
+}
