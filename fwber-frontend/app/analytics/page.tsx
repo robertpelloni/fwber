@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../lib/auth-context';
 import { useRouter } from 'next/navigation';
+import RateLimitStats from '../../components/analytics/RateLimitStats';
 
 interface AnalyticsData {
   users: {
@@ -129,6 +130,7 @@ export default function AnalyticsPage() {
             </div>
             <div className="flex items-center space-x-4">
               <select
+                aria-label="Select time range"
                 value={timeRange}
                 onChange={(e) => setTimeRange(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -253,6 +255,11 @@ export default function AnalyticsPage() {
               <p className="text-sm text-gray-600">Error Rate</p>
             </div>
           </div>
+        </div>
+
+        {/* Rate Limit Stats */}
+        <div className="mb-8">
+          <RateLimitStats />
         </div>
 
         {/* Most Active Areas */}
