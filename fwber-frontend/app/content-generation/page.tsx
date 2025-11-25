@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth-context';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import SmartContentEditor from '@/components/SmartContentEditor';
 import AIProfileBuilder from '@/components/AIProfileBuilder';
+import ConversationStarters from '@/components/ConversationStarters';
 import { useContentGenerationAnalytics } from '@/lib/hooks/use-content-generation';
 
 export default function ContentGenerationPage() {
@@ -17,6 +18,7 @@ export default function ContentGenerationPage() {
   const tabs = [
     { id: 'profile', name: 'AI Profile Builder', icon: '👤' },
     { id: 'editor', name: 'Smart Content Editor', icon: '✍️' },
+    { id: 'conversation', name: 'Conversation Starters', icon: '💬' },
     { id: 'analytics', name: 'Analytics Dashboard', icon: '📊' },
   ];
 
@@ -87,6 +89,12 @@ export default function ContentGenerationPage() {
                   enableQualityAnalysis={true}
                   showSuggestions={true}
                 />
+              </div>
+            )}
+
+            {activeTab === 'conversation' && (
+              <div className="p-6">
+                <ConversationStarters />
               </div>
             )}
 

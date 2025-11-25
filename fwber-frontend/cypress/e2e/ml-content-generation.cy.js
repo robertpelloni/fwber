@@ -161,7 +161,7 @@ describe('ML Content Generation E2E Test', () => {
     cy.get('[data-testid="content-textarea"]').should('not.contain', testContent);
   });
 
-  it.skip('should test bulletin board post suggestions', () => {
+  it('should test bulletin board post suggestions', () => {
     // Login first
     cy.visit('/login');
     cy.get('input[name="email"]').type(testUser.email);
@@ -221,7 +221,7 @@ describe('ML Content Generation E2E Test', () => {
     cy.get('textarea[placeholder*="Type your message"]').should('not.be.empty');
   });
 
-  it.skip('should test conversation starter generation', () => {
+  it('should test conversation starter generation', () => {
     // Login first
     cy.visit('/login');
     cy.get('input[name="email"]').type(testUser.email);
@@ -236,7 +236,7 @@ describe('ML Content Generation E2E Test', () => {
     cy.url().should('include', '/content-generation');
 
     // Test conversation starter generation
-    cy.get('[data-testid="conversation-starters-tab"]').click();
+    cy.get('[data-testid="conversation-tab"]').click();
     
     // Set context
     cy.get('[data-testid="conversation-type"]').select('casual');
