@@ -343,22 +343,15 @@ describe('ML Content Generation E2E Test', () => {
   });
 
   it('should test performance and caching', () => {
-    const perfUser = {
-      name: 'Perf User',
-      email: `perf-test-${Date.now()}@example.com`,
-      password: 'password123',
-    };
+    // Login first
+    cy.visit('/login');
+    cy.get('input[name="email"]').should('be.visible').type(testUser.email);
+    cy.get('input[name="password"]').should('be.visible').type(testUser.password);
+    cy.get('button[type="submit"]').should('be.visible').click();
 
-    // Register new user
-    // cy.visit('/register'); // Already visited in beforeEach
-    cy.get('input[name="name"]').type(perfUser.name);
-    cy.get('input[name="email"]').type(perfUser.email);
-    cy.get('input[name="password"]').type(perfUser.password);
-    cy.get('input[name="passwordConfirmation"]').type(perfUser.password);
-    cy.wait(1000);
-    cy.get('button[type="submit"]').click();
-
+    // Wait for dashboard with increased timeout and check for potential error
     cy.url({ timeout: 30000 }).should('include', '/dashboard');
+    cy.contains('Welcome').should('be.visible');
 
     // Navigate to content generation
     cy.contains('Show all features').click();
