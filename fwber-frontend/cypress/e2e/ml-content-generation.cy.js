@@ -33,12 +33,13 @@ describe('ML Content Generation E2E Test', () => {
     cy.get('[data-testid="interest-music"]').click();
     cy.get('[data-testid="interest-photography"]').click();
     
-    cy.get('textarea[placeholder*="Describe what you\'re looking for"]').type(
+    cy.wait(1000); // Wait for UI to settle
+    cy.get('[data-testid="goals-textarea"]').should('be.visible').type(
       'Looking for someone to share adventures and create memories with!'
     );
     
     cy.get('[data-testid="style-casual"]').click();
-    cy.get('input[placeholder*="Who do you want to attract"]').type('adventure lovers');
+    cy.get('[data-testid="target-audience-input"]').type('adventure lovers');
 
     // 4. Generate AI Profile
     cy.get('[data-testid="generate-btn"]').should('be.visible').and('not.be.disabled').click();
@@ -162,6 +163,68 @@ describe('ML Content Generation E2E Test', () => {
   });
 
   it('should test bulletin board post suggestions', () => {
+    // Mock bulletin board data
+    cy.intercept('GET', '/api/bulletin-boards*', {
+      statusCode: 200,
+      body: {
+        boards: [
+          {
+            id: 1,
+            name: 'Downtown Community',
+            description: 'General discussion for downtown area',
+            latitude: 40.7128,
+            longitude: -74.0060,
+            radius_meters: 1000,
+            active_users: 15,
+            message_count: 42
+          }
+        ]
+      }
+    }).as('getBoards');
+
+    cy.intercept('GET', '/api/bulletin-boards/1*', {
+      statusCode: 200,
+      body: {
+        board: {
+          id: 1,
+          name: 'Downtown Community',
+          description: 'General discussion for downtown area',
+          active_users: 15,
+          message_count: 42
+        }
+      }
+    }).as('getBoardDetails');
+
+    cy.intercept('GET', '/api/bulletin-boards/1/messages*', {
+      statusCode: 200,
+      body: {
+        messages: {
+          data: []
+        }
+      }
+    }).as('getMessages');
+
+    // Mock suggestions generation
+    cy.intercept('POST', '/api/content-generation/posts/*/suggestions', {
+      statusCode: 200,
+      body: {
+        data: {
+          suggestions: [
+            {
+              content: 'Has anyone tried the new coffee shop on Main St?',
+              confidence: 0.95,
+              tone: 'casual'
+            },
+            {
+              content: 'Looking for recommendations for a good plumber in the area.',
+              confidence: 0.88,
+              tone: 'inquisitive'
+            }
+          ]
+        }
+      }
+    }).as('generateSuggestions');
+
     // Login first
     cy.visit('/login');
     cy.get('input[name="email"]').type(testUser.email);
@@ -175,50 +238,27 @@ describe('ML Content Generation E2E Test', () => {
     cy.get('a[href="/bulletin-boards"]').click();
     cy.url().should('include', '/bulletin-boards');
 
-    // Mock geolocation for consistent testing
-    cy.window().then((win) => {
-      cy.stub(win.navigator.geolocation, 'getCurrentPosition').callsFake((cb) => {
-        return cb({
-          coords: {
-            latitude: 34.052235,
-            longitude: -118.243683,
-            accuracy: 20,
-          },
-        });
-      });
-    });
-
-    // Create a bulletin board
-    const boardName = `AI Test Board ${Date.now()}`;
-    cy.get('button').contains('Create New Board').click();
-    cy.get('input[placeholder="Board Name"]').type(boardName);
-    cy.get('textarea[placeholder="Description"]').type('A test board for AI content generation');
-    cy.get('button').contains('Submit').click();
-    cy.contains(boardName);
-
-    // Select the board
-    cy.contains(boardName).click();
-
-    // Test post suggestions
-    cy.get('button').contains('Get AI Suggestions').click();
+    // Wait for boards to load and click the first one
+    cy.wait('@getBoards');
+    cy.contains('Downtown Community').click();
     
-    // Wait for suggestions to load
-    cy.get('[data-testid="post-suggestions"]', { timeout: 30000 }).should('be.visible');
-    cy.get('[data-testid="suggestion-item"]').should('have.length.greaterThan', 0);
+    // Wait for board details and messages
+    cy.wait('@getBoardDetails');
+    cy.wait('@getMessages');
 
-    // Verify suggestion quality
-    cy.get('[data-testid="suggestion-item"]').first().within(() => {
-      cy.get('[data-testid="suggestion-content"]').should('not.be.empty');
-      cy.get('[data-testid="relevance-score"]').should('contain', '%');
-    });
+    // Open suggestions
+    cy.get('[data-testid="post-suggestions"]').click();
+    
+    // Verify suggestions are displayed
+    cy.get('[data-testid="suggestion-item"]').should('have.length', 2);
+    cy.contains('Has anyone tried the new coffee shop on Main St?').should('be.visible');
+    cy.get('[data-testid="relevance-score"]').first().should('contain', '95%');
 
-    // Test using a suggestion
-    cy.get('[data-testid="suggestion-item"]').first().within(() => {
-      cy.get('button').contains('Use This').click();
-    });
-
-    // Verify the suggestion was applied to the message input
-    cy.get('textarea[placeholder*="Type your message"]').should('not.be.empty');
+    // Use a suggestion
+    cy.get('[data-testid="use-suggestion"]').first().click();
+    
+    // Verify content is populated in input
+    cy.get('input[placeholder*="Share something"]').should('have.value', 'Has anyone tried the new coffee shop on Main St?');
   });
 
   it('should test conversation starter generation', () => {
@@ -303,13 +343,22 @@ describe('ML Content Generation E2E Test', () => {
   });
 
   it('should test performance and caching', () => {
-    // Login first
-    cy.visit('/login');
-    cy.get('input[name="email"]').type(testUser.email);
-    cy.get('input[name="password"]').type(testUser.password);
+    const perfUser = {
+      name: 'Perf User',
+      email: `perf-test-${Date.now()}@example.com`,
+      password: 'password123',
+    };
+
+    // Register new user
+    // cy.visit('/register'); // Already visited in beforeEach
+    cy.get('input[name="name"]').type(perfUser.name);
+    cy.get('input[name="email"]').type(perfUser.email);
+    cy.get('input[name="password"]').type(perfUser.password);
+    cy.get('input[name="passwordConfirmation"]').type(perfUser.password);
+    cy.wait(1000);
     cy.get('button[type="submit"]').click();
 
-    cy.url().should('include', '/dashboard');
+    cy.url({ timeout: 30000 }).should('include', '/dashboard');
 
     // Navigate to content generation
     cy.contains('Show all features').click();

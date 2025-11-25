@@ -1,1 +1,8 @@
-{}
+{
+  "/page": "app/page.js",
+  "/register/page": "app/register/page.js",
+  "/bulletin-boards/page": "app/bulletin-boards/page.js",
+  "/login/page": "app/login/page.js",
+  "/content-generation/page": "app/content-generation/page.js",
+  "/dashboard/page": "app/dashboard/page.js"
+}

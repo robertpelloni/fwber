@@ -171,6 +171,7 @@ export default function AIProfileBuilder({
                 value={preferences.goals}
                 onChange={(e) => setPreferences(prev => ({ ...prev, goals: e.target.value }))}
                 placeholder="Describe what you're looking for in a relationship..."
+                data-testid="goals-textarea"
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 rows={3}
               />
@@ -208,6 +209,7 @@ export default function AIProfileBuilder({
                 value={preferences.target_audience}
                 onChange={(e) => setPreferences(prev => ({ ...prev, target_audience: e.target.value }))}
                 placeholder="Who do you want to attract?"
+                data-testid="target-audience-input"
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
