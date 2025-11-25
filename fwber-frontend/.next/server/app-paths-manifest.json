@@ -1,7 +1,6 @@
 {
   "/register/page": "app/register/page.js",
-  "/content-generation/page": "app/content-generation/page.js",
-  "/bulletin-boards/page": "app/bulletin-boards/page.js",
   "/login/page": "app/login/page.js",
+  "/recommendations/page": "app/recommendations/page.js",
   "/dashboard/page": "app/dashboard/page.js"
 }
