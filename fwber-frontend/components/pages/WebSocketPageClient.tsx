@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 import { useWebSocket, useWebSocketPresence, useWebSocketNotifications } from '@/lib/hooks/use-websocket';
+import { WebSocketProvider } from '@/lib/contexts/WebSocketContext';
 import RealTimeChat, { ChatList, OnlineUsers } from '@/components/RealTimeChat';
 
-export default function WebSocketPageClient() {
+function WebSocketPageContent() {
   const { user, isAuthenticated, isLoading: loading } = useAuth();
   const router = useRouter();
   const [selectedRecipient, setSelectedRecipient] = useState<string>('');
@@ -358,5 +359,13 @@ export default function WebSocketPageClient() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function WebSocketPageClient() {
+  return (
+    <WebSocketProvider>
+      <WebSocketPageContent />
+    </WebSocketProvider>
   );
 }

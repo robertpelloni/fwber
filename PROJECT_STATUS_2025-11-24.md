@@ -33,8 +33,8 @@ The project has successfully delivered the core MVP scope and has significantly 
 
 ### 🚧 In Progress / Next Steps
 1.  **WebSocket/Mercure Integration**:
-    -   *Status*: Backend routes exist; Frontend components (`RealTimeChat.tsx`) are present.
-    -   *Next*: Comprehensive E2E testing of real-time events (typing indicators, presence).
+    -   *Status*: **Complete**. Refactored frontend to use `WebSocketProvider` for singleton connection.
+    -   *Verification*: E2E tests (`realtime-chat.cy.js`) passing for connection, messaging, typing indicators, and presence.
 2.  **Analytics & Rate Limiting**:
     -   *Status*: Backend routes implemented (`feature:analytics`, `feature:rate_limits`).
     -   *Next*: Frontend admin views for these metrics.

@@ -109,21 +109,26 @@ export class WebSocketClient {
    * Connect to WebSocket server
    */
   public async connect(): Promise<void> {
+    console.log('WebSocketClient.connect called');
     if (this.isConnecting || (this.ws && this.ws.readyState === WebSocket.OPEN)) {
+      console.log('WebSocketClient already connecting or connected');
       return;
     }
 
     this.isConnecting = true;
 
     try {
+      console.log('WebSocketClient establishing HTTP connection...');
       // First, establish connection via HTTP API
       const connectionData = await this.establishConnection();
+      console.log('WebSocketClient HTTP connection established:', connectionData);
       this.connectionId = connectionData.connection_id;
       this.userId = connectionData.user_id;
       this.heartbeatInterval = connectionData.heartbeat_interval * 1000;
 
       // Then connect WebSocket
       const wsUrl = `${this.wsUrl}?token=${this.token}&connection_id=${this.connectionId}`;
+      console.log('WebSocketClient creating WebSocket:', wsUrl);
       this.ws = new WebSocket(wsUrl);
 
       this.ws.onopen = this.handleOpen.bind(this);

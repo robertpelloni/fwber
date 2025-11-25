@@ -32,7 +32,12 @@ export default function RealTimeChat({
     isTyping,
   } = useWebSocketChat(recipientId);
 
-  const { loadConversationHistory } = useWebSocket();
+  const { loadConversationHistory, connectionStatus } = useWebSocket();
+
+  // Update isConnected based on global connection status
+  useEffect(() => {
+    setIsConnected(connectionStatus.connected);
+  }, [connectionStatus.connected]);
 
   // Load conversation history on mount
   useEffect(() => {
