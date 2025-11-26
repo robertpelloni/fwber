@@ -8,6 +8,7 @@ import { getConversations, getMessages, sendMessage, markMessagesAsRead, type Co
 import ReportModal from '@/components/ReportModal'
 import ProfileViewModal from '@/components/ProfileViewModal'
 import { blockUser, reportUser } from '@/lib/api/safety'
+import { PresenceIndicator, ConnectionStatusBadge, TypingIndicator } from '@/components/realtime'
 
 export default function MessagesPage() {
   const { token, isAuthenticated, user } = useAuth()
@@ -250,8 +251,13 @@ export default function MessagesPage() {
                       }`}
                     >
                       <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
-                          {conversation.other_user?.profile?.display_name?.[0] || '?'}
+                        <div className="relative">
+                          <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
+                            {conversation.other_user?.profile?.display_name?.[0] || '?'}
+                          </div>
+                          <div className="absolute -bottom-0.5 -right-0.5">
+                            <PresenceIndicator userId={String(conversation.other_user?.id)} size="sm" />
+                          </div>
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-900 truncate">
@@ -279,14 +285,24 @@ export default function MessagesPage() {
                     {/* Chat Header */}
                     <div className="p-4 border-b flex justify-between items-center">
                       <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
-                          {selectedConversation.other_user?.profile?.display_name?.[0] || '?'}
+                        <div className="relative">
+                          <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
+                            {selectedConversation.other_user?.profile?.display_name?.[0] || '?'}
+                          </div>
+                          <div className="absolute -bottom-0.5 -right-0.5">
+                            <PresenceIndicator userId={String(selectedConversation.other_user?.id)} size="sm" />
+                          </div>
                         </div>
                         <div>
-                          <h3 className="text-lg font-semibold text-gray-900">
-                            {selectedConversation.other_user?.profile?.display_name || 'Anonymous'}
-                          </h3>
                           <div className="flex items-center gap-2">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              {selectedConversation.other_user?.profile?.display_name || 'Anonymous'}
+                            </h3>
+                            <ConnectionStatusBadge />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <PresenceIndicator userId={String(selectedConversation.other_user?.id)} showLabel size="sm" />
+                            <span className="text-gray-300">•</span>
                             <p className="text-sm text-gray-500">
                               {selectedConversation.other_user?.profile?.age && 
                                 `${selectedConversation.other_user.profile.age} years old`
@@ -405,6 +421,12 @@ export default function MessagesPage() {
 
                     {/* Message Input */}
                     <div className="p-4 border-t">
+                      {/* Typing Indicator */}
+                      <TypingIndicator 
+                        contextId={String(selectedConversation.other_user?.id)} 
+                        contextType="user" 
+                        className="mb-2"
+                      />
                       {selectedFile && (
                         <div className="mb-2 px-3 py-1 bg-gray-100 rounded flex justify-between items-center">
                           <span className="text-sm text-gray-600 truncate max-w-xs">{selectedFile.name}</span>

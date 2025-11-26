@@ -1,9 +1,16 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useChatroom, useChatroomMessages, useSendMessage, useAddReaction, useRemoveReaction } from '@/lib/hooks/use-chatrooms';
 import { useAuth } from '@/lib/auth-context';
+import { 
+  ConnectionStatusBadge, 
+  PresenceIndicator,
+  TypingIndicator,
+  OnlineUsersList,
+  PresenceProvider
+} from '@/components/realtime';
 
 export default function ChatroomPage() {
   const params = useParams();
@@ -13,6 +20,7 @@ export default function ChatroomPage() {
   
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [showOnlineUsers, setShowOnlineUsers] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
 
@@ -24,6 +32,11 @@ export default function ChatroomPage() {
 
   const chatroom = chatroomData?.chatroom;
   const messages = useMemo(() => messagesData?.data || [], [messagesData?.data]);
+  
+  // Get member IDs for presence tracking
+  const memberIds = useMemo(() => {
+    return chatroom?.members?.map((m: { user_id: number }) => String(m.user_id)) || [];
+  }, [chatroom?.members]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -133,16 +146,31 @@ export default function ChatroomPage() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">{chatroom.display_name}</h1>
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-2xl font-bold text-gray-900">{chatroom.display_name}</h1>
+                <ConnectionStatusBadge />
+              </div>
               {chatroom.description && (
                 <p className="text-gray-600 mb-4">{chatroom.description}</p>
               )}
               <div className="flex items-center gap-4 text-sm text-gray-500">
-                <span>👥 {chatroom.member_count} members</span>
+                <button 
+                  onClick={() => setShowOnlineUsers(!showOnlineUsers)}
+                  className="flex items-center gap-1 hover:text-blue-600 transition-colors"
+                >
+                  👥 {chatroom.member_count} members
+                </button>
                 <span>💬 {chatroom.message_count} messages</span>
                 {chatroom.city && <span>📍 {chatroom.city}</span>}
                 <span>🕒 Last active {formatTime(chatroom.last_activity_at)}</span>
               </div>
+              
+              {/* Online Users Panel */}
+              {showOnlineUsers && (
+                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                  <OnlineUsersList userIds={memberIds} maxDisplay={8} />
+                </div>
+              )}
             </div>
             <div className="text-right">
               <div className="text-sm text-gray-500 mb-1">
@@ -167,9 +195,12 @@ export default function ChatroomPage() {
             ) : messages.length > 0 ? (
               messages.map((message) => (
                 <div key={message.id} className="flex items-start space-x-3">
-                  <div className="flex-shrink-0">
+                  <div className="flex-shrink-0 relative">
                     <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
                       {message.user?.name?.charAt(0).toUpperCase() || '?'}
+                    </div>
+                    <div className="absolute -bottom-0.5 -right-0.5">
+                      <PresenceIndicator userId={String(message.user?.id || message.user_id)} size="sm" />
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">
@@ -243,10 +274,11 @@ export default function ChatroomPage() {
               </button>
             </form>
             
-            {/* Typing Indicator */}
+            {/* Typing Indicator - Real-time from WebSocket or local state */}
+            <TypingIndicator contextId={String(chatroomId)} contextType="chatroom" className="mt-2" />
             {isTyping && (
               <div className="mt-2 text-sm text-gray-500">
-                <span className="animate-pulse">Someone is typing...</span>
+                <span className="animate-pulse">You are typing...</span>
               </div>
             )}
           </div>

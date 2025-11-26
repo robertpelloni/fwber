@@ -2,7 +2,7 @@
 
 import { AuthenticatedRealtimeProvider } from '@/components/AuthenticatedRealtimeProvider';
 
-export default function MessagesLayout({
+export default function ChatroomsLayout({
   children,
 }: {
   children: React.ReactNode

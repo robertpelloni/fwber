@@ -49,7 +49,7 @@ async function deriveKey(
   return crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt,
+      salt: salt.buffer as ArrayBuffer,
       iterations: PBKDF2_ITERATIONS,
       hash: 'SHA-256',
     },
@@ -73,7 +73,7 @@ export async function encryptData(
   const iv = generateIV();
 
   const ciphertext = await crypto.subtle.encrypt(
-    { name: ALGORITHM, iv },
+    { name: ALGORITHM, iv: iv.buffer as ArrayBuffer },
     key,
     data
   );
@@ -102,7 +102,7 @@ export async function decryptData(
   const iv = combined.slice(0, IV_LENGTH);
   const ciphertext = combined.slice(IV_LENGTH);
 
-  return crypto.subtle.decrypt({ name: ALGORITHM, iv }, key, ciphertext);
+  return crypto.subtle.decrypt({ name: ALGORITHM, iv: iv.buffer as ArrayBuffer }, key, ciphertext);
 }
 
 /**
@@ -237,7 +237,7 @@ export async function verifyPassphrase(
 ): Promise<boolean> {
   try {
     const encrypted = base64ToArrayBuffer(verifier);
-    const decrypted = await decryptData(encrypted.buffer, passphrase, salt);
+    const decrypted = await decryptData(encrypted.buffer as ArrayBuffer, passphrase, salt);
     const decoder = new TextDecoder();
     return decoder.decode(decrypted) === 'VAULT_VERIFY_V1';
   } catch {
