@@ -453,6 +453,106 @@ export interface AnalyticsResponse {
 }
 
 // ============================================================================
+// Admin Analytics & Ops Types
+// ============================================================================
+
+export type AnalyticsRange = '1d' | '7d' | '30d' | '90d'
+
+export interface PlatformAnalyticsUserStats {
+  total: number
+  active: number
+  new_today: number
+  growth_rate: number
+}
+
+export interface PlatformAnalyticsMessageStats {
+  total: number
+  today: number
+  average_per_user: number
+  moderation_stats: {
+    flagged: number
+    approved: number
+    rejected: number
+    pending_review: number
+  }
+}
+
+export interface PlatformAnalyticsLocationStats {
+  total_boards: number
+  active_areas: number
+  coverage_radius: number
+  most_active: Array<{
+    name: string
+    message_count: number
+    active_users: number
+  }>
+}
+
+export interface PlatformAnalyticsPerformanceStats {
+  api_response_time: number
+  sse_connections: number
+  cache_hit_rate: number
+  error_rate: number
+}
+
+export interface PlatformAnalyticsTrends {
+  hourly_activity: Array<{ hour: number; messages: number; users: number }>
+  daily_activity: Array<{ date: string; messages: number; users: number }>
+  top_categories: Array<{ category: string; count: number }>
+}
+
+export interface PlatformAnalyticsResponse {
+  users: PlatformAnalyticsUserStats
+  messages: PlatformAnalyticsMessageStats
+  locations: PlatformAnalyticsLocationStats
+  performance: PlatformAnalyticsPerformanceStats
+  trends: PlatformAnalyticsTrends
+}
+
+export interface RealtimeMetrics {
+  active_connections: number
+  messages_per_minute: number
+  new_users_last_hour: number
+  system_load: number
+  memory_usage: number
+  disk_usage: number
+}
+
+export interface ModerationInsights {
+  ai_accuracy: number
+  human_review_rate: number
+  false_positive_rate: number
+  average_review_time: number
+  top_flagged_categories: Array<{ category: string; count: number }>
+}
+
+export type RateLimitTimeframe = '1h' | '24h'
+
+export interface RateLimitConfig {
+  capacity: number
+  refill_rate: number
+  cost_per_request: number
+  burst_allowance: number
+}
+
+export interface RateLimitActionStats {
+  active_buckets: number
+  config: RateLimitConfig
+}
+
+export interface RateLimitStatistics {
+  total_keys: number
+  timeframe: string
+  actions: Record<string, RateLimitActionStats>
+}
+
+export interface RateLimitStatsResponse {
+  timeframe: string
+  statistics: RateLimitStatistics
+  timestamp: string
+}
+
+// ============================================================================
 // Chatroom Types (Proximity & Group)
 // ============================================================================
 
