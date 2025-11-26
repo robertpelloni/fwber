@@ -33,6 +33,7 @@ use App\Http\Controllers\ModerationController;
 use App\Http\Controllers\Api\DeviceTokenController;
 use App\Http\Controllers\Api\FriendController;
 use App\Http\Controllers\PhotoRevealController;
+use App\Http\Controllers\ConfigController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware("api")->group(function (): void {
@@ -337,5 +338,12 @@ Route::middleware("api")->group(function (): void {
         Route::delete('/throttles/{throttleId}', [ModerationController::class, 'removeThrottle']);
         Route::get('/actions', [ModerationController::class, 'actionHistory']);
         Route::get('/users/{userId}', [ModerationController::class, 'userProfile']);
+    });
+
+    // Configuration routes (Admin only)
+    Route::middleware(['auth.api', 'auth.moderator'])->prefix('config')->group(function (): void {
+        Route::get('/features', [ConfigController::class, 'getFeatures']);
+        Route::put('/features', [ConfigController::class, 'updateFeatures']);
+        Route::get('/health', [ConfigController::class, 'getHealth']);
     });
 });

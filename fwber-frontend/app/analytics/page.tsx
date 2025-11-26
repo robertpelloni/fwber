@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState } from 'react';
 import RateLimitStats from '@/components/analytics/RateLimitStats';
 import type { AnalyticsRange, PlatformAnalyticsResponse } from '@/lib/api/types';
 import {
@@ -8,6 +8,7 @@ import {
   usePlatformAnalytics,
   useRealtimeMetrics,
 } from '@/lib/hooks/use-admin-analytics';
+import { useSystemHealth } from '@/lib/hooks/use-config';
 import { exportAllAnalyticsToCSV, exportPlatformAnalyticsToCSV } from '@/lib/utils/csv-export';
 import './analytics-progress.css';
 
@@ -47,10 +48,12 @@ export default function AnalyticsPage() {
   const platformQuery = usePlatformAnalytics(range);
   const realtimeQuery = useRealtimeMetrics();
   const moderationQuery = useModerationInsights();
+  const healthQuery = useSystemHealth();
 
   const analytics = platformQuery.data;
   const realtimeMetrics = realtimeQuery.data;
   const moderationInsights = moderationQuery.data;
+  const systemHealth = healthQuery.data;
 
   const hourlyMaxMessages = useMemo(() => {
     if (!analytics?.trends?.hourly_activity?.length) {
@@ -151,6 +154,103 @@ export default function AnalyticsPage() {
         )}
 
       <RateLimitStats />
+
+      {/* System Health Status */}
+      <div className="rounded-lg bg-white p-6 shadow-sm">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900">🩺 System Health</h2>
+            <p className="text-sm text-gray-500">Backend services and infrastructure status</p>
+          </div>
+          {healthQuery.isFetching && <span className="text-xs text-gray-500">Checking…</span>}
+        </div>
+        {systemHealth ? (
+          <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {/* Overall Status */}
+            <div className={`rounded-lg p-4 text-center ${
+              systemHealth.status === 'healthy' ? 'bg-green-50' : 
+              systemHealth.status === 'degraded' ? 'bg-yellow-50' : 'bg-red-50'
+            }`}>
+              <p className={`text-sm ${
+                systemHealth.status === 'healthy' ? 'text-green-600' : 
+                systemHealth.status === 'degraded' ? 'text-yellow-600' : 'text-red-600'
+              }`}>Overall Status</p>
+              <p className={`mt-2 text-2xl font-semibold capitalize ${
+                systemHealth.status === 'healthy' ? 'text-green-900' : 
+                systemHealth.status === 'degraded' ? 'text-yellow-900' : 'text-red-900'
+              }`}>
+                {systemHealth.status === 'healthy' ? '✓ Healthy' : 
+                 systemHealth.status === 'degraded' ? '⚠ Degraded' : '✕ Unhealthy'}
+              </p>
+            </div>
+
+            {/* Database */}
+            <div className={`rounded-lg p-4 text-center ${
+              systemHealth.services?.database === 'up' ? 'bg-green-50' : 'bg-red-50'
+            }`}>
+              <p className={`text-sm ${
+                systemHealth.services?.database === 'up' ? 'text-green-600' : 'text-red-600'
+              }`}>Database</p>
+              <p className={`mt-2 text-2xl font-semibold ${
+                systemHealth.services?.database === 'up' ? 'text-green-900' : 'text-red-900'
+              }`}>
+                {systemHealth.services?.database === 'up' ? '✓ Connected' : '✕ Down'}
+              </p>
+              <p className="mt-1 text-xs text-gray-500">MySQL/PostgreSQL</p>
+            </div>
+
+            {/* Cache */}
+            <div className={`rounded-lg p-4 text-center ${
+              systemHealth.services?.cache === 'up' ? 'bg-green-50' : 'bg-yellow-50'
+            }`}>
+              <p className={`text-sm ${
+                systemHealth.services?.cache === 'up' ? 'text-green-600' : 'text-yellow-600'
+              }`}>Cache</p>
+              <p className={`mt-2 text-2xl font-semibold ${
+                systemHealth.services?.cache === 'up' ? 'text-green-900' : 'text-yellow-900'
+              }`}>
+                {systemHealth.services?.cache === 'up' ? '✓ Connected' : '⚠ Unavailable'}
+              </p>
+              <p className="mt-1 text-xs text-gray-500">Redis</p>
+            </div>
+
+            {/* Mercure */}
+            <div className={`rounded-lg p-4 text-center ${
+              systemHealth.services?.mercure === 'up' ? 'bg-green-50' : 
+              systemHealth.services?.mercure === 'down' ? 'bg-red-50' : 'bg-gray-50'
+            }`}>
+              <p className={`text-sm ${
+                systemHealth.services?.mercure === 'up' ? 'text-green-600' : 
+                systemHealth.services?.mercure === 'down' ? 'text-red-600' : 'text-gray-600'
+              }`}>Mercure Hub</p>
+              <p className={`mt-2 text-2xl font-semibold ${
+                systemHealth.services?.mercure === 'up' ? 'text-green-900' : 
+                systemHealth.services?.mercure === 'down' ? 'text-red-900' : 'text-gray-900'
+              }`}>
+                {systemHealth.services?.mercure === 'up' ? '✓ Connected' : 
+                 systemHealth.services?.mercure === 'down' ? '✕ Down' : '— N/A'}
+              </p>
+              <p className="mt-1 text-xs text-gray-500">Real-time events</p>
+            </div>
+          </div>
+        ) : healthQuery.isLoading ? (
+          <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={`health-skeleton-${i}`} className="h-24 animate-pulse rounded-lg bg-gray-100" />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-4 rounded-lg bg-gray-50 p-4 text-center">
+            <p className="text-sm text-gray-500">Health data unavailable.</p>
+            <button
+              onClick={() => healthQuery.refetch()}
+              className="mt-2 text-sm text-blue-600 hover:underline"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+      </div>
 
       <div className="rounded-lg bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between">
