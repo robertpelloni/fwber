@@ -27,3 +27,9 @@ export {
   WebSocketPresenceProvider,
   RealtimeProvider,
 } from './WebSocketBridge';
+
+// Proximity presence views
+export {
+  ProximityPresenceView,
+  ProximityPresenceCompact,
+} from './ProximityPresenceView';

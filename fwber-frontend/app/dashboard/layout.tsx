@@ -1,14 +1,15 @@
-import type { Metadata } from 'next'
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Dashboard | FWBer',
-  description: 'View your matches, messages, and activity.',
-}
+import { AuthenticatedRealtimeProvider } from '@/components/AuthenticatedRealtimeProvider';
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  return <>{children}</>
+  return (
+    <AuthenticatedRealtimeProvider>
+      {children}
+    </AuthenticatedRealtimeProvider>
+  );
 }

@@ -17,6 +17,7 @@ import {
   removeFromVault,
   listVaultItems,
   resetVault,
+  exportVault,
   isVaultSupported,
   VaultStatus,
   VaultInfo,
@@ -46,6 +47,7 @@ export interface UseVaultReturn {
   ) => Promise<string | null>;
   getFile: (id: string) => Promise<Blob | null>;
   removeFile: (id: string) => Promise<boolean>;
+  exportVault: () => Promise<string | null>;
   reset: () => Promise<boolean>;
   refresh: () => Promise<void>;
 
@@ -193,6 +195,19 @@ export function useVault(): UseVaultReturn {
     return true;
   }, [refresh]);
 
+  // Export vault
+  const doExportVault = useCallback(async (): Promise<string | null> => {
+    setError(null);
+
+    const result = await exportVault();
+    if (!result.success) {
+      setError(result.error || 'Failed to export vault');
+      return null;
+    }
+
+    return result.data || null;
+  }, []);
+
   return {
     isSupported,
     status,
@@ -207,6 +222,7 @@ export function useVault(): UseVaultReturn {
     addFile,
     getFile,
     removeFile,
+    exportVault: doExportVault,
     reset,
     refresh,
     checkStrength: checkPassphraseStrength,

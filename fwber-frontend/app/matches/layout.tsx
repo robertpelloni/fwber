@@ -1,14 +1,15 @@
-import type { Metadata } from 'next'
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Discover Matches | FWBer',
-  description: 'Find people near you.',
-}
+import { AuthenticatedRealtimeProvider } from '@/components/AuthenticatedRealtimeProvider';
 
 export default function MatchesLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  return <>{children}</>
+  return (
+    <AuthenticatedRealtimeProvider>
+      {children}
+    </AuthenticatedRealtimeProvider>
+  );
 }

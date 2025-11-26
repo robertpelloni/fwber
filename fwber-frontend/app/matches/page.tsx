@@ -12,6 +12,7 @@ import MatchFilter from '@/components/MatchFilter'
 import MatchModal from '@/components/MatchModal'
 import ReportModal from '@/components/ReportModal'
 import { reportUser, blockUser } from '@/lib/api/safety'
+import { PresenceIndicator, ConnectionStatusBadge } from '@/components/realtime'
 
 export default function MatchesPage() {
   const { token, isAuthenticated, user } = useAuth()
@@ -189,7 +190,10 @@ export default function MatchesPage() {
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center py-6">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Discover Matches</h1>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-3xl font-bold text-gray-900">Discover Matches</h1>
+                  <ConnectionStatusBadge />
+                </div>
                 <p className="text-gray-600">
                   {currentMatchIndex + 1} of {matches.length} potential matches
                 </p>
@@ -253,9 +257,12 @@ export default function MatchesPage() {
                 {/* Match Info Overlay */}
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6">
                   <div className="text-white">
-                    <h2 className="text-2xl font-bold">
-                      {currentMatch.profile?.display_name || 'Anonymous'}
-                    </h2>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h2 className="text-2xl font-bold">
+                        {currentMatch.profile?.display_name || 'Anonymous'}
+                      </h2>
+                      <PresenceIndicator userId={String(currentMatch.id)} size="md" showLabel />
+                    </div>
                     <p className="text-lg opacity-90">
                       {currentMatch.profile?.age && `${currentMatch.profile.age} years old`}
                     </p>

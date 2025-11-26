@@ -100,6 +100,29 @@ function VaultSettingsContent() {
     setMessage({ type: 'success', text: 'Vault locked' });
   };
 
+  const handleExport = async () => {
+    setActionLoading('export');
+    setMessage(null);
+
+    const data = await vault.exportVault();
+    if (data) {
+      // Create a downloadable file
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `fwber-vault-backup-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      setMessage({ type: 'success', text: 'Vault exported successfully! Keep this backup file secure.' });
+    } else {
+      setMessage({ type: 'error', text: vault.error || 'Failed to export vault' });
+    }
+    setActionLoading(null);
+  };
+
   const handleReset = async () => {
     setActionLoading('reset');
     setMessage(null);
@@ -254,8 +277,17 @@ function VaultSettingsContent() {
                               : strength.score >= 40
                                 ? 'bg-yellow-500'
                                 : 'bg-red-500'
+                          } ${
+                            strength.score >= 90 ? 'w-[90%]' :
+                            strength.score >= 80 ? 'w-[80%]' :
+                            strength.score >= 70 ? 'w-[70%]' :
+                            strength.score >= 60 ? 'w-[60%]' :
+                            strength.score >= 50 ? 'w-1/2' :
+                            strength.score >= 40 ? 'w-[40%]' :
+                            strength.score >= 30 ? 'w-[30%]' :
+                            strength.score >= 20 ? 'w-1/5' :
+                            strength.score >= 10 ? 'w-[10%]' : 'w-[5%]'
                           }`}
-                          style={{ width: `${strength.score}%` }}
                         />
                       </div>
                       <span className="text-xs text-gray-500">{strength.score}%</span>
@@ -321,7 +353,21 @@ function VaultSettingsContent() {
         {/* Vault Contents (when unlocked) */}
         {vault.isUnlocked && (
           <div className="rounded-lg border bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-gray-900">Vault Contents</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900">Vault Contents</h2>
+              <button
+                onClick={handleExport}
+                disabled={actionLoading === 'export' || vault.items.length === 0}
+                className="flex items-center gap-2 rounded-lg border border-purple-300 bg-purple-50 px-3 py-1.5 text-sm font-medium text-purple-700 hover:bg-purple-100 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {actionLoading === 'export' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4" />
+                )}
+                Export Backup
+              </button>
+            </div>
 
             {vault.items.length === 0 ? (
               <div className="mt-4 rounded-lg bg-gray-50 p-8 text-center">
