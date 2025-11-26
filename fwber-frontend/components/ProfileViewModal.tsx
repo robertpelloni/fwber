@@ -1,10 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { X } from 'lucide-react'
 import PhotoRevealGate from './PhotoRevealGate'
 import SecurePhotoReveal from './SecurePhotoReveal'
 import { RelationshipTier } from '@/lib/relationshipTiers'
+import { useFeatureFlag } from '@/lib/hooks/use-feature-flags'
 
 interface ProfileViewModalProps {
   isOpen: boolean
@@ -29,6 +31,7 @@ interface ProfileViewModalProps {
 
 export default function ProfileViewModal({ isOpen, onClose, user, messagesExchanged, matchId }: ProfileViewModalProps) {
   const [isVisible, setIsVisible] = useState(false)
+  const { isEnabled: faceRevealEnabled } = useFeatureFlag('face_reveal')
 
   useEffect(() => {
     if (isOpen) {
@@ -52,6 +55,32 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
     // For testing Face Reveal, we want 'real' photos to be blurred.
     type: 'real' as const 
   })) || []
+
+  // Simple photo grid for when Face Reveal is disabled
+  const SimplePhotoGrid = () => (
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      {user.profile?.photos?.map((photo) => (
+        <div key={photo.id} className="relative aspect-square rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-800">
+          <Image
+            src={photo.url}
+            alt="Photo"
+            fill
+            className="object-cover"
+          />
+          {photo.is_primary && (
+            <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+              Primary
+            </div>
+          )}
+        </div>
+      ))}
+      {(!user.profile?.photos || user.profile.photos.length === 0) && (
+        <div className="col-span-full text-center py-8 text-gray-500">
+          No photos available
+        </div>
+      )}
+    </div>
+  )
 
   return (
     <div data-testid="profile-modal" className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
@@ -95,12 +124,16 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
 
           <div className="mb-6">
             <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Photos</h3>
-            <PhotoRevealGate
-              photos={photos}
-              currentTier={RelationshipTier.MATCHED} // Assume matched since we are chatting
-              messagesExchanged={messagesExchanged}
-              daysConnected={1} // Mock
-            />
+            {faceRevealEnabled ? (
+              <PhotoRevealGate
+                photos={photos}
+                currentTier={RelationshipTier.MATCHED} // Assume matched since we are chatting
+                messagesExchanged={messagesExchanged}
+                daysConnected={1} // Mock
+              />
+            ) : (
+              <SimplePhotoGrid />
+            )}
           </div>
         </div>
 

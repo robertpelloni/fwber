@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import RateLimitStats from '@/components/analytics/RateLimitStats';
 import type { AnalyticsRange, PlatformAnalyticsResponse } from '@/lib/api/types';
 import {
@@ -8,6 +8,7 @@ import {
   usePlatformAnalytics,
   useRealtimeMetrics,
 } from '@/lib/hooks/use-admin-analytics';
+import { exportAllAnalyticsToCSV, exportPlatformAnalyticsToCSV } from '@/lib/utils/csv-export';
 import './analytics-progress.css';
 
 const RANGE_OPTIONS: Array<{ label: string; value: AnalyticsRange }> = [
@@ -125,6 +126,15 @@ export default function AnalyticsPage() {
           >
             {platformQuery.isFetching ? 'Refreshing…' : 'Refresh data'}
           </button>
+          {analytics && (
+            <button
+              type="button"
+              onClick={() => exportAllAnalyticsToCSV(analytics, moderationInsights ?? null, range)}
+              className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500"
+            >
+              📥 Export CSV
+            </button>
+          )}
         </div>
 
         </div>

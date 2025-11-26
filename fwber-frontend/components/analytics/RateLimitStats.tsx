@@ -1,66 +1,21 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/lib/auth-context';
-
-interface RateLimitConfig {
-  capacity: number;
-  refill_rate: number;
-  cost_per_request: number;
-  burst_allowance: number;
-}
-
-interface ActionStats {
-  active_buckets: number;
-  config: RateLimitConfig;
-}
-
-interface RateLimitStatsData {
-  total_keys: number;
-  timeframe: string;
-  actions: Record<string, ActionStats>;
-  timestamp?: string;
-}
+import { useState } from 'react';
+import { useRateLimitStatistics } from '@/lib/hooks/use-admin-analytics';
+import type { RateLimitTimeframe } from '@/lib/api/types';
+import { exportRateLimitStatsToCSV } from '@/lib/utils/csv-export';
 
 export default function RateLimitStats() {
-  const { token } = useAuth();
-  const [stats, setStats] = useState<RateLimitStatsData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [timeframe, setTimeframe] = useState('1h');
+  const [timeframe, setTimeframe] = useState<RateLimitTimeframe>('1h');
 
-  const fetchStats = useCallback(async () => {
-    if (!token) return;
-    
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const response = await fetch(`/api/rate-limits/stats/${timeframe}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+  const { data, isLoading: loading, error: queryError, refetch: fetchStats } = useRateLimitStatistics(
+    timeframe,
+    { refetchInterval: 60000 } // Refresh every minute
+  );
 
-      if (response.ok) {
-        const data = await response.json();
-        setStats(data.statistics); // The controller wraps it in 'statistics' key
-      } else {
-        setError('Failed to fetch rate limit statistics');
-      }
-    } catch (err) {
-      console.error('Error fetching rate limit stats:', err);
-      setError('An error occurred while fetching statistics');
-    } finally {
-      setLoading(false);
-    }
-  }, [token, timeframe]);
-
-  useEffect(() => {
-    fetchStats();
-    const interval = setInterval(fetchStats, 60000); // Refresh every minute
-    return () => clearInterval(interval);
-  }, [fetchStats]);
+  // Extract statistics from the response
+  const stats = data?.statistics ?? null;
+  const error = queryError ? (queryError as Error).message : null;
 
   if (loading && !stats) {
     return (
@@ -83,7 +38,7 @@ export default function RateLimitStats() {
           <span>{error}</span>
         </div>
         <button 
-          onClick={fetchStats}
+          onClick={() => fetchStats()}
           className="mt-4 text-sm text-blue-600 hover:underline"
         >
           Retry
@@ -105,14 +60,21 @@ export default function RateLimitStats() {
           <select
             aria-label="Select timeframe"
             value={timeframe}
-            onChange={(e) => setTimeframe(e.target.value)}
+            onChange={(e) => setTimeframe(e.target.value as RateLimitTimeframe)}
             className="text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
             <option value="1h">Last Hour</option>
             <option value="24h">Last 24 Hours</option>
           </select>
           <button
-            onClick={fetchStats}
+            onClick={() => exportRateLimitStatsToCSV(stats)}
+            className="p-2 text-green-600 hover:text-green-800"
+            title="Export CSV"
+          >
+            📥
+          </button>
+          <button
+            onClick={() => fetchStats()}
             className="p-2 text-gray-400 hover:text-gray-600"
             title="Refresh"
           >
