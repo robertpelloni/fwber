@@ -17,6 +17,7 @@ const nextConfig = {
   swcMinify: true,
   compress: true,
   poweredByHeader: false,
+  productionBrowserSourceMaps: false,
   
   // Experimental features for better performance
   experimental: {
@@ -78,6 +79,16 @@ const nextConfig = {
   
   // Bundle optimization
   webpack: (config, { dev, isServer }) => {
+    // Fix for packages that use node modules
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        crypto: false,
+      };
+    }
+
     // Production optimizations
     if (!dev && !isServer) {
       config.optimization.splitChunks = {

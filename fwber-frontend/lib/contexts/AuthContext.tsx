@@ -29,9 +29,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 }
 
 export function useAuth() {
-  // Add Cypress fallback
+  const context = useContext(AuthContext);
+
+  // If context is available, return it (Normal app flow)
+  if (context !== undefined) {
+    return context;
+  }
+
+  // Add Cypress fallback for when AuthProvider is missing in tests
   if (typeof window !== 'undefined') {
-    console.log('useAuth called. window.Cypress:', (window as any).Cypress);
+    console.log('useAuth called without provider. window.Cypress:', (window as any).Cypress);
     if ((window as any).Cypress) {
       console.log('Returning mock auth user');
       return {
@@ -56,9 +63,5 @@ export function useAuth() {
     }
   }
 
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  throw new Error('useAuth must be used within an AuthProvider');
 }
