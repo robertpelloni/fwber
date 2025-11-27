@@ -68,6 +68,9 @@ The project has successfully delivered the core MVP scope and **all planned seco
     -   `next-pwa` integrated for offline support and caching.
     -   Web App Manifest configured for installability.
     -   Service Worker strategy implemented (Network First for API, Cache First for static).
+10. **Security Hardening** (Nov 27 - Complete):
+    -   **Frontend**: Strict Content Security Policy (CSP), HSTS, X-Frame-Options, and Permissions-Policy headers configured in `next.config.js`.
+    -   **Backend**: `SecurityHeaders` middleware implemented to enforce security headers on all API responses.
 
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.
