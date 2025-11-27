@@ -8,7 +8,9 @@ import axios from 'axios';
 import Image from 'next/image';
 import Link from 'next/link';
 import ProfileCompletenessWidget from '@/components/ProfileCompletenessWidget';
-import { ProximityPresenceCompact, ConnectionStatusBadge } from '@/components/realtime';
+import { ProximityPresenceCompact } from '@/components/realtime';
+import AppHeader from '@/components/AppHeader';
+import { ActivityFeed } from '@/components/ActivityFeed';
 
 interface DashboardStats {
   total_matches: number;
@@ -23,19 +25,10 @@ interface DashboardStats {
   last_login: string;
 }
 
-interface RecentActivity {
-  type: 'match' | 'message' | 'view' | 'like';
-  user: {
-    id: number;
-    name: string;
-    avatar_url: string;
-  };
-  timestamp: string;
-  match_score?: number;
-}
-
 export default function DashboardPage() {
-  const { user, logout } = useAuth();
+  // Get user for legacy cards section
+  const { user } = useAuth();
+  // Activity feed now uses its own component with real-time presence
 
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard-stats'],
@@ -49,52 +42,20 @@ export default function DashboardPage() {
     },
   });
 
-  const { data: activity, isLoading: activityLoading } = useQuery({
-    queryKey: ['recent-activity'],
-    queryFn: async () => {
-      const token = localStorage.getItem('fwber_token');
-      const response = await axios.get<RecentActivity[]>(
-        `${process.env.NEXT_PUBLIC_API_URL}/dashboard/activity`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      return response.data;
-    },
-  });
-
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <header className="bg-white shadow">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center py-6">
-              <div className="flex items-center gap-3">
-                <h1 className="text-3xl font-bold text-gray-900">FWBer</h1>
-                <ConnectionStatusBadge />
-              </div>
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-700">
-                  Welcome, {user?.name || user?.email}!
-                </span>
-                <button
-                  onClick={logout}
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-                >
-                  Logout
-                </button>
-              </div>
-            </div>
-          </div>
-        </header>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+        {/* Unified App Header with Navigation & Notifications */}
+        <AppHeader />
 
         {/* Main Content */}
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="px-4 py-6 sm:px-0">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                 Dashboard
               </h2>
-              <p className="text-gray-600">Here&apos;s what&apos;s happening with your matches.</p>
+              <p className="text-gray-600 dark:text-gray-400">Here&apos;s what&apos;s happening with your matches.</p>
             </div>
 
             {/* Stats Grid */}
@@ -148,44 +109,8 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
               {/* Main Content - 2 columns */}
               <div className="lg:col-span-2 space-y-6">
-                {/* Recent Activity */}
-                <div className="bg-white rounded-xl border border-gray-200 p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-                      <Zap className="w-5 h-5 text-yellow-500" />
-                      Recent Activity
-                    </h3>
-                    <Link href="/activity" className="text-sm text-purple-600 hover:text-purple-700 font-medium">
-                      View all
-                    </Link>
-                  </div>
-
-                  {activityLoading ? (
-                    <div className="space-y-4">
-                      {[...Array(3)].map((_, i) => (
-                        <div key={i} className="flex items-center gap-4 p-3 animate-pulse">
-                          <div className="w-12 h-12 rounded-full bg-gray-200"></div>
-                          <div className="flex-1">
-                            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : !activity || activity.length === 0 ? (
-                    <div className="text-center py-12">
-                      <Clock className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                      <p className="text-gray-500">No recent activity</p>
-                      <p className="text-sm text-gray-400 mt-1">Start matching to see activity here</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {activity.map((item, idx) => (
-                        <ActivityItem key={idx} activity={item} />
-                      ))}
-                    </div>
-                  )}
-                </div>
+                {/* Real-time Activity Feed with Presence Indicators */}
+                <ActivityFeed maxItems={8} showRefresh />
 
                 {/* Quick Actions */}
                 <div className="bg-white rounded-xl border border-gray-200 p-6">

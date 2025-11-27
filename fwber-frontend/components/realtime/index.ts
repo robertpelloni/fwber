@@ -13,6 +13,7 @@ export {
   OnlineUsersList,
   ConnectionStatusBadge,
   useTypingNotifier,
+  usePresenceContext,
 } from './PresenceComponents';
 
 // Types

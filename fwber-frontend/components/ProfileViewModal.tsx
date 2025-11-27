@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { X } from 'lucide-react'
+import { X, Clock } from 'lucide-react'
 import PhotoRevealGate from './PhotoRevealGate'
 import SecurePhotoReveal from './SecurePhotoReveal'
 import { RelationshipTier } from '@/lib/relationshipTiers'
 import { useFeatureFlag } from '@/lib/hooks/use-feature-flags'
+import { PresenceIndicator, usePresenceContext } from './realtime/PresenceComponents'
 
 interface ProfileViewModalProps {
   isOpen: boolean
@@ -32,6 +33,26 @@ interface ProfileViewModalProps {
 export default function ProfileViewModal({ isOpen, onClose, user, messagesExchanged, matchId }: ProfileViewModalProps) {
   const [isVisible, setIsVisible] = useState(false)
   const { isEnabled: faceRevealEnabled } = useFeatureFlag('face_reveal')
+  const { onlineUsers, lastSeen } = usePresenceContext()
+  
+  // Check if user is online
+  const isUserOnline = onlineUsers.has(user.id)
+  const userLastSeen = lastSeen.get(user.id)
+
+  // Format last seen time
+  const formatLastSeen = (timestamp: number) => {
+    const now = Date.now()
+    const diff = now - timestamp
+    const minutes = Math.floor(diff / 60000)
+    const hours = Math.floor(minutes / 60)
+    const days = Math.floor(hours / 24)
+    
+    if (minutes < 1) return 'Just now'
+    if (minutes < 60) return `${minutes}m ago`
+    if (hours < 24) return `${hours}h ago`
+    if (days < 7) return `${days}d ago`
+    return new Date(timestamp).toLocaleDateString()
+  }
 
   useEffect(() => {
     if (isOpen) {
@@ -95,13 +116,33 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
         
         {/* Header */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center">
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-              {user.profile?.display_name || 'User'}
-            </h2>
-            {user.profile?.age && (
-              <p className="text-sm text-gray-500">{user.profile.age} years old</p>
-            )}
+          <div className="flex items-center gap-3">
+            {/* Presence Indicator */}
+            <PresenceIndicator 
+              userId={user.id} 
+              size="md" 
+              showLabel 
+              className="flex-shrink-0"
+            />
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                {user.profile?.display_name || 'User'}
+              </h2>
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                {user.profile?.age && (
+                  <span>{user.profile.age} years old</span>
+                )}
+                {!isUserOnline && userLastSeen && (
+                  <>
+                    <span>•</span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      Last seen {formatLastSeen(userLastSeen)}
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
           <button 
             onClick={onClose}

@@ -52,7 +52,7 @@ export function PresenceProvider({
 }
 
 // Hook to use the presence context
-function usePresenceContext(): WebSocketContextValue {
+export function usePresenceContext(): WebSocketContextValue {
   const context = useContext(FallbackWebSocketContext);
   return context || defaultContextValue;
 }

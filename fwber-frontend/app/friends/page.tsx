@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { getFriends, getFriendRequests, sendFriendRequest, respondToFriendRequest, removeFriend } from '@/lib/api/friends';
@@ -8,6 +8,8 @@ import FriendList from '@/components/friends/FriendList';
 import FriendRequestList from '@/components/friends/FriendRequestList';
 import UserSearch from '@/components/friends/UserSearch';
 import { searchUsers, type UserProfile } from '@/lib/api/profile';
+import { ConnectionStatusBadge, OnlineUsersList } from '@/components/realtime';
+import { Users, UserPlus, RefreshCw } from 'lucide-react';
 
 export default function FriendsPage() {
   const { token, isAuthenticated } = useAuth();
@@ -16,7 +18,11 @@ export default function FriendsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Get friend IDs for presence tracking
+  const friendIds = useMemo(() => friends.map(f => String(f.id)), [friends]);
 
   const fetchData = async () => {
     if (isAuthenticated && token) {
@@ -39,6 +45,12 @@ export default function FriendsPage() {
   useEffect(() => {
     fetchData();
   }, [isAuthenticated, token]);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await fetchData();
+    setIsRefreshing(false);
+  };
 
   const handleSearch = async () => {
     if (token) {
@@ -88,9 +100,47 @@ export default function FriendsPage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Friends</h1>
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Users className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Friends</h1>
+                <div className="flex items-center gap-2 mt-1">
+                  <ConnectionStatusBadge />
+                  <span className="text-sm text-gray-500">•</span>
+                  <span className="text-sm text-gray-500">{friends.length} friends</span>
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 transition-colors disabled:opacity-50"
+            >
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
+          </div>
 
-          {error && <div className="text-red-500 mb-4">{error}</div>}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+              {error}
+            </div>
+          )}
+
+          {/* Online Friends Summary */}
+          {friends.length > 0 && (
+            <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                <span className="font-medium text-green-800">Friends Online</span>
+              </div>
+              <OnlineUsersList userIds={friendIds} maxDisplay={8} showCount />
+            </div>
+          )}
 
           {/* Search Bar */}
           <div className="mb-8">
