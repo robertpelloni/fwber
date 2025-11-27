@@ -64,6 +64,10 @@ The project has successfully delivered the core MVP scope and **all planned seco
     -   IndexedDB storage for encrypted media.
     -   `useVault` hook with initialize, unlock, lock, add, remove, export operations.
     -   Passphrase strength checking and security warnings.
+9.  **Mobile Experience (PWA)** (Nov 27 - Complete):
+    -   `next-pwa` integrated for offline support and caching.
+    -   Web App Manifest configured for installability.
+    -   Service Worker strategy implemented (Network First for API, Cache First for static).
 
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.

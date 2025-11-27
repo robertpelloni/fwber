@@ -4,6 +4,12 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 const { withSentryConfig } = require('@sentry/nextjs');
+const withPWA = require('next-pwa')({
+  dest: 'public',
+  disable: process.env.NODE_ENV === 'development',
+  register: true,
+  skipWaiting: true,
+});
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -172,4 +178,4 @@ const sentryWebpackPluginOptions = {
 };
 
 // Make sure adding Sentry options is the last code to run before exporting
-module.exports = withSentryConfig(nextConfig, sentryWebpackPluginOptions);
+module.exports = withSentryConfig(withPWA(nextConfig), sentryWebpackPluginOptions);
