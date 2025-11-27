@@ -9,6 +9,7 @@ use App\Services\ShadowThrottleService;
 use App\Services\GeoSpoofDetectionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ProximityArtifactController extends Controller
 {
@@ -50,29 +51,38 @@ class ProximityArtifactController extends Controller
         $lat = (float)$request->lat;
         $lng = (float)$request->lng;
         $radius = (int)($request->radius ?? 1000);
+        $type = $request->type ?? 'all';
 
-        $q = ProximityArtifact::query()->active()->withinBox($lat, $lng, $radius);
-        if ($request->filled('type')) {
-            $q->type($request->type);
-        }
+        // Round coordinates to ~110m precision for caching grid
+        $gridLat = round($lat, 3);
+        $gridLng = round($lng, 3);
+        
+        $cacheKey = "proximity:feed:lat:{$gridLat}:lng:{$gridLng}:radius:{$radius}:type:{$type}";
 
-        $artifacts = $q->orderByDesc('created_at')->limit(100)->get()
-            ->map(function (ProximityArtifact $a) {
-                return [
-                    'id' => $a->id,
-                    'type' => $a->type,
-                    'content' => $a->content,
-                    'lat' => $a->fuzzed_latitude,
-                    'lng' => $a->fuzzed_longitude,
-                    'radius' => $a->visibility_radius_m,
-                    'expires_at' => $a->expires_at?->toIso8601String(),
-                    'moderation_status' => $a->moderation_status,
-                    'meta' => $a->meta,
-                    'user_id' => $a->user_id,
-                ];
-            });
+        $artifacts = Cache::remember($cacheKey, 60, function () use ($lat, $lng, $radius, $request) {
+            $q = ProximityArtifact::query()->active()->withinBox($lat, $lng, $radius);
+            if ($request->filled('type')) {
+                $q->type($request->type);
+            }
 
-        return response()->json(['artifacts' => $artifacts]);
+            return $q->orderByDesc('created_at')->limit(100)->get()
+                ->map(function (ProximityArtifact $a) {
+                    return [
+                        'id' => $a->id,
+                        'type' => $a->type,
+                        'content' => $a->content,
+                        'lat' => $a->fuzzed_latitude,
+                        'lng' => $a->fuzzed_longitude,
+                        'radius' => $a->visibility_radius_m,
+                        'expires_at' => $a->expires_at?->toIso8601String(),
+                        'moderation_status' => $a->moderation_status,
+                        'meta' => $a->meta,
+                        'user_id' => $a->user_id,
+                    ];
+                });
+        });
+
+        return response()->json(['artifacts' => $artifacts, 'meta' => ['cache_hit' => Cache::has($cacheKey)]]);
     }
 
     /**
@@ -316,52 +326,67 @@ class ProximityArtifactController extends Controller
         $lng = (float)$request->lng;
         $radius = (int)($request->radius ?? 1000);
 
-        // Get proximity artifacts with shadow throttle filtering
-        $artifacts = ProximityArtifact::query()
-            ->active()
-            ->withinBox($lat, $lng, $radius)
-            ->orderByDesc('created_at')
-            ->limit(100) // Get more, then filter and limit
-            ->get()
-            ->filter(function (ProximityArtifact $a) {
-                // Apply shadow throttle probabilistic filtering
-                $visibility = $this->shadowThrottleService->getVisibilityMultiplier($a->user_id);
-                
-                if ($visibility >= 1.0) {
-                    return true; // Always show if not throttled
-                }
-                
-                // Probabilistic inclusion based on visibility multiplier
-                return (mt_rand() / mt_getrandmax()) < $visibility;
-            })
-            ->take(20) // Limit to 20 after filtering
-            ->map(function (ProximityArtifact $a) {
-                return [
-                    'id' => $a->id,
-                    'type' => $a->type,
-                    'content' => $a->content,
-                    'lat' => $a->fuzzed_latitude,
-                    'lng' => $a->fuzzed_longitude,
-                    'radius' => $a->visibility_radius_m,
-                    'expires_at' => $a->expires_at?->toIso8601String(),
-                    'created_at' => $a->created_at?->toIso8601String(),
-                ];
-            });
+        // Round coordinates to ~110m precision for caching grid
+        $gridLat = round($lat, 3);
+        $gridLng = round($lng, 3);
 
-        // Get nearby match candidates (lightweight previews)
-        $candidates = $this->getNearbyCompatibleCandidates($user, $profile, $lat, $lng, $radius, 10);
+        $cacheKey = "proximity:pulse:user:{$user->id}:lat:{$gridLat}:lng:{$gridLng}:radius:{$radius}";
 
-        return response()->json([
-            'artifacts' => $artifacts,
-            'candidates' => $candidates,
-            'meta' => [
-                'center_lat' => $lat,
-                'center_lng' => $lng,
-                'radius_m' => $radius,
-                'artifacts_count' => $artifacts->count(),
-                'candidates_count' => count($candidates),
-            ],
-        ]);
+        // Cache for 2 minutes
+        $response = Cache::remember($cacheKey, 120, function () use ($user, $profile, $lat, $lng, $radius) {
+            // Get proximity artifacts with shadow throttle filtering
+            $artifacts = ProximityArtifact::query()
+                ->active()
+                ->withinBox($lat, $lng, $radius)
+                ->orderByDesc('created_at')
+                ->limit(100) // Get more, then filter and limit
+                ->get()
+                ->filter(function (ProximityArtifact $a) {
+                    // Apply shadow throttle probabilistic filtering
+                    $visibility = $this->shadowThrottleService->getVisibilityMultiplier($a->user_id);
+                    
+                    if ($visibility >= 1.0) {
+                        return true; // Always show if not throttled
+                    }
+                    
+                    // Probabilistic inclusion based on visibility multiplier
+                    return (mt_rand() / mt_getrandmax()) < $visibility;
+                })
+                ->take(20) // Limit to 20 after filtering
+                ->map(function (ProximityArtifact $a) {
+                    return [
+                        'id' => $a->id,
+                        'type' => $a->type,
+                        'content' => $a->content,
+                        'lat' => $a->fuzzed_latitude,
+                        'lng' => $a->fuzzed_longitude,
+                        'radius' => $a->visibility_radius_m,
+                        'expires_at' => $a->expires_at?->toIso8601String(),
+                        'created_at' => $a->created_at?->toIso8601String(),
+                    ];
+                });
+
+            // Get nearby match candidates (lightweight previews)
+            $candidates = $this->getNearbyCompatibleCandidates($user, $profile, $lat, $lng, $radius, 10);
+
+            return [
+                'artifacts' => $artifacts,
+                'candidates' => $candidates,
+                'meta' => [
+                    'center_lat' => $lat,
+                    'center_lng' => $lng,
+                    'radius_m' => $radius,
+                    'artifacts_count' => $artifacts->count(),
+                    'candidates_count' => count($candidates),
+                    'generated_at' => now()->toISOString(),
+                ],
+            ];
+        });
+
+        // Add cache hit status to meta (outside the cached array)
+        $response['meta']['cache_hit'] = Cache::has($cacheKey);
+
+        return response()->json($response);
     }
 
     /**

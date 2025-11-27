@@ -3,17 +3,18 @@
 This document establishes shared standards for all AI assistants and tools working on this repository.
 
 ## Mission and scope
-- **Current Phase**: Post-MVP / Secondary Systems.
+- **Current Phase**: Production Hardening.
 - **Completed MVP**: Auth, Profile, Dashboard, Matches, Direct Messages, Photos, Safety, Physical Profile, Location, Proximity Artifacts.
-- **Active Focus**: Refinement of Secondary Systems (Recommendations, AI Content, Chatrooms) and Real-time features (WebSocket/Mercure).
+- **Completed Secondary Systems**: Recommendations, AI Content, Chatrooms, Real-time (WebSocket/Mercure), Face Reveal, Admin Tools.
+- **Active Focus**: Performance Optimization, Security Auditing, Monitoring & Observability, Mobile Experience (PWA).
 
 ## Standard workflow
-1. **Check Status**: Read `PROJECT_STATUS_2025-11-24.md` for the latest state.
+1. **Check Status**: Read `PROJECT_STATUS.md` for the latest state.
 2. **Understand**: Read only what you need.
 3. **Plan**: Maintain a concise checklist.
 4. **Implement**: Small, targeted patches.
 5. **Test**: Verify routes and run Cypress tests.
-6. **Document**: Update `PROJECT_STATUS_2025-11-24.md` if significant milestones are reached.
+6. **Document**: Update `PROJECT_STATUS.md` if significant milestones are reached.
 
 ## Guardrails (Do/Don’t)
 - Do gate non‑MVP routes with `->middleware('feature:<flag>')`.
@@ -23,7 +24,7 @@ This document establishes shared standards for all AI assistants and tools worki
 - Don’t refactor broadly or change formatting unrelated to the task.
 
 ## Handover notes
-- **Primary Status Doc**: `PROJECT_STATUS_2025-11-24.md`.
+- **Primary Status Doc**: `PROJECT_STATUS.md`.
 - **Feature Flags**: See `docs/FEATURE_FLAGS.md`.
 - **Workflow**: See `docs/guides/WORKFLOW_GUIDE.md`.
 

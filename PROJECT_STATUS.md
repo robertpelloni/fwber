@@ -1,4 +1,7 @@
-# Project Status & Roadmap (November 27, 2025)
+# Project Status
+
+**Last Updated:** November 27, 2025
+**Status:** Production Hardening Phase
 
 ## 🟢 Current Status: MVP Complete + All Secondary Systems Implemented
 The project has successfully delivered the core MVP scope and **all planned secondary feature sets**. The application is feature-complete for production release.
@@ -25,10 +28,17 @@ The project has successfully delivered the core MVP scope and **all planned seco
 2.  **Recommendations Engine**:
     -   AI-powered, location-based, and collaborative filtering recommendations.
     -   Trending content feed.
-3.  **Proximity Chatrooms**:
+    -   **Performance**: Redis caching implemented for index, trending, and feed endpoints (5-30m TTL).
+3.  **Proximity Artifacts (Local Pulse)**:
+    -   Ephemeral, location-based content feed.
+    -   **Performance**: Grid-based spatial caching (~110m precision) for high-traffic feeds.
+4.  **Matches System**:
+    -   Matching logic, listing, and interaction.
+    -   **Performance**: Redis caching for match feeds and established match lists with tag-based invalidation.
+5.  **Proximity Chatrooms**:
     -   Location-based chat rooms with "enter/leave" mechanics.
     -   Real-time messaging within rooms.
-4.  **Face Reveal** (Nov 27 - Complete):
+6.  **Face Reveal** (Nov 27 - Complete):
     -   Progressive photo reveal mechanics based on relationship tiers.
     -   Frontend UI integrated with feature flag gating (`NEXT_PUBLIC_FEATURE_FACE_REVEAL`).
     -   `PhotoRevealGate`, `FaceReveal`, and `SecurePhotoReveal` components fully implemented.
@@ -78,7 +88,8 @@ The project has successfully delivered the core MVP scope and **all planned seco
     -   `AGENTS.md`: Operational guide for AI agents.
     -   `API_DOCS.md`: API reference.
     -   `FEATURE_FLAGS.md`: Feature flag management.
-    -   `docs/roadmap/ROADMAP_REFRESH_2025-11-25.md`: Latest roadmap priorities.
+    -   `ROADMAP.md`: Future roadmap and priorities.
+    -   `DEPLOYMENT.md`: Production deployment guide.
 
 ## 🛠 Maintenance & Cleanup
 -   **Documentation**: Consolidated into this file and `AGENTS.md`. Old status reports archived.
@@ -86,9 +97,4 @@ The project has successfully delivered the core MVP scope and **all planned seco
 -   **Feature Flags**: See `docs/FEATURE_FLAGS.md` for complete list and configuration.
 
 ## 🚀 Next Phase: Production Hardening
-With all secondary systems complete, the next phase focuses on:
-1.  **Performance Optimization**: Caching strategies, query optimization, CDN setup.
-2.  **Security Audit**: Penetration testing, dependency scanning, rate limit tuning.
-3.  **Monitoring & Alerting**: APM integration, error tracking, uptime monitoring.
-4.  **Documentation**: User guides, API versioning, deployment runbooks.
-5.  **Mobile Optimization**: PWA enhancements, push notifications, offline support.
+See `docs/ROADMAP.md` for the detailed plan.

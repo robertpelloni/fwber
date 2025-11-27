@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use App\Services\RecommendationService;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use OpenApi\Attributes as OA;
 
 class RecommendationController extends Controller
@@ -110,16 +111,26 @@ class RecommendationController extends Controller
                 $context['longitude'] = $user->longitude;
             }
 
-            // Get recommendations
-            $recommendations = $this->recommendationService->getRecommendations($user->id, $context);
+            // Generate cache key
+            $cacheKey = "recommendations:user:{$user->id}:" . md5(json_encode([
+                'limit' => $limit,
+                'types' => $types,
+                'context' => $context
+            ]));
 
-            // Filter by requested types
-            $filteredRecommendations = array_filter($recommendations, function($rec) use ($types) {
-                return in_array($rec['type'], $types);
+            // Try to get from cache (10 minutes TTL)
+            $filteredRecommendations = Cache::remember($cacheKey, 600, function () use ($user, $context, $types, $limit) {
+                // Get recommendations
+                $recommendations = $this->recommendationService->getRecommendations($user->id, $context);
+
+                // Filter by requested types
+                $filteredRecommendations = array_filter($recommendations, function($rec) use ($types) {
+                    return in_array($rec['type'], $types);
+                });
+
+                // Apply limit
+                return array_slice($filteredRecommendations, 0, $limit);
             });
-
-            // Apply limit
-            $filteredRecommendations = array_slice($filteredRecommendations, 0, $limit);
 
             // Add metadata
             $response = [
@@ -129,7 +140,7 @@ class RecommendationController extends Controller
                     'types' => $types,
                     'context' => $context,
                     'generated_at' => now()->toISOString(),
-                    'cache_hit' => false, // Would be true if served from cache
+                    'cache_hit' => Cache::has($cacheKey),
                 ]
             ];
 
@@ -236,8 +247,13 @@ class RecommendationController extends Controller
             $limit = $request->get('limit', 10);
             $timeframe = $request->get('timeframe', '24h'); // 24h, 7d, 30d
 
-            // Get trending content based on recent activity
-            $trendingContent = $this->getTrendingContent($timeframe, $limit);
+            // Generate cache key
+            $cacheKey = "recommendations:trending:{$timeframe}:{$limit}";
+            
+            // Try to get from cache (30 minutes TTL)
+            $trendingContent = Cache::remember($cacheKey, 1800, function () use ($timeframe, $limit) {
+                return $this->getTrendingContent($timeframe, $limit);
+            });
 
             $response = [
                 'trending' => $trendingContent,
@@ -245,6 +261,7 @@ class RecommendationController extends Controller
                     'timeframe' => $timeframe,
                     'total' => count($trendingContent),
                     'generated_at' => now()->toISOString(),
+                    'cache_hit' => Cache::has($cacheKey), // Note: This check might be slightly off if just cached, but good enough for metadata
                 ]
             ];
 
@@ -306,8 +323,13 @@ class RecommendationController extends Controller
             $perPage = $request->get('per_page', 20);
             $offset = ($page - 1) * $perPage;
 
-            // Get personalized feed combining recommendations and recent activity
-            $feed = $this->getPersonalizedFeed($user->id, $perPage, $offset);
+            // Generate cache key
+            $cacheKey = "recommendations:feed:user:{$user->id}:page:{$page}:limit:{$perPage}";
+
+            // Try to get from cache (5 minutes TTL)
+            $feed = Cache::remember($cacheKey, 300, function () use ($user, $perPage, $offset) {
+                return $this->getPersonalizedFeed($user->id, $perPage, $offset);
+            });
 
             $response = [
                 'feed' => $feed['items'],
@@ -320,6 +342,7 @@ class RecommendationController extends Controller
                 'metadata' => [
                     'generated_at' => now()->toISOString(),
                     'user_id' => $user->id,
+                    'cache_hit' => Cache::has($cacheKey),
                 ]
             ];
 

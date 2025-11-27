@@ -135,10 +135,10 @@ class MatchController extends Controller
             'height_min' => 'nullable|integer|min:120|max:250',
         ]);
 
-        // Cache feed for 60 seconds per user with filter params
+        // Cache feed for 5 minutes per user with filter params
         $cacheKey = "feed:user_{$user->id}:" . md5($request->getQueryString() ?? '');
         
-        $matches = Cache::remember($cacheKey, 60, function () use ($user, $profile, $request) {
+        $matches = Cache::tags(["matches_feed:user_{$user->id}"])->remember($cacheKey, 300, function () use ($user, $profile, $request) {
             $filters = [
                 'age_min' => $request->get('age_min'),
                 'age_max' => $request->get('age_max'),
@@ -195,41 +195,45 @@ class MatchController extends Controller
     {
         $user = auth()->user();
         
-        $matches = DB::table('matches')
-            ->where('user1_id', $user->id)
-            ->orWhere('user2_id', $user->id)
-            ->get();
+        $cacheKey = "matches:established:user_{$user->id}";
 
-        $userIds = $matches->map(function ($match) use ($user) {
-            return $match->user1_id === $user->id ? $match->user2_id : $match->user1_id;
-        });
+        $conversations = Cache::tags(["matches_list:user_{$user->id}"])->remember($cacheKey, 60, function () use ($user) {
+            $matches = DB::table('matches')
+                ->where('user1_id', $user->id)
+                ->orWhere('user2_id', $user->id)
+                ->get();
 
-        $users = User::with(['profile', 'photos'])->whereIn('id', $userIds)->get();
-
-        // Format as "Conversation" objects for frontend compatibility
-        $conversations = $users->map(function ($otherUser) use ($user, $matches) {
-            // Find the match record
-            $match = $matches->first(function ($m) use ($user, $otherUser) {
-                return ($m->user1_id === $user->id && $m->user2_id === $otherUser->id) ||
-                       ($m->user1_id === $otherUser->id && $m->user2_id === $user->id);
+            $userIds = $matches->map(function ($match) use ($user) {
+                return $match->user1_id === $user->id ? $match->user2_id : $match->user1_id;
             });
 
-            // Get last message
-            $lastMessage = \App\Models\Message::where(function ($q) use ($user, $otherUser) {
-                $q->where('sender_id', $user->id)->where('receiver_id', $otherUser->id);
-            })->orWhere(function ($q) use ($user, $otherUser) {
-                $q->where('sender_id', $otherUser->id)->where('receiver_id', $user->id);
-            })->latest()->first();
+            $users = User::with(['profile', 'photos'])->whereIn('id', $userIds)->get();
 
-            return [
-                'id' => $match->id, // Match ID acts as conversation ID
-                'user1_id' => $match->user1_id,
-                'user2_id' => $match->user2_id,
-                'created_at' => $match->created_at,
-                'updated_at' => $match->updated_at,
-                'last_message' => $lastMessage,
-                'other_user' => $otherUser,
-            ];
+            // Format as "Conversation" objects for frontend compatibility
+            return $users->map(function ($otherUser) use ($user, $matches) {
+                // Find the match record
+                $match = $matches->first(function ($m) use ($user, $otherUser) {
+                    return ($m->user1_id === $user->id && $m->user2_id === $otherUser->id) ||
+                           ($m->user1_id === $otherUser->id && $m->user2_id === $user->id);
+                });
+
+                // Get last message
+                $lastMessage = \App\Models\Message::where(function ($q) use ($user, $otherUser) {
+                    $q->where('sender_id', $user->id)->where('receiver_id', $otherUser->id);
+                })->orWhere(function ($q) use ($user, $otherUser) {
+                    $q->where('sender_id', $otherUser->id)->where('receiver_id', $user->id);
+                })->latest()->first();
+
+                return [
+                    'id' => $match->id, // Match ID acts as conversation ID
+                    'user1_id' => $match->user1_id,
+                    'user2_id' => $match->user2_id,
+                    'created_at' => $match->created_at,
+                    'updated_at' => $match->updated_at,
+                    'last_message' => $lastMessage,
+                    'other_user' => $otherUser,
+                ];
+            });
         });
 
         return response()->json(['data' => $conversations]);
@@ -301,6 +305,9 @@ class MatchController extends Controller
 
         // Record the action
         $this->recordMatchAction($user->id, $targetUserId, $action);
+
+        // Invalidate feed cache so the user doesn't see this person again immediately
+        Cache::tags(["matches_feed:user_{$user->id}"])->flush();
 
         // Check for mutual match
         $isMatch = $this->checkForMatch($user->id, $targetUserId);
@@ -559,6 +566,10 @@ class MatchController extends Controller
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
+
+                // Invalidate established matches cache for both users
+                Cache::tags(["matches_list:user_{$user1}"])->flush();
+                Cache::tags(["matches_list:user_{$user2}"])->flush();
 
                 // Send email notifications to both users
                 $emailService = app(\App\Services\EmailNotificationService::class);
