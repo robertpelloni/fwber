@@ -13,45 +13,8 @@ class AdvancedRateLimitingService
 
     public function __construct()
     {
-        $this->config = config('rate_limiting', [
-            'default_capacity' => 100,
-            'default_refill_rate' => 10,
-            'redis_prefix' => 'rate_limit',
-            'cleanup_interval' => 3600, // 1 hour
-        ]);
-
-        $this->actionConfigs = [
-            'content_generation' => [
-                'capacity' => 10,
-                'refill_rate' => 1,
-                'cost_per_request' => 1,
-                'burst_allowance' => 5,
-            ],
-            'bulletin_post' => [
-                'capacity' => 20,
-                'refill_rate' => 2,
-                'cost_per_request' => 1,
-                'burst_allowance' => 10,
-            ],
-            'location_update' => [
-                'capacity' => 50,
-                'refill_rate' => 5,
-                'cost_per_request' => 1,
-                'burst_allowance' => 25,
-            ],
-            'photo_upload' => [
-                'capacity' => 15,
-                'refill_rate' => 1,
-                'cost_per_request' => 2,
-                'burst_allowance' => 5,
-            ],
-            'api_call' => [
-                'capacity' => 1000,
-                'refill_rate' => 100,
-                'cost_per_request' => 1,
-                'burst_allowance' => 200,
-            ],
-        ];
+        $this->config = config('rate_limiting');
+        $this->actionConfigs = config('rate_limiting.actions');
     }
 
     /**

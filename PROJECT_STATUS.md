@@ -35,6 +35,7 @@ The project has successfully delivered the core MVP scope and **all planned seco
 4.  **Matches System**:
     -   Matching logic, listing, and interaction.
     -   **Performance**: Redis caching for match feeds and established match lists with tag-based invalidation.
+    -   **Database**: Performance indexes added for geospatial queries (`user_profiles`) and feed filtering (`proximity_artifacts`).
 5.  **Proximity Chatrooms**:
     -   Location-based chat rooms with "enter/leave" mechanics.
     -   Real-time messaging within rooms.
@@ -68,8 +69,7 @@ The project has successfully delivered the core MVP scope and **all planned seco
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.
 2.  **API Documentation**: OpenAPI/Swagger docs available at `/api/docs`.
 3.  **E2E Testing**: Comprehensive Cypress test suite covering all major flows.
-4.  **Admin Tools**: Analytics, moderation, rate limiting, and feature flag management ready.
-5.  **Real-time**: WebSocket/Mercure infrastructure with fallback support.
+4.  **Admin Tools**: Analytics, moderation, rate limiting, and feature flag management ready.    -   **Security**: Advanced Rate Limiting configured and applied to critical endpoints (Content Gen, Photos, Location).5.  **Real-time**: WebSocket/Mercure infrastructure with fallback support.
 
 ## 📂 Project Structure Overview
 -   **`fwber-backend/`**: Laravel 12 API.

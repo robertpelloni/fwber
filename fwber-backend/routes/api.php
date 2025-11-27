@@ -166,7 +166,7 @@ Route::middleware("api")->group(function (): void {
         
         // Photo routes (Phase 4A - Multi-AI Photo Upload System)
         Route::get("/photos", [PhotoController::class, "index"]);
-        Route::post("/photos", [PhotoController::class, "store"]);
+        Route::middleware('rate.limit:photo_upload')->post("/photos", [PhotoController::class, "store"]);
         Route::put("/photos/{id}", [PhotoController::class, "update"]);
         Route::delete("/photos/{id}", [PhotoController::class, "destroy"]);
         Route::post("/photos/reorder", [PhotoController::class, "reorder"]);
@@ -177,7 +177,7 @@ Route::middleware("api")->group(function (): void {
 
         // Location routes (Phase 5A - Location-Based Social Features)
         Route::get("/location", [LocationController::class, "show"]);
-        Route::post("/location", [LocationController::class, "update"]);
+        Route::middleware('rate.limit:location_update')->post("/location", [LocationController::class, "update"]);
         Route::put("/location/privacy", [LocationController::class, "updatePrivacy"]);
         Route::delete("/location", [LocationController::class, "clear"]);
         Route::get("/location/nearby", [LocationController::class, "nearby"]);
@@ -198,7 +198,7 @@ Route::middleware("api")->group(function (): void {
         Route::get("/bulletin-boards", [BulletinBoardController::class, "index"]);
         Route::get("/bulletin-boards/{id}", [BulletinBoardController::class, "show"]);
         Route::post("/bulletin-boards", [BulletinBoardController::class, "createOrFind"]);
-        Route::middleware('throttle:bulletin-message')->group(function () {
+        Route::middleware('rate.limit:bulletin_post')->group(function () {
             Route::post("/bulletin-boards/{id}/messages", [BulletinBoardController::class, "postMessage"]);
         });
         Route::get("/bulletin-boards/{id}/messages", [BulletinBoardController::class, "getMessages"]);
@@ -300,9 +300,9 @@ Route::middleware("api")->group(function (): void {
             });
 
             // Content Generation routes (AI-powered content creation and optimization)
-            // Apply a simple throttle to match test expectations (5 requests/minute allowed per user)
-            Route::prefix("content-generation")->middleware('feature:content_generation')->group(function (): void {
-                Route::middleware('throttle:5,1')->post("/profile", [ContentGenerationController::class, "generateProfileContent"]);
+            // Apply advanced rate limiting (content_generation bucket)
+            Route::prefix("content-generation")->middleware(['feature:content_generation', 'rate.limit:content_generation'])->group(function (): void {
+                Route::post("/profile", [ContentGenerationController::class, "generateProfileContent"]);
                 Route::post("/posts/{boardId}/suggestions", [ContentGenerationController::class, "generatePostSuggestions"]);
                 Route::post("/conversation-starters", [ContentGenerationController::class, "generateConversationStarters"]);
                 Route::post("/optimize", [ContentGenerationController::class, "optimizeContent"]);
