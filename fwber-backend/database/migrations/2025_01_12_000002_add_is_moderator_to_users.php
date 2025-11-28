@@ -9,7 +9,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->boolean('is_moderator')->default(false)->after('email');
+            if (!Schema::hasColumn('users', 'is_moderator')) {
+                $table->boolean('is_moderator')->default(false)->after('email');
+            }
         });
     }
 

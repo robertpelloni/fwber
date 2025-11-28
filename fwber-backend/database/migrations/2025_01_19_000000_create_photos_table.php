@@ -21,28 +21,30 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('photos', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('filename');
-            $table->string('original_filename');
-            $table->string('file_path');
-            $table->string('thumbnail_path')->nullable();
-            $table->string('mime_type');
-            $table->integer('file_size');
-            $table->integer('width')->nullable();
-            $table->integer('height')->nullable();
-            $table->boolean('is_primary')->default(false);
-            $table->boolean('is_private')->default(false);
-            $table->integer('sort_order')->default(0);
-            $table->json('metadata')->nullable();
-            $table->timestamps();
-            
-            // Indexes for performance
-            $table->index(['user_id', 'is_primary']);
-            $table->index(['user_id', 'sort_order']);
-            $table->index(['user_id', 'is_private']);
-        });
+        if (!Schema::hasTable('photos')) {
+            Schema::create('photos', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+                $table->string('filename');
+                $table->string('original_filename');
+                $table->string('file_path');
+                $table->string('thumbnail_path')->nullable();
+                $table->string('mime_type');
+                $table->integer('file_size');
+                $table->integer('width')->nullable();
+                $table->integer('height')->nullable();
+                $table->boolean('is_primary')->default(false);
+                $table->boolean('is_private')->default(false);
+                $table->integer('sort_order')->default(0);
+                $table->json('metadata')->nullable();
+                $table->timestamps();
+                
+                // Indexes for performance
+                $table->index(['user_id', 'is_primary']);
+                $table->index(['user_id', 'sort_order']);
+                $table->index(['user_id', 'is_private']);
+            });
+        }
     }
 
     /**

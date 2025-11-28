@@ -11,22 +11,24 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('messages', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('receiver_id')->constrained('users')->onDelete('cascade');
-            $table->text('content');
-            $table->enum('message_type', ['text', 'image', 'video', 'audio', 'file'])->default('text');
-            $table->boolean('is_read')->default(false);
-            $table->timestamp('sent_at');
-            $table->timestamp('read_at')->nullable();
-            $table->timestamps();
-            
-            // Index for performance
-            $table->index(['sender_id', 'receiver_id', 'sent_at']);
-            $table->index(['receiver_id', 'is_read']);
-            $table->index('sent_at');
-        });
+        if (!Schema::hasTable('messages')) {
+            Schema::create('messages', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
+                $table->foreignId('receiver_id')->constrained('users')->onDelete('cascade');
+                $table->text('content');
+                $table->enum('message_type', ['text', 'image', 'video', 'audio', 'file'])->default('text');
+                $table->boolean('is_read')->default(false);
+                $table->timestamp('sent_at');
+                $table->timestamp('read_at')->nullable();
+                $table->timestamps();
+                
+                // Index for performance
+                $table->index(['sender_id', 'receiver_id', 'sent_at']);
+                $table->index(['receiver_id', 'is_read']);
+                $table->index('sent_at');
+            });
+        }
     }
 
     /**
