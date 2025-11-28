@@ -234,7 +234,7 @@ if [ "$SKIP_BACKUP" = false ] && [ "$SKIP_MIGRATIONS" = false ]; then
             DB_PASSWORD=$(grep "^DB_PASSWORD=" .env | cut -d '=' -f2)
             
             if [ "$DRY_RUN" = false ]; then
-                mysqldump -h$DB_HOST -P$DB_PORT -u$DB_USERNAME -p$DB_PASSWORD $DB_DATABASE > $BACKUP_FILE
+                mysqldump --no-tablespaces -h$DB_HOST -P$DB_PORT -u$DB_USERNAME -p$DB_PASSWORD $DB_DATABASE > $BACKUP_FILE
                 log_success "Database backup created: $BACKUP_FILE"
             else
                 log_info "[DRY RUN] Would create backup: $BACKUP_FILE"
