@@ -427,10 +427,12 @@ class ProximityArtifactController extends Controller
         $ageMax = $profile->preferences['age_range']['max'] ?? 100;
         
         $query->whereHas('profile', function ($q) use ($ageMin, $ageMax) {
-            $q->whereRaw("(julianday('now') - julianday(date_of_birth)) / 365.25 BETWEEN ? AND ?", [
-                $ageMin,
-                $ageMax
-            ]);
+            // Support both SQLite (testing) and MySQL (production)
+            $sql = \Illuminate\Support\Facades\DB::connection()->getDriverName() === 'sqlite'
+                ? "(julianday('now') - julianday(date_of_birth)) / 365.25 BETWEEN ? AND ?"
+                : "TIMESTAMPDIFF(YEAR, date_of_birth, NOW()) BETWEEN ? AND ?";
+
+            $q->whereRaw($sql, [$ageMin, $ageMax]);
         });
 
         // Exclude users already interacted with
