@@ -10,3 +10,6 @@ Artisan::command('inspire', function () {
 
 // Schedule relationship tier updates daily at midnight
 Schedule::command('tiers:update-days')->daily();
+
+// Schedule system data pruning daily at 03:00
+Schedule::command('system:prune-data')->dailyAt('03:00');

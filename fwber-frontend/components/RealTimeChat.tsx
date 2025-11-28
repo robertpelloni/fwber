@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useWebSocketChat, ChatMessage, OnlineUser, useWebSocket } from '@/lib/hooks/use-websocket';
-import { useAuth } from '@/lib/contexts/AuthContext';
+import { useAuth } from '@/lib/auth-context';
 import { MessageMetadata } from '@/components/MessageStatusIndicator';
 import { UserAvatar, PresenceIndicator, PresenceStatus } from '@/components/PresenceIndicator';
 
