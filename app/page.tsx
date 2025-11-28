@@ -38,13 +38,12 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <Link href="/" className="flex-shrink-0 flex items-center gap-0.5">
-                <span className="text-3xl font-black tracking-tighter text-blue-600">F</span>
-                <span className="text-3xl font-black tracking-tighter text-red-500">W</span>
-                <span className="text-3xl font-black tracking-tighter text-yellow-500">B</span>
-                <span className="text-3xl font-black tracking-tighter text-green-600">e</span>
-                <span className="text-3xl font-black tracking-tighter text-purple-600">r</span>
-                <span className="text-xl font-bold text-gray-400 ml-0.5">.me</span>
+              <Link href="/" className="flex-shrink-0 flex items-center gap-0.5 hover:scale-105 transition-transform duration-200">
+                <span className="text-4xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-pink-500 to-pink-700 [-webkit-text-stroke:1.5px_black] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">F</span>
+                <span className="text-4xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-green-400 to-green-600 [-webkit-text-stroke:1.5px_black] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">W</span>
+                <span className="text-4xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-cyan-400 to-blue-600 [-webkit-text-stroke:1.5px_black] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">B</span>
+                <span className="text-4xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-purple-500 to-purple-700 [-webkit-text-stroke:1.5px_black] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">er</span>
+                <span className="text-xl font-bold text-gray-400 ml-1 self-end mb-1">.me</span>
               </Link>
             </div>
             
@@ -225,12 +224,11 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-8 md:mb-0">
               <div className="flex items-baseline gap-0.5">
-                <span className="text-2xl font-black tracking-tighter text-blue-600">F</span>
-                <span className="text-2xl font-black tracking-tighter text-red-500">W</span>
-                <span className="text-2xl font-black tracking-tighter text-yellow-500">B</span>
-                <span className="text-2xl font-black tracking-tighter text-green-600">e</span>
-                <span className="text-2xl font-black tracking-tighter text-purple-600">r</span>
-                <span className="text-lg font-bold text-gray-400 ml-0.5">.me</span>
+                <span className="text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-pink-500 to-pink-700 [-webkit-text-stroke:1px_black] drop-shadow-sm">F</span>
+                <span className="text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-green-400 to-green-600 [-webkit-text-stroke:1px_black] drop-shadow-sm">W</span>
+                <span className="text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-cyan-400 to-blue-600 [-webkit-text-stroke:1px_black] drop-shadow-sm">B</span>
+                <span className="text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-purple-500 to-purple-700 [-webkit-text-stroke:1px_black] drop-shadow-sm">er</span>
+                <span className="text-lg font-bold text-gray-400 ml-1">.me</span>
               </div>
               <p className="text-gray-500 mt-2">© 2025 FWBer. All rights reserved.</p>
             </div>
