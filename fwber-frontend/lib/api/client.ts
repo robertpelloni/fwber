@@ -13,7 +13,13 @@ import type {
   PaginatedResponse,
 } from './types';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+// Ensure BASE_URL always ends with /api to prevent 404s on shared hosting
+const getBaseUrl = () => {
+  const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+  return url.endsWith('/api') ? url : `${url}/api`;
+};
+
+const BASE_URL = getBaseUrl();
 
 export interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>;
