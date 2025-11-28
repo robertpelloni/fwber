@@ -38,9 +38,13 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <Link href="/" className="flex-shrink-0 flex items-center">
-                <span className="text-2xl font-bold text-blue-600">FWBer</span>
-                <span className="text-2xl font-bold text-gray-900">.me</span>
+              <Link href="/" className="flex-shrink-0 flex items-center gap-0.5">
+                <span className="text-3xl font-black tracking-tighter text-blue-600">F</span>
+                <span className="text-3xl font-black tracking-tighter text-red-500">W</span>
+                <span className="text-3xl font-black tracking-tighter text-yellow-500">B</span>
+                <span className="text-3xl font-black tracking-tighter text-green-600">e</span>
+                <span className="text-3xl font-black tracking-tighter text-purple-600">r</span>
+                <span className="text-xl font-bold text-gray-400 ml-0.5">.me</span>
               </Link>
             </div>
             
@@ -220,7 +224,14 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-8 md:mb-0">
-              <span className="text-2xl font-bold text-gray-900">FWBer.me</span>
+              <div className="flex items-baseline gap-0.5">
+                <span className="text-2xl font-black tracking-tighter text-blue-600">F</span>
+                <span className="text-2xl font-black tracking-tighter text-red-500">W</span>
+                <span className="text-2xl font-black tracking-tighter text-yellow-500">B</span>
+                <span className="text-2xl font-black tracking-tighter text-green-600">e</span>
+                <span className="text-2xl font-black tracking-tighter text-purple-600">r</span>
+                <span className="text-lg font-bold text-gray-400 ml-0.5">.me</span>
+              </div>
               <p className="text-gray-500 mt-2">© 2025 FWBer. All rights reserved.</p>
             </div>
             <div className="flex space-x-8">
