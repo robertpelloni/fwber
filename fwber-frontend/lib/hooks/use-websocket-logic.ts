@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useAuth } from '@/lib/contexts/AuthContext';
+import { useAuth } from '@/lib/auth-context';
 import { createWebSocketClient, WebSocketClient, WebSocketMessage as WSMessage } from '@/lib/websocket/client';
 import { logWebSocket } from '@/lib/logger';
 import { storeMessage, updateMessageStatus, getConversationMessages } from '@/lib/messageStorage';
@@ -75,7 +75,7 @@ export interface UseWebSocketOptions {
 }
 
 export function useWebSocketLogic(options: UseWebSocketOptions = {}) {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, token: authToken } = useAuth();
   const [client, setClient] = useState<WebSocketClient | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<WebSocketConnectionStatus>({
     connected: false,
@@ -91,7 +91,7 @@ export function useWebSocketLogic(options: UseWebSocketOptions = {}) {
   const [typingIndicators, setTypingIndicators] = useState<TypingIndicator[]>([]);
 
   const wsUrl = options.wsUrl || process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8080';
-  const token = user?.token || '';
+  const token = authToken || '';
 
   const handlersRef = useRef({
     handleConnection: (data: any) => {
