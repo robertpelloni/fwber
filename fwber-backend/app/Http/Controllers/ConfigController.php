@@ -172,33 +172,54 @@ class ConfigController extends Controller
         $mercureUrl = config('mercure.public_url') ?? env('MERCURE_PUBLIC_URL');
         $mercureConfigured = !empty($mercureUrl);
 
-        // Check cache connectivity
-        $cacheStatus = 'unknown';
+        // Check Database connectivity
+        $dbStatus = 'down';
         try {
-            Cache::put('health_check', true, 10);
-            $cacheStatus = Cache::get('health_check') ? 'healthy' : 'degraded';
-            Cache::forget('health_check');
+            \DB::connection()->getPdo();
+            $dbStatus = 'up';
         } catch (\Exception $e) {
-            $cacheStatus = 'unhealthy';
+            $dbStatus = 'down';
         }
 
-        // Check queue connectivity
+        // Check cache connectivity
+        $cacheStatus = 'down';
+        try {
+            Cache::put('health_check', true, 10);
+            if (Cache::get('health_check')) {
+                $cacheStatus = 'up';
+                Cache::forget('health_check');
+            }
+        } catch (\Exception $e) {
+            $cacheStatus = 'down';
+        }
+
+        // Check queue connectivity (basic check)
         $queueStatus = 'unknown';
         $queueDriver = config('queue.default');
 
+        // Mercure status
+        $mercureStatus = $mercureConfigured ? 'up' : 'down';
+
+        // Calculate overall status
+        $overallStatus = 'healthy';
+        if ($dbStatus === 'down') {
+            $overallStatus = 'unhealthy';
+        } elseif ($cacheStatus === 'down' || $mercureStatus === 'down') {
+            $overallStatus = 'degraded';
+        }
+
         return response()->json([
-            'mercure' => [
-                'configured' => $mercureConfigured,
-                'public_url' => $mercureUrl ?: null,
-                'status' => $mercureConfigured ? 'configured' : 'not_configured',
+            'status' => $overallStatus,
+            'services' => [
+                'database' => $dbStatus,
+                'cache' => $cacheStatus,
+                'mercure' => $mercureStatus,
+                'queue' => $queueStatus,
             ],
-            'cache' => [
-                'driver' => config('cache.default'),
-                'status' => $cacheStatus,
-            ],
-            'queue' => [
-                'driver' => $queueDriver,
-                'status' => $queueStatus,
+            'details' => [
+                'mercure_url' => $mercureUrl ?: null,
+                'cache_driver' => config('cache.default'),
+                'queue_driver' => $queueDriver,
             ],
             'features_enabled' => array_filter(config('features', []), fn($v) => $v === true),
             'timestamp' => now()->toISOString(),

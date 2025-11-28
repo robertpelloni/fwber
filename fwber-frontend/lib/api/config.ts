@@ -35,18 +35,17 @@ export interface FeatureFlagsUpdateResponse {
 }
 
 export interface SystemHealth {
-  mercure: {
-    configured: boolean;
-    public_url: string | null;
-    status: 'healthy' | 'configured' | 'not_configured' | 'unhealthy';
+  status: 'healthy' | 'degraded' | 'unhealthy';
+  services: {
+    database: 'up' | 'down';
+    cache: 'up' | 'down';
+    mercure: 'up' | 'down';
+    queue: 'up' | 'down' | 'unknown';
   };
-  cache: {
-    driver: string;
-    status: 'healthy' | 'degraded' | 'unhealthy' | 'unknown';
-  };
-  queue: {
-    driver: string;
-    status: 'healthy' | 'degraded' | 'unhealthy' | 'unknown';
+  details: {
+    mercure_url: string | null;
+    cache_driver: string;
+    queue_driver: string;
   };
   features_enabled: Partial<FeatureFlags>;
   timestamp: string;

@@ -91,11 +91,13 @@ function HealthStatusBadge({ status }: { status: string }) {
   const getStatusColor = (s: string) => {
     switch (s) {
       case 'healthy':
+      case 'up':
       case 'configured':
         return 'bg-green-100 text-green-800';
       case 'degraded':
         return 'bg-yellow-100 text-yellow-800';
       case 'unhealthy':
+      case 'down':
       case 'not_configured':
         return 'bg-red-100 text-red-800';
       default:
@@ -105,9 +107,9 @@ function HealthStatusBadge({ status }: { status: string }) {
 
   return (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
-      {status === 'healthy' || status === 'configured' ? (
+      {status === 'healthy' || status === 'up' || status === 'configured' ? (
         <Check className="w-3 h-3 mr-1" />
-      ) : status === 'unhealthy' || status === 'not_configured' ? (
+      ) : status === 'unhealthy' || status === 'down' || status === 'not_configured' ? (
         <X className="w-3 h-3 mr-1" />
       ) : (
         <AlertTriangle className="w-3 h-3 mr-1" />
@@ -272,17 +274,17 @@ export default function AdminSettingsPage() {
               <div className="bg-white rounded-lg border border-gray-200 p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    {health?.mercure.configured ? (
+                    {health?.services.mercure === 'up' ? (
                       <Wifi className="h-5 w-5 text-green-600" />
                     ) : (
                       <WifiOff className="h-5 w-5 text-gray-400" />
                     )}
                     <span className="font-medium text-gray-900">Mercure Hub</span>
                   </div>
-                  <HealthStatusBadge status={health?.mercure.status ?? 'unknown'} />
+                  <HealthStatusBadge status={health?.services.mercure ?? 'unknown'} />
                 </div>
                 <p className="text-sm text-gray-500 truncate">
-                  {health?.mercure.public_url || 'Not configured'}
+                  {health?.details.mercure_url || 'Not configured'}
                 </p>
               </div>
 
@@ -293,9 +295,9 @@ export default function AdminSettingsPage() {
                     <Database className="h-5 w-5 text-blue-600" />
                     <span className="font-medium text-gray-900">Cache</span>
                   </div>
-                  <HealthStatusBadge status={health?.cache.status ?? 'unknown'} />
+                  <HealthStatusBadge status={health?.services.cache ?? 'unknown'} />
                 </div>
-                <p className="text-sm text-gray-500">Driver: {health?.cache.driver ?? 'unknown'}</p>
+                <p className="text-sm text-gray-500">Driver: {health?.details.cache_driver ?? 'unknown'}</p>
               </div>
 
               {/* Queue Status */}
@@ -305,9 +307,9 @@ export default function AdminSettingsPage() {
                     <Shield className="h-5 w-5 text-purple-600" />
                     <span className="font-medium text-gray-900">Queue</span>
                   </div>
-                  <HealthStatusBadge status={health?.queue.status ?? 'unknown'} />
+                  <HealthStatusBadge status={health?.services.queue ?? 'unknown'} />
                 </div>
-                <p className="text-sm text-gray-500">Driver: {health?.queue.driver ?? 'unknown'}</p>
+                <p className="text-sm text-gray-500">Driver: {health?.details.queue_driver ?? 'unknown'}</p>
               </div>
             </div>
           </section>

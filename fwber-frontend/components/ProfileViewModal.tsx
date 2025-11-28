@@ -33,26 +33,10 @@ interface ProfileViewModalProps {
 export default function ProfileViewModal({ isOpen, onClose, user, messagesExchanged, matchId }: ProfileViewModalProps) {
   const [isVisible, setIsVisible] = useState(false)
   const { isEnabled: faceRevealEnabled } = useFeatureFlag('face_reveal')
-  const { onlineUsers, lastSeen } = usePresenceContext()
+  const { onlineUsers } = usePresenceContext()
   
   // Check if user is online
-  const isUserOnline = onlineUsers.has(user.id)
-  const userLastSeen = lastSeen.get(user.id)
-
-  // Format last seen time
-  const formatLastSeen = (timestamp: number) => {
-    const now = Date.now()
-    const diff = now - timestamp
-    const minutes = Math.floor(diff / 60000)
-    const hours = Math.floor(minutes / 60)
-    const days = Math.floor(hours / 24)
-    
-    if (minutes < 1) return 'Just now'
-    if (minutes < 60) return `${minutes}m ago`
-    if (hours < 24) return `${hours}h ago`
-    if (days < 7) return `${days}d ago`
-    return new Date(timestamp).toLocaleDateString()
-  }
+  const isUserOnline = onlineUsers?.some(u => u.user_id === user.id.toString() && u.status === 'online')
 
   useEffect(() => {
     if (isOpen) {
@@ -119,7 +103,7 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
           <div className="flex items-center gap-3">
             {/* Presence Indicator */}
             <PresenceIndicator 
-              userId={user.id} 
+              userId={user.id.toString()} 
               size="md" 
               showLabel 
               className="flex-shrink-0"
@@ -131,15 +115,6 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 {user.profile?.age && (
                   <span>{user.profile.age} years old</span>
-                )}
-                {!isUserOnline && userLastSeen && (
-                  <>
-                    <span>•</span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      Last seen {formatLastSeen(userLastSeen)}
-                    </span>
-                  </>
                 )}
               </div>
             </div>

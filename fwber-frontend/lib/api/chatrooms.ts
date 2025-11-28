@@ -22,6 +22,7 @@ export interface Chatroom {
     email: string;
   };
   recent_messages?: ChatroomMessage[];
+  members?: ChatroomMember[];
   url: string;
   display_name: string;
 }

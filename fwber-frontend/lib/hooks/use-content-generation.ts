@@ -79,11 +79,11 @@ export const useProfileContentGeneration = (preferences: ProfileContentRequest, 
 /**
  * Hook for generating post suggestions
  */
-export const usePostSuggestionsGeneration = (boardId: number, request: PostSuggestionsRequest) => {
+export const usePostSuggestionsGeneration = (boardId: number, request: PostSuggestionsRequest, options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: ['postSuggestionsGeneration', boardId, request],
     queryFn: () => generatePostSuggestions(boardId, request),
-    enabled: boardId > 0,
+    enabled: options?.enabled ?? boardId > 0,
     staleTime: 1000 * 60 * 15, // 15 minutes
     gcTime: 1000 * 60 * 30, // 30 minutes
   });
@@ -92,10 +92,11 @@ export const usePostSuggestionsGeneration = (boardId: number, request: PostSugge
 /**
  * Hook for generating conversation starters
  */
-export const useConversationStartersGeneration = (request: ConversationStartersRequest) => {
+export const useConversationStartersGeneration = (request: ConversationStartersRequest, options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: ['conversationStartersGeneration', request],
     queryFn: () => generateConversationStarters(request),
+    enabled: options?.enabled,
     staleTime: 1000 * 60 * 10, // 10 minutes
     gcTime: 1000 * 60 * 30, // 30 minutes
   });

@@ -320,6 +320,7 @@ export function analyzeContentQuality(content: string): {
   readability: number;
   engagement: number;
   clarity: number;
+  safety: number;
   length: number;
   wordCount: number;
   sentenceCount: number;
@@ -339,11 +340,18 @@ export function analyzeContentQuality(content: string): {
   
   // Clarity score based on sentence length and complexity
   const clarity = Math.max(0, Math.min(1, 1 - (avgWordsPerSentence - 15) / 20));
+
+  // Safety score (mock implementation - assumes safe unless specific keywords found)
+  // In a real app, this would use a content moderation API or more sophisticated regex
+  const unsafeKeywords = ['hate', 'violence', 'kill', 'attack', 'abuse'];
+  const foundUnsafe = unsafeKeywords.filter(k => content.toLowerCase().includes(k)).length;
+  const safety = Math.max(0, 1 - (foundUnsafe * 0.2));
   
   return {
     readability,
     engagement,
     clarity,
+    safety,
     length: content.length,
     wordCount,
     sentenceCount,

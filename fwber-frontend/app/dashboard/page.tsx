@@ -424,52 +424,6 @@ function StatCard({ icon, label, value, subtext, color, link }: StatCardProps) {
   );
 }
 
-function ActivityItem({ activity }: { activity: RecentActivity }) {
-  const icons = {
-    match: '💜',
-    message: '💬',
-    view: '👀',
-    like: '❤️',
-  };
-
-  const labels = {
-    match: 'New match',
-    message: 'Sent you a message',
-    view: 'Viewed your profile',
-    like: 'Liked your profile',
-  };
-
-  const timeAgo = getTimeAgo(activity.timestamp);
-
-  return (
-    <div className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-      <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden flex-shrink-0 relative">
-        {activity.user.avatar_url ? (
-          <Image 
-            src={activity.user.avatar_url} 
-            alt={activity.user.name} 
-            fill
-            className="object-cover"
-            sizes="48px"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-xl">
-            {icons[activity.type]}
-          </div>
-        )}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-900 truncate">{activity.user.name}</p>
-        <p className="text-sm text-gray-600">{labels[activity.type]}</p>
-        {activity.match_score && (
-          <p className="text-xs text-purple-600 font-medium">{activity.match_score}% match</p>
-        )}
-      </div>
-      <div className="text-xs text-gray-400">{timeAgo}</div>
-    </div>
-  );
-}
-
 function ActionButton({ href, label, icon, color }: { href: string; label: string; icon: string; color: string }) {
   const colorClasses = {
     purple: 'hover:bg-purple-50 hover:border-purple-300',
@@ -502,19 +456,4 @@ function Achievement({ title, description, unlocked }: { title: string; descript
       {unlocked && <span className="text-xs text-yellow-600 font-medium">✓</span>}
     </div>
   );
-}
-
-function getTimeAgo(timestamp: string): string {
-  const now = new Date();
-  const then = new Date(timestamp);
-  const diffMs = now.getTime() - then.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-
-  if (diffMins < 1) return 'Just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  const diffHours = Math.floor(diffMins / 60);
-  if (diffHours < 24) return `${diffHours}h ago`;
-  const diffDays = Math.floor(diffHours / 24);
-  if (diffDays < 7) return `${diffDays}d ago`;
-  return then.toLocaleDateString();
 }
