@@ -15,6 +15,12 @@ class MessageSendModerationTest extends TestCase
 {
     use RefreshDatabaseSilently;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        config(['features.chatrooms' => true]);
+    }
+
     #[Test]
     public function message_blocked_by_content_moderation()
     {

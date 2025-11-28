@@ -356,11 +356,10 @@ class MatchController extends Controller
         $ageMax = (int) $request->get('age_max', $profile->preferences['age_range']['max'] ?? 100);
         
         $query->whereHas('profile', function ($q) use ($ageMin, $ageMax) {
-            // SQLite-compatible age calculation
-            $q->whereRaw("(julianday('now') - julianday(date_of_birth)) / 365.25 BETWEEN ? AND ?", [
-                $ageMin,
-                $ageMax
-            ]);
+            // Database-agnostic age calculation
+            $startDate = now()->subYears($ageMax + 1)->addDay();
+            $endDate = now()->subYears($ageMin);
+            $q->whereBetween('date_of_birth', [$startDate, $endDate]);
         });
 
         // Advanced filters

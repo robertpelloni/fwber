@@ -189,7 +189,6 @@ class ProximityChatroomTest extends TestCase
         $this->assertDatabaseMissing('proximity_chatroom_members', [
             'proximity_chatroom_id' => $chatroom->id,
             'user_id' => $this->user->id,
-            'left_at' => null, // Assuming soft delete or left_at column, or row removal
         ]);
         // Check if row is removed or marked as left. 
         // The controller uses removeMember which likely detaches or updates pivot.
