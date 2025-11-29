@@ -12,6 +12,10 @@ class Group extends Model
     protected $fillable = [
         'name',
         'description',
+        'icon',
+        'created_by_user_id',
+        'privacy',
+        'member_count',
         'visibility',
         'avatar_url',
         'creator_id',
@@ -23,11 +27,17 @@ class Group extends Model
     protected $casts = [
         'settings' => 'array',
         'is_active' => 'boolean',
+        'member_count' => 'integer',
     ];
 
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'creator_id');
+        return $this->belongsTo(User::class, 'created_by_user_id');
+    }
+
+    public function posts(): HasMany
+    {
+        return $this->hasMany(GroupPost::class);
     }
 
     public function members(): HasMany

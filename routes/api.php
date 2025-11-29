@@ -26,6 +26,8 @@ use App\Http\Controllers\Api\UserPhysicalProfileController;
 use App\Http\Controllers\Api\BlockController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\GroupController;
+use App\Http\Controllers\GroupController as NewGroupController;
+use App\Http\Controllers\GroupPostController;
 use App\Http\Controllers\Api\GroupMessageController;
 use App\Http\Controllers\WebSocketController;
 use App\Http\Controllers\ProximityArtifactController;
@@ -107,14 +109,21 @@ Route::middleware("api")->group(function (): void {
         
             // Group routes
             Route::prefix("groups")->group(function (): void {
-                Route::get("/", [GroupController::class, "index"]);
-                Route::post("/", [GroupController::class, "store"]);
+                Route::get("/", [NewGroupController::class, "index"]);
+                Route::post("/", [NewGroupController::class, "store"]);
+                Route::get("/my-groups", [NewGroupController::class, "myGroups"]);
                 Route::get("/discover", [GroupController::class, "discover"]);
-                Route::get("/{groupId}", [GroupController::class, "show"]);
+                Route::get("/{groupId}", [NewGroupController::class, "show"]);
                 Route::put("/{groupId}", [GroupController::class, "update"]);
                 Route::delete("/{groupId}", [GroupController::class, "destroy"]);
-                Route::post("/{groupId}/join", [GroupController::class, "join"]);
-                Route::post("/{groupId}/leave", [GroupController::class, "leave"]);
+                Route::post("/{groupId}/join", [NewGroupController::class, "join"]);
+                Route::post("/{groupId}/leave", [NewGroupController::class, "leave"]);
+                
+                // Group Posts
+                Route::get("/{groupId}/posts", [GroupPostController::class, "index"]);
+                Route::post("/{groupId}/posts", [GroupPostController::class, "store"]);
+                Route::delete("/posts/{postId}", [GroupPostController::class, "destroy"]);
+
                 Route::post("/{groupId}/ownership/transfer", [GroupController::class, "transferOwnership"]);
                 Route::post("/{groupId}/members/{memberUserId}/role", [GroupController::class, "setRole"]);
                 Route::post("/{groupId}/members/{memberUserId}/ban", [GroupController::class, "banMember"]);
