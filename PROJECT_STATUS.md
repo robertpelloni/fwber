@@ -72,6 +72,24 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Frontend**: Strict Content Security Policy (CSP), HSTS, X-Frame-Options, and Permissions-Policy headers configured in `next.config.js`.
     -   **Backend**: `SecurityHeaders` middleware implemented to enforce security headers on all API responses.
 
+### ✅ Completed Future Features (2026+ Early Access)
+1.  **Premium Tiers (Gold)**:
+    -   Subscription management and "Gold" status tracking.
+    -   Exclusive features: "See who likes you", unlimited swipes.
+    -   `PremiumController`, `RequiresPremium` middleware, and frontend purchase flows.
+2.  **Profile Boosts**:
+    -   Temporary visibility enhancement logic.
+    -   `BoostController` and database schema for active boosts.
+    -   Frontend integration for purchasing and visualizing active boosts.
+3.  **Events System**:
+    -   Location-based event discovery and creation.
+    -   RSVP management and attendee lists.
+    -   Geospatial queries for finding events nearby.
+4.  **Groups System**:
+    -   Interest-based communities.
+    -   Group creation, membership management, and discussion feeds.
+    -   Full frontend routing and component library for groups.
+
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.
 2.  **API Documentation**: OpenAPI/Swagger docs available at `/api/docs`.
