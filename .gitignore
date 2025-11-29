@@ -58,8 +58,8 @@ __pycache__/
 .venv/
 venv/
 
-# Vendor (PHP Composer) - optional if vendor is committed elsewhere
-# vendor/
+# Vendor (PHP Composer)
+vendor/
 
 # Local runtime files
 *.log
