@@ -1,0 +1,6 @@
+[submodule "fwber-backend"]
+	path = fwber-backend
+	url = https://github.com/robertpelloni/fwber-backend
+[submodule "fwber-frontend"]
+	path = fwber-frontend
+	url = https://github.com/robertpelloni/fwber-frontend
