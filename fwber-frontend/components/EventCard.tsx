@@ -15,7 +15,7 @@ export function EventCard({ event }: EventCardProps) {
         <div className="flex items-center text-gray-600 dark:text-gray-300 mb-1">
           <Calendar className="w-4 h-4 mr-2" />
           <span className="text-sm">
-            {new Date(event.starts_at).toLocaleDateString()} {new Date(event.starts_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            {new Date(event.starts_at || (event as any).start_time).toLocaleDateString()} {new Date(event.starts_at || (event as any).start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </span>
         </div>
         <div className="flex items-center text-gray-600 dark:text-gray-300 mb-1">

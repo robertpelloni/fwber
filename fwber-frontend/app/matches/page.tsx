@@ -31,6 +31,7 @@ export default function MatchesPage() {
   
   // Report Modal State
   const [isReportModalOpen, setIsReportModalOpen] = useState(false)
+  const [isBoosted, setIsBoosted] = useState(false)
 
   // Simulated tier data - in real app, fetch from API
   const getCurrentTier = (match: Match): RelationshipTier => {
@@ -119,6 +120,27 @@ export default function MatchesPage() {
       }
     }
   }
+
+  const handleBoost = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/boosts/purchase`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      if (res.ok) {
+        setIsBoosted(true);
+      } else {
+        alert('Boost failed.');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('An error occurred.');
+    }
+  };
 
   const currentMatch = matches[currentMatchIndex]
 
@@ -385,6 +407,15 @@ export default function MatchesPage() {
                     className="bg-purple-500 hover:bg-purple-600 text-white px-8 py-3 rounded-full text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Super Like
+                  </button>
+                  
+                  <button
+                    onClick={handleBoost}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-3 rounded-full text-lg font-semibold"
+                    data-testid="boost-button"
+                    disabled={isBoosted}
+                  >
+                    {isBoosted ? 'Boost Active' : 'Boost Profile'}
                   </button>
                 </div>
 
