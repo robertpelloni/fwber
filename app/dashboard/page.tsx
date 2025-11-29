@@ -11,6 +11,7 @@ import ProfileCompletenessWidget from '@/components/ProfileCompletenessWidget';
 import { ProximityPresenceCompact } from '@/components/realtime';
 import AppHeader from '@/components/AppHeader';
 import { ActivityFeed } from '@/components/ActivityFeed';
+import BoostButton from '@/components/BoostButton';
 
 interface DashboardStats {
   total_matches: number;
@@ -51,11 +52,14 @@ export default function DashboardPage() {
         {/* Main Content */}
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="px-4 py-6 sm:px-0">
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Dashboard
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400">Here&apos;s what&apos;s happening with your matches.</p>
+            <div className="mb-8 flex justify-between items-end">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  Dashboard
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400">Here&apos;s what&apos;s happening with your matches.</p>
+              </div>
+              <BoostButton />
             </div>
 
             {/* Stats Grid */}
