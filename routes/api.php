@@ -88,6 +88,13 @@ Route::middleware("api")->group(function (): void {
                 Route::get("/who-likes-you", [\App\Http\Controllers\PremiumController::class, "getWhoLikesYou"]);
             });
         });
+
+        // Boost routes
+        Route::prefix("boosts")->group(function (): void {
+            Route::post("/purchase", [\App\Http\Controllers\BoostController::class, "purchaseBoost"]);
+            Route::get("/active", [\App\Http\Controllers\BoostController::class, "getActiveBoost"]);
+            Route::get("/history", [\App\Http\Controllers\BoostController::class, "getBoostHistory"]);
+        });
         
         // Message routes with tier tracking
         Route::prefix("messages")->group(function (): void {

@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use OpenApi\Attributes as OA;
 
+use App\Models\Boost;
+
 class RecommendationController extends Controller
 {
     private RecommendationService $recommendationService;
@@ -127,6 +129,26 @@ class RecommendationController extends Controller
                 $filteredRecommendations = array_filter($recommendations, function($rec) use ($types) {
                     return in_array($rec['type'], $types);
                 });
+
+                // Fetch active boosts to prioritize
+                $boostedUsers = Boost::active()
+                    ->where('user_id', '!=', $user->id) // Don't recommend self
+                    ->with('user')
+                    ->get();
+
+                $boostedRecommendations = [];
+                foreach ($boostedUsers as $boost) {
+                    $boostedRecommendations[] = [
+                        'type' => 'boosted_profile',
+                        'content' => $boost->user,
+                        'score' => 2.0, // High score to ensure top placement
+                        'reason' => 'Popular profile',
+                        'is_boosted' => true
+                    ];
+                }
+
+                // Merge boosted profiles at the top
+                $filteredRecommendations = array_merge($boostedRecommendations, $filteredRecommendations);
 
                 // Apply limit
                 return array_slice($filteredRecommendations, 0, $limit);
