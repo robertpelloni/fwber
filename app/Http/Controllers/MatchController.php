@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use App\Services\PushNotificationService;
+use Carbon\Carbon;
 
 class MatchController extends Controller
 {
@@ -296,6 +297,22 @@ class MatchController extends Controller
         // Prevent self-action
         if ($user->id === $targetUserId) {
             return response()->json(['message' => 'Cannot perform action on yourself'], 400);
+        }
+
+        // Check swipe limit for free users
+        if (!$user->unlimited_swipes) {
+            $todaySwipes = DB::table('match_actions')
+                ->where('user_id', $user->id)
+                ->where('created_at', '>=', Carbon::today())
+                ->whereIn('action', ['like', 'pass', 'super_like'])
+                ->count();
+
+            if ($todaySwipes >= 50) {
+                return response()->json([
+                    'message' => 'Daily swipe limit reached. Upgrade to Premium for unlimited swipes.',
+                    'limit_reached' => true
+                ], 403);
+            }
         }
 
         // Check if target user is accessible

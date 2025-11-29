@@ -79,6 +79,15 @@ Route::middleware("api")->group(function (): void {
             Route::get("/matches", [MatchController::class, "index"]);
             Route::post("/matches/action", [MatchController::class, "action"]);
         });
+
+        // Premium routes
+        Route::prefix("premium")->group(function (): void {
+            Route::get("/status", [\App\Http\Controllers\PremiumController::class, "getPremiumStatus"]);
+            Route::post("/purchase", [\App\Http\Controllers\PremiumController::class, "purchasePremium"]);
+            Route::middleware(\App\Http\Middleware\RequiresPremium::class)->group(function () {
+                Route::get("/who-likes-you", [\App\Http\Controllers\PremiumController::class, "getWhoLikesYou"]);
+            });
+        });
         
         // Message routes with tier tracking
         Route::prefix("messages")->group(function (): void {
