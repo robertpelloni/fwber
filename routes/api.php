@@ -338,6 +338,15 @@ Route::middleware("api")->group(function (): void {
                 Route::get("/suspicious-activity", [RateLimitController::class, "checkSuspiciousActivity"]);
                 Route::post("/cleanup", [RateLimitController::class, "cleanup"]);
             });
+
+            // Event routes
+            Route::prefix('events')->group(function () {
+                Route::get('/', [\App\Http\Controllers\EventController::class, 'index']);
+                Route::post('/', [\App\Http\Controllers\EventController::class, 'store']);
+                Route::get('/my-events', [\App\Http\Controllers\EventController::class, 'myEvents']);
+                Route::get('/{id}', [\App\Http\Controllers\EventController::class, 'show']);
+                Route::post('/{id}/rsvp', [\App\Http\Controllers\EventController::class, 'rsvp']);
+            });
     });
     
     // Moderation routes (Phase 2: Safety Features)
