@@ -1,8 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
-import { useSession } from 'next-auth/react';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+import { apiClient } from '@/lib/api/client';
+import { useAuth } from '@/lib/auth-context';
 
 export interface Event {
   id: number;
@@ -23,7 +21,7 @@ export interface Event {
 }
 
 export function useNearbyEvents(latitude?: number, longitude?: number, radius: number = 50) {
-  const { data: session } = useSession();
+  const { token } = useAuth();
 
   return useQuery({
     queryKey: ['events', 'nearby', latitude, longitude, radius],
@@ -33,55 +31,47 @@ export function useNearbyEvents(latitude?: number, longitude?: number, radius: n
         params.latitude = latitude;
         params.longitude = longitude;
       }
-      const { data } = await axios.get(`${API_URL}/events`, {
+      const { data } = await apiClient.get('/events', {
         params,
-        headers: { Authorization: `Bearer ${session?.accessToken}` },
       });
       return data;
     },
-    enabled: !!session?.accessToken,
+    enabled: !!token,
   });
 }
 
 export function useMyEvents() {
-  const { data: session } = useSession();
+  const { token } = useAuth();
 
   return useQuery({
     queryKey: ['events', 'my'],
     queryFn: async () => {
-      const { data } = await axios.get(`${API_URL}/events/my-events`, {
-        headers: { Authorization: `Bearer ${session?.accessToken}` },
-      });
+      const { data } = await apiClient.get('/events/my-events');
       return data;
     },
-    enabled: !!session?.accessToken,
+    enabled: !!token,
   });
 }
 
 export function useEvent(id: string) {
-  const { data: session } = useSession();
+  const { token } = useAuth();
 
   return useQuery({
     queryKey: ['events', id],
     queryFn: async () => {
-      const { data } = await axios.get(`${API_URL}/events/${id}`, {
-        headers: { Authorization: `Bearer ${session?.accessToken}` },
-      });
+      const { data } = await apiClient.get(`/events/${id}`);
       return data;
     },
-    enabled: !!session?.accessToken && !!id,
+    enabled: !!token && !!id,
   });
 }
 
 export function useCreateEvent() {
   const queryClient = useQueryClient();
-  const { data: session } = useSession();
 
   return useMutation({
     mutationFn: async (newEvent: any) => {
-      const { data } = await axios.post(`${API_URL}/events`, newEvent, {
-        headers: { Authorization: `Bearer ${session?.accessToken}` },
-      });
+      const { data } = await apiClient.post('/events', newEvent);
       return data;
     },
     onSuccess: () => {
@@ -92,13 +82,10 @@ export function useCreateEvent() {
 
 export function useRsvpEvent() {
   const queryClient = useQueryClient();
-  const { data: session } = useSession();
 
   return useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
-      const { data } = await axios.post(`${API_URL}/events/${id}/rsvp`, { status }, {
-        headers: { Authorization: `Bearer ${session?.accessToken}` },
-      });
+      const { data } = await apiClient.post(`/events/${id}/rsvp`, { status });
       return data;
     },
     onSuccess: (_, { id }) => {

@@ -50,6 +50,7 @@ export function GroupCard({ group }: GroupCardProps) {
             ) : (
               <Badge variant="outline"><Globe className="w-3 h-3 mr-1" /> Public</Badge>
             )}
+            {isMember && <Badge variant="default" className="ml-2">Member</Badge>}
           </div>
         </CardHeader>
         <CardContent>

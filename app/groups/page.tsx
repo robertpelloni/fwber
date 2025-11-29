@@ -9,11 +9,15 @@ import { GroupCard } from '@/components/GroupCard';
 import { useGroups, useMyGroups } from '@/lib/hooks/use-groups';
 
 export default function GroupsPage() {
-  const { data: groups, isLoading: isLoadingGroups } = useGroups();
-  const { data: myGroups, isLoading: isLoadingMyGroups } = useMyGroups();
+  const { data: groupsData, isLoading: isLoadingGroups } = useGroups();
+  const { data: myGroupsData, isLoading: isLoadingMyGroups } = useMyGroups();
   const [search, setSearch] = React.useState('');
 
-  const filteredGroups = groups?.filter(group => 
+  // Handle potential API response wrapping (e.g. { data: [...] })
+  const groups = Array.isArray(groupsData) ? groupsData : (groupsData as any)?.data || [];
+  const myGroups = Array.isArray(myGroupsData) ? myGroupsData : (myGroupsData as any)?.data || [];
+
+  const filteredGroups = groups?.filter((group: any) => 
     group.name.toLowerCase().includes(search.toLowerCase()) ||
     group.description?.toLowerCase().includes(search.toLowerCase())
   );

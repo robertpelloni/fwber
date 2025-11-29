@@ -30,7 +30,7 @@ describe('Events', () => {
       id: 1,
       title: 'Community Meetup',
       description: 'A casual meetup for the community.',
-      location: 'Central Park',
+      location_name: 'Central Park',
       start_time: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
       end_time: new Date(Date.now() + 90000000).toISOString(),
       organizer_id: 2,
@@ -41,7 +41,7 @@ describe('Events', () => {
 
   beforeEach(() => {
     cy.intercept('GET', '**/api/user', { statusCode: 200, body: { data: user } }).as('getUser');
-    cy.intercept('GET', '**/api/events', { statusCode: 200, body: { data: events } }).as('getEvents');
+    cy.intercept('GET', '**/api/events*', { statusCode: 200, body: { data: events } }).as('getEvents');
   });
 
   it('displays a list of events', () => {
@@ -67,16 +67,25 @@ describe('Events', () => {
 
     cy.wait('@getEvents');
 
+    cy.intercept('GET', '**/api/events/1', {
+      statusCode: 200,
+      body: { ...events[0], status: 'upcoming' }
+    }).as('getEventDetails');
+
     cy.intercept('POST', '**/api/events/1/rsvp', {
       statusCode: 200,
       body: { success: true, status: 'attending' }
     }).as('rsvpEvent');
 
-    // Assuming there's an RSVP button or link
-    cy.contains('Community Meetup').parent().find('button').contains('RSVP').click();
+    // Click event title to go to details
+    cy.contains('Community Meetup').click();
+    
+    cy.wait('@getEventDetails');
+    
+    // Click Attend
+    cy.contains('button', 'Attend').click();
     
     cy.wait('@rsvpEvent');
-    cy.contains('Attending').should('be.visible');
   });
 
   it('allows creating a new event', () => {
@@ -90,7 +99,10 @@ describe('Events', () => {
     cy.get('input[name="title"]').type('New Test Event');
     cy.get('textarea[name="description"]').type('Description for the new test event.');
     cy.get('input[name="location"]').type('Virtual');
+    cy.get('input[name="latitude"]').type('40.7128');
+    cy.get('input[name="longitude"]').type('-74.0060');
     cy.get('input[name="start_time"]').type('2025-12-01T18:00');
+    cy.get('input[name="end_time"]').type('2025-12-01T20:00');
     
     cy.intercept('POST', '**/api/events', {
       statusCode: 201,

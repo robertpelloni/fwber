@@ -32,6 +32,24 @@ describe('Profile Boosts', () => {
       statusCode: 200,
       body: { active: false, remaining_time: 0 }
     }).as('getBoostStatus');
+
+    cy.intercept('GET', '**/api/matches*', {
+      statusCode: 200,
+      body: {
+        matches: [
+          {
+            id: 2,
+            name: 'Match User',
+            age: 25,
+            locationDescription: 'New York, NY',
+            avatarUrl: '/images/match.jpg',
+            compatibilityScore: 0.95,
+            bio: 'Test Bio'
+          }
+        ],
+        total: 1
+      }
+    }).as('getMatches');
   });
 
   it('allows purchasing a profile boost', () => {

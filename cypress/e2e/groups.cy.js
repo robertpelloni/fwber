@@ -38,6 +38,7 @@ describe('Groups', () => {
   beforeEach(() => {
     cy.intercept('GET', '**/api/user', { statusCode: 200, body: { data: user } }).as('getUser');
     cy.intercept('GET', '**/api/groups', { statusCode: 200, body: { data: groups } }).as('getGroups');
+    cy.intercept('GET', '**/api/groups/my-groups', { statusCode: 200, body: { data: [] } }).as('getMyGroups');
   });
 
   it('displays a list of groups', () => {
@@ -68,9 +69,33 @@ describe('Groups', () => {
       body: { success: true, status: 'joined' }
     }).as('joinGroup');
 
+    // Update the groups mock to reflect membership
+    cy.intercept('GET', '**/api/groups', { 
+        statusCode: 200, 
+        body: { 
+            data: [{
+                ...groups[0],
+                is_member: true
+            }] 
+        } 
+    }).as('getGroupsUpdated');
+
+    // Also mock my-groups
+    cy.intercept('GET', '**/api/groups/my-groups', {
+        statusCode: 200,
+        body: {
+            data: [{
+                ...groups[0],
+                is_member: true
+            }]
+        }
+    }).as('getMyGroupsUpdated');
+
     cy.contains('Hiking Enthusiasts').parent().find('button').contains('Join').click();
     
     cy.wait('@joinGroup');
+    cy.wait('@getGroupsUpdated'); // Wait for the refetch
+    cy.wait('@getMyGroupsUpdated'); // Wait for my-groups refetch
     cy.contains('Member').should('be.visible');
   });
 
