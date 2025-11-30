@@ -85,11 +85,17 @@ describe('Nearby Users', () => {
     }).as('getNearbyUsers');
   });
 
-  it('shows loading state if unauthenticated', () => {
+  it('loads login page', () => {
+    cy.visit('/login');
+    cy.contains('Sign in to FWBer').should('be.visible');
+  });
+
+  it('redirects to login if unauthenticated', () => {
+    cy.clearLocalStorage();
     cy.visit('/nearby');
-    // It might redirect or show error depending on implementation
-    // The page checks for token and sets error if missing
-    cy.contains('Authentication token not found').should('be.visible');
+    
+    // Should redirect to login
+    cy.url().should('include', '/login')
   });
 
   it('loads nearby users when authenticated', () => {

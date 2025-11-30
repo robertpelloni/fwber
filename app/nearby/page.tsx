@@ -36,7 +36,7 @@ export default function NearbyPage() {
   useEffect(() => {
     const fetchNearbyUsers = async () => {
       if (!token) {
-        setError('Authentication token not found. Please log in.')
+        // Let ProtectedRoute handle the redirect
         setLoading(false)
         return
       }

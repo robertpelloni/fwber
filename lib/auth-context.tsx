@@ -59,7 +59,7 @@ interface AuthContextType extends AuthState {
 const initialState: AuthState = {
   user: null,
   token: null,
-  isLoading: false,
+  isLoading: true,
   isAuthenticated: false,
   error: null,
 }
@@ -124,81 +124,77 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 // Provider component
 export function AuthProvider({ children }: { children: ReactNode }) {
-  console.log('AuthProvider rendering');
-  const [state, dispatch] = useReducer(authReducer, {
-    ...initialState,
-    isLoading: true,
-  })
+  const [state, dispatch] = useReducer(authReducer, initialState)
 
   // Initialize auth state from localStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('fwber_token')
-      const userStr = localStorage.getItem('fwber_user')
-      const devToken = localStorage.getItem('auth_token')
-      
-      console.log('AuthContext Init:', { token, userStr, devToken }) // Debug log
-
-      // Development bypass: if we have 'auth_token' = 'dev', treat as authenticated
-      if (devToken === 'dev' || (window as any).Cypress) {
-        console.log('AuthContext: Cypress or Dev mode detected, bypassing auth');
-        dispatch({ 
-          type: 'AUTH_SUCCESS', 
-          payload: { 
-            user: { 
-              id: 1, 
-              email: 'test@example.com', 
-              name: 'Test User',
-              emailVerifiedAt: null,
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-              profile: {
-                displayName: 'Test User',
-                dateOfBirth: '1990-01-01',
-                gender: 'Non-binary',
-                pronouns: 'They/Them',
-                sexualOrientation: 'Pansexual',
-                relationshipStyle: 'Polyamorous',
-                bio: 'Test bio',
-                locationLatitude: 0,
-                locationLongitude: 0,
-                locationDescription: 'Test Location',
-                stiStatus: 'Negative',
-                preferences: {},
-                avatarUrl: null,
+      try {
+        const token = localStorage.getItem('fwber_token')
+        const userStr = localStorage.getItem('fwber_user')
+        const devToken = localStorage.getItem('auth_token')
+        
+        // Development bypass: if we have 'auth_token' = 'dev', treat as authenticated
+        if (devToken === 'dev') {
+          dispatch({ 
+            type: 'AUTH_SUCCESS', 
+            payload: { 
+              user: { 
+                id: 1, 
+                email: 'test@example.com', 
+                name: 'Test User',
+                emailVerifiedAt: null,
                 createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-              }
-            }, 
-            token: 'mock-jwt-token' 
-          } 
-        })
-        return
-      }
-      
-      if (token && userStr) {
-        try {
-          const user = JSON.parse(userStr)
-          console.log('AuthContext Restoring Session:', user) // Debug log
-          dispatch({ type: 'AUTH_SUCCESS', payload: { user, token } })
-          
-          // Wrap side effects in try-catch so they don't break auth
+                updatedAt: new Date().toISOString(),
+                profile: {
+                  displayName: 'Test User',
+                  dateOfBirth: '1990-01-01',
+                  gender: 'Non-binary',
+                  pronouns: 'They/Them',
+                  sexualOrientation: 'Pansexual',
+                  relationshipStyle: 'Polyamorous',
+                  bio: 'Test bio',
+                  locationLatitude: 0,
+                  locationLongitude: 0,
+                  locationDescription: 'Test Location',
+                  stiStatus: 'Negative',
+                  preferences: {},
+                  avatarUrl: null,
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString()
+                }
+              }, 
+              token: 'mock-jwt-token' 
+            } 
+          })
+          return
+        }
+        
+        if (token && userStr) {
           try {
-            setUserContext(user)
-            logAuth.sessionRestored(user.id)
-          } catch (e) {
-            console.error('Logging/Sentry error:', e)
+            const user = JSON.parse(userStr)
+            dispatch({ type: 'AUTH_SUCCESS', payload: { user, token } })
+            
+            // Wrap side effects in try-catch so they don't break auth
+            try {
+              setUserContext(user)
+              logAuth.sessionRestored(user.id)
+            } catch (e) {
+              console.error('Logging/Sentry error:', e)
+            }
+          } catch (error) {
+            console.error('AuthContext Restore Error:', error)
+            // Clear invalid data
+            localStorage.removeItem('fwber_token')
+            localStorage.removeItem('fwber_user')
+            dispatch({ type: 'INITIALIZE_END' })
           }
-        } catch (error) {
-          console.error('AuthContext Restore Error:', error) // Debug log
-          // Clear invalid data
-          localStorage.removeItem('fwber_token')
-          localStorage.removeItem('fwber_user')
+        } else {
           dispatch({ type: 'INITIALIZE_END' })
         }
-      } else {
-        console.log('AuthContext: No token or user in localStorage', { token, userStr })
-        dispatch({ type: 'INITIALIZE_END' })
+      } catch (err) {
+        console.error('AuthContext: Critical Init Error', err);
+        dispatch({ type: 'INITIALIZE_END' });
       }
     } else {
       dispatch({ type: 'INITIALIZE_END' })
@@ -210,7 +206,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (state.isLoading) return
 
     if (typeof window !== 'undefined') {
-      console.log('AuthContext Sync:', { isAuthenticated: state.isAuthenticated, token: state.token }) // Debug log
       if (state.isAuthenticated && state.token && state.user) {
         localStorage.setItem('fwber_token', state.token)
         localStorage.setItem('fwber_user', JSON.stringify(state.user))
