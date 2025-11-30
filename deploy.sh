@@ -343,8 +343,8 @@ echo ""
 #############################################################################
 
 log_info "Regenerating OpenAPI documentation..."
-run_or_dry php artisan l5-swagger:generate
-log_success "OpenAPI documentation regenerated"
+run_or_dry php artisan l5-swagger:generate || log_warning "OpenAPI generation failed, continuing anyway..."
+log_success "OpenAPI documentation regenerated (or skipped)"
 echo ""
 
 #############################################################################
