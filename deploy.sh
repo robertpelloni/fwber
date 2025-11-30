@@ -26,6 +26,11 @@ SKIP_BACKUP=false
 DRY_RUN=false
 FORCE=false
 
+# Auto-enable force mode in CI environments
+if [ "$CI" = "true" ] || [ "$GITHUB_ACTIONS" = "true" ]; then
+    FORCE=true
+fi
+
 # Parse command line arguments
 for arg in "$@"; do
     case $arg in
