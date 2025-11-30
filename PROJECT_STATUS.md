@@ -1,6 +1,6 @@
 # Project Status
 
-**Last Updated:** November 28, 2025
+**Last Updated:** December 01, 2025
 **Status:** 🚀 LIVE / DEPLOYED
 
 ## 🟢 Current Status: Production Deployed
@@ -88,6 +88,13 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Database**: `venue_checkins` table with auto-checkout logic.
     -   **Frontend**: User-facing venue list and check-in UI at `/venues`.
     -   **Features**: Real-time check-in status, automatic checkout from previous venues, venue history.
+    -   **Verification**: E2E tests (`venue-checkin.cy.js`) passing with mocked backend.
+13. **Monitoring & Observability (Sentry)** (Dec 01 - Complete):
+    -   **Frontend**: Integrated `@sentry/nextjs` for error tracking and performance monitoring.
+    -   **Backend**: Configured `sentry/sentry-laravel` and published configuration.
+    -   **Configuration**: `instrumentation.ts` (Next.js) and `config/sentry.php` (Laravel) set up.
+    -   **Components**: `SentryInitializer` component for client-side initialization.
+    -   **Build**: Verified production build with Sentry source map upload configuration.
 
 ### ✅ Completed Future Features (2026+ Early Access)
 1.  **Premium Tiers (Gold)**:
