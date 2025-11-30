@@ -24,6 +24,7 @@ BRANCH="main"
 SKIP_MIGRATIONS=false
 SKIP_BACKUP=false
 DRY_RUN=false
+FORCE=false
 
 # Parse command line arguments
 for arg in "$@"; do
@@ -48,6 +49,10 @@ for arg in "$@"; do
             DRY_RUN=true
             shift
             ;;
+        --force)
+            FORCE=true
+            shift
+            ;;
         --help)
             echo "Usage: $0 [OPTIONS]"
             echo ""
@@ -57,6 +62,7 @@ for arg in "$@"; do
             echo "  --skip-migrations   Skip database migrations"
             echo "  --skip-backup       Skip database backup before migrations"
             echo "  --dry-run          Show what would be done without executing"
+            echo "  --force            Skip confirmation prompts (useful for CI/CD)"
             echo "  --help             Show this help message"
             exit 0
             ;;
@@ -155,11 +161,16 @@ echo ""
 ENV_VALUE=$(grep "^APP_ENV=" .env | cut -d '=' -f2)
 if [ "$ENV_VALUE" != "$ENVIRONMENT" ]; then
     log_warning "APP_ENV in .env ($ENV_VALUE) doesn't match deployment environment ($ENVIRONMENT)"
-    read -p "Continue anyway? (y/N) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        log_info "Deployment cancelled"
-        exit 0
+    
+    if [ "$FORCE" = false ]; then
+        read -p "Continue anyway? (y/N) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            log_info "Deployment cancelled"
+            exit 0
+        fi
+    else
+        log_info "Forcing continuation despite environment mismatch..."
     fi
 fi
 
@@ -265,7 +276,7 @@ if [ "$SKIP_MIGRATIONS" = false ]; then
         if [ "$PENDING_MIGRATIONS" -gt 0 ]; then
             log_warning "Found $PENDING_MIGRATIONS pending migration(s)"
 
-            if [ "$ENVIRONMENT" = "production" ]; then
+            if [ "$ENVIRONMENT" = "production" ] && [ "$FORCE" = false ]; then
                 read -p "Continue with migrations? (y/N) " -n 1 -r
                 echo
                 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
