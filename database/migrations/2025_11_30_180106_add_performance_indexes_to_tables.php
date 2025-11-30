@@ -23,27 +23,35 @@ return new class extends Migration
         // Optimize User Profiles for Geospatial and Demographic queries
         
         if (! $indexExists('user_profiles', 'profiles_geo_index')) {
-            Schema::table('user_profiles', function (Blueprint $table) {
-                $table->index(['latitude', 'longitude'], 'profiles_geo_index');
-            });
+            if (Schema::hasColumn('user_profiles', 'latitude') && Schema::hasColumn('user_profiles', 'longitude')) {
+                Schema::table('user_profiles', function (Blueprint $table) {
+                    $table->index(['latitude', 'longitude'], 'profiles_geo_index');
+                });
+            }
         }
 
         if (! $indexExists('user_profiles', 'user_profiles_gender_index')) {
-            Schema::table('user_profiles', function (Blueprint $table) {
-                $table->index('gender');
-            });
+            if (Schema::hasColumn('user_profiles', 'gender')) {
+                Schema::table('user_profiles', function (Blueprint $table) {
+                    $table->index('gender');
+                });
+            }
         }
 
         if (! $indexExists('user_profiles', 'user_profiles_birthdate_index')) {
-            Schema::table('user_profiles', function (Blueprint $table) {
-                $table->index('birthdate');
-            });
+            if (Schema::hasColumn('user_profiles', 'birthdate')) {
+                Schema::table('user_profiles', function (Blueprint $table) {
+                    $table->index('birthdate');
+                });
+            }
         }
 
         if (! $indexExists('user_profiles', 'profiles_geo_gender_index')) {
-            Schema::table('user_profiles', function (Blueprint $table) {
-                $table->index(['latitude', 'longitude', 'gender'], 'profiles_geo_gender_index');
-            });
+            if (Schema::hasColumn('user_profiles', 'latitude') && Schema::hasColumn('user_profiles', 'longitude') && Schema::hasColumn('user_profiles', 'gender')) {
+                Schema::table('user_profiles', function (Blueprint $table) {
+                    $table->index(['latitude', 'longitude', 'gender'], 'profiles_geo_gender_index');
+                });
+            }
         }
 
         // Optimize Proximity Artifacts for Feed queries
