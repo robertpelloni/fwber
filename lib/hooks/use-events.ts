@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api/client';
 import { useAuth } from '@/lib/auth-context';
+import { PaginatedResponse } from '@/lib/api/types';
 
 export interface Event {
   id: number;
@@ -31,7 +32,7 @@ export function useNearbyEvents(latitude?: number, longitude?: number, radius: n
         params.latitude = latitude;
         params.longitude = longitude;
       }
-      const { data } = await apiClient.get('/events', {
+      const { data } = await apiClient.get<PaginatedResponse<Event>>('/events', {
         params,
       });
       return data;
@@ -46,7 +47,7 @@ export function useMyEvents() {
   return useQuery({
     queryKey: ['events', 'my'],
     queryFn: async () => {
-      const { data } = await apiClient.get('/events/my-events');
+      const { data } = await apiClient.get<PaginatedResponse<Event>>('/events/my-events');
       return data;
     },
     enabled: !!token,
@@ -59,7 +60,7 @@ export function useEvent(id: string) {
   return useQuery({
     queryKey: ['events', id],
     queryFn: async () => {
-      const { data } = await apiClient.get(`/events/${id}`);
+      const { data } = await apiClient.get<Event>(`/events/${id}`);
       return data;
     },
     enabled: !!token && !!id,

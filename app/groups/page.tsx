@@ -13,16 +13,15 @@ export default function GroupsPage() {
   const { data: myGroupsData, isLoading: isLoadingMyGroups } = useMyGroups();
   const [search, setSearch] = React.useState('');
 
-  // Handle potential API response wrapping (e.g. { data: [...] })
-  const groups = Array.isArray(groupsData) ? groupsData : (groupsData as any)?.data || [];
-  const myGroups = Array.isArray(myGroupsData) ? myGroupsData : (myGroupsData as any)?.data || [];
+  const groups = groupsData?.data || [];
+  const myGroups = myGroupsData?.data || [];
 
-  const filteredGroups = groups?.filter((group: any) => 
+  const filteredGroups = groups.filter((group) => 
     group.name.toLowerCase().includes(search.toLowerCase()) ||
-    group.description?.toLowerCase().includes(search.toLowerCase())
+    (group.description && group.description.toLowerCase().includes(search.toLowerCase()))
   );
 
-  const myGroupIds = new Set(myGroups?.map(g => g.id));
+  const myGroupIds = new Set(myGroups.map(g => g.id));
 
   if (isLoadingGroups || isLoadingMyGroups) {
     return <div className="p-8 text-center">Loading groups...</div>;

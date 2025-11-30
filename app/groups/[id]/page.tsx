@@ -15,7 +15,7 @@ export default function GroupDetailPage() {
   
   const { data: group, isLoading: isLoadingGroup } = useGroup(groupId);
   const { data: posts, isLoading: isLoadingPosts } = useGroupPosts(groupId);
-  const { data: myGroups } = useMyGroups();
+  const { data: myGroupsData } = useMyGroups();
   
   const createPost = useCreateGroupPost(groupId);
   const deletePost = useDeleteGroupPost();
@@ -24,7 +24,7 @@ export default function GroupDetailPage() {
   
   const [postContent, setPostContent] = React.useState('');
 
-  const isMember = myGroups?.some(g => g.id === groupId);
+  const isMember = myGroupsData?.data.some(g => g.id === groupId);
 
   const handleJoin = () => joinGroup.mutate(groupId);
   const handleLeave = () => leaveGroup.mutate(groupId);

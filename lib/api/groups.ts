@@ -1,4 +1,5 @@
 import { apiClient } from './client';
+import { PaginatedResponse } from './types';
 
 export interface Group {
   id: number;
@@ -53,13 +54,13 @@ export interface CreateGroupPostRequest {
   content: string;
 }
 
-export async function getGroups(): Promise<Group[]> {
-  const response = await apiClient.get<Group[]>('/groups');
+export async function getGroups(): Promise<PaginatedResponse<Group>> {
+  const response = await apiClient.get<PaginatedResponse<Group>>('/groups');
   return response.data;
 }
 
-export async function getMyGroups(): Promise<Group[]> {
-  const response = await apiClient.get<Group[]>('/groups/my-groups');
+export async function getMyGroups(): Promise<PaginatedResponse<Group>> {
+  const response = await apiClient.get<PaginatedResponse<Group>>('/groups/my-groups');
   return response.data;
 }
 

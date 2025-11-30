@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { useWhoLikesYou, usePremiumStatus } from '@/lib/hooks/use-premium';
 import { PremiumUpgradeModal } from '@/components/PremiumUpgradeModal';
 import { Button } from '@/components/ui/button';
@@ -67,10 +68,12 @@ export default function WhoLikesYouPage() {
           {likers?.map((user: any) => (
             <div key={user.id} className="relative group overflow-hidden rounded-xl shadow-md">
               <div className="aspect-[3/4] relative">
-                 <img 
+                 <Image 
                    src={user.photos?.[0]?.url || user.avatar_url || '/placeholder-user.jpg'} 
                    alt={user.name}
-                   className="object-cover w-full h-full"
+                   fill
+                   className="object-cover"
+                   sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                  />
                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 text-white">
                    <p className="font-bold">{user.name}, {user.age}</p>

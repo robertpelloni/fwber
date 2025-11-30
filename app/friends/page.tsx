@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { getFriends, getFriendRequests, sendFriendRequest, respondToFriendRequest, removeFriend } from '@/lib/api/friends';
@@ -24,7 +24,7 @@ export default function FriendsPage() {
   // Get friend IDs for presence tracking
   const friendIds = useMemo(() => friends.map(f => String(f.id)), [friends]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (isAuthenticated && token) {
       try {
         setIsLoading(true);
@@ -40,11 +40,11 @@ export default function FriendsPage() {
         setIsLoading(false);
       }
     }
-  };
+  }, [isAuthenticated, token]);
 
   useEffect(() => {
     fetchData();
-  }, [isAuthenticated, token]);
+  }, [fetchData]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
