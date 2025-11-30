@@ -126,6 +126,10 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   `DEPLOYMENT.md`: Production deployment guide.
 
 ## 🛠 Maintenance & Cleanup
+-   **Backend Route Restoration (Nov 28)**:
+    -   Restored missing API routes for `Recommendations`, `Proximity Artifacts`, `Matches`, and `Chatrooms` in `fwber-backend/routes/api.php`.
+    -   Fixed `RecommendationService` instantiation error (null config handling).
+    -   Verified endpoints via `ControllerCachingTest`.
 -   **Documentation**: Consolidated into this file and `AGENTS.md`. Old status reports archived.
 -   **Testing**: Full E2E suite available in `fwber-frontend/cypress/e2e/` (16 test files).
 -   **Feature Flags**: See `docs/FEATURE_FLAGS.md` for complete list and configuration.
