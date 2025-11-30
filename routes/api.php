@@ -125,4 +125,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('subscriptions', \App\Http\Controllers\SubscriptionController::class);
     Route::apiResource('event-matches', \App\Http\Controllers\EventMatchController::class);
     Route::apiResource('attendees', \App\Http\Controllers\AttendeeController::class);
+
+    // Venue Check-ins
+    Route::post('venues/{id}/checkin', [\App\Http\Controllers\VenueCheckinController::class, 'store']);
+    Route::post('venues/{id}/checkout', [\App\Http\Controllers\VenueCheckinController::class, 'destroy']);
+    Route::get('venues/{id}/checkins', [\App\Http\Controllers\VenueCheckinController::class, 'index']);
+    Route::get('user/checkin', [\App\Http\Controllers\VenueCheckinController::class, 'current']);
 });
