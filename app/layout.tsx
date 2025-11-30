@@ -6,6 +6,7 @@ import QueryProvider from '@/lib/query-client'
 import PerformanceMonitor from '@/components/PerformanceMonitor'
 import { ToastProvider } from '@/components/ToastProvider'
 import NotificationPermissionHandler from '@/components/NotificationPermissionHandler'
+import SentryInitializer from '@/components/SentryInitializer'
 
 const inter = Inter({
   variable: '--font-inter',
@@ -78,6 +79,7 @@ export default function RootLayout({
         <QueryProvider>
           <AuthProvider>
             <NotificationPermissionHandler />
+            <SentryInitializer />
             <ToastProvider>
               <div className="relative flex min-h-screen flex-col">
                 <div className="flex-1">{children}</div>

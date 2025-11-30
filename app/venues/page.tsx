@@ -22,9 +22,9 @@ export default function VenuesPage() {
             getCurrentCheckin(token)
           ])
           // Handle pagination wrapper if exists, otherwise assume array
-          const venuesList = venuesData.data ? venuesData.data : venuesData
+          const venuesList = (venuesData as any).data ? (venuesData as any).data : venuesData
           setVenues(Array.isArray(venuesList) ? venuesList : [])
-          setCurrentCheckin(checkinData)
+          setCurrentCheckin(checkinData as any)
         } catch (error) {
           console.error('Failed to fetch venues', error)
         } finally {
@@ -41,9 +41,9 @@ export default function VenuesPage() {
           getVenues(token),
           getCurrentCheckin(token)
         ])
-        const venuesList = venuesData.data ? venuesData.data : venuesData
+        const venuesList = (venuesData as any).data ? (venuesData as any).data : venuesData
         setVenues(Array.isArray(venuesList) ? venuesList : [])
-        setCurrentCheckin(checkinData)
+        setCurrentCheckin(checkinData as any)
       } catch (error) {
         console.error('Failed to refresh data', error)
       }
