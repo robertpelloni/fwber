@@ -78,6 +78,11 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 10. **Security Hardening** (Nov 27 - Complete):
     -   **Frontend**: Strict Content Security Policy (CSP), HSTS, X-Frame-Options, and Permissions-Policy headers configured in `next.config.js`.
     -   **Backend**: `SecurityHeaders` middleware implemented to enforce security headers on all API responses.
+11. **Venue Partner Portal** (Nov 28 - Complete):
+    -   **Backend**: `Venue` model, `VenueAuthController`, `VenueController` (Index, Show, Update).
+    -   **Frontend**: Dedicated portal at `/venue` (Login, Register, Dashboard).
+    -   **Auth**: Separate `venue` guard and `venues` provider in Laravel Auth.
+    -   **Features**: Venue registration, profile management, and dashboard.
 
 ### ✅ Completed Future Features (2026+ Early Access)
 1.  **Premium Tiers (Gold)**:
