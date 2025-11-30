@@ -109,8 +109,12 @@ describe('AI-Powered Recommendations', () => {
           {
             id: 'trend_1',
             type: 'bulletin_board',
-            title: 'Trending Topic 1',
-            description: 'Popular discussion topic',
+            score: 0.95,
+            content: {
+              id: 'trend_content_1',
+              title: 'Trending Topic 1',
+              description: 'Popular discussion topic',
+            },
             engagement_score: 0.95,
           },
         ],
