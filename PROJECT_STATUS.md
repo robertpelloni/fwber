@@ -25,6 +25,7 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   Profile bio generation.
     -   Conversation starters.
     -   Bulletin board post suggestions.
+    -   **Verification**: E2E tests (`ml-content-generation.cy.js`) passing with mocked backend.
 2.  **Recommendations Engine**:
     -   AI-powered, location-based, and collaborative filtering recommendations.
     -   Trending content feed.
