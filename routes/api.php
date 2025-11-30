@@ -18,6 +18,17 @@ use App\Http\Controllers\EventController;
 Route::post('auth/register', [\App\Http\Controllers\AuthController::class, 'register']);
 Route::post('auth/login', [\App\Http\Controllers\AuthController::class, 'login']);
 
+// Venue Partner Auth
+Route::prefix('venue')->group(function () {
+    Route::post('register', [\App\Http\Controllers\VenueAuthController::class, 'register']);
+    Route::post('login', [\App\Http\Controllers\VenueAuthController::class, 'login']);
+
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Route::post('logout', [\App\Http\Controllers\VenueAuthController::class, 'logout']);
+        Route::get('me', [\App\Http\Controllers\VenueAuthController::class, 'me']);
+    });
+});
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });

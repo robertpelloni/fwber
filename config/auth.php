@@ -45,6 +45,11 @@ return [
             'driver' => 'sanctum',
             'provider' => 'users',
         ],
+
+        'venue' => [
+            'driver' => 'sanctum',
+            'provider' => 'venues',
+        ],
     ],
 
     /*
@@ -68,6 +73,11 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
+        ],
+
+        'venues' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Venue::class,
         ],
 
         // 'users' => [
