@@ -48,6 +48,67 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('boosts/active', [\App\Http\Controllers\BoostController::class, 'getActiveBoost']);
     Route::get('boosts/history', [\App\Http\Controllers\BoostController::class, 'getBoostHistory']);
 
+    // Recommendations
+    Route::get('recommendations', [\App\Http\Controllers\RecommendationController::class, 'index']);
+    Route::get('recommendations/type/{type}', [\App\Http\Controllers\RecommendationController::class, 'byType']);
+    Route::get('recommendations/trending', [\App\Http\Controllers\RecommendationController::class, 'trending']);
+    Route::get('recommendations/feed', [\App\Http\Controllers\RecommendationController::class, 'feed']);
+    Route::post('recommendations/feedback', [\App\Http\Controllers\RecommendationController::class, 'feedback']);
+    Route::get('recommendations/analytics', [\App\Http\Controllers\RecommendationController::class, 'analytics']);
+
+    // Proximity Artifacts
+    Route::get('proximity/feed', [\App\Http\Controllers\ProximityArtifactController::class, 'index']);
+    Route::post('proximity/artifacts', [\App\Http\Controllers\ProximityArtifactController::class, 'store']);
+    Route::get('proximity/artifacts/{id}', [\App\Http\Controllers\ProximityArtifactController::class, 'show']);
+    Route::post('proximity/artifacts/{id}/flag', [\App\Http\Controllers\ProximityArtifactController::class, 'flag']);
+    Route::delete('proximity/artifacts/{id}', [\App\Http\Controllers\ProximityArtifactController::class, 'destroy']);
+    Route::get('proximity/local-pulse', [\App\Http\Controllers\ProximityArtifactController::class, 'localPulse']);
+
+    // Matches
+    Route::get('matches', [\App\Http\Controllers\MatchController::class, 'index']);
+    Route::get('matches/established', [\App\Http\Controllers\MatchController::class, 'establishedMatches']);
+    Route::post('matches/action', [\App\Http\Controllers\MatchController::class, 'action']);
+
+    // Chatrooms
+    Route::get('chatrooms/my', [\App\Http\Controllers\ChatroomController::class, 'myChatrooms']);
+    Route::get('chatrooms/categories', [\App\Http\Controllers\ChatroomController::class, 'categories']);
+    Route::get('chatrooms/popular', [\App\Http\Controllers\ChatroomController::class, 'popular']);
+    Route::get('chatrooms/search', [\App\Http\Controllers\ChatroomController::class, 'search']);
+    Route::get('chatrooms', [\App\Http\Controllers\ChatroomController::class, 'index']);
+    Route::post('chatrooms', [\App\Http\Controllers\ChatroomController::class, 'store']);
+    Route::get('chatrooms/{id}', [\App\Http\Controllers\ChatroomController::class, 'show']);
+    Route::put('chatrooms/{id}', [\App\Http\Controllers\ChatroomController::class, 'update']);
+    Route::delete('chatrooms/{id}', [\App\Http\Controllers\ChatroomController::class, 'destroy']);
+    Route::post('chatrooms/{id}/join', [\App\Http\Controllers\ChatroomController::class, 'join']);
+    Route::post('chatrooms/{id}/leave', [\App\Http\Controllers\ChatroomController::class, 'leave']);
+    Route::get('chatrooms/{id}/members', [\App\Http\Controllers\ChatroomController::class, 'members']);
+
+    // Proximity Chatrooms
+    Route::get('proximity-chatrooms/nearby', [\App\Http\Controllers\ProximityChatroomController::class, 'findNearby']);
+    Route::post('proximity-chatrooms', [\App\Http\Controllers\ProximityChatroomController::class, 'create']);
+    Route::get('proximity-chatrooms/{id}', [\App\Http\Controllers\ProximityChatroomController::class, 'show']);
+    Route::post('proximity-chatrooms/{id}/join', [\App\Http\Controllers\ProximityChatroomController::class, 'join']);
+    Route::post('proximity-chatrooms/{id}/leave', [\App\Http\Controllers\ProximityChatroomController::class, 'leave']);
+    Route::post('proximity-chatrooms/{id}/location', [\App\Http\Controllers\ProximityChatroomController::class, 'updateLocation']);
+    Route::get('proximity-chatrooms/{id}/members', [\App\Http\Controllers\ProximityChatroomController::class, 'members']);
+    Route::get('proximity-chatrooms/{id}/networking', [\App\Http\Controllers\ProximityChatroomController::class, 'nearbyNetworking']);
+    Route::get('proximity-chatrooms/{id}/analytics', [\App\Http\Controllers\ProximityChatroomController::class, 'analytics']);
+
+    // Proximity Chatroom Messages
+    Route::get('proximity-chatrooms/{chatroomId}/messages', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'index']);
+    Route::post('proximity-chatrooms/{chatroomId}/messages', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'store']);
+    Route::get('proximity-chatrooms/{chatroomId}/messages/pinned', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'pinned']);
+    Route::get('proximity-chatrooms/{chatroomId}/messages/networking', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'networking']);
+    Route::get('proximity-chatrooms/{chatroomId}/messages/social', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'social']);
+    Route::get('proximity-chatrooms/{chatroomId}/messages/{messageId}', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'show']);
+    Route::put('proximity-chatrooms/{chatroomId}/messages/{messageId}', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'update']);
+    Route::delete('proximity-chatrooms/{chatroomId}/messages/{messageId}', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'destroy']);
+    Route::post('proximity-chatrooms/{chatroomId}/messages/{messageId}/reactions', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'addReaction']);
+    Route::delete('proximity-chatrooms/{chatroomId}/messages/{messageId}/reactions', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'removeReaction']);
+    Route::post('proximity-chatrooms/{chatroomId}/messages/{messageId}/pin', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'pin']);
+    Route::delete('proximity-chatrooms/{chatroomId}/messages/{messageId}/pin', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'unpin']);
+    Route::get('proximity-chatrooms/{chatroomId}/messages/{messageId}/replies', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'replies']);
+
     // Restored Resources
     Route::apiResource('venues', \App\Http\Controllers\VenueController::class);
     Route::apiResource('subscriptions', \App\Http\Controllers\SubscriptionController::class);

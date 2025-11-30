@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('location_name');
             $table->decimal('latitude', 10, 8);
             $table->decimal('longitude', 11, 8);
-            $table->timestamp('starts_at');
-            $table->timestamp('ends_at');
+            $table->timestamp('starts_at')->nullable();
+            $table->timestamp('ends_at')->nullable();
             $table->integer('max_attendees')->nullable();
             $table->decimal('price', 10, 2)->nullable();
             $table->foreignId('created_by_user_id')->constrained('users')->onDelete('cascade');

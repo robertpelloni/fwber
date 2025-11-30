@@ -17,8 +17,8 @@ class RecommendationService
 
     public function __construct()
     {
-        $this->openaiApiKey = config('services.openai.api_key');
-        $this->geminiApiKey = config('services.gemini.api_key');
+        $this->openaiApiKey = config('services.openai.api_key', '');
+        $this->geminiApiKey = config('services.gemini.api_key', '');
         $this->recommendationConfig = config('recommendations', [
             'enabled' => true,
             'providers' => ['openai', 'gemini'],
