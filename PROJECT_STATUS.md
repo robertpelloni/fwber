@@ -30,30 +30,36 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   AI-powered, location-based, and collaborative filtering recommendations.
     -   Trending content feed.
     -   **Performance**: Redis caching implemented for index, trending, and feed endpoints (5-30m TTL).
+    -   **Verification**: E2E tests (`recommendations.cy.js`) passing with mocked backend.
 3.  **Proximity Artifacts (Local Pulse)**:
     -   Ephemeral, location-based content feed.
     -   **Performance**: Grid-based spatial caching (~110m precision) for high-traffic feeds.
+    -   **Verification**: E2E tests (`proximity-feed.cy.js`) passing with mocked backend.
 4.  **Matches System**:
     -   Matching logic, listing, and interaction.
     -   **Performance**: Redis caching for match feeds and established match lists with tag-based invalidation.
     -   **Database**: Performance indexes added for geospatial queries (`user_profiles`) and feed filtering (`proximity_artifacts`).
+    -   **Verification**: E2E tests (`matching-flow.cy.js`) passing with mocked backend.
 5.  **Proximity Chatrooms**:
     -   Location-based chat rooms with "enter/leave" mechanics.
     -   Real-time messaging within rooms.
+    -   **Verification**: E2E tests (`proximity-chatrooms.cy.js`) passing with mocked backend.
 6.  **Face Reveal** (Nov 27 - Complete):
     -   Progressive photo reveal mechanics based on relationship tiers.
     -   Frontend UI integrated with feature flag gating (`NEXT_PUBLIC_FEATURE_FACE_REVEAL`).
     -   `PhotoRevealGate`, `FaceReveal`, and `SecurePhotoReveal` components fully implemented.
     -   `usePhotoReveal` hook for reveal workflow.
+    -   **Verification**: E2E tests (`face-reveal.cy.js`) passing with mocked backend.
 5.  **Admin Observability** (Nov 26 - Complete):
     -   Analytics dashboard wired to backend (`/analytics`, `/analytics/realtime`, `/analytics/moderation`).
     -   Rate Limit Stats component using proper API client with `NEXT_PUBLIC_API_URL`.
     -   CSV export functionality for analytics and rate limit data.
     -   Frontend feature flag hooks (`use-feature-flags.ts`) for runtime feature gating.
+    -   **Verification**: E2E tests (`admin-analytics.cy.js`) passing with mocked backend.
 6.  **WebSocket/Mercure Integration** (Nov 27 - Complete):
     -   `WebSocketProvider` context for singleton connection management.
     -   `PresenceComponents` (PresenceIndicator, TypingIndicator, OnlineUsersList, ConnectionStatusBadge).
-    -   E2E tests (`realtime-chat.cy.js`) passing for connection, messaging, typing indicators, and presence.
+    -   **Verification**: E2E tests (`realtime-chat.cy.js`) passing for connection, messaging, typing indicators, and presence.
 7.  **Admin Feature Flag Toggle UI** (Nov 27 - Complete):
     -   `/admin/settings` page with full feature flag management.
     -   System health monitoring (Mercure, Cache, Queue status).
