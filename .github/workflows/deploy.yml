@@ -36,4 +36,4 @@ jobs:
             git reset --hard origin/main
             
             # Run deployment script
-            bash deploy.sh --env=production
+            bash deploy.sh --env=production --force
