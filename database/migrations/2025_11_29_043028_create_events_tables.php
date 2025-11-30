@@ -11,33 +11,37 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('events', function (Blueprint $table) {
-            $table->id();
-            $table->string('title');
-            $table->text('description');
-            $table->string('location_name');
-            $table->decimal('latitude', 10, 8);
-            $table->decimal('longitude', 11, 8);
-            $table->timestamp('starts_at')->nullable();
-            $table->timestamp('ends_at')->nullable();
-            $table->integer('max_attendees')->nullable();
-            $table->decimal('price', 10, 2)->nullable();
-            $table->foreignId('created_by_user_id')->constrained('users')->onDelete('cascade');
-            $table->enum('status', ['upcoming', 'ongoing', 'completed', 'cancelled'])->default('upcoming');
-            $table->timestamps();
+        if (!Schema::hasTable('events')) {
+            Schema::create('events', function (Blueprint $table) {
+                $table->id();
+                $table->string('title');
+                $table->text('description');
+                $table->string('location_name');
+                $table->decimal('latitude', 10, 8);
+                $table->decimal('longitude', 11, 8);
+                $table->timestamp('starts_at')->nullable();
+                $table->timestamp('ends_at')->nullable();
+                $table->integer('max_attendees')->nullable();
+                $table->decimal('price', 10, 2)->nullable();
+                $table->foreignId('created_by_user_id')->constrained('users')->onDelete('cascade');
+                $table->enum('status', ['upcoming', 'ongoing', 'completed', 'cancelled'])->default('upcoming');
+                $table->timestamps();
 
-            $table->index(['latitude', 'longitude']);
-        });
+                $table->index(['latitude', 'longitude']);
+            });
+        }
 
-        Schema::create('event_attendees', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->enum('status', ['attending', 'maybe', 'declined'])->default('attending');
-            $table->timestamps();
+        if (!Schema::hasTable('event_attendees')) {
+            Schema::create('event_attendees', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
+                $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+                $table->enum('status', ['attending', 'maybe', 'declined'])->default('attending');
+                $table->timestamps();
 
-            $table->unique(['event_id', 'user_id']);
-        });
+                $table->unique(['event_id', 'user_id']);
+            });
+        }
     }
 
     /**
