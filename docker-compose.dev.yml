@@ -30,7 +30,6 @@ services:
       - "8002:8000"
     volumes:
       - ./fwber-backend:/var/www/html
-      - /var/www/html/vendor
       - /var/www/html/node_modules
     environment:
       - APP_ENV=local

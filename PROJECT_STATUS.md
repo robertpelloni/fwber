@@ -83,6 +83,11 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Frontend**: Dedicated portal at `/venue` (Login, Register, Dashboard).
     -   **Auth**: Separate `venue` guard and `venues` provider in Laravel Auth.
     -   **Features**: Venue registration, profile management, and dashboard.
+12. **Venue Check-in & Presence System** (Dec 01 - Complete):
+    -   **Backend**: `VenueCheckin` model, `VenueCheckinController` (check-in, check-out, current status).
+    -   **Database**: `venue_checkins` table with auto-checkout logic.
+    -   **Frontend**: User-facing venue list and check-in UI at `/venues`.
+    -   **Features**: Real-time check-in status, automatic checkout from previous venues, venue history.
 
 ### ✅ Completed Future Features (2026+ Early Access)
 1.  **Premium Tiers (Gold)**:
@@ -135,6 +140,9 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   Restored missing API routes for `Recommendations`, `Proximity Artifacts`, `Matches`, and `Chatrooms` in `fwber-backend/routes/api.php`.
     -   Fixed `RecommendationService` instantiation error (null config handling).
     -   Verified endpoints via `ControllerCachingTest`.
+-   **Environment Fixes (Dec 01)**:
+    -   Resolved Docker/Composer volume mounting issue causing `Class "Laravel\Sanctum\Sanctum" not found`.
+    -   Updated `docker-compose.dev.yml` to prevent overwriting the `vendor` directory.
 -   **Documentation**: Consolidated into this file and `AGENTS.md`. Old status reports archived.
 -   **Testing**: Full E2E suite available in `fwber-frontend/cypress/e2e/` (16 test files).
 -   **Feature Flags**: See `docs/FEATURE_FLAGS.md` for complete list and configuration.
