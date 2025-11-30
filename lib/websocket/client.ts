@@ -561,6 +561,7 @@ export class WebSocketClient {
     channels: string[];
     heartbeat_interval: number;
   }> {
+    console.log('WebSocketClient: establishConnection called');
     const response = await apiClient.post<{
       connection_id: string;
       user_id: string;
@@ -573,6 +574,7 @@ export class WebSocketClient {
         device_type: this.getDeviceType(),
       },
     });
+    console.log('WebSocketClient: establishConnection response', response);
 
     return response.data;
   }

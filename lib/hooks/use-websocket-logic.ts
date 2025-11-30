@@ -207,10 +207,12 @@ export function useWebSocketLogic(options: UseWebSocketOptions = {}) {
   });
 
   useEffect(() => {
-    if (isAuthenticated && user?.token && options.autoConnect !== false) {
+    console.log('useWebSocketLogic effect triggered. Auth:', isAuthenticated, 'Token:', !!authToken, 'AutoConnect:', options.autoConnect);
+    if (isAuthenticated && authToken && options.autoConnect !== false) {
+      console.log('Initializing WebSocket client...');
       const handlers = handlersRef.current;
 
-      const wsClient = createWebSocketClient(wsUrl, token, {
+      const wsClient = createWebSocketClient(wsUrl, authToken, {
         autoConnect: true,
         heartbeatInterval: options.heartbeatInterval || 30000,
         maxReconnectAttempts: options.maxReconnectAttempts || 5,
@@ -252,7 +254,6 @@ export function useWebSocketLogic(options: UseWebSocketOptions = {}) {
     }
   }, [
     isAuthenticated,
-    user?.token,
     wsUrl,
     token,
     options.autoConnect,
@@ -262,8 +263,11 @@ export function useWebSocketLogic(options: UseWebSocketOptions = {}) {
   ]);
 
   const connect = useCallback(() => {
+    console.log('Manual connect called. Client exists:', !!client);
     if (client) {
       client.connect();
+    } else {
+      console.warn('Cannot connect: Client is null');
     }
   }, [client]);
 
@@ -406,5 +410,6 @@ export function useWebSocketLogic(options: UseWebSocketOptions = {}) {
     clearTypingIndicators,
     getConnectionStatus,
     client,
+    isReady: !!client,
   };
 }

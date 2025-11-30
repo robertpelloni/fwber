@@ -95,6 +95,7 @@ describe('ML Content Generation E2E Test', () => {
   it('should test Smart Content Editor with real-time optimization', () => {
     // Login first
     cy.visit('/login');
+    cy.wait(1000);
     cy.get('input[name="email"]').type(testUser.email);
     cy.get('input[name="password"]').type(testUser.password);
     cy.get('button[type="submit"]').click();

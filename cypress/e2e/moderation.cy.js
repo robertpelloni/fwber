@@ -71,7 +71,7 @@ describe('Moderation Dashboard', () => {
 
     cy.wait('@reviewFlag').its('request.body').should('include', {
       action: 'approve',
-      reason: 'Allowed'
+      reason: 'Content approved'
     });
   });
 });

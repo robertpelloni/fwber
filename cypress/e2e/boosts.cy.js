@@ -42,7 +42,7 @@ describe('Profile Boosts', () => {
             name: 'Match User',
             age: 25,
             locationDescription: 'New York, NY',
-            avatarUrl: '/images/match.jpg',
+            avatarUrl: '/images/test-avatar.svg',
             compatibilityScore: 0.95,
             bio: 'Test Bio'
           }

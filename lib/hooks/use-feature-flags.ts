@@ -34,12 +34,24 @@ const ENV_VAR_MAP: Record<FeatureFlagName, string> = {
 
 /**
  * Check if a feature flag is enabled via environment variable
+ * Note: We must access process.env.NEXT_PUBLIC_* explicitly for Next.js/Webpack to inline the values.
+ * Dynamic access like process.env[key] will return undefined in the browser.
  */
 function getEnvFeatureFlag(name: FeatureFlagName): boolean {
-  const envKey = ENV_VAR_MAP[name];
-  if (!envKey) return false;
+  let value: string | undefined;
 
-  const value = process.env[envKey];
+  switch (name) {
+    case 'client_face_blur':
+      value = process.env.NEXT_PUBLIC_FEATURE_CLIENT_FACE_BLUR;
+      break;
+    case 'face_reveal':
+      value = process.env.NEXT_PUBLIC_FEATURE_FACE_REVEAL;
+      break;
+    case 'local_media_vault':
+      value = process.env.NEXT_PUBLIC_FEATURE_LOCAL_MEDIA_VAULT;
+      break;
+  }
+
   return value === 'true' || value === '1';
 }
 

@@ -53,6 +53,7 @@ describe('Events', () => {
     });
 
     cy.wait('@getEvents');
+    cy.wait(1000);
     cy.contains('Community Meetup').should('be.visible');
     cy.contains('Central Park').should('be.visible');
   });

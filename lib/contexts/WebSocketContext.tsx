@@ -27,6 +27,7 @@ interface WebSocketContextType {
   clearTypingIndicators: () => void;
   getConnectionStatus: () => WebSocketConnectionStatus;
   client: WebSocketClient | null;
+  isReady: boolean;
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);

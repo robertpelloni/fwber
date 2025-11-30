@@ -2,11 +2,19 @@ describe('Real-time Chat & Presence', () => {
   beforeEach(() => {
     // Forward console logs to Cypress terminal
     cy.on('window:console', (msg) => {
-      console.log('BROWSER LOG:', msg);
+      // console.log('BROWSER LOG:', msg);
+      // Use cy.task to print to terminal if possible, but we can't chain it here easily.
+      // However, we can use a trick:
+      // cy.now('task', 'log', 'BROWSER LOG: ' + JSON.stringify(msg)); // cy.now is internal
+      // Let's just rely on the fact that we can see the output if we look closely or if we use a different approach.
+      // Actually, let's try to use the task via a promise if possible, or just ignore it for now and trust the file output.
+      // But the file output didn't show it.
+      
+      // Let's try to use a simple console.log, but maybe the issue is that the browser console is not piped.
     });
 
     // Mock the API endpoint for connection details
-    cy.intercept('POST', '**/api/websocket/connect', {
+    cy.intercept('POST', '**/websocket/connect', {
       statusCode: 200,
       body: {
         connection_id: 'test-connection-id',
@@ -18,6 +26,14 @@ describe('Real-time Chat & Presence', () => {
 
     cy.visit('/websocket', {
       onBeforeLoad(win) {
+        // Set auth token to simulate logged-in state
+        win.localStorage.setItem('fwber_token', 'mock-jwt-token');
+        win.localStorage.setItem('fwber_user', JSON.stringify({
+          id: 'test-user-id',
+          name: 'Test User',
+          email: 'test@example.com'
+        }));
+
         // Define the MockWebSocket class
         class MockWebSocket {
           constructor(url) {
@@ -114,6 +130,8 @@ describe('Real-time Chat & Presence', () => {
   });
 
   it('should connect to WebSocket and show online status', () => {
+    // Wait for AuthProvider and WebSocket client initialization
+    cy.contains('button', 'Connect').should('not.be.disabled').click();
     cy.wait('@connectRequest');
     
     // Wait for connection to be established (MockWebSocket sets readyState=1 after 100ms)
@@ -137,6 +155,7 @@ describe('Real-time Chat & Presence', () => {
   });
 
   it('should display typing indicator when receiving event', () => {
+    cy.contains('button', 'Connect').should('not.be.disabled').click();
     cy.wait('@connectRequest');
 
     // Select a recipient to enable the chat view
@@ -175,6 +194,7 @@ describe('Real-time Chat & Presence', () => {
   });
 
   it('should update presence status of other users', () => {
+    cy.contains('button', 'Connect').should('not.be.disabled').click();
     cy.wait('@connectRequest');
     cy.wait(500); // Wait for listeners to be attached
 
@@ -197,6 +217,7 @@ describe('Real-time Chat & Presence', () => {
   });
 
   it('should send a chat message', () => {
+    cy.contains('button', 'Connect').should('not.be.disabled').click();
     cy.wait('@connectRequest');
 
     // Select a recipient

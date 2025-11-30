@@ -30,6 +30,7 @@ function WebSocketPageContent() {
     sendNotification,
     clearMessages,
     clearNotifications,
+    isReady,
   } = useWebSocket();
 
   const {
@@ -121,10 +122,10 @@ function WebSocketPageContent() {
           <div className="flex space-x-4">
             <button
               onClick={handleConnect}
-              disabled={connectionStatus.connected}
+              disabled={connectionStatus.connected || !isReady}
               className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-4 py-2 rounded transition-colors"
             >
-              Connect
+              {isReady ? 'Connect' : 'Initializing...'}
             </button>
             <button
               onClick={handleDisconnect}
