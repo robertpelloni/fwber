@@ -15,7 +15,10 @@ import {
   MapPin, 
   User,
   Settings,
-  LogOut
+  LogOut,
+  Calendar,
+  Radio,
+  Zap
 } from 'lucide-react'
 
 interface AppHeaderProps {
@@ -27,7 +30,9 @@ const navLinks = [
   { href: '/dashboard', label: 'Dashboard', icon: Home },
   { href: '/matches', label: 'Matches', icon: Heart },
   { href: '/messages', label: 'Messages', icon: MessageSquare },
-  { href: '/friends', label: 'Friends', icon: Users },
+  { href: '/events', label: 'Events', icon: Calendar },
+  { href: '/groups', label: 'Groups', icon: Users },
+  { href: '/proximity-chatrooms', label: 'Local Chat', icon: Radio },
   { href: '/nearby', label: 'Nearby', icon: MapPin },
   { href: '/chatrooms', label: 'Chatrooms', icon: MessageSquare },
 ]
@@ -106,6 +111,15 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                     >
                       <User className="w-4 h-4" />
                       My Profile
+                    </Link>
+
+                    <Link
+                      href="/premium"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 font-medium"
+                    >
+                      <Zap className="w-4 h-4" />
+                      Upgrade to Premium
                     </Link>
                     
                     <Link
