@@ -1,30 +1,48 @@
 describe('AI-Powered Recommendations', () => {
   const testUser = {
+    id: 1,
     name: 'Recommendation Test User',
     email: `rec-test-${Date.now()}@example.com`,
     password: 'password123',
+    profile: {
+      bio: 'Test bio',
+      locationLatitude: 40.7128,
+      locationLongitude: -74.0060
+    }
   };
 
-  before(() => {
-    // Register a new user once for all tests
-    cy.visit('/register');
-    cy.get('input[name="name"]').type(testUser.name);
-    cy.get('input[name="email"]').type(testUser.email);
-    cy.get('input[name="password"]').type(testUser.password);
-    cy.get('input[name="passwordConfirmation"]').type(testUser.password);
-    cy.get('button[type="submit"]').click();
-    cy.url().should('include', '/dashboard');
-    cy.contains(`Welcome, ${testUser.name}`);
-    cy.get('button').contains('Logout').click();
-  });
-
   beforeEach(() => {
-    // Login before each test
-    cy.visit('/login');
-    cy.get('input[name="email"]').type(testUser.email);
-    cy.get('input[name="password"]').type(testUser.password);
-    cy.get('button[type="submit"]').click();
-    cy.url().should('include', '/dashboard');
+    // Mock Auth Endpoints
+    cy.intercept('POST', '/api/auth/login', {
+      statusCode: 200,
+      body: {
+        token: 'mock-jwt-token',
+        user: testUser,
+        message: 'Login successful'
+      }
+    }).as('login');
+
+    cy.intercept('GET', '/api/user', {
+      statusCode: 200,
+      body: testUser
+    }).as('getUser');
+
+    // Mock Dashboard Stats (needed if login redirects to dashboard)
+    cy.intercept('GET', '/api/dashboard/stats', {
+      statusCode: 200,
+      body: {
+        total_matches: 5,
+        pending_matches: 2,
+        accepted_matches: 3,
+        conversations: 4,
+        profile_views: 12,
+        today_views: 3,
+        match_score_avg: 85,
+        response_rate: 90,
+        days_active: 1,
+        last_login: new Date().toISOString()
+      }
+    }).as('getDashboardStats');
 
     // Mock Recommendations API
     cy.intercept('GET', '/api/recommendations?*', {
@@ -108,6 +126,14 @@ describe('AI-Powered Recommendations', () => {
       },
     }).as('submitFeedback');
 
+    // Perform Login
+    cy.visit('/login');
+    cy.get('input[name="email"]').type(testUser.email);
+    cy.get('input[name="password"]').type(testUser.password);
+    cy.get('button[type="submit"]').click();
+    cy.wait('@login');
+    cy.url().should('include', '/dashboard');
+
     // Visit the recommendations page
     cy.visit('/recommendations');
   });
@@ -125,8 +151,6 @@ describe('AI-Powered Recommendations', () => {
     cy.contains('button', 'AI-Powered').click();
     cy.wait('@getAIRecommendations');
     cy.contains('Hiking Group in Yosemite').should('be.visible');
-    // Should not see location recommendation if we only mock AI response for this tab
-    // But since we mocked it specifically, we can check.
   });
 
   it('should load trending recommendations', () => {
