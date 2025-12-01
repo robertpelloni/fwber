@@ -7,10 +7,7 @@
 The project has successfully completed the MVP, Secondary Systems, and Production Hardening phases. It is now **deployed and live**.
 
 ### ⚠️ Known Issues / Technical Debt
-1.  **Payment Subscriptions**:
-    -   **Status**: 🚧 In Progress.
-    -   **Details**: Backend supports Stripe Payment Intents via `StripePaymentGateway`. Frontend currently uses legacy mock flow. Needs update to Stripe Elements.
-2.  **Media Analysis**:
+1.  **Media Analysis**:
     -   **Status**: ⏸️ Disabled / Mocked.
     -   **Details**: Feature flag `media_analysis` is `false`. Controller exists but relies on mocked driver.
 
