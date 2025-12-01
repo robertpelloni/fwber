@@ -38,7 +38,7 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 4.  **Matches System**:
     -   Matching logic, listing, and interaction.
     -   **Performance**: Redis caching for match feeds and established match lists with tag-based invalidation.
-    -   **Database**: Performance indexes added for geospatial queries (`user_profiles`) and feed filtering (`proximity_artifacts`).
+    -   **Database**: Performance indexes added for geospatial queries (`user_profiles`), feed filtering (`proximity_artifacts`), and messaging/matching (`messages`, `matches`).
     -   **Verification**: E2E tests (`matching-flow.cy.js`) passing with mocked backend.
 5.  **Proximity Chatrooms**:
     -   Location-based chat rooms with "enter/leave" mechanics.
