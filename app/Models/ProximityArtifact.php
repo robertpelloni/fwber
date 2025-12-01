@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\Builder;
 
 class ProximityArtifact extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, Prunable;
 
     protected $fillable = [
         'user_id', 'type', 'content', 'location_lat', 'location_lng',
@@ -25,6 +26,14 @@ class ProximityArtifact extends Model
     ];
 
     protected $appends = ['fuzzed_latitude', 'fuzzed_longitude'];
+
+    /**
+     * Get the prunable model query.
+     */
+    public function prunable(): Builder
+    {
+        return static::where('expires_at', '<=', now());
+    }
 
     public function scopeActive(Builder $q): Builder
     {
