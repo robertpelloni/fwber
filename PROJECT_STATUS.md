@@ -80,6 +80,8 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Backend**: `SecurityHeaders` middleware implemented and registered globally in `bootstrap/app.php`.
     -   **Data Retention**: `Prunable` trait implemented on `ProximityArtifact`, `TelemetryEvent`, and `Notification` models. Scheduled cleanup tasks added to `routes/console.php`.
     -   **Audit**: Automated security audit skipped due to `enlightn` incompatibility with Laravel 12; manual review performed via header configuration.
+    -   **Photo Encryption**: Server-side encryption for sensitive photos implemented via `PhotoEncryptionService`. Integrated into `PhotoRevealController` for secure storage and retrieval.
+
 11. **Venue Partner Portal** (Nov 28 - Complete):
     -   **Backend**: `Venue` model, `VenueAuthController`, `VenueController` (Index, Show, Update).
     -   **Frontend**: Dedicated portal at `/venue` (Login, Register, Dashboard).
@@ -193,6 +195,9 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   Fixed Gemini integration to use `chat()` instead of `generate()`.
     -   Resolved `md5` hashing issue with array content.
     -   Verified with updated unit tests (`RecommendationServiceTest.php`).
+-   **Test Environment Fixes (Dec 01)**:
+    -   Created missing migrations (`matches`, `photos`, `photo_reveals`) to support backend feature testing.
+    -   Verified `PhotoRevealController` decryption logic with new feature tests.
 
 ## 🚀 Next Phase: Post-Launch Monitoring
 See `docs/ROADMAP.md` for future plans.
