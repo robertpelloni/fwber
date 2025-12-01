@@ -33,11 +33,15 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 
 ### ✅ Completed Secondary Systems
 1.  **AI Content Generation**:
-    -   Profile bio generation.
-    -   Conversation starters.
-    -   Bulletin board post suggestions.
+    -   **Status**: ✅ Implemented.
+    -   **Details**: `ContentGenerationService` fully implemented with multi-provider support (OpenAI, Gemini, Claude).
+    -   **Routes**: `post('content/generate-bio')`, `post('content/generate-posts/{boardId}')`, `post('content/generate-starters')`.
     -   **Verification**: E2E tests (`ml-content-generation.cy.js`) passing with mocked backend.
-2.  **Recommendations Engine**:
+2.  **AI Avatar Generation**:
+    -   **Status**: ✅ Implemented.
+    -   **Details**: `AvatarGenerationService` supports DALL-E, Gemini, Replicate. Frontend flow `AvatarGenerationFlow.tsx` complete.
+    -   **Routes**: `post('avatar/generate')`.
+3.  **Recommendations Engine**:
     -   AI-powered, location-based, and collaborative filtering recommendations.
     -   Trending content feed.
     -   **Performance**: Redis caching implemented for index, trending, and feed endpoints (5-30m TTL).
