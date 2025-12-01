@@ -15,7 +15,11 @@ mkdir -p $BACKUP_DIR
 echo "Starting backup for database: $DB_DATABASE"
 
 # Dump database
-mysqldump -h $DB_HOST -u $DB_USERNAME -p$DB_PASSWORD $DB_DATABASE > $FILEPATH
+# Use --no-tablespaces for compatibility with some cloud providers (like RDS)
+# Include port if specified
+DB_PORT=${DB_PORT:-3306}
+
+mysqldump --no-tablespaces -h $DB_HOST -P $DB_PORT -u $DB_USERNAME -p$DB_PASSWORD $DB_DATABASE > $FILEPATH
 
 if [ $? -eq 0 ]; then
     echo "Backup created successfully: $FILEPATH"
