@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useAuth } from '@/lib/auth-context';
-import axios from '@/lib/axios';
+import { api } from '@/lib/api/client';
 import { CreditCard, Check, Clock, AlertCircle, Star } from 'lucide-react';
 import Link from 'next/link';
 
@@ -39,12 +39,12 @@ export default function SubscriptionPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [statusRes, historyRes] = await Promise.all([
-        axios.get('/api/premium/status'),
-        axios.get('/api/subscriptions')
+      const [statusData, historyData] = await Promise.all([
+        api.get<PremiumStatus>('/premium/status'),
+        api.get<any>('/subscriptions')
       ]);
-      setStatus(statusRes.data);
-      setHistory(historyRes.data.data || historyRes.data); // Handle pagination or direct array
+      setStatus(statusData);
+      setHistory(historyData.data || historyData); // Handle pagination or direct array
     } catch (err) {
       console.error('Failed to fetch subscription data:', err);
       setError('Failed to load subscription details.');
@@ -60,7 +60,7 @@ export default function SubscriptionPage() {
       setSuccessMessage(null);
       
       // Call the purchase endpoint (using mock gateway by default)
-      await axios.post('/api/premium/purchase', {
+      await api.post('/premium/purchase', {
         payment_method_id: 'tok_visa' // Mock token
       });
 
@@ -68,7 +68,7 @@ export default function SubscriptionPage() {
       await fetchData(); // Refresh data
     } catch (err: any) {
       console.error('Purchase failed:', err);
-      setError(err.response?.data?.error || 'Purchase failed. Please try again.');
+      setError(err.message || 'Purchase failed. Please try again.');
     } finally {
       setPurchasing(false);
     }

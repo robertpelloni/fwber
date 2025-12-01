@@ -93,7 +93,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 tracking-tight mb-8">
-              Find Your <span className="text-blue-600">Perfect Match</span> Tonight
+              FWBer.me - <span className="text-blue-600">Adult Social Network</span>
             </h1>
             
             <div className="mb-8 transform hover:scale-105 transition-transform duration-300">

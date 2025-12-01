@@ -22,8 +22,8 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'FWBer.me - Adult Dating Platform',
-  description: 'A modern adult dating platform with advanced matching algorithms',
+  title: 'FWBer.me - Adult Social Network',
+  description: 'A modern adult social network with advanced matching algorithms',
   keywords: ['dating', 'adult', 'matching', 'relationships'],
   authors: [{ name: 'FWBer.me Team' }],
   manifest: '/manifest.json',
