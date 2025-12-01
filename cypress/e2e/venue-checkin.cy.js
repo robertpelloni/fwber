@@ -53,7 +53,7 @@ describe('Venue Check-in System', () => {
     }).as('getUser');
 
     // Mock venues list
-    cy.intercept('GET', '**/api/venues', {
+    cy.intercept('GET', '**/api/venues*', {
       statusCode: 200,
       body: {
         data: venues
@@ -72,6 +72,16 @@ describe('Venue Check-in System', () => {
       onBeforeLoad: (win) => {
         win.localStorage.setItem('fwber_token', 'fake-token');
         win.localStorage.setItem('fwber_user', JSON.stringify(user));
+        
+        // Mock Geolocation
+        cy.stub(win.navigator.geolocation, 'getCurrentPosition').callsFake((cb) => {
+          return cb({
+            coords: {
+              latitude: 40.7128,
+              longitude: -74.0060
+            }
+          });
+        });
       }
     });
 
