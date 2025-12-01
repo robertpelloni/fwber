@@ -86,7 +86,7 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   Web App Manifest configured for installability.
     -   Service Worker strategy implemented (Network First for API, Cache First for static).
     -   **Install Prompt**: Added `PWAInstallPrompt` component to homepage for easy installation.
-    -   **Note**: Push Notifications are currently client-side only (no backend support).
+    -   **Push Notifications**: Backend support added (Dec 01).
 10. **Security Hardening** (Dec 01 - Complete):
     -   **Frontend**: Strict Content Security Policy (CSP), HSTS, X-Frame-Options, and Permissions-Policy headers configured in `next.config.js`.
     -   **Backend**: `SecurityHeaders` middleware implemented and registered globally in `bootstrap/app.php`.
@@ -131,14 +131,19 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   `BoostController` and database schema for active boosts.
     -   Frontend integration for purchasing and visualizing active boosts.
     -   **Verification**: E2E tests (`boosts.cy.js`) passing with mocked backend.
+    -   **Refactor**: Frontend API calls standardized to use `lib/api/client.ts`.
 3.  **Events System**:
     -   Location-based event discovery and creation.
     -   RSVP management and attendee lists.
     -   Geospatial queries for finding events nearby.
+    -   **Verification**: E2E tests (`events.cy.js`) passing with mocked backend.
+    -   **Refactor**: Frontend API calls standardized to use `lib/api/client.ts`.
 4.  **Groups System**:
     -   Interest-based communities.
     -   Group creation, membership management, and discussion feeds.
     -   Full frontend routing and component library for groups.
+    -   **Verification**: E2E tests (`groups.cy.js`) passing with mocked backend.
+    -   **Refactor**: Frontend API calls standardized to use `lib/api/client.ts`.
 5.  **Behavioral Matching**:
     -   Implemented engagement scoring based on messages, groups, and events.
     -   Activity pattern analysis (peak hours).
