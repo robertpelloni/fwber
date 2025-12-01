@@ -60,6 +60,7 @@ class ContentGenerationServiceTest extends TestCase
         Config::set('content_generation.models.claude', 'claude-3-5-sonnet-20241022');
         Config::set('content_generation.max_tokens', 100);
         Config::set('content_generation.temperature', 0.7);
+        Config::set('content_generation.cache_ttl', 3600); // Add this line
 
         $service = new ContentGenerationService($mockLlmManager);
         
