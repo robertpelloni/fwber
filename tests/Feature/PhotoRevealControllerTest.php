@@ -62,9 +62,9 @@ class PhotoRevealControllerTest extends TestCase
         
         // Mock Request
         $request = \Illuminate\Http\Request::create('/dummy', 'GET');
-        $request->setUserResolver(function () use ($matchUser) {
-            return $matchUser;
-        });
+        
+        // Authenticate as matchUser
+        $this->actingAs($matchUser);
 
         // Call method
         $response = $controller->original($request, $photo, $encryptionService);
