@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import Link from 'next/link'
 import SexQuote from '@/components/SexQuote'
+import PWAInstallPrompt from '@/components/PWAInstallPrompt'
 import { Shield, Heart, Zap, MapPin, MessageCircle, Users, Menu, X, Lock, Ghost, Layers, FileText, Code, Building2 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -292,6 +293,8 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+      
+      <PWAInstallPrompt />
     </div>
   )
 }
