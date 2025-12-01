@@ -36,6 +36,7 @@
     32 => 'Sentry\\Laravel\\ServiceProvider',
     33 => 'Sentry\\Laravel\\Tracing\\ServiceProvider',
     34 => 'App\\Providers\\AppServiceProvider',
+    35 => 'App\\Providers\\PaymentServiceProvider',
   ),
   'eager' => 
   array (
@@ -59,6 +60,7 @@
     17 => 'Sentry\\Laravel\\ServiceProvider',
     18 => 'Sentry\\Laravel\\Tracing\\ServiceProvider',
     19 => 'App\\Providers\\AppServiceProvider',
+    20 => 'App\\Providers\\PaymentServiceProvider',
   ),
   'deferred' => 
   array (

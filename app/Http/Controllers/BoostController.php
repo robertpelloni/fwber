@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Boost;
+use App\Models\Payment;
+use App\Services\Payment\PaymentGatewayInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -10,6 +12,13 @@ use OpenApi\Attributes as OA;
 
 class BoostController extends Controller
 {
+    protected $paymentGateway;
+
+    public function __construct(PaymentGatewayInterface $paymentGateway)
+    {
+        $this->paymentGateway = $paymentGateway;
+    }
+
     /**
      * Purchase a profile boost
      *
@@ -50,21 +59,56 @@ class BoostController extends Controller
             return response()->json(['error' => 'You already have an active boost'], 400);
         }
 
-        $duration = $request->type === 'super' ? 120 : 30; // minutes
-        $now = now();
+        $type = $request->type;
+        $amount = $type === 'super' ? 9.99 : 4.99;
+        $currency = 'USD';
+        $paymentMethodId = $request->input('payment_method_id', 'tok_visa');
 
-        // In a real app, we would handle payment processing here.
-        // For this implementation, we assume payment is successful or handled elsewhere.
+        try {
+            $result = $this->paymentGateway->charge($amount, $currency, $paymentMethodId);
 
-        $boost = Boost::create([
-            'user_id' => $user->id,
-            'started_at' => $now,
-            'expires_at' => $now->copy()->addMinutes($duration),
-            'boost_type' => $request->type,
-            'status' => 'active',
-        ]);
+            if ($result->success) {
+                // Log payment
+                Payment::create([
+                    'user_id' => $user->id,
+                    'amount' => $amount,
+                    'currency' => $currency,
+                    'payment_gateway' => config('services.payment.driver', 'mock'),
+                    'transaction_id' => $result->transactionId,
+                    'status' => 'succeeded',
+                    'description' => ucfirst($type) . ' Boost',
+                    'metadata' => $result->data,
+                ]);
 
-        return response()->json($boost);
+                $duration = $type === 'super' ? 120 : 30; // minutes
+                $now = now();
+
+                $boost = Boost::create([
+                    'user_id' => $user->id,
+                    'started_at' => $now,
+                    'expires_at' => $now->copy()->addMinutes($duration),
+                    'boost_type' => $type,
+                    'status' => 'active',
+                ]);
+
+                return response()->json($boost);
+            } else {
+                 Payment::create([
+                    'user_id' => $user->id,
+                    'amount' => $amount,
+                    'currency' => $currency,
+                    'payment_gateway' => config('services.payment.driver', 'mock'),
+                    'transaction_id' => null,
+                    'status' => 'failed',
+                    'description' => ucfirst($type) . ' Boost Failed',
+                    'metadata' => ['error' => $result->message],
+                ]);
+
+                return response()->json(['error' => 'Payment failed: ' . $result->message], 400);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Payment error: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
