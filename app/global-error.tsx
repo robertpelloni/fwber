@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import * as Sentry from '@sentry/nextjs'
 
 export default function GlobalError({
   error,
@@ -13,8 +14,8 @@ export default function GlobalError({
     // Log error for debugging
     console.error('Global error:', error)
 
-    // TODO: Send error to error tracking service (Sentry, etc.)
-    // reportError({ error, digest: error.digest, context: 'global-error-boundary' })
+    // Send error to error tracking service
+    Sentry.captureException(error)
   }, [error])
 
   // Determine error type
@@ -97,7 +98,7 @@ export default function GlobalError({
               <div className="details-content">
                 <div>{error.message}</div>
                 {error.digest && (
-                  <div style={{ marginTop: '0.5rem', color: '#6b7280' }}>
+                  <div className="mt-2 text-gray-500">
                     Error ID: {error.digest}
                   </div>
                 )}

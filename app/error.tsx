@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import * as Sentry from '@sentry/nextjs'
 import { AlertTriangle, Home, RefreshCcw, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
@@ -19,8 +20,8 @@ export default function Error({
     // Log error for debugging
     console.error('App error:', error)
 
-    // TODO: Send error to error tracking service (Sentry, etc.)
-    // reportError({ error, digest: error.digest, context: 'error-boundary' })
+    // Send error to error tracking service
+    Sentry.captureException(error)
   }, [error])
 
   // Determine error type and messaging
@@ -54,7 +55,6 @@ export default function Error({
   }
 
   const handleContactSupport = () => {
-    // TODO: Update with actual support contact method
     window.location.href = 'mailto:support@fwber.me?subject=Error Report&body=' +
       encodeURIComponent(`Error: ${error.message}\nDigest: ${error.digest || 'N/A'}`)
   }

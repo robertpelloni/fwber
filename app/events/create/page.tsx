@@ -4,16 +4,31 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useCreateEvent } from '@/lib/hooks/use-events';
 import { useRouter } from 'next/navigation';
+import { MapPin } from 'lucide-react';
 
 export default function CreateEventPage() {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm();
   const createEvent = useCreateEvent();
   const router = useRouter();
 
+  const getLocation = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setValue('latitude', position.coords.latitude);
+        setValue('longitude', position.coords.longitude);
+      },
+      (error) => {
+        alert('Unable to retrieve your location');
+      }
+    );
+  };
+
   const onSubmit = (data: any) => {
-    // Hardcode lat/lon for now or use a map picker if available.
-    // For this MVP, I'll just ask for them or default them.
-    // Let's add fields for them.
     createEvent.mutate(data, {
       onSuccess: () => {
         router.push('/events');
@@ -72,6 +87,17 @@ export default function CreateEventPage() {
                     className="w-full border rounded-md p-2"
                 />
             </div>
+        </div>
+
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={getLocation}
+            className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+          >
+            <MapPin className="h-4 w-4 mr-1" />
+            Get Current Location
+          </button>
         </div>
 
         <div className="grid grid-cols-2 gap-4">

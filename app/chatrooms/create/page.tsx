@@ -3,24 +3,31 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateChatroom, useChatroomCategories } from '@/lib/hooks/use-chatrooms';
+import { useCreateProximityChatroom } from '@/lib/hooks/use-proximity-chatrooms';
 import { useAuth } from '@/lib/auth-context';
 
 export default function CreateChatroomPage() {
   const router = useRouter();
   const { user } = useAuth();
   const createChatroomMutation = useCreateChatroom();
+  const createProximityChatroomMutation = useCreateProximityChatroom();
   const { data: categories } = useChatroomCategories();
 
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    type: 'interest' as 'interest' | 'city' | 'event' | 'private',
+    type: 'interest' as 'interest' | 'city' | 'event' | 'private' | 'proximity',
+    proximityType: 'social' as 'conference' | 'event' | 'venue' | 'area' | 'temporary' | 'networking' | 'social' | 'dating' | 'professional' | 'casual',
     category: '',
     city: '',
     neighborhood: '',
     is_public: true,
+    latitude: 0,
+    longitude: 0,
+    radius_meters: 1000,
   });
 
+  const [locationStatus, setLocationStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -39,6 +46,32 @@ export default function CreateChatroomPage() {
         [name]: '',
       }));
     }
+  };
+
+  const getLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationStatus('error');
+      setErrors(prev => ({ ...prev, location: 'Geolocation is not supported by your browser' }));
+      return;
+    }
+
+    setLocationStatus('loading');
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setFormData(prev => ({
+          ...prev,
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        }));
+        setLocationStatus('success');
+        setErrors(prev => ({ ...prev, location: '' }));
+      },
+      (error) => {
+        console.error('Geolocation error:', error);
+        setLocationStatus('error');
+        setErrors(prev => ({ ...prev, location: 'Unable to retrieve your location. Please enable location services.' }));
+      }
+    );
   };
 
   const validateForm = () => {
@@ -62,6 +95,15 @@ export default function CreateChatroomPage() {
       newErrors.city = 'City is required for city-based chatrooms';
     }
 
+    if (formData.type === 'proximity') {
+      if (formData.latitude === 0 && formData.longitude === 0) {
+        newErrors.location = 'Location is required for proximity chatrooms';
+      }
+      if (formData.radius_meters < 100 || formData.radius_meters > 10000) {
+        newErrors.radius_meters = 'Radius must be between 100m and 10km';
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -72,8 +114,31 @@ export default function CreateChatroomPage() {
     if (!validateForm()) return;
 
     try {
-      const chatroom = await createChatroomMutation.mutateAsync(formData);
-      router.push(`/chatrooms/${chatroom.id}`);
+      if (formData.type === 'proximity') {
+        const chatroom = await createProximityChatroomMutation.mutateAsync({
+          name: formData.name,
+          description: formData.description,
+          type: formData.proximityType,
+          latitude: formData.latitude,
+          longitude: formData.longitude,
+          radius_meters: Number(formData.radius_meters),
+          city: formData.city || undefined,
+          neighborhood: formData.neighborhood || undefined,
+          is_public: formData.is_public,
+        });
+        router.push(`/chatrooms/${chatroom.id}?type=proximity`);
+      } else {
+        const chatroom = await createChatroomMutation.mutateAsync({
+          name: formData.name,
+          description: formData.description,
+          type: formData.type as 'interest' | 'city' | 'event' | 'private',
+          category: formData.category,
+          city: formData.city,
+          neighborhood: formData.neighborhood,
+          is_public: formData.is_public,
+        });
+        router.push(`/chatrooms/${chatroom.id}`);
+      }
     } catch (error) {
       console.error('Failed to create chatroom:', error);
     }
@@ -173,11 +238,96 @@ export default function CreateChatroomPage() {
                 <option value="city">🏙️ City-based</option>
                 <option value="event">🎉 Event-based</option>
                 <option value="private">🔒 Private</option>
+                <option value="proximity">📍 Proximity (Location-based)</option>
               </select>
               <p className="mt-1 text-sm text-gray-500">
                 Choose the type of chatroom you want to create
               </p>
             </div>
+
+            {/* Proximity Type */}
+            {formData.type === 'proximity' && (
+              <div>
+                <label htmlFor="proximityType" className="block text-sm font-medium text-gray-700 mb-2">
+                  Proximity Category *
+                </label>
+                <select
+                  id="proximityType"
+                  name="proximityType"
+                  value={formData.proximityType}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="social">Social</option>
+                  <option value="networking">Networking</option>
+                  <option value="event">Event</option>
+                  <option value="conference">Conference</option>
+                  <option value="venue">Venue</option>
+                  <option value="area">Area</option>
+                  <option value="temporary">Temporary</option>
+                  <option value="dating">Dating</option>
+                  <option value="professional">Professional</option>
+                  <option value="casual">Casual</option>
+                </select>
+              </div>
+            )}
+
+            {/* Location (for proximity) */}
+            {formData.type === 'proximity' && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Location *
+                  </label>
+                  <div className="flex items-center space-x-4">
+                    <button
+                      type="button"
+                      onClick={getLocation}
+                      disabled={locationStatus === 'loading'}
+                      className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                    >
+                      {locationStatus === 'loading' ? 'Getting Location...' : '📍 Get Current Location'}
+                    </button>
+                    {locationStatus === 'success' && (
+                      <span className="text-sm text-green-600 flex items-center">
+                        <svg className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Location set ({formData.latitude.toFixed(4)}, {formData.longitude.toFixed(4)})
+                      </span>
+                    )}
+                  </div>
+                  {errors.location && (
+                    <p className="mt-1 text-sm text-red-600">{errors.location}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="radius_meters" className="block text-sm font-medium text-gray-700 mb-2">
+                    Radius (meters) *
+                  </label>
+                  <input
+                    type="number"
+                    id="radius_meters"
+                    name="radius_meters"
+                    value={formData.radius_meters}
+                    onChange={handleInputChange}
+                    min="100"
+                    max="10000"
+                    step="100"
+                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      errors.radius_meters ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                  />
+                  <p className="mt-1 text-sm text-gray-500">
+                    Range: 100m to 10,000m (10km)
+                  </p>
+                  {errors.radius_meters && (
+                    <p className="mt-1 text-sm text-red-600">{errors.radius_meters}</p>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Category (for interest-based) */}
             {formData.type === 'interest' && (
@@ -279,10 +429,10 @@ export default function CreateChatroomPage() {
               </button>
               <button
                 type="submit"
-                disabled={createChatroomMutation.isPending}
+                disabled={createChatroomMutation.isPending || createProximityChatroomMutation.isPending}
                 className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {createChatroomMutation.isPending ? 'Creating...' : 'Create Chatroom'}
+                {createChatroomMutation.isPending || createProximityChatroomMutation.isPending ? 'Creating...' : 'Create Chatroom'}
               </button>
             </div>
           </form>
