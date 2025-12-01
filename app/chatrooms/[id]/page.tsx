@@ -95,8 +95,12 @@ export default function ChatroomPage() {
   
   // Get member IDs for presence tracking
   const memberIds = useMemo(() => {
-    return chatroom?.members?.map((m: any) => String(m.id)) || [];
-  }, [chatroom?.members]);
+    if (!chatroom) return [];
+    const members = isProximity 
+      ? (chatroom as any).active_members 
+      : (chatroom as any).members;
+    return members?.map((m: any) => String(m.id)) || [];
+  }, [chatroom, isProximity]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
