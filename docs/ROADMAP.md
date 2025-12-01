@@ -15,7 +15,7 @@ The MVP and all secondary systems (Recommendations, AI Content, Chatrooms, Real-
 #### 2. Monetization
 - [x] **Payment Integration (Backend)**: Implemented `StripePaymentGateway` with Payment Intent support.
 - [x] **Payment Integration (Frontend)**: Updated UI to use Stripe Elements and `initiatePurchase` flow.
-- [ ] **Subscription Management**: Implement `SubscriptionController` logic.
+- [x] **Subscription Management**: Implement `SubscriptionController` logic.
 
 ### 🚀 Immediate Priorities (Q4 2025)
 
