@@ -1,10 +1,22 @@
 # Project Status
 
-**Last Updated:** December 01, 2025
+**Last Updated:** December 02, 2025
 **Status:** 🚀 LIVE / DEPLOYED
 
 ## 🟢 Current Status: Production Deployed
 The project has successfully completed the MVP, Secondary Systems, and Production Hardening phases. It is now **deployed and live**.
+
+### ⚠️ Known Issues / Technical Debt
+1.  **Push Notifications**:
+    -   **Status**: ❌ Missing Backend Implementation.
+    -   **Details**: Frontend Service Worker (`sw-manual.js`) contains listener logic, but the backend lacks `webpush` dependencies, subscription storage, and notification dispatch logic.
+    -   **Action Required**: Install `laravel-notification-channels/webpush`, create `PushSubscription` model/migrations, and implement `NotificationController`.
+2.  **Payment Subscriptions**:
+    -   **Status**: 🚧 Pending Implementation.
+    -   **Details**: `SubscriptionController` exists but is empty. No payment gateway integration (Stripe/Apple Pay) beyond mocks.
+3.  **Media Analysis**:
+    -   **Status**: ⏸️ Disabled / Mocked.
+    -   **Details**: Feature flag `media_analysis` is `false`. Controller exists but relies on mocked driver.
 
 ### ✅ Completed MVP Features
 1.  **Authentication**: Secure registration, login, and session management.
@@ -71,10 +83,11 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   IndexedDB storage for encrypted media.
     -   `useVault` hook with initialize, unlock, lock, add, remove, export operations.
     -   Passphrase strength checking and security warnings.
-9.  **Mobile Experience (PWA)** (Nov 27 - Complete):
+9.  **Mobile Experience (PWA)** (Nov 27 - Partial):
     -   `next-pwa` integrated for offline support and caching.
     -   Web App Manifest configured for installability.
     -   Service Worker strategy implemented (Network First for API, Cache First for static).
+    -   **Note**: Push Notifications are currently client-side only (no backend support).
 10. **Security Hardening** (Dec 01 - Complete):
     -   **Frontend**: Strict Content Security Policy (CSP), HSTS, X-Frame-Options, and Permissions-Policy headers configured in `next.config.js`.
     -   **Backend**: `SecurityHeaders` middleware implemented and registered globally in `bootstrap/app.php`.

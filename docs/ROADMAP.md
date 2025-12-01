@@ -1,10 +1,20 @@
 # Project Roadmap
 
-**Last Updated:** November 27, 2025
+**Last Updated:** December 02, 2025
 **Status:** Production Hardening Phase
 
 ## 🟢 Current Phase: Production Hardening
 The MVP and all secondary systems (Recommendations, AI Content, Chatrooms, Real-time) are complete. The focus is now on preparing the application for scale, security, and reliability.
+
+### 🚧 Pending / In Progress
+
+#### 1. Mobile Experience
+- [ ] **Push Notifications**: Implement backend support (WebPush, Subscriptions).
+    - *Current Status*: Frontend listeners exist; Backend missing dependencies and logic.
+
+#### 2. Monetization
+- [ ] **Payment Integration**: Replace `MockPaymentGateway` with real Stripe/Apple Pay integration.
+- [ ] **Subscription Management**: Implement `SubscriptionController` logic.
 
 ### 🚀 Immediate Priorities (Q4 2025)
 
@@ -31,7 +41,7 @@ The MVP and all secondary systems (Recommendations, AI Content, Chatrooms, Real-
 
 #### 4. Mobile Experience (PWA)
 - [x] **Service Worker**: Refine caching strategies for offline support.
-- [x] **Push Notifications**: Implement Web Push for messages and matches.
+- [ ] **Push Notifications**: Implement Web Push for messages and matches.
 - [x] **Installability**: Ensure "Add to Home Screen" flow is seamless.
 
 ### 🔮 Future Features (2026+)
