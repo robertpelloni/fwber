@@ -38,7 +38,6 @@ The MVP and all secondary systems (Recommendations, AI Content, Chatrooms, Real-
 
 #### 1. Advanced AI Features
 - **Voice/Video Analysis**: Real-time safety checks for media.
-- **Behavioral Matching**: AI matching based on interaction patterns, not just profile data.
 
 ## ✅ Completed Milestones
 
@@ -47,6 +46,7 @@ The MVP and all secondary systems (Recommendations, AI Content, Chatrooms, Real-
 - [x] **Boosts**: Temporary visibility increase.
 - [x] **Events**: Location-based event discovery and ticketing.
 - [x] **Groups**: Interest-based sub-communities.
+- [x] **Behavioral Matching**: AI matching based on interaction patterns (Engagement, Activity, Content).
 
 ### MVP (Q3 2025)
 - [x] Authentication & Profiles
