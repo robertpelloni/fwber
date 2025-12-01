@@ -2,17 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Payment;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SubscriptionController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource (Payment History).
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $payments = Payment::where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        return response()->json($payments);
     }
 
     /**
@@ -28,15 +34,18 @@ class SubscriptionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Currently handled by PremiumController@purchasePremium
+        // In the future, this could handle creating recurring subscriptions
+        return response()->json(['message' => 'Please use /api/premium/purchase to upgrade.'], 400);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Subscription $subscription)
+    public function show($id)
     {
-        //
+        $payment = Payment::where('user_id', Auth::id())->findOrFail($id);
+        return response()->json($payment);
     }
 
     /**
