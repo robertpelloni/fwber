@@ -53,7 +53,7 @@ class PhotoRevealController extends Controller
         return response()->json($reveal);
     }
 
-    public function original(Request $request, Photo $photo)
+    public function original(Request $request, Photo $photo, \App\Services\PhotoEncryptionService $encryptionService)
     {
         $user = Auth::user();
 
@@ -80,8 +80,19 @@ class PhotoRevealController extends Controller
         }
 
         if ($photo->is_encrypted) {
-            // TODO: Implement decryption logic
-            return response()->json(['error' => 'Encryption not supported in MVP yet'], 501);
+            try {
+                // Decrypt and stream the response
+                $content = $encryptionService->decryptAndRetrieve($photo->original_path, 'local');
+                
+                return response()->streamDownload(function () use ($content) {
+                    echo $content;
+                }, $photo->original_filename ?? 'photo.jpg', [
+                    'Content-Type' => $photo->mime_type ?? 'image/jpeg',
+                ]);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Decryption error for photo {$photo->id}: " . $e->getMessage());
+                return response()->json(['error' => 'Failed to decrypt photo'], 500);
+            }
         }
 
         // Assuming original is stored in a private disk, e.g., 'local'
