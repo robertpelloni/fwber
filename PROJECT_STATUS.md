@@ -113,10 +113,12 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   Subscription management and "Gold" status tracking.
     -   Exclusive features: "See who likes you", unlimited swipes.
     -   `PremiumController`, `RequiresPremium` middleware, and frontend purchase flows.
+    -   **Verification**: E2E tests (`premium-features.cy.js`) passing with mocked backend.
 2.  **Profile Boosts**:
     -   Temporary visibility enhancement logic.
     -   `BoostController` and database schema for active boosts.
     -   Frontend integration for purchasing and visualizing active boosts.
+    -   **Verification**: E2E tests (`boosts.cy.js`) passing with mocked backend.
 3.  **Events System**:
     -   Location-based event discovery and creation.
     -   RSVP management and attendee lists.
