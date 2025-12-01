@@ -12,7 +12,7 @@ class GroupController extends Controller
     public function index()
     {
         $groups = Group::where('privacy', 'public')
-            ->orWhere('visibility', 'public')
+            ->orWhere('visibility', 'visible')
             ->withCount('members')
             ->get();
         return response()->json($groups);
@@ -35,7 +35,7 @@ class GroupController extends Controller
             'created_by_user_id' => Auth::id(),
             'creator_id' => Auth::id(), // For compatibility
             'member_count' => 1,
-            'visibility' => $validated['privacy'], // For compatibility
+            'visibility' => 'visible', // Default to visible
             'is_active' => true,
         ]);
 
@@ -44,7 +44,6 @@ class GroupController extends Controller
             'user_id' => Auth::id(),
             'role' => 'admin',
             'joined_at' => now(),
-            'is_active' => true,
         ]);
 
         return response()->json($group, 201);
@@ -70,7 +69,6 @@ class GroupController extends Controller
             'user_id' => $user->id,
             'role' => 'member',
             'joined_at' => now(),
-            'is_active' => true,
         ]);
 
         $group->increment('member_count');
@@ -101,7 +99,7 @@ class GroupController extends Controller
     {
         $user = Auth::user();
         $groups = Group::whereHas('members', function ($query) use ($user) {
-            $query->where('user_id', $user->id)->where('is_active', true);
+            $query->where('user_id', $user->id);
         })->get();
 
         return response()->json($groups);

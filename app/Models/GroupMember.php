@@ -14,12 +14,10 @@ class GroupMember extends Model
         'user_id',
         'role',
         'joined_at',
-        'is_active',
     ];
 
     protected $casts = [
         'joined_at' => 'datetime',
-        'is_active' => 'boolean',
     ];
 
     public function group()

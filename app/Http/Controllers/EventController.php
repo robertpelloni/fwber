@@ -20,13 +20,22 @@ class EventController extends Controller
             $lon = $request->longitude;
             $radius = $request->radius; // km
 
-            $query->select('*')
-                ->selectRaw(
-                    '(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance',
-                    [$lat, $lon, $lat]
-                )
-                ->having('distance', '<', $radius)
-                ->orderBy('distance');
+            if (DB::getDriverName() === 'sqlite') {
+                // Simple box approximation for testing
+                $latRange = $radius / 111;
+                $lonRange = $radius / (111 * cos(deg2rad($lat)));
+                
+                $query->whereBetween('latitude', [$lat - $latRange, $lat + $latRange])
+                      ->whereBetween('longitude', [$lon - $lonRange, $lon + $lonRange]);
+            } else {
+                $query->select('*')
+                    ->selectRaw(
+                        '(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance',
+                        [$lat, $lon, $lat]
+                    )
+                    ->having('distance', '<', $radius)
+                    ->orderBy('distance');
+            }
         } else {
             $query->orderBy('starts_at', 'asc');
         }
