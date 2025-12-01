@@ -477,8 +477,23 @@ class RecommendationService
      */
     private function calculateEngagementScore(User $user): float
     {
-        // This would calculate based on various engagement metrics
-        return 0.5; // Placeholder
+        $score = 0.0;
+        
+        // Message activity (max 50 messages = 0.4 points)
+        $messageCount = BulletinMessage::where('user_id', $user->id)
+            ->where('created_at', '>=', now()->subDays(30))
+            ->count();
+        $score += min($messageCount / 50, 1.0) * 0.4;
+
+        // Group participation (max 5 groups = 0.3 points)
+        $groupCount = $user->groups()->count();
+        $score += min($groupCount / 5, 1.0) * 0.3;
+
+        // Event attendance (max 3 events = 0.3 points)
+        $eventCount = $user->attendingEvents()->where('start_time', '>=', now()->subDays(30))->count();
+        $score += min($eventCount / 3, 1.0) * 0.3;
+
+        return min($score, 1.0);
     }
 
     /**
@@ -567,8 +582,31 @@ class RecommendationService
      */
     private function analyzeActivityPatterns(User $user): array
     {
-        // This would analyze when user is most active
-        return [];
+        $hours = BulletinMessage::where('user_id', $user->id)
+            ->where('created_at', '>=', now()->subDays(90))
+            ->selectRaw('HOUR(created_at) as hour')
+            ->pluck('hour');
+
+        if ($hours->isEmpty()) {
+            return ['unknown' => 1.0];
+        }
+
+        $patterns = [
+            'morning' => 0,   // 6-12
+            'afternoon' => 0, // 12-18
+            'evening' => 0,   // 18-24
+            'night' => 0,     // 0-6
+        ];
+
+        foreach ($hours as $hour) {
+            if ($hour >= 6 && $hour < 12) $patterns['morning']++;
+            elseif ($hour >= 12 && $hour < 18) $patterns['afternoon']++;
+            elseif ($hour >= 18 && $hour < 24) $patterns['evening']++;
+            else $patterns['night']++;
+        }
+
+        $total = $hours->count();
+        return array_map(fn($count) => round($count / $total, 2), $patterns);
     }
 
     /**
@@ -576,8 +614,15 @@ class RecommendationService
      */
     private function analyzeContentPreferences($messages): array
     {
-        // This would analyze what type of content user engages with
-        return [];
+        $text = $messages->pluck('content')->implode(' ');
+        $words = str_word_count(strtolower($text), 1);
+        $stopWords = ['the', 'and', 'is', 'in', 'at', 'to', 'for', 'with', 'a', 'of', 'it', 'on', 'that', 'this', 'i', 'you', 'my', 'are'];
+        
+        $filtered = array_filter($words, fn($w) => strlen($w) > 3 && !in_array($w, $stopWords));
+        $counts = array_count_values($filtered);
+        arsort($counts);
+        
+        return array_slice(array_keys($counts), 0, 5);
     }
 
     /**

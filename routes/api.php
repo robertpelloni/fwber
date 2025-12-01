@@ -18,6 +18,11 @@ use App\Http\Controllers\EventController;
 Route::post('auth/register', [\App\Http\Controllers\AuthController::class, 'register']);
 Route::post('auth/login', [\App\Http\Controllers\AuthController::class, 'login']);
 
+// Health Checks
+Route::get('health', [\App\Http\Controllers\HealthController::class, 'check']);
+Route::get('health/liveness', [\App\Http\Controllers\HealthController::class, 'liveness']);
+Route::get('health/readiness', [\App\Http\Controllers\HealthController::class, 'readiness']);
+
 // Venue Partner Auth
 Route::prefix('venue')->group(function () {
     Route::post('register', [\App\Http\Controllers\VenueAuthController::class, 'register']);
