@@ -198,6 +198,11 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 -   **Test Environment Fixes (Dec 01)**:
     -   Created missing migrations (`matches`, `photos`, `photo_reveals`) to support backend feature testing.
     -   Verified `PhotoRevealController` decryption logic with new feature tests.
+-   **Events & Groups Fixes (Dec 01)**:
+    -   **Backend**: Fixed `GroupController` schema mismatch (`visibility` enum) and removed invalid `is_active` column.
+    -   **Backend**: Implemented SQLite workaround for `acos` function in `EventController` to support local testing of geospatial queries.
+    -   **Frontend**: Fixed `SentryInitializer` to prevent "Multiple Sentry Session Replay instances" error during tests.
+    -   **Verification**: Validated "Events" and "Groups" features via full E2E test suite (`events.cy.js`, `groups.cy.js`).
 
 ## 🚀 Next Phase: Post-Launch Monitoring
 See `docs/ROADMAP.md` for future plans.
