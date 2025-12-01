@@ -8,12 +8,11 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 
 ### ⚠️ Known Issues / Technical Debt
 1.  **Push Notifications**:
-    -   **Status**: ❌ Missing Backend Implementation.
-    -   **Details**: Frontend Service Worker (`sw-manual.js`) contains listener logic, but the backend lacks `webpush` dependencies, subscription storage, and notification dispatch logic.
-    -   **Action Required**: Install `laravel-notification-channels/webpush`, create `PushSubscription` model/migrations, and implement `NotificationController`.
+    -   **Status**: ✅ Implemented.
+    -   **Details**: Backend `NotificationController` and `webpush` integration complete. Frontend `NotificationPermissionHandler` updated. VAPID keys configured.
 2.  **Payment Subscriptions**:
-    -   **Status**: 🚧 Pending Implementation.
-    -   **Details**: `SubscriptionController` exists but is empty. No payment gateway integration (Stripe/Apple Pay) beyond mocks.
+    -   **Status**: ✅ Implemented (Mock).
+    -   **Details**: `SubscriptionController` implements payment history. `PremiumController` handles upgrades via Mock Gateway. Frontend page `/settings/subscription` added.
 3.  **Media Analysis**:
     -   **Status**: ⏸️ Disabled / Mocked.
     -   **Details**: Feature flag `media_analysis` is `false`. Controller exists but relies on mocked driver.
