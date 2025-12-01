@@ -98,6 +98,7 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Components**: `SentryInitializer` component for client-side initialization.
     -   **Build**: Verified production build with Sentry source map upload configuration.
     -   **Health Checks**: Implemented `/api/health`, `/api/health/liveness`, and `/api/health/readiness` endpoints.
+    -   **APM Scaffolding**: `ApmMiddleware` and `config/apm.php` added for request timing and slow request logging.
 
 ### ✅ Completed Future Features (2026+ Early Access)
 1.  **Premium Tiers (Gold)**:

@@ -26,7 +26,7 @@ The MVP and all secondary systems (Recommendations, AI Content, Chatrooms, Real-
 
 #### 3. Monitoring & Observability
 - [x] **Error Tracking**: Integrate Sentry for Backend and Frontend.
-- [ ] **APM**: Setup Datadog or similar for performance monitoring.
+- [x] **APM**: Setup Datadog or similar for performance monitoring (Scaffolding implemented).
 - [x] **Uptime Monitoring**: Configure health check endpoints and external pingers.
 
 #### 4. Mobile Experience (PWA)
