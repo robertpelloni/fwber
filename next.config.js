@@ -11,6 +11,10 @@ const withPWA = require('next-pwa')({
   skipWaiting: true,
 });
 
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Performance optimizations
@@ -29,7 +33,7 @@ const nextConfig = {
         },
       },
     },
-    // optimizeCss: true, // Disabled - requires 'critters' package
+    optimizeCss: true, // Enabled - requires 'critters' package
     optimizePackageImports: ['@tanstack/react-query', 'lucide-react'],
   },
   
@@ -207,4 +211,4 @@ const sentryWebpackPluginOptions = {
 };
 
 // Make sure adding Sentry options is the last code to run before exporting
-module.exports = withSentryConfig(withPWA(nextConfig), sentryWebpackPluginOptions);
+module.exports = withSentryConfig(withPWA(withBundleAnalyzer(nextConfig)), sentryWebpackPluginOptions);
