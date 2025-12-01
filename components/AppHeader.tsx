@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
 import { ConnectionStatusBadge } from './realtime'
 import { NotificationBell } from './NotificationBell'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import { 
   Menu, 
   X, 
@@ -74,6 +75,9 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
 
           {/* Right Section */}
           <div className="flex items-center gap-2">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
             {/* Notification Bell */}
             <NotificationBell />
 

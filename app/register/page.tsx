@@ -7,6 +7,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { blurFacesOnFile } from '@/lib/faceBlur'
 import { isFeatureEnabled } from '@/lib/featureFlags'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -103,17 +104,20 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
             Create your FWBer account
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             Or{' '}
             <Link
               href="/login"
-              className="font-medium text-blue-600 hover:text-blue-500"
+              className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
             >
               sign in to your existing account
             </Link>
@@ -123,7 +127,7 @@ export default function RegisterPage() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Full Name
               </label>
               <input
@@ -132,7 +136,7 @@ export default function RegisterPage() {
                 type="text"
                 autoComplete="name"
                 required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white dark:bg-gray-800 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Enter your full name"
                 value={formData.name}
                 onChange={handleChange}
@@ -140,7 +144,7 @@ export default function RegisterPage() {
             </div>
             
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Email Address
               </label>
               <input
@@ -149,7 +153,7 @@ export default function RegisterPage() {
                 type="email"
                 autoComplete="email"
                 required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white dark:bg-gray-800 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Enter your email"
                 value={formData.email}
                 onChange={handleChange}
@@ -157,7 +161,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="avatar" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="avatar" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Profile Photo (Optional)
               </label>
               <input
@@ -165,18 +169,19 @@ export default function RegisterPage() {
                 name="avatar"
                 type="file"
                 accept="image/*"
-                className="mt-1 block w-full text-sm text-gray-500
+                className="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400
                   file:mr-4 file:py-2 file:px-4
                   file:rounded-full file:border-0
                   file:text-sm file:font-semibold
                   file:bg-blue-50 file:text-blue-700
-                  hover:file:bg-blue-100"
+                  dark:file:bg-blue-900/20 dark:file:text-blue-400
+                  hover:file:bg-blue-100 dark:hover:file:bg-blue-900/30"
                 onChange={handleFileChange}
               />
               {previewUrl && (
                 <div className="mt-4">
-                  <p className="text-sm text-gray-500 mb-2">Preview:</p>
-                  <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-gray-200">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Preview:</p>
+                  <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-gray-200 dark:border-gray-700">
                     <Image
                       src={previewUrl}
                       alt="Avatar preview"
@@ -189,7 +194,7 @@ export default function RegisterPage() {
             </div>
             
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Password
               </label>
               <input
@@ -198,7 +203,7 @@ export default function RegisterPage() {
                 type="password"
                 autoComplete="new-password"
                 required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white dark:bg-gray-800 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Create a password"
                 value={formData.password}
                 onChange={handleChange}
@@ -206,7 +211,7 @@ export default function RegisterPage() {
             </div>
             
             <div>
-              <label htmlFor="passwordConfirmation" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="passwordConfirmation" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Confirm Password
               </label>
               <input
@@ -215,7 +220,7 @@ export default function RegisterPage() {
                 type="password"
                 autoComplete="new-password"
                 required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white dark:bg-gray-800 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Confirm your password"
                 value={formData.passwordConfirmation}
                 onChange={handleChange}
@@ -224,14 +229,14 @@ export default function RegisterPage() {
           </div>
 
           {successMessage && (
-            <div className="rounded-md bg-green-50 border border-green-200 p-4">
-              <div className="text-sm font-medium text-green-800">{successMessage}</div>
+            <div className="rounded-md bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-4">
+              <div className="text-sm font-medium text-green-800 dark:text-green-400">{successMessage}</div>
             </div>
           )}
 
           {(error || validationError) && (
-            <div className="rounded-md bg-red-50 border border-red-200 p-4">
-              <div className="text-sm font-medium text-red-800">{validationError || error}</div>
+            <div className="rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4">
+              <div className="text-sm font-medium text-red-800 dark:text-red-400">{validationError || error}</div>
             </div>
           )}
 

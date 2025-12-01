@@ -6,6 +6,7 @@ import * as Sentry from '@sentry/nextjs'
 import { AlertTriangle, Home, RefreshCcw, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default function Error({
   error,
@@ -60,16 +61,19 @@ export default function Error({
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-pink-50 px-4 py-12">
-      <Card className="max-w-lg w-full shadow-lg">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-pink-50 dark:from-gray-900 dark:to-gray-800 px-4 py-12 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
+      <Card className="max-w-lg w-full shadow-lg dark:bg-gray-800 dark:border-gray-700">
         <CardHeader className="text-center pb-4">
-          <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
-            <AlertTriangle className="w-8 h-8 text-red-600" />
+          <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
+            <AlertTriangle className="w-8 h-8 text-red-600 dark:text-red-400" />
           </div>
-          <CardTitle className="text-2xl font-bold text-gray-900">
+          <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
             {getErrorTitle()}
           </CardTitle>
-          <CardDescription className="text-base mt-2">
+          <CardDescription className="text-base mt-2 dark:text-gray-400">
             {getErrorDescription()}
           </CardDescription>
         </CardHeader>
@@ -77,14 +81,14 @@ export default function Error({
         <CardContent className="space-y-4">
           {/* Error details (collapsible for technical users) */}
           <details className="group">
-            <summary className="cursor-pointer text-sm text-gray-600 hover:text-gray-900 flex items-center gap-2">
+            <summary className="cursor-pointer text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 flex items-center gap-2">
               <span className="group-open:rotate-90 transition-transform">▶</span>
               Technical Details
             </summary>
-            <div className="mt-2 p-3 bg-gray-100 rounded-md text-xs font-mono text-gray-800 overflow-auto max-h-32">
+            <div className="mt-2 p-3 bg-gray-100 dark:bg-gray-900 rounded-md text-xs font-mono text-gray-800 dark:text-gray-200 overflow-auto max-h-32">
               <p className="break-all">{error.message}</p>
               {error.digest && (
-                <p className="mt-2 text-gray-600">
+                <p className="mt-2 text-gray-600 dark:text-gray-400">
                   Error ID: {error.digest}
                 </p>
               )}
@@ -93,7 +97,7 @@ export default function Error({
 
           {/* User guidance based on error type */}
           {isNetworkError && (
-            <div className="p-3 bg-blue-50 border border-blue-200 rounded-md text-sm text-blue-800">
+            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md text-sm text-blue-800 dark:text-blue-300">
               <p className="font-semibold mb-1">Quick fixes to try:</p>
               <ul className="list-disc list-inside space-y-1 text-xs">
                 <li>Check your internet connection</li>
@@ -105,7 +109,7 @@ export default function Error({
           )}
 
           {isAuthError && (
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-md text-sm text-amber-800">
+            <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md text-sm text-amber-800 dark:text-amber-300">
               <p>For security, sessions expire after a period of inactivity. Please log in again to continue using FWBer.</p>
             </div>
           )}
@@ -139,7 +143,7 @@ export default function Error({
 
         {/* Helpful tip */}
         <div className="px-6 pb-6 text-center">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
             If the problem persists, please contact our support team with Error ID: {error.digest || 'N/A'}
           </p>
         </div>

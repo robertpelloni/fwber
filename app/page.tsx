@@ -6,6 +6,7 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 import SexQuote from '@/components/SexQuote'
 import PWAInstallPrompt from '@/components/PWAInstallPrompt'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import { Shield, Heart, Zap, MapPin, MessageCircle, Users, Menu, X, Lock, Ghost, Layers, FileText, Code, Building2 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -33,9 +34,9 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-900">
       {/* Navigation */}
-      <nav className="bg-white border-b border-gray-100 sticky top-0 z-50">
+      <nav className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
@@ -52,6 +53,7 @@ export default function HomePage() {
             <div className="hidden md:flex items-center space-x-8">
               <Link href="#features" className="text-gray-600 hover:text-blue-600 font-medium">Features</Link>
               <Link href="#safety" className="text-gray-600 hover:text-blue-600 font-medium">Safety</Link>
+              <ThemeToggle />
               <div className="flex items-center space-x-4">
                 <Link href="/login" className="text-gray-900 hover:text-blue-600 font-medium">
                   Log in
@@ -63,10 +65,11 @@ export default function HomePage() {
             </div>
 
             {/* Mobile menu button */}
-            <div className="md:hidden flex items-center">
+            <div className="md:hidden flex items-center gap-4">
+              <ThemeToggle />
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-gray-600 hover:text-gray-900 focus:outline-none"
+                className="text-gray-600 hover:text-gray-900 focus:outline-none dark:text-gray-300 dark:hover:text-white"
               >
                 {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </button>
@@ -76,11 +79,15 @@ export default function HomePage() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-100 py-4">
+          <div className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 py-4">
             <div className="flex flex-col space-y-4 px-4">
-              <Link href="#features" className="text-gray-600 font-medium">Features</Link>
-              <Link href="#safety" className="text-gray-600 font-medium">Safety</Link>
-              <Link href="/login" className="text-gray-900 font-medium">Log in</Link>
+              <Link href="#features" className="text-gray-600 dark:text-gray-300 font-medium">Features</Link>
+              <Link href="#safety" className="text-gray-600 dark:text-gray-300 font-medium">Safety</Link>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600 dark:text-gray-300 font-medium">Theme</span>
+                <ThemeToggle />
+              </div>
+              <Link href="/login" className="text-gray-900 dark:text-white font-medium">Log in</Link>
               <Link href="/register" className="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-medium text-center">
                 Sign up
               </Link>
@@ -90,24 +97,24 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-b from-blue-50 to-white pt-16 pb-24 lg:pt-32 lg:pb-40">
+      <div className="relative overflow-hidden bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 pt-16 pb-24 lg:pt-32 lg:pb-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 tracking-tight mb-8">
-              FWBer.me - <span className="text-blue-600">Adult Social Network</span>
+            <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-8">
+              FWBer.me - <span className="text-blue-600 dark:text-blue-400">Adult Social Network</span>
             </h1>
             
             <div className="mb-8 transform hover:scale-105 transition-transform duration-300">
-              <p className="text-2xl md:text-3xl text-orange-600 font-serif italic">
+              <p className="text-2xl md:text-3xl text-orange-600 dark:text-orange-400 font-serif italic">
                 &ldquo;Everybody wants to get laid.&rdquo;
               </p>
             </div>
 
-            <div className="w-full max-w-2xl mx-auto mb-10 bg-white/50 backdrop-blur-sm rounded-xl p-6 shadow-sm">
+            <div className="w-full max-w-2xl mx-auto mb-10 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 shadow-sm">
               <SexQuote />
             </div>
 
-            <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl text-gray-600 dark:text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
               Join the most advanced adult dating platform. Smart matching, verified profiles, and real connections waiting for you.
             </p>
             
@@ -121,7 +128,7 @@ export default function HomePage() {
               </Link>
               <Link
                 href="/login"
-                className="w-full sm:w-auto bg-white hover:bg-gray-50 text-gray-900 font-bold py-4 px-10 rounded-full text-lg border-2 border-gray-200 hover:border-blue-600 transition-all duration-200"
+                className="w-full sm:w-auto bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-bold py-4 px-10 rounded-full text-lg border-2 border-gray-200 dark:border-gray-700 hover:border-blue-600 dark:hover:border-blue-500 transition-all duration-200"
               >
                 Member Login
               </Link>

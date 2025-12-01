@@ -7,6 +7,7 @@ import PerformanceMonitor from '@/components/PerformanceMonitor'
 import { ToastProvider } from '@/components/ToastProvider'
 import NotificationPermissionHandler from '@/components/NotificationPermissionHandler'
 import SentryInitializer from '@/components/SentryInitializer'
+import { ThemeProvider } from '@/components/ThemeProvider'
 
 const inter = Inter({
   variable: '--font-inter',
@@ -76,18 +77,25 @@ export default function RootLayout({
         className="min-h-screen bg-background font-sans antialiased text-optimized"
         suppressHydrationWarning
       >
-        <QueryProvider>
-          <AuthProvider>
-            <NotificationPermissionHandler />
-            <SentryInitializer />
-            <ToastProvider>
-              <div className="relative flex min-h-screen flex-col">
-                <div className="flex-1">{children}</div>
-              </div>
-              <PerformanceMonitor />
-            </ToastProvider>
-          </AuthProvider>
-        </QueryProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <QueryProvider>
+            <AuthProvider>
+              <NotificationPermissionHandler />
+              <SentryInitializer />
+              <ToastProvider>
+                <div className="relative flex min-h-screen flex-col">
+                  <div className="flex-1">{children}</div>
+                </div>
+                <PerformanceMonitor />
+              </ToastProvider>
+            </AuthProvider>
+          </QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   )
