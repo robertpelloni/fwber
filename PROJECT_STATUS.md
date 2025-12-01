@@ -139,6 +139,7 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 4.  **Admin Tools**: Analytics, moderation, rate limiting, and feature flag management ready.
 5.  **Security**: Advanced Rate Limiting configured and applied to critical endpoints.
 6.  **Real-time**: WebSocket/Mercure infrastructure with fallback support.
+7.  **Deployment Automation**: Verified backend `deploy.sh` (backups, migrations, cache) and frontend `Dockerfile.prod` / `deploy.sh`.
 
 ## 📂 Project Structure Overview
 -   **`fwber-backend/`**: Laravel 12 API.
@@ -177,6 +178,8 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
         -   `backup_database.sh` (Database backup)
         -   `restore_database.sh` (Database restore)
     -   Verified alignment with `docs/DEPLOYMENT.md`.
+    -   **Audit**: Verified `fwber-backend/deploy.sh` for comprehensive production safety (maintenance mode, backups, migrations).
+    -   **Audit**: Verified `fwber-frontend/Dockerfile.prod` and `deploy.sh` for production build optimization.
 
 ## 🚀 Next Phase: Post-Launch Monitoring
 See `docs/ROADMAP.md` for future plans.
