@@ -87,8 +87,9 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Features**: Venue registration, profile management, and dashboard.
 12. **Venue Check-in & Presence System** (Dec 01 - Complete):
     -   **Backend**: `VenueCheckin` model, `VenueCheckinController` (check-in, check-out, current status).
+    -   **Security**: Spatial validation added to `VenueCheckinController` (500m radius enforcement).
     -   **Database**: `venue_checkins` table with auto-checkout logic.
-    -   **Frontend**: User-facing venue list and check-in UI at `/venues`.
+    -   **Frontend**: User-facing venue list and check-in UI at `/venues` with real-time Geolocation integration.
     -   **Features**: Real-time check-in status, automatic checkout from previous venues, venue history.
     -   **Verification**: E2E tests (`venue-checkin.cy.js`) passing with mocked backend.
 13. **Monitoring & Observability (Sentry)** (Dec 01 - Complete):
