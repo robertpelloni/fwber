@@ -8,17 +8,16 @@ use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use App\Models\BulletinBoard;
 use App\Models\BulletinMessage;
+use App\Services\Ai\Llm\LlmManager;
 
 class RecommendationService
 {
-    private string $openaiApiKey;
-    private string $geminiApiKey;
+    private LlmManager $llmManager;
     private array $recommendationConfig;
 
-    public function __construct()
+    public function __construct(LlmManager $llmManager)
     {
-        $this->openaiApiKey = config('services.openai.api_key', '');
-        $this->geminiApiKey = config('services.gemini.api_key', '');
+        $this->llmManager = $llmManager;
         $this->recommendationConfig = config('recommendations', [
             'enabled' => true,
             'providers' => ['openai', 'gemini'],
@@ -89,15 +88,17 @@ class RecommendationService
     /**
      * Get user profile data for recommendations
      */
-    private function getUserProfile(User $user): array
+    protected function getUserProfile(User $user): array
     {
+        $profile = $user->profile;
+        
         return [
             'id' => $user->id,
             'interests' => $user->interests ?? [],
-            'age' => $user->age,
+            'age' => $profile && $profile->birthdate ? $profile->birthdate->age : 0,
             'location' => [
-                'latitude' => $user->latitude,
-                'longitude' => $user->longitude,
+                'latitude' => $profile->latitude ?? 0,
+                'longitude' => $profile->longitude ?? 0,
             ],
             'preferences' => $user->preferences ?? [],
             'activity_level' => $this->calculateActivityLevel($user),
@@ -108,7 +109,7 @@ class RecommendationService
     /**
      * Get user behavior data
      */
-    private function getUserBehavior(User $user): array
+    protected function getUserBehavior(User $user): array
     {
         $recentMessages = BulletinMessage::where('user_id', $user->id)
             ->where('created_at', '>=', now()->subDays(30))
@@ -132,7 +133,7 @@ class RecommendationService
     /**
      * Get contextual data (time, location, etc.)
      */
-    private function getContextualData(array $context): array
+    protected function getContextualData(array $context): array
     {
         return [
             'time_of_day' => now()->format('H'),
@@ -147,7 +148,7 @@ class RecommendationService
     /**
      * Get content-based recommendations
      */
-    private function getContentBasedRecommendations(array $userProfile, array $userBehavior): array
+    protected function getContentBasedRecommendations(array $userProfile, array $userBehavior): array
     {
         $recommendations = [];
         
@@ -173,7 +174,7 @@ class RecommendationService
     /**
      * Get collaborative filtering recommendations
      */
-    private function getCollaborativeRecommendations(User $user, array $userBehavior): array
+    protected function getCollaborativeRecommendations(User $user, array $userBehavior): array
     {
         $recommendations = [];
         
@@ -201,7 +202,7 @@ class RecommendationService
     /**
      * Get AI-powered recommendations using OpenAI and Gemini
      */
-    private function getAIRecommendations(array $userProfile, array $userBehavior, array $contextualData): array
+    protected function getAIRecommendations(array $userProfile, array $userBehavior, array $contextualData): array
     {
         $recommendations = [];
         
@@ -223,28 +224,18 @@ class RecommendationService
     /**
      * Get OpenAI recommendations
      */
-    private function getOpenAIRecommendations(array $userProfile, array $userBehavior, array $contextualData): array
+    protected function getOpenAIRecommendations(array $userProfile, array $userBehavior, array $contextualData): array
     {
         try {
             $prompt = $this->buildOpenAIPrompt($userProfile, $userBehavior, $contextualData);
             
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->openaiApiKey,
-                'Content-Type' => 'application/json',
-            ])->post('https://api.openai.com/v1/chat/completions', [
-                'model' => 'gpt-4',
-                'messages' => [
-                    ['role' => 'system', 'content' => 'You are a recommendation engine for a location-based social platform. Provide personalized content recommendations based on user profile and behavior.'],
-                    ['role' => 'user', 'content' => $prompt]
-                ],
-                'max_tokens' => 1000,
-                'temperature' => 0.7,
+            $response = $this->llmManager->driver('openai')->chat([
+                ['role' => 'system', 'content' => 'You are a recommendation engine for a location-based social platform. Provide personalized content recommendations based on user profile and behavior.'],
+                ['role' => 'user', 'content' => $prompt]
             ]);
 
-            if ($response->successful()) {
-                $data = $response->json();
-                $content = $data['choices'][0]['message']['content'] ?? '';
-                return $this->parseAIRecommendations($content, 'openai');
+            if (isset($response->content)) {
+                return $this->parseAIRecommendations($response->content, 'openai');
             }
         } catch (\Exception $e) {
             Log::error('OpenAI recommendations failed', ['error' => $e->getMessage()]);
@@ -256,31 +247,17 @@ class RecommendationService
     /**
      * Get Gemini recommendations
      */
-    private function getGeminiRecommendations(array $userProfile, array $userBehavior, array $contextualData): array
+    protected function getGeminiRecommendations(array $userProfile, array $userBehavior, array $contextualData): array
     {
         try {
             $prompt = $this->buildGeminiPrompt($userProfile, $userBehavior, $contextualData);
             
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-            ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={$this->geminiApiKey}", [
-                'contents' => [
-                    [
-                        'parts' => [
-                            ['text' => $prompt]
-                        ]
-                    ]
-                ],
-                'generationConfig' => [
-                    'temperature' => 0.7,
-                    'maxOutputTokens' => 1000,
-                ]
+            $response = $this->llmManager->driver('gemini')->chat([
+                ['role' => 'user', 'content' => $prompt]
             ]);
 
-            if ($response->successful()) {
-                $data = $response->json();
-                $content = $data['candidates'][0]['content']['parts'][0]['text'] ?? '';
-                return $this->parseAIRecommendations($content, 'gemini');
+            if (isset($response->content)) {
+                return $this->parseAIRecommendations($response->content, 'gemini');
             }
         } catch (\Exception $e) {
             Log::error('Gemini recommendations failed', ['error' => $e->getMessage()]);
@@ -292,21 +269,22 @@ class RecommendationService
     /**
      * Get location-based recommendations
      */
-    private function getLocationBasedRecommendations(User $user, array $context): array
+    protected function getLocationBasedRecommendations(User $user, array $context): array
     {
         $recommendations = [];
+        $profile = $user->profile;
         
-        if (!$user->latitude || !$user->longitude) {
+        if (!$profile || !$profile->latitude || !$profile->longitude) {
             return $recommendations;
         }
 
         // Find nearby bulletin boards
         $nearbyBoards = BulletinBoard::whereRaw('ST_Distance_Sphere(location, POINT(?, ?)) <= ?', [
-            $user->longitude,
-            $user->latitude,
+            $profile->longitude,
+            $profile->latitude,
             5000 // 5km radius
         ])->where('is_active', true)
-        ->orderByRaw('ST_Distance_Sphere(location, POINT(?, ?))', [$user->longitude, $user->latitude])
+        ->orderByRaw('ST_Distance_Sphere(location, POINT(?, ?))', [$profile->longitude, $profile->latitude])
         ->limit(5)
         ->get();
 
@@ -317,7 +295,7 @@ class RecommendationService
                     'id' => $board->id,
                     'name' => $board->name,
                     'description' => $board->description,
-                    'distance' => $this->calculateDistance($user->latitude, $user->longitude, $board->center_lat, $board->center_lng),
+                    'distance' => $this->calculateDistance($profile->latitude, $profile->longitude, $board->center_lat, $board->center_lng),
                 ],
                 'score' => $this->calculateLocationScore($board, $user),
                 'reason' => 'Near your location',
@@ -344,7 +322,7 @@ class RecommendationService
         // Remove duplicates and merge scores
         $uniqueRecommendations = [];
         foreach ($allRecommendations as $rec) {
-            $key = $rec['content']['id'] ?? md5($rec['content']);
+            $key = $rec['content']['id'] ?? md5(is_array($rec['content']) ? json_encode($rec['content']) : $rec['content']);
             
             if (isset($uniqueRecommendations[$key])) {
                 // Merge scores from different sources
@@ -557,7 +535,12 @@ class RecommendationService
      */
     private function calculateLocationScore(BulletinBoard $board, User $user): float
     {
-        $distance = $this->calculateDistance($user->latitude, $user->longitude, $board->center_lat, $board->center_lng);
+        $profile = $user->profile;
+        if (!$profile || !$profile->latitude || !$profile->longitude) {
+            return 0;
+        }
+        
+        $distance = $this->calculateDistance($profile->latitude, $profile->longitude, $board->center_lat, $board->center_lng);
         return max(0, 1 - ($distance / 5000)); // Score decreases with distance
     }
 
