@@ -180,6 +180,13 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   Verified alignment with `docs/DEPLOYMENT.md`.
     -   **Audit**: Verified `fwber-backend/deploy.sh` for comprehensive production safety (maintenance mode, backups, migrations).
     -   **Audit**: Verified `fwber-frontend/Dockerfile.prod` and `deploy.sh` for production build optimization.
+    -   **Tooling**: Created `fwber-backend/scripts/health_check.sh` for lightweight post-deployment verification (curl-based).
+-   **Monitoring & Observability (Dec 01)**:
+    -   **Sentry**: Verified active configuration in `next.config.js` and `config/sentry.php`.
+    -   **PWA**: Verified `manifest.json` configuration for standalone installability.
+    -   **Infrastructure**: Confirmed `docker-compose.prod.yml` is streamlined (no heavy monitoring stack by default). Prometheus/Grafana setup is fully documented in `docs/monitoring/MONITORING.md` for optional deployment.
+-   **Feature Verification**:
+    -   Confirmed existence of "Events" feature artifacts (`Event` model, `EventController`), validating the "Future Features" status.
 
 ## 🚀 Next Phase: Post-Launch Monitoring
 See `docs/ROADMAP.md` for future plans.
