@@ -136,4 +136,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('venues/{id}/checkout', [\App\Http\Controllers\VenueCheckinController::class, 'destroy']);
     Route::get('venues/{id}/checkins', [\App\Http\Controllers\VenueCheckinController::class, 'index']);
     Route::get('user/checkin', [\App\Http\Controllers\VenueCheckinController::class, 'current']);
+
+    // Media Analysis
+    Route::middleware('feature:media_analysis')->group(function () {
+        Route::post('media/analyze', [\App\Http\Controllers\Api\MediaAnalysisController::class, 'analyze']);
+    });
 });
