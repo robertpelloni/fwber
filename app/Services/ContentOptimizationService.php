@@ -77,8 +77,8 @@ class ContentOptimizationService
                 ['role' => 'user', 'content' => $prompt]
             ]);
 
-            if (isset($response['content'])) {
-                $optimizedContent = $response['content'];
+            if (isset($response->content)) {
+                $optimizedContent = $response->content;
                 
                 return [
                     'original' => $content,
@@ -111,8 +111,8 @@ class ContentOptimizationService
                 ['role' => 'user', 'content' => $prompt]
             ]);
 
-            if (isset($response['content'])) {
-                $optimizedContent = $response['content'];
+            if (isset($response->content)) {
+                $optimizedContent = $response->content;
                 
                 return [
                     'original' => $content,
@@ -151,8 +151,8 @@ class ContentOptimizationService
                 ['role' => 'user', 'content' => $prompt]
             ]);
 
-            if (isset($response['content'])) {
-                $optimizedContent = $response['content'];
+            if (isset($response->content)) {
+                $optimizedContent = $response->content;
                 
                 // Re-check safety
                 $newModerationResult = $moderationService->moderateContent($optimizedContent);
@@ -187,8 +187,8 @@ class ContentOptimizationService
                 ['role' => 'user', 'content' => $prompt]
             ]);
 
-            if (isset($response['content'])) {
-                $optimizedContent = $response['content'];
+            if (isset($response->content)) {
+                $optimizedContent = $response->content;
                 
                 return [
                     'original' => $content,
