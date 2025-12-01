@@ -6,7 +6,8 @@ import {
   User, Mail, MapPin, Calendar, Heart, MessageSquare, 
   Save, Loader2, CheckCircle2, AlertCircle, Info, Eye, EyeOff 
 } from 'lucide-react';
-import axios from 'axios';
+import { api } from '@/lib/api/client';
+import { BioGenerator } from '@/components/ai/BioGenerator';
 
 interface UserProfile {
   name: string;
@@ -52,12 +53,7 @@ export default function EnhancedProfileEditor() {
   const { data: currentProfile, isLoading } = useQuery({
     queryKey: ['user-profile'],
     queryFn: async () => {
-      const token = localStorage.getItem('fwber_token');
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/user`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      return response.data;
+      return api.get<UserProfile>('/user');
     },
   });
 
@@ -109,13 +105,7 @@ export default function EnhancedProfileEditor() {
 
   const updateMutation = useMutation({
     mutationFn: async (updatedProfile: UserProfile) => {
-      const token = localStorage.getItem('fwber_token');
-      const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/user`,
-        updatedProfile,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      return response.data;
+      return api.put<UserProfile>('/user', updatedProfile);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-profile'] });
@@ -304,14 +294,20 @@ export default function EnhancedProfileEditor() {
             touched={touched.has('bio')}
             hint={profile.bio ? `${profile.bio.length}/500 characters` : '0/500 characters'}
           >
-            <textarea
-              value={profile.bio || ''}
-              onChange={(e) => handleChange('bio', e.target.value)}
-              onBlur={() => setTouched(prev => new Set(prev).add('bio'))}
-              className={`${inputClassName(errors.bio, touched.has('bio'))} min-h-[100px]`}
-              placeholder="Tell us about yourself..."
-              maxLength={500}
-            />
+            <div className="space-y-3">
+              <textarea
+                value={profile.bio || ''}
+                onChange={(e) => handleChange('bio', e.target.value)}
+                onBlur={() => setTouched(prev => new Set(prev).add('bio'))}
+                className={`${inputClassName(errors.bio, touched.has('bio'))} min-h-[100px]`}
+                placeholder="Tell us about yourself..."
+                maxLength={500}
+              />
+              <BioGenerator 
+                currentBio={profile.bio || ''}
+                onSelectBio={(bio) => handleChange('bio', bio)}
+              />
+            </div>
           </FormField>
         </Section>
 

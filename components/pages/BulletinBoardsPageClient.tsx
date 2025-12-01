@@ -12,7 +12,7 @@ import {
   useCreateBulletinBoard 
 } from '@/lib/hooks/use-bulletin-boards';
 import { useBulletinBoardMercure } from '@/lib/hooks/use-mercure-sse';
-import { usePostSuggestionsGeneration } from '@/lib/hooks/use-content-generation';
+import { PostSuggester } from '@/components/ai/PostSuggester';
 
 export default function BulletinBoardsPageClient() {
   const { user } = useAuth();
@@ -22,7 +22,6 @@ export default function BulletinBoardsPageClient() {
   const [selectedBoardId, setSelectedBoardId] = useState<number | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
-  const [showSuggestions, setShowSuggestions] = useState(false);
   
   // Use optimized hooks
   const { data: boardsData, isLoading: boardsLoading, error: boardsError } = useBulletinBoards({
@@ -45,18 +44,6 @@ export default function BulletinBoardsPageClient() {
   
   // Set up real-time updates with Mercure
   const { isConnected: mercureConnected } = useBulletinBoardMercure(selectedBoardId || 0);
-
-  const { data: suggestionsData, isLoading: suggestionsLoading } = usePostSuggestionsGeneration(
-    selectedBoardId || 0,
-    {
-      context: {
-        location: location ? {
-          latitude: location.lat,
-          longitude: location.lng,
-        } : undefined,
-      }
-    }
-  );
 
   // Get user's current location
   useEffect(() => {
@@ -277,51 +264,12 @@ export default function BulletinBoardsPageClient() {
 
                 {/* Message Input */}
                 <div className="p-6 border-t border-gray-200">
-                  {showSuggestions && (
-                    <div className="mb-4 bg-blue-50 p-4 rounded-lg">
-                      <div className="flex justify-between items-center mb-2">
-                        <h3 className="font-medium text-blue-900">AI Suggestions</h3>
-                        <button 
-                          onClick={() => setShowSuggestions(false)}
-                          className="text-blue-500 hover:text-blue-700"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                      {suggestionsLoading ? (
-                        <div className="text-center py-4">
-                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
-                        </div>
-                      ) : (
-                        <div className="space-y-2">
-                          {suggestionsData?.data?.suggestions?.map((suggestion: any, index: number) => (
-                            <div 
-                              key={index} 
-                              className="bg-white p-3 rounded border border-blue-100 hover:border-blue-300 cursor-pointer transition-colors"
-                              data-testid="suggestion-item"
-                              onClick={() => {
-                                setNewMessage(suggestion.content);
-                                setShowSuggestions(false);
-                              }}
-                            >
-                              <p className="text-sm text-gray-800">{suggestion.content}</p>
-                              <div className="flex justify-between items-center mt-1">
-                                <span className="text-xs text-blue-600" data-testid="relevance-score">
-                                  Relevance: {Math.round((suggestion.confidence || 0.8) * 100)}%
-                                </span>
-                                <button 
-                                  className="text-xs font-medium text-blue-600 hover:text-blue-800"
-                                  data-testid="use-suggestion"
-                                >
-                                  Use This
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  <div className="mb-4">
+                    <PostSuggester 
+                      boardId={selectedBoardId}
+                      onSelectPost={(content) => setNewMessage(content)}
+                    />
+                  </div>
 
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -337,13 +285,6 @@ export default function BulletinBoardsPageClient() {
                           Post anonymously
                         </label>
                       </div>
-                      <button
-                        onClick={() => setShowSuggestions(!showSuggestions)}
-                        className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center space-x-1"
-                        data-testid="post-suggestions"
-                      >
-                        <span>✨ Get AI Suggestions</span>
-                      </button>
                     </div>
                     <div className="flex space-x-3">
                       <input

@@ -5,6 +5,7 @@ import { useWebSocketChat, ChatMessage, OnlineUser, useWebSocket } from '@/lib/h
 import { useAuth } from '@/lib/auth-context';
 import { MessageMetadata } from '@/components/MessageStatusIndicator';
 import { UserAvatar, PresenceIndicator, PresenceStatus } from '@/components/PresenceIndicator';
+import { ConversationStarter } from '@/components/ai/ConversationStarter';
 
 interface RealTimeChatProps {
   recipientId: string;
@@ -148,6 +149,15 @@ export default function RealTimeChat({
 
       {/* Message Input */}
       <div className="p-4 border-t border-gray-700">
+        <div className="mb-2">
+          <ConversationStarter 
+            targetUserId={parseInt(recipientId) || undefined}
+            onSelectStarter={(starter) => {
+              setMessage(starter);
+              handleTypingChange(starter);
+            }}
+          />
+        </div>
         <form onSubmit={handleSendMessage} className="flex space-x-2">
           <input
             type="text"
