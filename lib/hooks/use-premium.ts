@@ -31,6 +31,14 @@ export const usePurchasePremium = () => {
   });
 };
 
+export const useInitiatePurchase = () => {
+  return useMutation({
+    mutationFn: async (planId: string = 'gold_monthly') => {
+      return await api.post<{ client_secret: string }>('/premium/initiate', { plan_id: planId });
+    },
+  });
+};
+
 export const useWhoLikesYou = () => {
   return useQuery({
     queryKey: ['who-likes-you'],
