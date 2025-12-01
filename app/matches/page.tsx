@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useAuth } from '@/lib/auth-context';
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { getMatches, performMatchAction, type Match, type MatchAction } from '@/lib/api/matches'
+import { purchaseBoost } from '@/lib/api/boosts'
 import { RelationshipTier } from '@/lib/relationshipTiers'
 import RelationshipTierBadge from '@/components/RelationshipTierBadge'
 import PhotoRevealGate from '@/components/PhotoRevealGate'
@@ -45,7 +46,7 @@ export default function MatchesPage() {
     try {
       setIsLoading(true)
       setError(null)
-      const matchesData = await getMatches(token, newFilters)
+      const matchesData = await getMatches(newFilters)
       setMatches(matchesData)
       setCurrentMatchIndex(0)
     } catch (err) {
@@ -79,7 +80,7 @@ export default function MatchesPage() {
       setIsPerformingAction(true)
       setError(null)
 
-      const response = await performMatchAction(token, currentMatch.id, action)
+      const response = await performMatchAction(currentMatch.id, action)
       
       if (response.is_match) {
         setMatchedUserProfile({
@@ -124,21 +125,11 @@ export default function MatchesPage() {
   const handleBoost = async () => {
     if (!token) return;
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/boosts/purchase`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      if (res.ok) {
-        setIsBoosted(true);
-      } else {
-        alert('Boost failed.');
-      }
+      await purchaseBoost();
+      setIsBoosted(true);
     } catch (error) {
       console.error(error);
-      alert('An error occurred.');
+      alert('Boost failed.');
     }
   };
 

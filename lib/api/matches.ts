@@ -8,7 +8,17 @@
  * Created: 2025-01-19
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+/**
+ * Matches API Client
+ * 
+ * AI Model: Claude 4.5 - Multi-AI Orchestration
+ * Phase: 3B - Matching System Integration
+ * Purpose: Type-safe API client for match operations
+ * 
+ * Created: 2025-01-19
+ */
+
+import { api } from './client';
 
 export interface Match {
   id: number;
@@ -62,27 +72,13 @@ export interface MatchActionResponse {
 /**
  * Fetch potential matches for the authenticated user
  */
-export async function getMatches(token: string, filters: any = {}): Promise<Match[]> {
-  const queryParams = new URLSearchParams(filters).toString();
-  const response = await fetch(`${API_BASE_URL}/matches?${queryParams}`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-  });
+export async function getMatches(filters: any = {}): Promise<Match[]> {
+  const response = await api.get<{ matches: any[], total: number }>('/matches', { params: filters });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to fetch matches' }));
-    throw new Error(error.message || 'Failed to fetch matches');
-  }
-
-  const data = await response.json();
   // The API returns { matches: [...], total: ... }
   // But the component expects an array.
   // Also we need to map the flat structure to the nested profile structure expected by the UI
-  const matches = data.matches || [];
+  const matches = response.matches || [];
   
   return matches.map((m: any) => ({
     ...m,
@@ -111,74 +107,30 @@ export async function getMatches(token: string, filters: any = {}): Promise<Matc
  * Perform an action on a potential match (like, pass, super like)
  */
 export async function performMatchAction(
-  token: string, 
   targetUserId: number, 
   action: MatchAction
 ): Promise<MatchActionResponse> {
-  const response = await fetch(`${API_BASE_URL}/matches/action`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-    body: JSON.stringify({
-      target_user_id: targetUserId,
-      action: action,
-    }),
+  return api.post<MatchActionResponse>('/matches/action', {
+    target_user_id: targetUserId,
+    action: action,
   });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to perform match action' }));
-    throw new Error(error.message || 'Failed to perform match action');
-  }
-
-  const data = await response.json();
-  return data;
 }
 
 /**
  * Get match history for the authenticated user
  */
-export async function getMatchHistory(token: string): Promise<Match[]> {
-  const response = await fetch(`${API_BASE_URL}/matches/history`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to fetch match history' }));
-    throw new Error(error.message || 'Failed to fetch match history');
-  }
-
-  const data = await response.json();
-  return data.data || data;
+export async function getMatchHistory(): Promise<Match[]> {
+  const response = await api.get<{ data: Match[] } | Match[]>('/matches/history');
+  // Handle both wrapped and unwrapped responses just in case
+  return Array.isArray(response) ? response : response.data;
 }
 
 /**
  * Get mutual matches (both users liked each other)
  */
-export async function getMutualMatches(token: string): Promise<Match[]> {
-  const response = await fetch(`${API_BASE_URL}/matches/established`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to fetch mutual matches' }));
-    throw new Error(error.message || 'Failed to fetch mutual matches');
-  }
-
-  const data = await response.json();
-  const conversations = data.data || [];
+export async function getMutualMatches(): Promise<Match[]> {
+  const response = await api.get<{ data: any[] }>('/matches/established');
+  const conversations = response.data || [];
 
   return conversations.map((c: any) => {
     const otherUser = c.other_user;

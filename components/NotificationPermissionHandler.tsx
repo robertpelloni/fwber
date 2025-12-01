@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import axios from 'axios';
+import { api } from '@/lib/api/client';
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -32,12 +32,9 @@ export default function NotificationPermissionHandler() {
             applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY),
           });
 
-          await axios.post(
-            `${process.env.NEXT_PUBLIC_API_URL}/notifications/subscribe`,
-            subscription.toJSON(),
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
+          await api.post(
+            '/notifications/subscribe',
+            subscription.toJSON()
           );
         }
       } catch (error) {

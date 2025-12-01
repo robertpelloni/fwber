@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useAuth } from '@/lib/auth-context';
+import { api } from '@/lib/api/client';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { Check, Star, Zap, Eye, MapPin, Ghost } from 'lucide-react';
 
@@ -14,21 +15,11 @@ export default function PremiumPage() {
     if (!token) return;
     setIsUpgrading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/premium/purchase`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      if (res.ok) {
-        setIsPremium(true);
-      } else {
-        alert('Upgrade failed.');
-      }
+      await api.post('/premium/purchase');
+      setIsPremium(true);
     } catch (error) {
       console.error(error);
-      alert('An error occurred.');
+      alert('Upgrade failed.');
     } finally {
       setIsUpgrading(false);
     }

@@ -41,7 +41,7 @@ export default function SubscriptionPage() {
       setLoading(true);
       const [statusData, historyData] = await Promise.all([
         api.get<PremiumStatus>('/premium/status'),
-        api.get<any>('/subscriptions')
+        api.get<any>('/subscriptions/history')
       ]);
       setStatus(statusData);
       setHistory(historyData.data || historyData); // Handle pagination or direct array

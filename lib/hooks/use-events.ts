@@ -1,42 +1,22 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/lib/api/client';
 import { useAuth } from '@/lib/auth-context';
-import { PaginatedResponse } from '@/lib/api/types';
+import { 
+  getNearbyEvents, 
+  getMyEvents, 
+  getEvent, 
+  createEvent, 
+  rsvpEvent, 
+  Event 
+} from '@/lib/api/events';
 
-export interface Event {
-  id: number;
-  title: string;
-  description: string;
-  location_name: string;
-  latitude: number;
-  longitude: number;
-  starts_at: string;
-  ends_at: string;
-  max_attendees: number | null;
-  price: number | null;
-  created_by_user_id: number;
-  status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
-  attendees_count: number;
-  creator?: any;
-  attendees?: any[];
-}
+export type { Event };
 
 export function useNearbyEvents(latitude?: number, longitude?: number, radius: number = 50) {
   const { token } = useAuth();
 
   return useQuery({
     queryKey: ['events', 'nearby', latitude, longitude, radius],
-    queryFn: async () => {
-      const params: any = { radius };
-      if (latitude && longitude) {
-        params.latitude = latitude;
-        params.longitude = longitude;
-      }
-      const { data } = await apiClient.get<PaginatedResponse<Event>>('/events', {
-        params,
-      });
-      return data;
-    },
+    queryFn: () => getNearbyEvents(latitude, longitude, radius),
     enabled: !!token,
   });
 }
@@ -46,10 +26,7 @@ export function useMyEvents() {
 
   return useQuery({
     queryKey: ['events', 'my'],
-    queryFn: async () => {
-      const { data } = await apiClient.get<PaginatedResponse<Event>>('/events/my-events');
-      return data;
-    },
+    queryFn: () => getMyEvents(),
     enabled: !!token,
   });
 }
@@ -59,10 +36,7 @@ export function useEvent(id: string) {
 
   return useQuery({
     queryKey: ['events', id],
-    queryFn: async () => {
-      const { data } = await apiClient.get<Event>(`/events/${id}`);
-      return data;
-    },
+    queryFn: () => getEvent(id),
     enabled: !!token && !!id,
   });
 }
@@ -71,10 +45,7 @@ export function useCreateEvent() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (newEvent: any) => {
-      const { data } = await apiClient.post('/events', newEvent);
-      return data;
-    },
+    mutationFn: createEvent,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
     },
@@ -85,10 +56,7 @@ export function useRsvpEvent() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, status }: { id: number; status: string }) => {
-      const { data } = await apiClient.post(`/events/${id}/rsvp`, { status });
-      return data;
-    },
+    mutationFn: ({ id, status }: { id: number; status: string }) => rsvpEvent(id, status),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['events', id.toString()] });
       queryClient.invalidateQueries({ queryKey: ['events', 'my'] });
