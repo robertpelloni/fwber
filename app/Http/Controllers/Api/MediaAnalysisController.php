@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Services\MediaAnalysisService;
+use App\Services\MediaAnalysis\MediaAnalysisInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class MediaAnalysisController extends Controller
 {
-    protected MediaAnalysisService $analysisService;
+    protected MediaAnalysisInterface $analysisService;
 
-    public function __construct(MediaAnalysisService $analysisService)
+    public function __construct(MediaAnalysisInterface $analysisService)
     {
         $this->analysisService = $analysisService;
     }
@@ -36,7 +36,7 @@ class MediaAnalysisController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $result,
+            'data' => $result->toArray(),
         ]);
     }
 }
