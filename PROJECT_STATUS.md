@@ -36,6 +36,7 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Status**: ✅ Implemented.
     -   **Details**: `ContentGenerationService` fully implemented with multi-provider support (OpenAI, Gemini, Claude).
     -   **Routes**: `post('content/generate-bio')`, `post('content/generate-posts/{boardId}')`, `post('content/generate-starters')`.
+    -   **Frontend**: `useAIContent` hook created. Components: `BioGenerator`, `ConversationStarter`, `PostSuggester`.
     -   **Verification**: E2E tests (`ml-content-generation.cy.js`) passing with mocked backend.
 2.  **AI Avatar Generation**:
     -   **Status**: ✅ Implemented.
