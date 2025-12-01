@@ -9,20 +9,16 @@ use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\BulletinBoard;
 use App\Models\BulletinMessage;
+use App\Services\Ai\Llm\LlmManager;
 
 class ContentGenerationService
 {
-    private string $openaiApiKey;
-    private string $geminiApiKey;
-    private string $anthropicApiKey;
+    private LlmManager $llmManager;
     private array $generationConfig;
 
-    public function __construct()
+    public function __construct(LlmManager $llmManager)
     {
-        // Default to empty strings in test/dev when keys are not configured
-        $this->openaiApiKey = (string) (config('services.openai.api_key') ?? '');
-        $this->geminiApiKey = (string) (config('services.gemini.api_key') ?? '');
-        $this->anthropicApiKey = (string) (config('services.anthropic.api_key') ?? '');
+        $this->llmManager = $llmManager;
         $this->generationConfig = config('content_generation', [
             'enabled' => true,
             'providers' => ['openai', 'gemini', 'claude'],
@@ -99,30 +95,20 @@ class ContentGenerationService
 
         foreach ($providers as $provider) {
             $provider = trim($provider);
+            $res = ['content' => ''];
 
-            if ($provider === 'openai' && ($this->openaiApiKey !== '' || app()->environment('testing'))) {
+            if ($provider === 'openai') {
                 $res = $this->generateWithOpenAI($context, $additionalContext, $type);
-                if (!empty($res['content'])) {
-                    $results['openai'] = $res;
-                    // Stop after first successful provider to minimize external calls (important for tests and caching semantics)
-                    break;
-                }
-            }
-
-            if ($provider === 'gemini' && ($this->geminiApiKey !== '' || app()->environment('testing'))) {
+            } elseif ($provider === 'gemini') {
                 $res = $this->generateWithGemini($context, $additionalContext, $type);
-                if (!empty($res['content'])) {
-                    $results['gemini'] = $res;
-                    break;
-                }
+            } elseif ($provider === 'claude') {
+                $res = $this->generateWithClaude($context, $additionalContext, $type);
             }
 
-            if ($provider === 'claude' && ($this->anthropicApiKey !== '' || app()->environment('testing'))) {
-                $res = $this->generateWithClaude($context, $additionalContext, $type);
-                if (!empty($res['content'])) {
-                    $results['claude'] = $res;
-                    break;
-                }
+            if (!empty($res['content'])) {
+                $results[$provider] = $res;
+                // Stop after first successful provider to minimize external calls (important for tests and caching semantics)
+                break;
             }
         }
 
@@ -138,30 +124,22 @@ class ContentGenerationService
         try {
             $prompt = $this->buildOpenAIPrompt($context, $additionalContext, $type);
             
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->openaiApiKey,
-                'Content-Type' => 'application/json',
-            ])->post('https://api.openai.com/v1/chat/completions', [
-                'model' => 'gpt-4',
-                'messages' => [
-                    ['role' => 'system', 'content' => $this->getSystemPrompt($type)],
-                    ['role' => 'user', 'content' => $prompt]
-                ],
+            $messages = [
+                ['role' => 'system', 'content' => $this->getSystemPrompt($type)],
+                ['role' => 'user', 'content' => $prompt]
+            ];
+
+            $response = $this->llmManager->driver('openai')->chat($messages, [
                 'max_tokens' => $this->generationConfig['max_tokens'],
                 'temperature' => $this->generationConfig['temperature'],
             ]);
 
-            if ($response->successful()) {
-                $data = $response->json();
-                $content = $data['choices'][0]['message']['content'] ?? '';
-                
-                return [
-                    'content' => $content,
-                    'provider' => 'openai',
-                    'confidence' => $this->calculateConfidence($content),
-                    'safety_score' => $this->calculateSafetyScore($content),
-                ];
-            }
+            return [
+                'content' => $response->content,
+                'provider' => 'openai',
+                'confidence' => $this->calculateConfidence($response->content),
+                'safety_score' => $this->calculateSafetyScore($response->content),
+            ];
         } catch (\Exception $e) {
             Log::error('OpenAI content generation failed', ['error' => $e->getMessage()]);
         }
@@ -177,33 +155,21 @@ class ContentGenerationService
         try {
             $prompt = $this->buildGeminiPrompt($context, $additionalContext, $type);
             
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-            ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={$this->geminiApiKey}", [
-                'contents' => [
-                    [
-                        'parts' => [
-                            ['text' => $prompt]
-                        ]
-                    ]
-                ],
-                'generationConfig' => [
-                    'temperature' => $this->generationConfig['temperature'],
-                    'maxOutputTokens' => $this->generationConfig['max_tokens'],
-                ]
+            $messages = [
+                ['role' => 'user', 'content' => $prompt]
+            ];
+
+            $response = $this->llmManager->driver('gemini')->chat($messages, [
+                'max_tokens' => $this->generationConfig['max_tokens'],
+                'temperature' => $this->generationConfig['temperature'],
             ]);
 
-            if ($response->successful()) {
-                $data = $response->json();
-                $content = $data['candidates'][0]['content']['parts'][0]['text'] ?? '';
-                
-                return [
-                    'content' => $content,
-                    'provider' => 'gemini',
-                    'confidence' => $this->calculateConfidence($content),
-                    'safety_score' => $this->calculateSafetyScore($content),
-                ];
-            }
+            return [
+                'content' => $response->content,
+                'provider' => 'gemini',
+                'confidence' => $this->calculateConfidence($response->content),
+                'safety_score' => $this->calculateSafetyScore($response->content),
+            ];
         } catch (\Exception $e) {
             Log::error('Gemini content generation failed', ['error' => $e->getMessage()]);
         }
@@ -217,34 +183,25 @@ class ContentGenerationService
     private function generateWithClaude(array $context, array $additionalContext, string $type): array
     {
         try {
-            $prompt = $this->buildOpenAIPrompt($context, $additionalContext, $type); // Reuse OpenAI prompt structure as it's chat-based
+            $prompt = $this->buildOpenAIPrompt($context, $additionalContext, $type);
             
-            $response = Http::withHeaders([
-                'x-api-key' => $this->anthropicApiKey,
-                'anthropic-version' => '2023-06-01',
-                'Content-Type' => 'application/json',
-            ])->post('https://api.anthropic.com/v1/messages', [
+            $messages = [
+                ['role' => 'system', 'content' => $this->getSystemPrompt($type)],
+                ['role' => 'user', 'content' => $prompt]
+            ];
+
+            $response = $this->llmManager->driver('claude')->chat($messages, [
                 'model' => $this->generationConfig['models']['claude'] ?? 'claude-3-5-sonnet-20241022',
                 'max_tokens' => $this->generationConfig['max_tokens'],
-                'messages' => [
-                    ['role' => 'user', 'content' => $this->getSystemPrompt($type) . "\n\n" . $prompt]
-                ],
                 'temperature' => $this->generationConfig['temperature'],
             ]);
 
-            if ($response->successful()) {
-                $data = $response->json();
-                $content = $data['content'][0]['text'] ?? '';
-                
-                return [
-                    'content' => $content,
-                    'provider' => 'claude',
-                    'confidence' => $this->calculateConfidence($content),
-                    'safety_score' => $this->calculateSafetyScore($content),
-                ];
-            } else {
-                Log::error('Claude content generation failed', ['status' => $response->status(), 'body' => $response->body()]);
-            }
+            return [
+                'content' => $response->content,
+                'provider' => 'claude',
+                'confidence' => $this->calculateConfidence($response->content),
+                'safety_score' => $this->calculateSafetyScore($response->content),
+            ];
         } catch (\Exception $e) {
             Log::error('Claude content generation failed', ['error' => $e->getMessage()]);
         }

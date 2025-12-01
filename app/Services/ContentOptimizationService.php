@@ -2,21 +2,18 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
+use App\Services\Ai\Llm\LlmManager;
 
 class ContentOptimizationService
 {
-    private string $openaiApiKey;
-    private string $geminiApiKey;
+    private LlmManager $llmManager;
     private array $optimizationConfig;
 
-    public function __construct()
+    public function __construct(LlmManager $llmManager)
     {
-        // Default to empty strings in test/dev when keys are not configured
-        $this->openaiApiKey = (string) (config('services.openai.api_key') ?? '');
-        $this->geminiApiKey = (string) (config('services.gemini.api_key') ?? '');
+        $this->llmManager = $llmManager;
         $this->optimizationConfig = config('content_optimization', [
             'enabled' => true,
             'providers' => ['openai', 'gemini'],
@@ -75,22 +72,13 @@ class ContentOptimizationService
                      "Make it more engaging, interesting, and likely to get responses. " .
                      "Keep the original meaning but make it more compelling.";
             
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->openaiApiKey,
-                'Content-Type' => 'application/json',
-            ])->post('https://api.openai.com/v1/chat/completions', [
-                'model' => 'gpt-4',
-                'messages' => [
-                    ['role' => 'system', 'content' => 'You are an expert content optimizer specializing in social media engagement.'],
-                    ['role' => 'user', 'content' => $prompt]
-                ],
-                'max_tokens' => 500,
-                'temperature' => 0.7,
+            $response = $this->llmManager->driver('openai')->chat([
+                ['role' => 'system', 'content' => 'You are an expert content optimizer specializing in social media engagement.'],
+                ['role' => 'user', 'content' => $prompt]
             ]);
 
-            if ($response->successful()) {
-                $data = $response->json();
-                $optimizedContent = $data['choices'][0]['message']['content'] ?? '';
+            if (isset($response['content'])) {
+                $optimizedContent = $response['content'];
                 
                 return [
                     'original' => $content,
@@ -118,22 +106,13 @@ class ContentOptimizationService
                      "Make it clearer, more concise, and easier to understand. " .
                      "Fix any grammar or structure issues.";
             
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->openaiApiKey,
-                'Content-Type' => 'application/json',
-            ])->post('https://api.openai.com/v1/chat/completions', [
-                'model' => 'gpt-4',
-                'messages' => [
-                    ['role' => 'system', 'content' => 'You are an expert editor specializing in clear, concise communication.'],
-                    ['role' => 'user', 'content' => $prompt]
-                ],
-                'max_tokens' => 500,
-                'temperature' => 0.3,
+            $response = $this->llmManager->driver('openai')->chat([
+                ['role' => 'system', 'content' => 'You are an expert editor specializing in clear, concise communication.'],
+                ['role' => 'user', 'content' => $prompt]
             ]);
 
-            if ($response->successful()) {
-                $data = $response->json();
-                $optimizedContent = $data['choices'][0]['message']['content'] ?? '';
+            if (isset($response['content'])) {
+                $optimizedContent = $response['content'];
                 
                 return [
                     'original' => $content,
@@ -167,22 +146,13 @@ class ContentOptimizationService
                      "Issues: " . json_encode($moderationResult['categories']) . "\n\n" .
                      "Rewrite to be safe and appropriate for a social platform.";
             
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->openaiApiKey,
-                'Content-Type' => 'application/json',
-            ])->post('https://api.openai.com/v1/chat/completions', [
-                'model' => 'gpt-4',
-                'messages' => [
-                    ['role' => 'system', 'content' => 'You are a content safety expert. Make content appropriate while preserving intent.'],
-                    ['role' => 'user', 'content' => $prompt]
-                ],
-                'max_tokens' => 500,
-                'temperature' => 0.3,
+            $response = $this->llmManager->driver('openai')->chat([
+                ['role' => 'system', 'content' => 'You are a content safety expert. Make content appropriate while preserving intent.'],
+                ['role' => 'user', 'content' => $prompt]
             ]);
 
-            if ($response->successful()) {
-                $data = $response->json();
-                $optimizedContent = $data['choices'][0]['message']['content'] ?? '';
+            if (isset($response['content'])) {
+                $optimizedContent = $response['content'];
                 
                 // Re-check safety
                 $newModerationResult = $moderationService->moderateContent($optimizedContent);
@@ -212,22 +182,13 @@ class ContentOptimizationService
                      "Context: " . json_encode($context) . "\n\n" .
                      "Adjust the content to be more relevant to the location, community, and current trends.";
             
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->openaiApiKey,
-                'Content-Type' => 'application/json',
-            ])->post('https://api.openai.com/v1/chat/completions', [
-                'model' => 'gpt-4',
-                'messages' => [
-                    ['role' => 'system', 'content' => 'You are a content relevance expert. Make content more contextually relevant.'],
-                    ['role' => 'user', 'content' => $prompt]
-                ],
-                'max_tokens' => 500,
-                'temperature' => 0.7,
+            $response = $this->llmManager->driver('openai')->chat([
+                ['role' => 'system', 'content' => 'You are a content relevance expert. Make content more contextually relevant.'],
+                ['role' => 'user', 'content' => $prompt]
             ]);
 
-            if ($response->successful()) {
-                $data = $response->json();
-                $optimizedContent = $data['choices'][0]['message']['content'] ?? '';
+            if (isset($response['content'])) {
+                $optimizedContent = $response['content'];
                 
                 return [
                     'original' => $content,

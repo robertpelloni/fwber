@@ -2,21 +2,18 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use App\Services\Ai\Llm\LlmManager;
 
 class ContentModerationService
 {
-    private string $openaiApiKey;
-    private string $geminiApiKey;
+    private LlmManager $llmManager;
     private array $moderationConfig;
 
-    public function __construct()
+    public function __construct(LlmManager $llmManager)
     {
-        // Default to empty strings if missing to avoid TypeError in tests
-        $this->openaiApiKey = (string) (config('services.openai.api_key') ?? '');
-        $this->geminiApiKey = (string) (config('services.gemini.api_key') ?? '');
+        $this->llmManager = $llmManager;
         $this->moderationConfig = config('moderation', [
             'enabled' => true,
             'providers' => ['openai', 'gemini'],
@@ -45,13 +42,13 @@ class ContentModerationService
 
         $results = [];
         
-        // OpenAI moderation (in testing allow execution with faked HTTP even if key missing)
-        if (in_array('openai', $this->moderationConfig['providers']) && ($this->openaiApiKey !== '' || app()->environment('testing'))) {
+        // OpenAI moderation
+        if (in_array('openai', $this->moderationConfig['providers'])) {
             $results['openai'] = $this->moderateWithOpenAI($content);
         }
         
-        // Gemini moderation (in testing allow execution with faked HTTP even if key missing)
-        if (in_array('gemini', $this->moderationConfig['providers']) && ($this->geminiApiKey !== '' || app()->environment('testing'))) {
+        // Gemini moderation
+        if (in_array('gemini', $this->moderationConfig['providers'])) {
             $results['gemini'] = $this->moderateWithGemini($content, $context);
         }
         
@@ -84,25 +81,18 @@ class ContentModerationService
     private function moderateWithOpenAI(string $content): array
     {
         try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->openaiApiKey,
-                'Content-Type' => 'application/json',
-            ])->post('https://api.openai.com/v1/moderations', [
-                'input' => $content,
-                'model' => 'text-moderation-latest'
-            ]);
-
-            if ($response->successful()) {
-                $data = $response->json();
-                $results = $data['results'][0] ?? [];
-                
-                return [
-                    'flagged' => $results['flagged'] ?? false,
-                    'categories' => $results['category_scores'] ?? [],
-                    'confidence' => $this->calculateConfidence($results['category_scores'] ?? []),
-                    'provider' => 'openai'
-                ];
+            $result = $this->llmManager->driver('openai')->moderate($content);
+            
+            if (isset($result['error'])) {
+                return ['flagged' => false, 'error' => $result['error']];
             }
+
+            return [
+                'flagged' => $result['flagged'],
+                'categories' => $result['categories'],
+                'confidence' => $result['score'],
+                'provider' => 'openai'
+            ];
         } catch (\Exception $e) {
             Log::error('OpenAI moderation failed', ['error' => $e->getMessage()]);
         }
@@ -116,76 +106,25 @@ class ContentModerationService
     private function moderateWithGemini(string $content, array $context = []): array
     {
         try {
-            $prompt = $this->buildGeminiPrompt($content, $context);
+            // Note: Context is currently ignored in driver implementation for simplicity, 
+            // but could be appended to content if needed.
+            $result = $this->llmManager->driver('gemini')->moderate($content);
             
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-            ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={$this->geminiApiKey}", [
-                'contents' => [
-                    [
-                        'parts' => [
-                            ['text' => $prompt]
-                        ]
-                    ]
-                ],
-                'generationConfig' => [
-                    'temperature' => 0.1,
-                    'maxOutputTokens' => 1000,
-                ]
-            ]);
-
-            if ($response->successful()) {
-                $data = $response->json();
-                $text = $data['candidates'][0]['content']['parts'][0]['text'] ?? '';
-                
-                return $this->parseGeminiResponse($text);
+            if (isset($result['error'])) {
+                return ['flagged' => false, 'error' => $result['error']];
             }
+
+            return [
+                'flagged' => $result['flagged'],
+                'categories' => $result['categories'],
+                'confidence' => $result['score'],
+                'provider' => 'gemini'
+            ];
         } catch (\Exception $e) {
             Log::error('Gemini moderation failed', ['error' => $e->getMessage()]);
         }
 
         return ['flagged' => false, 'error' => 'Gemini moderation unavailable'];
-    }
-
-    /**
-     * Build prompt for Gemini moderation
-     */
-    private function buildGeminiPrompt(string $content, array $context = []): string
-    {
-        $contextStr = !empty($context) ? "Context: " . json_encode($context) . "\n" : "";
-        
-        return "Analyze the following content for moderation. Respond with JSON only.\n\n" .
-               $contextStr .
-               "Content: \"$content\"\n\n" .
-               "Check for: hate speech, harassment, violence, sexual content, spam, inappropriate language.\n" .
-               "Respond with JSON: {\"flagged\": boolean, \"categories\": {\"hate\": 0.0-1.0, \"harassment\": 0.0-1.0, \"violence\": 0.0-1.0, \"sexual\": 0.0-1.0, \"spam\": 0.0-1.0}, \"reason\": \"explanation\"}";
-    }
-
-    /**
-     * Parse Gemini response
-     */
-    private function parseGeminiResponse(string $response): array
-    {
-        try {
-            // Extract JSON from response
-            preg_match('/\{.*\}/', $response, $matches);
-            $json = $matches[0] ?? '{}';
-            $data = json_decode($json, true);
-            
-            if (json_last_error() === JSON_ERROR_NONE) {
-                return [
-                    'flagged' => $data['flagged'] ?? false,
-                    'categories' => $data['categories'] ?? [],
-                    'reason' => $data['reason'] ?? '',
-                    'confidence' => $this->calculateConfidence($data['categories'] ?? []),
-                    'provider' => 'gemini'
-                ];
-            }
-        } catch (\Exception $e) {
-            Log::error('Failed to parse Gemini response', ['response' => $response, 'error' => $e->getMessage()]);
-        }
-
-        return ['flagged' => false, 'error' => 'Failed to parse Gemini response'];
     }
 
     /**
