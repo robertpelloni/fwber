@@ -139,6 +139,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Media Analysis
     Route::middleware('feature:media_analysis')->group(function () {
-        Route::post('media/analyze', [\App\Http\Controllers\Api\MediaAnalysisController::class, 'analyze']);
+        Route::post('media/analyze', [\App\Http\Controllers\MediaAnalysisController::class, 'analyze']);
     });
 });
