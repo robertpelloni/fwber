@@ -87,10 +87,11 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   IndexedDB storage for encrypted media.
     -   `useVault` hook with initialize, unlock, lock, add, remove, export operations.
     -   Passphrase strength checking and security warnings.
-9.  **Mobile Experience (PWA)** (Nov 27 - Partial):
+9.  **Mobile Experience (PWA)** (Dec 01 - Complete):
     -   `next-pwa` integrated for offline support and caching.
     -   Web App Manifest configured for installability.
     -   Service Worker strategy implemented (Network First for API, Cache First for static).
+    -   **Install Prompt**: Added `PWAInstallPrompt` component to homepage for easy installation.
     -   **Note**: Push Notifications are currently client-side only (no backend support).
 10. **Security Hardening** (Dec 01 - Complete):
     -   **Frontend**: Strict Content Security Policy (CSP), HSTS, X-Frame-Options, and Permissions-Policy headers configured in `next.config.js`.
