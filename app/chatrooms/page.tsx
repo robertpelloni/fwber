@@ -1,19 +1,52 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useChatrooms, useChatroomCategories, usePopularChatrooms, useSearchChatrooms } from '@/lib/hooks/use-chatrooms';
+import { useNearbyProximityChatrooms } from '@/lib/hooks/use-proximity-chatrooms';
 import type { ChatroomFilters } from '@/lib/api/chatrooms';
 
 export default function ChatroomsPage() {
+  const [activeTab, setActiveTab] = useState<'all' | 'nearby'>('all');
   const [filters, setFilters] = useState<ChatroomFilters>({});
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
+  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   const { data: chatrooms, isLoading: chatroomsLoading } = useChatrooms(filters);
   const { data: categories } = useChatroomCategories();
   const { data: popularChatrooms } = usePopularChatrooms();
   const { data: searchResults, isLoading: searchLoading } = useSearchChatrooms(searchQuery, filters);
+  
+  const { data: nearbyChatrooms, isLoading: nearbyLoading } = useNearbyProximityChatrooms({
+    latitude: location?.latitude || 0,
+    longitude: location?.longitude || 0,
+    radius_meters: 5000, // 5km default radius
+  });
+
+  useEffect(() => {
+    if (activeTab === 'nearby') {
+      if (!navigator.geolocation) {
+        setLocationError('Geolocation is not supported by your browser');
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+          setLocationError(null);
+        },
+        (error) => {
+          setLocationError('Unable to retrieve your location. Please enable location services.');
+          console.error('Geolocation error:', error);
+        }
+      );
+    }
+  }, [activeTab]);
 
   const handleFilterChange = (key: keyof ChatroomFilters, value: string) => {
     setFilters(prev => ({
@@ -27,8 +60,13 @@ export default function ChatroomsPage() {
     setShowSearch(query.length >= 2);
   };
 
-  const displayChatrooms = showSearch ? searchResults?.data : chatrooms?.data;
-  const isLoading = showSearch ? searchLoading : chatroomsLoading;
+  const displayChatrooms = activeTab === 'nearby' 
+    ? nearbyChatrooms?.chatrooms 
+    : (showSearch ? searchResults?.data : chatrooms?.data);
+    
+  const isLoading = activeTab === 'nearby' 
+    ? nearbyLoading 
+    : (showSearch ? searchLoading : chatroomsLoading);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -43,8 +81,35 @@ export default function ChatroomsPage() {
           </p>
         </div>
 
-        {/* Search and Filters */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+        {/* Tabs */}
+        <div className="border-b border-gray-200 mb-6">
+          <nav className="-mb-px flex space-x-8">
+            <button
+              onClick={() => setActiveTab('all')}
+              className={`${
+                activeTab === 'all'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              All Chatrooms
+            </button>
+            <button
+              onClick={() => setActiveTab('nearby')}
+              className={`${
+                activeTab === 'nearby'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              📍 Nearby
+            </button>
+          </nav>
+        </div>
+
+        {/* Search and Filters - Only show for 'all' tab or if we want to filter nearby too */}
+        {activeTab === 'all' && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search */}
             <div className="flex-1">
@@ -118,9 +183,17 @@ export default function ChatroomsPage() {
             </div>
           </div>
         </div>
+        )}
 
-        {/* Popular Chatrooms */}
-        {!showSearch && popularChatrooms && popularChatrooms.length > 0 && (
+        {/* Location Error */}
+        {activeTab === 'nearby' && locationError && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+            {locationError}
+          </div>
+        )}
+
+        {/* Popular Chatrooms - Only show on 'all' tab */}
+        {activeTab === 'all' && !showSearch && popularChatrooms && popularChatrooms.length > 0 && (
           <div className="mb-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">🔥 Popular Chatrooms</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -151,33 +224,47 @@ export default function ChatroomsPage() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900">
-              {showSearch ? `Search Results for "${searchQuery}"` : 'All Chatrooms'}
+              {activeTab === 'nearby' 
+                ? '📍 Nearby Chatrooms'
+                : (showSearch ? `Search Results for "${searchQuery}"` : 'All Chatrooms')
+              }
             </h2>
           </div>
 
           {isLoading ? (
             <div className="p-8 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Loading chatrooms...</p>
+              <p className="mt-2 text-gray-600">
+                {activeTab === 'nearby' ? 'Finding chatrooms near you...' : 'Loading chatrooms...'}
+              </p>
             </div>
           ) : displayChatrooms && displayChatrooms.length > 0 ? (
             <div className="divide-y divide-gray-200">
               {displayChatrooms.map((chatroom) => (
                 <Link
                   key={chatroom.id}
-                  href={`/chatrooms/${chatroom.id}`}
+                  href={`/chatrooms/${chatroom.id}${activeTab === 'nearby' ? '?type=proximity' : ''}`}
                   className="block p-6 hover:bg-gray-50 transition-colors"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-medium text-gray-900">{chatroom.display_name}</h3>
+                        <h3 className="text-lg font-medium text-gray-900">{chatroom.display_name || chatroom.name}</h3>
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                           {chatroom.type}
                         </span>
                         {!chatroom.is_public && (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                             Private
+                          </span>
+                        )}
+                        {/* Show distance for nearby chatrooms */}
+                        {(chatroom as any).distance_meters !== undefined && (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            {((chatroom as any).distance_meters < 1000 
+                              ? `${Math.round((chatroom as any).distance_meters)}m` 
+                              : `${((chatroom as any).distance_meters / 1000).toFixed(1)}km`
+                            )} away
                           </span>
                         )}
                       </div>
@@ -187,7 +274,7 @@ export default function ChatroomsPage() {
                       )}
                       
                       <div className="flex items-center gap-4 text-sm text-gray-500">
-                        <span>👥 {chatroom.member_count} members</span>
+                        <span>👥 {chatroom.member_count || (chatroom as any).current_members} members</span>
                         <span>💬 {chatroom.message_count} messages</span>
                         {chatroom.city && <span>📍 {chatroom.city}</span>}
                         <span>🕒 {new Date(chatroom.last_activity_at).toLocaleDateString()}</span>
@@ -199,7 +286,7 @@ export default function ChatroomsPage() {
                         Created by {chatroom.creator?.name}
                       </div>
                       <div className="text-xs text-gray-400">
-                        {new Date(chatroom.created_at).toLocaleDateString()}
+                        {new Date((chatroom as any).created_at || Date.now()).toLocaleDateString()}
                       </div>
                     </div>
                   </div>
@@ -215,9 +302,12 @@ export default function ChatroomsPage() {
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">No chatrooms found</h3>
               <p className="text-gray-600 mb-4">
-                {showSearch 
-                  ? 'Try adjusting your search terms or filters'
-                  : 'Be the first to create a chatroom in your area'
+                {activeTab === 'nearby'
+                  ? 'No chatrooms found in your area. Try increasing the search radius or create one!'
+                  : (showSearch 
+                    ? 'Try adjusting your search terms or filters'
+                    : 'Be the first to create a chatroom in your area'
+                  )
                 }
               </p>
               <Link

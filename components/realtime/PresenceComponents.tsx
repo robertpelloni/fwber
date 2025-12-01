@@ -118,7 +118,7 @@ interface TypingIndicatorProps {
   /** User ID or chatroom ID to show typing for */
   contextId: string;
   /** Type of context - 'user' for DMs or 'chatroom' */
-  contextType: 'user' | 'chatroom';
+  contextType: 'user' | 'chatroom' | 'proximity_chatroom';
   className?: string;
 }
 
@@ -141,6 +141,8 @@ export function TypingIndicator({
           return t.from_user_id === contextId && t.is_typing;
         }
         // For chatrooms, we'd need chatroom_id in the typing indicator
+        // Currently the TypingIndicatorData interface doesn't support chatroom_id
+        // This is a placeholder for future implementation
         return false;
       })
       .map((t: TypingIndicatorData) => t.from_user_id);

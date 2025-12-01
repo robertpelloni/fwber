@@ -1,8 +1,16 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useChatroom, useChatroomMessages, useSendMessage, useAddReaction, useRemoveReaction } from '@/lib/hooks/use-chatrooms';
+import { 
+  useProximityChatroom, 
+  useProximityChatroomMessages, 
+  useSendProximityMessage, 
+  useAddProximityReaction, 
+  useRemoveProximityReaction,
+  useJoinProximityChatroom
+} from '@/lib/hooks/use-proximity-chatrooms';
 import { useAuth } from '@/lib/auth-context';
 import { 
   ConnectionStatusBadge, 
@@ -14,28 +22,80 @@ import {
 
 export default function ChatroomPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const { user } = useAuth();
   const chatroomId = parseInt(params.id as string);
+  const isProximity = searchParams.get('type') === 'proximity';
   
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showOnlineUsers, setShowOnlineUsers] = useState(false);
+  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
 
-  const { data: chatroomData, isLoading: chatroomLoading } = useChatroom(chatroomId);
-  const { data: messagesData, isLoading: messagesLoading } = useChatroomMessages(chatroomId);
-  const sendMessageMutation = useSendMessage();
-  const addReactionMutation = useAddReaction();
-  const removeReactionMutation = useRemoveReaction();
+  // Get location for proximity chatrooms
+  useEffect(() => {
+    if (isProximity && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        (error) => console.error('Geolocation error:', error)
+      );
+    }
+  }, [isProximity]);
 
-  const chatroom = chatroomData?.chatroom;
-  const messages = useMemo(() => messagesData?.data || [], [messagesData?.data]);
+  // Standard Chatroom Hooks
+  const { data: standardChatroomData, isLoading: standardChatroomLoading } = useChatroom(chatroomId);
+  const { data: standardMessagesData, isLoading: standardMessagesLoading } = useChatroomMessages(chatroomId);
+  const sendStandardMessageMutation = useSendMessage();
+  const addStandardReactionMutation = useAddReaction();
+  const removeStandardReactionMutation = useRemoveReaction();
+
+  // Proximity Chatroom Hooks
+  const { data: proximityChatroomData, isLoading: proximityChatroomLoading } = useProximityChatroom(chatroomId, location || undefined);
+  const { data: proximityMessagesData, isLoading: proximityMessagesLoading } = useProximityChatroomMessages(chatroomId);
+  const sendProximityMessageMutation = useSendProximityMessage();
+  const addProximityReactionMutation = useAddProximityReaction();
+  const removeProximityReactionMutation = useRemoveProximityReaction();
+  const joinProximityChatroomMutation = useJoinProximityChatroom();
+
+  // Unified Data
+  const chatroom = isProximity ? proximityChatroomData : standardChatroomData?.chatroom;
+  const messages = useMemo(() => 
+    (isProximity ? proximityMessagesData?.data : standardMessagesData?.data) || [], 
+    [isProximity, proximityMessagesData?.data, standardMessagesData?.data]
+  );
+  const isLoading = isProximity ? proximityChatroomLoading : standardChatroomLoading;
+  const messagesLoading = isProximity ? proximityMessagesLoading : standardMessagesLoading;
+  const isSending = isProximity ? sendProximityMessageMutation.isPending : sendStandardMessageMutation.isPending;
+
+  // Join Proximity Chatroom if needed
+  useEffect(() => {
+    if (isProximity && chatroom && location) {
+      // If we are within proximity, ensure we join so we can participate
+      // We can check if we are already a member by looking at active_members or just try to join (idempotent usually)
+      // For now, we'll try to join if we have location data to ensure presence is tracked
+      if ((chatroom as any).is_within_proximity !== false) { // If true or undefined (implied)
+         joinProximityChatroomMutation.mutate({ 
+           id: chatroomId, 
+           data: { 
+             latitude: location.latitude, 
+             longitude: location.longitude 
+           } 
+         });
+      }
+    }
+  }, [isProximity, chatroomId, location?.latitude, location?.longitude]); // specific deps to avoid loops
   
   // Get member IDs for presence tracking
   const memberIds = useMemo(() => {
-    return chatroom?.members?.map((m) => String(m.id)) || [];
+    return chatroom?.members?.map((m: any) => String(m.id)) || [];
   }, [chatroom?.members]);
 
   // Auto-scroll to bottom when new messages arrive
@@ -56,16 +116,26 @@ export default function ChatroomPage() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || sendMessageMutation.isPending) return;
+    if (!newMessage.trim() || isSending) return;
 
     try {
-      await sendMessageMutation.mutateAsync({
-        chatroomId,
-        data: {
-          content: newMessage.trim(),
-          message_type: 'text',
-        },
-      });
+      if (isProximity) {
+        await sendProximityMessageMutation.mutateAsync({
+          chatroomId,
+          data: {
+            content: newMessage.trim(),
+            message_type: 'text',
+          },
+        });
+      } else {
+        await sendStandardMessageMutation.mutateAsync({
+          chatroomId,
+          data: {
+            content: newMessage.trim(),
+            message_type: 'text',
+          },
+        });
+      }
       setNewMessage('');
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -75,21 +145,37 @@ export default function ChatroomPage() {
   const handleReaction = async (messageId: number, emoji: string) => {
     try {
       // Check if user already reacted with this emoji
-      const message = messages.find(m => m.id === messageId);
-      const userReaction = message?.reactions?.find(r => r.user_id === user?.id && r.emoji === emoji);
+      const message = messages.find((m: any) => m.id === messageId);
+      const userReaction = message?.reactions?.find((r: any) => r.user_id === user?.id && r.emoji === emoji);
       
       if (userReaction) {
-        await removeReactionMutation.mutateAsync({
-          chatroomId,
-          messageId,
-          data: { emoji },
-        });
+        if (isProximity) {
+          await removeProximityReactionMutation.mutateAsync({
+            chatroomId,
+            messageId,
+            data: { emoji },
+          });
+        } else {
+          await removeStandardReactionMutation.mutateAsync({
+            chatroomId,
+            messageId,
+            data: { emoji },
+          });
+        }
       } else {
-        await addReactionMutation.mutateAsync({
-          chatroomId,
-          messageId,
-          data: { emoji },
-        });
+        if (isProximity) {
+          await addProximityReactionMutation.mutateAsync({
+            chatroomId,
+            messageId,
+            data: { emoji },
+          });
+        } else {
+          await addStandardReactionMutation.mutateAsync({
+            chatroomId,
+            messageId,
+            data: { emoji },
+          });
+        }
       }
     } catch (error) {
       console.error('Failed to toggle reaction:', error);
@@ -111,7 +197,7 @@ export default function ChatroomPage() {
     }
   };
 
-  if (chatroomLoading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -147,8 +233,13 @@ export default function ChatroomPage() {
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-2xl font-bold text-gray-900">{chatroom.display_name}</h1>
+                <h1 className="text-2xl font-bold text-gray-900">{chatroom.display_name || (chatroom as any).name}</h1>
                 <ConnectionStatusBadge />
+                {isProximity && (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    Proximity
+                  </span>
+                )}
               </div>
               {chatroom.description && (
                 <p className="text-gray-600 mb-4">{chatroom.description}</p>
@@ -158,7 +249,7 @@ export default function ChatroomPage() {
                   onClick={() => setShowOnlineUsers(!showOnlineUsers)}
                   className="flex items-center gap-1 hover:text-blue-600 transition-colors"
                 >
-                  👥 {chatroom.member_count} members
+                  👥 {chatroom.member_count || (chatroom as any).current_members} members
                 </button>
                 <span>💬 {chatroom.message_count} messages</span>
                 {chatroom.city && <span>📍 {chatroom.city}</span>}
@@ -177,7 +268,7 @@ export default function ChatroomPage() {
                 Created by {chatroom.creator?.name}
               </div>
               <div className="text-xs text-gray-400">
-                {new Date(chatroom.created_at).toLocaleDateString()}
+                {new Date((chatroom as any).created_at || Date.now()).toLocaleDateString()}
               </div>
             </div>
           </div>
@@ -193,7 +284,7 @@ export default function ChatroomPage() {
                 <p className="mt-2 text-gray-600">Loading messages...</p>
               </div>
             ) : messages.length > 0 ? (
-              messages.map((message) => (
+              messages.map((message: any) => (
                 <div key={message.id} className="flex items-start space-x-3">
                   <div className="flex-shrink-0 relative">
                     <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
@@ -220,14 +311,14 @@ export default function ChatroomPage() {
                     {/* Reactions */}
                     {message.reactions && message.reactions.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
-                        {Object.entries(message.reaction_summary).map(([emoji, count]) => (
+                        {Object.entries(message.reaction_summary || {}).map(([emoji, count]) => (
                           <button
                             key={emoji}
                             onClick={() => handleReaction(message.id, emoji)}
                             className="inline-flex items-center px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
                           >
                             <span className="mr-1">{emoji}</span>
-                            <span>{count}</span>
+                            <span>{count as number}</span>
                           </button>
                         ))}
                       </div>
@@ -262,20 +353,20 @@ export default function ChatroomPage() {
                   placeholder="Type your message..."
                   rows={2}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                  disabled={sendMessageMutation.isPending}
+                  disabled={isSending}
                 />
               </div>
               <button
                 type="submit"
-                disabled={!newMessage.trim() || sendMessageMutation.isPending}
+                disabled={!newMessage.trim() || isSending}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {sendMessageMutation.isPending ? 'Sending...' : 'Send'}
+                {isSending ? 'Sending...' : 'Send'}
               </button>
             </form>
             
             {/* Typing Indicator - Real-time from WebSocket or local state */}
-            <TypingIndicator contextId={String(chatroomId)} contextType="chatroom" className="mt-2" />
+            <TypingIndicator contextId={String(chatroomId)} contextType={isProximity ? "proximity_chatroom" : "chatroom"} className="mt-2" />
             {isTyping && (
               <div className="mt-2 text-sm text-gray-500">
                 <span className="animate-pulse">You are typing...</span>
