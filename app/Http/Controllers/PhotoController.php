@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Photo;
 use App\Models\User;
+use App\Services\MediaAnalysisService;
 use App\Services\TelemetryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -27,6 +28,13 @@ use Intervention\Image\Drivers\Gd\Driver;
  */
 class PhotoController extends Controller
 {
+    protected MediaAnalysisService $mediaAnalysis;
+
+    public function __construct(MediaAnalysisService $mediaAnalysis)
+    {
+        $this->mediaAnalysis = $mediaAnalysis;
+    }
+
     /**
      * Maximum file size in bytes (5MB)
      */
@@ -231,6 +239,27 @@ class PhotoController extends Controller
             
             Storage::disk('public')->put($thumbnailPath, (string) $thumbnail->encode());
             
+            // Analyze photo if feature is enabled
+            $analysisMetadata = [];
+            if (config('features.media_analysis')) {
+                // Use the full URL or path depending on what the service expects.
+                // The mock service uses the string to generate hash, so path is fine.
+                $analysisResult = $this->mediaAnalysis->analyze($filePath, 'image');
+                
+                if (!$analysisResult->safe) {
+                    // Delete the file we just uploaded
+                    Storage::disk('public')->delete($filePath);
+                    Storage::disk('public')->delete($thumbnailPath);
+                    
+                    return response()->json([
+                        'message' => 'Photo rejected by safety filter',
+                        'errors' => ['photo' => $analysisResult->moderationLabels]
+                    ], 422);
+                }
+                
+                $analysisMetadata = $analysisResult->toArray();
+            }
+
             // Create photo record
             $photo = Photo::create([
                 'user_id' => $user->id,
@@ -248,6 +277,7 @@ class PhotoController extends Controller
                 'metadata' => [
                     'uploaded_at' => now()->toISOString(),
                     'user_agent' => $request->userAgent(),
+                    'analysis' => $analysisMetadata,
                 ],
             ]);
             

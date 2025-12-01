@@ -22,27 +22,45 @@ class MediaAnalysisService implements MediaAnalysisInterface
         // Mock implementation
         // In a real implementation, this would call AWS Rekognition, Google Vision, etc.
         
-        // Mock logic: If URL contains "unsafe", return unsafe.
-        if (str_contains(strtolower($url), 'unsafe')) {
+        // 1. Check for explicit "unsafe" trigger in filename
+        if (str_contains(strtolower($url), 'unsafe') || str_contains(strtolower($url), 'explicit')) {
             return new MediaAnalysisResult(
                 safe: false,
-                labels: ['Explicit', 'Violence'],
-                moderationLabels: ['Explicit Content'],
+                labels: ['Explicit', 'Violence', 'Restricted'],
+                moderationLabels: ['Explicit Content', 'Violence'],
                 confidence: 0.95,
-                metadata: ['reason' => 'Mock detection triggered by filename']
+                metadata: ['reason' => 'Mock detection triggered by filename keyword']
             );
         }
 
-        // Default safe response
+        // 2. Deterministic Simulation based on filename hash
+        // This ensures the same file always gets the same "random" labels
+        $hash = crc32($url);
+        $scenarios = [
+            0 => ['labels' => ['Person', 'Smile', 'Portrait', 'Indoors'], 'mod' => []],
+            1 => ['labels' => ['Nature', 'Landscape', 'Trees', 'Sky'], 'mod' => []],
+            2 => ['labels' => ['Food', 'Drink', 'Restaurant', 'Table'], 'mod' => []],
+            3 => ['labels' => ['Cat', 'Pet', 'Animal', 'Cute'], 'mod' => []],
+            4 => ['labels' => ['City', 'Building', 'Architecture', 'Street'], 'mod' => []],
+            5 => ['labels' => ['Beach', 'Ocean', 'Sand', 'Summer'], 'mod' => ['Swimwear']], // Borderline
+        ];
+        
+        $scenarioIndex = $hash % count($scenarios);
+        $scenario = $scenarios[$scenarioIndex];
+        
+        // Simulate confidence variation
+        $confidence = 0.85 + (($hash % 15) / 100); // 0.85 to 0.99
+
         return new MediaAnalysisResult(
             safe: true,
-            labels: ['Person', 'Outdoors', 'Smile', 'Safe'],
-            moderationLabels: [],
-            confidence: 0.99,
+            labels: $scenario['labels'],
+            moderationLabels: $scenario['mod'],
+            confidence: $confidence,
             metadata: [
                 'width' => 1024, 
                 'height' => 768,
-                'mock' => true
+                'mock' => true,
+                'scenario_id' => $scenarioIndex
             ]
         );
     }
