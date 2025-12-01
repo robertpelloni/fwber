@@ -3,108 +3,111 @@
 namespace App\Http\Controllers;
 
 use App\Models\Venue;
+use App\Models\VenueCheckin;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class VenueController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Get venues near a location
+     *
+     * @OA\Get(
+     *   path="/venues",
+     *   tags={"Venues"},
+     *   summary="List nearby venues",
+     *   @OA\Parameter(name="lat", in="query", required=true, @OA\Schema(type="number", format="float")),
+     *   @OA\Parameter(name="lng", in="query", required=true, @OA\Schema(type="number", format="float")),
+     *   @OA\Parameter(name="radius", in="query", required=false, @OA\Schema(type="integer", minimum=100, maximum=50000)),
+     *   @OA\Response(response=200, description="Nearby venues",
+     *     @OA\JsonContent(type="object",
+     *       @OA\Property(property="venues", type="array", @OA\Items(type="object")),
+     *       @OA\Property(property="user_location", type="object")
+     *     )
+     *   )
+     * )
      */
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
-        $query = Venue::query();
-
-        // Filter by business type
-        if ($request->has('business_type')) {
-            $query->where('business_type', $request->business_type);
-        }
-
-        // Search by name or address
-        if ($request->has('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('address', 'like', "%{$search}%");
-            });
-        }
-
-        return response()->json($query->paginate(15));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        // Not used in API
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        // Creation is handled via Auth/Register for now.
-        return response()->json(['message' => 'Use /api/venue/register to create a new venue account.'], 405);
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Venue $venue)
-    {
-        return response()->json($venue);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Venue $venue)
-    {
-        // Not used in API
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Venue $venue)
-    {
-        $user = $request->user();
-
-        // Authorization: Only the venue itself or an admin can update
-        if (!($user instanceof Venue) || $user->id !== $venue->id) {
-             return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
-        $validated = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'address' => 'sometimes|string|max:255',
-            'description' => 'nullable|string',
-            'capacity' => 'sometimes|integer|min:1',
-            'business_type' => 'sometimes|string|in:bar,club,restaurant,cafe,other',
-            'operating_hours' => 'nullable|array',
-            'commission_rate' => 'sometimes|numeric|min:0|max:100',
+        $validator = Validator::make($request->all(), [
+            'lat' => 'required|numeric|between:-90,90',
+            'lng' => 'required|numeric|between:-180,180',
+            'radius' => 'integer|min:100|max:50000', // 100m to 50km
         ]);
 
-        $venue->update($validated);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
 
-        return response()->json($venue);
+        $lat = $request->input('lat');
+        $lng = $request->input('lng');
+        $radius = $request->input('radius', 10000); // Default 10km
+
+        // Use Haversine formula for distance
+        $venues = Venue::select('*')
+            ->selectRaw(
+                '(6371000 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance',
+                [$lat, $lng, $lat]
+            )
+            ->having('distance', '<=', $radius)
+            ->orderBy('distance')
+            ->where('is_active', true)
+            ->limit(20)
+            ->get();
+
+        // Append active check-in count to each venue
+        $venues->each(function ($venue) {
+            $venue->active_checkins = $venue->checkins()
+                ->whereNull('checked_out_at')
+                ->where('created_at', '>=', now()->subHours(12)) // Auto-checkout after 12h logic
+                ->count();
+        });
+
+        return response()->json([
+            'venues' => $venues,
+            'user_location' => ['lat' => $lat, 'lng' => $lng],
+            'search_radius' => $radius,
+        ]);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Get a specific venue details
+     *
+     * @OA\Get(
+     *   path="/venues/{id}",
+     *   tags={"Venues"},
+     *   summary="Get venue details",
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Venue details")
+     * )
      */
-    public function destroy(Venue $venue)
+    public function show(int $id): JsonResponse
     {
-        $user = request()->user();
+        $venue = Venue::findOrFail($id);
+        
+        // Get active checkins with user profiles (limited info)
+        $activeCheckins = $venue->checkins()
+            ->with(['user.profile'])
+            ->whereNull('checked_out_at')
+            ->where('created_at', '>=', now()->subHours(12))
+            ->orderBy('created_at', 'desc')
+            ->limit(50)
+            ->get()
+            ->map(function ($checkin) {
+                return [
+                    'user_id' => $checkin->user_id,
+                    'name' => $checkin->user->name, // Or display name
+                    'avatar' => $checkin->user->profile->avatar_url ?? null,
+                    'checked_in_at' => $checkin->created_at,
+                    'message' => $checkin->message,
+                ];
+            });
 
-        if (!($user instanceof Venue) || $user->id !== $venue->id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        $venue->active_checkins_count = $activeCheckins->count();
+        $venue->recent_checkins = $activeCheckins;
 
-        $venue->delete();
-
-        return response()->json(['message' => 'Venue deleted successfully']);
+        return response()->json(['venue' => $venue]);
     }
 }

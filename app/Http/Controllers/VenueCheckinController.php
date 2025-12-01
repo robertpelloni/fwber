@@ -15,10 +15,28 @@ class VenueCheckinController extends Controller
     public function store(Request $request, $venueId)
     {
         $request->validate([
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
             'message' => 'nullable|string|max:255',
         ]);
 
         $venue = Venue::findOrFail($venueId);
+        
+        // Verify distance (must be within 500m)
+        $distance = $this->calculateDistance(
+            $request->latitude,
+            $request->longitude,
+            $venue->latitude,
+            $venue->longitude
+        );
+
+        if ($distance > 0.5) { // 0.5 km = 500m
+            return response()->json([
+                'message' => 'You are too far from the venue to check in.',
+                'distance_km' => round($distance, 3)
+            ], 403);
+        }
+
         $user = Auth::user();
 
         // Auto-checkout from other venues
@@ -33,6 +51,26 @@ class VenueCheckinController extends Controller
         ]);
 
         return response()->json($checkin, 201);
+    }
+
+    /**
+     * Calculate distance between two points using Haversine formula.
+     * Returns distance in kilometers.
+     */
+    private function calculateDistance($lat1, $lon1, $lat2, $lon2)
+    {
+        $earthRadius = 6371; // Radius of the earth in km
+
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+             cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+             sin($dLon / 2) * sin($dLon / 2);
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $earthRadius * $c;
     }
 
     /**
