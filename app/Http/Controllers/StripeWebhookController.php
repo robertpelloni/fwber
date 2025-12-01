@@ -89,6 +89,17 @@ class StripeWebhookController extends Controller
         $user->unlimited_swipes = true;
         $user->save();
 
+        // Create Subscription record
+        \App\Models\Subscription::create([
+            'user_id' => $user->id,
+            'name' => 'gold',
+            'stripe_id' => $paymentIntent->id,
+            'stripe_status' => 'active',
+            'stripe_price' => 'price_premium_monthly',
+            'quantity' => 1,
+            'ends_at' => Carbon::now()->addDays(30),
+        ]);
+
         Log::info("Stripe Webhook: Premium granted to user {$user->id}");
     }
 }

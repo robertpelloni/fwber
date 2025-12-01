@@ -135,6 +135,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Restored Resources
     Route::apiResource('venues', \App\Http\Controllers\VenueController::class);
+    Route::get('subscriptions/history', [\App\Http\Controllers\SubscriptionController::class, 'history']);
     Route::apiResource('subscriptions', \App\Http\Controllers\SubscriptionController::class);
     Route::apiResource('event-matches', \App\Http\Controllers\EventMatchController::class);
     Route::apiResource('attendees', \App\Http\Controllers\AttendeeController::class);

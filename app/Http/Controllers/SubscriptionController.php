@@ -10,9 +10,21 @@ use Illuminate\Support\Facades\Auth;
 class SubscriptionController extends Controller
 {
     /**
-     * Display a listing of the resource (Payment History).
+     * Display a listing of the resource (Active Subscriptions).
      */
     public function index(Request $request)
+    {
+        $subscriptions = Subscription::where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($subscriptions);
+    }
+
+    /**
+     * Display payment history.
+     */
+    public function history(Request $request)
     {
         $payments = Payment::where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
@@ -44,8 +56,8 @@ class SubscriptionController extends Controller
      */
     public function show($id)
     {
-        $payment = Payment::where('user_id', Auth::id())->findOrFail($id);
-        return response()->json($payment);
+        $subscription = Subscription::where('user_id', Auth::id())->findOrFail($id);
+        return response()->json($subscription);
     }
 
     /**

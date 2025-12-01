@@ -84,6 +84,17 @@ class PremiumController extends Controller
                 $user->unlimited_swipes = true;
                 $user->save();
 
+                // Create Subscription record
+                \App\Models\Subscription::create([
+                    'user_id' => $user->id,
+                    'name' => 'gold',
+                    'stripe_id' => $result->transactionId ?? 'manual_' . uniqid(),
+                    'stripe_status' => 'active',
+                    'stripe_price' => 'price_premium_monthly',
+                    'quantity' => 1,
+                    'ends_at' => Carbon::now()->addDays(30),
+                ]);
+
                 return response()->json([
                     'message' => 'Premium purchased successfully',
                     'tier' => $user->tier,
