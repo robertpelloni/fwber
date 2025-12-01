@@ -11,18 +11,42 @@ export default function VenuesPage() {
   const [venues, setVenues] = useState<Venue[]>([])
   const [currentCheckin, setCurrentCheckin] = useState<VenueCheckin | null>(null)
   const [loading, setLoading] = useState(true)
+  const [location, setLocation] = useState<{lat: number, lng: number} | null>(null)
+  const [locationError, setLocationError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      setLocationError('Geolocation is not supported by your browser')
+      setLoading(false)
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        })
+      },
+      (error) => {
+        setLocationError('Unable to retrieve your location')
+        setLoading(false)
+        console.error(error)
+      }
+    )
+  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
-        if (!token) return
+        if (!token || !location) return
         try {
           setLoading(true)
           const [venuesData, checkinData] = await Promise.all([
-            getVenues(token),
+            getVenues(token, location.lat, location.lng),
             getCurrentCheckin(token)
           ])
           // Handle pagination wrapper if exists, otherwise assume array
-          const venuesList = (venuesData as any).data ? (venuesData as any).data : venuesData
+          const venuesList = (venuesData as any).data ? (venuesData as any).data : (venuesData as any).venues || venuesData
           setVenues(Array.isArray(venuesList) ? venuesList : [])
           setCurrentCheckin(checkinData as any)
         } catch (error) {
@@ -32,16 +56,16 @@ export default function VenuesPage() {
         }
       }
     fetchData()
-  }, [token])
+  }, [token, location])
 
   const refreshData = async () => {
-      if (!token) return
+      if (!token || !location) return
       try {
         const [venuesData, checkinData] = await Promise.all([
-          getVenues(token),
+          getVenues(token, location.lat, location.lng),
           getCurrentCheckin(token)
         ])
-        const venuesList = (venuesData as any).data ? (venuesData as any).data : venuesData
+        const venuesList = (venuesData as any).data ? (venuesData as any).data : (venuesData as any).venues || venuesData
         setVenues(Array.isArray(venuesList) ? venuesList : [])
         setCurrentCheckin(checkinData as any)
       } catch (error) {
@@ -50,14 +74,18 @@ export default function VenuesPage() {
   }
 
   const handleCheckIn = async (venueId: number) => {
-    if (!token) return
+    if (!token || !location) {
+      alert('Location is required to check in')
+      return
+    }
     const message = prompt("Enter a check-in message (optional):") || ""
     try {
-      await checkInToVenue(token, venueId, message)
+      await checkInToVenue(token, venueId, location.lat, location.lng, message)
       refreshData()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Check-in failed', error)
-      alert('Check-in failed')
+      const errorMsg = error.response?.data?.message || 'Check-in failed'
+      alert(errorMsg)
     }
   }
 
@@ -72,12 +100,13 @@ export default function VenuesPage() {
   }
 
   if (loading) return <div className="p-8 text-center">Loading venues...</div>
+  if (locationError) return <div className="p-8 text-center text-red-600">{locationError}</div>
 
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50 p-8">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8">Venues</h1>
+          <h1 className="text-3xl font-bold mb-8">Venues Nearby</h1>
 
           {currentCheckin && (
             <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6 flex justify-between items-center">
@@ -104,6 +133,11 @@ export default function VenuesPage() {
                     <p className="text-gray-600 flex items-center mt-1">
                       <MapPin className="h-4 w-4 mr-1" /> {venue.city}, {venue.state}
                     </p>
+                    {(venue as any).distance && (
+                       <p className="text-xs text-gray-500 mt-1">
+                         {Math.round((venue as any).distance / 100) / 10} km away
+                       </p>
+                    )}
                   </div>
                   {currentCheckin?.venue_id === venue.id ? (
                     <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">Checked In</span>
@@ -119,6 +153,11 @@ export default function VenuesPage() {
                 <p className="text-gray-700 mb-4">{venue.description}</p>
               </div>
             ))}
+            {venues.length === 0 && (
+                <div className="col-span-2 text-center text-gray-500 py-8">
+                    No venues found nearby.
+                </div>
+            )}
           </div>
         </div>
       </div>

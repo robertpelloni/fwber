@@ -30,9 +30,14 @@ export interface VenueCheckin {
   venue?: Venue
 }
 
-export const getVenues = async (token: string) => {
+export const getVenues = async (token: string, lat?: number, lng?: number) => {
+  const params: any = {}
+  if (lat !== undefined) params.lat = lat
+  if (lng !== undefined) params.lng = lng
+  
   const response = await client.get('/venues', {
     headers: { Authorization: `Bearer ${token}` },
+    params
   })
   return response.data
 }
@@ -44,10 +49,20 @@ export const getVenue = async (token: string, id: number) => {
   return response.data
 }
 
-export const checkInToVenue = async (token: string, venueId: number, message?: string) => {
+export const checkInToVenue = async (
+  token: string, 
+  venueId: number, 
+  latitude: number, 
+  longitude: number, 
+  message?: string
+) => {
   const response = await client.post(
     `/venues/${venueId}/checkin`,
-    { message },
+    { 
+      message,
+      latitude,
+      longitude
+    },
     { headers: { Authorization: `Bearer ${token}` } }
   )
   return response.data
