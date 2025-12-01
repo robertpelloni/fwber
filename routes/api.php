@@ -144,6 +144,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // AI Avatar Generation
     Route::post('avatar/generate', [\App\Http\Controllers\AvatarController::class, 'generate']);
 
+    // AI Content Generation
+    Route::post('content/generate-bio', [\App\Http\Controllers\ContentGenerationController::class, 'generateProfileBio']);
+    Route::post('content/generate-posts/{boardId}', [\App\Http\Controllers\ContentGenerationController::class, 'generatePostSuggestions']);
+    Route::post('content/generate-starters', [\App\Http\Controllers\ContentGenerationController::class, 'generateConversationStarters']);
+
     // Photos
     Route::post('photos/reorder', [\App\Http\Controllers\PhotoController::class, 'reorder']);
     Route::post('photos/{id}/reveal', [\App\Http\Controllers\PhotoController::class, 'reveal']);
