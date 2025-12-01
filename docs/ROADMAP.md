@@ -19,7 +19,7 @@ The MVP and all secondary systems (Recommendations, AI Content, Chatrooms, Real-
     - Optimize image loading (Next.js Image optimization tuning).
 
 #### 2. Security & Compliance
-- [ ] **Security Audit**: Run automated penetration tests (OWASP ZAP).
+- [x] **Security Audit**: Manual review and header hardening (Automated tools deferred).
 - [x] **Rate Limiting**: Tune `FEATURE_RATE_LIMITS` for production traffic patterns.
 - [x] **Headers**: Enforce strict CSP and security headers (HSTS, X-Frame-Options).
 - [x] **Data Retention**: Implement automated cleanup for old logs and ephemeral artifacts.

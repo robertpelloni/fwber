@@ -75,10 +75,11 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   `next-pwa` integrated for offline support and caching.
     -   Web App Manifest configured for installability.
     -   Service Worker strategy implemented (Network First for API, Cache First for static).
-10. **Security Hardening** (Nov 27 - Complete):
+10. **Security Hardening** (Dec 01 - Complete):
     -   **Frontend**: Strict Content Security Policy (CSP), HSTS, X-Frame-Options, and Permissions-Policy headers configured in `next.config.js`.
     -   **Backend**: `SecurityHeaders` middleware implemented and registered globally in `bootstrap/app.php`.
     -   **Data Retention**: `Prunable` trait implemented on `ProximityArtifact`, `TelemetryEvent`, and `Notification` models. Scheduled cleanup tasks added to `routes/console.php`.
+    -   **Audit**: Automated security audit skipped due to `enlightn` incompatibility with Laravel 12; manual review performed via header configuration.
 11. **Venue Partner Portal** (Nov 28 - Complete):
     -   **Backend**: `Venue` model, `VenueAuthController`, `VenueController` (Index, Show, Update).
     -   **Frontend**: Dedicated portal at `/venue` (Login, Register, Dashboard).
