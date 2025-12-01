@@ -137,6 +137,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('venues/{id}/checkins', [\App\Http\Controllers\VenueCheckinController::class, 'index']);
     Route::get('user/checkin', [\App\Http\Controllers\VenueCheckinController::class, 'current']);
 
+    // AI Avatar Generation
+    Route::post('avatar/generate', [\App\Http\Controllers\AvatarController::class, 'generate']);
+
+    // Photos
+    Route::post('photos/reorder', [\App\Http\Controllers\PhotoController::class, 'reorder']);
+    Route::post('photos/{id}/reveal', [\App\Http\Controllers\PhotoController::class, 'reveal']);
+    Route::get('photos/{id}/original', [\App\Http\Controllers\PhotoController::class, 'original']);
+    Route::apiResource('photos', \App\Http\Controllers\PhotoController::class);
+
     // Media Analysis
     Route::middleware('feature:media_analysis')->group(function () {
         Route::post('media/analyze', [\App\Http\Controllers\MediaAnalysisController::class, 'analyze']);

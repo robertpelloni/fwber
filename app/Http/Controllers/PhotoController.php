@@ -546,6 +546,154 @@ class PhotoController extends Controller
         }
     }
 
+    /**
+     * Reveal a photo to a match
+     * 
+     * @OA\Post(
+     *   path="/photos/{id}/reveal",
+     *   tags={"Photos"},
+     *   summary="Reveal photo to match",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"match_id"},
+     *       @OA\Property(property="match_id", type="string", description="Match ID")
+     *     )
+     *   ),
+     *   @OA\Response(response=200, description="Photo revealed"),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     * )
+     */
+    public function reveal(Request $request, int $id): JsonResponse
+    {
+        try {
+            $user = auth()->user();
+            $photo = Photo::findOrFail($id);
+            
+            // Check if user is the owner (no need to reveal)
+            if ($photo->user_id === $user->id) {
+                return response()->json(['success' => true, 'status' => 'owner']);
+            }
+
+            $matchId = $request->input('match_id');
+            $match = \App\Models\UserMatch::where('id', $matchId)
+                ->where(function($q) use ($user) {
+                    $q->where('user_id_1', $user->id)
+                      ->orWhere('user_id_2', $user->id);
+                })
+                ->first();
+
+            if (!$match) {
+                return response()->json(['message' => 'Match not found or unauthorized'], 403);
+            }
+
+            // Check Relationship Tier
+            $tier = \App\Models\RelationshipTier::where('match_id', $match->id)->first();
+            
+            if (!$tier) {
+                // Fallback if no tier record exists yet
+                return response()->json(['message' => 'Relationship tier not found'], 403);
+            }
+
+            // Logic: Only allow reveal if tier is 'connected' or higher
+            // 'matched' tier only allows blurred photos
+            $allowedTiers = ['connected', 'established', 'verified'];
+            
+            if (!in_array($tier->current_tier, $allowedTiers)) {
+                return response()->json([
+                    'message' => 'Relationship tier too low to reveal photos. Keep chatting to unlock!',
+                    'current_tier' => $tier->current_tier,
+                    'required_tier' => 'connected'
+                ], 403);
+            }
+
+            // Log the reveal event
+            Log::info('Photo revealed', [
+                'user_id' => $user->id,
+                'photo_id' => $photo->id,
+                'match_id' => $match->id,
+                'tier' => $tier->current_tier
+            ]);
+
+            return response()->json([
+                'success' => true, 
+                'status' => 'revealed',
+                'tier' => $tier->current_tier
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Photo reveal error', [
+                'user_id' => auth()->id(),
+                'photo_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json(['message' => 'Error revealing photo'], 500);
+        }
+    }
+
+    /**
+     * Get original photo file
+     * 
+     * @OA\Get(
+     *   path="/photos/{id}/original",
+     *   tags={"Photos"},
+     *   summary="Get original photo",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Original photo file"),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     * )
+     */
+    public function original(Request $request, int $id)
+    {
+        try {
+            $user = auth()->user();
+            $photo = Photo::findOrFail($id);
+
+            // 1. Owner check
+            if ($photo->user_id === $user->id) {
+                return Storage::disk('public')->download($photo->file_path, $photo->original_filename);
+            }
+
+            // 2. Match check
+            // Find any active match between these users
+            $match = \App\Models\UserMatch::where(function($q) use ($user, $photo) {
+                    $q->where('user_id_1', $user->id)->where('user_id_2', $photo->user_id);
+                })
+                ->orWhere(function($q) use ($user, $photo) {
+                    $q->where('user_id_1', $photo->user_id)->where('user_id_2', $user->id);
+                })
+                ->first();
+
+            if (!$match) {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
+
+            // 3. Tier check
+            $tier = \App\Models\RelationshipTier::where('match_id', $match->id)->first();
+            $allowedTiers = ['connected', 'established', 'verified'];
+
+            if (!$tier || !in_array($tier->current_tier, $allowedTiers)) {
+                 return response()->json(['message' => 'Photo locked by relationship tier'], 403);
+            }
+
+            // Return the file
+            return Storage::disk('public')->download($photo->file_path, $photo->original_filename);
+
+        } catch (\Exception $e) {
+            Log::error('Photo original fetch error', [
+                'user_id' => auth()->id(),
+                'photo_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json(['message' => 'Error fetching photo'], 500);
+        }
+    }
+
     private function parseFaceBlurMetadata($metadata): ?array
     {
         if (!$metadata || !is_string($metadata)) {
