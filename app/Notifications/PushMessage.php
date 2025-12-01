@@ -6,6 +6,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\BroadcastMessage;
+use NotificationChannels\WebPush\WebPushMessage;
+use NotificationChannels\WebPush\WebPushChannel;
 
 class PushMessage extends Notification implements ShouldQueue
 {
@@ -32,7 +34,7 @@ class PushMessage extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['database', 'broadcast'];
+        return ['database', 'broadcast', WebPushChannel::class];
     }
 
     /**
@@ -59,5 +61,20 @@ class PushMessage extends Notification implements ShouldQueue
             'body' => $this->body,
             'url' => $this->url,
         ]);
+    }
+
+    /**
+     * Get the web push representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return \NotificationChannels\WebPush\WebPushMessage
+     */
+    public function toWebPush($notifiable, $notification)
+    {
+        return (new WebPushMessage)
+            ->title($this->title)
+            ->body($this->body)
+            ->action('View', 'view_app')
+            ->data(['url' => $this->url ?? '/']);
     }
 }
