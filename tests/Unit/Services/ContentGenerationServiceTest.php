@@ -6,49 +6,68 @@ use Tests\TestCase;
 use App\Services\ContentGenerationService;
 use App\Services\Ai\Llm\LlmManager;
 use App\Services\Ai\Llm\LlmProviderInterface;
+use App\Models\User;
 use Mockery;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Cache;
+
+use App\DTOs\LlmResponse;
 
 class ContentGenerationServiceTest extends TestCase
 {
-    public function test_generate_content_uses_llm_manager()
+    protected function tearDown(): void
     {
+        Mockery::close();
+        parent::tearDown();
+    }
+
+    public function test_generate_profile_content_uses_llm_manager()
+    {
+        // Mock User
+        $user = Mockery::mock(User::class);
+        $user->shouldReceive('getAttribute')->with('id')->andReturn(1);
+        $user->shouldReceive('getAttribute')->with('name')->andReturn('Test User');
+        $user->shouldReceive('getAttribute')->with('age')->andReturn(25);
+        $user->shouldReceive('getAttribute')->with('interests')->andReturn(['coding', 'ai']);
+        $user->shouldReceive('getAttribute')->with('latitude')->andReturn(0.0);
+        $user->shouldReceive('getAttribute')->with('longitude')->andReturn(0.0);
+        $user->shouldReceive('getAttribute')->with('created_at')->andReturn(now());
+        // Handle isset checks (?? operator)
+        $user->shouldReceive('offsetExists')->andReturn(true);
+        
+        // Mock BulletinMessage alias to avoid DB calls
+        $mockMessage = Mockery::mock('alias:App\Models\BulletinMessage');
+        $mockMessage->shouldReceive('where->get')->andReturn(collect([]));
+        $mockMessage->shouldReceive('where->count')->andReturn(0);
+
+        // Mock LlmManager response
+        $responseObj = new LlmResponse(
+            content: 'Generated profile bio',
+            provider: 'claude'
+        );
+
         $mockDriver = Mockery::mock(LlmProviderInterface::class);
         $mockDriver->shouldReceive('chat')
-            ->once()
-            ->andReturn(['content' => 'Generated content']);
+            ->andReturn($responseObj);
 
         $mockLlmManager = Mockery::mock(LlmManager::class);
+        // The service iterates providers. We'll configure it to use 'claude' and mock that.
         $mockLlmManager->shouldReceive('driver')
-            ->with('openai')
+            ->with('claude')
             ->andReturn($mockDriver);
 
-        $service = new ContentGenerationService($mockLlmManager);
-        $result = $service->generateContent('Test prompt');
-
-        $this->assertEquals('Generated content', $result['content']);
-    }
-
-    public function test_generate_with_multi_ai()
-    {
-        $mockOpenAi = Mockery::mock(LlmProviderInterface::class);
-        $mockOpenAi->shouldReceive('chat')->andReturn(['content' => 'OpenAI content']);
-
-        $mockGemini = Mockery::mock(LlmProviderInterface::class);
-        $mockGemini->shouldReceive('chat')->andReturn(['content' => 'Gemini content']);
-
-        $mockClaude = Mockery::mock(LlmProviderInterface::class);
-        $mockClaude->shouldReceive('chat')->andReturn(['content' => 'Claude content']);
-
-        $mockLlmManager = Mockery::mock(LlmManager::class);
-        $mockLlmManager->shouldReceive('driver')->with('openai')->andReturn($mockOpenAi);
-        $mockLlmManager->shouldReceive('driver')->with('gemini')->andReturn($mockGemini);
-        $mockLlmManager->shouldReceive('driver')->with('anthropic')->andReturn($mockClaude);
+        Config::set('content_generation.routing.profile', ['claude']);
+        Config::set('content_generation.models.claude', 'claude-3-5-sonnet-20241022');
+        Config::set('content_generation.max_tokens', 100);
+        Config::set('content_generation.temperature', 0.7);
 
         $service = new ContentGenerationService($mockLlmManager);
-        $results = $service->generateWithMultiAI('Test prompt', ['openai', 'gemini', 'anthropic']);
+        
+        $result = $service->generateProfileContent($user);
 
-        $this->assertEquals('OpenAI content', $results['openai']['content']);
-        $this->assertEquals('Gemini content', $results['gemini']['content']);
-        $this->assertEquals('Claude content', $results['anthropic']['content']);
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('suggestions', $result);
+        $this->assertEquals('Generated profile bio', $result['suggestions'][0]['content']);
     }
 }
+
