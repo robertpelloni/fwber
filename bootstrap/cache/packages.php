@@ -21,6 +21,13 @@
       0 => 'Intervention\\Image\\Laravel\\ServiceProvider',
     ),
   ),
+  'laravel-notification-channels/webpush' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'NotificationChannels\\WebPush\\WebPushServiceProvider',
+    ),
+  ),
   'laravel/pail' => 
   array (
     'providers' => 

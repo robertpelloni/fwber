@@ -43,6 +43,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('auth/logout', [\App\Http\Controllers\AuthController::class, 'logout']);
     Route::get('auth/me', [\App\Http\Controllers\AuthController::class, 'me']);
 
+    // Notifications
+    Route::post('notifications/subscribe', [\App\Http\Controllers\NotificationController::class, 'subscribe']);
+    Route::post('notifications/unsubscribe', [\App\Http\Controllers\NotificationController::class, 'unsubscribe']);
+
     // Events
     Route::get('events/my-events', [EventController::class, 'myEvents']);
     Route::apiResource('events', EventController::class);
