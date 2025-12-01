@@ -16,6 +16,7 @@ import {
   HelpCircle,
   ChevronRight,
   LogOut,
+  CreditCard,
 } from 'lucide-react';
 
 interface SettingsLinkProps {
@@ -117,6 +118,21 @@ export default function SettingsPage() {
                 icon={<MapPin className="w-5 h-5" />}
                 title="Location Settings"
                 description="Manage your location privacy and visibility"
+              />
+            </div>
+          </section>
+
+          {/* Subscription Section */}
+          <section className="mb-8">
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
+              Subscription & Billing
+            </h2>
+            <div className="space-y-3">
+              <SettingsLink
+                href="/settings/subscription"
+                icon={<CreditCard className="w-5 h-5" />}
+                title="Manage Subscription"
+                description="View your plan, billing history, and upgrade options"
               />
             </div>
           </section>
