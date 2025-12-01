@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import Link from 'next/link'
 import SexQuote from '@/components/SexQuote'
-import { Shield, Heart, Zap, MapPin, MessageCircle, Users, Menu, X } from 'lucide-react'
+import { Shield, Heart, Zap, MapPin, MessageCircle, Users, Menu, X, Lock, Ghost, Layers, FileText, Code, Building2 } from 'lucide-react'
 import { useState } from 'react'
 
 export default function HomePage() {
@@ -133,43 +133,95 @@ export default function HomePage() {
         <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
       </div>
 
-      {/* Features Section */}
+      {/* Notable Features Section */}
       <div id="features" className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose FWBer?</h2>
-            <p className="text-xl text-gray-600">Everything you need to find exactly what you&apos;re looking for.</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Notable Features</h2>
+            <p className="text-xl text-gray-600">Unique tools designed for the modern dating experience.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-blue-50 transition-colors duration-300">
-              <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6 text-blue-600">
-                <Zap className="w-8 h-8" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Proximity */}
+            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-blue-50 transition-colors duration-300 border border-gray-100">
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-6 text-blue-600">
+                <MapPin className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Smart Matching</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Our advanced algorithm connects you with people who share your interests and desires. No more wasted time.
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Real-Time Proximity</h3>
+              <p className="text-gray-600">
+                See who&apos;s nearby right now. Our proximity artifacts let you discover matches within walking distance.
               </p>
             </div>
 
-            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-blue-50 transition-colors duration-300">
-              <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mb-6 text-purple-600">
-                <MapPin className="w-8 h-8" />
+            {/* AI Avatars */}
+            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-purple-50 transition-colors duration-300 border border-gray-100">
+              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-6 text-purple-600">
+                <Ghost className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Local Connections</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Find matches in your area instantly. Our location-based features help you meet people nearby.
+              <h3 className="text-xl font-bold text-gray-900 mb-3">No Embarrassment</h3>
+              <p className="text-gray-600">
+                Browse anonymously with AI-generated avatars. Reveal your true self only when you&apos;re ready.
               </p>
             </div>
 
-            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-blue-50 transition-colors duration-300">
-              <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-6 text-green-600">
-                <Shield className="w-8 h-8" />
+            {/* Gamified Tiers */}
+            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-pink-50 transition-colors duration-300 border border-gray-100">
+              <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center mb-6 text-pink-600">
+                <Layers className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Verified & Safe</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Your safety is our priority. Verified profiles and secure messaging keep your experience worry-free.
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Gamified Tiers</h3>
+              <p className="text-gray-600">
+                Unlock more features as you build trust. Progress from Discovery to Verified status to access exclusive perks.
               </p>
+            </div>
+
+            {/* Backpage Replacement */}
+            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-orange-50 transition-colors duration-300 border border-gray-100">
+              <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-6 text-orange-600">
+                <FileText className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Classifieds Are Back</h3>
+              <p className="text-gray-600">
+                Miss the old days? Our Bulletin Boards bring back the classic, no-nonsense classifieds experience you loved.
+              </p>
+            </div>
+
+            {/* Client-side Encryption */}
+            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-green-50 transition-colors duration-300 border border-gray-100">
+              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-6 text-green-600">
+                <Lock className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Client-Side Encryption</h3>
+              <p className="text-gray-600">
+                Your secrets stay yours. Photos and messages are encrypted on your device before they ever touch our servers.
+              </p>
+            </div>
+
+            {/* Venue Support */}
+            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-indigo-50 transition-colors duration-300 border border-gray-100">
+              <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-6 text-indigo-600">
+                <Building2 className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Venue Check-Ins</h3>
+              <p className="text-gray-600">
+                Meet safely in public. Check in to partner venues and see who else is there looking for a connection.
+              </p>
+            </div>
+
+             {/* Open Source */}
+             <div className="p-8 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors duration-300 border border-gray-100 md:col-span-2 lg:col-span-3">
+              <div className="flex flex-col md:flex-row items-center text-center md:text-left">
+                <div className="w-12 h-12 bg-gray-200 rounded-xl flex items-center justify-center mb-4 md:mb-0 md:mr-6 text-gray-700 shrink-0">
+                  <Code className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Open Source & Transparent</h3>
+                  <p className="text-gray-600">
+                    We have nothing to hide. Our code is open source, so you can verify our security claims yourself. 
+                    Built by the community, for the community.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
