@@ -25,7 +25,7 @@ The MVP and all secondary systems (Recommendations, AI Content, Chatrooms, Real-
 - [x] **Data Retention**: Implement automated cleanup for old logs and ephemeral artifacts.
 
 #### 3. Monitoring & Observability
-- [ ] **Error Tracking**: Integrate Sentry for Backend and Frontend.
+- [x] **Error Tracking**: Integrate Sentry for Backend and Frontend.
 - [ ] **APM**: Setup Datadog or similar for performance monitoring.
 - [x] **Uptime Monitoring**: Configure health check endpoints and external pingers.
 
