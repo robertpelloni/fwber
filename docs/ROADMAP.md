@@ -9,8 +9,8 @@ The MVP and all secondary systems (Recommendations, AI Content, Chatrooms, Real-
 ### 🚧 Pending / In Progress
 
 #### 1. Mobile Experience
-- [ ] **Push Notifications**: Implement backend support (WebPush, Subscriptions).
-    - *Current Status*: Frontend listeners exist; Backend missing dependencies and logic.
+- [x] **Push Notifications**: Implement backend support (WebPush, Subscriptions).
+    - *Current Status*: Backend `PushMessage` and `PushNotificationService` implemented using `laravel-notification-channels/webpush`.
 
 #### 2. Monetization
 - [ ] **Payment Integration**: Replace `MockPaymentGateway` with real Stripe/Apple Pay integration.
@@ -41,7 +41,7 @@ The MVP and all secondary systems (Recommendations, AI Content, Chatrooms, Real-
 
 #### 4. Mobile Experience (PWA)
 - [x] **Service Worker**: Refine caching strategies for offline support.
-- [ ] **Push Notifications**: Implement Web Push for messages and matches.
+- [x] **Push Notifications**: Implement Web Push for messages and matches.
 - [x] **Installability**: Ensure "Add to Home Screen" flow is seamless.
 
 ### 🔮 Future Features (2026+)

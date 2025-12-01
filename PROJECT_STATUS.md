@@ -7,13 +7,10 @@
 The project has successfully completed the MVP, Secondary Systems, and Production Hardening phases. It is now **deployed and live**.
 
 ### ⚠️ Known Issues / Technical Debt
-1.  **Push Notifications**:
-    -   **Status**: ✅ Implemented.
-    -   **Details**: Backend `NotificationController` and `webpush` integration complete. Frontend `NotificationPermissionHandler` updated. VAPID keys configured.
-2.  **Payment Subscriptions**:
+1.  **Payment Subscriptions**:
     -   **Status**: ✅ Implemented (Mock).
     -   **Details**: `SubscriptionController` implements payment history. `PremiumController` handles upgrades via Mock Gateway. Frontend page `/settings/subscription` added.
-3.  **Media Analysis**:
+2.  **Media Analysis**:
     -   **Status**: ⏸️ Disabled / Mocked.
     -   **Details**: Feature flag `media_analysis` is `false`. Controller exists but relies on mocked driver.
 
