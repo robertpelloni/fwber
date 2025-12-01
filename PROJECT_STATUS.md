@@ -188,6 +188,11 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Infrastructure**: Confirmed `docker-compose.prod.yml` is streamlined (no heavy monitoring stack by default). Prometheus/Grafana setup is fully documented in `docs/monitoring/MONITORING.md` for optional deployment.
 -   **Feature Verification**:
     -   Confirmed existence of "Events" feature artifacts (`Event` model, `EventController`), validating the "Future Features" status.
+-   **Recommendation Service Refactor (Dec 01)**:
+    -   Refactored `RecommendationService` for better testability (partial mocking).
+    -   Fixed Gemini integration to use `chat()` instead of `generate()`.
+    -   Resolved `md5` hashing issue with array content.
+    -   Verified with updated unit tests (`RecommendationServiceTest.php`).
 
 ## 🚀 Next Phase: Post-Launch Monitoring
 See `docs/ROADMAP.md` for future plans.
