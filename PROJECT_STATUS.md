@@ -8,8 +8,8 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 
 ### ⚠️ Known Issues / Technical Debt
 1.  **Payment Subscriptions**:
-    -   **Status**: ✅ Implemented (Mock).
-    -   **Details**: `SubscriptionController` implements payment history. `PremiumController` handles upgrades via Mock Gateway. Frontend page `/settings/subscription` added.
+    -   **Status**: 🚧 In Progress.
+    -   **Details**: Backend supports Stripe Payment Intents via `StripePaymentGateway`. Frontend currently uses legacy mock flow. Needs update to Stripe Elements.
 2.  **Media Analysis**:
     -   **Status**: ⏸️ Disabled / Mocked.
     -   **Details**: Feature flag `media_analysis` is `false`. Controller exists but relies on mocked driver.

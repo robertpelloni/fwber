@@ -13,7 +13,8 @@ The MVP and all secondary systems (Recommendations, AI Content, Chatrooms, Real-
     - *Current Status*: Backend `PushMessage` and `PushNotificationService` implemented using `laravel-notification-channels/webpush`.
 
 #### 2. Monetization
-- [ ] **Payment Integration**: Replace `MockPaymentGateway` with real Stripe/Apple Pay integration.
+- [x] **Payment Integration (Backend)**: Implemented `StripePaymentGateway` with Payment Intent support.
+- [ ] **Payment Integration (Frontend)**: Update UI to use Stripe Elements and `initiatePurchase` flow.
 - [ ] **Subscription Management**: Implement `SubscriptionController` logic.
 
 ### 🚀 Immediate Priorities (Q4 2025)
