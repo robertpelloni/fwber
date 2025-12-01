@@ -23,6 +23,9 @@ Route::get('health', [\App\Http\Controllers\HealthController::class, 'check']);
 Route::get('health/liveness', [\App\Http\Controllers\HealthController::class, 'liveness']);
 Route::get('health/readiness', [\App\Http\Controllers\HealthController::class, 'readiness']);
 
+// Stripe Webhook
+Route::post('stripe/webhook', [\App\Http\Controllers\StripeWebhookController::class, 'handleWebhook']);
+
 // Venue Partner Auth
 Route::prefix('venue')->group(function () {
     Route::post('register', [\App\Http\Controllers\VenueAuthController::class, 'register']);
