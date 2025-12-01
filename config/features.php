@@ -14,4 +14,5 @@ return [
     'face_reveal' => env('FEATURE_FACE_REVEAL', false),
     'local_media_vault' => env('FEATURE_LOCAL_MEDIA_VAULT', false),
     'moderation' => env('FEATURE_MODERATION', false),
+    'media_analysis' => env('FEATURE_MEDIA_ANALYSIS', false),
 ];
