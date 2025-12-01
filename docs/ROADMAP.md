@@ -37,7 +37,7 @@ The MVP and all secondary systems (Recommendations, AI Content, Chatrooms, Real-
 ### 🔮 Future Features (2026+)
 
 #### 1. Advanced AI Features
-- **Voice/Video Analysis**: Real-time safety checks for media.
+- [x] **Media Analysis**: Real-time safety checks for media (Mocked implementation).
 
 ## ✅ Completed Milestones
 
