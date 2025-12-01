@@ -4,11 +4,15 @@ namespace App\Services;
 
 use App\Models\GeoSpoofDetection;
 use App\Models\User;
-use Illuminate\Support\Facades\Http;
+use App\Services\IpIntelligence\IpIntelligenceInterface;
 use Illuminate\Support\Facades\Cache;
 
 class GeoSpoofDetectionService
 {
+    public function __construct(
+        private IpIntelligenceInterface $ipIntelligence
+    ) {}
+
     /**
      * Detect potential geolocation spoofing.
      *
@@ -23,12 +27,12 @@ class GeoSpoofDetectionService
         $detectionFlags = [];
         $suspicionScore = 0;
 
-        // Get IP geolocation (optional for velocity-based detection)
-        $ipGeo = $this->getIpGeolocation($ipAddress);
+        // Get IP geolocation via interface
+        $ipData = $this->ipIntelligence->analyze($ipAddress);
 
-        if ($ipGeo) {
-            $ipLat = $ipGeo['latitude'];
-            $ipLon = $ipGeo['longitude'];
+        if ($ipData) {
+            $ipLat = $ipData->latitude;
+            $ipLon = $ipData->longitude;
             // Calculate distance between claimed location and IP location
             $distanceKm = $this->calculateDistance($latitude, $longitude, $ipLat, $ipLon);
         } else {
@@ -95,13 +99,13 @@ class GeoSpoofDetectionService
         }
 
         // Check for VPN/Proxy indicators
-        if ($this->isVpnOrProxy($ipAddress)) {
+        if ($ipData && $ipData->isVpn) {
             $detectionFlags[] = 'vpn_or_proxy';
             $suspicionScore += 20;
         }
 
         // Check for data center IP
-        if ($this->isDataCenterIp($ipAddress)) {
+        if ($ipData && $ipData->isDataCenter) {
             $detectionFlags[] = 'datacenter_ip';
             $suspicionScore += 15;
         }
@@ -134,48 +138,6 @@ class GeoSpoofDetectionService
                 'is_confirmed_spoof' => false,
                 'detected_at' => now(),
             ]);
-        }
-
-        return null;
-    }
-
-    /**
-     * Get IP geolocation data (cached for performance).
-     */
-    private function getIpGeolocation(string $ipAddress): ?array
-    {
-        // Skip localhost/private IPs
-        if ($this->isPrivateIp($ipAddress)) {
-            return null;
-        }
-
-        $cacheKey = "ip_geo:{$ipAddress}";
-
-        // Avoid caching null values to prevent sticky failures in tests/production
-        $cached = Cache::get($cacheKey);
-        if ($cached !== null) {
-            return $cached;
-        }
-
-        try {
-            // Using ip-api.com (free tier, 45 req/min)
-            // In production, use a paid service like MaxMind, IPinfo, or IP2Location
-            $response = Http::timeout(5)->get("http://ip-api.com/json/{$ipAddress}");
-            
-            if ($response->successful() && $response->json('status') === 'success') {
-                $result = [
-                    'latitude' => $response->json('lat'),
-                    'longitude' => $response->json('lon'),
-                    'country' => $response->json('country'),
-                    'city' => $response->json('city'),
-                    'isp' => $response->json('isp'),
-                ];
-                Cache::put($cacheKey, $result, 3600);
-                return $result;
-            }
-        } catch (\Exception $e) {
-            // Log error but don't fail the request
-            \Log::warning("IP geolocation failed for {$ipAddress}: " . $e->getMessage());
         }
 
         return null;
@@ -235,26 +197,6 @@ class GeoSpoofDetectionService
     }
 
     /**
-     * Check if IP is a known VPN or proxy.
-     */
-    private function isVpnOrProxy(string $ipAddress): bool
-    {
-        // Placeholder: In production, use a VPN detection service
-        // Examples: IPQualityScore, ProxyCheck.io, IPHub
-        return false;
-    }
-
-    /**
-     * Check if IP belongs to a data center.
-     */
-    private function isDataCenterIp(string $ipAddress): bool
-    {
-        // Placeholder: Check against known data center IP ranges
-        // Can use ASN databases or services like IPinfo
-        return false;
-    }
-
-    /**
      * Check if user has frequent location changes (pattern analysis).
      */
     private function hasFrequentLocationChanges(int $userId): bool
@@ -264,19 +206,6 @@ class GeoSpoofDetectionService
             ->count();
 
         return $recentDetections > 10;
-    }
-
-    /**
-     * Check if IP is private/localhost.
-     */
-    private function isPrivateIp(string $ipAddress): bool
-    {
-        return in_array($ipAddress, ['127.0.0.1', '::1', 'localhost']) ||
-               str_starts_with($ipAddress, '192.168.') ||
-               str_starts_with($ipAddress, '10.') ||
-               str_starts_with($ipAddress, '172.16.') ||
-               str_starts_with($ipAddress, '172.17.') ||
-               str_starts_with($ipAddress, '172.18.');
     }
 
     /**
