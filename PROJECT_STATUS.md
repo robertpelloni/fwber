@@ -103,6 +103,7 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Bundle Analysis**: Integrated `@next/bundle-analyzer` for bundle size visualization.
     -   **CSS Optimization**: Enabled `optimizeCss` in `next.config.js` (via `critters`).
     -   **Configuration**: Updated `next.config.js` with performance best practices.
+    -   **Code Splitting**: Verified dynamic imports for heavy libraries (e.g., `face-api` in `lib/faceBlur.ts`) and page-based splitting for others (`@dnd-kit`).
 
 ### ✅ Completed Future Features (2026+ Early Access)
 1.  **Premium Tiers (Gold)**:
@@ -170,6 +171,12 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 -   **Documentation**: Consolidated into this file and `AGENTS.md`. Old status reports archived.
 -   **Testing**: Full E2E suite available in `fwber-frontend/cypress/e2e/` (16 test files).
 -   **Feature Flags**: See `docs/FEATURE_FLAGS.md` for complete list and configuration.
+-   **Deployment Scripts (Dec 01)**:
+    -   Restored missing operational scripts in `fwber-backend/scripts/`:
+        -   `perf/k6_baseline.js` (Performance testing)
+        -   `backup_database.sh` (Database backup)
+        -   `restore_database.sh` (Database restore)
+    -   Verified alignment with `docs/DEPLOYMENT.md`.
 
 ## 🚀 Next Phase: Post-Launch Monitoring
 See `docs/ROADMAP.md` for future plans.
