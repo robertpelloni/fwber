@@ -58,6 +58,10 @@ When a feature is disabled, its routes still register but requests return HTTP 4
   - Scope: Advanced moderation tools (shadow throttling, geo-spoof detection, moderation dashboard)
   - Routes (gated): `/api/moderation/*`
   - Note: Requires users with `is_moderator` flag; includes dashboard, flagged content review, spoof detection, shadow throttle management
+- FEATURE_MEDIA_ANALYSIS (default: false)
+  - Scope: AI-powered media analysis for safety and content moderation
+  - Routes (gated): `/api/media/analyze`
+  - Note: Currently uses a mock service. Integrate with AWS Rekognition or similar in production.
 
 ### Frontend-only toggles
 
