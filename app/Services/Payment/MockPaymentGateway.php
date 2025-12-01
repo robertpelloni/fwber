@@ -50,4 +50,14 @@ class MockPaymentGateway implements PaymentGatewayInterface
             message: 'Refund successful'
         );
     }
+
+    public function verifyPayment(string $paymentId): PaymentResult
+    {
+        return new PaymentResult(
+            success: true,
+            transactionId: $paymentId,
+            message: 'Payment verified (mock)',
+            data: ['status' => 'succeeded']
+        );
+    }
 }

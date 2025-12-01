@@ -60,6 +60,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Premium
     Route::get('premium/who-likes-you', [\App\Http\Controllers\PremiumController::class, 'getWhoLikesYou']);
+    Route::post('premium/initiate', [\App\Http\Controllers\PremiumController::class, 'initiatePurchase']);
     Route::post('premium/purchase', [\App\Http\Controllers\PremiumController::class, 'purchasePremium']);
     Route::get('premium/status', [\App\Http\Controllers\PremiumController::class, 'getPremiumStatus']);
 

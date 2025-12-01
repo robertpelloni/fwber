@@ -32,4 +32,12 @@ interface PaymentGatewayInterface
      * @return PaymentResult
      */
     public function refund(string $transactionId): PaymentResult;
+
+    /**
+     * Verify a payment status (e.g. after client-side confirmation).
+     *
+     * @param string $paymentId
+     * @return PaymentResult
+     */
+    public function verifyPayment(string $paymentId): PaymentResult;
 }

@@ -33,15 +33,37 @@ class PremiumController extends Controller
         return response()->json($likers);
     }
 
+    public function initiatePurchase(Request $request)
+    {
+        $user = $request->user();
+        $amount = 19.99;
+        $currency = 'USD';
+
+        $result = $this->paymentGateway->createPaymentIntent($amount, $currency, [
+            'user_id' => $user->id,
+            'description' => 'Premium Subscription'
+        ]);
+
+        if ($result->success) {
+            return response()->json($result->data);
+        }
+
+        return response()->json(['error' => $result->message], 500);
+    }
+
     public function purchasePremium(Request $request)
     {
         $user = $request->user();
         $amount = 19.99; // Price for premium
         $currency = 'USD';
-        $paymentMethodId = $request->input('payment_method_id', 'tok_visa'); // Default for mock
-
+        
         try {
-            $result = $this->paymentGateway->charge($amount, $currency, $paymentMethodId);
+            if ($request->has('payment_intent_id')) {
+                $result = $this->paymentGateway->verifyPayment($request->input('payment_intent_id'));
+            } else {
+                $paymentMethodId = $request->input('payment_method_id', 'tok_visa'); // Default for mock
+                $result = $this->paymentGateway->charge($amount, $currency, $paymentMethodId);
+            }
 
             if ($result->success) {
                 // Log payment
