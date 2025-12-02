@@ -484,32 +484,35 @@ class MatchController extends Controller
             ->first();
 
         if (!$existing) {
-            $chatroom = \App\Models\Chatroom::create([
-                'name' => $pairName,
-                'description' => 'Private chat for matched users',
-                'type' => 'private',
-                'created_by' => $user1,
-                'is_public' => false,
-                'is_active' => true,
-                'member_count' => 0,
-                'message_count' => 0,
-            ]);
+            // Wrap chatroom creation + member adds + system message in transaction for atomicity
+            \DB::transaction(function () use ($pairName, $user1, $user2) {
+                $chatroom = \App\Models\Chatroom::create([
+                    'name' => $pairName,
+                    'description' => 'Private chat for matched users',
+                    'type' => 'private',
+                    'created_by' => $user1,
+                    'is_public' => false,
+                    'is_active' => true,
+                    'member_count' => 0,
+                    'message_count' => 0,
+                ]);
 
-            // Attach members
-            $chatroom->addMember(\App\Models\User::find($user1));
-            $chatroom->addMember(\App\Models\User::find($user2));
+                // Attach members
+                $chatroom->addMember(\App\Models\User::find($user1));
+                $chatroom->addMember(\App\Models\User::find($user2));
 
-            // System message
-            \App\Models\ChatroomMessage::create([
-                'chatroom_id' => $chatroom->id,
-                'user_id' => $user1, // attribute to first user for simplicity
-                'content' => "It's a match! Start your conversation.",
-                'type' => 'system',
-                'is_edited' => false,
-                'is_deleted' => false,
-            ]);
+                // System message
+                \App\Models\ChatroomMessage::create([
+                    'chatroom_id' => $chatroom->id,
+                    'user_id' => $user1, // attribute to first user for simplicity
+                    'content' => "It's a match! Start your conversation.",
+                    'type' => 'system',
+                    'is_edited' => false,
+                    'is_deleted' => false,
+                ]);
 
-            $chatroom->update(['message_count' => 1, 'last_activity_at' => now()]);
+                $chatroom->update(['message_count' => 1, 'last_activity_at' => now()]);
+            });
         }
     }
 }

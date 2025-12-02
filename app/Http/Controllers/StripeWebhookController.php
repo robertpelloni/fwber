@@ -92,34 +92,37 @@ class StripeWebhookController extends Controller
             return;
         }
 
-        // Log Payment
-        Payment::create([
-            'user_id' => $user->id,
-            'amount' => $paymentIntent->amount / 100, // Convert cents to dollars
-            'currency' => $paymentIntent->currency,
-            'payment_gateway' => 'stripe',
-            'transaction_id' => $paymentIntent->id,
-            'status' => 'succeeded',
-            'description' => $paymentIntent->description ?? 'Premium Subscription',
-            'metadata' => $paymentIntent->toArray(),
-        ]);
+        // Wrap payment + user update + subscription creation in transaction for atomicity
+        \DB::transaction(function () use ($user, $paymentIntent) {
+            // Log Payment
+            Payment::create([
+                'user_id' => $user->id,
+                'amount' => $paymentIntent->amount / 100, // Convert cents to dollars
+                'currency' => $paymentIntent->currency,
+                'payment_gateway' => 'stripe',
+                'transaction_id' => $paymentIntent->id,
+                'status' => 'succeeded',
+                'description' => $paymentIntent->description ?? 'Premium Subscription',
+                'metadata' => $paymentIntent->toArray(),
+            ]);
 
-        // Grant Premium
-        $user->tier = 'gold';
-        $user->tier_expires_at = Carbon::now()->addDays(30);
-        $user->unlimited_swipes = true;
-        $user->save();
+            // Grant Premium
+            $user->tier = 'gold';
+            $user->tier_expires_at = Carbon::now()->addDays(30);
+            $user->unlimited_swipes = true;
+            $user->save();
 
-        // Create Subscription record
-        \App\Models\Subscription::create([
-            'user_id' => $user->id,
-            'name' => 'gold',
-            'stripe_id' => $paymentIntent->id,
-            'stripe_status' => 'active',
-            'stripe_price' => 'price_premium_monthly',
-            'quantity' => 1,
-            'ends_at' => Carbon::now()->addDays(30),
-        ]);
+            // Create Subscription record
+            \App\Models\Subscription::create([
+                'user_id' => $user->id,
+                'name' => 'gold',
+                'stripe_id' => $paymentIntent->id,
+                'stripe_status' => 'active',
+                'stripe_price' => 'price_premium_monthly',
+                'quantity' => 1,
+                'ends_at' => Carbon::now()->addDays(30),
+            ]);
+        });
 
         Log::info("Stripe Webhook: Premium granted to user {$user->id}");
         
@@ -153,25 +156,28 @@ class StripeWebhookController extends Controller
             return;
         }
 
-        // Create subscription record
-        Subscription::create([
-            'user_id' => $user->id,
-            'name' => $stripeSubscription->metadata->plan_name ?? 'gold',
-            'stripe_id' => $stripeSubscription->id,
-            'stripe_status' => $stripeSubscription->status,
-            'stripe_price' => $stripeSubscription->items->data[0]->price->id ?? null,
-            'quantity' => $stripeSubscription->items->data[0]->quantity ?? 1,
-            'trial_ends_at' => $stripeSubscription->trial_end ? Carbon::createFromTimestamp($stripeSubscription->trial_end) : null,
-            'ends_at' => $stripeSubscription->current_period_end ? Carbon::createFromTimestamp($stripeSubscription->current_period_end) : null,
-        ]);
+        // Wrap subscription creation + user update in transaction for atomicity
+        \DB::transaction(function () use ($user, $stripeSubscription) {
+            // Create subscription record
+            Subscription::create([
+                'user_id' => $user->id,
+                'name' => $stripeSubscription->metadata->plan_name ?? 'gold',
+                'stripe_id' => $stripeSubscription->id,
+                'stripe_status' => $stripeSubscription->status,
+                'stripe_price' => $stripeSubscription->items->data[0]->price->id ?? null,
+                'quantity' => $stripeSubscription->items->data[0]->quantity ?? 1,
+                'trial_ends_at' => $stripeSubscription->trial_end ? Carbon::createFromTimestamp($stripeSubscription->trial_end) : null,
+                'ends_at' => $stripeSubscription->current_period_end ? Carbon::createFromTimestamp($stripeSubscription->current_period_end) : null,
+            ]);
 
-        // Grant premium tier if subscription is active
-        if ($stripeSubscription->status === 'active') {
-            $user->tier = 'gold';
-            $user->tier_expires_at = Carbon::createFromTimestamp($stripeSubscription->current_period_end);
-            $user->unlimited_swipes = true;
-            $user->save();
-        }
+            // Grant premium tier if subscription is active
+            if ($stripeSubscription->status === 'active') {
+                $user->tier = 'gold';
+                $user->tier_expires_at = Carbon::createFromTimestamp($stripeSubscription->current_period_end);
+                $user->unlimited_swipes = true;
+                $user->save();
+            }
+        });
 
         Log::info("Stripe Webhook: Subscription created for user {$user->id}");
         

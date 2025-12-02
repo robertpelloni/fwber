@@ -68,28 +68,31 @@ class BoostController extends Controller
             $result = $this->paymentGateway->charge($amount, $currency, $paymentMethodId);
 
             if ($result->success) {
-                // Log payment
-                Payment::create([
-                    'user_id' => $user->id,
-                    'amount' => $amount,
-                    'currency' => $currency,
-                    'payment_gateway' => config('services.payment.driver', 'mock'),
-                    'transaction_id' => $result->transactionId,
-                    'status' => 'succeeded',
-                    'description' => ucfirst($type) . ' Boost',
-                    'metadata' => $result->data,
-                ]);
+                // Wrap payment + boost creation in transaction for atomicity
+                $boost = \DB::transaction(function () use ($user, $amount, $currency, $result, $type) {
+                    // Log payment
+                    Payment::create([
+                        'user_id' => $user->id,
+                        'amount' => $amount,
+                        'currency' => $currency,
+                        'payment_gateway' => config('services.payment.driver', 'mock'),
+                        'transaction_id' => $result->transactionId,
+                        'status' => 'succeeded',
+                        'description' => ucfirst($type) . ' Boost',
+                        'metadata' => $result->data,
+                    ]);
 
-                $duration = $type === 'super' ? 120 : 30; // minutes
-                $now = now();
+                    $duration = $type === 'super' ? 120 : 30; // minutes
+                    $now = now();
 
-                $boost = Boost::create([
-                    'user_id' => $user->id,
-                    'started_at' => $now,
-                    'expires_at' => $now->copy()->addMinutes($duration),
-                    'boost_type' => $type,
-                    'status' => 'active',
-                ]);
+                    return Boost::create([
+                        'user_id' => $user->id,
+                        'started_at' => $now,
+                        'expires_at' => $now->copy()->addMinutes($duration),
+                        'boost_type' => $type,
+                        'status' => 'active',
+                    ]);
+                });
 
                 return response()->json($boost);
             } else {

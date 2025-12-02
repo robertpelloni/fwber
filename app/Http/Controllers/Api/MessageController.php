@@ -220,33 +220,38 @@ class MessageController extends Controller
             $thumbnailUrl = $stored['thumbnail_url'];
         }
 
-        // Create the message
-        $message = Message::create([
-            'sender_id' => $senderId,
-            'receiver_id' => $receiverId,
-            'content' => $validated['content'] ?? '',
-            'message_type' => $resolvedType,
-            'media_url' => $mediaUrl,
-            'media_type' => $mediaType,
-            'media_duration' => $duration,
-            'thumbnail_url' => $thumbnailUrl,
-            'sent_at' => now(),
-        ]);
-
-        // Update match last_message_at
-        $match->last_message_at = now();
-        $match->save();
-
-        // Increment tier message count
-        $tier = $match->relationshipTier;
-        
-        if (!$tier) {
-            $tier = RelationshipTier::create([
-                'match_id' => $match->id,
-                'current_tier' => 'matched',
-                'first_matched_at' => $match->created_at,
+        // Wrap message + match update + tier creation in transaction for atomicity
+        [$message, $tier] = \DB::transaction(function () use ($senderId, $receiverId, $validated, $resolvedType, $mediaUrl, $mediaType, $duration, $thumbnailUrl, $match) {
+            // Create the message
+            $message = Message::create([
+                'sender_id' => $senderId,
+                'receiver_id' => $receiverId,
+                'content' => $validated['content'] ?? '',
+                'message_type' => $resolvedType,
+                'media_url' => $mediaUrl,
+                'media_type' => $mediaType,
+                'media_duration' => $duration,
+                'thumbnail_url' => $thumbnailUrl,
+                'sent_at' => now(),
             ]);
-        }
+
+            // Update match last_message_at
+            $match->last_message_at = now();
+            $match->save();
+
+            // Increment tier message count
+            $tier = $match->relationshipTier;
+            
+            if (!$tier) {
+                $tier = RelationshipTier::create([
+                    'match_id' => $match->id,
+                    'current_tier' => 'matched',
+                    'first_matched_at' => $match->created_at,
+                ]);
+            }
+
+            return [$message, $tier];
+        });
 
         $previousTier = $tier->current_tier;
         $tier->incrementMessages();

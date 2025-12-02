@@ -66,34 +66,37 @@ class PremiumController extends Controller
             }
 
             if ($result->success) {
-                // Log payment
-                Payment::create([
-                    'user_id' => $user->id,
-                    'amount' => $amount,
-                    'currency' => $currency,
-                    'payment_gateway' => config('services.payment.driver', 'mock'),
-                    'transaction_id' => $result->transactionId,
-                    'status' => 'succeeded',
-                    'description' => 'Premium Subscription',
-                    'metadata' => $result->data,
-                ]);
+                // Wrap payment + user update + subscription creation in transaction for atomicity
+                \DB::transaction(function () use ($user, $amount, $currency, $result) {
+                    // Log payment
+                    Payment::create([
+                        'user_id' => $user->id,
+                        'amount' => $amount,
+                        'currency' => $currency,
+                        'payment_gateway' => config('services.payment.driver', 'mock'),
+                        'transaction_id' => $result->transactionId,
+                        'status' => 'succeeded',
+                        'description' => 'Premium Subscription',
+                        'metadata' => $result->data,
+                    ]);
 
-                // Grant premium
-                $user->tier = 'gold';
-                $user->tier_expires_at = Carbon::now()->addDays(30);
-                $user->unlimited_swipes = true;
-                $user->save();
+                    // Grant premium
+                    $user->tier = 'gold';
+                    $user->tier_expires_at = Carbon::now()->addDays(30);
+                    $user->unlimited_swipes = true;
+                    $user->save();
 
-                // Create Subscription record
-                \App\Models\Subscription::create([
-                    'user_id' => $user->id,
-                    'name' => 'gold',
-                    'stripe_id' => $result->transactionId ?? 'manual_' . uniqid(),
-                    'stripe_status' => 'active',
-                    'stripe_price' => 'price_premium_monthly',
-                    'quantity' => 1,
-                    'ends_at' => Carbon::now()->addDays(30),
-                ]);
+                    // Create Subscription record
+                    \App\Models\Subscription::create([
+                        'user_id' => $user->id,
+                        'name' => 'gold',
+                        'stripe_id' => $result->transactionId ?? 'manual_' . uniqid(),
+                        'stripe_status' => 'active',
+                        'stripe_price' => 'price_premium_monthly',
+                        'quantity' => 1,
+                        'ends_at' => Carbon::now()->addDays(30),
+                    ]);
+                });
 
                 return response()->json([
                     'message' => 'Premium purchased successfully',
