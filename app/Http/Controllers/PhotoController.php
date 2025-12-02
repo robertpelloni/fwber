@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Photo;
 use App\Models\User;
-use App\Services\MediaAnalysisService;
+use App\Services\MediaAnalysis\MediaAnalysisInterface;
 use App\Services\TelemetryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -28,9 +28,9 @@ use Intervention\Image\Drivers\Gd\Driver;
  */
 class PhotoController extends Controller
 {
-    protected MediaAnalysisService $mediaAnalysis;
+    protected MediaAnalysisInterface $mediaAnalysis;
 
-    public function __construct(MediaAnalysisService $mediaAnalysis)
+    public function __construct(MediaAnalysisInterface $mediaAnalysis)
     {
         $this->mediaAnalysis = $mediaAnalysis;
     }

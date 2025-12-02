@@ -107,6 +107,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('chatrooms/{id}/leave', [\App\Http\Controllers\ChatroomController::class, 'leave']);
     Route::get('chatrooms/{id}/members', [\App\Http\Controllers\ChatroomController::class, 'members']);
 
+    // Chatroom Messages
+    Route::get('chatrooms/{chatroomId}/messages', [\App\Http\Controllers\ChatroomMessageController::class, 'index']);
+    Route::post('chatrooms/{chatroomId}/messages', [\App\Http\Controllers\ChatroomMessageController::class, 'store']);
+
     // Proximity Chatrooms
     Route::get('proximity-chatrooms/nearby', [\App\Http\Controllers\ProximityChatroomController::class, 'findNearby']);
     Route::post('proximity-chatrooms', [\App\Http\Controllers\ProximityChatroomController::class, 'create']);
@@ -137,8 +141,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('venues', \App\Http\Controllers\VenueController::class);
     Route::get('subscriptions/history', [\App\Http\Controllers\SubscriptionController::class, 'history']);
     Route::apiResource('subscriptions', \App\Http\Controllers\SubscriptionController::class);
-    Route::apiResource('event-matches', \App\Http\Controllers\EventMatchController::class);
-    Route::apiResource('attendees', \App\Http\Controllers\AttendeeController::class);
 
     // Venue Check-ins
     Route::post('venues/{id}/checkin', [\App\Http\Controllers\VenueCheckinController::class, 'store']);

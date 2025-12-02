@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\MediaAnalysisService;
+use App\Services\MediaAnalysis\MediaAnalysisInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -15,9 +15,9 @@ use Illuminate\Support\Facades\Validator;
  */
 class MediaAnalysisController extends Controller
 {
-    protected MediaAnalysisService $service;
+    protected MediaAnalysisInterface $service;
 
-    public function __construct(MediaAnalysisService $service)
+    public function __construct(MediaAnalysisInterface $service)
     {
         $this->service = $service;
     }
