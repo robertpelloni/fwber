@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Event;
 use App\Models\EventAttendee;
 use App\Models\User;
+use App\Notifications\EventReminderNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -49,10 +50,10 @@ class SendEventReminders implements ShouldQueue
         $now = Carbon::now();
         $reminderWindow = $now->copy()->addHours(24);
 
-        // Find all active events starting within the next 24 hours
-        $upcomingEvents = Event::where('status', 'active')
+        // Find all upcoming events starting within the next 24 hours
+        $upcomingEvents = Event::where('status', 'upcoming')
             ->whereBetween('starts_at', [$now, $reminderWindow])
-            ->where('reminder_sent', false) // Assuming we add this column
+            ->where('reminder_sent', false)
             ->get();
 
         $count = $upcomingEvents->count();
@@ -71,21 +72,20 @@ class SendEventReminders implements ShouldQueue
 
             foreach ($attendees as $attendee) {
                 if ($attendee->user) {
-                    // TODO: Send push notification or email
-                    // For now, just log
-                    Log::info("SendEventReminders: Would send reminder to user {$attendee->user_id} for event {$event->id} '{$event->title}'");
-                    
-                    // If using a notification system:
-                    // $attendee->user->notify(new EventReminderNotification($event));
+                    try {
+                        $attendee->user->notify(new EventReminderNotification($event));
+                        Log::info("SendEventReminders: Sent reminder to user {$attendee->user_id} for event {$event->id} '{$event->title}'");
+                    } catch (\Exception $e) {
+                        Log::error("SendEventReminders: Failed to send reminder to user {$attendee->user_id} for event {$event->id}: " . $e->getMessage());
+                    }
                 }
             }
 
-            // Mark reminder as sent (assumes we have a reminder_sent column on events table)
-            // Uncomment if column exists:
-            // $event->reminder_sent = true;
-            // $event->save();
+            // Mark reminder as sent
+            $event->reminder_sent = true;
+            $event->save();
 
-            Log::info("SendEventReminders: Sent reminders for event {$event->id} to {$attendees->count()} attendee(s)");
+            Log::info("SendEventReminders: Completed reminders for event {$event->id} to {$attendees->count()} attendee(s)");
         }
 
         Log::info("SendEventReminders: Processed {$count} upcoming event(s)");

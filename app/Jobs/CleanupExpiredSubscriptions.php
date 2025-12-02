@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Subscription;
 use App\Models\User;
+use App\Notifications\SubscriptionExpiredNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -49,7 +50,8 @@ class CleanupExpiredSubscriptions implements ShouldQueue
         $now = Carbon::now();
 
         // Find subscriptions that have ended and are still marked as active
-        $expiredSubscriptions = Subscription::where('stripe_status', 'active')
+        // Note: stripe_status might be 'active' or 'trialing'
+        $expiredSubscriptions = Subscription::whereIn('stripe_status', ['active', 'trialing'])
             ->where('ends_at', '<=', $now)
             ->with('user')
             ->get();
@@ -85,8 +87,12 @@ class CleanupExpiredSubscriptions implements ShouldQueue
                 // Invalidate user's subscription cache
                 Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
 
-                // TODO: Send notification to user about subscription expiration
-                // $user->notify(new SubscriptionExpiredNotification($subscription));
+                // Send notification to user about subscription expiration
+                try {
+                    $user->notify(new SubscriptionExpiredNotification($subscription));
+                } catch (\Exception $e) {
+                    Log::error("CleanupExpiredSubscriptions: Failed to notify user {$user->id}: " . $e->getMessage());
+                }
             }
         }
 

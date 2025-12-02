@@ -11,6 +11,7 @@ use Stripe\Exception\SignatureVerificationException;
 use App\Models\User;
 use App\Models\Payment;
 use App\Models\Subscription;
+use App\Notifications\PaymentFailedNotification;
 use App\Support\LogContext;
 use Carbon\Carbon;
 
@@ -408,7 +409,12 @@ class StripeWebhookController extends Controller
         // Invalidate subscription cache
         Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
         
-        // TODO: Send notification to user about failed payment
+        // Send notification to user about failed payment
+        try {
+            $user->notify(new PaymentFailedNotification($invoice->amount_due / 100, $invoice->currency));
+        } catch (\Exception $e) {
+            Log::error("Stripe Webhook: Failed to notify user {$user->id} about failed payment: " . $e->getMessage());
+        }
     }
 
     /**

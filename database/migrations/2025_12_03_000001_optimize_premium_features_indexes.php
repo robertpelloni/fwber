@@ -14,17 +14,13 @@ return new class extends Migration
     {
         $addIndex = function($table, $columns, $name) {
             if (Schema::hasTable($table)) {
-                // Check if index exists using raw SQL for MySQL to avoid duplicate key errors
-                $exists = count(DB::select("SHOW INDEX FROM `{$table}` WHERE Key_name = ?", [$name])) > 0;
-                
-                if (!$exists) {
-                    try {
-                        Schema::table($table, function (Blueprint $table) use ($columns, $name) {
-                            $table->index($columns, $name);
-                        });
-                    } catch (\Exception $e) {
-                        // Index likely exists or column missing
-                    }
+                try {
+                    // Attempt to add index, will fail if exists
+                    Schema::table($table, function (Blueprint $table) use ($columns, $name) {
+                        $table->index($columns, $name);
+                    });
+                } catch (\Exception $e) {
+                    // Index likely exists or column missing
                 }
             }
         };
