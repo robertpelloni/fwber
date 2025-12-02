@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { api } from '@/lib/api/client';
 import { X, Search, UserPlus, Check } from 'lucide-react';
 
@@ -61,6 +62,7 @@ export default function InviteUserModal({ eventId, isOpen, onClose }: InviteUser
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          aria-label="Close"
         >
           <X className="w-6 h-6" />
         </button>
@@ -85,9 +87,15 @@ export default function InviteUserModal({ eventId, isOpen, onClose }: InviteUser
             matches.map((user) => (
               <div key={user.id} className="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="w-10 h-10 bg-gray-200 rounded-full overflow-hidden relative">
                     {user.avatar_url ? (
-                      <img src={user.avatar_url} alt={user.name} className="w-full h-full object-cover" />
+                      <Image 
+                        src={user.avatar_url} 
+                        alt={user.name} 
+                        width={40} 
+                        height={40} 
+                        className="object-cover" 
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-500">
                         {user.name.charAt(0)}
@@ -104,6 +112,7 @@ export default function InviteUserModal({ eventId, isOpen, onClose }: InviteUser
                       ? 'bg-green-100 text-green-600'
                       : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
                   }`}
+                  aria-label={invited.includes(user.id) ? "Invited" : "Invite"}
                 >
                   {invited.includes(user.id) ? (
                     <Check className="w-5 h-5" />
