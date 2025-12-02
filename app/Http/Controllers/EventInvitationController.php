@@ -97,6 +97,9 @@ class EventInvitationController extends Controller
             'status' => 'pending',
         ]);
 
+        $invitation->load(['event', 'inviter', 'invitee']);
+        $invitation->invitee->notify(new \App\Notifications\EventInvitationReceived($invitation));
+
         return response()->json($invitation, 201);
     }
 
