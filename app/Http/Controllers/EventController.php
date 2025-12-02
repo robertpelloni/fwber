@@ -266,17 +266,18 @@ class EventController extends Controller
             'status' => 'required|in:attending,maybe,declined',
         ]);
 
-        $event = Event::findOrFail($id);
+        // Eager load attendees to avoid N+1 queries
+        $event = Event::with('attendees')->findOrFail($id);
         $user = Auth::user();
 
         // Check max attendees
         if ($request->status === 'attending' && $event->max_attendees) {
-            $currentAttendees = $event->attendees()->where('status', 'attending')->count();
+            $currentAttendees = $event->attendees->where('status', 'attending')->count();
             // If user is already attending, don't count them again
-            $isAlreadyAttending = $event->attendees()
+            $isAlreadyAttending = $event->attendees
                 ->where('user_id', $user->id)
                 ->where('status', 'attending')
-                ->exists();
+                ->isNotEmpty();
                 
             if (!$isAlreadyAttending && $currentAttendees >= $event->max_attendees) {
                 return response()->json(['message' => 'Event is full'], 400);

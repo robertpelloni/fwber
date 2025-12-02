@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateLocationRequest;
 use App\Models\UserLocation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -45,7 +46,7 @@ class LocationController extends Controller
     *   @OA\Response(response=401, description="Unauthenticated")
     * )
      */
-    public function update(Request $request): JsonResponse
+    public function update(UpdateLocationRequest $request): JsonResponse
     {
         try {
             $user = auth()->user();
@@ -54,11 +55,8 @@ class LocationController extends Controller
                 return response()->json(['message' => 'Unauthenticated'], 401);
             }
 
-            // Validation rules
+            // Additional validation for optional fields (FormRequest handles lat/lon/accuracy)
             $validator = Validator::make($request->all(), [
-                'latitude' => 'required|numeric|between:-90,90',
-                'longitude' => 'required|numeric|between:-180,180',
-                'accuracy' => 'sometimes|numeric|min:0|max:1000',
                 'heading' => 'sometimes|numeric|between:0,360',
                 'speed' => 'sometimes|numeric|min:0|max:100',
                 'altitude' => 'sometimes|numeric|min:-1000|max:50000',

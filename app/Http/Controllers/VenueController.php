@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\VenueSearchRequest;
 use App\Models\Venue;
 use App\Models\VenueCheckin;
 use Illuminate\Http\Request;
@@ -29,21 +30,11 @@ class VenueController extends Controller
      *   )
      * )
      */
-    public function index(Request $request): JsonResponse
+    public function index(VenueSearchRequest $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'lat' => 'required|numeric|between:-90,90',
-            'lng' => 'required|numeric|between:-180,180',
-            'radius' => 'integer|min:100|max:50000', // 100m to 50km
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 400);
-        }
-
-        $lat = $request->input('lat');
-        $lng = $request->input('lng');
-        $radius = $request->input('radius', 10000); // Default 10km
+        $lat = $request->validated('lat');
+        $lng = $request->validated('lng');
+        $radius = $request->validated('radius', 10000); // Default 10km
 
         // Use Haversine formula for distance
         $venues = Venue::select('*')

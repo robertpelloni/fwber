@@ -43,5 +43,19 @@ class AppServiceProvider extends ServiceProvider
                 ? Limit::perMinute(100)->by('user:' . $request->user()->id) // 100 requests per minute for authenticated users
                 : Limit::perMinute(60)->by('ip:' . $request->ip()); // 60 requests per minute for anonymous users
         });
+        
+        // Configure rate limiting for AI content generation (expensive operations)
+        RateLimiter::for('content_generation', function (Request $request) {
+            return $request->user()
+                ? Limit::perMinute(10)->by('user:' . $request->user()->id) // 10 generations per minute
+                : Limit::perMinute(3)->by('ip:' . $request->ip()); // 3 generations per minute for guests
+        });
+        
+        // Configure rate limiting for photo uploads
+        RateLimiter::for('photo_uploads', function (Request $request) {
+            return $request->user()
+                ? Limit::perMinute(20)->by('user:' . $request->user()->id) // 20 photo operations per minute
+                : Limit::perMinute(5)->by('ip:' . $request->ip()); // 5 uploads per minute for guests
+        });
     }
 }

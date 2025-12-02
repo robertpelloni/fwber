@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\OptimizeContentRequest;
 use App\Services\ContentGenerationService;
 use App\Services\ContentOptimizationService;
 use App\Models\User;
@@ -253,25 +254,11 @@ class ContentGenerationController extends Controller
     *     @OA\Response(response=400, ref="#/components/responses/BadRequest")
      * )
      */
-    public function optimizeContent(Request $request): JsonResponse
+    public function optimizeContent(OptimizeContentRequest $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'content' => 'required|string|max:2000',
-            'context' => 'nullable|array',
-            'optimization_types' => 'nullable|array',
-            'optimization_types.*' => 'string|in:engagement,clarity,safety,relevance',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'error' => 'Validation failed',
-                'messages' => $validator->errors()
-            ], 400);
-        }
-
-        $content = $request->input('content');
+        $content = $request->validated('content');
         $context = $request->input('context', []);
-        $optimizationTypes = $request->input('optimization_types', ['engagement', 'clarity', 'safety', 'relevance']);
+        $optimizationTypes = $request->validated('optimization_types', ['engagement', 'clarity', 'safety', 'relevance']);
 
         try {
             $result = $this->contentOptimizationService->optimizeContent($content, $context);

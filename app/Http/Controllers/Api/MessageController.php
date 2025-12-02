@@ -95,11 +95,11 @@ class MessageController extends Controller
             return response()->json(['error' => 'Messaging blocked between users'], 403);
         }
 
-        // Find the match between these users
+        // Find the match between these users (eager load relationshipTier to avoid N+1)
         $match = UserMatch::where(function ($query) use ($senderId, $receiverId) {
             $query->where('user1_id', $senderId)->where('user2_id', $receiverId)
                   ->orWhere('user1_id', $receiverId)->where('user2_id', $senderId);
-        })->where('is_active', true)->first();
+        })->where('is_active', true)->with('relationshipTier')->first();
 
         if (!$match) {
             return response()->json(['error' => 'No active match found'], 404);

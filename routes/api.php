@@ -151,16 +151,24 @@ Route::middleware('auth:sanctum')->group(function () {
     // AI Avatar Generation
     Route::post('avatar/generate', [\App\Http\Controllers\AvatarController::class, 'generate']);
 
-    // AI Content Generation
-    Route::post('content/generate-bio', [\App\Http\Controllers\ContentGenerationController::class, 'generateProfileBio']);
-    Route::post('content/generate-posts/{boardId}', [\App\Http\Controllers\ContentGenerationController::class, 'generatePostSuggestions']);
-    Route::post('content/generate-starters', [\App\Http\Controllers\ContentGenerationController::class, 'generateConversationStarters']);
+    // AI Content Generation (rate limited)
+    Route::middleware('throttle:content_generation')->group(function () {
+        Route::post('content/generate-bio', [\App\Http\Controllers\ContentGenerationController::class, 'generateProfileBio']);
+        Route::post('content/generate-posts/{boardId}', [\App\Http\Controllers\ContentGenerationController::class, 'generatePostSuggestions']);
+        Route::post('content/generate-starters', [\App\Http\Controllers\ContentGenerationController::class, 'generateConversationStarters']);
+    });
 
-    // Photos
-    Route::post('photos/reorder', [\App\Http\Controllers\PhotoController::class, 'reorder']);
+    // Photos (upload rate limited)
+    Route::middleware('throttle:photo_uploads')->group(function () {
+        Route::post('photos', [\App\Http\Controllers\PhotoController::class, 'store']);
+        Route::post('photos/reorder', [\App\Http\Controllers\PhotoController::class, 'reorder']);
+    });
     Route::post('photos/{id}/reveal', [\App\Http\Controllers\PhotoController::class, 'reveal']);
     Route::get('photos/{id}/original', [\App\Http\Controllers\PhotoController::class, 'original']);
-    Route::apiResource('photos', \App\Http\Controllers\PhotoController::class);
+    Route::get('photos', [\App\Http\Controllers\PhotoController::class, 'index']);
+    Route::get('photos/{id}', [\App\Http\Controllers\PhotoController::class, 'show']);
+    Route::put('photos/{id}', [\App\Http\Controllers\PhotoController::class, 'update']);
+    Route::delete('photos/{id}', [\App\Http\Controllers\PhotoController::class, 'destroy']);
 
     // Media Analysis
     Route::middleware('feature:media_analysis')->group(function () {
