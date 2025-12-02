@@ -27,6 +27,7 @@ export default function SubscriptionPage() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
+  const [canceling, setCanceling] = useState(false);
   const [status, setStatus] = useState<PremiumStatus | null>(null);
   const [history, setHistory] = useState<Payment[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -71,6 +72,28 @@ export default function SubscriptionPage() {
       setError(err.message || 'Purchase failed. Please try again.');
     } finally {
       setPurchasing(false);
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!confirm('Are you sure you want to cancel your subscription? You will retain access until the end of the billing period.')) {
+      return;
+    }
+
+    try {
+      setCanceling(true);
+      setError(null);
+      setSuccessMessage(null);
+
+      const response = await api.post<{ message: string; ends_at: string }>('/subscriptions/cancel', {});
+      
+      setSuccessMessage(response.message);
+      await fetchData(); // Refresh data
+    } catch (err: any) {
+      console.error('Cancellation failed:', err);
+      setError(err.message || 'Cancellation failed. Please try again.');
+    } finally {
+      setCanceling(false);
     }
   };
 
@@ -132,14 +155,23 @@ export default function SubscriptionPage() {
 
                 {status?.is_premium ? (
                   <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-4">
-                    <div className="flex">
-                      <Check className="h-5 w-5 text-green-400" />
-                      <div className="ml-3">
-                        <h3 className="text-sm font-medium text-green-800">Premium Active</h3>
-                        <div className="mt-2 text-sm text-green-700">
-                          <p>You have access to all Gold features including unlimited swipes and &quot;Who Likes You&quot;.</p>
+                    <div className="flex justify-between items-start">
+                      <div className="flex">
+                        <Check className="h-5 w-5 text-green-400" />
+                        <div className="ml-3">
+                          <h3 className="text-sm font-medium text-green-800">Premium Active</h3>
+                          <div className="mt-2 text-sm text-green-700">
+                            <p>You have access to all Gold features including unlimited swipes and &quot;Who Likes You&quot;.</p>
+                          </div>
                         </div>
                       </div>
+                      <button
+                        onClick={handleCancel}
+                        disabled={canceling}
+                        className="text-sm text-red-600 hover:text-red-800 font-medium underline disabled:opacity-50"
+                      >
+                        {canceling ? 'Canceling...' : 'Cancel Subscription'}
+                      </button>
                     </div>
                   </div>
                 ) : (
