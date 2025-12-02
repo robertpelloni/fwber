@@ -199,6 +199,25 @@ Schedule::job(new CleanupExpiredSubscriptions)->dailyAt('02:00')
 
 ---
 
+### 5. Cache Warming & Monitoring
+**Files Modified**: `app/Console/Commands/WarmCache.php`, `routes/console.php`, `app/Providers/AppServiceProvider.php`
+
+#### **Cache Warming Command**
+- **Command**: `php artisan cache:warm`
+- **Logic**: Pre-populates `groups:index:public` (10m TTL) and `events:index:...` (5m TTL)
+- **Schedule**: Runs every 5 minutes to ensure cache is always warm
+- **Impact**: Eliminates "cold start" latency for the most popular endpoints
+
+#### **Failed Job Alerts**
+- **Implementation**: `Queue::failing` listener in `AppServiceProvider`
+- **Action**: Logs `critical` error with job details (connection, queue, job name, exception)
+- **Integration**: Works with Sentry (if configured) and standard log monitoring
+#### Webhook Performance Monitoring
+- **Implementation**: Added timing logic to `StripeWebhookController::handleWebhook`
+- **Metrics**: Logs `duration_ms` for every processed webhook
+- **Impact**: Allows tracking of webhook processing latency and identification of slow handlers
+---
+
 ## 📊 Performance Impact
 
 ### Expected Improvements
@@ -306,13 +325,13 @@ tail -f storage/logs/laravel.log | grep "Stripe Webhook"
 
 ### Medium Priority
 4. **Cache Warming**:
-   - [ ] Add cache warming command for frequently accessed data
-   - [ ] Schedule cache warming during low-traffic periods
+   - [x] Add cache warming command for frequently accessed data
+   - [x] Schedule cache warming during low-traffic periods
 
 5. **Monitoring & Alerting**:
-   - [ ] Add failed job alerts
+   - [x] Add failed job alerts
    - [ ] Monitor cache hit ratios
-   - [ ] Track webhook processing times
+   - [x] Track webhook processing times
 
 6. **Queue Management**:
    - [ ] Consider separate queues for different job priorities
