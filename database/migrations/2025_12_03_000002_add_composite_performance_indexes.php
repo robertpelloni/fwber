@@ -19,46 +19,72 @@ return new class extends Migration
         if (Schema::hasTable('user_profiles')) {
             Schema::table('user_profiles', function (Blueprint $table) {
                 // Common filter combinations for matching algorithm
-                $table->index(['gender', 'latitude', 'longitude'], 'profiles_match_filter_index');
+                try {
+                    $table->index(['gender', 'latitude', 'longitude'], 'profiles_match_filter_index');
+                } catch (\Exception $e) {
+                    // Index likely exists
+                }
             });
         }
 
         if (Schema::hasTable('messages')) {
             Schema::table('messages', function (Blueprint $table) {
                 // Conversation queries (sender + receiver + timestamp)
-                $table->index(['sender_id', 'receiver_id', 'created_at'], 'messages_conversation_index');
-                $table->index(['receiver_id', 'is_read', 'created_at'], 'messages_unread_index');
+                try {
+                    $table->index(['sender_id', 'receiver_id', 'created_at'], 'messages_conversation_index');
+                } catch (\Exception $e) {}
+                
+                try {
+                    $table->index(['receiver_id', 'is_read', 'created_at'], 'messages_unread_index');
+                } catch (\Exception $e) {}
             });
         }
 
         if (Schema::hasTable('events')) {
             Schema::table('events', function (Blueprint $table) {
                 // Event discovery queries (status + location + time)
-                $table->index(['status', 'latitude', 'longitude'], 'events_discovery_index');
-                $table->index(['created_by_user_id', 'status', 'starts_at'], 'events_creator_status_index');
+                try {
+                    $table->index(['status', 'latitude', 'longitude'], 'events_discovery_index');
+                } catch (\Exception $e) {}
+                
+                try {
+                    $table->index(['created_by_user_id', 'status', 'starts_at'], 'events_creator_status_index');
+                } catch (\Exception $e) {}
             });
         }
 
         if (Schema::hasTable('user_matches')) {
             Schema::table('user_matches', function (Blueprint $table) {
                 // Match lookups (user pairs + active status)
-                $table->index(['user1_id', 'user2_id', 'is_active'], 'matches_user_pair_index');
-                $table->index(['is_active', 'last_message_at'], 'matches_active_recent_index');
+                try {
+                    $table->index(['user1_id', 'user2_id', 'is_active'], 'matches_user_pair_index');
+                } catch (\Exception $e) {}
+                
+                try {
+                    $table->index(['is_active', 'last_message_at'], 'matches_active_recent_index');
+                } catch (\Exception $e) {}
             });
         }
 
         if (Schema::hasTable('chatroom_messages')) {
             Schema::table('chatroom_messages', function (Blueprint $table) {
                 // Chatroom message queries
-                $table->index(['chatroom_id', 'created_at', 'is_deleted'], 'chatroom_messages_feed_index');
+                try {
+                    $table->index(['chatroom_id', 'created_at', 'is_deleted'], 'chatroom_messages_feed_index');
+                } catch (\Exception $e) {}
             });
         }
 
         if (Schema::hasTable('proximity_chatroom_messages')) {
             Schema::table('proximity_chatroom_messages', function (Blueprint $table) {
                 // Proximity chatroom message queries
-                $table->index(['proximity_chatroom_id', 'created_at', 'is_deleted'], 'proximity_messages_feed_index');
-                $table->index(['message_type', 'is_pinned'], 'proximity_messages_type_index');
+                try {
+                    $table->index(['proximity_chatroom_id', 'created_at', 'is_deleted'], 'proximity_messages_feed_index');
+                } catch (\Exception $e) {}
+                
+                try {
+                    $table->index(['message_type', 'is_pinned'], 'proximity_messages_type_index');
+                } catch (\Exception $e) {}
             });
         }
     }
