@@ -4,6 +4,7 @@ import {
   getPlatformAnalytics,
   getRateLimitStatistics,
   getRealtimeAnalytics,
+  getSlowRequests,
 } from '@/lib/api/admin';
 import type {
   AnalyticsRange,
@@ -12,6 +13,7 @@ import type {
   RateLimitStatsResponse,
   RateLimitTimeframe,
   RealtimeMetrics,
+  SlowRequest,
 } from '@/lib/api/types';
 
 interface AdminQueryOptions {
@@ -54,6 +56,18 @@ export function useModerationInsights(options: AdminQueryOptions = {}) {
     enabled: options.enabled ?? true,
     refetchInterval: options.refetchInterval ?? 5 * 60_000,
     staleTime: options.staleTime ?? 5 * 60_000,
+    gcTime: DEFAULT_GC_TIME,
+    refetchOnWindowFocus: false,
+  });
+}
+
+export function useSlowRequests(options: AdminQueryOptions = {}) {
+  return useQuery<SlowRequest[]>({
+    queryKey: ['analytics', 'slow-requests'],
+    queryFn: getSlowRequests,
+    enabled: options.enabled ?? true,
+    refetchInterval: options.refetchInterval ?? 60_000,
+    staleTime: options.staleTime ?? 30_000,
     gcTime: DEFAULT_GC_TIME,
     refetchOnWindowFocus: false,
   });

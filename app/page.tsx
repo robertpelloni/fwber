@@ -4,6 +4,7 @@ import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import Link from 'next/link'
+import { Logo } from '@/components/Logo'
 import SexQuote from '@/components/SexQuote'
 import PWAInstallPrompt from '@/components/PWAInstallPrompt'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -41,11 +42,7 @@ export default function HomePage() {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <Link href="/" className="flex-shrink-0 flex items-center gap-1 hover:scale-105 transition-transform duration-200">
-                <span className="text-4xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-pink-500 to-pink-700 [-webkit-text-stroke:1px_black] [paint-order:stroke_fill] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">F</span>
-                <span className="text-4xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-green-400 to-green-600 [-webkit-text-stroke:1px_black] [paint-order:stroke_fill] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">W</span>
-                <span className="text-4xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-cyan-400 to-blue-600 [-webkit-text-stroke:1px_black] [paint-order:stroke_fill] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">B</span>
-                <span className="text-4xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-purple-500 to-purple-700 [-webkit-text-stroke:1px_black] [paint-order:stroke_fill] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">er</span>
-                <span className="text-xl font-bold text-gray-400 ml-1 self-end mb-1">.me</span>
+                <Logo className="text-4xl" />
               </Link>
             </div>
             
@@ -102,11 +99,7 @@ export default function HomePage() {
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8">
               <span className="inline-flex flex-wrap justify-center gap-1">
-                <span className="text-transparent bg-clip-text bg-gradient-to-b from-pink-500 to-pink-700 [-webkit-text-stroke:1px_black] md:[-webkit-text-stroke:2px_black] [paint-order:stroke_fill] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)] md:drop-shadow-[4px_4px_0px_rgba(0,0,0,0.2)]">F</span>
-                <span className="text-transparent bg-clip-text bg-gradient-to-b from-green-400 to-green-600 [-webkit-text-stroke:1px_black] md:[-webkit-text-stroke:2px_black] [paint-order:stroke_fill] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)] md:drop-shadow-[4px_4px_0px_rgba(0,0,0,0.2)]">W</span>
-                <span className="text-transparent bg-clip-text bg-gradient-to-b from-cyan-400 to-blue-600 [-webkit-text-stroke:1px_black] md:[-webkit-text-stroke:2px_black] [paint-order:stroke_fill] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)] md:drop-shadow-[4px_4px_0px_rgba(0,0,0,0.2)]">B</span>
-                <span className="text-transparent bg-clip-text bg-gradient-to-b from-purple-500 to-purple-700 [-webkit-text-stroke:1px_black] md:[-webkit-text-stroke:2px_black] [paint-order:stroke_fill] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)] md:drop-shadow-[4px_4px_0px_rgba(0,0,0,0.2)]">er</span>
-                <span className="text-2xl md:text-4xl font-bold text-gray-400 ml-1 self-end mb-2 md:mb-3">.me</span>
+                <Logo className="text-5xl md:text-7xl" />
               </span>
               <span className="block md:inline mt-2 md:mt-0 text-gray-900 dark:text-white"> - <span className="text-blue-600 dark:text-blue-400">Adult Social Network</span></span>
             </h1>
@@ -465,11 +458,7 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-8 md:mb-0">
               <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-pink-500 to-pink-700 [-webkit-text-stroke:1px_black] [paint-order:stroke_fill] drop-shadow-sm">F</span>
-                <span className="text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-green-400 to-green-600 [-webkit-text-stroke:1px_black] [paint-order:stroke_fill] drop-shadow-sm">W</span>
-                <span className="text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-cyan-400 to-blue-600 [-webkit-text-stroke:1px_black] [paint-order:stroke_fill] drop-shadow-sm">B</span>
-                <span className="text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-purple-500 to-purple-700 [-webkit-text-stroke:1px_black] [paint-order:stroke_fill] drop-shadow-sm">er</span>
-                <span className="text-lg font-bold text-gray-400 ml-1">.me</span>
+                <Logo className="text-3xl" />
               </div>
               <p className="text-gray-500 mt-2">© 2025 FWBer. All rights reserved.</p>
             </div>

@@ -509,6 +509,20 @@ export interface PlatformAnalyticsResponse {
   trends: PlatformAnalyticsTrends
 }
 
+export interface SlowRequest {
+  id: number
+  method: string
+  url: string
+  duration_ms: number
+  status_code: number
+  ip_address: string | null
+  user_agent: string | null
+  user_id: number | null
+  occurred_at: string
+  created_at: string
+  updated_at: string
+}
+
 export interface RealtimeMetrics {
   active_connections: number
   messages_per_minute: number

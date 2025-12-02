@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
+import { Logo } from '@/components/Logo'
 import { ConnectionStatusBadge } from './realtime'
 import { NotificationBell } from './NotificationBell'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -49,10 +50,8 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
         <div className="flex justify-between items-center h-16">
           {/* Logo & Brand */}
           <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="flex items-center gap-2">
-              <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-orange-500 bg-clip-text text-transparent">
-                {title}
-              </span>
+            <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+              <Logo className="text-3xl" />
             </Link>
             <ConnectionStatusBadge />
           </div>
