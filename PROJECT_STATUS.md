@@ -38,7 +38,7 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   AI-powered, location-based, and collaborative filtering recommendations.
     -   Trending content feed.
     -   **Performance**: Redis caching implemented for index, trending, and feed endpoints (5-30m TTL).
-    -   **Verification**: E2E tests (`recommendations.cy.js`) passing with mocked backend.
+    -   **Verification**: Backend tests (`RecommendationServiceTest.php`) passing. E2E tests (`recommendations.cy.js`) passing.
 3.  **Proximity Artifacts (Local Pulse)**:
     -   Ephemeral, location-based content feed.
     -   **Performance**: Grid-based spatial caching (~110m precision) for high-traffic feeds.
@@ -51,7 +51,7 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 5.  **Proximity Chatrooms**:
     -   Location-based chat rooms with "enter/leave" mechanics.
     -   Real-time messaging within rooms.
-    -   **Verification**: E2E tests (`proximity-chatrooms.cy.js`) passing with mocked backend.
+    -   **Verification**: Backend tests (`ChatroomTest.php`) passing. E2E tests (`proximity-chatrooms.cy.js`) passing.
 6.  **Face Reveal** (Nov 27 - Complete):
     -   Progressive photo reveal mechanics based on relationship tiers.
     -   Frontend UI integrated with feature flag gating (`NEXT_PUBLIC_FEATURE_FACE_REVEAL`).
@@ -118,30 +118,28 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Configuration**: Updated `next.config.js` with performance best practices.
     -   **Code Splitting**: Verified dynamic imports for heavy libraries (e.g., `face-api` in `lib/faceBlur.ts`) and page-based splitting for others (`@dnd-kit`).
 
-### ✅ Completed Future Features (2026+ Early Access)
+### ✅ Completed Features (Post-MVP)
 1.  **Premium Tiers (Gold)**:
     -   Subscription management and "Gold" status tracking.
     -   Exclusive features: "See who likes you", unlimited swipes.
     -   `PremiumController`, `RequiresPremium` middleware, and frontend purchase flows.
-    -   **Verification**: E2E tests (`premium-features.cy.js`) passing with mocked backend.
+    -   **Backend**: `StripePaymentGateway` implemented.
+    -   **Verification**: Backend tests (`SubscriptionControllerTest.php`) passing.
 2.  **Profile Boosts**:
     -   Temporary visibility enhancement logic.
     -   `BoostController` and database schema for active boosts.
     -   Frontend integration for purchasing and visualizing active boosts.
-    -   **Verification**: E2E tests (`boosts.cy.js`) passing with mocked backend.
-    -   **Refactor**: Frontend API calls standardized to use `lib/api/client.ts`.
+    -   **Verification**: Backend tests passing.
 3.  **Events System**:
     -   Location-based event discovery and creation.
     -   RSVP management and attendee lists.
     -   Geospatial queries for finding events nearby.
-    -   **Verification**: E2E tests (`events.cy.js`) passing with mocked backend.
-    -   **Refactor**: Frontend API calls standardized to use `lib/api/client.ts`.
+    -   **Verification**: Backend tests (`EventControllerTest.php`) passing.
 4.  **Groups System**:
     -   Interest-based communities.
     -   Group creation, membership management, and discussion feeds.
     -   Full frontend routing and component library for groups.
-    -   **Verification**: E2E tests (`groups.cy.js`) passing with mocked backend.
-    -   **Refactor**: Frontend API calls standardized to use `lib/api/client.ts`.
+    -   **Verification**: Backend tests (`GroupControllerTest.php`) passing.
 5.  **Behavioral Matching**:
     -   Implemented engagement scoring based on messages, groups, and events.
     -   Activity pattern analysis (peak hours).
@@ -152,6 +150,7 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Details**: `AwsRekognitionDriver` implemented using AWS SDK.
     -   Supports Image analysis (Moderation & Labels).
     -   Gated behind `FEATURE_MEDIA_ANALYSIS`.
+    -   **Verification**: Backend tests (`MediaAnalysisTest.php`) passing.
 
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.
