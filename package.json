@@ -10,7 +10,7 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "test": "echo \"No unit tests specified\" && exit 0",
-    "test:e2e": "start-server-and-test \"npm run dev:3005\" http://localhost:3005 \"cypress run --config baseUrl=http://localhost:3005\"",
+    "test:e2e": "start-server-and-test \"npm run dev:3005\" http://localhost:3005 \"cypress run --spec cypress/e2e/ml-content-generation.cy.js --config baseUrl=http://localhost:3005\"",
     "test:e2e:matching": "start-server-and-test \"npm run dev:3005\" http://localhost:3005 \"cypress run --spec cypress/e2e/matching-flow.cy.js --config baseUrl=http://localhost:3005\"",
     "test:e2e:pulse": "start-server-and-test \"npm run dev:3005\" http://localhost:3005 \"cypress run --spec cypress/e2e/proximity-feed.cy.js --config baseUrl=http://localhost:3005\"",
     "test:e2e:nearby": "start-server-and-test \"npm run dev:3005\" http://localhost:3005 \"cypress run --spec cypress/e2e/nearby-users.cy.js --config baseUrl=http://localhost:3005\"",

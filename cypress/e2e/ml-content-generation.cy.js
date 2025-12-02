@@ -320,6 +320,12 @@ describe('ML Content Generation E2E Test', () => {
     cy.contains('Downtown Community').should('be.visible');
     cy.contains('General discussion for downtown area').should('be.visible');
 
+    // Debugging: Check if message input area is visible
+    cy.get('input[placeholder*="Share something"]').should('be.visible');
+    
+    // Debugging: Check if PostSuggester header is visible
+    cy.contains('Stuck on what to post?').should('be.visible');
+
     // Open suggestions
     cy.get('[data-testid="post-suggestions"]').should('be.visible').click();
     
