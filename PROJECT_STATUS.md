@@ -24,6 +24,14 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   Added `queue-worker` service to `docker-compose.prod.yml`.
     -   Assigned `SendEventReminders` to `notifications` queue.
     -   Documented strategy in `docs/QUEUE_MANAGEMENT.md`.
+5.  **Subscription Cancellation Flow** (Dec 04 - Complete):
+    -   **Backend**: Added `cancel` method to `SubscriptionController` and `POST /api/subscriptions/cancel` route.
+    -   **Frontend**: Added "Cancel Subscription" button and logic to `SubscriptionPage`.
+    -   **Verification**: Verified with frontend type check.
+6.  **OpenAPI Documentation** (Dec 04 - Complete):
+    -   **Configuration**: Added `@OA\Info` to `Controller.php`.
+    -   **Schemas**: Added missing schemas (`Friend`, `Subscription`, `Payment`, `Event`, `Boost`) to `Schemas.php`.
+    -   **Generation**: Successfully generated `api-docs.json` via `l5-swagger:generate`.
 ### ✅ Completed MVP Features
 1.  **Authentication**: Secure registration, login, and session management.
 2.  **Profile Management**: Comprehensive profile editing, including "Physical Profile" attributes.
