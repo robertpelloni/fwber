@@ -6,6 +6,9 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Support\LogContext;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -57,5 +60,28 @@ class AppServiceProvider extends ServiceProvider
                 ? Limit::perMinute(20)->by('user:' . $request->user()->id) // 20 photo operations per minute
                 : Limit::perMinute(5)->by('ip:' . $request->ip()); // 5 uploads per minute for guests
         });
+
+        // Query Monitoring: Log slow queries (>100ms) for performance analysis
+        DB::whenQueryingForLongerThan(100, function ($connection, $event) {
+            Log::warning('Slow Query Detected', LogContext::make([
+                'sql' => $event->sql,
+                'bindings' => $event->bindings,
+                'duration_ms' => $event->time,
+                'connection' => $connection->getName(),
+            ]));
+        });
+
+        // Development N+1 Detection: Track repeated similar queries
+        if (config('app.debug')) {
+            DB::listen(function ($query) {
+                // Log all queries in development for N+1 detection
+                // Can be filtered/analyzed with tools like Telescope or custom monitoring
+                Log::channel('database')->debug('Query Executed', [
+                    'sql' => $query->sql,
+                    'bindings' => $query->bindings,
+                    'duration_ms' => $query->time,
+                ]);
+            });
+        }
     }
 }
