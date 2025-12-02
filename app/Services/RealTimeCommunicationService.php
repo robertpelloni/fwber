@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Message;
-use App\Models\Match;
+use App\Models\UserMatch;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
@@ -158,7 +158,7 @@ class RealTimeCommunicationService
     public function getOnlineFriends(int $userId): array
     {
         // Get user's matches
-        $matches = Match::where('is_active', true)
+        $matches = UserMatch::where('is_active', true)
             ->where(function ($query) use ($userId) {
                 $query->where('user1_id', $userId)->orWhere('user2_id', $userId);
             })
@@ -184,7 +184,7 @@ class RealTimeCommunicationService
 
     private function canUsersCommunicate(int $userId1, int $userId2): bool
     {
-        return Match::where('is_active', true)
+        return UserMatch::where('is_active', true)
             ->where(function ($query) use ($userId1, $userId2) {
                 $query->where('user1_id', $userId1)->where('user2_id', $userId2)
                       ->orWhere('user1_id', $userId2)->where('user2_id', $userId1);
@@ -235,7 +235,7 @@ class RealTimeCommunicationService
 
     private function updateMatchLastMessage(int $userId1, int $userId2): void
     {
-        Match::where('is_active', true)
+        UserMatch::where('is_active', true)
             ->where(function ($query) use ($userId1, $userId2) {
                 $query->where('user1_id', $userId1)->where('user2_id', $userId2)
                       ->orWhere('user1_id', $userId2)->where('user2_id', $userId1);
