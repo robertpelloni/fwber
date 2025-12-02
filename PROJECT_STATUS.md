@@ -222,6 +222,15 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Backend**: Implemented SQLite workaround for `acos` function in `EventController` to support local testing of geospatial queries.
     -   **Frontend**: Fixed `SentryInitializer` to prevent "Multiple Sentry Session Replay instances" error during tests.
     -   **Verification**: Validated "Events" and "Groups" features via full E2E test suite (`events.cy.js`, `groups.cy.js`).
+-   **Chatroom Backend Fix (Dec 02)**:
+    -   **Database**: Created missing migrations for `chatrooms`, `chatroom_members`, `chatroom_messages`, `reactions`, and `mentions`.
+    -   **Testing**: Created `ChatroomTest` and `ChatroomMessageTest` covering creation, joining, messaging, and moderation.
+    -   **Verification**: All backend tests passing.
+-   **Database Infrastructure Completion (Dec 02)**:
+    -   **Safety & Moderation**: Created missing tables for `shadow_throttles`, `moderation_actions`, `reports`, `blocks`, `proximity_artifacts`, `telemetry_events`, `relationship_tiers`, and `friends`.
+    -   **Remaining Models**: Created missing tables for `match_actions`, `device_tokens`, `group_moderation_events`, `user_locations`, and `user_physical_profiles`.
+    -   **Cleanup**: Removed redundant `Attendee` model (replaced by `EventAttendee`).
+    -   **Verification**: Implemented and passed `SafetyAndModerationTest` and `RemainingModelsTest`. Fixed `Report` model relationships. Full test suite passing.
 
 ## 🚀 Next Phase: Post-Launch Monitoring
 See `docs/ROADMAP.md` for future plans.
