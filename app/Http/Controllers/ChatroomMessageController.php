@@ -7,6 +7,8 @@ use App\Models\ChatroomMessage;
 use App\Models\ChatroomMessageReaction;
 use App\Services\ContentModerationService;
 use App\Services\TelemetryService;
+use App\Http\Requests\StoreChatroomMessageRequest;
+use App\Http\Requests\ReactToChatroomMessageRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -101,7 +103,7 @@ class ChatroomMessageController extends Controller
     *   @OA\Response(response=422, ref="#/components/responses/ModerationError")
      * )
      */
-    public function store(Request $request, int $chatroomId): JsonResponse
+    public function store(StoreChatroomMessageRequest $request, int $chatroomId): JsonResponse
     {
         $chatroom = Chatroom::findOrFail($chatroomId);
 
@@ -115,12 +117,7 @@ class ChatroomMessageController extends Controller
             return response()->json(['message' => 'You are muted in this chatroom'], 403);
         }
 
-        $request->validate([
-            'content' => 'required|string|max:2000',
-            'type' => 'nullable|in:text,image,file,announcement',
-            'parent_id' => 'nullable|exists:chatroom_messages,id',
-            'metadata' => 'nullable|array',
-        ]);
+        // Validation handled by StoreChatroomMessageRequest
 
         // Content moderation
         $moderationResult = $this->contentModeration->moderateContent($request->content, [
@@ -359,9 +356,7 @@ class ChatroomMessageController extends Controller
 
         $message = $chatroom->messages()->findOrFail($messageId);
 
-        $request->validate([
-            'emoji' => 'required|string|max:10',
-        ]);
+        // Validation handled by ReactToChatroomMessageRequest
 
         $message->addReaction(Auth::user(), $request->emoji);
 
