@@ -79,6 +79,54 @@ class SubscriptionController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/subscriptions/cancel",
+     *     summary="Cancel active subscription",
+     *     tags={"Subscriptions"},
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Subscription canceled successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="ends_at", type="string", format="date-time")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="No active subscription found"
+     *     )
+     * )
+     */
+    public function cancel(Request $request)
+    {
+        $user = $request->user();
+        
+        $subscription = Subscription::where('user_id', $user->id)
+            ->where('stripe_status', 'active')
+            ->first();
+
+        if (!$subscription) {
+            return response()->json(['message' => 'No active subscription found.'], 400);
+        }
+
+        // In a real implementation, we would call Stripe API here to cancel
+        // $this->paymentGateway->cancelSubscription($subscription->stripe_id);
+
+        $subscription->stripe_status = 'canceled';
+        // We keep ends_at as is, so user has access until the end of the period
+        $subscription->save();
+
+        // Invalidate cache
+        Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
+
+        return response()->json([
+            'message' => 'Subscription canceled successfully. You will retain access until ' . $subscription->ends_at->format('Y-m-d'),
+            'ends_at' => $subscription->ends_at
+        ]);
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()

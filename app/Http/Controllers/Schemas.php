@@ -418,6 +418,78 @@ namespace App\Http\Controllers;
  *   @OA\Property(property="created_at", type="string", format="date-time"),
  *   @OA\Property(property="updated_at", type="string", format="date-time")
  * )
+ *
+ * @OA\Schema(
+ *   schema="Friend",
+ *   type="object",
+ *   required={"id","user_id","friend_id","status"},
+ *   @OA\Property(property="id", type="integer", example=1),
+ *   @OA\Property(property="user_id", type="integer", example=1),
+ *   @OA\Property(property="friend_id", type="integer", example=2),
+ *   @OA\Property(property="status", type="string", example="accepted", enum={"pending","accepted","blocked"}),
+ *   @OA\Property(property="created_at", type="string", format="date-time"),
+ *   @OA\Property(property="updated_at", type="string", format="date-time")
+ * )
+ *
+ * @OA\Schema(
+ *   schema="Subscription",
+ *   type="object",
+ *   required={"id","user_id","name","stripe_status"},
+ *   @OA\Property(property="id", type="integer", example=1),
+ *   @OA\Property(property="user_id", type="integer", example=1),
+ *   @OA\Property(property="name", type="string", example="gold"),
+ *   @OA\Property(property="stripe_id", type="string", example="sub_123"),
+ *   @OA\Property(property="stripe_status", type="string", example="active"),
+ *   @OA\Property(property="stripe_price", type="string", example="price_123"),
+ *   @OA\Property(property="quantity", type="integer", example=1),
+ *   @OA\Property(property="trial_ends_at", type="string", format="date-time", nullable=true),
+ *   @OA\Property(property="ends_at", type="string", format="date-time", nullable=true),
+ *   @OA\Property(property="created_at", type="string", format="date-time"),
+ *   @OA\Property(property="updated_at", type="string", format="date-time")
+ * )
+ *
+ * @OA\Schema(
+ *   schema="Payment",
+ *   type="object",
+ *   required={"id","user_id","amount","currency","status"},
+ *   @OA\Property(property="id", type="integer", example=1),
+ *   @OA\Property(property="user_id", type="integer", example=1),
+ *   @OA\Property(property="amount", type="string", example="19.99"),
+ *   @OA\Property(property="currency", type="string", example="USD"),
+ *   @OA\Property(property="status", type="string", example="succeeded"),
+ *   @OA\Property(property="description", type="string", example="Premium Subscription"),
+ *   @OA\Property(property="created_at", type="string", format="date-time"),
+ *   @OA\Property(property="updated_at", type="string", format="date-time")
+ * )
+ *
+ * @OA\Schema(
+ *   schema="Event",
+ *   type="object",
+ *   required={"id","title","start_time","end_time"},
+ *   @OA\Property(property="id", type="integer", example=1),
+ *   @OA\Property(property="title", type="string", example="Tech Meetup"),
+ *   @OA\Property(property="description", type="string", nullable=true),
+ *   @OA\Property(property="start_time", type="string", format="date-time"),
+ *   @OA\Property(property="end_time", type="string", format="date-time"),
+ *   @OA\Property(property="location", type="string", nullable=true),
+ *   @OA\Property(property="latitude", type="number", format="float", nullable=true),
+ *   @OA\Property(property="longitude", type="number", format="float", nullable=true),
+ *   @OA\Property(property="created_at", type="string", format="date-time"),
+ *   @OA\Property(property="updated_at", type="string", format="date-time")
+ * )
+ *
+ * @OA\Schema(
+ *   schema="Boost",
+ *   type="object",
+ *   required={"id","user_id","type","status","expires_at"},
+ *   @OA\Property(property="id", type="integer", example=1),
+ *   @OA\Property(property="user_id", type="integer", example=1),
+ *   @OA\Property(property="type", type="string", example="standard", enum={"standard","super"}),
+ *   @OA\Property(property="status", type="string", example="active", enum={"active","expired"}),
+ *   @OA\Property(property="expires_at", type="string", format="date-time"),
+ *   @OA\Property(property="created_at", type="string", format="date-time"),
+ *   @OA\Property(property="updated_at", type="string", format="date-time")
+ * )
  */
 class Schemas
 {
