@@ -7,7 +7,7 @@ import Link from 'next/link'
 import SexQuote from '@/components/SexQuote'
 import PWAInstallPrompt from '@/components/PWAInstallPrompt'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { Shield, Heart, Zap, MapPin, MessageCircle, Users, Menu, X, Lock, Ghost, Layers, FileText, Code, Building2 } from 'lucide-react'
+import { Shield, Heart, Zap, MapPin, MessageCircle, Users, Menu, X, Lock, Ghost, Layers, FileText, Code, Building2, CheckCircle2, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 
 export default function HomePage() {
@@ -132,6 +132,25 @@ export default function HomePage() {
               >
                 Member Login
               </Link>
+            </div>
+
+            <div className="mt-12 pt-8 border-t border-gray-200/60 dark:border-gray-700/60">
+              <p className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-6">
+                Inclusive Community Support
+              </p>
+              <div className="flex flex-wrap justify-center gap-3">
+                {[
+                  'Straight', 'Gay', 'Trans', 'Crossdress', 'Swingers', 'Couples',
+                  'Sex Positive', 'Safer Sex Workers', 'Fetish Community Support', 'Mild to Wild'
+                ].map((item) => (
+                  <span 
+                    key={item}
+                    className="px-4 py-2 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 cursor-default shadow-sm"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -272,6 +291,151 @@ export default function HomePage() {
                 >
                   Create Free Account
                 </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Why FWBer Section */}
+      <div className="py-24 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16 max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-6">
+              Yet another hookup site? <br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">What makes this one better?</span>
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              We&apos;re building the future of adult dating. A perfect blend of privacy, fun, and cutting-edge tech.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+            <div className="flex gap-4">
+              <div className="flex-shrink-0 mt-1">
+                <CheckCircle2 className="w-6 h-6 text-green-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Privacy-First Architecture</h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Your secrets are safe. Photos are encrypted on your device—we can&apos;t see them, and neither can hackers.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <div className="flex-shrink-0 mt-1">
+                <Zap className="w-6 h-6 text-yellow-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Hyper-Local Proximity</h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Why wait? Discover matches within walking distance in real-time for spontaneous connections.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <div className="flex-shrink-0 mt-1">
+                <Layers className="w-6 h-6 text-pink-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Progressive Trust Tiers</h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  The game of seduction. Unlock clearer photos and private details only as you chat and build trust.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <div className="flex-shrink-0 mt-1">
+                <Ghost className="w-6 h-6 text-purple-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">AI Avatars</h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Be anyone you want. Browse anonymously with a custom AI persona until you&apos;re ready to reveal the real you.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <div className="flex-shrink-0 mt-1">
+                <Lock className="w-6 h-6 text-blue-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">The Local Vault</h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  A secure, dedicated gallery for your private content that never touches the cloud unencrypted.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <div className="flex-shrink-0 mt-1">
+                <Shield className="w-6 h-6 text-green-600" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Verify Your Date</h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  No more catfishing. Our Face Reveal system ensures the person you meet matches their profile.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-4 opacity-80">
+              <div className="flex-shrink-0 mt-1">
+                <Sparkles className="w-6 h-6 text-indigo-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                  Smart Behavioral Matching <span className="text-xs ml-2 bg-indigo-100 text-indigo-800 py-0.5 px-2 rounded-full uppercase tracking-wider font-semibold">Coming Soon</span>
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  An AI matchmaker that learns your true &quot;type&quot; based on who you actually interact with, not just who you say you like.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-4 opacity-80">
+              <div className="flex-shrink-0 mt-1">
+                <Shield className="w-6 h-6 text-red-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                  AI Safety Guardrails <span className="text-xs ml-2 bg-red-100 text-red-800 py-0.5 px-2 rounded-full uppercase tracking-wider font-semibold">Coming Soon</span>
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Advanced AI that blocks unsolicited explicit content before it ruins your mood.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-4 opacity-80">
+              <div className="flex-shrink-0 mt-1">
+                <Users className="w-6 h-6 text-orange-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                  Social Circles & Events <span className="text-xs ml-2 bg-orange-100 text-orange-800 py-0.5 px-2 rounded-full uppercase tracking-wider font-semibold">Coming Soon</span>
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Because sometimes the best connections happen in a crowd. Find local events and groups.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-4 opacity-80">
+              <div className="flex-shrink-0 mt-1">
+                <MapPin className="w-6 h-6 text-blue-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                  Native Mobile Experience <span className="text-xs ml-2 bg-blue-100 text-blue-800 py-0.5 px-2 rounded-full uppercase tracking-wider font-semibold">Coming Soon</span>
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  The full FWBer experience in your pocket with a native app for iOS and Android.
+                </p>
               </div>
             </div>
           </div>
