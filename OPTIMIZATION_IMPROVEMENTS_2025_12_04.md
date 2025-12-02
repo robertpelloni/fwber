@@ -291,18 +291,18 @@ tail -f storage/logs/laravel.log | grep "Stripe Webhook"
 
 ### High Priority
 1. **SendEventReminders Job**:
-   - [ ] Implement push notification sending
-   - [ ] Implement email notification sending
-   - [ ] Add `reminder_sent` column to events table
-   - [ ] Migration: `$table->boolean('reminder_sent')->default(false)`
+   - [x] Implement push notification sending
+   - [x] Implement email notification sending
+   - [x] Add `reminder_sent` column to events table
+   - [x] Migration: `$table->boolean('reminder_sent')->default(false)`
 
 2. **CleanupExpiredSubscriptions Job**:
-   - [ ] Implement SubscriptionExpiredNotification
-   - [ ] Add email template for expiration notice
+   - [x] Implement SubscriptionExpiredNotification
+   - [x] Add email template for expiration notice
 
 3. **Invoice Payment Failed Handler**:
-   - [ ] Implement user notification for failed payments
-   - [ ] Add retry payment flow
+   - [x] Implement user notification for failed payments
+   - [x] Add retry payment flow
 
 ### Medium Priority
 4. **Cache Warming**:
