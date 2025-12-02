@@ -117,6 +117,19 @@ class BulletinBoard extends Model
      */
     public function scopeNearLocation($query, float $lat, float $lng, int $radiusMeters = 5000)
     {
+        if (config('database.default') === 'sqlite' || \Illuminate\Support\Facades\DB::connection()->getDriverName() === 'sqlite') {
+             // Simple box approximation for testing
+             // 1 degree latitude ~= 111km = 111000m
+             $latRange = $radiusMeters / 111000;
+             // 1 degree longitude ~= 111km * cos(lat)
+             // Avoid division by zero if lat is 90/-90
+             $cosLat = cos(deg2rad($lat));
+             $lonRange = $cosLat == 0 ? 180 : $radiusMeters / (111000 * abs($cosLat));
+             
+             return $query->whereBetween('center_lat', [$lat - $latRange, $lat + $latRange])
+                          ->whereBetween('center_lng', [$lng - $lonRange, $lng + $lonRange]);
+        }
+
         return $query->whereRaw(
             "ST_Distance_Sphere(
                 POINT(center_lng, center_lat), 

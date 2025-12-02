@@ -70,9 +70,7 @@ class BulletinBoardTest extends TestCase
 
     public function test_scope_near_location_skipped_on_sqlite()
     {
-        if (DB::connection()->getDriverName() === 'sqlite') {
-            $this->markTestSkipped('ST_Distance_Sphere not supported in SQLite');
-        }
+        // SQLite support added via bounding box approximation in model
 
         $board = BulletinBoard::factory()->create([
             'center_lat' => 40.7128,
