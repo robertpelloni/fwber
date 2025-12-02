@@ -6,6 +6,7 @@ use App\Models\Payment;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class SubscriptionController extends Controller
 {
@@ -27,9 +28,15 @@ class SubscriptionController extends Controller
      */
     public function index(Request $request)
     {
-        $subscriptions = Subscription::where('user_id', Auth::id())
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $userId = Auth::id();
+        
+        // Cache for 5 minutes with user-specific tagged caching
+        $subscriptions = Cache::tags(['subscriptions', "user:{$userId}"])
+            ->remember("subscriptions:user:{$userId}", 300, function () use ($userId) {
+                return Subscription::where('user_id', $userId)
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+            });
 
         return response()->json($subscriptions);
     }
@@ -55,9 +62,17 @@ class SubscriptionController extends Controller
      */
     public function history(Request $request)
     {
-        $payments = Payment::where('user_id', Auth::id())
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+        $userId = Auth::id();
+        $page = $request->input('page', 1);
+        
+        // Cache for 10 minutes with user-specific and page-specific tagged caching
+        $cacheKey = "payments:history:user:{$userId}:page:{$page}";
+        $payments = Cache::tags(['subscriptions', "user:{$userId}"])
+            ->remember($cacheKey, 600, function () use ($userId) {
+                return Payment::where('user_id', $userId)
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(20);
+            });
 
         return response()->json($payments);
     }

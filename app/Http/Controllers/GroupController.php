@@ -6,6 +6,7 @@ use App\Models\Group;
 use App\Models\GroupMember;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class GroupController extends Controller
 {
@@ -27,10 +28,14 @@ class GroupController extends Controller
      */
     public function index()
     {
-        $groups = Group::where('privacy', 'public')
-            ->orWhere('visibility', 'visible')
-            ->withCount('members')
-            ->get();
+        // Cache for 10 minutes with tagged caching
+        $groups = Cache::tags(['groups'])->remember('groups:index:public', 600, function () {
+            return Group::where('privacy', 'public')
+                ->orWhere('visibility', 'visible')
+                ->withCount('members')
+                ->get();
+        });
+        
         return response()->json($groups);
     }
 
@@ -85,6 +90,9 @@ class GroupController extends Controller
             'role' => 'admin',
             'joined_at' => now(),
         ]);
+
+        // Invalidate groups cache
+        Cache::tags(['groups'])->flush();
 
         return response()->json($group, 201);
     }
@@ -157,6 +165,9 @@ class GroupController extends Controller
 
         $group->increment('member_count');
 
+        // Invalidate groups cache (member count changed)
+        Cache::tags(['groups'])->flush();
+
         return response()->json(['message' => 'Joined group successfully']);
     }
 
@@ -198,6 +209,9 @@ class GroupController extends Controller
 
         $member->delete(); // Or set is_active = false
         $group->decrement('member_count');
+
+        // Invalidate groups cache (member count changed)
+        Cache::tags(['groups'])->flush();
 
         return response()->json(['message' => 'Left group successfully']);
     }

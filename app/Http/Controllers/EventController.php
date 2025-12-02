@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Models\EventAttendee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class EventController extends Controller
@@ -59,42 +60,54 @@ class EventController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Event::query();
+        // Generate cache key based on query parameters
+        $cacheKey = 'events:index:' . md5(json_encode([
+            'lat' => $request->latitude,
+            'lon' => $request->longitude,
+            'radius' => $request->radius,
+            'status' => $request->status,
+            'page' => $request->input('page', 1),
+        ]));
 
-        // Geospatial filter
-        if ($request->has(['latitude', 'longitude', 'radius'])) {
-            $lat = $request->latitude;
-            $lon = $request->longitude;
-            $radius = $request->radius; // km
+        // Cache for 5 minutes with tagged caching
+        $events = Cache::tags(['events'])->remember($cacheKey, 300, function () use ($request) {
+            $query = Event::query();
 
-            if (DB::getDriverName() === 'sqlite') {
-                // Simple box approximation for testing
-                $latRange = $radius / 111;
-                $lonRange = $radius / (111 * cos(deg2rad($lat)));
-                
-                $query->whereBetween('latitude', [$lat - $latRange, $lat + $latRange])
-                      ->whereBetween('longitude', [$lon - $lonRange, $lon + $lonRange]);
+            // Geospatial filter
+            if ($request->has(['latitude', 'longitude', 'radius'])) {
+                $lat = $request->latitude;
+                $lon = $request->longitude;
+                $radius = $request->radius; // km
+
+                if (DB::getDriverName() === 'sqlite') {
+                    // Simple box approximation for testing
+                    $latRange = $radius / 111;
+                    $lonRange = $radius / (111 * cos(deg2rad($lat)));
+                    
+                    $query->whereBetween('latitude', [$lat - $latRange, $lat + $latRange])
+                          ->whereBetween('longitude', [$lon - $lonRange, $lon + $lonRange]);
+                } else {
+                    $query->select('*')
+                        ->selectRaw(
+                            '(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance',
+                            [$lat, $lon, $lat]
+                        )
+                        ->having('distance', '<', $radius)
+                        ->orderBy('distance');
+                }
             } else {
-                $query->select('*')
-                    ->selectRaw(
-                        '(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance',
-                        [$lat, $lon, $lat]
-                    )
-                    ->having('distance', '<', $radius)
-                    ->orderBy('distance');
+                $query->orderBy('starts_at', 'asc');
             }
-        } else {
-            $query->orderBy('starts_at', 'asc');
-        }
 
-        // Status filter
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
-        } else {
-            $query->where('status', '!=', 'cancelled');
-        }
+            // Status filter
+            if ($request->has('status')) {
+                $query->where('status', $request->status);
+            } else {
+                $query->where('status', '!=', 'cancelled');
+            }
 
-        $events = $query->withCount('attendees')->paginate(20);
+            return $query->withCount('attendees')->paginate(20);
+        });
 
         return response()->json($events);
     }
@@ -147,6 +160,9 @@ class EventController extends Controller
             'created_by_user_id' => Auth::id(),
             'status' => 'upcoming',
         ]);
+
+        // Invalidate events cache
+        Cache::tags(['events'])->flush();
 
         return response()->json($event, 201);
     }
@@ -271,6 +287,9 @@ class EventController extends Controller
             ['event_id' => $event->id, 'user_id' => $user->id],
             ['status' => $request->status]
         );
+
+        // Invalidate events cache (attendee counts changed)
+        Cache::tags(['events'])->flush();
 
         return response()->json($attendee);
     }

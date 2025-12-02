@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use Stripe\Stripe;
 use Stripe\Webhook;
 use Stripe\Exception\SignatureVerificationException;
 use App\Models\User;
 use App\Models\Payment;
+use App\Models\Subscription;
 use Carbon\Carbon;
 
 class StripeWebhookController extends Controller
@@ -39,10 +41,29 @@ class StripeWebhookController extends Controller
                 $paymentIntent = $event->data->object;
                 $this->handlePaymentIntentSucceeded($paymentIntent);
                 break;
-            // ... handle other event types
+            case 'customer.subscription.created':
+                $subscription = $event->data->object;
+                $this->handleSubscriptionCreated($subscription);
+                break;
+            case 'customer.subscription.updated':
+                $subscription = $event->data->object;
+                $this->handleSubscriptionUpdated($subscription);
+                break;
+            case 'customer.subscription.deleted':
+                $subscription = $event->data->object;
+                $this->handleSubscriptionDeleted($subscription);
+                break;
+            case 'invoice.payment_failed':
+                $invoice = $event->data->object;
+                $this->handleInvoicePaymentFailed($invoice);
+                break;
+            case 'invoice.payment_succeeded':
+                $invoice = $event->data->object;
+                $this->handleInvoicePaymentSucceeded($invoice);
+                break;
             default:
-                // Unexpected event type
-                // Log::info('Received unknown event type ' . $event->type);
+                // Log unknown event types for monitoring
+                Log::info('Stripe Webhook: Received unknown event type ' . $event->type);
         }
 
         return response()->json(['status' => 'success']);
@@ -101,5 +122,247 @@ class StripeWebhookController extends Controller
         ]);
 
         Log::info("Stripe Webhook: Premium granted to user {$user->id}");
+        
+        // Invalidate subscription cache for this user
+        Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
+    }
+
+    /**
+     * Handle subscription created event
+     */
+    protected function handleSubscriptionCreated($stripeSubscription)
+    {
+        $customerId = $stripeSubscription->customer;
+        $userId = $stripeSubscription->metadata->user_id ?? null;
+
+        if (!$userId) {
+            Log::warning('Stripe Webhook: No user_id in subscription metadata for ' . $stripeSubscription->id);
+            return;
+        }
+
+        $user = User::find($userId);
+        if (!$user) {
+            Log::error('Stripe Webhook: User not found for ID ' . $userId);
+            return;
+        }
+
+        // Check if subscription already exists
+        $existing = Subscription::where('stripe_id', $stripeSubscription->id)->first();
+        if ($existing) {
+            Log::info('Stripe Webhook: Subscription already exists ' . $stripeSubscription->id);
+            return;
+        }
+
+        // Create subscription record
+        Subscription::create([
+            'user_id' => $user->id,
+            'name' => $stripeSubscription->metadata->plan_name ?? 'gold',
+            'stripe_id' => $stripeSubscription->id,
+            'stripe_status' => $stripeSubscription->status,
+            'stripe_price' => $stripeSubscription->items->data[0]->price->id ?? null,
+            'quantity' => $stripeSubscription->items->data[0]->quantity ?? 1,
+            'trial_ends_at' => $stripeSubscription->trial_end ? Carbon::createFromTimestamp($stripeSubscription->trial_end) : null,
+            'ends_at' => $stripeSubscription->current_period_end ? Carbon::createFromTimestamp($stripeSubscription->current_period_end) : null,
+        ]);
+
+        // Grant premium tier if subscription is active
+        if ($stripeSubscription->status === 'active') {
+            $user->tier = 'gold';
+            $user->tier_expires_at = Carbon::createFromTimestamp($stripeSubscription->current_period_end);
+            $user->unlimited_swipes = true;
+            $user->save();
+        }
+
+        Log::info("Stripe Webhook: Subscription created for user {$user->id}");
+        
+        // Invalidate subscription cache
+        Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
+    }
+
+    /**
+     * Handle subscription updated event
+     */
+    protected function handleSubscriptionUpdated($stripeSubscription)
+    {
+        $subscription = Subscription::where('stripe_id', $stripeSubscription->id)->first();
+        
+        if (!$subscription) {
+            Log::warning('Stripe Webhook: Subscription not found ' . $stripeSubscription->id);
+            return;
+        }
+
+        $user = $subscription->user;
+        if (!$user) {
+            Log::error('Stripe Webhook: User not found for subscription ' . $stripeSubscription->id);
+            return;
+        }
+
+        // Update subscription record
+        $subscription->update([
+            'stripe_status' => $stripeSubscription->status,
+            'quantity' => $stripeSubscription->items->data[0]->quantity ?? 1,
+            'trial_ends_at' => $stripeSubscription->trial_end ? Carbon::createFromTimestamp($stripeSubscription->trial_end) : null,
+            'ends_at' => $stripeSubscription->current_period_end ? Carbon::createFromTimestamp($stripeSubscription->current_period_end) : null,
+        ]);
+
+        // Update user tier based on subscription status
+        if (in_array($stripeSubscription->status, ['active', 'trialing'])) {
+            $user->tier = 'gold';
+            $user->tier_expires_at = Carbon::createFromTimestamp($stripeSubscription->current_period_end);
+            $user->unlimited_swipes = true;
+            $user->save();
+        } elseif (in_array($stripeSubscription->status, ['past_due', 'canceled', 'unpaid'])) {
+            // Revoke premium access
+            $user->tier = 'free';
+            $user->tier_expires_at = null;
+            $user->unlimited_swipes = false;
+            $user->save();
+        }
+
+        Log::info("Stripe Webhook: Subscription updated for user {$user->id}, status: {$stripeSubscription->status}");
+        
+        // Invalidate subscription cache
+        Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
+    }
+
+    /**
+     * Handle subscription deleted/canceled event
+     */
+    protected function handleSubscriptionDeleted($stripeSubscription)
+    {
+        $subscription = Subscription::where('stripe_id', $stripeSubscription->id)->first();
+        
+        if (!$subscription) {
+            Log::warning('Stripe Webhook: Subscription not found for deletion ' . $stripeSubscription->id);
+            return;
+        }
+
+        $user = $subscription->user;
+        if (!$user) {
+            Log::error('Stripe Webhook: User not found for subscription deletion ' . $stripeSubscription->id);
+            return;
+        }
+
+        // Update subscription status to canceled
+        $subscription->update([
+            'stripe_status' => 'canceled',
+            'ends_at' => now(),
+        ]);
+
+        // Revoke premium access immediately
+        $user->tier = 'free';
+        $user->tier_expires_at = null;
+        $user->unlimited_swipes = false;
+        $user->save();
+
+        Log::info("Stripe Webhook: Subscription canceled for user {$user->id}");
+        
+        // Invalidate subscription cache
+        Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
+    }
+
+    /**
+     * Handle invoice payment failed event
+     */
+    protected function handleInvoicePaymentFailed($invoice)
+    {
+        $subscriptionId = $invoice->subscription;
+        
+        if (!$subscriptionId) {
+            Log::warning('Stripe Webhook: No subscription ID in failed invoice ' . $invoice->id);
+            return;
+        }
+
+        $subscription = Subscription::where('stripe_id', $subscriptionId)->first();
+        
+        if (!$subscription) {
+            Log::warning('Stripe Webhook: Subscription not found for failed invoice ' . $subscriptionId);
+            return;
+        }
+
+        $user = $subscription->user;
+        if (!$user) {
+            Log::error('Stripe Webhook: User not found for failed invoice');
+            return;
+        }
+
+        // Update subscription status
+        $subscription->update([
+            'stripe_status' => 'past_due',
+        ]);
+
+        // Log the failed payment
+        Payment::create([
+            'user_id' => $user->id,
+            'amount' => $invoice->amount_due / 100,
+            'currency' => $invoice->currency,
+            'payment_gateway' => 'stripe',
+            'transaction_id' => $invoice->id,
+            'status' => 'failed',
+            'description' => 'Subscription renewal failed - Invoice ' . $invoice->number,
+            'metadata' => [
+                'invoice_id' => $invoice->id,
+                'subscription_id' => $subscriptionId,
+                'attempt_count' => $invoice->attempt_count,
+            ],
+        ]);
+
+        // Keep premium active for grace period but log the issue
+        Log::warning("Stripe Webhook: Invoice payment failed for user {$user->id}, subscription {$subscriptionId}");
+        
+        // Invalidate subscription cache
+        Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
+        
+        // TODO: Send notification to user about failed payment
+    }
+
+    /**
+     * Handle invoice payment succeeded event
+     */
+    protected function handleInvoicePaymentSucceeded($invoice)
+    {
+        $subscriptionId = $invoice->subscription;
+        
+        if (!$subscriptionId) {
+            // One-time payment, already handled by payment_intent.succeeded
+            return;
+        }
+
+        $subscription = Subscription::where('stripe_id', $subscriptionId)->first();
+        
+        if (!$subscription) {
+            Log::warning('Stripe Webhook: Subscription not found for successful invoice ' . $subscriptionId);
+            return;
+        }
+
+        $user = $subscription->user;
+        if (!$user) {
+            Log::error('Stripe Webhook: User not found for successful invoice');
+            return;
+        }
+
+        // Check if payment already recorded
+        $existingPayment = Payment::where('transaction_id', $invoice->payment_intent)->first();
+        if (!$existingPayment) {
+            // Log the successful renewal payment
+            Payment::create([
+                'user_id' => $user->id,
+                'amount' => $invoice->amount_paid / 100,
+                'currency' => $invoice->currency,
+                'payment_gateway' => 'stripe',
+                'transaction_id' => $invoice->payment_intent,
+                'status' => 'succeeded',
+                'description' => 'Subscription renewal - Invoice ' . $invoice->number,
+                'metadata' => [
+                    'invoice_id' => $invoice->id,
+                    'subscription_id' => $subscriptionId,
+                ],
+            ]);
+        }
+
+        Log::info("Stripe Webhook: Subscription renewal successful for user {$user->id}");
+        
+        // Invalidate subscription cache
+        Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
     }
 }
