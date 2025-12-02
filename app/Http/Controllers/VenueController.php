@@ -32,22 +32,18 @@ class VenueController extends Controller
      */
     public function index(VenueSearchRequest $request): JsonResponse
     {
-        $lat = $request->validated('lat');
-        $lng = $request->validated('lng');
-        $radius = $request->validated('radius', 10000); // Default 10km
+        $lat = (float) $request->validated('lat');
+        $lng = (float) $request->validated('lng');
+        $radius = (int) $request->validated('radius', 10000); // Default 10km
+
+        $haversine = '(6371000 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude))))';
 
         // Use Haversine formula for distance
         $venues = Venue::select('*')
-            ->selectRaw(
-                '(6371000 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance',
-                [$lat, $lng, $lat]
-            )
-            ->whereRaw(
-                '(6371000 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) <= ?',
-                [$lat, $lng, $lat, $radius]
-            )
-            ->orderBy('distance')
+            ->selectRaw("{$haversine} AS distance", [$lat, $lng, $lat])
+            ->whereRaw("{$haversine} <= ?", [$lat, $lng, $lat, $radius])
             ->where('is_active', true)
+            ->orderBy('distance')
             ->limit(20)
             ->get();
 
