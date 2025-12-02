@@ -7,7 +7,7 @@ describe('Navigation', () => {
   };
 
   beforeEach(() => {
-    cy.intercept('POST', '/api/auth/login', {
+    cy.intercept('POST', '**/api/auth/login', {
       statusCode: 200,
       body: {
         token: 'mock-jwt-token',
@@ -15,12 +15,12 @@ describe('Navigation', () => {
       }
     }).as('login');
 
-    cy.intercept('GET', '/api/user', {
+    cy.intercept('GET', '**/api/user', {
       statusCode: 200,
       body: testUser
     }).as('getUser');
 
-    cy.intercept('GET', '/api/matches*', {
+    cy.intercept('GET', '**/api/matches*', {
       statusCode: 200,
       body: {
         matches: [

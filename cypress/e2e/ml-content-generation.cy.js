@@ -13,7 +13,7 @@ describe('ML Content Generation E2E Test', () => {
 
   beforeEach(() => {
     // Mock Auth Endpoints
-    cy.intercept('POST', '/api/auth/register', {
+    cy.intercept('POST', '**/api/auth/register', {
       statusCode: 201,
       body: {
         token: 'mock-jwt-token',
@@ -22,7 +22,7 @@ describe('ML Content Generation E2E Test', () => {
       }
     }).as('register');
 
-    cy.intercept('POST', '/api/auth/login', {
+    cy.intercept('POST', '**/api/auth/login', {
       statusCode: 200,
       body: {
         token: 'mock-jwt-token',
@@ -32,7 +32,7 @@ describe('ML Content Generation E2E Test', () => {
     }).as('login');
 
     // Mock Dashboard Stats
-    cy.intercept('GET', '/api/dashboard/stats', {
+    cy.intercept('GET', '**/api/dashboard/stats', {
       statusCode: 200,
       body: {
         total_matches: 5,
@@ -49,7 +49,7 @@ describe('ML Content Generation E2E Test', () => {
     }).as('getDashboardStats');
 
     // Mock User Profile
-    cy.intercept('GET', '/api/user', {
+    cy.intercept('GET', '**/api/user', {
       statusCode: 200,
       body: testUser
     }).as('getUser');
@@ -92,7 +92,7 @@ describe('ML Content Generation E2E Test', () => {
     cy.get('[data-testid="target-audience-input"]').type('adventure lovers');
 
     // Mock Profile Generation
-    cy.intercept('POST', '/api/content/generate-bio', {
+    cy.intercept('POST', '**/api/content/generate-bio', {
       statusCode: 200,
       body: {
         success: true,
@@ -140,7 +140,7 @@ describe('ML Content Generation E2E Test', () => {
 
     // 6. Test feedback submission
     // Mock feedback submission
-    cy.intercept('POST', '/api/content-generation/feedback', {
+    cy.intercept('POST', '**/api/content-generation/feedback', {
       statusCode: 200,
       body: {
         success: true,
@@ -197,7 +197,7 @@ describe('ML Content Generation E2E Test', () => {
     cy.get('[data-testid="safety-score"]').should('contain', '%');
 
     // Mock optimization response
-    cy.intercept('POST', '/api/content-generation/optimize', {
+    cy.intercept('POST', '**/api/content-generation/optimize', {
       statusCode: 200,
       body: {
         success: true,
@@ -235,7 +235,7 @@ describe('ML Content Generation E2E Test', () => {
 
   it('should test bulletin board post suggestions', () => {
     // Mock bulletin board data
-    cy.intercept('GET', '/api/bulletin-boards*', {
+    cy.intercept('GET', '**/api/bulletin-boards*', {
       statusCode: 200,
       body: {
         boards: [
@@ -253,7 +253,7 @@ describe('ML Content Generation E2E Test', () => {
       }
     }).as('getBoards');
 
-    cy.intercept('GET', '/api/bulletin-boards/1*', {
+    cy.intercept('GET', '**/api/bulletin-boards/1*', {
       statusCode: 200,
       body: {
         board: {
@@ -266,7 +266,7 @@ describe('ML Content Generation E2E Test', () => {
       }
     }).as('getBoardDetails');
 
-    cy.intercept('GET', '/api/bulletin-boards/1/messages*', {
+    cy.intercept('GET', '**/api/bulletin-boards/1/messages*', {
       statusCode: 200,
       body: {
         messages: {
@@ -276,7 +276,7 @@ describe('ML Content Generation E2E Test', () => {
     }).as('getMessages');
 
     // Mock suggestions generation
-    cy.intercept('POST', '/api/content/generate-posts/*', {
+    cy.intercept('POST', '**/api/content/generate-posts/*', {
       statusCode: 200,
       body: {
         suggestions: [
@@ -365,7 +365,7 @@ describe('ML Content Generation E2E Test', () => {
     cy.get('[data-testid="conversation-hints"]').type('shared love for adventure');
 
     // Mock Conversation Starters
-    cy.intercept('POST', '/api/content/generate-starters', {
+    cy.intercept('POST', '**/api/content/generate-starters', {
       statusCode: 200,
       body: {
         success: true,
@@ -422,7 +422,7 @@ describe('ML Content Generation E2E Test', () => {
     cy.url().should('include', '/content-generation');
 
     // Mock API failure
-    cy.intercept('POST', '/api/content/generate-bio', {
+    cy.intercept('POST', '**/api/content/generate-bio', {
       statusCode: 500,
       body: { error: 'AI service temporarily unavailable' }
     }).as('profileGenerationFailure');
@@ -465,7 +465,7 @@ describe('ML Content Generation E2E Test', () => {
     cy.get('[data-testid="interest-music"]').click();
 
     // Mock with delay for first request
-    cy.intercept('POST', '/api/content/generate-bio', {
+    cy.intercept('POST', '**/api/content/generate-bio', {
       delay: 1000,
       statusCode: 200,
       body: {
@@ -533,7 +533,7 @@ describe('ML Content Generation E2E Test', () => {
     cy.url().should('include', '/dashboard');
 
     // Mock stats BEFORE navigation
-    cy.intercept('GET', '/api/content-generation/stats', {
+    cy.intercept('GET', '**/api/content-generation/stats', {
       statusCode: 200,
       body: {
         success: true,
@@ -549,7 +549,7 @@ describe('ML Content Generation E2E Test', () => {
       }
     }).as('getStats');
     
-    cy.intercept('GET', '/api/content-generation/optimization-stats', {
+    cy.intercept('GET', '**/api/content-generation/optimization-stats', {
       statusCode: 200,
       body: {
         success: true,
