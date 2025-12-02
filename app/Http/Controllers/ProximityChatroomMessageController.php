@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\MessageReactionRequest;
+use App\Http\Requests\StoreProximityChatroomMessageRequest;
+use App\Http\Requests\UpdateProximityChatroomMessageRequest;
 use App\Models\ProximityChatroom;
 use App\Models\ProximityChatroomMessage;
 use App\Services\ContentModerationService;
@@ -110,7 +113,7 @@ class ProximityChatroomMessageController extends Controller
      *   @OA\Response(response=422, ref="#/components/responses/ModerationError")
      * )
      */
-    public function store(Request $request, int $chatroomId): JsonResponse
+    public function store(StoreProximityChatroomMessageRequest $request, int $chatroomId): JsonResponse
     {
         $chatroom = ProximityChatroom::findOrFail($chatroomId);
 
@@ -124,17 +127,10 @@ class ProximityChatroomMessageController extends Controller
             return response()->json(['message' => 'You are muted in this chatroom'], 403);
         }
 
-        $request->validate([
-            'content' => 'required|string|max:2000',
-            'message_type' => 'nullable|in:text,image,file,announcement',
-            'parent_id' => 'nullable|exists:proximity_chatroom_messages,id',
-            'is_networking' => 'boolean',
-            'is_social' => 'boolean',
-            'metadata' => 'nullable|array',
-        ]);
+        $validated = $request->validated();
 
         // Content moderation
-        $moderationResult = $this->contentModeration->moderateContent($request->content, [
+        $moderationResult = $this->contentModeration->moderateContent($validated['content'], [
             'user_id' => Auth::id(),
             'content_type' => 'proximity_chatroom_message',
             'chatroom_id' => $chatroomId,
@@ -151,16 +147,16 @@ class ProximityChatroomMessageController extends Controller
         $message = ProximityChatroomMessage::create([
             'proximity_chatroom_id' => $chatroomId,
             'user_id' => Auth::id(),
-            'parent_id' => $request->parent_id,
-            'content' => $request->content,
-            'message_type' => $request->get('message_type', 'text'),
-            'metadata' => $request->metadata ?? [],
+            'parent_id' => $validated['parent_id'] ?? null,
+            'content' => $validated['content'],
+            'message_type' => $validated['message_type'] ?? 'text',
+            'metadata' => $validated['metadata'] ?? [],
             'is_edited' => false,
             'is_deleted' => false,
             'is_pinned' => false,
-            'is_announcement' => $request->get('message_type') === 'announcement',
-            'is_networking' => $request->get('is_networking', false),
-            'is_social' => $request->get('is_social', true),
+            'is_announcement' => ($validated['message_type'] ?? 'text') === 'announcement',
+            'is_networking' => $validated['is_networking'] ?? false,
+            'is_social' => $validated['is_social'] ?? true,
             'reaction_count' => 0,
             'reply_count' => 0,
         ]);
@@ -170,8 +166,8 @@ class ProximityChatroomMessageController extends Controller
         $chatroom->increment('message_count');
 
         // If this is a reply, increment parent message reply count
-        if ($request->parent_id) {
-            ProximityChatroomMessage::where('id', $request->parent_id)->increment('reply_count');
+        if (isset($validated['parent_id'])) {
+            ProximityChatroomMessage::where('id', $validated['parent_id'])->increment('reply_count');
         }
 
         // Load relationships
@@ -238,7 +234,7 @@ class ProximityChatroomMessageController extends Controller
      *   @OA\Response(response=422, ref="#/components/responses/ModerationError")
      * )
      */
-    public function update(Request $request, int $chatroomId, int $messageId): JsonResponse
+    public function update(UpdateProximityChatroomMessageRequest $request, int $chatroomId, int $messageId): JsonResponse
     {
         $chatroom = ProximityChatroom::findOrFail($chatroomId);
 
@@ -253,14 +249,10 @@ class ProximityChatroomMessageController extends Controller
             return response()->json(['message' => 'You can only edit your own messages'], 403);
         }
 
-        $request->validate([
-            'content' => 'required|string|max:2000',
-            'is_networking' => 'boolean',
-            'is_social' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         // Content moderation
-        $moderationResult = $this->contentModeration->moderateContent($request->content, [
+        $moderationResult = $this->contentModeration->moderateContent($validated['content'], [
             'user_id' => Auth::id(),
             'content_type' => 'proximity_chatroom_message_edit',
             'chatroom_id' => $chatroomId,
@@ -274,15 +266,15 @@ class ProximityChatroomMessageController extends Controller
             ], 422);
         }
 
-        $message->edit($request->content);
+        $message->edit($validated['content']);
         
         // Update networking/social flags
-        if ($request->has('is_networking')) {
-            $message->update(['is_networking' => $request->is_networking]);
+        if (isset($validated['is_networking'])) {
+            $message->update(['is_networking' => $validated['is_networking']]);
         }
         
-        if ($request->has('is_social')) {
-            $message->update(['is_social' => $request->is_social]);
+        if (isset($validated['is_social'])) {
+            $message->update(['is_social' => $validated['is_social']]);
         }
 
         Log::info('Proximity chatroom message edited', [
@@ -350,7 +342,7 @@ class ProximityChatroomMessageController extends Controller
     *   @OA\Response(response=200, description="Added", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse"))
      * )
      */
-    public function addReaction(Request $request, int $chatroomId, int $messageId): JsonResponse
+    public function addReaction(MessageReactionRequest $request, int $chatroomId, int $messageId): JsonResponse
     {
         $chatroom = ProximityChatroom::findOrFail($chatroomId);
 
@@ -359,12 +351,9 @@ class ProximityChatroomMessageController extends Controller
         }
 
         $message = $chatroom->messages()->findOrFail($messageId);
+        $validated = $request->validated();
 
-        $request->validate([
-            'emoji' => 'required|string|max:10',
-        ]);
-
-        $message->addReaction(Auth::user(), $request->emoji);
+        $message->addReaction(Auth::user(), $validated['emoji']);
 
         return response()->json(['message' => 'Reaction added successfully']);
     }
@@ -386,7 +375,7 @@ class ProximityChatroomMessageController extends Controller
     *   @OA\Response(response=200, description="Removed", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse"))
      * )
      */
-    public function removeReaction(Request $request, int $chatroomId, int $messageId): JsonResponse
+    public function removeReaction(MessageReactionRequest $request, int $chatroomId, int $messageId): JsonResponse
     {
         $chatroom = ProximityChatroom::findOrFail($chatroomId);
 
@@ -395,12 +384,9 @@ class ProximityChatroomMessageController extends Controller
         }
 
         $message = $chatroom->messages()->findOrFail($messageId);
+        $validated = $request->validated();
 
-        $request->validate([
-            'emoji' => 'required|string|max:10',
-        ]);
-
-        $message->removeReaction(Auth::user(), $request->emoji);
+        $message->removeReaction(Auth::user(), $validated['emoji']);
 
         return response()->json(['message' => 'Reaction removed successfully']);
     }

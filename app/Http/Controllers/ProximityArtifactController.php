@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LocalPulseRequest;
+use App\Http\Requests\ProximityFeedRequest;
+use App\Http\Requests\StoreProximityArtifactRequest;
 use App\Models\ProximityArtifact;
 use App\Services\MercurePublisher;
 use App\Services\ProximityArtifactService;
 use App\Services\ShadowThrottleService;
 use App\Services\GeoSpoofDetectionService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
 class ProximityArtifactController extends Controller
@@ -38,20 +40,15 @@ class ProximityArtifactController extends Controller
     *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
-    public function index(Request $request): JsonResponse
+    public function index(ProximityFeedRequest $request): JsonResponse
     {
         $user = auth()->user();
-        $request->validate([
-            'lat' => 'required|numeric',
-            'lng' => 'required|numeric',
-            'radius' => 'nullable|integer|min:100|max:10000',
-            'type' => 'nullable|in:chat,board_post,announce',
-        ]);
+        $validated = $request->validated();
 
-        $lat = (float)$request->lat;
-        $lng = (float)$request->lng;
-        $radius = (int)($request->radius ?? 1000);
-        $type = $request->type ?? 'all';
+        $lat = (float)$validated['lat'];
+        $lng = (float)$validated['lng'];
+        $radius = (int)($validated['radius'] ?? 1000);
+        $type = $validated['type'] ?? 'all';
 
         // Round coordinates to ~110m precision for caching grid
         $gridLat = round($lat, 3);
@@ -59,10 +56,10 @@ class ProximityArtifactController extends Controller
         
         $cacheKey = "proximity:feed:lat:{$gridLat}:lng:{$gridLng}:radius:{$radius}:type:{$type}";
 
-        $artifacts = Cache::remember($cacheKey, 60, function () use ($lat, $lng, $radius, $request) {
+        $artifacts = Cache::remember($cacheKey, 60, function () use ($lat, $lng, $radius, $validated) {
             $q = ProximityArtifact::query()->active()->withinBox($lat, $lng, $radius);
-            if ($request->filled('type')) {
-                $q->type($request->type);
+            if (isset($validated['type'])) {
+                $q->type($validated['type']);
             }
 
             return $q->orderByDesc('created_at')->limit(100)->get()
@@ -106,31 +103,25 @@ class ProximityArtifactController extends Controller
     *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
-    public function store(Request $request, ProximityArtifactService $service): JsonResponse
+    public function store(StoreProximityArtifactRequest $request, ProximityArtifactService $service): JsonResponse
     {
         $user = auth()->user();
-        $request->validate([
-            'type' => 'required|in:chat,board_post,announce',
-            'content' => 'required|string',
-            'lat' => 'required|numeric',
-            'lng' => 'required|numeric',
-            'radius' => 'nullable|integer|min:100|max:10000',
-        ]);
+        $validated = $request->validated();
 
         // Detect potential geo-spoofing
         $ipAddress = $request->ip();
-        $lat = (float)$request->lat;
-        $lng = (float)$request->lng;
+        $lat = (float)$validated['lat'];
+        $lng = (float)$validated['lng'];
         
         $this->geoSpoofService->detectSpoof($user->id, $lat, $lng, $ipAddress);
 
         try {
             $artifact = $service->createArtifact($user, [
-                'type' => $request->type,
-                'content' => $request->content,
+                'type' => $validated['type'],
+                'content' => $validated['content'],
                 'location_lat' => $lat,
                 'location_lng' => $lng,
-                'visibility_radius_m' => (int)($request->radius ?? 1000),
+                'visibility_radius_m' => (int)($validated['radius'] ?? 1000),
             ]);
         } catch (\Throwable $e) {
             return response()->json(['error' => $e->getMessage()], 422);
@@ -304,10 +295,10 @@ class ProximityArtifactController extends Controller
     *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      * 
-     * @param Request $request
+     * @param LocalPulseRequest $request
      * @return JsonResponse
      */
-    public function localPulse(Request $request): JsonResponse
+    public function localPulse(LocalPulseRequest $request): JsonResponse
     {
         $user = auth()->user();
         $profile = $user->profile;
@@ -316,15 +307,11 @@ class ProximityArtifactController extends Controller
             return response()->json(['error' => 'Profile required'], 422);
         }
 
-        $request->validate([
-            'lat' => 'required|numeric',
-            'lng' => 'required|numeric',
-            'radius' => 'nullable|integer|min:100|max:10000',
-        ]);
+        $validated = $request->validated();
 
-        $lat = (float)$request->lat;
-        $lng = (float)$request->lng;
-        $radius = (int)($request->radius ?? 1000);
+        $lat = (float)$validated['lat'];
+        $lng = (float)$validated['lng'];
+        $radius = (int)($validated['radius'] ?? 1000);
 
         // Round coordinates to ~110m precision for caching grid
         $gridLat = round($lat, 3);

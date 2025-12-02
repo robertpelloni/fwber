@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\FindNearbyChatroomsRequest;
+use App\Http\Requests\JoinProximityChatroomRequest;
+use App\Http\Requests\NearbyNetworkingRequest;
+use App\Http\Requests\StoreProximityChatroomRequest;
+use App\Http\Requests\UpdateChatroomLocationRequest;
 use App\Models\ProximityChatroom;
 use App\Models\User;
 use App\Services\ContentModerationService;
@@ -37,23 +42,16 @@ class ProximityChatroomController extends Controller
      *   @OA\Response(response=200, description="Nearby rooms")
      * )
      */
-    public function findNearby(Request $request): JsonResponse
+    public function findNearby(FindNearbyChatroomsRequest $request): JsonResponse
     {
-        $request->validate([
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
-            'radius_meters' => 'nullable|integer|min:50|max:5000',
-            'type' => 'nullable|in:conference,event,venue,area,temporary',
-            'venue_type' => 'nullable|string|max:50',
-            'tags' => 'nullable|array',
-        ]);
+        $validated = $request->validated();
 
-        $latitude = $request->latitude;
-        $longitude = $request->longitude;
-        $radiusMeters = $request->get('radius_meters', 1000);
-        $type = $request->get('type');
-        $venueType = $request->get('venue_type');
-        $tags = $request->get('tags', []);
+        $latitude = $validated['latitude'];
+        $longitude = $validated['longitude'];
+        $radiusMeters = $validated['radius_meters'] ?? 1000;
+        $type = $validated['type'] ?? null;
+        $venueType = $validated['venue_type'] ?? null;
+        $tags = $validated['tags'] ?? [];
 
         $query = ProximityChatroom::active()->public()
             ->withinRadius($latitude, $longitude, $radiusMeters);
@@ -128,66 +126,46 @@ class ProximityChatroomController extends Controller
      *   @OA\Response(response=201, description="Created")
      * )
      */
-    public function create(Request $request): JsonResponse
+    public function create(StoreProximityChatroomRequest $request): JsonResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:100',
-            'description' => 'nullable|string|max:500',
-            'type' => 'required|in:conference,event,venue,area,temporary',
-            'venue_name' => 'nullable|string|max:100',
-            'venue_type' => 'nullable|string|max:50',
-            'event_name' => 'nullable|string|max:100',
-            'event_date' => 'nullable|date',
-            'event_start_time' => 'nullable|date_format:H:i',
-            'event_end_time' => 'nullable|date_format:H:i',
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
-            'radius_meters' => 'nullable|integer|min:50|max:1000',
-            'city' => 'nullable|string|max:100',
-            'neighborhood' => 'nullable|string|max:100',
-            'address' => 'nullable|string|max:200',
-            'tags' => 'nullable|array',
-            'max_members' => 'nullable|integer|min:2|max:1000',
-            'requires_approval' => 'boolean',
-            'expires_at' => 'nullable|date|after:now',
-        ]);
+        $validated = $request->validated();
 
         // Generate geohash for efficient proximity queries
-        $geohash = $this->generateGeohash($request->latitude, $request->longitude);
+        $geohash = $this->generateGeohash($validated['latitude'], $validated['longitude']);
 
         $chatroom = ProximityChatroom::create([
-            'name' => $request->name,
-            'description' => $request->description,
-            'type' => $request->type,
-            'venue_name' => $request->venue_name,
-            'venue_type' => $request->venue_type,
-            'event_name' => $request->event_name,
-            'event_date' => $request->event_date,
-            'event_start_time' => $request->event_start_time,
-            'event_end_time' => $request->event_end_time,
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
-            'radius_meters' => $request->get('radius_meters', 100),
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'type' => $validated['type'],
+            'venue_name' => $validated['venue_name'] ?? null,
+            'venue_type' => $validated['venue_type'] ?? null,
+            'event_name' => $validated['event_name'] ?? null,
+            'event_date' => $validated['event_date'] ?? null,
+            'event_start_time' => $validated['event_start_time'] ?? null,
+            'event_end_time' => $validated['event_end_time'] ?? null,
+            'latitude' => $validated['latitude'],
+            'longitude' => $validated['longitude'],
+            'radius_meters' => $validated['radius_meters'] ?? 100,
             'geohash' => $geohash,
-            'city' => $request->city,
-            'neighborhood' => $request->neighborhood,
-            'address' => $request->address,
-            'tags' => $request->tags ?? [],
+            'city' => $validated['city'] ?? null,
+            'neighborhood' => $validated['neighborhood'] ?? null,
+            'address' => $validated['address'] ?? null,
+            'tags' => $validated['tags'] ?? [],
             'created_by' => Auth::id(),
             'is_active' => true,
             'is_public' => true,
-            'requires_approval' => $request->get('requires_approval', false),
-            'max_members' => $request->max_members,
+            'requires_approval' => $validated['requires_approval'] ?? false,
+            'max_members' => $validated['max_members'] ?? null,
             'current_members' => 1,
             'message_count' => 0,
             'last_activity_at' => now(),
-            'expires_at' => $request->expires_at,
+            'expires_at' => $validated['expires_at'] ?? null,
         ]);
 
         // Add creator as admin member
         $chatroom->addMember(Auth::user(), [
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
+            'latitude' => $validated['latitude'],
+            'longitude' => $validated['longitude'],
             'distance_meters' => 0,
         ]);
 
@@ -195,7 +173,7 @@ class ProximityChatroomController extends Controller
             'chatroom_id' => $chatroom->id,
             'created_by' => Auth::id(),
             'type' => $chatroom->type,
-            'location' => "{$request->latitude}, {$request->longitude}",
+            'location' => "{$validated['latitude']}, {$validated['longitude']}",
         ]);
 
         return response()->json($chatroom->load('creator'), 201);
@@ -255,21 +233,13 @@ class ProximityChatroomController extends Controller
      *   @OA\Response(response=400, description="Already member")
      * )
      */
-    public function join(Request $request, int $id): JsonResponse
+    public function join(JoinProximityChatroomRequest $request, int $id): JsonResponse
     {
-        $request->validate([
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
-            'is_networking' => 'boolean',
-            'is_social' => 'boolean',
-            'professional_info' => 'nullable|array',
-            'interests' => 'nullable|array',
-        ]);
-
+        $validated = $request->validated();
         $chatroom = ProximityChatroom::findOrFail($id);
 
         // Check if user is within proximity
-        if (!$chatroom->isWithinProximity($request->latitude, $request->longitude)) {
+        if (!$chatroom->isWithinProximity($validated['latitude'], $validated['longitude'])) {
             return response()->json([
                 'message' => 'You are not within the proximity of this chatroom',
                 'required_radius' => $chatroom->radius_meters,
@@ -293,19 +263,19 @@ class ProximityChatroomController extends Controller
 
         // Add user as member with location and preferences
         $chatroom->addMember(Auth::user(), [
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
-            'distance_meters' => $chatroom->calculateDistance($request->latitude, $request->longitude),
-            'is_networking' => $request->get('is_networking', false),
-            'is_social' => $request->get('is_social', true),
-            'professional_info' => $request->professional_info ?? [],
-            'interests' => $request->interests ?? [],
+            'latitude' => $validated['latitude'],
+            'longitude' => $validated['longitude'],
+            'distance_meters' => $chatroom->calculateDistance($validated['latitude'], $validated['longitude']),
+            'is_networking' => $validated['is_networking'] ?? false,
+            'is_social' => $validated['is_social'] ?? true,
+            'professional_info' => $validated['professional_info'] ?? [],
+            'interests' => $validated['interests'] ?? [],
         ]);
 
         Log::info('User joined proximity chatroom', [
             'chatroom_id' => $chatroom->id,
             'user_id' => Auth::id(),
-            'location' => "{$request->latitude}, {$request->longitude}",
+            'location' => "{$validated['latitude']}, {$validated['longitude']}",
         ]);
 
         return response()->json(['message' => 'Successfully joined proximity chatroom']);
@@ -360,13 +330,9 @@ class ProximityChatroomController extends Controller
     *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
-    public function updateLocation(Request $request, int $id): JsonResponse
+    public function updateLocation(UpdateChatroomLocationRequest $request, int $id): JsonResponse
     {
-        $request->validate([
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
-        ]);
-
+        $validated = $request->validated();
         $chatroom = ProximityChatroom::findOrFail($id);
 
         if (!$chatroom->hasMember(Auth::user())) {
@@ -374,7 +340,7 @@ class ProximityChatroomController extends Controller
         }
 
         // Check if still within proximity
-        if (!$chatroom->isWithinProximity($request->latitude, $request->longitude)) {
+        if (!$chatroom->isWithinProximity($validated['latitude'], $validated['longitude'])) {
             return response()->json([
                 'message' => 'You are no longer within the proximity of this chatroom',
                 'required_radius' => $chatroom->radius_meters,
@@ -383,8 +349,8 @@ class ProximityChatroomController extends Controller
 
         $chatroom->updateMemberLocation(
             Auth::user(),
-            $request->latitude,
-            $request->longitude
+            $validated['latitude'],
+            $validated['longitude']
         );
 
         return response()->json(['message' => 'Location updated successfully']);
@@ -445,23 +411,18 @@ class ProximityChatroomController extends Controller
      *   @OA\Response(response=200, description="Members within radius")
      * )
      */
-    public function nearbyNetworking(Request $request, int $id): JsonResponse
+    public function nearbyNetworking(NearbyNetworkingRequest $request, int $id): JsonResponse
     {
-        $request->validate([
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
-            'radius_meters' => 'nullable|integer|min:50|max:1000',
-        ]);
-
+        $validated = $request->validated();
         $chatroom = ProximityChatroom::findOrFail($id);
 
         if (!$chatroom->hasMember(Auth::user())) {
             return response()->json(['message' => 'You are not a member of this chatroom'], 403);
         }
 
-        $radiusMeters = $request->get('radius_meters', 100);
-        $latitude = $request->latitude;
-        $longitude = $request->longitude;
+        $radiusMeters = $validated['radius_meters'] ?? 100;
+        $latitude = $validated['latitude'];
+        $longitude = $validated['longitude'];
 
         $members = $chatroom->networkingMembers()
             ->wherePivot('is_visible', true)
