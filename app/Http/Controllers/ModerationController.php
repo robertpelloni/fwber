@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ReviewFlagRequest;
+use App\Http\Requests\ReviewSpoofRequest;
 use App\Models\ModerationAction;
 use App\Models\ShadowThrottle;
 use App\Models\GeoSpoofDetection;
@@ -114,19 +116,13 @@ class ModerationController extends Controller
     *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
-    public function reviewFlag(Request $request, int $artifactId)
+    public function reviewFlag(ReviewFlagRequest $request, int $artifactId)
     {
         if (!$request->user()->is_moderator) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $validated = $request->validate([
-            // Align with test suite expectations
-            'action' => 'required|in:dismiss,remove,throttle_user,ban_user',
-            'reason' => 'required|string|max:500',
-            'throttle_severity' => 'nullable|integer|min:1|max:5',
-            'throttle_duration_hours' => 'nullable|integer|min:1',
-        ]);
+        $validated = $request->validated();
 
         $artifact = ProximityArtifact::findOrFail($artifactId);
 
@@ -261,17 +257,13 @@ class ModerationController extends Controller
     *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
-    public function reviewSpoof(Request $request, int $detectionId)
+    public function reviewSpoof(ReviewSpoofRequest $request, int $detectionId)
     {
         if (!$request->user()->is_moderator) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $validated = $request->validate([
-            'action' => 'required|in:confirm,dismiss',
-            'reason' => 'required|string|max:500',
-            'apply_throttle' => 'nullable|boolean',
-        ]);
+        $validated = $request->validated();
 
         $detection = GeoSpoofDetection::findOrFail($detectionId);
 

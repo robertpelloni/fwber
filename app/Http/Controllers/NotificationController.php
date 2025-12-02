@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SubscribePushRequest;
+use App\Http\Requests\UnsubscribePushRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,17 +13,11 @@ class NotificationController extends Controller
     /**
      * Subscribe the user to push notifications.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\SubscribePushRequest  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function subscribe(Request $request): JsonResponse
+    public function subscribe(SubscribePushRequest $request): JsonResponse
     {
-        $request->validate([
-            'endpoint' => 'required|string',
-            'keys.auth' => 'required|string',
-            'keys.p256dh' => 'required|string',
-        ]);
-
         $endpoint = $request->endpoint;
         $token = $request->keys['auth'];
         $key = $request->keys['p256dh'];
@@ -35,15 +31,11 @@ class NotificationController extends Controller
     /**
      * Unsubscribe the user from push notifications.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\UnsubscribePushRequest  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function unsubscribe(Request $request): JsonResponse
+    public function unsubscribe(UnsubscribePushRequest $request): JsonResponse
     {
-        $request->validate([
-            'endpoint' => 'required|string',
-        ]);
-
         $user = Auth::user();
         $user->deletePushSubscription($request->endpoint);
 

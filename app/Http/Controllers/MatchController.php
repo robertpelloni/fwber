@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\MatchActionRequest;
+use App\Http\Requests\MatchFilterRequest;
 use App\Http\Resources\MatchResource;
 use App\Models\User;
 use App\Models\UserProfile;
@@ -112,7 +114,7 @@ class MatchController extends Controller
      *     )
      * )
      */
-    public function index(Request $request): JsonResponse
+    public function index(MatchFilterRequest $request): JsonResponse
     {
         $user = auth()->user();
         $profile = $user->profile;
@@ -122,17 +124,6 @@ class MatchController extends Controller
                 'message' => 'Profile not found. Please complete your profile first.',
             ], 400);
         }
-
-        // Validate filter parameters
-        $request->validate([
-            'age_min' => 'nullable|integer|min:18|max:100',
-            'age_max' => 'nullable|integer|min:18|max:100',
-            'max_distance' => 'nullable|integer|min:1|max:500',
-            'smoking' => 'nullable|string|in:non-smoker,occasional,regular,social,trying-to-quit',
-            'drinking' => 'nullable|string|in:non-drinker,occasional,regular,social,sober',
-            'body_type' => 'nullable|string|in:slim,athletic,average,curvy,plus-size,muscular',
-            'height_min' => 'nullable|integer|min:120|max:250',
-        ]);
 
         // Cache feed for 5 minutes per user with filter params
         $cacheKey = "feed:user_{$user->id}:" . md5($request->getQueryString() ?? '');
@@ -281,13 +272,8 @@ class MatchController extends Controller
      *     )
      * )
      */
-    public function action(Request $request): JsonResponse
+    public function action(MatchActionRequest $request): JsonResponse
     {
-        $request->validate([
-            'action' => 'required|in:like,pass,super_like',
-            'target_user_id' => 'required|integer|exists:users,id',
-        ]);
-
         $user = auth()->user();
         $targetUserId = $request->target_user_id;
         $action = $request->action;
