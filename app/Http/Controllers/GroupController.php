@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreGroupRequest;
 use App\Models\Group;
 use App\Models\GroupMember;
 use Illuminate\Http\Request;
@@ -63,14 +64,9 @@ class GroupController extends Controller
      *     @OA\Response(response=422, description="Validation error")
      * )
      */
-    public function store(Request $request)
+    public function store(StoreGroupRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'icon' => 'nullable|string',
-            'privacy' => 'required|in:public,private',
-        ]);
+        $validated = $request->validated();
 
         $group = Group::create([
             'name' => $validated['name'],

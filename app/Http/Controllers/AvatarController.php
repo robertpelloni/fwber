@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\GenerateAvatarRequest;
 use App\Services\AvatarGenerationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,13 +16,8 @@ class AvatarController extends Controller
         $this->avatarService = $avatarService;
     }
 
-    public function generate(Request $request)
+    public function generate(GenerateAvatarRequest $request)
     {
-        $request->validate([
-            'style' => 'nullable|string|max:100',
-            'provider' => 'nullable|string|in:dalle,gemini,replicate',
-        ]);
-
         $user = Auth::user();
         
         try {

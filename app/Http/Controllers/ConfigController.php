@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateFeaturesRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -92,13 +93,8 @@ class ConfigController extends Controller
      *     @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
-    public function updateFeatures(Request $request): JsonResponse
+    public function updateFeatures(UpdateFeaturesRequest $request): JsonResponse
     {
-        $request->validate([
-            'features' => 'required|array',
-            'features.*' => 'boolean',
-        ]);
-
         $validFlags = array_keys(config('features', []));
         $requestedFlags = $request->input('features', []);
         $updated = [];
