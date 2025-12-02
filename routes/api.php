@@ -46,6 +46,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('auth/logout', [\App\Http\Controllers\AuthController::class, 'logout']);
     Route::get('auth/me', [\App\Http\Controllers\AuthController::class, 'me']);
 
+    // Analytics
+    Route::get('analytics', [\App\Http\Controllers\AnalyticsController::class, 'index']);
+    Route::get('analytics/realtime', [\App\Http\Controllers\AnalyticsController::class, 'realtime']);
+    Route::get('analytics/moderation', [\App\Http\Controllers\AnalyticsController::class, 'moderation']);
+    Route::get('analytics/slow-requests', [\App\Http\Controllers\AnalyticsController::class, 'slowRequests']);
+
     // Notifications
     Route::post('notifications/subscribe', [\App\Http\Controllers\NotificationController::class, 'subscribe']);
     Route::post('notifications/unsubscribe', [\App\Http\Controllers\NotificationController::class, 'unsubscribe']);

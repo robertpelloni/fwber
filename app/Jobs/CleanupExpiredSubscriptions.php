@@ -33,18 +33,11 @@ class CleanupExpiredSubscriptions implements ShouldQueue
     public $timeout = 120;
 
     /**
-     * The name of the queue the job should be sent to.
-     *
-     * @var string|null
-     */
-    public $queue = 'default';
-
-    /**
      * Create a new job instance.
      */
     public function __construct()
     {
-        //
+        $this->queue = 'default';
     }
 
     /**

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\User;
 use App\Models\BulletinBoard;
 use App\Models\BulletinMessage;
+use App\Models\SlowRequest;
 use App\Services\ContentModerationService;
 
 class AnalyticsController extends Controller
@@ -149,14 +150,38 @@ class AnalyticsController extends Controller
      */
     private function getPerformanceAnalytics(): array
     {
-        // These would typically come from monitoring systems
-        // For now, we'll simulate realistic values
+        // Get real data from SlowRequest model
+        $avgResponseTime = SlowRequest::where('created_at', '>=', now()->subDay())->avg('duration_ms') ?? 0;
+        $slowRequestCount = SlowRequest::where('created_at', '>=', now()->subDay())->count();
+        
         return [
-            'api_response_time' => rand(50, 200),
-            'sse_connections' => rand(100, 500),
-            'cache_hit_rate' => rand(85, 95),
-            'error_rate' => rand(0, 2),
+            'api_response_time' => round($avgResponseTime, 2), // Average of slow requests (biased, but useful)
+            'slow_requests_24h' => $slowRequestCount,
+            'sse_connections' => rand(100, 500), // Still simulated
+            'cache_hit_rate' => rand(85, 95), // Still simulated
+            'error_rate' => rand(0, 2), // Still simulated
         ];
+    }
+
+    /**
+     * Get slow requests list
+     *
+     * @OA\Get(
+     *   path="/analytics/slow-requests",
+     *   tags={"Analytics"},
+     *   summary="List slow requests",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="List of slow requests")
+     * )
+     */
+    public function slowRequests(): JsonResponse
+    {
+        $requests = SlowRequest::with('user:id,name')
+            ->orderBy('created_at', 'desc')
+            ->limit(100)
+            ->get();
+
+        return response()->json($requests);
     }
 
     /**
