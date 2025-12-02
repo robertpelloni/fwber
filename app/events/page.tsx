@@ -5,6 +5,7 @@ import { useNearbyEvents } from '@/lib/hooks/use-events';
 import { EventCard } from '@/components/EventCard';
 import Link from 'next/link';
 import { Plus, MapPin } from 'lucide-react';
+import EventInvitationsList from '@/components/events/EventInvitationsList';
 
 export default function EventsPage() {
   const [location, setLocation] = useState<{ latitude: number | null; longitude: number | null; error: string | null }>({
@@ -41,6 +42,8 @@ export default function EventsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <EventInvitationsList />
+      
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center space-x-2">
             <h1 className="text-2xl font-bold">Nearby Events</h1>

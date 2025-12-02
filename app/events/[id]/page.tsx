@@ -1,14 +1,16 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useEvent, useRsvpEvent } from '@/lib/hooks/use-events';
 import { useParams } from 'next/navigation';
-import { Calendar, MapPin, Users, DollarSign } from 'lucide-react';
+import { Calendar, MapPin, Users, DollarSign, UserPlus } from 'lucide-react';
+import InviteUserModal from '@/components/events/InviteUserModal';
 
 export default function EventDetailPage() {
   const { id } = useParams();
   const { data: event, isLoading } = useEvent(id as string);
   const rsvp = useRsvpEvent();
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   if (isLoading) return <div className="p-8">Loading...</div>;
   if (!event) return <div className="p-8">Event not found</div>;
@@ -23,11 +25,20 @@ export default function EventDetailPage() {
         <div className="p-6">
           <div className="flex justify-between items-start mb-4">
             <h1 className="text-3xl font-bold">{event.title}</h1>
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-              event.status === 'upcoming' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-            }`}>
-              {event.status.toUpperCase()}
-            </span>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setIsInviteModalOpen(true)}
+                className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium flex items-center gap-1 hover:bg-blue-200"
+              >
+                <UserPlus className="w-4 h-4" />
+                Invite
+              </button>
+              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                event.status === 'upcoming' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+              }`}>
+                {event.status.toUpperCase()}
+              </span>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -86,6 +97,12 @@ export default function EventDetailPage() {
           </div>
         </div>
       </div>
+      
+      <InviteUserModal
+        eventId={event.id}
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+      />
     </div>
   );
 }
