@@ -42,7 +42,10 @@ class VenueController extends Controller
                 '(6371000 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance',
                 [$lat, $lng, $lat]
             )
-            ->having('distance', '<=', $radius)
+            ->whereRaw(
+                '(6371000 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) <= ?',
+                [$lat, $lng, $lat, $radius]
+            )
             ->orderBy('distance')
             ->where('is_active', true)
             ->limit(20)

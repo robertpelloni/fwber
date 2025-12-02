@@ -67,4 +67,9 @@ class Venue extends Authenticatable
         'longitude' => 'decimal:8',
         'commission_rate' => 'decimal:2',
     ];
+
+    public function checkins()
+    {
+        return $this->hasMany(VenueCheckin::class);
+    }
 }
