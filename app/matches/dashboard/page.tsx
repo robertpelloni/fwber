@@ -34,7 +34,7 @@ export default function MatchesDashboardPage() {
     try {
       setIsLoading(true)
       setError(null)
-      const matchesData = await getMutualMatches(token)
+      const matchesData = await getMutualMatches()
       
       // Simulate tier data - in real app, fetch from backend
       const matchesWithTierData: MatchWithTierData[] = matchesData.map((match, index) => ({

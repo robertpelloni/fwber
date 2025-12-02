@@ -91,6 +91,7 @@ export default function ChatroomPage() {
          });
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isProximity, chatroomId, location?.latitude, location?.longitude]); // specific deps to avoid loops
   
   // Get member IDs for presence tracking
