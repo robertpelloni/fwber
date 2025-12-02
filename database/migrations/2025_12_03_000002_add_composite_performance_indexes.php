@@ -19,7 +19,6 @@ return new class extends Migration
         Schema::table('user_profiles', function (Blueprint $table) {
             // Common filter combinations for matching algorithm
             $table->index(['gender', 'latitude', 'longitude'], 'profiles_match_filter_index');
-            $table->index(['gender', 'age'], 'profiles_gender_age_index');
         });
 
         Schema::table('messages', function (Blueprint $table) {
@@ -64,7 +63,6 @@ return new class extends Migration
 
         Schema::table('user_profiles', function (Blueprint $table) {
             $table->dropIndex('profiles_match_filter_index');
-            $table->dropIndex('profiles_gender_age_index');
         });
 
         Schema::table('messages', function (Blueprint $table) {

@@ -346,7 +346,7 @@ class ChatroomMessageController extends Controller
     *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
-    public function addReaction(Request $request, int $chatroomId, int $messageId): JsonResponse
+    public function addReaction(ReactToChatroomMessageRequest $request, int $chatroomId, int $messageId): JsonResponse
     {
         $chatroom = Chatroom::findOrFail($chatroomId);
 
@@ -383,7 +383,7 @@ class ChatroomMessageController extends Controller
     *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
-    public function removeReaction(Request $request, int $chatroomId, int $messageId): JsonResponse
+    public function removeReaction(ReactToChatroomMessageRequest $request, int $chatroomId, int $messageId): JsonResponse
     {
         $chatroom = Chatroom::findOrFail($chatroomId);
 
@@ -393,9 +393,7 @@ class ChatroomMessageController extends Controller
 
         $message = $chatroom->messages()->findOrFail($messageId);
 
-        $request->validate([
-            'emoji' => 'required|string|max:10',
-        ]);
+        // Validation handled by ReactToChatroomMessageRequest
 
         $message->removeReaction(Auth::user(), $request->emoji);
 
