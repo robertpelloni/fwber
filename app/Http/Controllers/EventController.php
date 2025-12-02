@@ -10,6 +10,53 @@ use Illuminate\Support\Facades\DB;
 
 class EventController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/api/events",
+     *     summary="List nearby events",
+     *     tags={"Events"},
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="latitude",
+     *         in="query",
+     *         description="User's latitude for geospatial search",
+     *         required=false,
+     *         @OA\Schema(type="number", format="float")
+     *     ),
+     *     @OA\Parameter(
+     *         name="longitude",
+     *         in="query",
+     *         description="User's longitude for geospatial search",
+     *         required=false,
+     *         @OA\Schema(type="number", format="float")
+     *     ),
+     *     @OA\Parameter(
+     *         name="radius",
+     *         in="query",
+     *         description="Search radius in kilometers (default: 10)",
+     *         required=false,
+     *         @OA\Schema(type="number", format="float", default=10)
+     *     ),
+     *     @OA\Parameter(
+     *         name="status",
+     *         in="query",
+     *         description="Filter by event status",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"upcoming", "ongoing", "completed", "cancelled"})
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of events with attendee counts",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Event")),
+     *             @OA\Property(property="current_page", type="integer"),
+     *             @OA\Property(property="per_page", type="integer"),
+     *             @OA\Property(property="total", type="integer")
+     *         )
+     *     )
+     * )
+     */
     public function index(Request $request)
     {
         $query = Event::query();
@@ -52,6 +99,35 @@ class EventController extends Controller
         return response()->json($events);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/events",
+     *     summary="Create a new event",
+     *     tags={"Events"},
+     *     security={{"sanctum":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"title", "description", "location_name", "latitude", "longitude", "starts_at", "ends_at"},
+     *             @OA\Property(property="title", type="string", maxLength=255),
+     *             @OA\Property(property="description", type="string"),
+     *             @OA\Property(property="location_name", type="string"),
+     *             @OA\Property(property="latitude", type="number", format="float"),
+     *             @OA\Property(property="longitude", type="number", format="float"),
+     *             @OA\Property(property="starts_at", type="string", format="date-time"),
+     *             @OA\Property(property="ends_at", type="string", format="date-time"),
+     *             @OA\Property(property="max_attendees", type="integer", nullable=true),
+     *             @OA\Property(property="price", type="number", format="float", nullable=true)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Event created successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Event")
+     *     ),
+     *     @OA\Response(response=422, description="Validation error")
+     * )
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -75,6 +151,26 @@ class EventController extends Controller
         return response()->json($event, 201);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/events/{id}",
+     *     summary="Get event details",
+     *     tags={"Events"},
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Event details with creator and attendees",
+     *         @OA\JsonContent(ref="#/components/schemas/Event")
+     *     ),
+     *     @OA\Response(response=404, description="Event not found")
+     * )
+     */
     public function show($id)
     {
         $event = Event::with(['creator', 'attendees.user'])
@@ -84,6 +180,22 @@ class EventController extends Controller
         return response()->json($event);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/events/my",
+     *     summary="Get user's created and attending events",
+     *     tags={"Events"},
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of user's events",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Event"))
+     *         )
+     *     )
+     * )
+     */
     public function myEvents(Request $request)
     {
         $user = Auth::user();
@@ -101,6 +213,37 @@ class EventController extends Controller
         return response()->json($events);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/events/{id}/rsvp",
+     *     summary="RSVP to an event",
+     *     tags={"Events"},
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"status"},
+     *             @OA\Property(property="status", type="string", enum={"attending", "maybe", "declined"})
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="RSVP updated successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="rsvp", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Event is full"),
+     *     @OA\Response(response=404, description="Event not found")
+     * )
+     */
     public function rsvp(Request $request, $id)
     {
         $request->validate([

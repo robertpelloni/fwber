@@ -9,6 +9,22 @@ use Illuminate\Support\Facades\Auth;
 
 class GroupController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/api/groups",
+     *     summary="List public and visible groups",
+     *     tags={"Groups"},
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of groups with member counts",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Group")
+     *         )
+     *     )
+     * )
+     */
     public function index()
     {
         $groups = Group::where('privacy', 'public')
@@ -18,6 +34,30 @@ class GroupController extends Controller
         return response()->json($groups);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/groups",
+     *     summary="Create a new group",
+     *     tags={"Groups"},
+     *     security={{"sanctum":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name", "privacy"},
+     *             @OA\Property(property="name", type="string", maxLength=255),
+     *             @OA\Property(property="description", type="string", nullable=true),
+     *             @OA\Property(property="icon", type="string", nullable=true),
+     *             @OA\Property(property="privacy", type="string", enum={"public", "private"})
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Group created successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Group")
+     *     ),
+     *     @OA\Response(response=422, description="Validation error")
+     * )
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -49,12 +89,56 @@ class GroupController extends Controller
         return response()->json($group, 201);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/groups/{id}",
+     *     summary="Get group details",
+     *     tags={"Groups"},
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Group details with members and posts",
+     *         @OA\JsonContent(ref="#/components/schemas/Group")
+     *     ),
+     *     @OA\Response(response=404, description="Group not found")
+     * )
+     */
     public function show($id)
     {
         $group = Group::with(['members.user', 'posts.user'])->findOrFail($id);
         return response()->json($group);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/groups/{id}/join",
+     *     summary="Join a group",
+     *     tags={"Groups"},
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Joined group successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="group", ref="#/components/schemas/Group")
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Already a member"),
+     *     @OA\Response(response=404, description="Group not found")
+     * )
+     */
     public function join($id)
     {
         $group = Group::findOrFail($id);
@@ -76,6 +160,29 @@ class GroupController extends Controller
         return response()->json(['message' => 'Joined group successfully']);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/groups/{id}/leave",
+     *     summary="Leave a group",
+     *     tags={"Groups"},
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Left group successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(response=400, description="Not a member"),
+     *     @OA\Response(response=404, description="Group not found")
+     * )
+     */
     public function leave($id)
     {
         $group = Group::findOrFail($id);
@@ -95,6 +202,22 @@ class GroupController extends Controller
         return response()->json(['message' => 'Left group successfully']);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/groups/my",
+     *     summary="Get user's joined groups",
+     *     tags={"Groups"},
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of user's groups",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Group")
+     *         )
+     *     )
+     * )
+     */
     public function myGroups()
     {
         $user = Auth::user();

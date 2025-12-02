@@ -10,7 +10,20 @@ use Illuminate\Support\Facades\Auth;
 class SubscriptionController extends Controller
 {
     /**
-     * Display a listing of the resource (Active Subscriptions).
+     * @OA\Get(
+     *     path="/api/subscriptions",
+     *     summary="Get user's subscriptions",
+     *     tags={"Subscriptions"},
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of user's subscriptions",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Subscription")
+     *         )
+     *     )
+     * )
      */
     public function index(Request $request)
     {
@@ -22,7 +35,23 @@ class SubscriptionController extends Controller
     }
 
     /**
-     * Display payment history.
+     * @OA\Get(
+     *     path="/api/subscriptions/history",
+     *     summary="Get user's payment history",
+     *     tags={"Subscriptions"},
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Paginated list of payments",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Payment")),
+     *             @OA\Property(property="current_page", type="integer"),
+     *             @OA\Property(property="per_page", type="integer"),
+     *             @OA\Property(property="total", type="integer")
+     *         )
+     *     )
+     * )
      */
     public function history(Request $request)
     {
