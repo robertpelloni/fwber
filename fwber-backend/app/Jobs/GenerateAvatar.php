@@ -15,10 +15,12 @@ class GenerateAvatar implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $profileId;
+    public string $style;
 
-    public function __construct(int $profileId)
+    public function __construct(int $profileId, string $style)
     {
         $this->profileId = $profileId;
+        $this->style = $style;
     }
 
     public function handle(): void
@@ -38,7 +40,7 @@ class GenerateAvatar implements ShouldQueue
             usleep(200000); // 200ms placeholder
 
             // For now produce a deterministic placeholder image URL
-            $hash = substr(md5(($profile->avatar_prompt ?? '') . $profile->user_id), 0, 12);
+            $hash = substr(md5(($profile->avatar_prompt ?? '') . $profile->user_id . $this->style), 0, 12);
             $profile->avatar_image_url = url("/storage/avatars/placeholder_{$hash}.png");
             $profile->avatar_status = 'ready';
             $profile->save();

@@ -113,6 +113,9 @@ class UserPhysicalProfileController extends Controller
      *   tags={"Physical Profile"},
      *   summary="Request avatar generation",
     *   security={{"bearerAuth":{}}},
+     *   @OA\RequestBody(@OA\JsonContent(
+     *     @OA\Property(property="style", type="string", enum={"realistic", "anime", "fantasy", "sci-fi", "cartoon", "pixel-art"})
+     *   )),
      *   @OA\Response(response=200, description="Requested",
      *     @OA\JsonContent(type="object",
      *       @OA\Property(property="data", type="object",
@@ -124,8 +127,12 @@ class UserPhysicalProfileController extends Controller
      *   @OA\Response(response=401, description="Unauthenticated")
      * )
      */
-    public function requestAvatar()
+    public function requestAvatar(Request $request)
     {
+        $data = $request->validate([
+            'style' => 'required|string|in:realistic,anime,fantasy,sci-fi,cartoon,pixel-art',
+        ]);
+
         $profile = UserPhysicalProfile::firstOrNew(['user_id' => Auth::id()]);
         if (!$profile->avatar_prompt) {
             return response()->json(['error' => 'Set avatar_prompt first'], 422);
@@ -133,7 +140,7 @@ class UserPhysicalProfileController extends Controller
         $profile->avatar_status = 'requested';
         $profile->save();
         // Dispatch async generation job (queue driver 'sync' will process immediately in dev)
-        GenerateAvatar::dispatch($profile->id);
+        GenerateAvatar::dispatch($profile->id, $data['style']);
         return response()->json(['data' => $profile]);
     }
 }

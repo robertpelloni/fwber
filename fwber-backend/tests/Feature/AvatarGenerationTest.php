@@ -24,7 +24,7 @@ class AvatarGenerationTest extends TestCase
             ->assertJsonStructure(['data' => ['avatar_prompt']]);
 
         $this->withHeaders($headers)
-            ->postJson('/api/physical-profile/avatar/request')
+            ->postJson('/api/physical-profile/avatar/request', ['style' => 'anime'])
             ->assertStatus(200)
             ->assertJsonStructure(['data' => ['avatar_status']]);
 
@@ -41,7 +41,7 @@ class AvatarGenerationTest extends TestCase
         $user = User::factory()->create();
         $headers = $this->apiHeaderFor($user);
         $this->withHeaders($headers)
-            ->postJson('/api/physical-profile/avatar/request')
+            ->postJson('/api/physical-profile/avatar/request', ['style' => 'anime'])
             ->assertStatus(422)
             ->assertJson(['error' => 'Set avatar_prompt first']);
     }

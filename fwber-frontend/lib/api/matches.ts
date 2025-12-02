@@ -56,8 +56,9 @@ export interface MatchActionResponse {
 /**
  * Fetch potential matches for the authenticated user
  */
-export async function getMatches(token: string): Promise<Match[]> {
-  const response = await fetch(`${API_BASE_URL}/matches`, {
+export async function getMatches(token: string, filters: any = {}): Promise<Match[]> {
+  const queryParams = new URLSearchParams(filters).toString();
+  const response = await fetch(`${API_BASE_URL}/matches?${queryParams}`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}`,
