@@ -118,31 +118,34 @@ self.addEventListener('sync', (event) => {
 self.addEventListener('push', (event) => {
   console.log('Push notification received:', event);
   
+  let data = { title: 'FWBer.me', body: 'New notification', url: '/' };
+  
+  try {
+    data = event.data ? event.data.json() : data;
+  } catch (e) {
+    data.body = event.data ? event.data.text() : data.body;
+  }
+
   const options = {
-    body: event.data ? event.data.text() : 'New message in your area!',
-    icon: '/icons/icon-192x192.png',
+    body: data.body,
+    icon: data.icon || '/icons/icon-192x192.png',
     badge: '/icons/badge-72x72.png',
     vibrate: [200, 100, 200],
     data: {
-      url: '/bulletin-boards',
+      url: data.url || '/',
       timestamp: Date.now()
     },
-    actions: [
+    actions: data.actions || [
       {
         action: 'view',
-        title: 'View Message',
+        title: 'View',
         icon: '/icons/view-24x24.png'
-      },
-      {
-        action: 'dismiss',
-        title: 'Dismiss',
-        icon: '/icons/dismiss-24x24.png'
       }
     ]
   };
   
   event.waitUntil(
-    self.registration.showNotification('FWBer.me', options)
+    self.registration.showNotification(data.title || 'FWBer.me', options)
   );
 });
 
@@ -152,9 +155,9 @@ self.addEventListener('notificationclick', (event) => {
   
   event.notification.close();
   
-  if (event.action === 'view') {
+  if (event.action === 'view' || !event.action) {
     event.waitUntil(
-      clients.openWindow(event.notification.data.url || '/bulletin-boards')
+      clients.openWindow(event.notification.data.url)
     );
   }
 });
