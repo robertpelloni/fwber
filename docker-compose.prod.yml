@@ -48,6 +48,31 @@ services:
     networks:
       - fwber_network
 
+  # Queue Worker
+  queue-worker:
+    build:
+      context: ./fwber-backend
+      dockerfile: Dockerfile.prod
+    container_name: fwber-queue-worker-prod
+    restart: unless-stopped
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=${MYSQL_DATABASE}
+      - DB_USERNAME=${MYSQL_USER}
+      - DB_PASSWORD=${MYSQL_PASSWORD}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - fwber_network
+    command: php artisan queue:work --queue=high,default,notifications --tries=3 --timeout=120
+
   # Next.js Frontend
   nextjs:
     build:

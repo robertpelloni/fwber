@@ -1,6 +1,6 @@
 # Project Status
 
-**Last Updated:** December 02, 2025 (Updated)
+**Last Updated:** December 04, 2025 (Updated)
 **Status:** 🚀 LIVE / DEPLOYED
 
 ## 🟢 Current Status: Production Deployed
@@ -9,6 +9,21 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 ### ⚠️ Known Issues / Technical Debt
 *   None at this time.
 
+### ✅ Completed Operational Improvements
+1.  **Cache Versioning & Strategy** (Dec 04 - Complete):
+    -   Implemented `CACHE_VERSION` strategy for global cache invalidation.
+    -   Updated `Group`, `Event`, and `Subscription` controllers to use versioned keys.
+    -   Documented strategy in `docs/CACHE_STRATEGY.md`.
+2.  **Redis Monitoring** (Dec 04 - Complete):
+    -   Created `cache:stats` Artisan command for real-time Redis metrics (Hit Ratio, Memory, Misses).
+    -   Integrated into operational workflow.
+3.  **Operational Documentation** (Dec 04 - Complete):
+    -   Created `docs/WEBHOOKS.md` for Stripe integration details.
+    -   Created `docs/operations/JOB_FAILURES_RUNBOOK.md` for queue troubleshooting.4.  **Queue Management** (Dec 04 - Complete):
+    -   Configured priority queues: `high`, `default`, `notifications`.
+    -   Added `queue-worker` service to `docker-compose.prod.yml`.
+    -   Assigned `SendEventReminders` to `notifications` queue.
+    -   Documented strategy in `docs/QUEUE_MANAGEMENT.md`.
 ### ✅ Completed MVP Features
 1.  **Authentication**: Secure registration, login, and session management.
 2.  **Profile Management**: Comprehensive profile editing, including "Physical Profile" attributes.

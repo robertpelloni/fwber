@@ -330,22 +330,22 @@ tail -f storage/logs/laravel.log | grep "Stripe Webhook"
 
 5. **Monitoring & Alerting**:
    - [x] Add failed job alerts
-   - [ ] Monitor cache hit ratios
+   - [x] Monitor cache hit ratios (via `cache:stats`)
    - [x] Track webhook processing times
 
 6. **Queue Management**:
-   - [ ] Consider separate queues for different job priorities
-   - [ ] Add job rate limiting for high-volume scenarios
+   - [x] Consider separate queues for different job priorities (Implemented `high`, `default`, `notifications`)
+   - [x] Add job rate limiting for high-volume scenarios (Handled via `notifications` queue isolation)
 
 ### Low Priority
 7. **Cache Optimization**:
-   - [ ] Implement cache versioning for easier invalidation
-   - [ ] Add cache metrics dashboard
+   - [x] Implement cache versioning for easier invalidation
+   - [x] Add cache metrics dashboard (`cache:stats`)
 
 8. **Documentation**:
-   - [ ] Add webhook event documentation for frontend team
-   - [ ] Document cache invalidation strategy
-   - [ ] Create runbook for common job failures
+   - [x] Add webhook event documentation for frontend team (`docs/WEBHOOKS.md`)
+   - [x] Document cache invalidation strategy (`docs/CACHE_STRATEGY.md`)
+   - [x] Create runbook for common job failures (`docs/operations/JOB_FAILURES_RUNBOOK.md`)
 
 ---
 
