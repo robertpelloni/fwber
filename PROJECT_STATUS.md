@@ -37,6 +37,8 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Routes**: Added endpoints for listing, sending, and responding to invitations.
     -   **Frontend**: Implemented `InviteUserModal` for inviting matches and `EventInvitationsList` for managing incoming invites.
     -   **Integration**: Added invitation UI to Event Details and Events Listing pages.
+    -   **Testing**: Implemented comprehensive feature tests (`EventInvitationTest.php`) covering invite, list, and respond flows.
+    -   **Notifications**: Implemented `EventInvitationReceived` notification with Database and WebPush channels.
 ### ✅ Completed MVP Features
 1.  **Authentication**: Secure registration, login, and session management.
 2.  **Profile Management**: Comprehensive profile editing, including "Physical Profile" attributes.
