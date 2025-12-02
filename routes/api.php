@@ -58,6 +58,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Events
     Route::get('events/my-events', [EventController::class, 'myEvents']);
+    Route::get('events/invitations', [\App\Http\Controllers\EventInvitationController::class, 'index']);
+    Route::post('events/{id}/invite', [\App\Http\Controllers\EventInvitationController::class, 'store']);
+    Route::post('events/invitations/{id}/respond', [\App\Http\Controllers\EventInvitationController::class, 'respond']);
     Route::apiResource('events', EventController::class);
     Route::post('events/{id}/rsvp', [EventController::class, 'rsvp']);
 
