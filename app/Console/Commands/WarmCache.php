@@ -49,7 +49,8 @@ class WarmCache extends Command
             ->withCount('members')
             ->get();
 
-        Cache::tags(['groups'])->put('groups:index:public', $groups, 600);
+        $cacheKey = config('optimization.cache_version') . ':groups:index:public';
+        Cache::tags(['groups'])->put($cacheKey, $groups, 600);
 
         $duration = round((microtime(true) - $start) * 1000, 2);
         $this->info("Groups cache warmed in {$duration}ms. Count: {$groups->count()}");
@@ -63,7 +64,7 @@ class WarmCache extends Command
 
         // Replicate EventController::index logic for default view (no geo, page 1)
         // Key generation must match controller exactly
-        $cacheKey = 'events:index:' . md5(json_encode([
+        $cacheKey = config('optimization.cache_version') . ':events:index:' . md5(json_encode([
             'lat' => null,
             'lon' => null,
             'radius' => null, // Controller uses $request->radius which is null if not present

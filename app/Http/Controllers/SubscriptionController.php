@@ -31,8 +31,9 @@ class SubscriptionController extends Controller
         $userId = Auth::id();
         
         // Cache for 5 minutes with user-specific tagged caching
+        $cacheKey = config('optimization.cache_version') . ":subscriptions:user:{$userId}";
         $subscriptions = Cache::tags(['subscriptions', "user:{$userId}"])
-            ->remember("subscriptions:user:{$userId}", 300, function () use ($userId) {
+            ->remember($cacheKey, 300, function () use ($userId) {
                 return Subscription::where('user_id', $userId)
                     ->orderBy('created_at', 'desc')
                     ->get();
@@ -66,7 +67,7 @@ class SubscriptionController extends Controller
         $page = $request->input('page', 1);
         
         // Cache for 10 minutes with user-specific and page-specific tagged caching
-        $cacheKey = "payments:history:user:{$userId}:page:{$page}";
+        $cacheKey = config('optimization.cache_version') . ":payments:history:user:{$userId}:page:{$page}";
         $payments = Cache::tags(['subscriptions', "user:{$userId}"])
             ->remember($cacheKey, 600, function () use ($userId) {
                 return Payment::where('user_id', $userId)

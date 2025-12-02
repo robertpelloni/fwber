@@ -30,7 +30,8 @@ class GroupController extends Controller
     public function index()
     {
         // Cache for 10 minutes with tagged caching
-        $groups = Cache::tags(['groups'])->remember('groups:index:public', 600, function () {
+        $cacheKey = config('optimization.cache_version') . ':groups:index:public';
+        $groups = Cache::tags(['groups'])->remember($cacheKey, 600, function () {
             return Group::where('privacy', 'public')
                 ->orWhere('visibility', 'visible')
                 ->withCount('members')

@@ -63,7 +63,7 @@ class EventController extends Controller
     public function index(Request $request)
     {
         // Generate cache key based on query parameters
-        $cacheKey = 'events:index:' . md5(json_encode([
+        $cacheKey = config('optimization.cache_version') . ':events:index:' . md5(json_encode([
             'lat' => $request->latitude,
             'lon' => $request->longitude,
             'radius' => $request->radius,
