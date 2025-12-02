@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PurchaseBoostRequest;
 use App\Models\Boost;
 use App\Models\Payment;
 use App\Services\Payment\PaymentGatewayInterface;
@@ -42,12 +43,8 @@ class BoostController extends Controller
      *     @OA\Response(response=400, description="User already has an active boost")
      * )
      */
-    public function purchaseBoost(Request $request): JsonResponse
+    public function purchaseBoost(PurchaseBoostRequest $request): JsonResponse
     {
-        $request->validate([
-            'type' => 'required|in:standard,super',
-        ]);
-
         $user = $request->user();
 
         // Check for existing active boost

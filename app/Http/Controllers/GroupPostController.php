@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreGroupPostRequest;
 use App\Models\Group;
 use App\Models\GroupPost;
 use Illuminate\Http\Request;
@@ -18,11 +19,9 @@ class GroupPostController extends Controller
         return response()->json($posts);
     }
 
-    public function store(Request $request, $groupId)
+    public function store(StoreGroupPostRequest $request, $groupId)
     {
-        $validated = $request->validate([
-            'content' => 'required|string',
-        ]);
+        $validated = $request->validated();
 
         $group = Group::findOrFail($groupId);
         

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PhotoRevealRequest;
 use App\Models\Photo;
 use App\Models\PhotoReveal;
 use App\Models\UserMatch;
@@ -11,12 +12,8 @@ use Illuminate\Support\Facades\Auth;
 
 class PhotoRevealController extends Controller
 {
-    public function reveal(Request $request, Photo $photo)
+    public function reveal(PhotoRevealRequest $request, Photo $photo)
     {
-        $request->validate([
-            'match_id' => 'required|exists:matches,id',
-        ]);
-
         $user = Auth::user();
 
         // Verify match belongs to user

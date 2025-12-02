@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreVenueCheckinRequest;
 use App\Models\Venue;
 use App\Models\VenueCheckin;
 use Illuminate\Http\Request;
@@ -12,14 +13,8 @@ class VenueCheckinController extends Controller
     /**
      * Check in to a venue.
      */
-    public function store(Request $request, $venueId)
+    public function store(StoreVenueCheckinRequest $request, $venueId)
     {
-        $request->validate([
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'message' => 'nullable|string|max:255',
-        ]);
-
         $venue = Venue::findOrFail($venueId);
         
         // Verify distance (must be within 500m)
