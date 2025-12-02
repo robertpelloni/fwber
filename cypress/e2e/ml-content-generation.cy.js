@@ -72,7 +72,8 @@ describe('ML Content Generation E2E Test', () => {
 
     // 2. Navigate to Content Generation
     cy.contains('Show all features').click();
-    cy.get('a[href="/content-generation"]').click();
+    cy.get('#legacy-cards').should('not.have.class', 'hidden');
+    cy.get('a[href="/content-generation"]').should('be.visible').click();
     cy.url().should('include', '/content-generation');
     cy.contains('AI Content Generation');
 
@@ -91,7 +92,7 @@ describe('ML Content Generation E2E Test', () => {
     cy.get('[data-testid="target-audience-input"]').type('adventure lovers');
 
     // Mock Profile Generation
-    cy.intercept('POST', '/api/content-generation/profile', {
+    cy.intercept('POST', '/api/content/generate-bio', {
       statusCode: 200,
       body: {
         success: true,
@@ -275,7 +276,7 @@ describe('ML Content Generation E2E Test', () => {
     }).as('getMessages');
 
     // Mock suggestions generation
-    cy.intercept('POST', '/api/content-generation/posts/*/suggestions', {
+    cy.intercept('POST', '/api/content/generate-posts/*', {
       statusCode: 200,
       body: {
         suggestions: [
@@ -354,7 +355,7 @@ describe('ML Content Generation E2E Test', () => {
     cy.get('[data-testid="conversation-hints"]').type('shared love for adventure');
 
     // Mock Conversation Starters
-    cy.intercept('POST', '/api/content-generation/conversation-starters', {
+    cy.intercept('POST', '/api/content/generate-starters', {
       statusCode: 200,
       body: {
         success: true,
@@ -411,7 +412,7 @@ describe('ML Content Generation E2E Test', () => {
     cy.url().should('include', '/content-generation');
 
     // Mock API failure
-    cy.intercept('POST', '/api/content-generation/profile', {
+    cy.intercept('POST', '/api/content/generate-bio', {
       statusCode: 500,
       body: { error: 'AI service temporarily unavailable' }
     }).as('profileGenerationFailure');
@@ -454,7 +455,7 @@ describe('ML Content Generation E2E Test', () => {
     cy.get('[data-testid="interest-music"]').click();
 
     // Mock with delay for first request
-    cy.intercept('POST', '/api/content-generation/profile', {
+    cy.intercept('POST', '/api/content/generate-bio', {
       delay: 1000,
       statusCode: 200,
       body: {

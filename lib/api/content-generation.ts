@@ -133,7 +133,7 @@ export interface GenerationHistory {
 export async function generateProfileContent(
   preferences: ProfileContentRequest
 ): Promise<ContentGenerationResponse> {
-  const response = await apiClient.post<ContentGenerationResponse>('/content-generation/profile', preferences);
+  const response = await apiClient.post<ContentGenerationResponse>('/content/generate-bio', preferences);
   return response.data;
 }
 
@@ -144,7 +144,7 @@ export async function generatePostSuggestions(
   boardId: number,
   request: PostSuggestionsRequest
 ): Promise<ContentGenerationResponse> {
-  const response = await apiClient.post<ContentGenerationResponse>(`/content-generation/posts/${boardId}/suggestions`, request);
+  const response = await apiClient.post<ContentGenerationResponse>(`/content/generate-posts/${boardId}`, request);
   return response.data;
 }
 
@@ -154,7 +154,7 @@ export async function generatePostSuggestions(
 export async function generateConversationStarters(
   request: ConversationStartersRequest
 ): Promise<ContentGenerationResponse> {
-  const response = await apiClient.post<ContentGenerationResponse>('/content-generation/conversation-starters', request);
+  const response = await apiClient.post<ContentGenerationResponse>('/content/generate-starters', request);
   return response.data;
 }
 

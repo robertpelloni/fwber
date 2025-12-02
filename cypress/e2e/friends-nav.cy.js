@@ -22,18 +22,21 @@ describe('Navigation', () => {
 
     cy.intercept('GET', '/api/matches*', {
       statusCode: 200,
-      body: [
-        {
-          id: 2,
-          compatibilityScore: 0.9,
-          profile: {
-            display_name: 'Match User',
-            photos: [{ url: '/placeholder.jpg' }],
-            age: 25,
-            location: { city: 'New York', state: 'NY' }
+      body: {
+        matches: [
+          {
+            id: 2,
+            compatibilityScore: 0.9,
+            profile: {
+              display_name: 'Match User',
+              photos: [{ url: '/placeholder.jpg' }],
+              age: 25,
+              location: { city: 'New York', state: 'NY' }
+            }
           }
-        }
-      ]
+        ],
+        total: 1
+      }
     }).as('getMatches');
   });
 

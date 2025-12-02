@@ -77,9 +77,9 @@ export function PostSuggester({ boardId, onSelectPost }: PostSuggesterProps) {
 
         {generatePosts.data && (
           <div className="grid grid-cols-1 gap-2 mt-2">
-            {generatePosts.data.suggestions.map((suggestion) => (
+            {(generatePosts.data.suggestions || []).map((suggestion) => (
               <div
-                key={suggestion.id}
+                key={suggestion.id || Math.random().toString()}
                 className="bg-white p-3 rounded border text-sm hover:border-blue-300 cursor-pointer transition-all shadow-sm"
                 onClick={() => onSelectPost(suggestion.content)}
                 data-testid="suggestion-item"
