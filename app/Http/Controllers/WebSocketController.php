@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use App\Services\WebSocketService;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use App\Support\LogContext;
 use OpenApi\Attributes as OA;
 
 class WebSocketController extends Controller
@@ -75,10 +76,11 @@ class WebSocketController extends Controller
             }
 
         } catch (\Exception $e) {
-            Log::error('WebSocket connection failed', [
-                'user_id' => $request->user()?->id,
-                'error' => $e->getMessage()
-            ]);
+            Log::error('WebSocket connection failed', LogContext::fromWebSocket(
+                connectionId: null,
+                eventType: 'connection_failed',
+                extra: ['error' => $e->getMessage()]
+            ));
 
             return response()->json(['error' => 'Connection failed'], 500);
         }
@@ -134,10 +136,11 @@ class WebSocketController extends Controller
             }
 
         } catch (\Exception $e) {
-            Log::error('WebSocket disconnection failed', [
-                'user_id' => $request->user()?->id,
-                'error' => $e->getMessage()
-            ]);
+            Log::error('WebSocket disconnection failed', LogContext::fromWebSocket(
+                connectionId: $request->input('connection_id'),
+                eventType: 'disconnection_failed',
+                extra: ['error' => $e->getMessage()]
+            ));
 
             return response()->json(['error' => 'Disconnection failed'], 500);
         }
@@ -205,10 +208,14 @@ class WebSocketController extends Controller
             }
 
         } catch (\Exception $e) {
-            Log::error('WebSocket message sending failed', [
-                'user_id' => $request->user()?->id,
-                'error' => $e->getMessage()
-            ]);
+            Log::error('WebSocket message sending failed', LogContext::fromWebSocket(
+                connectionId: $request->input('connection_id'),
+                eventType: 'message_failed',
+                extra: [
+                    'receiver_id' => $request->input('receiver_id'),
+                    'error' => $e->getMessage()
+                ]
+            ));
 
             return response()->json(['error' => 'Failed to send message'], 500);
         }
@@ -270,10 +277,14 @@ class WebSocketController extends Controller
             }
 
         } catch (\Exception $e) {
-            Log::error('WebSocket typing indicator failed', [
-                'user_id' => $request->user()?->id,
-                'error' => $e->getMessage()
-            ]);
+            Log::error('WebSocket typing indicator failed', LogContext::fromWebSocket(
+                connectionId: $request->input('connection_id'),
+                eventType: 'typing_indicator_failed',
+                extra: [
+                    'receiver_id' => $request->input('receiver_id'),
+                    'error' => $e->getMessage()
+                ]
+            ));
 
             return response()->json(['error' => 'Failed to send typing indicator'], 500);
         }
@@ -335,10 +346,14 @@ class WebSocketController extends Controller
             }
 
         } catch (\Exception $e) {
-            Log::error('WebSocket presence update failed', [
-                'user_id' => $request->user()?->id,
-                'error' => $e->getMessage()
-            ]);
+            Log::error('WebSocket presence update failed', LogContext::fromWebSocket(
+                connectionId: $request->input('connection_id'),
+                eventType: 'presence_update_failed',
+                extra: [
+                    'status' => $request->input('status'),
+                    'error' => $e->getMessage()
+                ]
+            ));
 
             return response()->json(['error' => 'Failed to update presence'], 500);
         }
@@ -410,10 +425,14 @@ class WebSocketController extends Controller
             }
 
         } catch (\Exception $e) {
-            Log::error('WebSocket notification failed', [
-                'user_id' => $request->user()?->id,
-                'error' => $e->getMessage()
-            ]);
+            Log::error('WebSocket notification failed', LogContext::fromWebSocket(
+                connectionId: null,
+                eventType: 'notification_failed',
+                extra: [
+                    'receiver_id' => $request->input('user_id'),
+                    'error' => $e->getMessage()
+                ]
+            ));
 
             return response()->json(['error' => 'Failed to send notification'], 500);
         }
@@ -455,10 +474,11 @@ class WebSocketController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Failed to get online users', [
-                'user_id' => $request->user()?->id,
-                'error' => $e->getMessage()
-            ]);
+            Log::error('Failed to get online users', LogContext::fromWebSocket(
+                connectionId: null,
+                eventType: 'get_online_users_failed',
+                extra: ['error' => $e->getMessage()]
+            ));
 
             return response()->json(['error' => 'Failed to get online users'], 500);
         }
@@ -500,10 +520,14 @@ class WebSocketController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Failed to get user connections', [
-                'user_id' => $request->user()?->id,
-                'error' => $e->getMessage()
-            ]);
+            Log::error('Failed to get user connections', LogContext::fromWebSocket(
+                connectionId: null,
+                eventType: 'get_user_connections_failed',
+                extra: [
+                    'target_user_id' => $userId,
+                    'error' => $e->getMessage()
+                ]
+            ));
 
             return response()->json(['error' => 'Failed to get user connections'], 500);
         }
@@ -579,10 +603,14 @@ class WebSocketController extends Controller
             }
 
         } catch (\Exception $e) {
-            Log::error('WebSocket broadcast failed', [
-                'user_id' => $request->user()?->id,
-                'error' => $e->getMessage()
-            ]);
+            Log::error('WebSocket broadcast failed', LogContext::fromWebSocket(
+                connectionId: null,
+                eventType: 'broadcast_failed',
+                extra: [
+                    'recipients_count' => count($request->input('user_ids', [])),
+                    'error' => $e->getMessage()
+                ]
+            ));
 
             return response()->json(['error' => 'Failed to broadcast message'], 500);
         }
@@ -627,10 +655,11 @@ class WebSocketController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Failed to get WebSocket status', [
-                'user_id' => $request->user()?->id,
-                'error' => $e->getMessage()
-            ]);
+            Log::error('Failed to get WebSocket status', LogContext::fromWebSocket(
+                connectionId: null,
+                eventType: 'get_status_failed',
+                extra: ['error' => $e->getMessage()]
+            ));
 
             return response()->json(['error' => 'Failed to get WebSocket status'], 500);
         }

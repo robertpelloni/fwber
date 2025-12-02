@@ -11,6 +11,7 @@ use Stripe\Exception\SignatureVerificationException;
 use App\Models\User;
 use App\Models\Payment;
 use App\Models\Subscription;
+use App\Support\LogContext;
 use Carbon\Carbon;
 
 class StripeWebhookController extends Controller
@@ -74,21 +75,33 @@ class StripeWebhookController extends Controller
         $userId = $paymentIntent->metadata->user_id ?? null;
 
         if (!$userId) {
-            Log::warning('Stripe Webhook: No user_id in metadata for PaymentIntent ' . $paymentIntent->id);
+            Log::warning('Stripe Webhook: No user_id in metadata for PaymentIntent ' . $paymentIntent->id, LogContext::fromWebhook(
+                webhookId: $paymentIntent->id,
+                eventType: 'payment_intent_missing_user',
+                extra: ['payment_intent_id' => $paymentIntent->id]
+            ));
             return;
         }
 
         $user = User::find($userId);
 
         if (!$user) {
-            Log::error('Stripe Webhook: User not found for ID ' . $userId);
+            Log::error('Stripe Webhook: User not found for ID ' . $userId, LogContext::fromWebhook(
+                webhookId: $paymentIntent->id,
+                eventType: 'payment_user_not_found',
+                extra: ['user_id' => $userId, 'payment_intent_id' => $paymentIntent->id]
+            ));
             return;
         }
 
         // Check if payment already recorded to avoid duplicates
         $existingPayment = Payment::where('transaction_id', $paymentIntent->id)->first();
         if ($existingPayment) {
-            Log::info('Stripe Webhook: Payment already recorded for ' . $paymentIntent->id);
+            Log::info('Stripe Webhook: Payment already recorded for ' . $paymentIntent->id, LogContext::fromWebhook(
+                webhookId: $paymentIntent->id,
+                eventType: 'payment_duplicate',
+                extra: ['payment_intent_id' => $paymentIntent->id]
+            ));
             return;
         }
 
@@ -124,7 +137,14 @@ class StripeWebhookController extends Controller
             ]);
         });
 
-        Log::info("Stripe Webhook: Premium granted to user {$user->id}");
+        Log::info("Stripe Webhook: Premium granted to user {$user->id}", LogContext::fromPayment(
+            transactionId: $paymentIntent->id,
+            gateway: 'stripe',
+            extra: [
+                'tier' => 'gold',
+                'expires_at' => $user->tier_expires_at->toIso8601String()
+            ]
+        ));
         
         // Invalidate subscription cache for this user
         Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
@@ -139,20 +159,32 @@ class StripeWebhookController extends Controller
         $userId = $stripeSubscription->metadata->user_id ?? null;
 
         if (!$userId) {
-            Log::warning('Stripe Webhook: No user_id in subscription metadata for ' . $stripeSubscription->id);
+            Log::warning('Stripe Webhook: No user_id in subscription metadata for ' . $stripeSubscription->id, LogContext::fromWebhook(
+                webhookId: $stripeSubscription->id,
+                eventType: 'subscription_missing_user',
+                extra: ['stripe_subscription_id' => $stripeSubscription->id]
+            ));
             return;
         }
 
         $user = User::find($userId);
         if (!$user) {
-            Log::error('Stripe Webhook: User not found for ID ' . $userId);
+            Log::error('Stripe Webhook: User not found for ID ' . $userId, LogContext::fromWebhook(
+                webhookId: $stripeSubscription->id,
+                eventType: 'subscription_user_not_found',
+                extra: ['user_id' => $userId, 'stripe_subscription_id' => $stripeSubscription->id]
+            ));
             return;
         }
 
         // Check if subscription already exists
         $existing = Subscription::where('stripe_id', $stripeSubscription->id)->first();
         if ($existing) {
-            Log::info('Stripe Webhook: Subscription already exists ' . $stripeSubscription->id);
+            Log::info('Stripe Webhook: Subscription already exists ' . $stripeSubscription->id, LogContext::fromWebhook(
+                webhookId: $stripeSubscription->id,
+                eventType: 'subscription_duplicate',
+                extra: ['stripe_subscription_id' => $stripeSubscription->id]
+            ));
             return;
         }
 
@@ -179,7 +211,15 @@ class StripeWebhookController extends Controller
             }
         });
 
-        Log::info("Stripe Webhook: Subscription created for user {$user->id}");
+        Log::info("Stripe Webhook: Subscription created for user {$user->id}", LogContext::fromWebhook(
+            webhookId: $stripeSubscription->id,
+            eventType: 'subscription_created',
+            extra: [
+                'user_id' => $user->id,
+                'status' => $stripeSubscription->status,
+                'plan' => $stripeSubscription->metadata->plan_name ?? 'gold'
+            ]
+        ));
         
         // Invalidate subscription cache
         Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
@@ -193,13 +233,21 @@ class StripeWebhookController extends Controller
         $subscription = Subscription::where('stripe_id', $stripeSubscription->id)->first();
         
         if (!$subscription) {
-            Log::warning('Stripe Webhook: Subscription not found ' . $stripeSubscription->id);
+            Log::warning('Stripe Webhook: Subscription not found ' . $stripeSubscription->id, LogContext::fromWebhook(
+                webhookId: $stripeSubscription->id,
+                eventType: 'subscription_not_found_update',
+                extra: ['stripe_subscription_id' => $stripeSubscription->id]
+            ));
             return;
         }
 
         $user = $subscription->user;
         if (!$user) {
-            Log::error('Stripe Webhook: User not found for subscription ' . $stripeSubscription->id);
+            Log::error('Stripe Webhook: User not found for subscription ' . $stripeSubscription->id, LogContext::fromWebhook(
+                webhookId: $stripeSubscription->id,
+                eventType: 'subscription_update_user_not_found',
+                extra: ['stripe_subscription_id' => $stripeSubscription->id]
+            ));
             return;
         }
 
@@ -225,7 +273,15 @@ class StripeWebhookController extends Controller
             $user->save();
         }
 
-        Log::info("Stripe Webhook: Subscription updated for user {$user->id}, status: {$stripeSubscription->status}");
+        Log::info("Stripe Webhook: Subscription updated for user {$user->id}, status: {$stripeSubscription->status}", LogContext::fromWebhook(
+            webhookId: $stripeSubscription->id,
+            eventType: 'subscription_updated',
+            extra: [
+                'user_id' => $user->id,
+                'status' => $stripeSubscription->status,
+                'tier' => $user->tier
+            ]
+        ));
         
         // Invalidate subscription cache
         Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
@@ -239,13 +295,21 @@ class StripeWebhookController extends Controller
         $subscription = Subscription::where('stripe_id', $stripeSubscription->id)->first();
         
         if (!$subscription) {
-            Log::warning('Stripe Webhook: Subscription not found for deletion ' . $stripeSubscription->id);
+            Log::warning('Stripe Webhook: Subscription not found for deletion ' . $stripeSubscription->id, LogContext::fromWebhook(
+                webhookId: $stripeSubscription->id,
+                eventType: 'subscription_not_found_delete',
+                extra: ['stripe_subscription_id' => $stripeSubscription->id]
+            ));
             return;
         }
 
         $user = $subscription->user;
         if (!$user) {
-            Log::error('Stripe Webhook: User not found for subscription deletion ' . $stripeSubscription->id);
+            Log::error('Stripe Webhook: User not found for subscription deletion ' . $stripeSubscription->id, LogContext::fromWebhook(
+                webhookId: $stripeSubscription->id,
+                eventType: 'subscription_delete_user_not_found',
+                extra: ['stripe_subscription_id' => $stripeSubscription->id]
+            ));
             return;
         }
 
@@ -261,7 +325,11 @@ class StripeWebhookController extends Controller
         $user->unlimited_swipes = false;
         $user->save();
 
-        Log::info("Stripe Webhook: Subscription canceled for user {$user->id}");
+        Log::info("Stripe Webhook: Subscription canceled for user {$user->id}", LogContext::fromWebhook(
+            webhookId: $stripeSubscription->id,
+            eventType: 'subscription_canceled',
+            extra: ['user_id' => $user->id]
+        ));
         
         // Invalidate subscription cache
         Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
@@ -275,20 +343,32 @@ class StripeWebhookController extends Controller
         $subscriptionId = $invoice->subscription;
         
         if (!$subscriptionId) {
-            Log::warning('Stripe Webhook: No subscription ID in failed invoice ' . $invoice->id);
+            Log::warning('Stripe Webhook: No subscription ID in failed invoice ' . $invoice->id, LogContext::fromWebhook(
+                webhookId: $invoice->id,
+                eventType: 'invoice_missing_subscription',
+                extra: ['invoice_id' => $invoice->id]
+            ));
             return;
         }
 
         $subscription = Subscription::where('stripe_id', $subscriptionId)->first();
         
         if (!$subscription) {
-            Log::warning('Stripe Webhook: Subscription not found for failed invoice ' . $subscriptionId);
+            Log::warning('Stripe Webhook: Subscription not found for failed invoice ' . $subscriptionId, LogContext::fromWebhook(
+                webhookId: $invoice->id,
+                eventType: 'invoice_failed_subscription_not_found',
+                extra: ['subscription_id' => $subscriptionId, 'invoice_id' => $invoice->id]
+            ));
             return;
         }
 
         $user = $subscription->user;
         if (!$user) {
-            Log::error('Stripe Webhook: User not found for failed invoice');
+            Log::error('Stripe Webhook: User not found for failed invoice', LogContext::fromWebhook(
+                webhookId: $invoice->id,
+                eventType: 'invoice_failed_user_not_found',
+                extra: ['subscription_id' => $subscriptionId, 'invoice_id' => $invoice->id]
+            ));
             return;
         }
 
@@ -314,7 +394,16 @@ class StripeWebhookController extends Controller
         ]);
 
         // Keep premium active for grace period but log the issue
-        Log::warning("Stripe Webhook: Invoice payment failed for user {$user->id}, subscription {$subscriptionId}");
+        Log::warning("Stripe Webhook: Invoice payment failed for user {$user->id}, subscription {$subscriptionId}", LogContext::fromWebhook(
+            webhookId: $invoice->id,
+            eventType: 'invoice_payment_failed',
+            extra: [
+                'user_id' => $user->id,
+                'subscription_id' => $subscriptionId,
+                'amount' => $invoice->amount_due / 100,
+                'attempt_count' => $invoice->attempt_count
+            ]
+        ));
         
         // Invalidate subscription cache
         Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
@@ -337,13 +426,21 @@ class StripeWebhookController extends Controller
         $subscription = Subscription::where('stripe_id', $subscriptionId)->first();
         
         if (!$subscription) {
-            Log::warning('Stripe Webhook: Subscription not found for successful invoice ' . $subscriptionId);
+            Log::warning('Stripe Webhook: Subscription not found for successful invoice ' . $subscriptionId, LogContext::fromWebhook(
+                webhookId: $invoice->id,
+                eventType: 'invoice_succeeded_subscription_not_found',
+                extra: ['subscription_id' => $subscriptionId, 'invoice_id' => $invoice->id]
+            ));
             return;
         }
 
         $user = $subscription->user;
         if (!$user) {
-            Log::error('Stripe Webhook: User not found for successful invoice');
+            Log::error('Stripe Webhook: User not found for successful invoice', LogContext::fromWebhook(
+                webhookId: $invoice->id,
+                eventType: 'invoice_succeeded_user_not_found',
+                extra: ['subscription_id' => $subscriptionId, 'invoice_id' => $invoice->id]
+            ));
             return;
         }
 
@@ -366,7 +463,15 @@ class StripeWebhookController extends Controller
             ]);
         }
 
-        Log::info("Stripe Webhook: Subscription renewal successful for user {$user->id}");
+        Log::info("Stripe Webhook: Subscription renewal successful for user {$user->id}", LogContext::fromPayment(
+            transactionId: $invoice->payment_intent,
+            gateway: 'stripe',
+            extra: [
+                'user_id' => $user->id,
+                'subscription_id' => $subscriptionId,
+                'amount' => $invoice->amount_paid / 100
+            ]
+        ));
         
         // Invalidate subscription cache
         Cache::tags(['subscriptions', "user:{$user->id}"])->flush();

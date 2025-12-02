@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
         $middleware->append(\App\Http\Middleware\ApmMiddleware::class);
+        $middleware->append(\App\Http\Middleware\InjectLoggingContext::class);
         
         $middleware->alias([
             'feature' => \App\Http\Middleware\FeatureEnabled::class,
