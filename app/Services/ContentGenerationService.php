@@ -21,11 +21,10 @@ class ContentGenerationService
         $this->llmManager = $llmManager;
         $this->generationConfig = config('content_generation', [
             'enabled' => true,
-            'providers' => ['openai', 'gemini', 'claude'],
+            'providers' => ['gemini', 'openai'],
             'models' => [
                 'openai' => 'gpt-4',
                 'gemini' => 'gemini-pro',
-                'claude' => 'claude-sonnet-4-5-20250929',
             ],
             'max_tokens' => 1000,
             'temperature' => 0.7,
@@ -91,7 +90,7 @@ class ContentGenerationService
 
         // Determine providers based on routing config
         $routing = $this->generationConfig['routing'] ?? [];
-        $providers = $routing[$type] ?? ($routing['default'] ?? ['claude', 'openai', 'gemini']);
+        $providers = $routing[$type] ?? ($routing['default'] ?? ['gemini', 'openai']);
 
         foreach ($providers as $provider) {
             $provider = trim($provider);
@@ -101,8 +100,6 @@ class ContentGenerationService
                 $res = $this->generateWithOpenAI($context, $additionalContext, $type);
             } elseif ($provider === 'gemini') {
                 $res = $this->generateWithGemini($context, $additionalContext, $type);
-            } elseif ($provider === 'claude') {
-                $res = $this->generateWithClaude($context, $additionalContext, $type);
             }
 
             if (!empty($res['content'])) {
@@ -175,38 +172,6 @@ class ContentGenerationService
         }
 
         return ['content' => '', 'error' => 'Gemini generation unavailable'];
-    }
-
-    /**
-     * Generate content with Claude (Anthropic)
-     */
-    private function generateWithClaude(array $context, array $additionalContext, string $type): array
-    {
-        try {
-            $prompt = $this->buildOpenAIPrompt($context, $additionalContext, $type);
-            
-            $messages = [
-                ['role' => 'system', 'content' => $this->getSystemPrompt($type)],
-                ['role' => 'user', 'content' => $prompt]
-            ];
-
-            $response = $this->llmManager->driver('claude')->chat($messages, [
-                'model' => $this->generationConfig['models']['claude'] ?? 'claude-3-5-sonnet-20241022',
-                'max_tokens' => $this->generationConfig['max_tokens'],
-                'temperature' => $this->generationConfig['temperature'],
-            ]);
-
-            return [
-                'content' => $response->content,
-                'provider' => 'claude',
-                'confidence' => $this->calculateConfidence($response->content),
-                'safety_score' => $this->calculateSafetyScore($response->content),
-            ];
-        } catch (\Exception $e) {
-            Log::error('Claude content generation failed', ['error' => $e->getMessage()]);
-        }
-
-        return ['content' => '', 'error' => 'Claude generation unavailable'];
     }
 
     /**
