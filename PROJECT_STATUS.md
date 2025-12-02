@@ -32,6 +32,11 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Configuration**: Added `@OA\Info` to `Controller.php`.
     -   **Schemas**: Added missing schemas (`Friend`, `Subscription`, `Payment`, `Event`, `Boost`) to `Schemas.php`.
     -   **Generation**: Successfully generated `api-docs.json` via `l5-swagger:generate`.
+7.  **Event Invitations** (Dec 04 - Complete):
+    -   **Backend**: Created `EventInvitation` model and controller.
+    -   **Routes**: Added endpoints for listing, sending, and responding to invitations.
+    -   **Frontend**: Implemented `InviteUserModal` for inviting matches and `EventInvitationsList` for managing incoming invites.
+    -   **Integration**: Added invitation UI to Event Details and Events Listing pages.
 ### ✅ Completed MVP Features
 1.  **Authentication**: Secure registration, login, and session management.
 2.  **Profile Management**: Comprehensive profile editing, including "Physical Profile" attributes.
