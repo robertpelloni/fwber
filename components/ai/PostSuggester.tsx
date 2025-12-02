@@ -65,6 +65,7 @@ export function PostSuggester({ boardId, onSelectPost }: PostSuggesterProps) {
           className="w-full" 
           onClick={handleGenerate}
           disabled={generatePosts.isPending}
+          data-testid="post-suggestions"
         >
           {generatePosts.isPending ? (
             <Loader2 className="h-3 w-3 animate-spin mr-2" />
@@ -81,8 +82,24 @@ export function PostSuggester({ boardId, onSelectPost }: PostSuggesterProps) {
                 key={suggestion.id}
                 className="bg-white p-3 rounded border text-sm hover:border-blue-300 cursor-pointer transition-all shadow-sm"
                 onClick={() => onSelectPost(suggestion.content)}
+                data-testid="suggestion-item"
               >
-                {suggestion.content}
+                <div className="flex justify-between items-start mb-1">
+                  <span className="font-medium text-xs text-slate-500" data-testid="relevance-score">
+                    {Math.round((suggestion.confidence || 0) * 100)}% Match
+                  </span>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-5 text-xs px-2"
+                    data-testid="use-suggestion"
+                  >
+                    Use
+                  </Button>
+                </div>
+                <div data-testid="suggestion-content">
+                  {suggestion.content}
+                </div>
               </div>
             ))}
           </div>

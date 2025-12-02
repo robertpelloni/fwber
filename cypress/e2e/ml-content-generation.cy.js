@@ -278,20 +278,18 @@ describe('ML Content Generation E2E Test', () => {
     cy.intercept('POST', '/api/content-generation/posts/*/suggestions', {
       statusCode: 200,
       body: {
-        data: {
-          suggestions: [
-            {
-              content: 'Has anyone tried the new coffee shop on Main St?',
-              confidence: 0.95,
-              tone: 'casual'
-            },
-            {
-              content: 'Looking for recommendations for a good plumber in the area.',
-              confidence: 0.88,
-              tone: 'inquisitive'
-            }
-          ]
-        }
+        suggestions: [
+          {
+            content: 'Has anyone tried the new coffee shop on Main St?',
+            confidence: 0.95,
+            tone: 'casual'
+          },
+          {
+            content: 'Looking for recommendations for a good plumber in the area.',
+            confidence: 0.88,
+            tone: 'inquisitive'
+          }
+        ]
       }
     }).as('generateSuggestions');
 

@@ -1,6 +1,58 @@
 describe('Navigation', () => {
+  const testUser = {
+    id: 1,
+    name: 'Test User',
+    email: 'test@example.com',
+    password: 'password123'
+  };
+
+  beforeEach(() => {
+    cy.intercept('POST', '/api/auth/login', {
+      statusCode: 200,
+      body: {
+        token: 'mock-jwt-token',
+        user: testUser
+      }
+    }).as('login');
+
+    cy.intercept('GET', '/api/user', {
+      statusCode: 200,
+      body: testUser
+    }).as('getUser');
+
+    cy.intercept('GET', '/api/matches*', {
+      statusCode: 200,
+      body: [
+        {
+          id: 2,
+          compatibilityScore: 0.9,
+          profile: {
+            display_name: 'Match User',
+            photos: [{ url: '/placeholder.jpg' }],
+            age: 25,
+            location: { city: 'New York', state: 'NY' }
+          }
+        }
+      ]
+    }).as('getMatches');
+  });
+
   it('should navigate to the friends page', () => {
+    // Login flow
+    cy.visit('/login');
+    cy.get('input[name="email"]').type(testUser.email);
+    cy.get('input[name="password"]').type(testUser.password);
+    cy.get('button[type="submit"]').click();
+    cy.wait('@login');
+    
+    // Wait for redirect to dashboard to ensure auth state is processed and saved
+    cy.url().should('include', '/dashboard');
+
+    // Now visit matches
     cy.visit('/matches');
+    cy.wait('@getMatches');
+    
+    // Check for the link
     cy.get('a[href*="friends"]').click();
     cy.url().should('include', '/friends');
     cy.get('h1').should('contain', 'Friends');
