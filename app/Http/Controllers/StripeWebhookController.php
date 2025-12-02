@@ -19,6 +19,7 @@ class StripeWebhookController extends Controller
 {
     public function handleWebhook(Request $request)
     {
+        $startTime = microtime(true);
         $payload = $request->getContent();
         $sig_header = $request->header('Stripe-Signature');
         $endpoint_secret = config('services.stripe.webhook_secret');
@@ -67,6 +68,13 @@ class StripeWebhookController extends Controller
                 // Log unknown event types for monitoring
                 Log::info('Stripe Webhook: Received unknown event type ' . $event->type);
         }
+
+        $duration = microtime(true) - $startTime;
+        Log::info('Stripe Webhook Processed', [
+            'type' => $event->type,
+            'duration_ms' => round($duration * 1000, 2),
+            'id' => $event->id
+        ]);
 
         return response()->json(['status' => 'success']);
     }

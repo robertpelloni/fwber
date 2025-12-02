@@ -8,6 +8,8 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Queue\Events\JobFailed;
 use App\Support\LogContext;
 
 class AppServiceProvider extends ServiceProvider
@@ -28,6 +30,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Monitor failed jobs
+        Queue::failing(function (JobFailed $event) {
+            Log::critical('Job Failed', [
+                'connection' => $event->connectionName,
+                'queue' => $event->job->getQueue(),
+                'job' => $event->job->resolveName(),
+                'exception' => $event->exception->getMessage(),
+            ]);
+        });
+
         // Configure rate limiting for bulletin board messages
         RateLimiter::for('bulletin-message', function (Request $request) {
             return $request->user()

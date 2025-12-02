@@ -31,3 +31,8 @@ Schedule::job(new SendEventReminders)->hourly()
 Schedule::job(new CleanupExpiredSubscriptions)->dailyAt('02:00')
     ->name('cleanup-expired-subscriptions')
     ->withoutOverlapping();
+
+// Cache warming
+Schedule::command('cache:warm')->everyFiveMinutes()
+    ->name('warm-cache')
+    ->withoutOverlapping();
