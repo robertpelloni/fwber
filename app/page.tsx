@@ -7,7 +7,7 @@ import Link from 'next/link'
 import SexQuote from '@/components/SexQuote'
 import PWAInstallPrompt from '@/components/PWAInstallPrompt'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { Shield, Heart, Zap, MapPin, MessageCircle, Users, Menu, X, Lock, Ghost, Layers, FileText, Code, Building2, CheckCircle2, Sparkles } from 'lucide-react'
+import { Shield, Heart, Zap, MapPin, MessageCircle, Users, Menu, X, Lock, Ghost, Layers, FileText, Code, Building2, CheckCircle2, Sparkles, GitMerge, Shirt, RefreshCw, Flame, Link as LinkIcon, Rainbow } from 'lucide-react'
 import { useState } from 'react'
 
 export default function HomePage() {
@@ -41,10 +41,10 @@ export default function HomePage() {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <Link href="/" className="flex-shrink-0 flex items-center gap-0.5 hover:scale-105 transition-transform duration-200">
-                <span className="text-4xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-pink-500 to-pink-700 [-webkit-text-stroke:1px_black] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">F</span>
-                <span className="text-4xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-green-400 to-green-600 [-webkit-text-stroke:1px_black] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">W</span>
-                <span className="text-4xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-cyan-400 to-blue-600 [-webkit-text-stroke:1px_black] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">B</span>
-                <span className="text-4xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-purple-500 to-purple-700 [-webkit-text-stroke:1px_black] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">er</span>
+                <span className="text-4xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-pink-500 to-pink-700 [-webkit-text-stroke:1px_black] [paint-order:stroke_fill] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">F</span>
+                <span className="text-4xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-green-400 to-green-600 [-webkit-text-stroke:1px_black] [paint-order:stroke_fill] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">W</span>
+                <span className="text-4xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-cyan-400 to-blue-600 [-webkit-text-stroke:1px_black] [paint-order:stroke_fill] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">B</span>
+                <span className="text-4xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-purple-500 to-purple-700 [-webkit-text-stroke:1px_black] [paint-order:stroke_fill] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">er</span>
                 <span className="text-xl font-bold text-gray-400 ml-1 self-end mb-1">.me</span>
               </Link>
             </div>
@@ -100,8 +100,15 @@ export default function HomePage() {
       <div className="relative overflow-hidden bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 pt-16 pb-24 lg:pt-32 lg:pb-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-8">
-              FWBer.me - <span className="text-blue-600 dark:text-blue-400">Adult Social Network</span>
+            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8">
+              <span className="inline-flex flex-wrap justify-center gap-0.5">
+                <span className="text-transparent bg-clip-text bg-gradient-to-b from-pink-500 to-pink-700 [-webkit-text-stroke:1px_black] md:[-webkit-text-stroke:2px_black] [paint-order:stroke_fill] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)] md:drop-shadow-[4px_4px_0px_rgba(0,0,0,0.2)]">F</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-b from-green-400 to-green-600 [-webkit-text-stroke:1px_black] md:[-webkit-text-stroke:2px_black] [paint-order:stroke_fill] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)] md:drop-shadow-[4px_4px_0px_rgba(0,0,0,0.2)]">W</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-b from-cyan-400 to-blue-600 [-webkit-text-stroke:1px_black] md:[-webkit-text-stroke:2px_black] [paint-order:stroke_fill] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)] md:drop-shadow-[4px_4px_0px_rgba(0,0,0,0.2)]">B</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-b from-purple-500 to-purple-700 [-webkit-text-stroke:1px_black] md:[-webkit-text-stroke:2px_black] [paint-order:stroke_fill] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)] md:drop-shadow-[4px_4px_0px_rgba(0,0,0,0.2)]">er</span>
+                <span className="text-2xl md:text-4xl font-bold text-gray-400 ml-1 self-end mb-2 md:mb-3">.me</span>
+              </span>
+              <span className="block md:inline mt-2 md:mt-0 text-gray-900 dark:text-white"> - <span className="text-blue-600 dark:text-blue-400">Adult Social Network</span></span>
             </h1>
             
             <div className="mb-8 transform hover:scale-105 transition-transform duration-300">
@@ -140,14 +147,24 @@ export default function HomePage() {
               </p>
               <div className="flex flex-wrap justify-center gap-3">
                 {[
-                  'Straight', 'Gay', 'Trans', 'Crossdress', 'Swingers', 'Couples',
-                  'Sex Positive', 'Safer Sex Workers', 'Fetish Community Support', 'Mild to Wild'
+                  { name: 'Straight', icon: Users },
+                  { name: 'Couples', icon: Heart },
+                  { name: 'Bisexual', icon: GitMerge },
+                  { name: 'Gay', icon: Rainbow },
+                  { name: 'Trans', icon: Sparkles },
+                  { name: 'Crossdress', icon: Shirt },
+                  { name: 'Swingers', icon: RefreshCw },
+                  { name: 'Mild to Wild', icon: Flame },
+                  { name: 'Sex Positive', icon: CheckCircle2 },
+                  { name: 'Safer Sex Workers', icon: Shield },
+                  { name: 'Fetish Community Support', icon: LinkIcon },
                 ].map((item) => (
                   <span 
-                    key={item}
-                    className="px-4 py-2 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 cursor-default shadow-sm"
+                    key={item.name}
+                    className="flex items-center px-4 py-2 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 cursor-default shadow-sm"
                   >
-                    {item}
+                    <item.icon className="w-4 h-4 mr-2" />
+                    {item.name}
                   </span>
                 ))}
               </div>
@@ -448,10 +465,10 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-8 md:mb-0">
               <div className="flex items-baseline gap-0.5">
-                <span className="text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-pink-500 to-pink-700 [-webkit-text-stroke:1px_black] drop-shadow-sm">F</span>
-                <span className="text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-green-400 to-green-600 [-webkit-text-stroke:1px_black] drop-shadow-sm">W</span>
-                <span className="text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-cyan-400 to-blue-600 [-webkit-text-stroke:1px_black] drop-shadow-sm">B</span>
-                <span className="text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-purple-500 to-purple-700 [-webkit-text-stroke:1px_black] drop-shadow-sm">er</span>
+                <span className="text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-pink-500 to-pink-700 [-webkit-text-stroke:1px_black] [paint-order:stroke_fill] drop-shadow-sm">F</span>
+                <span className="text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-green-400 to-green-600 [-webkit-text-stroke:1px_black] [paint-order:stroke_fill] drop-shadow-sm">W</span>
+                <span className="text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-cyan-400 to-blue-600 [-webkit-text-stroke:1px_black] [paint-order:stroke_fill] drop-shadow-sm">B</span>
+                <span className="text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-purple-500 to-purple-700 [-webkit-text-stroke:1px_black] [paint-order:stroke_fill] drop-shadow-sm">er</span>
                 <span className="text-lg font-bold text-gray-400 ml-1">.me</span>
               </div>
               <p className="text-gray-500 mt-2">© 2025 FWBer. All rights reserved.</p>

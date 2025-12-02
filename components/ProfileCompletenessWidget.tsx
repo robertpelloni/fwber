@@ -44,7 +44,16 @@ export default function ProfileCompletenessWidget() {
     );
   }
 
-  const { percentage, required_complete, missing_required, missing_optional, sections } = data;
+  const { percentage = 0, required_complete = false, missing_required = [], missing_optional = [], sections } = data;
+
+  const safeSections = sections || {
+    basic: false,
+    location: false,
+    preferences: false,
+    interests: false,
+    physical: false,
+    lifestyle: false,
+  };
 
   const getStatusColor = (pct: number) => {
     if (pct >= 80) return 'text-green-600';
@@ -91,12 +100,12 @@ export default function ProfileCompletenessWidget() {
 
       {/* Section Checklist */}
       <div className="space-y-2 mb-4">
-        <SectionItem label="Basic Information" complete={sections.basic} />
-        <SectionItem label="Location" complete={sections.location} />
-        <SectionItem label="Dating Preferences" complete={sections.preferences} />
-        <SectionItem label="Interests & Hobbies" complete={sections.interests} />
-        <SectionItem label="Physical Attributes" complete={sections.physical} />
-        <SectionItem label="Lifestyle" complete={sections.lifestyle} />
+        <SectionItem label="Basic Information" complete={safeSections.basic} />
+        <SectionItem label="Location" complete={safeSections.location} />
+        <SectionItem label="Dating Preferences" complete={safeSections.preferences} />
+        <SectionItem label="Interests & Hobbies" complete={safeSections.interests} />
+        <SectionItem label="Physical Attributes" complete={safeSections.physical} />
+        <SectionItem label="Lifestyle" complete={safeSections.lifestyle} />
       </div>
 
       {/* Missing Fields */}
