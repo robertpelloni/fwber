@@ -130,6 +130,11 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Build**: Verified production build with Sentry source map upload configuration.
     -   **Health Checks**: Implemented `/api/health`, `/api/health/liveness`, and `/api/health/readiness` endpoints.
     -   **APM Scaffolding**: `ApmMiddleware` and `config/apm.php` added for request timing and slow request logging.
+    -   **Slow Request Monitoring** (Dec 04 - Complete):
+        -   Implemented `SlowRequest` model and database storage for requests exceeding threshold.
+        -   Updated `ApmMiddleware` to persist slow requests.
+        -   Added `/api/analytics/slow-requests` endpoint for admin visibility.
+        -   Integrated into `AnalyticsController`.
 14. **Frontend Optimization** (Dec 01 - Complete):
     -   **Bundle Analysis**: Integrated `@next/bundle-analyzer` for bundle size visualization.
     -   **CSS Optimization**: Enabled `optimizeCss` in `next.config.js` (via `critters`).
