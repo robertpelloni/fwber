@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EventRsvpRequest;
+use App\Http\Requests\StoreEventRequest;
 use App\Models\Event;
 use App\Models\EventAttendee;
 use Illuminate\Http\Request;
@@ -141,19 +143,9 @@ class EventController extends Controller
      *     @OA\Response(response=422, description="Validation error")
      * )
      */
-    public function store(Request $request)
+    public function store(StoreEventRequest $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'location_name' => 'required|string',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'starts_at' => 'required|date',
-            'ends_at' => 'required|date|after:starts_at',
-            'max_attendees' => 'nullable|integer|min:1',
-            'price' => 'nullable|numeric|min:0',
-        ]);
+        $validated = $request->validated();
 
         $event = Event::create([
             ...$validated,
@@ -260,12 +252,8 @@ class EventController extends Controller
      *     @OA\Response(response=404, description="Event not found")
      * )
      */
-    public function rsvp(Request $request, $id)
+    public function rsvp(EventRsvpRequest $request, $id)
     {
-        $request->validate([
-            'status' => 'required|in:attending,maybe,declined',
-        ]);
-
         // Eager load attendees to avoid N+1 queries
         $event = Event::with('attendees')->findOrFail($id);
         $user = Auth::user();

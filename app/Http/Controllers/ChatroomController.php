@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SearchChatroomRequest;
+use App\Http\Requests\StoreChatroomRequest;
+use App\Http\Requests\UpdateChatroomRequest;
 use App\Models\Chatroom;
 use App\Models\ChatroomMessage;
 use App\Models\User;
@@ -155,19 +158,8 @@ class ChatroomController extends Controller
     *   @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/Chatroom"))
      * )
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreChatroomRequest $request): JsonResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:100',
-            'description' => 'nullable|string|max:500',
-            'type' => 'required|in:interest,city,event,private',
-            'category' => 'nullable|string|max:50',
-            'city' => 'nullable|string|max:100',
-            'neighborhood' => 'nullable|string|max:100',
-            'is_public' => 'boolean',
-            'settings' => 'nullable|array',
-        ]);
-
         $chatroom = Chatroom::create([
             'name' => $request->name,
             'description' => $request->description,
@@ -314,20 +306,13 @@ class ChatroomController extends Controller
     *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(UpdateChatroomRequest $request, int $id): JsonResponse
     {
         $chatroom = Chatroom::findOrFail($id);
 
         if (!$chatroom->hasModerator(Auth::user())) {
             return response()->json(['message' => 'You do not have permission to update this chatroom'], 403);
         }
-
-        $request->validate([
-            'name' => 'sometimes|string|max:100',
-            'description' => 'nullable|string|max:500',
-            'is_public' => 'boolean',
-            'settings' => 'nullable|array',
-        ]);
 
         $chatroom->update($request->only(['name', 'description', 'is_public', 'settings']));
 
@@ -458,15 +443,8 @@ class ChatroomController extends Controller
      *   @OA\Response(response=200, description="Paginated results")
      * )
      */
-    public function search(Request $request): JsonResponse
+    public function search(SearchChatroomRequest $request): JsonResponse
     {
-        $request->validate([
-            'q' => 'required|string|min:2',
-            'type' => 'nullable|in:interest,city,event,private',
-            'category' => 'nullable|string',
-            'city' => 'nullable|string',
-        ]);
-
         $query = Chatroom::active()->public();
 
         // Search in name and description
