@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Message\StoreMessageRequest;
 use App\Models\Block;
 use App\Models\Message;
 use App\Models\RelationshipTier;
@@ -76,16 +77,9 @@ class MessageController extends Controller
      * 
      * Send a message to a matched user
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreMessageRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'receiver_id' => 'required|exists:users,id',
-            'content' => 'nullable|string|max:5000',
-            'message_type' => 'sometimes|string|in:text,image,video,audio,file',
-            'media' => 'nullable|file',
-            // media_duration provided by clients for audio/video; we clamp to type-specific caps later
-            'media_duration' => 'nullable|integer|min:1',
-        ]);
+        $validated = $request->validated();
 
         $senderId = Auth::id();
         $receiverId = $validated['receiver_id'];
