@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\VenueLoginRequest;
+use App\Http\Requests\VenueRegisterRequest;
 use App\Models\Venue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -9,28 +11,19 @@ use Illuminate\Validation\ValidationException;
 
 class VenueAuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(VenueRegisterRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:venues',
-            'password' => 'required|string|min:8|confirmed',
-            'business_type' => 'required|string',
-            'address' => 'required|string',
-            'city' => 'required|string',
-            'state' => 'required|string',
-            'zip_code' => 'required|string',
-        ]);
+        $validated = $request->validated();
 
         $venue = Venue::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'business_type' => $request->business_type,
-            'address' => $request->address,
-            'city' => $request->city,
-            'state' => $request->state,
-            'zip_code' => $request->zip_code,
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'business_type' => $validated['business_type'],
+            'address' => $validated['address'],
+            'city' => $validated['city'],
+            'state' => $validated['state'],
+            'zip_code' => $validated['zip_code'],
             'verification_status' => 'pending',
         ]);
 
@@ -42,16 +35,13 @@ class VenueAuthController extends Controller
         ], 201);
     }
 
-    public function login(Request $request)
+    public function login(VenueLoginRequest $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+        $validated = $request->validated();
 
-        $venue = Venue::where('email', $request->email)->first();
+        $venue = Venue::where('email', $validated['email'])->first();
 
-        if (! $venue || ! Hash::check($request->password, $venue->password)) {
+        if (! $venue || ! Hash::check($validated['password'], $venue->password)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials do not match our records.'],
             ]);
