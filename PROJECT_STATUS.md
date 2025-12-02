@@ -39,6 +39,14 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Integration**: Added invitation UI to Event Details and Events Listing pages.
     -   **Testing**: Implemented comprehensive feature tests (`EventInvitationTest.php`) covering invite, list, and respond flows.
     -   **Notifications**: Implemented `EventInvitationReceived` notification with Database and WebPush channels.
+8.  **Test Suite Improvements** (Dec 02 - Complete):
+    -   **BulletinBoardTest**: Fixed SQLite compatibility issue by implementing bounding box approximation in `BulletinBoard::scopeNearLocation`.
+    -   **Verification**: All backend feature tests passing, including `BulletinBoardTest`.
+9.  **Frontend Code Quality** (Dec 02 - Complete):
+    -   **Linting**: Fixed image optimization warning in `InviteUserModal.tsx` (replaced `img` with `next/image`).
+    -   **Accessibility**: Added `aria-label` to buttons in `InviteUserModal.tsx`.
+    -   **Verification**: `npm run lint` passing with zero errors.
+
 ### ✅ Completed MVP Features
 1.  **Authentication**: Secure registration, login, and session management.
 2.  **Profile Management**: Comprehensive profile editing, including "Physical Profile" attributes.
