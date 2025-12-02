@@ -55,8 +55,11 @@ describe('Navigation', () => {
     cy.visit('/matches');
     cy.wait('@getMatches');
     
+    // Ensure loading is done
+    cy.get('.animate-spin').should('not.exist');
+    
     // Check for the link
-    cy.get('a[href*="friends"]').click();
+    cy.get('a[href*="friends"]').should('be.visible').click();
     cy.url().should('include', '/friends');
     cy.get('h1').should('contain', 'Friends');
   });

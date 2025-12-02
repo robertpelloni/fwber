@@ -316,8 +316,12 @@ describe('ML Content Generation E2E Test', () => {
     cy.wait('@getBoardDetails');
     cy.wait('@getMessages');
 
+    // Verify board is loaded
+    cy.contains('Downtown Community').should('be.visible');
+    cy.contains('General discussion for downtown area').should('be.visible');
+
     // Open suggestions
-    cy.get('[data-testid="post-suggestions"]').click();
+    cy.get('[data-testid="post-suggestions"]').should('be.visible').click();
     
     // Verify suggestions are displayed
     cy.get('[data-testid="suggestion-item"]').should('have.length', 2);

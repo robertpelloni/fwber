@@ -114,12 +114,12 @@ describe('Media Messaging Flow', () => {
 
     cy.wait('@getConversations');
 
-    // 2. Click the conversation to open chat
-    cy.contains('Future Partner').click();
+    // Verify conversation is visible
+    cy.contains('Future Partner').should('be.visible').click();
     cy.wait('@getMessages');
 
     // 3. Attach a file
-    cy.get('input[type="file"]').selectFile({
+    cy.get('input[type="file"]').should('exist').selectFile({
         contents: Cypress.Buffer.from('fake image content'),
         fileName: 'test-image.jpg',
         mimeType: 'image/jpeg',
