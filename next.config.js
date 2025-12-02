@@ -9,6 +9,7 @@ const withPWA = require('next-pwa')({
   disable: process.env.NODE_ENV === 'development',
   register: true,
   skipWaiting: true,
+  importScripts: ['/sw-push.js'],
 });
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
