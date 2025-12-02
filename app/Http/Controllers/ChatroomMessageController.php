@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Chatroom;
 use App\Models\ChatroomMessage;
 use App\Models\ChatroomMessageReaction;
+use App\Notifications\NewMessageNotification;
 use App\Services\ContentModerationService;
 use App\Services\TelemetryService;
 use App\Http\Requests\EditChatroomMessageRequest;
@@ -15,6 +16,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 
 class ChatroomMessageController extends Controller
 {
@@ -187,6 +189,24 @@ class ChatroomMessageController extends Controller
             'is_reply' => !is_null($request->parent_id),
             'content_length' => strlen($request->content),
         ]);
+
+        // Send push notification to other members
+        try {
+            $recipients = $chatroom->activeMembers()
+                ->where('users.id', '!=', Auth::id())
+                ->get();
+            
+            if ($recipients->isNotEmpty()) {
+                Notification::send($recipients, new NewMessageNotification($message));
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send push notifications for new message', [
+                'chatroom_id' => $chatroomId,
+                'message_id' => $message->id,
+                'error' => $e->getMessage()
+            ]);
+            // Don't fail the request if notifications fail
+        }
 
         return response()->json($message, 201);
     }

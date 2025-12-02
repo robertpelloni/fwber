@@ -7,6 +7,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\WebPush\WebPushMessage;
+use NotificationChannels\WebPush\WebPushChannel;
 
 class EventReminderNotification extends Notification implements ShouldQueue
 {
@@ -29,7 +31,7 @@ class EventReminderNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['mail', 'database', WebPushChannel::class];
     }
 
     /**
@@ -45,6 +47,18 @@ class EventReminderNotification extends Notification implements ShouldQueue
             ->line('Location: ' . $this->event->location_name)
             ->action('View Event', url('/events/' . $this->event->id))
             ->line('We look forward to seeing you there!');
+    }
+
+    /**
+     * Get the web push representation of the notification.
+     */
+    public function toWebPush($notifiable, $notification)
+    {
+        return (new WebPushMessage)
+            ->title('Upcoming Event Reminder')
+            ->body('Event: ' . $this->event->title . ' starts soon!')
+            ->action('View Event', 'view_event')
+            ->data(['url' => '/events/' . $this->event->id]);
     }
 
     /**

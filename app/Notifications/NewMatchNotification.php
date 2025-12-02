@@ -2,7 +2,7 @@
 
 namespace App\Notifications;
 
-use App\Models\Subscription;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -10,18 +10,18 @@ use Illuminate\Notifications\Notification;
 use NotificationChannels\WebPush\WebPushMessage;
 use NotificationChannels\WebPush\WebPushChannel;
 
-class SubscriptionExpiredNotification extends Notification implements ShouldQueue
+class NewMatchNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public $subscription;
+    public $matchedUser;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(Subscription $subscription)
+    public function __construct(User $matchedUser)
     {
-        $this->subscription = $subscription;
+        $this->matchedUser = $matchedUser;
     }
 
     /**
@@ -40,11 +40,10 @@ class SubscriptionExpiredNotification extends Notification implements ShouldQueu
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Your Subscription Has Expired')
-            ->line('Your premium subscription has expired.')
-            ->line('You have been reverted to the free tier.')
-            ->action('Renew Subscription', url('/subscription'))
-            ->line('Thank you for being a valued member!');
+            ->subject('You have a new match!')
+            ->line('You matched with ' . $this->matchedUser->name . '!')
+            ->action('View Match', url('/matches'))
+            ->line('Send them a message now!');
     }
 
     /**
@@ -53,10 +52,10 @@ class SubscriptionExpiredNotification extends Notification implements ShouldQueu
     public function toWebPush($notifiable, $notification)
     {
         return (new WebPushMessage)
-            ->title('Subscription Expired')
-            ->body('Your premium subscription has expired. Renew now to keep your benefits.')
-            ->action('Renew', 'renew_subscription')
-            ->data(['url' => '/subscription']);
+            ->title('New Match!')
+            ->body("You matched with {$this->matchedUser->name}!")
+            ->action('View Match', 'view_match')
+            ->data(['url' => '/matches']);
     }
 
     /**
@@ -67,8 +66,9 @@ class SubscriptionExpiredNotification extends Notification implements ShouldQueu
     public function toArray(object $notifiable): array
     {
         return [
-            'subscription_id' => $this->subscription->id,
-            'message' => 'Your subscription has expired. Renew now to regain premium features.',
+            'matched_user_id' => $this->matchedUser->id,
+            'matched_user_name' => $this->matchedUser->name,
+            'message' => 'You matched with ' . $this->matchedUser->name . '!',
         ];
     }
 }

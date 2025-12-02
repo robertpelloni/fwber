@@ -423,25 +423,13 @@ class MatchController extends Controller
                 Cache::tags(["matches_list:user_{$user1}"])->flush();
                 Cache::tags(["matches_list:user_{$user2}"])->flush();
 
-                // Send email notifications to both users
-                $emailService = app(\App\Services\EmailNotificationService::class);
+                // Send notifications to both users
                 $userA = User::find($user1);
                 $userB = User::find($user2);
                 
                 if ($userA && $userB) {
-                    $emailService->sendNewMatchNotification($userA, $userB);
-                    $emailService->sendNewMatchNotification($userB, $userA);
-
-                    // Send push notifications to both users
-                    $pushService = app(PushNotificationService::class);
-                    $pushService->send($userA, [
-                        'title' => 'It\'s a match!',
-                        'body' => "You've matched with {$userB->name}!",
-                    ]);
-                    $pushService->send($userB, [
-                        'title' => 'It\'s a match!',
-                        'body' => "You've matched with {$userA->name}!",
-                    ]);
+                    $userA->notify(new \App\Notifications\NewMatchNotification($userB));
+                    $userB->notify(new \App\Notifications\NewMatchNotification($userA));
                 }
             }
 

@@ -6,6 +6,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\WebPush\WebPushMessage;
+use NotificationChannels\WebPush\WebPushChannel;
 
 class PaymentFailedNotification extends Notification implements ShouldQueue
 {
@@ -30,7 +32,7 @@ class PaymentFailedNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['mail', 'database', WebPushChannel::class];
     }
 
     /**
@@ -46,6 +48,20 @@ class PaymentFailedNotification extends Notification implements ShouldQueue
             ->line('Please update your payment method to avoid service interruption.')
             ->action('Update Payment Method', url('/settings/billing'))
             ->line('Thank you for using our application!');
+    }
+
+    /**
+     * Get the web push representation of the notification.
+     */
+    public function toWebPush($notifiable, $notification)
+    {
+        $formattedAmount = number_format($this->amount, 2) . ' ' . strtoupper($this->currency);
+
+        return (new WebPushMessage)
+            ->title('Payment Failed')
+            ->body("We couldn't process your payment of {$formattedAmount}. Please update your billing info.")
+            ->action('Update Billing', 'update_billing')
+            ->data(['url' => '/settings/billing']);
     }
 
     /**
