@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\StoreBlockRequest;
 use App\Models\Block;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class BlockController extends Controller
@@ -26,11 +26,9 @@ class BlockController extends Controller
      *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
      * )
      */
-    public function store(Request $request)
+    public function store(StoreBlockRequest $request)
     {
-        $data = $request->validate([
-            'blocked_id' => 'required|integer|exists:users,id'
-        ]);
+        $data = $request->validated();
         if ($data['blocked_id'] == Auth::id()) {
             return response()->json(['error' => 'Cannot block yourself'], 422);
         }

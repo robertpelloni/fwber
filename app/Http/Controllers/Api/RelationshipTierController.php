@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\UpdateRelationshipTierRequest;
 use App\Models\UserMatch;
 use App\Models\RelationshipTier;
 use App\Models\Photo;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
@@ -92,15 +92,12 @@ class RelationshipTierController extends Controller
     *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
-    public function update(Request $request, int $matchId): JsonResponse
+    public function update(UpdateRelationshipTierRequest $request, int $matchId): JsonResponse
     {
         $match = $this->authorizeAndLoadMatch($matchId);
         $tier = $this->getOrCreateTier($match);
 
-        $validated = $request->validate([
-            'increment_messages' => 'sometimes|boolean',
-            'mark_met_in_person' => 'sometimes|boolean',
-        ]);
+        $validated = $request->validated();
 
         $previousTier = $tier->current_tier;
 

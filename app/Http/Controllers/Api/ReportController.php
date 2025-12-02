@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\StoreReportRequest;
+use App\Http\Requests\Api\UpdateReportRequest;
 use App\Models\Report;
-use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
@@ -30,14 +30,9 @@ class ReportController extends Controller
      *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
      * )
      */
-    public function store(Request $request)
+    public function store(StoreReportRequest $request)
     {
-        $data = $request->validate([
-            'accused_id' => 'required|integer|exists:users,id',
-            'message_id' => 'nullable|integer|exists:messages,id',
-            'reason' => 'required|string|max:100',
-            'details' => 'nullable|string|max:2000'
-        ]);
+        $data = $request->validated();
         if ($data['accused_id'] == Auth::id()) {
             return response()->json(['error' => 'Cannot report yourself'], 422);
         }
@@ -91,16 +86,13 @@ class ReportController extends Controller
     *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
-    public function update(Request $request, int $reportId)
+    public function update(UpdateReportRequest $request, int $reportId)
     {
         $user = Auth::user();
         if (!$user || !$user->is_moderator) {
             return response()->json(['error' => 'Forbidden'], 403);
         }
-        $data = $request->validate([
-            'status' => 'required|string|in:open,reviewing,resolved,dismissed',
-            'resolution_notes' => 'nullable|string|max:5000'
-        ]);
+        $data = $request->validated();
         $report = Report::findOrFail($reportId);
         $report->status = $data['status'];
         $report->resolution_notes = $data['resolution_notes'] ?? $report->resolution_notes;

@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\RequestAvatarRequest;
+use App\Http\Requests\Api\UpsertPhysicalProfileRequest;
 use App\Models\UserPhysicalProfile;
 use App\Jobs\GenerateAvatar;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class UserPhysicalProfileController extends Controller
@@ -79,23 +80,9 @@ class UserPhysicalProfileController extends Controller
      *   @OA\Response(response=401, description="Unauthenticated")
      * )
      */
-    public function upsert(Request $request)
+    public function upsert(UpsertPhysicalProfileRequest $request)
     {
-        $data = $request->validate([
-            'height_cm' => 'nullable|integer|min:80|max:250',
-            'body_type' => 'nullable|string|max:50',
-            'hair_color' => 'nullable|string|max:50',
-            'eye_color' => 'nullable|string|max:50',
-            'skin_tone' => 'nullable|string|max:50',
-            'ethnicity' => 'nullable|string|max:50',
-            'facial_hair' => 'nullable|string|max:50',
-            'tattoos' => 'nullable|boolean',
-            'piercings' => 'nullable|boolean',
-            'dominant_hand' => 'nullable|string|in:left,right,ambi',
-            'fitness_level' => 'nullable|string|in:low,average,fit,athletic',
-            'clothing_style' => 'nullable|string|max:50',
-            'avatar_prompt' => 'nullable|string|max:500',
-        ]);
+        $data = $request->validated();
 
         $profile = UserPhysicalProfile::updateOrCreate(
             ['user_id' => Auth::id()],
@@ -127,11 +114,9 @@ class UserPhysicalProfileController extends Controller
      *   @OA\Response(response=401, description="Unauthenticated")
      * )
      */
-    public function requestAvatar(Request $request)
+    public function requestAvatar(RequestAvatarRequest $request)
     {
-        $data = $request->validate([
-            'style' => 'required|string|in:realistic,anime,fantasy,sci-fi,cartoon,pixel-art',
-        ]);
+        $data = $request->validated();
 
         $profile = UserPhysicalProfile::firstOrNew(['user_id' => Auth::id()]);
         if (!$profile->avatar_prompt) {

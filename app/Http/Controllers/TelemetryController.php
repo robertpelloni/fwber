@@ -5,24 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreClientEventsRequest;
 use App\Services\TelemetryService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class TelemetryController extends Controller
 {
-    private const ALLOWED_CLIENT_EVENTS = [
-        'face_blur_preview_ready',
-        'face_blur_preview_toggled',
-        'face_blur_preview_discarded',
-    ];
-
     public function storeClientEvents(StoreClientEventsRequest $request, TelemetryService $telemetry): JsonResponse
     {
-        // Additional validation for event names
-        $validated = $request->validate([
-            'events.*.name' => 'required|string|in:' . implode(',', self::ALLOWED_CLIENT_EVENTS),
-            'events.*.payload' => 'required|array',
-            'events.*.ts' => 'nullable|date',
-        ]);
+        $validated = $request->validated();
 
         $user = $request->user();
         $userId = $user ? (int)$user->id : null;

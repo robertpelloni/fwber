@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\RespondToFriendRequest;
+use App\Http\Requests\Api\SendFriendRequest;
 use App\Models\Friend;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -81,10 +83,9 @@ class FriendController extends Controller
      *     )
      * )
      */
-    public function sendFriendRequest(Request $request)
+    public function sendFriendRequest(SendFriendRequest $request)
     {
-        $request->validate(['friend_id' => 'required|exists:users,id']);
-        $friendId = $request->friend_id;
+        $friendId = $request->validated()['friend_id'];
 
         if (Auth::id() == $friendId) {
             return response()->json(['message' => 'You cannot send a friend request to yourself.'], 400);
@@ -128,10 +129,9 @@ class FriendController extends Controller
      *     )
      * )
      */
-    public function respondToFriendRequest(Request $request, $userId)
+    public function respondToFriendRequest(RespondToFriendRequest $request, $userId)
     {
-        $request->validate(['status' => 'required|in:accepted,declined']);
-        $status = $request->status;
+        $status = $request->validated()['status'];
 
         $friendship = Friend::where('user_id', $userId)->where('friend_id', Auth::id())->where('status', 'pending')->first();
 

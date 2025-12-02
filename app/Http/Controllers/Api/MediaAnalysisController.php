@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\AnalyzeMediaRequest;
 use App\Services\MediaAnalysis\MediaAnalysisInterface;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class MediaAnalysisController extends Controller
@@ -22,16 +22,13 @@ class MediaAnalysisController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function analyze(Request $request): JsonResponse
+    public function analyze(AnalyzeMediaRequest $request): JsonResponse
     {
-        $request->validate([
-            'media_url' => 'required|url',
-            'media_type' => 'required|in:image,video,audio',
-        ]);
+        $validated = $request->validated();
 
         $result = $this->analysisService->analyze(
-            $request->input('media_url'),
-            $request->input('media_type')
+            $validated['media_url'],
+            $validated['media_type']
         );
 
         return response()->json([

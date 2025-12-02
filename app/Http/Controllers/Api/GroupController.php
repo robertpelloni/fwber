@@ -3,10 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\DiscoverGroupsRequest;
+use App\Http\Requests\Api\MuteGroupMemberRequest;
+use App\Http\Requests\Api\SetGroupRoleRequest;
+use App\Http\Requests\Api\StoreGroupRequest;
+use App\Http\Requests\Api\TransferGroupOwnershipRequest;
+use App\Http\Requests\Api\UpdateGroupRequest;
 use App\Models\Group;
 use App\Services\GroupService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class GroupController extends Controller
@@ -82,14 +87,9 @@ class GroupController extends Controller
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreGroupRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:100',
-            'description' => 'nullable|string|max:1000',
-            'visibility' => 'sometimes|in:public,private',
-            'max_members' => 'sometimes|integer|min:2|max:500',
-        ]);
+        $validated = $request->validated();
 
         try {
             $group = $this->groupService->createGroup(Auth::id(), $validated);
@@ -163,14 +163,9 @@ class GroupController extends Controller
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */
-    public function update(Request $request, int $groupId): JsonResponse
+    public function update(UpdateGroupRequest $request, int $groupId): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'sometimes|string|max:100',
-            'description' => 'nullable|string|max:1000',
-            'visibility' => 'sometimes|in:public,private',
-            'max_members' => 'sometimes|integer|min:2|max:500',
-        ]);
+        $validated = $request->validated();
 
         $group = Group::findOrFail($groupId);
         $userId = Auth::id();
@@ -293,11 +288,9 @@ class GroupController extends Controller
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */
-    public function setRole(Request $request, int $groupId, int $memberUserId): JsonResponse
+    public function setRole(SetGroupRoleRequest $request, int $groupId, int $memberUserId): JsonResponse
     {
-        $validated = $request->validate([
-            'role' => 'required|in:admin,moderator,member',
-        ]);
+        $validated = $request->validated();
 
         $group = Group::findOrFail($groupId);
         try {
@@ -327,11 +320,9 @@ class GroupController extends Controller
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */
-    public function transferOwnership(Request $request, int $groupId): JsonResponse
+    public function transferOwnership(TransferGroupOwnershipRequest $request, int $groupId): JsonResponse
     {
-        $validated = $request->validate([
-            'new_owner_user_id' => 'required|integer',
-        ]);
+        $validated = $request->validated();
 
         $group = Group::findOrFail($groupId);
         try {
@@ -417,13 +408,9 @@ class GroupController extends Controller
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */
-    public function muteMember(int $groupId, int $memberUserId): JsonResponse
+    public function muteMember(MuteGroupMemberRequest $request, int $groupId, int $memberUserId): JsonResponse
     {
-        $validated = request()->validate([
-            'duration_minutes' => 'nullable|integer|min:1|max:10080', // up to 7 days
-            'until' => 'nullable|date',
-            'reason' => 'nullable|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         $group = Group::findOrFail($groupId);
         try {
@@ -561,12 +548,9 @@ class GroupController extends Controller
         *   @OA\Response(response=200, description="Paginated groups list")
         * )
      */
-    public function discover(Request $request): JsonResponse
+    public function discover(DiscoverGroupsRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'search' => 'nullable|string|max:100',
-            'per_page' => 'sometimes|integer|min:1|max:50',
-        ]);
+        $validated = $request->validated();
 
         $query = Group::public()
             ->active()

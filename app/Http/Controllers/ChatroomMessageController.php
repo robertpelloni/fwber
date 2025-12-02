@@ -7,6 +7,7 @@ use App\Models\ChatroomMessage;
 use App\Models\ChatroomMessageReaction;
 use App\Services\ContentModerationService;
 use App\Services\TelemetryService;
+use App\Http\Requests\EditChatroomMessageRequest;
 use App\Http\Requests\StoreChatroomMessageRequest;
 use App\Http\Requests\ReactToChatroomMessageRequest;
 use Illuminate\Http\Request;
@@ -240,7 +241,7 @@ class ChatroomMessageController extends Controller
     *   @OA\Response(response=422, ref="#/components/responses/ModerationError")
      * )
      */
-    public function update(Request $request, int $chatroomId, int $messageId): JsonResponse
+    public function update(EditChatroomMessageRequest $request, int $chatroomId, int $messageId): JsonResponse
     {
         $chatroom = Chatroom::findOrFail($chatroomId);
 
@@ -255,12 +256,10 @@ class ChatroomMessageController extends Controller
             return response()->json(['message' => 'You can only edit your own messages'], 403);
         }
 
-        $request->validate([
-            'content' => 'required|string|max:2000',
-        ]);
+        $validated = $request->validated();
 
         // Content moderation
-        $moderationResult = $this->contentModeration->moderateContent($request->content, [
+        $moderationResult = $this->contentModeration->moderateContent($validated['content'], [
             'user_id' => Auth::id(),
             'content_type' => 'chatroom_message_edit',
             'chatroom_id' => $chatroomId,
@@ -274,7 +273,7 @@ class ChatroomMessageController extends Controller
             ], 422);
         }
 
-        $message->edit($request->content);
+        $message->edit($validated['content']);
 
         Log::info('Chatroom message edited', [
             'chatroom_id' => $chatroomId,

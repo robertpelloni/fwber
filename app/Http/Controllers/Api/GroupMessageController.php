@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\StoreGroupMessageRequest;
 use App\Models\Group;
 use App\Models\GroupMessage;
 use App\Models\GroupMessageRead;
 use App\Services\MediaUploadService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class GroupMessageController extends Controller
@@ -39,14 +39,9 @@ class GroupMessageController extends Controller
      *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
      * )
      */
-    public function store(Request $request, int $groupId): JsonResponse
+    public function store(StoreGroupMessageRequest $request, int $groupId): JsonResponse
     {
-        $validated = $request->validate([
-            'content' => 'nullable|string|max:5000',
-            'message_type' => 'sometimes|string|in:text,image,video,audio,file',
-            'media' => 'nullable|file',
-            'media_duration' => 'nullable|integer|min:1',
-        ]);
+        $validated = $request->validated();
 
         $senderId = Auth::id();
         $group = Group::findOrFail($groupId);
