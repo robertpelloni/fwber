@@ -29,6 +29,11 @@ export {
   RealtimeProvider,
 } from './WebSocketBridge';
 
+// Mercure bridge
+export {
+  MercureRealtimeProvider,
+} from './MercureBridge';
+
 // Proximity presence views
 export {
   ProximityPresenceView,

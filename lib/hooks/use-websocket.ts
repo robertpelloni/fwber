@@ -1,24 +1,23 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useWebSocketContext } from '@/lib/contexts/WebSocketContext';
-import { useWebSocketLogic, UseWebSocketOptions } from './use-websocket-logic';
+import { useMercure } from '@/lib/contexts/MercureContext';
+import { useMercureLogic } from './use-mercure-logic';
+import { UseWebSocketOptions } from './use-websocket-logic';
 
 // Re-export types
 export * from './use-websocket-logic';
 
 /**
- * Hook to access the WebSocket context.
- * If used outside of a WebSocketProvider, it falls back to creating a local instance (legacy behavior),
- * but this is discouraged as it creates multiple connections.
+ * Hook to access the Realtime (Mercure) context.
+ * If used outside of a MercureProvider, it falls back to creating a local instance.
  */
 export function useWebSocket(options: UseWebSocketOptions = {}) {
   try {
-    return useWebSocketContext();
+    return useMercure();
   } catch (e) {
-    // Fallback for components not wrapped in Provider (legacy support)
-    // This ensures existing code doesn't break immediately, but warns about multiple connections
-    console.warn('useWebSocket used outside of WebSocketProvider. Creating local instance.');
+    // Fallback for components not wrapped in Provider
+    console.warn('useWebSocket used outside of MercureProvider. Creating local instance.');
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    return useWebSocketLogic(options);
+    return useMercureLogic(options);
   }
 }
 
