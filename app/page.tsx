@@ -116,7 +116,7 @@ export default function HomePage() {
 
             <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-10 max-w-4xl mx-auto leading-relaxed">
               Find your perfect partner(s) wherever you are—at home, at a convention, or on vacation.
-              Whether you're new to the scene, exploring what's out there, or passing profiles to your partner for approval, we've got you covered.
+              Whether you&apos;re new to the scene, exploring what&apos;s out there, or passing profiles to your partner for approval, we&apos;ve got you covered.
               Find new best friends, a fling, the whole team, or a life mate. Just for tonight, for right now, or for the rest of your life—we cover all scenarios.
             </p>
             
