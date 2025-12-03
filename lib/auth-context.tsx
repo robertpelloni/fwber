@@ -246,7 +246,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         type: 'AUTH_SUCCESS', 
         payload: { 
           user: data.user, 
-          token: data.token 
+          token: data.access_token || data.token 
         } 
       })
     } catch (error) {
@@ -305,7 +305,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         type: 'AUTH_SUCCESS', 
         payload: { 
           user: data.user, 
-          token: data.token 
+          token: data.access_token || data.token 
         } 
       })
     } catch (error) {
