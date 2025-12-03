@@ -219,6 +219,7 @@ class Chatroom extends Model
             'city' => '🏙️',
             'event' => '🎉',
             'private' => '🔒',
+            'group' => '👥',
         ];
 
         $prefix = $prefixes[$this->type] ?? '💬';

@@ -19,6 +19,7 @@ class Group extends Model
         'member_count',
         'visibility',
         'is_active',
+        'chatroom_id',
     ];
 
     protected $casts = [
@@ -29,6 +30,11 @@ class Group extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by_user_id');
+    }
+
+    public function chatroom()
+    {
+        return $this->belongsTo(Chatroom::class);
     }
 
     public function members()

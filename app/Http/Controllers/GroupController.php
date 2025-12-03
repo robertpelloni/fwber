@@ -71,8 +71,8 @@ class GroupController extends Controller
 
         $group = Group::create([
             'name' => $validated['name'],
-            'description' => $validated['description'],
-            'icon' => $validated['icon'],
+            'description' => $validated['description'] ?? null,
+            'icon' => $validated['icon'] ?? null,
             'privacy' => $validated['privacy'],
             'created_by_user_id' => Auth::id(),
             'creator_id' => Auth::id(), // For compatibility
@@ -80,6 +80,21 @@ class GroupController extends Controller
             'visibility' => 'visible', // Default to visible
             'is_active' => true,
         ]);
+
+        // Create associated chatroom
+        $chatroom = \App\Models\Chatroom::create([
+            'name' => $group->name,
+            'description' => $group->description,
+            'type' => 'group',
+            'created_by' => Auth::id(),
+            'is_public' => $group->privacy === 'public',
+            'is_active' => true,
+            'member_count' => 1,
+            'last_activity_at' => now(),
+        ]);
+
+        $chatroom->addMember(Auth::user(), 'admin');
+        $group->update(['chatroom_id' => $chatroom->id]);
 
         GroupMember::create([
             'group_id' => $group->id,
@@ -162,6 +177,14 @@ class GroupController extends Controller
 
         $group->increment('member_count');
 
+        // Add to chatroom if exists
+        if ($group->chatroom_id) {
+            $chatroom = \App\Models\Chatroom::find($group->chatroom_id);
+            if ($chatroom && !$chatroom->hasMember($user)) {
+                $chatroom->addMember($user, 'member');
+            }
+        }
+
         // Invalidate groups cache (member count changed)
         Cache::tags(['groups'])->flush();
 
@@ -206,6 +229,14 @@ class GroupController extends Controller
 
         $member->delete(); // Or set is_active = false
         $group->decrement('member_count');
+
+        // Remove from chatroom if exists
+        if ($group->chatroom_id) {
+            $chatroom = \App\Models\Chatroom::find($group->chatroom_id);
+            if ($chatroom && $chatroom->hasMember($user)) {
+                $chatroom->removeMember($user);
+            }
+        }
 
         // Invalidate groups cache (member count changed)
         Cache::tags(['groups'])->flush();
