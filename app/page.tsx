@@ -94,15 +94,15 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 pt-16 pb-24 lg:pt-32 lg:pb-40">
+      <div className="relative overflow-hidden bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 pt-16 pb-4 lg:pt-32 lg:pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8">
-              <span className="inline-flex flex-wrap justify-center gap-1">
-                <Logo className="text-5xl md:text-7xl" />
-              </span>
-              <span className="block md:inline mt-2 md:mt-0 text-gray-900 dark:text-white"> - <span className="text-blue-600 dark:text-blue-400">Adult Social Network</span></span>
+            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-4">
+              <span className="text-gray-900 dark:text-white">FWBer.me</span>
             </h1>
+            <p className="text-3xl md:text-5xl font-bold mb-8 animate-gradient-x bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent bg-[length:200%_auto]">
+              The Definitive Social Network for Adults
+            </p>
             
             <div className="mb-8 transform hover:scale-105 transition-transform duration-300">
               <p className="text-2xl md:text-3xl text-orange-600 dark:text-orange-400 font-serif italic">
@@ -114,8 +114,10 @@ export default function HomePage() {
               <SexQuote />
             </div>
 
-            <p className="text-xl text-gray-600 dark:text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
-              Join the most advanced adult dating platform. Smart matching, verified profiles, and real connections waiting for you.
+            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-10 max-w-4xl mx-auto leading-relaxed">
+              Find your perfect partner(s) wherever you are—at home, at a convention, or on vacation.
+              Whether you're new to the scene, exploring what's out there, or passing profiles to your partner for approval, we've got you covered.
+              Find new best friends, a fling, the whole team, or a life mate. Just for tonight, for right now, or for the rest of your life—we cover all scenarios.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
@@ -170,144 +172,7 @@ export default function HomePage() {
         <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
       </div>
 
-      {/* Notable Features Section */}
-      <div id="features" className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Notable Features</h2>
-            <p className="text-xl text-gray-600">Unique tools designed for the modern dating experience.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Proximity */}
-            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-blue-50 transition-colors duration-300 border border-gray-100">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-6 text-blue-600">
-                <MapPin className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Real-Time Proximity</h3>
-              <p className="text-gray-600">
-                See who&apos;s nearby right now. Our proximity artifacts let you discover matches within walking distance.
-              </p>
-            </div>
-
-            {/* AI Avatars */}
-            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-purple-50 transition-colors duration-300 border border-gray-100">
-              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-6 text-purple-600">
-                <Ghost className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">No Embarrassment</h3>
-              <p className="text-gray-600">
-                Browse anonymously with AI-generated avatars. Reveal your true self only when you&apos;re ready.
-              </p>
-            </div>
-
-            {/* Gamified Tiers */}
-            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-pink-50 transition-colors duration-300 border border-gray-100">
-              <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center mb-6 text-pink-600">
-                <Layers className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Gamified Tiers</h3>
-              <p className="text-gray-600">
-                Unlock more features as you build trust. Progress from Discovery to Verified status to access exclusive perks.
-              </p>
-            </div>
-
-            {/* Backpage Replacement */}
-            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-orange-50 transition-colors duration-300 border border-gray-100">
-              <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-6 text-orange-600">
-                <FileText className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Classifieds Are Back</h3>
-              <p className="text-gray-600">
-                Miss the old days? Our Bulletin Boards bring back the classic, no-nonsense classifieds experience you loved.
-              </p>
-            </div>
-
-            {/* Client-side Encryption */}
-            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-green-50 transition-colors duration-300 border border-gray-100">
-              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-6 text-green-600">
-                <Lock className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Client-Side Encryption</h3>
-              <p className="text-gray-600">
-                Your secrets stay yours. Photos and messages are encrypted on your device before they ever touch our servers.
-              </p>
-            </div>
-
-            {/* Venue Support */}
-            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-indigo-50 transition-colors duration-300 border border-gray-100">
-              <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-6 text-indigo-600">
-                <Building2 className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Venue Check-Ins</h3>
-              <p className="text-gray-600">
-                Meet safely in public. Check in to partner venues and see who else is there looking for a connection.
-              </p>
-            </div>
-
-             {/* Open Source */}
-             <div className="p-8 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors duration-300 border border-gray-100 md:col-span-2 lg:col-span-3">
-              <div className="flex flex-col md:flex-row items-center text-center md:text-left">
-                <div className="w-12 h-12 bg-gray-200 rounded-xl flex items-center justify-center mb-4 md:mb-0 md:mr-6 text-gray-700 shrink-0">
-                  <Code className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Open Source & Transparent</h3>
-                  <p className="text-gray-600">
-                    We have nothing to hide. Our code is open source, so you can verify our security claims yourself. 
-                    Built by the community, for the community.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Safety Section */}
-      <div id="safety" className="py-24 bg-gray-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="md:w-1/2 mb-12 md:mb-0">
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">Your Privacy Matters</h2>
-              <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-                We use state-of-the-art encryption and security measures to protect your data. 
-                You&apos;re in control of what you share and who sees it.
-              </p>
-              <ul className="space-y-4">
-                <li className="flex items-center text-gray-300">
-                  <Shield className="w-6 h-6 text-green-400 mr-3" />
-                  <span>End-to-end encryption for messages</span>
-                </li>
-                <li className="flex items-center text-gray-300">
-                  <Users className="w-6 h-6 text-blue-400 mr-3" />
-                  <span>Verified profiles only</span>
-                </li>
-                <li className="flex items-center text-gray-300">
-                  <MessageCircle className="w-6 h-6 text-purple-400 mr-3" />
-                  <span>Private and secure chat</span>
-                </li>
-              </ul>
-            </div>
-            <div className="md:w-5/12">
-              <div className="bg-gray-800 p-8 rounded-2xl border border-gray-700">
-                <h3 className="text-2xl font-bold mb-4">Join 50,000+ Members</h3>
-                <p className="text-gray-400 mb-8">
-                  Create your free account today and start exploring matches in your area.
-                </p>
-                <Link
-                  href="/register"
-                  className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center font-bold py-4 rounded-xl transition-colors"
-                >
-                  Create Free Account
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Why FWBer Section */}
+      {/* Why FWBer Section (Moved Up) */}
       <div className="py-24 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16 max-w-3xl mx-auto">
@@ -446,6 +311,145 @@ export default function HomePage() {
                 <p className="text-gray-600 dark:text-gray-400">
                   The full FWBer experience in your pocket with a native app for iOS and Android.
                 </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Notable Features Section */}
+      <div id="features" className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Notable Features</h2>
+            <p className="text-xl text-gray-600">Unique tools designed for the modern dating experience.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Proximity */}
+            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-blue-50 transition-colors duration-300 border border-gray-100">
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-6 text-blue-600">
+                <MapPin className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Real-Time Proximity</h3>
+              <p className="text-gray-600">
+                See who&apos;s nearby right now. Our proximity artifacts let you discover matches within walking distance.
+              </p>
+            </div>
+
+            {/* AI Avatars */}
+            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-purple-50 transition-colors duration-300 border border-gray-100">
+              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-6 text-purple-600">
+                <Ghost className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">No Embarrassment</h3>
+              <p className="text-gray-600">
+                Browse anonymously with AI-generated avatars. Reveal your true self only when you&apos;re ready.
+              </p>
+            </div>
+
+            {/* Gamified Tiers */}
+            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-pink-50 transition-colors duration-300 border border-gray-100">
+              <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center mb-6 text-pink-600">
+                <Layers className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Gamified Tiers</h3>
+              <p className="text-gray-600">
+                Unlock more features as you build trust. Progress from Discovery to Verified status to access exclusive perks.
+              </p>
+            </div>
+
+            {/* Backpage Replacement */}
+            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-orange-50 transition-colors duration-300 border border-gray-100">
+              <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-6 text-orange-600">
+                <FileText className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Classifieds Are Back</h3>
+              <p className="text-gray-600">
+                Miss the old days? Our Bulletin Boards bring back the classic, no-nonsense classifieds experience you loved.
+              </p>
+            </div>
+
+            {/* Client-side Encryption */}
+            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-green-50 transition-colors duration-300 border border-gray-100">
+              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-6 text-green-600">
+                <Lock className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Client-Side Encryption</h3>
+              <p className="text-gray-600">
+                Your secrets stay yours. Photos and messages are encrypted on your device before they ever touch our servers.
+              </p>
+            </div>
+
+            {/* Venue Support */}
+            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-indigo-50 transition-colors duration-300 border border-gray-100">
+              <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-6 text-indigo-600">
+                <Building2 className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Venue Check-Ins</h3>
+              <p className="text-gray-600">
+                Meet safely in public. Check in to partner venues and see who else is there looking for a connection.
+              </p>
+            </div>
+
+             {/* Open Source */}
+             <div className="p-8 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors duration-300 border border-gray-100 md:col-span-2 lg:col-span-3">
+              <div className="flex flex-col md:flex-row items-center text-center md:text-left">
+                <div className="w-12 h-12 bg-gray-200 rounded-xl flex items-center justify-center mb-4 md:mb-0 md:mr-6 text-gray-700 shrink-0">
+                  <Code className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Open Source & Transparent</h3>
+                  <p className="text-gray-600">
+                    We have nothing to hide. Our code is open source, so you can verify our security claims yourself. 
+                    Built by the community, for the community.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      {/* Safety Section */}
+      <div id="safety" className="py-24 bg-gray-900 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between">
+            <div className="md:w-1/2 mb-12 md:mb-0">
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">Your Privacy Matters</h2>
+              <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+                We use state-of-the-art encryption and security measures to protect your data. 
+                You&apos;re in control of what you share and who sees it.
+              </p>
+              <ul className="space-y-4">
+                <li className="flex items-center text-gray-300">
+                  <Shield className="w-6 h-6 text-green-400 mr-3" />
+                  <span>End-to-end encryption for messages</span>
+                </li>
+                <li className="flex items-center text-gray-300">
+                  <Users className="w-6 h-6 text-blue-400 mr-3" />
+                  <span>Verified profiles only</span>
+                </li>
+                <li className="flex items-center text-gray-300">
+                  <MessageCircle className="w-6 h-6 text-purple-400 mr-3" />
+                  <span>Private and secure chat</span>
+                </li>
+              </ul>
+            </div>
+            <div className="md:w-5/12">
+              <div className="bg-gray-800 p-8 rounded-2xl border border-gray-700">
+                <h3 className="text-2xl font-bold mb-4">Join 50,000+ Members</h3>
+                <p className="text-gray-400 mb-8">
+                  Create your free account today and start exploring matches in your area.
+                </p>
+                <Link
+                  href="/register"
+                  className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center font-bold py-4 rounded-xl transition-colors"
+                >
+                  Create Free Account
+                </Link>
               </div>
             </div>
           </div>
