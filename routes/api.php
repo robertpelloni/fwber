@@ -52,6 +52,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('profile/completeness', [\App\Http\Controllers\DashboardController::class, 'getProfileCompleteness']);
 
     // WebSocket
+    Route::get('websocket/token', [\App\Http\Controllers\WebSocketController::class, 'getToken']);
     Route::post('websocket/connect', [\App\Http\Controllers\WebSocketController::class, 'connect']);
     Route::post('websocket/disconnect', [\App\Http\Controllers\WebSocketController::class, 'disconnect']);
     Route::post('websocket/message', [\App\Http\Controllers\WebSocketController::class, 'sendMessage']);

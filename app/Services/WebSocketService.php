@@ -29,6 +29,19 @@ class WebSocketService
     }
 
     /**
+     * Get Mercure JWT token for user
+     */
+    public function getMercureToken(string $userId): string
+    {
+        $topics = [
+            "https://fwber.me/user/{$userId}",
+            "https://fwber.me/presence"
+        ];
+
+        return $this->mercurePublisher->generateSubscriberJWT($topics, (int) $userId);
+    }
+
+    /**
      * Handle WebSocket connection
      */
     public function handleConnection(string $userId, array $connectionData): array
@@ -148,12 +161,19 @@ class WebSocketService
             $message['timestamp'] = now()->toISOString();
             $message['user_id'] = $userId;
 
-            // Publish to user channel
+            // Publish to user channel via Redis (for legacy WebSocket)
             Redis::publish($this->config['redis_channel'], json_encode([
                 'action' => 'send_to_user',
                 'user_id' => $userId,
                 'message' => $message
             ]));
+
+            // Publish to Mercure
+            $this->mercurePublisher->publish(
+                "https://fwber.me/user/{$userId}",
+                $message,
+                true // Private update
+            );
 
             return true;
 
@@ -177,11 +197,19 @@ class WebSocketService
             $message['broadcast'] = true;
 
             foreach ($userIds as $userId) {
+                // Redis
                 Redis::publish($this->config['redis_channel'], json_encode([
                     'action' => 'send_to_user',
                     'user_id' => $userId,
                     'message' => $message
                 ]));
+
+                // Mercure
+                $this->mercurePublisher->publish(
+                    "https://fwber.me/user/{$userId}",
+                    $message,
+                    true
+                );
             }
 
             return true;
@@ -217,8 +245,15 @@ class WebSocketService
                 'last_seen' => now()->toISOString(),
             ]));
 
-            // Notify presence channel
+            // Notify presence channel via Redis
             Redis::publish($this->config['presence_channel'], json_encode($message));
+
+            // Notify via Mercure (public topic for presence)
+            $this->mercurePublisher->publish(
+                "https://fwber.me/presence",
+                $message,
+                false // Public update
+            );
 
             return true;
 

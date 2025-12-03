@@ -19,8 +19,50 @@ class WebSocketController extends Controller
         $this->webSocketService = $webSocketService;
     }
 
-    /**
-     * Handle WebSocket connection
+    /**     * Get Mercure JWT token
+     * 
+     * @OA\Get(
+     *     path="/websocket/token",
+     *     tags={"WebSocket"},
+     *     summary="Get Mercure JWT token",
+     *     description="Get a JWT token for Mercure subscription",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(response=200, description="Token generated",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="token", type="string"),
+     *             @OA\Property(property="hub_url", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
+     * )
+     */
+    public function getToken(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
+            $token = $this->webSocketService->getMercureToken($user->id);
+
+            return response()->json([
+                'token' => $token,
+                'hub_url' => config('services.mercure.public_url', 'https://fwber.me/.well-known/mercure'),
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to get Mercure token', LogContext::fromWebSocket(
+                connectionId: null,
+                eventType: 'get_token_failed',
+                extra: ['error' => $e->getMessage()]
+            ));
+
+            return response()->json(['error' => 'Failed to get token'], 500);
+        }
+    }
+
+    /**     * Handle WebSocket connection
      * 
      * @OA\Post(
      *     path="/websocket/connect",
