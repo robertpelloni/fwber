@@ -104,6 +104,7 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   `PhotoRevealGate`, `FaceReveal`, and `SecurePhotoReveal` components fully implemented.
     -   `usePhotoReveal` hook for reveal workflow.
     -   **Verification**: E2E tests (`face-reveal.cy.js`) passing with mocked backend.
+    -   **Backend Integration** (Dec 04 - Complete): Registered missing `RelationshipTierController` routes (`GET /matches/{id}/tier`, `PUT /matches/{id}/tier`, `GET /matches/{id}/tier/photos`) to fully enable the feature.
 5.  **Admin Observability** (Nov 26 - Complete):
     -   Analytics dashboard wired to backend (`/analytics`, `/analytics/realtime`, `/analytics/moderation`).
     -   Rate Limit Stats component using proper API client with `NEXT_PUBLIC_API_URL`.
