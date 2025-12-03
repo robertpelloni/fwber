@@ -59,6 +59,11 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Visuals**: Added `gradient-x` animation to Hero subtitle.
     -   **Layout**: Reordered Landing Page sections (moved "Why FWBer" above "Notable Features") and refined spacing.
     -   **Verification**: Verified layout and content changes.
+13. **Group Chat Integration** (Dec 04 - Complete):
+    -   **Backend**: Updated `GroupController` to automatically create a linked `Chatroom` upon group creation.
+    -   **Sync**: Implemented membership synchronization (Join/Leave group -> Add/Remove from Chatroom).
+    -   **Database**: Added `chatroom_id` to `groups` table and 'group' type to `chatrooms`.
+    -   **Verification**: Implemented `GroupChatTest` covering creation, joining, and leaving flows.
 
 ### ✅ Completed MVP Features
 1.  **Authentication**: Secure registration, login, and session management.
