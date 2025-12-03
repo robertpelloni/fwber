@@ -158,6 +158,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('venues/{id}/checkins', [\App\Http\Controllers\VenueCheckinController::class, 'index']);
     Route::get('user/checkin', [\App\Http\Controllers\VenueCheckinController::class, 'current']);
 
+    // Relationship Tiers (Face Reveal)
+    Route::middleware('feature:face_reveal')->group(function () {
+        Route::get('matches/{matchId}/tier', [\App\Http\Controllers\Api\RelationshipTierController::class, 'show']);
+        Route::put('matches/{matchId}/tier', [\App\Http\Controllers\Api\RelationshipTierController::class, 'update']);
+        Route::get('matches/{matchId}/tier/photos', [\App\Http\Controllers\Api\RelationshipTierController::class, 'getPhotos']);
+    });
+
     // AI Avatar Generation
     Route::post('avatar/generate', [\App\Http\Controllers\AvatarController::class, 'generate']);
 
