@@ -52,7 +52,7 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Verification**: All Venue-related tests passing.
 11. **Frontend Build & Service Worker Fix** (Dec 04 - Complete):
     -   **Issue**: `next-pwa` was overwriting custom `sw-manual.js`, breaking Push Notifications and Background Sync.
-    -   **Fix**: Extracted logic to `sw-push.js` and configured `next.config.js` to import it via `importScripts`.
+    -   **Fix**: Extracted logic to `sw-push.js` and configured `next.config.js` to import it via `importScripts`. Added missing `date-fns` dependency to fix production build.
     -   **Verification**: Frontend build (`npm run build`) passing locally. Service Worker registration confirmed.
 
 ### ✅ Completed MVP Features
