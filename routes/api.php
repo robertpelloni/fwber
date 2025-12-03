@@ -46,6 +46,23 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('auth/logout', [\App\Http\Controllers\AuthController::class, 'logout']);
     Route::get('auth/me', [\App\Http\Controllers\AuthController::class, 'me']);
 
+    // Dashboard
+    Route::get('dashboard/stats', [\App\Http\Controllers\DashboardController::class, 'getStats']);
+    Route::get('dashboard/activity', [\App\Http\Controllers\DashboardController::class, 'getActivity']);
+    Route::get('profile/completeness', [\App\Http\Controllers\DashboardController::class, 'getProfileCompleteness']);
+
+    // WebSocket
+    Route::post('websocket/connect', [\App\Http\Controllers\WebSocketController::class, 'connect']);
+    Route::post('websocket/disconnect', [\App\Http\Controllers\WebSocketController::class, 'disconnect']);
+    Route::post('websocket/message', [\App\Http\Controllers\WebSocketController::class, 'sendMessage']);
+    Route::post('websocket/typing', [\App\Http\Controllers\WebSocketController::class, 'sendTypingIndicator']);
+    Route::post('websocket/presence', [\App\Http\Controllers\WebSocketController::class, 'updatePresence']);
+    Route::post('websocket/notification', [\App\Http\Controllers\WebSocketController::class, 'sendNotification']);
+    Route::get('websocket/online-users', [\App\Http\Controllers\WebSocketController::class, 'getOnlineUsers']);
+    Route::get('websocket/connections', [\App\Http\Controllers\WebSocketController::class, 'getUserConnections']);
+    Route::get('websocket/status', [\App\Http\Controllers\WebSocketController::class, 'status']);
+    Route::post('websocket/broadcast', [\App\Http\Controllers\WebSocketController::class, 'broadcast']);
+
     // Analytics
     Route::get('analytics', [\App\Http\Controllers\AnalyticsController::class, 'index']);
     Route::get('analytics/realtime', [\App\Http\Controllers\AnalyticsController::class, 'realtime']);

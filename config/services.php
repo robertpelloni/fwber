@@ -39,4 +39,11 @@ return [
         'model' => env('ANTHROPIC_MODEL', 'claude-3-5-sonnet-20241022'),
     ],
 
+    'mercure' => [
+        'public_url' => env('MERCURE_PUBLIC_URL', 'http://localhost:3001/.well-known/mercure'),
+        'internal_url' => env('MERCURE_INTERNAL_URL', 'http://mercure/.well-known/mercure'),
+        'publisher_key' => env('MERCURE_PUBLISHER_JWT_KEY'),
+        'subscriber_key' => env('MERCURE_SUBSCRIBER_JWT_KEY'),
+    ],
+
 ];
