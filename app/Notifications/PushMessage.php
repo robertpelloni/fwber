@@ -8,10 +8,13 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use NotificationChannels\WebPush\WebPushMessage;
 use NotificationChannels\WebPush\WebPushChannel;
+use App\Notifications\Traits\ChecksNotificationPreferences;
+
+use Illuminate\Notifications\Messages\MailMessage;
 
 class PushMessage extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, ChecksNotificationPreferences;
 
     public $title;
     public $body;
@@ -34,7 +37,26 @@ class PushMessage extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['database', 'broadcast', WebPushChannel::class];
+        // Use 'marketing' preference
+        $channels = $this->getChannels($notifiable, 'marketing');
+        
+        // Ensure broadcast is included for real-time updates
+        if (!in_array('broadcast', $channels)) {
+             $channels[] = 'broadcast';
+        }
+        
+        return $channels;
+    }
+
+    /**
+     * Get the mail representation of the notification.
+     */
+    public function toMail(object $notifiable): MailMessage
+    {
+        return (new MailMessage)
+            ->subject($this->title)
+            ->line($this->body)
+            ->action('View Details', url($this->url ?? '/'));
     }
 
     /**

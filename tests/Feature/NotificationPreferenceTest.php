@@ -90,4 +90,23 @@ class NotificationPreferenceTest extends TestCase
         $this->assertContains('database', $channels);
         $this->assertContains(\NotificationChannels\WebPush\WebPushChannel::class, $channels);
     }
+
+    public function test_api_returns_all_types()
+    {
+        $user = \App\Models\User::factory()->create();
+
+        $response = $this->actingAs($user)->getJson('/api/notification-preferences');
+
+        $response->assertStatus(200);
+        
+        $types = collect($response->json())->pluck('type')->toArray();
+        
+        $this->assertContains('new_match', $types);
+        $this->assertContains('new_message', $types);
+        $this->assertContains('event_reminder', $types);
+        $this->assertContains('event_invitation', $types);
+        $this->assertContains('subscription_expired', $types);
+        $this->assertContains('payment_failed', $types);
+        $this->assertContains('marketing', $types);
+    }
 }

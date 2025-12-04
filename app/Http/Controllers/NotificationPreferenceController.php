@@ -11,6 +11,8 @@ class NotificationPreferenceController extends Controller
         'new_message' => 'New Messages',
         'event_reminder' => 'Event Reminders',
         'event_invitation' => 'Event Invitations',
+        'subscription_expired' => 'Subscription Alerts',
+        'payment_failed' => 'Payment Alerts',
         'marketing' => 'Marketing & Updates',
     ];
 

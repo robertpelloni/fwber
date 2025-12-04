@@ -9,10 +9,11 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\WebPush\WebPushMessage;
 use NotificationChannels\WebPush\WebPushChannel;
+use App\Notifications\Traits\ChecksNotificationPreferences;
 
 class SubscriptionExpiredNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, ChecksNotificationPreferences;
 
     public $subscription;
 
@@ -31,7 +32,7 @@ class SubscriptionExpiredNotification extends Notification implements ShouldQueu
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database', WebPushChannel::class];
+        return $this->getChannels($notifiable, 'subscription_expired');
     }
 
     /**
