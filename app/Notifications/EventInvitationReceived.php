@@ -9,10 +9,11 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\WebPush\WebPushChannel;
 use NotificationChannels\WebPush\WebPushMessage;
+use App\Notifications\Traits\ChecksNotificationPreferences;
 
 class EventInvitationReceived extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, ChecksNotificationPreferences;
 
     public $invitation;
 
@@ -31,7 +32,7 @@ class EventInvitationReceived extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['database', WebPushChannel::class];
+        return $this->getChannels($notifiable, 'event_invitation', ['database', WebPushChannel::class]);
     }
 
     /**

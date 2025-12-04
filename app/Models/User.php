@@ -73,4 +73,9 @@ class User extends Authenticatable
                     ->withPivot('role', 'joined_at', 'is_active')
                     ->withTimestamps();
     }
+
+    public function notificationPreferences()
+    {
+        return $this->hasMany(NotificationPreference::class);
+    }
 }

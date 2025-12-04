@@ -9,10 +9,11 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\WebPush\WebPushMessage;
 use NotificationChannels\WebPush\WebPushChannel;
+use App\Notifications\Traits\ChecksNotificationPreferences;
 
 class NewMatchNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, ChecksNotificationPreferences;
 
     public $matchedUser;
 
@@ -31,7 +32,7 @@ class NewMatchNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database', WebPushChannel::class];
+        return $this->getChannels($notifiable, 'new_match');
     }
 
     /**

@@ -9,10 +9,11 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\WebPush\WebPushMessage;
 use NotificationChannels\WebPush\WebPushChannel;
+use App\Notifications\Traits\ChecksNotificationPreferences;
 
 class NewMessageNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, ChecksNotificationPreferences;
 
     public $sender;
     public $messageContent;
@@ -35,8 +36,8 @@ class NewMessageNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        // Only send push for messages, maybe database too. Mail is too spammy for chat.
-        return ['database', WebPushChannel::class];
+        // Default to database and push only for messages
+        return $this->getChannels($notifiable, 'new_message', ['database', WebPushChannel::class]);
     }
 
     /**
