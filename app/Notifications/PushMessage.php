@@ -19,15 +19,17 @@ class PushMessage extends Notification implements ShouldQueue
     public $title;
     public $body;
     public $url;
+    public $type;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(string $title, string $body, ?string $url = null)
+    public function __construct(string $title, string $body, ?string $url = null, string $type = 'marketing')
     {
         $this->title = $title;
         $this->body = $body;
         $this->url = $url;
+        $this->type = $type;
     }
 
     /**
@@ -37,8 +39,8 @@ class PushMessage extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        // Use 'marketing' preference
-        $channels = $this->getChannels($notifiable, 'marketing');
+        // Use preference based on type
+        $channels = $this->getChannels($notifiable, $this->type);
         
         // Ensure broadcast is included for real-time updates
         if (!in_array('broadcast', $channels)) {
