@@ -50,7 +50,15 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Backend**: Implemented comprehensive feature tests for `VenueController` (listing, details) and `VenueCheckinController` (check-in, check-out, spatial validation).
     -   **Infrastructure**: Created `VenueFactory` and fixed SQLite compatibility for geospatial queries in tests.
     -   **Verification**: All Venue-related tests passing.
-11. **Frontend Build & Service Worker Fix** (Dec 04 - Complete):
+11. **Boost Analytics** (Dec 04 - Complete):
+    -   **Backend**: Implemented `boosts()` method in `AnalyticsController` to calculate revenue and active boosts.
+    -   **Frontend**: Created `BoostAnalytics` component and integrated it into the Admin Analytics dashboard.
+    -   **Verification**: Verified component rendering and API integration.
+12. **Stripe Webhook Reliability** (Dec 04 - Complete):
+    -   **Testing**: Created `StripeWebhookTest` covering payment intents and subscription lifecycle events.
+    -   **Hardening**: Patched `StripeWebhookController` to safely handle object casting, preventing crashes on invalid payloads.
+    -   **Verification**: All 4 webhook feature tests passing.
+13. **Frontend Build & Service Worker Fix** (Dec 04 - Complete):
     -   **Issue**: `next-pwa` was overwriting custom `sw-manual.js`, breaking Push Notifications and Background Sync.
     -   **Fix**: Extracted logic to `sw-push.js` and configured `next.config.js` to import it via `importScripts`. Added missing `date-fns` dependency to fix production build.
     -   **Verification**: Frontend build (`npm run build`) passing locally. Service Worker registration confirmed.
@@ -64,6 +72,7 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Sync**: Implemented membership synchronization (Join/Leave group -> Add/Remove from Chatroom).
     -   **Database**: Added `chatroom_id` to `groups` table and 'group' type to `chatrooms`.
     -   **Verification**: Implemented `GroupChatTest` covering creation, joining, and leaving flows.
+    -   **Frontend**: Updated `Group` interface and added "Chat" button to Group Detail page linking to the chatroom.
 
 ### ✅ Completed MVP Features
 1.  **Authentication**: Secure registration, login, and session management.
