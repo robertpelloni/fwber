@@ -11,6 +11,7 @@ export interface Group {
   created_by_user_id: number;
   created_at: string;
   updated_at: string;
+  chatroom_id?: number;
   members?: GroupMember[];
   posts?: GroupPost[];
   is_member?: boolean; // Helper if backend returns it, or we check locally

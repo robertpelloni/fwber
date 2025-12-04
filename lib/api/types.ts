@@ -566,6 +566,25 @@ export interface RateLimitStatsResponse {
   timestamp: string
 }
 
+export interface BoostAnalyticsResponse {
+  active_total: number
+  active_standard: number
+  active_super: number
+  revenue_total: number
+  revenue_today: number
+  recent_purchases: Array<{
+    id: number
+    amount: number
+    currency: string
+    status: string
+    created_at: string
+    user: {
+      id: number
+      name: string
+    }
+  }>
+}
+
 // ============================================================================
 // Chatroom Types (Proximity & Group)
 // ============================================================================

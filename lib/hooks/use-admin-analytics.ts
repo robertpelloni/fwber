@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import {
+  getBoostAnalytics,
   getModerationInsights,
   getPlatformAnalytics,
   getRateLimitStatistics,
@@ -8,6 +9,7 @@ import {
 } from '@/lib/api/admin';
 import type {
   AnalyticsRange,
+  BoostAnalyticsResponse,
   ModerationInsights,
   PlatformAnalyticsResponse,
   RateLimitStatsResponse,
@@ -56,6 +58,18 @@ export function useModerationInsights(options: AdminQueryOptions = {}) {
     enabled: options.enabled ?? true,
     refetchInterval: options.refetchInterval ?? 5 * 60_000,
     staleTime: options.staleTime ?? 5 * 60_000,
+    gcTime: DEFAULT_GC_TIME,
+    refetchOnWindowFocus: false,
+  });
+}
+
+export function useBoostAnalytics(options: AdminQueryOptions = {}) {
+  return useQuery<BoostAnalyticsResponse>({
+    queryKey: ['analytics', 'boosts'],
+    queryFn: getBoostAnalytics,
+    enabled: options.enabled ?? true,
+    refetchInterval: options.refetchInterval ?? 60_000,
+    staleTime: options.staleTime ?? 30_000,
     gcTime: DEFAULT_GC_TIME,
     refetchOnWindowFocus: false,
   });

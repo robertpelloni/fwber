@@ -7,6 +7,7 @@ import type {
   RateLimitStatsResponse,
   RateLimitTimeframe,
   SlowRequest,
+  BoostAnalyticsResponse,
 } from './types';
 
 const DEFAULT_ANALYTICS_RANGE: AnalyticsRange = '7d';
@@ -28,6 +29,10 @@ export function getModerationInsights() {
 
 export function getSlowRequests() {
   return api.get<SlowRequest[]>('/analytics/slow-requests');
+}
+
+export function getBoostAnalytics() {
+  return api.get<BoostAnalyticsResponse>('/analytics/boosts');
 }
 
 export function getRateLimitStatistics(timeframe: RateLimitTimeframe = DEFAULT_RATE_LIMIT_TIMEFRAME) {

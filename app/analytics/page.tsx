@@ -11,6 +11,7 @@ import {
 } from '@/lib/hooks/use-admin-analytics';
 import { useSystemHealth } from '@/lib/hooks/use-config';
 import { exportAllAnalyticsToCSV, exportPlatformAnalyticsToCSV } from '@/lib/utils/csv-export';
+import BoostAnalytics from '@/components/analytics/BoostAnalytics';
 import './analytics-progress.css';
 
 const RANGE_OPTIONS: Array<{ label: string; value: AnalyticsRange }> = [
@@ -153,6 +154,8 @@ export default function AnalyticsPage() {
         ) : (
           <AnalyticsSkeleton />
         )}
+
+      <BoostAnalytics />
 
       <RateLimitStats />
       <SlowRequestsTable />

@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { useParams } from 'next/navigation';
-import { Users, Lock, Globe, Send, Trash2 } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import { Users, Lock, Globe, Send, Trash2, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +11,7 @@ import { useGroup, useGroupPosts, useCreateGroupPost, useJoinGroup, useLeaveGrou
 
 export default function GroupDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const groupId = parseInt(params.id as string);
   
   const { data: group, isLoading: isLoadingGroup } = useGroup(groupId);
@@ -76,13 +77,24 @@ export default function GroupDetailPage() {
             </div>
           </div>
           
-          <Button 
-            variant={isMember ? "outline" : "default"}
-            onClick={isMember ? handleLeave : handleJoin}
-            disabled={joinGroup.isPending || leaveGroup.isPending}
-          >
-            {isMember ? 'Leave Group' : 'Join Group'}
-          </Button>
+          <div className="flex gap-2">
+            {isMember && group.chatroom_id && (
+              <Button 
+                variant="secondary"
+                onClick={() => router.push(`/chatrooms/${group.chatroom_id}`)}
+              >
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Chat
+              </Button>
+            )}
+            <Button 
+              variant={isMember ? "outline" : "default"}
+              onClick={isMember ? handleLeave : handleJoin}
+              disabled={joinGroup.isPending || leaveGroup.isPending}
+            >
+              {isMember ? 'Leave Group' : 'Join Group'}
+            </Button>
+          </div>
         </div>
       </div>
 
