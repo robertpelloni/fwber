@@ -125,7 +125,7 @@ class StripeWebhookController extends Controller
                 'transaction_id' => $paymentIntent->id,
                 'status' => 'succeeded',
                 'description' => $paymentIntent->description ?? 'Premium Subscription',
-                'metadata' => $paymentIntent->toArray(),
+                'metadata' => method_exists($paymentIntent, 'toArray') ? $paymentIntent->toArray() : (array) $paymentIntent,
             ]);
 
             // Grant Premium

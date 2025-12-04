@@ -361,4 +361,52 @@ class AnalyticsController extends Controller
 
         return response()->json($insights);
     }
+
+    /**
+     * Get boost analytics
+     *
+     * @OA\Get(
+     *   path="/analytics/boosts",
+     *   tags={"Analytics"},
+     *   summary="Boost analytics",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="Boost analytics payload")
+     * )
+     */
+    public function boosts(): JsonResponse
+    {
+        $stats = Cache::remember('analytics_boosts', 300, function () {
+            $activeBoosts = \App\Models\Boost::active()->count();
+            $activeStandard = \App\Models\Boost::active()->where('boost_type', 'standard')->count();
+            $activeSuper = \App\Models\Boost::active()->where('boost_type', 'super')->count();
+
+            // Revenue calculation (assuming description contains 'Boost')
+            $totalRevenue = \App\Models\Payment::where('status', 'succeeded')
+                ->where('description', 'like', '%Boost%')
+                ->sum('amount');
+            
+            $todayRevenue = \App\Models\Payment::where('status', 'succeeded')
+                ->where('description', 'like', '%Boost%')
+                ->whereDate('created_at', today())
+                ->sum('amount');
+
+            $recentPurchases = \App\Models\Payment::with('user:id,name')
+                ->where('status', 'succeeded')
+                ->where('description', 'like', '%Boost%')
+                ->orderBy('created_at', 'desc')
+                ->limit(10)
+                ->get();
+
+            return [
+                'active_total' => $activeBoosts,
+                'active_standard' => $activeStandard,
+                'active_super' => $activeSuper,
+                'revenue_total' => $totalRevenue,
+                'revenue_today' => $todayRevenue,
+                'recent_purchases' => $recentPurchases,
+            ];
+        });
+
+        return response()->json($stats);
+    }
 }
