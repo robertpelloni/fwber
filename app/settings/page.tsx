@@ -174,7 +174,7 @@ export default function SettingsPage() {
             </h2>
             <div className="space-y-3">
               <SettingsLink
-                href="/notifications"
+                href="/settings/notifications"
                 icon={<Bell className="w-5 h-5" />}
                 title="Notification Preferences"
                 description="Choose what notifications you receive"
