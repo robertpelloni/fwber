@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\GroupMessageController;
 use App\Http\Controllers\WebSocketController;
 use App\Http\Controllers\ProximityArtifactController;
 use App\Http\Controllers\ModerationController;
+use App\Http\Controllers\Api\FriendController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware("api")->group(function (): void {
@@ -126,6 +127,16 @@ Route::middleware("api")->group(function (): void {
             Route::post('/', [ReportController::class, 'store']);
             Route::get('/', [ReportController::class, 'index']);
             Route::put('/{reportId}', [ReportController::class, 'update']);
+        });
+
+        // Friend routes
+        Route::prefix('friends')->group(function () {
+            Route::get('/', [FriendController::class, 'getFriends']);
+            Route::get('/requests', [FriendController::class, 'getFriendRequests']);
+            Route::post('/requests', [FriendController::class, 'sendFriendRequest']);
+            Route::post('/requests/{userId}', [FriendController::class, 'respondToFriendRequest']);
+            Route::delete('/{friendId}', [FriendController::class, 'removeFriend']);
+            Route::get('/search', [FriendController::class, 'search']);
         });
         
         // Photo routes (Phase 4A - Multi-AI Photo Upload System)
