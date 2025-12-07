@@ -17,6 +17,7 @@ import {
   ChevronRight,
   LogOut,
   CreditCard,
+  CheckCircle,
 } from 'lucide-react';
 
 interface SettingsLinkProps {
@@ -150,6 +151,12 @@ export default function SettingsPage() {
                 description="Securely store sensitive photos with encryption"
                 badge={vaultEnabled ? 'Enabled' : 'Disabled'}
                 disabled={!vaultEnabled}
+              />
+              <SettingsLink
+                href="/settings/verification"
+                icon={<CheckCircle className="w-5 h-5" />}
+                title="Identity Verification"
+                description="Verify your profile with a selfie"
               />
               <SettingsLink
                 href="/photos"

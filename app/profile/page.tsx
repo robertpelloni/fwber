@@ -12,6 +12,7 @@ import { ProfileCompletenessBar, ProfileCompletenessChecklist, calculateProfileC
 import PhysicalProfileEditor from '@/components/PhysicalProfileEditor'
 import { isFeatureEnabled } from '@/lib/featureFlags'
 import ProfileTabs from '@/components/profile/ProfileTabs'
+import VerificationCard from '@/components/VerificationCard'
 
 export default function ProfilePage() {
   const { isAuthenticated, user, token, isLoading: authLoading } = useAuth()
@@ -445,6 +446,9 @@ export default function ProfilePage() {
                 />
               </CardContent>
             </Card>
+
+            {/* Verification Section */}
+            <VerificationCard />
 
             {/* Basic Information */}
             <div>
