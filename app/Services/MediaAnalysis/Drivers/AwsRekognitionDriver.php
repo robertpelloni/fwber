@@ -100,4 +100,54 @@ class AwsRekognitionDriver implements MediaAnalysisInterface
             throw $e;
         }
     }
+
+    public function compareFaces(string $sourcePath, string $targetPath): float
+    {
+        if (!$this->client) {
+            Log::warning('AWS Rekognition credentials not configured. Falling back to mock comparison.');
+            return 99.9; // Auto-pass if not configured (dev mode behavior)
+        }
+
+        try {
+            if (!Storage::disk('public')->exists($sourcePath)) {
+                throw new Exception("Source file not found: $sourcePath");
+            }
+            if (!Storage::disk('public')->exists($targetPath)) {
+                throw new Exception("Target file not found: $targetPath");
+            }
+
+            $sourceBytes = Storage::disk('public')->get($sourcePath);
+            $targetBytes = Storage::disk('public')->get($targetPath);
+
+            $result = $this->client->compareFaces([
+                'SourceImage' => ['Bytes' => $sourceBytes],
+                'TargetImage' => ['Bytes' => $targetBytes],
+                'SimilarityThreshold' => 70
+            ]);
+
+            $faceMatches = $result['FaceMatches'] ?? [];
+            
+            if (empty($faceMatches)) {
+                return 0.0;
+            }
+
+            // Return the highest similarity found
+            $maxSimilarity = 0.0;
+            foreach ($faceMatches as $match) {
+                if (isset($match['Similarity']) && $match['Similarity'] > $maxSimilarity) {
+                    $maxSimilarity = $match['Similarity'];
+                }
+            }
+
+            return $maxSimilarity;
+
+        } catch (Exception $e) {
+            Log::error('AWS Rekognition Compare Faces Failed', [
+                'error' => $e->getMessage(),
+                'source' => $sourcePath,
+                'target' => $targetPath
+            ]);
+            throw $e;
+        }
+    }
 }

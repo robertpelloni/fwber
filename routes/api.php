@@ -212,4 +212,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('feature:media_analysis')->group(function () {
         Route::post('media/analyze', [\App\Http\Controllers\MediaAnalysisController::class, 'analyze']);
     });
+
+    // Verification
+    Route::post('verification/verify', [\App\Http\Controllers\VerificationController::class, 'verify']);
+    Route::get('verification/status', [\App\Http\Controllers\VerificationController::class, 'status']);
 });

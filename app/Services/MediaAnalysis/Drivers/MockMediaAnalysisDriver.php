@@ -88,4 +88,17 @@ class MockMediaAnalysisDriver implements MediaAnalysisInterface
             ['transcription' => 'Hello, this is a test message.', 'sentiment' => 'positive', 'source' => 'mock_driver']
         );
     }
+
+    public function compareFaces(string $sourcePath, string $targetPath): float
+    {
+        Log::info("MockMediaAnalysisDriver: Comparing faces: {$sourcePath} vs {$targetPath}");
+
+        // If filename contains "mismatch", return low score
+        if (str_contains(strtolower($sourcePath), 'mismatch') || str_contains(strtolower($targetPath), 'mismatch')) {
+            return 15.5;
+        }
+
+        // Otherwise return high score
+        return 95.5;
+    }
 }
