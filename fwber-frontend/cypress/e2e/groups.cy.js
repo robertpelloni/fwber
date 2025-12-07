@@ -1,0 +1,132 @@
+describe('Groups', () => {
+  const user = {
+    id: 1,
+    name: 'Test User',
+    email: 'test@example.com',
+    emailVerifiedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    profile: {
+      displayName: 'Test User',
+      dateOfBirth: '1990-01-01',
+      gender: 'non-binary',
+      pronouns: 'they/them',
+      sexualOrientation: 'pansexual',
+      relationshipStyle: 'polyamorous',
+      bio: 'Test bio',
+      locationLatitude: 40.7128,
+      locationLongitude: -74.0060,
+      locationDescription: 'New York, NY',
+      stiStatus: 'negative',
+      preferences: {},
+      avatarUrl: '/images/test-avatar.svg',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+  };
+
+  const groups = [
+    {
+      id: 1,
+      name: 'Hiking Enthusiasts',
+      description: 'A group for people who love hiking.',
+      member_count: 120,
+      is_member: false
+    }
+  ];
+
+  beforeEach(() => {
+    cy.intercept('GET', '**/api/user', { statusCode: 200, body: { data: user } }).as('getUser');
+    cy.intercept('GET', '**/api/groups', { statusCode: 200, body: { data: groups } }).as('getGroups');
+    cy.intercept('GET', '**/api/groups/my-groups', { statusCode: 200, body: { data: [] } }).as('getMyGroups');
+  });
+
+  it('displays a list of groups', () => {
+    cy.visit('/groups', {
+      onBeforeLoad: (win) => {
+        win.localStorage.setItem('fwber_token', 'fake-token');
+        win.localStorage.setItem('fwber_user', JSON.stringify(user));
+      }
+    });
+
+    cy.wait('@getGroups');
+    cy.contains('Hiking Enthusiasts').should('be.visible');
+    cy.contains('120 members').should('be.visible');
+  });
+
+  it('allows joining a group', () => {
+    cy.visit('/groups', {
+      onBeforeLoad: (win) => {
+        win.localStorage.setItem('fwber_token', 'fake-token');
+        win.localStorage.setItem('fwber_user', JSON.stringify(user));
+      }
+    });
+
+    cy.wait('@getGroups');
+
+    cy.intercept('POST', '**/api/groups/1/join', {
+      statusCode: 200,
+      body: { success: true, status: 'joined' }
+    }).as('joinGroup');
+
+    // Update the groups mock to reflect membership
+    cy.intercept('GET', '**/api/groups', { 
+        statusCode: 200, 
+        body: { 
+            data: [{
+                ...groups[0],
+                is_member: true
+            }] 
+        } 
+    }).as('getGroupsUpdated');
+
+    // Also mock my-groups
+    cy.intercept('GET', '**/api/groups/my-groups', {
+        statusCode: 200,
+        body: {
+            data: [{
+                ...groups[0],
+                is_member: true
+            }]
+        }
+    }).as('getMyGroupsUpdated');
+
+    cy.contains('Hiking Enthusiasts').parent().find('button').contains('Join').click();
+    
+    cy.wait('@joinGroup');
+    cy.wait('@getGroupsUpdated'); // Wait for the refetch
+    cy.wait('@getMyGroupsUpdated'); // Wait for my-groups refetch
+    cy.contains('Member').should('be.visible');
+  });
+
+  it('allows creating a new group', () => {
+    cy.visit('/groups/create', {
+      onBeforeLoad: (win) => {
+        win.localStorage.setItem('fwber_token', 'fake-token');
+        win.localStorage.setItem('fwber_user', JSON.stringify(user));
+      }
+    });
+
+    cy.get('input[name="name"]').type('New Test Group');
+    cy.get('textarea[name="description"]').type('Description for the new test group.');
+    
+    cy.intercept('POST', '**/api/groups', {
+      statusCode: 201,
+      body: {
+        data: {
+          id: 2,
+          name: 'New Test Group',
+          description: 'Description for the new test group.',
+          member_count: 1,
+          is_member: true
+        }
+      }
+    }).as('createGroup');
+
+    cy.contains('button', 'Create Group').click();
+    cy.wait('@createGroup');
+    
+    // Should redirect to groups list or the new group page
+    cy.url().should('include', '/groups');
+  });
+});

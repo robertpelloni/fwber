@@ -1,0 +1,190 @@
+
+
+DevTools listening on ws://127.0.0.1:59150/devtools/browser/97b6646a-c82b-4b5a-b8c3-b03383f053aa
+
+====================================================================================================
+
+  (Run Starting)
+
+  ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+  Γöé Cypress:        15.7.0                                                                         Γöé
+  Γöé Browser:        Electron 138 (headless)                                                        Γöé
+  Γöé Node Version:   v24.10.0 (C:\Program Files\nodejs\node.exe)                                    Γöé
+  Γöé Specs:          1 found (realtime-chat.cy.js)                                                  Γöé
+  Γöé Searched:       C:\Users\hyper\workspace\fwber\fwber-frontend\cypress\e2e\realtime-chat.cy.js  Γöé
+  ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
+
+
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+                                                                                                    
+  Running:  realtime-chat.cy.js                                                             (1 of 1)
+
+
+  Real-time Chat & Presence
+    ΓêÜ should load login page (5000ms)
+    1) should connect to WebSocket and show online status
+    2) should display typing indicator when receiving event
+    3) should update presence status of other users
+    4) should send a chat message
+
+
+  1 passing (53s)
+  4 failing
+
+  1) Real-time Chat & Presence
+       should connect to WebSocket and show online status:
+     CypressError: Timed out retrying after 10000ms: `cy.wait()` timed out waiting `10000ms` for the 1st request to the route: `connectRequest`. No request ever occurred.
+
+https://on.cypress.io/wait
+      at cypressErr (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:77989:18)
+      at Object.errByPath (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:78057:10)
+      at checkForXhr (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:138412:84)
+      at <unknown> (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:138437:28)
+      at tryCatcher (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1777:23)
+      at Promise.attempt.Promise.try (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:4285:29)
+      at whenStable (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:151483:68)
+      at <unknown> (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:151424:14)
+      at tryCatcher (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1777:23)
+      at Promise._settlePromiseFromHandler (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1489:31)
+      at Promise._settlePromise (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1546:18)
+      at Promise._settlePromise0 (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1591:10)
+      at Promise._settlePromises (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1671:18)
+      at Promise._fulfill (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1615:18)
+      at <unknown> (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:5420:46)
+  From Your Spec Code:
+      at Object.proxyGetter [as get] (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:80776:22)
+      at exists (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:150671:26)
+      at elExists (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:150686:10)
+      at ensureExistence (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:150867:22)
+      at onFailFn (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:150896:53)
+
+  2) Real-time Chat & Presence
+       should display typing indicator when receiving event:
+     CypressError: Timed out retrying after 10000ms: `cy.wait()` timed out waiting `10000ms` for the 1st request to the route: `connectRequest`. No request ever occurred.
+
+https://on.cypress.io/wait
+      at cypressErr (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:77989:18)
+      at Object.errByPath (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:78057:10)
+      at checkForXhr (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:138412:84)
+      at <unknown> (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:138437:28)
+      at tryCatcher (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1777:23)
+      at Promise.attempt.Promise.try (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:4285:29)
+      at whenStable (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:151483:68)
+      at <unknown> (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:151424:14)
+      at tryCatcher (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1777:23)
+      at Promise._settlePromiseFromHandler (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1489:31)
+      at Promise._settlePromise (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1546:18)
+      at Promise._settlePromise0 (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1591:10)
+      at Promise._settlePromises (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1671:18)
+      at Promise._fulfill (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1615:18)
+      at <unknown> (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:5420:46)
+  From Your Spec Code:
+      at Object.proxyGetter [as get] (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:80776:22)
+      at exists (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:150671:26)
+      at elExists (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:150686:10)
+      at ensureExistence (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:150867:22)
+      at onFailFn (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:150896:53)
+
+  3) Real-time Chat & Presence
+       should update presence status of other users:
+     CypressError: Timed out retrying after 10000ms: `cy.wait()` timed out waiting `10000ms` for the 1st request to the route: `connectRequest`. No request ever occurred.
+
+https://on.cypress.io/wait
+      at cypressErr (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:77989:18)
+      at Object.errByPath (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:78057:10)
+      at checkForXhr (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:138412:84)
+      at <unknown> (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:138437:28)
+      at tryCatcher (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1777:23)
+      at Promise.attempt.Promise.try (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:4285:29)
+      at whenStable (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:151483:68)
+      at <unknown> (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:151424:14)
+      at tryCatcher (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1777:23)
+      at Promise._settlePromiseFromHandler (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1489:31)
+      at Promise._settlePromise (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1546:18)
+      at Promise._settlePromise0 (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1591:10)
+      at Promise._settlePromises (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1671:18)
+      at Promise._fulfill (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1615:18)
+      at <unknown> (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:5420:46)
+  From Your Spec Code:
+      at Object.proxyGetter [as get] (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:80776:22)
+      at exists (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:150671:26)
+      at elExists (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:150686:10)
+      at ensureExistence (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:150867:22)
+      at onFailFn (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:150896:53)
+
+  4) Real-time Chat & Presence
+       should send a chat message:
+     CypressError: Timed out retrying after 10000ms: `cy.wait()` timed out waiting `10000ms` for the 1st request to the route: `connectRequest`. No request ever occurred.
+
+https://on.cypress.io/wait
+      at cypressErr (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:77989:18)
+      at Object.errByPath (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:78057:10)
+      at checkForXhr (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:138412:84)
+      at <unknown> (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:138437:28)
+      at tryCatcher (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1777:23)
+      at Promise.attempt.Promise.try (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:4285:29)
+      at whenStable (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:151483:68)
+      at <unknown> (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:151424:14)
+      at tryCatcher (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1777:23)
+      at Promise._settlePromiseFromHandler (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1489:31)
+      at Promise._settlePromise (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1546:18)
+      at Promise._settlePromise0 (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1591:10)
+      at Promise._settlePromises (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1671:18)
+      at Promise._fulfill (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:1615:18)
+      at <unknown> (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:5420:46)
+  From Your Spec Code:
+      at Object.proxyGetter [as get] (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:80776:22)
+      at exists (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:150671:26)
+      at elExists (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:150686:10)
+      at ensureExistence (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:150867:22)
+      at onFailFn (http://127.0.0.1:3005/__cypress/runner/cypress_runner.js:150896:53)
+
+
+
+
+  (Results)
+
+  ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+  Γöé Tests:        5                                                                                Γöé
+  Γöé Passing:      1                                                                                Γöé
+  Γöé Failing:      4                                                                                Γöé
+  Γöé Pending:      0                                                                                Γöé
+  Γöé Skipped:      0                                                                                Γöé
+  Γöé Screenshots:  4                                                                                Γöé
+  Γöé Video:        true                                                                             Γöé
+  Γöé Duration:     53 seconds                                                                       Γöé
+  Γöé Spec Ran:     realtime-chat.cy.js                                                              Γöé
+  ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
+
+
+  (Screenshots)
+
+  -  C:\Users\hyper\workspace\fwber\fwber-frontend\cypress\screenshots\realtime-chat.     (1280x720)
+     cy.js\Real-time Chat & Presence -- should connect to WebSocket and show online s               
+     tatus (failed).png                                                                             
+  -  C:\Users\hyper\workspace\fwber\fwber-frontend\cypress\screenshots\realtime-chat.     (1280x720)
+     cy.js\Real-time Chat & Presence -- should display typing indicator when receivin               
+     g event (failed).png                                                                           
+  -  C:\Users\hyper\workspace\fwber\fwber-frontend\cypress\screenshots\realtime-chat.     (1280x720)
+     cy.js\Real-time Chat & Presence -- should update presence status of other users                
+     (failed).png                                                                                   
+  -  C:\Users\hyper\workspace\fwber\fwber-frontend\cypress\screenshots\realtime-chat.     (1280x720)
+     cy.js\Real-time Chat & Presence -- should send a chat message (failed).png                     
+
+
+  (Video)
+
+  -  Video output: C:\Users\hyper\workspace\fwber\fwber-frontend\cypress\videos\realtime-chat.cy.js.mp4
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+  Γöé ├ù  realtime-chat.cy.js                      00:53        5        1        4        -        - Γöé
+  ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
+    ├ù  1 of 1 failed (100%)                     00:53        5        1        4        -        -  
+
