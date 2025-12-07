@@ -280,8 +280,11 @@ Visit `/tier-demo` to interactively test the tier system:
 - See photo reveals in real-time
 - Test tier upgrade notifications
 
-### Mock Data
-Current implementation uses simulated tier data. Real backend integration pending.
+### Backend Integration
+Backend integration is complete. The `RelationshipTierController` provides full API support for tier management, including:
+- `GET /api/matches/{matchId}/tier` - Get tier progress
+- `PUT /api/matches/{matchId}/tier` - Update tier metrics (increment messages, mark met in person)
+- `GET /api/matches/{matchId}/tier/photos` - Get tier-based photos with progressive unlock
 
 ## Future Enhancements
 
@@ -317,9 +320,9 @@ Current implementation uses simulated tier data. Real backend integration pendin
 - Demo page functional
 - Simulated data working
 
-### Phase 2: Backend Integration 🔄
-- Database schema creation
-- API endpoint development
+### Phase 2: Backend Integration ✅
+- Database schema creation (relationship_tiers table)
+- API endpoint development (RelationshipTierController)
 - WebSocket tier updates
 - Real-time notifications
 
@@ -358,6 +361,6 @@ Adjust these values to tune the progression speed based on user feedback and pla
 
 ---
 
-**Status:** Frontend implementation complete, backend integration pending
-**Version:** 1.0.0
-**Last Updated:** November 4, 2025
+**Status:** Frontend and backend implementation complete
+**Version:** 1.1.0
+**Last Updated:** December 7, 2025
