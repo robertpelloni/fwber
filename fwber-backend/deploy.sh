@@ -204,10 +204,24 @@ echo ""
 #############################################################################
 
 log_info "Updating code from Git repository..."
+
+# Navigate to repo root if we are in fwber-backend
+if [ -d "../fwber-backend" ] && [ -d "../.git" ]; then
+    cd ..
+    log_info "Changed directory to repository root: $PWD"
+fi
+
 run_or_dry git fetch origin
 run_or_dry git checkout $BRANCH
 run_or_dry git pull origin $BRANCH
 log_success "Code updated to branch: $BRANCH"
+
+# Navigate back to backend directory if we are in root
+if [ -d "fwber-backend" ]; then
+    cd fwber-backend
+    log_info "Changed directory to backend: $PWD"
+fi
+
 echo ""
 
 # Get current commit hash
