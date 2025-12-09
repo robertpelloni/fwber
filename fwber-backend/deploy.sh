@@ -187,6 +187,15 @@ if [ ! -f .env ]; then
         exit 1
     fi
 fi
+
+# Fix invalid Sentry DSN if present (prevents composer install crash)
+if grep -q "SENTRY_LARAVEL_DSN=your_sentry_dsn_here" .env; then
+    log_warning "Found invalid Sentry DSN placeholder. Clearing it to prevent crashes..."
+    # Use sed to replace the line. The syntax differs slightly between GNU sed and BSD sed (macOS)
+    # This syntax should work on Linux (DreamHost)
+    sed -i 's/SENTRY_LARAVEL_DSN=your_sentry_dsn_here/SENTRY_LARAVEL_DSN=/g' .env
+fi
+
 log_success ".env file exists"
 echo ""
 
