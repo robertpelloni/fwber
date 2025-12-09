@@ -33,6 +33,31 @@ export interface UserProfile {
       city: string | null;
       state: string | null;
     };
+    // New Optional Attributes
+    love_language?: string;
+    personality_type?: string;
+    chronotype?: string;
+    social_media?: Record<string, string>;
+    communication_style?: string;
+    blood_type?: string;
+    sti_status?: Record<string, any>;
+    family_plans?: string;
+    relationship_goals?: string;
+    sexual_orientation?: string;
+    pronouns?: string;
+    languages?: string[];
+    zodiac_sign?: string;
+    drinking_status?: string;
+    smoking_status?: string;
+    cannabis_status?: string;
+    dietary_preferences?: string;
+    exercise_habits?: string;
+    sleep_habits?: string;
+    pets?: string[];
+    children?: string;
+    religion?: string;
+    political_views?: string;
+    
     preferences: {
       // Lifestyle preferences
       smoking?: string;
@@ -93,6 +118,29 @@ export interface ProfileUpdateData {
     city?: string;
     state?: string;
   };
+  // New Optional Attributes
+  love_language?: string;
+  personality_type?: string;
+  chronotype?: string;
+  social_media?: Record<string, string>;
+  communication_style?: string;
+  blood_type?: string;
+  sti_status?: Record<string, any>;
+  family_plans?: string;
+  relationship_goals?: string;
+  languages?: string[];
+  zodiac_sign?: string;
+  drinking_status?: string;
+  smoking_status?: string;
+  cannabis_status?: string;
+  dietary_preferences?: string;
+  exercise_habits?: string;
+  sleep_habits?: string;
+  pets?: string[];
+  children?: string;
+  religion?: string;
+  political_views?: string;
+  
   preferences?: {
     // Lifestyle preferences
     smoking?: string;
