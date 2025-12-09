@@ -12,7 +12,7 @@ export default function UserSearch() {
 
   const { data: users, refetch } = useQuery({
     queryKey: ['userSearch', query],
-    queryFn: () => apiClient.get(`/friends/search?query=${query}`).then((res) => res.data),
+    queryFn: () => apiClient.get(`/friends/search?query=${encodeURIComponent(query)}`).then((res) => res.data),
     enabled: false,
   });
 
