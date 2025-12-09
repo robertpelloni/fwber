@@ -253,6 +253,40 @@ export default function EnhancedProfileEditor() {
               </select>
             </FormField>
 
+            <FormField label="Pronouns">
+              <select
+                title="Pronouns"
+                value={profile.pronouns || ''}
+                onChange={(e) => handleChange('pronouns', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select pronouns</option>
+                <option value="he/him">He/Him</option>
+                <option value="she/her">She/Her</option>
+                <option value="they/them">They/Them</option>
+                <option value="other">Other</option>
+              </select>
+            </FormField>
+
+            <FormField label="Sexual Orientation">
+              <select
+                title="Sexual Orientation"
+                value={profile.sexual_orientation || ''}
+                onChange={(e) => handleChange('sexual_orientation', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select orientation</option>
+                <option value="straight">Straight</option>
+                <option value="gay">Gay</option>
+                <option value="lesbian">Lesbian</option>
+                <option value="bisexual">Bisexual</option>
+                <option value="pansexual">Pansexual</option>
+                <option value="asexual">Asexual</option>
+                <option value="queer">Queer</option>
+                <option value="questioning">Questioning</option>
+              </select>
+            </FormField>
+
             <FormField label="Zodiac Sign">
               <select
                 title="Zodiac Sign"
@@ -371,6 +405,22 @@ export default function EnhancedProfileEditor() {
                 <option value="separated">Separated</option>
                 <option value="widowed">Widowed</option>
                 <option value="open-relationship">Open Relationship</option>
+              </select>
+            </FormField>
+
+            <FormField label="Relationship Style">
+              <select
+                title="Relationship Style"
+                value={profile.relationship_style || ''}
+                onChange={(e) => handleChange('relationship_style', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select style</option>
+                <option value="monogamous">Monogamous</option>
+                <option value="non-monogamous">Non-monogamous</option>
+                <option value="open">Open</option>
+                <option value="polyamorous">Polyamorous</option>
+                <option value="other">Other</option>
               </select>
             </FormField>
 
@@ -507,6 +557,126 @@ export default function EnhancedProfileEditor() {
                 <option value="body">Body</option>
                 <option value="intimate">Intimate</option>
                 <option value="multiple">Multiple Locations</option>
+              </select>
+            </FormField>
+
+            <FormField label="Hair Color">
+              <select
+                title="Hair Color"
+                value={profile.hair_color || ''}
+                onChange={(e) => handleChange('hair_color', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="black">Black</option>
+                <option value="brown">Brown</option>
+                <option value="blonde">Blonde</option>
+                <option value="red">Red</option>
+                <option value="auburn">Auburn</option>
+                <option value="grey">Grey</option>
+                <option value="white">White</option>
+                <option value="bald">Bald</option>
+                <option value="dyed">Dyed/Unnatural</option>
+              </select>
+            </FormField>
+
+            <FormField label="Eye Color">
+              <select
+                title="Eye Color"
+                value={profile.eye_color || ''}
+                onChange={(e) => handleChange('eye_color', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="brown">Brown</option>
+                <option value="blue">Blue</option>
+                <option value="green">Green</option>
+                <option value="hazel">Hazel</option>
+                <option value="grey">Grey</option>
+                <option value="amber">Amber</option>
+                <option value="heterochromia">Heterochromia</option>
+              </select>
+            </FormField>
+
+            <FormField label="Skin Tone">
+              <select
+                title="Skin Tone"
+                value={profile.skin_tone || ''}
+                onChange={(e) => handleChange('skin_tone', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="fair">Fair</option>
+                <option value="light">Light</option>
+                <option value="medium">Medium</option>
+                <option value="olive">Olive</option>
+                <option value="tan">Tan</option>
+                <option value="brown">Brown</option>
+                <option value="dark">Dark</option>
+              </select>
+            </FormField>
+
+            <FormField label="Facial Hair">
+              <select
+                title="Facial Hair"
+                value={profile.facial_hair || ''}
+                onChange={(e) => handleChange('facial_hair', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="clean-shaven">Clean Shaven</option>
+                <option value="stubble">Stubble</option>
+                <option value="beard">Beard</option>
+                <option value="mustache">Mustache</option>
+                <option value="goatee">Goatee</option>
+              </select>
+            </FormField>
+
+            <FormField label="Fitness Level">
+              <select
+                title="Fitness Level"
+                value={profile.fitness_level || ''}
+                onChange={(e) => handleChange('fitness_level', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="sedentary">Sedentary</option>
+                <option value="lightly-active">Lightly Active</option>
+                <option value="moderately-active">Moderately Active</option>
+                <option value="very-active">Very Active</option>
+                <option value="athlete">Athlete</option>
+              </select>
+            </FormField>
+
+            <FormField label="Clothing Style">
+              <select
+                title="Clothing Style"
+                value={profile.clothing_style || ''}
+                onChange={(e) => handleChange('clothing_style', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="casual">Casual</option>
+                <option value="formal">Formal</option>
+                <option value="business">Business</option>
+                <option value="sporty">Sporty</option>
+                <option value="alternative">Alternative</option>
+                <option value="vintage">Vintage</option>
+                <option value="trendy">Trendy</option>
+              </select>
+            </FormField>
+
+            <FormField label="Dominant Hand">
+              <select
+                title="Dominant Hand"
+                value={profile.dominant_hand || ''}
+                onChange={(e) => handleChange('dominant_hand', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="right">Right</option>
+                <option value="left">Left</option>
+                <option value="ambidextrous">Ambidextrous</option>
               </select>
             </FormField>
           </div>

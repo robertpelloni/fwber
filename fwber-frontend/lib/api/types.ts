@@ -66,6 +66,17 @@ export interface UserProfile {
   occupation: string | null
   education: string | null
   
+  // Appearance & Physical
+  hair_color: string | null
+  eye_color: string | null
+  skin_tone: string | null
+  facial_hair: string | null
+  dominant_hand: string | null
+  fitness_level: string | null
+  clothing_style: string | null
+  avatar_prompt: string | null
+  avatar_status: string | null
+
   // Intimate Attributes
   penis_length_cm: number | null
   penis_girth_cm: number | null

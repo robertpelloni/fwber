@@ -43,6 +43,18 @@ class UserProfile extends Model
         'has_pets',
         'languages',
         'interests',
+        'pronouns',
+        'sexual_orientation',
+        'relationship_style',
+        'hair_color',
+        'eye_color',
+        'skin_tone',
+        'facial_hair',
+        'dominant_hand',
+        'fitness_level',
+        'clothing_style',
+        'avatar_prompt',
+        'avatar_status',
     ];
 
     protected $casts = [
