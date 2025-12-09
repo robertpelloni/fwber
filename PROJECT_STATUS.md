@@ -45,6 +45,7 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Feedback**: Verified `FeedbackController` implementation and `FeedbackTest` coverage.
     -   **Voice Messages**: Created `DirectMessageTest` covering text and audio messages. Fixed missing `messages` routes in `api.php`.
     -   **Verification**: All new tests passing.
+    -   **Avatar Generation Enhancement**: Refactored `AvatarGenerationService` to include detailed physical attributes (body type, tattoos, style, etc.) in AI prompts. Added `avatar_url` to `users` table. Verified with `AvatarGenerationTest`.
 9.  **Monitoring & Observability** (Dec 09 - Complete):
     -   **Health Checks**: Enhanced `HealthController` to be database-agnostic (SQLite/MySQL/PgSQL) and robust against failures. Created `HealthCheckTest`.
     -   **Structured Logging**: Configured `json` logging channel in `logging.php` for production observability.

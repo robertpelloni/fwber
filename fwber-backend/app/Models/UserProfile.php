@@ -81,6 +81,8 @@ class UserProfile extends Model
         'penis_girth_cm' => 'decimal:2',
         'sti_status' => 'array',
         'fetishes' => 'array',
+        'tattoos' => 'array',
+        'piercings' => 'array',
         'preferences' => 'array',
         'social_media' => 'array',
     ];

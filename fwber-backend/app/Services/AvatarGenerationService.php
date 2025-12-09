@@ -279,7 +279,13 @@ class AvatarGenerationService
 
     private function saveImageFromUrl(string $url, string $provider): string
     {
-        $contents = file_get_contents($url);
+        $response = Http::get($url);
+        
+        if (!$response->successful()) {
+            throw new \Exception("Failed to download image from {$url}");
+        }
+
+        $contents = $response->body();
         $filename = 'avatars/' . Str::uuid() . '.png';
         Storage::disk('public')->put($filename, $contents);
         return Storage::url($filename);
