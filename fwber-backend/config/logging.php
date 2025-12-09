@@ -64,6 +64,15 @@ return [
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 14,
+            'formatter' => env('LOG_FORMATTER', null), // Allow overriding formatter
+        ],
+
+        'json' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/laravel-json.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 14,
+            'formatter' => \Monolog\Formatter\JsonFormatter::class,
         ],
 
         'slack' => [

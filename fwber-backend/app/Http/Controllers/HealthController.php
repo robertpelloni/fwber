@@ -54,13 +54,24 @@ class HealthController extends Controller
         // Database connectivity
         try {
             DB::connection()->getPdo();
-            $dbVersion = DB::select('SELECT VERSION() as version')[0]->version ?? 'unknown';
+            
+            $driver = DB::connection()->getDriverName();
+            $dbVersion = 'unknown';
+            
+            if ($driver === 'sqlite') {
+                $dbVersion = DB::select('SELECT sqlite_version() as version')[0]->version ?? 'unknown';
+            } elseif ($driver === 'mysql' || $driver === 'mariadb') {
+                $dbVersion = DB::select('SELECT VERSION() as version')[0]->version ?? 'unknown';
+            } elseif ($driver === 'pgsql') {
+                $dbVersion = DB::select('SELECT version() as version')[0]->version ?? 'unknown';
+            }
+
             $status['checks']['database'] = [
                 'status' => 'ok',
                 'version' => $dbVersion,
                 'connection' => DB::connection()->getDatabaseName(),
             ];
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $status['checks']['database'] = [
                 'status' => 'failed',
                 'error' => $e->getMessage(),
@@ -76,7 +87,7 @@ class HealthController extends Controller
                 'status' => 'ok',
                 'version' => $redisInfo['redis_version'] ?? 'unknown',
             ];
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $status['checks']['redis'] = [
                 'status' => 'failed',
                 'error' => $e->getMessage(),
@@ -199,7 +210,7 @@ class HealthController extends Controller
             Redis::ping();
             
             return response()->json(['status' => 'ready'], 200);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'status' => 'not_ready',
                 'error' => $e->getMessage(),

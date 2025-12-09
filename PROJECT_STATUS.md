@@ -45,6 +45,11 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Feedback**: Verified `FeedbackController` implementation and `FeedbackTest` coverage.
     -   **Voice Messages**: Created `DirectMessageTest` covering text and audio messages. Fixed missing `messages` routes in `api.php`.
     -   **Verification**: All new tests passing.
+9.  **Monitoring & Observability** (Dec 09 - Complete):
+    -   **Health Checks**: Enhanced `HealthController` to be database-agnostic (SQLite/MySQL/PgSQL) and robust against failures. Created `HealthCheckTest`.
+    -   **Structured Logging**: Configured `json` logging channel in `logging.php` for production observability.
+    -   **Context Injection**: Enhanced `InjectLoggingContext` middleware to use `Log::withContext()` for distributed tracing (Request ID, User ID, IP).
+    -   **Verification**: All health check tests passing.
 2.  **Cache Versioning & Strategy** (Dec 04 - Complete):
     -   Implemented `CACHE_VERSION` strategy for global cache invalidation.
     -   Updated `Group`, `Event`, and `Subscription` controllers to use versioned keys.
