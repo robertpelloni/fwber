@@ -26,6 +26,10 @@ class UserProfile extends Model
         'looking_for',
         'interested_in',
         'smoking_status',
+        'penis_length_cm',
+        'penis_girth_cm',
+        'sti_status',
+        'fetishes',
         'drinking_status',
         'cannabis_status',
         'dietary_preferences',
@@ -50,6 +54,10 @@ class UserProfile extends Model
         'looking_for' => 'array',
         'interested_in' => 'array',
         'height_cm' => 'integer',
+        'penis_length_cm' => 'decimal:2',
+        'penis_girth_cm' => 'decimal:2',
+        'sti_status' => 'array',
+        'fetishes' => 'array',
     ];
 
     public function user()

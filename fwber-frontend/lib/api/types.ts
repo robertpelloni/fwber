@@ -66,6 +66,12 @@ export interface UserProfile {
   occupation: string | null
   education: string | null
   
+  // Intimate Attributes
+  penis_length_cm: number | null
+  penis_girth_cm: number | null
+  sti_status: Record<string, any> | null
+  fetishes: string[] | null
+
   // Lifestyle Attributes
   smoking_status: string | null
   drinking_status: string | null

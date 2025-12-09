@@ -22,6 +22,8 @@ export default function EnhancedProfileEditor() {
     looking_for: [],
     interests: [],
     languages: [],
+    fetishes: [],
+    sti_status: {},
   });
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [touched, setTouched] = useState<Set<string>>(new Set());
@@ -85,7 +87,7 @@ export default function EnhancedProfileEditor() {
     setTouched(prev => new Set(prev).add(field));
   };
 
-  const handleArrayToggle = (field: 'looking_for' | 'interests' | 'languages' | 'interested_in', value: string) => {
+  const handleArrayToggle = (field: 'looking_for' | 'interests' | 'languages' | 'interested_in' | 'fetishes', value: string) => {
     const current = (profile[field] as string[]) || [];
     const updated = current.includes(value)
       ? current.filter(item => item !== value)
@@ -589,6 +591,92 @@ export default function EnhancedProfileEditor() {
                 <option value="false">No</option>
                 <option value="true">Yes</option>
               </select>
+            </FormField>
+          </div>
+        </Section>
+
+        {/* Intimate Details */}
+        <Section title="Intimate Details" icon={<Info />}>
+          <div className="p-4 bg-purple-50 border border-purple-100 rounded-lg mb-6">
+            <div className="flex gap-3">
+              <Info className="w-5 h-5 text-purple-600 flex-shrink-0" />
+              <p className="text-sm text-purple-800">
+                These details are sensitive and personal. You can choose who sees this information in your privacy settings. 
+                Sharing this information can help find more compatible matches.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField label="Penis Length (cm)">
+              <input
+                type="number"
+                value={profile.penis_length_cm || ''}
+                onChange={(e) => handleChange('penis_length_cm', parseFloat(e.target.value))}
+                className={inputClassName()}
+                placeholder="Length in cm"
+                step="0.1"
+              />
+            </FormField>
+
+            <FormField label="Penis Girth (cm)">
+              <input
+                type="number"
+                value={profile.penis_girth_cm || ''}
+                onChange={(e) => handleChange('penis_girth_cm', parseFloat(e.target.value))}
+                className={inputClassName()}
+                placeholder="Girth in cm"
+                step="0.1"
+              />
+            </FormField>
+          </div>
+
+          <div className="mt-4">
+            <FormField label="STI Status">
+              <div className="space-y-2">
+                <div className="flex flex-wrap gap-2">
+                  {['HIV Negative', 'HIV Positive (Undetectable)', 'HSV-1', 'HSV-2', 'HPV', 'PrEP User', 'Regularly Tested'].map(status => (
+                    <ToggleChip
+                      key={status}
+                      label={status}
+                      selected={(profile.sti_status?.status || []).includes(status)}
+                      onClick={() => {
+                        const currentStatus = (profile.sti_status?.status as string[]) || [];
+                        const newStatus = currentStatus.includes(status)
+                          ? currentStatus.filter(s => s !== status)
+                          : [...currentStatus, status];
+                        handleChange('sti_status', { ...profile.sti_status, status: newStatus });
+                      }}
+                    />
+                  ))}
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-gray-500">Last Tested Date</label>
+                  <input
+                    title="Last Tested Date"
+                    type="date"
+                    value={profile.sti_status?.last_tested || ''}
+                    onChange={(e) => handleChange('sti_status', { ...profile.sti_status, last_tested: e.target.value })}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                  />
+                </div>
+              </div>
+            </FormField>
+          </div>
+
+          <div className="mt-4">
+            <FormField label="Fetishes & Kinks">
+              <div className="flex flex-wrap gap-2">
+                {['BDSM', 'Roleplay', 'Voyeurism', 'Exhibitionism', 'Bondage', 'Domination', 'Submission', 'Feet', 'Leather', 'Latex', 'Group Sex', 'Public'].map(fetish => (
+                  <ToggleChip
+                    key={fetish}
+                    label={fetish}
+                    selected={(profile.fetishes || []).includes(fetish)}
+                    onClick={() => handleArrayToggle('fetishes', fetish)}
+                  />
+                ))}
+              </div>
+              <p className="mt-2 text-xs text-gray-500">Select all that apply. You can add more specific details in your bio if you wish.</p>
             </FormField>
           </div>
         </Section>
