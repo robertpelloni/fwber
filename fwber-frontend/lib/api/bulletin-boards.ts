@@ -1,4 +1,5 @@
 import { useAuth } from '../auth-context';
+import { storeOfflineMessage } from '../offline-store';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -144,15 +145,56 @@ export class BulletinBoardAPI {
     message: BulletinMessage;
     board: BulletinBoard;
   }> {
-    return this.request(`/bulletin-boards/${boardId}/messages`, {
-      method: 'POST',
-      body: JSON.stringify({
-        content,
-        lat: location.lat,
-        lng: location.lng,
-        ...options,
-      }),
-    });
+    try {
+      return await this.request(`/bulletin-boards/${boardId}/messages`, {
+        method: 'POST',
+        body: JSON.stringify({
+          content,
+          lat: location.lat,
+          lng: location.lng,
+          ...options,
+        }),
+      });
+    } catch (error) {
+      // Check if offline
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        console.log('Offline, storing message for sync');
+        await storeOfflineMessage({
+          boardId,
+          content,
+          lat: location.lat,
+          lng: location.lng,
+          is_anonymous: options.is_anonymous,
+          token: this.token, // Store token to replay request
+          createdAt: Date.now()
+        });
+        
+        // Register sync
+        if ('serviceWorker' in navigator && 'SyncManager' in window) {
+          const registration = await navigator.serviceWorker.ready;
+          // @ts-ignore - SyncManager is not in all TS definitions
+          await registration.sync.register('bulletin-message');
+        }
+        
+        // Return a fake message so the UI updates optimistically
+        return {
+          message: {
+            id: -Date.now(), // Negative ID for temp
+            bulletin_board_id: boardId,
+            user_id: 0, // Unknown
+            content,
+            is_anonymous: !!options.is_anonymous,
+            is_moderated: false,
+            reaction_count: 0,
+            reply_count: 0,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          board: {} as any // Partial board
+        };
+      }
+      throw error;
+    }
   }
 
   /**

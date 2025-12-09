@@ -119,22 +119,68 @@ async function syncLocationUpdates() {
 }
 
 // IndexedDB helpers for offline storage
+const DB_NAME = 'fwber_offline_store';
+const DB_VERSION = 1;
+const STORE_MESSAGES = 'offline_messages';
+const STORE_LOCATIONS = 'offline_locations';
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains(STORE_MESSAGES)) {
+        db.createObjectStore(STORE_MESSAGES, { keyPath: 'id', autoIncrement: true });
+      }
+      if (!db.objectStoreNames.contains(STORE_LOCATIONS)) {
+        db.createObjectStore(STORE_LOCATIONS, { keyPath: 'id', autoIncrement: true });
+      }
+    };
+  });
+}
+
 async function getOfflineMessages() {
-  // This would typically use IndexedDB
-  return [];
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(STORE_MESSAGES, 'readonly');
+    const store = transaction.objectStore(STORE_MESSAGES);
+    const request = store.getAll();
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
 }
 
 async function removeOfflineMessage(id) {
-  // This would typically use IndexedDB
-  console.log('Removing offline message:', id);
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(STORE_MESSAGES, 'readwrite');
+    const store = transaction.objectStore(STORE_MESSAGES);
+    const request = store.delete(id);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
 }
 
 async function getOfflineLocations() {
-  // This would typically use IndexedDB
-  return [];
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(STORE_LOCATIONS, 'readonly');
+    const store = transaction.objectStore(STORE_LOCATIONS);
+    const request = store.getAll();
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
 }
 
 async function removeOfflineLocation(id) {
-  // This would typically use IndexedDB
-  console.log('Removing offline location:', id);
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(STORE_LOCATIONS, 'readwrite');
+    const store = transaction.objectStore(STORE_LOCATIONS);
+    const request = store.delete(id);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
 }

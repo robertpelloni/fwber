@@ -36,6 +36,10 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
         -   **Proximity Feed**: Stabilized `proximity-feed.cy.js` with `MockEventSource`.
     -   **Verification**: Verified passing status for all remaining E2E tests: `proximity-feed`, `face-reveal`, `groups`, `proximity-chatrooms`, `physical-profile`, `ml-content-generation`, `premium-features`, `boosts`, `events`.
     -   **Status**: Full E2E test suite (16+ specs) is now passing.
+7.  **Offline Support Implementation** (Dec 10 - Complete):
+    -   **Service Worker**: Implemented IndexedDB logic in `sw-push.js` for `bulletin-message` background sync.
+    -   **Frontend**: Created `lib/offline-store.ts` and updated `BulletinBoardAPI` to store messages when offline and register sync tasks.
+    -   **Verification**: Code implementation complete.
 2.  **Cache Versioning & Strategy** (Dec 04 - Complete):
     -   Implemented `CACHE_VERSION` strategy for global cache invalidation.
     -   Updated `Group`, `Event`, and `Subscription` controllers to use versioned keys.

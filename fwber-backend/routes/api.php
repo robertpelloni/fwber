@@ -272,3 +272,4 @@ Route::middleware('auth:sanctum')->group(function () {
     // Feedback
     Route::post('feedback', [\App\Http\Controllers\FeedbackController::class, 'store']);
 });
+
