@@ -17,7 +17,7 @@ class FriendTest extends TestCase
         $friend = User::factory()->create();
         Friend::factory()->create(['user_id' => $user->id, 'friend_id' => $friend->id, 'status' => 'accepted']);
 
-        $response = $this->actingAs($user)->getJson('/api/venue/friends');
+        $response = $this->actingAs($user)->getJson('/api/friends');
 
         $response->assertStatus(200);
         $response->assertJsonCount(1);
@@ -29,7 +29,7 @@ class FriendTest extends TestCase
         $requester = User::factory()->create();
         Friend::factory()->create(['user_id' => $requester->id, 'friend_id' => $user->id, 'status' => 'pending']);
 
-        $response = $this->actingAs($user)->getJson('/api/venue/friends/requests');
+        $response = $this->actingAs($user)->getJson('/api/friends/requests');
 
         $response->assertStatus(200);
         $response->assertJsonCount(1);
@@ -40,7 +40,7 @@ class FriendTest extends TestCase
         $user = User::factory()->create();
         $friend = User::factory()->create();
 
-        $response = $this->actingAs($user)->postJson('/api/venue/friends/requests', ['friend_id' => $friend->id]);
+        $response = $this->actingAs($user)->postJson('/api/friends/requests', ['friend_id' => $friend->id]);
 
         $response->assertStatus(201);
         $this->assertDatabaseHas('friends', ['user_id' => $user->id, 'friend_id' => $friend->id]);
@@ -52,7 +52,7 @@ class FriendTest extends TestCase
         $requester = User::factory()->create();
         $friendRequest = Friend::factory()->create(['user_id' => $requester->id, 'friend_id' => $user->id, 'status' => 'pending']);
 
-        $response = $this->actingAs($user)->postJson("/api/venue/friends/requests/{$requester->id}", ['status' => 'accepted']);
+        $response = $this->actingAs($user)->postJson("/api/friends/requests/{$requester->id}", ['status' => 'accepted']);
 
         $response->assertStatus(200);
         $this->assertDatabaseHas('friends', ['id' => $friendRequest->id, 'status' => 'accepted']);
@@ -64,7 +64,7 @@ class FriendTest extends TestCase
         $friend = User::factory()->create();
         $friendship = Friend::factory()->create(['user_id' => $user->id, 'friend_id' => $friend->id, 'status' => 'accepted']);
 
-        $response = $this->actingAs($user)->deleteJson("/api/venue/friends/{$friend->id}");
+        $response = $this->actingAs($user)->deleteJson("/api/friends/{$friend->id}");
 
         $response->assertStatus(200);
         $this->assertDatabaseMissing('friends', ['id' => $friendship->id]);
@@ -76,7 +76,7 @@ class FriendTest extends TestCase
         User::factory()->create(['name' => 'John Doe']);
         User::factory()->create(['name' => 'Jane Doe']);
 
-        $response = $this->actingAs($user)->getJson('/api/venue/friends/search?query=John');
+        $response = $this->actingAs($user)->getJson('/api/friends/search?query=John');
 
         $response->assertStatus(200);
         $response->assertJsonFragment(['name' => 'John Doe']);

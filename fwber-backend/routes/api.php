@@ -66,30 +66,6 @@ Route::prefix('venue')->group(function () {
             Route::put('/{reportId}', [ReportController::class, 'update']);
         });
 
-        // Friend routes
-        Route::prefix('friends')->group(function () {
-            Route::get('/', [FriendController::class, 'getFriends']);
-            Route::get('/requests', [FriendController::class, 'getFriendRequests']);
-            Route::post('/requests', [FriendController::class, 'sendFriendRequest']);
-            Route::post('/requests/{userId}', [FriendController::class, 'respondToFriendRequest']);
-            Route::delete('/{friendId}', [FriendController::class, 'removeFriend']);
-            Route::get('/search', [FriendController::class, 'search']);
-        });
-        
-        // Photo routes (Phase 4A - Multi-AI Photo Upload System)
-        Route::get("/photos", [PhotoController::class, "index"]);
-        Route::post("/photos", [PhotoController::class, "store"]);
-        Route::put("/photos/{id}", [PhotoController::class, "update"]);
-        Route::delete("/photos/{id}", [PhotoController::class, "destroy"]);
-        Route::post("/photos/reorder", [PhotoController::class, "reorder"]);
-        
-        // Location routes (Phase 5A - Location-Based Social Features)
-        Route::get("/location", [LocationController::class, "show"]);
-        Route::post("/location", [LocationController::class, "update"]);
-        Route::put("/location/privacy", [LocationController::class, "updatePrivacy"]);
-        Route::delete("/location", [LocationController::class, "clear"]);
-        Route::get("/location/nearby", [LocationController::class, "nearby"]);
-
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('logout', [\App\Http\Controllers\VenueAuthController::class, 'logout']);
         Route::get('me', [\App\Http\Controllers\VenueAuthController::class, 'me']);
@@ -271,6 +247,23 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('feature:media_analysis')->group(function () {
         Route::post('media/analyze', [\App\Http\Controllers\MediaAnalysisController::class, 'analyze']);
     });
+
+    // Friend routes
+    Route::prefix('friends')->group(function () {
+        Route::get('/', [FriendController::class, 'getFriends']);
+        Route::get('/requests', [FriendController::class, 'getFriendRequests']);
+        Route::post('/requests', [FriendController::class, 'sendFriendRequest']);
+        Route::post('/requests/{userId}', [FriendController::class, 'respondToFriendRequest']);
+        Route::delete('/{friendId}', [FriendController::class, 'removeFriend']);
+        Route::get('/search', [FriendController::class, 'search']);
+    });
+
+    // Location routes (Phase 5A - Location-Based Social Features)
+    Route::get("/location", [LocationController::class, "show"]);
+    Route::post("/location", [LocationController::class, "update"]);
+    Route::put("/location/privacy", [LocationController::class, "updatePrivacy"]);
+    Route::delete("/location", [LocationController::class, "clear"]);
+    Route::get("/location/nearby", [LocationController::class, "nearby"]);
 
     // Verification
     Route::post('verification/verify', [\App\Http\Controllers\VerificationController::class, 'verify']);

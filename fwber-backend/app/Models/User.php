@@ -78,4 +78,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(NotificationPreference::class);
     }
+
+    public function matchesAsUser1()
+    {
+        return $this->hasMany(MatchModel::class, 'user1_id');
+    }
+
+    public function matchesAsUser2()
+    {
+        return $this->hasMany(MatchModel::class, 'user2_id');
+    }
 }

@@ -28,7 +28,7 @@ export async function sendFriendRequest(token: string, friend_id: number) {
 
 export async function respondToFriendRequest(token: string, userId: number, status: 'accepted' | 'declined') {
   const response = await fetch(`${API_BASE_URL}/friends/requests/${userId}`, {
-    method: 'PUT',
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
