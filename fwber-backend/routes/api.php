@@ -1,6 +1,35 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BulletinBoardController;
+use App\Http\Controllers\ChatroomController;
+use App\Http\Controllers\ChatroomMessageController;
+use App\Http\Controllers\ContentGenerationController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LocationController;
+use App\Http\Controllers\MatchController;
+use App\Http\Controllers\MercureAuthController;
+use App\Http\Controllers\PhotoController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProfileViewController;
+use App\Http\Controllers\ProximityChatroomController;
+use App\Http\Controllers\ProximityChatroomMessageController;
+use App\Http\Controllers\RateLimitController;
+use App\Http\Controllers\RecommendationController;
+use App\Http\Controllers\HealthController;
+use App\Http\Controllers\Api\RelationshipTierController;
+use App\Http\Controllers\Api\MessageController;
+use App\Http\Controllers\Api\UserPhysicalProfileController;
+use App\Http\Controllers\Api\BlockController;
+use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\GroupController;
+use App\Http\Controllers\Api\GroupMessageController;
+use App\Http\Controllers\WebSocketController;
+use App\Http\Controllers\ProximityArtifactController;
+use App\Http\Controllers\ModerationController;
+use App\Http\Controllers\Api\FriendController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventController;
 
@@ -30,6 +59,36 @@ Route::post('stripe/webhook', [\App\Http\Controllers\StripeWebhookController::cl
 Route::prefix('venue')->group(function () {
     Route::post('register', [\App\Http\Controllers\VenueAuthController::class, 'register']);
     Route::post('login', [\App\Http\Controllers\VenueAuthController::class, 'login']);
+        // Report routes
+        Route::prefix('reports')->group(function (): void {
+            Route::post('/', [ReportController::class, 'store']);
+            Route::get('/', [ReportController::class, 'index']);
+            Route::put('/{reportId}', [ReportController::class, 'update']);
+        });
+
+        // Friend routes
+        Route::prefix('friends')->group(function () {
+            Route::get('/', [FriendController::class, 'getFriends']);
+            Route::get('/requests', [FriendController::class, 'getFriendRequests']);
+            Route::post('/requests', [FriendController::class, 'sendFriendRequest']);
+            Route::post('/requests/{userId}', [FriendController::class, 'respondToFriendRequest']);
+            Route::delete('/{friendId}', [FriendController::class, 'removeFriend']);
+            Route::get('/search', [FriendController::class, 'search']);
+        });
+        
+        // Photo routes (Phase 4A - Multi-AI Photo Upload System)
+        Route::get("/photos", [PhotoController::class, "index"]);
+        Route::post("/photos", [PhotoController::class, "store"]);
+        Route::put("/photos/{id}", [PhotoController::class, "update"]);
+        Route::delete("/photos/{id}", [PhotoController::class, "destroy"]);
+        Route::post("/photos/reorder", [PhotoController::class, "reorder"]);
+        
+        // Location routes (Phase 5A - Location-Based Social Features)
+        Route::get("/location", [LocationController::class, "show"]);
+        Route::post("/location", [LocationController::class, "update"]);
+        Route::put("/location/privacy", [LocationController::class, "updatePrivacy"]);
+        Route::delete("/location", [LocationController::class, "clear"]);
+        Route::get("/location/nearby", [LocationController::class, "nearby"]);
 
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('logout', [\App\Http\Controllers\VenueAuthController::class, 'logout']);
