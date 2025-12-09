@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Services\MediaAnalysis\MediaAnalysisInterface;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -11,9 +12,11 @@ use Illuminate\Support\Str;
 class AvatarGenerationService
 {
     private array $config;
+    private MediaAnalysisInterface $mediaAnalysis;
 
-    public function __construct()
+    public function __construct(MediaAnalysisInterface $mediaAnalysis)
     {
+        $this->mediaAnalysis = $mediaAnalysis;
         $this->config = config('avatar_generation', [
             'enabled' => true,
             'default_provider' => 'dalle', // or 'gemini', 'replicate'
@@ -288,6 +291,25 @@ class AvatarGenerationService
         $contents = $response->body();
         $filename = 'avatars/' . Str::uuid() . '.png';
         Storage::disk('public')->put($filename, $contents);
+
+        // Analyze the image for safety
+        try {
+            $analysis = $this->mediaAnalysis->analyze($filename, 'image');
+            if (!$analysis->isSafe()) {
+                Storage::disk('public')->delete($filename);
+                throw new \Exception("Generated avatar was flagged as unsafe: " . implode(', ', $analysis->unsafeReasons()));
+            }
+        } catch (\Exception $e) {
+            // If analysis fails (e.g. service down), we might want to fail safe or log warning.
+            // For now, we'll treat analysis failure as a blocker if it's the unsafe exception,
+            // but if it's a technical error, we might want to allow it or block it.
+            // Let's block it to be safe.
+            if (Storage::disk('public')->exists($filename)) {
+                Storage::disk('public')->delete($filename);
+            }
+            throw $e;
+        }
+
         return Storage::url($filename);
     }
 
