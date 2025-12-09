@@ -26,8 +26,8 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body,
-    icon: data.icon || '/icons/icon-192x192.png',
-    badge: '/icons/badge-72x72.png',
+    icon: data.icon || '/icon.svg',
+    badge: '/icon.svg',
     vibrate: [200, 100, 200],
     data: {
       url: data.url || '/',
@@ -37,7 +37,7 @@ self.addEventListener('push', (event) => {
       {
         action: 'view',
         title: 'View',
-        icon: '/icons/view-24x24.png'
+        icon: '/icon.svg'
       }
     ]
   };
@@ -54,9 +54,27 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   
   if (event.action === 'view' || !event.action) {
-    event.waitUntil(
-      clients.openWindow(event.notification.data.url)
-    );
+    const urlToOpen = new URL(event.notification.data.url, self.location.origin).href;
+
+    const promiseChain = clients.matchAll({
+      type: 'window',
+      includeUncontrolled: true
+    }).then((windowClients) => {
+      // Check if there is already a window/tab open with the target URL
+      for (let i = 0; i < windowClients.length; i++) {
+        const client = windowClients[i];
+        // If so, just focus it.
+        if (client.url === urlToOpen && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      // If not, then open the target URL in a new window/tab.
+      if (clients.openWindow) {
+        return clients.openWindow(urlToOpen);
+      }
+    });
+
+    event.waitUntil(promiseChain);
   }
 });
 

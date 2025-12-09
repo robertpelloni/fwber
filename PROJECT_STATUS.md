@@ -50,6 +50,14 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Structured Logging**: Configured `json` logging channel in `logging.php` for production observability.
     -   **Context Injection**: Enhanced `InjectLoggingContext` middleware to use `Log::withContext()` for distributed tracing (Request ID, User ID, IP).
     -   **Verification**: All health check tests passing.
+10. **Security & PWA Refinement** (Dec 09 - Complete):
+    -   **Security Audit**:
+        -   **Frontend**: Enabled `camera` and `microphone` in `Permissions-Policy` (Next.js config) to support Voice/Face features.
+        -   **Backend**: Enabled `camera`, `microphone`, and `payment` in `Permissions-Policy` (API headers).
+        -   **CSP**: Relaxed `connect-src` in Backend CSP to allow `https:` and `wss:` for external integrations (Stripe, Mercure).
+    -   **PWA Polish**:
+        -   **Service Worker**: Updated `sw-push.js` to use existing `/icon.svg` instead of missing PNGs to prevent 404s.
+        -   **UX**: Improved notification click handling to focus existing windows instead of opening new tabs.
 2.  **Cache Versioning & Strategy** (Dec 04 - Complete):
     -   Implemented `CACHE_VERSION` strategy for global cache invalidation.
     -   Updated `Group`, `Event`, and `Subscription` controllers to use versioned keys.
