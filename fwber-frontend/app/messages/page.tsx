@@ -10,9 +10,11 @@ import ProfileViewModal from '@/components/ProfileViewModal'
 import { blockUser, reportUser } from '@/lib/api/safety'
 import { PresenceIndicator, ConnectionStatusBadge, TypingIndicator } from '@/components/realtime'
 import AudioRecorder from '@/components/AudioRecorder'
+import { useToast } from '@/components/ToastProvider'
 
 export default function MessagesPage() {
   const { token, isAuthenticated, user } = useAuth()
+  const { showError } = useToast()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
@@ -91,8 +93,8 @@ export default function MessagesPage() {
 
     try {
       setIsSending(true)
-      setError(null)
-
+      // Don't clear global error here as we use toast for sending errors
+      
       const message = await sendMessage(
         token, 
         selectedConversation.other_user.id, 
@@ -102,7 +104,7 @@ export default function MessagesPage() {
       )
       setMessages(prev => [...prev, message])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send voice message')
+      showError('Failed to send voice message', err instanceof Error ? err.message : 'Unknown error')
     } finally {
       setIsSending(false)
     }
@@ -114,8 +116,7 @@ export default function MessagesPage() {
 
     try {
       setIsSending(true)
-      setError(null)
-
+      
       const message = await sendMessage(
         token, 
         selectedConversation.other_user.id, 
@@ -127,7 +128,7 @@ export default function MessagesPage() {
       setSelectedFile(null)
       if (fileInputRef.current) fileInputRef.current.value = ''
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send message')
+      showError('Failed to send message', err instanceof Error ? err.message : 'Unknown error')
     } finally {
       setIsSending(false)
     }
@@ -143,25 +144,30 @@ export default function MessagesPage() {
       setSelectedConversation(null)
       setShowSafetyMenu(false)
     } catch (err) {
-      alert('Failed to block user')
+      showError('Failed to block user')
     }
   }
 
   const handleReport = async (reason: string, details: string) => {
     const otherUser = selectedConversation?.other_user
     if (!token || !otherUser) return
-    await reportUser(token, otherUser.id, reason, details)
     
-    if (confirm('Report submitted. Do you want to block this user as well?')) {
-      try {
-        await blockUser(token, otherUser.id)
-        setConversations(prev => prev.filter(c => c.id !== selectedConversation!.id))
-        setSelectedConversation(null)
-      } catch (err) {
-        console.error('Failed to block after report', err)
+    try {
+      await reportUser(token, otherUser.id, reason, details)
+      
+      if (confirm('Report submitted. Do you want to block this user as well?')) {
+        try {
+          await blockUser(token, otherUser.id)
+          setConversations(prev => prev.filter(c => c.id !== selectedConversation!.id))
+          setSelectedConversation(null)
+        } catch (err) {
+          console.error('Failed to block after report', err)
+        }
       }
+      setShowSafetyMenu(false)
+    } catch (err) {
+      showError('Failed to submit report', err instanceof Error ? err.message : 'Unknown error')
     }
-    setShowSafetyMenu(false)
   }
 
   const formatMessageTime = (timestamp: string) => {
