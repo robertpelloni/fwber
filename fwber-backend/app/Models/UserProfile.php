@@ -56,6 +56,12 @@ class UserProfile extends Model
         'avatar_prompt',
         'avatar_status',
         'preferences',
+        'love_language',
+        'personality_type',
+        'political_views',
+        'religion',
+        'sleep_schedule',
+        'social_media',
     ];
 
     protected $casts = [
@@ -75,6 +81,7 @@ class UserProfile extends Model
         'sti_status' => 'array',
         'fetishes' => 'array',
         'preferences' => 'array',
+        'social_media' => 'array',
     ];
 
     public function user()

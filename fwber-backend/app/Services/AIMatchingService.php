@@ -390,6 +390,70 @@ class AIMatchingService
         // Drugs
         if (($userPrefs['drugs'] ?? 0) && ($candidatePrefs['no_drugs'] ?? 0)) $penalties += 25;
 
+        // Children Compatibility
+        if (isset($userPrefs['wants_children']) && isset($candidateProfile->wants_children)) {
+            if ($userPrefs['wants_children'] !== $candidateProfile->wants_children) {
+                $penalties += 15;
+            }
+        }
+        
+        // Dealbreaker: Has Kids
+        if (($userPrefs['no_kids'] ?? false) && $candidateProfile->has_children) {
+            $penalties += 50;
+        }
+
+        // Pets Compatibility
+        if (($userPrefs['must_love_pets'] ?? false) && !$candidateProfile->has_pets) {
+            $penalties += 10;
+        }
+
+        // Love Language Compatibility
+        if ($userProfile->love_language && $candidateProfile->love_language) {
+            if ($userProfile->love_language === $candidateProfile->love_language) {
+                $score += 10;
+            }
+        }
+
+        // Personality Compatibility (MBTI/Simple)
+        if ($userProfile->personality_type && $candidateProfile->personality_type) {
+            // Simple logic: Introverts match well with Extroverts often, but let's keep it simple for now
+            // Or maybe similar types match? Let's assume similarity for now unless specified otherwise
+            if ($userProfile->personality_type === $candidateProfile->personality_type) {
+                $score += 5;
+            }
+        }
+
+        // Political Views Compatibility
+        if ($userProfile->political_views && $candidateProfile->political_views) {
+            if ($userProfile->political_views === $candidateProfile->political_views) {
+                $score += 10;
+            } elseif (
+                ($userProfile->political_views === 'liberal' && $candidateProfile->political_views === 'conservative') ||
+                ($userProfile->political_views === 'conservative' && $candidateProfile->political_views === 'liberal')
+            ) {
+                $penalties += 10; // Potential friction
+            }
+        }
+
+        // Religion Compatibility
+        if ($userProfile->religion && $candidateProfile->religion) {
+            if ($userProfile->religion === $candidateProfile->religion) {
+                $score += 10;
+            }
+        }
+
+        // Sleep Schedule Compatibility
+        if ($userProfile->sleep_schedule && $candidateProfile->sleep_schedule) {
+            if ($userProfile->sleep_schedule === $candidateProfile->sleep_schedule) {
+                $score += 5;
+            } elseif (
+                ($userProfile->sleep_schedule === 'early_bird' && $candidateProfile->sleep_schedule === 'night_owl') ||
+                ($userProfile->sleep_schedule === 'night_owl' && $candidateProfile->sleep_schedule === 'early_bird')
+            ) {
+                $penalties += 5; // Minor friction
+            }
+        }
+
         return max(0, $score - $penalties);
     }
 

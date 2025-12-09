@@ -24,6 +24,8 @@ export default function EnhancedProfileEditor() {
     languages: [],
     fetishes: [],
     sti_status: {},
+    social_media: {},
+    preferences: {},
   });
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [touched, setTouched] = useState<Set<string>>(new Set());
@@ -813,6 +815,145 @@ export default function EnhancedProfileEditor() {
                 <option value="true">Yes</option>
               </select>
             </FormField>
+          </div>
+        </Section>
+
+        {/* Personality & Social */}
+        <Section title="Personality & Social" icon={<Heart />}>
+          <div className="p-4 bg-blue-50 border border-blue-100 rounded-lg mb-6">
+            <div className="flex gap-3">
+              <Info className="w-5 h-5 text-blue-600 flex-shrink-0" />
+              <p className="text-sm text-blue-800">
+                Filling out these details helps our matching algorithm find more compatible partners. 
+                If you leave them blank, they won&apos;t be used as criteria for matching.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField label="Love Language">
+              <select
+                title="Love Language"
+                value={profile.love_language || ''}
+                onChange={(e) => handleChange('love_language', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="words_of_affirmation">Words of Affirmation</option>
+                <option value="acts_of_service">Acts of Service</option>
+                <option value="receiving_gifts">Receiving Gifts</option>
+                <option value="quality_time">Quality Time</option>
+                <option value="physical_touch">Physical Touch</option>
+              </select>
+            </FormField>
+
+            <FormField label="Personality Type">
+              <select
+                title="Personality Type"
+                value={profile.personality_type || ''}
+                onChange={(e) => handleChange('personality_type', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="introvert">Introvert</option>
+                <option value="extrovert">Extrovert</option>
+                <option value="ambivert">Ambivert</option>
+                <option value="intj">INTJ</option>
+                <option value="intp">INTP</option>
+                <option value="entj">ENTJ</option>
+                <option value="entp">ENTP</option>
+                <option value="infj">INFJ</option>
+                <option value="infp">INFP</option>
+                <option value="enfj">ENFJ</option>
+                <option value="enfp">ENFP</option>
+                <option value="istj">ISTJ</option>
+                <option value="isfj">ISFJ</option>
+                <option value="estj">ESTJ</option>
+                <option value="esfj">ESFJ</option>
+                <option value="istp">ISTP</option>
+                <option value="isfp">ISFP</option>
+                <option value="estp">ESTP</option>
+                <option value="esfp">ESFP</option>
+              </select>
+            </FormField>
+
+            <FormField label="Political Views">
+              <select
+                title="Political Views"
+                value={profile.political_views || ''}
+                onChange={(e) => handleChange('political_views', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="liberal">Liberal</option>
+                <option value="moderate">Moderate</option>
+                <option value="conservative">Conservative</option>
+                <option value="apolitical">Apolitical</option>
+                <option value="other">Other</option>
+              </select>
+            </FormField>
+
+            <FormField label="Religion / Spirituality">
+              <select
+                title="Religion / Spirituality"
+                value={profile.religion || ''}
+                onChange={(e) => handleChange('religion', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="agnostic">Agnostic</option>
+                <option value="atheist">Atheist</option>
+                <option value="christian">Christian</option>
+                <option value="muslim">Muslim</option>
+                <option value="jewish">Jewish</option>
+                <option value="buddhist">Buddhist</option>
+                <option value="hindu">Hindu</option>
+                <option value="spiritual">Spiritual but not religious</option>
+                <option value="other">Other</option>
+              </select>
+            </FormField>
+
+            <FormField label="Sleep Schedule">
+              <select
+                title="Sleep Schedule"
+                value={profile.sleep_schedule || ''}
+                onChange={(e) => handleChange('sleep_schedule', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="early_bird">Early Bird</option>
+                <option value="night_owl">Night Owl</option>
+                <option value="flexible">Flexible</option>
+                <option value="irregular">Irregular</option>
+              </select>
+            </FormField>
+          </div>
+
+          <div className="mt-4">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">Social Media (Optional)</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <input
+                type="text"
+                value={profile.social_media?.instagram || ''}
+                onChange={(e) => handleChange('social_media', { ...profile.social_media, instagram: e.target.value })}
+                className={inputClassName()}
+                placeholder="Instagram Handle"
+              />
+              <input
+                type="text"
+                value={profile.social_media?.twitter || ''}
+                onChange={(e) => handleChange('social_media', { ...profile.social_media, twitter: e.target.value })}
+                className={inputClassName()}
+                placeholder="Twitter/X Handle"
+              />
+              <input
+                type="text"
+                value={profile.social_media?.snapchat || ''}
+                onChange={(e) => handleChange('social_media', { ...profile.social_media, snapchat: e.target.value })}
+                className={inputClassName()}
+                placeholder="Snapchat Handle"
+              />
+            </div>
           </div>
         </Section>
 

@@ -77,6 +77,14 @@ export interface UserProfile {
   avatar_prompt: string | null
   avatar_status: string | null
 
+  // Personality & Social
+  love_language: string | null
+  personality_type: string | null
+  political_views: string | null
+  religion: string | null
+  sleep_schedule: string | null
+  social_media: Record<string, string> | null
+
   // Intimate Attributes
   penis_length_cm: number | null
   penis_girth_cm: number | null
