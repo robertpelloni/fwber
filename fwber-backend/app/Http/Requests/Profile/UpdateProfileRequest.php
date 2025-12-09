@@ -22,7 +22,7 @@ class UpdateProfileRequest extends FormRequest
             'sexual_orientation' => 'sometimes|string|in:straight,gay,lesbian,bisexual,pansexual,asexual,demisexual,queer,questioning,other,prefer-not-to-say',
             'relationship_style' => 'sometimes|string|in:monogamous,non-monogamous,polyamorous,open,swinger,other,prefer-not-to-say',
             'looking_for' => 'sometimes|array',
-            'looking_for.*' => 'string|in:friendship,dating,relationship,casual,marriage,networking',
+            "looking_for.*" => 'string|in:friendship,dating,relationship,casual,marriage,networking',
             'location.latitude' => 'sometimes|numeric|between:-90,90',
             'location.longitude' => 'sometimes|numeric|between:-180,180',
             'location.max_distance' => 'sometimes|integer|min:1|max:500',

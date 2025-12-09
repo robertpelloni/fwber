@@ -172,8 +172,20 @@ echo ""
 
 # Check if .env exists
 if [ ! -f .env ]; then
-    log_error ".env file not found. Please create it from .env.example"
-    exit 1
+    log_warning ".env file not found. Creating from .env.example..."
+    if [ -f .env.example ]; then
+        cp .env.example .env
+        log_warning "Created .env from .env.example. Please update with production credentials!"
+        
+        # Generate key if needed
+        if grep -q "APP_KEY=" .env && [ -z "$(grep "APP_KEY=" .env | cut -d '=' -f2)" ]; then
+            log_info "Generating application key..."
+            php artisan key:generate --force
+        fi
+    else
+        log_error ".env file not found and .env.example is missing!"
+        exit 1
+    fi
 fi
 log_success ".env file exists"
 echo ""

@@ -617,7 +617,7 @@ class WebSocketController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'user_ids' => 'required|array',
-                'user_ids.*' => 'string',
+                "user_ids.*" => 'string',
                 'message' => 'required|array',
                 'message.type' => 'required|string',
                 'message.content' => 'required|string',
