@@ -69,6 +69,9 @@ export interface UserProfile {
   // Intimate Attributes
   penis_length_cm: number | null
   penis_girth_cm: number | null
+  breast_size: string | null
+  tattoos: string | null
+  piercings: string | null
   sti_status: Record<string, any> | null
   fetishes: string[] | null
 

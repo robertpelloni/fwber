@@ -397,7 +397,7 @@ export default function EnhancedProfileEditor() {
         <Section title="Interests & Hobbies" icon={<MessageSquare />}>
           <FormField label="Select your interests" hint="Choose all that apply">
             <div className="flex flex-wrap gap-2">
-              {['music', 'movies', 'sports', 'gaming', 'travel', 'cooking', 'reading', 'art', 'fitness', 'outdoors', 'tech', 'nightlife', 'photography', 'dancing', 'foodie', 'fashion', 'politics', 'volunteering'].map(interest => (
+              {['music', 'movies', 'sports', 'gaming', 'travel', 'cooking', 'reading', 'art', 'fitness', 'outdoors', 'tech', 'nightlife', 'photography', 'dancing', 'foodie', 'fashion', 'politics', 'volunteering', 'hot tubs', 'saunas', 'spas'].map(interest => (
                 <ToggleChip
                   key={interest}
                   label={interest.charAt(0).toUpperCase() + interest.slice(1)}
@@ -456,6 +456,57 @@ export default function EnhancedProfileEditor() {
                 <option value="middle_eastern">Middle Eastern</option>
                 <option value="mixed">Mixed</option>
                 <option value="other">Other</option>
+              </select>
+            </FormField>
+
+            <FormField label="Breast Size">
+              <select
+                title="Breast Size"
+                value={profile.breast_size || ''}
+                onChange={(e) => handleChange('breast_size', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="flat">Flat</option>
+                <option value="a-cup">A Cup</option>
+                <option value="b-cup">B Cup</option>
+                <option value="c-cup">C Cup</option>
+                <option value="d-cup">D Cup</option>
+                <option value="dd-cup">DD+ Cup</option>
+                <option value="prefer-not-to-say">Prefer not to say</option>
+              </select>
+            </FormField>
+
+            <FormField label="Tattoos">
+              <select
+                title="Tattoos"
+                value={profile.tattoos || ''}
+                onChange={(e) => handleChange('tattoos', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="none">None</option>
+                <option value="some">Some</option>
+                <option value="many">Many</option>
+                <option value="full-sleeve">Full Sleeve(s)</option>
+                <option value="heavily-inked">Heavily Inked</option>
+              </select>
+            </FormField>
+
+            <FormField label="Piercings">
+              <select
+                title="Piercings"
+                value={profile.piercings || ''}
+                onChange={(e) => handleChange('piercings', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="none">None</option>
+                <option value="ears">Ears Only</option>
+                <option value="face">Face</option>
+                <option value="body">Body</option>
+                <option value="intimate">Intimate</option>
+                <option value="multiple">Multiple Locations</option>
               </select>
             </FormField>
           </div>
@@ -667,7 +718,7 @@ export default function EnhancedProfileEditor() {
           <div className="mt-4">
             <FormField label="Fetishes & Kinks">
               <div className="flex flex-wrap gap-2">
-                {['BDSM', 'Roleplay', 'Voyeurism', 'Exhibitionism', 'Bondage', 'Domination', 'Submission', 'Feet', 'Leather', 'Latex', 'Group Sex', 'Public'].map(fetish => (
+                {['BDSM', 'Roleplay', 'Voyeurism', 'Exhibitionism', 'Bondage', 'Domination', 'Submission', 'Feet', 'Leather', 'Latex', 'Group Sex', 'Public', 'Orgies', 'Gangbangs', 'Threesomes', 'Swinging', 'Cuckolding', 'Hotwife'].map(fetish => (
                   <ToggleChip
                     key={fetish}
                     label={fetish}
