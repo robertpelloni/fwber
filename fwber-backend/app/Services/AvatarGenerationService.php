@@ -318,6 +318,21 @@ class AvatarGenerationService
         $contents = base64_decode($base64);
         $filename = 'avatars/' . Str::uuid() . '.png';
         Storage::disk('public')->put($filename, $contents);
+
+        // Analyze the image for safety
+        try {
+            $analysis = $this->mediaAnalysis->analyze($filename, 'image');
+            if (!$analysis->isSafe()) {
+                Storage::disk('public')->delete($filename);
+                throw new \Exception("Generated avatar was flagged as unsafe: " . implode(', ', $analysis->unsafeReasons()));
+            }
+        } catch (\Exception $e) {
+            if (Storage::disk('public')->exists($filename)) {
+                Storage::disk('public')->delete($filename);
+            }
+            throw $e;
+        }
+
         return Storage::url($filename);
     }
 
