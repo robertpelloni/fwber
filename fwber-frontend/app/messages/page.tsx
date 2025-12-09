@@ -9,6 +9,7 @@ import ReportModal from '@/components/ReportModal'
 import ProfileViewModal from '@/components/ProfileViewModal'
 import { blockUser, reportUser } from '@/lib/api/safety'
 import { PresenceIndicator, ConnectionStatusBadge, TypingIndicator } from '@/components/realtime'
+import AudioRecorder from '@/components/AudioRecorder'
 
 export default function MessagesPage() {
   const { token, isAuthenticated, user } = useAuth()
@@ -82,6 +83,28 @@ export default function MessagesPage() {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setSelectedFile(e.target.files[0])
+    }
+  }
+
+  const handleVoiceMessage = async (audioFile: File, duration: number) => {
+    if (!token || !selectedConversation?.other_user?.id) return
+
+    try {
+      setIsSending(true)
+      setError(null)
+
+      const message = await sendMessage(
+        token, 
+        selectedConversation.other_user.id, 
+        '', 
+        audioFile,
+        'audio'
+      )
+      setMessages(prev => [...prev, message])
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to send voice message')
+    } finally {
+      setIsSending(false)
     }
   }
 
@@ -441,7 +464,7 @@ export default function MessagesPage() {
                           </button>
                         </div>
                       )}
-                      <form onSubmit={handleSendMessage} className="flex space-x-2">
+                      <form onSubmit={handleSendMessage} className="flex space-x-2 items-center">
                         <button
                           type="button"
                           onClick={() => fileInputRef.current?.click()}
@@ -452,6 +475,7 @@ export default function MessagesPage() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                           </svg>
                         </button>
+                        <AudioRecorder onRecordingComplete={handleVoiceMessage} isSending={isSending} />
                         <input
                           type="file"
                           ref={fileInputRef}

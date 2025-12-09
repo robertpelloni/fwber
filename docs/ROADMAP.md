@@ -15,7 +15,8 @@ The application is live. The focus is on monitoring system health, optimizing pe
 
 #### 2. User Experience Refinement
 - [ ] **PWA Verification**: Verify Push Notifications and Offline mode on a wider range of devices.
-- [ ] **Feedback Loop**: Implement mechanisms to gather and analyze user feedback.
+- [x] **Feedback Loop**: Implement mechanisms to gather and analyze user feedback.
+- [x] **Voice Messages**: Enable voice recording in chat.
 
 ### ✅ Completed Phases
 

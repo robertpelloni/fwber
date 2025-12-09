@@ -241,6 +241,10 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   Supports Image analysis (Moderation & Labels).
     -   Gated behind `FEATURE_MEDIA_ANALYSIS`.
     -   **Verification**: Backend tests (`MediaAnalysisTest.php`) passing.
+7.  **Voice Messages** (Dec 09 - Complete):
+    -   **Frontend**: Implemented `AudioRecorder` component using `MediaRecorder` API.
+    -   **Integration**: Added voice recording capability to `MessagesPage`.
+    -   **Backend**: Verified support for `audio` message type and file uploads.
 
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.
