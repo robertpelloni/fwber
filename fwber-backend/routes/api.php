@@ -52,6 +52,12 @@ Route::get('health', [\App\Http\Controllers\HealthController::class, 'check']);
 Route::get('health/liveness', [\App\Http\Controllers\HealthController::class, 'liveness']);
 Route::get('health/readiness', [\App\Http\Controllers\HealthController::class, 'readiness']);
 
+// Test Route for Slow Requests (Temporary)
+Route::get('test/slow-request', function () {
+    usleep(1500000); // 1.5 seconds
+    return response()->json(['message' => 'Slow request executed']);
+});
+
 // Stripe Webhook
 Route::post('stripe/webhook', [\App\Http\Controllers\StripeWebhookController::class, 'handleWebhook']);
 
