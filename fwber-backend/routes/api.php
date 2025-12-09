@@ -52,10 +52,18 @@ Route::get('health', [\App\Http\Controllers\HealthController::class, 'check']);
 Route::get('health/liveness', [\App\Http\Controllers\HealthController::class, 'liveness']);
 Route::get('health/readiness', [\App\Http\Controllers\HealthController::class, 'readiness']);
 
-// Test Route for Slow Requests (Temporary)
-Route::get('test/slow-request', function () {
-    usleep(1500000); // 1.5 seconds
-    return response()->json(['message' => 'Slow request executed']);
+// Test Route for Media Analysis (Current Driver)
+Route::get('test/media-analysis', function (\App\Services\MediaAnalysis\MediaAnalysisInterface $service) {
+    try {
+        // Use a known existing file
+        $result = $service->analyze('photos/test/ai-photo-6-1.jpg', 'image');
+        return response()->json($result->toArray());
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
 });
 
 // Stripe Webhook
