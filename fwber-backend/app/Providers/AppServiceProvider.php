@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Database\Eloquent\Model;
 use App\Support\LogContext;
 
 class AppServiceProvider extends ServiceProvider
@@ -30,6 +31,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Prevent N+1 queries in non-production environments
+        Model::preventLazyLoading(! $this->app->isProduction());
+        
+        // Prevent silently discarding attributes in non-production environments
+        Model::preventSilentlyDiscardingAttributes(! $this->app->isProduction());
+
         // Monitor failed jobs
         Queue::failing(function (JobFailed $event) {
             Log::critical('Job Failed', [
