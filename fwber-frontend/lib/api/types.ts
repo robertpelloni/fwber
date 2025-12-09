@@ -45,19 +45,40 @@ export interface UserProfile {
   id: number
   user_id: number
   display_name: string | null
-  date_of_birth: string | null
+  birthdate: string | null
   gender: Gender | null
   pronouns: string | null
   sexual_orientation: string | null
   relationship_style: RelationshipStyle | null
   bio: string | null
-  location_latitude: number | null
-  location_longitude: number | null
-  location_description: string | null
+  latitude: number | null
+  longitude: number | null
+  location_name: string | null
   sti_status: Record<string, any> | null
   preferences: Record<string, any> | null
   avatar_url: string | null
   looking_for: string[] | null
+  interested_in: string[] | null
+  relationship_status: string | null
+  height_cm: number | null
+  body_type: string | null
+  ethnicity: string | null
+  occupation: string | null
+  education: string | null
+  
+  // Lifestyle Attributes
+  smoking_status: string | null
+  drinking_status: string | null
+  cannabis_status: string | null
+  dietary_preferences: string | null
+  zodiac_sign: string | null
+  relationship_goals: string | null
+  has_children: boolean
+  wants_children: boolean
+  has_pets: boolean
+  languages: string[] | null
+  interests: string[] | null
+
   created_at: string
   updated_at: string
 }
