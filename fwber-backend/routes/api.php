@@ -52,34 +52,6 @@ Route::get('health', [\App\Http\Controllers\HealthController::class, 'check']);
 Route::get('health/liveness', [\App\Http\Controllers\HealthController::class, 'liveness']);
 Route::get('health/readiness', [\App\Http\Controllers\HealthController::class, 'readiness']);
 
-// Test Route for Stripe (Current Driver)
-Route::get('test/stripe-connection', function (\App\Services\Payment\PaymentGatewayInterface $gateway) {
-    try {
-        // Attempt to create a Payment Intent for $10.00
-        $result = $gateway->createPaymentIntent(10.00, 'usd', ['description' => 'Connection Test']);
-        
-        if ($result->success) {
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Stripe connection successful',
-                'intent_id' => $result->transactionId,
-                'client_secret' => $result->data['client_secret'] ?? 'hidden'
-            ]);
-        } else {
-            return response()->json([
-                'status' => 'error',
-                'message' => $result->message
-            ], 500);
-        }
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'exception',
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ], 500);
-    }
-});
-
 // Stripe Webhook
 Route::post('stripe/webhook', [\App\Http\Controllers\StripeWebhookController::class, 'handleWebhook']);
 
