@@ -25,11 +25,12 @@ class FriendController extends Controller
         $friends = Friend::where(function ($query) use ($user) {
             $query->where('user_id', $user->id)
                 ->orWhere('friend_id', $user->id);
-        })->where('status', 'accepted')->get();
+        })->where('status', 'accepted')
+            ->with(['user', 'friend'])
+            ->get();
 
         $friendDetails = $friends->map(function ($friend) use ($user) {
-            $friendId = $friend->user_id == $user->id ? $friend->friend_id : $friend->user_id;
-            return User::find($friendId);
+            return $friend->user_id == $user->id ? $friend->friend : $friend->user;
         });
 
         return response()->json($friendDetails);
