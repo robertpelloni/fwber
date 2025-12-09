@@ -130,10 +130,6 @@ class LocationControllerTest extends TestCase
 
         $response = $this->actingAs($user)->getJson('/api/location/nearby?latitude=40.7128&longitude=-74.0060&radius=1000');
 
-        if ($response->status() !== 200) {
-            dump($response->json());
-        }
-
         $response->assertStatus(200);
         $response->assertJsonFragment(['id' => $nearbyUser->id]);
         $response->assertJsonMissing(['id' => $farUser->id]);
