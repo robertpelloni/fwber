@@ -288,6 +288,6 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
     loadConversationHistory,
     clearMessages,
     clearNotifications,
-    isReady: status.connected,
+    isReady: !status.connecting,
   };
 }

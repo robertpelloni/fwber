@@ -1,4 +1,21 @@
 describe('Nearby Users', () => {
+  // Mock EventSource to prevent real connection attempts
+  class MockEventSource {
+    constructor(url) {
+      this.url = url;
+      this.readyState = 0; // CONNECTING
+      setTimeout(() => {
+        this.readyState = 1; // OPEN
+        if (this.onopen) this.onopen({ type: 'open' });
+      }, 10);
+    }
+    close() {
+      this.readyState = 2; // CLOSED
+    }
+    addEventListener() {}
+    removeEventListener() {}
+  }
+
   const user = {
     id: 1,
     name: 'Test User',
@@ -26,6 +43,11 @@ describe('Nearby Users', () => {
   };
 
   beforeEach(() => {
+    // Inject MockEventSource
+    cy.window().then((win) => {
+      win.EventSource = MockEventSource;
+    });
+
     // Mock login
     cy.intercept('POST', '**/api/auth/login', {
       statusCode: 200,
@@ -83,6 +105,15 @@ describe('Nearby Users', () => {
         }
       }
     }).as('getNearbyUsers');
+
+    // Mock WebSocket token endpoint to avoid 404s
+    cy.intercept('GET', '**/api/websocket/token', {
+      statusCode: 200,
+      body: {
+        token: 'mock-mercure-token',
+        hub_url: 'http://localhost:3000/.well-known/mercure'
+      }
+    }).as('getWebsocketToken');
   });
 
   it('loads login page', () => {
@@ -104,6 +135,7 @@ describe('Nearby Users', () => {
         // Mock auth token and user
         win.localStorage.setItem('fwber_token', 'fake-token');
         win.localStorage.setItem('fwber_user', JSON.stringify(user));
+        win.EventSource = MockEventSource;
         
         // Mock geolocation
         cy.stub(win.navigator.geolocation, 'getCurrentPosition').callsFake((cb) => {

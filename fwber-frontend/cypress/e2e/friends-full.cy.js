@@ -27,7 +27,29 @@ describe('Friends Feature', () => {
     profile_photo_url: '/placeholder.jpg'
   };
 
+  // Mock EventSource to prevent real connection attempts
+  class MockEventSource {
+    constructor(url) {
+      this.url = url;
+      this.readyState = 0; // CONNECTING
+      setTimeout(() => {
+        this.readyState = 1; // OPEN
+        if (this.onopen) this.onopen({ type: 'open' });
+      }, 10);
+    }
+    close() {
+      this.readyState = 2; // CLOSED
+    }
+    addEventListener() {}
+    removeEventListener() {}
+  }
+
   beforeEach(() => {
+    // Inject MockEventSource
+    cy.window().then((win) => {
+      win.EventSource = MockEventSource;
+    });
+
     cy.intercept('POST', '**/api/auth/login', {
       statusCode: 200,
       body: {
@@ -58,7 +80,7 @@ describe('Friends Feature', () => {
       }]
     }).as('getFriendRequests');
 
-    cy.intercept('GET', '**/api/friends/search?query=Search', {
+    cy.intercept('GET', '**/api/users/search?q=Search', {
       statusCode: 200,
       body: [searchUser]
     }).as('searchFriends');
@@ -72,17 +94,39 @@ describe('Friends Feature', () => {
       statusCode: 200,
       body: { status: 'accepted' }
     }).as('respondRequest');
+
+    // Mock WebSocket token endpoint to avoid 404s
+    cy.intercept('GET', '**/api/websocket/token', {
+      statusCode: 200,
+      body: {
+        token: 'mock-mercure-token',
+        hub_url: 'http://localhost:3000/.well-known/mercure'
+      }
+    }).as('getWebsocketToken');
   });
 
   it('should list friends and requests', () => {
     // Login flow
     cy.visit('/login');
-    cy.get('input[name="email"]').type(testUser.email);
-    cy.get('input[name="password"]').type(testUser.password);
-    cy.get('button[type="submit"]').click();
+    // Re-inject MockEventSource after visit
+    cy.window().then((win) => {
+      win.EventSource = MockEventSource;
+    });
+
+    cy.get('input[name=\"email\"]').type(testUser.email);
+    cy.get('input[name=\"password\"]').type(testUser.password);
+    cy.get('button[type=\"submit\"]').click();
     cy.wait('@login');
     
+    // Wait for redirect to dashboard
+    cy.url().should('include', '/dashboard');
+
     cy.visit('/friends');
+    // Re-inject MockEventSource after visit
+    cy.window().then((win) => {
+      win.EventSource = MockEventSource;
+    });
+
     cy.wait('@getFriends');
     cy.wait('@getFriendRequests');
 
@@ -97,25 +141,36 @@ describe('Friends Feature', () => {
 
   it('should search and send friend request', () => {
     cy.visit('/login');
-    cy.get('input[name="email"]').type(testUser.email);
-    cy.get('input[name="password"]').type(testUser.password);
-    cy.get('button[type="submit"]').click();
+    cy.window().then((win) => {
+      win.EventSource = MockEventSource;
+    });
+
+    cy.get('input[name=\"email\"]').type(testUser.email);
+    cy.get('input[name=\"password\"]').type(testUser.password);
+    cy.get('button[type=\"submit\"]').click();
     cy.wait('@login');
     
+    cy.url().should('include', '/dashboard');
+
     cy.visit('/friends');
+    cy.window().then((win) => {
+      win.EventSource = MockEventSource;
+    });
     
     // Search
-    cy.get('input[placeholder="Search by name or email"]').type('Search');
+    cy.get('input[placeholder=\"Search by name or email\"]').type('Search');
     cy.contains('button', 'Search').click();
     cy.wait('@searchFriends');
     
     cy.contains(searchUser.name).should('be.visible');
     
     // Send Request
-    cy.contains(searchUser.name).parent().find('button').click();
-    // Note: The button text might be "Add Friend" or icon.
-    // I need to check UserSearch component.
-    // Assuming it has a button.
+    // Find the button in the search result card
+    cy.contains(searchUser.name)
+      .closest('.shadow')
+      .contains('button', 'Send Request')
+      .click();
+    
     cy.wait('@sendRequest');
     cy.on('window:alert', (str) => {
       expect(str).to.equal('Friend request sent!');
@@ -124,12 +179,22 @@ describe('Friends Feature', () => {
 
   it('should accept friend request', () => {
     cy.visit('/login');
-    cy.get('input[name="email"]').type(testUser.email);
-    cy.get('input[name="password"]').type(testUser.password);
-    cy.get('button[type="submit"]').click();
+    cy.window().then((win) => {
+      win.EventSource = MockEventSource;
+    });
+
+    cy.get('input[name=\"email\"]').type(testUser.email);
+    cy.get('input[name=\"password\"]').type(testUser.password);
+    cy.get('button[type=\"submit\"]').click();
     cy.wait('@login');
     
+    cy.url().should('include', '/dashboard');
+
     cy.visit('/friends');
+    cy.window().then((win) => {
+      win.EventSource = MockEventSource;
+    });
+
     cy.wait('@getFriends');
     cy.wait('@getFriendRequests');
     

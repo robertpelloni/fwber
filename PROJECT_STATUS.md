@@ -26,6 +26,9 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Testing**: Created and passed `SlowRequestTest` to verify logging of slow requests.
 4.  **Frontend Testing** (Dec 09 - Complete):
     -   **Friends E2E**: Updated `friends-full.cy.js` to remove outdated comments and added a test case for accepting friend requests.
+5.  **Frontend E2E Stabilization** (Dec 10 - Complete):
+    -   **Fixes**: Resolved `ESOCKETTIMEDOUT` in `friends-full.cy.js` by mocking `EventSource` and ensuring dev server connectivity. Fixed selector issues in `UserSearch` component tests.
+    -   **Verification**: Verified passing status for critical E2E flows: `realtime-chat`, `friends-full`, `matching-flow`, `messaging-flow`, `nearby-users`.
 2.  **Cache Versioning & Strategy** (Dec 04 - Complete):
     -   Implemented `CACHE_VERSION` strategy for global cache invalidation.
     -   Updated `Group`, `Event`, and `Subscription` controllers to use versioned keys.
