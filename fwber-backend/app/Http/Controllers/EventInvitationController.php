@@ -144,7 +144,6 @@ class EventInvitationController extends Controller
                     'user_id' => $invitation->invitee_id,
                 ], [
                     'status' => 'attending', // Default status
-                    'role' => 'attendee',
                 ]);
             }
         });

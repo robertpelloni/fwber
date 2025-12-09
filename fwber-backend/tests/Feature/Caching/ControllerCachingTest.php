@@ -17,12 +17,11 @@ class ControllerCachingTest extends TestCase
     {
         config(['features.recommendations' => true]);
         
-        $user = User::factory()->create();
+        $user = User::factory()->create(['name' => 'Test User']);
         $user->profile()->create([
-            "display_name" => "Test User",
-            "date_of_birth" => "1990-01-01",
+            "birthdate" => "1990-01-01",
             "gender" => "male",
-            "location_description" => "Test City",
+            "location_name" => "Test City",
         ]);
         $token = ApiToken::generateForUser($user, "test");
 
@@ -41,14 +40,13 @@ class ControllerCachingTest extends TestCase
     {
         config(['features.proximity_artifacts' => true]);
 
-        $user = User::factory()->create();
+        $user = User::factory()->create(['name' => 'Test User']);
         $user->profile()->create([
-            "display_name" => "Test User",
-            "date_of_birth" => "1990-01-01",
+            "birthdate" => "1990-01-01",
             "gender" => "male",
-            "location_description" => "Test City",
-            'location_latitude' => 40.7128,
-            'location_longitude' => -74.0060
+            "location_name" => "Test City",
+            'latitude' => 40.7128,
+            'longitude' => -74.0060
         ]);
         $token = ApiToken::generateForUser($user, "test");
 
@@ -67,12 +65,11 @@ class ControllerCachingTest extends TestCase
 
     public function test_matches_feed_is_cached_with_tags()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['name' => 'Test User']);
         $user->profile()->create([
-            "display_name" => "Test User",
-            "date_of_birth" => "1990-01-01",
+            "birthdate" => "1990-01-01",
             "gender" => "male",
-            "location_description" => "Test City",
+            "location_name" => "Test City",
         ]);
         $token = ApiToken::generateForUser($user, "test");
 

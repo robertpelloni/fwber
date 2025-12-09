@@ -14,6 +14,7 @@ class VenueCheckin extends Model
         'venue_id',
         'message',
         'checked_out_at',
+        'created_at',
     ];
 
     protected $casts = [

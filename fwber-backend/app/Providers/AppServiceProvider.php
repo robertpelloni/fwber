@@ -80,6 +80,41 @@ class AppServiceProvider extends ServiceProvider
                 : Limit::perMinute(5)->by('ip:' . $request->ip()); // 5 uploads per minute for guests
         });
 
+        // Configure rate limiting for messaging
+        RateLimiter::for('messaging', function (Request $request) {
+            return $request->user()
+                ? Limit::perMinute(30)->by('user:' . $request->user()->id)
+                : Limit::perMinute(5)->by('ip:' . $request->ip());
+        });
+
+        // Configure rate limiting for matching (swipes)
+        RateLimiter::for('matching', function (Request $request) {
+            return $request->user()
+                ? Limit::perMinute(60)->by('user:' . $request->user()->id)
+                : Limit::perMinute(10)->by('ip:' . $request->ip());
+        });
+
+        // Configure rate limiting for friend requests
+        RateLimiter::for('friend_requests', function (Request $request) {
+            return $request->user()
+                ? Limit::perMinute(10)->by('user:' . $request->user()->id)
+                : Limit::perMinute(3)->by('ip:' . $request->ip());
+        });
+
+        // Configure rate limiting for verification
+        RateLimiter::for('verification', function (Request $request) {
+            return $request->user()
+                ? Limit::perMinute(3)->by('user:' . $request->user()->id)
+                : Limit::perMinute(1)->by('ip:' . $request->ip());
+        });
+
+        // Configure rate limiting for feedback
+        RateLimiter::for('feedback', function (Request $request) {
+            return $request->user()
+                ? Limit::perMinute(5)->by('user:' . $request->user()->id)
+                : Limit::perMinute(2)->by('ip:' . $request->ip());
+        });
+
         // Query Monitoring: Log slow queries (>100ms) for performance analysis
         DB::whenQueryingForLongerThan(100, function ($connection, $event) {
             Log::warning('Slow Query Detected', LogContext::make([

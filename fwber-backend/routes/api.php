@@ -44,8 +44,8 @@ use App\Http\Controllers\EventController;
 |
 */
 
-Route::post('auth/register', [\App\Http\Controllers\AuthController::class, 'register']);
-Route::post('auth/login', [\App\Http\Controllers\AuthController::class, 'login']);
+Route::post('auth/register', [\App\Http\Controllers\AuthController::class, 'register'])->middleware('throttle:auth');
+Route::post('auth/login', [\App\Http\Controllers\AuthController::class, 'login'])->middleware('throttle:auth');
 
 // Health Checks
 Route::get('health', [\App\Http\Controllers\HealthController::class, 'check']);
@@ -156,11 +156,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // Matches
     Route::get('matches', [\App\Http\Controllers\MatchController::class, 'index']);
     Route::get('matches/established', [\App\Http\Controllers\MatchController::class, 'establishedMatches']);
-    Route::post('matches/action', [\App\Http\Controllers\MatchController::class, 'action']);
+    Route::post('matches/action', [\App\Http\Controllers\MatchController::class, 'action'])->middleware('throttle:matching');
 
     // Direct Messages
     Route::get('messages/unread-count', [\App\Http\Controllers\Api\MessageController::class, 'unreadCount']);
-    Route::post('messages', [\App\Http\Controllers\Api\MessageController::class, 'store']);
+    Route::post('messages', [\App\Http\Controllers\Api\MessageController::class, 'store'])->middleware('throttle:messaging');
     Route::get('messages/{userId}', [\App\Http\Controllers\Api\MessageController::class, 'index']);
     Route::post('messages/{messageId}/read', [\App\Http\Controllers\Api\MessageController::class, 'markAsRead']);
     Route::post('messages/mark-all-read/{senderId}', [\App\Http\Controllers\Api\MessageController::class, 'markAllAsRead']);
@@ -181,7 +181,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Chatroom Messages
     Route::get('chatrooms/{chatroomId}/messages', [\App\Http\Controllers\ChatroomMessageController::class, 'index']);
-    Route::post('chatrooms/{chatroomId}/messages', [\App\Http\Controllers\ChatroomMessageController::class, 'store']);
+    Route::post('chatrooms/{chatroomId}/messages', [\App\Http\Controllers\ChatroomMessageController::class, 'store'])->middleware('throttle:messaging');
 
     // Proximity Chatrooms
     Route::get('proximity-chatrooms/nearby', [\App\Http\Controllers\ProximityChatroomController::class, 'findNearby']);
@@ -196,7 +196,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Proximity Chatroom Messages
     Route::get('proximity-chatrooms/{chatroomId}/messages', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'index']);
-    Route::post('proximity-chatrooms/{chatroomId}/messages', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'store']);
+    Route::post('proximity-chatrooms/{chatroomId}/messages', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'store'])->middleware('throttle:messaging');
     Route::get('proximity-chatrooms/{chatroomId}/messages/pinned', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'pinned']);
     Route::get('proximity-chatrooms/{chatroomId}/messages/networking', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'networking']);
     Route::get('proximity-chatrooms/{chatroomId}/messages/social', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'social']);
@@ -259,7 +259,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('friends')->group(function () {
         Route::get('/', [FriendController::class, 'getFriends']);
         Route::get('/requests', [FriendController::class, 'getFriendRequests']);
-        Route::post('/requests', [FriendController::class, 'sendFriendRequest']);
+        Route::post('/requests', [FriendController::class, 'sendFriendRequest'])->middleware('throttle:friend_requests');
         Route::post('/requests/{userId}', [FriendController::class, 'respondToFriendRequest']);
         Route::delete('/{friendId}', [FriendController::class, 'removeFriend']);
         Route::get('/search', [FriendController::class, 'search']);
@@ -273,10 +273,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get("/location/nearby", [LocationController::class, "nearby"]);
 
     // Verification
-    Route::post('verification/verify', [\App\Http\Controllers\VerificationController::class, 'verify']);
+    Route::post('verification/verify', [\App\Http\Controllers\VerificationController::class, 'verify'])->middleware('throttle:verification');
     Route::get('verification/status', [\App\Http\Controllers\VerificationController::class, 'status']);
 
     // Feedback
-    Route::post('feedback', [\App\Http\Controllers\FeedbackController::class, 'store']);
+    Route::post('feedback', [\App\Http\Controllers\FeedbackController::class, 'store'])->middleware('throttle:feedback');
 });
 
