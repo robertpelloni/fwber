@@ -1,12 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 
 export default function UserSearch() {
   const [query, setQuery] = useState('');
-  const queryClient = useQueryClient();
 
   const { data: users, refetch } = useQuery({
     queryKey: ['userSearch', query],
