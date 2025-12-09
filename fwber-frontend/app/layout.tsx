@@ -8,6 +8,7 @@ import { ToastProvider } from '@/components/ToastProvider'
 import NotificationPermissionHandler from '@/components/NotificationPermissionHandler'
 import SentryInitializer from '@/components/SentryInitializer'
 import { ThemeProvider } from '@/components/ThemeProvider'
+import FeedbackModal from '@/components/FeedbackModal'
 
 const inter = Inter({
   variable: '--font-inter',
@@ -91,6 +92,7 @@ export default function RootLayout({
                 <div className="relative flex min-h-screen flex-col">
                   <div className="flex-1">{children}</div>
                 </div>
+                <FeedbackModal />
                 <PerformanceMonitor />
               </ToastProvider>
             </AuthProvider>

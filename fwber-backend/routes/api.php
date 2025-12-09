@@ -268,4 +268,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Verification
     Route::post('verification/verify', [\App\Http\Controllers\VerificationController::class, 'verify']);
     Route::get('verification/status', [\App\Http\Controllers\VerificationController::class, 'status']);
+
+    // Feedback
+    Route::post('feedback', [\App\Http\Controllers\FeedbackController::class, 'store']);
 });
