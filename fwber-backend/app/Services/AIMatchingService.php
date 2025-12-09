@@ -265,8 +265,46 @@ class AIMatchingService
             }
         }
 
-        // Height & Weight (Simplified)
-        // ... implementation ...
+        // Hair Color
+        if (isset($userPrefs['preferred_hair_colors']) && is_array($userPrefs['preferred_hair_colors'])) {
+            $maxScore += 10;
+            if (in_array($candidateProfile->hair_color, $userPrefs['preferred_hair_colors'])) {
+                $score += 10;
+            }
+        }
+
+        // Eye Color
+        if (isset($userPrefs['preferred_eye_colors']) && is_array($userPrefs['preferred_eye_colors'])) {
+            $maxScore += 10;
+            if (in_array($candidateProfile->eye_color, $userPrefs['preferred_eye_colors'])) {
+                $score += 10;
+            }
+        }
+
+        // Height
+        if (isset($userPrefs['min_height']) && isset($userPrefs['max_height']) && $candidateProfile->height_cm) {
+            $maxScore += 15;
+            if ($candidateProfile->height_cm >= $userPrefs['min_height'] && 
+                $candidateProfile->height_cm <= $userPrefs['max_height']) {
+                $score += 15;
+            }
+        }
+
+        // Breast Size
+        if (isset($userPrefs['preferred_breast_sizes']) && is_array($userPrefs['preferred_breast_sizes'])) {
+            $maxScore += 10;
+            if (in_array($candidateProfile->breast_size, $userPrefs['preferred_breast_sizes'])) {
+                $score += 10;
+            }
+        }
+
+        // Tattoos & Piercings
+        if (isset($userPrefs['preferred_tattoos']) && is_array($userPrefs['preferred_tattoos'])) {
+            $maxScore += 5;
+            if (in_array($candidateProfile->tattoos, $userPrefs['preferred_tattoos'])) {
+                $score += 5;
+            }
+        }
 
         return $maxScore > 0 ? ($score / $maxScore) * 100 : 50;
     }
@@ -277,6 +315,31 @@ class AIMatchingService
         $total = 0;
         $userPrefs = $userProfile->preferences ?? [];
         $candidatePrefs = $candidateProfile->preferences ?? [];
+
+        // Penis Size Preferences
+        if ($candidateProfile->penis_length_cm) {
+            $minLen = $userPrefs['min_penis_length'] ?? 0;
+            $maxLen = $userPrefs['max_penis_length'] ?? 100;
+            
+            if ($minLen > 0 || $maxLen < 100) {
+                $total++;
+                if ($candidateProfile->penis_length_cm >= $minLen && $candidateProfile->penis_length_cm <= $maxLen) {
+                    $score += 20;
+                }
+            }
+        }
+
+        if ($candidateProfile->penis_girth_cm) {
+            $minGirth = $userPrefs['min_penis_girth'] ?? 0;
+            $maxGirth = $userPrefs['max_penis_girth'] ?? 100;
+            
+            if ($minGirth > 0 || $maxGirth < 100) {
+                $total++;
+                if ($candidateProfile->penis_girth_cm >= $minGirth && $candidateProfile->penis_girth_cm <= $maxGirth) {
+                    $score += 20;
+                }
+            }
+        }
 
         $sexualActs = [
             'safe_sex', 'bareback', 'oral_give', 'oral_receive',
