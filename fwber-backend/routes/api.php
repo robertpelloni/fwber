@@ -81,6 +81,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('auth/logout', [\App\Http\Controllers\AuthController::class, 'logout']);
     Route::get('auth/me', [\App\Http\Controllers\AuthController::class, 'me']);
 
+    // Profile
+    Route::get('profile', [\App\Http\Controllers\ProfileController::class, 'show']);
+    Route::put('profile', [\App\Http\Controllers\ProfileController::class, 'update']);
+    Route::get('profile/completeness', [\App\Http\Controllers\ProfileController::class, 'completeness']);
+
     // Dashboard
     Route::get('dashboard/stats', [\App\Http\Controllers\DashboardController::class, 'getStats']);
     Route::get('dashboard/activity', [\App\Http\Controllers\DashboardController::class, 'getActivity']);

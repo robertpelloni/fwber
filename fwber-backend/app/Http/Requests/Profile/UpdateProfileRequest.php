@@ -16,13 +16,61 @@ class UpdateProfileRequest extends FormRequest
         return [
             'display_name' => 'sometimes|string|max:50',
             'bio' => 'sometimes|string|max:500',
-            'date_of_birth' => 'sometimes|date|before_or_equal:' . now()->subYears(18)->toDateString() . '|after:1900-01-01',
+            'birthdate' => 'sometimes|date|before_or_equal:' . now()->subYears(18)->toDateString() . '|after:1900-01-01',
             'gender' => 'sometimes|string|in:male,female,non-binary,mtf,ftm,other,prefer-not-to-say',
             'pronouns' => 'sometimes|string|in:he/him,she/her,they/them,he/they,she/they,other,prefer-not-to-say',
             'sexual_orientation' => 'sometimes|string|in:straight,gay,lesbian,bisexual,pansexual,asexual,demisexual,queer,questioning,other,prefer-not-to-say',
             'relationship_style' => 'sometimes|string|in:monogamous,non-monogamous,polyamorous,open,swinger,other,prefer-not-to-say',
+            
+            // Physical
+            'height_cm' => 'sometimes|integer|min:50|max:300',
+            'body_type' => 'sometimes|string|in:slim,athletic,average,curvy,plus-size,muscular',
+            'ethnicity' => 'sometimes|string',
+            'breast_size' => 'sometimes|string',
+            'tattoos' => 'sometimes|string',
+            'piercings' => 'sometimes|string',
+            'hair_color' => 'sometimes|string',
+            'eye_color' => 'sometimes|string',
+            'skin_tone' => 'sometimes|string',
+            'facial_hair' => 'sometimes|string',
+            'dominant_hand' => 'sometimes|string',
+            'fitness_level' => 'sometimes|string',
+            'clothing_style' => 'sometimes|string',
+            
+            // Intimate
+            'penis_length_cm' => 'sometimes|numeric|min:0|max:50',
+            'penis_girth_cm' => 'sometimes|numeric|min:0|max:50',
+            'fetishes' => 'sometimes|array',
+            'sti_status' => 'sometimes|array',
+            
+            // Lifestyle
+            'occupation' => 'sometimes|string|max:100',
+            'education' => 'sometimes|string',
+            'relationship_status' => 'sometimes|string',
+            'smoking_status' => 'sometimes|string',
+            'drinking_status' => 'sometimes|string',
+            'cannabis_status' => 'sometimes|string',
+            'dietary_preferences' => 'sometimes|string',
+            'zodiac_sign' => 'sometimes|string',
+            'relationship_goals' => 'sometimes|string',
+            'has_children' => 'sometimes|boolean',
+            'wants_children' => 'sometimes|boolean',
+            'has_pets' => 'sometimes|boolean',
+            'languages' => 'sometimes|array',
+            'interests' => 'sometimes|array',
+            
+            // Social & Personality
+            'love_language' => 'sometimes|string|in:words_of_affirmation,acts_of_service,receiving_gifts,quality_time,physical_touch',
+            'personality_type' => 'sometimes|string|size:4', // MBTI
+            'political_views' => 'sometimes|string',
+            'religion' => 'sometimes|string',
+            'sleep_schedule' => 'sometimes|string',
+            'social_media' => 'sometimes|array',
+            
             'looking_for' => 'sometimes|array',
             "looking_for.*" => 'string|in:friendship,dating,relationship,casual,marriage,networking',
+            'interested_in' => 'sometimes|array',
+            
             'location.latitude' => 'sometimes|numeric|between:-90,90',
             'location.longitude' => 'sometimes|numeric|between:-180,180',
             'location.max_distance' => 'sometimes|integer|min:1|max:500',

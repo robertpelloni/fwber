@@ -202,30 +202,71 @@ class ProfileController extends Controller
             $profile->fill(array_intersect_key($validated, array_flip([
                 'display_name',
                 'bio',
-                'date_of_birth',
+                'birthdate',
                 'gender',
                 'pronouns',
                 'sexual_orientation',
                 'relationship_style',
+                'height_cm',
+                'body_type',
+                'ethnicity',
+                'breast_size',
+                'tattoos',
+                'piercings',
+                'hair_color',
+                'eye_color',
+                'skin_tone',
+                'facial_hair',
+                'dominant_hand',
+                'fitness_level',
+                'clothing_style',
+                'penis_length_cm',
+                'penis_girth_cm',
+                'occupation',
+                'education',
+                'relationship_status',
+                'smoking_status',
+                'drinking_status',
+                'cannabis_status',
+                'dietary_preferences',
+                'zodiac_sign',
+                'relationship_goals',
+                'has_children',
+                'wants_children',
+                'has_pets',
+                'love_language',
+                'personality_type',
+                'political_views',
+                'religion',
+                'sleep_schedule',
+                'social_media',
+                'interests',
+                'languages',
+                'fetishes',
+                'sti_status',
             ])));
             
             // Handle location fields
             if (isset($validated['location'])) {
                 $location = $validated['location'];
                 if (isset($location['latitude'])) {
-                    $profile->location_latitude = $location['latitude'];
+                    $profile->latitude = $location['latitude'];
                 }
                 if (isset($location['longitude'])) {
-                    $profile->location_longitude = $location['longitude'];
+                    $profile->longitude = $location['longitude'];
                 }
                 if (isset($location['city'])) {
-                    $profile->location_description = $location['city'] . ', ' . ($location['state'] ?? '');
+                    $profile->location_name = $location['city'] . ', ' . ($location['state'] ?? '');
                 }
             }
             
             // Handle JSON fields
             if (isset($validated['looking_for'])) {
                 $profile->looking_for = $validated['looking_for'];
+            }
+            
+            if (isset($validated['interested_in'])) {
+                $profile->interested_in = $validated['interested_in'];
             }
             
             if (isset($validated['preferences'])) {
@@ -285,8 +326,8 @@ class ProfileController extends Controller
         $requiredFields = [
             'display_name',
             'gender',
-            'location_latitude',
-            'location_longitude',
+            'latitude',
+            'longitude',
             'looking_for',
         ];
 
@@ -297,12 +338,12 @@ class ProfileController extends Controller
         }
 
         // Validate adult age via DOB (>= 18)
-        if (empty($profile->date_of_birth)) {
+        if (empty($profile->birthdate)) {
             return false;
         }
-        $dob = $profile->date_of_birth instanceof \DateTimeInterface
-            ? Carbon::instance($profile->date_of_birth)
-            : Carbon::parse($profile->date_of_birth);
+        $dob = $profile->birthdate instanceof \DateTimeInterface
+            ? Carbon::instance($profile->birthdate)
+            : Carbon::parse($profile->birthdate);
         if ($dob->age < 18) {
             return false;
         }
@@ -330,7 +371,7 @@ class ProfileController extends Controller
                 return response()->json([
                     'percentage' => 0,
                     'required_complete' => false,
-                    'missing_required' => ['display_name', 'date_of_birth', 'gender', 'location', 'looking_for'],
+                    'missing_required' => ['display_name', 'birthdate', 'gender', 'location', 'looking_for'],
                     'missing_optional' => ['bio', 'pronouns', 'sexual_orientation', 'relationship_style', 'preferences'],
                     'sections' => [
                         'basic' => false,
@@ -350,16 +391,16 @@ class ProfileController extends Controller
 
             // Check sections
             $sections = [
-                'basic' => !empty($profile->display_name) && !empty($profile->date_of_birth) && !empty($profile->gender),
-                'location' => !empty($profile->location_latitude) && !empty($profile->location_longitude),
+                'basic' => !empty($profile->display_name) && !empty($profile->birthdate) && !empty($profile->gender),
+                'location' => !empty($profile->latitude) && !empty($profile->longitude),
                 'preferences' => !empty($profile->looking_for) && count($profile->looking_for ?? []) > 0,
-                'interests' => $hasPref('hobbies') || $hasPref('music') || $hasPref('sports'),
-                'physical' => $hasPref('body_type'),
-                'lifestyle' => $hasPref('smoking') || $hasPref('drinking') || $hasPref('exercise'),
+                'interests' => !empty($profile->interests) || $hasPref('hobbies') || $hasPref('music') || $hasPref('sports'),
+                'physical' => !empty($profile->body_type) || $hasPref('body_type'),
+                'lifestyle' => !empty($profile->smoking_status) || $hasPref('smoking') || $hasPref('drinking') || $hasPref('exercise'),
             ];
 
             // Required fields
-            $required = ['display_name', 'date_of_birth', 'gender', 'location_latitude', 'looking_for'];
+            $required = ['display_name', 'birthdate', 'gender', 'latitude', 'looking_for'];
             $missingRequired = [];
             foreach ($required as $field) {
                 if (empty($profile->$field)) {

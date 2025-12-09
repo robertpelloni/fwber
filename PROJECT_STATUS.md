@@ -280,6 +280,12 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Frontend**: Implemented `AudioRecorder` component using `MediaRecorder` API.
     -   **Integration**: Added voice recording capability to `MessagesPage`.
     -   **Backend**: Verified support for `audio` message type and file uploads.
+8.  **Optional Profile Attributes** (Dec 09 - Complete):
+    -   **Database**: Added `love_language`, `personality_type`, `political_views`, `religion`, `sleep_schedule`, `social_media` to `user_profiles`.
+    -   **Backend**: Updated `UserProfile` model, `UserProfileResource`, and `ProfileController` to support new fields.
+    -   **Matching**: Updated `AIMatchingService` to include scoring for optional attributes.
+    -   **Frontend**: Updated `EnhancedProfileEditor` with "Personality & Social" section.
+    -   **Verification**: Feature tests (`FullProfileAttributesTest`) passing.
 
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.
