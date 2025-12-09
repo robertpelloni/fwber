@@ -87,7 +87,7 @@ class RecommendationController extends Controller
             $validator = Validator::make($request->all(), [
                 'limit' => 'integer|min:1|max:50',
                 'types' => 'array',
-                'types.*' => 'string|in:content,collaborative,ai,location',
+                "types.*" => 'string|in:content,collaborative,ai,location',
                 'context' => 'array',
                 'context.latitude' => 'numeric|between:-90,90',
                 'context.longitude' => 'numeric|between:-180,180',

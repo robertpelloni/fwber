@@ -23,7 +23,7 @@ class UpdateFeaturesRequest extends FormRequest
     {
         return [
             'features' => 'required|array',
-            'features.*' => 'boolean',
+            "features.*" => 'boolean',
         ];
     }
 
@@ -35,7 +35,7 @@ class UpdateFeaturesRequest extends FormRequest
         return [
             'features.required' => 'Features array is required.',
             'features.array' => 'Features must be an array.',
-            'features.*.boolean' => 'Each feature value must be a boolean (true/false).',
+            "features.*.boolean" => 'Each feature value must be a boolean (true/false).',
         ];
     }
 }

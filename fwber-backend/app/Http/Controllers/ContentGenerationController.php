@@ -61,7 +61,7 @@ class ContentGenerationController extends Controller
         $validator = Validator::make($request->all(), [
             'personality' => 'nullable|string|max:255',
             'interests' => 'nullable|array',
-            'interests.*' => 'string|max:255',
+            "interests.*" => 'string|max:255',
             'goals' => 'nullable|string|max:1000',
             'style' => 'nullable|string|in:casual,professional,humorous,romantic',
             'target_audience' => 'nullable|string|max:255',
@@ -127,7 +127,7 @@ class ContentGenerationController extends Controller
             'context.location' => 'nullable|array',
             'context.time' => 'nullable|string',
             'context.topics' => 'nullable|array',
-            'context.topics.*' => 'string|max:255',
+            "context.topics.*" => 'string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -401,7 +401,7 @@ class ContentGenerationController extends Controller
             'rating' => 'required|integer|min:1|max:5',
             'feedback' => 'nullable|string|max:1000',
             'improvements' => 'nullable|array',
-            'improvements.*' => 'string|max:255',
+            "improvements.*" => 'string|max:255',
         ]);
 
         if ($validator->fails()) {
