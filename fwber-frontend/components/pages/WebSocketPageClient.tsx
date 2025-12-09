@@ -23,7 +23,6 @@ function WebSocketPageContent() {
     typingIndicators,
     connect,
     disconnect,
-    sendMessage,
     sendChatMessage,
     sendTypingIndicator,
     updatePresence,
@@ -59,17 +58,6 @@ function WebSocketPageContent() {
 
   const handleDisconnect = () => {
     disconnect();
-  };
-
-  const handleSendTestMessage = () => {
-    if (testMessage.trim()) {
-      sendMessage({
-        type: 'test_message',
-        data: { content: testMessage },
-        timestamp: new Date().toISOString(),
-      });
-      setTestMessage('');
-    }
   };
 
   const handleSendChatMessage = () => {
@@ -237,13 +225,6 @@ function WebSocketPageContent() {
               </div>
 
               <div className="flex space-x-2">
-                <button
-                  onClick={handleSendTestMessage}
-                  disabled={!testMessage.trim()}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-4 py-2 rounded transition-colors"
-                >
-                  Send Test Message
-                </button>
                 <button
                   onClick={handleSendChatMessage}
                   disabled={!selectedRecipient || !testMessage.trim()}

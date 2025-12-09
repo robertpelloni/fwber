@@ -89,8 +89,8 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
       setStatus(prev => ({ ...prev, connecting: true, error: null }));
 
       // 1. Get Mercure Token and Hub URL
-      const response = await api.get('/websocket/token');
-      const { token: mercureToken, hub_url } = response.data;
+      const response = await api.get<{ token: string; hub_url: string }>('/websocket/token');
+      const { token: mercureToken, hub_url } = response;
 
       // 2. Construct URL with topics
       const url = new URL(hub_url);
@@ -232,6 +232,31 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
     }
   }, []);
 
+  const loadConversationHistory = useCallback(async (recipientId: string) => {
+    try {
+      const response = await api.get<any>(`/messages/${recipientId}`);
+      const history = (response.messages || response.data || []).map((msg: any) => ({
+        id: msg.id,
+        from_user_id: msg.sender_id,
+        to_user_id: msg.receiver_id,
+        content: msg.content,
+        timestamp: msg.created_at,
+        status: msg.read_at ? 'read' : 'delivered',
+      }));
+      setChatMessages(prev => {
+        // Merge history with existing messages, avoiding duplicates
+        const existingIds = new Set(prev.map(m => m.id));
+        const newMessages = history.filter((m: any) => !existingIds.has(m.id));
+        return [...newMessages, ...prev].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      });
+    } catch (err) {
+      console.error('Failed to load conversation history:', err);
+    }
+  }, []);
+
+  const clearMessages = useCallback(() => setMessages([]), []);
+  const clearNotifications = useCallback(() => setNotifications([]), []);
+
   useEffect(() => {
     if (options.autoConnect && isAuthenticated && !status.connected && !status.connecting) {
       connect();
@@ -260,6 +285,9 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
     sendTypingIndicator,
     updatePresence,
     sendNotification,
+    loadConversationHistory,
+    clearMessages,
+    clearNotifications,
     isReady: status.connected,
   };
 }

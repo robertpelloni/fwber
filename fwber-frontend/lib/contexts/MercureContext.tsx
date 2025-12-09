@@ -20,6 +20,9 @@ interface MercureContextType {
   sendTypingIndicator: (recipientId: string, isTyping: boolean) => Promise<void>;
   updatePresence: (status: 'online' | 'away' | 'busy' | 'offline', metadata?: Record<string, any>) => Promise<void>;
   sendNotification: (recipientId: string, notification: any) => Promise<void>;
+  loadConversationHistory: (recipientId: string) => Promise<void>;
+  clearMessages: () => void;
+  clearNotifications: () => void;
   isReady: boolean;
 }
 

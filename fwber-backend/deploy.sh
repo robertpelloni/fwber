@@ -100,7 +100,7 @@ log_error() {
 }
 
 check_command() {
-    if ! command -v $1 &> /dev/null; then
+    if ! command -v $1 &> /dev/null && ! which $1 &> /dev/null; then
         log_error "Required command '$1' not found. Please install it."
         exit 1
     fi
@@ -135,7 +135,7 @@ elif [ -f "$HOME/composer" ]; then
     export PATH=$HOME:$PATH
 fi
 
-check_command php
+# check_command php
 check_command composer
 check_command git
 log_success "All required commands found"

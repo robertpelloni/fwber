@@ -10,7 +10,11 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 *   None at this time.
 
 ### ✅ Completed Operational Improvements
-1.  **Cache Versioning & Strategy** (Dec 04 - Complete):
+1.  **Post-Launch Fixes** (Dec 09 - Complete):
+    -   **Frontend Build**: Fixed TypeScript errors in `FriendsPage` and related components (`FriendList`, `FriendRequestList`, `UserSearch`). Updated components to be presentational and fixed `api-client` imports.
+    -   **Deployment Script**: Fixed Windows CRLF line endings and `php` command detection in `fwber-backend/deploy.sh`.
+    -   **Verification**: Verified `npm run build` (Frontend) and `composer install` / `php artisan` (Backend) in the workspace.
+2.  **Cache Versioning & Strategy** (Dec 04 - Complete):
     -   Implemented `CACHE_VERSION` strategy for global cache invalidation.
     -   Updated `Group`, `Event`, and `Subscription` controllers to use versioned keys.
     -   Documented strategy in `docs/CACHE_STRATEGY.md`.
