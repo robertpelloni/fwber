@@ -335,6 +335,12 @@ class AvatarGenerationService
             elseif ($height < 160) $parts[] = 'short';
         }
 
+        // Breast size (only for relevant genders)
+        $breastSize = $get('breast_size');
+        if ($breastSize && in_array(strtolower($gender ?? ''), ['female', 'trans-female', 'non-binary'])) {
+             $parts[] = $breastSize . ' bust';
+        }
+
         $hairColor = $get('hair_color');
         if ($hairColor) $parts[] = $hairColor . ' hair';
 
@@ -360,10 +366,32 @@ class AvatarGenerationService
 
         // Style & Vibe
         $clothingStyle = $get('clothing_style');
-        if ($clothingStyle) $parts[] = 'wearing ' . $clothingStyle . ' style clothing';
+        $occupation = $get('occupation');
+        
+        if ($clothingStyle) {
+            $parts[] = 'wearing ' . $clothingStyle . ' style clothing';
+        } elseif ($occupation) {
+            // Fallback to occupation-based style if no specific style set
+            $parts[] = 'dressed as a ' . $occupation;
+        }
 
         $fitnessLevel = $get('fitness_level');
         if ($fitnessLevel) $parts[] = $fitnessLevel . ' build';
+
+        // Personality & Vibe (MBTI)
+        $mbti = $get('personality_type');
+        if ($mbti) {
+            $firstLetter = strtoupper(substr($mbti, 0, 1));
+            if ($firstLetter === 'E') $parts[] = 'energetic, friendly expression';
+            elseif ($firstLetter === 'I') $parts[] = 'calm, thoughtful expression';
+        }
+
+        // Background context from interests
+        $interests = $get('interests');
+        if (!empty($interests) && is_array($interests)) {
+            $mainInterest = $interests[0];
+            $parts[] = $mainInterest . ' background theme';
+        }
 
         // Quality modifiers
         $parts[] = 'high quality, detailed, professional photography, attractive, confident expression, natural lighting';
