@@ -1,4 +1,21 @@
 describe('Face Reveal Game', () => {
+  // Mock EventSource to prevent real connection attempts
+  class MockEventSource {
+    constructor(url) {
+      this.url = url;
+      this.readyState = 0; // CONNECTING
+      setTimeout(() => {
+        this.readyState = 1; // OPEN
+        if (this.onopen) this.onopen({ type: 'open' });
+      }, 10);
+    }
+    close() {
+      this.readyState = 2; // CLOSED
+    }
+    addEventListener() {}
+    removeEventListener() {}
+  }
+
   const user = {
     id: 1,
     name: 'Test User',
@@ -37,6 +54,11 @@ describe('Face Reveal Game', () => {
   };
 
   beforeEach(() => {
+    // Inject MockEventSource
+    cy.window().then((win) => {
+      win.EventSource = MockEventSource;
+    });
+
     // Set viewport to desktop to ensure side-by-side layout
     cy.viewport(1280, 720);
 
@@ -67,10 +89,24 @@ describe('Face Reveal Game', () => {
       body: { success: true }
     }).as('markAsRead');
 
+    // Mock WebSocket token endpoint to avoid 404s
+    cy.intercept('GET', '**/api/websocket/token', {
+      statusCode: 200,
+      body: {
+        token: 'mock-mercure-token',
+        hub_url: 'http://localhost:3000/.well-known/mercure'
+      }
+    }).as('getWebsocketToken');
+
     cy.visit('/messages', {
       onBeforeLoad: (win) => {
         win.localStorage.setItem('fwber_token', 'fake-token');
         win.localStorage.setItem('fwber_user', JSON.stringify(user));
+        win.EventSource = MockEventSource;
+        // Enable face reveal feature flag
+        win.__CYPRESS_FEATURE_FLAGS__ = {
+          face_reveal: true
+        };
       }
     });
     

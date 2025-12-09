@@ -1,5 +1,5 @@
 {
-  "/login/page": "app/login/page.js",
   "/page": "app/page.js",
-  "/nearby/page": "app/nearby/page.js"
+  "/pulse/page": "app/pulse/page.js",
+  "/proximity-chatrooms/[id]/page": "app/proximity-chatrooms/[id]/page.js"
 }

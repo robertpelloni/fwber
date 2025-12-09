@@ -1,4 +1,21 @@
 describe('Proximity Feed (Local Pulse)', () => {
+  // Mock EventSource to prevent real connection attempts
+  class MockEventSource {
+    constructor(url) {
+      this.url = url;
+      this.readyState = 0; // CONNECTING
+      setTimeout(() => {
+        this.readyState = 1; // OPEN
+        if (this.onopen) this.onopen({ type: 'open' });
+      }, 10);
+    }
+    close() {
+      this.readyState = 2; // CLOSED
+    }
+    addEventListener() {}
+    removeEventListener() {}
+  }
+
   const user = {
     id: 1,
     name: 'Test User',
@@ -26,6 +43,11 @@ describe('Proximity Feed (Local Pulse)', () => {
   };
 
   beforeEach(() => {
+    // Inject MockEventSource
+    cy.window().then((win) => {
+      win.EventSource = MockEventSource;
+    });
+
     // Mock login
     cy.intercept('POST', '**/api/auth/login', {
       statusCode: 200,
@@ -118,10 +140,24 @@ describe('Proximity Feed (Local Pulse)', () => {
         }
       }
     }).as('createArtifact');
+
+    // Mock WebSocket token endpoint to avoid 404s
+    cy.intercept('GET', '**/api/websocket/token', {
+      statusCode: 200,
+      body: {
+        token: 'mock-mercure-token',
+        hub_url: 'http://localhost:3000/.well-known/mercure'
+      }
+    }).as('getWebsocketToken');
   });
 
   it('shows loading state or error if unauthenticated', () => {
     cy.visit('/pulse');
+    // Re-inject MockEventSource after visit
+    cy.window().then((win) => {
+      win.EventSource = MockEventSource;
+    });
+
     cy.url().then(url => cy.log('Current URL:', url));
     cy.get('body').invoke('text').then(text => cy.log('Body text:', text.substring(0, 200)));
 
@@ -153,6 +189,7 @@ describe('Proximity Feed (Local Pulse)', () => {
         win.localStorage.setItem('auth_token', 'dev');
         // And our component's geo bypass
         win.localStorage.setItem('mock_geo', 'true');
+        win.EventSource = MockEventSource;
       }
     });
 
@@ -192,9 +229,17 @@ describe('Proximity Feed (Local Pulse)', () => {
     
     // Verify navigation
     cy.url().should('include', '/proximity-chatrooms/201');
+    // Re-inject MockEventSource after navigation
+    cy.window().then((win) => {
+      win.EventSource = MockEventSource;
+    });
 
     // Go back
     cy.go('back');
+    // Re-inject MockEventSource after navigation
+    cy.window().then((win) => {
+      win.EventSource = MockEventSource;
+    });
 
     // Check for joined room
     cy.contains('Joined Group').should('be.visible');
