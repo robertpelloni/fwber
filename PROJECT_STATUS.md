@@ -58,6 +58,9 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **PWA Polish**:
         -   **Service Worker**: Updated `sw-push.js` to use existing `/icon.svg` instead of missing PNGs to prevent 404s.
         -   **UX**: Improved notification click handling to focus existing windows instead of opening new tabs.
+11. **Payment Integration** (Dec 09 - Complete):
+    -   **Stripe**: Switched from Mock driver to live Stripe driver in production configuration.
+    -   **Verification**: Verified `StripePaymentGateway` connectivity and PaymentIntent creation via live API test.
 2.  **Cache Versioning & Strategy** (Dec 04 - Complete):
     -   Implemented `CACHE_VERSION` strategy for global cache invalidation.
     -   Updated `Group`, `Event`, and `Subscription` controllers to use versioned keys.
