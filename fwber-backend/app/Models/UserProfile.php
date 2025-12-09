@@ -55,6 +55,7 @@ class UserProfile extends Model
         'clothing_style',
         'avatar_prompt',
         'avatar_status',
+        'preferences',
     ];
 
     protected $casts = [
@@ -73,6 +74,7 @@ class UserProfile extends Model
         'penis_girth_cm' => 'decimal:2',
         'sti_status' => 'array',
         'fetishes' => 'array',
+        'preferences' => 'array',
     ];
 
     public function user()
