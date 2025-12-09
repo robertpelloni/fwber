@@ -29,6 +29,13 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 5.  **Frontend E2E Stabilization** (Dec 10 - Complete):
     -   **Fixes**: Resolved `ESOCKETTIMEDOUT` in `friends-full.cy.js` by mocking `EventSource` and ensuring dev server connectivity. Fixed selector issues in `UserSearch` component tests.
     -   **Verification**: Verified passing status for critical E2E flows: `realtime-chat`, `friends-full`, `matching-flow`, `messaging-flow`, `nearby-users`.
+6.  **Comprehensive E2E Suite Stabilization** (Dec 10 - Complete):
+    -   **Fixes**:
+        -   **Face Reveal**: Fixed `face-reveal.cy.js` by injecting feature flag override (`window.__CYPRESS_FEATURE_FLAGS__`) and mocking `EventSource`.
+        -   **ML Content**: Fixed `ml-content-generation.cy.js` by updating `useAIContent` hook to use `apiClient` (resolving `BASE_URL` issues).
+        -   **Proximity Feed**: Stabilized `proximity-feed.cy.js` with `MockEventSource`.
+    -   **Verification**: Verified passing status for all remaining E2E tests: `proximity-feed`, `face-reveal`, `groups`, `proximity-chatrooms`, `physical-profile`, `ml-content-generation`, `premium-features`, `boosts`, `events`.
+    -   **Status**: Full E2E test suite (16+ specs) is now passing.
 2.  **Cache Versioning & Strategy** (Dec 04 - Complete):
     -   Implemented `CACHE_VERSION` strategy for global cache invalidation.
     -   Updated `Group`, `Event`, and `Subscription` controllers to use versioned keys.
