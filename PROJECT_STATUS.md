@@ -10,7 +10,13 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 *   None at this time.
 
 ### ✅ Completed Operational Improvements
-1.  **Post-Launch Fixes** (Dec 09 - Complete):
+1.  **Test Suite Stabilization** (Dec 09 - Complete):
+    -   **PhotoControllerTest**: Fixed 403 errors by overriding `app.avatar_mode` config in tests. Created `PhotoFactory`.
+    -   **LocationControllerTest**: Fixed 500 errors by adding `matchesAsUser1` and `matchesAsUser2` relationships to `User` model.
+    -   **FriendTest**: Fixed 404 errors by correcting route definitions in `api.php` (removed incorrect `/venue` prefix).
+    -   **Frontend API**: Updated `friends.ts` to use `POST` for `respondToFriendRequest` to match backend.
+    -   **Verification**: All backend feature tests passing.
+2.  **Post-Launch Fixes** (Dec 09 - Complete):
     -   **Frontend Build**: Fixed TypeScript errors in `FriendsPage` and related components (`FriendList`, `FriendRequestList`, `UserSearch`). Updated components to be presentational and fixed `api-client` imports.
     -   **Deployment Script**: Fixed Windows CRLF line endings and `php` command detection in `fwber-backend/deploy.sh`. Added WSL/Git Bash compatibility for PHP path detection.
     -   **Migrations**: Fixed idempotency issues in `2025_12_07_190732_create_friends_table` (table existence check) and `2025_12_02_000000_optimize_messaging_and_matching_indexes` (index existence check with SQLite support).

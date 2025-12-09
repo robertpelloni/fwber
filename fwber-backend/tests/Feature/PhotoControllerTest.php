@@ -15,6 +15,7 @@ class PhotoControllerTest extends TestCase
 
     public function test_user_can_upload_photo()
     {
+        config(['app.avatar_mode' => 'upload']);
         Storage::fake('public');
         $user = User::factory()->create();
 
