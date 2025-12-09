@@ -70,6 +70,9 @@ class PhotoRevealControllerTest extends TestCase
         $response = $controller->original($request, $photo, $encryptionService);
         
         // Assert response is a StreamedResponse and content matches
+        if ($response instanceof \Illuminate\Http\JsonResponse) {
+            $this->fail('Expected StreamedResponse, got JsonResponse: ' . json_encode($response->getData()));
+        }
         $this->assertInstanceOf(\Symfony\Component\HttpFoundation\StreamedResponse::class, $response);
         
         // Capture output
