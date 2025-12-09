@@ -48,7 +48,7 @@ describe('Optional Profile Attributes (Personality & Social)', () => {
       body: user
     }).as('getMe');
 
-    cy.intercept('GET', '**/api/profile', {
+    cy.intercept('GET', '**/api/user', {
       statusCode: 200,
       body: { 
         success: true,
@@ -64,7 +64,7 @@ describe('Optional Profile Attributes (Personality & Social)', () => {
         body: { percentage: 50, missing_fields: [] }
     }).as('getCompleteness');
 
-    cy.intercept('PUT', '**/api/profile', {
+    cy.intercept('PUT', '**/api/user', {
       statusCode: 200,
       body: {
         success: true,
@@ -77,7 +77,7 @@ describe('Optional Profile Attributes (Personality & Social)', () => {
                 personality_type: 'INTJ',
                 political_views: 'liberal',
                 religion: 'agnostic',
-                sleep_schedule: 'night_owl',
+                sleep_habits: 'night-owl',
                 social_media: { instagram: 'test_handle' }
             }
         }
@@ -88,6 +88,7 @@ describe('Optional Profile Attributes (Personality & Social)', () => {
   it('allows editing Personality & Social attributes', () => {
     cy.visit('/profile', {
       onBeforeLoad: (win) => {
+        win.localStorage.setItem('fwber_token', 'dev');
         win.localStorage.setItem('auth_token', 'dev');
       }
     });
@@ -95,33 +96,41 @@ describe('Optional Profile Attributes (Personality & Social)', () => {
     // Wait for profile fetch
     cy.wait('@getProfile');
 
-    // Scroll to the new section
-    cy.contains('h2', 'Personality & Social').scrollIntoView().should('be.visible');
+    // Verify page content loaded
+    cy.contains('Basic Information', { timeout: 10000 }).should('be.visible');
 
-    // Fill in the fields
-    // Note: Selectors depend on how EnhancedProfileEditor renders them. 
-    // Assuming standard selects/inputs based on the implementation.
+    // Enable Edit Mode
+    cy.contains('button', 'Edit Profile').click();
+
+    // 1. Basic Info Tab (Love Language, Personality Type, Religion, Political Views)
+    cy.contains('button', 'Basic Info').click();
     
     // Love Language
     cy.contains('label', 'Love Language').parent().find('select').select('Quality Time');
     
     // Personality Type
-    cy.contains('label', 'Personality Type').parent().find('input').clear().type('INTJ');
-    
-    // Political Views
-    cy.contains('label', 'Political Views').parent().find('select').select('Liberal');
+    cy.contains('label', 'Personality Type (MBTI)').parent().find('select').select('INTJ');
     
     // Religion
     cy.contains('label', 'Religion').parent().find('select').select('Agnostic');
     
-    // Sleep Schedule
-    cy.contains('label', 'Sleep Schedule').parent().find('select').select('Night Owl');
+    // Political Views
+    cy.contains('label', 'Political Views').parent().find('select').select('Liberal');
+
+    // 2. Lifestyle Tab (Sleep Habits)
+    cy.contains('button', 'Lifestyle').click();
     
-    // Social Media (Instagram)
-    cy.contains('label', 'Instagram').parent().find('input').clear().type('test_handle');
+    // Sleep Habits
+    cy.contains('label', 'Sleep Habits').parent().find('select').select('Night owl');
+
+    // 3. Dating Tab (Relationship Goals, Family Plans)
+    cy.contains('button', 'Dating').click();
+    
+    // Relationship Goals
+    cy.contains('label', 'Relationship Goals').parent().find('select').select('Long-term partner');
 
     // Save
-    cy.contains('button', 'Save Changes').click();
+    cy.contains('button', 'Save Profile').click();
 
     // Verify request payload
     cy.wait('@updateProfile').then((interception) => {
@@ -130,8 +139,8 @@ describe('Optional Profile Attributes (Personality & Social)', () => {
       expect(body).to.have.property('personality_type', 'INTJ');
       expect(body).to.have.property('political_views', 'liberal');
       expect(body).to.have.property('religion', 'agnostic');
-      expect(body).to.have.property('sleep_schedule', 'night_owl');
-      expect(body.social_media).to.deep.equal({ instagram: 'test_handle' });
+      expect(body).to.have.property('sleep_habits', 'night-owl');
+      expect(body).to.have.property('relationship_goals', 'long-term');
     });
 
     // Verify success message
