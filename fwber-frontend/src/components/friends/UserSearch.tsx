@@ -20,7 +20,7 @@ export default function UserSearch() {
       alert('Friend request sent!');
     },
     onError: (error: any) => {
-      alert(error.response.data.message);
+      alert(error.response?.data?.message || 'An error occurred');
     },
   });
 
