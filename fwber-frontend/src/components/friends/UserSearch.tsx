@@ -22,7 +22,7 @@ export default function UserSearch() {
       showSuccess('Friend request sent!');
     },
     onError: (error: any) => {
-      showError('Failed to send friend request', error.response?.data?.message || 'An error occurred');
+      alert(error.response?.data?.message || 'An error occurred');
     },
   });
 
