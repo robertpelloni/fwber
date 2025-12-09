@@ -1,0 +1,25 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'fwber-backend/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Deploy to DreamHost via SSH
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.DREAMHOST_HOST }}
+        username: ${{ secrets.DREAMHOST_USERNAME }}
+        key: ${{ secrets.DREAMHOST_SSH_KEY }}
+        port: 22
+        script: |
+          cd ${{ secrets.DREAMHOST_PROJECT_PATH }}
+          # Run the deployment script (it handles directory navigation)
+          bash fwber-backend/deploy.sh --env=production --force
