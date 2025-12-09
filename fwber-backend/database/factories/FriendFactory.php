@@ -21,7 +21,7 @@ class FriendFactory extends Factory
         return [
             'user_id' => User::factory(),
             'friend_id' => User::factory(),
-            'status' => $this->faker->randomElement(['pending', 'accepted']),
+            'status' => $this->faker->randomElement(['pending', 'accepted', 'declined']),
         ];
     }
 }

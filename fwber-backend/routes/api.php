@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BulletinBoardController;
@@ -30,98 +31,34 @@ use App\Http\Controllers\ProximityArtifactController;
 use App\Http\Controllers\ModerationController;
 use App\Http\Controllers\Api\FriendController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\EventController;
 
-Route::middleware("api")->group(function (): void {
-    // Health check endpoints (no auth required)
-    Route::get('/health', [HealthController::class, 'check']);
-    Route::get('/health/liveness', [HealthController::class, 'liveness']);
-    Route::get('/health/readiness', [HealthController::class, 'readiness']);
-    
-    Route::middleware('throttle:auth')->group(function () {
-        Route::post("/auth/register", [AuthController::class, "register"]);
-        Route::post("/auth/login", [AuthController::class, "login"]);
-    });
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "api" middleware group. Make something great!
+|
+*/
 
-    Route::middleware("auth.api")->group(function (): void {
-        // Profile routes (Phase 3A - Multi-AI Implementation)
-        Route::get("/user", [ProfileController::class, "show"]);
-        Route::put("/user", [ProfileController::class, "update"]);
-        Route::get("/profile/completeness", [ProfileController::class, "completeness"]);
-        
-        // Dashboard routes
-        Route::get("/dashboard/stats", [DashboardController::class, "getStats"]);
-        Route::get("/dashboard/activity", [DashboardController::class, "getActivity"]);
-        
-        // Profile view tracking routes
-        Route::post("/profile/{userId}/view", [ProfileViewController::class, "recordView"]);
-        Route::get("/profile/{userId}/views", [ProfileViewController::class, "getViews"]);
-        Route::get("/profile/{userId}/views/stats", [ProfileViewController::class, "getStats"]);
-        
-        Route::post("/auth/logout", [AuthController::class, "logout"]);
-        
-        // Matching routes (require complete profile)
-        Route::middleware('profile.complete')->group(function (): void {
-            Route::get("/matches", [MatchController::class, "index"]);
-            Route::post("/matches/action", [MatchController::class, "action"]);
-        });
-        
-        // Message routes with tier tracking
-        Route::prefix("messages")->group(function (): void {
-            Route::get("/unread-count", [MessageController::class, "unreadCount"]);
-            Route::get("/{userId}", [MessageController::class, "index"]);
-            Route::post("/", [MessageController::class, "store"]);
-            Route::post("/{messageId}/read", [MessageController::class, "markAsRead"]);
-        });
-        
-            // Group routes
-            Route::prefix("groups")->group(function (): void {
-                Route::get("/", [GroupController::class, "index"]);
-                Route::post("/", [GroupController::class, "store"]);
-                Route::get("/discover", [GroupController::class, "discover"]);
-                Route::get("/{groupId}", [GroupController::class, "show"]);
-                Route::put("/{groupId}", [GroupController::class, "update"]);
-                Route::delete("/{groupId}", [GroupController::class, "destroy"]);
-                Route::post("/{groupId}/join", [GroupController::class, "join"]);
-                Route::post("/{groupId}/leave", [GroupController::class, "leave"]);
-                Route::post("/{groupId}/ownership/transfer", [GroupController::class, "transferOwnership"]);
-                Route::post("/{groupId}/members/{memberUserId}/role", [GroupController::class, "setRole"]);
-                Route::post("/{groupId}/members/{memberUserId}/ban", [GroupController::class, "banMember"]);
-                Route::post("/{groupId}/members/{memberUserId}/unban", [GroupController::class, "unbanMember"]);
-                Route::post("/{groupId}/members/{memberUserId}/kick", [GroupController::class, "kickMember"]);
-                Route::post("/{groupId}/members/{memberUserId}/mute", [GroupController::class, "muteMember"]);
-                Route::post("/{groupId}/members/{memberUserId}/unmute", [GroupController::class, "unmuteMember"]);
-                Route::get("/{groupId}/stats", [GroupController::class, "stats"]);
-            });
-        
-            // Group message routes
-            Route::prefix("groups/{groupId}/messages")->group(function (): void {
-                Route::get("/", [GroupMessageController::class, "index"]);
-                Route::post("/", [GroupMessageController::class, "store"]);
-            });
-        
-            Route::post("/group-messages/{messageId}/read", [GroupMessageController::class, "markAsRead"]);
-            Route::get("/group-messages/unread-count", [GroupMessageController::class, "unreadCount"]);
-        
-        // Relationship Tier routes
-        Route::prefix("matches/{matchId}")->group(function (): void {
-            Route::get("/tier", [RelationshipTierController::class, "show"]);
-            Route::post("/tier/update", [RelationshipTierController::class, "update"]);
-            Route::get("/photos", [RelationshipTierController::class, "getPhotos"]);
-        });
+Route::post('auth/register', [\App\Http\Controllers\AuthController::class, 'register']);
+Route::post('auth/login', [\App\Http\Controllers\AuthController::class, 'login']);
 
-        // Physical Profile & Avatar routes
-        Route::prefix('physical-profile')->group(function (): void {
-            Route::get('/', [UserPhysicalProfileController::class, 'show']);
-            Route::put('/', [UserPhysicalProfileController::class, 'upsert']);
-            Route::post('/avatar/request', [UserPhysicalProfileController::class, 'requestAvatar']);
-        });
+// Health Checks
+Route::get('health', [\App\Http\Controllers\HealthController::class, 'check']);
+Route::get('health/liveness', [\App\Http\Controllers\HealthController::class, 'liveness']);
+Route::get('health/readiness', [\App\Http\Controllers\HealthController::class, 'readiness']);
 
-        // Block routes
-        Route::prefix('blocks')->group(function (): void {
-            Route::post('/', [BlockController::class, 'store']);
-            Route::delete('/{blockedId}', [BlockController::class, 'destroy']);
-        });
+// Stripe Webhook
+Route::post('stripe/webhook', [\App\Http\Controllers\StripeWebhookController::class, 'handleWebhook']);
 
+// Venue Partner Auth
+Route::prefix('venue')->group(function () {
+    Route::post('register', [\App\Http\Controllers\VenueAuthController::class, 'register']);
+    Route::post('login', [\App\Http\Controllers\VenueAuthController::class, 'login']);
         // Report routes
         Route::prefix('reports')->group(function (): void {
             Route::post('/', [ReportController::class, 'store']);
@@ -153,157 +90,189 @@ Route::middleware("api")->group(function (): void {
         Route::delete("/location", [LocationController::class, "clear"]);
         Route::get("/location/nearby", [LocationController::class, "nearby"]);
 
-        // Proximity Artifacts (Unified Ephemeral Layer)
-        Route::prefix('proximity')->middleware('feature:proximity_artifacts')->group(function (): void {
-            Route::get('/feed', [ProximityArtifactController::class, 'index']);
-            Route::get('/local-pulse', [ProximityArtifactController::class, 'localPulse']); // Merged feed: artifacts + match candidates
-            Route::post('/artifacts', [ProximityArtifactController::class, 'store']);
-            Route::get('/artifacts/{id}', [ProximityArtifactController::class, 'show']);
-            Route::post('/artifacts/{id}/flag', [ProximityArtifactController::class, 'flag']);
-            Route::delete('/artifacts/{id}', [ProximityArtifactController::class, 'destroy']);
-        });
-
-        // Moderation routes (Phase 2: Safety Features)
-        Route::prefix('moderation')->middleware('auth.moderator')->group(function (): void {
-            Route::get('/dashboard', [ModerationController::class, 'dashboard']);
-            Route::get('/flagged-content', [ModerationController::class, 'flaggedContent']);
-            Route::post('/flags/{artifactId}/review', [ModerationController::class, 'reviewFlag']);
-            Route::get('/spoof-detections', [ModerationController::class, 'spoofDetections']);
-            Route::post('/spoofs/{detectionId}/review', [ModerationController::class, 'reviewSpoof']);
-            Route::get('/throttles', [ModerationController::class, 'activeThrottles']);
-            Route::delete('/throttles/{throttleId}', [ModerationController::class, 'removeThrottle']);
-            Route::get('/actions', [ModerationController::class, 'actionHistory']);
-            Route::get('/users/{userId}', [ModerationController::class, 'userProfile']);
-        });
-        
-        // Bulletin Board routes (Phase 5B - Location-Based Bulletin Board System)
-        Route::get("/bulletin-boards", [BulletinBoardController::class, "index"]);
-        Route::get("/bulletin-boards/{id}", [BulletinBoardController::class, "show"]);
-        Route::post("/bulletin-boards", [BulletinBoardController::class, "createOrFind"]);
-        Route::middleware('throttle:bulletin-message')->group(function () {
-            Route::post("/bulletin-boards/{id}/messages", [BulletinBoardController::class, "postMessage"]);
-        });
-        Route::get("/bulletin-boards/{id}/messages", [BulletinBoardController::class, "getMessages"]);
-        Route::get("/bulletin-boards/{id}/stream", [BulletinBoardController::class, "stream"]);
-        
-        // Chatroom routes (Phase 6A - Real-time Location-Based Chatrooms)
-        Route::prefix("chatrooms")->middleware('feature:chatrooms')->group(function (): void {
-            Route::get("/", [ChatroomController::class, "index"]);
-            Route::get("/categories", [ChatroomController::class, "categories"]);
-            Route::get("/popular", [ChatroomController::class, "popular"]);
-            Route::get("/search", [ChatroomController::class, "search"]);
-            Route::get("/my", [ChatroomController::class, "myChatrooms"]);
-            Route::post("/", [ChatroomController::class, "store"]);
-            Route::get("/{id}", [ChatroomController::class, "show"]);
-            Route::put("/{id}", [ChatroomController::class, "update"]);
-            Route::delete("/{id}", [ChatroomController::class, "destroy"]);
-            Route::post("/{id}/join", [ChatroomController::class, "join"]);
-            Route::post("/{id}/leave", [ChatroomController::class, "leave"]);
-            Route::get("/{id}/members", [ChatroomController::class, "members"]);
-        });
-        
-        // Chatroom Message routes (Phase 6A - Real-time Location-Based Chatrooms)
-        Route::prefix("chatrooms/{chatroomId}/messages")->middleware('feature:chatrooms')->group(function (): void {
-            Route::get("/", [ChatroomMessageController::class, "index"]);
-            Route::post("/", [ChatroomMessageController::class, "store"]);
-            Route::get("/pinned", [ChatroomMessageController::class, "pinned"]);
-            Route::get("/{messageId}", [ChatroomMessageController::class, "show"]);
-            Route::put("/{messageId}", [ChatroomMessageController::class, "update"]);
-            Route::delete("/{messageId}", [ChatroomMessageController::class, "destroy"]);
-            Route::post("/{messageId}/reactions", [ChatroomMessageController::class, "addReaction"]);
-            Route::delete("/{messageId}/reactions", [ChatroomMessageController::class, "removeReaction"]);
-            Route::post("/{messageId}/pin", [ChatroomMessageController::class, "pin"]);
-            Route::delete("/{messageId}/pin", [ChatroomMessageController::class, "unpin"]);
-            Route::get("/{messageId}/replies", [ChatroomMessageController::class, "replies"]);
-        });
-        
-        // Proximity Chatroom routes (Phase 6B - Proximity-Based Networking Chatrooms)
-        Route::prefix("proximity-chatrooms")->middleware('feature:proximity_chatrooms')->group(function (): void {
-            Route::get("/nearby", [ProximityChatroomController::class, "findNearby"]);
-            Route::post("/", [ProximityChatroomController::class, "create"]);
-            Route::get("/{id}", [ProximityChatroomController::class, "show"]);
-            Route::post("/{id}/join", [ProximityChatroomController::class, "join"]);
-            Route::post("/{id}/leave", [ProximityChatroomController::class, "leave"]);
-            Route::post("/{id}/location", [ProximityChatroomController::class, "updateLocation"]);
-            Route::get("/{id}/members", [ProximityChatroomController::class, "members"]);
-            Route::get("/{id}/networking", [ProximityChatroomController::class, "nearbyNetworking"]);
-            Route::get("/{id}/analytics", [ProximityChatroomController::class, "analytics"]);
-        });
-        
-        // Proximity Chatroom Message routes (Phase 6B - Proximity-Based Networking Chatrooms)
-        Route::prefix("proximity-chatrooms/{chatroomId}/messages")->middleware('feature:proximity_chatrooms')->group(function (): void {
-            Route::get("/", [ProximityChatroomMessageController::class, "index"]);
-            Route::post("/", [ProximityChatroomMessageController::class, "store"]);
-            Route::get("/pinned", [ProximityChatroomMessageController::class, "pinned"]);
-            Route::get("/networking", [ProximityChatroomMessageController::class, "networking"]);
-            Route::get("/social", [ProximityChatroomMessageController::class, "social"]);
-            Route::get("/{messageId}", [ProximityChatroomMessageController::class, "show"]);
-            Route::put("/{messageId}", [ProximityChatroomMessageController::class, "update"]);
-            Route::delete("/{messageId}", [ProximityChatroomMessageController::class, "destroy"]);
-            Route::post("/{messageId}/reactions", [ProximityChatroomMessageController::class, "addReaction"]);
-            Route::delete("/{messageId}/reactions", [ProximityChatroomMessageController::class, "removeReaction"]);
-            Route::post("/{messageId}/pin", [ProximityChatroomMessageController::class, "pin"]);
-            Route::delete("/{messageId}/pin", [ProximityChatroomMessageController::class, "unpin"]);
-            Route::get("/{messageId}/replies", [ProximityChatroomMessageController::class, "replies"]);
-        });
-        
-        // Mercure SSE Broker routes
-        Route::get("/mercure/cookie", [MercureAuthController::class, "cookie"]);
-        Route::get("/mercure/status", [MercureAuthController::class, "status"]);
-        
-        // Analytics routes (admin only)
-        Route::middleware('feature:analytics')->group(function (): void {
-            Route::get("/analytics", [AnalyticsController::class, "index"]);
-            Route::get("/analytics/realtime", [AnalyticsController::class, "realtime"]);
-            Route::get("/analytics/moderation", [AnalyticsController::class, "moderation"]);
-        });
-        
-        // Recommendation routes (AI-powered personalization)
-        Route::prefix("recommendations")->middleware('feature:recommendations')->group(function (): void {
-            Route::get("/", [RecommendationController::class, "index"]);
-            Route::get("/trending", [RecommendationController::class, "trending"]);
-            Route::get("/feed", [RecommendationController::class, "feed"]);
-            Route::get("/type/{type}", [RecommendationController::class, "byType"]);
-            Route::post("/feedback", [RecommendationController::class, "feedback"]);
-            Route::get("/analytics", [RecommendationController::class, "analytics"]);
-        });
-
-            // WebSocket routes (bidirectional real-time communication)
-            Route::prefix("websocket")->middleware('feature:websocket')->group(function (): void {
-                Route::post("/connect", [WebSocketController::class, "connect"]);
-                Route::post("/disconnect", [WebSocketController::class, "disconnect"]);
-                Route::post("/message", [WebSocketController::class, "sendMessage"]);
-                Route::post("/typing", [WebSocketController::class, "sendTypingIndicator"]);
-                Route::post("/presence", [WebSocketController::class, "updatePresence"]);
-                Route::post("/notification", [WebSocketController::class, "sendNotification"]);
-                Route::get("/online-users", [WebSocketController::class, "getOnlineUsers"]);
-                Route::get("/connections", [WebSocketController::class, "getUserConnections"]);
-                Route::get("/status", [WebSocketController::class, "status"]);
-                Route::post("/broadcast", [WebSocketController::class, "broadcast"]);
-            });
-
-            // Content Generation routes (AI-powered content creation and optimization)
-            // Apply a simple throttle to match test expectations (5 requests/minute allowed per user)
-            Route::prefix("content-generation")->middleware('feature:content_generation')->group(function (): void {
-                Route::middleware('throttle:5,1')->post("/profile", [ContentGenerationController::class, "generateProfileContent"]);
-                Route::post("/posts/{boardId}/suggestions", [ContentGenerationController::class, "generatePostSuggestions"]);
-                Route::post("/conversation-starters", [ContentGenerationController::class, "generateConversationStarters"]);
-                Route::post("/optimize", [ContentGenerationController::class, "optimizeContent"]);
-                Route::get("/stats", [ContentGenerationController::class, "getGenerationStats"]);
-                Route::get("/optimization-stats", [ContentGenerationController::class, "getOptimizationStats"]);
-                Route::post("/feedback", [ContentGenerationController::class, "submitContentFeedback"]);
-                Route::get("/history", [ContentGenerationController::class, "getGenerationHistory"]);
-                Route::delete("/content/{contentId}", [ContentGenerationController::class, "deleteGeneratedContent"]);
-            });
-
-            // Rate Limiting routes (Advanced security features)
-            Route::prefix("rate-limits")->middleware('feature:rate_limits')->group(function (): void {
-                Route::get("/status/{action?}", [RateLimitController::class, "getStatus"]);
-                Route::get("/all-status", [RateLimitController::class, "getAllStatus"]);
-                Route::post("/reset/{action}", [RateLimitController::class, "reset"]);
-                Route::get("/stats/{timeframe?}", [RateLimitController::class, "getStats"]);
-                Route::get("/suspicious-activity", [RateLimitController::class, "checkSuspiciousActivity"]);
-                Route::post("/cleanup", [RateLimitController::class, "cleanup"]);
-            });
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Route::post('logout', [\App\Http\Controllers\VenueAuthController::class, 'logout']);
+        Route::get('me', [\App\Http\Controllers\VenueAuthController::class, 'me']);
     });
+});
+
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    // Auth
+    Route::post('auth/logout', [\App\Http\Controllers\AuthController::class, 'logout']);
+    Route::get('auth/me', [\App\Http\Controllers\AuthController::class, 'me']);
+
+    // Dashboard
+    Route::get('dashboard/stats', [\App\Http\Controllers\DashboardController::class, 'getStats']);
+    Route::get('dashboard/activity', [\App\Http\Controllers\DashboardController::class, 'getActivity']);
+    Route::get('profile/completeness', [\App\Http\Controllers\DashboardController::class, 'getProfileCompleteness']);
+
+    // WebSocket
+    Route::get('websocket/token', [\App\Http\Controllers\WebSocketController::class, 'getToken']);
+    Route::post('websocket/connect', [\App\Http\Controllers\WebSocketController::class, 'connect']);
+    Route::post('websocket/disconnect', [\App\Http\Controllers\WebSocketController::class, 'disconnect']);
+    Route::post('websocket/message', [\App\Http\Controllers\WebSocketController::class, 'sendMessage']);
+    Route::post('websocket/typing', [\App\Http\Controllers\WebSocketController::class, 'sendTypingIndicator']);
+    Route::post('websocket/presence', [\App\Http\Controllers\WebSocketController::class, 'updatePresence']);
+    Route::post('websocket/notification', [\App\Http\Controllers\WebSocketController::class, 'sendNotification']);
+    Route::get('websocket/online-users', [\App\Http\Controllers\WebSocketController::class, 'getOnlineUsers']);
+    Route::get('websocket/connections', [\App\Http\Controllers\WebSocketController::class, 'getUserConnections']);
+    Route::get('websocket/status', [\App\Http\Controllers\WebSocketController::class, 'status']);
+    Route::post('websocket/broadcast', [\App\Http\Controllers\WebSocketController::class, 'broadcast']);
+
+    // Analytics
+    Route::get('analytics', [\App\Http\Controllers\AnalyticsController::class, 'index']);
+    Route::get('analytics/realtime', [\App\Http\Controllers\AnalyticsController::class, 'realtime']);
+    Route::get('analytics/moderation', [\App\Http\Controllers\AnalyticsController::class, 'moderation']);
+    Route::get('analytics/slow-requests', [\App\Http\Controllers\AnalyticsController::class, 'slowRequests']);
+    Route::get('analytics/boosts', [\App\Http\Controllers\AnalyticsController::class, 'boosts']);
+
+    // Notifications
+    Route::get('notification-preferences', [\App\Http\Controllers\NotificationPreferenceController::class, 'index']);
+    Route::put('notification-preferences/{type}', [\App\Http\Controllers\NotificationPreferenceController::class, 'update']);
+    Route::post('notifications/subscribe', [\App\Http\Controllers\NotificationController::class, 'subscribe']);
+    Route::post('notifications/unsubscribe', [\App\Http\Controllers\NotificationController::class, 'unsubscribe']);
+
+    // Events
+    Route::get('events/my-events', [EventController::class, 'myEvents']);
+    Route::get('events/invitations', [\App\Http\Controllers\EventInvitationController::class, 'index']);
+    Route::post('events/{id}/invite', [\App\Http\Controllers\EventInvitationController::class, 'store']);
+    Route::post('events/invitations/{id}/respond', [\App\Http\Controllers\EventInvitationController::class, 'respond']);
+    Route::apiResource('events', EventController::class);
+    Route::post('events/{id}/rsvp', [EventController::class, 'rsvp']);
+
+    // Groups
+    Route::get('groups/my-groups', [\App\Http\Controllers\GroupController::class, 'myGroups']);
+    Route::post('groups/{id}/join', [\App\Http\Controllers\GroupController::class, 'join']);
+    Route::post('groups/{id}/leave', [\App\Http\Controllers\GroupController::class, 'leave']);
+    Route::apiResource('groups', \App\Http\Controllers\GroupController::class);
+
+    // Premium
+    Route::get('premium/who-likes-you', [\App\Http\Controllers\PremiumController::class, 'getWhoLikesYou']);
+    Route::post('premium/initiate', [\App\Http\Controllers\PremiumController::class, 'initiatePurchase']);
+    Route::post('premium/purchase', [\App\Http\Controllers\PremiumController::class, 'purchasePremium']);
+    Route::get('premium/status', [\App\Http\Controllers\PremiumController::class, 'getPremiumStatus']);
+
+    // Boosts
+    Route::post('boosts/purchase', [\App\Http\Controllers\BoostController::class, 'purchaseBoost']);
+    Route::get('boosts/active', [\App\Http\Controllers\BoostController::class, 'getActiveBoost']);
+    Route::get('boosts/history', [\App\Http\Controllers\BoostController::class, 'getBoostHistory']);
+
+    // Recommendations
+    Route::get('recommendations', [\App\Http\Controllers\RecommendationController::class, 'index']);
+    Route::get('recommendations/type/{type}', [\App\Http\Controllers\RecommendationController::class, 'byType']);
+    Route::get('recommendations/trending', [\App\Http\Controllers\RecommendationController::class, 'trending']);
+    Route::get('recommendations/feed', [\App\Http\Controllers\RecommendationController::class, 'feed']);
+    Route::post('recommendations/feedback', [\App\Http\Controllers\RecommendationController::class, 'feedback']);
+    Route::get('recommendations/analytics', [\App\Http\Controllers\RecommendationController::class, 'analytics']);
+
+    // Proximity Artifacts
+    Route::get('proximity/feed', [\App\Http\Controllers\ProximityArtifactController::class, 'index']);
+    Route::post('proximity/artifacts', [\App\Http\Controllers\ProximityArtifactController::class, 'store']);
+    Route::get('proximity/artifacts/{id}', [\App\Http\Controllers\ProximityArtifactController::class, 'show']);
+    Route::post('proximity/artifacts/{id}/flag', [\App\Http\Controllers\ProximityArtifactController::class, 'flag']);
+    Route::delete('proximity/artifacts/{id}', [\App\Http\Controllers\ProximityArtifactController::class, 'destroy']);
+    Route::get('proximity/local-pulse', [\App\Http\Controllers\ProximityArtifactController::class, 'localPulse']);
+
+    // Matches
+    Route::get('matches', [\App\Http\Controllers\MatchController::class, 'index']);
+    Route::get('matches/established', [\App\Http\Controllers\MatchController::class, 'establishedMatches']);
+    Route::post('matches/action', [\App\Http\Controllers\MatchController::class, 'action']);
+
+    // Chatrooms
+    Route::get('chatrooms/my', [\App\Http\Controllers\ChatroomController::class, 'myChatrooms']);
+    Route::get('chatrooms/categories', [\App\Http\Controllers\ChatroomController::class, 'categories']);
+    Route::get('chatrooms/popular', [\App\Http\Controllers\ChatroomController::class, 'popular']);
+    Route::get('chatrooms/search', [\App\Http\Controllers\ChatroomController::class, 'search']);
+    Route::get('chatrooms', [\App\Http\Controllers\ChatroomController::class, 'index']);
+    Route::post('chatrooms', [\App\Http\Controllers\ChatroomController::class, 'store']);
+    Route::get('chatrooms/{id}', [\App\Http\Controllers\ChatroomController::class, 'show']);
+    Route::put('chatrooms/{id}', [\App\Http\Controllers\ChatroomController::class, 'update']);
+    Route::delete('chatrooms/{id}', [\App\Http\Controllers\ChatroomController::class, 'destroy']);
+    Route::post('chatrooms/{id}/join', [\App\Http\Controllers\ChatroomController::class, 'join']);
+    Route::post('chatrooms/{id}/leave', [\App\Http\Controllers\ChatroomController::class, 'leave']);
+    Route::get('chatrooms/{id}/members', [\App\Http\Controllers\ChatroomController::class, 'members']);
+
+    // Chatroom Messages
+    Route::get('chatrooms/{chatroomId}/messages', [\App\Http\Controllers\ChatroomMessageController::class, 'index']);
+    Route::post('chatrooms/{chatroomId}/messages', [\App\Http\Controllers\ChatroomMessageController::class, 'store']);
+
+    // Proximity Chatrooms
+    Route::get('proximity-chatrooms/nearby', [\App\Http\Controllers\ProximityChatroomController::class, 'findNearby']);
+    Route::post('proximity-chatrooms', [\App\Http\Controllers\ProximityChatroomController::class, 'create']);
+    Route::get('proximity-chatrooms/{id}', [\App\Http\Controllers\ProximityChatroomController::class, 'show']);
+    Route::post('proximity-chatrooms/{id}/join', [\App\Http\Controllers\ProximityChatroomController::class, 'join']);
+    Route::post('proximity-chatrooms/{id}/leave', [\App\Http\Controllers\ProximityChatroomController::class, 'leave']);
+    Route::post('proximity-chatrooms/{id}/location', [\App\Http\Controllers\ProximityChatroomController::class, 'updateLocation']);
+    Route::get('proximity-chatrooms/{id}/members', [\App\Http\Controllers\ProximityChatroomController::class, 'members']);
+    Route::get('proximity-chatrooms/{id}/networking', [\App\Http\Controllers\ProximityChatroomController::class, 'nearbyNetworking']);
+    Route::get('proximity-chatrooms/{id}/analytics', [\App\Http\Controllers\ProximityChatroomController::class, 'analytics']);
+
+    // Proximity Chatroom Messages
+    Route::get('proximity-chatrooms/{chatroomId}/messages', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'index']);
+    Route::post('proximity-chatrooms/{chatroomId}/messages', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'store']);
+    Route::get('proximity-chatrooms/{chatroomId}/messages/pinned', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'pinned']);
+    Route::get('proximity-chatrooms/{chatroomId}/messages/networking', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'networking']);
+    Route::get('proximity-chatrooms/{chatroomId}/messages/social', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'social']);
+    Route::get('proximity-chatrooms/{chatroomId}/messages/{messageId}', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'show']);
+    Route::put('proximity-chatrooms/{chatroomId}/messages/{messageId}', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'update']);
+    Route::delete('proximity-chatrooms/{chatroomId}/messages/{messageId}', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'destroy']);
+    Route::post('proximity-chatrooms/{chatroomId}/messages/{messageId}/reactions', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'addReaction']);
+    Route::delete('proximity-chatrooms/{chatroomId}/messages/{messageId}/reactions', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'removeReaction']);
+    Route::post('proximity-chatrooms/{chatroomId}/messages/{messageId}/pin', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'pin']);
+    Route::delete('proximity-chatrooms/{chatroomId}/messages/{messageId}/pin', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'unpin']);
+    Route::get('proximity-chatrooms/{chatroomId}/messages/{messageId}/replies', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'replies']);
+
+    // Restored Resources
+    Route::apiResource('venues', \App\Http\Controllers\VenueController::class);
+    Route::get('subscriptions/history', [\App\Http\Controllers\SubscriptionController::class, 'history']);
+    Route::post('subscriptions/cancel', [\App\Http\Controllers\SubscriptionController::class, 'cancel']);
+    Route::apiResource('subscriptions', \App\Http\Controllers\SubscriptionController::class);
+
+    // Venue Check-ins
+    Route::post('venues/{id}/checkin', [\App\Http\Controllers\VenueCheckinController::class, 'store']);
+    Route::post('venues/{id}/checkout', [\App\Http\Controllers\VenueCheckinController::class, 'destroy']);
+    Route::get('venues/{id}/checkins', [\App\Http\Controllers\VenueCheckinController::class, 'index']);
+    Route::get('user/checkin', [\App\Http\Controllers\VenueCheckinController::class, 'current']);
+
+    // Relationship Tiers (Face Reveal)
+    Route::middleware('feature:face_reveal')->group(function () {
+        Route::get('matches/{matchId}/tier', [\App\Http\Controllers\Api\RelationshipTierController::class, 'show']);
+        Route::put('matches/{matchId}/tier', [\App\Http\Controllers\Api\RelationshipTierController::class, 'update']);
+        Route::get('matches/{matchId}/tier/photos', [\App\Http\Controllers\Api\RelationshipTierController::class, 'getPhotos']);
+    });
+
+    // AI Avatar Generation
+    Route::post('avatar/generate', [\App\Http\Controllers\AvatarController::class, 'generate']);
+
+    // AI Content Generation (rate limited)
+    Route::middleware('throttle:content_generation')->group(function () {
+        Route::post('content/generate-bio', [\App\Http\Controllers\ContentGenerationController::class, 'generateProfileBio']);
+        Route::post('content/generate-posts/{boardId}', [\App\Http\Controllers\ContentGenerationController::class, 'generatePostSuggestions']);
+        Route::post('content/generate-starters', [\App\Http\Controllers\ContentGenerationController::class, 'generateConversationStarters']);
+    });
+
+    // Photos (upload rate limited)
+    Route::middleware('throttle:photo_uploads')->group(function () {
+        Route::post('photos', [\App\Http\Controllers\PhotoController::class, 'store']);
+        Route::post('photos/reorder', [\App\Http\Controllers\PhotoController::class, 'reorder']);
+    });
+    Route::post('photos/{id}/reveal', [\App\Http\Controllers\PhotoController::class, 'reveal']);
+    Route::get('photos/{id}/original', [\App\Http\Controllers\PhotoController::class, 'original']);
+    Route::get('photos', [\App\Http\Controllers\PhotoController::class, 'index']);
+    Route::get('photos/{id}', [\App\Http\Controllers\PhotoController::class, 'show']);
+    Route::put('photos/{id}', [\App\Http\Controllers\PhotoController::class, 'update']);
+    Route::delete('photos/{id}', [\App\Http\Controllers\PhotoController::class, 'destroy']);
+
+    // Media Analysis
+    Route::middleware('feature:media_analysis')->group(function () {
+        Route::post('media/analyze', [\App\Http\Controllers\MediaAnalysisController::class, 'analyze']);
+    });
+
+    // Verification
+    Route::post('verification/verify', [\App\Http\Controllers\VerificationController::class, 'verify']);
+    Route::get('verification/status', [\App\Http\Controllers\VerificationController::class, 'status']);
 });

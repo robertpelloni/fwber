@@ -1,23 +1,25 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
+import { useToast } from '@/components/ToastProvider';
 
 export default function UserSearch() {
   const [query, setQuery] = useState('');
   const queryClient = useQueryClient();
+  const { showSuccess, showError } = useToast();
 
   const { data: users, refetch } = useQuery({
     queryKey: ['userSearch', query],
-    queryFn: () => apiClient.get(`/friends/search?query=${query}`).then((res) => res.data),
+    queryFn: () => apiClient.get(`/friends/search?query=${encodeURIComponent(query)}`).then((res) => res.data),
     enabled: false,
   });
 
   const sendRequest = useMutation({
     mutationFn: (friendId: number) => apiClient.post('/friends/requests', { friend_id: friendId }),
     onSuccess: () => {
-      alert('Friend request sent!');
+      showSuccess('Friend request sent!');
     },
     onError: (error: any) => {
       alert(error.response?.data?.message || 'An error occurred');
