@@ -135,6 +135,22 @@ elif [ -f "$HOME/composer" ]; then
     export PATH=$HOME:$PATH
 fi
 
+# Add common Windows PHP paths to PATH if php is not found
+if ! command -v php &> /dev/null; then
+    export PATH="/mnt/c/tools/php84:$PATH"
+    export PATH="/c/tools/php84:$PATH"
+    export PATH="/c/php:$PATH"
+    export PATH="/c/xampp/php:$PATH"
+    
+    # If php is still not found but php.exe is, create a function wrapper
+    if ! command -v php &> /dev/null && command -v php.exe &> /dev/null; then
+        php() {
+            php.exe "$@"
+        }
+        export -f php
+    fi
+fi
+
 # check_command php
 check_command composer
 check_command git

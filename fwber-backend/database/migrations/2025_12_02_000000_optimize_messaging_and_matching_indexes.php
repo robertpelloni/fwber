@@ -10,6 +10,11 @@ return new class extends Migration
     public function up(): void
     {
         $indexExists = function ($table, $indexName) {
+            $driver = DB::getDriverName();
+            if ($driver === 'sqlite') {
+                return collect(DB::select("SELECT name FROM sqlite_master WHERE type='index' AND tbl_name = ? AND name = ?", [$table, $indexName]))->count() > 0;
+            }
+            
             try {
                 return collect(DB::select("SHOW INDEXES FROM " . $table . " WHERE Key_name = ?", [$indexName]))->count() > 0;
             } catch (\Exception $e) {
