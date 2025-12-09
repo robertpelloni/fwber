@@ -295,30 +295,80 @@ class AvatarGenerationService
 
     private function buildPrompt(User $user, array $options): string
     {
+        $profile = $user->profile;
         $parts = [];
         
+        // Helper to get attribute from options or profile
+        $get = fn($key) => $options[$key] ?? $profile?->{$key} ?? null;
+
         // Base style
         $parts[] = $options['style'] ?? $this->config['default_style'];
 
-        // Demographics
-        if ($user->age) {
-            $parts[] = $this->getAgeGroup($user->age) . ' person';
+        // Age
+        $age = $options['age'] ?? null;
+        if (!$age && $profile?->birthdate) {
+            $age = $profile->birthdate->age;
         }
         
-        if ($user->gender) {
-            $parts[] = $this->mapGender($user->gender);
+        if ($age) {
+            $parts[] = $this->getAgeGroup((int)$age) . ' person';
+        } else {
+            $parts[] = 'person';
+        }
+        
+        // Gender
+        $gender = $get('gender');
+        if ($gender) {
+            $parts[] = $this->mapGender($gender);
         }
 
-        // Physical attributes (assuming these fields exist on User or profile)
-        // Using null coalescing for safety
-        if ($user->hair_color) $parts[] = $user->hair_color . ' hair';
-        if ($user->eye_color) $parts[] = $user->eye_color . ' eyes';
-        if ($user->ethnicity) $parts[] = $user->ethnicity;
-        
+        // Physical attributes
+        $ethnicity = $get('ethnicity');
+        if ($ethnicity) $parts[] = $ethnicity;
+
+        $bodyType = $get('body_type');
+        if ($bodyType) $parts[] = $bodyType . ' body type';
+
+        $height = $get('height_cm');
+        if ($height) {
+            if ($height > 185) $parts[] = 'tall';
+            elseif ($height < 160) $parts[] = 'short';
+        }
+
+        $hairColor = $get('hair_color');
+        if ($hairColor) $parts[] = $hairColor . ' hair';
+
+        $eyeColor = $get('eye_color');
+        if ($eyeColor) $parts[] = $eyeColor . ' eyes';
+
+        $skinTone = $get('skin_tone');
+        if ($skinTone) $parts[] = $skinTone . ' skin tone';
+
+        $facialHair = $get('facial_hair');
+        if ($facialHair && $facialHair !== 'none') $parts[] = $facialHair;
+
+        // Distinctive features
+        $tattoos = $get('tattoos');
+        if (!empty($tattoos) && is_array($tattoos)) {
+             $parts[] = 'visible tattoos';
+        }
+
+        $piercings = $get('piercings');
+        if (!empty($piercings) && is_array($piercings)) {
+             $parts[] = 'piercings';
+        }
+
+        // Style & Vibe
+        $clothingStyle = $get('clothing_style');
+        if ($clothingStyle) $parts[] = 'wearing ' . $clothingStyle . ' style clothing';
+
+        $fitnessLevel = $get('fitness_level');
+        if ($fitnessLevel) $parts[] = $fitnessLevel . ' build';
+
         // Quality modifiers
         $parts[] = 'high quality, detailed, professional photography, attractive, confident expression, natural lighting';
 
-        return implode(', ', $parts);
+        return implode(', ', array_filter($parts));
     }
 
     private function buildNegativePrompt(): string
