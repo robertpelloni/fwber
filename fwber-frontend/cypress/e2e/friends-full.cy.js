@@ -71,15 +71,7 @@ describe('Friends Feature', () => {
     cy.intercept('POST', '**/api/friends/requests/*', {
       statusCode: 200,
       body: { status: 'accepted' }
-    }).as('respondRequest'); // Note: Frontend uses PUT but API might be POST/PUT depending on implementation. 
-    // Wait, FriendController says POST /requests/{userId} for respond.
-    // But lib/api/friends.ts says PUT.
-    // Let's check FriendController again.
-    // public function respondToFriendRequest(RespondToFriendRequest $request, $userId)
-    // Route::post('/requests/{userId}', [FriendController::class, 'respondToFriendRequest']);
-    // So backend expects POST.
-    // Frontend lib/api/friends.ts uses PUT.
-    // This is another bug!
+    }).as('respondRequest');
   });
 
   it('should list friends and requests', () => {
@@ -128,5 +120,23 @@ describe('Friends Feature', () => {
     cy.on('window:alert', (str) => {
       expect(str).to.equal('Friend request sent!');
     });
+  });
+
+  it('should accept friend request', () => {
+    cy.visit('/login');
+    cy.get('input[name="email"]').type(testUser.email);
+    cy.get('input[name="password"]').type(testUser.password);
+    cy.get('button[type="submit"]').click();
+    cy.wait('@login');
+    
+    cy.visit('/friends');
+    cy.wait('@getFriends');
+    cy.wait('@getFriendRequests');
+    
+    cy.contains('Friend Requests').should('be.visible');
+    cy.contains(requestUser.name).should('be.visible');
+    
+    cy.contains('button', 'Accept').click();
+    cy.wait('@respondRequest').its('request.body').should('deep.equal', { status: 'accepted' });
   });
 });
