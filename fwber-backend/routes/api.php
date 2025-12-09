@@ -158,6 +158,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('matches/established', [\App\Http\Controllers\MatchController::class, 'establishedMatches']);
     Route::post('matches/action', [\App\Http\Controllers\MatchController::class, 'action']);
 
+    // Direct Messages
+    Route::get('messages/unread-count', [\App\Http\Controllers\Api\MessageController::class, 'unreadCount']);
+    Route::post('messages', [\App\Http\Controllers\Api\MessageController::class, 'store']);
+    Route::get('messages/{userId}', [\App\Http\Controllers\Api\MessageController::class, 'index']);
+    Route::post('messages/{messageId}/read', [\App\Http\Controllers\Api\MessageController::class, 'markAsRead']);
+    Route::post('messages/mark-all-read/{senderId}', [\App\Http\Controllers\Api\MessageController::class, 'markAllAsRead']);
+
     // Chatrooms
     Route::get('chatrooms/my', [\App\Http\Controllers\ChatroomController::class, 'myChatrooms']);
     Route::get('chatrooms/categories', [\App\Http\Controllers\ChatroomController::class, 'categories']);
