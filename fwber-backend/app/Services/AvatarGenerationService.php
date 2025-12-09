@@ -293,21 +293,19 @@ class AvatarGenerationService
         Storage::disk('public')->put($filename, $contents);
 
         // Analyze the image for safety
-        try {
-            $analysis = $this->mediaAnalysis->analyze($filename, 'image');
-            if (!$analysis->isSafe()) {
-                Storage::disk('public')->delete($filename);
-                throw new \Exception("Generated avatar was flagged as unsafe: " . implode(', ', $analysis->unsafeReasons()));
+        if (config('features.media_analysis')) {
+            try {
+                $analysis = $this->mediaAnalysis->analyze($filename, 'image');
+                if (!$analysis->safe) {
+                    Storage::disk('public')->delete($filename);
+                    throw new \Exception("Generated avatar was flagged as unsafe: " . implode(', ', $analysis->moderationLabels));
+                }
+            } catch (\Exception $e) {
+                if (Storage::disk('public')->exists($filename)) {
+                    Storage::disk('public')->delete($filename);
+                }
+                throw $e;
             }
-        } catch (\Exception $e) {
-            // If analysis fails (e.g. service down), we might want to fail safe or log warning.
-            // For now, we'll treat analysis failure as a blocker if it's the unsafe exception,
-            // but if it's a technical error, we might want to allow it or block it.
-            // Let's block it to be safe.
-            if (Storage::disk('public')->exists($filename)) {
-                Storage::disk('public')->delete($filename);
-            }
-            throw $e;
         }
 
         return Storage::url($filename);
@@ -320,17 +318,19 @@ class AvatarGenerationService
         Storage::disk('public')->put($filename, $contents);
 
         // Analyze the image for safety
-        try {
-            $analysis = $this->mediaAnalysis->analyze($filename, 'image');
-            if (!$analysis->isSafe()) {
-                Storage::disk('public')->delete($filename);
-                throw new \Exception("Generated avatar was flagged as unsafe: " . implode(', ', $analysis->unsafeReasons()));
+        if (config('features.media_analysis')) {
+            try {
+                $analysis = $this->mediaAnalysis->analyze($filename, 'image');
+                if (!$analysis->safe) {
+                    Storage::disk('public')->delete($filename);
+                    throw new \Exception("Generated avatar was flagged as unsafe: " . implode(', ', $analysis->moderationLabels));
+                }
+            } catch (\Exception $e) {
+                if (Storage::disk('public')->exists($filename)) {
+                    Storage::disk('public')->delete($filename);
+                }
+                throw $e;
             }
-        } catch (\Exception $e) {
-            if (Storage::disk('public')->exists($filename)) {
-                Storage::disk('public')->delete($filename);
-            }
-            throw $e;
         }
 
         return Storage::url($filename);

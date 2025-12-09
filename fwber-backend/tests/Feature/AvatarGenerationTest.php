@@ -122,4 +122,43 @@ class AvatarGenerationTest extends TestCase
                    !str_contains($prompt, 'brown hair');
         });
     }
+
+    public function test_rejects_unsafe_generated_avatar()
+    {
+        Config::set('features.media_analysis', true);
+        $user = User::factory()->create();
+        UserProfile::create(['user_id' => $user->id, 'gender' => 'male']);
+
+        Http::fake([
+            'api.openai.com/*' => Http::response([
+                'data' => [
+                    ['url' => 'https://example.com/unsafe-avatar.png']
+                ]
+            ], 200),
+            'https://example.com/unsafe-avatar.png' => Http::response('unsafe-image-content', 200),
+        ]);
+
+        // Mock MediaAnalysisInterface to return unsafe
+        $mockAnalysis = \Mockery::mock(\App\Services\MediaAnalysis\MediaAnalysisInterface::class);
+        $mockAnalysis->shouldReceive('analyze')
+            ->once()
+            ->andReturn(new \App\Services\MediaAnalysis\MediaAnalysisResult(
+                false, // safe
+                [],
+                ['Explicit Content'], // unsafe reasons
+                0.9,
+                ['source' => 'mock']
+            ));
+        
+        $this->app->instance(\App\Services\MediaAnalysis\MediaAnalysisInterface::class, $mockAnalysis);
+
+        $response = $this->actingAs($user)
+            ->postJson('/api/avatar/generate');
+
+        $response->assertStatus(500)
+            ->assertJson([
+                'success' => false,
+                'error' => 'Generated avatar was flagged as unsafe: Explicit Content'
+            ]);
+    }
 }
