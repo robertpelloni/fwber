@@ -3,12 +3,11 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
-import { useToast } from '@/components/ToastProvider';
+import { useToast } from '@/lib/hooks/use-toast';
 
 export default function UserSearch() {
   const [query, setQuery] = useState('');
-  const queryClient = useQueryClient();
-  const { showSuccess, showError } = useToast();
+  const { success, error, ToastContainer } = useToast();
 
   const { data: users, refetch } = useQuery({
     queryKey: ['userSearch', query],
@@ -19,10 +18,10 @@ export default function UserSearch() {
   const sendRequest = useMutation({
     mutationFn: (friendId: number) => apiClient.post('/friends/requests', { friend_id: friendId }),
     onSuccess: () => {
-      showSuccess('Friend request sent!');
+      success('Friend request sent!');
     },
-    onError: (error: any) => {
-      alert(error.response?.data?.message || 'An error occurred');
+    onError: (err: any) => {
+      error(err.response?.data?.message || 'An error occurred');
     },
   });
 
@@ -34,7 +33,9 @@ export default function UserSearch() {
   };
 
   return (
-    <div>
+    <>
+      <ToastContainer />
+      <div>
       <form onSubmit={handleSearch} className="flex mb-4">
         <input
           type="text"
@@ -61,5 +62,6 @@ export default function UserSearch() {
         ))}
       </div>
     </div>
+    </>
   );
 }
