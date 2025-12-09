@@ -3,9 +3,12 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
+import { useToast } from '@/components/ToastProvider';
 
 export default function UserSearch() {
   const [query, setQuery] = useState('');
+  const queryClient = useQueryClient();
+  const { showSuccess, showError } = useToast();
 
   const { data: users, refetch } = useQuery({
     queryKey: ['userSearch', query],
@@ -16,10 +19,10 @@ export default function UserSearch() {
   const sendRequest = useMutation({
     mutationFn: (friendId: number) => apiClient.post('/friends/requests', { friend_id: friendId }),
     onSuccess: () => {
-      alert('Friend request sent!');
+      showSuccess('Friend request sent!');
     },
     onError: (error: any) => {
-      alert(error.response.data.message);
+      showError('Failed to send friend request', error.response?.data?.message || 'An error occurred');
     },
   });
 
