@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('user_profiles', function (Blueprint $table) {
-            $table->string('display_name')->nullable()->after('user_id');
-        });
+        if (!Schema::hasColumn('user_profiles', 'display_name')) {
+            Schema::table('user_profiles', function (Blueprint $table) {
+                $table->string('display_name')->nullable()->after('user_id');
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('user_profiles', function (Blueprint $table) {
-            $table->dropColumn('display_name');
-        });
+        if (Schema::hasColumn('user_profiles', 'display_name')) {
+            Schema::table('user_profiles', function (Blueprint $table) {
+                $table->dropColumn('display_name');
+            });
+        }
     }
 };

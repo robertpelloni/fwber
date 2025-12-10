@@ -35,7 +35,7 @@ The application is live. The focus is on monitoring system health, optimizing pe
 ### 🔮 Future Features (2026+)
 
 #### 1. Advanced AI Features
-- [x] **Media Analysis**: Real-time safety checks for media (Mocked implementation).
+- [x] **Media Analysis**: Real-time safety checks for media (AWS Rekognition integration).
 
 ## ✅ Completed Milestones
 
