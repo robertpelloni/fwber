@@ -43,8 +43,6 @@ export interface UserProfile {
     sti_status?: Record<string, any>;
     family_plans?: string;
     relationship_goals?: string;
-    sexual_orientation?: string;
-    pronouns?: string;
     languages?: string[];
     zodiac_sign?: string;
     drinking_status?: string;
