@@ -22,8 +22,6 @@ export interface UserProfile {
     date_of_birth?: string | null;
     age: number | null;
     gender: string | null;
-    pronouns: string | null;
-    sexual_orientation: string | null;
     relationship_style: string | null;
     looking_for: string[];
     location: {
@@ -45,6 +43,8 @@ export interface UserProfile {
     relationship_goals?: string;
     languages?: string[];
     zodiac_sign?: string;
+    pronouns?: string;
+    sexual_orientation?: string;
     drinking_status?: string;
     smoking_status?: string;
     cannabis_status?: string;
@@ -105,8 +105,6 @@ export interface ProfileUpdateData {
   // ISO date string YYYY-MM-DD
   date_of_birth?: string;
   gender?: string;
-  pronouns?: string;
-  sexual_orientation?: string;
   relationship_style?: string;
   looking_for?: string[];
   location?: {
@@ -128,6 +126,8 @@ export interface ProfileUpdateData {
   relationship_goals?: string;
   languages?: string[];
   zodiac_sign?: string;
+  pronouns?: string;
+  sexual_orientation?: string;
   drinking_status?: string;
   smoking_status?: string;
   cannabis_status?: string;
