@@ -91,7 +91,6 @@ export interface UserProfile {
   breast_size: string | null
   tattoos: string | null
   piercings: string | null
-  sti_status: Record<string, any> | null
   fetishes: string[] | null
 
   // Lifestyle Attributes
