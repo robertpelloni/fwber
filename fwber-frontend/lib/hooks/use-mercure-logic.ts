@@ -264,7 +264,7 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
     return () => {
       disconnect();
     };
-  }, [options.autoConnect, isAuthenticated, connect, disconnect]);
+  }, [options.autoConnect, isAuthenticated, connect, disconnect, status.connected, status.connecting]);
 
   return {
     connectionStatus: {

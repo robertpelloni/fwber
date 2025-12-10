@@ -7,7 +7,7 @@
 The project has successfully completed the MVP, Secondary Systems, and Production Hardening phases. It is now **deployed and live**.
 
 ### ⚠️ Known Issues / Technical Debt
-*   None at this time.
+*   **Deployment**: `database.sqlite` and `storage/app/public/photos` are tracked in git, causing merge conflicts during deployment if the server has local changes. Added to `.gitignore` to prevent future tracking, but existing files need to be removed from the repo index (`git rm --cached`).
 
 ### ✅ Completed Operational Improvements
 1.  **Test Suite Stabilization** (Dec 09 - Complete):
@@ -62,6 +62,10 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 11. **Payment Integration** (Dec 09 - Complete):
     -   **Stripe**: Switched from Mock driver to live Stripe driver in production configuration.
     -   **Verification**: Verified `StripePaymentGateway` connectivity and PaymentIntent creation via live API test.
+12. **Frontend Build Fix** (Dec 10 - Complete):
+    -   **Linting**: Fixed unescaped single quote in `components/profile/Dating.tsx` causing build failure.
+    -   **Hooks**: Fixed missing dependencies in `useMercureLogic` hook (`useEffect`).
+    -   **Verification**: Code fixes applied.
 2.  **Cache Versioning & Strategy** (Dec 04 - Complete):
     -   Implemented `CACHE_VERSION` strategy for global cache invalidation.
     -   Updated `Group`, `Event`, and `Subscription` controllers to use versioned keys.

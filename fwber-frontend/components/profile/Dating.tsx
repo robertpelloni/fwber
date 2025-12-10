@@ -46,7 +46,7 @@ export default function Dating({ formData, handlePreferenceChange, handleInputCh
           >
             <option value="">Select plans</option>
             <option value="want-kids">Want kids</option>
-            <option value="dont-want-kids">Don't want kids</option>
+            <option value="dont-want-kids">Don&apos;t want kids</option>
             <option value="have-kids">Have kids</option>
             <option value="open">Open to kids</option>
           </select>

@@ -29,3 +29,7 @@ yarn-error.log
 /.vscode
 /bootstrap/cache/*.php
 
+
+/database/database.sqlite
+/storage/app/public/photos/*
+!/storage/app/public/photos/.gitignore
