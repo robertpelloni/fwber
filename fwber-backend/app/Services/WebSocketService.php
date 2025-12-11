@@ -338,18 +338,30 @@ class WebSocketService
     /**
      * Handle typing indicator
      */
-    public function handleTypingIndicator(string $userId, string $recipientId, bool $isTyping): bool
+    public function handleTypingIndicator(string $userId, ?string $recipientId, bool $isTyping, ?string $chatroomId = null): bool
     {
         try {
             $message = [
                 'type' => 'typing_indicator',
                 'from_user_id' => $userId,
-                'to_user_id' => $recipientId,
                 'is_typing' => $isTyping,
                 'timestamp' => now()->toISOString(),
             ];
 
-            $this->sendToUser($recipientId, $message);
+            if ($chatroomId) {
+                $message['chatroom_id'] = $chatroomId;
+                // Broadcast to chatroom topic
+                $this->mercurePublisher->publish(
+                    "https://fwber.me/chatroom/{$chatroomId}",
+                    $message,
+                    false // Public update (or private depending on chatroom privacy, assuming public/protected for now)
+                );
+            } elseif ($recipientId) {
+                $message['to_user_id'] = $recipientId;
+                $this->sendToUser($recipientId, $message);
+            } else {
+                return false;
+            }
 
             return true;
 
@@ -357,6 +369,7 @@ class WebSocketService
             Log::error('Failed to handle typing indicator', [
                 'user_id' => $userId,
                 'recipient_id' => $recipientId,
+                'chatroom_id' => $chatroomId,
                 'error' => $e->getMessage()
             ]);
 

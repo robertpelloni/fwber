@@ -296,7 +296,8 @@ class WebSocketController extends Controller
             }
 
             $validator = Validator::make($request->all(), [
-                'recipient_id' => 'required|string',
+                'recipient_id' => 'required_without:chatroom_id|string|nullable',
+                'chatroom_id' => 'required_without:recipient_id|string|nullable',
                 'is_typing' => 'required|boolean',
             ]);
 
@@ -308,9 +309,10 @@ class WebSocketController extends Controller
             }
 
             $recipientId = $request->get('recipient_id');
+            $chatroomId = $request->get('chatroom_id');
             $isTyping = $request->get('is_typing');
 
-            $success = $this->webSocketService->handleTypingIndicator($user->id, $recipientId, $isTyping);
+            $success = $this->webSocketService->handleTypingIndicator($user->id, $recipientId, $isTyping, $chatroomId);
 
             if ($success) {
                 return response()->json(['message' => 'Typing indicator sent']);
@@ -324,6 +326,7 @@ class WebSocketController extends Controller
                 eventType: 'typing_indicator_failed',
                 extra: [
                     'receiver_id' => $request->input('receiver_id'),
+                    'chatroom_id' => $request->input('chatroom_id'),
                     'error' => $e->getMessage()
                 ]
             ));
