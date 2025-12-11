@@ -5,6 +5,7 @@ import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { Loader2, Sparkles, RefreshCw, Check, X, Settings, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import axios from 'axios';
+import { useWebSocket } from '@/lib/hooks/use-websocket';
 
 interface AvatarGenerationProps {
   userId: number;
@@ -48,7 +49,32 @@ export default function AvatarGenerationFlow({
   const [loraScale, setLoraScale] = useState<number>(0.8);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
+  const { messages, clearMessages } = useWebSocket();
+
   const queryClient = useQueryClient();
+
+  // Listen for avatar generation completion
+  useEffect(() => {
+    if (step === 'generating') {
+        // Check for avatar_generated message
+        // The message structure from Mercure might vary, but we expect type='avatar_generated'
+        // or a notification with that type.
+        const avatarMsg = messages.find(m => 
+            m.type === 'avatar_generated' || 
+            (m.type === 'notification' && (m.data?.type === 'avatar_generated' || m.data?.notification?.type === 'avatar_generated'))
+        );
+
+        if (avatarMsg) {
+            const data = avatarMsg.data?.notification || avatarMsg.data;
+            if (data?.url) {
+                setGeneratedAvatar(data.url);
+                setGeneratedPhotoId(data.photo_id);
+                setStep('preview');
+                setError(null);
+            }
+        }
+    }
+  }, [messages, step]);
 
   const galleryQuery = useQuery({
     queryKey: ['avatar-gallery'],
@@ -97,10 +123,17 @@ export default function AvatarGenerationFlow({
       return response.data;
     },
     onSuccess: (data) => {
-      setGeneratedAvatar(data.avatar_url);
-      setGeneratedPhotoId(data.photo_id);
-      setStep('preview');
-      setError(null);
+      // If the backend returns a URL immediately (e.g. cached or fast), use it.
+      // Otherwise, if it returns status='processing', we wait for WebSocket.
+      if (data.avatar_url) {
+          setGeneratedAvatar(data.avatar_url);
+          setGeneratedPhotoId(data.photo_id);
+          setStep('preview');
+          setError(null);
+      } else {
+          // Stay in 'generating' step and wait for WebSocket
+          console.log('Avatar generation started, waiting for completion...');
+      }
     },
     onError: (err: any) => {
       setError(err.response?.data?.message || 'Failed to generate avatar');
@@ -131,6 +164,7 @@ export default function AvatarGenerationFlow({
   });
 
   const handleGenerate = () => {
+    clearMessages();
     setStep('generating');
     setError(null);
     generateMutation.mutate(profile);
@@ -141,6 +175,7 @@ export default function AvatarGenerationFlow({
   };
 
   const handleRegenerate = () => {
+    clearMessages();
     setStep('generating');
     generateMutation.mutate(profile);
   };

@@ -161,4 +161,83 @@ class AvatarGenerationTest extends TestCase
                 'error' => 'Generated avatar was flagged as unsafe: Explicit Content'
             ]);
     }
+
+    public function test_can_fetch_providers_list()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)
+            ->getJson('/api/avatar/providers');
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'providers' => [
+                    'dalle',
+                    'gemini',
+                    'replicate'
+                ]
+            ]);
+    }
+
+    public function test_generates_avatar_with_replicate_provider_and_custom_options()
+    {
+        $user = User::factory()->create();
+        Config::set('avatar_generation.providers.replicate.api_token', 'test-token');
+
+        // Mock Replicate API flow
+        Http::fake([
+            // 1. Prediction Request
+            'api.replicate.com/v1/predictions' => Http::response([
+                'id' => 'pred_123',
+                'status' => 'starting',
+            ], 201),
+            
+            // 2. Polling Status (Succeeded)
+            'api.replicate.com/v1/predictions/pred_123' => Http::response([
+                'id' => 'pred_123',
+                'status' => 'succeeded',
+                'output' => ['https://replicate.com/output.png']
+            ], 200),
+
+            // 3. Download Image
+            'replicate.com/output.png' => Http::response('fake-image-content', 200),
+        ]);
+
+        $response = $this->actingAs($user)
+            ->postJson('/api/avatar/generate', [
+                'provider' => 'replicate',
+                'model' => 'custom-model-v1',
+                'lora_scale' => 0.8,
+                'style' => 'cyberpunk',
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => true,
+                'provider' => 'replicate',
+            ]);
+
+        // Verify Replicate Request contained custom options
+        Http::assertSent(function ($request) {
+            if ($request->url() === 'https://api.replicate.com/v1/predictions') {
+                $data = $request->data();
+                return $data['version'] === 'custom-model-v1' &&
+                       $data['input']['lora_scale'] === 0.8;
+            }
+            return true;
+        });
+
+        // Verify Photo was created
+        $this->assertDatabaseHas('photos', [
+            'user_id' => $user->id,
+            'mime_type' => 'image/png',
+        ]);
+
+        // Verify Metadata
+        $photo = \App\Models\Photo::where('user_id', $user->id)->latest()->first();
+        $this->assertEquals('ai', $photo->metadata['source']);
+        $this->assertEquals('replicate', $photo->metadata['provider']);
+        $this->assertEquals('custom-model-v1', $photo->metadata['model']);
+        $this->assertEquals('cyberpunk', $photo->metadata['style']);
+    }
 }

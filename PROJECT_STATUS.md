@@ -84,9 +84,10 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Visual Polish**: Added color-cycling and glow animation to the site logo (`Logo.tsx`, `globals.css`).
     -   **Avatar System Upgrade**:
         -   **Backend**: Updated `AvatarGenerationService` to support custom providers (Replicate, DALL-E), models, and LoRA scales.
+        -   **Backend**: Refactored generation to be **asynchronous** using `GenerateAvatar` Job and `AvatarGeneratedNotification` (Database + Broadcast).
         -   **Backend**: Updated `AvatarController` to store generations in `photos` table with metadata.
-        -   **Frontend**: Enhanced `AvatarGenerationFlow` with "Gallery" view and "Advanced Settings" (Provider/Model/LoRA selection).
-        -   **Verification**: Frontend linting passed.
+        -   **Frontend**: Enhanced `AvatarGenerationFlow` with "Gallery" view, "Advanced Settings", and **Real-time WebSocket updates** for async generation.
+        -   **Verification**: Backend feature tests (`AvatarGenerationTest`) passing. Frontend type check passing.
 2.  **Cache Versioning & Strategy** (Dec 04 - Complete):
     -   Implemented `CACHE_VERSION` strategy for global cache invalidation.
     -   Updated `Group`, `Event`, and `Subscription` controllers to use versioned keys.

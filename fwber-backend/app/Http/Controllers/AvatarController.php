@@ -29,43 +29,14 @@ class AvatarController extends Controller
         $user = Auth::user();
         
         try {
-            $result = $this->avatarService->generateAvatar($user, $request->all());
-
-            if ($result['success']) {
-                // Extract relative path from URL
-                // URL is like http://localhost/storage/avatars/uuid.png
-                // Path should be avatars/uuid.png
-                $path = 'avatars/' . basename($result['image_url']);
-
-                // Save to photos table
-                $photo = new Photo();
-                $photo->user_id = $user->id;
-                $photo->file_path = $path;
-                $photo->filename = basename($path);
-                $photo->original_filename = 'ai-generated.png';
-                $photo->mime_type = 'image/png';
-                $photo->is_private = false;
-                $photo->is_primary = false;
-                $photo->metadata = [
-                    'source' => 'ai',
-                    'provider' => $result['provider'],
-                    'model' => $request->input('model'),
-                    'style' => $request->input('style'),
-                ];
-                $photo->save();
-
-                return response()->json([
-                    'success' => true,
-                    'avatar_url' => $result['image_url'],
-                    'photo_id' => $photo->id,
-                    'provider' => $result['provider'],
-                ]);
-            }
+            // Dispatch job for async generation
+            \App\Jobs\GenerateAvatar::dispatch($user, $request->all());
 
             return response()->json([
-                'success' => false,
-                'error' => $result['error'] ?? 'Unknown error occurred',
-            ], 500);
+                'success' => true,
+                'message' => 'Avatar generation started. You will be notified when it is ready.',
+                'status' => 'processing',
+            ]);
 
         } catch (\Exception $e) {
             return response()->json([
