@@ -7,7 +7,7 @@
 The project has successfully completed the MVP, Secondary Systems, and Production Hardening phases. It is now **deployed and live**.
 
 ### ⚠️ Known Issues / Technical Debt
-*   **Deployment**: `database.sqlite` and `storage/app/public/photos` are tracked in git, causing merge conflicts during deployment if the server has local changes. Added to `.gitignore` to prevent future tracking, but existing files need to be removed from the repo index (`git rm --cached`).
+*   **None**: No critical technical debt currently tracked.
 
 ### ✅ Completed Operational Improvements
 1.  **Test Suite Stabilization** (Dec 09 - Complete):
@@ -293,7 +293,8 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Details**: `AiWingmanService` implemented using `LlmManager`.
     -   **Routes**: `GET /wingman/ice-breakers/{matchId}`, `GET /wingman/replies/{matchId}`.
     -   **Features**: Generates personalized ice breakers and reply suggestions based on user profiles and conversation history.
-    -   **Verification**: Unit tests (`AiWingmanServiceTest.php`) passing.
+    -   **Frontend**: Integrated `WingmanSuggestions` component into `RealTimeChat`. Added `useAiWingman` hook.
+    -   **Verification**: Unit tests (`AiWingmanServiceTest.php`) passing. Frontend Lint passing.
 8.  **Voice Messages** (Dec 09 - Complete):
     -   **Frontend**: Implemented `AudioRecorder` component using `MediaRecorder` API.
     -   **Integration**: Added voice recording capability to `MessagesPage`.

@@ -11,11 +11,12 @@ interface WingmanSuggestionsProps {
 }
 
 export function WingmanSuggestions({ matchId, onSelectSuggestion, mode = 'reply' }: WingmanSuggestionsProps) {
-  const { getIceBreakers, getReplySuggestions } = useAiWingman();
+  const { getIceBreakers, getReplySuggestions, error, setError } = useAiWingman();
   
   const mutation = mode === 'ice-breaker' ? getIceBreakers : getReplySuggestions;
 
   const handleGenerate = () => {
+    setError(null);
     mutation.mutate(matchId);
   };
 
@@ -28,6 +29,11 @@ export function WingmanSuggestions({ matchId, onSelectSuggestion, mode = 'reply'
         </CardTitle>
       </CardHeader>
       <CardContent className="px-4 pb-3 space-y-3">
+        {error && (
+          <div className="text-xs text-red-400 bg-red-900/20 p-2 rounded border border-red-900/50">
+            {error}
+          </div>
+        )}
         {!mutation.data ? (
           <Button 
             size="sm" 
