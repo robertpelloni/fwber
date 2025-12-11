@@ -67,4 +67,25 @@ export function useWebSocketToasts() {
     
     lastOnlineCountRef.current = currentOnlineCount;
   }, [onlineUsers, showSuccess]);
+
+  // Show notification for network status changes
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleOnline = () => {
+      showSuccess('Back Online', 'Internet connection restored');
+    };
+
+    const handleOffline = () => {
+      showError('You are Offline', 'Check your internet connection');
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [showSuccess, showError]);
 }

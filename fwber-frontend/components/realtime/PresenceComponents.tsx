@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useContext, createContext } from 'react';
+import { useEffect, useMemo, useContext, createContext, useState } from 'react';
 
 // Create a fallback context for when WebSocketProvider is not available
 const FallbackWebSocketContext = createContext<WebSocketContextValue | null>(null);
@@ -243,9 +243,36 @@ export function ConnectionStatusBadge({
   className = '',
 }: ConnectionStatusBadgeProps) {
   const context = usePresenceContext();
+  const [isOnline, setIsOnline] = useState(true);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsOnline(navigator.onLine);
+
+      const handleOnline = () => setIsOnline(true);
+      const handleOffline = () => setIsOnline(false);
+
+      window.addEventListener('online', handleOnline);
+      window.addEventListener('offline', handleOffline);
+
+      return () => {
+        window.removeEventListener('online', handleOnline);
+        window.removeEventListener('offline', handleOffline);
+      };
+    }
+  }, []);
 
   const { connected, reconnectAttempts } = context.connectionStatus;
   const isReconnecting = !connected && reconnectAttempts > 0;
+
+  if (!isOnline) {
+    return (
+      <div className={`inline-flex items-center gap-1.5 text-xs ${className}`}>
+        <span className="w-2 h-2 bg-red-500 rounded-full" />
+        <span className="text-red-600 font-medium">Offline</span>
+      </div>
+    );
+  }
 
   if (connected) {
     return (
