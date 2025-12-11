@@ -36,6 +36,7 @@ The application is live. The focus is on monitoring system health, optimizing pe
 
 #### 1. Advanced AI Features
 - [x] **Media Analysis**: Real-time safety checks for media (AWS Rekognition integration).
+- [x] **Chat Translation**: Real-time message translation using LLM.
 
 ## ✅ Completed Milestones
 

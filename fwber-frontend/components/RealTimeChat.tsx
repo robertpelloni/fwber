@@ -8,11 +8,46 @@ import { UserAvatar, PresenceIndicator, PresenceStatus } from '@/components/Pres
 import { WingmanSuggestions } from '@/components/ai/WingmanSuggestions';
 import AudioRecorder from '@/components/AudioRecorder';
 import { api } from '@/lib/api';
+import { Languages, Loader2 } from 'lucide-react';
+import { useTranslation } from '@/lib/hooks/use-translation';
 
 interface RealTimeChatProps {
   recipientId: string;
   recipientName?: string;
   className?: string;
+}
+
+function TranslateButton({ text, isOwnMessage }: { text: string, isOwnMessage: boolean }) {
+  const { translate, isLoading } = useTranslation();
+  const [translatedText, setTranslatedText] = useState<string | null>(null);
+
+  const handleTranslate = async () => {
+    if (translatedText) {
+      setTranslatedText(null);
+      return;
+    }
+    // Default to English for now
+    const result = await translate(text, 'en');
+    if (result) setTranslatedText(result);
+  };
+
+  return (
+    <div className={`flex flex-col ${isOwnMessage ? 'items-end' : 'items-start'}`}>
+      {translatedText && (
+        <div className="text-xs text-gray-200 italic mb-1 border-l-2 border-blue-500 pl-2 bg-black/20 p-1 rounded">
+          {translatedText}
+        </div>
+      )}
+      <button 
+        onClick={handleTranslate}
+        className="text-[10px] text-gray-400 hover:text-white flex items-center gap-1 mt-1 opacity-50 hover:opacity-100 transition-opacity"
+        title="Translate"
+      >
+        {isLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Languages className="h-3 w-3" />}
+        {translatedText ? 'Original' : 'Translate'}
+      </button>
+    </div>
+  );
 }
 
 export default function RealTimeChat({ 
@@ -159,7 +194,15 @@ export default function RealTimeChat({
                         {msg.media_duration && <span className="text-xs opacity-75">{msg.media_duration}s</span>}
                     </div>
                   ) : (
-                    <p className="text-sm">{msg.message?.content || msg.content}</p>
+                    <div>
+                      <p className="text-sm">{msg.message?.content || msg.content}</p>
+                      {!isOwnMessage && (msg.message?.content || msg.content) && (
+                        <TranslateButton 
+                          text={msg.message?.content || msg.content || ''} 
+                          isOwnMessage={isOwnMessage} 
+                        />
+                      )}
+                    </div>
                   )}
                   <MessageMetadata 
                     timestamp={msg.timestamp}

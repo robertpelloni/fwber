@@ -166,6 +166,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Direct Messages
     Route::get('messages/unread-count', [\App\Http\Controllers\Api\MessageController::class, 'unreadCount']);
     Route::post('messages', [\App\Http\Controllers\Api\MessageController::class, 'store'])->middleware('throttle:messaging');
+    Route::post('messages/translate', [\App\Http\Controllers\TranslationController::class, 'translate'])->middleware('throttle:content_generation');
     Route::get('messages/{userId}', [\App\Http\Controllers\Api\MessageController::class, 'index']);
     Route::post('messages/{messageId}/read', [\App\Http\Controllers\Api\MessageController::class, 'markAsRead']);
     Route::post('messages/mark-all-read/{senderId}', [\App\Http\Controllers\Api\MessageController::class, 'markAllAsRead']);

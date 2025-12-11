@@ -305,6 +305,12 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Matching**: Updated `AIMatchingService` to include scoring for optional attributes.
     -   **Frontend**: Updated `EnhancedProfileEditor` with "Personality & Social" section.
     -   **Verification**: Feature tests (`FullProfileAttributesTest`) passing.
+9.  **Real-time Chat Translation**:
+    -   **Status**: ✅ Implemented.
+    -   **Details**: `TranslationService` implemented using `LlmManager`.
+    -   **Routes**: `POST /messages/translate`.
+    -   **Frontend**: Integrated `TranslateButton` into `RealTimeChat`.
+    -   **Verification**: Frontend Type Check passing.
 
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.

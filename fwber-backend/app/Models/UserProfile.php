@@ -63,6 +63,7 @@ class UserProfile extends Model
         'religion',
         'sleep_schedule',
         'social_media',
+        'preferred_language',
     ];
 
     protected $casts = [
