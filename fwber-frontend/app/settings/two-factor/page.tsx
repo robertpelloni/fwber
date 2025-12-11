@@ -143,7 +143,7 @@ export default function TwoFactorSettingsPage() {
                   </div>
                   <h2 className="text-lg font-medium text-gray-900 mb-2">Two-Factor Authentication is Disabled</h2>
                   <p className="text-gray-500 max-w-md mx-auto mb-8">
-                    When two-factor authentication is enabled, you will be prompted for a secure, random token during authentication. You may retrieve this token from your phone's Google Authenticator application.
+                    When two-factor authentication is enabled, you will be prompted for a secure, random token during authentication. You may retrieve this token from your phone&apos;s Google Authenticator application.
                   </p>
                   <button
                     onClick={enableTwoFactor}
@@ -160,7 +160,7 @@ export default function TwoFactorSettingsPage() {
                   <div className="border-b border-gray-200 pb-8">
                     <h3 className="text-lg font-medium text-gray-900 mb-4">Finish Enabling Two-Factor Authentication</h3>
                     <p className="text-gray-500 mb-6">
-                      To finish enabling two-factor authentication, scan the following QR code using your phone's authenticator application or enter the setup key and provide the generated OTP code.
+                      To finish enabling two-factor authentication, scan the following QR code using your phone&apos;s authenticator application or enter the setup key and provide the generated OTP code.
                     </p>
                     
                     <div className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg mb-6">

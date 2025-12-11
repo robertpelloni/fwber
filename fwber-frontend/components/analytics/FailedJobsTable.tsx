@@ -33,7 +33,7 @@ export default function FailedJobsTable() {
     try {
       setLoading(true);
       const response = await api.get<FailedJobsResponse>('/analytics/failed-jobs');
-      setJobs(response.data.data || []); // Handle pagination structure
+      setJobs(response.data || []);
     } catch (err) {
       console.error('Failed to fetch failed jobs:', err);
       setError('Failed to load failed jobs.');
