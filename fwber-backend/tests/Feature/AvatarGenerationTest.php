@@ -2,12 +2,16 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\GenerateAvatar;
 use App\Models\User;
 use App\Models\UserProfile;
+use App\Services\AvatarGenerationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\AvatarGeneratedNotification;
 use Tests\TestCase;
 
 class AvatarGenerationTest extends TestCase
@@ -23,7 +27,35 @@ class AvatarGenerationTest extends TestCase
         Config::set('avatar_generation.providers.dalle.api_key', 'sk-test-key');
     }
 
-    public function test_generates_avatar_prompt_with_detailed_attributes()
+    /**
+     * Test that the API endpoint dispatches the job and returns immediately.
+     */
+    public function test_api_dispatches_generation_job()
+    {
+        Queue::fake();
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)
+            ->postJson('/api/avatar/generate', [
+                'style' => 'digital art',
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => true,
+                'status' => 'processing'
+            ]);
+
+        Queue::assertPushed(GenerateAvatar::class, function ($job) use ($user) {
+            return $job->user->id === $user->id &&
+                   $job->options['style'] === 'digital art';
+        });
+    }
+
+    /**
+     * Test the Service logic for prompt generation.
+     */
+    public function test_service_generates_prompt_with_detailed_attributes()
     {
         $user = User::factory()->create();
         
@@ -51,16 +83,14 @@ class AvatarGenerationTest extends TestCase
                     ['url' => 'https://example.com/avatar.png']
                 ]
             ], 200),
-            '*' => Http::response('ok', 200), // Catch-all for image download
+            '*' => Http::response('ok', 200),
         ]);
 
-        $response = $this->actingAs($user)
-            ->postJson('/api/avatar/generate', [
-                'style' => 'digital art',
-            ]);
+        // Instantiate service directly
+        $service = app(AvatarGenerationService::class);
+        $result = $service->generateAvatar($user, ['style' => 'digital art']);
 
-        $response->assertStatus(200)
-            ->assertJson(['success' => true]);
+        $this->assertTrue($result['success']);
 
         // Verify the prompt sent to OpenAI
         Http::assertSent(function ($request) {
@@ -71,7 +101,6 @@ class AvatarGenerationTest extends TestCase
             $data = $request->data();
             $prompt = $data['prompt'];
 
-            // Check for all the attributes we expect in the prompt
             return str_contains($prompt, 'digital art') &&
                    str_contains($prompt, 'adult person') &&
                    str_contains($prompt, 'woman') &&
@@ -83,12 +112,15 @@ class AvatarGenerationTest extends TestCase
                    str_contains($prompt, 'piercings') &&
                    str_contains($prompt, 'wearing cyberpunk style clothing') &&
                    str_contains($prompt, 'muscular build') &&
-                   str_contains($prompt, 'energetic, friendly expression') && // From ENTP
-                   str_contains($prompt, 'Gaming background theme'); // From interests
+                   str_contains($prompt, 'energetic, friendly expression') &&
+                   str_contains($prompt, 'Gaming background theme');
         });
     }
 
-    public function test_uses_request_options_over_profile_data()
+    /**
+     * Test the Service logic for option priority.
+     */
+    public function test_service_uses_request_options_over_profile_data()
     {
         $user = User::factory()->create();
         UserProfile::create([
@@ -106,11 +138,11 @@ class AvatarGenerationTest extends TestCase
             '*' => Http::response('ok', 200),
         ]);
 
-        $this->actingAs($user)
-            ->postJson('/api/avatar/generate', [
-                'gender' => 'female', // Override gender
-                'hair_color' => 'pink', // Override hair
-            ]);
+        $service = app(AvatarGenerationService::class);
+        $service->generateAvatar($user, [
+            'gender' => 'female', // Override gender
+            'hair_color' => 'pink', // Override hair
+        ]);
 
         Http::assertSent(function ($request) {
             if ($request->url() !== 'https://api.openai.com/v1/images/generations') {
@@ -123,7 +155,10 @@ class AvatarGenerationTest extends TestCase
         });
     }
 
-    public function test_rejects_unsafe_generated_avatar()
+    /**
+     * Test the Service logic for unsafe content rejection.
+     */
+    public function test_service_rejects_unsafe_generated_avatar()
     {
         Config::set('features.media_analysis', true);
         $user = User::factory()->create();
@@ -138,7 +173,7 @@ class AvatarGenerationTest extends TestCase
             'https://example.com/unsafe-avatar.png' => Http::response('unsafe-image-content', 200),
         ]);
 
-        // Mock MediaAnalysisInterface to return unsafe
+        // Mock MediaAnalysisInterface
         $mockAnalysis = \Mockery::mock(\App\Services\MediaAnalysis\MediaAnalysisInterface::class);
         $mockAnalysis->shouldReceive('analyze')
             ->once()
@@ -152,14 +187,11 @@ class AvatarGenerationTest extends TestCase
         
         $this->app->instance(\App\Services\MediaAnalysis\MediaAnalysisInterface::class, $mockAnalysis);
 
-        $response = $this->actingAs($user)
-            ->postJson('/api/avatar/generate');
+        $service = app(AvatarGenerationService::class);
+        $result = $service->generateAvatar($user);
 
-        $response->assertStatus(500)
-            ->assertJson([
-                'success' => false,
-                'error' => 'Generated avatar was flagged as unsafe: Explicit Content'
-            ]);
+        $this->assertFalse($result['success']);
+        $this->assertStringContainsString('unsafe', $result['error']);
     }
 
     public function test_can_fetch_providers_list()
@@ -179,8 +211,12 @@ class AvatarGenerationTest extends TestCase
             ]);
     }
 
-    public function test_generates_avatar_with_replicate_provider_and_custom_options()
+    /**
+     * Test the full Job execution flow (Service -> DB -> Notification).
+     */
+    public function test_job_execution_saves_photo_and_notifies()
     {
+        Notification::fake();
         $user = User::factory()->create();
         Config::set('avatar_generation.providers.replicate.api_token', 'test-token');
 
@@ -203,19 +239,15 @@ class AvatarGenerationTest extends TestCase
             'replicate.com/output.png' => Http::response('fake-image-content', 200),
         ]);
 
-        $response = $this->actingAs($user)
-            ->postJson('/api/avatar/generate', [
-                'provider' => 'replicate',
-                'model' => 'custom-model-v1',
-                'lora_scale' => 0.8,
-                'style' => 'cyberpunk',
-            ]);
-
-        $response->assertStatus(200)
-            ->assertJson([
-                'success' => true,
-                'provider' => 'replicate',
-            ]);
+        // Manually execute the job
+        $job = new GenerateAvatar($user, [
+            'provider' => 'replicate',
+            'model' => 'custom-model-v1',
+            'lora_scale' => 0.8,
+            'style' => 'cyberpunk',
+        ]);
+        
+        $job->handle(app(AvatarGenerationService::class));
 
         // Verify Replicate Request contained custom options
         Http::assertSent(function ($request) {
@@ -239,5 +271,11 @@ class AvatarGenerationTest extends TestCase
         $this->assertEquals('replicate', $photo->metadata['provider']);
         $this->assertEquals('custom-model-v1', $photo->metadata['model']);
         $this->assertEquals('cyberpunk', $photo->metadata['style']);
+
+        // Verify Notification
+        Notification::assertSentTo(
+            [$user],
+            AvatarGeneratedNotification::class
+        );
     }
 }

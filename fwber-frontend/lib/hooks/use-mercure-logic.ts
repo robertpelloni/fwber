@@ -220,6 +220,7 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
           // Register background sync
           if ('serviceWorker' in navigator && 'SyncManager' in window) {
             const registration = await navigator.serviceWorker.ready;
+            // @ts-ignore - SyncManager is not yet in standard TS lib
             await registration.sync.register('chat-message');
           }
           
