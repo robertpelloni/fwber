@@ -13,6 +13,8 @@ import { useTranslation } from '@/lib/hooks/use-translation';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { MatchInsights } from '@/components/matches/MatchInsights';
 import { DatePlanner } from '@/components/realtime/DatePlanner';
+import { storeOfflineChatMessage } from '@/lib/offline-store';
+import { useToast } from '@/components/ToastProvider';
 
 interface RealTimeChatProps {
   recipientId: string;
@@ -64,6 +66,7 @@ export default function RealTimeChat({
   const [loadingHistory, setLoadingHistory] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
+  const { showSuccess, showError } = useToast();
   
   const {
     messages,
@@ -129,11 +132,43 @@ export default function RealTimeChat({
     formData.append('message_type', 'audio');
 
     try {
+      if (!navigator.onLine) throw new Error('Offline');
       await api.post('/messages', formData);
       // Message will be received via WebSocket
     } catch (error) {
       console.error('Failed to send voice message:', error);
-      // Ideally show a toast here
+      
+      // Offline fallback
+      if (!navigator.onLine || (error as any)?.message === 'Offline' || (error as any)?.code === 'ERR_NETWORK') {
+        try {
+          const token = localStorage.getItem('fwber_token');
+          if (token) {
+             await storeOfflineChatMessage({
+                recipient_id: recipientId,
+                message: { 
+                    type: 'audio', 
+                    media: audioFile, 
+                    media_duration: duration 
+                },
+                token: token,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Register background sync
+            if ('serviceWorker' in navigator && 'SyncManager' in window) {
+                const registration = await navigator.serviceWorker.ready;
+                await registration.sync.register('chat-message');
+            }
+            
+            showSuccess('Saved Offline', 'Voice message will be sent when online');
+          }
+        } catch (storeErr) {
+             console.error('Failed to store offline voice message:', storeErr);
+             showError('Error', 'Failed to save voice message offline');
+        }
+      } else {
+        showError('Error', 'Failed to send voice message');
+      }
     }
   };
 

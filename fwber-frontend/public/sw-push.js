@@ -143,19 +143,39 @@ async function syncOfflineChatMessages() {
     const offlineMessages = await getOfflineChatMessages();
     
     for (const message of offlineMessages) {
-      const response = await fetch('/api/websocket/message', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + message.token
-        },
-        body: JSON.stringify({
-          recipient_id: message.recipient_id,
-          message: message.message
-        })
-      });
+      let response;
       
-      if (response.ok) {
+      if (message.message.type === 'audio' && message.message.media) {
+        // Handle Audio/Media Message
+        const formData = new FormData();
+        formData.append('receiver_id', message.recipient_id);
+        formData.append('media', message.message.media);
+        formData.append('media_duration', message.message.media_duration);
+        formData.append('message_type', 'audio');
+
+        response = await fetch('/api/messages', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + message.token
+          },
+          body: formData
+        });
+      } else {
+        // Handle Text Message
+        response = await fetch('/api/websocket/message', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + message.token
+          },
+          body: JSON.stringify({
+            recipient_id: message.recipient_id,
+            message: message.message
+          })
+        });
+      }
+      
+      if (response && response.ok) {
         await removeOfflineChatMessage(message.id);
         console.log('Offline chat message synced:', message.id);
       }

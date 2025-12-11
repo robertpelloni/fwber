@@ -94,6 +94,7 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Frontend**: Updated `useMercureLogic` to handle offline errors, store messages locally, and register sync tasks.
     -   **UX**: Implemented optimistic updates for offline messages with 'sending' status.
     -   **Verification**: Code implementation complete.
+    -   **Enhancement**: Added support for offline Voice Messages (Blob storage + FormData sync).
 19. **Connectivity UX Improvements** (Dec 11 - Complete):
     -   **UI**: Updated `ConnectionStatusBadge` to display global "Offline" state.
     -   **Feedback**: Updated `useWebSocketToasts` to show "You are Offline" / "Back Online" toasts.
