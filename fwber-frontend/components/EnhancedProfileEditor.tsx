@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api/client';
 import { BioGenerator } from '@/components/ai/BioGenerator';
+import { ProfileAnalysis } from '@/components/profile/ProfileAnalysis';
 
 import { UserProfile } from '@/lib/api/types';
 
@@ -186,6 +187,11 @@ export default function EnhancedProfileEditor() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* AI Profile Analysis */}
+      <div className="mb-8">
+        <ProfileAnalysis />
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">

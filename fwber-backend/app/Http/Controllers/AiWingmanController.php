@@ -95,4 +95,18 @@ class AiWingmanController extends Controller
 
         return response()->json(['suggestions' => $suggestions]);
     }
+
+    /**
+     * Analyze the authenticated user's profile.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getProfileAnalysis(Request $request)
+    {
+        $user = Auth::user();
+        $analysis = $this->wingmanService->analyzeProfile($user);
+
+        return response()->json($analysis);
+    }
 }

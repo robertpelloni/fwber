@@ -266,6 +266,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('feature:ai_wingman')->group(function () {
         Route::get('wingman/ice-breakers/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'getIceBreakers']);
         Route::get('wingman/replies/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'getReplySuggestions']);
+        Route::get('wingman/profile-analysis', [\App\Http\Controllers\AiWingmanController::class, 'getProfileAnalysis']);
     });
 
     // Friend routes
