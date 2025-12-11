@@ -6,6 +6,16 @@ interface WingmanSuggestion {
   suggestions: string[];
 }
 
+export interface DateIdea {
+  title: string;
+  description: string;
+  reason: string;
+}
+
+interface DateIdeasResponse {
+  ideas: DateIdea[];
+}
+
 export function useAiWingman() {
   const [error, setError] = useState<string | null>(null);
 
@@ -27,9 +37,20 @@ export function useAiWingman() {
     },
   });
 
+  const getDateIdeas = useMutation({
+    mutationFn: async ({ matchId, location }: { matchId: string; location?: string }) => {
+      const params = location ? { location } : undefined;
+      return api.get<DateIdeasResponse>(`/wingman/date-ideas/${matchId}`, { params });
+    },
+    onError: (err: any) => {
+      setError(err.message || 'Failed to get date ideas');
+    },
+  });
+
   return {
     getIceBreakers,
     getReplySuggestions,
+    getDateIdeas,
     error,
     setError,
   };

@@ -12,6 +12,7 @@ import { Languages, Loader2, Sparkles } from 'lucide-react';
 import { useTranslation } from '@/lib/hooks/use-translation';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { MatchInsights } from '@/components/matches/MatchInsights';
+import { DatePlanner } from '@/components/realtime/DatePlanner';
 
 interface RealTimeChatProps {
   recipientId: string;
@@ -156,6 +157,7 @@ export default function RealTimeChat({
           </div>
         </div>
         <div className="flex items-center space-x-2">
+          <DatePlanner matchId={recipientId} matchName={recipientName} />
           <Dialog>
             <DialogTrigger asChild>
               <button 

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Models\Venue;
 use App\Services\Ai\Llm\LlmManager;
 use Illuminate\Support\Facades\Log;
 
@@ -102,6 +103,45 @@ class AiWingmanService
         }
     }
 
+    /**
+     * Suggest date ideas based on user profiles and location.
+     *
+     * @param User $user
+     * @param User $match
+     * @param string|null $location
+     * @return array List of date ideas
+     */
+    public function suggestDateIdeas(User $user, User $match, ?string $location = null): array
+    {
+        // Fetch nearby venues if location is provided (simplified for now)
+        // In a real implementation, we would use geospatial search
+        $venues = [];
+        if ($location) {
+            // Placeholder: Fetch top 5 active venues
+            $venues = Venue::where('is_active', true)->limit(5)->get();
+        }
+
+        $prompt = $this->buildDateIdeasPrompt($user, $match, $venues, $location);
+
+        try {
+            $response = $this->llmManager->driver()->chat([
+                ['role' => 'system', 'content' => 'You are a creative dating concierge. Your goal is to suggest unique and personalized date ideas based on the interests of two people.'],
+                ['role' => 'user', 'content' => $prompt]
+            ], ['temperature' => 0.8]);
+
+            return $this->parseDateIdeas($response->content);
+        } catch (\Exception $e) {
+            Log::error("AiWingmanService: Failed to suggest date ideas: " . $e->getMessage());
+            return [
+                [
+                    'title' => 'Coffee Date',
+                    'description' => 'Grab a coffee and get to know each other.',
+                    'reason' => 'Classic and low pressure.'
+                ]
+            ];
+        }
+    }
+
     protected function buildIceBreakerPrompt(User $user, User $match): string
     {
         $userInterests = implode(', ', $user->profile->interests ?? []);
@@ -175,6 +215,37 @@ Focus on:
 EOT;
     }
 
+    protected function buildDateIdeasPrompt(User $user, User $match, $venues, ?string $location): string
+    {
+        $userInterests = implode(', ', $user->profile->interests ?? []);
+        $matchInterests = implode(', ', $match->profile->interests ?? []);
+        
+        $venueContext = "";
+        if (count($venues) > 0) {
+            $venueContext = "Here are some local venues you can recommend if they fit:\n";
+            foreach ($venues as $venue) {
+                $venueContext .= "- {$venue->name} ({$venue->business_type}): {$venue->description}\n";
+            }
+        }
+
+        return <<<EOT
+Suggest 3 date ideas for two people with the following interests:
+
+Person A: {$userInterests}
+Person B: {$matchInterests}
+
+Location Context: {$location}
+{$venueContext}
+
+Provide the output as a JSON array of objects with keys:
+- title: (string) A catchy title for the date.
+- description: (string) A short description of the activity.
+- reason: (string) Why this is a good match for their shared (or complementary) interests.
+
+Ensure the ideas are distinct (e.g., one active, one relaxing, one cultural).
+EOT;
+    }
+
     protected function parseSuggestions(string $content): array
     {
         // Attempt to parse JSON from the response
@@ -214,6 +285,24 @@ EOT;
             'strengths' => ['Could not parse analysis.'],
             'weaknesses' => [],
             'tips' => ['Please try again.']
+        ];
+    }
+
+    protected function parseDateIdeas(string $content): array
+    {
+        $content = preg_replace('/^```json\s*|\s*```$/', '', trim($content));
+        $decoded = json_decode($content, true);
+
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            return $decoded;
+        }
+
+        return [
+            [
+                'title' => 'Coffee & Walk',
+                'description' => 'Grab a coffee and take a walk in a nearby park.',
+                'reason' => 'Simple, low pressure, and allows for conversation.'
+            ]
         ];
     }
 }

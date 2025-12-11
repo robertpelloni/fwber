@@ -109,4 +109,33 @@ class AiWingmanController extends Controller
 
         return response()->json($analysis);
     }
+
+    /**
+     * Get date ideas for a specific match.
+     *
+     * @param Request $request
+     * @param string $matchId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getDateIdeas(Request $request, string $matchId)
+    {
+        $user = Auth::user();
+        $match = User::findOrFail($matchId);
+
+        // Check if they are matched
+        $isMatched = \App\Models\UserMatch::where(function($q) use ($user, $matchId) {
+            $q->where('user1_id', $user->id)->where('user2_id', $matchId);
+        })->orWhere(function($q) use ($user, $matchId) {
+            $q->where('user1_id', $matchId)->where('user2_id', $user->id);
+        })->exists();
+
+        if (!$isMatched) {
+            return response()->json(['error' => 'You are not matched with this user.'], 403);
+        }
+
+        $location = $request->input('location'); // Optional location string
+        $ideas = $this->wingmanService->suggestDateIdeas($user, $match, $location);
+
+        return response()->json(['ideas' => $ideas]);
+    }
 }

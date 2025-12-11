@@ -329,6 +329,12 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Routes**: `GET /wingman/profile-analysis`.
     -   **Frontend**: Created `ProfileAnalysis` component and integrated into `EnhancedProfileEditor`.
     -   **Verification**: Frontend Type Check passing.
+13. **AI Date Planner**:
+    -   **Status**: ✅ Implemented.
+    -   **Details**: `AiWingmanService` updated with `suggestDateIdeas` method using LLM and Venue context.
+    -   **Routes**: `GET /wingman/date-ideas/{matchId}`.
+    -   **Frontend**: Created `DatePlanner` component and integrated into `RealTimeChat`.
+    -   **Verification**: Frontend Type Check passing.
 
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.
