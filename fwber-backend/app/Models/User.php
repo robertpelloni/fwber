@@ -7,10 +7,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use NotificationChannels\WebPush\HasPushSubscriptions;
+use App\Models\Traits\HasTwoFactorAuthentication;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasPushSubscriptions;
+    use HasApiTokens, HasFactory, Notifiable, HasPushSubscriptions, HasTwoFactorAuthentication;
 
     protected $fillable = [
         'name',
@@ -24,6 +25,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
     ];
 
     protected $casts = [
@@ -31,9 +34,19 @@ class User extends Authenticatable
         'password' => 'hashed',
         'tier_expires_at' => 'datetime',
         'unlimited_swipes' => 'boolean',
+        'two_factor_confirmed_at' => 'datetime',
+    ];
+
+    protected $appends = [
+        'two_factor_enabled',
     ];
 
     // Relationships
+
+    public function getTwoFactorEnabledAttribute(): bool
+    {
+        return $this->hasEnabledTwoFactorAuthentication();
+    }
 
     public function profile()
     {

@@ -35,13 +35,21 @@ class AuthController extends Controller
     {
         $validated = $request->validated();
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        $user = User::where('email', $validated['email'])->first();
+
+        if (! $user || ! Hash::check($validated['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['Invalid credentials'],
             ]);
         }
 
-        $user = User::where('email', $validated['email'])->firstOrFail();
+        if ($user->hasEnabledTwoFactorAuthentication()) {
+            return response()->json([
+                'two_factor' => true,
+                'message' => 'Two factor authentication required.',
+            ]);
+        }
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([

@@ -145,6 +145,12 @@ export default function SettingsPage() {
             </h2>
             <div className="space-y-3">
               <SettingsLink
+                href="/settings/two-factor"
+                icon={<Shield className="w-5 h-5" />}
+                title="Two-Factor Authentication"
+                description="Add an extra layer of security to your account"
+              />
+              <SettingsLink
                 href="/settings/vault"
                 icon={<Lock className="w-5 h-5" />}
                 title="Local Media Vault"

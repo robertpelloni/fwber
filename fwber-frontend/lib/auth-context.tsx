@@ -11,6 +11,7 @@ interface User {
   emailVerifiedAt: string | null
   createdAt: string
   updatedAt: string
+  two_factor_enabled?: boolean
   profile?: {
     displayName: string | null
     dateOfBirth: string | null
@@ -35,6 +36,7 @@ interface AuthState {
   token: string | null
   isLoading: boolean
   isAuthenticated: boolean
+  requiresTwoFactor: boolean
   error: string | null
 }
 
@@ -42,6 +44,7 @@ type AuthAction =
   | { type: 'AUTH_START' }
   | { type: 'AUTH_SUCCESS'; payload: { user: User; token: string } }
   | { type: 'AUTH_FAILURE'; payload: string }
+  | { type: 'TWO_FACTOR_REQUIRED' }
   | { type: 'LOGOUT' }
   | { type: 'CLEAR_ERROR' }
   | { type: 'UPDATE_USER'; payload: User }
@@ -49,6 +52,7 @@ type AuthAction =
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>
+  verifyTwoFactor: (code: string, recoveryCode?: string) => Promise<void>
   register: (name: string, email: string, password: string, passwordConfirmation: string, avatar?: File | null) => Promise<void>
   logout: () => void
   clearError: () => void
@@ -61,6 +65,7 @@ const initialState: AuthState = {
   token: null,
   isLoading: true,
   isAuthenticated: false,
+  requiresTwoFactor: false,
   error: null,
 }
 
@@ -78,8 +83,16 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
         ...state,
         isLoading: false,
         isAuthenticated: true,
+        requiresTwoFactor: false,
         user: action.payload.user,
         token: action.payload.token,
+        error: null,
+      }
+    case 'TWO_FACTOR_REQUIRED':
+      return {
+        ...state,
+        isLoading: false,
+        requiresTwoFactor: true,
         error: null,
       }
     case 'AUTH_FAILURE':
@@ -87,6 +100,7 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
         ...state,
         isLoading: false,
         isAuthenticated: false,
+        requiresTwoFactor: false,
         user: null,
         token: null,
         error: action.payload,
@@ -95,6 +109,7 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
       return {
         ...state,
         isAuthenticated: false,
+        requiresTwoFactor: false,
         user: null,
         token: null,
         error: null,
@@ -240,6 +255,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error(data.message || 'Login failed')
       }
 
+      if (data.two_factor) {
+        dispatch({ type: 'TWO_FACTOR_REQUIRED' })
+        return
+      }
+
       logAuth.login(email, true)
       setUserContext(data.user)
       dispatch({ 
@@ -253,6 +273,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       dispatch({ 
         type: 'AUTH_FAILURE', 
         payload: error instanceof Error ? error.message : 'Login failed' 
+      })
+      throw error
+    }
+  }, [API_BASE_URL]);
+
+  // Verify Two Factor function
+  const verifyTwoFactor = useCallback(async (code: string, recoveryCode?: string) => {
+    dispatch({ type: 'AUTH_START' })
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/two-factor-challenge`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ 
+          code,
+          recovery_code: recoveryCode 
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Two factor verification failed')
+      }
+
+      // Assuming the challenge endpoint returns the same structure as login on success
+      setUserContext(data.user)
+      dispatch({ 
+        type: 'AUTH_SUCCESS', 
+        payload: { 
+          user: data.user, 
+          token: data.access_token || data.token 
+        } 
+      })
+    } catch (error) {
+      dispatch({ 
+        type: 'AUTH_FAILURE', 
+        payload: error instanceof Error ? error.message : 'Two factor verification failed' 
       })
       throw error
     }
@@ -338,11 +399,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthContextType = useMemo(() => ({
     ...state,
     login,
+    verifyTwoFactor,
     register,
     logout,
     clearError,
     updateUser,
-  }), [state, login, register, logout, clearError, updateUser]);
+  }), [state, login, verifyTwoFactor, register, logout, clearError, updateUser]);
 
   return (
     <AuthContext.Provider value={value}>
@@ -362,8 +424,10 @@ export function useAuth() {
          user: { id: 1, name: 'Test User', email: 'test@example.com' },
          isAuthenticated: true,
          isLoading: false,
+         requiresTwoFactor: false,
          token: 'mock-token',
          login: async () => {},
+         verifyTwoFactor: async () => {},
          register: async () => {},
          logout: () => {},
          clearError: () => {},

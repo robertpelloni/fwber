@@ -120,7 +120,13 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 24. **Performance Monitoring Verification** (Dec 12 - Complete):
     -   **Frontend**: Updated `admin-analytics.cy.js` to verify `SlowRequestsTable` rendering and data display.
     -   **Backend**: Verified `SlowRequestTest` passing.
-    -   **Verification**: Full stack observability for slow requests is confirmed.
+    -   **Verification**: Full stack observability for surface slow requests is confirmed.
+25. **Multi-Factor Authentication (2FA)** (Dec 12 - Complete):
+    -   **Backend**: Implemented `TwoFactorAuthenticationController` and `TwoFactorChallengeController`.
+    -   **Database**: Added `two_factor_secret`, `two_factor_recovery_codes`, `two_factor_confirmed_at` to `users` table.
+    -   **Frontend**: Created `TwoFactorSettingsPage` for setup (QR Code) and management.
+    -   **Auth Flow**: Updated `AuthContext` and `LoginPage` to handle 2FA challenge during login.
+    -   **Verification**: Code implementation complete. E2E test `two-factor-auth.cy.js` created (pending environment fix).
 2.  **Cache Versioning & Strategy** (Dec 04 - Complete):
     -   Implemented `CACHE_VERSION` strategy for global cache invalidation.
     -   Updated `Group`, `Event`, and `Subscription` controllers to use versioned keys.
