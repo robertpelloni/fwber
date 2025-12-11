@@ -236,6 +236,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // AI Avatar Generation
+    Route::get('avatar/providers', [\App\Http\Controllers\AvatarController::class, 'providers']);
     Route::post('avatar/generate', [\App\Http\Controllers\AvatarController::class, 'generate']);
 
     // AI Content Generation (rate limited)

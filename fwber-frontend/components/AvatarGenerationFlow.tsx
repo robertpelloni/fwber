@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Loader2, Sparkles, RefreshCw, Check, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import { Loader2, Sparkles, RefreshCw, Check, X, Settings, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import axios from 'axios';
 
@@ -22,30 +22,83 @@ interface PhysicalProfile {
   height_cm?: number;
 }
 
+interface ProviderConfig {
+  model: string;
+  api_key?: string;
+  api_token?: string;
+}
+
 export default function AvatarGenerationFlow({ 
   userId, 
   currentAvatarUrl,
   onComplete 
 }: AvatarGenerationProps) {
+  const [view, setView] = useState<'generate' | 'gallery'>('generate');
   const [step, setStep] = useState<'profile' | 'style' | 'generating' | 'preview' | 'complete'>('profile');
   const [profile, setProfile] = useState<PhysicalProfile>({});
   const [style, setStyle] = useState<string>('realistic');
   const [generatedAvatar, setGeneratedAvatar] = useState<string | null>(null);
+  const [generatedPhotoId, setGeneratedPhotoId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  
+  // Provider settings
+  const [providers, setProviders] = useState<Record<string, ProviderConfig>>({});
+  const [selectedProvider, setSelectedProvider] = useState<string>('dalle');
+  const [customModel, setCustomModel] = useState<string>('');
+  const [loraScale, setLoraScale] = useState<number>(0.8);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
   const queryClient = useQueryClient();
+
+  const galleryQuery = useQuery({
+    queryKey: ['avatar-gallery'],
+    queryFn: async () => {
+        const token = localStorage.getItem('fwber_token');
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/photos`, {
+             headers: { Authorization: `Bearer ${token}` }
+        });
+        return res.data.filter((p: any) => p.metadata?.source === 'ai');
+    },
+    enabled: view === 'gallery'
+  });
+
+  useEffect(() => {
+    const fetchProviders = async () => {
+      const token = localStorage.getItem('fwber_token');
+      try {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/avatar/providers`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setProviders(res.data.providers);
+      } catch (e) {
+        console.error('Failed to fetch providers', e);
+      }
+    };
+    fetchProviders();
+  }, []);
 
   const generateMutation = useMutation({
     mutationFn: async (profileData: PhysicalProfile) => {
       const token = localStorage.getItem('fwber_token');
+      const payload: any = { 
+        ...profileData, 
+        style,
+        provider: selectedProvider 
+      };
+      
+      if (customModel) payload.model = customModel;
+      if (selectedProvider === 'replicate') payload.lora_scale = loraScale;
+
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/avatar/generate`,
-        { ...profileData, style },
+        payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       return response.data;
     },
     onSuccess: (data) => {
       setGeneratedAvatar(data.avatar_url);
+      setGeneratedPhotoId(data.photo_id);
       setStep('preview');
       setError(null);
     },
@@ -58,11 +111,15 @@ export default function AvatarGenerationFlow({
   const acceptMutation = useMutation({
     mutationFn: async () => {
       const token = localStorage.getItem('fwber_token');
+      // Update profile with new avatar URL
       await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/physical-profile`,
         { ...profile, avatar_url: generatedAvatar },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      
+      // If we have a photo ID, we might want to mark it as primary or something, 
+      // but updating the profile avatar_url is usually enough.
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
@@ -104,6 +161,78 @@ export default function AvatarGenerationFlow({
 
   return (
     <div className="max-w-2xl mx-auto p-6">
+      {/* View Toggle */}
+      <div className="flex justify-center mb-6">
+        <div className="bg-gray-100 p-1 rounded-lg flex">
+            <button
+                onClick={() => setView('generate')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    view === 'generate' ? 'bg-white shadow text-purple-600' : 'text-gray-600 hover:text-gray-900'
+                }`}
+            >
+                Generate
+            </button>
+            <button
+                onClick={() => setView('gallery')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    view === 'gallery' ? 'bg-white shadow text-purple-600' : 'text-gray-600 hover:text-gray-900'
+                }`}
+            >
+                My Gallery
+            </button>
+        </div>
+      </div>
+
+      {view === 'gallery' ? (
+        <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">My AI Avatars</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {galleryQuery.isLoading ? (
+                    <div className="col-span-full flex justify-center py-12">
+                        <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
+                    </div>
+                ) : galleryQuery.data?.length === 0 ? (
+                    <div className="col-span-full text-center py-12 bg-gray-50 rounded-lg">
+                        <ImageIcon className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                        <p className="text-gray-500">No AI avatars generated yet.</p>
+                        <button 
+                            onClick={() => setView('generate')}
+                            className="mt-4 text-purple-600 font-medium hover:underline"
+                        >
+                            Create your first avatar
+                        </button>
+                    </div>
+                ) : (
+                    galleryQuery.data?.map((photo: any) => (
+                        <div key={photo.id} className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                            <Image 
+                                src={photo.url || photo.thumbnail_url} 
+                                alt="AI Avatar" 
+                                fill 
+                                className="object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                                <button 
+                                    onClick={() => {
+                                        setGeneratedAvatar(photo.url);
+                                        setStep('preview');
+                                        setView('generate');
+                                    }}
+                                    className="bg-white text-purple-600 px-3 py-1 rounded-full text-xs font-bold hover:bg-purple-50"
+                                >
+                                    Preview
+                                </button>
+                                <span className="text-white text-[10px] px-2 py-0.5 bg-black/30 rounded">
+                                    {photo.metadata?.provider || 'AI'}
+                                </span>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+        </div>
+      ) : (
+        <>
       {/* Progress Indicator */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-2">
@@ -167,6 +296,7 @@ export default function AvatarGenerationFlow({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
               <select
+                aria-label="Select gender"
                 value={profile.gender || ''}
                 onChange={(e) => setProfile({ ...profile, gender: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -182,6 +312,7 @@ export default function AvatarGenerationFlow({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Ethnicity</label>
               <select
+                aria-label="Select ethnicity"
                 value={profile.ethnicity || ''}
                 onChange={(e) => setProfile({ ...profile, ethnicity: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -200,6 +331,7 @@ export default function AvatarGenerationFlow({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Body Type</label>
               <select
+                aria-label="Select body type"
                 value={profile.body_type || ''}
                 onChange={(e) => setProfile({ ...profile, body_type: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -216,6 +348,7 @@ export default function AvatarGenerationFlow({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Hair Color</label>
               <select
+                aria-label="Select hair color"
                 value={profile.hair_color || ''}
                 onChange={(e) => setProfile({ ...profile, hair_color: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -234,6 +367,7 @@ export default function AvatarGenerationFlow({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Eye Color</label>
               <select
+                aria-label="Select eye color"
                 value={profile.eye_color || ''}
                 onChange={(e) => setProfile({ ...profile, eye_color: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -304,6 +438,63 @@ export default function AvatarGenerationFlow({
             ))}
           </div>
 
+          {/* Advanced Settings Toggle */}
+          <div className="border-t pt-4">
+            <button 
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+            >
+                <Settings className="w-4 h-4" />
+                {showAdvanced ? 'Hide Advanced Settings' : 'Show Advanced Settings'}
+            </button>
+          </div>
+
+          {showAdvanced && (
+            <div className="bg-gray-50 p-4 rounded-lg space-y-4">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">AI Provider</label>
+                    <select 
+                        value={selectedProvider}
+                        onChange={(e) => setSelectedProvider(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        title="Select AI Provider"
+                    >
+                        {Object.keys(providers).map(p => (
+                            <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>
+                        ))}
+                    </select>
+                </div>
+                
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Model / Version</label>
+                    <input 
+                        type="text" 
+                        value={customModel}
+                        onChange={(e) => setCustomModel(e.target.value)}
+                        placeholder={providers[selectedProvider]?.model || "Default Model"}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Leave empty to use default.</p>
+                </div>
+
+                {selectedProvider === 'replicate' && (
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">LoRA Scale ({loraScale})</label>
+                        <input 
+                            type="range" 
+                            aria-label="LoRA Scale"
+                            min="0" 
+                            max="1" 
+                            step="0.1"
+                            value={loraScale}
+                            onChange={(e) => setLoraScale(parseFloat(e.target.value))}
+                            className="w-full"
+                        />
+                    </div>
+                )}
+            </div>
+          )}
+
           <div className="flex justify-between">
             <button
               onClick={() => setStep('profile')}
@@ -330,9 +521,9 @@ export default function AvatarGenerationFlow({
             Our AI is creating a unique avatar based on your profile...
           </p>
           <div className="mt-8 flex justify-center gap-2">
-            <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-            <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-            <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+            <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" />
+            <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce delay-150" />
+            <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce delay-300" />
           </div>
         </div>
       )}
@@ -411,6 +602,8 @@ export default function AvatarGenerationFlow({
             />
           )}
         </div>
+      )}
+      </>
       )}
     </div>
   );

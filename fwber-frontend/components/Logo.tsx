@@ -47,7 +47,7 @@ export function Logo({ className = '', showDotMe = true }: LogoProps) {
           This layer renders the colorful gradients.
           It sits exactly on top of the outline layer.
       */}
-      <div className={`${fontClasses} flex items-baseline relative z-10 select-none`}>
+      <div className={`${fontClasses} flex items-baseline relative z-10 select-none animate-hue-cycle animate-glow`}>
         {letters.map((l, i) => (
           <span 
             key={i} 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\GenerateAvatarRequest;
 use App\Services\AvatarGenerationService;
+use App\Models\Photo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,6 +17,13 @@ class AvatarController extends Controller
         $this->avatarService = $avatarService;
     }
 
+    public function providers()
+    {
+        return response()->json([
+            'providers' => $this->avatarService->getProviders()
+        ]);
+    }
+
     public function generate(GenerateAvatarRequest $request)
     {
         $user = Auth::user();
@@ -24,12 +32,32 @@ class AvatarController extends Controller
             $result = $this->avatarService->generateAvatar($user, $request->all());
 
             if ($result['success']) {
-                $user->avatar_url = $result['image_url'];
-                $user->save();
+                // Extract relative path from URL
+                // URL is like http://localhost/storage/avatars/uuid.png
+                // Path should be avatars/uuid.png
+                $path = 'avatars/' . basename($result['image_url']);
+
+                // Save to photos table
+                $photo = new Photo();
+                $photo->user_id = $user->id;
+                $photo->file_path = $path;
+                $photo->filename = basename($path);
+                $photo->original_filename = 'ai-generated.png';
+                $photo->mime_type = 'image/png';
+                $photo->is_private = false;
+                $photo->is_primary = false;
+                $photo->metadata = [
+                    'source' => 'ai',
+                    'provider' => $result['provider'],
+                    'model' => $request->input('model'),
+                    'style' => $request->input('style'),
+                ];
+                $photo->save();
 
                 return response()->json([
                     'success' => true,
                     'avatar_url' => $result['image_url'],
+                    'photo_id' => $photo->id,
                     'provider' => $result['provider'],
                 ]);
             }

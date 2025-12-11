@@ -40,6 +40,11 @@ class AvatarGenerationService
         ]);
     }
 
+    public function getProviders(): array
+    {
+        return $this->config['providers'];
+    }
+
     public function generateAvatar(User $user, array $options = []): array
     {
         $provider = $options['provider'] ?? $this->config['default_provider'];
@@ -178,17 +183,27 @@ class AvatarGenerationService
             throw new \Exception('Replicate API token not configured');
         }
 
+        // Use provided model version or fallback to config
+        $version = $options['model'] ?? $this->config['providers']['replicate']['model'];
+
+        $input = [
+            'prompt' => $prompt,
+            'negative_prompt' => $negativePrompt,
+            'width' => 512,
+            'height' => 512,
+        ];
+
+        // Support LoRA parameters if provided
+        if (isset($options['lora_scale'])) {
+            $input['lora_scale'] = (float) $options['lora_scale'];
+        }
+
         $response = Http::withHeaders([
             'Authorization' => 'Token ' . $apiToken,
             'Content-Type' => 'application/json',
         ])->post('https://api.replicate.com/v1/predictions', [
-            'version' => '27b93a2413e7f36cd83da926f3656280b2931564ff050bf9575f1fdf9bcd7478', // SD model version
-            'input' => [
-                'prompt' => $prompt,
-                'negative_prompt' => $negativePrompt,
-                'width' => 512,
-                'height' => 512,
-            ],
+            'version' => $version,
+            'input' => $input,
         ]);
 
         if ($response->successful()) {

@@ -80,6 +80,13 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 16. **Performance Tuning (AI Wingman)** (Dec 10 - Complete):
     -   **Caching**: Implemented caching for `generateIceBreakers` (1h), `suggestDateIdeas` (1h), and `analyzeProfile` (24h).
     -   **Verification**: Unit tests (`AiWingmanServiceTest.php`) passing.
+17. **User Experience Refinement** (Dec 11 - Complete):
+    -   **Visual Polish**: Added color-cycling and glow animation to the site logo (`Logo.tsx`, `globals.css`).
+    -   **Avatar System Upgrade**:
+        -   **Backend**: Updated `AvatarGenerationService` to support custom providers (Replicate, DALL-E), models, and LoRA scales.
+        -   **Backend**: Updated `AvatarController` to store generations in `photos` table with metadata.
+        -   **Frontend**: Enhanced `AvatarGenerationFlow` with "Gallery" view and "Advanced Settings" (Provider/Model/LoRA selection).
+        -   **Verification**: Frontend linting passed.
 2.  **Cache Versioning & Strategy** (Dec 04 - Complete):
     -   Implemented `CACHE_VERSION` strategy for global cache invalidation.
     -   Updated `Group`, `Event`, and `Subscription` controllers to use versioned keys.
