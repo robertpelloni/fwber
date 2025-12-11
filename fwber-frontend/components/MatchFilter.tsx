@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp, Filter } from 'lucide-react';
 
 interface MatchFilterProps {
@@ -21,6 +21,20 @@ export default function MatchFilter({ onFilterChange }: MatchFilterProps) {
     distance_max: '',
   });
 
+  useEffect(() => {
+    const savedFilters = localStorage.getItem('match_filters');
+    if (savedFilters) {
+      try {
+        const parsed = JSON.parse(savedFilters);
+        setFilters(parsed);
+        // Optionally apply them immediately on mount
+        onFilterChange(parsed);
+      } catch (e) {
+        console.error('Failed to parse saved filters', e);
+      }
+    }
+  }, []);
+
   const handleInputChange = (field: string, value: any) => {
     setFilters((prev) => ({
       ...prev,
@@ -29,6 +43,7 @@ export default function MatchFilter({ onFilterChange }: MatchFilterProps) {
   };
 
   const handleApplyFilters = () => {
+    localStorage.setItem('match_filters', JSON.stringify(filters));
     onFilterChange(filters);
   };
 
@@ -45,6 +60,7 @@ export default function MatchFilter({ onFilterChange }: MatchFilterProps) {
       distance_max: '',
     };
     setFilters(resetFilters);
+    localStorage.removeItem('match_filters');
     onFilterChange(resetFilters);
   };
 
