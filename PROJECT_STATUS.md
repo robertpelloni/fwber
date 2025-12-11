@@ -374,6 +374,10 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Call History**: Implemented `VideoCall` model, migration, and API endpoints (`initiate`, `updateStatus`, `history`). Added `CallHistory` component and integrated into `MessagesPage`.
     -   **Feature Flag**: Added `FEATURE_VIDEO_CHAT` and gated routes.
     -   **Verification**: Code implementation complete. Linting passed.
+15. **Frontend Build Fix** (Dec 11 - Complete):
+    -   **Issue**: `useMercure must be used within a MercureProvider` error during build.
+    -   **Fix**: Added `MercureProvider` to `RootLayout` in `app/layout.tsx`. Added `'use client'` to `MercureContext.tsx`.
+    -   **Verification**: `npm run build` passing successfully.
 
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.

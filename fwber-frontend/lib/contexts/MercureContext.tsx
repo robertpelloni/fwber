@@ -1,3 +1,5 @@
+'use client';
+
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useMercureLogic, MercureConnectionStatus, OnlineUser, PresenceUpdate, ChatMessage, TypingIndicator, NotificationPayload, VideoSignal } from '@/lib/hooks/use-mercure-logic';
 
