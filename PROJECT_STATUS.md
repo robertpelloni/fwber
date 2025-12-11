@@ -109,6 +109,14 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Frontend**: Updated `MatchFilter` component with new fields and `localStorage` persistence.
     -   **Testing**: Created `MatchFilterTest` covering all scenarios. All tests passing.
     -   **Verification**: Feature complete and tested.
+22. **Video Chat Stability Fix** (Dec 12 - Complete):
+    -   **Issue**: Resolved "Maximum update depth exceeded" infinite loop in `RealTimeChat`.
+    -   **Fix**: Memoized `useMercureLogic` return value and `AuthContext` values.
+    -   **Verification**: Manual verification and code review.
+23. **Feedback Loop E2E Verification** (Dec 12 - Complete):
+    -   **Testing**: Created `cypress/e2e/feedback.cy.js` covering submission flow.
+    -   **Fixes**: Resolved UI obstruction by "Performance Monitor" during tests.
+    -   **Verification**: E2E tests passing.
 2.  **Cache Versioning & Strategy** (Dec 04 - Complete):
     -   Implemented `CACHE_VERSION` strategy for global cache invalidation.
     -   Updated `Group`, `Event`, and `Subscription` controllers to use versioned keys.
