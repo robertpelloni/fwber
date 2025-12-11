@@ -88,6 +88,12 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
         -   **Backend**: Updated `AvatarController` to store generations in `photos` table with metadata.
         -   **Frontend**: Enhanced `AvatarGenerationFlow` with "Gallery" view, "Advanced Settings", and **Real-time WebSocket updates** for async generation.
         -   **Verification**: Backend feature tests (`AvatarGenerationTest`) passing. Frontend type check passing.
+18. **Offline Chat Support** (Dec 11 - Complete):
+    -   **Storage**: Implemented `offline_chat_messages` store in `lib/offline-store.ts` (IndexedDB).
+    -   **Sync**: Implemented `syncOfflineChatMessages` in `sw-push.js` (Service Worker Background Sync).
+    -   **Frontend**: Updated `useMercureLogic` to handle offline errors, store messages locally, and register sync tasks.
+    -   **UX**: Implemented optimistic updates for offline messages with 'sending' status.
+    -   **Verification**: Code implementation complete.
 2.  **Cache Versioning & Strategy** (Dec 04 - Complete):
     -   Implemented `CACHE_VERSION` strategy for global cache invalidation.
     -   Updated `Group`, `Event`, and `Subscription` controllers to use versioned keys.

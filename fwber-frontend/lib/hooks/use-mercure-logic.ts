@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
+import { storeOfflineChatMessage } from '@/lib/offline-store';
 
 export interface MercureConnectionStatus {
   connected: boolean;
@@ -194,6 +195,9 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
   // API wrappers for sending data (since Mercure is one-way for client)
   const sendChatMessage = useCallback(async (recipientId: string, content: string, type: string = 'text') => {
     try {
+      if (!navigator.onLine) {
+        throw new Error('Offline');
+      }
       await api.post('/websocket/message', {
         recipient_id: recipientId,
         message: { type, content }
@@ -202,8 +206,41 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
       // Optimistic update could be added here
     } catch (err) {
       console.error('Failed to send message:', err);
+      
+      // Offline fallback
+      if (!navigator.onLine || (err as any)?.message === 'Offline' || (err as any)?.code === 'ERR_NETWORK') {
+        try {
+          await storeOfflineChatMessage({
+            recipient_id: recipientId,
+            message: { type, content },
+            token: token,
+            timestamp: new Date().toISOString()
+          });
+          
+          // Register background sync
+          if ('serviceWorker' in navigator && 'SyncManager' in window) {
+            const registration = await navigator.serviceWorker.ready;
+            await registration.sync.register('chat-message');
+          }
+          
+          // Optimistic update for offline message
+          const offlineMsg: ChatMessage = {
+            id: `offline-${Date.now()}`,
+            from_user_id: user?.id || '',
+            to_user_id: recipientId,
+            content: content,
+            timestamp: new Date().toISOString(),
+            status: 'sending', // Indicate pending status
+            message_type: type
+          };
+          setChatMessages(prev => [...prev, offlineMsg]);
+          
+        } catch (storeErr) {
+          console.error('Failed to store offline message:', storeErr);
+        }
+      }
     }
-  }, []);
+  }, [token, user?.id]);
 
   const sendTypingIndicator = useCallback(async (recipientId: string, isTyping: boolean) => {
     try {

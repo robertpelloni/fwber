@@ -9,6 +9,8 @@ self.addEventListener('sync', (event) => {
     event.waitUntil(syncOfflineMessages());
   } else if (event.tag === 'location-update') {
     event.waitUntil(syncLocationUpdates());
+  } else if (event.tag === 'chat-message') {
+    event.waitUntil(syncOfflineChatMessages());
   }
 });
 
@@ -136,11 +138,39 @@ async function syncLocationUpdates() {
   }
 }
 
+async function syncOfflineChatMessages() {
+  try {
+    const offlineMessages = await getOfflineChatMessages();
+    
+    for (const message of offlineMessages) {
+      const response = await fetch('/api/websocket/message', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + message.token
+        },
+        body: JSON.stringify({
+          recipient_id: message.recipient_id,
+          message: message.message
+        })
+      });
+      
+      if (response.ok) {
+        await removeOfflineChatMessage(message.id);
+        console.log('Offline chat message synced:', message.id);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to sync offline chat messages:', error);
+  }
+}
+
 // IndexedDB helpers for offline storage
 const DB_NAME = 'fwber_offline_store';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_MESSAGES = 'offline_messages';
 const STORE_LOCATIONS = 'offline_locations';
+const STORE_CHAT_MESSAGES = 'offline_chat_messages';
 
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -154,6 +184,9 @@ function openDB() {
       }
       if (!db.objectStoreNames.contains(STORE_LOCATIONS)) {
         db.createObjectStore(STORE_LOCATIONS, { keyPath: 'id', autoIncrement: true });
+      }
+      if (!db.objectStoreNames.contains(STORE_CHAT_MESSAGES)) {
+        db.createObjectStore(STORE_CHAT_MESSAGES, { keyPath: 'id', autoIncrement: true });
       }
     };
   });
@@ -197,6 +230,28 @@ async function removeOfflineLocation(id) {
   return new Promise((resolve, reject) => {
     const transaction = db.transaction(STORE_LOCATIONS, 'readwrite');
     const store = transaction.objectStore(STORE_LOCATIONS);
+    const request = store.delete(id);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function getOfflineChatMessages() {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(STORE_CHAT_MESSAGES, 'readonly');
+    const store = transaction.objectStore(STORE_CHAT_MESSAGES);
+    const request = store.getAll();
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function removeOfflineChatMessage(id) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(STORE_CHAT_MESSAGES, 'readwrite');
+    const store = transaction.objectStore(STORE_CHAT_MESSAGES);
     const request = store.delete(id);
     request.onsuccess = () => resolve();
     request.onerror = () => reject(request.error);
