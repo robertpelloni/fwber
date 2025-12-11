@@ -60,6 +60,7 @@ export interface TypingIndicator {
 export interface VideoSignal {
   from_user_id: string;
   signal: any;
+  call_id?: number;
   timestamp: string;
 }
 
@@ -283,9 +284,9 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
     }
   }, []);
 
-  const sendVideoSignal = useCallback(async (recipientId: string, signal: any) => {
+  const sendVideoSignal = useCallback(async (recipientId: string, signal: any, callId?: number) => {
     try {
-      await api.post('/video/signal', { recipient_id: recipientId, signal });
+      await api.post('/video/signal', { recipient_id: recipientId, signal, call_id: callId });
     } catch (err) {
       console.error('Failed to send video signal:', err);
     }

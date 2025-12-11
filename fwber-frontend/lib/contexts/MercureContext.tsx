@@ -19,7 +19,7 @@ interface MercureContextType {
   disconnect: () => void;
   sendChatMessage: (recipientId: string, content: string, type?: string) => Promise<void>;
   sendTypingIndicator: (recipientId: string, isTyping: boolean) => Promise<void>;
-  sendVideoSignal: (recipientId: string, signal: any) => Promise<void>;
+  sendVideoSignal: (recipientId: string, signal: any, callId?: number) => Promise<void>;
   updatePresence: (status: 'online' | 'away' | 'busy' | 'offline', metadata?: Record<string, any>) => Promise<void>;
   sendNotification: (recipientId: string, notification: any) => Promise<void>;
   loadConversationHistory: (recipientId: string) => Promise<void>;

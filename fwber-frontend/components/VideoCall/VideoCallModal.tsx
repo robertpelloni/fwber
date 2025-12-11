@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Phone, PhoneOff, Video, Mic, MicOff, VideoOff } from 'lucide-react';
+import { initiateCall, updateCallStatus } from '@/lib/api/video';
 
 interface VideoCallModalProps {
   recipientId: string;
@@ -22,7 +23,7 @@ const ICE_SERVERS = {
 };
 
 export function VideoCallModal({ recipientId, isOpen, onClose, isIncoming = false }: VideoCallModalProps) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { sendVideoSignal, videoSignals } = useMercure();
   
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
@@ -31,23 +32,36 @@ export function VideoCallModal({ recipientId, isOpen, onClose, isIncoming = fals
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [incomingOffer, setIncomingOffer] = useState<RTCSessionDescriptionInit | null>(null);
+  const [callId, setCallId] = useState<number | null>(null);
   
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const pendingCandidates = useRef<RTCIceCandidate[]>([]);
 
-  const endCall = useCallback(() => {
+  const endCall = useCallback(async () => {
     if (localStream) {
       localStream.getTracks().forEach(track => track.stop());
     }
     if (peerConnectionRef.current) {
       peerConnectionRef.current.close();
     }
-    sendVideoSignal(recipientId, { type: 'bye' });
+    
+    // Send bye signal
+    sendVideoSignal(recipientId, { type: 'bye' }, callId || undefined);
+    
+    // Update DB status
+    if (callId && token) {
+        try {
+            await updateCallStatus(token, callId, 'ended');
+        } catch (e) {
+            console.error('Failed to update call status:', e);
+        }
+    }
+
     setCallStatus('ended');
     onClose();
-  }, [localStream, recipientId, sendVideoSignal, onClose]);
+  }, [localStream, recipientId, sendVideoSignal, onClose, callId, token]);
 
   const createPeerConnection = useCallback((stream: MediaStream) => {
     const pc = new RTCPeerConnection(ICE_SERVERS);
@@ -56,7 +70,7 @@ export function VideoCallModal({ recipientId, isOpen, onClose, isIncoming = fals
 
     pc.onicecandidate = (event) => {
       if (event.candidate) {
-        sendVideoSignal(recipientId, { type: 'candidate', candidate: event.candidate });
+        sendVideoSignal(recipientId, { type: 'candidate', candidate: event.candidate }, callId || undefined);
       }
     };
 
@@ -70,6 +84,9 @@ export function VideoCallModal({ recipientId, isOpen, onClose, isIncoming = fals
     pc.onconnectionstatechange = () => {
       if (pc.connectionState === 'connected') {
         setCallStatus('connected');
+        if (callId && token) {
+            updateCallStatus(token, callId, 'connected').catch(console.error);
+        }
       } else if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
         endCall();
       }
@@ -77,21 +94,35 @@ export function VideoCallModal({ recipientId, isOpen, onClose, isIncoming = fals
 
     peerConnectionRef.current = pc;
     return pc;
-  }, [recipientId, sendVideoSignal, endCall]);
+  }, [recipientId, sendVideoSignal, endCall, callId, token]);
 
   const startCall = useCallback(async (stream: MediaStream) => {
     setCallStatus('calling');
+    
+    // Initiate call in DB
+    let newCallId: number | undefined;
+    if (token) {
+        try {
+            const call = await initiateCall(token, recipientId);
+            setCallId(call.id);
+            newCallId = call.id;
+        } catch (e) {
+            console.error('Failed to initiate call log:', e);
+        }
+    }
+
     const pc = createPeerConnection(stream);
     
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
     
-    sendVideoSignal(recipientId, { type: 'offer', sdp: offer });
-  }, [createPeerConnection, recipientId, sendVideoSignal]);
+    sendVideoSignal(recipientId, { type: 'offer', sdp: offer }, newCallId);
+  }, [createPeerConnection, recipientId, sendVideoSignal, token]);
 
-  const handleSignal = useCallback(async (signal: any) => {
+  const handleSignal = useCallback(async (signal: any, signalCallId?: number) => {
     if (signal.type === 'offer') {
       setIncomingOffer(signal.sdp);
+      if (signalCallId) setCallId(signalCallId);
       setCallStatus('ringing');
     } else if (signal.type === 'answer') {
       if (peerConnectionRef.current) {
@@ -140,7 +171,7 @@ export function VideoCallModal({ recipientId, isOpen, onClose, isIncoming = fals
     const lastSignal = videoSignals[videoSignals.length - 1];
     if (!lastSignal || lastSignal.from_user_id !== recipientId) return;
 
-    handleSignal(lastSignal.signal);
+    handleSignal(lastSignal.signal, lastSignal.call_id);
   }, [videoSignals, recipientId, handleSignal]);
 
   const acceptCall = async () => {
@@ -158,8 +189,12 @@ export function VideoCallModal({ recipientId, isOpen, onClose, isIncoming = fals
     const answer = await pc.createAnswer();
     await pc.setLocalDescription(answer);
     
-    sendVideoSignal(recipientId, { type: 'answer', sdp: answer });
+    sendVideoSignal(recipientId, { type: 'answer', sdp: answer }, callId || undefined);
     setCallStatus('connected');
+    
+    if (callId && token) {
+        updateCallStatus(token, callId, 'connected').catch(console.error);
+    }
   };
 
   const toggleMute = () => {

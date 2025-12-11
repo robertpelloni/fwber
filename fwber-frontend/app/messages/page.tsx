@@ -14,6 +14,8 @@ import { useToast } from '@/components/ToastProvider'
 import { VideoCallModal } from '@/components/VideoCall/VideoCallModal'
 import { Video } from 'lucide-react'
 import { useMercure } from '@/lib/contexts/MercureContext'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { CallHistory } from '@/components/VideoCall/CallHistory'
 
 export default function MessagesPage() {
   const { token, isAuthenticated, user } = useAuth()
@@ -32,6 +34,7 @@ export default function MessagesPage() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const [showSafetyMenu, setShowSafetyMenu] = useState(false)
   const [isVideoCallOpen, setIsVideoCallOpen] = useState(false)
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [incomingCall, setIncomingCall] = useState<{ callerId: string } | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   
@@ -240,6 +243,12 @@ export default function MessagesPage() {
                 </p>
               </div>
               <div className="flex items-center space-x-4">
+                <button
+                  onClick={() => setIsHistoryOpen(true)}
+                  className="bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-700"
+                >
+                  Call History
+                </button>
                 <button
                   onClick={loadConversations}
                   className="bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-700"
@@ -574,6 +583,15 @@ export default function MessagesPage() {
           isIncoming={!!incomingCall}
         />
       )}
+
+      <Dialog open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Call History</DialogTitle>
+          </DialogHeader>
+          <CallHistory />
+        </DialogContent>
+      </Dialog>
     </ProtectedRoute>
   )
 }

@@ -105,7 +105,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('websocket/broadcast', [\App\Http\Controllers\WebSocketController::class, 'broadcast']);
 
     // Video Chat
-    Route::post('video/signal', [\App\Http\Controllers\VideoChatController::class, 'signal']);
+    Route::middleware('feature:video_chat')->group(function () {
+        Route::post('video/signal', [\App\Http\Controllers\VideoChatController::class, 'signal']);
+        Route::post('video/initiate', [\App\Http\Controllers\VideoChatController::class, 'initiate']);
+        Route::put('video/{id}/status', [\App\Http\Controllers\VideoChatController::class, 'updateStatus']);
+        Route::get('video/history', [\App\Http\Controllers\VideoChatController::class, 'history']);
+    });
 
     // Analytics
     Route::get('analytics', [\App\Http\Controllers\AnalyticsController::class, 'index']);

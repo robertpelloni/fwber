@@ -16,4 +16,5 @@ return [
     'moderation' => env('FEATURE_MODERATION', false),
     'media_analysis' => env('FEATURE_MEDIA_ANALYSIS', false),
     'ai_wingman' => env('FEATURE_AI_WINGMAN', false),
+    'video_chat' => env('FEATURE_VIDEO_CHAT', false),
 ];

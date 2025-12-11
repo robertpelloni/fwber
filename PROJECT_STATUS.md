@@ -371,6 +371,8 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Backend**: Created `VideoChatController` and `/api/video/signal` route for WebRTC signaling via Mercure.
     -   **Frontend**: Implemented `VideoCallModal` using `RTCPeerConnection` and `useMercureLogic` for signaling.
     -   **Integration**: Added "Video Call" button to `MessagesPage` and handled incoming call notifications.
+    -   **Call History**: Implemented `VideoCall` model, migration, and API endpoints (`initiate`, `updateStatus`, `history`). Added `CallHistory` component and integrated into `MessagesPage`.
+    -   **Feature Flag**: Added `FEATURE_VIDEO_CHAT` and gated routes.
     -   **Verification**: Code implementation complete. Linting passed.
 
 ### 🎯 Production Readiness Checklist
