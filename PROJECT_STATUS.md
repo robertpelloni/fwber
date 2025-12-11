@@ -99,6 +99,11 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **UI**: Updated `ConnectionStatusBadge` to display global "Offline" state.
     -   **Feedback**: Updated `useWebSocketToasts` to show "You are Offline" / "Back Online" toasts.
     -   **Verification**: Code implementation complete.
+20. **Deployment Fixes & Content Polish** (Dec 11 - Complete):
+    -   **Frontend Build**: Fixed `SyncManager` TypeScript error in `RealTimeChat.tsx` and `use-mercure-logic.ts` by adding `@ts-ignore` for experimental API.
+    -   **Backend Tests**: Refactored `AvatarGenerationTest` to support asynchronous job dispatching (using `Queue::fake()`).
+    -   **Content**: Updated Landing Page tagline and added new sex/love quotes.
+    -   **Verification**: All backend tests passing (118 tests). Frontend lint passing.
 2.  **Cache Versioning & Strategy** (Dec 04 - Complete):
     -   Implemented `CACHE_VERSION` strategy for global cache invalidation.
     -   Updated `Group`, `Event`, and `Subscription` controllers to use versioned keys.
