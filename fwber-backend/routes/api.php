@@ -293,5 +293,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Feedback
     Route::post('feedback', [\App\Http\Controllers\FeedbackController::class, 'store'])->middleware('throttle:feedback');
+    Route::get('feedback', [\App\Http\Controllers\FeedbackController::class, 'index']);
+    Route::put('feedback/{id}', [\App\Http\Controllers\FeedbackController::class, 'update']);
 });
 

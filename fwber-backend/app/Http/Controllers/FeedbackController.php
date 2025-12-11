@@ -10,6 +10,57 @@ use Illuminate\Support\Facades\Log;
 class FeedbackController extends Controller
 {
     /**
+     * Get all feedback (Admin only)
+     * 
+     * @OA\Get(
+     *   path="/feedback",
+     *   tags={"Feedback"},
+     *   summary="List all feedback",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="List of feedback")
+     * )
+     */
+    public function index(Request $request)
+    {
+        $feedback = Feedback::with('user:id,name,email')
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        return response()->json($feedback);
+    }
+
+    /**
+     * Update feedback status (Admin only)
+     * 
+     * @OA\Put(
+     *   path="/feedback/{id}",
+     *   tags={"Feedback"},
+     *   summary="Update feedback status",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"status"},
+     *       @OA\Property(property="status", type="string", enum={"new", "reviewed", "resolved", "dismissed"})
+     *     )
+     *   ),
+     *   @OA\Response(response=200, description="Feedback updated")
+     * )
+     */
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:new,reviewed,resolved,dismissed'
+        ]);
+
+        $feedback = Feedback::findOrFail($id);
+        $feedback->update(['status' => $request->status]);
+
+        return response()->json($feedback);
+    }
+
+    /**
      * Submit feedback
      * 
      * @OA\Post(

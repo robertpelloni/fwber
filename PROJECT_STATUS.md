@@ -72,6 +72,14 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Verification**: Verified build and component integration.
 14. **Event Model Fix** (Dec 10 - Complete):
     -   **Model**: Added `reminder_sent` to `$fillable` and `$casts` in `Event` model.
+15. **Feedback Loop** (Dec 10 - Complete):
+    -   **Backend**: Updated `FeedbackController` with Admin management endpoints (`index`, `update`).
+    -   **Frontend**: Created `AdminFeedbackPage` for managing feedback.
+    -   **Frontend**: Verified `FeedbackModal` integration and category alignment.
+    -   **Verification**: Frontend Type Check passing.
+16. **Performance Tuning (AI Wingman)** (Dec 10 - Complete):
+    -   **Caching**: Implemented caching for `generateIceBreakers` (1h), `suggestDateIdeas` (1h), and `analyzeProfile` (24h).
+    -   **Verification**: Unit tests (`AiWingmanServiceTest.php`) passing.
 2.  **Cache Versioning & Strategy** (Dec 04 - Complete):
     -   Implemented `CACHE_VERSION` strategy for global cache invalidation.
     -   Updated `Group`, `Event`, and `Subscription` controllers to use versioned keys.

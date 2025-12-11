@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use App\Models\Venue;
 use App\Services\Ai\Llm\LlmManager;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class AiWingmanService
@@ -25,26 +26,30 @@ class AiWingmanService
      */
     public function generateIceBreakers(User $user, User $match): array
     {
-        $userProfile = $user->profile;
-        $matchProfile = $match->profile;
+        $cacheKey = "wingman:icebreakers:{$user->id}:{$match->id}";
 
-        if (!$userProfile || !$matchProfile) {
-            return ["Hi! How's it going?", "Hey! I saw we matched."];
-        }
+        return Cache::remember($cacheKey, 3600, function () use ($user, $match) {
+            $userProfile = $user->profile;
+            $matchProfile = $match->profile;
 
-        $prompt = $this->buildIceBreakerPrompt($user, $match);
+            if (!$userProfile || !$matchProfile) {
+                return ["Hi! How's it going?", "Hey! I saw we matched."];
+            }
 
-        try {
-            $response = $this->llmManager->driver()->chat([
-                ['role' => 'system', 'content' => 'You are a helpful dating coach and wingman. Your goal is to help users start conversations that are engaging, respectful, and relevant to their shared interests.'],
-                ['role' => 'user', 'content' => $prompt]
-            ], ['temperature' => 0.7]);
+            $prompt = $this->buildIceBreakerPrompt($user, $match);
 
-            return $this->parseSuggestions($response->content);
-        } catch (\Exception $e) {
-            Log::error("AiWingmanService: Failed to generate ice breakers: " . $e->getMessage());
-            return ["Hi! How's it going?", "Hey! I saw we matched."];
-        }
+            try {
+                $response = $this->llmManager->driver()->chat([
+                    ['role' => 'system', 'content' => 'You are a helpful dating coach and wingman. Your goal is to help users start conversations that are engaging, respectful, and relevant to their shared interests.'],
+                    ['role' => 'user', 'content' => $prompt]
+                ], ['temperature' => 0.7]);
+
+                return $this->parseSuggestions($response->content);
+            } catch (\Exception $e) {
+                Log::error("AiWingmanService: Failed to generate ice breakers: " . $e->getMessage());
+                return ["Hi! How's it going?", "Hey! I saw we matched."];
+            }
+        });
     }
 
     /**
@@ -81,26 +86,31 @@ class AiWingmanService
     public function analyzeProfile(User $user): array
     {
         $profile = $user->profile;
-        $photos = $user->photos;
-        
-        $prompt = $this->buildProfileAnalysisPrompt($user, $profile, $photos);
+        $updatedAt = $profile ? $profile->updated_at->timestamp : 0;
+        $cacheKey = "wingman:profile_analysis:{$user->id}:{$updatedAt}";
 
-        try {
-            $response = $this->llmManager->driver()->chat([
-                ['role' => 'system', 'content' => 'You are an expert dating profile consultant. Your goal is to help users optimize their profiles to attract better matches. Be honest but constructive.'],
-                ['role' => 'user', 'content' => $prompt]
-            ], ['temperature' => 0.7]);
+        return Cache::remember($cacheKey, 86400, function () use ($user, $profile) {
+            $photos = $user->photos;
+            
+            $prompt = $this->buildProfileAnalysisPrompt($user, $profile, $photos);
 
-            return $this->parseAnalysis($response->content);
-        } catch (\Exception $e) {
-            Log::error("AiWingmanService: Failed to analyze profile: " . $e->getMessage());
-            return [
-                'score' => 0,
-                'strengths' => [],
-                'weaknesses' => ['Service unavailable'],
-                'tips' => ['Please try again later.']
-            ];
-        }
+            try {
+                $response = $this->llmManager->driver()->chat([
+                    ['role' => 'system', 'content' => 'You are an expert dating profile consultant. Your goal is to help users optimize their profiles to attract better matches. Be honest but constructive.'],
+                    ['role' => 'user', 'content' => $prompt]
+                ], ['temperature' => 0.7]);
+
+                return $this->parseAnalysis($response->content);
+            } catch (\Exception $e) {
+                Log::error("AiWingmanService: Failed to analyze profile: " . $e->getMessage());
+                return [
+                    'score' => 0,
+                    'strengths' => [],
+                    'weaknesses' => ['Service unavailable'],
+                    'tips' => ['Please try again later.']
+                ];
+            }
+        });
     }
 
     /**
@@ -113,33 +123,38 @@ class AiWingmanService
      */
     public function suggestDateIdeas(User $user, User $match, ?string $location = null): array
     {
-        // Fetch nearby venues if location is provided (simplified for now)
-        // In a real implementation, we would use geospatial search
-        $venues = [];
-        if ($location) {
-            // Placeholder: Fetch top 5 active venues
-            $venues = Venue::where('is_active', true)->limit(5)->get();
-        }
+        $locKey = $location ? md5($location) : 'none';
+        $cacheKey = "wingman:date_ideas:{$user->id}:{$match->id}:{$locKey}";
 
-        $prompt = $this->buildDateIdeasPrompt($user, $match, $venues, $location);
+        return Cache::remember($cacheKey, 3600, function () use ($user, $match, $location) {
+            // Fetch nearby venues if location is provided (simplified for now)
+            // In a real implementation, we would use geospatial search
+            $venues = [];
+            if ($location) {
+                // Placeholder: Fetch top 5 active venues
+                $venues = Venue::where('is_active', true)->limit(5)->get();
+            }
 
-        try {
-            $response = $this->llmManager->driver()->chat([
-                ['role' => 'system', 'content' => 'You are a creative dating concierge. Your goal is to suggest unique and personalized date ideas based on the interests of two people.'],
-                ['role' => 'user', 'content' => $prompt]
-            ], ['temperature' => 0.8]);
+            $prompt = $this->buildDateIdeasPrompt($user, $match, $venues, $location);
 
-            return $this->parseDateIdeas($response->content);
-        } catch (\Exception $e) {
-            Log::error("AiWingmanService: Failed to suggest date ideas: " . $e->getMessage());
-            return [
-                [
-                    'title' => 'Coffee Date',
-                    'description' => 'Grab a coffee and get to know each other.',
-                    'reason' => 'Classic and low pressure.'
-                ]
-            ];
-        }
+            try {
+                $response = $this->llmManager->driver()->chat([
+                    ['role' => 'system', 'content' => 'You are a creative dating concierge. Your goal is to suggest unique and personalized date ideas based on the interests of two people.'],
+                    ['role' => 'user', 'content' => $prompt]
+                ], ['temperature' => 0.8]);
+
+                return $this->parseDateIdeas($response->content);
+            } catch (\Exception $e) {
+                Log::error("AiWingmanService: Failed to suggest date ideas: " . $e->getMessage());
+                return [
+                    [
+                        'title' => 'Coffee Date',
+                        'description' => 'Grab a coffee and get to know each other.',
+                        'reason' => 'Classic and low pressure.'
+                    ]
+                ];
+            }
+        });
     }
 
     protected function buildIceBreakerPrompt(User $user, User $match): string

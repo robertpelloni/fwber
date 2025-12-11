@@ -116,10 +116,12 @@ class AiWingmanServiceTest extends TestCase
         // Mock Users
         $user = Mockery::mock(User::class);
         $user->shouldReceive('getAttribute')->with('profile')->andReturn(null);
+        $user->shouldReceive('getAttribute')->with('id')->andReturn(1);
         $user->shouldReceive('offsetExists')->with('profile')->andReturn(true);
         
         $match = Mockery::mock(User::class);
         $match->shouldReceive('getAttribute')->with('profile')->andReturn(null);
+        $match->shouldReceive('getAttribute')->with('id')->andReturn(2);
         $match->shouldReceive('offsetExists')->with('profile')->andReturn(true);
 
         $mockDriver = Mockery::mock(LlmProviderInterface::class);
