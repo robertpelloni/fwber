@@ -440,6 +440,27 @@ export default function MatchesPage() {
                         </span>
                       </div>
                     </div>
+
+                    {/* Photo Reveal Gallery Preview */}
+                    <div className="mt-8">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Photo Gallery Preview</h3>
+                      <PhotoRevealGate 
+                        photos={[
+                          // Main avatar as AI photo
+                          ...(currentMatch.profile?.photos?.[0] ? [{
+                            id: String(currentMatch.profile.photos[0].id),
+                            url: currentMatch.profile.photos[0].url,
+                            isPrimary: true,
+                            type: 'ai' as const
+                          }] : []),
+                          // Placeholder locked photos to demonstrate the feature
+                          { id: 'locked-1', url: '', isPrimary: false, type: 'real' as const },
+                          { id: 'locked-2', url: '', isPrimary: false, type: 'real' as const },
+                          { id: 'locked-3', url: '', isPrimary: false, type: 'real' as const },
+                        ]}
+                        currentTier={RelationshipTier.DISCOVERY}
+                      />
+                    </div>
                   </div>
                 )}
               </div>
