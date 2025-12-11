@@ -144,17 +144,17 @@ class AIMatchingService
         $query->whereHas('profile', function ($q) use ($filters) {
             // Smoking
             if (!empty($filters['smoking'])) {
-                $q->whereJsonContains('preferences->smoke', $filters['smoking']);
+                $q->where('smoking_status', $filters['smoking']);
             }
 
             // Drinking
             if (!empty($filters['drinking'])) {
-                $q->whereJsonContains('preferences->drink', $filters['drinking']);
+                $q->where('drinking_status', $filters['drinking']);
             }
 
             // Body Type
             if (!empty($filters['body_type'])) {
-                $q->whereJsonContains('preferences->body_type', $filters['body_type']);
+                $q->where('body_type', $filters['body_type']);
             }
 
             // Height Min
