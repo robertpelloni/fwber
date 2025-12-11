@@ -34,7 +34,7 @@ Expanded from 1 to 6 comprehensive webhook event handlers:
 - Creates failed Payment record with metadata (invoice_id, subscription_id, attempt_count)
 - Logs warning for monitoring
 - Keeps premium active for grace period
-- TODO: Implement user notification
+- [x] Implement user notification (PaymentFailedNotification)
 - Cache invalidation
 
 #### **invoice.payment_succeeded**
@@ -74,9 +74,9 @@ public $timeout = 120;
 ```
 - Finds events starting within 24 hours: `whereBetween('starts_at', [now(), now()->addHours(24)])`
 - Gets attendees with status='attending'
-- Logs reminder actions (actual notification commented out)
-- TODO: Implement push notification/email sending
-- TODO: Add `reminder_sent` column to events table
+- Logs reminder actions
+- [x] Implement push notification/email sending (EventReminderNotification)
+- [x] Add `reminder_sent` column to events table
 - Error handling: `failed()` method logs exceptions
 - **Scheduled**: Every hour
 
@@ -89,7 +89,7 @@ public $timeout = 120;
 - Updates subscription: `stripe_status = 'expired'`
 - Revokes premium: `tier = 'free'`, `tier_expires_at = null`, `unlimited_swipes = false`
 - Cache invalidation: `Cache::tags(['subscriptions', "user:{$user->id}"])->flush()`
-- TODO: Implement SubscriptionExpiredNotification
+- [x] Implement SubscriptionExpiredNotification
 - Error handling: Handles missing user gracefully
 - **Scheduled**: Daily at 2 AM
 
@@ -336,6 +336,7 @@ tail -f storage/logs/laravel.log | grep "Stripe Webhook"
 6. **Queue Management**:
    - [x] Consider separate queues for different job priorities (Implemented `high`, `default`, `notifications`)
    - [x] Add job rate limiting for high-volume scenarios (Handled via `notifications` queue isolation)
+   - [x] Implement Failed Job Management UI (Backend API + Admin Frontend)
 
 ### Low Priority
 7. **Cache Optimization**:

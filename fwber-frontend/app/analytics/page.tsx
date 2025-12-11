@@ -12,6 +12,7 @@ import {
 import { useSystemHealth } from '@/lib/hooks/use-config';
 import { exportAllAnalyticsToCSV, exportPlatformAnalyticsToCSV } from '@/lib/utils/csv-export';
 import BoostAnalytics from '@/components/analytics/BoostAnalytics';
+import FailedJobsTable from '@/components/analytics/FailedJobsTable';
 import './analytics-progress.css';
 
 const RANGE_OPTIONS: Array<{ label: string; value: AnalyticsRange }> = [
@@ -256,6 +257,8 @@ export default function AnalyticsPage() {
           </div>
         )}
       </div>
+
+      <FailedJobsTable />
 
       <div className="rounded-lg bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between">

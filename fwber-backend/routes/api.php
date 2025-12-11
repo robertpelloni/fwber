@@ -118,6 +118,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('analytics/moderation', [\App\Http\Controllers\AnalyticsController::class, 'moderation']);
     Route::get('analytics/slow-requests', [\App\Http\Controllers\AnalyticsController::class, 'slowRequests']);
     Route::get('analytics/boosts', [\App\Http\Controllers\AnalyticsController::class, 'boosts']);
+    
+    // Failed Jobs (Admin)
+    Route::get('analytics/failed-jobs', [\App\Http\Controllers\FailedJobController::class, 'index']);
+    Route::post('analytics/failed-jobs/retry-all', [\App\Http\Controllers\FailedJobController::class, 'retryAll']);
+    Route::post('analytics/failed-jobs/flush', [\App\Http\Controllers\FailedJobController::class, 'flush']);
+    Route::post('analytics/failed-jobs/{uuid}/retry', [\App\Http\Controllers\FailedJobController::class, 'retry']);
+    Route::delete('analytics/failed-jobs/{uuid}', [\App\Http\Controllers\FailedJobController::class, 'destroy']);
 
     // Notifications
     Route::get('notification-preferences', [\App\Http\Controllers\NotificationPreferenceController::class, 'index']);
