@@ -260,6 +260,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('media/analyze', [\App\Http\Controllers\MediaAnalysisController::class, 'analyze']);
     });
 
+    // AI Wingman
+    Route::middleware('feature:ai_wingman')->group(function () {
+        Route::get('wingman/ice-breakers/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'getIceBreakers']);
+        Route::get('wingman/replies/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'getReplySuggestions']);
+    });
+
     // Friend routes
     Route::prefix('friends')->group(function () {
         Route::get('/', [FriendController::class, 'getFriends']);

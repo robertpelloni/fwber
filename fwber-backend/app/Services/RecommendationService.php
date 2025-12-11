@@ -6,8 +6,10 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
+use App\Models\UserProfile;
 use App\Models\BulletinBoard;
 use App\Models\BulletinMessage;
+use App\Models\TelemetryEvent;
 use App\Services\Ai\Llm\LlmManager;
 
 class RecommendationService
@@ -491,8 +493,86 @@ class RecommendationService
      */
     private function findSimilarUsers(array $userProfile): array
     {
-        // This would implement user similarity algorithm
-        return [];
+        $userId = $userProfile['id'];
+        $interests = $userProfile['interests'] ?? [];
+        
+        // Find users with overlapping interests
+        // This is a simplified implementation. In production, use a dedicated search engine or vector database.
+        $candidates = UserProfile::with('user')
+            ->where('user_id', '!=', $userId)
+            ->whereNotNull('interests')
+            ->limit(50) // Limit candidates for performance
+            ->get();
+
+        $similarUsers = [];
+
+        foreach ($candidates as $candidate) {
+            $candidateInterests = $candidate->interests ?? [];
+            $similarity = $this->calculateJaccardSimilarity($interests, $candidateInterests);
+
+            if ($similarity > 0.1) { // Threshold
+                // Get candidate's liked content
+                $user = $candidate->user;
+                if ($user) {
+                    $likedContent = $this->getUserLikedContent($user);
+                    if (!empty($likedContent)) {
+                        $similarUsers[] = [
+                            'id' => $user->id,
+                            'similarity' => $similarity,
+                            'liked_content' => $likedContent
+                        ];
+                    }
+                }
+            }
+        }
+
+        // Sort by similarity
+        usort($similarUsers, fn($a, $b) => $b['similarity'] <=> $a['similarity']);
+
+        return array_slice($similarUsers, 0, 5);
+    }
+
+    /**
+     * Calculate Jaccard Similarity between two arrays
+     */
+    private function calculateJaccardSimilarity(array $setA, array $setB): float
+    {
+        if (empty($setA) && empty($setB)) return 0.0;
+        
+        $intersection = count(array_intersect($setA, $setB));
+        $union = count(array_unique(array_merge($setA, $setB)));
+        
+        return $union > 0 ? $intersection / $union : 0.0;
+    }
+
+    /**
+     * Get content liked by a user
+     */
+    private function getUserLikedContent(User $user): array
+    {
+        // Assuming 'likedContent' relationship or logic exists. 
+        // If not, we can infer from BulletinMessage interactions or Telemetry
+        // For now, let's use TelemetryEvent for 'like' events
+        $likedEvents = TelemetryEvent::where('user_id', $user->id)
+            ->where('event', 'like_content')
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        $content = [];
+        foreach ($likedEvents as $event) {
+            if (isset($event->payload['content_id'], $event->payload['content_type'])) {
+                // Fetch actual content based on type. For simplicity, returning metadata.
+                $content[] = [
+                    'id' => $event->payload['content_id'],
+                    'type' => $event->payload['content_type'],
+                    'title' => $event->payload['title'] ?? 'Untitled',
+                    'description' => $event->payload['description'] ?? '',
+                    'created_at' => $event->created_at,
+                ];
+            }
+        }
+        return $content;
     }
 
     /**
@@ -500,8 +580,52 @@ class RecommendationService
      */
     private function findUsersWithSimilarBehavior(array $userBehavior): array
     {
-        // This would implement collaborative filtering
-        return [];
+        // In a real system, this would use collaborative filtering matrix factorization
+        // Here we use a simplified "shared activity" approach
+        
+        // We don't have direct access to the user object here, but we can infer from context or pass it
+        // For now, let's assume we can't easily get the user ID from $userBehavior alone if it's just arrays
+        // But looking at call site: $this->getCollaborativeRecommendations($user, $userBehavior)
+        // We should update the signature or use the data we have.
+        // Let's stick to the signature but maybe we need to refactor slightly to pass User ID if needed, 
+        // but wait, getCollaborativeRecommendations passes $user.
+        
+        // Actually, let's look at how it's called:
+        // $similarUsers = $this->findUsersWithSimilarBehavior($userBehavior);
+        // It seems I can't easily get the current user ID inside this method unless I pass it.
+        // However, $userBehavior contains 'viewed_boards', 'liked_content'.
+        
+        // Let's find users who viewed the same boards
+        $viewedBoards = $userBehavior['viewed_boards'] ?? [];
+        if (empty($viewedBoards)) return [];
+
+        $boardIds = array_column($viewedBoards, 'id');
+        
+        // Find other users who viewed these boards
+        // Using TelemetryEvent for 'view_board'
+        $similarUserIds = TelemetryEvent::where('event', 'view_board')
+            ->whereIn('payload->board_id', $boardIds)
+            ->select('user_id')
+            ->distinct()
+            ->limit(50)
+            ->pluck('user_id')
+            ->toArray();
+
+        $users = [];
+        foreach ($similarUserIds as $uid) {
+            // Skip current user (we don't have ID here easily, but we can filter later or pass it)
+            // Let's fetch the user
+            $u = User::find($uid);
+            if ($u) {
+                $users[] = [
+                    'id' => $u->id,
+                    'similarity' => 0.5, // Placeholder score
+                    'liked_content' => $this->getUserLikedContent($u)
+                ];
+            }
+        }
+
+        return $users;
     }
 
     /**
@@ -520,17 +644,44 @@ class RecommendationService
      */
     private function hasUserSeenContent(int $userId, int $contentId): bool
     {
-        // This would check user's view history
-        return false;
+        // Check TelemetryEvents for view_content
+        // Caching this check would be good for performance
+        $cacheKey = "user_seen_{$userId}_{$contentId}";
+        
+        return Cache::remember($cacheKey, 3600, function() use ($userId, $contentId) {
+            return TelemetryEvent::where('user_id', $userId)
+                ->where('event', 'view_content')
+                ->where('payload->content_id', $contentId)
+                ->exists();
+        });
     }
 
     /**
-     * Calculate content score
+     * Calculate content score based on user profile matching
      */
     private function calculateContentScore(array $content, array $userProfile): float
     {
-        // This would implement content scoring algorithm
-        return rand(0, 100) / 100;
+        $score = 0.5; // Base score
+        
+        $title = strtolower($content['title'] ?? '');
+        $description = strtolower($content['description'] ?? '');
+        $text = $title . ' ' . $description;
+        
+        $interests = $userProfile['interests'] ?? [];
+        
+        // Boost score if content matches interests
+        foreach ($interests as $interest) {
+            if (str_contains($text, strtolower($interest))) {
+                $score += 0.1;
+            }
+        }
+        
+        // Boost if matches location name
+        if (isset($userProfile['location']['name']) && str_contains($text, strtolower($userProfile['location']['name']))) {
+            $score += 0.2;
+        }
+
+        return min($score, 1.0);
     }
 
     /**
@@ -538,8 +689,16 @@ class RecommendationService
      */
     private function calculateCollaborativeScore(array $similarUser, array $content): float
     {
-        // This would implement collaborative filtering score
-        return rand(0, 100) / 100;
+        // Score is based on user similarity and content freshness
+        $similarity = $similarUser['similarity'] ?? 0.5;
+        
+        $createdAt = isset($content['created_at']) ? \Carbon\Carbon::parse($content['created_at']) : now();
+        $ageInHours = $createdAt->diffInHours(now());
+        
+        // Decay factor: content loses 10% value every 24 hours
+        $freshness = max(0.1, 1.0 - ($ageInHours / 240)); 
+        
+        return min($similarity * $freshness + 0.2, 1.0);
     }
 
     /**

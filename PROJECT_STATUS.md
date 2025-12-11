@@ -288,7 +288,13 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   Gated behind `FEATURE_MEDIA_ANALYSIS`.
     -   **Integration**: Integrated into `AvatarGenerationService` to automatically scan and reject unsafe generated avatars.
     -   **Verification**: Backend tests (`MediaAnalysisTest.php`) passing. Verified integration with `AvatarGenerationTest`.
-7.  **Voice Messages** (Dec 09 - Complete):
+7.  **AI Wingman**:
+    -   **Status**: ✅ Implemented.
+    -   **Details**: `AiWingmanService` implemented using `LlmManager`.
+    -   **Routes**: `GET /wingman/ice-breakers/{matchId}`, `GET /wingman/replies/{matchId}`.
+    -   **Features**: Generates personalized ice breakers and reply suggestions based on user profiles and conversation history.
+    -   **Verification**: Unit tests (`AiWingmanServiceTest.php`) passing.
+8.  **Voice Messages** (Dec 09 - Complete):
     -   **Frontend**: Implemented `AudioRecorder` component using `MediaRecorder` API.
     -   **Integration**: Added voice recording capability to `MessagesPage`.
     -   **Backend**: Verified support for `audio` message type and file uploads.

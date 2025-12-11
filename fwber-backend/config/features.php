@@ -15,4 +15,5 @@ return [
     'local_media_vault' => env('FEATURE_LOCAL_MEDIA_VAULT', false),
     'moderation' => env('FEATURE_MODERATION', false),
     'media_analysis' => env('FEATURE_MEDIA_ANALYSIS', false),
+    'ai_wingman' => env('FEATURE_AI_WINGMAN', false),
 ];

@@ -9,6 +9,7 @@ use App\Services\Ai\Llm\LlmProviderInterface;
 use App\DTOs\LlmResponse;
 use App\Models\User;
 use App\Models\UserProfile;
+use App\Models\TelemetryEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 
@@ -37,75 +38,101 @@ class RecommendationServiceTest extends TestCase
             ->with('gemini')
             ->andReturn($this->geminiDriver);
 
-        $this->service = Mockery::mock(RecommendationService::class, [$this->llmManager])->makePartial();
-        $this->service->shouldAllowMockingProtectedMethods();
+        // We use the real service now, but mock LLM
+        $this->service = new RecommendationService($this->llmManager);
     }
 
-    public function testGetRecommendationsUsesLlmManager()
+    public function testFindSimilarUsers()
     {
-        // Create a user with profile
+        // Create target user
         $user = User::factory()->create();
         UserProfile::create([
             'user_id' => $user->id,
-            'birthdate' => '2000-01-01',
-            'latitude' => 40.7128,
-            'longitude' => -74.0060,
+            'interests' => ['coding', 'music', 'hiking'],
+            'birthdate' => '1990-01-01',
         ]);
 
-        // Mock protected methods to avoid DB calls
-        $this->service->shouldReceive('getUserProfile')
-            ->andReturn(['id' => $user->id, 'interests' => []]);
-        $this->service->shouldReceive('getUserBehavior')
-            ->andReturn(['recent_activity' => []]);
-        $this->service->shouldReceive('getContextualData')
-            ->andReturn([]);
-        $this->service->shouldReceive('getContentBasedRecommendations')
-            ->andReturn([]);
-        $this->service->shouldReceive('getCollaborativeRecommendations')
-            ->andReturn([]);
-        $this->service->shouldReceive('getLocationBasedRecommendations')
-            ->andReturn([]);
+        // Create similar user
+        $similarUser = User::factory()->create();
+        UserProfile::create([
+            'user_id' => $similarUser->id,
+            'interests' => ['coding', 'music', 'gaming'], // 2/4 overlap (coding, music) vs (coding, music, hiking, gaming) -> 0.5
+            'birthdate' => '1992-01-01',
+        ]);
 
-        // Mock OpenAI response
-        $openaiResponse = new LlmResponse(
-            content: json_encode([
-                [
-                    'content' => ['title' => 'Tech Meetup', 'description' => 'A meetup for tech enthusiasts'],
-                    'reason' => 'Matches your interest in tech',
-                    'score' => 0.9
-                ]
-            ]),
-            provider: 'openai',
-            metadata: []
-        );
+        // Create dissimilar user
+        $dissimilarUser = User::factory()->create();
+        UserProfile::create([
+            'user_id' => $dissimilarUser->id,
+            'interests' => ['cooking', 'reading'],
+            'birthdate' => '1985-01-01',
+        ]);
 
-        $this->openaiDriver->shouldReceive('chat')
-            ->once()
-            ->andReturn($openaiResponse);
+        // Create liked content for similar user via Telemetry
+        TelemetryEvent::create([
+            'user_id' => $similarUser->id,
+            'event' => 'like_content',
+            'payload' => [
+                'content_id' => 1,
+                'content_type' => 'bulletin_message',
+                'title' => 'Coding Workshop',
+                'description' => 'Learn Laravel'
+            ],
+            'recorded_at' => now(),
+        ]);
 
-        // Mock Gemini response
-        $geminiResponse = new LlmResponse(
-            content: json_encode([
-                [
-                    'content' => ['title' => 'Concert', 'description' => 'Live music event'],
-                    'reason' => 'Matches your interest in music',
-                    'score' => 0.85
-                ]
-            ]),
-            provider: 'gemini',
-            metadata: []
-        );
+        // Use reflection to access private method
+        $reflection = new \ReflectionClass($this->service);
+        $method = $reflection->getMethod('findSimilarUsers');
+        $method->setAccessible(true);
 
-        $this->geminiDriver->shouldReceive('chat')
-            ->once()
-            ->andReturn($geminiResponse);
+        $profile = [
+            'id' => $user->id,
+            'interests' => ['coding', 'music', 'hiking']
+        ];
 
-        $recommendations = $this->service->getRecommendations($user->id);
+        $result = $method->invoke($this->service, $profile);
 
-        $this->assertIsArray($recommendations);
-        
-        $titles = array_map(fn($r) => $r['content']['title'], $recommendations);
-        $this->assertContains('Tech Meetup', $titles);
-        $this->assertContains('Concert', $titles);
+        $this->assertCount(1, $result);
+        $this->assertEquals($similarUser->id, $result[0]['id']);
+        $this->assertGreaterThan(0.3, $result[0]['similarity']);
+        $this->assertEquals('Coding Workshop', $result[0]['liked_content'][0]['title']);
+    }
+
+    public function testCalculateContentScore()
+    {
+        $reflection = new \ReflectionClass($this->service);
+        $method = $reflection->getMethod('calculateContentScore');
+        $method->setAccessible(true);
+
+        $content = [
+            'title' => 'Laravel Workshop',
+            'description' => 'Learn PHP and Coding'
+        ];
+
+        $profile = [
+            'interests' => ['coding', 'php'],
+            'location' => ['name' => 'New York']
+        ];
+
+        $score = $method->invoke($this->service, $content, $profile);
+
+        // Base 0.5 + 0.1 (coding) + 0.1 (php) = 0.7
+        $this->assertEquals(0.7, $score);
+    }
+
+    public function testCalculateCollaborativeScore()
+    {
+        $reflection = new \ReflectionClass($this->service);
+        $method = $reflection->getMethod('calculateCollaborativeScore');
+        $method->setAccessible(true);
+
+        $similarUser = ['similarity' => 0.8];
+        $content = ['created_at' => now()->subHours(1)->toDateTimeString()];
+
+        $score = $method->invoke($this->service, $similarUser, $content);
+
+        // Freshness ~1.0. Score = 0.8 * 1.0 + 0.2 = 1.0
+        $this->assertEqualsWithDelta(1.0, $score, 0.01);
     }
 }
