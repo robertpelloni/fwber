@@ -104,6 +104,11 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Backend Tests**: Refactored `AvatarGenerationTest` to support asynchronous job dispatching (using `Queue::fake()`).
     -   **Content**: Updated Landing Page tagline and added new sex/love quotes.
     -   **Verification**: All backend tests passing (118 tests). Frontend lint passing.
+21. **Advanced Match Filters** (Dec 12 - Complete):
+    -   **Backend**: Implemented filtering by smoking, drinking, body type, height, bio, and verification status in `MatchController` and `AIMatchingService`.
+    -   **Frontend**: Updated `MatchFilter` component with new fields and `localStorage` persistence.
+    -   **Testing**: Created `MatchFilterTest` covering all scenarios. All tests passing.
+    -   **Verification**: Feature complete and tested.
 2.  **Cache Versioning & Strategy** (Dec 04 - Complete):
     -   Implemented `CACHE_VERSION` strategy for global cache invalidation.
     -   Updated `Group`, `Event`, and `Subscription` controllers to use versioned keys.

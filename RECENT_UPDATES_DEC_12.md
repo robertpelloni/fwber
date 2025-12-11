@@ -20,9 +20,15 @@ Implemented advanced match filtering capabilities, including backend support for
 
 ### 2. Real-time Features
 - **Backend**: Finalized `WebSocketController` and `WebSocketService` to support `chatroom_id` in typing indicators.
+- **Video Chat**: Verified implementation of `VideoChatController`, `VideoCallModal`, and signaling via Mercure. Confirmed robust handling of WebRTC states and streams.
+
+### 3. Testing
+- **Match Filters**: Created `tests/Feature/MatchFilterTest.php` covering all new filter criteria and combinations. All tests passing.
 
 ## 🔄 Git Commits
 - `feat(backend): support chatroom typing indicators`
 - `feat(match): implement advanced match filters`
 - `feat(ui): persist match filters to local storage`
 - `fix(backend): correct column mapping for match filters`
+- `test(backend): add feature tests for match filters`
+
