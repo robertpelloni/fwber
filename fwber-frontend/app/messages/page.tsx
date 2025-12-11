@@ -11,10 +11,14 @@ import { blockUser, reportUser } from '@/lib/api/safety'
 import { PresenceIndicator, ConnectionStatusBadge, TypingIndicator } from '@/components/realtime'
 import AudioRecorder from '@/components/AudioRecorder'
 import { useToast } from '@/components/ToastProvider'
+import { VideoCallModal } from '@/components/VideoCall/VideoCallModal'
+import { Video } from 'lucide-react'
+import { useMercure } from '@/lib/contexts/MercureContext'
 
 export default function MessagesPage() {
   const { token, isAuthenticated, user } = useAuth()
   const { showError } = useToast()
+  const { videoSignals } = useMercure()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
@@ -27,6 +31,8 @@ export default function MessagesPage() {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false)
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const [showSafetyMenu, setShowSafetyMenu] = useState(false)
+  const [isVideoCallOpen, setIsVideoCallOpen] = useState(false)
+  const [incomingCall, setIncomingCall] = useState<{ callerId: string } | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   
   const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:8000'
@@ -77,6 +83,14 @@ export default function MessagesPage() {
   useEffect(() => {
     scrollToBottom()
   }, [messages])
+
+  useEffect(() => {
+    const lastSignal = videoSignals[videoSignals.length - 1];
+    if (lastSignal && lastSignal.signal.type === 'offer') {
+       setIncomingCall({ callerId: lastSignal.from_user_id });
+       setIsVideoCallOpen(true);
+    }
+  }, [videoSignals]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -347,7 +361,15 @@ export default function MessagesPage() {
                         </div>
                       </div>
                       
-                      <div className="relative">
+                      <div className="relative flex items-center gap-2">
+                        <button
+                          onClick={() => setIsVideoCallOpen(true)}
+                          className="p-2 text-gray-500 hover:text-blue-600 rounded-full hover:bg-gray-100"
+                          title="Video Call"
+                        >
+                          <Video className="w-6 h-6" />
+                        </button>
+
                         <button
                           onClick={() => setShowSafetyMenu(!showSafetyMenu)}
                           className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100"
@@ -538,6 +560,18 @@ export default function MessagesPage() {
           user={selectedConversation.other_user}
           messagesExchanged={messages.length}
           matchId={selectedConversation.id}
+        />
+      )}
+
+      {(selectedConversation?.other_user || incomingCall) && (
+        <VideoCallModal
+          recipientId={incomingCall ? incomingCall.callerId : String(selectedConversation!.other_user!.id)}
+          isOpen={isVideoCallOpen}
+          onClose={() => {
+              setIsVideoCallOpen(false);
+              setIncomingCall(null);
+          }}
+          isIncoming={!!incomingCall}
         />
       )}
     </ProtectedRoute>

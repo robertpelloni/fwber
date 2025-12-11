@@ -104,6 +104,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('websocket/status', [\App\Http\Controllers\WebSocketController::class, 'status']);
     Route::post('websocket/broadcast', [\App\Http\Controllers\WebSocketController::class, 'broadcast']);
 
+    // Video Chat
+    Route::post('video/signal', [\App\Http\Controllers\VideoChatController::class, 'signal']);
+
     // Analytics
     Route::get('analytics', [\App\Http\Controllers\AnalyticsController::class, 'index']);
     Route::get('analytics/realtime', [\App\Http\Controllers\AnalyticsController::class, 'realtime']);

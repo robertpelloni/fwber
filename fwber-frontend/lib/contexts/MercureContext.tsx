@@ -1,5 +1,5 @@
 import React, { createContext, useContext, ReactNode } from 'react';
-import { useMercureLogic, MercureConnectionStatus, OnlineUser, PresenceUpdate, ChatMessage, TypingIndicator, NotificationPayload } from '@/lib/hooks/use-mercure-logic';
+import { useMercureLogic, MercureConnectionStatus, OnlineUser, PresenceUpdate, ChatMessage, TypingIndicator, NotificationPayload, VideoSignal } from '@/lib/hooks/use-mercure-logic';
 
 interface MercureContextType {
   connectionStatus: {
@@ -14,10 +14,12 @@ interface MercureContextType {
   notifications: NotificationPayload[];
   chatMessages: ChatMessage[];
   typingIndicators: TypingIndicator[];
+  videoSignals: VideoSignal[];
   connect: () => void;
   disconnect: () => void;
   sendChatMessage: (recipientId: string, content: string, type?: string) => Promise<void>;
   sendTypingIndicator: (recipientId: string, isTyping: boolean) => Promise<void>;
+  sendVideoSignal: (recipientId: string, signal: any) => Promise<void>;
   updatePresence: (status: 'online' | 'away' | 'busy' | 'offline', metadata?: Record<string, any>) => Promise<void>;
   sendNotification: (recipientId: string, notification: any) => Promise<void>;
   loadConversationHistory: (recipientId: string) => Promise<void>;

@@ -57,6 +57,12 @@ export interface TypingIndicator {
   timestamp: string;
 }
 
+export interface VideoSignal {
+  from_user_id: string;
+  signal: any;
+  timestamp: string;
+}
+
 export interface NotificationPayload {
   id?: string;
   type: string;
@@ -81,6 +87,7 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
   const [notifications, setNotifications] = useState<NotificationPayload[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [typingIndicators, setTypingIndicators] = useState<TypingIndicator[]>([]);
+  const [videoSignals, setVideoSignals] = useState<VideoSignal[]>([]);
 
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -187,6 +194,9 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
             return [...filtered, data].slice(-20);
         });
         break;
+      case 'video_signal':
+        setVideoSignals(prev => [...prev, data]);
+        break;
       default:
         setMessages(prev => [...prev.slice(-99), data]);
     }
@@ -273,6 +283,14 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
     }
   }, []);
 
+  const sendVideoSignal = useCallback(async (recipientId: string, signal: any) => {
+    try {
+      await api.post('/video/signal', { recipient_id: recipientId, signal });
+    } catch (err) {
+      console.error('Failed to send video signal:', err);
+    }
+  }, []);
+
   const loadConversationHistory = useCallback(async (recipientId: string) => {
     try {
       const response = await api.get<any>(`/messages/${recipientId}`);
@@ -323,10 +341,12 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
     notifications,
     chatMessages,
     typingIndicators,
+    videoSignals,
     connect,
     disconnect,
     sendChatMessage,
     sendTypingIndicator,
+    sendVideoSignal,
     updatePresence,
     sendNotification,
     loadConversationHistory,

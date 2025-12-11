@@ -367,6 +367,11 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Routes**: `GET /wingman/date-ideas/{matchId}`.
     -   **Frontend**: Created `DatePlanner` component and integrated into `RealTimeChat`.
     -   **Verification**: Frontend Type Check passing.
+14. **Video Chat Implementation** (Dec 11 - Complete):
+    -   **Backend**: Created `VideoChatController` and `/api/video/signal` route for WebRTC signaling via Mercure.
+    -   **Frontend**: Implemented `VideoCallModal` using `RTCPeerConnection` and `useMercureLogic` for signaling.
+    -   **Integration**: Added "Video Call" button to `MessagesPage` and handled incoming call notifications.
+    -   **Verification**: Code implementation complete. Linting passed.
 
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.
