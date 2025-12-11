@@ -140,6 +140,39 @@ class AIMatchingService
             });
         }
 
+        // Advanced Filters
+        $query->whereHas('profile', function ($q) use ($filters) {
+            // Smoking
+            if (!empty($filters['smoking'])) {
+                $q->whereJsonContains('preferences->smoke', $filters['smoking']);
+            }
+
+            // Drinking
+            if (!empty($filters['drinking'])) {
+                $q->whereJsonContains('preferences->drink', $filters['drinking']);
+            }
+
+            // Body Type
+            if (!empty($filters['body_type'])) {
+                $q->whereJsonContains('preferences->body_type', $filters['body_type']);
+            }
+
+            // Height Min
+            if (!empty($filters['height_min'])) {
+                $q->where('height_cm', '>=', (int)$filters['height_min']);
+            }
+
+            // Has Bio
+            if (!empty($filters['has_bio']) && $filters['has_bio']) {
+                $q->whereNotNull('bio')->where('bio', '!=', '');
+            }
+        });
+
+        // Verified Only
+        if (!empty($filters['verified_only']) && $filters['verified_only']) {
+            $query->whereNotNull('email_verified_at');
+        }
+
         // Exclude users already interacted with
         $excludedIds = MatchAction::where('user_id', $user->id)
             ->pluck('target_user_id')

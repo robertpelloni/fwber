@@ -133,6 +133,12 @@ class MatchController extends Controller
                 'age_min' => $request->get('age_min'),
                 'age_max' => $request->get('age_max'),
                 'max_distance' => $request->get('max_distance'),
+                'smoking' => $request->get('smoking'),
+                'drinking' => $request->get('drinking'),
+                'body_type' => $request->get('body_type'),
+                'height_min' => $request->get('height_min'),
+                'has_bio' => $request->get('has_bio'),
+                'verified_only' => $request->get('verified_only'),
             ];
 
             $candidates = $this->matchingService->findAdvancedMatches($user, $filters);
