@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { storeOfflineChatMessage } from '@/lib/offline-store';
@@ -334,7 +334,7 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
     };
   }, [options.autoConnect, isAuthenticated, connect, disconnect, status.connected, status.connecting]);
 
-  return {
+  return useMemo(() => ({
     connectionStatus: {
         connected: status.connected,
         connectionId: 'mercure', // Dummy ID
@@ -359,5 +359,26 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
     clearMessages,
     clearNotifications,
     isReady: !status.connecting,
-  };
+  }), [
+    status.connected,
+    status.connecting,
+    user?.id,
+    messages,
+    onlineUsers,
+    presenceUpdates,
+    notifications,
+    chatMessages,
+    typingIndicators,
+    videoSignals,
+    connect,
+    disconnect,
+    sendChatMessage,
+    sendTypingIndicator,
+    sendVideoSignal,
+    updatePresence,
+    sendNotification,
+    loadConversationHistory,
+    clearMessages,
+    clearNotifications
+  ]);
 }

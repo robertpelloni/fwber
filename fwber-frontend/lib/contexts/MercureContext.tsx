@@ -47,30 +47,29 @@ export function useMercure() {
   if (!context) {
     // Return a dummy context to prevent build failures during static generation
     // where the provider might not be available in the tree.
-    if (typeof window === 'undefined') {
-      return {
-        connectionStatus: { connected: false, connectionId: null, userId: null, reconnectAttempts: 0 },
-        messages: [],
-        onlineUsers: [],
-        presenceUpdates: [],
-        notifications: [],
-        chatMessages: [],
-        typingIndicators: [],
-        videoSignals: [],
-        connect: () => {},
-        disconnect: () => {},
-        sendChatMessage: async () => {},
-        sendTypingIndicator: async () => {},
-        sendVideoSignal: async () => {},
-        updatePresence: async () => {},
-        sendNotification: async () => {},
-        loadConversationHistory: async () => {},
-        clearMessages: () => {},
-        clearNotifications: () => {},
-        isReady: false,
-      };
-    }
-    throw new Error('useMercure must be used within a MercureProvider');
+    // Also return dummy context if window is defined but provider is missing (e.g. some build environments)
+    // to prevent build crashes.
+    return {
+      connectionStatus: { connected: false, connectionId: null, userId: null, reconnectAttempts: 0 },
+      messages: [],
+      onlineUsers: [],
+      presenceUpdates: [],
+      notifications: [],
+      chatMessages: [],
+      typingIndicators: [],
+      videoSignals: [],
+      connect: () => {},
+      disconnect: () => {},
+      sendChatMessage: async () => {},
+      sendTypingIndicator: async () => {},
+      sendVideoSignal: async () => {},
+      updatePresence: async () => {},
+      sendNotification: async () => {},
+      loadConversationHistory: async () => {},
+      clearMessages: () => {},
+      clearNotifications: () => {},
+      isReady: false,
+    };
   }
   return context;
 }

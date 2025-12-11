@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react'
+import React, { createContext, useContext, useReducer, useEffect, ReactNode, useMemo, useCallback } from 'react'
 import { logAuth, setUserContext, clearUserContext } from './logger'
 
 // Types
@@ -220,7 +220,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
 
   // Login function
-  const login = async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string) => {
     dispatch({ type: 'AUTH_START' })
     
     try {
@@ -256,10 +256,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       throw error
     }
-  }
+  }, [API_BASE_URL]);
 
   // Register function
-  const register = async (name: string, email: string, password: string, passwordConfirmation: string, avatar?: File | null) => {
+  const register = useCallback(async (name: string, email: string, password: string, passwordConfirmation: string, avatar?: File | null) => {
     dispatch({ type: 'AUTH_START' })
     
     try {
@@ -315,34 +315,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       throw error
     }
-  }
+  }, [API_BASE_URL]);
 
   // Logout function
-  const logout = () => {
+  const logout = useCallback(() => {
     const userId = state.user?.id
     clearUserContext()
     logAuth.logout(userId)
     dispatch({ type: 'LOGOUT' })
-  }
+  }, [state.user?.id]);
 
   // Clear error function
-  const clearError = () => {
+  const clearError = useCallback(() => {
     dispatch({ type: 'CLEAR_ERROR' })
-  }
+  }, []);
 
   // Update user function
-  const updateUser = (user: User) => {
+  const updateUser = useCallback((user: User) => {
     dispatch({ type: 'UPDATE_USER', payload: user })
-  }
+  }, []);
 
-  const value: AuthContextType = {
+  const value: AuthContextType = useMemo(() => ({
     ...state,
     login,
     register,
     logout,
     clearError,
     updateUser,
-  }
+  }), [state, login, register, logout, clearError, updateUser]);
 
   return (
     <AuthContext.Provider value={value}>
