@@ -387,6 +387,11 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Issue**: `useMercure must be used within a MercureProvider` error during build of `/messages`.
     -   **Fix**: Updated `useMercure` hook in `MercureContext.tsx` to return a fallback context during server-side rendering/static generation when the provider is missing.
     -   **Verification**: Code fix applied.
+17. **Subscription Management Page** (Dec 12 - Complete):
+    -   **Frontend**: Created `app/subscription/page.tsx` for managing subscriptions (view status, history, cancel).
+    -   **Backend**: Verified `SubscriptionExpiredNotification` points to this page.
+    -   **Backend**: Verified `CleanupExpiredSubscriptions` job handles expiration logic.
+    -   **Verification**: Frontend build passing.
 
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.

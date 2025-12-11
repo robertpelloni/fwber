@@ -40,8 +40,8 @@ export default function SubscriptionPage() {
           api.get('/subscriptions'),
           api.get('/subscriptions/history'),
         ]);
-        setSubscriptions(subsRes.data);
-        setHistory(historyRes.data.data); // Pagination wrapper
+        setSubscriptions((subsRes as any).data);
+        setHistory((historyRes as any).data.data); // Pagination wrapper
       } catch (error) {
         console.error('Failed to fetch subscription data:', error);
       } finally {
@@ -62,11 +62,11 @@ export default function SubscriptionPage() {
 
     try {
       const response = await api.post('/subscriptions/cancel');
-      setMessage({ type: 'success', text: response.data.message });
+      setMessage({ type: 'success', text: (response as any).data.message });
       
       // Refresh subscriptions
       const subsRes = await api.get('/subscriptions');
-      setSubscriptions(subsRes.data);
+      setSubscriptions((subsRes as any).data);
     } catch (error: any) {
       setMessage({ 
         type: 'error', 
