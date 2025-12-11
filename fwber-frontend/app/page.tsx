@@ -101,7 +101,7 @@ export default function HomePage() {
               <span className="text-gray-900 dark:text-white">FWBer.me</span>
             </h1>
             <p className="text-3xl md:text-5xl font-bold mb-8 animate-gradient-x bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent bg-[length:200%_auto]">
-              The Definitive Social Network for Adults
+              Adult Social Network - Friends, Dating, Hookups, Ads, Groups, Fun, Love, Lust, and More!
             </p>
             
             <div className="mb-8 transform hover:scale-105 transition-transform duration-300">
