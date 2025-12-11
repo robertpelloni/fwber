@@ -161,6 +161,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Matches
     Route::get('matches', [\App\Http\Controllers\MatchController::class, 'index']);
     Route::get('matches/established', [\App\Http\Controllers\MatchController::class, 'establishedMatches']);
+    Route::get('matches/{id}/insights', [\App\Http\Controllers\MatchInsightsController::class, 'show']);
     Route::post('matches/action', [\App\Http\Controllers\MatchController::class, 'action'])->middleware('throttle:matching');
 
     // Direct Messages

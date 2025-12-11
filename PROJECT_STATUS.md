@@ -311,6 +311,12 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Routes**: `POST /messages/translate`.
     -   **Frontend**: Integrated `TranslateButton` into `RealTimeChat`.
     -   **Verification**: Frontend Type Check passing.
+10. **Match Insights**:
+    -   **Status**: ✅ Implemented.
+    -   **Details**: `AIMatchingService` updated to expose compatibility breakdown (Physical, Sexual, Lifestyle, Personality).
+    -   **Routes**: `GET /matches/{id}/insights`.
+    -   **Frontend**: Created `MatchInsights` component with detailed score visualization. Integrated into `RealTimeChat` header.
+    -   **Verification**: Frontend Type Check passing.
 
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.

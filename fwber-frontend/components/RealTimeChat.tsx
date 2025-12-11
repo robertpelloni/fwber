@@ -8,8 +8,10 @@ import { UserAvatar, PresenceIndicator, PresenceStatus } from '@/components/Pres
 import { WingmanSuggestions } from '@/components/ai/WingmanSuggestions';
 import AudioRecorder from '@/components/AudioRecorder';
 import { api } from '@/lib/api';
-import { Languages, Loader2 } from 'lucide-react';
+import { Languages, Loader2, Sparkles } from 'lucide-react';
 import { useTranslation } from '@/lib/hooks/use-translation';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { MatchInsights } from '@/components/matches/MatchInsights';
 
 interface RealTimeChatProps {
   recipientId: string;
@@ -154,6 +156,20 @@ export default function RealTimeChat({
           </div>
         </div>
         <div className="flex items-center space-x-2">
+          <Dialog>
+            <DialogTrigger asChild>
+              <button 
+                className="p-2 hover:bg-gray-700 rounded-full text-gray-400 hover:text-yellow-400 transition-colors"
+                title="View Match Insights"
+              >
+                <Sparkles className="w-5 h-5" />
+              </button>
+            </DialogTrigger>
+            <DialogContent className="bg-gray-900 border-gray-800 text-white max-w-md">
+              <MatchInsights matchId={recipientId} />
+            </DialogContent>
+          </Dialog>
+
           {recipientTyping && (
             <div className="flex items-center space-x-1 text-gray-400 text-sm">
               <div className="flex space-x-1">

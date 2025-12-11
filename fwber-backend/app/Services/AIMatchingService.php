@@ -188,6 +188,53 @@ class AIMatchingService
         return min(100, max(0, $score));
     }
 
+    public function getCompatibilityBreakdown(User $user, User $candidate): array
+    {
+        $userProfile = $user->profile;
+        $candidateProfile = $candidate->profile;
+
+        if (!$userProfile || !$candidateProfile) {
+            return [];
+        }
+
+        // Get behavioral preferences
+        $behavioralPrefs = $this->analyzeUserBehavior($user);
+
+        // Calculate individual scores
+        $baseScore = $this->calculateBaseCompatibility($userProfile, $candidateProfile);
+        $preferenceScore = $this->calculateDetailedPreferenceScore($userProfile, $candidateProfile);
+        $behavioralScore = $this->calculateBehavioralScore($candidateProfile, $behavioralPrefs);
+        $communicationScore = $this->calculateCommunicationScore($userProfile, $candidateProfile);
+        $mutualScore = $this->calculateMutualInterestScore($user, $candidate);
+        $recencyScore = $this->calculateRecencyScore($candidate);
+
+        // Calculate total weighted score
+        $totalScore = ($baseScore * 0.20) +
+                      ($preferenceScore * 0.30) +
+                      ($behavioralScore * 0.15) +
+                      ($communicationScore * 0.10) +
+                      ($mutualScore * 0.10) +
+                      ($recencyScore * 0.15);
+
+        return [
+            'total_score' => round(min(100, max(0, $totalScore))),
+            'breakdown' => [
+                'base' => round($baseScore),
+                'preferences' => round($preferenceScore),
+                'behavioral' => round($behavioralScore),
+                'communication' => round($communicationScore),
+                'mutual' => round($mutualScore),
+                'recency' => round($recencyScore),
+            ],
+            'details' => [
+                'physical' => round($this->calculatePhysicalScore($userProfile, $candidateProfile)),
+                'sexual' => round($this->calculateSexualScore($userProfile, $candidateProfile)),
+                'lifestyle' => round($this->calculateLifestyleScore($userProfile, $candidateProfile)),
+                'personality' => round($this->calculatePersonalityScore($userProfile, $candidateProfile)),
+            ]
+        ];
+    }
+
     private function calculateRecencyScore(User $candidate): float
     {
         if (!$candidate->last_seen_at) {
