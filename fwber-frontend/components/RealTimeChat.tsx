@@ -207,7 +207,14 @@ export default function RealTimeChat({
                   {(msg.message_type === 'audio' || msg.message?.type === 'audio') ? (
                     <div className="flex flex-col gap-1 min-w-[200px]">
                         <audio controls src={msg.media_url} className="w-full h-8" />
-                        {msg.media_duration && <span className="text-xs opacity-75">{msg.media_duration}s</span>}
+                        <div className="flex justify-between items-center">
+                          {msg.media_duration && <span className="text-xs opacity-75">{msg.media_duration}s</span>}
+                        </div>
+                        {msg.transcription && (
+                          <div className="mt-1 p-2 bg-black/20 rounded text-sm italic text-gray-200">
+                            &quot;{msg.transcription}&quot;
+                          </div>
+                        )}
                     </div>
                   ) : (
                     <div>

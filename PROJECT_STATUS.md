@@ -317,6 +317,12 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Routes**: `GET /matches/{id}/insights`.
     -   **Frontend**: Created `MatchInsights` component with detailed score visualization. Integrated into `RealTimeChat` header.
     -   **Verification**: Frontend Type Check passing.
+11. **Voice Message Transcription**:
+    -   **Status**: ✅ Implemented.
+    -   **Details**: `AudioTranscriptionService` implemented using OpenAI Whisper. `TranscribeAudioMessage` Job created.
+    -   **Database**: Added `transcription` column to `messages` table.
+    -   **Frontend**: Updated `RealTimeChat` to display transcription below audio player.
+    -   **Verification**: Frontend Type Check passing.
 
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.

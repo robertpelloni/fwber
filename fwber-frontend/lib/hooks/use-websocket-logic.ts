@@ -50,6 +50,7 @@ export interface ChatMessage {
   message_type?: string;
   media_url?: string;
   media_duration?: number;
+  transcription?: string;
 }
 
 export interface TypingIndicator {
