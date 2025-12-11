@@ -47,6 +47,9 @@ export interface ChatMessage {
   delivered_at?: string;
   read_at?: string;
   metadata?: Record<string, any>;
+  message_type?: string;
+  media_url?: string;
+  media_duration?: number;
 }
 
 export interface TypingIndicator {

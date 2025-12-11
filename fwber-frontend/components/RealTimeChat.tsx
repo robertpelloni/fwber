@@ -6,6 +6,8 @@ import { useAuth } from '@/lib/auth-context';
 import { MessageMetadata } from '@/components/MessageStatusIndicator';
 import { UserAvatar, PresenceIndicator, PresenceStatus } from '@/components/PresenceIndicator';
 import { ConversationStarter } from '@/components/ai/ConversationStarter';
+import AudioRecorder from '@/components/AudioRecorder';
+import { api } from '@/lib/api';
 
 interface RealTimeChatProps {
   recipientId: string;
@@ -19,6 +21,7 @@ export default function RealTimeChat({
   className = '' 
 }: RealTimeChatProps) {
   const [message, setMessage] = useState('');
+  const [isRecordingVoice, setIsRecordingVoice] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -78,6 +81,24 @@ export default function RealTimeChat({
     handleTypingChange(value);
   };
 
+  const handleVoiceMessage = async (audioFile: File, duration: number) => {
+    if (!recipientId) return;
+
+    const formData = new FormData();
+    formData.append('receiver_id', recipientId);
+    formData.append('media', audioFile);
+    formData.append('media_duration', duration.toString());
+    formData.append('message_type', 'audio');
+
+    try {
+      await api.post('/messages', formData);
+      // Message will be received via WebSocket
+    } catch (error) {
+      console.error('Failed to send voice message:', error);
+      // Ideally show a toast here
+    }
+  };
+
   return (
     <div className={`flex flex-col h-96 bg-gray-800 rounded-lg ${className}`}>
       {/* Chat Header */}
@@ -132,7 +153,14 @@ export default function RealTimeChat({
                       : 'bg-gray-700 text-white'
                   }`}
                 >
-                  <p className="text-sm">{msg.message?.content || msg.content}</p>
+                  {(msg.message_type === 'audio' || msg.message?.type === 'audio') ? (
+                    <div className="flex flex-col gap-1 min-w-[200px]">
+                        <audio controls src={msg.media_url} className="w-full h-8" />
+                        {msg.media_duration && <span className="text-xs opacity-75">{msg.media_duration}s</span>}
+                    </div>
+                  ) : (
+                    <p className="text-sm">{msg.message?.content || msg.content}</p>
+                  )}
                   <MessageMetadata 
                     timestamp={msg.timestamp}
                     status={msg.status}
@@ -158,22 +186,30 @@ export default function RealTimeChat({
             }}
           />
         </div>
-        <form onSubmit={handleSendMessage} className="flex space-x-2">
-          <input
-            type="text"
-            value={message}
-            onChange={handleMessageChange}
-            placeholder="Type a message..."
-            className="flex-1 bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-            disabled={!isConnected}
+        <form onSubmit={handleSendMessage} className="flex space-x-2 items-center">
+          <AudioRecorder 
+            onRecordingComplete={handleVoiceMessage} 
+            onRecordingStateChange={setIsRecordingVoice}
           />
-          <button
-            type="submit"
-            disabled={!message.trim() || !isConnected}
-            className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition-colors"
-          >
-            Send
-          </button>
+          {!isRecordingVoice && (
+            <>
+              <input
+                type="text"
+                value={message}
+                onChange={handleMessageChange}
+                placeholder="Type a message..."
+                className="flex-1 bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                disabled={!isConnected}
+              />
+              <button
+                type="submit"
+                disabled={!message.trim() || !isConnected}
+                className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                Send
+              </button>
+            </>
+          )}
         </form>
       </div>
     </div>

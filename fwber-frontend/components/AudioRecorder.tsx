@@ -6,15 +6,23 @@ import { Mic, Square, X, Send, Trash2 } from 'lucide-react';
 interface AudioRecorderProps {
   onRecordingComplete: (audioFile: File, duration: number) => void;
   isSending?: boolean;
+  onRecordingStateChange?: (isActive: boolean) => void;
 }
 
-export default function AudioRecorder({ onRecordingComplete, isSending }: AudioRecorderProps) {
+export default function AudioRecorder({ onRecordingComplete, isSending, onRecordingStateChange }: AudioRecorderProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [duration, setDuration] = useState(0);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+
+  // Helper to notify parent of state changes
+  const notifyStateChange = (active: boolean) => {
+    if (onRecordingStateChange) {
+      onRecordingStateChange(active);
+    }
+  };
 
   const startRecording = async () => {
     try {
@@ -37,6 +45,7 @@ export default function AudioRecorder({ onRecordingComplete, isSending }: AudioR
 
       mediaRecorder.start();
       setIsRecording(true);
+      notifyStateChange(true);
       setDuration(0);
 
       timerRef.current = setInterval(() => {
@@ -53,6 +62,8 @@ export default function AudioRecorder({ onRecordingComplete, isSending }: AudioR
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
+      // Still active because we have a blob to preview
+      // notifyStateChange(true); // Already true
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
@@ -71,6 +82,7 @@ export default function AudioRecorder({ onRecordingComplete, isSending }: AudioR
     }
     setAudioBlob(null);
     setDuration(0);
+    notifyStateChange(false);
   };
 
   const sendRecording = () => {
@@ -79,6 +91,7 @@ export default function AudioRecorder({ onRecordingComplete, isSending }: AudioR
       onRecordingComplete(file, duration);
       setAudioBlob(null);
       setDuration(0);
+      notifyStateChange(false);
     }
   };
 
@@ -99,6 +112,7 @@ export default function AudioRecorder({ onRecordingComplete, isSending }: AudioR
           onClick={() => {
             setAudioBlob(null);
             setDuration(0);
+            notifyStateChange(false);
           }}
           className="p-2 text-red-500 hover:bg-red-100 rounded-full"
           title="Delete"

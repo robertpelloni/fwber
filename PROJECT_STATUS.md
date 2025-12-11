@@ -66,6 +66,12 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Linting**: Fixed unescaped single quote in `components/profile/Dating.tsx` causing build failure.
     -   **Hooks**: Fixed missing dependencies in `useMercureLogic` hook (`useEffect`).
     -   **Verification**: Code fixes applied.
+13. **Voice Messages Integration** (Dec 10 - Complete):
+    -   **Frontend**: Integrated `AudioRecorder` into `RealTimeChat` component.
+    -   **Logic**: Updated `useMercureLogic` and `useWebSocketLogic` to handle audio message types.
+    -   **Verification**: Verified build and component integration.
+14. **Event Model Fix** (Dec 10 - Complete):
+    -   **Model**: Added `reminder_sent` to `$fillable` and `$casts` in `Event` model.
 2.  **Cache Versioning & Strategy** (Dec 04 - Complete):
     -   Implemented `CACHE_VERSION` strategy for global cache invalidation.
     -   Updated `Group`, `Event`, and `Subscription` controllers to use versioned keys.

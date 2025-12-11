@@ -44,6 +44,9 @@ export interface ChatMessage {
   delivered_at?: string;
   read_at?: string;
   metadata?: Record<string, any>;
+  message_type?: string;
+  media_url?: string;
+  media_duration?: number;
 }
 
 export interface TypingIndicator {
@@ -242,6 +245,9 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
         content: msg.content,
         timestamp: msg.created_at,
         status: msg.read_at ? 'read' : 'delivered',
+        message_type: msg.message_type,
+        media_url: msg.media_url,
+        media_duration: msg.media_duration,
       }));
       setChatMessages(prev => {
         // Merge history with existing messages, avoiding duplicates
