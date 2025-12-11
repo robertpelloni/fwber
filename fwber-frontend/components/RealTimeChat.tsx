@@ -157,6 +157,7 @@ export default function RealTimeChat({
             // Register background sync
             if ('serviceWorker' in navigator && 'SyncManager' in window) {
                 const registration = await navigator.serviceWorker.ready;
+                // @ts-ignore
                 await registration.sync.register('chat-message');
             }
             
