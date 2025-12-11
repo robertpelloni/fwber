@@ -6,56 +6,42 @@ interface LogoProps {
 }
 
 export function Logo({ className = '', showDotMe = true }: LogoProps) {
-  const letters = [
-    { char: 'F', gradient: 'from-pink-500 to-pink-700' },
-    { char: 'W', gradient: 'from-green-400 to-green-600' },
-    { char: 'B', gradient: 'from-cyan-400 to-blue-600' },
-    { char: 'er', gradient: 'from-purple-500 to-purple-700' },
-  ];
+  // Unified gradient for the whole text to allow smooth cycling
+  const gradientClass = "bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500";
 
-  // Common font classes to ensure perfect alignment between layers
   const fontClasses = "font-black tracking-tight";
   
-  // Stroke width for the outline layer
-  // Using a thicker stroke on the background layer creates the outline effect
-  // 2px stroke -> 1px visible outline (since half is inside)
-  // 4px stroke -> 2px visible outline
-  const outlineClass = "text-black [-webkit-text-stroke:3px_black] md:[-webkit-text-stroke:5px_black]";
+  // Thicker stroke for the background to create the outline
+  const outlineClass = "text-black [-webkit-text-stroke:4px_black] md:[-webkit-text-stroke:6px_black]";
   
-  // Drop shadow applied to the outline layer
-  const dropShadowClass = "drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)] md:drop-shadow-[4px_4px_0px_rgba(0,0,0,0.2)]";
+  // Purple glow outside the black outline
+  const outlineGlowClass = "drop-shadow-[0_0_10px_rgba(168,85,247,0.8)]";
 
   return (
     <div className={`relative inline-block ${className}`}>
-      {/* Layer 1: Outline (Background) 
-          This layer renders the text in solid black with a thick stroke.
-          Because it's solid black, overlapping characters merge into a single silhouette,
-          fixing the "janky overlapping outlines" issue.
-      */}
+      {/* Layer 1: Outline (Background) with Glow */}
       <div 
-        className={`${fontClasses} flex items-baseline absolute inset-0 select-none ${dropShadowClass} z-0`} 
+        className={`${fontClasses} absolute inset-0 select-none ${outlineGlowClass} z-0`} 
         aria-hidden="true"
       >
-        {letters.map((l, i) => (
-          <span key={i} className={outlineClass}>
-            {l.char}
-          </span>
-        ))}
+        <span className={outlineClass}>
+          fwber
+        </span>
       </div>
 
-      {/* Layer 2: Fill (Foreground) 
-          This layer renders the colorful gradients.
-          It sits exactly on top of the outline layer.
-      */}
-      <div className={`${fontClasses} flex items-baseline relative z-10 select-none animate-hue-cycle animate-glow`}>
-        {letters.map((l, i) => (
-          <span 
-            key={i} 
-            className={`text-transparent bg-clip-text bg-gradient-to-b ${l.gradient}`}
-          >
-            {l.char}
+      {/* Layer 2: Fill (Foreground) with Color Cycle */}
+      <div 
+        className={`${fontClasses} relative z-10 select-none animate-hue-cycle`}
+        style={{ animationDuration: '3s' }}
+      >
+        <span className={`relative text-transparent bg-clip-text ${gradientClass}`}>
+          fwber
+          
+          {/* Layer 3: Inner Shine/Highlight */}
+          <span className="absolute inset-0 bg-gradient-to-tr from-white/60 via-transparent to-transparent bg-clip-text text-transparent pointer-events-none">
+            fwber
           </span>
-        ))}
+        </span>
         
         {showDotMe && (
           <span className="text-gray-400 font-bold text-[0.5em] ml-0.5">

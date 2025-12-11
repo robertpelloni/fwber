@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useContext, createContext, useState } from 'react';
+import { MercureContext } from '@/lib/contexts/MercureContext';
 
 // Create a fallback context for when WebSocketProvider is not available
 const FallbackWebSocketContext = createContext<WebSocketContextValue | null>(null);
@@ -53,8 +54,30 @@ export function PresenceProvider({
 
 // Hook to use the presence context
 export function usePresenceContext(): WebSocketContextValue {
-  const context = useContext(FallbackWebSocketContext);
-  return context || defaultContextValue;
+  const fallbackContext = useContext(FallbackWebSocketContext);
+  const mercureContext = useContext(MercureContext);
+
+  if (mercureContext) {
+    return {
+      onlineUsers: mercureContext.onlineUsers.map(u => ({
+        user_id: u.user_id,
+        status: u.status || 'online'
+      })),
+      typingIndicators: mercureContext.typingIndicators.map(t => ({
+        from_user_id: t.from_user_id,
+        is_typing: t.is_typing
+      })),
+      connectionStatus: {
+        connected: mercureContext.connectionStatus.connected,
+        reconnectAttempts: mercureContext.connectionStatus.reconnectAttempts,
+      },
+      sendTypingIndicator: (recipientId, isTyping) => {
+        mercureContext.sendTypingIndicator(recipientId, isTyping);
+      }
+    };
+  }
+
+  return fallbackContext || defaultContextValue;
 }
 
 interface PresenceIndicatorProps {

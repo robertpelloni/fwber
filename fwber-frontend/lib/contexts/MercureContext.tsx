@@ -30,7 +30,7 @@ interface MercureContextType {
   isReady: boolean;
 }
 
-const MercureContext = createContext<MercureContextType | null>(null);
+export const MercureContext = createContext<MercureContextType | null>(null);
 
 export function MercureProvider({ children }: { children: ReactNode }) {
   const mercure = useMercureLogic({ autoConnect: true });
