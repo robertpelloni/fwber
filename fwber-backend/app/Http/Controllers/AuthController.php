@@ -9,10 +9,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use App\Services\TokenDistributionService;
 
 class AuthController extends Controller
 {
-    public function register(RegisterRequest $request)
+    public function register(RegisterRequest $request, TokenDistributionService $tokenService)
     {
         $validated = $request->validated();
 
@@ -20,7 +21,11 @@ class AuthController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
+            'referral_code' => $tokenService->generateReferralCode(),
         ]);
+
+        // Process tokens
+        $tokenService->processSignupBonus($user, $validated['referral_code'] ?? null);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

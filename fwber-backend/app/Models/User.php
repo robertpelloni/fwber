@@ -20,6 +20,10 @@ class User extends Authenticatable
         'tier',
         'tier_expires_at',
         'unlimited_swipes',
+        'referral_code',
+        'referrer_id',
+        'wallet_address',
+        'token_balance',
     ];
 
     protected $hidden = [
@@ -35,6 +39,7 @@ class User extends Authenticatable
         'tier_expires_at' => 'datetime',
         'unlimited_swipes' => 'boolean',
         'two_factor_confirmed_at' => 'datetime',
+        'token_balance' => 'decimal:4',
     ];
 
     protected $appends = [
@@ -42,6 +47,21 @@ class User extends Authenticatable
     ];
 
     // Relationships
+
+    public function referrer()
+    {
+        return $this->belongsTo(User::class, 'referrer_id');
+    }
+
+    public function referrals()
+    {
+        return $this->hasMany(User::class, 'referrer_id');
+    }
+
+    public function tokenTransactions()
+    {
+        return $this->hasMany(TokenTransaction::class);
+    }
 
     public function getTwoFactorEnabledAttribute(): bool
     {

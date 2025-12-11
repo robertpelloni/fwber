@@ -10,6 +10,8 @@ export interface UserTierData {
   messagesExchanged: number
   daysConnected: number
   hasMetInPerson: boolean
+  userConfirmedMeeting: boolean
+  otherUserConfirmedMeeting: boolean
   lastTierUpgrade: Date | null
   canUpgrade: boolean
 }
@@ -41,6 +43,8 @@ export function useRelationshipTier(userId: number | null, matchId: number | nul
         messagesExchanged: response.messages_exchanged,
         daysConnected: response.days_connected,
         hasMetInPerson: response.has_met_in_person,
+        userConfirmedMeeting: response.user_confirmed_meeting,
+        otherUserConfirmedMeeting: response.other_user_confirmed_meeting,
         lastTierUpgrade: new Date(response.updated_at),
         canUpgrade: response.current_tier !== 'verified'
       })
@@ -92,6 +96,8 @@ export function useRelationshipTier(userId: number | null, matchId: number | nul
       setTierData({
         ...tierData,
         hasMetInPerson: response.has_met_in_person,
+        userConfirmedMeeting: response.user_confirmed_meeting,
+        otherUserConfirmedMeeting: response.other_user_confirmed_meeting,
         tier: response.current_tier as RelationshipTier,
         lastTierUpgrade: new Date()
       })
@@ -125,6 +131,8 @@ export function useDiscoveryTier() {
       messagesExchanged: 0,
       daysConnected: 0,
       hasMetInPerson: false,
+      userConfirmedMeeting: false,
+      otherUserConfirmedMeeting: false,
       lastTierUpgrade: null,
       canUpgrade: true
     },

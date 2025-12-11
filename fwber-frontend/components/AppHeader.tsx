@@ -20,7 +20,9 @@ import {
   LogOut,
   Calendar,
   Radio,
-  Zap
+  Zap,
+  Wallet,
+  Trophy
 } from 'lucide-react'
 
 interface AppHeaderProps {
@@ -36,7 +38,8 @@ const navLinks = [
   { href: '/groups', label: 'Groups', icon: Users },
   { href: '/proximity-chatrooms', label: 'Local Chat', icon: Radio },
   { href: '/nearby', label: 'Nearby', icon: MapPin },
-  { href: '/chatrooms', label: 'Chatrooms', icon: MessageSquare },
+  { href: '/wallet', label: 'Wallet', icon: Wallet },
+  { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
 ]
 
 export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeaderProps) {
@@ -114,6 +117,15 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                     >
                       <User className="w-4 h-4" />
                       My Profile
+                    </Link>
+
+                    <Link
+                      href="/wallet"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <Wallet className="w-4 h-4" />
+                      My Wallet
                     </Link>
 
                     <Link

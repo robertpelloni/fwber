@@ -320,5 +320,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('feedback', [\App\Http\Controllers\FeedbackController::class, 'store'])->middleware('throttle:feedback');
     Route::get('feedback', [\App\Http\Controllers\FeedbackController::class, 'index']);
     Route::put('feedback/{id}', [\App\Http\Controllers\FeedbackController::class, 'update']);
+
+    // Token / Wallet
+    Route::get('wallet', [\App\Http\Controllers\Api\TokenController::class, 'balance']);
+    Route::post('wallet/address', [\App\Http\Controllers\Api\TokenController::class, 'updateAddress']);
+    Route::get('leaderboard', [\App\Http\Controllers\Api\TokenController::class, 'leaderboard']);
 });
 

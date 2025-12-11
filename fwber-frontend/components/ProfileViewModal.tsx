@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { X, Clock } from 'lucide-react'
+import { X, Clock, CheckCircle, UserCheck } from 'lucide-react'
 import PhotoRevealGate from './PhotoRevealGate'
 import SecurePhotoReveal from './SecurePhotoReveal'
 import { RelationshipTier } from '@/lib/relationshipTiers'
 import { useFeatureFlag } from '@/lib/hooks/use-feature-flags'
 import { PresenceIndicator, usePresenceContext } from './realtime/PresenceComponents'
+import { useRelationshipTier } from '@/lib/hooks/useRelationshipTier'
 
 interface ProfileViewModalProps {
   isOpen: boolean
@@ -34,6 +35,14 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
   const [isVisible, setIsVisible] = useState(false)
   const { isEnabled: faceRevealEnabled } = useFeatureFlag('face_reveal')
   const { onlineUsers } = usePresenceContext()
+  
+  const { 
+    currentTier, 
+    userConfirmedMeeting, 
+    otherUserConfirmedMeeting, 
+    markAsMetInPerson,
+    loading: tierLoading 
+  } = useRelationshipTier(matchId)
   
   // Check if user is online
   const isUserOnline = onlineUsers?.some(u => u.user_id === user.id.toString() && u.status === 'online')
@@ -138,12 +147,64 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
             </div>
           )}
 
+          {/* Meeting Confirmation Section */}
+          {currentTier === RelationshipTier.ESTABLISHED && (
+            <div className="mb-6 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-100 dark:border-purple-800">
+              <h3 className="text-sm font-semibold text-purple-900 dark:text-purple-100 mb-2 flex items-center gap-2">
+                <UserCheck className="w-4 h-4" />
+                Verify Relationship
+              </h3>
+              <p className="text-sm text-purple-700 dark:text-purple-300 mb-4">
+                To unlock the final tier and see all photos, both of you need to confirm that you've met in person.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={() => markAsMetInPerson()}
+                  disabled={userConfirmedMeeting}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    userConfirmedMeeting
+                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 cursor-default'
+                      : 'bg-purple-600 text-white hover:bg-purple-700 dark:bg-purple-600 dark:hover:bg-purple-500'
+                  }`}
+                >
+                  {userConfirmedMeeting ? (
+                    <>
+                      <CheckCircle className="w-4 h-4" />
+                      You confirmed meeting
+                    </>
+                  ) : (
+                    'I met this person'
+                  )}
+                </button>
+                
+                <div className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border ${
+                  otherUserConfirmedMeeting
+                    ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300'
+                    : 'bg-gray-50 text-gray-500 border-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400'
+                }`}>
+                  {otherUserConfirmedMeeting ? (
+                    <>
+                      <CheckCircle className="w-4 h-4" />
+                      They confirmed meeting
+                    </>
+                  ) : (
+                    <>
+                      <Clock className="w-4 h-4" />
+                      Waiting for them...
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="mb-6">
             <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Photos</h3>
             {faceRevealEnabled ? (
               <PhotoRevealGate
                 photos={photos}
-                currentTier={RelationshipTier.MATCHED} // Assume matched since we are chatting
+                currentTier={currentTier || RelationshipTier.MATCHED} 
                 messagesExchanged={messagesExchanged}
                 daysConnected={1} // Mock
               />

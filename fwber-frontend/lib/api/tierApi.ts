@@ -6,6 +6,8 @@ export interface TierResponse {
   messages_exchanged: number
   days_connected: number
   has_met_in_person: boolean
+  user_confirmed_meeting: boolean
+  other_user_confirmed_meeting: boolean
   tier_info: {
     name: string
     icon: string
@@ -77,7 +79,7 @@ export async function updateMatchTier(
     mark_met_in_person?: boolean
   }
 ): Promise<TierUpdateResponse> {
-  const response = await apiClient.post<TierUpdateResponse>(`/matches/${matchId}/tier/update`, data)
+  const response = await apiClient.put<TierUpdateResponse>(`/matches/${matchId}/tier`, data)
   return response.data
 }
 

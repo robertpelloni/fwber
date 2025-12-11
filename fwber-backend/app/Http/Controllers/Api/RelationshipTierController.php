@@ -61,12 +61,20 @@ class RelationshipTierController extends Controller
         // Update days connected
         $tier->updateDaysConnected();
 
+        $userId = Auth::id();
+        $userConfirmed = ($tier->user1_confirmed_meeting_at && $match->user1_id === $userId) || 
+                         ($tier->user2_confirmed_meeting_at && $match->user2_id === $userId);
+        $otherConfirmed = ($tier->user1_confirmed_meeting_at && $match->user1_id !== $userId) || 
+                          ($tier->user2_confirmed_meeting_at && $match->user2_id !== $userId);
+
         return response()->json([
             'match_id' => $matchId,
             'current_tier' => $tier->current_tier,
             'messages_exchanged' => $tier->messages_exchanged,
             'days_connected' => $tier->days_connected,
             'has_met_in_person' => $tier->has_met_in_person,
+            'user_confirmed_meeting' => $userConfirmed,
+            'other_user_confirmed_meeting' => $otherConfirmed,
             'tier_info' => $tier->getTierInfo(),
             'created_at' => $tier->created_at,
             'updated_at' => $tier->updated_at,
@@ -106,10 +114,16 @@ class RelationshipTierController extends Controller
         }
 
         if ($validated['mark_met_in_person'] ?? false) {
-            $tier->markMetInPerson();
+            $tier->confirmMeetingForUser(Auth::id());
         }
 
         $tierUpgraded = $tier->current_tier !== $previousTier;
+
+        $userId = Auth::id();
+        $userConfirmed = ($tier->user1_confirmed_meeting_at && $match->user1_id === $userId) || 
+                         ($tier->user2_confirmed_meeting_at && $match->user2_id === $userId);
+        $otherConfirmed = ($tier->user1_confirmed_meeting_at && $match->user1_id !== $userId) || 
+                          ($tier->user2_confirmed_meeting_at && $match->user2_id !== $userId);
 
         return response()->json([
             'match_id' => $matchId,
@@ -119,6 +133,8 @@ class RelationshipTierController extends Controller
             'messages_exchanged' => $tier->messages_exchanged,
             'days_connected' => $tier->days_connected,
             'has_met_in_person' => $tier->has_met_in_person,
+            'user_confirmed_meeting' => $userConfirmed,
+            'other_user_confirmed_meeting' => $otherConfirmed,
             'tier_info' => $tier->getTierInfo(),
         ]);
     }

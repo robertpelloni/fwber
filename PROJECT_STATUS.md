@@ -410,6 +410,19 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Backend**: Verified `SubscriptionExpiredNotification` points to this page.
     -   **Backend**: Verified `CleanupExpiredSubscriptions` job handles expiration logic.
     -   **Verification**: Frontend build passing.
+26. **Tiered Relationship Refinement (Mutual Confirmation)** (Dec 12 - Complete):
+    -   **Logic**: Updated "Verified" tier (Tier 5) to require *both* users to confirm they have met in person.
+    -   **Database**: Added `user1_confirmed_meeting_at` and `user2_confirmed_meeting_at` columns.
+    -   **Frontend**: Updated `ProfileViewModal` with "Verify Relationship" section, showing status of both users.
+    -   **Verification**: Code implementation complete.
+
+27. **Blockchain Powered Ownership Distribution** (Dec 12 - Complete):
+    -   **Concept**: Viral marketing via "FWB Tokens" (internal ledger, blockchain-ready).
+    -   **Backend**: Implemented `TokenDistributionService` with decaying signup bonus and referral rewards.
+    -   **Database**: Added `token_transactions` table and user wallet fields.
+    -   **API**: Created `TokenController` for wallet balance, address management, and leaderboards.
+    -   **Frontend**: Created `WalletPage` and `LeaderboardPage`. Updated Registration to accept referral codes.
+    -   **Verification**: Backend feature tests (`TokenDistributionTest.php`) passing.
 
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.

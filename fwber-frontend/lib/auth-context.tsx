@@ -53,7 +53,7 @@ type AuthAction =
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>
   verifyTwoFactor: (code: string, recoveryCode?: string) => Promise<void>
-  register: (name: string, email: string, password: string, passwordConfirmation: string, avatar?: File | null) => Promise<void>
+  register: (name: string, email: string, password: string, passwordConfirmation: string, avatar?: File | null, referralCode?: string) => Promise<void>
   logout: () => void
   clearError: () => void
   updateUser: (user: User) => void
@@ -320,7 +320,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [API_BASE_URL]);
 
   // Register function
-  const register = useCallback(async (name: string, email: string, password: string, passwordConfirmation: string, avatar?: File | null) => {
+  const register = useCallback(async (name: string, email: string, password: string, passwordConfirmation: string, avatar?: File | null, referralCode?: string) => {
     dispatch({ type: 'AUTH_START' })
     
     try {
@@ -336,6 +336,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         formData.append('password', password);
         formData.append('password_confirmation', passwordConfirmation);
         formData.append('avatar', avatar);
+        if (referralCode) formData.append('referral_code', referralCode);
         body = formData;
       } else {
         headers['Content-Type'] = 'application/json';
@@ -343,7 +344,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           name, 
           email, 
           password, 
-          password_confirmation: passwordConfirmation 
+          password_confirmation: passwordConfirmation,
+          referral_code: referralCode
         });
       }
 

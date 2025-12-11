@@ -15,6 +15,7 @@ export default function RegisterPage() {
     email: '',
     password: '',
     passwordConfirmation: '',
+    referralCode: '',
   })
   const [avatar, setAvatar] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -91,7 +92,7 @@ export default function RegisterPage() {
         }
       }
 
-      await register(formData.name, formData.email, formData.password, formData.passwordConfirmation, finalAvatar)
+      await register(formData.name, formData.email, formData.password, formData.passwordConfirmation, finalAvatar, formData.referralCode)
       setSuccessMessage('Account created successfully! Redirecting...')
       setTimeout(() => {
         router.push('/dashboard')
@@ -191,6 +192,21 @@ export default function RegisterPage() {
                   </div>
                 </div>
               )}
+            </div>
+
+            <div>
+              <label htmlFor="referralCode" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Referral Code (Optional)
+              </label>
+              <input
+                id="referralCode"
+                name="referralCode"
+                type="text"
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white dark:bg-gray-800 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="Enter referral code if you have one"
+                value={formData.referralCode}
+                onChange={handleChange}
+              />
             </div>
             
             <div>
