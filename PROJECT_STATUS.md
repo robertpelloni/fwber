@@ -383,6 +383,10 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Issue**: `useMercure must be used within a MercureProvider` error during build.
     -   **Fix**: Added `MercureProvider` to `RootLayout` in `app/layout.tsx`. Added `'use client'` to `MercureContext.tsx`.
     -   **Verification**: `npm run build` passing successfully.
+16. **Frontend Build Fix (Mercure)** (Dec 12 - Complete):
+    -   **Issue**: `useMercure must be used within a MercureProvider` error during build of `/messages`.
+    -   **Fix**: Updated `useMercure` hook in `MercureContext.tsx` to return a fallback context during server-side rendering/static generation when the provider is missing.
+    -   **Verification**: Code fix applied.
 
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.
