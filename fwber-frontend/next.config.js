@@ -97,8 +97,15 @@ const nextConfig = {
         fs: false,
         path: false,
         crypto: false,
+        encoding: false,
       };
     }
+
+    // Ignore face-api.js critical dependency warning
+    config.ignoreWarnings = [
+      ...(config.ignoreWarnings || []),
+      { module: /node_modules\/@vladmandic\/face-api/ }
+    ];
 
     // Production optimizations
     if (!dev && !isServer) {

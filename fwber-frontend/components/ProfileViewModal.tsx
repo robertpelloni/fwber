@@ -37,12 +37,15 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
   const { onlineUsers } = usePresenceContext()
   
   const { 
-    currentTier, 
-    userConfirmedMeeting, 
-    otherUserConfirmedMeeting, 
-    markAsMetInPerson,
-    loading: tierLoading 
-  } = useRelationshipTier(matchId)
+    tierData,
+    isLoading: tierLoading,
+    incrementMessages,
+    markAsMetInPerson
+  } = useRelationshipTier(user.id, matchId || null)
+
+  const currentTier = tierData?.tier
+  const userConfirmedMeeting = tierData?.userConfirmedMeeting
+  const otherUserConfirmedMeeting = tierData?.otherUserConfirmedMeeting
   
   // Check if user is online
   const isUserOnline = onlineUsers?.some(u => u.user_id === user.id.toString() && u.status === 'online')
@@ -155,7 +158,7 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
                 Verify Relationship
               </h3>
               <p className="text-sm text-purple-700 dark:text-purple-300 mb-4">
-                To unlock the final tier and see all photos, both of you need to confirm that you've met in person.
+                To unlock the final tier and see all photos, both of you need to confirm that you&apos;ve met in person.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-3">

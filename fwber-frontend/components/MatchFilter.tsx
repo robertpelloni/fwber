@@ -33,6 +33,7 @@ export default function MatchFilter({ onFilterChange }: MatchFilterProps) {
         console.error('Failed to parse saved filters', e);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleInputChange = (field: string, value: any) => {

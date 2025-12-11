@@ -248,10 +248,31 @@ if [ -d "../fwber-backend" ] && [ -d "../.git" ]; then
     log_info "Changed directory to repository root: $PWD"
 fi
 
+# Handle SQLite conflict - Preserve local data
+if [ -f "fwber-backend/database/database.sqlite" ]; then
+    log_info "Preserving local SQLite database..."
+    cp fwber-backend/database/database.sqlite fwber-backend/database/database.sqlite.preserve
+    # Revert changes to allow pull
+    git checkout fwber-backend/database/database.sqlite || true
+elif [ -f "database/database.sqlite" ]; then
+    log_info "Preserving local SQLite database..."
+    cp database/database.sqlite database/database.sqlite.preserve
+    git checkout database/database.sqlite || true
+fi
+
 run_or_dry git fetch origin
 run_or_dry git checkout $BRANCH
 run_or_dry git pull origin $BRANCH
 log_success "Code updated to branch: $BRANCH"
+
+# Restore SQLite data
+if [ -f "fwber-backend/database/database.sqlite.preserve" ]; then
+    log_info "Restoring local SQLite database..."
+    mv fwber-backend/database/database.sqlite.preserve fwber-backend/database/database.sqlite
+elif [ -f "database/database.sqlite.preserve" ]; then
+    log_info "Restoring local SQLite database..."
+    mv database/database.sqlite.preserve database/database.sqlite
+fi
 
 # Navigate back to backend directory if we are in root
 if [ -d "fwber-backend" ]; then
@@ -306,11 +327,29 @@ if [ "$SKIP_BACKUP" = false ] && [ "$SKIP_MIGRATIONS" = false ]; then
             else
                 log_info "[DRY RUN] Would create backup: $BACKUP_FILE"
             fi
+        elif [ "$DB_CONNECTION" = "sqlite" ]; then
+            # SQLite Backup
+            DB_DATABASE=$(grep "^DB_DATABASE=" .env | cut -d '=' -f2)
+            # Handle absolute or relative path
+            if [[ "$DB_DATABASE" != /* ]]; then
+                DB_DATABASE="$PWD/$DB_DATABASE"
+            fi
+            
+            if [ -f "$DB_DATABASE" ]; then
+                if [ "$DRY_RUN" = false ]; then
+                    cp "$DB_DATABASE" "$BACKUP_FILE"
+                    log_success "SQLite database backup created: $BACKUP_FILE"
+                else
+                    log_info "[DRY RUN] Would create SQLite backup: $BACKUP_FILE"
+                fi
+            else
+                log_warning "SQLite database file not found at $DB_DATABASE"
+            fi
         else
             log_warning "PostgreSQL backup not implemented yet. Skipping..."
         fi
     else
-        log_warning "Database backup only supported for MySQL/PostgreSQL. Current: $DB_CONNECTION"
+        log_warning "Database backup only supported for MySQL/SQLite. Current: $DB_CONNECTION"
     fi
     echo ""
 else
