@@ -5,7 +5,7 @@ import { useWebSocketChat, ChatMessage, OnlineUser, useWebSocket } from '@/lib/h
 import { useAuth } from '@/lib/auth-context';
 import { MessageMetadata } from '@/components/MessageStatusIndicator';
 import { UserAvatar, PresenceIndicator, PresenceStatus } from '@/components/PresenceIndicator';
-import { ConversationStarter } from '@/components/ai/ConversationStarter';
+import { WingmanSuggestions } from '@/components/ai/WingmanSuggestions';
 import AudioRecorder from '@/components/AudioRecorder';
 import { api } from '@/lib/api';
 
@@ -178,12 +178,13 @@ export default function RealTimeChat({
       {/* Message Input */}
       <div className="p-4 border-t border-gray-700">
         <div className="mb-2">
-          <ConversationStarter 
-            targetUserId={parseInt(recipientId) || undefined}
-            onSelectStarter={(starter) => {
-              setMessage(starter);
-              handleTypingChange(starter);
+          <WingmanSuggestions 
+            matchId={recipientId}
+            onSelectSuggestion={(suggestion) => {
+              setMessage(suggestion);
+              handleTypingChange(suggestion);
             }}
+            mode={(messages as ChatMessage[]).length === 0 ? 'ice-breaker' : 'reply'}
           />
         </div>
         <form onSubmit={handleSendMessage} className="flex space-x-2 items-center">
