@@ -20,7 +20,7 @@ interface MercureContextType {
   connect: () => void;
   disconnect: () => void;
   sendChatMessage: (recipientId: string, content: string, type?: string) => Promise<void>;
-  sendTypingIndicator: (recipientId: string, isTyping: boolean) => Promise<void>;
+  sendTypingIndicator: (recipientId: string, isTyping: boolean, chatroomId?: string) => Promise<void>;
   sendVideoSignal: (recipientId: string, signal: any, callId?: number) => Promise<void>;
   updatePresence: (status: 'online' | 'away' | 'busy' | 'offline', metadata?: Record<string, any>) => Promise<void>;
   sendNotification: (recipientId: string, notification: any) => Promise<void>;

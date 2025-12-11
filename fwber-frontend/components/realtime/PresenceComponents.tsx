@@ -14,6 +14,7 @@ export interface OnlineUser {
 
 export interface TypingIndicatorData {
   from_user_id: string;
+  chatroom_id?: string;
   is_typing: boolean;
 }
 
@@ -24,7 +25,7 @@ export interface WebSocketContextValue {
     connected: boolean;
     reconnectAttempts: number;
   };
-  sendTypingIndicator?: (recipientId: string, isTyping: boolean) => void;
+  sendTypingIndicator?: (recipientId: string, isTyping: boolean, chatroomId?: string) => void;
 }
 
 // Default context value when not in provider
@@ -65,14 +66,15 @@ export function usePresenceContext(): WebSocketContextValue {
       })),
       typingIndicators: mercureContext.typingIndicators.map(t => ({
         from_user_id: t.from_user_id,
+        chatroom_id: t.chatroom_id,
         is_typing: t.is_typing
       })),
       connectionStatus: {
         connected: mercureContext.connectionStatus.connected,
         reconnectAttempts: mercureContext.connectionStatus.reconnectAttempts,
       },
-      sendTypingIndicator: (recipientId, isTyping) => {
-        mercureContext.sendTypingIndicator(recipientId, isTyping);
+      sendTypingIndicator: (recipientId, isTyping, chatroomId) => {
+        mercureContext.sendTypingIndicator(recipientId, isTyping, chatroomId);
       }
     };
   }
@@ -161,11 +163,11 @@ export function TypingIndicator({
     return context.typingIndicators
       .filter((t: TypingIndicatorData) => {
         if (contextType === 'user') {
-          return t.from_user_id === contextId && t.is_typing;
+          return t.from_user_id === contextId && t.is_typing && !t.chatroom_id;
         }
-        // For chatrooms, we'd need chatroom_id in the typing indicator
-        // Currently the TypingIndicatorData interface doesn't support chatroom_id
-        // This is a placeholder for future implementation
+        if (contextType === 'chatroom' || contextType === 'proximity_chatroom') {
+          return t.chatroom_id === contextId && t.is_typing;
+        }
         return false;
       })
       .map((t: TypingIndicatorData) => t.from_user_id);
@@ -327,32 +329,33 @@ export function ConnectionStatusBadge({
 
 interface UseTypingNotifierOptions {
   recipientId: string;
+  chatroomId?: string;
 }
 
 /**
  * Hook to manage sending typing indicators
  */
-export function useTypingNotifier({ recipientId }: UseTypingNotifierOptions) {
+export function useTypingNotifier({ recipientId, chatroomId }: UseTypingNotifierOptions) {
   const context = usePresenceContext();
 
   useEffect(() => {
     return () => {
       // Send stop typing when component unmounts
       if (context?.sendTypingIndicator) {
-        context.sendTypingIndicator(recipientId, false);
+        context.sendTypingIndicator(recipientId, false, chatroomId);
       }
     };
-  }, [context, recipientId]);
+  }, [context, recipientId, chatroomId]);
 
   const sendTyping = () => {
     if (context?.sendTypingIndicator) {
-      context.sendTypingIndicator(recipientId, true);
+      context.sendTypingIndicator(recipientId, true, chatroomId);
     }
   };
 
   const stopTyping = () => {
     if (context?.sendTypingIndicator) {
-      context.sendTypingIndicator(recipientId, false);
+      context.sendTypingIndicator(recipientId, false, chatroomId);
     }
   };
 

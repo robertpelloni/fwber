@@ -52,7 +52,8 @@ export interface ChatMessage {
 
 export interface TypingIndicator {
   from_user_id: string;
-  to_user_id: string;
+  to_user_id?: string;
+  chatroom_id?: string;
   is_typing: boolean;
   timestamp: string;
 }
@@ -189,9 +190,12 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
         break;
       case 'typing_indicator':
         setTypingIndicators(prev => {
-            const filtered = prev.filter(item =>
-              !(item.from_user_id === data.from_user_id && item.to_user_id === data.to_user_id)
-            );
+            const filtered = prev.filter(item => {
+              if (data.chatroom_id) {
+                return !(item.from_user_id === data.from_user_id && item.chatroom_id === data.chatroom_id);
+              }
+              return !(item.from_user_id === data.from_user_id && item.to_user_id === data.to_user_id);
+            });
             return [...filtered, data].slice(-20);
         });
         break;
@@ -254,10 +258,11 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
     }
   }, [token, user?.id]);
 
-  const sendTypingIndicator = useCallback(async (recipientId: string, isTyping: boolean) => {
+  const sendTypingIndicator = useCallback(async (recipientId: string, isTyping: boolean, chatroomId?: string) => {
     try {
       await api.post('/websocket/typing', {
         recipient_id: recipientId,
+        chatroom_id: chatroomId,
         is_typing: isTyping
       });
     } catch (err) {
