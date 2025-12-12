@@ -67,4 +67,25 @@ class TokenDistributionService
             'description' => $description,
         ]);
     }
+
+    public function spendTokens(User $user, float $amount, string $description): bool
+    {
+        if ($user->token_balance < $amount) {
+            return false;
+        }
+
+        DB::transaction(function () use ($user, $amount, $description) {
+            $user->token_balance -= $amount;
+            $user->save();
+
+            TokenTransaction::create([
+                'user_id' => $user->id,
+                'amount' => -$amount,
+                'type' => 'spend',
+                'description' => $description,
+            ]);
+        });
+
+        return true;
+    }
 }

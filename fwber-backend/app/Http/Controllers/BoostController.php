@@ -6,6 +6,7 @@ use App\Http\Requests\PurchaseBoostRequest;
 use App\Models\Boost;
 use App\Models\Payment;
 use App\Services\Payment\PaymentGatewayInterface;
+use App\Services\TokenDistributionService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -14,10 +15,12 @@ use OpenApi\Attributes as OA;
 class BoostController extends Controller
 {
     protected $paymentGateway;
+    protected $tokenService;
 
-    public function __construct(PaymentGatewayInterface $paymentGateway)
+    public function __construct(PaymentGatewayInterface $paymentGateway, TokenDistributionService $tokenService)
     {
         $this->paymentGateway = $paymentGateway;
+        $this->tokenService = $tokenService;
     }
 
     /**
