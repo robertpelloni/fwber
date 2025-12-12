@@ -232,7 +232,14 @@ echo ""
 #############################################################################
 
 log_info "Enabling maintenance mode..."
-run_or_dry php artisan down --retry=60 || true
+# Ensure we are in the backend directory or call artisan correctly
+if [ -f "artisan" ]; then
+    run_or_dry php artisan down --retry=60 || true
+elif [ -f "fwber-backend/artisan" ]; then
+    run_or_dry php fwber-backend/artisan down --retry=60 || true
+else
+    log_warning "Could not find artisan to enable maintenance mode"
+fi
 log_success "Maintenance mode enabled"
 echo ""
 
@@ -250,14 +257,19 @@ fi
 
 # Handle SQLite conflict - Preserve local data
 if [ -f "fwber-backend/database/database.sqlite" ]; then
-    log_info "Preserving local SQLite database..."
+    log_info "Preserving local SQLite database (fwber-backend/database/database.sqlite)..."
     cp fwber-backend/database/database.sqlite fwber-backend/database/database.sqlite.preserve
     # Revert changes to allow pull
     git checkout fwber-backend/database/database.sqlite || true
 elif [ -f "database/database.sqlite" ]; then
-    log_info "Preserving local SQLite database..."
+    log_info "Preserving local SQLite database (database/database.sqlite)..."
     cp database/database.sqlite database/database.sqlite.preserve
     git checkout database/database.sqlite || true
+else
+    log_warning "SQLite database not found for preservation. Checked: fwber-backend/database/database.sqlite and database/database.sqlite"
+    log_info "Current directory: $PWD"
+    ls -la fwber-backend/database/ || true
+    ls -la database/ || true
 fi
 
 run_or_dry git fetch origin
