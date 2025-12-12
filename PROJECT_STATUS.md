@@ -434,6 +434,17 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Frontend**: Updated `PremiumUpgradeModal` to allow purchasing premium with tokens or cash.
     -   **Verification**: Code implementation complete.
 
+30. **Virtual Gifts** (Dec 12 - Complete):
+    -   **Backend**: Implemented `Gift` model, `GiftController`, and `GiftSeeder`.
+    -   **Database**: Created `gifts` and `user_gifts` tables.
+    -   **Frontend**: Created `GiftShopModal` and integrated "Gift" button into `RealTimeChat`.
+    -   **Verification**: Feature tests (`GiftTest.php`) passing.
+
+31. **Branding & Landing Page Update** (Dec 12 - Complete):
+    -   **Visuals**: Updated Logo with multicolor outline and glow animation.
+    -   **Content**: Updated Landing Page to reflect all implemented features (Video Chat, Gifts, etc.) and removed "Coming Soon" badges.
+    -   **Verification**: Visual inspection.
+
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.
 2.  **API Documentation**: OpenAPI/Swagger docs available at `/api/docs`.
