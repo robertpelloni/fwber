@@ -8,7 +8,7 @@ import { Logo } from '@/components/Logo'
 import SexQuote from '@/components/SexQuote'
 import PWAInstallPrompt from '@/components/PWAInstallPrompt'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { Shield, Heart, Zap, MapPin, MessageCircle, Users, Menu, X, Lock, Ghost, Layers, FileText, Code, Building2, CheckCircle2, Sparkles, GitMerge, Shirt, RefreshCw, Flame, Link as LinkIcon, Rainbow } from 'lucide-react'
+import { Shield, Heart, Zap, MapPin, MessageCircle, Users, Menu, X, Lock, Ghost, Layers, FileText, Code, Building2, CheckCircle2, Sparkles, GitMerge, Shirt, RefreshCw, Flame, Link as LinkIcon, Rainbow, Video, Gift } from 'lucide-react'
 import { useState } from 'react'
 
 export default function HomePage() {
@@ -263,13 +263,13 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="flex gap-4 opacity-80">
+            <div className="flex gap-4">
               <div className="flex-shrink-0 mt-1">
                 <Sparkles className="w-6 h-6 text-indigo-500" />
               </div>
               <div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                  Smart Behavioral Matching <span className="text-xs ml-2 bg-indigo-100 text-indigo-800 py-0.5 px-2 rounded-full uppercase tracking-wider font-semibold">Coming Soon</span>
+                  Smart Behavioral Matching <span className="text-xs ml-2 bg-green-100 text-green-800 py-0.5 px-2 rounded-full uppercase tracking-wider font-semibold">New</span>
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
                   An AI matchmaker that learns your true &quot;type&quot; based on who you actually interact with, not just who you say you like.
@@ -277,13 +277,13 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="flex gap-4 opacity-80">
+            <div className="flex gap-4">
               <div className="flex-shrink-0 mt-1">
                 <Shield className="w-6 h-6 text-red-500" />
               </div>
               <div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                  AI Safety Guardrails <span className="text-xs ml-2 bg-red-100 text-red-800 py-0.5 px-2 rounded-full uppercase tracking-wider font-semibold">Coming Soon</span>
+                  AI Safety Guardrails <span className="text-xs ml-2 bg-green-100 text-green-800 py-0.5 px-2 rounded-full uppercase tracking-wider font-semibold">Active</span>
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
                   Advanced AI that blocks unsolicited explicit content before it ruins your mood.
@@ -291,13 +291,13 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="flex gap-4 opacity-80">
+            <div className="flex gap-4">
               <div className="flex-shrink-0 mt-1">
                 <Users className="w-6 h-6 text-orange-500" />
               </div>
               <div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                  Social Circles & Events <span className="text-xs ml-2 bg-orange-100 text-orange-800 py-0.5 px-2 rounded-full uppercase tracking-wider font-semibold">Coming Soon</span>
+                  Social Circles & Events
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
                   Because sometimes the best connections happen in a crowd. Find local events and groups.
@@ -305,16 +305,16 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="flex gap-4 opacity-80">
+            <div className="flex gap-4">
               <div className="flex-shrink-0 mt-1">
                 <MapPin className="w-6 h-6 text-blue-500" />
               </div>
               <div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                  Native Mobile Experience <span className="text-xs ml-2 bg-blue-100 text-blue-800 py-0.5 px-2 rounded-full uppercase tracking-wider font-semibold">Coming Soon</span>
+                  Native Mobile Experience
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  The full FWBer experience in your pocket with a native app for iOS and Android.
+                  The full FWBer experience in your pocket. Install directly to your home screen.
                 </p>
               </div>
             </div>
@@ -394,6 +394,28 @@ export default function HomePage() {
               <h3 className="text-xl font-bold text-gray-900 mb-3">Venue Check-Ins</h3>
               <p className="text-gray-600">
                 Meet safely in public. Check in to partner venues and see who else is there looking for a connection.
+              </p>
+            </div>
+
+            {/* Video Chat */}
+            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-red-50 transition-colors duration-300 border border-gray-100">
+              <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-6 text-red-600">
+                <Video className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Private Video Chat</h3>
+              <p className="text-gray-600">
+                Verify your chemistry before you meet. Secure, peer-to-peer video calls built right into the app.
+              </p>
+            </div>
+
+            {/* Virtual Gifts */}
+            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-pink-50 transition-colors duration-300 border border-gray-100">
+              <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center mb-6 text-pink-600">
+                <Gift className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Virtual Gifts</h3>
+              <p className="text-gray-600">
+                Break the ice or show appreciation. Send virtual roses, drinks, and more using FWB Tokens.
               </p>
             </div>
 
