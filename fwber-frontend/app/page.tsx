@@ -101,7 +101,7 @@ export default function HomePage() {
               <Logo className="text-6xl md:text-8xl" showDotMe={true} />
             </div>
             
-            <h2 className="text-3xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 animate-gradient-x bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent bg-[length:200%_auto]">
               Adult Social Network
             </h2>
             

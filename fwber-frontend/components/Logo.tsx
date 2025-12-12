@@ -18,7 +18,7 @@ export function Logo({ className = '', showDotMe = true }: LogoProps) {
   const outlineGlowClass = "drop-shadow-[0_0_10px_rgba(168,85,247,0.8)]";
 
   return (
-    <div className={`relative inline-block ${className}`}>
+    <div className={`relative inline-block text-left ${className}`}>
       {/* Layer 1: Outline (Background) with Glow */}
       <div 
         className={`${fontClasses} absolute inset-0 select-none ${outlineGlowClass} z-0`} 
