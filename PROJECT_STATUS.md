@@ -1,6 +1,6 @@
 # Project Status
 
-**Last Updated:** December 10, 2025 (Updated - Media Analysis Integration)
+**Last Updated:** December 12, 2025
 **Status:** 🚀 LIVE / DEPLOYED
 
 ## 🟢 Current Status: Production Deployed
@@ -9,8 +9,23 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 ### ⚠️ Known Issues / Technical Debt
 *   **None**: No critical technical debt currently tracked.
 
-### ✅ Completed Operational Improvements
-1.  **Test Suite Stabilization** (Dec 09 - Complete):
+### ✅ Completed Operational Improvements (Dec 12)
+1.  **Landing Page UI Polish**:
+    -   **Logo**: Fixed alignment issues and added glow effects.
+    -   **Typography**: Applied animated gradients to the main tagline and primary buttons for a cohesive, premium feel.
+    -   **Verification**: Visual inspection complete.
+2.  **Security & Embedding**:
+    -   **Iframe Support**: Configured Nginx and Next.js to allow embedding in WordPress via `Content-Security-Policy: frame-ancestors *`.
+    -   **Cookies**: Configured `SameSite=None; Secure` for session cookies to support cross-site authentication in iframes.
+    -   **Verification**: Configuration updated and pushed.
+3.  **Gifts Feature (Complete)**:
+    -   **Backend**: Implemented `Gift` model, `GiftController`, and `GiftSeeder`.
+    -   **Notifications**: Implemented `GiftReceivedNotification` with database and real-time (WebPush/WebSocket) delivery.
+    -   **Frontend**: Integrated `GiftShopModal` into the Matches page.
+    -   **User Flow**: Users can now send virtual gifts using their token balance directly from the match screen.
+    -   **Verification**: Feature tests (`GiftTest.php`) passing. Manual verification of UI flow.
+
+### ✅ Completed Operational Improvements (Dec 09 - Dec 11)
     -   **PhotoControllerTest**: Fixed 403 errors by overriding `app.avatar_mode` config in tests. Created `PhotoFactory`.
     -   **LocationControllerTest**: Fixed 500 errors by adding `matchesAsUser1` and `matchesAsUser2` relationships to `User` model.
     -   **FriendTest**: Fixed 404 errors by correcting route definitions in `api.php` (removed incorrect `/venue` prefix).
