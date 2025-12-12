@@ -325,5 +325,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('wallet', [\App\Http\Controllers\Api\TokenController::class, 'balance']);
     Route::post('wallet/address', [\App\Http\Controllers\Api\TokenController::class, 'updateAddress']);
     Route::get('leaderboard', [\App\Http\Controllers\Api\TokenController::class, 'leaderboard']);
+
+    // Gifts
+    Route::get('gifts', [\App\Http\Controllers\GiftController::class, 'index']);
+    Route::post('gifts/send', [\App\Http\Controllers\GiftController::class, 'send']);
+    Route::get('gifts/received', [\App\Http\Controllers\GiftController::class, 'received']);
 });
 
