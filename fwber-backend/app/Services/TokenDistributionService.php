@@ -68,10 +68,10 @@ class TokenDistributionService
         ]);
     }
 
-    public function spendTokens(User $user, float $amount, string $description): bool
+    public function spendTokens(User $user, float $amount, string $description): void
     {
         if ($user->token_balance < $amount) {
-            return false;
+            throw new \Exception("Insufficient token balance.");
         }
 
         DB::transaction(function () use ($user, $amount, $description) {
@@ -85,7 +85,5 @@ class TokenDistributionService
                 'description' => $description,
             ]);
         });
-
-        return true;
     }
 }

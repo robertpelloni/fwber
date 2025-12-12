@@ -46,6 +46,7 @@ The application is live. The focus is on monitoring system health, optimizing pe
 - [x] **Events**: Location-based event discovery and ticketing.
 - [x] **Groups**: Interest-based sub-communities.
 - [x] **Behavioral Matching**: AI matching based on interaction patterns (Engagement, Activity, Content).
+- [x] **Token Utility**: Pay for Boosts and Premium with FWB Tokens.
 
 ### MVP (Q3 2025)
 - [x] Authentication & Profiles

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Check, Star } from 'lucide-react';
-import { useInitiatePurchase } from '@/lib/hooks/use-premium';
+import { Check, Star, Coins, CreditCard } from 'lucide-react';
+import { useInitiatePurchase, usePurchasePremium } from '@/lib/hooks/use-premium';
 import { Elements } from '@stripe/react-stripe-js';
 import { stripePromise } from '@/lib/stripe';
 import { StripePaymentForm } from './StripePaymentForm';
 import { useQueryClient } from '@tanstack/react-query';
+import { useWallet } from '@/lib/hooks/useWallet';
 
 interface PremiumUpgradeModalProps {
   isOpen: boolean;
@@ -15,30 +16,44 @@ interface PremiumUpgradeModalProps {
 
 export const PremiumUpgradeModal = ({ isOpen, onClose }: PremiumUpgradeModalProps) => {
   const { mutate: initiate, isPending: isInitiating } = useInitiatePurchase();
+  const { mutate: purchaseWithToken, isPending: isPurchasingToken } = usePurchasePremium();
+  const { data: wallet } = useWallet();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'token'>('token');
   const queryClient = useQueryClient();
 
-  const handleInitiate = () => {
-    initiate('gold_monthly', {
-      onSuccess: (data) => {
-        setClientSecret(data.client_secret);
-      }
-    });
+  const handleUpgrade = () => {
+    if (paymentMethod === 'token') {
+      purchaseWithToken({ paymentMethod: 'token' }, {
+        onSuccess: () => {
+          handleSuccess();
+        },
+        onError: (error: any) => {
+           alert(error.response?.data?.error || 'Failed to purchase premium');
+        }
+      });
+    } else {
+      initiate('gold_monthly', {
+        onSuccess: (data) => {
+          setClientSecret(data.client_secret);
+        }
+      });
+    }
   };
 
   const handleSuccess = () => {
-    // Invalidate queries to refresh premium status
-    // Note: Webhook might take a moment, so optimistic update or polling might be better
-    // For now, we just invalidate and close
     queryClient.invalidateQueries({ queryKey: ['premium-status'] });
     queryClient.invalidateQueries({ queryKey: ['user'] });
     onClose();
-    setClientSecret(null); // Reset for next time
+    setClientSecret(null);
   };
 
   const handleCancel = () => {
     setClientSecret(null);
   };
+
+  const tokenBalance = parseFloat(wallet?.balance || '0');
+  const tokenPrice = 200;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
@@ -60,6 +75,7 @@ export const PremiumUpgradeModal = ({ isOpen, onClose }: PremiumUpgradeModalProp
         {!clientSecret ? (
           <>
             <div className="space-y-4 py-4">
+              {/* Features List */}
               <div className="flex items-center gap-3">
                 <div className="bg-green-100 p-2 rounded-full">
                   <Check className="w-5 h-5 text-green-600" />
@@ -79,16 +95,47 @@ export const PremiumUpgradeModal = ({ isOpen, onClose }: PremiumUpgradeModalProp
                   <p className="text-sm text-gray-500">No more daily limits. Swipe as much as you want.</p>
                 </div>
               </div>
+
+              {/* Payment Method Selector */}
+              <div className="flex gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg mt-4">
+                <button
+                  onClick={() => setPaymentMethod('token')}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-all ${
+                    paymentMethod === 'token'
+                      ? 'bg-white dark:bg-gray-700 shadow-sm text-purple-600 dark:text-purple-400'
+                      : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+                  }`}
+                >
+                  <Coins className="w-4 h-4" />
+                  Tokens ({tokenBalance})
+                </button>
+                <button
+                  onClick={() => setPaymentMethod('stripe')}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-all ${
+                    paymentMethod === 'stripe'
+                      ? 'bg-white dark:bg-gray-700 shadow-sm text-purple-600 dark:text-purple-400'
+                      : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+                  }`}
+                >
+                  <CreditCard className="w-4 h-4" />
+                  Card
+                </button>
+              </div>
             </div>
 
             <DialogFooter className="flex-col sm:flex-col gap-2">
               <Button 
                 className="w-full bg-gradient-to-r from-yellow-500 to-yellow-700 hover:from-yellow-600 hover:to-yellow-800 text-white font-bold py-6 text-lg"
-                onClick={handleInitiate}
-                disabled={isInitiating}
+                onClick={handleUpgrade}
+                disabled={isInitiating || isPurchasingToken || (paymentMethod === 'token' && tokenBalance < tokenPrice)}
               >
-                {isInitiating ? 'Loading Payment...' : 'Upgrade for $9.99/mo'}
+                {isInitiating || isPurchasingToken ? 'Processing...' : (
+                  paymentMethod === 'token' ? `Upgrade for ${tokenPrice} Tokens` : 'Upgrade for $19.99/mo'
+                )}
               </Button>
+              {paymentMethod === 'token' && tokenBalance < tokenPrice && (
+                <p className="text-xs text-red-500 text-center">Insufficient tokens. Earn more by inviting friends!</p>
+              )}
               <Button variant="ghost" onClick={onClose} className="w-full">
                 Maybe Later
               </Button>
@@ -99,7 +146,7 @@ export const PremiumUpgradeModal = ({ isOpen, onClose }: PremiumUpgradeModalProp
             <StripePaymentForm 
               onSuccess={handleSuccess} 
               onCancel={handleCancel}
-              amount={9.99}
+              amount={19.99}
             />
           </Elements>
         )}

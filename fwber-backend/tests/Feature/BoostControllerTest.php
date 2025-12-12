@@ -182,4 +182,42 @@ class BoostControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonCount(2);
     }
+
+    public function test_can_purchase_boost_with_tokens()
+    {
+        $user = User::factory()->create(['token_balance' => 100]);
+
+        $response = $this->actingAs($user)
+            ->postJson('/api/boosts/purchase', [
+                'type' => 'standard',
+                'payment_method' => 'token'
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'boost_type' => 'standard',
+                'status' => 'active',
+            ]);
+
+        $this->assertEquals(50, $user->fresh()->token_balance);
+        $this->assertDatabaseHas('token_transactions', [
+            'user_id' => $user->id,
+            'amount' => -50,
+            'type' => 'spend',
+        ]);
+    }
+
+    public function test_cannot_purchase_boost_with_insufficient_tokens()
+    {
+        $user = User::factory()->create(['token_balance' => 10]);
+
+        $response = $this->actingAs($user)
+            ->postJson('/api/boosts/purchase', [
+                'type' => 'standard',
+                'payment_method' => 'token'
+            ]);
+
+        $response->assertStatus(400)
+            ->assertJson(['error' => 'Insufficient token balance.']);
+    }
 }

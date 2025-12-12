@@ -24,6 +24,7 @@ class PurchaseBoostRequest extends FormRequest
         return [
             'type' => 'required|in:standard,super',
             'payment_method_id' => 'nullable|string',
+            'payment_method' => 'nullable|in:stripe,token',
         ];
     }
 

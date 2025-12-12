@@ -21,8 +21,8 @@ export const usePurchasePremium = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async () => {
-      return await api.post('/premium/purchase');
+    mutationFn: async (data?: { paymentMethod?: 'stripe' | 'token' }) => {
+      return await api.post('/premium/purchase', { payment_method: data?.paymentMethod });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['premium-status'] });

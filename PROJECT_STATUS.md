@@ -424,6 +424,16 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Frontend**: Created `WalletPage` and `LeaderboardPage`. Updated Registration to accept referral codes.
     -   **Verification**: Backend feature tests (`TokenDistributionTest.php`) passing.
 
+28. **Token Utility (Boosts)** (Dec 12 - Complete):
+    -   **Backend**: Updated `BoostController` to accept token payments via `TokenDistributionService`.
+    -   **Frontend**: Updated `BoostPurchaseModal` to allow purchasing boosts with tokens or cash.
+    -   **Verification**: Code implementation complete.
+
+29. **Token Utility (Premium)** (Dec 12 - Complete):
+    -   **Backend**: Updated `PremiumController` to accept token payments via `TokenDistributionService`.
+    -   **Frontend**: Updated `PremiumUpgradeModal` to allow purchasing premium with tokens or cash.
+    -   **Verification**: Code implementation complete.
+
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.
 2.  **API Documentation**: OpenAPI/Swagger docs available at `/api/docs`.

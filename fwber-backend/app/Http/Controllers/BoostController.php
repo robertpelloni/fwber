@@ -60,6 +60,31 @@ class BoostController extends Controller
         }
 
         $type = $request->type;
+        $paymentMethod = $request->input('payment_method', 'stripe');
+
+        if ($paymentMethod === 'token') {
+            $tokenCost = $type === 'super' ? 100 : 50;
+
+            try {
+                $this->tokenService->spendTokens($user, $tokenCost, "Purchased " . ucfirst($type) . " Boost");
+
+                $duration = $type === 'super' ? 120 : 30; // minutes
+                $now = now();
+
+                $boost = Boost::create([
+                    'user_id' => $user->id,
+                    'started_at' => $now,
+                    'expires_at' => $now->copy()->addMinutes($duration),
+                    'boost_type' => $type,
+                    'status' => 'active',
+                ]);
+
+                return response()->json($boost);
+            } catch (\Exception $e) {
+                return response()->json(['error' => $e->getMessage()], 400);
+            }
+        }
+
         $amount = $type === 'super' ? 9.99 : 4.99;
         $currency = 'USD';
         $paymentMethodId = $request->input('payment_method_id', 'tok_visa');

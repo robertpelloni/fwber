@@ -6,16 +6,19 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Payment;
 use App\Services\Payment\PaymentGatewayInterface;
+use App\Services\TokenDistributionService;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class PremiumController extends Controller
 {
     protected $paymentGateway;
+    protected $tokenService;
 
-    public function __construct(PaymentGatewayInterface $paymentGateway)
+    public function __construct(PaymentGatewayInterface $paymentGateway, TokenDistributionService $tokenService)
     {
         $this->paymentGateway = $paymentGateway;
+        $this->tokenService = $tokenService;
     }
 
     public function getWhoLikesYou(Request $request)
@@ -54,6 +57,42 @@ class PremiumController extends Controller
     public function purchasePremium(Request $request)
     {
         $user = $request->user();
+        $paymentMethod = $request->input('payment_method', 'stripe');
+
+        if ($paymentMethod === 'token') {
+            $tokenCost = 200; // 200 tokens for 1 month premium
+
+            try {
+                $this->tokenService->spendTokens($user, $tokenCost, "Purchased Premium Subscription (1 Month)");
+
+                // Grant premium
+                $user->tier = 'gold';
+                $user->tier_expires_at = Carbon::now()->addDays(30);
+                $user->unlimited_swipes = true;
+                $user->save();
+
+                // Create Subscription record
+                \App\Models\Subscription::create([
+                    'user_id' => $user->id,
+                    'name' => 'gold',
+                    'stripe_id' => 'token_' . uniqid(),
+                    'stripe_status' => 'active',
+                    'stripe_price' => 'token_price_premium_monthly',
+                    'quantity' => 1,
+                    'ends_at' => Carbon::now()->addDays(30),
+                ]);
+
+                return response()->json([
+                    'message' => 'Premium purchased successfully',
+                    'tier' => $user->tier,
+                    'expires_at' => $user->tier_expires_at
+                ]);
+
+            } catch (\Exception $e) {
+                return response()->json(['error' => $e->getMessage()], 400);
+            }
+        }
+
         $amount = 19.99; // Price for premium
         $currency = 'USD';
         
