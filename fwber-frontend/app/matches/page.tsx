@@ -12,6 +12,7 @@ import PhotoRevealGate from '@/components/PhotoRevealGate'
 import MatchFilter from '@/components/MatchFilter'
 import MatchModal from '@/components/MatchModal'
 import ReportModal from '@/components/ReportModal'
+import GiftShopModal from '@/components/gifts/GiftShopModal'
 import { reportUser, blockUser } from '@/lib/api/safety'
 import { PresenceIndicator, ConnectionStatusBadge } from '@/components/realtime'
 
@@ -33,6 +34,9 @@ export default function MatchesPage() {
   // Report Modal State
   const [isReportModalOpen, setIsReportModalOpen] = useState(false)
   const [isBoosted, setIsBoosted] = useState(false)
+  
+  // Gift Modal State
+  const [isGiftModalOpen, setIsGiftModalOpen] = useState(false)
 
   // Simulated tier data - in real app, fetch from API
   const getCurrentTier = (match: Match): RelationshipTier => {
@@ -399,6 +403,13 @@ export default function MatchesPage() {
                   >
                     Super Like
                   </button>
+
+                  <button
+                    onClick={() => setIsGiftModalOpen(true)}
+                    className="bg-pink-500 hover:bg-pink-600 text-white px-8 py-3 rounded-full text-lg font-semibold"
+                  >
+                    Send Gift
+                  </button>
                   
                   <button
                     onClick={handleBoost}
@@ -486,6 +497,15 @@ export default function MatchesPage() {
             onClose={() => setIsReportModalOpen(false)}
             onSubmit={handleReport}
             userName={currentMatch.profile?.display_name || 'User'}
+          />
+        )}
+
+        {currentMatch && (
+          <GiftShopModal
+            isOpen={isGiftModalOpen}
+            onClose={() => setIsGiftModalOpen(false)}
+            receiverId={currentMatch.id}
+            receiverName={currentMatch.profile?.display_name || 'User'}
           />
         )}
       </div>
