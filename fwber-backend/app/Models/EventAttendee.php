@@ -13,6 +13,13 @@ class EventAttendee extends Model
         'event_id',
         'user_id',
         'status',
+        'paid',
+        'payment_method',
+        'transaction_id',
+    ];
+
+    protected $casts = [
+        'paid' => 'boolean',
     ];
 
     public function event()

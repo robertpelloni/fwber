@@ -56,7 +56,16 @@ export async function createEvent(data: CreateEventRequest): Promise<Event> {
   return response.data;
 }
 
-export async function rsvpEvent(id: number, status: string): Promise<{ message: string }> {
-  const response = await apiClient.post<{ message: string }>(`/events/${id}/rsvp`, { status });
+export async function rsvpEvent(
+  id: number, 
+  status: string, 
+  paymentMethod?: 'stripe' | 'token',
+  paymentMethodId?: string
+): Promise<{ message: string }> {
+  const response = await apiClient.post<{ message: string }>(`/events/${id}/rsvp`, { 
+    status,
+    payment_method: paymentMethod,
+    payment_method_id: paymentMethodId
+  });
   return response.data;
 }

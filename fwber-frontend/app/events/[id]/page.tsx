@@ -5,18 +5,24 @@ import { useEvent, useRsvpEvent } from '@/lib/hooks/use-events';
 import { useParams } from 'next/navigation';
 import { Calendar, MapPin, Users, DollarSign, UserPlus } from 'lucide-react';
 import InviteUserModal from '@/components/events/InviteUserModal';
+import EventPaymentModal from '@/components/events/EventPaymentModal';
 
 export default function EventDetailPage() {
   const { id } = useParams();
   const { data: event, isLoading } = useEvent(id as string);
   const rsvp = useRsvpEvent();
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   if (isLoading) return <div className="p-8">Loading...</div>;
   if (!event) return <div className="p-8">Event not found</div>;
 
   const handleRsvp = (status: string) => {
-    rsvp.mutate({ id: event.id, status });
+    if (status === 'attending' && event.price && Number(event.price) > 0) {
+      setIsPaymentModalOpen(true);
+      return;
+    }
+    rsvp.mutate({ eventId: event.id, status });
   };
 
   return (
@@ -102,6 +108,12 @@ export default function EventDetailPage() {
         eventId={event.id}
         isOpen={isInviteModalOpen}
         onClose={() => setIsInviteModalOpen(false)}
+      />
+      
+      <EventPaymentModal
+        event={event}
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
       />
     </div>
   );
