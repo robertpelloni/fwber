@@ -8,13 +8,14 @@ import { UserAvatar, PresenceIndicator, PresenceStatus } from '@/components/Pres
 import { WingmanSuggestions } from '@/components/ai/WingmanSuggestions';
 import AudioRecorder from '@/components/AudioRecorder';
 import { api } from '@/lib/api';
-import { Languages, Loader2, Sparkles } from 'lucide-react';
+import { Languages, Loader2, Sparkles, Gift as GiftIcon } from 'lucide-react';
 import { useTranslation } from '@/lib/hooks/use-translation';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { MatchInsights } from '@/components/matches/MatchInsights';
 import { DatePlanner } from '@/components/realtime/DatePlanner';
 import { storeOfflineChatMessage } from '@/lib/offline-store';
 import { useToast } from '@/components/ToastProvider';
+import GiftShopModal from '@/components/gifts/GiftShopModal';
 
 interface RealTimeChatProps {
   recipientId: string;
@@ -64,6 +65,7 @@ export default function RealTimeChat({
   const [isRecordingVoice, setIsRecordingVoice] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(true);
+  const [isGiftModalOpen, setIsGiftModalOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
   const { showSuccess, showError } = useToast();
@@ -194,6 +196,15 @@ export default function RealTimeChat({
         </div>
         <div className="flex items-center space-x-2">
           <DatePlanner matchId={recipientId} matchName={recipientName} />
+          
+          <button 
+            onClick={() => setIsGiftModalOpen(true)}
+            className="p-2 hover:bg-gray-700 rounded-full text-gray-400 hover:text-pink-400 transition-colors"
+            title="Send Gift"
+          >
+            <GiftIcon className="w-5 h-5" />
+          </button>
+
           <Dialog>
             <DialogTrigger asChild>
               <button 
@@ -317,6 +328,13 @@ export default function RealTimeChat({
           )}
         </form>
       </div>
+
+      <GiftShopModal 
+        isOpen={isGiftModalOpen}
+        onClose={() => setIsGiftModalOpen(false)}
+        receiverId={parseInt(recipientId)}
+        receiverName={recipientName}
+      />
     </div>
   );
 }
