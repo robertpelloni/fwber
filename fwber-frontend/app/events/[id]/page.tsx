@@ -22,7 +22,7 @@ export default function EventDetailPage() {
       setIsPaymentModalOpen(true);
       return;
     }
-    rsvp.mutate({ eventId: event.id, status });
+    rsvp.mutate({ id: event.id, status });
   };
 
   return (

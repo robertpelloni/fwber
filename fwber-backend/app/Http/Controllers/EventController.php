@@ -290,7 +290,13 @@ class EventController extends Controller
 
         // Handle Payment Logic if switching to attending and not paid
         if ($request->status === 'attending' && $event->price > 0 && !$alreadyPaid) {
-            $paymentMethod = $request->input('payment_method', 'stripe');
+            $paymentMethod = $request->input('payment_method');
+            
+            // If no payment method provided for a paid event, return error
+            if (!$paymentMethod) {
+                 return response()->json(['error' => 'Payment method required for paid events'], 400);
+            }
+
             $transactionId = null;
 
             if ($paymentMethod === 'token') {
