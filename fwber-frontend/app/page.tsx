@@ -97,11 +97,16 @@ export default function HomePage() {
       <div className="relative overflow-hidden bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 pt-16 pb-4 lg:pt-32 lg:pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-4">
-              <span className="text-gray-900 dark:text-white">FWBer.me</span>
-            </h1>
-            <p className="text-3xl md:text-5xl font-bold mb-8 animate-gradient-x bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent bg-[length:200%_auto]">
-              Adult Social Network - Friends, Dating, Hookups, Ads, Groups, Fun, Love, Lust, and More!
+            <div className="mb-6 flex justify-center">
+              <Logo className="text-6xl md:text-8xl" showDotMe={true} />
+            </div>
+            
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 animate-gradient-x bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent bg-[length:200%_auto]">
+              Adult Social Network
+            </h2>
+            
+            <p className="text-xl md:text-2xl font-medium text-black dark:text-gray-300 mb-8">
+              Friends, Dating, Hookups, Ads, Groups, Fun, Love, Lust, and More!
             </p>
             
             <div className="mb-8 transform hover:scale-105 transition-transform duration-300">
