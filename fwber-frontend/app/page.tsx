@@ -101,11 +101,11 @@ export default function HomePage() {
               <Logo className="text-6xl md:text-8xl" showDotMe={true} />
             </div>
             
-            <h2 className="text-3xl md:text-5xl font-bold mb-4 animate-gradient-x bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent bg-[length:200%_auto]">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white">
               Adult Social Network
             </h2>
             
-            <p className="text-xl md:text-2xl font-medium text-black dark:text-gray-300 mb-8">
+            <p className="text-lg md:text-xl font-medium text-black dark:text-gray-300 mb-8 max-w-2xl mx-auto">
               Friends, Dating, Hookups, Ads, Groups, Fun, Love, Lust, and More!
             </p>
             

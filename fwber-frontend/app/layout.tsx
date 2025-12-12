@@ -44,11 +44,17 @@ export const metadata: Metadata = {
     description: 'A modern adult dating platform with advanced matching algorithms',
     type: 'website',
     locale: 'en_US',
+    siteName: 'FWBer.me',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'FWBer.me - Adult Dating Platform',
     description: 'A modern adult dating platform with advanced matching algorithms',
+  },
+  alternates: {
+    types: {
+      'application/json+oembed': 'https://fwber.me/api/oembed',
+    },
   },
   robots: {
     index: true,

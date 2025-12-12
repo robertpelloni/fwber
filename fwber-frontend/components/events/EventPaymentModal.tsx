@@ -24,7 +24,7 @@ export default function EventPaymentModal({ isOpen, onClose, event }: EventPayme
 
   const handlePurchase = () => {
     rsvpEvent({ 
-      eventId: event.id, 
+      id: event.id, 
       status: 'attending',
       paymentMethod: paymentMethod 
     }, {
