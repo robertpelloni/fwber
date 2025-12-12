@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Gift;
 use App\Models\User;
 use App\Models\UserGift;
+use App\Notifications\GiftReceivedNotification;
 use App\Services\TokenDistributionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -72,7 +73,8 @@ class GiftController extends Controller
                     'cost_at_time' => $gift->cost,
                 ]);
 
-                // TODO: Send Notification to Receiver
+                // Send Notification to Receiver
+                $receiver->notify(new GiftReceivedNotification($sender, $gift, $request->message));
             });
 
             return response()->json(['message' => 'Gift sent successfully!']);
