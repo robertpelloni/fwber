@@ -141,9 +141,14 @@ const nextConfig = {
         key: 'Strict-Transport-Security',
         value: 'max-age=63072000; includeSubDomains; preload'
       },
+      // X-Frame-Options removed to allow embedding
+      // {
+      //   key: 'X-Frame-Options',
+      //   value: 'DENY',
+      // },
       {
-        key: 'X-Frame-Options',
-        value: 'DENY',
+        key: 'Content-Security-Policy',
+        value: "frame-ancestors *",
       },
       {
         key: 'X-Content-Type-Options',
