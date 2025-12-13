@@ -51,6 +51,8 @@ export default function SlowRequestStatsTable() {
               <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Count</th>
               <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Duration</th>
               <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Max Duration</th>
+              <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Queries</th>
+              <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Memory</th>
               <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Last Seen</th>
             </tr>
           </thead>
@@ -69,6 +71,12 @@ export default function SlowRequestStatsTable() {
                 </td>
                 <td className="px-3 py-2 whitespace-nowrap text-right text-sm text-gray-900 font-mono">
                   {(stat.max_duration / 1000).toFixed(2)}s
+                </td>
+                <td className="px-3 py-2 whitespace-nowrap text-right text-sm text-gray-900 font-mono">
+                  {stat.avg_queries ? Math.round(stat.avg_queries) : '-'}
+                </td>
+                <td className="px-3 py-2 whitespace-nowrap text-right text-sm text-gray-900 font-mono">
+                  {stat.avg_memory ? `${(stat.avg_memory / 1024).toFixed(1)} MB` : '-'}
                 </td>
                 <td className="px-3 py-2 whitespace-nowrap text-right text-sm text-gray-500">
                   {formatDistanceToNow(new Date(stat.last_occurrence), { addSuffix: true })}

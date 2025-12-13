@@ -514,4 +514,88 @@ class ProfileController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Export all user data (GDPR)
+     * 
+     * @return JsonResponse
+     */
+    public function export(Request $request): JsonResponse
+    {
+        try {
+            $user = auth()->user();
+            
+            if (!$user) {
+                return response()->json(['message' => 'Unauthenticated'], 401);
+            }
+
+            // Load all relationships
+            $user->load([
+                'profile',
+                'photos',
+                'matchesAsUser1',
+                'matchesAsUser2',
+                'sentMessages',
+                'receivedMessages',
+                'groups',
+                'events',
+                'subscriptions',
+                'giftsReceived',
+                'giftsSent',
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'data' => $user,
+                'generated_at' => now()->toIso8601String(),
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Data export error', [
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage(),
+            ]);
+            
+            return response()->json([
+                'message' => 'Error exporting data',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete user account and all associated data
+     * 
+     * @return JsonResponse
+     */
+    public function destroy(Request $request): JsonResponse
+    {
+        try {
+            $user = auth()->user();
+            
+            if (!$user) {
+                return response()->json(['message' => 'Unauthenticated'], 401);
+            }
+
+            // Delete user (cascades to profile, photos, matches, etc. via DB constraints)
+            // Note: S3 file cleanup should be handled by Model Observers or a cleanup job
+            $user->delete();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Account deleted successfully',
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Account deletion error', [
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage(),
+            ]);
+            
+            return response()->json([
+                'message' => 'Error deleting account',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
+    }
 }

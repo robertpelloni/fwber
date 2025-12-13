@@ -202,7 +202,9 @@ class AnalyticsController extends Controller
                 method,
                 COUNT(*) as count,
                 AVG(duration_ms) as avg_duration,
-                MAX(duration_ms) as max_duration
+                MAX(duration_ms) as max_duration,
+                AVG(db_query_count) as avg_queries,
+                AVG(memory_usage_kb) as avg_memory
             ')
             ->where('created_at', '>=', now()->subDays(7))
             ->groupBy('endpoint', 'method')

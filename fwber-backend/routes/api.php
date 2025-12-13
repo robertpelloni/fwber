@@ -94,7 +94,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('users/{id}', [\App\Http\Controllers\ProfileController::class, 'showPublic']);
     Route::get('profile', [\App\Http\Controllers\ProfileController::class, 'show']);
     Route::put('profile', [\App\Http\Controllers\ProfileController::class, 'update']);
+    Route::delete('profile', [\App\Http\Controllers\ProfileController::class, 'destroy']);
     Route::get('profile/completeness', [\App\Http\Controllers\ProfileController::class, 'completeness']);
+    Route::get('profile/export', [\App\Http\Controllers\ProfileController::class, 'export']);
 
     // Dashboard
     Route::get('dashboard/stats', [\App\Http\Controllers\DashboardController::class, 'getStats']);

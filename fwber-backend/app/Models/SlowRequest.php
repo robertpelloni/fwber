@@ -13,6 +13,8 @@ class SlowRequest extends Model
         'route_name',
         'action',
         'duration_ms',
+        'db_query_count',
+        'memory_usage_kb',
         'ip',
         'user_agent',
         'payload',
@@ -20,6 +22,8 @@ class SlowRequest extends Model
 
     protected $casts = [
         'duration_ms' => 'float',
+        'db_query_count' => 'integer',
+        'memory_usage_kb' => 'integer',
         'payload' => 'array',
     ];
 

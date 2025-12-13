@@ -56,6 +56,26 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Backend**: Added `is_incognito` to `user_profiles`. Updated `AIMatchingService` and `LocationController` to filter incognito users.
     -   **Frontend**: Added "Incognito Mode" toggle to Settings page.
     -   **Verification**: Feature implemented across full stack.
+2.  **Account Deletion (Self-Service)**:
+    -   **Concept**: Users can permanently delete their account and all associated data.
+    -   **Backend**: Implemented `DELETE /api/profile` endpoint and `ProfileController::destroy` method.
+    -   **Frontend**: Added "Danger Zone" to Settings page with "Delete Account" button and confirmation flow.
+    -   **Verification**: Feature tests (`ProfileDeletionTest.php`) passing.
+3.  **Data Export (GDPR)**:
+    -   **Concept**: Users can download a JSON copy of their personal data.
+    -   **Backend**: Implemented `GET /api/profile/export` endpoint and `ProfileController::export` method.
+    -   **Frontend**: Added "Export Data" button to Settings page.
+    -   **Verification**: Feature tests (`ProfileExportTest.php`) passing.
+
+### ✅ Completed Operational Improvements (Dec 13)
+1.  **Performance Tuning (Metrics)**:
+    -   **Backend**: Enhanced `ApmMiddleware` to capture **Database Query Count** and **Memory Usage** for slow requests.
+    -   **Database**: Added `db_query_count` and `memory_usage_kb` columns to `slow_requests` table.
+    -   **Frontend**: Updated `SlowRequestStatsTable` to display average queries and memory usage.
+    -   **Verification**: Updated `SlowRequestTest` to verify metric capture and API response.
+5.  **PWA Verification**:
+    -   **Testing**: Created `cypress/e2e/pwa.cy.js` to verify Manifest, Service Worker registration, and Offline page.
+    -   **Verification**: E2E tests passing. Confirmed `manifest.json` validity and `offline.html` availability.
 
 ### ✅ Completed Operational Improvements (Dec 09 - Dec 11)
     -   **PhotoControllerTest**: Fixed 403 errors by overriding `app.avatar_mode` config in tests. Created `PhotoFactory`.

@@ -585,6 +585,8 @@ export interface SlowRequestStats {
   count: number
   avg_duration: number
   max_duration: number
+  avg_queries?: number
+  avg_memory?: number
   last_occurrence: string
 }
 

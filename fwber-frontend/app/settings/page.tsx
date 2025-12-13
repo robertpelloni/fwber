@@ -23,6 +23,8 @@ import {
   CheckCircle,
   Plane,
   Ghost,
+  Trash2,
+  Download,
 } from 'lucide-react';
 
 interface SettingsLinkProps {
@@ -112,6 +114,35 @@ function SettingsToggle({ icon, title, description, checked, onChange, disabled,
   );
 }
 
+interface SettingsButtonProps {
+  onClick: () => void;
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  disabled?: boolean;
+}
+
+function SettingsButton({ onClick, icon, title, description, disabled }: SettingsButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className="w-full flex items-center gap-4 p-4 bg-white rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-sm transition-all group text-left disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      <div className="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 group-hover:bg-purple-200 transition-colors">
+        {icon}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-medium text-gray-900">{title}</h3>
+        </div>
+        <p className="text-sm text-gray-500">{description}</p>
+      </div>
+      <Download className="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors" />
+    </button>
+  );
+}
+
 export default function SettingsPage() {
   const { user, logout } = useAuth();
   const { isEnabled: vaultEnabled } = useFeatureFlag('local_media_vault');
@@ -135,6 +166,38 @@ export default function SettingsPage() {
       setIsIncognito(!checked);
     } finally {
       setUpdatingIncognito(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (window.confirm('Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently lost.')) {
+      try {
+        await apiClient.delete('/profile');
+        await logout();
+        window.location.href = '/login';
+      } catch (error) {
+        console.error('Failed to delete account', error);
+        alert('Failed to delete account. Please try again.');
+      }
+    }
+  };
+
+  const handleExportData = async () => {
+    try {
+      const response = await apiClient.get('/profile/export');
+      const dataStr = JSON.stringify(response, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `fwber-data-export-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to export data', error);
+      alert('Failed to export data. Please try again.');
     }
   };
 
@@ -251,6 +314,12 @@ export default function SettingsPage() {
                 title="Blocked Users"
                 description="Manage blocked users and privacy settings"
               />
+              <SettingsButton
+                onClick={handleExportData}
+                icon={<Download className="w-5 h-5" />}
+                title="Export Data"
+                description="Download a copy of your personal data"
+              />
             </div>
           </section>
 
@@ -332,6 +401,27 @@ export default function SettingsPage() {
                   </span>
                 </div>
               </div>
+            </div>
+          </section>
+
+          {/* Danger Zone */}
+          <section className="mb-8">
+            <h2 className="text-sm font-semibold text-red-600 uppercase tracking-wider mb-4">
+              Danger Zone
+            </h2>
+            <div className="space-y-3">
+              <button
+                onClick={handleDeleteAccount}
+                className="w-full flex items-center gap-4 p-4 bg-red-50 rounded-lg border border-red-200 hover:bg-red-100 transition-colors group text-left"
+              >
+                <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center text-red-600 group-hover:bg-red-200 transition-colors">
+                  <Trash2 className="w-5 h-5" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-medium text-red-900">Delete Account</h3>
+                  <p className="text-sm text-red-700">Permanently delete your account and all data</p>
+                </div>
+              </button>
             </div>
           </section>
 

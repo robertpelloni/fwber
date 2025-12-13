@@ -107,7 +107,7 @@ class User extends Authenticatable
     public function groups()
     {
         return $this->belongsToMany(Group::class, 'group_members')
-                    ->withPivot('role', 'joined_at', 'is_active')
+                    ->withPivot('role', 'joined_at')
                     ->withTimestamps();
     }
 
@@ -124,5 +124,30 @@ class User extends Authenticatable
     public function matchesAsUser2()
     {
         return $this->hasMany(UserMatch::class, 'user2_id');
+    }
+
+    public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    public function receivedMessages()
+    {
+        return $this->hasMany(Message::class, 'receiver_id');
+    }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    public function giftsSent()
+    {
+        return $this->hasMany(UserGift::class, 'sender_id');
+    }
+
+    public function giftsReceived()
+    {
+        return $this->hasMany(UserGift::class, 'receiver_id');
     }
 }
