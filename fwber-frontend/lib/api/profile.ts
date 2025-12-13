@@ -22,8 +22,6 @@ export interface UserProfile {
     date_of_birth?: string | null;
     age: number | null;
     gender: string | null;
-    pronouns: string | null;
-    sexual_orientation: string | null;
     relationship_style: string | null;
     looking_for: string[];
     location: {
@@ -33,6 +31,37 @@ export interface UserProfile {
       city: string | null;
       state: string | null;
     };
+    // Travel Mode
+    is_travel_mode?: boolean;
+    travel_latitude?: number | null;
+    travel_longitude?: number | null;
+    travel_location_name?: string | null;
+    
+    // New Optional Attributes
+    love_language?: string;
+    personality_type?: string;
+    chronotype?: string;
+    social_media?: Record<string, string>;
+    communication_style?: string;
+    blood_type?: string;
+    sti_status?: Record<string, any>;
+    family_plans?: string;
+    relationship_goals?: string;
+    languages?: string[];
+    zodiac_sign?: string;
+    pronouns?: string;
+    sexual_orientation?: string;
+    drinking_status?: string;
+    smoking_status?: string;
+    cannabis_status?: string;
+    dietary_preferences?: string;
+    exercise_habits?: string;
+    sleep_habits?: string;
+    pets?: string[];
+    children?: string;
+    religion?: string;
+    political_views?: string;
+    
     preferences: {
       // Lifestyle preferences
       smoking?: string;
@@ -82,8 +111,6 @@ export interface ProfileUpdateData {
   // ISO date string YYYY-MM-DD
   date_of_birth?: string;
   gender?: string;
-  pronouns?: string;
-  sexual_orientation?: string;
   relationship_style?: string;
   looking_for?: string[];
   location?: {
@@ -93,6 +120,38 @@ export interface ProfileUpdateData {
     city?: string;
     state?: string;
   };
+  // Travel Mode
+  is_travel_mode?: boolean;
+  travel_location?: {
+    latitude?: number;
+    longitude?: number;
+    name?: string;
+  };
+  // New Optional Attributes
+  love_language?: string;
+  personality_type?: string;
+  chronotype?: string;
+  social_media?: Record<string, string>;
+  communication_style?: string;
+  blood_type?: string;
+  sti_status?: Record<string, any>;
+  family_plans?: string;
+  relationship_goals?: string;
+  languages?: string[];
+  zodiac_sign?: string;
+  pronouns?: string;
+  sexual_orientation?: string;
+  drinking_status?: string;
+  smoking_status?: string;
+  cannabis_status?: string;
+  dietary_preferences?: string;
+  exercise_habits?: string;
+  sleep_habits?: string;
+  pets?: string[];
+  children?: string;
+  religion?: string;
+  political_views?: string;
+  
   preferences?: {
     // Lifestyle preferences
     smoking?: string;
@@ -136,10 +195,32 @@ export interface ProfileCompletenessResponse {
 }
 
 /**
+ * Fetch a public user profile by ID
+ */
+export async function getPublicProfile(token: string, userId: number): Promise<UserProfile> {
+  const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Failed to fetch profile' }));
+    throw new Error(error.message || 'Failed to fetch profile');
+  }
+
+  const data = await response.json();
+  return data.data || data;
+}
+
+/**
  * Fetch authenticated user's profile
  */
 export async function getUserProfile(token: string): Promise<UserProfile> {
-  const response = await fetch(`${API_BASE_URL}/user`, {
+  const response = await fetch(`${API_BASE_URL}/profile`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -164,7 +245,7 @@ export async function updateUserProfile(
   token: string,
   updates: ProfileUpdateData
 ): Promise<UserProfile> {
-  const response = await fetch(`${API_BASE_URL}/user`, {
+  const response = await fetch(`${API_BASE_URL}/profile`, {
     method: 'PUT',
     headers: {
       'Authorization': `Bearer ${token}`,

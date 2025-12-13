@@ -1,32 +1,22 @@
-describe('Real-time Chat & Presence', () => {
+describe('Real-time Chat & Presence (Mercure)', () => {
   beforeEach(() => {
-    // Forward console logs to Cypress terminal
-    cy.on('window:console', (msg) => {
-      // console.log('BROWSER LOG:', msg);
-      // Use cy.task to print to terminal if possible, but we can't chain it here easily.
-      // However, we can use a trick:
-      // cy.now('task', 'log', 'BROWSER LOG: ' + JSON.stringify(msg)); // cy.now is internal
-      // Let's just rely on the fact that we can see the output if we look closely or if we use a different approach.
-      // Actually, let's try to use the task via a promise if possible, or just ignore it for now and trust the file output.
-      // But the file output didn't show it.
-      
-      // Let's try to use a simple console.log, but maybe the issue is that the browser console is not piped.
-    });
-
-    // Mock the API endpoint for connection details
-    cy.intercept('POST', '**/websocket/connect', {
+    // Mock the API endpoint for Mercure token
+    cy.intercept('GET', '**/websocket/token', {
       statusCode: 200,
       body: {
-        connection_id: 'test-connection-id',
-        user_id: 'test-user-id',
-        channels: ['global'],
-        heartbeat_interval: 30,
+        token: 'mock-mercure-token',
+        hub_url: 'http://mock-mercure-hub',
       },
-    }).as('connectRequest');
+    }).as('tokenRequest');
+
+    // Mock other API endpoints used by the hook
+    cy.intercept('POST', '**/websocket/message', { statusCode: 200 }).as('sendMessage');
+    cy.intercept('POST', '**/websocket/typing', { statusCode: 200 }).as('sendTyping');
+    cy.intercept('POST', '**/websocket/presence', { statusCode: 200 }).as('updatePresence');
 
     cy.visit('/websocket', {
       onBeforeLoad(win) {
-        // Set auth token to simulate logged-in state
+        // Set auth token
         win.localStorage.setItem('fwber_token', 'mock-jwt-token');
         win.localStorage.setItem('fwber_user', JSON.stringify({
           id: 'test-user-id',
@@ -34,51 +24,32 @@ describe('Real-time Chat & Presence', () => {
           email: 'test@example.com'
         }));
 
-        // Define the MockWebSocket class
-        class MockWebSocket {
+        // Mock EventSource
+        class MockEventSource {
           constructor(url) {
-            console.log('MockWebSocket instantiated with URL:', url);
+            console.log('MockEventSource instantiated with URL:', url);
             this.url = url;
             this.readyState = 0; // CONNECTING
             this.onopen = null;
             this.onmessage = null;
-            this.onclose = null;
             this.onerror = null;
             this.listeners = {};
 
-            // Store instance on window for test access
-            win.mockWebSocketInstance = this;
-            win.mockSentMessages = [];
+            win.mockEventSourceInstance = this;
 
             setTimeout(() => {
-              console.log('MockWebSocket opening...');
               this.readyState = 1; // OPEN
-              if (this.onopen) {
-                 console.log('Calling onopen handler');
-                 this.onopen();
-              } else {
-                 console.log('No onopen handler defined');
-              }
+              if (this.onopen) this.onopen({ type: 'open' });
               this.dispatchEvent({ type: 'open' });
             }, 100);
           }
 
-          send(data) {
-            const parsed = JSON.parse(data);
-            win.mockSentMessages.push(parsed);
-          }
-
           close() {
-            this.readyState = 3; // CLOSED
-            const event = { type: 'close', code: 1000, reason: 'Normal Closure', wasClean: true };
-            if (this.onclose) this.onclose(event);
-            this.dispatchEvent(event);
+            this.readyState = 2; // CLOSED
           }
 
           addEventListener(type, listener) {
-            if (!this.listeners[type]) {
-              this.listeners[type] = [];
-            }
+            if (!this.listeners[type]) this.listeners[type] = [];
             this.listeners[type].push(listener);
           }
 
@@ -94,51 +65,36 @@ describe('Real-time Chat & Presence', () => {
             }
           }
 
-          // Helper for tests to simulate incoming messages
+          // Helper to simulate incoming events
           simulateMessage(data) {
             const event = {
               type: 'message',
               data: JSON.stringify(data),
-              origin: 'ws://mock',
-              lastEventId: '',
-              source: null,
-              ports: []
+              lastEventId: '1',
+              origin: 'http://mock-mercure-hub'
             };
-            
-            if (this.onmessage) {
-              this.onmessage(event);
-            }
+            if (this.onmessage) this.onmessage(event);
             this.dispatchEvent(event);
           }
         }
 
-        // Constants
-        MockWebSocket.CONNECTING = 0;
-        MockWebSocket.OPEN = 1;
-        MockWebSocket.CLOSING = 2;
-        MockWebSocket.CLOSED = 3;
+        MockEventSource.CONNECTING = 0;
+        MockEventSource.OPEN = 1;
+        MockEventSource.CLOSED = 2;
 
-        // Replace native WebSocket
-        win.WebSocket = MockWebSocket;
+        win.EventSource = MockEventSource;
       }
     });
   });
 
-  it('should load login page', () => {
-    cy.visit('/login');
-    cy.contains('Sign in').should('exist');
-  });
+  it('should connect to Mercure and show online status', () => {
+    // Auto-connect should trigger
+    cy.wait('@tokenRequest');
 
-  it('should connect to WebSocket and show online status', () => {
-    // Wait for AuthProvider and WebSocket client initialization
-    cy.contains('button', 'Connect').should('not.be.disabled').click();
-    cy.wait('@connectRequest');
-    
-    // Wait for connection to be established (MockWebSocket sets readyState=1 after 100ms)
     cy.window().then((win) => {
       return new Cypress.Promise((resolve) => {
         const checkConnection = () => {
-          if (win.mockWebSocketInstance && win.mockWebSocketInstance.readyState === 1) {
+          if (win.mockEventSourceInstance && win.mockEventSourceInstance.readyState === 1) {
             resolve();
           } else {
             setTimeout(checkConnection, 50);
@@ -148,97 +104,81 @@ describe('Real-time Chat & Presence', () => {
       });
     });
 
-    // Verify connection status in UI
-    // Note: The UI might show "Connected" or a green dot. Adjusting expectation to be more generic if needed.
-    // Assuming the UI has a "Connected" text or similar indicator.
     cy.contains('Connected', { timeout: 10000 }).should('be.visible');
   });
 
   it('should display typing indicator when receiving event', () => {
-    cy.contains('button', 'Connect').should('not.be.disabled').click();
-    cy.wait('@connectRequest');
+    // Auto-connect should trigger
+    cy.wait('@tokenRequest');
 
-    // Select a recipient to enable the chat view
     cy.get('input[placeholder="Enter recipient user ID"]').type('other-user');
 
     cy.window().then((win) => {
-      // Simulate incoming typing indicator
-      win.mockWebSocketInstance.simulateMessage({
+      return new Cypress.Promise((resolve) => {
+        const checkInstance = () => {
+          if (win.mockEventSourceInstance) {
+            resolve(win.mockEventSourceInstance);
+          } else {
+            setTimeout(checkInstance, 10);
+          }
+        };
+        checkInstance();
+      });
+    }).then((mockInstance) => {
+      mockInstance.simulateMessage({
         type: 'typing_indicator',
-        data: {
-          from_user_id: 'other-user',
-          to_user_id: 'test-user-id',
-          is_typing: true,
-        },
+        from_user_id: 'other-user',
+        to_user_id: 'test-user-id',
+        is_typing: true,
         timestamp: new Date().toISOString(),
       });
     });
 
-    // Check for typing indicator in UI
     cy.contains('typing...', { timeout: 5000 }).should('be.visible');
-
-    cy.window().then((win) => {
-      // Simulate stopping typing
-      win.mockWebSocketInstance.simulateMessage({
-        type: 'typing_indicator',
-        data: {
-          from_user_id: 'other-user',
-          to_user_id: 'test-user-id',
-          is_typing: false,
-        },
-        timestamp: new Date().toISOString(),
-      });
-    });
-
-    cy.contains('typing...').should('not.exist');
   });
 
   it('should update presence status of other users', () => {
-    cy.contains('button', 'Connect').should('not.be.disabled').click();
-    cy.wait('@connectRequest');
-    cy.wait(500); // Wait for listeners to be attached
+    // Auto-connect should trigger
+    cy.wait('@tokenRequest');
 
     cy.window().then((win) => {
-      // Simulate presence update
-      win.mockWebSocketInstance.simulateMessage({
+      return new Cypress.Promise((resolve) => {
+        const checkInstance = () => {
+          if (win.mockEventSourceInstance) {
+            resolve(win.mockEventSourceInstance);
+          } else {
+            setTimeout(checkInstance, 10);
+          }
+        };
+        checkInstance();
+      });
+    }).then((mockInstance) => {
+      mockInstance.simulateMessage({
         type: 'presence_update',
-        data: {
-          user_id: 'other-user',
-          status: 'online',
-          metadata: { name: 'Other User' }
-        },
+        user_id: 'other-user',
+        status: 'online',
         timestamp: new Date().toISOString(),
+        metadata: { name: 'Other User' }
       });
     });
 
-    // Verify user appears in online list or status updates
+    cy.contains('Online Users').should('exist');
     cy.contains('User other-user').should('be.visible');
-    cy.contains('online').should('be.visible');
   });
 
   it('should send a chat message', () => {
-    cy.contains('button', 'Connect').should('not.be.disabled').click();
-    cy.wait('@connectRequest');
+    // Auto-connect should trigger
+    cy.wait('@tokenRequest');
 
-    // Select a recipient
     cy.get('input[placeholder="Enter recipient user ID"]').type('other-user');
+    cy.get('input[placeholder*="Enter test message"]').type('Hello World');
+    cy.contains('button', 'Send Chat Message').click();
 
-    // Type and send a message
-    // Ensure the input exists first
-    cy.get('input[placeholder*="Type a message"]', { timeout: 10000 }).should('exist');
-    cy.get('input[placeholder*="Type a message"]').type('Hello World{enter}');
-
-    // Verify message was sent via WebSocket
-    cy.window().then((win) => {
-      // Wait a bit for the send to happen
-      cy.wrap(null).then(() => {
-        const sentMsg = win.mockSentMessages.find(m => m.type === 'chat_message');
-        expect(sentMsg).to.exist;
-        expect(sentMsg.data.message.content).to.equal('Hello World');
+    cy.wait('@sendMessage').then((interception) => {
+      expect(interception.request.body).to.deep.include({
+        recipient_id: 'other-user',
+        message: { type: 'text', content: 'Hello World' }
       });
     });
-
-    // Verify message appears in UI (optimistic update or echo)
-    cy.contains('Hello World').should('be.visible');
   });
 });

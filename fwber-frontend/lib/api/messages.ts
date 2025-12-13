@@ -6,9 +6,10 @@
  * Purpose: Type-safe API client for messaging operations
  * 
  * Created: 2025-01-19
+ * Updated: 2025-10-27 (Refactored to use shared apiClient)
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+import { api } from './client';
 
 export interface Message {
   id: number;
@@ -62,21 +63,9 @@ export interface SendMessageResponse {
  * Fetch all conversations (established matches) for the authenticated user
  */
 export async function getConversations(token: string): Promise<Conversation[]> {
-  const response = await fetch(`${API_BASE_URL}/matches/established`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
+  const data = await api.get<any>('/matches/established', {
+    headers: { Authorization: `Bearer ${token}` }
   });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to fetch conversations' }));
-    throw new Error(error.message || 'Failed to fetch conversations');
-  }
-
-  const data = await response.json();
   return data.data || data;
 }
 
@@ -84,21 +73,9 @@ export async function getConversations(token: string): Promise<Conversation[]> {
  * Fetch messages for a specific conversation (user)
  */
 export async function getMessages(token: string, userId: number): Promise<Message[]> {
-  const response = await fetch(`${API_BASE_URL}/messages/${userId}`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
+  const data = await api.get<any>(`/messages/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` }
   });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to fetch messages' }));
-    throw new Error(error.message || 'Failed to fetch messages');
-  }
-
-  const data = await response.json();
   return data.messages || data.data || data;
 }
 
@@ -109,7 +86,8 @@ export async function sendMessage(
   token: string, 
   receiverId: number, 
   content: string,
-  media?: File | null
+  media?: File | null,
+  messageType?: 'text' | 'image' | 'video' | 'audio' | 'file'
 ): Promise<Message> {
   const formData = new FormData();
   formData.append('receiver_id', receiverId.toString());
@@ -119,22 +97,22 @@ export async function sendMessage(
     formData.append('media', media);
   }
 
-  const response = await fetch(`${API_BASE_URL}/messages`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      // 'Content-Type': 'multipart/form-data', // Let browser set this with boundary
-      'Accept': 'application/json',
-    },
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to send message' }));
-    throw new Error(error.message || 'Failed to send message');
+  if (messageType) {
+    formData.append('message_type', messageType);
+  } else if (media) {
+     // Auto-detect simple types if not provided
+     if (media.type.startsWith('image/')) formData.append('message_type', 'image');
+     else if (media.type.startsWith('video/')) formData.append('message_type', 'video');
+     else if (media.type.startsWith('audio/')) formData.append('message_type', 'audio');
+     else formData.append('message_type', 'file');
+  } else {
+    formData.append('message_type', 'text');
   }
 
-  const data = await response.json();
+  const data = await api.post<any>('/messages', formData, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  
   return data.message || data.data || data;
 }
 
@@ -145,39 +123,17 @@ export async function markMessagesAsRead(
   token: string, 
   userId: number
 ): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/messages/mark-all-read/${userId}`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
+  await api.post(`/messages/mark-all-read/${userId}`, {}, {
+    headers: { Authorization: `Bearer ${token}` }
   });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to mark messages as read' }));
-    throw new Error(error.message || 'Failed to mark messages as read');
-  }
 }
 
 /**
  * Get unread message count for the authenticated user
  */
 export async function getUnreadCount(token: string): Promise<number> {
-  const response = await fetch(`${API_BASE_URL}/messages/unread-count`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
+  const data = await api.get<any>('/messages/unread-count', {
+    headers: { Authorization: `Bearer ${token}` }
   });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to fetch unread count' }));
-    throw new Error(error.message || 'Failed to fetch unread count');
-  }
-
-  const data = await response.json();
   return data.unread_count || data.count || 0;
 }

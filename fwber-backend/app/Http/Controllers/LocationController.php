@@ -179,6 +179,25 @@ class LocationController extends Controller
             $nearbyUsers = UserLocation::active()
                 ->with(['user.profile'])
                 ->where('user_id', '!=', $user->id) // Exclude current user
+                // Incognito Mode Logic
+                ->whereHas('user', function ($userQuery) use ($user) {
+                    $userQuery->where(function ($q) use ($user) {
+                        // Case 1: Not Incognito
+                        $q->whereHas('profile', function ($p) {
+                            $p->where('is_incognito', false);
+                        })
+                        // Case 2: Incognito but Liked Me
+                        ->orWhere(function ($q) use ($user) {
+                            $q->whereHas('profile', function ($p) {
+                                $p->where('is_incognito', true);
+                            })
+                            ->whereHas('matchActions', function ($ma) use ($user) {
+                                $ma->where('target_user_id', $user->id)
+                                   ->whereIn('action', ['like', 'super_like']);
+                            });
+                        });
+                    });
+                })
                 ->where(function ($query) use ($user) {
                     // Show public locations to everyone
                     $query->where('privacy_level', 'public')

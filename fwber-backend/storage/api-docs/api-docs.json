@@ -116,6 +116,26 @@
                 ]
             }
         },
+        "/analytics/boosts": {
+            "get": {
+                "tags": [
+                    "Analytics"
+                ],
+                "summary": "Boost analytics",
+                "description": "Get boost analytics",
+                "operationId": "f953949aa62e8d282230e576f1fb8d47",
+                "responses": {
+                    "200": {
+                        "description": "Boost analytics payload"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/blocks": {
             "post": {
                 "tags": [
@@ -361,7 +381,7 @@
                     }
                 },
                 "responses": {
-                    "200": {
+                    "201": {
                         "description": "Friend request sent successfully",
                         "content": {
                             "application/json": {
@@ -373,6 +393,9 @@
                     },
                     "400": {
                         "description": "Bad request"
+                    },
+                    "409": {
+                        "description": "Friend request already sent or you are already friends"
                     }
                 },
                 "security": [
@@ -477,7 +500,7 @@
                 "operationId": "f385fdd687be248eabe0979905faa72f",
                 "parameters": [
                     {
-                        "name": "q",
+                        "name": "query",
                         "in": "query",
                         "required": true,
                         "schema": {
@@ -5410,6 +5433,135 @@
                 ]
             }
         },
+        "/api/events/invitations": {
+            "get": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Get my event invitations",
+                "operationId": "2f4f4bd166dbb59a3d5772f6055ee22d",
+                "responses": {
+                    "200": {
+                        "description": "List of invitations",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/EventInvitation"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/events/{id}/invite": {
+            "post": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Invite a user to an event",
+                "operationId": "7718f59aed58c6465d6a75ef6fc64948",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Invitation sent",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EventInvitation"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/events/invitations/{id}/respond": {
+            "post": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Respond to an invitation",
+                "operationId": "0d219a0cb0ee4d8e3e371da5c8785330",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "accepted",
+                                            "declined"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Response recorded"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/groups": {
             "get": {
                 "tags": [
@@ -6881,6 +7033,123 @@
                 "security": [
                     {
                         "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/notification-preferences": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Get user notification preferences",
+                "operationId": "38278ac7b31a8ba6683e441913cb49a9",
+                "responses": {
+                    "200": {
+                        "description": "List of preferences",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "type": {
+                                                "type": "string"
+                                            },
+                                            "label": {
+                                                "type": "string"
+                                            },
+                                            "mail": {
+                                                "type": "boolean"
+                                            },
+                                            "push": {
+                                                "type": "boolean"
+                                            },
+                                            "database": {
+                                                "type": "boolean"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/notification-preferences/{type}": {
+            "put": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Update notification preference",
+                "operationId": "203cb3983c1fc9ae58febaf2986283a2",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "mail": {
+                                        "type": "boolean"
+                                    },
+                                    "push": {
+                                        "type": "boolean"
+                                    },
+                                    "database": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Preference updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "type": {
+                                            "type": "string"
+                                        },
+                                        "mail": {
+                                            "type": "boolean"
+                                        },
+                                        "push": {
+                                            "type": "boolean"
+                                        },
+                                        "database": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
                     }
                 ]
             }
@@ -10174,6 +10443,87 @@
                 }
             }
         },
+        "/verification/verify": {
+            "post": {
+                "tags": [
+                    "Verification"
+                ],
+                "summary": "Verify user identity with selfie",
+                "description": "Initiate verification by uploading a selfie",
+                "operationId": "1e356b7751d778bf3c04b264c4321415",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "photo"
+                                ],
+                                "properties": {
+                                    "photo": {
+                                        "description": "Selfie image",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Verification result"
+                    },
+                    "422": {
+                        "$ref": "#/components/schemas/ValidationError"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/websocket/token": {
+            "get": {
+                "tags": [
+                    "WebSocket"
+                ],
+                "summary": "Get Mercure JWT token",
+                "description": "Get a JWT token for Mercure subscription",
+                "operationId": "789d1de33cd72a1faa819de55a7c67cb",
+                "responses": {
+                    "200": {
+                        "description": "Token generated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string"
+                                        },
+                                        "hub_url": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/websocket/connect": {
             "post": {
                 "tags": [
@@ -12037,6 +12387,51 @@
                 },
                 "type": "object"
             },
+            "EventInvitation": {
+                "required": [
+                    "id",
+                    "event_id",
+                    "inviter_id",
+                    "invitee_id",
+                    "status"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "event_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "inviter_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "invitee_id": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "accepted",
+                            "declined"
+                        ],
+                        "example": "pending"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "FindNearbyChatroomsRequest": {
                 "required": [
                     "latitude",
@@ -12651,6 +13046,10 @@
             "description": "Moderation"
         },
         {
+            "name": "Notifications",
+            "description": "Notifications"
+        },
+        {
             "name": "Photos",
             "description": "Photos"
         },
@@ -12681,6 +13080,10 @@
         {
             "name": "Venues",
             "description": "Venues"
+        },
+        {
+            "name": "Verification",
+            "description": "Verification"
         },
         {
             "name": "WebSocket",

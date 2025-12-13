@@ -12,6 +12,7 @@ import PhotoRevealGate from '@/components/PhotoRevealGate'
 import MatchFilter from '@/components/MatchFilter'
 import MatchModal from '@/components/MatchModal'
 import ReportModal from '@/components/ReportModal'
+import GiftShopModal from '@/components/gifts/GiftShopModal'
 import { reportUser, blockUser } from '@/lib/api/safety'
 import { PresenceIndicator, ConnectionStatusBadge } from '@/components/realtime'
 
@@ -33,6 +34,9 @@ export default function MatchesPage() {
   // Report Modal State
   const [isReportModalOpen, setIsReportModalOpen] = useState(false)
   const [isBoosted, setIsBoosted] = useState(false)
+  
+  // Gift Modal State
+  const [isGiftModalOpen, setIsGiftModalOpen] = useState(false)
 
   // Simulated tier data - in real app, fetch from API
   const getCurrentTier = (match: Match): RelationshipTier => {
@@ -166,11 +170,11 @@ export default function MatchesPage() {
   if (matches.length === 0) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="text-center">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">No Matches Found</h1>
-              <p className="text-gray-600 mb-8">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">No Matches Found</h1>
+              <p className="text-gray-600 dark:text-gray-300 mb-8">
                 We couldn&apos;t find any potential matches for you right now. 
                 Try updating your profile or preferences to find more people.
               </p>
@@ -197,17 +201,17 @@ export default function MatchesPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         {/* Header */}
-        <header className="bg-white shadow">
+        <header className="bg-white dark:bg-gray-800 shadow">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center py-6">
               <div>
                 <div className="flex items-center gap-3">
-                  <h1 className="text-3xl font-bold text-gray-900">Discover Matches</h1>
+                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Discover Matches</h1>
                   <ConnectionStatusBadge />
                 </div>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-300">
                   {currentMatchIndex + 1} of {matches.length} potential matches
                 </p>
               </div>
@@ -239,7 +243,7 @@ export default function MatchesPage() {
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <MatchFilter onFilterChange={(newFilters) => setFilters(newFilters)} />
           {currentMatch && (
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden mt-8">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-8">
               {/* Match Card */}
               <div className="relative">
                 {/* Profile Photo with Tier-based Reveal */}
@@ -339,8 +343,8 @@ export default function MatchesPage() {
                 {/* Bio */}
                 {currentMatch.profile?.bio && (
                   <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">About</h3>
-                    <p className="text-gray-700">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">About</h3>
+                    <p className="text-gray-700 dark:text-gray-300">
                       {/* Show preview in discovery mode */}
                       {currentMatch.profile.bio.length > 150 
                         ? `${currentMatch.profile.bio.slice(0, 150)}... (Match to read more)`
@@ -353,12 +357,12 @@ export default function MatchesPage() {
                 {/* Looking For */}
                 {currentMatch.profile?.looking_for && currentMatch.profile.looking_for.length > 0 && (
                   <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Looking For</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Looking For</h3>
                     <div className="flex flex-wrap gap-2">
                       {currentMatch.profile.looking_for.map((item, index) => (
                         <span
                           key={index}
-                          className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full"
+                          className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 text-sm px-3 py-1 rounded-full"
                         >
                           {item}
                         </span>
@@ -368,7 +372,7 @@ export default function MatchesPage() {
                 )}
 
                 {/* Match Actions */}
-                <div className="flex justify-center space-x-4 pt-6 border-t">
+                <div className="flex justify-center space-x-4 pt-6 border-t dark:border-gray-700">
                   <button
                     onClick={() => handleMatchAction('pass')}
                     disabled={isPerformingAction}
@@ -399,6 +403,25 @@ export default function MatchesPage() {
                   >
                     Super Like
                   </button>
+
+                  <button
+                    onClick={() => setIsGiftModalOpen(true)}
+                    className="bg-pink-500 hover:bg-pink-600 text-white px-8 py-3 rounded-full text-lg font-semibold"
+                  >
+                    Send Gift
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      const link = `${window.location.origin}/profile/${currentMatch.id}?wingman=${user?.id}`;
+                      navigator.clipboard.writeText(link);
+                      alert('Wingman Link Copied! Share it with a friend. If they match, you earn tokens!');
+                    }}
+                    className="bg-indigo-500 hover:bg-indigo-600 text-white px-8 py-3 rounded-full text-lg font-semibold"
+                    title="Copy Wingman Link"
+                  >
+                    🧚 Share
+                  </button>
                   
                   <button
                     onClick={handleBoost}
@@ -412,33 +435,54 @@ export default function MatchesPage() {
 
                 {/* Detailed Match Information */}
                 {showMatchDetails && (
-                  <div className="mt-6 pt-6 border-t">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Detailed Information</h3>
+                  <div className="mt-6 pt-6 border-t dark:border-gray-700">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Detailed Information</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <span className="font-medium text-gray-700">Gender:</span>
-                        <span className="ml-2 text-gray-600 capitalize">
+                        <span className="font-medium text-gray-700 dark:text-gray-300">Gender:</span>
+                        <span className="ml-2 text-gray-600 dark:text-gray-400 capitalize">
                           {currentMatch.profile?.gender || 'Not specified'}
                         </span>
                       </div>
                       <div>
-                        <span className="font-medium text-gray-700">Max Distance:</span>
-                        <span className="ml-2 text-gray-600">
+                        <span className="font-medium text-gray-700 dark:text-gray-300">Max Distance:</span>
+                        <span className="ml-2 text-gray-600 dark:text-gray-400">
                           {currentMatch.profile?.location?.max_distance || 'Not specified'} miles
                         </span>
                       </div>
                       <div>
-                        <span className="font-medium text-gray-700">Compatibility Score:</span>
-                        <span className="ml-2 text-gray-600">
+                        <span className="font-medium text-gray-700 dark:text-gray-300">Compatibility Score:</span>
+                        <span className="ml-2 text-gray-600 dark:text-gray-400">
                           {Math.round(currentMatch.compatibilityScore * 100)}%
                         </span>
                       </div>
                       <div>
-                        <span className="font-medium text-gray-700">Profile Complete:</span>
-                        <span className="ml-2 text-gray-600">
+                        <span className="font-medium text-gray-700 dark:text-gray-300">Profile Complete:</span>
+                        <span className="ml-2 text-gray-600 dark:text-gray-400">
                           {currentMatch.profile?.profile_complete ? 'Yes' : 'No'}
                         </span>
                       </div>
+                    </div>
+
+                    {/* Photo Reveal Gallery Preview */}
+                    <div className="mt-8">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Photo Gallery Preview</h3>
+                      <PhotoRevealGate 
+                        photos={[
+                          // Main avatar as AI photo
+                          ...(currentMatch.profile?.photos?.[0] ? [{
+                            id: String(currentMatch.profile.photos[0].id),
+                            url: currentMatch.profile.photos[0].url,
+                            isPrimary: true,
+                            type: 'ai' as const
+                          }] : []),
+                          // Placeholder locked photos to demonstrate the feature
+                          { id: 'locked-1', url: '', isPrimary: false, type: 'real' as const },
+                          { id: 'locked-2', url: '', isPrimary: false, type: 'real' as const },
+                          { id: 'locked-3', url: '', isPrimary: false, type: 'real' as const },
+                        ]}
+                        currentTier={RelationshipTier.DISCOVERY}
+                      />
                     </div>
                   </div>
                 )}
@@ -465,6 +509,15 @@ export default function MatchesPage() {
             onClose={() => setIsReportModalOpen(false)}
             onSubmit={handleReport}
             userName={currentMatch.profile?.display_name || 'User'}
+          />
+        )}
+
+        {currentMatch && (
+          <GiftShopModal
+            isOpen={isGiftModalOpen}
+            onClose={() => setIsGiftModalOpen(false)}
+            receiverId={currentMatch.id}
+            receiverName={currentMatch.profile?.display_name || 'User'}
           />
         )}
       </div>

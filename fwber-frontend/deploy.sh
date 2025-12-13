@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+shopt -s expand_aliases
 
 #############################################################################
 # FWBer Next.js Frontend Deployment Script
@@ -104,6 +105,25 @@ echo ""
 
 # Check required commands
 log_info "Checking required commands..."
+
+# Try to load NVM if present
+export NVM_DIR="$HOME/.nvm"
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+    . "$NVM_DIR/nvm.sh"
+elif [ -s "/usr/local/nvm/nvm.sh" ]; then
+    . "/usr/local/nvm/nvm.sh"
+fi
+
+# Windows support: Check for node.exe/npm.cmd if node/npm not found
+if ! command -v node &> /dev/null && command -v node.exe &> /dev/null; then
+    log_info "Windows environment detected. Using node.exe and npm.cmd"
+    alias node="node.exe"
+    # npm is usually a batch file or shell script wrapper on Windows
+    if command -v npm.cmd &> /dev/null; then
+        alias npm="npm.cmd"
+    fi
+fi
+
 check_command node
 check_command npm
 check_command git

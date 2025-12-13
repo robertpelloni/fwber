@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
+import { storeOfflineChatMessage } from '@/lib/offline-store';
 
 export interface MercureConnectionStatus {
   connected: boolean;
@@ -44,12 +45,23 @@ export interface ChatMessage {
   delivered_at?: string;
   read_at?: string;
   metadata?: Record<string, any>;
+  message_type?: string;
+  media_url?: string;
+  media_duration?: number;
 }
 
 export interface TypingIndicator {
   from_user_id: string;
-  to_user_id: string;
+  to_user_id?: string;
+  chatroom_id?: string;
   is_typing: boolean;
+  timestamp: string;
+}
+
+export interface VideoSignal {
+  from_user_id: string;
+  signal: any;
+  call_id?: number;
   timestamp: string;
 }
 
@@ -77,6 +89,7 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
   const [notifications, setNotifications] = useState<NotificationPayload[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [typingIndicators, setTypingIndicators] = useState<TypingIndicator[]>([]);
+  const [videoSignals, setVideoSignals] = useState<VideoSignal[]>([]);
 
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -89,8 +102,8 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
       setStatus(prev => ({ ...prev, connecting: true, error: null }));
 
       // 1. Get Mercure Token and Hub URL
-      const response = await api.get('/websocket/token');
-      const { token: mercureToken, hub_url } = response.data;
+      const response = await api.get<{ token: string; hub_url: string }>('/websocket/token');
+      const { token: mercureToken, hub_url } = response;
 
       // 2. Construct URL with topics
       const url = new URL(hub_url);
@@ -177,11 +190,17 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
         break;
       case 'typing_indicator':
         setTypingIndicators(prev => {
-            const filtered = prev.filter(item =>
-              !(item.from_user_id === data.from_user_id && item.to_user_id === data.to_user_id)
-            );
+            const filtered = prev.filter(item => {
+              if (data.chatroom_id) {
+                return !(item.from_user_id === data.from_user_id && item.chatroom_id === data.chatroom_id);
+              }
+              return !(item.from_user_id === data.from_user_id && item.to_user_id === data.to_user_id);
+            });
             return [...filtered, data].slice(-20);
         });
+        break;
+      case 'video_signal':
+        setVideoSignals(prev => [...prev, data]);
         break;
       default:
         setMessages(prev => [...prev.slice(-99), data]);
@@ -191,6 +210,9 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
   // API wrappers for sending data (since Mercure is one-way for client)
   const sendChatMessage = useCallback(async (recipientId: string, content: string, type: string = 'text') => {
     try {
+      if (!navigator.onLine) {
+        throw new Error('Offline');
+      }
       await api.post('/websocket/message', {
         recipient_id: recipientId,
         message: { type, content }
@@ -199,13 +221,48 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
       // Optimistic update could be added here
     } catch (err) {
       console.error('Failed to send message:', err);
+      
+      // Offline fallback
+      if (!navigator.onLine || (err as any)?.message === 'Offline' || (err as any)?.code === 'ERR_NETWORK') {
+        try {
+          await storeOfflineChatMessage({
+            recipient_id: recipientId,
+            message: { type, content },
+            token: token,
+            timestamp: new Date().toISOString()
+          });
+          
+          // Register background sync
+          if ('serviceWorker' in navigator && 'SyncManager' in window) {
+            const registration = await navigator.serviceWorker.ready;
+            // @ts-ignore - SyncManager is not yet in standard TS lib
+            await registration.sync.register('chat-message');
+          }
+          
+          // Optimistic update for offline message
+          const offlineMsg: ChatMessage = {
+            id: `offline-${Date.now()}`,
+            from_user_id: user?.id || '',
+            to_user_id: recipientId,
+            content: content,
+            timestamp: new Date().toISOString(),
+            status: 'sending', // Indicate pending status
+            message_type: type
+          };
+          setChatMessages(prev => [...prev, offlineMsg]);
+          
+        } catch (storeErr) {
+          console.error('Failed to store offline message:', storeErr);
+        }
+      }
     }
-  }, []);
+  }, [token, user?.id]);
 
-  const sendTypingIndicator = useCallback(async (recipientId: string, isTyping: boolean) => {
+  const sendTypingIndicator = useCallback(async (recipientId: string, isTyping: boolean, chatroomId?: string) => {
     try {
       await api.post('/websocket/typing', {
         recipient_id: recipientId,
+        chatroom_id: chatroomId,
         is_typing: isTyping
       });
     } catch (err) {
@@ -232,6 +289,42 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
     }
   }, []);
 
+  const sendVideoSignal = useCallback(async (recipientId: string, signal: any, callId?: number) => {
+    try {
+      await api.post('/video/signal', { recipient_id: recipientId, signal, call_id: callId });
+    } catch (err) {
+      console.error('Failed to send video signal:', err);
+    }
+  }, []);
+
+  const loadConversationHistory = useCallback(async (recipientId: string) => {
+    try {
+      const response = await api.get<any>(`/messages/${recipientId}`);
+      const history = (response.messages || response.data || []).map((msg: any) => ({
+        id: msg.id,
+        from_user_id: msg.sender_id,
+        to_user_id: msg.receiver_id,
+        content: msg.content,
+        timestamp: msg.created_at,
+        status: msg.read_at ? 'read' : 'delivered',
+        message_type: msg.message_type,
+        media_url: msg.media_url,
+        media_duration: msg.media_duration,
+      }));
+      setChatMessages(prev => {
+        // Merge history with existing messages, avoiding duplicates
+        const existingIds = new Set(prev.map(m => m.id));
+        const newMessages = history.filter((m: any) => !existingIds.has(m.id));
+        return [...newMessages, ...prev].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      });
+    } catch (err) {
+      console.error('Failed to load conversation history:', err);
+    }
+  }, []);
+
+  const clearMessages = useCallback(() => setMessages([]), []);
+  const clearNotifications = useCallback(() => setNotifications([]), []);
+
   useEffect(() => {
     if (options.autoConnect && isAuthenticated && !status.connected && !status.connecting) {
       connect();
@@ -239,9 +332,9 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
     return () => {
       disconnect();
     };
-  }, [options.autoConnect, isAuthenticated, connect, disconnect]);
+  }, [options.autoConnect, isAuthenticated, connect, disconnect, status.connected, status.connecting]);
 
-  return {
+  return useMemo(() => ({
     connectionStatus: {
         connected: status.connected,
         connectionId: 'mercure', // Dummy ID
@@ -254,12 +347,38 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
     notifications,
     chatMessages,
     typingIndicators,
+    videoSignals,
     connect,
     disconnect,
     sendChatMessage,
     sendTypingIndicator,
+    sendVideoSignal,
     updatePresence,
     sendNotification,
-    isReady: status.connected,
-  };
+    loadConversationHistory,
+    clearMessages,
+    clearNotifications,
+    isReady: !status.connecting,
+  }), [
+    status.connected,
+    status.connecting,
+    user?.id,
+    messages,
+    onlineUsers,
+    presenceUpdates,
+    notifications,
+    chatMessages,
+    typingIndicators,
+    videoSignals,
+    connect,
+    disconnect,
+    sendChatMessage,
+    sendTypingIndicator,
+    sendVideoSignal,
+    updatePresence,
+    sendNotification,
+    loadConversationHistory,
+    clearMessages,
+    clearNotifications
+  ]);
 }

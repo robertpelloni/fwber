@@ -9,10 +9,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use App\Services\TokenDistributionService;
 
 class AuthController extends Controller
 {
-    public function register(RegisterRequest $request)
+    public function register(RegisterRequest $request, TokenDistributionService $tokenService)
     {
         $validated = $request->validated();
 
@@ -20,7 +21,11 @@ class AuthController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
+            'referral_code' => $tokenService->generateReferralCode(),
         ]);
+
+        // Process tokens
+        $tokenService->processSignupBonus($user, $validated['referral_code'] ?? null);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -35,13 +40,21 @@ class AuthController extends Controller
     {
         $validated = $request->validated();
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        $user = User::where('email', $validated['email'])->first();
+
+        if (! $user || ! Hash::check($validated['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['Invalid credentials'],
             ]);
         }
 
-        $user = User::where('email', $validated['email'])->firstOrFail();
+        if ($user->hasEnabledTwoFactorAuthentication()) {
+            return response()->json([
+                'two_factor' => true,
+                'message' => 'Two factor authentication required.',
+            ]);
+        }
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([

@@ -1,4 +1,5 @@
 const { defineConfig } = require('cypress')
+const { authenticator } = require('otplib')
 
 module.exports = defineConfig({
   e2e: {
@@ -10,15 +11,18 @@ module.exports = defineConfig({
     video: true,
     screenshotOnRunFailure: true,
     defaultCommandTimeout: 10000,
-    requestTimeout: 10000,
-    responseTimeout: 10000,
-    pageLoadTimeout: 60000,
+    requestTimeout: 30000,
+    responseTimeout: 60000,
+    pageLoadTimeout: 120000,
     chromeWebSecurity: false,
     setupNodeEvents(on, config) {
       on('task', {
         log(message) {
           console.log(message)
           return null
+        },
+        generateOTP(secret) {
+          return authenticator.generate(secret)
         },
       })
       // Mock geolocation

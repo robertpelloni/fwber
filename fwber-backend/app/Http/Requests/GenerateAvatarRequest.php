@@ -24,6 +24,8 @@ class GenerateAvatarRequest extends FormRequest
         return [
             'style' => 'nullable|string|max:100',
             'provider' => 'nullable|string|in:dalle,gemini,replicate',
+            'model' => 'nullable|string',
+            'lora_scale' => 'nullable|numeric|min:0|max:1',
         ];
     }
 

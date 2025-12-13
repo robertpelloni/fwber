@@ -8,6 +8,8 @@ import { ToastProvider } from '@/components/ToastProvider'
 import NotificationPermissionHandler from '@/components/NotificationPermissionHandler'
 import SentryInitializer from '@/components/SentryInitializer'
 import { ThemeProvider } from '@/components/ThemeProvider'
+import FeedbackModal from '@/components/FeedbackModal'
+import { MercureProvider } from '@/lib/contexts/MercureContext'
 
 const inter = Inter({
   variable: '--font-inter',
@@ -24,8 +26,8 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: 'FWBer.me - Adult Social Network',
-  description: 'A modern adult social network with advanced matching algorithms',
-  keywords: ['dating', 'adult', 'matching', 'relationships'],
+  description: 'Adult Social Network - Friends, Dating, Hookups, Ads, Groups, Fun, Love, Lust, and More!',
+  keywords: ['dating', 'adult', 'matching', 'relationships', 'hookups', 'friends', 'groups', 'ads'],
   authors: [{ name: 'FWBer.me Team' }],
   manifest: '/manifest.json',
   icons: {
@@ -42,11 +44,17 @@ export const metadata: Metadata = {
     description: 'A modern adult dating platform with advanced matching algorithms',
     type: 'website',
     locale: 'en_US',
+    siteName: 'FWBer.me',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'FWBer.me - Adult Dating Platform',
     description: 'A modern adult dating platform with advanced matching algorithms',
+  },
+  alternates: {
+    types: {
+      'application/json+oembed': 'https://fwber.me/api/oembed',
+    },
   },
   robots: {
     index: true,
@@ -85,14 +93,17 @@ export default function RootLayout({
         >
           <QueryProvider>
             <AuthProvider>
-              <NotificationPermissionHandler />
-              <SentryInitializer />
-              <ToastProvider>
-                <div className="relative flex min-h-screen flex-col">
-                  <div className="flex-1">{children}</div>
-                </div>
-                <PerformanceMonitor />
-              </ToastProvider>
+              <MercureProvider>
+                <NotificationPermissionHandler />
+                <SentryInitializer />
+                <ToastProvider>
+                  <div className="relative flex min-h-screen flex-col">
+                    <div className="flex-1">{children}</div>
+                  </div>
+                  <FeedbackModal />
+                  <PerformanceMonitor />
+                </ToastProvider>
+              </MercureProvider>
             </AuthProvider>
           </QueryProvider>
         </ThemeProvider>

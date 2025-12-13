@@ -57,7 +57,11 @@ class EventControllerTest extends TestCase
     {
         $creator = User::factory()->create();
         $attendee = User::factory()->create();
-        $event = Event::factory()->create(['created_by_user_id' => $creator->id]);
+        // Ensure price is 0 for free RSVP test
+        $event = Event::factory()->create([
+            'created_by_user_id' => $creator->id,
+            'price' => 0
+        ]);
 
         $response = $this->actingAs($attendee)
             ->postJson("/api/events/{$event->id}/rsvp", ['status' => 'attending']);

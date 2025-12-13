@@ -1,5 +1,27 @@
 describe('Matching Flow', () => {
+  // Mock EventSource to prevent real connection attempts
+  class MockEventSource {
+    constructor(url) {
+      this.url = url;
+      this.readyState = 0; // CONNECTING
+      setTimeout(() => {
+        this.readyState = 1; // OPEN
+        if (this.onopen) this.onopen({ type: 'open' });
+      }, 10);
+    }
+    close() {
+      this.readyState = 2; // CLOSED
+    }
+    addEventListener() {}
+    removeEventListener() {}
+  }
+
   beforeEach(() => {
+    // Inject MockEventSource
+    cy.window().then((win) => {
+      win.EventSource = MockEventSource;
+    });
+
     // Mock login
     cy.intercept('POST', '**/api/auth/login', {
       statusCode: 200,
@@ -55,6 +77,15 @@ describe('Matching Flow', () => {
         message: 'Action recorded'
       }
     }).as('matchAction');
+
+    // Mock WebSocket token endpoint to avoid 404s
+    cy.intercept('GET', '**/api/websocket/token', {
+      statusCode: 200,
+      body: {
+        token: 'mock-mercure-token',
+        hub_url: 'http://localhost:3000/.well-known/mercure'
+      }
+    }).as('getWebsocketToken');
   });
 
   const user = {
@@ -92,6 +123,7 @@ describe('Matching Flow', () => {
       onBeforeLoad: (win) => {
         win.localStorage.setItem('fwber_token', 'fake-token');
         win.localStorage.setItem('fwber_user', JSON.stringify(user));
+        win.EventSource = MockEventSource;
       }
     });
     
@@ -139,6 +171,7 @@ describe('Matching Flow', () => {
       onBeforeLoad: (win) => {
         win.localStorage.setItem('fwber_token', 'fake-token');
         win.localStorage.setItem('fwber_user', JSON.stringify(user));
+        win.EventSource = MockEventSource;
       }
     });
 

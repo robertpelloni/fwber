@@ -87,7 +87,7 @@ class RecommendationController extends Controller
             $validator = Validator::make($request->all(), [
                 'limit' => 'integer|min:1|max:50',
                 'types' => 'array',
-                'types.*' => 'string|in:content,collaborative,ai,location',
+                "types.*" => 'string|in:content,collaborative,ai,location',
                 'context' => 'array',
                 'context.latitude' => 'numeric|between:-90,90',
                 'context.longitude' => 'numeric|between:-180,180',
@@ -121,7 +121,7 @@ class RecommendationController extends Controller
             ]));
 
             // Try to get from cache (10 minutes TTL)
-            $filteredRecommendations = Cache::remember($cacheKey, 600, function () use ($user, $context, $types, $limit) {
+            $filteredRecommendations = Cache::tags(["recommendations:user:{$user->id}"])->remember($cacheKey, 600, function () use ($user, $context, $types, $limit) {
                 // Get recommendations
                 $recommendations = $this->recommendationService->getRecommendations($user->id, $context);
 
@@ -133,6 +133,9 @@ class RecommendationController extends Controller
                 // Fetch active boosts to prioritize
                 $boostedUsers = Boost::active()
                     ->where('user_id', '!=', $user->id) // Don't recommend self
+                    ->whereHas('user.profile', function($q) {
+                        $q->where('is_incognito', false);
+                    })
                     ->with('user')
                     ->get();
 

@@ -97,8 +97,15 @@ const nextConfig = {
         fs: false,
         path: false,
         crypto: false,
+        encoding: false,
       };
     }
+
+    // Ignore face-api.js critical dependency warning
+    config.ignoreWarnings = [
+      ...(config.ignoreWarnings || []),
+      { module: /node_modules\/@vladmandic\/face-api/ }
+    ];
 
     // Production optimizations
     if (!dev && !isServer) {
@@ -134,9 +141,14 @@ const nextConfig = {
         key: 'Strict-Transport-Security',
         value: 'max-age=63072000; includeSubDomains; preload'
       },
+      // X-Frame-Options removed to allow embedding
+      // {
+      //   key: 'X-Frame-Options',
+      //   value: 'DENY',
+      // },
       {
-        key: 'X-Frame-Options',
-        value: 'DENY',
+        key: 'Content-Security-Policy',
+        value: "frame-ancestors *",
       },
       {
         key: 'X-Content-Type-Options',
@@ -152,7 +164,7 @@ const nextConfig = {
       },
       {
         key: 'Permissions-Policy',
-        value: 'camera=(), microphone=(), geolocation=(self), interest-cohort=()'
+        value: 'camera=(self), microphone=(self), geolocation=(self), interest-cohort=()'
       }
     ];
 

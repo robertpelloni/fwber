@@ -53,11 +53,11 @@ export function usePurchaseBoost() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (type: 'standard' | 'super') => {
+    mutationFn: async ({ type, paymentMethod }: { type: 'standard' | 'super', paymentMethod?: 'stripe' | 'token' }) => {
       const token = localStorage.getItem('fwber_token');
       const response = await axios.post<Boost>(
         `${process.env.NEXT_PUBLIC_API_URL}/boosts/purchase`,
-        { type },
+        { type, payment_method: paymentMethod },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       return response.data;

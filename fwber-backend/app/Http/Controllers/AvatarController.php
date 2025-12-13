@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\GenerateAvatarRequest;
 use App\Services\AvatarGenerationService;
+use App\Models\Photo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,28 +17,26 @@ class AvatarController extends Controller
         $this->avatarService = $avatarService;
     }
 
+    public function providers()
+    {
+        return response()->json([
+            'providers' => $this->avatarService->getProviders()
+        ]);
+    }
+
     public function generate(GenerateAvatarRequest $request)
     {
         $user = Auth::user();
         
         try {
-            $result = $this->avatarService->generateAvatar($user, $request->all());
-
-            if ($result['success']) {
-                $user->avatar_url = $result['image_url'];
-                $user->save();
-
-                return response()->json([
-                    'success' => true,
-                    'avatar_url' => $result['image_url'],
-                    'provider' => $result['provider'],
-                ]);
-            }
+            // Dispatch job for async generation
+            \App\Jobs\GenerateAvatar::dispatch($user, $request->all());
 
             return response()->json([
-                'success' => false,
-                'error' => $result['error'] ?? 'Unknown error occurred',
-            ], 500);
+                'success' => true,
+                'message' => 'Avatar generation started. You will be notified when it is ready.',
+                'status' => 'processing',
+            ]);
 
         } catch (\Exception $e) {
             return response()->json([

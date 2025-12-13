@@ -9,9 +9,18 @@ import ReportModal from '@/components/ReportModal'
 import ProfileViewModal from '@/components/ProfileViewModal'
 import { blockUser, reportUser } from '@/lib/api/safety'
 import { PresenceIndicator, ConnectionStatusBadge, TypingIndicator } from '@/components/realtime'
+import AudioRecorder from '@/components/AudioRecorder'
+import { useToast } from '@/components/ToastProvider'
+import { VideoCallModal } from '@/components/VideoCall/VideoCallModal'
+import { Video } from 'lucide-react'
+import { useMercure } from '@/lib/contexts/MercureContext'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { CallHistory } from '@/components/VideoCall/CallHistory'
 
 export default function MessagesPage() {
   const { token, isAuthenticated, user } = useAuth()
+  const { showError } = useToast()
+  const { videoSignals } = useMercure()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
@@ -24,6 +33,9 @@ export default function MessagesPage() {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false)
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const [showSafetyMenu, setShowSafetyMenu] = useState(false)
+  const [isVideoCallOpen, setIsVideoCallOpen] = useState(false)
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false)
+  const [incomingCall, setIncomingCall] = useState<{ callerId: string } | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   
   const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:8000'
@@ -75,6 +87,14 @@ export default function MessagesPage() {
     scrollToBottom()
   }, [messages])
 
+  useEffect(() => {
+    const lastSignal = videoSignals[videoSignals.length - 1];
+    if (lastSignal && lastSignal.signal.type === 'offer') {
+       setIncomingCall({ callerId: lastSignal.from_user_id });
+       setIsVideoCallOpen(true);
+    }
+  }, [videoSignals]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -85,14 +105,35 @@ export default function MessagesPage() {
     }
   }
 
+  const handleVoiceMessage = async (audioFile: File, duration: number) => {
+    if (!token || !selectedConversation?.other_user?.id) return
+
+    try {
+      setIsSending(true)
+      // Don't clear global error here as we use toast for sending errors
+      
+      const message = await sendMessage(
+        token, 
+        selectedConversation.other_user.id, 
+        '', 
+        audioFile,
+        'audio'
+      )
+      setMessages(prev => [...prev, message])
+    } catch (err) {
+      showError('Failed to send voice message', err instanceof Error ? err.message : 'Unknown error')
+    } finally {
+      setIsSending(false)
+    }
+  }
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!token || !selectedConversation?.other_user?.id || (!newMessage.trim() && !selectedFile)) return
 
     try {
       setIsSending(true)
-      setError(null)
-
+      
       const message = await sendMessage(
         token, 
         selectedConversation.other_user.id, 
@@ -104,7 +145,7 @@ export default function MessagesPage() {
       setSelectedFile(null)
       if (fileInputRef.current) fileInputRef.current.value = ''
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send message')
+      showError('Failed to send message', err instanceof Error ? err.message : 'Unknown error')
     } finally {
       setIsSending(false)
     }
@@ -120,25 +161,30 @@ export default function MessagesPage() {
       setSelectedConversation(null)
       setShowSafetyMenu(false)
     } catch (err) {
-      alert('Failed to block user')
+      showError('Failed to block user')
     }
   }
 
   const handleReport = async (reason: string, details: string) => {
     const otherUser = selectedConversation?.other_user
     if (!token || !otherUser) return
-    await reportUser(token, otherUser.id, reason, details)
     
-    if (confirm('Report submitted. Do you want to block this user as well?')) {
-      try {
-        await blockUser(token, otherUser.id)
-        setConversations(prev => prev.filter(c => c.id !== selectedConversation!.id))
-        setSelectedConversation(null)
-      } catch (err) {
-        console.error('Failed to block after report', err)
+    try {
+      await reportUser(token, otherUser.id, reason, details)
+      
+      if (confirm('Report submitted. Do you want to block this user as well?')) {
+        try {
+          await blockUser(token, otherUser.id)
+          setConversations(prev => prev.filter(c => c.id !== selectedConversation!.id))
+          setSelectedConversation(null)
+        } catch (err) {
+          console.error('Failed to block after report', err)
+        }
       }
+      setShowSafetyMenu(false)
+    } catch (err) {
+      showError('Failed to submit report', err instanceof Error ? err.message : 'Unknown error')
     }
-    setShowSafetyMenu(false)
   }
 
   const formatMessageTime = (timestamp: string) => {
@@ -197,6 +243,12 @@ export default function MessagesPage() {
                 </p>
               </div>
               <div className="flex items-center space-x-4">
+                <button
+                  onClick={() => setIsHistoryOpen(true)}
+                  className="bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-700"
+                >
+                  Call History
+                </button>
                 <button
                   onClick={loadConversations}
                   className="bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-700"
@@ -318,7 +370,15 @@ export default function MessagesPage() {
                         </div>
                       </div>
                       
-                      <div className="relative">
+                      <div className="relative flex items-center gap-2">
+                        <button
+                          onClick={() => setIsVideoCallOpen(true)}
+                          className="p-2 text-gray-500 hover:text-blue-600 rounded-full hover:bg-gray-100"
+                          title="Video Call"
+                        >
+                          <Video className="w-6 h-6" />
+                        </button>
+
                         <button
                           onClick={() => setShowSafetyMenu(!showSafetyMenu)}
                           className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100"
@@ -441,7 +501,7 @@ export default function MessagesPage() {
                           </button>
                         </div>
                       )}
-                      <form onSubmit={handleSendMessage} className="flex space-x-2">
+                      <form onSubmit={handleSendMessage} className="flex space-x-2 items-center">
                         <button
                           type="button"
                           onClick={() => fileInputRef.current?.click()}
@@ -452,6 +512,7 @@ export default function MessagesPage() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                           </svg>
                         </button>
+                        <AudioRecorder onRecordingComplete={handleVoiceMessage} isSending={isSending} />
                         <input
                           type="file"
                           ref={fileInputRef}
@@ -510,6 +571,27 @@ export default function MessagesPage() {
           matchId={selectedConversation.id}
         />
       )}
+
+      {(selectedConversation?.other_user || incomingCall) && (
+        <VideoCallModal
+          recipientId={incomingCall ? incomingCall.callerId : String(selectedConversation!.other_user!.id)}
+          isOpen={isVideoCallOpen}
+          onClose={() => {
+              setIsVideoCallOpen(false);
+              setIncomingCall(null);
+          }}
+          isIncoming={!!incomingCall}
+        />
+      )}
+
+      <Dialog open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Call History</DialogTitle>
+          </DialogHeader>
+          <CallHistory />
+        </DialogContent>
+      </Dialog>
     </ProtectedRoute>
   )
 }

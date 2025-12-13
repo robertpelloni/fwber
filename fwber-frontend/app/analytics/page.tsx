@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import RateLimitStats from '@/components/analytics/RateLimitStats';
 import SlowRequestsTable from '@/components/analytics/SlowRequestsTable';
+import SlowRequestStatsTable from '@/components/analytics/SlowRequestStatsTable';
 import type { AnalyticsRange, PlatformAnalyticsResponse } from '@/lib/api/types';
 import {
   useModerationInsights,
@@ -12,6 +13,8 @@ import {
 import { useSystemHealth } from '@/lib/hooks/use-config';
 import { exportAllAnalyticsToCSV, exportPlatformAnalyticsToCSV } from '@/lib/utils/csv-export';
 import BoostAnalytics from '@/components/analytics/BoostAnalytics';
+import { RetentionTable } from '@/components/analytics/RetentionTable';
+import FailedJobsTable from '@/components/analytics/FailedJobsTable';
 import './analytics-progress.css';
 
 const RANGE_OPTIONS: Array<{ label: string; value: AnalyticsRange }> = [
@@ -155,10 +158,13 @@ export default function AnalyticsPage() {
           <AnalyticsSkeleton />
         )}
 
+      <RetentionTable />
+
       <BoostAnalytics />
 
       <RateLimitStats />
       <SlowRequestsTable />
+      <SlowRequestStatsTable />
 
       {/* System Health Status */}
       <div className="rounded-lg bg-white p-6 shadow-sm">
@@ -256,6 +262,8 @@ export default function AnalyticsPage() {
           </div>
         )}
       </div>
+
+      <FailedJobsTable />
 
       <div className="rounded-lg bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between">

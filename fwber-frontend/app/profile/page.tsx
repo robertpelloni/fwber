@@ -44,6 +44,32 @@ export default function ProfilePage() {
     }
     location: NonNullable<ProfileUpdateData['location']>
     looking_for: string[]
+    
+    // New Optional Attributes
+    love_language?: string
+    personality_type?: string
+    political_views?: string
+    religion?: string
+    sleep_schedule?: string
+    social_media?: Record<string, string>
+    sti_status?: Record<string, any>
+    fetishes?: string[]
+    penis_length_cm?: number
+    penis_girth_cm?: number
+    breast_size?: string
+    tattoos?: string
+    piercings?: string
+    smoking_status?: string
+    drinking_status?: string
+    cannabis_status?: string
+    dietary_preferences?: string
+    zodiac_sign?: string
+    relationship_goals?: string
+    has_children?: boolean
+    wants_children?: boolean
+    has_pets?: boolean
+    languages?: string[]
+    interests?: string[]
   }
 
   // Form state
@@ -95,6 +121,31 @@ export default function ProfilePage() {
       response_time: '',
       meeting_preference: '',
     },
+    // Initialize new fields
+    love_language: '',
+    personality_type: '',
+    political_views: '',
+    religion: '',
+    sleep_schedule: '',
+    social_media: {},
+    sti_status: {},
+    fetishes: [],
+    penis_length_cm: undefined,
+    penis_girth_cm: undefined,
+    breast_size: '',
+    tattoos: '',
+    piercings: '',
+    smoking_status: '',
+    drinking_status: '',
+    cannabis_status: '',
+    dietary_preferences: '',
+    zodiac_sign: '',
+    relationship_goals: '',
+    has_children: false,
+    wants_children: false,
+    has_pets: false,
+    languages: [],
+    interests: [],
   })
 
   // Calculate completeness from current form data
@@ -111,10 +162,10 @@ export default function ProfilePage() {
       occupation: formData.preferences.occupation,
       education: formData.preferences.education,
       height: formData.preferences.height_min,
-      religion: formData.preferences.religion,
-      politics: formData.preferences.politics,
-      drinking: formData.preferences.drinking,
-      smoking: formData.preferences.smoking
+      religion: formData.religion || formData.preferences.religion,
+      politics: formData.political_views || formData.preferences.politics,
+      drinking: formData.drinking_status || formData.preferences.drinking,
+      smoking: formData.smoking_status || formData.preferences.smoking
     });
   }, [
     formData.display_name,
@@ -132,6 +183,10 @@ export default function ProfilePage() {
     formData.preferences.politics,
     formData.preferences.drinking,
     formData.preferences.smoking,
+    formData.religion,
+    formData.political_views,
+    formData.drinking_status,
+    formData.smoking_status,
     photos
   ]);
 
@@ -168,6 +223,29 @@ export default function ProfilePage() {
             city: profileData.profile.location.city || '',
             state: profileData.profile.location.state || '',
           },
+          // New Optional Attributes
+          love_language: profileData.profile.love_language || '',
+          personality_type: profileData.profile.personality_type || '',
+          chronotype: profileData.profile.chronotype || '',
+          social_media: profileData.profile.social_media || {},
+          communication_style: profileData.profile.communication_style || '',
+          blood_type: profileData.profile.blood_type || '',
+          sti_status: profileData.profile.sti_status || {},
+          family_plans: profileData.profile.family_plans || '',
+          relationship_goals: profileData.profile.relationship_goals || '',
+          languages: profileData.profile.languages || [],
+          zodiac_sign: profileData.profile.zodiac_sign || '',
+          drinking_status: profileData.profile.drinking_status || '',
+          smoking_status: profileData.profile.smoking_status || '',
+          cannabis_status: profileData.profile.cannabis_status || '',
+          dietary_preferences: profileData.profile.dietary_preferences || '',
+          exercise_habits: profileData.profile.exercise_habits || '',
+          sleep_habits: profileData.profile.sleep_habits || '',
+          pets: profileData.profile.pets || [],
+          children: profileData.profile.children || '',
+          religion: profileData.profile.religion || '',
+          political_views: profileData.profile.political_views || '',
+          
           preferences: {
             // Lifestyle preferences
             smoking: profileData.profile.preferences?.smoking || '',

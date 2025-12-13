@@ -43,6 +43,7 @@ export default function ProfileTabs({
     <div>
       <div className="flex justify-end mb-4">
         <button
+          type="button"
           onClick={() => setIsEditMode(!isEditMode)}
           className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200"
         >
@@ -76,16 +77,16 @@ export default function ProfileTabs({
             <Location formData={formData} handleLocationChange={handleLocationChange} />
           </TabsContent>
           <TabsContent value="lifestyle">
-            <Lifestyle formData={formData} handlePreferenceChange={handlePreferenceChange} />
+            <Lifestyle formData={formData} handlePreferenceChange={handlePreferenceChange} handleInputChange={handleInputChange} />
           </TabsContent>
           <TabsContent value="dating">
-            <Dating formData={formData} handlePreferenceChange={handlePreferenceChange} />
+            <Dating formData={formData} handlePreferenceChange={handlePreferenceChange} handleInputChange={handleInputChange} />
           </TabsContent>
           <TabsContent value="interests">
             <Interests formData={formData} handleArrayPreferenceChange={handleArrayPreferenceChange} />
           </TabsContent>
           <TabsContent value="communication">
-            <Communication formData={formData} handlePreferenceChange={handlePreferenceChange} />
+            <Communication formData={formData} handlePreferenceChange={handlePreferenceChange} handleInputChange={handleInputChange} />
           </TabsContent>
           <TabsContent value="photos">
             <Card id="photos">
@@ -118,10 +119,10 @@ export default function ProfileTabs({
           <Bio formData={formData} handleInputChange={() => {}} />
           <LookingFor formData={formData} handleLookingForChange={() => {}} />
           <Location formData={formData} handleLocationChange={() => {}} />
-          <Lifestyle formData={formData} handlePreferenceChange={() => {}} />
-          <Dating formData={formData} handlePreferenceChange={() => {}} />
+          <Lifestyle formData={formData} handlePreferenceChange={() => {}} handleInputChange={() => {}} />
+          <Dating formData={formData} handlePreferenceChange={() => {}} handleInputChange={() => {}} />
           <Interests formData={formData} handleArrayPreferenceChange={() => {}} />
-          <Communication formData={formData} handlePreferenceChange={() => {}} />
+          <Communication formData={formData} handlePreferenceChange={() => {}} handleInputChange={() => {}} />
         </div>
       )}
     </div>

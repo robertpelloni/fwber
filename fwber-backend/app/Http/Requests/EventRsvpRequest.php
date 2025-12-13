@@ -23,6 +23,8 @@ class EventRsvpRequest extends FormRequest
     {
         return [
             'status' => 'required|in:attending,maybe,declined',
+            'payment_method' => 'nullable|in:stripe,token',
+            'payment_method_id' => 'nullable|string',
         ];
     }
 

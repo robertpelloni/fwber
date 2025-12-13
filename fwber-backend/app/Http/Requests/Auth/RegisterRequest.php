@@ -46,6 +46,7 @@ class RegisterRequest extends FormRequest
             "profile.preferences" => ["nullable", "array"],
             "profile.avatar_url" => ["nullable", "string", "max:2048"],
             "avatar" => ["nullable", "image", "max:10240"], // Max 10MB
+            "referral_code" => ["nullable", "string", "exists:users,referral_code"],
         ];
     }
 }

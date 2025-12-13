@@ -490,6 +490,18 @@ namespace App\Http\Controllers;
  *   @OA\Property(property="created_at", type="string", format="date-time"),
  *   @OA\Property(property="updated_at", type="string", format="date-time")
  * )
+ * @OA\Schema(
+ *   schema="EventInvitation",
+ *   type="object",
+ *   required={"id","event_id","inviter_id","invitee_id","status"},
+ *   @OA\Property(property="id", type="integer", example=1),
+ *   @OA\Property(property="event_id", type="integer", example=1),
+ *   @OA\Property(property="inviter_id", type="integer", example=1),
+ *   @OA\Property(property="invitee_id", type="integer", example=2),
+ *   @OA\Property(property="status", type="string", example="pending", enum={"pending","accepted","declined"}),
+ *   @OA\Property(property="created_at", type="string", format="date-time"),
+ *   @OA\Property(property="updated_at", type="string", format="date-time")
+ * )
  */
 class Schemas
 {

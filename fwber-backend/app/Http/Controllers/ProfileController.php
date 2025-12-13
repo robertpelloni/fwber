@@ -25,6 +25,46 @@ class ProfileController extends Controller
 {
     /**
      * @OA\Get(
+     *     path="/users/{id}",
+     *     tags={"Profile"},
+     *     summary="Get public profile of a user",
+     *     description="Retrieve public profile information for a specific user.",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="User ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Profile retrieved successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/UserProfileResource")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found"
+     *     )
+     * )
+     */
+    public function showPublic(int $id): JsonResponse
+    {
+        $user = User::with(['profile', 'photos'])->findOrFail($id);
+        
+        // Ensure profile exists
+        if (!$user->profile) {
+            return response()->json(['message' => 'Profile not found'], 404);
+        }
+
+        // Return resource (it handles privacy/sanitization)
+        return response()->json([
+            'data' => new UserProfileResource($user),
+        ]);
+    }
+
+    /**
+     * @OA\Get(
      *     path="/profile",
      *     tags={"Profile"},
      *     summary="Get authenticated user's profile",
@@ -202,30 +242,90 @@ class ProfileController extends Controller
             $profile->fill(array_intersect_key($validated, array_flip([
                 'display_name',
                 'bio',
-                'date_of_birth',
+                'birthdate',
                 'gender',
                 'pronouns',
                 'sexual_orientation',
                 'relationship_style',
+                'height_cm',
+                'body_type',
+                'ethnicity',
+                'breast_size',
+                'tattoos',
+                'piercings',
+                'hair_color',
+                'eye_color',
+                'skin_tone',
+                'facial_hair',
+                'dominant_hand',
+                'fitness_level',
+                'clothing_style',
+                'penis_length_cm',
+                'penis_girth_cm',
+                'occupation',
+                'education',
+                'relationship_status',
+                'smoking_status',
+                'drinking_status',
+                'cannabis_status',
+                'dietary_preferences',
+                'zodiac_sign',
+                'relationship_goals',
+                'has_children',
+                'wants_children',
+                'has_pets',
+                'love_language',
+                'personality_type',
+                'political_views',
+                'religion',
+                'sleep_schedule',
+                'social_media',
+                'interests',
+                'languages',
+                'fetishes',
+                'sti_status',
+                'is_incognito',
             ])));
             
             // Handle location fields
             if (isset($validated['location'])) {
                 $location = $validated['location'];
                 if (isset($location['latitude'])) {
-                    $profile->location_latitude = $location['latitude'];
+                    $profile->latitude = $location['latitude'];
                 }
                 if (isset($location['longitude'])) {
-                    $profile->location_longitude = $location['longitude'];
+                    $profile->longitude = $location['longitude'];
                 }
                 if (isset($location['city'])) {
-                    $profile->location_description = $location['city'] . ', ' . ($location['state'] ?? '');
+                    $profile->location_name = $location['city'] . ', ' . ($location['state'] ?? '');
+                }
+            }
+
+            // Handle travel mode
+            if (isset($validated['is_travel_mode'])) {
+                $profile->is_travel_mode = $validated['is_travel_mode'];
+            }
+            
+            if (isset($validated['travel_location'])) {
+                $travel = $validated['travel_location'];
+                if (isset($travel['latitude'])) {
+                    $profile->travel_latitude = $travel['latitude'];
+                }
+                if (isset($travel['longitude'])) {
+                    $profile->travel_longitude = $travel['longitude'];
+                }
+                if (isset($travel['name'])) {
+                    $profile->travel_location_name = $travel['name'];
                 }
             }
             
             // Handle JSON fields
             if (isset($validated['looking_for'])) {
                 $profile->looking_for = $validated['looking_for'];
+            }
+            
+            if (isset($validated['interested_in'])) {
+                $profile->interested_in = $validated['interested_in'];
             }
             
             if (isset($validated['preferences'])) {
@@ -285,8 +385,8 @@ class ProfileController extends Controller
         $requiredFields = [
             'display_name',
             'gender',
-            'location_latitude',
-            'location_longitude',
+            'latitude',
+            'longitude',
             'looking_for',
         ];
 
@@ -297,12 +397,12 @@ class ProfileController extends Controller
         }
 
         // Validate adult age via DOB (>= 18)
-        if (empty($profile->date_of_birth)) {
+        if (empty($profile->birthdate)) {
             return false;
         }
-        $dob = $profile->date_of_birth instanceof \DateTimeInterface
-            ? Carbon::instance($profile->date_of_birth)
-            : Carbon::parse($profile->date_of_birth);
+        $dob = $profile->birthdate instanceof \DateTimeInterface
+            ? Carbon::instance($profile->birthdate)
+            : Carbon::parse($profile->birthdate);
         if ($dob->age < 18) {
             return false;
         }
@@ -330,7 +430,7 @@ class ProfileController extends Controller
                 return response()->json([
                     'percentage' => 0,
                     'required_complete' => false,
-                    'missing_required' => ['display_name', 'date_of_birth', 'gender', 'location', 'looking_for'],
+                    'missing_required' => ['display_name', 'birthdate', 'gender', 'location', 'looking_for'],
                     'missing_optional' => ['bio', 'pronouns', 'sexual_orientation', 'relationship_style', 'preferences'],
                     'sections' => [
                         'basic' => false,
@@ -350,16 +450,16 @@ class ProfileController extends Controller
 
             // Check sections
             $sections = [
-                'basic' => !empty($profile->display_name) && !empty($profile->date_of_birth) && !empty($profile->gender),
-                'location' => !empty($profile->location_latitude) && !empty($profile->location_longitude),
+                'basic' => !empty($profile->display_name) && !empty($profile->birthdate) && !empty($profile->gender),
+                'location' => !empty($profile->latitude) && !empty($profile->longitude),
                 'preferences' => !empty($profile->looking_for) && count($profile->looking_for ?? []) > 0,
-                'interests' => $hasPref('hobbies') || $hasPref('music') || $hasPref('sports'),
-                'physical' => $hasPref('body_type'),
-                'lifestyle' => $hasPref('smoking') || $hasPref('drinking') || $hasPref('exercise'),
+                'interests' => !empty($profile->interests) || $hasPref('hobbies') || $hasPref('music') || $hasPref('sports'),
+                'physical' => !empty($profile->body_type) || $hasPref('body_type'),
+                'lifestyle' => !empty($profile->smoking_status) || $hasPref('smoking') || $hasPref('drinking') || $hasPref('exercise'),
             ];
 
             // Required fields
-            $required = ['display_name', 'date_of_birth', 'gender', 'location_latitude', 'looking_for'];
+            $required = ['display_name', 'birthdate', 'gender', 'latitude', 'looking_for'];
             $missingRequired = [];
             foreach ($required as $field) {
                 if (empty($profile->$field)) {
@@ -411,6 +511,90 @@ class ProfileController extends Controller
             
             return response()->json([
                 'message' => 'Error checking profile completeness',
+            ], 500);
+        }
+    }
+
+    /**
+     * Export all user data (GDPR)
+     * 
+     * @return JsonResponse
+     */
+    public function export(Request $request): JsonResponse
+    {
+        try {
+            $user = auth()->user();
+            
+            if (!$user) {
+                return response()->json(['message' => 'Unauthenticated'], 401);
+            }
+
+            // Load all relationships
+            $user->load([
+                'profile',
+                'photos',
+                'matchesAsUser1',
+                'matchesAsUser2',
+                'sentMessages',
+                'receivedMessages',
+                'groups',
+                'events',
+                'subscriptions',
+                'giftsReceived',
+                'giftsSent',
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'data' => $user,
+                'generated_at' => now()->toIso8601String(),
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Data export error', [
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage(),
+            ]);
+            
+            return response()->json([
+                'message' => 'Error exporting data',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete user account and all associated data
+     * 
+     * @return JsonResponse
+     */
+    public function destroy(Request $request): JsonResponse
+    {
+        try {
+            $user = auth()->user();
+            
+            if (!$user) {
+                return response()->json(['message' => 'Unauthenticated'], 401);
+            }
+
+            // Delete user (cascades to profile, photos, matches, etc. via DB constraints)
+            // Note: S3 file cleanup should be handled by Model Observers or a cleanup job
+            $user->delete();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Account deleted successfully',
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Account deletion error', [
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage(),
+            ]);
+            
+            return response()->json([
+                'message' => 'Error deleting account',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
             ], 500);
         }
     }

@@ -23,7 +23,7 @@ const BASE_URL = getBaseUrl();
 
 export interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>;
-  body?: string; // Allow body on DELETE requests
+  body?: any; // Allow any body (string, FormData, etc.)
   retry?: number; // Number of retry attempts
   retryDelay?: number; // Delay between retries in ms
 }
@@ -77,6 +77,10 @@ export class ApiError extends Error implements ApiErrorResponse {
   get isClientError(): boolean {
     return this.status >= 400 && this.status < 500;
   }
+  
+  get isRateLimitError(): boolean {
+    return this.status === 429;
+  }
 
   /**
    * Get validation errors by field name
@@ -107,6 +111,16 @@ export class ApiError extends Error implements ApiErrorResponse {
       errors: this.errors,
       code: this.code,
     };
+  }
+}
+
+/**
+ * Specific error for Rate Limits (429)
+ */
+export class RateLimitError extends ApiError {
+  constructor(message: string, data?: any) {
+    super(message || 'Too many requests. Please try again later.', 429, 'Too Many Requests', data);
+    this.name = 'RateLimitError';
   }
 }
 
@@ -147,6 +161,7 @@ async function request<T>(
     headers,
     retry = 0,
     retryDelay = 1000,
+    body,
     ...fetchOptions
   } = options;
 
@@ -165,11 +180,23 @@ async function request<T>(
     }
   }
 
-  // Merge headers
-  const finalHeaders: Record<string, string> = {
-    'Content-Type': 'application/json',
+  // Determine Content-Type
+  // If body is FormData, let the browser set Content-Type (multipart/form-data with boundary)
+  // Otherwise default to application/json
+  const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
+  
+  const defaultHeaders: Record<string, string> = {
     'Accept': 'application/json',
     ...getAuthHeaders(),
+  };
+
+  if (!isFormData) {
+    defaultHeaders['Content-Type'] = 'application/json';
+  }
+
+  // Merge headers
+  const finalHeaders: Record<string, string> = {
+    ...defaultHeaders,
     ...(headers as Record<string, string>),
   };
 
@@ -182,6 +209,7 @@ async function request<T>(
       const response = await fetch(url, {
         ...fetchOptions,
         headers: finalHeaders,
+        body: isFormData ? body : (typeof body === 'object' ? JSON.stringify(body) : body),
       });
 
       // Parse response - handle empty responses
@@ -196,15 +224,22 @@ async function request<T>(
 
       if (!response.ok) {
         const errorMessage = data.message || data.error || `Request failed with status ${response.status}`;
-        const apiError = new ApiError(
-          errorMessage,
-          response.status,
-          response.statusText,
-          data
-        );
+        
+        let apiError: ApiError;
+        
+        if (response.status === 429) {
+          apiError = new RateLimitError(errorMessage, data);
+        } else {
+          apiError = new ApiError(
+            errorMessage,
+            response.status,
+            response.statusText,
+            data
+          );
+        }
 
         // Don't retry client errors (except 429 rate limit) or auth errors
-        if ((apiError.isClientError && response.status !== 429) || apiError.isAuthError) {
+        if ((apiError.isClientError && !apiError.isRateLimitError) || apiError.isAuthError) {
           throw apiError;
         }
 
@@ -253,7 +288,7 @@ export const apiClient = {
     request<T>(endpoint, {
       ...options,
       method: 'POST',
-      body: body ? JSON.stringify(body) : undefined,
+      body: body,
       retry: options?.retry ?? 1, // POST requests get 1 retry by default
     }),
 
@@ -261,7 +296,7 @@ export const apiClient = {
     request<T>(endpoint, {
       ...options,
       method: 'PUT',
-      body: body ? JSON.stringify(body) : undefined,
+      body: body,
       retry: options?.retry ?? 1,
     }),
 
@@ -269,7 +304,7 @@ export const apiClient = {
     request<T>(endpoint, {
       ...options,
       method: 'PATCH',
-      body: body ? JSON.stringify(body) : undefined,
+      body: body,
       retry: options?.retry ?? 1,
     }),
 
@@ -284,6 +319,10 @@ export function isApiError(error: unknown): error is ApiError {
   return error instanceof ApiError;
 }
 
+export function isRateLimitError(error: unknown): error is RateLimitError {
+  return error instanceof RateLimitError;
+}
+
 export function isNetworkError(error: unknown): error is NetworkError {
   return error instanceof NetworkError;
 }
@@ -292,6 +331,9 @@ export function isNetworkError(error: unknown): error is NetworkError {
  * Get user-friendly error message from error
  */
 export function getErrorMessage(error: unknown): string {
+  if (isRateLimitError(error)) {
+    return "You're doing that too fast. Please wait a moment.";
+  }
   if (isApiError(error)) {
     return error.message;
   }
@@ -452,29 +494,8 @@ export async function uploadFile<T>(
     });
   }
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('fwber_token') : null;
-  const headers: Record<string, string> = {};
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  const response = await fetch(`${BASE_URL}${endpoint}`, {
-    method: 'POST',
-    headers,
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const data = await response.json().catch(() => ({}));
-    throw new ApiError(
-      data.message || 'Upload failed',
-      response.status,
-      response.statusText,
-      data
-    );
-  }
-
-  return response.json();
+  // Use api.post which now handles FormData correctly
+  return api.post<T>(endpoint, formData);
 }
 
 /**

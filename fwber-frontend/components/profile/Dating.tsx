@@ -5,15 +5,53 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 interface DatingProps {
   formData: any;
   handlePreferenceChange: (field: string, value: any) => void;
+  handleInputChange: (field: string, value: any) => void;
 }
 
-export default function Dating({ formData, handlePreferenceChange }: DatingProps) {
+export default function Dating({ formData, handlePreferenceChange, handleInputChange }: DatingProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Dating Preferences</CardTitle>
+        <CardTitle>Dating Profile & Preferences</CardTitle>
       </CardHeader>
       <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div>
+          <label htmlFor="relationship_goals" className="block text-sm font-medium text-gray-700">
+            Relationship Goals
+          </label>
+          <select
+            id="relationship_goals"
+            value={formData.relationship_goals}
+            onChange={(e) => handleInputChange('relationship_goals', e.target.value)}
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          >
+            <option value="">Select goals</option>
+            <option value="long-term">Long-term partner</option>
+            <option value="short-term">Short-term fun</option>
+            <option value="marriage">Marriage</option>
+            <option value="friends">New friends</option>
+            <option value="figuring-out">Still figuring it out</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="family_plans" className="block text-sm font-medium text-gray-700">
+            Family Plans
+          </label>
+          <select
+            id="family_plans"
+            value={formData.family_plans}
+            onChange={(e) => handleInputChange('family_plans', e.target.value)}
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          >
+            <option value="">Select plans</option>
+            <option value="want-kids">Want kids</option>
+            <option value="dont-want-kids">Don&apos;t want kids</option>
+            <option value="have-kids">Have kids</option>
+            <option value="open">Open to kids</option>
+          </select>
+        </div>
+
         <div>
           <label htmlFor="height_min" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Your Height

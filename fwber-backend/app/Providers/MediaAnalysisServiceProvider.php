@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Services\MediaAnalysis\Drivers\AwsRekognitionDriver;
 use App\Services\MediaAnalysis\Drivers\MockMediaAnalysisDriver;
+use App\Services\MediaAnalysis\Drivers\OpenAIVisionDriver;
 use App\Services\MediaAnalysis\MediaAnalysisInterface;
 use Illuminate\Support\ServiceProvider;
 
@@ -19,6 +20,10 @@ class MediaAnalysisServiceProvider extends ServiceProvider
 
             if ($driver === 'aws') {
                 return new AwsRekognitionDriver();
+            }
+
+            if ($driver === 'openai') {
+                return new OpenAIVisionDriver();
             }
 
             return new MockMediaAnalysisDriver();

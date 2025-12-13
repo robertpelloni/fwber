@@ -96,6 +96,21 @@ describe('Admin Analytics Dashboard', () => {
         }
       }
     }).as('getSystemHealth');
+
+    // Mock Slow Requests
+    cy.intercept('GET', '**/api/analytics/slow-requests*', {
+      statusCode: 200,
+      body: [
+        {
+          id: 1,
+          method: 'GET',
+          url: 'http://localhost/api/slow-endpoint',
+          duration_ms: 1500,
+          status_code: 200,
+          occurred_at: new Date().toISOString()
+        }
+      ]
+    }).as('getSlowRequests');
   });
 
   it('loads the analytics dashboard and displays key metrics', () => {
@@ -136,6 +151,11 @@ describe('Admin Analytics Dashboard', () => {
     cy.contains('h2', 'Moderation Insights').should('be.visible');
     cy.contains('AI Accuracy').should('exist');
     cy.contains('98.5%').should('exist');
+
+    // Verify Slow Requests
+    cy.contains('h2', 'Slow Requests').should('be.visible');
+    cy.contains('http://localhost/api/slow-endpoint').should('exist');
+    cy.contains('1.50s').should('exist');
   });
 
   it('handles error states gracefully', () => {

@@ -6,6 +6,7 @@ use App\Http\Requests\PurchaseBoostRequest;
 use App\Models\Boost;
 use App\Models\Payment;
 use App\Services\Payment\PaymentGatewayInterface;
+use App\Services\TokenDistributionService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -14,10 +15,12 @@ use OpenApi\Attributes as OA;
 class BoostController extends Controller
 {
     protected $paymentGateway;
+    protected $tokenService;
 
-    public function __construct(PaymentGatewayInterface $paymentGateway)
+    public function __construct(PaymentGatewayInterface $paymentGateway, TokenDistributionService $tokenService)
     {
         $this->paymentGateway = $paymentGateway;
+        $this->tokenService = $tokenService;
     }
 
     /**
@@ -57,6 +60,31 @@ class BoostController extends Controller
         }
 
         $type = $request->type;
+        $paymentMethod = $request->input('payment_method', 'stripe');
+
+        if ($paymentMethod === 'token') {
+            $tokenCost = $type === 'super' ? 100 : 50;
+
+            try {
+                $this->tokenService->spendTokens($user, $tokenCost, "Purchased " . ucfirst($type) . " Boost");
+
+                $duration = $type === 'super' ? 120 : 30; // minutes
+                $now = now();
+
+                $boost = Boost::create([
+                    'user_id' => $user->id,
+                    'started_at' => $now,
+                    'expires_at' => $now->copy()->addMinutes($duration),
+                    'boost_type' => $type,
+                    'status' => 'active',
+                ]);
+
+                return response()->json($boost);
+            } catch (\Exception $e) {
+                return response()->json(['error' => $e->getMessage()], 400);
+            }
+        }
+
         $amount = $type === 'super' ? 9.99 : 4.99;
         $currency = 'USD';
         $paymentMethodId = $request->input('payment_method_id', 'tok_visa');

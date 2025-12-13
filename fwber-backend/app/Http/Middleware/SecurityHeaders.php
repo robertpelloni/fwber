@@ -55,7 +55,7 @@ class SecurityHeaders
             $styleDirectives,
             "img-src 'self' data: https:",
             "font-src 'self' data:",
-            "connect-src 'self'",
+            "connect-src 'self' https: wss:",
             "frame-ancestors 'self'",
             "base-uri 'self'",
             "form-action 'self'",
@@ -66,9 +66,9 @@ class SecurityHeaders
         // Disable potentially dangerous browser features
         $permissionsPolicy = implode(', ', [
             'geolocation=(self)',
-            'microphone=()',
-            'camera=()',
-            'payment=()',
+            'microphone=(self)',
+            'camera=(self)',
+            'payment=(self)',
             'usb=()',
             'magnetometer=()',
             'gyroscope=()',

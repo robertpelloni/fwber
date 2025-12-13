@@ -92,10 +92,10 @@
   }
   
   .btn-primary {
-    @apply bg-primary text-primary-foreground;
-    @apply hover:bg-primary/90 active:bg-primary/95;
+    @apply bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-[length:200%_auto] animate-gradient-x text-white border-none;
+    @apply hover:opacity-90 active:opacity-100;
     @apply transition-all duration-200 ease-in-out;
-    @apply focus:ring-2 focus:ring-primary focus:ring-offset-2;
+    @apply focus:ring-2 focus:ring-purple-500 focus:ring-offset-2;
   }
   
   .btn-secondary {
@@ -136,4 +136,22 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+}
+
+@keyframes hue-cycle {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5)); }
+  50% { filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8)); }
+}
+
+.animate-hue-cycle {
+  animation: hue-cycle 10s linear infinite;
+}
+
+.animate-glow {
+  animation: glow-pulse 2s ease-in-out infinite;
 }

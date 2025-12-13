@@ -5,9 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 interface LifestyleProps {
   formData: any;
   handlePreferenceChange: (field: string, value: any) => void;
+  handleInputChange: (field: string, value: any) => void;
 }
 
-export default function Lifestyle({ formData, handlePreferenceChange }: LifestyleProps) {
+export default function Lifestyle({ formData, handlePreferenceChange, handleInputChange }: LifestyleProps) {
   return (
     <Card>
       <CardHeader>
@@ -29,13 +30,13 @@ export default function Lifestyle({ formData, handlePreferenceChange }: Lifestyl
         </div>
 
         <div>
-          <label htmlFor="smoking" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label htmlFor="smoking_status" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Smoking
           </label>
           <select
-            id="smoking"
-            value={formData.preferences.smoking}
-            onChange={(e) => handlePreferenceChange('smoking', e.target.value)}
+            id="smoking_status"
+            value={formData.smoking_status}
+            onChange={(e) => handleInputChange('smoking_status', e.target.value)}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           >
             <option value="">Select preference</option>
@@ -48,13 +49,13 @@ export default function Lifestyle({ formData, handlePreferenceChange }: Lifestyl
         </div>
 
         <div>
-          <label htmlFor="drinking" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label htmlFor="drinking_status" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Drinking
           </label>
           <select
-            id="drinking"
-            value={formData.preferences.drinking}
-            onChange={(e) => handlePreferenceChange('drinking', e.target.value)}
+            id="drinking_status"
+            value={formData.drinking_status}
+            onChange={(e) => handleInputChange('drinking_status', e.target.value)}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           >
             <option value="">Select preference</option>
@@ -67,13 +68,31 @@ export default function Lifestyle({ formData, handlePreferenceChange }: Lifestyl
         </div>
 
         <div>
-          <label htmlFor="exercise" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="cannabis_status" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Cannabis
+          </label>
+          <select
+            id="cannabis_status"
+            value={formData.cannabis_status}
+            onChange={(e) => handleInputChange('cannabis_status', e.target.value)}
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          >
+            <option value="">Select preference</option>
+            <option value="non-user">Non-user</option>
+            <option value="occasional">Occasional user</option>
+            <option value="regular">Regular user</option>
+            <option value="medical">Medical user</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="exercise_habits" className="block text-sm font-medium text-gray-700">
             Exercise
           </label>
           <select
-            id="exercise"
-            value={formData.preferences.exercise}
-            onChange={(e) => handlePreferenceChange('exercise', e.target.value)}
+            id="exercise_habits"
+            value={formData.exercise_habits}
+            onChange={(e) => handleInputChange('exercise_habits', e.target.value)}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           >
             <option value="">Select preference</option>
@@ -87,13 +106,13 @@ export default function Lifestyle({ formData, handlePreferenceChange }: Lifestyl
         </div>
 
         <div>
-          <label htmlFor="diet" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="dietary_preferences" className="block text-sm font-medium text-gray-700">
             Diet
           </label>
           <select
-            id="diet"
-            value={formData.preferences.diet}
-            onChange={(e) => handlePreferenceChange('diet', e.target.value)}
+            id="dietary_preferences"
+            value={formData.dietary_preferences}
+            onChange={(e) => handleInputChange('dietary_preferences', e.target.value)}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           >
             <option value="">Select preference</option>
@@ -109,13 +128,31 @@ export default function Lifestyle({ formData, handlePreferenceChange }: Lifestyl
         </div>
 
         <div>
+          <label htmlFor="sleep_habits" className="block text-sm font-medium text-gray-700">
+            Sleep Habits
+          </label>
+          <select
+            id="sleep_habits"
+            value={formData.sleep_habits}
+            onChange={(e) => handleInputChange('sleep_habits', e.target.value)}
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          >
+            <option value="">Select preference</option>
+            <option value="early-riser">Early riser</option>
+            <option value="night-owl">Night owl</option>
+            <option value="irregular">Irregular schedule</option>
+            <option value="average">Average (11pm-7am)</option>
+          </select>
+        </div>
+
+        <div>
           <label htmlFor="pets" className="block text-sm font-medium text-gray-700">
             Pets
           </label>
           <select
             id="pets"
-            value={formData.preferences.pets}
-            onChange={(e) => handlePreferenceChange('pets', e.target.value)}
+            value={formData.pets?.[0] || ''}
+            onChange={(e) => handleInputChange('pets', e.target.value ? [e.target.value] : [])}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           >
             <option value="">Select preference</option>
@@ -133,8 +170,8 @@ export default function Lifestyle({ formData, handlePreferenceChange }: Lifestyl
           </label>
           <select
             id="children"
-            value={formData.preferences.children}
-            onChange={(e) => handlePreferenceChange('children', e.target.value)}
+            value={formData.children}
+            onChange={(e) => handleInputChange('children', e.target.value)}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           >
             <option value="">Select preference</option>

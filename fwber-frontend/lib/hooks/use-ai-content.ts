@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import axios from 'axios';
 import { useMutation } from '@tanstack/react-query';
+import { api } from '@/lib/api/client';
 
 interface GenerationResult {
   suggestions: Array<{
@@ -37,53 +37,30 @@ interface StarterParams {
 export function useAIContent() {
   const [error, setError] = useState<string | null>(null);
 
-  const getHeaders = () => {
-    const token = localStorage.getItem('fwber_token');
-    return {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    };
-  };
-
   const generateBio = useMutation({
     mutationFn: async (params: BioParams) => {
-      const response = await axios.post<GenerationResult>(
-        `${process.env.NEXT_PUBLIC_API_URL}/content/generate-bio`,
-        params,
-        { headers: getHeaders() }
-      );
-      return response.data;
+      return api.post<GenerationResult>('/content/generate-bio', params);
     },
     onError: (err: any) => {
-      setError(err.response?.data?.message || 'Failed to generate bio');
+      setError(err.message || 'Failed to generate bio');
     },
   });
 
   const generatePosts = useMutation({
     mutationFn: async ({ boardId, params }: { boardId: number; params: PostParams }) => {
-      const response = await axios.post<GenerationResult>(
-        `${process.env.NEXT_PUBLIC_API_URL}/content/generate-posts/${boardId}`,
-        params,
-        { headers: getHeaders() }
-      );
-      return response.data;
+      return api.post<GenerationResult>(`/content/generate-posts/${boardId}`, params);
     },
     onError: (err: any) => {
-      setError(err.response?.data?.message || 'Failed to generate posts');
+      setError(err.message || 'Failed to generate posts');
     },
   });
 
   const generateStarters = useMutation({
     mutationFn: async (params: StarterParams) => {
-      const response = await axios.post<GenerationResult>(
-        `${process.env.NEXT_PUBLIC_API_URL}/content/generate-starters`,
-        params,
-        { headers: getHeaders() }
-      );
-      return response.data;
+      return api.post<GenerationResult>('/content/generate-starters', params);
     },
     onError: (err: any) => {
-      setError(err.response?.data?.message || 'Failed to generate conversation starters');
+      setError(err.message || 'Failed to generate conversation starters');
     },
   });
 

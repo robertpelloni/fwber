@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import { Quote } from 'lucide-react';
 
 const QUOTES = [
-  "Everything is about sex, except sex. Sex is about power. — Oscar Wilde",
+  "Everything in the world is about sex except sex. Sex is about power. — Oscar Wilde",
+  "I must, I must, I must increase my bust — Lord Of Acid",
+  "The power of love is a curious thing / Make a one man weep, make another man sing / Change a hawk to a little white dove / More than a feeling; that's the power of love — Huey Lewis & The News",
   "Let's talk about sex, baby. Let's talk about you and me. — Salt-N-Pepa",
   "Sex is the consolation you have when you can't have love. — Gabriel García Márquez",
   "Sex without love is a meaningless experience, but as far as meaningless experiences go its pretty damn good. — Woody Allen",
@@ -36,7 +38,17 @@ const QUOTES = [
   "Biologically speaking, if something bites you it's more likely to be female. — Desmond Morris",
   "I've been on so many blind dates, I should get a free dog. — Wendy Liebman",
   "My mother told me to be a lady. And for her, that meant be your own person, be independent. — Ruth Bader Ginsburg",
-  "Sex is one of the nine reasons for reincarnation. The other eight are unimportant. — Henry Miller"
+  "Sex is one of the nine reasons for reincarnation. The other eight are unimportant. — Henry Miller",
+  "I want your sex. — George Michael",
+  "Let's get it on. — Marvin Gaye",
+  "Sexual healing is good for me. — Marvin Gaye",
+  "You can leave your hat on. — Joe Cocker",
+  "I'm too sexy for my shirt. — Right Said Fred",
+  "Like a virgin, touched for the very first time. — Madonna",
+  "I wanna sex you up. — Color Me Badd",
+  "Touch-a, Touch-a, Touch-a, Touch Me — The Rocky Horror Picture Show",
+  "Relax, don't do it, when you want to go to it. — Frankie Goes to Hollywood",
+  "Physical, physical, I wanna get physical. — Olivia Newton-John"
 ];
 
 export default function SexQuote() {

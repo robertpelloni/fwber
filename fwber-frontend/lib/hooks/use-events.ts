@@ -56,7 +56,17 @@ export function useRsvpEvent() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, status }: { id: number; status: string }) => rsvpEvent(id, status),
+    mutationFn: ({ 
+      id, 
+      status, 
+      paymentMethod, 
+      paymentMethodId 
+    }: { 
+      id: number; 
+      status: string; 
+      paymentMethod?: 'stripe' | 'token';
+      paymentMethodId?: string;
+    }) => rsvpEvent(id, status, paymentMethod, paymentMethodId),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['events', id.toString()] });
       queryClient.invalidateQueries({ queryKey: ['events', 'my'] });

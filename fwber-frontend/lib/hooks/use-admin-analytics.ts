@@ -5,7 +5,9 @@ import {
   getPlatformAnalytics,
   getRateLimitStatistics,
   getRealtimeAnalytics,
+  getRetentionAnalytics,
   getSlowRequests,
+  getSlowRequestStats,
 } from '@/lib/api/admin';
 import type {
   AnalyticsRange,
@@ -15,7 +17,9 @@ import type {
   RateLimitStatsResponse,
   RateLimitTimeframe,
   RealtimeMetrics,
+  RetentionResponse,
   SlowRequest,
+  SlowRequestStats,
 } from '@/lib/api/types';
 
 interface AdminQueryOptions {
@@ -75,10 +79,34 @@ export function useBoostAnalytics(options: AdminQueryOptions = {}) {
   });
 }
 
+export function useRetentionAnalytics(options: AdminQueryOptions = {}) {
+  return useQuery<RetentionResponse>({
+    queryKey: ['analytics', 'retention'],
+    queryFn: getRetentionAnalytics,
+    enabled: options.enabled ?? true,
+    refetchInterval: options.refetchInterval ?? 3600_000, // 1 hour
+    staleTime: options.staleTime ?? 3600_000,
+    gcTime: DEFAULT_GC_TIME,
+    refetchOnWindowFocus: false,
+  });
+}
+
 export function useSlowRequests(options: AdminQueryOptions = {}) {
   return useQuery<SlowRequest[]>({
     queryKey: ['analytics', 'slow-requests'],
     queryFn: getSlowRequests,
+    enabled: options.enabled ?? true,
+    refetchInterval: options.refetchInterval ?? 60_000,
+    staleTime: options.staleTime ?? 30_000,
+    gcTime: DEFAULT_GC_TIME,
+    refetchOnWindowFocus: false,
+  });
+}
+
+export function useSlowRequestStats(options: AdminQueryOptions = {}) {
+  return useQuery<SlowRequestStats[]>({
+    queryKey: ['analytics', 'slow-requests', 'stats'],
+    queryFn: getSlowRequestStats,
     enabled: options.enabled ?? true,
     refetchInterval: options.refetchInterval ?? 60_000,
     staleTime: options.staleTime ?? 30_000,

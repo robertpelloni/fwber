@@ -6,6 +6,9 @@ use App\Http\Requests\EventRsvpRequest;
 use App\Http\Requests\StoreEventRequest;
 use App\Models\Event;
 use App\Models\EventAttendee;
+use App\Models\Payment;
+use App\Services\Payment\PaymentGatewayInterface;
+use App\Services\TokenDistributionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -13,6 +16,14 @@ use Illuminate\Support\Facades\DB;
 
 class EventController extends Controller
 {
+    protected $paymentGateway;
+    protected $tokenService;
+
+    public function __construct(PaymentGatewayInterface $paymentGateway, TokenDistributionService $tokenService)
+    {
+        $this->paymentGateway = $paymentGateway;
+        $this->tokenService = $tokenService;
+    }
     /**
      * @OA\Get(
      *     path="/api/events",
@@ -272,9 +283,72 @@ class EventController extends Controller
             }
         }
 
+        $existingAttendee = $event->attendees->where('user_id', $user->id)->first();
+        $alreadyPaid = $existingAttendee && $existingAttendee->paid;
+        
+        $paymentData = [];
+
+        // Handle Payment Logic if switching to attending and not paid
+        if ($request->status === 'attending' && $event->price > 0 && !$alreadyPaid) {
+            $paymentMethod = $request->input('payment_method');
+            
+            // If no payment method provided for a paid event, return error
+            if (!$paymentMethod) {
+                 return response()->json(['error' => 'Payment method required for paid events'], 400);
+            }
+
+            $transactionId = null;
+
+            if ($paymentMethod === 'token') {
+                // Conversion: 1 USD = 10 Tokens
+                $tokenCost = $event->price * 10;
+                
+                try {
+                    $this->tokenService->spendTokens($user, $tokenCost, "Ticket for event: {$event->title}");
+                    $transactionId = 'token_' . uniqid();
+                } catch (\Exception $e) {
+                    return response()->json(['error' => $e->getMessage()], 400);
+                }
+            } else {
+                // Stripe
+                $paymentMethodId = $request->input('payment_method_id');
+                if (!$paymentMethodId) {
+                        return response()->json(['error' => 'Payment method ID required for paid events'], 400);
+                }
+
+                try {
+                    $result = $this->paymentGateway->charge($event->price, 'USD', $paymentMethodId);
+                    if (!$result->success) {
+                        return response()->json(['error' => 'Payment failed: ' . $result->message], 400);
+                    }
+                    $transactionId = $result->transactionId;
+                    
+                    // Log Payment
+                    Payment::create([
+                        'user_id' => $user->id,
+                        'amount' => $event->price,
+                        'currency' => 'USD',
+                        'payment_gateway' => config('services.payment.driver', 'mock'),
+                        'transaction_id' => $result->transactionId,
+                        'status' => 'succeeded',
+                        'description' => "Ticket for event: {$event->title}",
+                        'metadata' => $result->data,
+                    ]);
+                } catch (\Exception $e) {
+                    return response()->json(['error' => 'Payment error: ' . $e->getMessage()], 500);
+                }
+            }
+
+            $paymentData = [
+                'paid' => true,
+                'payment_method' => $paymentMethod,
+                'transaction_id' => $transactionId,
+            ];
+        }
+
         $attendee = EventAttendee::updateOrCreate(
             ['event_id' => $event->id, 'user_id' => $user->id],
-            ['status' => $request->status]
+            array_merge(['status' => $request->status], $paymentData)
         );
 
         // Invalidate events cache (attendee counts changed)

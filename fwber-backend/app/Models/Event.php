@@ -21,6 +21,7 @@ class Event extends Model
         'price',
         'created_by_user_id',
         'status',
+        'reminder_sent',
     ];
 
     protected $casts = [
@@ -29,6 +30,7 @@ class Event extends Model
         'latitude' => 'float',
         'longitude' => 'float',
         'price' => 'decimal:2',
+        'reminder_sent' => 'boolean',
     ];
 
     public function creator()

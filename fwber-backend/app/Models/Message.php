@@ -19,6 +19,7 @@ class Message extends Model
         'media_type',
         'media_duration',
         'thumbnail_url',
+        'transcription',
         'is_read',
         'sent_at',
         'read_at',

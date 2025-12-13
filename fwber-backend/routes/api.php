@@ -1,6 +1,35 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BulletinBoardController;
+use App\Http\Controllers\ChatroomController;
+use App\Http\Controllers\ChatroomMessageController;
+use App\Http\Controllers\ContentGenerationController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LocationController;
+use App\Http\Controllers\MatchController;
+use App\Http\Controllers\MercureAuthController;
+use App\Http\Controllers\PhotoController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProfileViewController;
+use App\Http\Controllers\ProximityChatroomController;
+use App\Http\Controllers\ProximityChatroomMessageController;
+use App\Http\Controllers\RateLimitController;
+use App\Http\Controllers\RecommendationController;
+use App\Http\Controllers\HealthController;
+use App\Http\Controllers\Api\RelationshipTierController;
+use App\Http\Controllers\Api\MessageController;
+use App\Http\Controllers\Api\UserPhysicalProfileController;
+use App\Http\Controllers\Api\BlockController;
+use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\GroupController;
+use App\Http\Controllers\Api\GroupMessageController;
+use App\Http\Controllers\WebSocketController;
+use App\Http\Controllers\ProximityArtifactController;
+use App\Http\Controllers\ModerationController;
+use App\Http\Controllers\Api\FriendController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventController;
 
@@ -15,8 +44,9 @@ use App\Http\Controllers\EventController;
 |
 */
 
-Route::post('auth/register', [\App\Http\Controllers\AuthController::class, 'register']);
-Route::post('auth/login', [\App\Http\Controllers\AuthController::class, 'login']);
+Route::post('auth/register', [\App\Http\Controllers\AuthController::class, 'register'])->middleware('throttle:auth');
+Route::post('auth/login', [\App\Http\Controllers\AuthController::class, 'login'])->middleware('throttle:auth');
+Route::post('auth/two-factor-challenge', [\App\Http\Controllers\TwoFactorChallengeController::class, 'store'])->middleware('throttle:auth');
 
 // Health Checks
 Route::get('health', [\App\Http\Controllers\HealthController::class, 'check']);
@@ -30,6 +60,12 @@ Route::post('stripe/webhook', [\App\Http\Controllers\StripeWebhookController::cl
 Route::prefix('venue')->group(function () {
     Route::post('register', [\App\Http\Controllers\VenueAuthController::class, 'register']);
     Route::post('login', [\App\Http\Controllers\VenueAuthController::class, 'login']);
+        // Report routes
+        Route::prefix('reports')->group(function (): void {
+            Route::post('/', [ReportController::class, 'store']);
+            Route::get('/', [ReportController::class, 'index']);
+            Route::put('/{reportId}', [ReportController::class, 'update']);
+        });
 
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('logout', [\App\Http\Controllers\VenueAuthController::class, 'logout']);
@@ -45,6 +81,22 @@ Route::middleware('auth:sanctum')->group(function () {
     // Auth
     Route::post('auth/logout', [\App\Http\Controllers\AuthController::class, 'logout']);
     Route::get('auth/me', [\App\Http\Controllers\AuthController::class, 'me']);
+
+    // Two Factor Authentication
+    Route::post('user/two-factor-authentication', [\App\Http\Controllers\TwoFactorAuthenticationController::class, 'store']);
+    Route::post('user/confirmed-two-factor-authentication', [\App\Http\Controllers\TwoFactorAuthenticationController::class, 'confirm']);
+    Route::delete('user/two-factor-authentication', [\App\Http\Controllers\TwoFactorAuthenticationController::class, 'destroy']);
+    Route::get('user/two-factor-qr-code', [\App\Http\Controllers\TwoFactorAuthenticationController::class, 'showQrCode']);
+    Route::get('user/two-factor-recovery-codes', [\App\Http\Controllers\TwoFactorAuthenticationController::class, 'recoveryCodes']);
+    Route::post('user/two-factor-recovery-codes', [\App\Http\Controllers\TwoFactorAuthenticationController::class, 'regenerateRecoveryCodes']);
+
+    // Profile
+    Route::get('users/{id}', [\App\Http\Controllers\ProfileController::class, 'showPublic']);
+    Route::get('profile', [\App\Http\Controllers\ProfileController::class, 'show']);
+    Route::put('profile', [\App\Http\Controllers\ProfileController::class, 'update']);
+    Route::delete('profile', [\App\Http\Controllers\ProfileController::class, 'destroy']);
+    Route::get('profile/completeness', [\App\Http\Controllers\ProfileController::class, 'completeness']);
+    Route::get('profile/export', [\App\Http\Controllers\ProfileController::class, 'export']);
 
     // Dashboard
     Route::get('dashboard/stats', [\App\Http\Controllers\DashboardController::class, 'getStats']);
@@ -64,12 +116,29 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('websocket/status', [\App\Http\Controllers\WebSocketController::class, 'status']);
     Route::post('websocket/broadcast', [\App\Http\Controllers\WebSocketController::class, 'broadcast']);
 
+    // Video Chat
+    Route::middleware('feature:video_chat')->group(function () {
+        Route::post('video/signal', [\App\Http\Controllers\VideoChatController::class, 'signal']);
+        Route::post('video/initiate', [\App\Http\Controllers\VideoChatController::class, 'initiate']);
+        Route::put('video/{id}/status', [\App\Http\Controllers\VideoChatController::class, 'updateStatus']);
+        Route::get('video/history', [\App\Http\Controllers\VideoChatController::class, 'history']);
+    });
+
     // Analytics
     Route::get('analytics', [\App\Http\Controllers\AnalyticsController::class, 'index']);
     Route::get('analytics/realtime', [\App\Http\Controllers\AnalyticsController::class, 'realtime']);
     Route::get('analytics/moderation', [\App\Http\Controllers\AnalyticsController::class, 'moderation']);
     Route::get('analytics/slow-requests', [\App\Http\Controllers\AnalyticsController::class, 'slowRequests']);
+    Route::get('analytics/slow-requests/stats', [\App\Http\Controllers\AnalyticsController::class, 'slowRequestStats']);
     Route::get('analytics/boosts', [\App\Http\Controllers\AnalyticsController::class, 'boosts']);
+    Route::get('analytics/retention', [\App\Http\Controllers\AnalyticsController::class, 'retention']);
+    
+    // Failed Jobs (Admin)
+    Route::get('analytics/failed-jobs', [\App\Http\Controllers\FailedJobController::class, 'index']);
+    Route::post('analytics/failed-jobs/retry-all', [\App\Http\Controllers\FailedJobController::class, 'retryAll']);
+    Route::post('analytics/failed-jobs/flush', [\App\Http\Controllers\FailedJobController::class, 'flush']);
+    Route::post('analytics/failed-jobs/{uuid}/retry', [\App\Http\Controllers\FailedJobController::class, 'retry']);
+    Route::delete('analytics/failed-jobs/{uuid}', [\App\Http\Controllers\FailedJobController::class, 'destroy']);
 
     // Notifications
     Route::get('notification-preferences', [\App\Http\Controllers\NotificationPreferenceController::class, 'index']);
@@ -121,7 +190,16 @@ Route::middleware('auth:sanctum')->group(function () {
     // Matches
     Route::get('matches', [\App\Http\Controllers\MatchController::class, 'index']);
     Route::get('matches/established', [\App\Http\Controllers\MatchController::class, 'establishedMatches']);
-    Route::post('matches/action', [\App\Http\Controllers\MatchController::class, 'action']);
+    Route::get('matches/{id}/insights', [\App\Http\Controllers\MatchInsightsController::class, 'show']);
+    Route::post('matches/action', [\App\Http\Controllers\MatchController::class, 'action'])->middleware('throttle:matching');
+
+    // Direct Messages
+    Route::get('messages/unread-count', [\App\Http\Controllers\Api\MessageController::class, 'unreadCount']);
+    Route::post('messages', [\App\Http\Controllers\Api\MessageController::class, 'store'])->middleware('throttle:messaging');
+    Route::post('messages/translate', [\App\Http\Controllers\TranslationController::class, 'translate'])->middleware('throttle:content_generation');
+    Route::get('messages/{userId}', [\App\Http\Controllers\Api\MessageController::class, 'index']);
+    Route::post('messages/{messageId}/read', [\App\Http\Controllers\Api\MessageController::class, 'markAsRead']);
+    Route::post('messages/mark-all-read/{senderId}', [\App\Http\Controllers\Api\MessageController::class, 'markAllAsRead']);
 
     // Chatrooms
     Route::get('chatrooms/my', [\App\Http\Controllers\ChatroomController::class, 'myChatrooms']);
@@ -139,7 +217,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Chatroom Messages
     Route::get('chatrooms/{chatroomId}/messages', [\App\Http\Controllers\ChatroomMessageController::class, 'index']);
-    Route::post('chatrooms/{chatroomId}/messages', [\App\Http\Controllers\ChatroomMessageController::class, 'store']);
+    Route::post('chatrooms/{chatroomId}/messages', [\App\Http\Controllers\ChatroomMessageController::class, 'store'])->middleware('throttle:messaging');
 
     // Proximity Chatrooms
     Route::get('proximity-chatrooms/nearby', [\App\Http\Controllers\ProximityChatroomController::class, 'findNearby']);
@@ -154,7 +232,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Proximity Chatroom Messages
     Route::get('proximity-chatrooms/{chatroomId}/messages', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'index']);
-    Route::post('proximity-chatrooms/{chatroomId}/messages', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'store']);
+    Route::post('proximity-chatrooms/{chatroomId}/messages', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'store'])->middleware('throttle:messaging');
     Route::get('proximity-chatrooms/{chatroomId}/messages/pinned', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'pinned']);
     Route::get('proximity-chatrooms/{chatroomId}/messages/networking', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'networking']);
     Route::get('proximity-chatrooms/{chatroomId}/messages/social', [\App\Http\Controllers\ProximityChatroomMessageController::class, 'social']);
@@ -187,6 +265,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // AI Avatar Generation
+    Route::get('avatar/providers', [\App\Http\Controllers\AvatarController::class, 'providers']);
     Route::post('avatar/generate', [\App\Http\Controllers\AvatarController::class, 'generate']);
 
     // AI Content Generation (rate limited)
@@ -213,7 +292,55 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('media/analyze', [\App\Http\Controllers\MediaAnalysisController::class, 'analyze']);
     });
 
+    // AI Wingman
+    Route::middleware('feature:ai_wingman')->group(function () {
+        Route::get('wingman/ice-breakers/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'getIceBreakers']);
+        Route::get('wingman/replies/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'getReplySuggestions']);
+        Route::get('wingman/profile-analysis', [\App\Http\Controllers\AiWingmanController::class, 'getProfileAnalysis']);
+        Route::get('wingman/date-ideas/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'getDateIdeas']);
+    });
+
+    // Friend routes
+    Route::prefix('friends')->group(function () {
+        Route::get('/', [FriendController::class, 'getFriends']);
+        Route::get('/requests', [FriendController::class, 'getFriendRequests']);
+        Route::post('/requests', [FriendController::class, 'sendFriendRequest'])->middleware('throttle:friend_requests');
+        Route::post('/requests/{userId}', [FriendController::class, 'respondToFriendRequest']);
+        Route::delete('/{friendId}', [FriendController::class, 'removeFriend']);
+        Route::get('/search', [FriendController::class, 'search']);
+    });
+
+    // Location routes (Phase 5A - Location-Based Social Features)
+    Route::get("/location", [LocationController::class, "show"]);
+    Route::post("/location", [LocationController::class, "update"]);
+    Route::put("/location/privacy", [LocationController::class, "updatePrivacy"]);
+    Route::delete("/location", [LocationController::class, "clear"]);
+    Route::get("/location/nearby", [LocationController::class, "nearby"]);
+
     // Verification
-    Route::post('verification/verify', [\App\Http\Controllers\VerificationController::class, 'verify']);
+    Route::post('verification/verify', [\App\Http\Controllers\VerificationController::class, 'verify'])->middleware('throttle:verification');
     Route::get('verification/status', [\App\Http\Controllers\VerificationController::class, 'status']);
+
+    // Feedback
+    Route::post('feedback', [\App\Http\Controllers\FeedbackController::class, 'store'])->middleware('throttle:feedback');
+    Route::get('feedback', [\App\Http\Controllers\FeedbackController::class, 'index']);
+    Route::put('feedback/{id}', [\App\Http\Controllers\FeedbackController::class, 'update']);
+
+    // Token / Wallet
+    Route::get('wallet', [\App\Http\Controllers\Api\TokenController::class, 'balance']);
+    Route::post('wallet/address', [\App\Http\Controllers\Api\TokenController::class, 'updateAddress']);
+    Route::get('leaderboard', [\App\Http\Controllers\Api\TokenController::class, 'leaderboard']);
+
+    // Gifts
+    Route::get('gifts', [\App\Http\Controllers\GiftController::class, 'index']);
+    Route::post('gifts/send', [\App\Http\Controllers\GiftController::class, 'send']);
+    Route::get('gifts/received', [\App\Http\Controllers\GiftController::class, 'received']);
+
+    // Wingman
+    Route::post('wingman/assist', [\App\Http\Controllers\WingmanController::class, 'recordAssist']);
+
+    // Share Unlock
+    Route::post('share-unlock', [\App\Http\Controllers\Api\ShareUnlockController::class, 'store']);
+    Route::get('share-unlock/{targetProfileId}', [\App\Http\Controllers\Api\ShareUnlockController::class, 'check']);
 });
+

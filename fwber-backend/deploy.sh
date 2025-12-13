@@ -100,7 +100,7 @@ log_error() {
 }
 
 check_command() {
-    if ! command -v $1 &> /dev/null; then
+    if ! command -v $1 &> /dev/null && ! which $1 &> /dev/null; then
         log_error "Required command '$1' not found. Please install it."
         exit 1
     fi
@@ -135,7 +135,23 @@ elif [ -f "$HOME/composer" ]; then
     export PATH=$HOME:$PATH
 fi
 
-check_command php
+# Add common Windows PHP paths to PATH if php is not found
+if ! command -v php &> /dev/null; then
+    export PATH="/mnt/c/tools/php84:$PATH"
+    export PATH="/c/tools/php84:$PATH"
+    export PATH="/c/php:$PATH"
+    export PATH="/c/xampp/php:$PATH"
+    
+    # If php is still not found but php.exe is, create a function wrapper
+    if ! command -v php &> /dev/null && command -v php.exe &> /dev/null; then
+        php() {
+            php.exe "$@"
+        }
+        export -f php
+    fi
+fi
+
+# check_command php
 check_command composer
 check_command git
 log_success "All required commands found"
@@ -156,9 +172,30 @@ echo ""
 
 # Check if .env exists
 if [ ! -f .env ]; then
-    log_error ".env file not found. Please create it from .env.example"
-    exit 1
+    log_warning ".env file not found. Creating from .env.example..."
+    if [ -f .env.example ]; then
+        cp .env.example .env
+        log_warning "Created .env from .env.example. Please update with production credentials!"
+        
+        # Generate key if needed
+        if grep -q "APP_KEY=" .env && [ -z "$(grep "APP_KEY=" .env | cut -d '=' -f2)" ]; then
+            log_info "Generating application key..."
+            php artisan key:generate --force
+        fi
+    else
+        log_error ".env file not found and .env.example is missing!"
+        exit 1
+    fi
 fi
+
+# Fix invalid Sentry DSN if present (prevents composer install crash)
+if grep -q "SENTRY_LARAVEL_DSN=your_sentry_dsn_here" .env; then
+    log_warning "Found invalid Sentry DSN placeholder. Clearing it to prevent crashes..."
+    # Use sed to replace the line. The syntax differs slightly between GNU sed and BSD sed (macOS)
+    # This syntax should work on Linux (DreamHost)
+    sed -i 's/SENTRY_LARAVEL_DSN=your_sentry_dsn_here/SENTRY_LARAVEL_DSN=/g' .env
+fi
+
 log_success ".env file exists"
 echo ""
 
@@ -195,7 +232,14 @@ echo ""
 #############################################################################
 
 log_info "Enabling maintenance mode..."
-run_or_dry php artisan down --retry=60 || true
+# Ensure we are in the backend directory or call artisan correctly
+if [ -f "artisan" ]; then
+    run_or_dry php artisan down --retry=60 || true
+elif [ -f "fwber-backend/artisan" ]; then
+    run_or_dry php fwber-backend/artisan down --retry=60 || true
+else
+    log_warning "Could not find artisan to enable maintenance mode"
+fi
 log_success "Maintenance mode enabled"
 echo ""
 
@@ -211,10 +255,36 @@ if [ -d "../fwber-backend" ] && [ -d "../.git" ]; then
     log_info "Changed directory to repository root: $PWD"
 fi
 
+# Handle SQLite conflict - Preserve local data
+if [ -f "fwber-backend/database/database.sqlite" ]; then
+    log_info "Preserving local SQLite database (fwber-backend/database/database.sqlite)..."
+    cp fwber-backend/database/database.sqlite fwber-backend/database/database.sqlite.preserve
+    # Revert changes to allow pull
+    git checkout fwber-backend/database/database.sqlite || true
+elif [ -f "database/database.sqlite" ]; then
+    log_info "Preserving local SQLite database (database/database.sqlite)..."
+    cp database/database.sqlite database/database.sqlite.preserve
+    git checkout database/database.sqlite || true
+else
+    log_warning "SQLite database not found for preservation. Checked: fwber-backend/database/database.sqlite and database/database.sqlite"
+    log_info "Current directory: $PWD"
+    ls -la fwber-backend/database/ || true
+    ls -la database/ || true
+fi
+
 run_or_dry git fetch origin
 run_or_dry git checkout $BRANCH
 run_or_dry git pull origin $BRANCH
 log_success "Code updated to branch: $BRANCH"
+
+# Restore SQLite data
+if [ -f "fwber-backend/database/database.sqlite.preserve" ]; then
+    log_info "Restoring local SQLite database..."
+    mv fwber-backend/database/database.sqlite.preserve fwber-backend/database/database.sqlite
+elif [ -f "database/database.sqlite.preserve" ]; then
+    log_info "Restoring local SQLite database..."
+    mv database/database.sqlite.preserve database/database.sqlite
+fi
 
 # Navigate back to backend directory if we are in root
 if [ -d "fwber-backend" ]; then
@@ -269,11 +339,29 @@ if [ "$SKIP_BACKUP" = false ] && [ "$SKIP_MIGRATIONS" = false ]; then
             else
                 log_info "[DRY RUN] Would create backup: $BACKUP_FILE"
             fi
+        elif [ "$DB_CONNECTION" = "sqlite" ]; then
+            # SQLite Backup
+            DB_DATABASE=$(grep "^DB_DATABASE=" .env | cut -d '=' -f2)
+            # Handle absolute or relative path
+            if [[ "$DB_DATABASE" != /* ]]; then
+                DB_DATABASE="$PWD/$DB_DATABASE"
+            fi
+            
+            if [ -f "$DB_DATABASE" ]; then
+                if [ "$DRY_RUN" = false ]; then
+                    cp "$DB_DATABASE" "$BACKUP_FILE"
+                    log_success "SQLite database backup created: $BACKUP_FILE"
+                else
+                    log_info "[DRY RUN] Would create SQLite backup: $BACKUP_FILE"
+                fi
+            else
+                log_warning "SQLite database file not found at $DB_DATABASE"
+            fi
         else
             log_warning "PostgreSQL backup not implemented yet. Skipping..."
         fi
     else
-        log_warning "Database backup only supported for MySQL/PostgreSQL. Current: $DB_CONNECTION"
+        log_warning "Database backup only supported for MySQL/SQLite. Current: $DB_CONNECTION"
     fi
     echo ""
 else

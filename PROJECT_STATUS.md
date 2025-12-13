@@ -1,16 +1,208 @@
 # Project Status
 
-**Last Updated:** December 04, 2025 (Updated - Push Notifications Complete)
+**Last Updated:** December 13, 2025
 **Status:** 🚀 LIVE / DEPLOYED
 
 ## 🟢 Current Status: Production Deployed
 The project has successfully completed the MVP, Secondary Systems, and Production Hardening phases. It is now **deployed and live**.
 
 ### ⚠️ Known Issues / Technical Debt
-*   None at this time.
+*   **None**: No critical technical debt currently tracked.
 
-### ✅ Completed Operational Improvements
-1.  **Cache Versioning & Strategy** (Dec 04 - Complete):
+### ✅ Completed Operational Improvements (Dec 12-13)
+1.  **Landing Page UI Polish**:
+    -   **Logo**: Fixed alignment issues and added glow effects.
+    -   **Typography**: Applied animated gradients to the main tagline and primary buttons for a cohesive, premium feel.
+    -   **Verification**: Visual inspection complete.
+2.  **Security & Embedding**:
+    -   **Iframe Support**: Configured Nginx and Next.js to allow embedding in WordPress via `Content-Security-Policy: frame-ancestors *`.
+    -   **Cookies**: Configured `SameSite=None; Secure` for session cookies to support cross-site authentication in iframes.
+    -   **Verification**: Configuration updated and pushed.
+3.  **Gifts Feature (Complete)**:
+    -   **Backend**: Implemented `Gift` model, `GiftController`, and `GiftSeeder`.
+    -   **Notifications**: Implemented `GiftReceivedNotification` with database and real-time (WebPush/WebSocket) delivery.
+    -   **Frontend**: Integrated `GiftShopModal` into the Matches page.
+    -   **User Flow**: Users can now send virtual gifts using their token balance directly from the match screen.
+    -   **Verification**: Feature tests (`GiftTest.php`) passing. Manual verification of UI flow.
+4.  **Performance Tuning (Slow Request Aggregation)**:
+    -   **Backend**: Enhanced `SlowRequest` model and `ApmMiddleware` to capture `route_name` and `action`.
+    -   **Backend**: Added `/analytics/slow-requests/stats` endpoint for aggregated metrics.
+    -   **Frontend**: Implemented `SlowRequestStatsTable` in Admin Analytics to visualize aggregated performance data.
+    -   **Verification**: Verified data flow from middleware to frontend UI.
+
+### ✅ Viral Growth Features (Dec 13)
+1.  **Wingman Bounties**:
+    -   **Concept**: Users earn tokens for successfully matchmaking friends.
+    -   **Backend**: Implemented `MatchAssist` model and `MatchMakerService`.
+    -   **Frontend**: Added "Share" button to Matches page generating unique referral links.
+    -   **Flow**: Referrer gets credit when the recipient matches with the shared profile.
+2.  **Unlock via Share**:
+    -   **Concept**: Viral loop where sharing a profile unlocks its photos for the sharer.
+    -   **Backend**: Implemented `ShareUnlock` model and controller.
+    -   **Frontend**: Updated `PhotoRevealGate` and `ProfileViewModal` to support instant unlock upon sharing.
+3.  **Community Leaderboard**:
+    -   **Backend**: Updated `TokenController` to return "Top Wingmen" stats.
+    -   **Frontend**: Updated `LeaderboardPage` to display top matchmakers alongside token holders and referrers.
+4.  **Daily Streaks (Gamification)**:
+    -   **Concept**: Track consecutive days of user activity to encourage retention.
+    -   **Backend**: Implemented `StreakService`, updated `User` model with `current_streak` and `last_active_at`.
+    -   **Frontend**: Added "Daily Streak" stat card to Dashboard.
+    -   **Verification**: Feature tests (`StreakTest.php`) passing. Fixed `DashboardController` SQL compatibility (SQLite/MySQL).
+    -   **Fixes**: Added missing `match_score` column to `matches` table and created missing `profile_views` table migration.
+
+### ✅ Privacy Features (Dec 13)
+1.  **Incognito Mode (Ghost Mode)**:
+    -   **Concept**: Users can browse without being seen by others, unless they initiate contact (like/super-like).
+    -   **Backend**: Added `is_incognito` to `user_profiles`. Updated `AIMatchingService` and `LocationController` to filter incognito users.
+    -   **Frontend**: Added "Incognito Mode" toggle to Settings page.
+    -   **Verification**: Feature implemented across full stack.
+2.  **Account Deletion (Self-Service)**:
+    -   **Concept**: Users can permanently delete their account and all associated data.
+    -   **Backend**: Implemented `DELETE /api/profile` endpoint and `ProfileController::destroy` method.
+    -   **Frontend**: Added "Danger Zone" to Settings page with "Delete Account" button and confirmation flow.
+    -   **Verification**: Feature tests (`ProfileDeletionTest.php`) passing.
+3.  **Data Export (GDPR)**:
+    -   **Concept**: Users can download a JSON copy of their personal data.
+    -   **Backend**: Implemented `GET /api/profile/export` endpoint and `ProfileController::export` method.
+    -   **Frontend**: Added "Export Data" button to Settings page.
+    -   **Verification**: Feature tests (`ProfileExportTest.php`) passing.
+
+### ✅ Completed Operational Improvements (Dec 13)
+1.  **Performance Tuning (Metrics)**:
+    -   **Backend**: Enhanced `ApmMiddleware` to capture **Database Query Count** and **Memory Usage** for slow requests.
+    -   **Database**: Added `db_query_count` and `memory_usage_kb` columns to `slow_requests` table.
+    -   **Frontend**: Updated `SlowRequestStatsTable` to display average queries and memory usage.
+    -   **Verification**: Updated `SlowRequestTest` to verify metric capture and API response.
+2.  **User Retention Analysis (Cohort)**:
+    -   **Backend**: Implemented `DailyActiveUser` model and `TrackUserActivity` middleware to track daily active users.
+    -   **Analytics**: Added `/api/analytics/retention` endpoint to `AnalyticsController` for calculating monthly cohort retention.
+    -   **Verification**: Created `AnalyticsRetentionTest` covering cohort generation and retention calculation.
+5.  **PWA Verification**:
+    -   **Testing**: Created `cypress/e2e/pwa.cy.js` to verify Manifest, Service Worker registration, and Offline page.
+    -   **Verification**: E2E tests passing. Confirmed `manifest.json` validity and `offline.html` availability.
+6.  **Location Controller Fix**:
+    -   **Issue**: `LocationController::nearby` was throwing 500 error due to missing `matchActions` relationship in `User` model and incorrect column name usage (`action_type` vs `action`).
+    -   **Fix**: Added `matchActions` relationship to `User` model. Updated `LocationController` to use `action` column. Updated `LocationControllerTest` to create user profiles.
+    -   **Verification**: `LocationControllerTest` passing.
+
+### ✅ Completed Operational Improvements (Dec 09 - Dec 11)
+    -   **PhotoControllerTest**: Fixed 403 errors by overriding `app.avatar_mode` config in tests. Created `PhotoFactory`.
+    -   **LocationControllerTest**: Fixed 500 errors by adding `matchesAsUser1` and `matchesAsUser2` relationships to `User` model.
+    -   **FriendTest**: Fixed 404 errors by correcting route definitions in `api.php` (removed incorrect `/venue` prefix).
+    -   **Frontend API**: Updated `friends.ts` to use `POST` for `respondToFriendRequest` to match backend.
+    -   **Verification**: All backend feature tests passing.
+2.  **Post-Launch Fixes** (Dec 09 - Complete):
+    -   **Frontend Build**: Fixed TypeScript errors in `FriendsPage` and related components (`FriendList`, `FriendRequestList`, `UserSearch`). Updated components to be presentational and fixed `api-client` imports.
+    -   **Deployment Script**: Fixed Windows CRLF line endings and `php` command detection in `fwber-backend/deploy.sh`. Added WSL/Git Bash compatibility for PHP path detection.
+    -   **Migrations**: Fixed idempotency issues in `2025_12_07_190732_create_friends_table` (table existence check) and `2025_12_02_000000_optimize_messaging_and_matching_indexes` (index existence check with SQLite support).
+    -   **Verification**: Verified `npm run build` (Frontend) and `bash deploy.sh --dry-run` (Backend) in the workspace.
+3.  **Performance Monitoring** (Dec 09 - Complete):
+    -   **SlowRequest**: Verified `SlowRequest` model and `ApmMiddleware` implementation.
+    -   **Testing**: Created and passed `SlowRequestTest` to verify logging of slow requests.
+4.  **Frontend Testing** (Dec 09 - Complete):
+    -   **Friends E2E**: Updated `friends-full.cy.js` to remove outdated comments and added a test case for accepting friend requests.
+5.  **Frontend E2E Stabilization** (Dec 10 - Complete):
+    -   **Fixes**: Resolved `ESOCKETTIMEDOUT` in `friends-full.cy.js` by mocking `EventSource` and ensuring dev server connectivity. Fixed selector issues in `UserSearch` component tests.
+    -   **Verification**: Verified passing status for critical E2E flows: `realtime-chat`, `friends-full`, `matching-flow`, `messaging-flow`, `nearby-users`.
+6.  **Comprehensive E2E Suite Stabilization** (Dec 10 - Complete):
+    -   **Fixes**:
+        -   **Face Reveal**: Fixed `face-reveal.cy.js` by injecting feature flag override (`window.__CYPRESS_FEATURE_FLAGS__`) and mocking `EventSource`.
+        -   **ML Content**: Fixed `ml-content-generation.cy.js` by updating `useAIContent` hook to use `apiClient` (resolving `BASE_URL` issues).
+        -   **Proximity Feed**: Stabilized `proximity-feed.cy.js` with `MockEventSource`.
+    -   **Verification**: Verified passing status for all remaining E2E tests: `proximity-feed`, `face-reveal`, `groups`, `proximity-chatrooms`, `physical-profile`, `ml-content-generation`, `premium-features`, `boosts`, `events`.
+    -   **Status**: Full E2E test suite (16+ specs) is now passing.
+7.  **Offline Support Implementation** (Dec 10 - Complete):
+    -   **Service Worker**: Implemented IndexedDB logic in `sw-push.js` for `bulletin-message` background sync.
+    -   **Frontend**: Created `lib/offline-store.ts` and updated `BulletinBoardAPI` to store messages when offline and register sync tasks.
+    -   **Verification**: Code implementation complete.
+8.  **Operational Excellence & Refinement** (Dec 09 - Complete):
+    -   **Performance**: Enabled `Model::preventLazyLoading()` and `Model::preventSilentlyDiscardingAttributes()` in `AppServiceProvider` to prevent N+1 queries.
+    -   **Feedback**: Verified `FeedbackController` implementation and `FeedbackTest` coverage.
+    -   **Voice Messages**: Created `DirectMessageTest` covering text and audio messages. Fixed missing `messages` routes in `api.php`.
+    -   **Verification**: All new tests passing.
+    -   **Avatar Generation Enhancement**: Refactored `AvatarGenerationService` to include detailed physical attributes (body type, tattoos, style, etc.) in AI prompts. Added `avatar_url` to `users` table. Verified with `AvatarGenerationTest`.
+9.  **Monitoring & Observability** (Dec 09 - Complete):
+    -   **Health Checks**: Enhanced `HealthController` to be database-agnostic (SQLite/MySQL/PgSQL) and robust against failures. Created `HealthCheckTest`.
+    -   **Structured Logging**: Configured `json` logging channel in `logging.php` for production observability.
+    -   **Context Injection**: Enhanced `InjectLoggingContext` middleware to use `Log::withContext()` for distributed tracing (Request ID, User ID, IP).
+    -   **Verification**: All health check tests passing.
+10. **Security & PWA Refinement** (Dec 09 - Complete):
+    -   **Security Audit**:
+        -   **Frontend**: Enabled `camera` and `microphone` in `Permissions-Policy` (Next.js config) to support Voice/Face features.
+        -   **Backend**: Enabled `camera`, `microphone`, and `payment` in `Permissions-Policy` (API headers).
+        -   **CSP**: Relaxed `connect-src` in Backend CSP to allow `https:` and `wss:` for external integrations (Stripe, Mercure).
+    -   **PWA Polish**:
+        -   **Service Worker**: Updated `sw-push.js` to use existing `/icon.svg` instead of missing PNGs to prevent 404s.
+        -   **UX**: Improved notification click handling to focus existing windows instead of opening new tabs.
+11. **Payment Integration** (Dec 09 - Complete):
+    -   **Stripe**: Switched from Mock driver to live Stripe driver in production configuration.
+    -   **Verification**: Verified `StripePaymentGateway` connectivity and PaymentIntent creation via live API test.
+12. **Frontend Build Fix** (Dec 10 - Complete):
+    -   **Linting**: Fixed unescaped single quote in `components/profile/Dating.tsx` causing build failure.
+    -   **Hooks**: Fixed missing dependencies in `useMercureLogic` hook (`useEffect`).
+    -   **Verification**: Code fixes applied.
+13. **Voice Messages Integration** (Dec 10 - Complete):
+    -   **Frontend**: Integrated `AudioRecorder` into `RealTimeChat` component.
+    -   **Logic**: Updated `useMercureLogic` and `useWebSocketLogic` to handle audio message types.
+    -   **Verification**: Verified build and component integration.
+14. **Event Model Fix** (Dec 10 - Complete):
+    -   **Model**: Added `reminder_sent` to `$fillable` and `$casts` in `Event` model.
+15. **Feedback Loop** (Dec 10 - Complete):
+    -   **Backend**: Updated `FeedbackController` with Admin management endpoints (`index`, `update`).
+    -   **Frontend**: Created `AdminFeedbackPage` for managing feedback.
+    -   **Frontend**: Verified `FeedbackModal` integration and category alignment.
+    -   **Verification**: Frontend Type Check passing.
+16. **Performance Tuning (AI Wingman)** (Dec 10 - Complete):
+    -   **Caching**: Implemented caching for `generateIceBreakers` (1h), `suggestDateIdeas` (1h), and `analyzeProfile` (24h).
+    -   **Verification**: Unit tests (`AiWingmanServiceTest.php`) passing.
+17. **User Experience Refinement** (Dec 11 - Complete):
+    -   **Visual Polish**: Added color-cycling and glow animation to the site logo (`Logo.tsx`, `globals.css`).
+    -   **Avatar System Upgrade**:
+        -   **Backend**: Updated `AvatarGenerationService` to support custom providers (Replicate, DALL-E), models, and LoRA scales.
+        -   **Backend**: Refactored generation to be **asynchronous** using `GenerateAvatar` Job and `AvatarGeneratedNotification` (Database + Broadcast).
+        -   **Backend**: Updated `AvatarController` to store generations in `photos` table with metadata.
+        -   **Frontend**: Enhanced `AvatarGenerationFlow` with "Gallery" view, "Advanced Settings", and **Real-time WebSocket updates** for async generation.
+        -   **Verification**: Backend feature tests (`AvatarGenerationTest`) passing. Frontend type check passing.
+18. **Offline Chat Support** (Dec 11 - Complete):
+    -   **Storage**: Implemented `offline_chat_messages` store in `lib/offline-store.ts` (IndexedDB).
+    -   **Sync**: Implemented `syncOfflineChatMessages` in `sw-push.js` (Service Worker Background Sync).
+    -   **Frontend**: Updated `useMercureLogic` to handle offline errors, store messages locally, and register sync tasks.
+    -   **UX**: Implemented optimistic updates for offline messages with 'sending' status.
+    -   **Verification**: Code implementation complete.
+    -   **Enhancement**: Added support for offline Voice Messages (Blob storage + FormData sync).
+19. **Connectivity UX Improvements** (Dec 11 - Complete):
+    -   **UI**: Updated `ConnectionStatusBadge` to display global "Offline" state.
+    -   **Feedback**: Updated `useWebSocketToasts` to show "You are Offline" / "Back Online" toasts.
+    -   **Verification**: Code implementation complete.
+20. **Deployment Fixes & Content Polish** (Dec 11 - Complete):
+    -   **Frontend Build**: Fixed `SyncManager` TypeScript error in `RealTimeChat.tsx` and `use-mercure-logic.ts` by adding `@ts-ignore` for experimental API.
+    -   **Backend Tests**: Refactored `AvatarGenerationTest` to support asynchronous job dispatching (using `Queue::fake()`).
+    -   **Content**: Updated Landing Page tagline and added new sex/love quotes.
+    -   **Verification**: All backend tests passing (118 tests). Frontend lint passing.
+21. **Advanced Match Filters** (Dec 12 - Complete):
+    -   **Backend**: Implemented filtering by smoking, drinking, body type, height, bio, and verification status in `MatchController` and `AIMatchingService`.
+    -   **Frontend**: Updated `MatchFilter` component with new fields and `localStorage` persistence.
+    -   **Testing**: Created `MatchFilterTest` covering all scenarios. All tests passing.
+    -   **Verification**: Feature complete and tested.
+22. **Video Chat Stability Fix** (Dec 12 - Complete):
+    -   **Issue**: Resolved "Maximum update depth exceeded" infinite loop in `RealTimeChat`.
+    -   **Fix**: Memoized `useMercureLogic` return value and `AuthContext` values.
+    -   **Verification**: Manual verification and code review.
+23. **Feedback Loop E2E Verification** (Dec 12 - Complete):
+    -   **Testing**: Created `cypress/e2e/feedback.cy.js` covering submission flow.
+    -   **Fixes**: Resolved UI obstruction by "Performance Monitor" during tests.
+    -   **Verification**: E2E tests passing.
+24. **Performance Monitoring Verification** (Dec 12 - Complete):
+    -   **Frontend**: Updated `admin-analytics.cy.js` to verify `SlowRequestsTable` rendering and data display.
+    -   **Backend**: Verified `SlowRequestTest` passing.
+    -   **Verification**: Full stack observability for surface slow requests is confirmed.
+25. **Multi-Factor Authentication (2FA)** (Dec 12 - Complete):
+    -   **Backend**: Implemented `TwoFactorAuthenticationController` and `TwoFactorChallengeController`.
+    -   **Database**: Added `two_factor_secret`, `two_factor_recovery_codes`, `two_factor_confirmed_at` to `users` table.
+    -   **Frontend**: Created `TwoFactorSettingsPage` for setup (QR Code) and management.
+    -   **Auth Flow**: Updated `AuthContext` and `LoginPage` to handle 2FA challenge during login.
+    -   **Verification**: Code implementation complete. E2E test `two-factor-auth.cy.js` created (pending environment fix).
+2.  **Cache Versioning & Strategy** (Dec 04 - Complete):
     -   Implemented `CACHE_VERSION` strategy for global cache invalidation.
     -   Updated `Group`, `Event`, and `Subscription` controllers to use versioned keys.
     -   Documented strategy in `docs/CACHE_STRATEGY.md`.
@@ -224,7 +416,116 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Details**: `AwsRekognitionDriver` implemented using AWS SDK.
     -   Supports Image analysis (Moderation & Labels).
     -   Gated behind `FEATURE_MEDIA_ANALYSIS`.
-    -   **Verification**: Backend tests (`MediaAnalysisTest.php`) passing.
+    -   **Integration**: Integrated into `AvatarGenerationService` to automatically scan and reject unsafe generated avatars.
+    -   **Verification**: Backend tests (`MediaAnalysisTest.php`) passing. Verified integration with `AvatarGenerationTest`.
+7.  **AI Wingman**:
+    -   **Status**: ✅ Implemented.
+    -   **Details**: `AiWingmanService` implemented using `LlmManager`.
+    -   **Routes**: `GET /wingman/ice-breakers/{matchId}`, `GET /wingman/replies/{matchId}`.
+    -   **Features**: Generates personalized ice breakers and reply suggestions based on user profiles and conversation history.
+    -   **Frontend**: Integrated `WingmanSuggestions` component into `RealTimeChat`. Added `useAiWingman` hook.
+    -   **Verification**: Unit tests (`AiWingmanServiceTest.php`) passing. Frontend Lint passing.
+8.  **Voice Messages** (Dec 09 - Complete):
+    -   **Frontend**: Implemented `AudioRecorder` component using `MediaRecorder` API.
+    -   **Integration**: Added voice recording capability to `MessagesPage`.
+    -   **Backend**: Verified support for `audio` message type and file uploads.
+8.  **Optional Profile Attributes** (Dec 09 - Complete):
+    -   **Database**: Added `love_language`, `personality_type`, `political_views`, `religion`, `sleep_schedule`, `social_media` to `user_profiles`.
+    -   **Backend**: Updated `UserProfile` model, `UserProfileResource`, and `ProfileController` to support new fields.
+    -   **Matching**: Updated `AIMatchingService` to include scoring for optional attributes.
+    -   **Frontend**: Updated `EnhancedProfileEditor` with "Personality & Social" section.
+    -   **Verification**: Feature tests (`FullProfileAttributesTest`) passing.
+9.  **Real-time Chat Translation**:
+    -   **Status**: ✅ Implemented.
+    -   **Details**: `TranslationService` implemented using `LlmManager`.
+    -   **Routes**: `POST /messages/translate`.
+    -   **Frontend**: Integrated `TranslateButton` into `RealTimeChat`.
+    -   **Verification**: Frontend Type Check passing.
+10. **Match Insights**:
+    -   **Status**: ✅ Implemented.
+    -   **Details**: `AIMatchingService` updated to expose compatibility breakdown (Physical, Sexual, Lifestyle, Personality).
+    -   **Routes**: `GET /matches/{id}/insights`.
+    -   **Frontend**: Created `MatchInsights` component with detailed score visualization. Integrated into `RealTimeChat` header.
+    -   **Verification**: Frontend Type Check passing.
+11. **Voice Message Transcription**:
+    -   **Status**: ✅ Implemented.
+    -   **Details**: `AudioTranscriptionService` implemented using OpenAI Whisper. `TranscribeAudioMessage` Job created.
+    -   **Database**: Added `transcription` column to `messages` table.
+    -   **Frontend**: Updated `RealTimeChat` to display transcription below audio player.
+    -   **Verification**: Frontend Type Check passing.
+12. **AI Wingman Profile Analysis**:
+    -   **Status**: ✅ Implemented.
+    -   **Details**: `AiWingmanService` updated with `analyzeProfile` method using LLM.
+    -   **Routes**: `GET /wingman/profile-analysis`.
+    -   **Frontend**: Created `ProfileAnalysis` component and integrated into `EnhancedProfileEditor`.
+    -   **Verification**: Frontend Type Check passing.
+13. **AI Date Planner**:
+    -   **Status**: ✅ Implemented.
+    -   **Details**: `AiWingmanService` updated with `suggestDateIdeas` method using LLM and Venue context.
+    -   **Routes**: `GET /wingman/date-ideas/{matchId}`.
+    -   **Frontend**: Created `DatePlanner` component and integrated into `RealTimeChat`.
+    -   **Verification**: Frontend Type Check passing.
+14. **Video Chat Implementation** (Dec 11 - Complete):
+    -   **Backend**: Created `VideoChatController` and `/api/video/signal` route for WebRTC signaling via Mercure.
+    -   **Frontend**: Implemented `VideoCallModal` using `RTCPeerConnection` and `useMercureLogic` for signaling.
+    -   **Integration**: Added "Video Call" button to `MessagesPage` and handled incoming call notifications.
+    -   **Call History**: Implemented `VideoCall` model, migration, and API endpoints (`initiate`, `updateStatus`, `history`). Added `CallHistory` component and integrated into `MessagesPage`.
+    -   **Feature Flag**: Added `FEATURE_VIDEO_CHAT` and gated routes.
+    -   **Verification**: Code implementation complete. Linting passed.
+15. **Frontend Build Fix** (Dec 11 - Complete):
+    -   **Issue**: `useMercure must be used within a MercureProvider` error during build.
+    -   **Fix**: Added `MercureProvider` to `RootLayout` in `app/layout.tsx`. Added `'use client'` to `MercureContext.tsx`.
+    -   **Verification**: `npm run build` passing successfully.
+16. **Frontend Build Fix (Mercure)** (Dec 12 - Complete):
+    -   **Issue**: `useMercure must be used within a MercureProvider` error during build of `/messages`.
+    -   **Fix**: Updated `useMercure` hook in `MercureContext.tsx` to return a fallback context during server-side rendering/static generation when the provider is missing.
+    -   **Verification**: Code fix applied.
+17. **Subscription Management Page** (Dec 12 - Complete):
+    -   **Frontend**: Created `app/subscription/page.tsx` for managing subscriptions (view status, history, cancel).
+    -   **Backend**: Verified `SubscriptionExpiredNotification` points to this page.
+    -   **Backend**: Verified `CleanupExpiredSubscriptions` job handles expiration logic.
+    -   **Verification**: Frontend build passing.
+26. **Tiered Relationship Refinement (Mutual Confirmation)** (Dec 12 - Complete):
+    -   **Logic**: Updated "Verified" tier (Tier 5) to require *both* users to confirm they have met in person.
+    -   **Database**: Added `user1_confirmed_meeting_at` and `user2_confirmed_meeting_at` columns.
+    -   **Frontend**: Updated `ProfileViewModal` with "Verify Relationship" section, showing status of both users.
+    -   **Verification**: Code implementation complete.
+
+27. **Blockchain Powered Ownership Distribution** (Dec 12 - Complete):
+    -   **Concept**: Viral marketing via "FWB Tokens" (internal ledger, blockchain-ready).
+    -   **Backend**: Implemented `TokenDistributionService` with decaying signup bonus and referral rewards.
+    -   **Database**: Added `token_transactions` table and user wallet fields.
+    -   **API**: Created `TokenController` for wallet balance, address management, and leaderboards.
+    -   **Frontend**: Created `WalletPage` and `LeaderboardPage`. Updated Registration to accept referral codes.
+    -   **Verification**: Backend feature tests (`TokenDistributionTest.php`) passing.
+
+28. **Token Utility (Boosts)** (Dec 12 - Complete):
+    -   **Backend**: Updated `BoostController` to accept token payments via `TokenDistributionService`.
+    -   **Frontend**: Updated `BoostPurchaseModal` to allow purchasing boosts with tokens or cash.
+    -   **Verification**: Code implementation complete.
+
+29. **Token Utility (Premium)** (Dec 12 - Complete):
+    -   **Backend**: Updated `PremiumController` to accept token payments via `TokenDistributionService`.
+    -   **Frontend**: Updated `PremiumUpgradeModal` to allow purchasing premium with tokens or cash.
+    -   **Verification**: Code implementation complete.
+
+30. **Virtual Gifts** (Dec 12 - Complete):
+    -   **Backend**: Implemented `Gift` model, `GiftController`, and `GiftSeeder`.
+    -   **Database**: Created `gifts` and `user_gifts` tables.
+    -   **Frontend**: Created `GiftShopModal` and integrated "Gift" button into `RealTimeChat`.
+    -   **Verification**: Feature tests (`GiftTest.php`) passing.
+
+31. **Branding & Landing Page Update** (Dec 12 - Complete):
+    -   **Visuals**: Updated Logo with multicolor outline and glow animation.
+    -   **Content**: Updated Landing Page to reflect all implemented features (Video Chat, Gifts, etc.) and removed "Coming Soon" badges.
+    -   **Verification**: Visual inspection.
+
+32. **Travel Mode (Passport)** (Dec 13 - Complete):
+    -   **Concept**: Allow users to set a virtual location to match with people in other cities.
+    -   **Backend**: Added `is_travel_mode`, `travel_latitude`, `travel_longitude` to `user_profiles`.
+    -   **Logic**: Updated `AIMatchingService` and `MatchController` to use travel coordinates for distance calculations.
+    -   **Frontend**: Created `TravelModePage` (`/settings/travel`) with map interface for location selection.
+    -   **Verification**: Updated `MatchFilterTest` to cover travel mode scenarios. All tests passing.
 
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.

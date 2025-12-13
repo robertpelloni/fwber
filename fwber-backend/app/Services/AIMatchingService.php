@@ -85,8 +85,8 @@ class AIMatchingService
             }
 
             // Analyze location preferences
-            if ($targetUser->profile->location_description) {
-                $location = $targetUser->profile->location_description;
+            if ($targetUser->profile->location_name) {
+                $location = $targetUser->profile->location_name;
                 $behavioralPrefs['preferred_locations'][$location] = 
                     ($behavioralPrefs['preferred_locations'][$location] ?? 0) + ($weight * $count);
             }
@@ -109,20 +109,38 @@ class AIMatchingService
             ->whereHas('profile')
             ->with(['profile']);
 
+        // Determine effective location for the current user
+        $myLat = $userProfile->is_travel_mode ? $userProfile->travel_latitude : $userProfile->latitude;
+        $myLon = $userProfile->is_travel_mode ? $userProfile->travel_longitude : $userProfile->longitude;
+
         // Basic distance filter
-        if ($userProfile->location_latitude && $userProfile->location_longitude) {
+        if ($myLat && $myLon) {
             $maxDistance = $filters['max_distance'] ?? 50; // Default 50 miles
-            $query->whereHas('profile', function ($q) use ($userProfile, $maxDistance) {
-                $latDist = (1.1 * $maxDistance) / 49.1;
-                $lonDist = (1.1 * $maxDistance) / 69.1;
-                
-                $q->whereBetween('location_latitude', [
-                    $userProfile->location_latitude - $latDist,
-                    $userProfile->location_latitude + $latDist
-                ])->whereBetween('location_longitude', [
-                    $userProfile->location_longitude - $lonDist,
-                    $userProfile->location_longitude + $lonDist
-                ]);
+            
+            // Calculate bounding box
+            $latDist = (1.1 * $maxDistance) / 49.1;
+            $lonDist = (1.1 * $maxDistance) / 69.1;
+            
+            $minLat = $myLat - $latDist;
+            $maxLat = $myLat + $latDist;
+            $minLon = $myLon - $lonDist;
+            $maxLon = $myLon + $lonDist;
+
+            $query->whereHas('profile', function ($q) use ($minLat, $maxLat, $minLon, $maxLon) {
+                $q->where(function($sub) use ($minLat, $maxLat, $minLon, $maxLon) {
+                    // Match users at their real location (if not in travel mode)
+                    $sub->where(function($w) use ($minLat, $maxLat, $minLon, $maxLon) {
+                        $w->where('is_travel_mode', false)
+                          ->whereBetween('latitude', [$minLat, $maxLat])
+                          ->whereBetween('longitude', [$minLon, $maxLon]);
+                    })
+                    // Or match users who are virtually traveling to my area
+                    ->orWhere(function($w) use ($minLat, $maxLat, $minLon, $maxLon) {
+                        $w->where('is_travel_mode', true)
+                          ->whereBetween('travel_latitude', [$minLat, $maxLat])
+                          ->whereBetween('travel_longitude', [$minLon, $maxLon]);
+                    });
+                });
             });
         }
 
@@ -139,6 +157,58 @@ class AIMatchingService
                 ]);
             });
         }
+
+        // Advanced Filters
+        $query->whereHas('profile', function ($q) use ($filters) {
+            // Smoking
+            if (!empty($filters['smoking'])) {
+                $q->where('smoking_status', $filters['smoking']);
+            }
+
+            // Drinking
+            if (!empty($filters['drinking'])) {
+                $q->where('drinking_status', $filters['drinking']);
+            }
+
+            // Body Type
+            if (!empty($filters['body_type'])) {
+                $q->where('body_type', $filters['body_type']);
+            }
+
+            // Height Min
+            if (!empty($filters['height_min'])) {
+                $q->where('height_cm', '>=', (int)$filters['height_min']);
+            }
+
+            // Has Bio
+            if (!empty($filters['has_bio']) && $filters['has_bio']) {
+                $q->whereNotNull('bio')->where('bio', '!=', '');
+            }
+        });
+
+        // Verified Only
+        if (!empty($filters['verified_only']) && $filters['verified_only']) {
+            $query->whereNotNull('email_verified_at');
+        }
+
+        // Incognito Mode Logic
+        // Get IDs of users who have liked the current user
+        $likerIds = MatchAction::where('target_user_id', $user->id)
+            ->whereIn('action', ['like', 'super_like'])
+            ->pluck('user_id')
+            ->toArray();
+
+        $query->whereHas('profile', function ($q) use ($likerIds) {
+            $q->where(function ($sub) use ($likerIds) {
+                // Show if NOT incognito
+                $sub->where('is_incognito', false)
+                    // OR if they are incognito but have liked me
+                    ->orWhere(function ($incognito) use ($likerIds) {
+                        $incognito->where('is_incognito', true)
+                                  ->whereIn('user_id', $likerIds);
+                    });
+            });
+        });
 
         // Exclude users already interacted with
         $excludedIds = MatchAction::where('user_id', $user->id)
@@ -186,6 +256,53 @@ class AIMatchingService
         $score += $recencyScore * 0.15;
 
         return min(100, max(0, $score));
+    }
+
+    public function getCompatibilityBreakdown(User $user, User $candidate): array
+    {
+        $userProfile = $user->profile;
+        $candidateProfile = $candidate->profile;
+
+        if (!$userProfile || !$candidateProfile) {
+            return [];
+        }
+
+        // Get behavioral preferences
+        $behavioralPrefs = $this->analyzeUserBehavior($user);
+
+        // Calculate individual scores
+        $baseScore = $this->calculateBaseCompatibility($userProfile, $candidateProfile);
+        $preferenceScore = $this->calculateDetailedPreferenceScore($userProfile, $candidateProfile);
+        $behavioralScore = $this->calculateBehavioralScore($candidateProfile, $behavioralPrefs);
+        $communicationScore = $this->calculateCommunicationScore($userProfile, $candidateProfile);
+        $mutualScore = $this->calculateMutualInterestScore($user, $candidate);
+        $recencyScore = $this->calculateRecencyScore($candidate);
+
+        // Calculate total weighted score
+        $totalScore = ($baseScore * 0.20) +
+                      ($preferenceScore * 0.30) +
+                      ($behavioralScore * 0.15) +
+                      ($communicationScore * 0.10) +
+                      ($mutualScore * 0.10) +
+                      ($recencyScore * 0.15);
+
+        return [
+            'total_score' => round(min(100, max(0, $totalScore))),
+            'breakdown' => [
+                'base' => round($baseScore),
+                'preferences' => round($preferenceScore),
+                'behavioral' => round($behavioralScore),
+                'communication' => round($communicationScore),
+                'mutual' => round($mutualScore),
+                'recency' => round($recencyScore),
+            ],
+            'details' => [
+                'physical' => round($this->calculatePhysicalScore($userProfile, $candidateProfile)),
+                'sexual' => round($this->calculateSexualScore($userProfile, $candidateProfile)),
+                'lifestyle' => round($this->calculateLifestyleScore($userProfile, $candidateProfile)),
+                'personality' => round($this->calculatePersonalityScore($userProfile, $candidateProfile)),
+            ]
+        ];
     }
 
     private function calculateRecencyScore(User $candidate): float
@@ -265,8 +382,46 @@ class AIMatchingService
             }
         }
 
-        // Height & Weight (Simplified)
-        // ... implementation ...
+        // Hair Color
+        if (isset($userPrefs['preferred_hair_colors']) && is_array($userPrefs['preferred_hair_colors'])) {
+            $maxScore += 10;
+            if (in_array($candidateProfile->hair_color, $userPrefs['preferred_hair_colors'])) {
+                $score += 10;
+            }
+        }
+
+        // Eye Color
+        if (isset($userPrefs['preferred_eye_colors']) && is_array($userPrefs['preferred_eye_colors'])) {
+            $maxScore += 10;
+            if (in_array($candidateProfile->eye_color, $userPrefs['preferred_eye_colors'])) {
+                $score += 10;
+            }
+        }
+
+        // Height
+        if (isset($userPrefs['min_height']) && isset($userPrefs['max_height']) && $candidateProfile->height_cm) {
+            $maxScore += 15;
+            if ($candidateProfile->height_cm >= $userPrefs['min_height'] && 
+                $candidateProfile->height_cm <= $userPrefs['max_height']) {
+                $score += 15;
+            }
+        }
+
+        // Breast Size
+        if (isset($userPrefs['preferred_breast_sizes']) && is_array($userPrefs['preferred_breast_sizes'])) {
+            $maxScore += 10;
+            if (in_array($candidateProfile->breast_size, $userPrefs['preferred_breast_sizes'])) {
+                $score += 10;
+            }
+        }
+
+        // Tattoos & Piercings
+        if (isset($userPrefs['preferred_tattoos']) && is_array($userPrefs['preferred_tattoos'])) {
+            $maxScore += 5;
+            if (in_array($candidateProfile->tattoos, $userPrefs['preferred_tattoos'])) {
+                $score += 5;
+            }
+        }
 
         return $maxScore > 0 ? ($score / $maxScore) * 100 : 50;
     }
@@ -277,6 +432,31 @@ class AIMatchingService
         $total = 0;
         $userPrefs = $userProfile->preferences ?? [];
         $candidatePrefs = $candidateProfile->preferences ?? [];
+
+        // Penis Size Preferences
+        if ($candidateProfile->penis_length_cm) {
+            $minLen = $userPrefs['min_penis_length'] ?? 0;
+            $maxLen = $userPrefs['max_penis_length'] ?? 100;
+            
+            if ($minLen > 0 || $maxLen < 100) {
+                $total++;
+                if ($candidateProfile->penis_length_cm >= $minLen && $candidateProfile->penis_length_cm <= $maxLen) {
+                    $score += 20;
+                }
+            }
+        }
+
+        if ($candidateProfile->penis_girth_cm) {
+            $minGirth = $userPrefs['min_penis_girth'] ?? 0;
+            $maxGirth = $userPrefs['max_penis_girth'] ?? 100;
+            
+            if ($minGirth > 0 || $maxGirth < 100) {
+                $total++;
+                if ($candidateProfile->penis_girth_cm >= $minGirth && $candidateProfile->penis_girth_cm <= $maxGirth) {
+                    $score += 20;
+                }
+            }
+        }
 
         $sexualActs = [
             'safe_sex', 'bareback', 'oral_give', 'oral_receive',
@@ -327,6 +507,70 @@ class AIMatchingService
         // Drugs
         if (($userPrefs['drugs'] ?? 0) && ($candidatePrefs['no_drugs'] ?? 0)) $penalties += 25;
 
+        // Children Compatibility
+        if (isset($userPrefs['wants_children']) && isset($candidateProfile->wants_children)) {
+            if ($userPrefs['wants_children'] !== $candidateProfile->wants_children) {
+                $penalties += 15;
+            }
+        }
+        
+        // Dealbreaker: Has Kids
+        if (($userPrefs['no_kids'] ?? false) && $candidateProfile->has_children) {
+            $penalties += 50;
+        }
+
+        // Pets Compatibility
+        if (($userPrefs['must_love_pets'] ?? false) && !$candidateProfile->has_pets) {
+            $penalties += 10;
+        }
+
+        // Love Language Compatibility
+        if ($userProfile->love_language && $candidateProfile->love_language) {
+            if ($userProfile->love_language === $candidateProfile->love_language) {
+                $score += 10;
+            }
+        }
+
+        // Personality Compatibility (MBTI/Simple)
+        if ($userProfile->personality_type && $candidateProfile->personality_type) {
+            // Simple logic: Introverts match well with Extroverts often, but let's keep it simple for now
+            // Or maybe similar types match? Let's assume similarity for now unless specified otherwise
+            if ($userProfile->personality_type === $candidateProfile->personality_type) {
+                $score += 5;
+            }
+        }
+
+        // Political Views Compatibility
+        if ($userProfile->political_views && $candidateProfile->political_views) {
+            if ($userProfile->political_views === $candidateProfile->political_views) {
+                $score += 10;
+            } elseif (
+                ($userProfile->political_views === 'liberal' && $candidateProfile->political_views === 'conservative') ||
+                ($userProfile->political_views === 'conservative' && $candidateProfile->political_views === 'liberal')
+            ) {
+                $penalties += 10; // Potential friction
+            }
+        }
+
+        // Religion Compatibility
+        if ($userProfile->religion && $candidateProfile->religion) {
+            if ($userProfile->religion === $candidateProfile->religion) {
+                $score += 10;
+            }
+        }
+
+        // Sleep Schedule Compatibility
+        if ($userProfile->sleep_schedule && $candidateProfile->sleep_schedule) {
+            if ($userProfile->sleep_schedule === $candidateProfile->sleep_schedule) {
+                $score += 5;
+            } elseif (
+                ($userProfile->sleep_schedule === 'early_bird' && $candidateProfile->sleep_schedule === 'night_owl') ||
+                ($userProfile->sleep_schedule === 'night_owl' && $candidateProfile->sleep_schedule === 'early_bird')
+            ) {
+                $penalties += 5; // Minor friction
+            }
+        }
+
         return max(0, $score - $penalties);
     }
 
@@ -363,7 +607,10 @@ class AIMatchingService
         }
 
         // Distance compatibility
-        if ($userProfile->location_latitude && $candidateProfile->location_latitude) {
+        $myLat = $userProfile->is_travel_mode ? $userProfile->travel_latitude : $userProfile->latitude;
+        $theirLat = $candidateProfile->is_travel_mode ? $candidateProfile->travel_latitude : $candidateProfile->latitude;
+
+        if ($myLat && $theirLat) {
             $distance = $this->calculateDistance($userProfile, $candidateProfile);
             $score += max(0, 20 - ($distance / 5));
         }
@@ -391,8 +638,8 @@ class AIMatchingService
         }
 
         // Location preference matching
-        if ($candidateProfile->location_description) {
-            $locationScore = $behavioralPrefs['preferred_locations'][$candidateProfile->location_description] ?? 0;
+        if ($candidateProfile->location_name) {
+            $locationScore = $behavioralPrefs['preferred_locations'][$candidateProfile->location_name] ?? 0;
             $score += min(25, $locationScore);
         }
 
@@ -454,14 +701,15 @@ class AIMatchingService
 
     private function calculateDistance(UserProfile $profile1, UserProfile $profile2): float
     {
-        if (!$profile1->location_latitude || !$profile2->location_latitude) {
+        $lat1 = $profile1->is_travel_mode ? $profile1->travel_latitude : $profile1->latitude;
+        $lon1 = $profile1->is_travel_mode ? $profile1->travel_longitude : $profile1->longitude;
+        
+        $lat2 = $profile2->is_travel_mode ? $profile2->travel_latitude : $profile2->latitude;
+        $lon2 = $profile2->is_travel_mode ? $profile2->travel_longitude : $profile2->longitude;
+
+        if (!$lat1 || !$lat2) {
             return 0;
         }
-
-        $lat1 = $profile1->location_latitude;
-        $lon1 = $profile1->location_longitude;
-        $lat2 = $profile2->location_latitude;
-        $lon2 = $profile2->location_longitude;
 
         $theta = $lon1 - $lon2;
         $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) + 

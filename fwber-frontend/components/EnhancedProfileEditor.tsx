@@ -8,41 +8,25 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api/client';
 import { BioGenerator } from '@/components/ai/BioGenerator';
+import { ProfileAnalysis } from '@/components/profile/ProfileAnalysis';
 
-interface UserProfile {
-  name: string;
-  email: string;
-  bio?: string;
-  age?: number;
-  gender?: string;
-  interested_in?: string[];
-  location_city?: string;
-  location_state?: string;
-  interests?: string[];
-  relationship_status?: string;
-  looking_for?: string[];
-  height_cm?: number;
-  body_type?: string;
-  ethnicity?: string;
-  occupation?: string;
-  education?: string;
-  smoking?: string;
-  drinking?: string;
-  has_kids?: boolean;
-  wants_kids?: boolean;
-}
+import { UserProfile } from '@/lib/api/types';
 
 interface ValidationErrors {
   [key: string]: string;
 }
 
 export default function EnhancedProfileEditor() {
-  const [profile, setProfile] = useState<UserProfile>({
-    name: '',
+  const [profile, setProfile] = useState<Partial<UserProfile> & { email?: string }>({
+    display_name: '',
     email: '',
-    interested_in: [],
-    interests: [],
     looking_for: [],
+    interests: [],
+    languages: [],
+    fetishes: [],
+    sti_status: {},
+    social_media: {},
+    preferences: {},
   });
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [touched, setTouched] = useState<Set<string>>(new Set());
@@ -53,7 +37,13 @@ export default function EnhancedProfileEditor() {
   const { data: currentProfile, isLoading } = useQuery({
     queryKey: ['user-profile'],
     queryFn: async () => {
-      return api.get<UserProfile>('/user');
+      const response = await api.get<any>('/user');
+      // Merge user and profile data
+      return {
+        ...response.profile,
+        email: response.email,
+        display_name: response.profile?.display_name || response.name,
+      };
     },
   });
 
@@ -67,45 +57,26 @@ export default function EnhancedProfileEditor() {
   useEffect(() => {
     const newErrors: ValidationErrors = {};
 
-    if (touched.has('name') && !profile.name) {
-      newErrors.name = 'Name is required';
-    } else if (touched.has('name') && profile.name.length < 2) {
-      newErrors.name = 'Name must be at least 2 characters';
-    } else if (touched.has('name') && profile.name.length > 50) {
-      newErrors.name = 'Name must be less than 50 characters';
+    if (touched.has('display_name') && !profile.display_name) {
+      newErrors.display_name = 'Name is required';
+    } else if (touched.has('display_name') && (profile.display_name?.length || 0) < 2) {
+      newErrors.display_name = 'Name must be at least 2 characters';
     }
 
     if (touched.has('bio') && profile.bio && profile.bio.length > 500) {
       newErrors.bio = 'Bio must be less than 500 characters';
     }
 
-    if (touched.has('age') && profile.age) {
-      if (profile.age < 18) {
-        newErrors.age = 'You must be at least 18 years old';
-      } else if (profile.age > 120) {
-        newErrors.age = 'Please enter a valid age';
-      }
+    if (touched.has('birthdate') && !profile.birthdate) {
+      newErrors.birthdate = 'Date of birth is required';
     }
-
-    if (touched.has('email') && profile.email) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(profile.email)) {
-        newErrors.email = 'Please enter a valid email address';
-      }
-    }
-
-    if (touched.has('height_cm') && profile.height_cm) {
-      if (profile.height_cm < 140 || profile.height_cm > 220) {
-        newErrors.height_cm = 'Height must be between 140-220 cm';
-      }
-    }
-
+    
     setErrors(newErrors);
   }, [profile, touched]);
 
   const updateMutation = useMutation({
-    mutationFn: async (updatedProfile: UserProfile) => {
-      return api.put<UserProfile>('/user', updatedProfile);
+    mutationFn: async (updatedProfile: Partial<UserProfile>) => {
+      return api.put<UserProfile>('/user/profile', updatedProfile);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-profile'] });
@@ -114,13 +85,13 @@ export default function EnhancedProfileEditor() {
     },
   });
 
-  const handleChange = (field: keyof UserProfile, value: any) => {
+  const handleChange = (field: keyof UserProfile | 'email', value: any) => {
     setProfile({ ...profile, [field]: value });
     setTouched(prev => new Set(prev).add(field));
   };
 
-  const handleArrayToggle = (field: 'interested_in' | 'interests' | 'looking_for', value: string) => {
-    const current = profile[field] || [];
+  const handleArrayToggle = (field: 'looking_for' | 'interests' | 'languages' | 'interested_in' | 'fetishes', value: string) => {
+    const current = (profile[field] as string[]) || [];
     const updated = current.includes(value)
       ? current.filter(item => item !== value)
       : [...current, value];
@@ -141,18 +112,18 @@ export default function EnhancedProfileEditor() {
   };
 
   const calculateCompleteness = () => {
-    const requiredFields = ['name', 'email', 'age', 'gender', 'bio'];
-    const optionalFields = ['location_city', 'interested_in', 'interests', 'looking_for', 'relationship_status'];
+    const requiredFields = ['display_name', 'email', 'birthdate', 'gender', 'bio'];
+    const optionalFields = ['location_name', 'interested_in', 'interests', 'looking_for', 'relationship_status'];
     
     let completed = 0;
     let total = requiredFields.length + optionalFields.length;
 
     requiredFields.forEach(field => {
-      if (profile[field as keyof UserProfile]) completed++;
+      if (profile[field as keyof typeof profile]) completed++;
     });
 
     optionalFields.forEach(field => {
-      const value = profile[field as keyof UserProfile];
+      const value = profile[field as keyof typeof profile];
       if (value && (Array.isArray(value) ? value.length > 0 : true)) completed++;
     });
 
@@ -218,22 +189,27 @@ export default function EnhancedProfileEditor() {
         )}
       </div>
 
+      {/* AI Profile Analysis */}
+      <div className="mb-8">
+        <ProfileAnalysis />
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Basic Information */}
-        <Section title="Basic Information" icon={<User />}>
+        {/* About Myself */}
+        <Section title="About Myself" icon={<User />}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               label="Name"
               required
-              error={errors.name}
-              touched={touched.has('name')}
+              error={errors.display_name}
+              touched={touched.has('display_name')}
             >
               <input
                 type="text"
-                value={profile.name}
-                onChange={(e) => handleChange('name', e.target.value)}
-                onBlur={() => setTouched(prev => new Set(prev).add('name'))}
-                className={inputClassName(errors.name, touched.has('name'))}
+                value={profile.display_name || ''}
+                onChange={(e) => handleChange('display_name', e.target.value)}
+                onBlur={() => setTouched(prev => new Set(prev).add('display_name'))}
+                className={inputClassName(errors.display_name, touched.has('display_name'))}
                 placeholder="Your display name"
               />
             </FormField>
@@ -246,7 +222,7 @@ export default function EnhancedProfileEditor() {
             >
               <input
                 type="email"
-                value={profile.email}
+                value={profile.email || ''}
                 onChange={(e) => handleChange('email', e.target.value)}
                 onBlur={() => setTouched(prev => new Set(prev).add('email'))}
                 className={inputClassName(errors.email, touched.has('email'))}
@@ -255,25 +231,24 @@ export default function EnhancedProfileEditor() {
             </FormField>
 
             <FormField
-              label="Age"
+              label="Date of Birth"
               required
-              error={errors.age}
-              touched={touched.has('age')}
+              error={errors.birthdate}
+              touched={touched.has('birthdate')}
             >
               <input
-                type="number"
-                value={profile.age || ''}
-                onChange={(e) => handleChange('age', parseInt(e.target.value))}
-                onBlur={() => setTouched(prev => new Set(prev).add('age'))}
-                className={inputClassName(errors.age, touched.has('age'))}
-                placeholder="25"
-                min="18"
-                max="120"
+                title="Date of Birth"
+                type="date"
+                value={profile.birthdate || ''}
+                onChange={(e) => handleChange('birthdate', e.target.value)}
+                onBlur={() => setTouched(prev => new Set(prev).add('birthdate'))}
+                className={inputClassName(errors.birthdate, touched.has('birthdate'))}
               />
             </FormField>
 
             <FormField label="Gender" required>
               <select
+                title="Gender"
                 value={profile.gender || ''}
                 onChange={(e) => handleChange('gender', e.target.value)}
                 className={inputClassName()}
@@ -284,6 +259,76 @@ export default function EnhancedProfileEditor() {
                 <option value="non-binary">Non-binary</option>
                 <option value="other">Other</option>
               </select>
+            </FormField>
+
+            <FormField label="Pronouns">
+              <select
+                title="Pronouns"
+                value={profile.pronouns || ''}
+                onChange={(e) => handleChange('pronouns', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select pronouns</option>
+                <option value="he/him">He/Him</option>
+                <option value="she/her">She/Her</option>
+                <option value="they/them">They/Them</option>
+                <option value="other">Other</option>
+              </select>
+            </FormField>
+
+            <FormField label="Sexual Orientation">
+              <select
+                title="Sexual Orientation"
+                value={profile.sexual_orientation || ''}
+                onChange={(e) => handleChange('sexual_orientation', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select orientation</option>
+                <option value="straight">Straight</option>
+                <option value="gay">Gay</option>
+                <option value="lesbian">Lesbian</option>
+                <option value="bisexual">Bisexual</option>
+                <option value="pansexual">Pansexual</option>
+                <option value="asexual">Asexual</option>
+                <option value="queer">Queer</option>
+                <option value="questioning">Questioning</option>
+              </select>
+            </FormField>
+
+            <FormField label="Zodiac Sign">
+              <select
+                title="Zodiac Sign"
+                value={profile.zodiac_sign || ''}
+                onChange={(e) => handleChange('zodiac_sign', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select sign</option>
+                <option value="aries">Aries</option>
+                <option value="taurus">Taurus</option>
+                <option value="gemini">Gemini</option>
+                <option value="cancer">Cancer</option>
+                <option value="leo">Leo</option>
+                <option value="virgo">Virgo</option>
+                <option value="libra">Libra</option>
+                <option value="scorpio">Scorpio</option>
+                <option value="sagittarius">Sagittarius</option>
+                <option value="capricorn">Capricorn</option>
+                <option value="aquarius">Aquarius</option>
+                <option value="pisces">Pisces</option>
+              </select>
+            </FormField>
+
+            <FormField label="Languages">
+              <div className="flex flex-wrap gap-2">
+                {['English', 'Spanish', 'French', 'German', 'Chinese', 'Japanese', 'Korean', 'Italian', 'Portuguese', 'Russian', 'Arabic', 'Hindi'].map(lang => (
+                  <ToggleChip
+                    key={lang}
+                    label={lang}
+                    selected={(profile.languages || []).includes(lang)}
+                    onClick={() => handleArrayToggle('languages', lang)}
+                  />
+                ))}
+              </div>
             </FormField>
           </div>
 
@@ -314,30 +359,20 @@ export default function EnhancedProfileEditor() {
         {/* Location */}
         <Section title="Location" icon={<MapPin />}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField label="City">
+            <FormField label="Location Name">
               <input
                 type="text"
-                value={profile.location_city || ''}
-                onChange={(e) => handleChange('location_city', e.target.value)}
+                value={profile.location_name || ''}
+                onChange={(e) => handleChange('location_name', e.target.value)}
                 className={inputClassName()}
-                placeholder="San Francisco"
-              />
-            </FormField>
-
-            <FormField label="State/Province">
-              <input
-                type="text"
-                value={profile.location_state || ''}
-                onChange={(e) => handleChange('location_state', e.target.value)}
-                className={inputClassName()}
-                placeholder="California"
+                placeholder="City, State"
               />
             </FormField>
           </div>
         </Section>
 
-        {/* Dating Preferences */}
-        <Section title="Dating Preferences" icon={<Heart />}>
+        {/* Looking For */}
+        <Section title="Looking For" icon={<Heart />}>
           <FormField label="Interested In">
             <div className="flex flex-wrap gap-2">
               {['men', 'women', 'non-binary', 'everyone'].map(option => (
@@ -364,27 +399,63 @@ export default function EnhancedProfileEditor() {
             </div>
           </FormField>
 
-          <FormField label="Relationship Status">
-            <select
-              value={profile.relationship_status || ''}
-              onChange={(e) => handleChange('relationship_status', e.target.value)}
-              className={inputClassName()}
-            >
-              <option value="">Select status</option>
-              <option value="single">Single</option>
-              <option value="divorced">Divorced</option>
-              <option value="separated">Separated</option>
-              <option value="widowed">Widowed</option>
-              <option value="open-relationship">Open Relationship</option>
-            </select>
-          </FormField>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField label="Relationship Status">
+              <select
+                title="Relationship Status"
+                value={profile.relationship_status || ''}
+                onChange={(e) => handleChange('relationship_status', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select status</option>
+                <option value="single">Single</option>
+                <option value="divorced">Divorced</option>
+                <option value="separated">Separated</option>
+                <option value="widowed">Widowed</option>
+                <option value="open-relationship">Open Relationship</option>
+              </select>
+            </FormField>
+
+            <FormField label="Relationship Style">
+              <select
+                title="Relationship Style"
+                value={profile.relationship_style || ''}
+                onChange={(e) => handleChange('relationship_style', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select style</option>
+                <option value="monogamous">Monogamous</option>
+                <option value="non-monogamous">Non-monogamous</option>
+                <option value="open">Open</option>
+                <option value="polyamorous">Polyamorous</option>
+                <option value="other">Other</option>
+              </select>
+            </FormField>
+
+            <FormField label="Relationship Goals">
+              <select
+                title="Relationship Goals"
+                value={profile.relationship_goals || ''}
+                onChange={(e) => handleChange('relationship_goals', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select goal</option>
+                <option value="long-term">Long-term partner</option>
+                <option value="long-term-open">Long-term, open to short</option>
+                <option value="short-term-open">Short-term, open to long</option>
+                <option value="short-term">Short-term fun</option>
+                <option value="friends">New friends</option>
+                <option value="figuring-out">Still figuring it out</option>
+              </select>
+            </FormField>
+          </div>
         </Section>
 
         {/* Interests */}
         <Section title="Interests & Hobbies" icon={<MessageSquare />}>
           <FormField label="Select your interests" hint="Choose all that apply">
             <div className="flex flex-wrap gap-2">
-              {['music', 'movies', 'sports', 'gaming', 'travel', 'cooking', 'reading', 'art', 'fitness', 'outdoors', 'tech', 'nightlife'].map(interest => (
+              {['music', 'movies', 'sports', 'gaming', 'travel', 'cooking', 'reading', 'art', 'fitness', 'outdoors', 'tech', 'nightlife', 'photography', 'dancing', 'foodie', 'fashion', 'politics', 'volunteering', 'hot tubs', 'saunas', 'spas'].map(interest => (
                 <ToggleChip
                   key={interest}
                   label={interest.charAt(0).toUpperCase() + interest.slice(1)}
@@ -414,6 +485,7 @@ export default function EnhancedProfileEditor() {
 
             <FormField label="Body Type">
               <select
+                title="Body Type"
                 value={profile.body_type || ''}
                 onChange={(e) => handleChange('body_type', e.target.value)}
                 className={inputClassName()}
@@ -429,6 +501,7 @@ export default function EnhancedProfileEditor() {
 
             <FormField label="Ethnicity">
               <select
+                title="Ethnicity"
                 value={profile.ethnicity || ''}
                 onChange={(e) => handleChange('ethnicity', e.target.value)}
                 className={inputClassName()}
@@ -441,6 +514,177 @@ export default function EnhancedProfileEditor() {
                 <option value="middle_eastern">Middle Eastern</option>
                 <option value="mixed">Mixed</option>
                 <option value="other">Other</option>
+              </select>
+            </FormField>
+
+            <FormField label="Breast Size">
+              <select
+                title="Breast Size"
+                value={profile.breast_size || ''}
+                onChange={(e) => handleChange('breast_size', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="flat">Flat</option>
+                <option value="a-cup">A Cup</option>
+                <option value="b-cup">B Cup</option>
+                <option value="c-cup">C Cup</option>
+                <option value="d-cup">D Cup</option>
+                <option value="dd-cup">DD+ Cup</option>
+                <option value="prefer-not-to-say">Prefer not to say</option>
+              </select>
+            </FormField>
+
+            <FormField label="Tattoos">
+              <select
+                title="Tattoos"
+                value={profile.tattoos || ''}
+                onChange={(e) => handleChange('tattoos', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="none">None</option>
+                <option value="some">Some</option>
+                <option value="many">Many</option>
+                <option value="full-sleeve">Full Sleeve(s)</option>
+                <option value="heavily-inked">Heavily Inked</option>
+              </select>
+            </FormField>
+
+            <FormField label="Piercings">
+              <select
+                title="Piercings"
+                value={profile.piercings || ''}
+                onChange={(e) => handleChange('piercings', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="none">None</option>
+                <option value="ears">Ears Only</option>
+                <option value="face">Face</option>
+                <option value="body">Body</option>
+                <option value="intimate">Intimate</option>
+                <option value="multiple">Multiple Locations</option>
+              </select>
+            </FormField>
+
+            <FormField label="Hair Color">
+              <select
+                title="Hair Color"
+                value={profile.hair_color || ''}
+                onChange={(e) => handleChange('hair_color', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="black">Black</option>
+                <option value="brown">Brown</option>
+                <option value="blonde">Blonde</option>
+                <option value="red">Red</option>
+                <option value="auburn">Auburn</option>
+                <option value="grey">Grey</option>
+                <option value="white">White</option>
+                <option value="bald">Bald</option>
+                <option value="dyed">Dyed/Unnatural</option>
+              </select>
+            </FormField>
+
+            <FormField label="Eye Color">
+              <select
+                title="Eye Color"
+                value={profile.eye_color || ''}
+                onChange={(e) => handleChange('eye_color', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="brown">Brown</option>
+                <option value="blue">Blue</option>
+                <option value="green">Green</option>
+                <option value="hazel">Hazel</option>
+                <option value="grey">Grey</option>
+                <option value="amber">Amber</option>
+                <option value="heterochromia">Heterochromia</option>
+              </select>
+            </FormField>
+
+            <FormField label="Skin Tone">
+              <select
+                title="Skin Tone"
+                value={profile.skin_tone || ''}
+                onChange={(e) => handleChange('skin_tone', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="fair">Fair</option>
+                <option value="light">Light</option>
+                <option value="medium">Medium</option>
+                <option value="olive">Olive</option>
+                <option value="tan">Tan</option>
+                <option value="brown">Brown</option>
+                <option value="dark">Dark</option>
+              </select>
+            </FormField>
+
+            <FormField label="Facial Hair">
+              <select
+                title="Facial Hair"
+                value={profile.facial_hair || ''}
+                onChange={(e) => handleChange('facial_hair', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="clean-shaven">Clean Shaven</option>
+                <option value="stubble">Stubble</option>
+                <option value="beard">Beard</option>
+                <option value="mustache">Mustache</option>
+                <option value="goatee">Goatee</option>
+              </select>
+            </FormField>
+
+            <FormField label="Fitness Level">
+              <select
+                title="Fitness Level"
+                value={profile.fitness_level || ''}
+                onChange={(e) => handleChange('fitness_level', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="sedentary">Sedentary</option>
+                <option value="lightly-active">Lightly Active</option>
+                <option value="moderately-active">Moderately Active</option>
+                <option value="very-active">Very Active</option>
+                <option value="athlete">Athlete</option>
+              </select>
+            </FormField>
+
+            <FormField label="Clothing Style">
+              <select
+                title="Clothing Style"
+                value={profile.clothing_style || ''}
+                onChange={(e) => handleChange('clothing_style', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="casual">Casual</option>
+                <option value="formal">Formal</option>
+                <option value="business">Business</option>
+                <option value="sporty">Sporty</option>
+                <option value="alternative">Alternative</option>
+                <option value="vintage">Vintage</option>
+                <option value="trendy">Trendy</option>
+              </select>
+            </FormField>
+
+            <FormField label="Dominant Hand">
+              <select
+                title="Dominant Hand"
+                value={profile.dominant_hand || ''}
+                onChange={(e) => handleChange('dominant_hand', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="right">Right</option>
+                <option value="left">Left</option>
+                <option value="ambidextrous">Ambidextrous</option>
               </select>
             </FormField>
           </div>
@@ -461,6 +705,7 @@ export default function EnhancedProfileEditor() {
 
             <FormField label="Education">
               <select
+                title="Education"
                 value={profile.education || ''}
                 onChange={(e) => handleChange('education', e.target.value)}
                 className={inputClassName()}
@@ -476,8 +721,9 @@ export default function EnhancedProfileEditor() {
 
             <FormField label="Smoking">
               <select
-                value={profile.smoking || ''}
-                onChange={(e) => handleChange('smoking', e.target.value)}
+                title="Smoking"
+                value={profile.smoking_status || ''}
+                onChange={(e) => handleChange('smoking_status', e.target.value)}
                 className={inputClassName()}
               >
                 <option value="">Select</option>
@@ -490,8 +736,9 @@ export default function EnhancedProfileEditor() {
 
             <FormField label="Drinking">
               <select
-                value={profile.drinking || ''}
-                onChange={(e) => handleChange('drinking', e.target.value)}
+                title="Drinking"
+                value={profile.drinking_status || ''}
+                onChange={(e) => handleChange('drinking_status', e.target.value)}
                 className={inputClassName()}
               >
                 <option value="">Select</option>
@@ -500,13 +747,60 @@ export default function EnhancedProfileEditor() {
                 <option value="regularly">Regularly</option>
               </select>
             </FormField>
+
+            <FormField label="Cannabis">
+              <select
+                title="Cannabis"
+                value={profile.cannabis_status || ''}
+                onChange={(e) => handleChange('cannabis_status', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="never">Never</option>
+                <option value="socially">Socially</option>
+                <option value="regularly">Regularly</option>
+              </select>
+            </FormField>
+
+            <FormField label="Dietary Preferences">
+              <select
+                title="Dietary Preferences"
+                value={profile.dietary_preferences || ''}
+                onChange={(e) => handleChange('dietary_preferences', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="omnivore">Omnivore</option>
+                <option value="vegetarian">Vegetarian</option>
+                <option value="vegan">Vegan</option>
+                <option value="pescatarian">Pescatarian</option>
+                <option value="keto">Keto</option>
+                <option value="paleo">Paleo</option>
+                <option value="halal">Halal</option>
+                <option value="kosher">Kosher</option>
+              </select>
+            </FormField>
+
+            <FormField label="Pets">
+              <select
+                title="Pets"
+                value={profile.has_pets === undefined ? '' : profile.has_pets.toString()}
+                onChange={(e) => handleChange('has_pets', e.target.value === 'true')}
+                className={inputClassName()}
+              >
+                <option value="">Prefer not to say</option>
+                <option value="false">No</option>
+                <option value="true">Yes</option>
+              </select>
+            </FormField>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField label="Has Kids">
               <select
-                value={profile.has_kids === undefined ? '' : profile.has_kids.toString()}
-                onChange={(e) => handleChange('has_kids', e.target.value === 'true')}
+                title="Has Kids"
+                value={profile.has_children === undefined ? '' : profile.has_children.toString()}
+                onChange={(e) => handleChange('has_children', e.target.value === 'true')}
                 className={inputClassName()}
               >
                 <option value="">Prefer not to say</option>
@@ -517,14 +811,240 @@ export default function EnhancedProfileEditor() {
 
             <FormField label="Wants Kids">
               <select
-                value={profile.wants_kids === undefined ? '' : profile.wants_kids.toString()}
-                onChange={(e) => handleChange('wants_kids', e.target.value === 'true')}
+                title="Wants Kids"
+                value={profile.wants_children === undefined ? '' : profile.wants_children.toString()}
+                onChange={(e) => handleChange('wants_children', e.target.value === 'true')}
                 className={inputClassName()}
               >
                 <option value="">Prefer not to say</option>
                 <option value="false">No</option>
                 <option value="true">Yes</option>
               </select>
+            </FormField>
+          </div>
+        </Section>
+
+        {/* Personality & Social */}
+        <Section title="Personality & Social" icon={<Heart />}>
+          <div className="p-4 bg-blue-50 border border-blue-100 rounded-lg mb-6">
+            <div className="flex gap-3">
+              <Info className="w-5 h-5 text-blue-600 flex-shrink-0" />
+              <p className="text-sm text-blue-800">
+                Filling out these details helps our matching algorithm find more compatible partners. 
+                If you leave them blank, they won&apos;t be used as criteria for matching.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField label="Love Language">
+              <select
+                title="Love Language"
+                value={profile.love_language || ''}
+                onChange={(e) => handleChange('love_language', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="words_of_affirmation">Words of Affirmation</option>
+                <option value="acts_of_service">Acts of Service</option>
+                <option value="receiving_gifts">Receiving Gifts</option>
+                <option value="quality_time">Quality Time</option>
+                <option value="physical_touch">Physical Touch</option>
+              </select>
+            </FormField>
+
+            <FormField label="Personality Type">
+              <select
+                title="Personality Type"
+                value={profile.personality_type || ''}
+                onChange={(e) => handleChange('personality_type', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="introvert">Introvert</option>
+                <option value="extrovert">Extrovert</option>
+                <option value="ambivert">Ambivert</option>
+                <option value="intj">INTJ</option>
+                <option value="intp">INTP</option>
+                <option value="entj">ENTJ</option>
+                <option value="entp">ENTP</option>
+                <option value="infj">INFJ</option>
+                <option value="infp">INFP</option>
+                <option value="enfj">ENFJ</option>
+                <option value="enfp">ENFP</option>
+                <option value="istj">ISTJ</option>
+                <option value="isfj">ISFJ</option>
+                <option value="estj">ESTJ</option>
+                <option value="esfj">ESFJ</option>
+                <option value="istp">ISTP</option>
+                <option value="isfp">ISFP</option>
+                <option value="estp">ESTP</option>
+                <option value="esfp">ESFP</option>
+              </select>
+            </FormField>
+
+            <FormField label="Political Views">
+              <select
+                title="Political Views"
+                value={profile.political_views || ''}
+                onChange={(e) => handleChange('political_views', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="liberal">Liberal</option>
+                <option value="moderate">Moderate</option>
+                <option value="conservative">Conservative</option>
+                <option value="apolitical">Apolitical</option>
+                <option value="other">Other</option>
+              </select>
+            </FormField>
+
+            <FormField label="Religion / Spirituality">
+              <select
+                title="Religion / Spirituality"
+                value={profile.religion || ''}
+                onChange={(e) => handleChange('religion', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="agnostic">Agnostic</option>
+                <option value="atheist">Atheist</option>
+                <option value="christian">Christian</option>
+                <option value="muslim">Muslim</option>
+                <option value="jewish">Jewish</option>
+                <option value="buddhist">Buddhist</option>
+                <option value="hindu">Hindu</option>
+                <option value="spiritual">Spiritual but not religious</option>
+                <option value="other">Other</option>
+              </select>
+            </FormField>
+
+            <FormField label="Sleep Schedule">
+              <select
+                title="Sleep Schedule"
+                value={profile.sleep_schedule || ''}
+                onChange={(e) => handleChange('sleep_schedule', e.target.value)}
+                className={inputClassName()}
+              >
+                <option value="">Select</option>
+                <option value="early_bird">Early Bird</option>
+                <option value="night_owl">Night Owl</option>
+                <option value="flexible">Flexible</option>
+                <option value="irregular">Irregular</option>
+              </select>
+            </FormField>
+          </div>
+
+          <div className="mt-4">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">Social Media (Optional)</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <input
+                type="text"
+                value={profile.social_media?.instagram || ''}
+                onChange={(e) => handleChange('social_media', { ...profile.social_media, instagram: e.target.value })}
+                className={inputClassName()}
+                placeholder="Instagram Handle"
+              />
+              <input
+                type="text"
+                value={profile.social_media?.twitter || ''}
+                onChange={(e) => handleChange('social_media', { ...profile.social_media, twitter: e.target.value })}
+                className={inputClassName()}
+                placeholder="Twitter/X Handle"
+              />
+              <input
+                type="text"
+                value={profile.social_media?.snapchat || ''}
+                onChange={(e) => handleChange('social_media', { ...profile.social_media, snapchat: e.target.value })}
+                className={inputClassName()}
+                placeholder="Snapchat Handle"
+              />
+            </div>
+          </div>
+        </Section>
+
+        {/* Intimate Details */}
+        <Section title="Intimate Details" icon={<Info />}>
+          <div className="p-4 bg-purple-50 border border-purple-100 rounded-lg mb-6">
+            <div className="flex gap-3">
+              <Info className="w-5 h-5 text-purple-600 flex-shrink-0" />
+              <p className="text-sm text-purple-800">
+                These details are sensitive and personal. You can choose who sees this information in your privacy settings. 
+                Sharing this information can help find more compatible matches.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField label="Penis Length (cm)">
+              <input
+                type="number"
+                value={profile.penis_length_cm || ''}
+                onChange={(e) => handleChange('penis_length_cm', parseFloat(e.target.value))}
+                className={inputClassName()}
+                placeholder="Length in cm"
+                step="0.1"
+              />
+            </FormField>
+
+            <FormField label="Penis Girth (cm)">
+              <input
+                type="number"
+                value={profile.penis_girth_cm || ''}
+                onChange={(e) => handleChange('penis_girth_cm', parseFloat(e.target.value))}
+                className={inputClassName()}
+                placeholder="Girth in cm"
+                step="0.1"
+              />
+            </FormField>
+          </div>
+
+          <div className="mt-4">
+            <FormField label="STI Status">
+              <div className="space-y-2">
+                <div className="flex flex-wrap gap-2">
+                  {['HIV Negative', 'HIV Positive (Undetectable)', 'HSV-1', 'HSV-2', 'HPV', 'PrEP User', 'Regularly Tested'].map(status => (
+                    <ToggleChip
+                      key={status}
+                      label={status}
+                      selected={(profile.sti_status?.status || []).includes(status)}
+                      onClick={() => {
+                        const currentStatus = (profile.sti_status?.status as string[]) || [];
+                        const newStatus = currentStatus.includes(status)
+                          ? currentStatus.filter(s => s !== status)
+                          : [...currentStatus, status];
+                        handleChange('sti_status', { ...profile.sti_status, status: newStatus });
+                      }}
+                    />
+                  ))}
+                </div>
+                <div className="mt-2">
+                  <label className="text-xs text-gray-500">Last Tested Date</label>
+                  <input
+                    title="Last Tested Date"
+                    type="date"
+                    value={profile.sti_status?.last_tested || ''}
+                    onChange={(e) => handleChange('sti_status', { ...profile.sti_status, last_tested: e.target.value })}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                  />
+                </div>
+              </div>
+            </FormField>
+          </div>
+
+          <div className="mt-4">
+            <FormField label="Fetishes & Kinks">
+              <div className="flex flex-wrap gap-2">
+                {['BDSM', 'Roleplay', 'Voyeurism', 'Exhibitionism', 'Bondage', 'Domination', 'Submission', 'Feet', 'Leather', 'Latex', 'Group Sex', 'Public', 'Orgies', 'Gangbangs', 'Threesomes', 'Swinging', 'Cuckolding', 'Hotwife'].map(fetish => (
+                  <ToggleChip
+                    key={fetish}
+                    label={fetish}
+                    selected={(profile.fetishes || []).includes(fetish)}
+                    onClick={() => handleArrayToggle('fetishes', fetish)}
+                  />
+                ))}
+              </div>
+              <p className="mt-2 text-xs text-gray-500">Select all that apply. You can add more specific details in your bio if you wish.</p>
             </FormField>
           </div>
         </Section>

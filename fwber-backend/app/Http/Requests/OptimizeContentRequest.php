@@ -16,7 +16,7 @@ class OptimizeContentRequest extends FormRequest
         return [
             'content' => 'required|string|max:2000',
             'optimization_types' => 'sometimes|array',
-            'optimization_types.*' => 'string|in:engagement,clarity,safety,relevance',
+            "optimization_types.*" => 'string|in:engagement,clarity,safety,relevance',
         ];
     }
 }

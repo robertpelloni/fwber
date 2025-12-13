@@ -1,5 +1,7 @@
+'use client';
+
 import React, { createContext, useContext, ReactNode } from 'react';
-import { useMercureLogic, MercureConnectionStatus, OnlineUser, PresenceUpdate, ChatMessage, TypingIndicator, NotificationPayload } from '@/lib/hooks/use-mercure-logic';
+import { useMercureLogic, MercureConnectionStatus, OnlineUser, PresenceUpdate, ChatMessage, TypingIndicator, NotificationPayload, VideoSignal } from '@/lib/hooks/use-mercure-logic';
 
 interface MercureContextType {
   connectionStatus: {
@@ -14,16 +16,21 @@ interface MercureContextType {
   notifications: NotificationPayload[];
   chatMessages: ChatMessage[];
   typingIndicators: TypingIndicator[];
+  videoSignals: VideoSignal[];
   connect: () => void;
   disconnect: () => void;
   sendChatMessage: (recipientId: string, content: string, type?: string) => Promise<void>;
-  sendTypingIndicator: (recipientId: string, isTyping: boolean) => Promise<void>;
+  sendTypingIndicator: (recipientId: string, isTyping: boolean, chatroomId?: string) => Promise<void>;
+  sendVideoSignal: (recipientId: string, signal: any, callId?: number) => Promise<void>;
   updatePresence: (status: 'online' | 'away' | 'busy' | 'offline', metadata?: Record<string, any>) => Promise<void>;
   sendNotification: (recipientId: string, notification: any) => Promise<void>;
+  loadConversationHistory: (recipientId: string) => Promise<void>;
+  clearMessages: () => void;
+  clearNotifications: () => void;
   isReady: boolean;
 }
 
-const MercureContext = createContext<MercureContextType | null>(null);
+export const MercureContext = createContext<MercureContextType | null>(null);
 
 export function MercureProvider({ children }: { children: ReactNode }) {
   const mercure = useMercureLogic({ autoConnect: true });
@@ -38,7 +45,31 @@ export function MercureProvider({ children }: { children: ReactNode }) {
 export function useMercure() {
   const context = useContext(MercureContext);
   if (!context) {
-    throw new Error('useMercure must be used within a MercureProvider');
+    // Return a dummy context to prevent build failures during static generation
+    // where the provider might not be available in the tree.
+    // Also return dummy context if window is defined but provider is missing (e.g. some build environments)
+    // to prevent build crashes.
+    return {
+      connectionStatus: { connected: false, connectionId: null, userId: null, reconnectAttempts: 0 },
+      messages: [],
+      onlineUsers: [],
+      presenceUpdates: [],
+      notifications: [],
+      chatMessages: [],
+      typingIndicators: [],
+      videoSignals: [],
+      connect: () => {},
+      disconnect: () => {},
+      sendChatMessage: async () => {},
+      sendTypingIndicator: async () => {},
+      sendVideoSignal: async () => {},
+      updatePresence: async () => {},
+      sendNotification: async () => {},
+      loadConversationHistory: async () => {},
+      clearMessages: () => {},
+      clearNotifications: () => {},
+      isReady: false,
+    };
   }
   return context;
 }

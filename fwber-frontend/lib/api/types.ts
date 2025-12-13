@@ -45,19 +45,75 @@ export interface UserProfile {
   id: number
   user_id: number
   display_name: string | null
-  date_of_birth: string | null
+  birthdate: string | null
   gender: Gender | null
   pronouns: string | null
   sexual_orientation: string | null
   relationship_style: RelationshipStyle | null
   bio: string | null
-  location_latitude: number | null
-  location_longitude: number | null
-  location_description: string | null
+  latitude: number | null
+  longitude: number | null
+  location_name: string | null
   sti_status: Record<string, any> | null
   preferences: Record<string, any> | null
   avatar_url: string | null
   looking_for: string[] | null
+  interested_in: string[] | null
+  relationship_status: string | null
+  height_cm: number | null
+  body_type: string | null
+  ethnicity: string | null
+  occupation: string | null
+  education: string | null
+  
+  // Appearance & Physical
+  hair_color: string | null
+  eye_color: string | null
+  skin_tone: string | null
+  facial_hair: string | null
+  dominant_hand: string | null
+  fitness_level: string | null
+  clothing_style: string | null
+  avatar_prompt: string | null
+  avatar_status: string | null
+
+  // Personality & Social
+  love_language: string | null
+  personality_type: string | null
+  political_views: string | null
+  religion: string | null
+  sleep_schedule: string | null
+  social_media: Record<string, string> | null
+
+  // Intimate Attributes
+  penis_length_cm: number | null
+  penis_girth_cm: number | null
+  breast_size: string | null
+  tattoos: string | null
+  piercings: string | null
+  fetishes: string[] | null
+
+  // Lifestyle Attributes
+  smoking_status: string | null
+  drinking_status: string | null
+  cannabis_status: string | null
+  dietary_preferences: string | null
+  zodiac_sign: string | null
+  relationship_goals: string | null
+  has_children: boolean
+  wants_children: boolean
+  has_pets: boolean
+  languages: string[] | null
+  interests: string[] | null
+
+  // Settings
+  preferred_language?: string | null
+  is_travel_mode?: boolean
+  travel_latitude?: number | null
+  travel_longitude?: number | null
+  travel_location_name?: string | null
+  is_incognito?: boolean
+
   created_at: string
   updated_at: string
 }
@@ -523,6 +579,17 @@ export interface SlowRequest {
   updated_at: string
 }
 
+export interface SlowRequestStats {
+  route_name: string | null
+  action: string | null
+  count: number
+  avg_duration: number
+  max_duration: number
+  avg_queries?: number
+  avg_memory?: number
+  last_occurrence: string
+}
+
 export interface RealtimeMetrics {
   active_connections: number
   messages_per_minute: number
@@ -584,6 +651,20 @@ export interface BoostAnalyticsResponse {
     }
   }>
 }
+
+export interface RetentionDataPoint {
+  month_offset: number
+  percentage: number
+  count: number
+}
+
+export interface RetentionCohort {
+  month: string
+  size: number
+  retention: RetentionDataPoint[]
+}
+
+export type RetentionResponse = RetentionCohort[]
 
 // ============================================================================
 // Chatroom Types (Proximity & Group)

@@ -13,15 +13,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use App\Services\PushNotificationService;
+use App\Services\MatchMakerService;
 use Carbon\Carbon;
 
 class MatchController extends Controller
 {
     private AIMatchingService $matchingService;
+    private MatchMakerService $matchMakerService;
 
-    public function __construct(AIMatchingService $matchingService)
+    public function __construct(AIMatchingService $matchingService, MatchMakerService $matchMakerService)
     {
         $this->matchingService = $matchingService;
+        $this->matchMakerService = $matchMakerService;
     }
     /**
      * @OA\Get(
@@ -133,6 +136,12 @@ class MatchController extends Controller
                 'age_min' => $request->get('age_min'),
                 'age_max' => $request->get('age_max'),
                 'max_distance' => $request->get('max_distance'),
+                'smoking' => $request->get('smoking'),
+                'drinking' => $request->get('drinking'),
+                'body_type' => $request->get('body_type'),
+                'height_min' => $request->get('height_min'),
+                'has_bio' => $request->get('has_bio'),
+                'verified_only' => $request->get('verified_only'),
             ];
 
             $candidates = $this->matchingService->findAdvancedMatches($user, $filters);
@@ -322,14 +331,15 @@ class MatchController extends Controller
 
     private function calculateDistance(UserProfile $profile1, UserProfile $profile2): float
     {
-        if (!$profile1->location_latitude || !$profile2->location_latitude) {
+        $lat1 = $profile1->is_travel_mode ? $profile1->travel_latitude : $profile1->latitude;
+        $lon1 = $profile1->is_travel_mode ? $profile1->travel_longitude : $profile1->longitude;
+        
+        $lat2 = $profile2->is_travel_mode ? $profile2->travel_latitude : $profile2->latitude;
+        $lon2 = $profile2->is_travel_mode ? $profile2->travel_longitude : $profile2->longitude;
+
+        if (!$lat1 || !$lat2) {
             return 0;
         }
-
-        $lat1 = $profile1->location_latitude;
-        $lon1 = $profile1->location_longitude;
-        $lat2 = $profile2->location_latitude;
-        $lon2 = $profile2->location_longitude;
 
         $theta = $lon1 - $lon2;
         $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) + 
@@ -431,6 +441,9 @@ class MatchController extends Controller
                     $userA->notify(new \App\Notifications\NewMatchNotification($userB));
                     $userB->notify(new \App\Notifications\NewMatchNotification($userA));
                 }
+
+                // Process Wingman Bounties
+                $this->matchMakerService->processMatch($user1, $user2);
             }
 
             // Auto chat creation under feature flag

@@ -5,12 +5,55 @@ import { useWebSocketChat, ChatMessage, OnlineUser, useWebSocket } from '@/lib/h
 import { useAuth } from '@/lib/auth-context';
 import { MessageMetadata } from '@/components/MessageStatusIndicator';
 import { UserAvatar, PresenceIndicator, PresenceStatus } from '@/components/PresenceIndicator';
-import { ConversationStarter } from '@/components/ai/ConversationStarter';
+import { WingmanSuggestions } from '@/components/ai/WingmanSuggestions';
+import AudioRecorder from '@/components/AudioRecorder';
+import { api } from '@/lib/api';
+import { Languages, Loader2, Sparkles, Gift as GiftIcon } from 'lucide-react';
+import { useTranslation } from '@/lib/hooks/use-translation';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { MatchInsights } from '@/components/matches/MatchInsights';
+import { DatePlanner } from '@/components/realtime/DatePlanner';
+import { storeOfflineChatMessage } from '@/lib/offline-store';
+import { useToast } from '@/components/ToastProvider';
+import GiftShopModal from '@/components/gifts/GiftShopModal';
 
 interface RealTimeChatProps {
   recipientId: string;
   recipientName?: string;
   className?: string;
+}
+
+function TranslateButton({ text, isOwnMessage }: { text: string, isOwnMessage: boolean }) {
+  const { translate, isLoading } = useTranslation();
+  const [translatedText, setTranslatedText] = useState<string | null>(null);
+
+  const handleTranslate = async () => {
+    if (translatedText) {
+      setTranslatedText(null);
+      return;
+    }
+    // Default to English for now
+    const result = await translate(text, 'en');
+    if (result) setTranslatedText(result);
+  };
+
+  return (
+    <div className={`flex flex-col ${isOwnMessage ? 'items-end' : 'items-start'}`}>
+      {translatedText && (
+        <div className="text-xs text-gray-200 italic mb-1 border-l-2 border-blue-500 pl-2 bg-black/20 p-1 rounded">
+          {translatedText}
+        </div>
+      )}
+      <button 
+        onClick={handleTranslate}
+        className="text-[10px] text-gray-400 hover:text-white flex items-center gap-1 mt-1 opacity-50 hover:opacity-100 transition-opacity"
+        title="Translate"
+      >
+        {isLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Languages className="h-3 w-3" />}
+        {translatedText ? 'Original' : 'Translate'}
+      </button>
+    </div>
+  );
 }
 
 export default function RealTimeChat({ 
@@ -19,10 +62,13 @@ export default function RealTimeChat({
   className = '' 
 }: RealTimeChatProps) {
   const [message, setMessage] = useState('');
+  const [isRecordingVoice, setIsRecordingVoice] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(true);
+  const [isGiftModalOpen, setIsGiftModalOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
+  const { showSuccess, showError } = useToast();
   
   const {
     messages,
@@ -78,6 +124,57 @@ export default function RealTimeChat({
     handleTypingChange(value);
   };
 
+  const handleVoiceMessage = async (audioFile: File, duration: number) => {
+    if (!recipientId) return;
+
+    const formData = new FormData();
+    formData.append('receiver_id', recipientId);
+    formData.append('media', audioFile);
+    formData.append('media_duration', duration.toString());
+    formData.append('message_type', 'audio');
+
+    try {
+      if (!navigator.onLine) throw new Error('Offline');
+      await api.post('/messages', formData);
+      // Message will be received via WebSocket
+    } catch (error) {
+      console.error('Failed to send voice message:', error);
+      
+      // Offline fallback
+      if (!navigator.onLine || (error as any)?.message === 'Offline' || (error as any)?.code === 'ERR_NETWORK') {
+        try {
+          const token = localStorage.getItem('fwber_token');
+          if (token) {
+             await storeOfflineChatMessage({
+                recipient_id: recipientId,
+                message: { 
+                    type: 'audio', 
+                    media: audioFile, 
+                    media_duration: duration 
+                },
+                token: token,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Register background sync
+            if ('serviceWorker' in navigator && 'SyncManager' in window) {
+                const registration = await navigator.serviceWorker.ready;
+                // @ts-ignore
+                await registration.sync.register('chat-message');
+            }
+            
+            showSuccess('Saved Offline', 'Voice message will be sent when online');
+          }
+        } catch (storeErr) {
+             console.error('Failed to store offline voice message:', storeErr);
+             showError('Error', 'Failed to save voice message offline');
+        }
+      } else {
+        showError('Error', 'Failed to send voice message');
+      }
+    }
+  };
+
   return (
     <div className={`flex flex-col h-96 bg-gray-800 rounded-lg ${className}`}>
       {/* Chat Header */}
@@ -98,6 +195,30 @@ export default function RealTimeChat({
           </div>
         </div>
         <div className="flex items-center space-x-2">
+          <DatePlanner matchId={recipientId} matchName={recipientName} />
+          
+          <button 
+            onClick={() => setIsGiftModalOpen(true)}
+            className="p-2 hover:bg-gray-700 rounded-full text-gray-400 hover:text-pink-400 transition-colors"
+            title="Send Gift"
+          >
+            <GiftIcon className="w-5 h-5" />
+          </button>
+
+          <Dialog>
+            <DialogTrigger asChild>
+              <button 
+                className="p-2 hover:bg-gray-700 rounded-full text-gray-400 hover:text-yellow-400 transition-colors"
+                title="View Match Insights"
+              >
+                <Sparkles className="w-5 h-5" />
+              </button>
+            </DialogTrigger>
+            <DialogContent className="bg-gray-900 border-gray-800 text-white max-w-md">
+              <MatchInsights matchId={recipientId} />
+            </DialogContent>
+          </Dialog>
+
           {recipientTyping && (
             <div className="flex items-center space-x-1 text-gray-400 text-sm">
               <div className="flex space-x-1">
@@ -132,7 +253,29 @@ export default function RealTimeChat({
                       : 'bg-gray-700 text-white'
                   }`}
                 >
-                  <p className="text-sm">{msg.message?.content || msg.content}</p>
+                  {(msg.message_type === 'audio' || msg.message?.type === 'audio') ? (
+                    <div className="flex flex-col gap-1 min-w-[200px]">
+                        <audio controls src={msg.media_url} className="w-full h-8" />
+                        <div className="flex justify-between items-center">
+                          {msg.media_duration && <span className="text-xs opacity-75">{msg.media_duration}s</span>}
+                        </div>
+                        {msg.transcription && (
+                          <div className="mt-1 p-2 bg-black/20 rounded text-sm italic text-gray-200">
+                            &quot;{msg.transcription}&quot;
+                          </div>
+                        )}
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-sm">{msg.message?.content || msg.content}</p>
+                      {!isOwnMessage && (msg.message?.content || msg.content) && (
+                        <TranslateButton 
+                          text={msg.message?.content || msg.content || ''} 
+                          isOwnMessage={isOwnMessage} 
+                        />
+                      )}
+                    </div>
+                  )}
                   <MessageMetadata 
                     timestamp={msg.timestamp}
                     status={msg.status}
@@ -150,32 +293,48 @@ export default function RealTimeChat({
       {/* Message Input */}
       <div className="p-4 border-t border-gray-700">
         <div className="mb-2">
-          <ConversationStarter 
-            targetUserId={parseInt(recipientId) || undefined}
-            onSelectStarter={(starter) => {
-              setMessage(starter);
-              handleTypingChange(starter);
+          <WingmanSuggestions 
+            matchId={recipientId}
+            onSelectSuggestion={(suggestion) => {
+              setMessage(suggestion);
+              handleTypingChange(suggestion);
             }}
+            mode={(messages as ChatMessage[]).length === 0 ? 'ice-breaker' : 'reply'}
           />
         </div>
-        <form onSubmit={handleSendMessage} className="flex space-x-2">
-          <input
-            type="text"
-            value={message}
-            onChange={handleMessageChange}
-            placeholder="Type a message..."
-            className="flex-1 bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-            disabled={!isConnected}
+        <form onSubmit={handleSendMessage} className="flex space-x-2 items-center">
+          <AudioRecorder 
+            onRecordingComplete={handleVoiceMessage} 
+            onRecordingStateChange={setIsRecordingVoice}
           />
-          <button
-            type="submit"
-            disabled={!message.trim() || !isConnected}
-            className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition-colors"
-          >
-            Send
-          </button>
+          {!isRecordingVoice && (
+            <>
+              <input
+                type="text"
+                value={message}
+                onChange={handleMessageChange}
+                placeholder="Type a message..."
+                className="flex-1 bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                disabled={!isConnected}
+              />
+              <button
+                type="submit"
+                disabled={!message.trim() || !isConnected}
+                className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                Send
+              </button>
+            </>
+          )}
         </form>
       </div>
+
+      <GiftShopModal 
+        isOpen={isGiftModalOpen}
+        onClose={() => setIsGiftModalOpen(false)}
+        receiverId={parseInt(recipientId)}
+        receiverName={recipientName}
+      />
     </div>
   );
 }

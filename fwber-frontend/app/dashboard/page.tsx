@@ -23,6 +23,7 @@ interface DashboardStats {
   match_score_avg: number;
   response_rate: number;
   days_active: number;
+  current_streak: number;
   last_login: string;
 }
 
@@ -64,8 +65,8 @@ export default function DashboardPage() {
 
             {/* Stats Grid */}
             {statsLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                {[...Array(4)].map((_, i) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+                {[...Array(5)].map((_, i) => (
                   <div key={i} className="bg-white rounded-xl border border-gray-200 p-6 animate-pulse">
                     <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
                     <div className="h-8 bg-gray-200 rounded w-1/2"></div>
@@ -73,7 +74,7 @@ export default function DashboardPage() {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
                 <StatCard
                   icon={<Heart className="w-6 h-6" />}
                   label="Total Matches"
@@ -105,6 +106,14 @@ export default function DashboardPage() {
                   subtext="Average compatibility"
                   color="orange"
                   link="/matches"
+                />
+                <StatCard
+                  icon={<Zap className="w-6 h-6" />}
+                  label="Daily Streak"
+                  value={stats?.current_streak || 0}
+                  subtext="Days active"
+                  color="yellow"
+                  link="#"
                 />
               </div>
             )}
@@ -402,7 +411,7 @@ interface StatCardProps {
   label: string;
   value: number | string;
   subtext: string;
-  color: 'purple' | 'blue' | 'green' | 'orange';
+  color: 'purple' | 'blue' | 'green' | 'orange' | 'yellow';
   link: string;
 }
 
@@ -412,6 +421,7 @@ function StatCard({ icon, label, value, subtext, color, link }: StatCardProps) {
     blue: 'bg-blue-100 text-blue-600',
     green: 'bg-green-100 text-green-600',
     orange: 'bg-orange-100 text-orange-600',
+    yellow: 'bg-yellow-100 text-yellow-600',
   };
 
   return (

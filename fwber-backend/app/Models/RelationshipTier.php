@@ -17,6 +17,8 @@ class RelationshipTier extends Model
         'first_matched_at',
         'last_message_at',
         'met_in_person_at',
+        'user1_confirmed_meeting_at',
+        'user2_confirmed_meeting_at',
     ];
 
     protected $casts = [
@@ -24,6 +26,8 @@ class RelationshipTier extends Model
         'first_matched_at' => 'datetime',
         'last_message_at' => 'datetime',
         'met_in_person_at' => 'datetime',
+        'user1_confirmed_meeting_at' => 'datetime',
+        'user2_confirmed_meeting_at' => 'datetime',
     ];
 
     public function match(): BelongsTo
@@ -93,6 +97,30 @@ class RelationshipTier extends Model
         $this->met_in_person_at = now();
         $this->current_tier = 'verified';
         $this->save();
+    }
+
+    /**
+     * Confirm meeting for a specific user
+     */
+    public function confirmMeetingForUser(int $userId): void
+    {
+        // Ensure match is loaded
+        if (!$this->relationLoaded('match')) {
+            $this->load('match');
+        }
+
+        if ($this->match->user1_id === $userId) {
+            $this->user1_confirmed_meeting_at = now();
+        } elseif ($this->match->user2_id === $userId) {
+            $this->user2_confirmed_meeting_at = now();
+        }
+
+        $this->save();
+
+        // If both have confirmed, mark as met in person
+        if ($this->user1_confirmed_meeting_at && $this->user2_confirmed_meeting_at) {
+            $this->markMetInPerson();
+        }
     }
 
     /**

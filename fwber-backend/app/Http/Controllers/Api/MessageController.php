@@ -9,6 +9,7 @@ use App\Models\Message;
 use App\Models\RelationshipTier;
 use App\Models\User;
 use App\Models\UserMatch;
+use App\Jobs\TranscribeAudioMessage;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -250,6 +251,11 @@ class MessageController extends Controller
         $previousTier = $tier->current_tier;
         $tier->incrementMessages();
         $tierUpgraded = $tier->current_tier !== $previousTier;
+
+        // Dispatch audio transcription job if applicable
+        if ($message->message_type === 'audio') {
+            TranscribeAudioMessage::dispatch($message);
+        }
 
         return response()->json([
             'message' => $message,

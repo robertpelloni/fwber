@@ -529,7 +529,7 @@ class PhotoController extends Controller
             
             $validator = Validator::make($request->all(), [
                 'photo_ids' => 'required|array',
-                'photo_ids.*' => 'integer|exists:photos,id',
+                "photo_ids.*" => 'integer|exists:photos,id',
             ]);
             
             if ($validator->fails()) {

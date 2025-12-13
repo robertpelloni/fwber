@@ -38,6 +38,11 @@ const ENV_VAR_MAP: Record<FeatureFlagName, string> = {
  * Dynamic access like process.env[key] will return undefined in the browser.
  */
 function getEnvFeatureFlag(name: FeatureFlagName): boolean {
+  // Allow window override for Cypress testing
+  if (typeof window !== 'undefined' && (window as any).__CYPRESS_FEATURE_FLAGS__?.[name] !== undefined) {
+    return (window as any).__CYPRESS_FEATURE_FLAGS__[name];
+  }
+
   let value: string | undefined;
 
   switch (name) {

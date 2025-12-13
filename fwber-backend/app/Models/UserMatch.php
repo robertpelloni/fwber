@@ -16,6 +16,7 @@ class UserMatch extends Model
         'user2_id',
         'is_active',
         'last_message_at',
+        'status',
     ];
 
     protected $casts = [
