@@ -127,6 +127,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('analytics/realtime', [\App\Http\Controllers\AnalyticsController::class, 'realtime']);
     Route::get('analytics/moderation', [\App\Http\Controllers\AnalyticsController::class, 'moderation']);
     Route::get('analytics/slow-requests', [\App\Http\Controllers\AnalyticsController::class, 'slowRequests']);
+    Route::get('analytics/slow-requests/stats', [\App\Http\Controllers\AnalyticsController::class, 'slowRequestStats']);
     Route::get('analytics/boosts', [\App\Http\Controllers\AnalyticsController::class, 'boosts']);
     
     // Failed Jobs (Admin)

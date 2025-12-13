@@ -7,6 +7,7 @@ import type {
   RateLimitStatsResponse,
   RateLimitTimeframe,
   SlowRequest,
+  SlowRequestStats,
   BoostAnalyticsResponse,
 } from './types';
 
@@ -29,6 +30,10 @@ export function getModerationInsights() {
 
 export function getSlowRequests() {
   return api.get<SlowRequest[]>('/analytics/slow-requests');
+}
+
+export function getSlowRequestStats() {
+  return api.get<SlowRequestStats[]>('/analytics/slow-requests/stats');
 }
 
 export function getBoostAnalytics() {

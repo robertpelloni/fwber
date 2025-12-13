@@ -10,6 +10,8 @@ class SlowRequest extends Model
         'user_id',
         'method',
         'url',
+        'route_name',
+        'action',
         'duration_ms',
         'ip',
         'user_agent',

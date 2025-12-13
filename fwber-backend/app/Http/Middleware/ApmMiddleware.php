@@ -34,6 +34,8 @@ class ApmMiddleware
                     'user_id' => $request->user()?->id,
                     'method' => $request->method(),
                     'url' => $request->fullUrl(),
+                    'route_name' => $request->route()?->getName(),
+                    'action' => $request->route()?->getActionName(),
                     'duration_ms' => $duration,
                     'ip' => $request->ip(),
                     'user_agent' => $request->userAgent(),

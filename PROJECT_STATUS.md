@@ -9,7 +9,7 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 ### ⚠️ Known Issues / Technical Debt
 *   **None**: No critical technical debt currently tracked.
 
-### ✅ Completed Operational Improvements (Dec 12)
+### ✅ Completed Operational Improvements (Dec 12-13)
 1.  **Landing Page UI Polish**:
     -   **Logo**: Fixed alignment issues and added glow effects.
     -   **Typography**: Applied animated gradients to the main tagline and primary buttons for a cohesive, premium feel.
@@ -24,6 +24,11 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Frontend**: Integrated `GiftShopModal` into the Matches page.
     -   **User Flow**: Users can now send virtual gifts using their token balance directly from the match screen.
     -   **Verification**: Feature tests (`GiftTest.php`) passing. Manual verification of UI flow.
+4.  **Performance Tuning (Slow Request Aggregation)**:
+    -   **Backend**: Enhanced `SlowRequest` model and `ApmMiddleware` to capture `route_name` and `action`.
+    -   **Backend**: Added `/analytics/slow-requests/stats` endpoint for aggregated metrics.
+    -   **Frontend**: Implemented `SlowRequestStatsTable` in Admin Analytics to visualize aggregated performance data.
+    -   **Verification**: Verified data flow from middleware to frontend UI.
 
 ### ✅ Viral Growth Features (Dec 13)
 1.  **Wingman Bounties**:

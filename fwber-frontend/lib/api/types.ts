@@ -571,6 +571,15 @@ export interface SlowRequest {
   updated_at: string
 }
 
+export interface SlowRequestStats {
+  route_name: string | null
+  action: string | null
+  count: number
+  avg_duration: number
+  max_duration: number
+  last_occurrence: string
+}
+
 export interface RealtimeMetrics {
   active_connections: number
   messages_per_minute: number

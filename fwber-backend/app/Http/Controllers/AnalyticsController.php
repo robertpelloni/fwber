@@ -185,6 +185,35 @@ class AnalyticsController extends Controller
     }
 
     /**
+     * Get slow request statistics
+     *
+     * @OA\Get(
+     *   path="/analytics/slow-requests/stats",
+     *   tags={"Analytics"},
+     *   summary="Aggregated slow request statistics",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="Aggregated stats")
+     * )
+     */
+    public function slowRequestStats(): JsonResponse
+    {
+        $stats = SlowRequest::selectRaw('
+                COALESCE(route_name, action, url) as endpoint,
+                method,
+                COUNT(*) as count,
+                AVG(duration_ms) as avg_duration,
+                MAX(duration_ms) as max_duration
+            ')
+            ->where('created_at', '>=', now()->subDays(7))
+            ->groupBy('endpoint', 'method')
+            ->orderByDesc('avg_duration')
+            ->limit(20)
+            ->get();
+
+        return response()->json($stats);
+    }
+
+    /**
      * Get trend analytics
      */
     private function getTrendAnalytics(array $dateRange): array

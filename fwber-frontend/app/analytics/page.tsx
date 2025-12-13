@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import RateLimitStats from '@/components/analytics/RateLimitStats';
 import SlowRequestsTable from '@/components/analytics/SlowRequestsTable';
+import SlowRequestStatsTable from '@/components/analytics/SlowRequestStatsTable';
 import type { AnalyticsRange, PlatformAnalyticsResponse } from '@/lib/api/types';
 import {
   useModerationInsights,
@@ -160,6 +161,7 @@ export default function AnalyticsPage() {
 
       <RateLimitStats />
       <SlowRequestsTable />
+      <SlowRequestStatsTable />
 
       {/* System Health Status */}
       <div className="rounded-lg bg-white p-6 shadow-sm">
