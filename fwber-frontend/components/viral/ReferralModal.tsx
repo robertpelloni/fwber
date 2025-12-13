@@ -19,7 +19,7 @@ interface ReferralModalProps {
 
 export function ReferralModal({ trigger }: ReferralModalProps) {
   const { user } = useAuth();
-  const { toast } = useToast();
+  const { success } = useToast();
   const [isOpen, setIsOpen] = useState(false);
 
   if (!user) return null;
@@ -30,10 +30,7 @@ export function ReferralModal({ trigger }: ReferralModalProps) {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(referralLink);
-    toast({
-      title: 'Copied!',
-      description: 'Referral link copied to clipboard.',
-    });
+    success('Referral link copied to clipboard.');
   };
 
   return (
