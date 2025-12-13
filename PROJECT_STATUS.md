@@ -9,6 +9,19 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 ### ⚠️ Known Issues / Technical Debt
 *   **None**: No critical technical debt currently tracked.
 
+### ✅ Backend Stabilization (Dec 13)
+1.  **Merge Artifact Cleanup**:
+    -   **Issue**: Identified and resolved "Bad Merge" artifacts (duplicate class definitions) in `FriendController`, `GenerateAvatar` Job, and `UserPhysicalProfileController`.
+    -   **Fix**: Removed duplicate code blocks and ensured correct versioning of methods.
+2.  **Test Suite Green**:
+    -   **Status**: All 170 backend tests passing.
+    -   **Fixes**:
+        -   **FriendTest**: Aligned assertions with controller logic (200 OK vs 201 Created).
+        -   **SafetyAndModerationTest**: Fixed enum mismatch (`ProximityArtifact` type).
+        -   **AvatarGenerationTest**: Fixed `setUp` order, undefined methods, and missing routes.
+3.  **Route Restoration**:
+    -   **Avatar**: Restored `POST /api/physical-profile/avatar/request` and `PUT /api/physical-profile`.
+
 ### ✅ Completed Operational Improvements (Dec 12-13)
 1.  **Landing Page UI Polish**:
     -   **Logo**: Fixed alignment issues and added glow effects.
