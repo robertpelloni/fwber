@@ -31,6 +31,12 @@ export interface UserProfile {
       city: string | null;
       state: string | null;
     };
+    // Travel Mode
+    is_travel_mode?: boolean;
+    travel_latitude?: number | null;
+    travel_longitude?: number | null;
+    travel_location_name?: string | null;
+    
     // New Optional Attributes
     love_language?: string;
     personality_type?: string;
@@ -113,6 +119,13 @@ export interface ProfileUpdateData {
     max_distance?: number;
     city?: string;
     state?: string;
+  };
+  // Travel Mode
+  is_travel_mode?: boolean;
+  travel_location?: {
+    latitude?: number;
+    longitude?: number;
+    name?: string;
   };
   // New Optional Attributes
   love_language?: string;
@@ -207,7 +220,7 @@ export async function getPublicProfile(token: string, userId: number): Promise<U
  * Fetch authenticated user's profile
  */
 export async function getUserProfile(token: string): Promise<UserProfile> {
-  const response = await fetch(`${API_BASE_URL}/user`, {
+  const response = await fetch(`${API_BASE_URL}/profile`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -232,7 +245,7 @@ export async function updateUserProfile(
   token: string,
   updates: ProfileUpdateData
 ): Promise<UserProfile> {
-  const response = await fetch(`${API_BASE_URL}/user`, {
+  const response = await fetch(`${API_BASE_URL}/profile`, {
     method: 'PUT',
     headers: {
       'Authorization': `Bearer ${token}`,

@@ -480,6 +480,13 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Content**: Updated Landing Page to reflect all implemented features (Video Chat, Gifts, etc.) and removed "Coming Soon" badges.
     -   **Verification**: Visual inspection.
 
+32. **Travel Mode (Passport)** (Dec 13 - Complete):
+    -   **Concept**: Allow users to set a virtual location to match with people in other cities.
+    -   **Backend**: Added `is_travel_mode`, `travel_latitude`, `travel_longitude` to `user_profiles`.
+    -   **Logic**: Updated `AIMatchingService` and `MatchController` to use travel coordinates for distance calculations.
+    -   **Frontend**: Created `TravelModePage` (`/settings/travel`) with map interface for location selection.
+    -   **Verification**: Updated `MatchFilterTest` to cover travel mode scenarios. All tests passing.
+
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.
 2.  **API Documentation**: OpenAPI/Swagger docs available at `/api/docs`.

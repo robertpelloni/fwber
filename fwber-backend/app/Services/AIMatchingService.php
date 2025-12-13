@@ -85,8 +85,8 @@ class AIMatchingService
             }
 
             // Analyze location preferences
-            if ($targetUser->profile->location_description) {
-                $location = $targetUser->profile->location_description;
+            if ($targetUser->profile->location_name) {
+                $location = $targetUser->profile->location_name;
                 $behavioralPrefs['preferred_locations'][$location] = 
                     ($behavioralPrefs['preferred_locations'][$location] ?? 0) + ($weight * $count);
             }
@@ -109,20 +109,38 @@ class AIMatchingService
             ->whereHas('profile')
             ->with(['profile']);
 
+        // Determine effective location for the current user
+        $myLat = $userProfile->is_travel_mode ? $userProfile->travel_latitude : $userProfile->latitude;
+        $myLon = $userProfile->is_travel_mode ? $userProfile->travel_longitude : $userProfile->longitude;
+
         // Basic distance filter
-        if ($userProfile->location_latitude && $userProfile->location_longitude) {
+        if ($myLat && $myLon) {
             $maxDistance = $filters['max_distance'] ?? 50; // Default 50 miles
-            $query->whereHas('profile', function ($q) use ($userProfile, $maxDistance) {
-                $latDist = (1.1 * $maxDistance) / 49.1;
-                $lonDist = (1.1 * $maxDistance) / 69.1;
-                
-                $q->whereBetween('location_latitude', [
-                    $userProfile->location_latitude - $latDist,
-                    $userProfile->location_latitude + $latDist
-                ])->whereBetween('location_longitude', [
-                    $userProfile->location_longitude - $lonDist,
-                    $userProfile->location_longitude + $lonDist
-                ]);
+            
+            // Calculate bounding box
+            $latDist = (1.1 * $maxDistance) / 49.1;
+            $lonDist = (1.1 * $maxDistance) / 69.1;
+            
+            $minLat = $myLat - $latDist;
+            $maxLat = $myLat + $latDist;
+            $minLon = $myLon - $lonDist;
+            $maxLon = $myLon + $lonDist;
+
+            $query->whereHas('profile', function ($q) use ($minLat, $maxLat, $minLon, $maxLon) {
+                $q->where(function($sub) use ($minLat, $maxLat, $minLon, $maxLon) {
+                    // Match users at their real location (if not in travel mode)
+                    $sub->where(function($w) use ($minLat, $maxLat, $minLon, $maxLon) {
+                        $w->where('is_travel_mode', false)
+                          ->whereBetween('latitude', [$minLat, $maxLat])
+                          ->whereBetween('longitude', [$minLon, $maxLon]);
+                    })
+                    // Or match users who are virtually traveling to my area
+                    ->orWhere(function($w) use ($minLat, $maxLat, $minLon, $maxLon) {
+                        $w->where('is_travel_mode', true)
+                          ->whereBetween('travel_latitude', [$minLat, $maxLat])
+                          ->whereBetween('travel_longitude', [$minLon, $maxLon]);
+                    });
+                });
             });
         }
 
@@ -570,7 +588,10 @@ class AIMatchingService
         }
 
         // Distance compatibility
-        if ($userProfile->location_latitude && $candidateProfile->location_latitude) {
+        $myLat = $userProfile->is_travel_mode ? $userProfile->travel_latitude : $userProfile->latitude;
+        $theirLat = $candidateProfile->is_travel_mode ? $candidateProfile->travel_latitude : $candidateProfile->latitude;
+
+        if ($myLat && $theirLat) {
             $distance = $this->calculateDistance($userProfile, $candidateProfile);
             $score += max(0, 20 - ($distance / 5));
         }
@@ -598,8 +619,8 @@ class AIMatchingService
         }
 
         // Location preference matching
-        if ($candidateProfile->location_description) {
-            $locationScore = $behavioralPrefs['preferred_locations'][$candidateProfile->location_description] ?? 0;
+        if ($candidateProfile->location_name) {
+            $locationScore = $behavioralPrefs['preferred_locations'][$candidateProfile->location_name] ?? 0;
             $score += min(25, $locationScore);
         }
 
@@ -661,14 +682,15 @@ class AIMatchingService
 
     private function calculateDistance(UserProfile $profile1, UserProfile $profile2): float
     {
-        if (!$profile1->location_latitude || !$profile2->location_latitude) {
+        $lat1 = $profile1->is_travel_mode ? $profile1->travel_latitude : $profile1->latitude;
+        $lon1 = $profile1->is_travel_mode ? $profile1->travel_longitude : $profile1->longitude;
+        
+        $lat2 = $profile2->is_travel_mode ? $profile2->travel_latitude : $profile2->latitude;
+        $lon2 = $profile2->is_travel_mode ? $profile2->travel_longitude : $profile2->longitude;
+
+        if (!$lat1 || !$lat2) {
             return 0;
         }
-
-        $lat1 = $profile1->location_latitude;
-        $lon1 = $profile1->location_longitude;
-        $lat2 = $profile2->location_latitude;
-        $lon2 = $profile2->location_longitude;
 
         $theta = $lon1 - $lon2;
         $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) + 

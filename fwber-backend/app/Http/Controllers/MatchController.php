@@ -331,14 +331,15 @@ class MatchController extends Controller
 
     private function calculateDistance(UserProfile $profile1, UserProfile $profile2): float
     {
-        if (!$profile1->location_latitude || !$profile2->location_latitude) {
+        $lat1 = $profile1->is_travel_mode ? $profile1->travel_latitude : $profile1->latitude;
+        $lon1 = $profile1->is_travel_mode ? $profile1->travel_longitude : $profile1->longitude;
+        
+        $lat2 = $profile2->is_travel_mode ? $profile2->travel_latitude : $profile2->latitude;
+        $lon2 = $profile2->is_travel_mode ? $profile2->travel_longitude : $profile2->longitude;
+
+        if (!$lat1 || !$lat2) {
             return 0;
         }
-
-        $lat1 = $profile1->location_latitude;
-        $lon1 = $profile1->location_longitude;
-        $lat2 = $profile2->location_latitude;
-        $lon2 = $profile2->location_longitude;
 
         $theta = $lon1 - $lon2;
         $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) + 

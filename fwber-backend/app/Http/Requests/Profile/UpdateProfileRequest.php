@@ -76,6 +76,13 @@ class UpdateProfileRequest extends FormRequest
             'location.max_distance' => 'sometimes|integer|min:1|max:500',
             'location.city' => 'sometimes|string|max:100',
             'location.state' => 'sometimes|string|max:100',
+
+            // Travel Mode
+            'is_travel_mode' => 'sometimes|boolean',
+            'travel_location.latitude' => 'sometimes|numeric|between:-90,90',
+            'travel_location.longitude' => 'sometimes|numeric|between:-180,180',
+            'travel_location.name' => 'sometimes|string|max:100',
+
             'preferences' => 'sometimes|array',
             'preferences.smoking' => 'sometimes|string|in:non-smoker,occasional,regular,social,trying-to-quit',
             'preferences.drinking' => 'sometimes|string|in:non-drinker,occasional,regular,social,sober',

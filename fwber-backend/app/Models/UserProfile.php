@@ -64,12 +64,19 @@ class UserProfile extends Model
         'sleep_schedule',
         'social_media',
         'preferred_language',
+        'is_travel_mode',
+        'travel_latitude',
+        'travel_longitude',
+        'travel_location_name',
     ];
 
     protected $casts = [
         'birthdate' => 'date',
         'latitude' => 'float',
         'longitude' => 'float',
+        'is_travel_mode' => 'boolean',
+        'travel_latitude' => 'float',
+        'travel_longitude' => 'float',
         'has_children' => 'boolean',
         'wants_children' => 'boolean',
         'has_pets' => 'boolean',

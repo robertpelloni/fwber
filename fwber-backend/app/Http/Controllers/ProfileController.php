@@ -299,6 +299,24 @@ class ProfileController extends Controller
                     $profile->location_name = $location['city'] . ', ' . ($location['state'] ?? '');
                 }
             }
+
+            // Handle travel mode
+            if (isset($validated['is_travel_mode'])) {
+                $profile->is_travel_mode = $validated['is_travel_mode'];
+            }
+            
+            if (isset($validated['travel_location'])) {
+                $travel = $validated['travel_location'];
+                if (isset($travel['latitude'])) {
+                    $profile->travel_latitude = $travel['latitude'];
+                }
+                if (isset($travel['longitude'])) {
+                    $profile->travel_longitude = $travel['longitude'];
+                }
+                if (isset($travel['name'])) {
+                    $profile->travel_location_name = $travel['name'];
+                }
+            }
             
             // Handle JSON fields
             if (isset($validated['looking_for'])) {

@@ -419,6 +419,17 @@ export default function HomePage() {
               </p>
             </div>
 
+            {/* Travel Mode */}
+            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-teal-50 transition-colors duration-300 border border-gray-100">
+              <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center mb-6 text-teal-600">
+                <MapPin className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Travel Mode</h3>
+              <p className="text-gray-600">
+                Planning a trip? Set your location to your destination and start matching with locals before you arrive.
+              </p>
+            </div>
+
              {/* Open Source */}
              <div className="p-8 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors duration-300 border border-gray-100 md:col-span-2 lg:col-span-3">
               <div className="flex flex-col md:flex-row items-center text-center md:text-left">

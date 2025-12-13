@@ -18,6 +18,7 @@ import {
   LogOut,
   CreditCard,
   CheckCircle,
+  Plane,
 } from 'lucide-react';
 
 interface SettingsLinkProps {
@@ -119,6 +120,13 @@ export default function SettingsPage() {
                 icon={<MapPin className="w-5 h-5" />}
                 title="Location Settings"
                 description="Manage your location privacy and visibility"
+              />
+              <SettingsLink
+                href="/settings/travel"
+                icon={<Plane className="w-5 h-5" />}
+                title="Travel Mode"
+                description="Change your location to match in other cities"
+                badge="Gold"
               />
             </div>
           </section>
