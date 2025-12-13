@@ -124,6 +124,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('user/two-factor-recovery-codes', [\App\Http\Controllers\TwoFactorAuthenticationController::class, 'recoveryCodes']);
     Route::post('user/two-factor-recovery-codes', [\App\Http\Controllers\TwoFactorAuthenticationController::class, 'regenerateRecoveryCodes']);
 
+    // E2E Encryption Keys
+    Route::prefix('security/keys')->group(function () {
+        Route::post('/', [\App\Http\Controllers\Api\E2EKeyManagementController::class, 'store']);
+        Route::get('/me', [\App\Http\Controllers\Api\E2EKeyManagementController::class, 'me']);
+        Route::get('/{userId}', [\App\Http\Controllers\Api\E2EKeyManagementController::class, 'show']);
+    });
+
     // Profile
     Route::get('users/{id}', [\App\Http\Controllers\ProfileController::class, 'showPublic']);
     Route::get('profile', [\App\Http\Controllers\ProfileController::class, 'show']);

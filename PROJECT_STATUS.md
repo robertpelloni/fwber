@@ -552,6 +552,13 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Frontend**: Created `TravelModePage` (`/settings/travel`) with map interface for location selection.
     -   **Verification**: Updated `MatchFilterTest` to cover travel mode scenarios. All tests passing.
 
+33. **End-to-End Encryption (Key Management)** (Dec 13 - Complete):
+    -   **Concept**: Secure infrastructure for users to exchange encrypted secrets.
+    -   **Backend**: Implemented `UserPublicKey` model and `E2EKeyManagementService`.
+    -   **API**: Created `E2EKeyManagementController` with endpoints for storing and retrieving public keys.
+    -   **Security**: Public keys are encrypted at rest using the application key.
+    -   **Verification**: Feature tests (`E2EKeyManagementTest.php`) passing.
+
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.
 2.  **API Documentation**: OpenAPI/Swagger docs available at `/api/docs`.
