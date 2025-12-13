@@ -227,6 +227,7 @@ class MessageController extends Controller
                 'media_type' => $mediaType,
                 'media_duration' => $duration,
                 'thumbnail_url' => $thumbnailUrl,
+                'is_encrypted' => $validated['is_encrypted'] ?? false,
                 'sent_at' => now(),
             ]);
 

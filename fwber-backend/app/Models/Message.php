@@ -20,6 +20,7 @@ class Message extends Model
         'media_duration',
         'thumbnail_url',
         'transcription',
+        'is_encrypted',
         'is_read',
         'sent_at',
         'read_at',
@@ -29,6 +30,7 @@ class Message extends Model
         'sent_at' => 'datetime',
         'read_at' => 'datetime',
         'is_read' => 'boolean',
+        'is_encrypted' => 'boolean',
         'media_duration' => 'integer',
     ];
 

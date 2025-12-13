@@ -19,6 +19,7 @@ class TokenController extends Controller
             'wallet_address' => $user->wallet_address,
             'transactions' => $user->tokenTransactions()->latest()->take(20)->get(),
             'referral_count' => $user->referrals()->count(),
+            'golden_tickets_remaining' => $user->golden_tickets_remaining,
         ]);
     }
 

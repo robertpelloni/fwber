@@ -12,6 +12,7 @@ import { ProximityPresenceCompact } from '@/components/realtime';
 import AppHeader from '@/components/AppHeader';
 import { ActivityFeed } from '@/components/ActivityFeed';
 import BoostButton from '@/components/BoostButton';
+import { ReferralModal } from '@/components/viral/ReferralModal';
 
 interface DashboardStats {
   total_matches: number;
@@ -60,7 +61,10 @@ export default function DashboardPage() {
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400">Here&apos;s what&apos;s happening with your matches.</p>
               </div>
-              <BoostButton />
+              <div className="flex gap-2">
+                <ReferralModal />
+                <BoostButton />
+              </div>
             </div>
 
             {/* Stats Grid */}

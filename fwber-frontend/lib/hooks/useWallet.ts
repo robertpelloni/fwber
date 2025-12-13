@@ -15,6 +15,7 @@ export interface WalletData {
   wallet_address: string | null
   transactions: Transaction[]
   referral_count: number
+  golden_tickets_remaining: number
 }
 
 export function useWallet() {

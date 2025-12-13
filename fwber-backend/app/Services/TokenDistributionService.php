@@ -45,11 +45,20 @@ class TokenDistributionService
                     $user->referrer_id = $referrer->id;
                     $user->save();
 
+                    // Check for Golden Ticket
+                    if ($referrer->golden_tickets_remaining > 0) {
+                        $referrer->decrement('golden_tickets_remaining');
+                        
+                        // Grant 3 Days of Premium (Gold Tier)
+                        $user->tier = 'gold';
+                        $user->tier_expires_at = now()->addDays(3);
+                        $user->save();
+                    }
+
                     // Award Referrer
                     $this->awardTokens($referrer, self::REFERRAL_BONUS, 'referral_bonus', "Referral Bonus for user {$user->id}");
                     
                     // Award Referee (extra bonus for being referred?)
-                    // Let's give them a small kicker, say 10% of base
                     $this->awardTokens($user, 10, 'referral_accepted_bonus', "Bonus for using referral code");
                 }
             }

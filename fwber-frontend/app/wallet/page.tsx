@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { useWallet } from '@/lib/hooks/useWallet'
-import { Copy, Wallet, Users, TrendingUp, History } from 'lucide-react'
+import { Copy, Wallet, Users, TrendingUp, History, Ticket } from 'lucide-react'
 import { useToast } from '@/components/ToastProvider'
 
 export default function WalletPage() {
@@ -58,6 +58,20 @@ export default function WalletPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            {/* Golden Tickets Card */}
+            <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl p-6 shadow-sm border border-yellow-300 text-white">
+              <div className="flex items-center gap-3 mb-4">
+                <Ticket className="w-6 h-6" />
+                <h3 className="text-lg font-semibold">Golden Tickets</h3>
+              </div>
+              <p className="text-yellow-50 mb-4">
+                You have <strong className="text-2xl">{data.golden_tickets_remaining}</strong> Golden Tickets left.
+              </p>
+              <p className="text-sm text-yellow-100">
+                Invite a friend using your code. If you have tickets, they get <strong>3 Days of Gold Premium</strong> instantly!
+              </p>
+            </div>
+
             {/* Referral Card */}
             <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-3 mb-4">

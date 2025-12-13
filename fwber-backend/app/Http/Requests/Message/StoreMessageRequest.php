@@ -28,6 +28,7 @@ class StoreMessageRequest extends FormRequest
             'media' => 'nullable|file',
             // media_duration provided by clients for audio/video; we clamp to type-specific caps later
             'media_duration' => 'nullable|integer|min:1',
+            'is_encrypted' => 'nullable|boolean',
         ];
     }
 }

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { storeOfflineChatMessage } from '@/lib/offline-store';
+import { useE2EEncryption } from '@/lib/hooks/use-e2e-encryption';
 
 export interface MercureConnectionStatus {
   connected: boolean;
@@ -48,6 +49,8 @@ export interface ChatMessage {
   message_type?: string;
   media_url?: string;
   media_duration?: number;
+  is_encrypted?: boolean;
+  transcription?: string;
 }
 
 export interface TypingIndicator {
@@ -77,6 +80,7 @@ export interface NotificationPayload {
 
 export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
   const { user, isAuthenticated, token } = useAuth();
+  const { encrypt, decrypt, isReady: isE2EReady } = useE2EEncryption();
   const [status, setStatus] = useState<MercureConnectionStatus>({
     connected: false,
     connecting: false,
@@ -93,78 +97,35 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
 
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Refs for E2E to avoid stale closures in EventSource callbacks
+  const decryptRef = useRef(decrypt);
+  const encryptRef = useRef(encrypt);
+  const isE2EReadyRef = useRef(isE2EReady);
 
-  const connect = useCallback(async () => {
-    if (!isAuthenticated || !token) return;
-    if (eventSourceRef.current?.readyState === EventSource.OPEN) return;
+  useEffect(() => { decryptRef.current = decrypt; }, [decrypt]);
+  useEffect(() => { encryptRef.current = encrypt; }, [encrypt]);
+  useEffect(() => { isE2EReadyRef.current = isE2EReady; }, [isE2EReady]);
 
-    try {
-      setStatus(prev => ({ ...prev, connecting: true, error: null }));
-
-      // 1. Get Mercure Token and Hub URL
-      const response = await api.get<{ token: string; hub_url: string }>('/websocket/token');
-      const { token: mercureToken, hub_url } = response;
-
-      // 2. Construct URL with topics
-      const url = new URL(hub_url);
-      url.searchParams.append('topic', `https://fwber.me/user/${user?.id}`);
-      url.searchParams.append('topic', 'https://fwber.me/presence');
-      
-      // Append authorization token
-      url.searchParams.append('authorization', mercureToken);
-
-      // 3. Create EventSource
-      const es = new EventSource(url.toString());
-
-      es.onopen = () => {
-        console.log('Mercure connected');
-        setStatus({ connected: true, connecting: false, error: null });
-      };
-
-      es.onerror = (e) => {
-        console.error('Mercure error:', e);
-        setStatus(prev => ({ ...prev, connected: false, error: new Error('Connection failed') }));
-        es.close();
-        
-        // Simple reconnect logic
-        if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
-        reconnectTimeoutRef.current = setTimeout(() => {
-          connect();
-        }, 3000);
-      };
-
-      es.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          handleMessage(data);
-        } catch (err) {
-          console.error('Failed to parse Mercure message:', err);
-        }
-      };
-
-      eventSourceRef.current = es;
-
-    } catch (err) {
-      console.error('Failed to connect to Mercure:', err);
-      setStatus({ connected: false, connecting: false, error: err as Error });
-    }
-  }, [isAuthenticated, token, user?.id]);
-
-  const disconnect = useCallback(() => {
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-      eventSourceRef.current = null;
-    }
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current);
-    }
-    setStatus({ connected: false, connecting: false, error: null });
-  }, []);
-
-  const handleMessage = (data: any) => {
+  const handleMessage = async (data: any) => {
     // Dispatch based on message type
     // The backend sends messages with a 'type' field
     console.log('Mercure message received:', data);
+
+    // Decrypt if needed
+    if (data.type === 'chat_message' && data.is_encrypted && isE2EReadyRef.current) {
+        try {
+            const peerId = parseInt(data.from_user_id);
+            if (!isNaN(peerId)) {
+                const decrypted = await decryptRef.current(peerId, data.content);
+                data.content = decrypted;
+                data.is_encrypted = false;
+            }
+        } catch (e) {
+            console.error('Decryption failed for incoming message', e);
+            data.content = '🔒 Encrypted Message (Decryption Failed)';
+        }
+    }
 
     switch (data.type) {
       case 'chat_message':
@@ -213,9 +174,22 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
       if (!navigator.onLine) {
         throw new Error('Offline');
       }
+
+      let finalContent = content;
+      let isEncrypted = false;
+
+      if (type === 'text' && isE2EReadyRef.current) {
+        try {
+            finalContent = await encryptRef.current(parseInt(recipientId), content);
+            isEncrypted = true;
+        } catch (e) {
+            console.error('Encryption failed, falling back to plain text', e);
+        }
+      }
+
       await api.post('/websocket/message', {
         recipient_id: recipientId,
-        message: { type, content }
+        message: { type, content: finalContent, is_encrypted: isEncrypted }
       });
       
       // Optimistic update could be added here
@@ -300,17 +274,35 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
   const loadConversationHistory = useCallback(async (recipientId: string) => {
     try {
       const response = await api.get<any>(`/messages/${recipientId}`);
-      const history = (response.messages || response.data || []).map((msg: any) => ({
-        id: msg.id,
-        from_user_id: msg.sender_id,
-        to_user_id: msg.receiver_id,
-        content: msg.content,
-        timestamp: msg.created_at,
-        status: msg.read_at ? 'read' : 'delivered',
-        message_type: msg.message_type,
-        media_url: msg.media_url,
-        media_duration: msg.media_duration,
+      const history = await Promise.all((response.messages || response.data || []).map(async (msg: any) => {
+        let content = msg.content;
+        if (msg.is_encrypted && isE2EReadyRef.current) {
+            try {
+                // If I am the sender, I use the receiver's ID to derive the shared key.
+                // If I am the receiver, I use the sender's ID.
+                // The shared key is the same in both cases (ECDH property).
+                const peerId = msg.sender_id === user?.id ? msg.receiver_id : msg.sender_id;
+                content = await decryptRef.current(peerId, content);
+            } catch (e) {
+                console.error('Failed to decrypt history message', e);
+                content = '🔒 Encrypted Message';
+            }
+        }
+
+        return {
+            id: msg.id,
+            from_user_id: msg.sender_id,
+            to_user_id: msg.receiver_id,
+            content: content,
+            timestamp: msg.created_at,
+            status: msg.read_at ? 'read' : 'delivered',
+            message_type: msg.message_type,
+            media_url: msg.media_url,
+            media_duration: msg.media_duration,
+            is_encrypted: false
+        };
       }));
+
       setChatMessages(prev => {
         // Merge history with existing messages, avoiding duplicates
         const existingIds = new Set(prev.map(m => m.id));
@@ -320,6 +312,62 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
     } catch (err) {
       console.error('Failed to load conversation history:', err);
     }
+  }, [user?.id]);
+
+  const connect = useCallback(() => {
+    if (status.connected || status.connecting || !user?.id) return;
+
+    setStatus(prev => ({ ...prev, connecting: true, error: null }));
+
+    const hubUrl = new URL(process.env.NEXT_PUBLIC_MERCURE_URL || 'http://localhost:3000/.well-known/mercure');
+    hubUrl.searchParams.append('topic', `/users/${user.id}`);
+    
+    const es = new EventSource(hubUrl.toString(), {
+      withCredentials: true
+    });
+    
+    es.onopen = () => {
+      setStatus({ connected: true, connecting: false, error: null });
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
+    };
+
+    es.onerror = (e) => {
+      console.error('Mercure connection error:', e);
+      setStatus({ connected: false, connecting: false, error: new Error('Connection failed') });
+      es.close();
+      eventSourceRef.current = null;
+      
+      reconnectTimeoutRef.current = setTimeout(() => {
+        connect();
+      }, 5000);
+    };
+
+    es.onmessage = (e) => {
+        handleMessage(JSON.parse(e.data));
+    };
+    
+    es.addEventListener('chat_message', (e: MessageEvent) => handleMessage(JSON.parse(e.data)));
+    es.addEventListener('presence_update', (e: MessageEvent) => handleMessage(JSON.parse(e.data)));
+    es.addEventListener('notification', (e: MessageEvent) => handleMessage(JSON.parse(e.data)));
+    es.addEventListener('typing_indicator', (e: MessageEvent) => handleMessage(JSON.parse(e.data)));
+    es.addEventListener('video_signal', (e: MessageEvent) => handleMessage(JSON.parse(e.data)));
+
+    eventSourceRef.current = es;
+  }, [user?.id, status.connected, status.connecting]);
+
+  const disconnect = useCallback(() => {
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
+    }
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
+    }
+    setStatus({ connected: false, connecting: false, error: null });
   }, []);
 
   const clearMessages = useCallback(() => setMessages([]), []);

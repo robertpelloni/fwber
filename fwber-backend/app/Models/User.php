@@ -26,6 +26,7 @@ class User extends Authenticatable
         'token_balance',
         'current_streak',
         'last_active_at',
+        'golden_tickets_remaining',
     ];
 
     protected $hidden = [
@@ -44,6 +45,7 @@ class User extends Authenticatable
         'token_balance' => 'decimal:4',
         'last_active_at' => 'datetime',
         'current_streak' => 'integer',
+        'golden_tickets_remaining' => 'integer',
     ];
 
     protected $appends = [

@@ -12,6 +12,9 @@ interface User {
   createdAt: string
   updatedAt: string
   two_factor_enabled?: boolean
+  referral_code?: string
+  golden_tickets_remaining?: number
+  token_balance?: number
   profile?: {
     displayName: string | null
     dateOfBirth: string | null
