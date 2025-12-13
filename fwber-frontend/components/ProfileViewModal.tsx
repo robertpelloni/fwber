@@ -10,7 +10,7 @@ import { useFeatureFlag } from '@/lib/hooks/use-feature-flags'
 import { PresenceIndicator, usePresenceContext } from './realtime/PresenceComponents'
 import { useRelationshipTier } from '@/lib/hooks/useRelationshipTier'
 import { apiClient } from '@/lib/api/client'
-import { useToast } from '@/components/ui/use-toast'
+import { useToast } from '@/components/ToastProvider'
 
 interface ProfileViewModalProps {
   isOpen: boolean
@@ -38,7 +38,7 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
   const [isUnlockedViaShare, setIsUnlockedViaShare] = useState(false)
   const { isEnabled: faceRevealEnabled } = useFeatureFlag('face_reveal')
   const { onlineUsers } = usePresenceContext()
-  const { toast } = useToast()
+  const { showSuccess, showError } = useToast()
   
   const { 
     tierData,
@@ -81,17 +81,16 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
       
       setIsUnlockedViaShare(true)
       
-      toast({
-        title: "Link copied!",
-        description: "Profile unlocked! Share this link with a friend.",
-      })
+      showSuccess(
+        "Link copied!",
+        "Profile unlocked! Share this link with a friend."
+      )
     } catch (error) {
       console.error('Share failed', error)
-      toast({
-        title: "Share failed",
-        description: "Could not copy link.",
-        variant: "destructive"
-      })
+      showError(
+        "Share failed",
+        "Could not copy link."
+      )
     }
   }
 

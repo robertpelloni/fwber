@@ -8,6 +8,8 @@ use Tests\TestCase;
 
 class SchemaCheckTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_gifts_table_has_columns()
     {
         $this->assertTrue(Schema::hasTable('gifts'));
