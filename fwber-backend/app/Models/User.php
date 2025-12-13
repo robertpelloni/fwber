@@ -150,4 +150,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserGift::class, 'receiver_id');
     }
+
+    public function matchActions()
+    {
+        return $this->hasMany(MatchAction::class);
+    }
 }

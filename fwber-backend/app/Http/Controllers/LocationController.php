@@ -193,7 +193,7 @@ class LocationController extends Controller
                             })
                             ->whereHas('matchActions', function ($ma) use ($user) {
                                 $ma->where('target_user_id', $user->id)
-                                   ->whereIn('action_type', ['like', 'super_like']);
+                                   ->whereIn('action', ['like', 'super_like']);
                             });
                         });
                     });

@@ -76,6 +76,10 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 5.  **PWA Verification**:
     -   **Testing**: Created `cypress/e2e/pwa.cy.js` to verify Manifest, Service Worker registration, and Offline page.
     -   **Verification**: E2E tests passing. Confirmed `manifest.json` validity and `offline.html` availability.
+6.  **Location Controller Fix**:
+    -   **Issue**: `LocationController::nearby` was throwing 500 error due to missing `matchActions` relationship in `User` model and incorrect column name usage (`action_type` vs `action`).
+    -   **Fix**: Added `matchActions` relationship to `User` model. Updated `LocationController` to use `action` column. Updated `LocationControllerTest` to create user profiles.
+    -   **Verification**: `LocationControllerTest` passing.
 
 ### ✅ Completed Operational Improvements (Dec 09 - Dec 11)
     -   **PhotoControllerTest**: Fixed 403 errors by overriding `app.avatar_mode` config in tests. Created `PhotoFactory`.
