@@ -8,7 +8,7 @@ import { UserAvatar, PresenceIndicator, PresenceStatus } from '@/components/Pres
 import { WingmanSuggestions } from '@/components/ai/WingmanSuggestions';
 import AudioRecorder from '@/components/AudioRecorder';
 import { api } from '@/lib/api';
-import { Languages, Loader2, Sparkles, Gift as GiftIcon } from 'lucide-react';
+import { Languages, Loader2, Sparkles, Gift as GiftIcon, Lock } from 'lucide-react';
 import { useTranslation } from '@/lib/hooks/use-translation';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { MatchInsights } from '@/components/matches/MatchInsights';
@@ -16,6 +16,7 @@ import { DatePlanner } from '@/components/realtime/DatePlanner';
 import { storeOfflineChatMessage } from '@/lib/offline-store';
 import { useToast } from '@/components/ToastProvider';
 import GiftShopModal from '@/components/gifts/GiftShopModal';
+import { useE2EEncryption } from '@/lib/hooks/use-e2e-encryption';
 
 interface RealTimeChatProps {
   recipientId: string;
@@ -56,6 +57,49 @@ function TranslateButton({ text, isOwnMessage }: { text: string, isOwnMessage: b
   );
 }
 
+function EncryptedMessageContent({ content, senderId, isOwnMessage }: { content: string, senderId: number, isOwnMessage: boolean }) {
+  const { decrypt, isReady } = useE2EEncryption();
+  const [decryptedText, setDecryptedText] = useState<string | null>(null);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    if (!isReady || !content) return;
+
+    // Check if content looks like JSON (our encrypted format)
+    if (!content.trim().startsWith('{')) {
+      setDecryptedText(content); // Assume plain text if not JSON
+      return;
+    }
+
+    const decryptMsg = async () => {
+      try {
+        const text = await decrypt(senderId, content);
+        setDecryptedText(text);
+      } catch (e) {
+        console.error('Decryption failed', e);
+        setError(true);
+      }
+    };
+
+    decryptMsg();
+  }, [content, senderId, isReady, decrypt]);
+
+  if (error) return <span className="text-red-300 italic text-xs">Failed to decrypt message</span>;
+  if (!decryptedText) return <span className="text-gray-400 italic text-xs">Decrypting...</span>;
+
+  return (
+    <div>
+      <p className="text-sm">{decryptedText}</p>
+      {!isOwnMessage && (
+        <TranslateButton 
+          text={decryptedText} 
+          isOwnMessage={isOwnMessage} 
+        />
+      )}
+    </div>
+  );
+}
+
 export default function RealTimeChat({ 
   recipientId, 
   recipientName = 'User',
@@ -69,6 +113,7 @@ export default function RealTimeChat({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
   const { showSuccess, showError } = useToast();
+  const { encrypt, isReady: isE2EReady } = useE2EEncryption();
   
   const {
     messages,
@@ -110,10 +155,21 @@ export default function RealTimeChat({
     indicator => indicator.from_user_id === recipientId && indicator.is_typing
   );
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim() && recipientId) {
-      sendMessage(message.trim());
+      let payload = message.trim();
+      
+      // Encrypt if E2E is ready
+      if (isE2EReady) {
+        try {
+          payload = await encrypt(parseInt(recipientId), payload);
+        } catch (error) {
+          console.error('Encryption failed, sending plain text', error);
+        }
+      }
+
+      sendMessage(payload);
       setMessage('');
     }
   };
@@ -186,7 +242,10 @@ export default function RealTimeChat({
             size="md"
           />
           <div>
-            <h3 className="text-white font-semibold">{recipientName}</h3>
+            <h3 className="text-white font-semibold flex items-center gap-2">
+              {recipientName}
+              {isE2EReady && <Lock className="w-3 h-3 text-green-400" title="End-to-End Encrypted" />}
+            </h3>
             <PresenceIndicator 
               status={recipientStatus}
               lastSeen={recipientUser?.last_seen}
@@ -237,10 +296,17 @@ export default function RealTimeChat({
         {(messages as ChatMessage[]).length === 0 ? (
           <div className="text-center text-gray-400 py-8">
             <p>No messages yet. Start a conversation!</p>
+            {isE2EReady && (
+              <p className="text-xs text-green-500 mt-2 flex items-center justify-center gap-1">
+                <Lock className="w-3 h-3" /> Messages are end-to-end encrypted
+              </p>
+            )}
           </div>
         ) : (
           (messages as ChatMessage[]).map((msg, index) => {
             const isOwnMessage = msg.from_user_id === user?.id;
+            const content = msg.message?.content || msg.content || '';
+            
             return (
               <div
                 key={msg.message_id || msg.id || index}
@@ -266,15 +332,11 @@ export default function RealTimeChat({
                         )}
                     </div>
                   ) : (
-                    <div>
-                      <p className="text-sm">{msg.message?.content || msg.content}</p>
-                      {!isOwnMessage && (msg.message?.content || msg.content) && (
-                        <TranslateButton 
-                          text={msg.message?.content || msg.content || ''} 
-                          isOwnMessage={isOwnMessage} 
-                        />
-                      )}
-                    </div>
+                    <EncryptedMessageContent 
+                      content={content} 
+                      senderId={parseInt(msg.from_user_id || '0')} 
+                      isOwnMessage={isOwnMessage} 
+                    />
                   )}
                   <MessageMetadata 
                     timestamp={msg.timestamp}
@@ -313,7 +375,7 @@ export default function RealTimeChat({
                 type="text"
                 value={message}
                 onChange={handleMessageChange}
-                placeholder="Type a message..."
+                placeholder={isE2EReady ? "Type an encrypted message..." : "Type a message..."}
                 className="flex-1 bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 disabled={!isConnected}
               />
