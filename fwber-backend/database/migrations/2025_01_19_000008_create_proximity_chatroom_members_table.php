@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('proximity_chatroom_members')) {
+            return;
+        }
+
         Schema::create('proximity_chatroom_members', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('proximity_chatroom_id')->unsigned();

@@ -22,6 +22,18 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 3.  **Route Restoration**:
     -   **Avatar**: Restored `POST /api/physical-profile/avatar/request` and `PUT /api/physical-profile`.
 
+### ✅ Deployment Fixes (Dec 13)
+1.  **Migration Idempotency**:
+    -   **Issue**: Deployment failed with `table "proximity_artifacts" already exists`.
+    -   **Fix**: Patched 6 pending migrations to check `Schema::hasTable()` before creating tables. This handles the "Bad Merge" state where tables exist but migrations were not recorded.
+    -   **Files Patched**:
+        -   `create_proximity_artifacts_table`
+        -   `create_proximity_chatroom_members_table`
+        -   `create_chatroom_message_mentions_table`
+        -   `create_venues_table_fixed`
+        -   `create_notifications_table`
+        -   `create_device_tokens_table`
+
 ### ✅ Completed Operational Improvements (Dec 12-13)
 1.  **Landing Page UI Polish**:
     -   **Logo**: Fixed alignment issues and added glow effects.
