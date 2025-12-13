@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use App\Services\PushNotificationService;
-use App\Services\PushNotificationService;
 use App\Services\MatchMakerService;
 use Carbon\Carbon;
 

@@ -114,11 +114,6 @@ class UserPhysicalProfileController extends Controller
      *   @OA\Response(response=401, description="Unauthenticated")
      * )
      */
-    public function requestAvatar(Request $request)
-    {
-        $data = $request->validate([
-            'style' => 'required|string|in:realistic,anime,fantasy,sci-fi,cartoon,pixel-art',
-        ]);
     public function requestAvatar(RequestAvatarRequest $request)
     {
         $data = $request->validated();

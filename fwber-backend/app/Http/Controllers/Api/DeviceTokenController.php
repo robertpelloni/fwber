@@ -4,11 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\DeviceToken;
-use App\Models\Notification;
-use Illuminate\Http\Request;
 use App\Http\Requests\Api\StoreDeviceTokenRequest;
-use App\Models\DeviceToken;
-use App\Models\Notification;
 use Illuminate\Support\Facades\Auth;
 
 class DeviceTokenController extends Controller
@@ -33,18 +29,6 @@ class DeviceTokenController extends Controller
      *     )
      * )
      */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'token' => 'required|string',
-            'type' => 'nullable|string',
-        ]);
-
-        $deviceToken = DeviceToken::updateOrCreate(
-            ['token' => $request->token],
-            [
-                'user_id' => Auth::id(),
-                'type' => $request->type,
     public function store(StoreDeviceTokenRequest $request)
     {
         $validated = $request->validated();
@@ -99,9 +83,7 @@ class DeviceTokenController extends Controller
      */
     public function index()
     {
-        $notifications = Notification::where('user_id', Auth::id())
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $notifications = Auth::user()->notifications()->orderBy('created_at', 'desc')->get();
 
         return response()->json($notifications);
     }

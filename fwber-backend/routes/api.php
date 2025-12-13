@@ -31,8 +31,6 @@ use App\Http\Controllers\ProximityArtifactController;
 use App\Http\Controllers\ModerationController;
 use App\Http\Controllers\Api\DeviceTokenController;
 use App\Http\Controllers\Api\FriendController;
-use App\Http\Controllers\Api\FriendController;
-use App\Http\Controllers\Api\DeviceTokenController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventController;
 
@@ -133,6 +131,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('profile', [\App\Http\Controllers\ProfileController::class, 'destroy']);
     Route::get('profile/completeness', [\App\Http\Controllers\ProfileController::class, 'completeness']);
     Route::get('profile/export', [\App\Http\Controllers\ProfileController::class, 'export']);
+
+    // Physical Profile
+    Route::get('physical-profile', [\App\Http\Controllers\Api\UserPhysicalProfileController::class, 'show']);
+    Route::put('physical-profile', [\App\Http\Controllers\Api\UserPhysicalProfileController::class, 'upsert']);
+    Route::post('physical-profile/avatar/request', [\App\Http\Controllers\Api\UserPhysicalProfileController::class, 'requestAvatar']);
 
     // Dashboard
     Route::get('dashboard/stats', [\App\Http\Controllers\DashboardController::class, 'getStats']);

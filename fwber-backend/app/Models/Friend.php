@@ -16,15 +16,11 @@ class Friend extends Model
         'status',
     ];
 
-    public function user()
-    protected $fillable = ['user_id', 'friend_id', 'status'];
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function friend()
     public function friend(): BelongsTo
     {
         return $this->belongsTo(User::class, 'friend_id');

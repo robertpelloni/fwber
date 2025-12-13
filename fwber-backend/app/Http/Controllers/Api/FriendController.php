@@ -35,8 +35,6 @@ class FriendController extends Controller
      */
     public function getFriends()
     {
-        $friends = Auth::user()->friends;
-        return response()->json($friends);
         $user = Auth::user();
         $friends = Friend::where(function ($query) use ($user) {
             $query->where('user_id', $user->id)
@@ -47,7 +45,7 @@ class FriendController extends Controller
 
         $friendDetails = $friends->map(function ($friend) use ($user) {
             return $friend->user_id == $user->id ? $friend->friend : $friend->user;
-        });
+        })->unique('id')->values();
 
         return response()->json($friendDetails);
     }
@@ -68,8 +66,6 @@ class FriendController extends Controller
      */
     public function getFriendRequests()
     {
-        $friendRequests = Friend::where('friend_id', Auth::id())->where('status', 'pending')->with('user')->get();
-        return response()->json($friendRequests);
         $user = Auth::user();
         $requests = Friend::where('friend_id', $user->id)->where('status', 'pending')->with('user')->get();
 
@@ -91,7 +87,6 @@ class FriendController extends Controller
      *         )
      *     ),
      *     @OA\Response(
-     *         response=200,
      *         response=201,
      *         description="Friend request sent successfully",
      *         @OA\JsonContent(ref="#/components/schemas/Friend")
@@ -99,24 +94,6 @@ class FriendController extends Controller
      *     @OA\Response(
      *         response=400,
      *         description="Bad request"
-     *     )
-     * )
-     */
-    public function sendFriendRequest(Request $request)
-    {
-        $request->validate(['friend_id' => 'required|exists:users,id']);
-        $friendId = $request->friend_id;
-
-        if (Auth::id() == $friendId) {
-            return response()->json(['message' => 'You cannot send a friend request to yourself.'], 400);
-        }
-
-        $friendship = Friend::firstOrCreate(
-            ['user_id' => Auth::id(), 'friend_id' => $friendId],
-            ['status' => 'pending']
-        );
-
-        return response()->json($friendship);
      *     ),
      *     @OA\Response(
      *         response=409,
@@ -183,29 +160,6 @@ class FriendController extends Controller
      *     )
      * )
      */
-    public function respondToFriendRequest(Request $request, $userId)
-    {
-        $request->validate(['status' => 'required|in:accepted,declined']);
-        $status = $request->status;
-
-        $friendship = Friend::where('user_id', $userId)->where('friend_id', Auth::id())->where('status', 'pending')->first();
-
-        if (!$friendship) {
-            return response()->json(['message' => 'Friend request not found.'], 404);
-        }
-
-        if ($status == 'accepted') {
-            $friendship->update(['status' => 'accepted']);
-            // Create the inverse relationship
-            Friend::firstOrCreate(
-                ['user_id' => Auth::id(), 'friend_id' => $userId],
-                ['status' => 'accepted']
-            );
-        } else {
-            $friendship->delete();
-        }
-
-        return response()->json(['message' => 'Friend request ' . $status . '.']);
     public function respondToFriendRequest(RespondToFriendRequest $request, $userId)
     {
         $user = Auth::user();
@@ -219,6 +173,10 @@ class FriendController extends Controller
 
         if ($status == 'accepted') {
             $friendRequest->update(['status' => 'accepted']);
+            Friend::firstOrCreate(
+                ['user_id' => $user->id, 'friend_id' => $userId],
+                ['status' => 'accepted']
+            );
             return response()->json($friendRequest);
         } else {
             $friendRequest->delete();
@@ -247,8 +205,6 @@ class FriendController extends Controller
      */
     public function removeFriend($friendId)
     {
-        Friend::where('user_id', Auth::id())->where('friend_id', $friendId)->delete();
-        Friend::where('user_id', $friendId)->where('friend_id', Auth::id())->delete();
         $user = Auth::user();
         $friendship = Friend::where(function ($query) use ($user, $friendId) {
             $query->where('user_id', $user->id)->where('friend_id', $friendId);
@@ -274,7 +230,6 @@ class FriendController extends Controller
      *     description="Search for users by name or email.",
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
-     *         name="q",
      *         name="query",
      *         in="query",
      *         required=true,
@@ -289,14 +244,13 @@ class FriendController extends Controller
      */
     public function search(Request $request)
     {
-        $searchTerm = $request->q;
-        $users = User::where('name', 'like', "%{$searchTerm}%")
-            ->orWhere('email', 'like', "%{$searchTerm}%")
-            ->where('id', '!=', Auth::id())
-        $request->validate(['query' => 'required|string|min:2']);
+        $query = $request->input('query') ?? $request->input('q');
+        
+        if (!$query || strlen($query) < 2) {
+             return response()->json(['message' => 'The query field is required and must be at least 2 characters.'], 422);
+        }
 
         $user = Auth::user();
-        $query = $request->query('query');
 
         $users = User::where('name', 'like', "%{$query}%")
             ->where('id', '!=', $user->id)

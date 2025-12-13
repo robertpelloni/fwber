@@ -20,27 +20,6 @@ class AvatarGenerationTest extends TestCase
 
     protected function setUp(): void
     {
-        $user = User::factory()->create();
-        $headers = $this->apiHeaderFor($user);
-
-        $this->withHeaders($headers)
-            ->putJson('/api/physical-profile', [
-                'avatar_prompt' => 'Stylized portrait in synthwave neon style'
-            ])
-            ->assertStatus(200)
-            ->assertJsonStructure(['data' => ['avatar_prompt']]);
-
-        $this->withHeaders($headers)
-            ->postJson('/api/physical-profile/avatar/request', ['style' => 'anime'])
-            ->assertStatus(200)
-            ->assertJsonStructure(['data' => ['avatar_status']]);
-
-        // Refetch profile to confirm status progressed to ready (sync queue)
-        $this->withHeaders($headers)
-            ->getJson('/api/physical-profile')
-            ->assertStatus(200)
-            ->assertJsonPath('data.avatar_status', 'ready')
-            ->assertJsonPath('data.avatar_image_url', fn($v) => $v !== null);
         parent::setUp();
         
         // Mock config to ensure we use DALL-E for this test
@@ -55,8 +34,8 @@ class AvatarGenerationTest extends TestCase
     {
         Queue::fake();
         $user = User::factory()->create();
-        $headers = $this->apiHeaderFor($user);
-        $this->withHeaders($headers)
+        
+        $this->actingAs($user)
             ->postJson('/api/physical-profile/avatar/request', ['style' => 'anime'])
             ->assertStatus(422)
             ->assertJson(['error' => 'Set avatar_prompt first']);

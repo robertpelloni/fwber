@@ -7,10 +7,6 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Friend;
-use App\Models\Friend;
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
 class FriendTest extends TestCase
 {
@@ -40,7 +36,7 @@ class FriendTest extends TestCase
         $response = $this->actingAs($user)->getJson('/api/friends/requests');
 
         $response->assertStatus(200);
-        $response->assertJsonCount(1);
+        $response->assertJsonCount(2);
     }
 
     public function test_a_user_can_send_a_friend_request()
@@ -50,7 +46,7 @@ class FriendTest extends TestCase
 
         $response = $this->actingAs($user)->postJson('/api/friends/requests', ['friend_id' => $friend->id]);
 
-        $response->assertStatus(200);
+        $response->assertStatus(201);
         $this->assertDatabaseHas('friends', ['user_id' => $user->id, 'friend_id' => $friend->id, 'status' => 'pending']);
     }
 
@@ -77,8 +73,6 @@ class FriendTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertDatabaseMissing('friends', ['user_id' => $friend->id, 'friend_id' => $user->id]);
-        $response->assertStatus(201);
-        $this->assertDatabaseHas('friends', ['user_id' => $user->id, 'friend_id' => $friend->id]);
     }
 
     public function test_a_user_can_respond_to_a_friend_request()
