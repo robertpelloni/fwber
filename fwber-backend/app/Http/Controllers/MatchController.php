@@ -13,15 +13,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use App\Services\PushNotificationService;
+use App\Services\MatchMakerService;
 use Carbon\Carbon;
 
 class MatchController extends Controller
 {
     private AIMatchingService $matchingService;
+    private MatchMakerService $matchMakerService;
 
-    public function __construct(AIMatchingService $matchingService)
+    public function __construct(AIMatchingService $matchingService, MatchMakerService $matchMakerService)
     {
         $this->matchingService = $matchingService;
+        $this->matchMakerService = $matchMakerService;
     }
     /**
      * @OA\Get(
@@ -437,6 +440,9 @@ class MatchController extends Controller
                     $userA->notify(new \App\Notifications\NewMatchNotification($userB));
                     $userB->notify(new \App\Notifications\NewMatchNotification($userA));
                 }
+
+                // Process Wingman Bounties
+                $this->matchMakerService->processMatch($user1, $user2);
             }
 
             // Auto chat creation under feature flag

@@ -8,7 +8,12 @@ The application is live. The focus is on monitoring system health, optimizing pe
 
 ### 🚀 Immediate Priorities (Q1 2026)
 
-#### 1. Operational Excellence
+#### 1. Viral Growth & Social Loops
+- [ ] **Wingman Bounties**: Reward users for successfully matching friends (Matchmaker system).
+- [ ] **Viral Loops**: "Unlock via Share" mechanics for premium filters/content.
+- [ ] **Gamification**: Local Leaderboards (Top Connector, Most Active) and Daily Streaks.
+
+#### 2. Operational Excellence
 - [ ] **Monitor Sentry**: Triage and fix production errors as they appear.
 - [ ] **Performance Tuning**: Analyze `SlowRequest` logs and optimize bottlenecks.
 - [ ] **Infrastructure Scaling**: Monitor Redis and Database load; scale resources if needed.

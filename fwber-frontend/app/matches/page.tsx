@@ -410,6 +410,18 @@ export default function MatchesPage() {
                   >
                     Send Gift
                   </button>
+
+                  <button
+                    onClick={() => {
+                      const link = `${window.location.origin}/profile/${currentMatch.id}?wingman=${user?.id}`;
+                      navigator.clipboard.writeText(link);
+                      alert('Wingman Link Copied! Share it with a friend. If they match, you earn tokens!');
+                    }}
+                    className="bg-indigo-500 hover:bg-indigo-600 text-white px-8 py-3 rounded-full text-lg font-semibold"
+                    title="Copy Wingman Link"
+                  >
+                    🧚 Share
+                  </button>
                   
                   <button
                     onClick={handleBoost}

@@ -91,6 +91,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('user/two-factor-recovery-codes', [\App\Http\Controllers\TwoFactorAuthenticationController::class, 'regenerateRecoveryCodes']);
 
     // Profile
+    Route::get('users/{id}', [\App\Http\Controllers\ProfileController::class, 'showPublic']);
     Route::get('profile', [\App\Http\Controllers\ProfileController::class, 'show']);
     Route::put('profile', [\App\Http\Controllers\ProfileController::class, 'update']);
     Route::get('profile/completeness', [\App\Http\Controllers\ProfileController::class, 'completeness']);
@@ -330,5 +331,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('gifts', [\App\Http\Controllers\GiftController::class, 'index']);
     Route::post('gifts/send', [\App\Http\Controllers\GiftController::class, 'send']);
     Route::get('gifts/received', [\App\Http\Controllers\GiftController::class, 'received']);
+
+    // Wingman
+    Route::post('wingman/assist', [\App\Http\Controllers\WingmanController::class, 'recordAssist']);
 });
 

@@ -25,6 +25,46 @@ class ProfileController extends Controller
 {
     /**
      * @OA\Get(
+     *     path="/users/{id}",
+     *     tags={"Profile"},
+     *     summary="Get public profile of a user",
+     *     description="Retrieve public profile information for a specific user.",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="User ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Profile retrieved successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/UserProfileResource")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found"
+     *     )
+     * )
+     */
+    public function showPublic(int $id): JsonResponse
+    {
+        $user = User::with(['profile', 'photos'])->findOrFail($id);
+        
+        // Ensure profile exists
+        if (!$user->profile) {
+            return response()->json(['message' => 'Profile not found'], 404);
+        }
+
+        // Return resource (it handles privacy/sanitization)
+        return response()->json([
+            'data' => new UserProfileResource($user),
+        ]);
+    }
+
+    /**
+     * @OA\Get(
      *     path="/profile",
      *     tags={"Profile"},
      *     summary="Get authenticated user's profile",

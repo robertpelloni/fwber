@@ -11,6 +11,7 @@ class TokenDistributionService
 {
     const SIGNUP_BONUS_BASE = 100;
     const REFERRAL_BONUS = 50;
+    const MATCHMAKER_BONUS = 50;
     const EARLY_ADOPTER_MULTIPLIER_DECAY = 0.0001; // Decay factor per user
 
     public function generateReferralCode(): string

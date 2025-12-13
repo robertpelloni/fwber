@@ -182,6 +182,28 @@ export interface ProfileCompletenessResponse {
 }
 
 /**
+ * Fetch a public user profile by ID
+ */
+export async function getPublicProfile(token: string, userId: number): Promise<UserProfile> {
+  const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Failed to fetch profile' }));
+    throw new Error(error.message || 'Failed to fetch profile');
+  }
+
+  const data = await response.json();
+  return data.data || data;
+}
+
+/**
  * Fetch authenticated user's profile
  */
 export async function getUserProfile(token: string): Promise<UserProfile> {
