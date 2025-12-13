@@ -60,9 +60,24 @@ class TokenController extends Controller
                 ];
             });
 
+        $topWingmen = \App\Models\MatchAssist::select('matchmaker_id', \DB::raw('count(*) as assists_count'))
+            ->where('status', 'matched')
+            ->groupBy('matchmaker_id')
+            ->orderByDesc('assists_count')
+            ->take(10)
+            ->with('matchmaker:id,name')
+            ->get()
+            ->map(function ($assist) {
+                return [
+                    'name' => substr($assist->matchmaker->name, 0, 3) . '***',
+                    'assists' => $assist->assists_count,
+                ];
+            });
+
         return response()->json([
             'top_holders' => $topHolders,
             'top_referrers' => $topReferrers,
+            'top_wingmen' => $topWingmen,
         ]);
     }
 }

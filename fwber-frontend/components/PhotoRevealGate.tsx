@@ -19,6 +19,7 @@ interface PhotoRevealGateProps {
   daysConnected?: number
   onUnlockClick?: () => void
   className?: string
+  isUnlockedViaShare?: boolean
 }
 
 export default function PhotoRevealGate({
@@ -27,12 +28,18 @@ export default function PhotoRevealGate({
   messagesExchanged = 0,
   daysConnected = 0,
   onUnlockClick,
-  className = ''
+  className = '',
+  isUnlockedViaShare = false
 }: PhotoRevealGateProps) {
   const realPhotos = photos.filter(p => p.type === 'real')
   const aiPhotos = photos.filter(p => p.type === 'ai')
   
-  const visibility = getVisiblePhotoCount(currentTier, realPhotos.length)
+  let visibility = getVisiblePhotoCount(currentTier, realPhotos.length)
+  
+  // Override visibility if unlocked via share
+  if (isUnlockedViaShare) {
+    visibility = { real: realPhotos.length, ai: 999, blurred: 0 }
+  }
   
   // Separate photos by visibility status
   const visibleRealPhotos = realPhotos.slice(0, visibility.real)
@@ -41,6 +48,9 @@ export default function PhotoRevealGate({
   
   // Determine what's needed for next unlock
   const getUnlockMessage = () => {
+    if (isUnlockedViaShare) {
+      return 'Unlocked via Share!'
+    }
     if (currentTier === RelationshipTier.DISCOVERY) {
       return 'Match to unlock real photos'
     }
@@ -165,12 +175,12 @@ export default function PhotoRevealGate({
       )}
 
       {/* All Unlocked Message */}
-      {currentTier === RelationshipTier.VERIFIED && (
+      {(currentTier === RelationshipTier.VERIFIED || isUnlockedViaShare) && (
         <div className="mt-6 p-4 rounded-lg bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 border border-green-200 dark:border-green-700">
           <div className="flex items-center gap-3">
             <Unlock className="w-5 h-5 text-green-600 dark:text-green-400" />
             <p className="font-semibold text-sm text-green-900 dark:text-green-100">
-              All photos unlocked! You have complete access.
+              {isUnlockedViaShare ? 'Photos unlocked via sharing!' : 'All photos unlocked! You have complete access.'}
             </p>
           </div>
         </div>

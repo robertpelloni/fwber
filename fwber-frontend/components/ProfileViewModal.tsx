@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { X, Clock, CheckCircle, UserCheck } from 'lucide-react'
+import { X, Clock, CheckCircle, UserCheck, Share2 } from 'lucide-react'
 import PhotoRevealGate from './PhotoRevealGate'
 import SecurePhotoReveal from './SecurePhotoReveal'
 import { RelationshipTier } from '@/lib/relationshipTiers'
 import { useFeatureFlag } from '@/lib/hooks/use-feature-flags'
 import { PresenceIndicator, usePresenceContext } from './realtime/PresenceComponents'
 import { useRelationshipTier } from '@/lib/hooks/useRelationshipTier'
+import { apiClient } from '@/lib/api/client'
+import { useToast } from '@/components/ui/use-toast'
 
 interface ProfileViewModalProps {
   isOpen: boolean
@@ -33,8 +35,10 @@ interface ProfileViewModalProps {
 
 export default function ProfileViewModal({ isOpen, onClose, user, messagesExchanged, matchId }: ProfileViewModalProps) {
   const [isVisible, setIsVisible] = useState(false)
+  const [isUnlockedViaShare, setIsUnlockedViaShare] = useState(false)
   const { isEnabled: faceRevealEnabled } = useFeatureFlag('face_reveal')
   const { onlineUsers } = usePresenceContext()
+  const { toast } = useToast()
   
   const { 
     tierData,
@@ -53,11 +57,43 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true)
+      // Check if unlocked via share
+      apiClient.get<{ unlocked: boolean }>(`/share-unlock/${user.id}`)
+        .then(res => setIsUnlockedViaShare(res.data.unlocked))
+        .catch(() => setIsUnlockedViaShare(false))
     } else {
       const timer = setTimeout(() => setIsVisible(false), 300)
       return () => clearTimeout(timer)
     }
-  }, [isOpen])
+  }, [isOpen, user.id])
+
+  const handleShare = async () => {
+    try {
+      // Generate link (mock for now, or use real wingman link)
+      const link = `${window.location.origin}/profile/${user.id}?ref=${user.id}` // In real app, use current user ID as ref
+      await navigator.clipboard.writeText(link)
+      
+      // Record share
+      await apiClient.post('/share-unlock', {
+        target_profile_id: user.id,
+        platform: 'copy_link'
+      })
+      
+      setIsUnlockedViaShare(true)
+      
+      toast({
+        title: "Link copied!",
+        description: "Profile unlocked! Share this link with a friend.",
+      })
+    } catch (error) {
+      console.error('Share failed', error)
+      toast({
+        title: "Share failed",
+        description: "Could not copy link.",
+        variant: "destructive"
+      })
+    }
+  }
 
   if (!isVisible && !isOpen) return null
 
@@ -131,14 +167,24 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
               </div>
             </div>
           </div>
-          <button 
-            onClick={onClose}
-            className="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
-            aria-label="Close profile view"
-            title="Close"
-          >
-            <X className="w-6 h-6" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={handleShare}
+              className="p-2 text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 rounded-full hover:bg-purple-50 dark:hover:bg-purple-900/20"
+              aria-label="Share to unlock"
+              title="Share to unlock photos"
+            >
+              <Share2 className="w-6 h-6" />
+            </button>
+            <button 
+              onClick={onClose}
+              className="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+              aria-label="Close profile view"
+              title="Close"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
         </div>
 
         {/* Body */}
@@ -210,6 +256,7 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
                 currentTier={currentTier || RelationshipTier.MATCHED} 
                 messagesExchanged={messagesExchanged}
                 daysConnected={1} // Mock
+                isUnlockedViaShare={isUnlockedViaShare}
               />
             ) : (
               <SimplePhotoGrid />

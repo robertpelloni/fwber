@@ -25,6 +25,20 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **User Flow**: Users can now send virtual gifts using their token balance directly from the match screen.
     -   **Verification**: Feature tests (`GiftTest.php`) passing. Manual verification of UI flow.
 
+### ✅ Viral Growth Features (Dec 13)
+1.  **Wingman Bounties**:
+    -   **Concept**: Users earn tokens for successfully matchmaking friends.
+    -   **Backend**: Implemented `MatchAssist` model and `MatchMakerService`.
+    -   **Frontend**: Added "Share" button to Matches page generating unique referral links.
+    -   **Flow**: Referrer gets credit when the recipient matches with the shared profile.
+2.  **Unlock via Share**:
+    -   **Concept**: Viral loop where sharing a profile unlocks its photos for the sharer.
+    -   **Backend**: Implemented `ShareUnlock` model and controller.
+    -   **Frontend**: Updated `PhotoRevealGate` and `ProfileViewModal` to support instant unlock upon sharing.
+3.  **Community Leaderboard**:
+    -   **Backend**: Updated `TokenController` to return "Top Wingmen" stats.
+    -   **Frontend**: Updated `LeaderboardPage` to display top matchmakers alongside token holders and referrers.
+
 ### ✅ Completed Operational Improvements (Dec 09 - Dec 11)
     -   **PhotoControllerTest**: Fixed 403 errors by overriding `app.avatar_mode` config in tests. Created `PhotoFactory`.
     -   **LocationControllerTest**: Fixed 500 errors by adding `matchesAsUser1` and `matchesAsUser2` relationships to `User` model.

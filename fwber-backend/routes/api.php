@@ -334,5 +334,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Wingman
     Route::post('wingman/assist', [\App\Http\Controllers\WingmanController::class, 'recordAssist']);
+
+    // Share Unlock
+    Route::post('share-unlock', [\App\Http\Controllers\Api\ShareUnlockController::class, 'store']);
+    Route::get('share-unlock/{targetProfileId}', [\App\Http\Controllers\Api\ShareUnlockController::class, 'check']);
 });
 
