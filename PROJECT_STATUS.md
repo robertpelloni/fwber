@@ -1,6 +1,6 @@
 # Project Status
 
-**Last Updated:** December 12, 2025
+**Last Updated:** December 13, 2025
 **Status:** 🚀 LIVE / DEPLOYED
 
 ## 🟢 Current Status: Production Deployed
@@ -38,6 +38,12 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 3.  **Community Leaderboard**:
     -   **Backend**: Updated `TokenController` to return "Top Wingmen" stats.
     -   **Frontend**: Updated `LeaderboardPage` to display top matchmakers alongside token holders and referrers.
+4.  **Daily Streaks (Gamification)**:
+    -   **Concept**: Track consecutive days of user activity to encourage retention.
+    -   **Backend**: Implemented `StreakService`, updated `User` model with `current_streak` and `last_active_at`.
+    -   **Frontend**: Added "Daily Streak" stat card to Dashboard.
+    -   **Verification**: Feature tests (`StreakTest.php`) passing. Fixed `DashboardController` SQL compatibility (SQLite/MySQL).
+    -   **Fixes**: Added missing `match_score` column to `matches` table and created missing `profile_views` table migration.
 
 ### ✅ Completed Operational Improvements (Dec 09 - Dec 11)
     -   **PhotoControllerTest**: Fixed 403 errors by overriding `app.avatar_mode` config in tests. Created `PhotoFactory`.

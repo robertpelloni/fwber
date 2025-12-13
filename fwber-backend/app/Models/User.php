@@ -24,6 +24,8 @@ class User extends Authenticatable
         'referrer_id',
         'wallet_address',
         'token_balance',
+        'current_streak',
+        'last_active_at',
     ];
 
     protected $hidden = [
@@ -40,6 +42,8 @@ class User extends Authenticatable
         'unlimited_swipes' => 'boolean',
         'two_factor_confirmed_at' => 'datetime',
         'token_balance' => 'decimal:4',
+        'last_active_at' => 'datetime',
+        'current_streak' => 'integer',
     ];
 
     protected $appends = [

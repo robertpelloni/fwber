@@ -1,6 +1,6 @@
 # Project Roadmap
 
-**Last Updated:** December 09, 2025
+**Last Updated:** December 13, 2025
 **Status:** Post-Launch Monitoring & Growth
 
 ## 🟢 Current Phase: Post-Launch Monitoring & Growth
@@ -9,9 +9,9 @@ The application is live. The focus is on monitoring system health, optimizing pe
 ### 🚀 Immediate Priorities (Q1 2026)
 
 #### 1. Viral Growth & Social Loops
-- [ ] **Wingman Bounties**: Reward users for successfully matching friends (Matchmaker system).
-- [ ] **Viral Loops**: "Unlock via Share" mechanics for premium filters/content.
-- [ ] **Gamification**: Local Leaderboards (Top Connector, Most Active) and Daily Streaks.
+- [x] **Wingman Bounties**: Reward users for successfully matching friends (Matchmaker system).
+- [x] **Viral Loops**: "Unlock via Share" mechanics for premium filters/content.
+- [x] **Gamification**: Local Leaderboards (Top Connector, Most Active) and Daily Streaks.
 
 #### 2. Operational Excellence
 - [ ] **Monitor Sentry**: Triage and fix production errors as they appear.

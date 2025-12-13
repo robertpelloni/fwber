@@ -38,10 +38,13 @@ class DashboardController extends Controller
      *     )
      * )
      */
-    public function getStats(Request $request)
+    public function getStats(Request $request, \App\Services\StreakService $streakService)
     {
         $user = $request->user();
         $userId = $user->id;
+
+        // Update streak
+        $streakService->updateStreak($user);
 
         // Get match statistics
         $matchStats = DB::table('matches')
@@ -61,8 +64,13 @@ class DashboardController extends Controller
         $conversationCount = DB::table('messages')
             ->where('sender_id', $userId)
             ->orWhere('receiver_id', $userId)
+            ->selectRaw('
+                CASE WHEN sender_id < receiver_id THEN sender_id ELSE receiver_id END as p1,
+                CASE WHEN sender_id < receiver_id THEN receiver_id ELSE sender_id END as p2
+            ')
             ->distinct()
-            ->count(DB::raw('LEAST(sender_id, receiver_id), GREATEST(sender_id, receiver_id)'));
+            ->get()
+            ->count();
 
         // Get profile views
         $profileViews = DB::table('profile_views')
@@ -100,6 +108,7 @@ class DashboardController extends Controller
             'match_score_avg' => (int) round($matchStats->match_score_avg ?? 0),
             'response_rate' => (int) $responseRate,
             'days_active' => (int) $daysActive,
+            'current_streak' => (int) $user->current_streak,
             'last_login' => $user->updated_at->toISOString(),
         ]);
     }
