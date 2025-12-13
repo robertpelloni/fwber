@@ -121,7 +121,7 @@ class RecommendationController extends Controller
             ]));
 
             // Try to get from cache (10 minutes TTL)
-            $filteredRecommendations = Cache::remember($cacheKey, 600, function () use ($user, $context, $types, $limit) {
+            $filteredRecommendations = Cache::tags(["recommendations:user:{$user->id}"])->remember($cacheKey, 600, function () use ($user, $context, $types, $limit) {
                 // Get recommendations
                 $recommendations = $this->recommendationService->getRecommendations($user->id, $context);
 
