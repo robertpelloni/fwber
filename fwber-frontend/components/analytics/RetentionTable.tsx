@@ -40,7 +40,7 @@ export function RetentionTable() {
     );
   }
 
-  const cohorts = data?.cohorts || [];
+  const cohorts = data || [];
 
   // Find the maximum number of months to display
   const maxMonths = cohorts.reduce((max, cohort) => {

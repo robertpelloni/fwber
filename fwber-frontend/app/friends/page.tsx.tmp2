@@ -18,7 +18,7 @@ export default function FriendsPage() {
   const [requests, setRequests] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { success, error, ToastContainer } = useToast();
+  const { toast } = useToast();
   const router = useRouter();
 
   useEffect(() => {
@@ -30,12 +30,16 @@ export default function FriendsPage() {
       const [friendsRes, requestsRes] = await Promise.all([
         api.get('/friends'),
         api.get('/friends/requests/pending')
-      ]) as any[];
+      ]);
       setFriends(friendsRes.data);
       setRequests(requestsRes.data);
-    } catch (err) {
-      console.error('Error fetching friends data:', err);
-      error('Failed to load friends data');
+    } catch (error) {
+      console.error('Error fetching friends data:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load friends data',
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }
@@ -47,12 +51,16 @@ export default function FriendsPage() {
 
     try {
       setLoading(true);
-      const response = await api.get(`/users/search?q=${searchQuery}`) as any;
+      const response = await api.get(`/users/search?q=${searchQuery}`);
       setSearchResults(response.data);
       setActiveTab('search');
-    } catch (err) {
-      console.error('Error searching users:', err);
-      error('Failed to search users');
+    } catch (error) {
+      console.error('Error searching users:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to search users',
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }
@@ -61,12 +69,19 @@ export default function FriendsPage() {
   const sendFriendRequest = async (userId: number) => {
     try {
       await api.post(`/friends/request/${userId}`);
-      success('Friend request sent');
+      toast({
+        title: 'Success',
+        description: 'Friend request sent',
+      });
       // Remove from search results or update UI
       setSearchResults(prev => prev.filter((u: any) => u.id !== userId));
-    } catch (err) {
-      console.error('Error sending friend request:', err);
-      error('Failed to send friend request');
+    } catch (error) {
+      console.error('Error sending friend request:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to send friend request',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -81,22 +96,36 @@ export default function FriendsPage() {
   const handleAcceptRequest = async (requestId: number) => {
     try {
       await api.post(`/friends/accept/${requestId}`);
-      success('Friend request accepted');
+      toast({
+        title: 'Success',
+        description: 'Friend request accepted',
+      });
       fetchData(); // Refresh lists
-    } catch (err) {
-      console.error('Error accepting friend request:', err);
-      error('Failed to accept friend request');
+    } catch (error) {
+      console.error('Error accepting friend request:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to accept friend request',
+        variant: 'destructive',
+      });
     }
   };
 
   const handleRejectRequest = async (requestId: number) => {
     try {
       await api.post(`/friends/reject/${requestId}`);
-      success('Friend request rejected');
+      toast({
+        title: 'Success',
+        description: 'Friend request rejected',
+      });
       setRequests(prev => prev.filter((r: any) => r.id !== requestId));
-    } catch (err) {
-      console.error('Error rejecting friend request:', err);
-      error('Failed to reject friend request');
+    } catch (error) {
+      console.error('Error rejecting friend request:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to reject friend request',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -105,17 +134,23 @@ export default function FriendsPage() {
 
     try {
       await api.delete(`/friends/${friendId}`);
-      success('Friend removed');
+      toast({
+        title: 'Success',
+        description: 'Friend removed',
+      });
       setFriends(prev => prev.filter((f: any) => f.id !== friendId));
-    } catch (err) {
-      console.error('Error removing friend:', err);
-      error('Failed to remove friend');
+    } catch (error) {
+      console.error('Error removing friend:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to remove friend',
+        variant: 'destructive',
+      });
     }
   };
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">
-      <ToastContainer />
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
           <h1 className="text-2xl font-bold">Friends & Connections</h1>

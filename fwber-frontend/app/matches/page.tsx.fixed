@@ -10,10 +10,10 @@ import { useRouter } from 'next/navigation';
 import MatchFilter from '@/components/MatchFilter';
 
 export default function MatchesPage() {
-  const [matches, setMatches] = useState<any[]>([]);
+  const [matches, setMatches] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-  const { success, error, ToastContainer } = useToast();
+  const { toast } = useToast();
   const router = useRouter();
 
   useEffect(() => {
@@ -23,12 +23,16 @@ export default function MatchesPage() {
   const fetchMatches = async (filters = {}) => {
     try {
       setLoading(true);
-      const response = await api.get('/matches', { params: filters }) as any;
+      const response = await api.get('/matches', { params: filters });
       setMatches(response.data.matches || []);
       setCurrentIndex(0);
-    } catch (err) {
-      console.error('Error fetching matches:', err);
-      error('Failed to load matches');
+    } catch (error) {
+      console.error('Error fetching matches:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load matches',
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }
@@ -47,16 +51,23 @@ export default function MatchesPage() {
       const response = await api.post('/matches/action', {
         target_user_id: targetUserId,
         action,
-      }) as any;
+      });
 
       if (response.data.is_match) {
-        success(`You matched with ${matches[currentIndex].name}!`);
+        toast({
+          title: "It's a Match!",
+          description: `You matched with ${matches[currentIndex].name}!`,
+        });
         // Optionally show match modal
       }
-    } catch (err) {
-      console.error('Error performing match action:', err);
+    } catch (error) {
+      console.error('Error performing match action:', error);
       // Revert optimistic update if needed, or just show error
-      error('Failed to perform action');
+      toast({
+        title: 'Error',
+        description: 'Failed to perform action',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -82,7 +93,6 @@ export default function MatchesPage() {
 
   return (
     <div className="container mx-auto p-4 max-w-md">
-      <ToastContainer />
       <div className="mb-4">
         <MatchFilter onFilterChange={handleFilterChange} />
       </div>

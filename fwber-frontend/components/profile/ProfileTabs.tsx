@@ -81,17 +81,12 @@ export default function ProfileTabs({
           </TabsContent>
           <TabsContent value="dating">
             <Dating formData={formData} handlePreferenceChange={handlePreferenceChange} />
-            <Lifestyle formData={formData} handlePreferenceChange={handlePreferenceChange} handleInputChange={handleInputChange} />
-          </TabsContent>
-          <TabsContent value="dating">
-            <Dating formData={formData} handlePreferenceChange={handlePreferenceChange} handleInputChange={handleInputChange} />
           </TabsContent>
           <TabsContent value="interests">
             <Interests formData={formData} handleArrayPreferenceChange={handleArrayPreferenceChange} />
           </TabsContent>
           <TabsContent value="communication">
             <Communication formData={formData} handlePreferenceChange={handlePreferenceChange} />
-            <Communication formData={formData} handlePreferenceChange={handlePreferenceChange} handleInputChange={handleInputChange} />
           </TabsContent>
           <TabsContent value="photos">
             <Card id="photos">
@@ -128,10 +123,6 @@ export default function ProfileTabs({
           <Dating formData={formData} handlePreferenceChange={() => {}} />
           <Interests formData={formData} handleArrayPreferenceChange={() => {}} />
           <Communication formData={formData} handlePreferenceChange={() => {}} />
-          <Lifestyle formData={formData} handlePreferenceChange={() => {}} handleInputChange={() => {}} />
-          <Dating formData={formData} handlePreferenceChange={() => {}} handleInputChange={() => {}} />
-          <Interests formData={formData} handleArrayPreferenceChange={() => {}} />
-          <Communication formData={formData} handlePreferenceChange={() => {}} handleInputChange={() => {}} />
         </div>
       )}
     </div>

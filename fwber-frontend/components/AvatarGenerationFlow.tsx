@@ -116,8 +116,6 @@ export default function AvatarGenerationFlow({
       if (selectedProvider === 'replicate') payload.lora_scale = loraScale;
 
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/physical-profile/avatar/request`,
-        { ...profileData, style },
         `${process.env.NEXT_PUBLIC_API_URL}/avatar/generate`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }

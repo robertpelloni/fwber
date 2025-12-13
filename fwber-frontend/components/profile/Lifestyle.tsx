@@ -8,10 +8,6 @@ interface LifestyleProps {
 }
 
 export default function Lifestyle({ formData, handlePreferenceChange }: LifestyleProps) {
-  handleInputChange: (field: string, value: any) => void;
-}
-
-export default function Lifestyle({ formData, handlePreferenceChange, handleInputChange }: LifestyleProps) {
   return (
     <Card>
       <CardHeader>
@@ -40,13 +36,6 @@ export default function Lifestyle({ formData, handlePreferenceChange, handleInpu
             id="smoking"
             value={formData.preferences.smoking}
             onChange={(e) => handlePreferenceChange('smoking', e.target.value)}
-          <label htmlFor="smoking_status" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Smoking
-          </label>
-          <select
-            id="smoking_status"
-            value={formData.smoking_status}
-            onChange={(e) => handleInputChange('smoking_status', e.target.value)}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           >
             <option value="">Select preference</option>
@@ -66,13 +55,6 @@ export default function Lifestyle({ formData, handlePreferenceChange, handleInpu
             id="drinking"
             value={formData.preferences.drinking}
             onChange={(e) => handlePreferenceChange('drinking', e.target.value)}
-          <label htmlFor="drinking_status" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Drinking
-          </label>
-          <select
-            id="drinking_status"
-            value={formData.drinking_status}
-            onChange={(e) => handleInputChange('drinking_status', e.target.value)}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           >
             <option value="">Select preference</option>
@@ -92,31 +74,6 @@ export default function Lifestyle({ formData, handlePreferenceChange, handleInpu
             id="exercise"
             value={formData.preferences.exercise}
             onChange={(e) => handlePreferenceChange('exercise', e.target.value)}
-          <label htmlFor="cannabis_status" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Cannabis
-          </label>
-          <select
-            id="cannabis_status"
-            value={formData.cannabis_status}
-            onChange={(e) => handleInputChange('cannabis_status', e.target.value)}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          >
-            <option value="">Select preference</option>
-            <option value="non-user">Non-user</option>
-            <option value="occasional">Occasional user</option>
-            <option value="regular">Regular user</option>
-            <option value="medical">Medical user</option>
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="exercise_habits" className="block text-sm font-medium text-gray-700">
-            Exercise
-          </label>
-          <select
-            id="exercise_habits"
-            value={formData.exercise_habits}
-            onChange={(e) => handleInputChange('exercise_habits', e.target.value)}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           >
             <option value="">Select preference</option>
@@ -137,13 +94,6 @@ export default function Lifestyle({ formData, handlePreferenceChange, handleInpu
             id="diet"
             value={formData.preferences.diet}
             onChange={(e) => handlePreferenceChange('diet', e.target.value)}
-          <label htmlFor="dietary_preferences" className="block text-sm font-medium text-gray-700">
-            Diet
-          </label>
-          <select
-            id="dietary_preferences"
-            value={formData.dietary_preferences}
-            onChange={(e) => handleInputChange('dietary_preferences', e.target.value)}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           >
             <option value="">Select preference</option>
@@ -159,24 +109,6 @@ export default function Lifestyle({ formData, handlePreferenceChange, handleInpu
         </div>
 
         <div>
-          <label htmlFor="sleep_habits" className="block text-sm font-medium text-gray-700">
-            Sleep Habits
-          </label>
-          <select
-            id="sleep_habits"
-            value={formData.sleep_habits}
-            onChange={(e) => handleInputChange('sleep_habits', e.target.value)}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          >
-            <option value="">Select preference</option>
-            <option value="early-riser">Early riser</option>
-            <option value="night-owl">Night owl</option>
-            <option value="irregular">Irregular schedule</option>
-            <option value="average">Average (11pm-7am)</option>
-          </select>
-        </div>
-
-        <div>
           <label htmlFor="pets" className="block text-sm font-medium text-gray-700">
             Pets
           </label>
@@ -184,8 +116,6 @@ export default function Lifestyle({ formData, handlePreferenceChange, handleInpu
             id="pets"
             value={formData.preferences.pets}
             onChange={(e) => handlePreferenceChange('pets', e.target.value)}
-            value={formData.pets?.[0] || ''}
-            onChange={(e) => handleInputChange('pets', e.target.value ? [e.target.value] : [])}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           >
             <option value="">Select preference</option>
@@ -205,14 +135,11 @@ export default function Lifestyle({ formData, handlePreferenceChange, handleInpu
             id="children"
             value={formData.preferences.children}
             onChange={(e) => handlePreferenceChange('children', e.target.value)}
-            value={formData.children}
-            onChange={(e) => handleInputChange('children', e.target.value)}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           >
             <option value="">Select preference</option>
             <option value="have-children">Have children</option>
             <option value="want-children">Want children</option>
-            <option value="dont-want-children">Don't want children</option>
             <option value="dont-want-children">Don&apos;t want children</option>
             <option value="maybe-someday">Maybe someday</option>
             <option value="not-sure">Not sure</option>

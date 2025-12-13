@@ -8,10 +8,6 @@ interface CommunicationProps {
 }
 
 export default function Communication({ formData, handlePreferenceChange }: CommunicationProps) {
-  handleInputChange: (field: string, value: any) => void;
-}
-
-export default function Communication({ formData, handlePreferenceChange, handleInputChange }: CommunicationProps) {
   return (
     <Card>
       <CardHeader>
@@ -26,8 +22,6 @@ export default function Communication({ formData, handlePreferenceChange, handle
             id="communication_style"
             value={formData.preferences.communication_style}
             onChange={(e) => handlePreferenceChange('communication_style', e.target.value)}
-            value={formData.communication_style}
-            onChange={(e) => handleInputChange('communication_style', e.target.value)}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           >
             <option value="">Select style</option>
