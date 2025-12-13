@@ -62,6 +62,10 @@ When a feature is disabled, its routes still register but requests return HTTP 4
   - Scope: AI-powered media analysis for safety and content moderation
   - Routes (gated): `/api/media/analyze`
   - Note: Currently uses a mock service. Integrate with AWS Rekognition or similar in production.
+- FEATURE_VIDEO_CHAT (default: false)
+  - Scope: One-on-one video calling via WebRTC
+  - Routes (gated): `/api/video/signal`
+  - Note: Requires Mercure hub for signaling.
 
 ### Frontend-only toggles
 

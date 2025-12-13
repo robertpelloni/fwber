@@ -46,6 +46,9 @@ Thumbs.db
 # Node
 node_modules/
 
+# Composer vendor (root-level composer install)
+vendor/
+
 # Next.js build output and cache
 .next/
 out/
@@ -119,3 +122,5 @@ DEPLOYMENT_PLAN_2025.md
 .qoder/rules/byterover-rules.md
 .augment/rules/byterover-rules.md
 
+archive
+archive

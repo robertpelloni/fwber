@@ -1,4 +1,4 @@
-# fwber – Privacy-First Proximity Dating
+# Fwber
 
 [![Agents & Docs](https://img.shields.io/badge/Agents-Docs-blue)](README-agents.md)
 [![Status: MVP Complete](https://img.shields.io/badge/Status-MVP%20Complete-green)](PROJECT_STATUS_2025-11-24.md)
@@ -7,15 +7,13 @@
 [![Laravel 12](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel)](https://laravel.com/)
 [![Next.js 14](https://img.shields.io/badge/Next.js-14-000000?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+Fwber is a social networking application designed to connect people.
 
-**fwber** is an open-source, privacy-first proximity dating platform that combines AI-generated avatars with location-based discovery. Built with modern technologies and a focus on user safety, fwber reimagines the casual dating experience for the 2020s.
+## Project Status
 
-🌟 **Key Features:**
-- 🎭 **Avatar Mode:** AI-generated profile pictures level the playing field
-- 📍 **Local Pulse:** Discover proximity-based posts and nearby matches in real-time
-- 🔒 **Privacy-First:** Location fuzzing, no personal photos required, secure by design
-- 🛡️ **Safety-Focused:** Content moderation, flagging, shadow throttling, TTL expiry
-- 🚀 **Modern Stack:** Laravel 12 + Next.js 14 + TypeScript + React Query
+For a detailed overview of the project's current status, roadmap, and architectural decisions, please see [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
+
+## Project Structure
 
 ## 🟢 Project Status
 **Current Status: MVP Complete + Advanced Features**
@@ -31,10 +29,12 @@ See [PROJECT_STATUS_2025-11-24.md](PROJECT_STATUS_2025-11-24.md) for the detaile
 - [Contributing](#contributing)
 - [Roadmap](#roadmap)
 - [License](#license)
+The project is organized as a monorepo with the backend and frontend in separate directories:
 
----
+-   `fwber-backend`: The Laravel (PHP) backend API.
+-   `fwber-frontend`: The Next.js (React) frontend application.
 
-## Features
+## Getting Started
 
 ### 🎭 Avatar Mode
 AI-generated avatars replace traditional profile photos:
@@ -608,3 +608,4 @@ This project was modernized through collaboration between human developers and A
 ---
 
 **Built with ❤️ for privacy, safety, and genuine human connection.**
+For instructions on how to set up and run the development environments for the backend and frontend, please refer to the `README.md` files within each directory.

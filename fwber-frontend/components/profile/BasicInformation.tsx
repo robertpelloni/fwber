@@ -1,0 +1,309 @@
+'use client';
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+interface BasicInformationProps {
+  formData: any;
+  handleInputChange: (field: string, value: any) => void;
+  handleLocationChange: (field: string, value: any) => void;
+}
+
+export default function BasicInformation({ formData, handleInputChange, handleLocationChange }: BasicInformationProps) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Basic Information</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label htmlFor="display_name" className="block text-sm font-medium text-gray-700">
+              Display Name
+            </label>
+            <input
+              type="text"
+              id="display_name"
+              value={formData.display_name}
+              onChange={(e) => handleInputChange('display_name', e.target.value)}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              placeholder="How would you like to be called?"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700">
+              Date of Birth
+            </label>
+            <input
+              type="date"
+              id="date_of_birth"
+              value={formData.date_of_birth || ''}
+              onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
+              Gender
+            </label>
+            <select
+              id="gender"
+              value={formData.gender}
+              onChange={(e) => handleInputChange('gender', e.target.value)}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            >
+              <option value="">Select gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="non-binary">Non-binary</option>
+              <option value="mtf">Trans Woman</option>
+              <option value="ftm">Trans Man</option>
+              <option value="other">Other</option>
+              <option value="prefer-not-to-say">Prefer not to say</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="pronouns" className="block text-sm font-medium text-gray-700">
+              Pronouns
+            </label>
+            <select
+              id="pronouns"
+              value={formData.pronouns}
+              onChange={(e) => handleInputChange('pronouns', e.target.value)}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            >
+              <option value="">Select pronouns</option>
+              <option value="he/him">He/Him</option>
+              <option value="she/her">She/Her</option>
+              <option value="they/them">They/Them</option>
+              <option value="he/they">He/They</option>
+              <option value="she/they">She/They</option>
+              <option value="other">Other</option>
+              <option value="prefer-not-to-say">Prefer not to say</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="sexual_orientation" className="block text-sm font-medium text-gray-700">
+              Sexual Orientation
+            </label>
+            <select
+              id="sexual_orientation"
+              value={formData.sexual_orientation}
+              onChange={(e) => handleInputChange('sexual_orientation', e.target.value)}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            >
+              <option value="">Select orientation</option>
+              <option value="straight">Straight</option>
+              <option value="gay">Gay</option>
+              <option value="lesbian">Lesbian</option>
+              <option value="bisexual">Bisexual</option>
+              <option value="pansexual">Pansexual</option>
+              <option value="asexual">Asexual</option>
+              <option value="demisexual">Demisexual</option>
+              <option value="queer">Queer</option>
+              <option value="questioning">Questioning</option>
+              <option value="other">Other</option>
+              <option value="prefer-not-to-say">Prefer not to say</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="relationship_style" className="block text-sm font-medium text-gray-700">
+              Relationship Style
+            </label>
+            <select
+              id="relationship_style"
+              value={formData.relationship_style}
+              onChange={(e) => handleInputChange('relationship_style', e.target.value)}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            >
+              <option value="">Select relationship style</option>
+              <option value="monogamous">Monogamous</option>
+              <option value="non-monogamous">Non-monogamous</option>
+              <option value="polyamorous">Polyamorous</option>
+              <option value="open">Open Relationship</option>
+              <option value="swinger">Swinger</option>
+              <option value="other">Other</option>
+              <option value="prefer-not-to-say">Prefer not to say</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="max_distance" className="block text-sm font-medium text-gray-700">
+              Maximum Distance (miles)
+            </label>
+            <input
+              type="number"
+              id="max_distance"
+              min="1"
+              max="100"
+              value={formData.location.max_distance}
+              onChange={(e) => handleLocationChange('max_distance', parseInt(e.target.value))}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="zodiac_sign" className="block text-sm font-medium text-gray-700">
+              Zodiac Sign
+            </label>
+            <select
+              id="zodiac_sign"
+              value={formData.zodiac_sign}
+              onChange={(e) => handleInputChange('zodiac_sign', e.target.value)}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            >
+              <option value="">Select sign</option>
+              <option value="aries">Aries</option>
+              <option value="taurus">Taurus</option>
+              <option value="gemini">Gemini</option>
+              <option value="cancer">Cancer</option>
+              <option value="leo">Leo</option>
+              <option value="virgo">Virgo</option>
+              <option value="libra">Libra</option>
+              <option value="scorpio">Scorpio</option>
+              <option value="sagittarius">Sagittarius</option>
+              <option value="capricorn">Capricorn</option>
+              <option value="aquarius">Aquarius</option>
+              <option value="pisces">Pisces</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="blood_type" className="block text-sm font-medium text-gray-700">
+              Blood Type
+            </label>
+            <select
+              id="blood_type"
+              value={formData.blood_type}
+              onChange={(e) => handleInputChange('blood_type', e.target.value)}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            >
+              <option value="">Select blood type</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="personality_type" className="block text-sm font-medium text-gray-700">
+              Personality Type (MBTI)
+            </label>
+            <select
+              id="personality_type"
+              value={formData.personality_type}
+              onChange={(e) => handleInputChange('personality_type', e.target.value)}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            >
+              <option value="">Select type</option>
+              <option value="INTJ">INTJ</option>
+              <option value="INTP">INTP</option>
+              <option value="ENTJ">ENTJ</option>
+              <option value="ENTP">ENTP</option>
+              <option value="INFJ">INFJ</option>
+              <option value="INFP">INFP</option>
+              <option value="ENFJ">ENFJ</option>
+              <option value="ENFP">ENFP</option>
+              <option value="ISTJ">ISTJ</option>
+              <option value="ISFJ">ISFJ</option>
+              <option value="ESTJ">ESTJ</option>
+              <option value="ESFJ">ESFJ</option>
+              <option value="ISTP">ISTP</option>
+              <option value="ISFP">ISFP</option>
+              <option value="ESTP">ESTP</option>
+              <option value="ESFP">ESFP</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="chronotype" className="block text-sm font-medium text-gray-700">
+              Chronotype
+            </label>
+            <select
+              id="chronotype"
+              value={formData.chronotype}
+              onChange={(e) => handleInputChange('chronotype', e.target.value)}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            >
+              <option value="">Select chronotype</option>
+              <option value="early_bird">Early Bird</option>
+              <option value="night_owl">Night Owl</option>
+              <option value="intermediate">Intermediate</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="love_language" className="block text-sm font-medium text-gray-700">
+              Love Language
+            </label>
+            <select
+              id="love_language"
+              value={formData.love_language}
+              onChange={(e) => handleInputChange('love_language', e.target.value)}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            >
+              <option value="">Select love language</option>
+              <option value="words_of_affirmation">Words of Affirmation</option>
+              <option value="acts_of_service">Acts of Service</option>
+              <option value="receiving_gifts">Receiving Gifts</option>
+              <option value="quality_time">Quality Time</option>
+              <option value="physical_touch">Physical Touch</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="religion" className="block text-sm font-medium text-gray-700">
+              Religion
+            </label>
+            <select
+              id="religion"
+              value={formData.religion}
+              onChange={(e) => handleInputChange('religion', e.target.value)}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            >
+              <option value="">Select religion</option>
+              <option value="christian">Christian</option>
+              <option value="catholic">Catholic</option>
+              <option value="jewish">Jewish</option>
+              <option value="muslim">Muslim</option>
+              <option value="hindu">Hindu</option>
+              <option value="buddhist">Buddhist</option>
+              <option value="agnostic">Agnostic</option>
+              <option value="atheist">Atheist</option>
+              <option value="spiritual">Spiritual</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="political_views" className="block text-sm font-medium text-gray-700">
+              Political Views
+            </label>
+            <select
+              id="political_views"
+              value={formData.political_views}
+              onChange={(e) => handleInputChange('political_views', e.target.value)}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            >
+              <option value="">Select views</option>
+              <option value="liberal">Liberal</option>
+              <option value="moderate">Moderate</option>
+              <option value="conservative">Conservative</option>
+              <option value="apolitical">Apolitical</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

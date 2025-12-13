@@ -3,10 +3,10 @@
 This document establishes shared standards for all AI assistants and tools working on this repository.
 
 ## Mission and scope
-- **Current Phase**: Production Hardening.
+- **Current Phase**: Post-Launch Monitoring & Growth.
 - **Completed MVP**: Auth, Profile, Dashboard, Matches, Direct Messages, Photos, Safety, Physical Profile, Location, Proximity Artifacts.
 - **Completed Secondary Systems**: Recommendations, AI Content, Chatrooms, Real-time (WebSocket/Mercure), Face Reveal, Admin Tools.
-- **Active Focus**: Performance Optimization, Security Auditing, Monitoring & Observability, Mobile Experience (PWA).
+- **Active Focus**: Operational Excellence (Sentry/Logs), User Experience Refinement, Advanced AI Features.
 
 ## Standard workflow
 1. **Check Status**: Read `PROJECT_STATUS.md` for the latest state.

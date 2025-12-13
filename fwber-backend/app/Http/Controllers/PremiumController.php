@@ -1,0 +1,179 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\User;
+use App\Models\Payment;
+use App\Services\Payment\PaymentGatewayInterface;
+use App\Services\TokenDistributionService;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
+class PremiumController extends Controller
+{
+    protected $paymentGateway;
+    protected $tokenService;
+
+    public function __construct(PaymentGatewayInterface $paymentGateway, TokenDistributionService $tokenService)
+    {
+        $this->paymentGateway = $paymentGateway;
+        $this->tokenService = $tokenService;
+    }
+
+    public function getWhoLikesYou(Request $request)
+    {
+        $user = $request->user();
+        
+        // Get users who liked the current user
+        $likerIds = DB::table('match_actions')
+            ->where('target_user_id', $user->id)
+            ->where('action', 'like')
+            ->pluck('user_id');
+            
+        $likers = User::with(['profile', 'photos'])->whereIn('id', $likerIds)->get();
+
+        return response()->json($likers);
+    }
+
+    public function initiatePurchase(Request $request)
+    {
+        $user = $request->user();
+        $amount = 19.99;
+        $currency = 'USD';
+
+        $result = $this->paymentGateway->createPaymentIntent($amount, $currency, [
+            'user_id' => $user->id,
+            'description' => 'Premium Subscription'
+        ]);
+
+        if ($result->success) {
+            return response()->json($result->data);
+        }
+
+        return response()->json(['error' => $result->message], 500);
+    }
+
+    public function purchasePremium(Request $request)
+    {
+        $user = $request->user();
+        $paymentMethod = $request->input('payment_method', 'stripe');
+
+        if ($paymentMethod === 'token') {
+            $tokenCost = 200; // 200 tokens for 1 month premium
+
+            try {
+                $this->tokenService->spendTokens($user, $tokenCost, "Purchased Premium Subscription (1 Month)");
+
+                // Grant premium
+                $user->tier = 'gold';
+                $user->tier_expires_at = Carbon::now()->addDays(30);
+                $user->unlimited_swipes = true;
+                $user->save();
+
+                // Create Subscription record
+                \App\Models\Subscription::create([
+                    'user_id' => $user->id,
+                    'name' => 'gold',
+                    'stripe_id' => 'token_' . uniqid(),
+                    'stripe_status' => 'active',
+                    'stripe_price' => 'token_price_premium_monthly',
+                    'quantity' => 1,
+                    'ends_at' => Carbon::now()->addDays(30),
+                ]);
+
+                return response()->json([
+                    'message' => 'Premium purchased successfully',
+                    'tier' => $user->tier,
+                    'expires_at' => $user->tier_expires_at
+                ]);
+
+            } catch (\Exception $e) {
+                return response()->json(['error' => $e->getMessage()], 400);
+            }
+        }
+
+        $amount = 19.99; // Price for premium
+        $currency = 'USD';
+        
+        try {
+            if ($request->has('payment_intent_id')) {
+                $result = $this->paymentGateway->verifyPayment($request->input('payment_intent_id'));
+            } else {
+                $paymentMethodId = $request->input('payment_method_id', 'tok_visa'); // Default for mock
+                $result = $this->paymentGateway->charge($amount, $currency, $paymentMethodId);
+            }
+
+            if ($result->success) {
+                // Wrap payment + user update + subscription creation in transaction for atomicity
+                \DB::transaction(function () use ($user, $amount, $currency, $result) {
+                    // Log payment
+                    Payment::create([
+                        'user_id' => $user->id,
+                        'amount' => $amount,
+                        'currency' => $currency,
+                        'payment_gateway' => config('services.payment.driver', 'mock'),
+                        'transaction_id' => $result->transactionId,
+                        'status' => 'succeeded',
+                        'description' => 'Premium Subscription',
+                        'metadata' => $result->data,
+                    ]);
+
+                    // Grant premium
+                    $user->tier = 'gold';
+                    $user->tier_expires_at = Carbon::now()->addDays(30);
+                    $user->unlimited_swipes = true;
+                    $user->save();
+
+                    // Create Subscription record
+                    \App\Models\Subscription::create([
+                        'user_id' => $user->id,
+                        'name' => 'gold',
+                        'stripe_id' => $result->transactionId ?? 'manual_' . uniqid(),
+                        'stripe_status' => 'active',
+                        'stripe_price' => 'price_premium_monthly',
+                        'quantity' => 1,
+                        'ends_at' => Carbon::now()->addDays(30),
+                    ]);
+                });
+
+                return response()->json([
+                    'message' => 'Premium purchased successfully',
+                    'tier' => $user->tier,
+                    'expires_at' => $user->tier_expires_at
+                ]);
+            } else {
+                 Payment::create([
+                    'user_id' => $user->id,
+                    'amount' => $amount,
+                    'currency' => $currency,
+                    'payment_gateway' => config('services.payment.driver', 'mock'),
+                    'transaction_id' => null,
+                    'status' => 'failed',
+                    'description' => 'Premium Subscription Failed',
+                    'metadata' => ['error' => $result->message],
+                ]);
+
+                return response()->json(['error' => 'Payment failed: ' . $result->message], 400);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Payment error: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function getPremiumStatus(Request $request)
+    {
+        $user = $request->user();
+        
+        $isPremium = $user->tier === 'gold' && 
+                     $user->tier_expires_at && 
+                     Carbon::parse($user->tier_expires_at)->isFuture();
+
+        return response()->json([
+            'is_premium' => $isPremium,
+            'tier' => $user->tier,
+            'expires_at' => $user->tier_expires_at,
+            'unlimited_swipes' => $user->unlimited_swipes
+        ]);
+    }
+}
