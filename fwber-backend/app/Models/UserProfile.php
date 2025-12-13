@@ -68,6 +68,7 @@ class UserProfile extends Model
         'travel_latitude',
         'travel_longitude',
         'travel_location_name',
+        'is_incognito',
     ];
 
     protected $casts = [
@@ -77,6 +78,7 @@ class UserProfile extends Model
         'is_travel_mode' => 'boolean',
         'travel_latitude' => 'float',
         'travel_longitude' => 'float',
+        'is_incognito' => 'boolean',
         'has_children' => 'boolean',
         'wants_children' => 'boolean',
         'has_pets' => 'boolean',

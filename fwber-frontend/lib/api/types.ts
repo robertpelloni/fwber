@@ -106,6 +106,14 @@ export interface UserProfile {
   languages: string[] | null
   interests: string[] | null
 
+  // Settings
+  preferred_language?: string | null
+  is_travel_mode?: boolean
+  travel_latitude?: number | null
+  travel_longitude?: number | null
+  travel_location_name?: string | null
+  is_incognito?: boolean
+
   created_at: string
   updated_at: string
 }

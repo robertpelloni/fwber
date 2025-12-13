@@ -191,6 +191,25 @@ class AIMatchingService
             $query->whereNotNull('email_verified_at');
         }
 
+        // Incognito Mode Logic
+        // Get IDs of users who have liked the current user
+        $likerIds = MatchAction::where('target_user_id', $user->id)
+            ->whereIn('action', ['like', 'super_like'])
+            ->pluck('user_id')
+            ->toArray();
+
+        $query->whereHas('profile', function ($q) use ($likerIds) {
+            $q->where(function ($sub) use ($likerIds) {
+                // Show if NOT incognito
+                $sub->where('is_incognito', false)
+                    // OR if they are incognito but have liked me
+                    ->orWhere(function ($incognito) use ($likerIds) {
+                        $incognito->where('is_incognito', true)
+                                  ->whereIn('user_id', $likerIds);
+                    });
+            });
+        });
+
         // Exclude users already interacted with
         $excludedIds = MatchAction::where('user_id', $user->id)
             ->pluck('target_user_id')

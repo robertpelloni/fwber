@@ -1,9 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useFeatureFlag } from '@/lib/hooks/use-feature-flags';
 import { useAuth } from '@/lib/auth-context';
+import { apiClient } from '@/lib/api/client';
+import { Switch } from '@/components/ui/switch';
 import {
   Settings,
   Shield,
@@ -19,6 +22,7 @@ import {
   CreditCard,
   CheckCircle,
   Plane,
+  Ghost,
 } from 'lucide-react';
 
 interface SettingsLinkProps {
@@ -76,10 +80,63 @@ function SettingsLink({ href, icon, title, description, badge, disabled }: Setti
   );
 }
 
+interface SettingsToggleProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  disabled?: boolean;
+  badge?: string;
+}
+
+function SettingsToggle({ icon, title, description, checked, onChange, disabled, badge }: SettingsToggleProps) {
+  return (
+    <div className="flex items-center gap-4 p-4 bg-white rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-sm transition-all group">
+      <div className="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 group-hover:bg-purple-200 transition-colors">
+        {icon}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-medium text-gray-900">{title}</h3>
+          {badge && (
+            <span className="px-2 py-0.5 text-xs font-medium bg-purple-100 text-purple-700 rounded-full">
+              {badge}
+            </span>
+          )}
+        </div>
+        <p className="text-sm text-gray-500">{description}</p>
+      </div>
+      <Switch checked={checked} onCheckedChange={onChange} disabled={disabled} />
+    </div>
+  );
+}
+
 export default function SettingsPage() {
   const { user, logout } = useAuth();
   const { isEnabled: vaultEnabled } = useFeatureFlag('local_media_vault');
   const { isEnabled: faceRevealEnabled } = useFeatureFlag('face_reveal');
+  
+  const [isIncognito, setIsIncognito] = useState(user?.profile?.is_incognito || false);
+  const [updatingIncognito, setUpdatingIncognito] = useState(false);
+
+  const toggleIncognito = async (checked: boolean) => {
+    setUpdatingIncognito(true);
+    try {
+      await apiClient.put('/profile', { is_incognito: checked });
+      setIsIncognito(checked);
+      // Optimistically update user context if possible
+      if (user && user.profile) {
+          user.profile.is_incognito = checked;
+      }
+    } catch (error) {
+      console.error('Failed to toggle incognito', error);
+      // Revert on error
+      setIsIncognito(!checked);
+    } finally {
+      setUpdatingIncognito(false);
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -152,6 +209,15 @@ export default function SettingsPage() {
               Privacy & Security
             </h2>
             <div className="space-y-3">
+              <SettingsToggle
+                icon={<Ghost className="w-5 h-5" />}
+                title="Incognito Mode"
+                description="Only be seen by people you like"
+                checked={isIncognito}
+                onChange={toggleIncognito}
+                disabled={updatingIncognito}
+                badge="Ghost Mode"
+              />
               <SettingsLink
                 href="/settings/two-factor"
                 icon={<Shield className="w-5 h-5" />}

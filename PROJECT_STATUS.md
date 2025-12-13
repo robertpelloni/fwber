@@ -50,6 +50,13 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Verification**: Feature tests (`StreakTest.php`) passing. Fixed `DashboardController` SQL compatibility (SQLite/MySQL).
     -   **Fixes**: Added missing `match_score` column to `matches` table and created missing `profile_views` table migration.
 
+### ✅ Privacy Features (Dec 13)
+1.  **Incognito Mode (Ghost Mode)**:
+    -   **Concept**: Users can browse without being seen by others, unless they initiate contact (like/super-like).
+    -   **Backend**: Added `is_incognito` to `user_profiles`. Updated `AIMatchingService` and `LocationController` to filter incognito users.
+    -   **Frontend**: Added "Incognito Mode" toggle to Settings page.
+    -   **Verification**: Feature implemented across full stack.
+
 ### ✅ Completed Operational Improvements (Dec 09 - Dec 11)
     -   **PhotoControllerTest**: Fixed 403 errors by overriding `app.avatar_mode` config in tests. Created `PhotoFactory`.
     -   **LocationControllerTest**: Fixed 500 errors by adding `matchesAsUser1` and `matchesAsUser2` relationships to `User` model.

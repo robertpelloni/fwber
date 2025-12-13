@@ -133,6 +133,9 @@ class RecommendationController extends Controller
                 // Fetch active boosts to prioritize
                 $boostedUsers = Boost::active()
                     ->where('user_id', '!=', $user->id) // Don't recommend self
+                    ->whereHas('user.profile', function($q) {
+                        $q->where('is_incognito', false);
+                    })
                     ->with('user')
                     ->get();
 

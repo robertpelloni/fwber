@@ -54,6 +54,7 @@ class UserProfileResource extends JsonResource
                 'languages' => $this->profile?->languages ?? [],
                 'fetishes' => $this->profile?->fetishes ?? [],
                 'sti_status' => $this->profile?->sti_status ?? [],
+                'is_incognito' => (bool) $this->profile?->is_incognito,
                 
                 // Physical Attributes
                 'height_cm' => $this->profile?->height_cm,

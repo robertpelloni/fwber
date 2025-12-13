@@ -284,6 +284,7 @@ class ProfileController extends Controller
                 'languages',
                 'fetishes',
                 'sti_status',
+                'is_incognito',
             ])));
             
             // Handle location fields
