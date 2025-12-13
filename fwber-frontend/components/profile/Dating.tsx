@@ -5,6 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 interface DatingProps {
   formData: any;
   handlePreferenceChange: (field: string, value: any) => void;
+}
+
+export default function Dating({ formData, handlePreferenceChange }: DatingProps) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Dating Preferences</CardTitle>
+      </CardHeader>
+      <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div>
   handleInputChange: (field: string, value: any) => void;
 }
 
@@ -172,6 +182,9 @@ export default function Dating({ formData, handlePreferenceChange, handleInputCh
             <option value="">Select education</option>
             <option value="high-school">High School</option>
             <option value="some-college">Some College</option>
+            <option value="associates">Associate's Degree</option>
+            <option value="bachelors">Bachelor's Degree</option>
+            <option value="masters">Master's Degree</option>
             <option value="associates">Associate&apos;s Degree</option>
             <option value="bachelors">Bachelor&apos;s Degree</option>
             <option value="masters">Master&apos;s Degree</option>

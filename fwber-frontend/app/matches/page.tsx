@@ -50,6 +50,7 @@ export default function MatchesPage() {
     try {
       setIsLoading(true)
       setError(null)
+      const matchesData = await getMatches(token, newFilters)
       const matchesData = await getMatches(newFilters)
       setMatches(matchesData)
       setCurrentMatchIndex(0)
@@ -63,6 +64,8 @@ export default function MatchesPage() {
   useEffect(() => {
     if (isAuthenticated && token) {
       loadMatches(filters)
+    }
+  }, [isAuthenticated, token, loadMatches, filters])
     }
   }, [isAuthenticated, token, loadMatches, filters])
 
@@ -243,6 +246,7 @@ export default function MatchesPage() {
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <MatchFilter onFilterChange={(newFilters) => setFilters(newFilters)} />
           {currentMatch && (
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden mt-8">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-8">
               {/* Match Card */}
               <div className="relative">

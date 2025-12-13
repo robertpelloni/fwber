@@ -30,6 +30,7 @@ use App\Http\Controllers\WebSocketController;
 use App\Http\Controllers\ProximityArtifactController;
 use App\Http\Controllers\ModerationController;
 use App\Http\Controllers\Api\FriendController;
+use App\Http\Controllers\Api\DeviceTokenController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventController;
 
@@ -55,6 +56,20 @@ Route::get('health/readiness', [\App\Http\Controllers\HealthController::class, '
 
 // Stripe Webhook
 Route::post('stripe/webhook', [\App\Http\Controllers\StripeWebhookController::class, 'handleWebhook']);
+        // Device Token routes for Push Notifications
+        Route::prefix('device-tokens')->group(function (): void {
+            Route::post('/', [DeviceTokenController::class, 'store']);
+            Route::delete('/{token}', [DeviceTokenController::class, 'destroy']);
+        });
+
+        // Notification routes
+        Route::get('/notifications', [DeviceTokenController::class, 'index']);
+
+        // Block routes
+        Route::prefix('blocks')->group(function (): void {
+            Route::post('/', [BlockController::class, 'store']);
+            Route::delete('/{blockedId}', [BlockController::class, 'destroy']);
+        });
 
 // Venue Partner Auth
 Route::prefix('venue')->group(function () {

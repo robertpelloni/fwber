@@ -77,6 +77,10 @@ export default function ProfileTabs({
             <Location formData={formData} handleLocationChange={handleLocationChange} />
           </TabsContent>
           <TabsContent value="lifestyle">
+            <Lifestyle formData={formData} handlePreferenceChange={handlePreferenceChange} />
+          </TabsContent>
+          <TabsContent value="dating">
+            <Dating formData={formData} handlePreferenceChange={handlePreferenceChange} />
             <Lifestyle formData={formData} handlePreferenceChange={handlePreferenceChange} handleInputChange={handleInputChange} />
           </TabsContent>
           <TabsContent value="dating">
@@ -86,6 +90,7 @@ export default function ProfileTabs({
             <Interests formData={formData} handleArrayPreferenceChange={handleArrayPreferenceChange} />
           </TabsContent>
           <TabsContent value="communication">
+            <Communication formData={formData} handlePreferenceChange={handlePreferenceChange} />
             <Communication formData={formData} handlePreferenceChange={handlePreferenceChange} handleInputChange={handleInputChange} />
           </TabsContent>
           <TabsContent value="photos">
@@ -119,6 +124,10 @@ export default function ProfileTabs({
           <Bio formData={formData} handleInputChange={() => {}} />
           <LookingFor formData={formData} handleLookingForChange={() => {}} />
           <Location formData={formData} handleLocationChange={() => {}} />
+          <Lifestyle formData={formData} handlePreferenceChange={() => {}} />
+          <Dating formData={formData} handlePreferenceChange={() => {}} />
+          <Interests formData={formData} handleArrayPreferenceChange={() => {}} />
+          <Communication formData={formData} handlePreferenceChange={() => {}} />
           <Lifestyle formData={formData} handlePreferenceChange={() => {}} handleInputChange={() => {}} />
           <Dating formData={formData} handlePreferenceChange={() => {}} handleInputChange={() => {}} />
           <Interests formData={formData} handleArrayPreferenceChange={() => {}} />

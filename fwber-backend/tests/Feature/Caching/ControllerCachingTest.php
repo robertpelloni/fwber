@@ -15,6 +15,7 @@ class ControllerCachingTest extends TestCase
 
     public function test_recommendations_are_cached()
     {
+        $this->withoutMiddleware(\App\Http\Middleware\TrackUserActivity::class);
         config(['features.recommendations' => true]);
         
         $user = User::factory()->create(['name' => 'Test User']);
@@ -24,6 +25,11 @@ class ControllerCachingTest extends TestCase
             "location_name" => "Test City",
         ]);
         $token = ApiToken::generateForUser($user, "test");
+
+        Cache::shouldReceive('tags')
+            ->once()
+            ->with(["recommendations:user:{$user->id}"])
+            ->andReturnSelf();
 
         Cache::shouldReceive('remember')
             ->once()
@@ -38,6 +44,7 @@ class ControllerCachingTest extends TestCase
 
     public function test_proximity_artifacts_are_cached()
     {
+        $this->withoutMiddleware(\App\Http\Middleware\TrackUserActivity::class);
         config(['features.proximity_artifacts' => true]);
 
         $user = User::factory()->create(['name' => 'Test User']);
@@ -59,12 +66,18 @@ class ControllerCachingTest extends TestCase
             })
             ->andReturn(collect([]));
 
+        Cache::shouldReceive('has')
+            ->andReturn(true);
+
         $this->withHeader("Authorization", "Bearer " . $token)
              ->getJson('/api/proximity/feed?lat=40.7128&lng=-74.0060&radius=1000');
     }
 
     public function test_matches_feed_is_cached_with_tags()
     {
+        $this->withoutMiddleware(\App\Http\Middleware\TrackUserActivity::class);
+        config(['telemetry.enabled' => false]);
+        
         $user = User::factory()->create(['name' => 'Test User']);
         $user->profile()->create([
             "birthdate" => "1990-01-01",

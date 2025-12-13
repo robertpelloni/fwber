@@ -103,6 +103,15 @@ function SortablePhotoItem({
                <Image
                  src={photo.thumbnail_url || photo.url}
                  alt={`Photo ${index + 1}`}
+                 style={{
+                   width: '100%',
+                   height: '100%',
+                   objectFit: 'cover',
+                   display: 'block',
+                   borderRadius: '0.5rem',
+                   userSelect: 'none',
+                   pointerEvents: 'auto',
+                 } as React.CSSProperties}
                  fill
                  className="object-cover rounded-lg select-none pointer-events-auto"
                  onClick={(e) => {

@@ -155,4 +155,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(MatchAction::class);
     }
+
+    public function deviceTokens()
+    {
+        return $this->hasMany(DeviceToken::class);
+    }
 }

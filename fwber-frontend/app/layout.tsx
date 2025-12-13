@@ -81,6 +81,18 @@ export default function RootLayout({
         {/* Preload critical resources */}
         {/* <link rel="preload" href="/_next/static/css/app/layout.css" as="style" /> */}
       </head>
+      <body className="min-h-screen bg-background font-sans antialiased text-optimized">
+        <QueryProvider>
+          <AuthProvider>
+            <NotificationPermissionHandler />
+            <ToastProvider>
+              <div className="relative flex min-h-screen flex-col">
+                <div className="flex-1">{children}</div>
+              </div>
+              <PerformanceMonitor />
+            </ToastProvider>
+          </AuthProvider>
+        </QueryProvider>
       <body
         className="min-h-screen bg-background font-sans antialiased text-optimized"
         suppressHydrationWarning
