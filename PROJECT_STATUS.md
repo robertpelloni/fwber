@@ -580,6 +580,11 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **UX**: Added "Translate" button support for decrypted messages.
     -   **Verification**: Linting passed. Manual verification of UI components.
 
+38. **Viral Growth: Wingman & Discovery Integration** (Dec 13 - Complete):
+    -   **UX**: Updated `MatchesPage` to allow opening `ProfileViewModal` (via image click or Info button).
+    -   **Integration**: This connects the "Discovery" flow to the "Share to Unlock" viral loop.
+    -   **Polish**: Replaced `img` with `next/image` in `MatchesPage` for performance.
+
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.
 2.  **API Documentation**: OpenAPI/Swagger docs available at `/api/docs`.

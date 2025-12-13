@@ -244,7 +244,11 @@ export default function RealTimeChat({
           <div>
             <h3 className="text-white font-semibold flex items-center gap-2">
               {recipientName}
-              {isE2EReady && <Lock className="w-3 h-3 text-green-400" title="End-to-End Encrypted" />}
+              {isE2EReady && (
+                <span title="End-to-End Encrypted">
+                  <Lock className="w-3 h-3 text-green-400" />
+                </span>
+              )}
             </h3>
             <PresenceIndicator 
               status={recipientStatus}

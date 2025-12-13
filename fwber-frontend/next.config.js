@@ -10,6 +10,7 @@ const withPWA = require('next-pwa')({
   register: true,
   skipWaiting: true,
   importScripts: ['/sw-push.js'],
+  maximumFileSizeToCacheInBytes: 7000000, // 7MB to accommodate large source maps
 });
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
