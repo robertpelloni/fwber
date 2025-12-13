@@ -13,6 +13,7 @@ import {
 import { useSystemHealth } from '@/lib/hooks/use-config';
 import { exportAllAnalyticsToCSV, exportPlatformAnalyticsToCSV } from '@/lib/utils/csv-export';
 import BoostAnalytics from '@/components/analytics/BoostAnalytics';
+import { RetentionTable } from '@/components/analytics/RetentionTable';
 import FailedJobsTable from '@/components/analytics/FailedJobsTable';
 import './analytics-progress.css';
 
@@ -156,6 +157,8 @@ export default function AnalyticsPage() {
         ) : (
           <AnalyticsSkeleton />
         )}
+
+      <RetentionTable />
 
       <BoostAnalytics />
 

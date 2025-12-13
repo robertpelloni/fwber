@@ -40,6 +40,10 @@ export function getBoostAnalytics() {
   return api.get<BoostAnalyticsResponse>('/analytics/boosts');
 }
 
+export function getRetentionAnalytics() {
+  return api.get<import('./types').RetentionResponse>('/analytics/retention');
+}
+
 export function getRateLimitStatistics(timeframe: RateLimitTimeframe = DEFAULT_RATE_LIMIT_TIMEFRAME) {
   return api.get<RateLimitStatsResponse>(`/rate-limits/stats/${timeframe}`);
 }

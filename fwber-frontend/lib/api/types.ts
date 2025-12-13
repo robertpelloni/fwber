@@ -652,6 +652,20 @@ export interface BoostAnalyticsResponse {
   }>
 }
 
+export interface RetentionDataPoint {
+  month_offset: number
+  percentage: number
+  count: number
+}
+
+export interface RetentionCohort {
+  month: string
+  size: number
+  retention: RetentionDataPoint[]
+}
+
+export type RetentionResponse = RetentionCohort[]
+
 // ============================================================================
 // Chatroom Types (Proximity & Group)
 // ============================================================================
