@@ -29,6 +29,8 @@ use App\Http\Controllers\Api\GroupMessageController;
 use App\Http\Controllers\WebSocketController;
 use App\Http\Controllers\ProximityArtifactController;
 use App\Http\Controllers\ModerationController;
+use App\Http\Controllers\Api\DeviceTokenController;
+use App\Http\Controllers\Api\FriendController;
 use App\Http\Controllers\Api\FriendController;
 use App\Http\Controllers\Api\DeviceTokenController;
 use Illuminate\Support\Facades\Route;
@@ -60,6 +62,25 @@ Route::post('stripe/webhook', [\App\Http\Controllers\StripeWebhookController::cl
         Route::prefix('device-tokens')->group(function (): void {
             Route::post('/', [DeviceTokenController::class, 'store']);
             Route::delete('/{token}', [DeviceTokenController::class, 'destroy']);
+        });
+
+        // Device Token routes for Push Notifications
+        Route::prefix('device-tokens')->group(function (): void {
+            Route::post('/', [DeviceTokenController::class, 'store']);
+            Route::delete('/{token}', [DeviceTokenController::class, 'destroy']);
+        });
+
+        // Notification routes
+        Route::get('/notifications', [DeviceTokenController::class, 'index']);
+
+        // Friend routes
+        Route::prefix('friends')->group(function () {
+            Route::get('/', [FriendController::class, 'getFriends']);
+            Route::get('/requests', [FriendController::class, 'getFriendRequests']);
+            Route::post('/requests', [FriendController::class, 'sendFriendRequest']);
+            Route::post('/requests/{userId}', [FriendController::class, 'respondToFriendRequest']);
+            Route::delete('/{friendId}', [FriendController::class, 'removeFriend']);
+            Route::get('/search', [FriendController::class, 'search']);
         });
 
         // Notification routes

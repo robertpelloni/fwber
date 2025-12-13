@@ -28,6 +28,8 @@
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
         <env name="FEATURE_CHATROOMS" value="true"/>
+        <env name="FEATURE_CONTENT_GENERATION" value="true"/>
+        <env name="FEATURE_RATE_LIMITS" value="true"/>
         <env name="FEATURE_PROXIMITY_CHATROOMS" value="true"/>
         <env name="FEATURE_RECOMMENDATIONS" value="true"/>
         <env name="FEATURE_WEBSOCKET" value="true"/>

@@ -1,4 +1,7 @@
 describe('Navigation', () => {
+  it('should navigate to the friends page', () => {
+    cy.visit('/matches');
+    cy.get('a[href*="friends"]').click();
   const testUser = {
     id: 1,
     name: 'Test User',

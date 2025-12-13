@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -7,6 +8,18 @@ import { getFriends, getFriendRequests, sendFriendRequest, respondToFriendReques
 import FriendList from '@/components/friends/FriendList';
 import FriendRequestList from '@/components/friends/FriendRequestList';
 import UserSearch from '@/components/friends/UserSearch';
+import { searchUsers } from '@/lib/api/profile';
+
+export default function FriendsPage() {
+  const { token, isAuthenticated } = useAuth();
+  const [friends, setFriends] = useState([]);
+  const [friendRequests, setFriendRequests] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = async () => {
 import { searchUsers, type UserProfile } from '@/lib/api/profile';
 import { ConnectionStatusBadge, OnlineUsersList } from '@/components/realtime';
 import { Users, UserPlus, RefreshCw } from 'lucide-react';
@@ -40,6 +53,11 @@ export default function FriendsPage() {
         setIsLoading(false);
       }
     }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [isAuthenticated, token]);
   }, [isAuthenticated, token]);
 
   useEffect(() => {
@@ -100,6 +118,9 @@ export default function FriendsPage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">Friends</h1>
+
+          {error && <div className="text-red-500 mb-4">{error}</div>}
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <div className="flex items-center gap-3">

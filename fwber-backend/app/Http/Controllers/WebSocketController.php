@@ -490,6 +490,10 @@ class WebSocketController extends Controller
      *     path="/websocket/online-users",
      *     tags={"WebSocket"},
      *     summary="Get online users",
+     *     description="Returns a list of all currently online users",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(response=200, description="Online users retrieved successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/OnlineUsersResponse")
      *     description="Retrieve a list of currently online users",
      *     security={{"bearerAuth":{}}},
      *     @OA\Response(response=200, description="List of online users",
@@ -536,6 +540,10 @@ class WebSocketController extends Controller
      *     path="/websocket/connections",
      *     tags={"WebSocket"},
      *     summary="Get user connections",
+     *     description="Returns a list of the authenticated user's active WebSocket connections",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(response=200, description="User connections retrieved successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/UserConnectionsResponse")
      *     description="Retrieve active WebSocket connections for the authenticated user",
      *     security={{"bearerAuth":{}}},
      *     @OA\Response(response=200, description="User connections",
@@ -580,6 +588,11 @@ class WebSocketController extends Controller
 
     /**
      * Broadcast message to multiple users
+     * @OA\Post(
+     *     path="/websocket/broadcast",
+     *     tags={"WebSocket"},
+     *     summary="Broadcast message to multiple users",
+     *     description="Send a message to a specified list of users. Admin only.",
      * 
      * @OA\Post(
      *     path="/websocket/broadcast",
@@ -594,6 +607,13 @@ class WebSocketController extends Controller
      *             @OA\Property(property="user_ids", type="array", @OA\Items(type="string")),
      *             @OA\Property(property="message", type="object",
      *                 required={"type", "content"},
+     *                 @OA\Property(property="type", type="string", example="announcement"),
+     *                 @OA\Property(property="content", type="string", example="The system will be down for maintenance in 10 minutes.")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Broadcast sent successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/BroadcastResponse")
      *                 @OA\Property(property="type", type="string"),
      *                 @OA\Property(property="content", type="string")
      *             )
@@ -668,6 +688,10 @@ class WebSocketController extends Controller
      *     path="/websocket/status",
      *     tags={"WebSocket"},
      *     summary="Get WebSocket status",
+     *     description="Returns the current status of the WebSocket server and the user's connection",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(response=200, description="WebSocket status retrieved successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/WebSocketStatusResponse")
      *     description="Check the status of the WebSocket service",
      *     security={{"bearerAuth":{}}},
      *     @OA\Response(response=200, description="WebSocket status",

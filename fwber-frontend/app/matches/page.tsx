@@ -68,6 +68,8 @@ export default function MatchesPage() {
   }, [isAuthenticated, token, loadMatches, filters])
     }
   }, [isAuthenticated, token, loadMatches, filters])
+    }
+  }, [isAuthenticated, token, loadMatches, filters])
 
   const advanceToNextMatch = useCallback(() => {
     if (currentMatchIndex < matches.length - 1) {

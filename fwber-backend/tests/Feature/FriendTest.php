@@ -2,6 +2,11 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
+use App\Models\User;
+use App\Models\Friend;
 use App\Models\Friend;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -16,6 +21,7 @@ class FriendTest extends TestCase
         $user = User::factory()->create();
         $friend = User::factory()->create();
         Friend::factory()->create(['user_id' => $user->id, 'friend_id' => $friend->id, 'status' => 'accepted']);
+        Friend::factory()->create(['user_id' => $friend->id, 'friend_id' => $user->id, 'status' => 'accepted']);
 
         $response = $this->actingAs($user)->getJson('/api/friends');
 
@@ -26,6 +32,8 @@ class FriendTest extends TestCase
     public function test_a_user_can_get_their_friend_requests()
     {
         $user = User::factory()->create();
+        $friend = User::factory()->create();
+        Friend::factory()->create(['user_id' => $friend->id, 'friend_id' => $user->id, 'status' => 'pending']);
         $requester = User::factory()->create();
         Friend::factory()->create(['user_id' => $requester->id, 'friend_id' => $user->id, 'status' => 'pending']);
 
@@ -42,6 +50,33 @@ class FriendTest extends TestCase
 
         $response = $this->actingAs($user)->postJson('/api/friends/requests', ['friend_id' => $friend->id]);
 
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('friends', ['user_id' => $user->id, 'friend_id' => $friend->id, 'status' => 'pending']);
+    }
+
+    public function test_a_user_can_accept_a_friend_request()
+    {
+        $user = User::factory()->create();
+        $friend = User::factory()->create();
+        Friend::factory()->create(['user_id' => $friend->id, 'friend_id' => $user->id, 'status' => 'pending']);
+
+        $response = $this->actingAs($user)->postJson("/api/friends/requests/{$friend->id}", ['status' => 'accepted']);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('friends', ['user_id' => $user->id, 'friend_id' => $friend->id, 'status' => 'accepted']);
+        $this->assertDatabaseHas('friends', ['user_id' => $friend->id, 'friend_id' => $user->id, 'status' => 'accepted']);
+    }
+
+    public function test_a_user_can_decline_a_friend_request()
+    {
+        $user = User::factory()->create();
+        $friend = User::factory()->create();
+        Friend::factory()->create(['user_id' => $friend->id, 'friend_id' => $user->id, 'status' => 'pending']);
+
+        $response = $this->actingAs($user)->postJson("/api/friends/requests/{$friend->id}", ['status' => 'declined']);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseMissing('friends', ['user_id' => $friend->id, 'friend_id' => $user->id]);
         $response->assertStatus(201);
         $this->assertDatabaseHas('friends', ['user_id' => $user->id, 'friend_id' => $friend->id]);
     }
@@ -62,17 +97,27 @@ class FriendTest extends TestCase
     {
         $user = User::factory()->create();
         $friend = User::factory()->create();
+        Friend::factory()->create(['user_id' => $user->id, 'friend_id' => $friend->id, 'status' => 'accepted']);
+        Friend::factory()->create(['user_id' => $friend->id, 'friend_id' => $user->id, 'status' => 'accepted']);
         $friendship = Friend::factory()->create(['user_id' => $user->id, 'friend_id' => $friend->id, 'status' => 'accepted']);
 
         $response = $this->actingAs($user)->deleteJson("/api/friends/{$friend->id}");
 
         $response->assertStatus(200);
+        $this->assertDatabaseMissing('friends', ['user_id' => $user->id, 'friend_id' => $friend->id]);
+        $this->assertDatabaseMissing('friends', ['user_id' => $friend->id, 'friend_id' => $user->id]);
         $this->assertDatabaseMissing('friends', ['id' => $friendship->id]);
     }
 
     public function test_a_user_can_search_for_other_users()
     {
         $user = User::factory()->create();
+        $userToFind = User::factory()->create(['name' => 'John Doe']);
+
+        $response = $this->actingAs($user)->getJson('/api/friends/search?q=John');
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment(['name' => 'John Doe']);
         User::factory()->create(['name' => 'John Doe']);
         User::factory()->create(['name' => 'Jane Doe']);
 
