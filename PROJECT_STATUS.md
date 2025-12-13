@@ -73,6 +73,10 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Database**: Added `db_query_count` and `memory_usage_kb` columns to `slow_requests` table.
     -   **Frontend**: Updated `SlowRequestStatsTable` to display average queries and memory usage.
     -   **Verification**: Updated `SlowRequestTest` to verify metric capture and API response.
+2.  **User Retention Analysis (Cohort)**:
+    -   **Backend**: Implemented `DailyActiveUser` model and `TrackUserActivity` middleware to track daily active users.
+    -   **Analytics**: Added `/api/analytics/retention` endpoint to `AnalyticsController` for calculating monthly cohort retention.
+    -   **Verification**: Created `AnalyticsRetentionTest` covering cohort generation and retention calculation.
 5.  **PWA Verification**:
     -   **Testing**: Created `cypress/e2e/pwa.cy.js` to verify Manifest, Service Worker registration, and Offline page.
     -   **Verification**: E2E tests passing. Confirmed `manifest.json` validity and `offline.html` availability.

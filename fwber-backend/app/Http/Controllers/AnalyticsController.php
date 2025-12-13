@@ -440,4 +440,71 @@ class AnalyticsController extends Controller
 
         return response()->json($stats);
     }
+
+    /**
+     * Get retention analytics (Cohort Analysis)
+     *
+     * @OA\Get(
+     *   path="/analytics/retention",
+     *   tags={"Analytics"},
+     *   summary="User retention cohorts",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="Retention payload")
+     * )
+     */
+    public function retention(): JsonResponse
+    {
+        $retention = Cache::remember('analytics_retention', 3600, function () {
+            return $this->calculateRetention();
+        });
+
+        return response()->json($retention);
+    }
+
+    private function calculateRetention(): array
+    {
+        // Get cohorts for the last 12 months
+        $cohorts = [];
+        for ($i = 11; $i >= 0; $i--) {
+            $month = now()->subMonths($i)->startOfMonth();
+            $nextMonth = $month->copy()->addMonth();
+            
+            // Users registered in this month
+            $cohortUsers = User::whereBetween('created_at', [$month, $nextMonth])->pluck('id');
+            $cohortSize = $cohortUsers->count();
+
+            if ($cohortSize === 0) {
+                continue;
+            }
+
+            $retentionData = [];
+            // Check retention for subsequent months
+            for ($j = 0; $j <= 11 - $i; $j++) {
+                $checkMonth = $month->copy()->addMonths($j);
+                
+                // Count how many of $cohortUsers were active in $checkMonth
+                // Using DailyActiveUser table
+                $activeCount = \App\Models\DailyActiveUser::whereIn('user_id', $cohortUsers)
+                    ->whereBetween('date', [$checkMonth, $checkMonth->copy()->endOfMonth()])
+                    ->distinct('user_id')
+                    ->count();
+
+                $percentage = $cohortSize > 0 ? round(($activeCount / $cohortSize) * 100, 1) : 0;
+                
+                $retentionData[] = [
+                    'month_offset' => $j,
+                    'percentage' => $percentage,
+                    'count' => $activeCount,
+                ];
+            }
+
+            $cohorts[] = [
+                'month' => $month->format('Y-m'),
+                'size' => $cohortSize,
+                'retention' => $retentionData,
+            ];
+        }
+
+        return $cohorts;
+    }
 }

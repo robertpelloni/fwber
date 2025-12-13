@@ -131,6 +131,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('analytics/slow-requests', [\App\Http\Controllers\AnalyticsController::class, 'slowRequests']);
     Route::get('analytics/slow-requests/stats', [\App\Http\Controllers\AnalyticsController::class, 'slowRequestStats']);
     Route::get('analytics/boosts', [\App\Http\Controllers\AnalyticsController::class, 'boosts']);
+    Route::get('analytics/retention', [\App\Http\Controllers\AnalyticsController::class, 'retention']);
     
     // Failed Jobs (Admin)
     Route::get('analytics/failed-jobs', [\App\Http\Controllers\FailedJobController::class, 'index']);

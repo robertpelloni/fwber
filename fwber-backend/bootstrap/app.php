@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(\App\Http\Middleware\ApmMiddleware::class);
         $middleware->append(\App\Http\Middleware\InjectLoggingContext::class);
         
+        $middleware->api(append: [
+            \App\Http\Middleware\TrackUserActivity::class,
+        ]);
+
         $middleware->alias([
             'feature' => \App\Http\Middleware\FeatureEnabled::class,
         ]);
