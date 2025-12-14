@@ -183,7 +183,15 @@ EOT;
         $conversation = "";
         foreach ($history as $msg) {
             $sender = ($msg['sender_id'] == $user->id) ? "Me" : "Match";
-            $conversation .= "{$sender}: {$msg['content']}\n";
+            
+            $content = $msg['content'];
+            if (!empty($msg['transcription'])) {
+                $content = $msg['transcription'];
+            } elseif (($msg['message_type'] ?? '') === 'audio') {
+                $content = "[Audio Message]";
+            }
+
+            $conversation .= "{$sender}: {$content}\n";
         }
 
         return <<<EOT

@@ -81,7 +81,9 @@ class AiWingmanController extends Controller
             ->map(function($msg) {
                 return [
                     'sender_id' => $msg->sender_id,
-                    'content' => $msg->content
+                    'content' => $msg->content,
+                    'transcription' => $msg->transcription ?? null,
+                    'message_type' => $msg->message_type ?? 'text',
                 ];
             })
             ->toArray();
