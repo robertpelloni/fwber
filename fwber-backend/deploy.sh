@@ -200,7 +200,7 @@ log_success ".env file exists"
 echo ""
 
 # Verify environment matches
-ENV_VALUE=$(grep "^APP_ENV=" .env | cut -d '=' -f2)
+ENV_VALUE=$(grep "^APP_ENV=" .env | cut -d '=' -f2 | tr -d '\r')
 if [ "$ENV_VALUE" != "$ENVIRONMENT" ]; then
     log_warning "APP_ENV in .env ($ENV_VALUE) doesn't match deployment environment ($ENVIRONMENT)"
     
