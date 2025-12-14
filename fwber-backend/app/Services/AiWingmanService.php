@@ -358,30 +358,37 @@ EOT;
     }
 
     /**
-     * Generate a humorous "roast" of the user's profile.
+     * Generate a humorous "roast" or enthusiastic "hype" of the user's profile.
      *
      * @param User $user
+     * @param string $mode 'roast' or 'hype'
      * @return string
      */
-    public function roastProfile(User $user): string
+    public function roastProfile(User $user, string $mode = 'roast'): string
     {
         $profile = $user->profile;
         $updatedAt = $profile ? $profile->updated_at->timestamp : 0;
-        $cacheKey = "wingman:roast:{$user->id}:{$updatedAt}";
+        $cacheKey = "wingman:{$mode}:{$user->id}:{$updatedAt}";
 
-        return Cache::remember($cacheKey, 86400, function () use ($user, $profile) {
-            $prompt = $this->buildRoastPrompt($user, $profile);
+        return Cache::remember($cacheKey, 86400, function () use ($user, $profile, $mode) {
+            $prompt = $this->buildRoastPrompt($user, $profile, $mode);
+
+            $systemPrompt = $mode === 'hype'
+                ? 'You are an enthusiastic hype man. Your goal is to make this person sound like the biggest catch in the world. Use slang, emojis, and high energy.'
+                : 'You are a professional comedian and roast master. Your goal is to humorously critique dating profiles. Be savage but keep it fun and safe (no hate speech).';
 
             try {
                 $response = $this->llmManager->driver()->chat([
-                    ['role' => 'system', 'content' => 'You are a professional comedian and roast master. Your goal is to humorously critique dating profiles. Be savage but keep it fun and safe (no hate speech).'],
+                    ['role' => 'system', 'content' => $systemPrompt],
                     ['role' => 'user', 'content' => $prompt]
                 ], ['temperature' => 0.9]);
 
                 return $response->content;
             } catch (\Exception $e) {
-                Log::error("AiWingmanService: Failed to roast profile: " . $e->getMessage());
-                return "Your profile is so perfect I can't even find anything to roast! (Or maybe my servers are just busy...)";
+                Log::error("AiWingmanService: Failed to generate {$mode}: " . $e->getMessage());
+                return $mode === 'hype'
+                    ? "You're amazing! (My hype circuits are overloaded right now, try again later!)"
+                    : "Your profile is so perfect I can't even find anything to roast! (Or maybe my servers are just busy...)";
             }
         });
     }
@@ -415,15 +422,19 @@ Focus on shared interests, complementary vibes from the bio, or lifestyle compat
 EOT;
     }
 
-    protected function buildRoastPrompt(User $user, $profile): string
+    protected function buildRoastPrompt(User $user, $profile, string $mode = 'roast'): string
     {
         $bio = $profile->bio ?? 'No bio provided.';
         $interests = implode(', ', $profile->interests ?? []);
         $job = $profile->occupation ?? 'Unemployed';
         $age = $profile->age ?? 'Unknown age';
         
+        $instruction = $mode === 'hype'
+            ? "Write a hype intro for this person. Make them sound irresistible. Focus on their best qualities and spin their flaws into features."
+            : "Roast this dating profile. Be funny, witty, and slightly mean, but don't cross the line into harassment. Make fun of their clichés.";
+
         return <<<EOT
-Roast this dating profile. Be funny, witty, and slightly mean, but don't cross the line into harassment.
+{$instruction}
 
 Profile Details:
 - Age: {$age}
@@ -431,7 +442,7 @@ Profile Details:
 - Bio: "{$bio}"
 - Interests: {$interests}
 
-Make fun of their clichés, their job, or their lack of effort. Keep it under 280 characters so it's tweetable.
+Keep it under 280 characters so it's tweetable.
 EOT;
     }
 }

@@ -68,11 +68,11 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 3.  **Community Leaderboard**:
     -   **Backend**: Updated `TokenController` to return "Top Wingmen" stats.
     -   **Frontend**: Updated `LeaderboardPage` to display top matchmakers alongside token holders and referrers.
-4.  **AI Profile Roast**:
-    -   **Concept**: Viral feature where AI humorously critiques a user's profile to encourage social sharing.
-    -   **Backend**: Implemented `roastProfile` in `AiWingmanService` using a "Roast Master" persona.
-    -   **API**: Added `POST /wingman/roast` endpoint.
-    -   **Frontend**: Created `ProfileRoast` component with "Roast Me" button and social sharing.
+4.  **AI Profile Roast & Hype**:
+    -   **Concept**: Viral feature where AI humorously critiques ("Roast") or enthusiastically praises ("Hype") a user's profile.
+    -   **Backend**: Implemented `roastProfile` in `AiWingmanService` with `mode` parameter ('roast' or 'hype').
+    -   **API**: Updated `POST /wingman/roast` to accept `mode`.
+    -   **Frontend**: Updated `ProfileRoast` component with toggle for Roast/Hype modes and dynamic theming.
     -   **Integration**: Added to `ProfilePage` and `EnhancedProfileEditor`.
     -   **Verification**: Feature tests (`AiProfileRoasterTest.php`) passing. Frontend lint passing.
 5.  **Daily Streaks (Gamification)**:

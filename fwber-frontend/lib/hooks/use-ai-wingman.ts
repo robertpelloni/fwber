@@ -48,11 +48,11 @@ export function useAiWingman() {
   });
 
   const roastProfile = useMutation({
-    mutationFn: async () => {
-      return api.post<{ roast: string }>('/wingman/roast');
+    mutationFn: async (mode: 'roast' | 'hype' = 'roast') => {
+      return api.post<{ roast: string }>('/wingman/roast', { mode });
     },
     onError: (err: any) => {
-      setError(err.message || 'Failed to roast profile');
+      setError(err.message || 'Failed to generate content');
     },
   });
 

@@ -142,7 +142,7 @@ class AiWingmanController extends Controller
     }
 
     /**
-     * Generate a roast of the authenticated user's profile.
+     * Generate a roast or hype of the authenticated user's profile.
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -150,8 +150,14 @@ class AiWingmanController extends Controller
     public function roastProfile(Request $request)
     {
         $user = Auth::user();
-        $roast = $this->wingmanService->roastProfile($user);
+        $mode = $request->input('mode', 'roast');
 
-        return response()->json(['roast' => $roast]);
+        if (!in_array($mode, ['roast', 'hype'])) {
+            $mode = 'roast';
+        }
+
+        $result = $this->wingmanService->roastProfile($user, $mode);
+
+        return response()->json(['roast' => $result]);
     }
 }
