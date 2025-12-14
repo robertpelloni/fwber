@@ -157,6 +157,34 @@ class AiWingmanService
         });
     }
 
+    /**
+     * Generate a personalized explanation of why two users are a good match.
+     *
+     * @param User $user
+     * @param User $match
+     * @return string
+     */
+    public function generateMatchExplanation(User $user, User $match): string
+    {
+        $cacheKey = "wingman:match_explanation:{$user->id}:{$match->id}";
+
+        return Cache::remember($cacheKey, 86400, function () use ($user, $match) {
+            $prompt = $this->buildMatchExplanationPrompt($user, $match);
+
+            try {
+                $response = $this->llmManager->driver()->chat([
+                    ['role' => 'system', 'content' => 'You are an insightful relationship expert. Your goal is to explain to a user why they matched with someone else, highlighting shared interests and complementary traits.'],
+                    ['role' => 'user', 'content' => $prompt]
+                ], ['temperature' => 0.7]);
+
+                return $response->content;
+            } catch (\Exception $e) {
+                Log::error("AiWingmanService: Failed to generate match explanation: " . $e->getMessage());
+                return "You both have shared interests and compatible preferences!";
+            }
+        });
+    }
+
     protected function buildIceBreakerPrompt(User $user, User $match): string
     {
         $userInterests = implode(', ', $user->profile->interests ?? []);
@@ -327,5 +355,34 @@ EOT;
                 'reason' => 'Simple, low pressure, and allows for conversation.'
             ]
         ];
+    }
+
+    protected function buildMatchExplanationPrompt(User $user, User $match): string
+    {
+        $userProfile = $user->profile;
+        $matchProfile = $match->profile;
+
+        $userInterests = implode(', ', $userProfile->interests ?? []);
+        $matchInterests = implode(', ', $matchProfile->interests ?? []);
+        
+        $userBio = $userProfile->bio ?? '';
+        $matchBio = $matchProfile->bio ?? '';
+
+        return <<<EOT
+Explain why these two people are a good match based on their profiles:
+
+User (Me):
+- Bio: "{$userBio}"
+- Interests: {$userInterests}
+- Age: {$userProfile->age}
+
+Match (Them):
+- Bio: "{$matchBio}"
+- Interests: {$matchInterests}
+- Age: {$matchProfile->age}
+
+Write a short, encouraging paragraph (2-3 sentences) explaining the compatibility. Address "Me" directly.
+Focus on shared interests, complementary vibes from the bio, or lifestyle compatibility.
+EOT;
     }
 }

@@ -78,8 +78,8 @@ class AIMatchingService
             $count = $interaction->count;
 
             // Analyze age preferences
-            if ($targetUser->profile->date_of_birth) {
-                $age = $targetUser->profile->date_of_birth->diffInYears(now());
+            if ($targetUser->profile->birthdate) {
+                $age = $targetUser->profile->birthdate->diffInYears(now());
                 $behavioralPrefs['preferred_ages'][$age] = 
                     ($behavioralPrefs['preferred_ages'][$age] ?? 0) + ($weight * $count);
             }
@@ -151,7 +151,7 @@ class AIMatchingService
             
             $query->whereHas('profile', function ($q) use ($ageMin, $ageMax) {
                 // SQLite-compatible age calculation
-                $q->whereRaw("(julianday('now') - julianday(date_of_birth)) / 365.25 BETWEEN ? AND ?", [
+                $q->whereRaw("(julianday('now') - julianday(birthdate)) / 365.25 BETWEEN ? AND ?", [
                     $ageMin,
                     $ageMax
                 ]);
@@ -599,9 +599,9 @@ class AIMatchingService
         $score = 0;
 
         // Age compatibility
-        if ($userProfile->date_of_birth && $candidateProfile->date_of_birth) {
-            $userAge = $userProfile->date_of_birth->diffInYears(now());
-            $candidateAge = $candidateProfile->date_of_birth->diffInYears(now());
+        if ($userProfile->birthdate && $candidateProfile->birthdate) {
+            $userAge = $userProfile->birthdate->diffInYears(now());
+            $candidateAge = $candidateProfile->birthdate->diffInYears(now());
             $ageDiff = abs($userAge - $candidateAge);
             $score += max(0, 20 - $ageDiff);
         }
@@ -631,8 +631,8 @@ class AIMatchingService
         $score = 0;
 
         // Age preference matching
-        if ($candidateProfile->date_of_birth) {
-            $age = $candidateProfile->date_of_birth->diffInYears(now());
+        if ($candidateProfile->birthdate) {
+            $age = $candidateProfile->birthdate->diffInYears(now());
             $ageScore = $behavioralPrefs['preferred_ages'][$age] ?? 0;
             $score += min(25, $ageScore);
         }

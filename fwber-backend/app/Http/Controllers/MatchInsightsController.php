@@ -5,16 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\UserMatch;
 use App\Services\AIMatchingService;
+use App\Services\AiWingmanService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class MatchInsightsController extends Controller
 {
     protected AIMatchingService $matchingService;
+    protected AiWingmanService $wingmanService;
 
-    public function __construct(AIMatchingService $matchingService)
+    public function __construct(AIMatchingService $matchingService, AiWingmanService $wingmanService)
     {
         $this->matchingService = $matchingService;
+        $this->wingmanService = $wingmanService;
     }
 
     /**
@@ -56,6 +59,10 @@ class MatchInsightsController extends Controller
         }
 
         $insights = $this->matchingService->getCompatibilityBreakdown($user, $targetUser);
+        
+        // Generate AI explanation
+        $explanation = $this->wingmanService->generateMatchExplanation($user, $targetUser);
+        $insights['ai_explanation'] = $explanation;
 
         return response()->json([
             'success' => true,
