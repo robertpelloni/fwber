@@ -160,4 +160,18 @@ class AiWingmanController extends Controller
 
         return response()->json(['roast' => $result]);
     }
+
+    /**
+     * Generate "Red Flags" and "Green Flags" for the authenticated user's profile.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function checkVibe(Request $request)
+    {
+        $user = Auth::user();
+        $result = $this->wingmanService->checkVibe($user);
+
+        return response()->json($result);
+    }
 }

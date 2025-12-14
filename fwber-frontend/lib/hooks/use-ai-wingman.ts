@@ -16,6 +16,11 @@ interface DateIdeasResponse {
   ideas: DateIdea[];
 }
 
+export interface VibeCheckResponse {
+  green_flags: string[];
+  red_flags: string[];
+}
+
 export function useAiWingman() {
   const [error, setError] = useState<string | null>(null);
 
@@ -56,11 +61,21 @@ export function useAiWingman() {
     },
   });
 
+  const checkVibe = useMutation({
+    mutationFn: async () => {
+      return api.get<VibeCheckResponse>('/wingman/vibe-check');
+    },
+    onError: (err: any) => {
+      setError(err.message || 'Failed to check vibe');
+    },
+  });
+
   return {
     getIceBreakers,
     getReplySuggestions,
     getDateIdeas,
     roastProfile,
+    checkVibe,
     error,
     setError,
   };

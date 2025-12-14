@@ -10,6 +10,7 @@ import { api } from '@/lib/api/client';
 import { BioGenerator } from '@/components/ai/BioGenerator';
 import { ProfileAnalysis } from '@/components/profile/ProfileAnalysis';
 import { ProfileRoast } from '@/components/profile/ProfileRoast';
+import { VibeCheck } from '@/components/profile/VibeCheck';
 
 import { UserProfile } from '@/lib/api/types';
 
@@ -194,6 +195,7 @@ export default function EnhancedProfileEditor() {
       <div className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ProfileAnalysis />
         <ProfileRoast />
+        <VibeCheck />
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">

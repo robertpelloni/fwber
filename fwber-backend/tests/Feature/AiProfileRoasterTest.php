@@ -71,4 +71,36 @@ class AiProfileRoasterTest extends TestCase
                 'roast' => 'You are the absolute best! Coding genius and mountain conqueror!'
             ]);
     }
+
+    public function test_can_check_vibe()
+    {
+        config(['features.ai_wingman' => true]);
+
+        $user = User::factory()->create();
+        UserProfile::factory()->create([
+            'user_id' => $user->id,
+            'bio' => 'I love hiking and coding.',
+        ]);
+
+        $this->actingAs($user);
+
+        // Mock AiWingmanService
+        $this->mock(AiWingmanService::class, function ($mock) {
+            $mock->shouldReceive('checkVibe')
+                ->with(Mockery::type(User::class))
+                ->once()
+                ->andReturn([
+                    'green_flags' => ['Passionate', 'Active'],
+                    'red_flags' => ['Might talk about code too much']
+                ]);
+        });
+
+        $response = $this->getJson('/api/wingman/vibe-check');
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'green_flags' => ['Passionate', 'Active'],
+                'red_flags' => ['Might talk about code too much']
+            ]);
+    }
 }

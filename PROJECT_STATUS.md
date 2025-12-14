@@ -81,6 +81,13 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Frontend**: Added "Daily Streak" stat card to Dashboard.
     -   **Verification**: Feature tests (`StreakTest.php`) passing. Fixed `DashboardController` SQL compatibility (SQLite/MySQL).
     -   **Fixes**: Added missing `match_score` column to `matches` table and created missing `profile_views` table migration.
+6.  **AI Vibe Check**:
+    -   **Concept**: Viral feature where AI analyzes a profile to list "Green Flags" and "Red Flags".
+    -   **Backend**: Implemented `checkVibe` in `AiWingmanService` and `AiWingmanController`.
+    -   **API**: Added `GET /wingman/vibe-check`.
+    -   **Frontend**: Created `VibeCheck` component with shareable UI.
+    -   **Integration**: Added to `ProfilePage` and `EnhancedProfileEditor`.
+    -   **Verification**: Feature tests (`AiProfileRoasterTest.php`) passing.
 
 ### ✅ Privacy Features (Dec 13)
 1.  **Incognito Mode (Ghost Mode)**:

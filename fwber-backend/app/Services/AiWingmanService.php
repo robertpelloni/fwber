@@ -393,6 +393,38 @@ EOT;
         });
     }
 
+    /**
+     * Generate "Red Flags" and "Green Flags" for a user's profile.
+     *
+     * @param User $user
+     * @return array
+     */
+    public function checkVibe(User $user): array
+    {
+        $profile = $user->profile;
+        $updatedAt = $profile ? $profile->updated_at->timestamp : 0;
+        $cacheKey = "wingman:vibe_check:{$user->id}:{$updatedAt}";
+
+        return Cache::remember($cacheKey, 86400, function () use ($user, $profile) {
+            $prompt = $this->buildVibeCheckPrompt($user, $profile);
+
+            try {
+                $response = $this->llmManager->driver()->chat([
+                    ['role' => 'system', 'content' => 'You are a "Vibe Checker". Your job is to analyze dating profiles and identify "Green Flags" (positive traits) and "Red Flags" (potential warning signs or humorous observations). Be witty, observant, and keep it lighthearted.'],
+                    ['role' => 'user', 'content' => $prompt]
+                ], ['temperature' => 0.8]);
+
+                return $this->parseVibeCheck($response->content);
+            } catch (\Exception $e) {
+                Log::error("AiWingmanService: Failed to check vibe: " . $e->getMessage());
+                return [
+                    'green_flags' => ['Mystery', 'Unpredictable'],
+                    'red_flags' => ['Service unavailable', 'Too hot to handle']
+                ];
+            }
+        });
+    }
+
     protected function buildMatchExplanationPrompt(User $user, User $match): string
     {
         $userProfile = $user->profile;
@@ -444,5 +476,47 @@ Profile Details:
 
 Keep it under 280 characters so it's tweetable.
 EOT;
+    }
+
+    protected function buildVibeCheckPrompt(User $user, $profile): string
+    {
+        $bio = $profile->bio ?? 'No bio provided.';
+        $interests = implode(', ', $profile->interests ?? []);
+        $job = $profile->occupation ?? 'Unknown';
+        $age = $profile->age ?? 'Unknown';
+
+        return <<<EOT
+Analyze this dating profile and list "Green Flags" and "Red Flags".
+
+Profile:
+- Age: {$age}
+- Job: {$job}
+- Bio: "{$bio}"
+- Interests: {$interests}
+
+Output a JSON object with exactly these keys:
+- green_flags: (array of 3-5 strings) Positive, attractive traits.
+- red_flags: (array of 3-5 strings) Humorous warning signs or playful critiques.
+
+Keep the flags short (2-5 words each).
+EOT;
+    }
+
+    protected function parseVibeCheck(string $content): array
+    {
+        $content = preg_replace('/^```json\s*|\s*```$/', '', trim($content));
+        $decoded = json_decode($content, true);
+
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            return [
+                'green_flags' => $decoded['green_flags'] ?? [],
+                'red_flags' => $decoded['red_flags'] ?? []
+            ];
+        }
+
+        return [
+            'green_flags' => ['Good vibes only'],
+            'red_flags' => ['AI confusion']
+        ];
     }
 }
