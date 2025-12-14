@@ -585,6 +585,21 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Integration**: This connects the "Discovery" flow to the "Share to Unlock" viral loop.
     -   **Polish**: Replaced `img` with `next/image` in `MatchesPage` for performance.
 
+### ✅ Advanced AI Features (Dec 13)
+1.  **Automated Audio Moderation**:
+    -   **Backend**: Implemented `ContentModerationService` using OpenAI Moderation API.
+    -   **Integration**: Updated `TranscribeAudioMessage` job to flag inappropriate audio content automatically.
+    -   **Database**: Added `is_flagged` column to `messages` table.
+    -   **Verification**: Verified with `ContentModerationServiceTest`.
+2.  **Smart Voice Replies**:
+    -   **Backend**: Updated `AiWingmanService` to use audio transcriptions for generating reply suggestions.
+    -   **Verification**: Verified with `SmartVoiceRepliesTest`.
+3.  **Generative AI Match Explanations**:
+    -   **Backend**: Implemented `generateMatchExplanation` in `AiWingmanService` to provide personalized compatibility summaries.
+    -   **API**: Updated `MatchInsightsController` to include the AI explanation in the response.
+    -   **Fix**: Resolved `AIMatchingService` bug where `date_of_birth` was used instead of `birthdate`.
+    -   **Verification**: Verified with `MatchInsightsTest`.
+
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.
 2.  **API Documentation**: OpenAPI/Swagger docs available at `/api/docs`.
