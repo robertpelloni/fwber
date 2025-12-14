@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import { updateUserProfile, completeOnboarding, getUserProfile, type UserProfile } from '@/lib/api/profile'
 import { usePhotos } from '@/lib/api/photos'
+import { getCurrentGeolocation } from '@/lib/api/location'
 import PhotoUpload from '@/components/PhotoUpload'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card'
@@ -74,6 +75,26 @@ export default function OnboardingPage() {
       }).catch(console.error)
     }
   }, [isAuthenticated, token])
+
+  const handleUseCurrentLocation = async () => {
+    setIsLoading(true)
+    try {
+      const position = await getCurrentGeolocation()
+      setFormData(prev => ({
+        ...prev,
+        location: {
+          ...prev.location,
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        }
+      }))
+    } catch (err) {
+      console.error(err)
+      setError('Could not get location. Please enter manually.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleNext = async () => {
     setError(null)
@@ -208,6 +229,17 @@ export default function OnboardingPage() {
                   placeholder="State"
                 />
               </div>
+            </div>
+            <div className="flex flex-col items-end gap-1">
+              <Button type="button" variant="outline" size="sm" onClick={handleUseCurrentLocation} disabled={isLoading}>
+                <MapPin className="mr-2 h-4 w-4" />
+                Use Current Location
+              </Button>
+              {formData.location.latitude !== 0 && (
+                <p className="text-xs text-green-600">
+                  Coordinates set: {formData.location.latitude.toFixed(4)}, {formData.location.longitude.toFixed(4)}
+                </p>
+              )}
             </div>
           </div>
         )

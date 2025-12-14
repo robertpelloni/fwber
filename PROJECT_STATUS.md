@@ -105,7 +105,7 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 1.  **User Onboarding Wizard**:
     -   **Concept**: A multi-step wizard to guide new users through profile setup (Basics, Photos, Preferences).
     -   **Backend**: Added `onboarding_completed_at` to `users` table. Implemented `OnboardingController` (`status`, `complete`).
-    -   **Frontend**: Created `/onboarding` page with step-by-step form.
+    -   **Frontend**: Created `/onboarding` page with step-by-step form. Added **Geolocation** support ("Use Current Location") to automatically fill coordinates.
     -   **Logic**: Updated `AuthContext` and `ProtectedRoute` to redirect incomplete users to the wizard.
     -   **Verification**: Manual verification of flow and redirection logic. Frontend build passing.
 
