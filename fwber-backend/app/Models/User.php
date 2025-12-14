@@ -27,6 +27,7 @@ class User extends Authenticatable
         'current_streak',
         'last_active_at',
         'golden_tickets_remaining',
+        'onboarding_completed_at',
     ];
 
     protected $hidden = [
@@ -46,6 +47,7 @@ class User extends Authenticatable
         'last_active_at' => 'datetime',
         'current_streak' => 'integer',
         'golden_tickets_remaining' => 'integer',
+        'onboarding_completed_at' => 'datetime',
     ];
 
     protected $appends = [

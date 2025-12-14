@@ -15,6 +15,7 @@ interface User {
   referral_code?: string
   golden_tickets_remaining?: number
   token_balance?: number
+  onboarding_completed_at?: string | null
   profile?: {
     displayName: string | null
     dateOfBirth: string | null

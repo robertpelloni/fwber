@@ -304,3 +304,40 @@ export async function searchUsers(token: string, searchTerm: string): Promise<Us
   const data = await response.json();
   return data.data || data;
 }
+
+export interface OnboardingStatus {
+  completed: boolean;
+  completed_at: string | null;
+}
+
+export async function getOnboardingStatus(token: string): Promise<OnboardingStatus> {
+  const response = await fetch(`${API_BASE_URL}/onboarding/status`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to get onboarding status');
+  }
+
+  return response.json();
+}
+
+export async function completeOnboarding(token: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/onboarding/complete`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to complete onboarding');
+  }
+}

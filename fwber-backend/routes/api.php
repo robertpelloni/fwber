@@ -139,6 +139,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('profile/completeness', [\App\Http\Controllers\ProfileController::class, 'completeness']);
     Route::get('profile/export', [\App\Http\Controllers\ProfileController::class, 'export']);
 
+    // Onboarding
+    Route::get('onboarding/status', [\App\Http\Controllers\OnboardingController::class, 'getStatus']);
+    Route::post('onboarding/complete', [\App\Http\Controllers\OnboardingController::class, 'complete']);
+
     // Physical Profile
     Route::get('physical-profile', [\App\Http\Controllers\Api\UserPhysicalProfileController::class, 'show']);
     Route::put('physical-profile', [\App\Http\Controllers\Api\UserPhysicalProfileController::class, 'upsert']);

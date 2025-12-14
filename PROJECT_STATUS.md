@@ -101,6 +101,14 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Integration**: Integrated all 5 AI Wingman tools into `EnhancedProfileEditor` under "AI Wingman Insights".
     -   **Verification**: Code implementation complete.
 
+### ✅ User Experience Refinement (Dec 14)
+1.  **User Onboarding Wizard**:
+    -   **Concept**: A multi-step wizard to guide new users through profile setup (Basics, Photos, Preferences).
+    -   **Backend**: Added `onboarding_completed_at` to `users` table. Implemented `OnboardingController` (`status`, `complete`).
+    -   **Frontend**: Created `/onboarding` page with step-by-step form.
+    -   **Logic**: Updated `AuthContext` and `ProtectedRoute` to redirect incomplete users to the wizard.
+    -   **Verification**: Manual verification of flow and redirection logic.
+
 ### ✅ Privacy Features (Dec 13)
 1.  **Incognito Mode (Ghost Mode)**:
     -   **Concept**: Users can browse without being seen by others, unless they initiate contact (like/super-like).

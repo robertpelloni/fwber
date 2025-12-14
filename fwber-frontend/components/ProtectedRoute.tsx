@@ -7,20 +7,30 @@ import { useEffect, ReactNode } from 'react'
 interface ProtectedRouteProps {
   children: ReactNode
   redirectTo?: string
+  requireOnboarding?: boolean
 }
 
 export default function ProtectedRoute({ 
   children, 
-  redirectTo = '/login' 
+  redirectTo = '/login',
+  requireOnboarding = true
 }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading } = useAuth()
+  const { isAuthenticated, isLoading, user } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push(redirectTo)
+    if (!isLoading) {
+      if (!isAuthenticated) {
+        router.push(redirectTo)
+      } else if (requireOnboarding && user && !user.onboarding_completed_at) {
+        // Check if we are already on the onboarding page to avoid loops
+        // Note: This check is basic; ideally we'd check pathname but router doesn't expose it directly in this hook easily without usePathname
+        // But since this component wraps pages, the page itself determines if it uses ProtectedRoute.
+        // OnboardingPage should use ProtectedRoute with requireOnboarding={false}
+        router.push('/onboarding')
+      }
     }
-  }, [isAuthenticated, isLoading, router, redirectTo])
+  }, [isAuthenticated, isLoading, router, redirectTo, requireOnboarding, user])
 
   // Show loading while checking authentication
   if (isLoading) {
