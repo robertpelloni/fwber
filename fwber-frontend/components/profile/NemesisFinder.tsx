@@ -57,7 +57,7 @@ export function NemesisFinder() {
           <div>
             <h3 className="text-lg font-semibold text-white">Scientific Nemesis</h3>
             <p className="text-sm text-gray-400 mt-1">
-              Use advanced "science" to find your absolute worst match.
+              Use advanced &quot;science&quot; to find your absolute worst match.
             </p>
           </div>
           <Button 

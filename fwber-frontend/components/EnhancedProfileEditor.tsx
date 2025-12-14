@@ -11,6 +11,9 @@ import { BioGenerator } from '@/components/ai/BioGenerator';
 import { ProfileAnalysis } from '@/components/profile/ProfileAnalysis';
 import { ProfileRoast } from '@/components/profile/ProfileRoast';
 import { VibeCheck } from '@/components/profile/VibeCheck';
+import { DatingFortune } from '@/components/profile/DatingFortune';
+import { CosmicMatch } from '@/components/profile/CosmicMatch';
+import { NemesisFinder } from '@/components/profile/NemesisFinder';
 
 import { UserProfile } from '@/lib/api/types';
 
@@ -191,11 +194,20 @@ export default function EnhancedProfileEditor() {
         )}
       </div>
 
-      {/* AI Profile Analysis & Roast */}
-      <div className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ProfileAnalysis />
-        <ProfileRoast />
-        <VibeCheck />
+      {/* AI Wingman Insights */}
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <Sparkles className="w-5 h-5 text-purple-600" />
+          AI Wingman Insights
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <ProfileAnalysis />
+          <ProfileRoast />
+          <VibeCheck />
+          <DatingFortune />
+          <CosmicMatch />
+          <NemesisFinder />
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
