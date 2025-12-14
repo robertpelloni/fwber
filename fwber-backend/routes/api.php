@@ -327,7 +327,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('photos/reorder', [\App\Http\Controllers\PhotoController::class, 'reorder']);
     });
     Route::post('photos/{id}/reveal', [\App\Http\Controllers\PhotoController::class, 'reveal']);
-    Route::post('photos/{id}/unlock', [\App\Http\Controllers\PhotoUnlockController::class, 'unlock']);
+    Route::post('photos/{id}/unlock', [\App\Http\Controllers\PhotoController::class, 'unlock']);
     Route::get('photos/{id}/original', [\App\Http\Controllers\PhotoController::class, 'original']);
     Route::get('photos', [\App\Http\Controllers\PhotoController::class, 'index']);
     Route::get('photos/{id}', [\App\Http\Controllers\PhotoController::class, 'show']);
