@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { 
   User, Mail, MapPin, Calendar, Heart, MessageSquare, 
-  Save, Loader2, CheckCircle2, AlertCircle, Info, Eye, EyeOff 
+  Save, Loader2, CheckCircle2, AlertCircle, Info, Eye, EyeOff, Sparkles 
 } from 'lucide-react';
 import { api } from '@/lib/api/client';
 import { BioGenerator } from '@/components/ai/BioGenerator';
