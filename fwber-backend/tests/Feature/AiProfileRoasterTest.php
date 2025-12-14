@@ -31,6 +31,7 @@ class AiProfileRoasterTest extends TestCase
         // Mock AiWingmanService
         $this->mock(AiWingmanService::class, function ($mock) {
             $mock->shouldReceive('roastProfile')
+                ->with(Mockery::type(User::class), 'roast')
                 ->once()
                 ->andReturn('Look at you, a coding hiker. How original. Do you debug trails too?');
         });
@@ -40,6 +41,34 @@ class AiProfileRoasterTest extends TestCase
         $response->assertStatus(200)
             ->assertJson([
                 'roast' => 'Look at you, a coding hiker. How original. Do you debug trails too?'
+            ]);
+    }
+
+    public function test_can_hype_profile()
+    {
+        config(['features.ai_wingman' => true]);
+
+        $user = User::factory()->create();
+        UserProfile::factory()->create([
+            'user_id' => $user->id,
+            'bio' => 'I love hiking and coding.',
+        ]);
+
+        $this->actingAs($user);
+
+        // Mock AiWingmanService
+        $this->mock(AiWingmanService::class, function ($mock) {
+            $mock->shouldReceive('roastProfile')
+                ->with(Mockery::type(User::class), 'hype')
+                ->once()
+                ->andReturn('You are the absolute best! Coding genius and mountain conqueror!');
+        });
+
+        $response = $this->postJson('/api/wingman/roast', ['mode' => 'hype']);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'roast' => 'You are the absolute best! Coding genius and mountain conqueror!'
             ]);
     }
 }
