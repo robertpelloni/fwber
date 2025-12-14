@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
@@ -21,20 +21,7 @@ export default function PublicProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [actionPerformed, setActionPerformed] = useState(false);
 
-  useEffect(() => {
-    if (token && id) {
-      loadProfile();
-    }
-  }, [token, id]);
-
-  useEffect(() => {
-    // Record Wingman Assist if present
-    if (token && wingmanId && id && !actionPerformed) {
-      recordAssist();
-    }
-  }, [token, wingmanId, id]);
-
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     try {
       setIsLoading(true);
       const data = await getPublicProfile(token!, Number(id));
@@ -44,9 +31,9 @@ export default function PublicProfilePage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [token, id]);
 
-  const recordAssist = async () => {
+  const recordAssist = useCallback(async () => {
     try {
       await api.post('/wingman/assist', {
         subject_id: Number(id),
@@ -56,7 +43,20 @@ export default function PublicProfilePage() {
     } catch (err) {
       console.error('Failed to record assist', err);
     }
-  };
+  }, [id, wingmanId]);
+
+  useEffect(() => {
+    if (token && id) {
+      loadProfile();
+    }
+  }, [token, id, loadProfile]);
+
+  useEffect(() => {
+    // Record Wingman Assist if present
+    if (token && wingmanId && id && !actionPerformed) {
+      recordAssist();
+    }
+  }, [token, wingmanId, id, actionPerformed, recordAssist]);
 
   const handleAction = async (action: 'like' | 'pass') => {
     if (!token || !profile) return;

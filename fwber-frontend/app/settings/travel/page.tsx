@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useAuth } from '@/lib/auth-context';
@@ -30,13 +30,7 @@ export default function TravelModePage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (token) {
-      loadProfile();
-    }
-  }, [token]);
-
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getUserProfile(token!);
@@ -56,7 +50,13 @@ export default function TravelModePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    if (token) {
+      loadProfile();
+    }
+  }, [token, loadProfile]);
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;

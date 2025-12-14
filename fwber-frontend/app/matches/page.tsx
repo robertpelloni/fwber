@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, X, Star, MessageCircle, MapPin, Info } from 'lucide-react';
@@ -19,11 +19,7 @@ export default function MatchesPage() {
   const { success, error, ToastContainer } = useToast();
   const router = useRouter();
 
-  useEffect(() => {
-    fetchMatches();
-  }, []);
-
-  const fetchMatches = async (filters = {}) => {
+  const fetchMatches = useCallback(async (filters = {}) => {
     try {
       setLoading(true);
       const response = await api.get('/matches', { params: filters }) as any;
@@ -35,7 +31,11 @@ export default function MatchesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [error]);
+
+  useEffect(() => {
+    fetchMatches();
+  }, [fetchMatches]);
 
   const handleAction = async (action: 'like' | 'pass' | 'super_like') => {
     if (!matches[currentIndex]) return;

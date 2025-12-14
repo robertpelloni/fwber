@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -21,11 +21,7 @@ export default function FriendsPage() {
   const { success, error, ToastContainer } = useToast();
   const router = useRouter();
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const [friendsRes, requestsRes] = await Promise.all([
         api.get('/friends'),
@@ -39,7 +35,11 @@ export default function FriendsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [error]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();

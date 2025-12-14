@@ -32,6 +32,12 @@ Schedule::job(new CleanupExpiredSubscriptions)->dailyAt('02:00')
     ->name('cleanup-expired-subscriptions')
     ->withoutOverlapping();
 
+// Analyze slow requests for performance alerts every hour
+use App\Jobs\AnalyzeSlowRequests;
+Schedule::job(new AnalyzeSlowRequests)->hourly()
+    ->name('analyze-slow-requests')
+    ->withoutOverlapping();
+
 // Cache warming
 Schedule::command('cache:warm')->everyFiveMinutes()
     ->name('warm-cache')
