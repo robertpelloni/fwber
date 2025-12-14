@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PhotoUnlock extends Model
 {
-    protected $fillable = ['user_id', 'photo_id', 'cost'];
+    protected $fillable = ['user_id', 'photo_id', 'cost', 'unlocked_at'];
 
     public function user(): BelongsTo
     {
