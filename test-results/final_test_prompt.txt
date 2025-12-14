@@ -1,1 +1,0 @@
-﻿Use the available MCP tools to list the current directory contents and provide a brief project overview.

@@ -18,6 +18,8 @@
 !/storage/logs/.gitignore
 .env
 .env.backup
+.env.bak
+.env.local
 .env.production
 .phpunit.result.cache
 Homestead.json
