@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Photo;
 use App\Models\PhotoUnlock;
+use App\Models\TokenTransaction;
 use App\Models\User;
+use App\Notifications\PhotoUnlockedNotification;
 use App\Services\MediaAnalysis\MediaAnalysisInterface;
 use App\Services\TelemetryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -667,6 +670,95 @@ class PhotoController extends Controller
                 'error' => $e->getMessage()
             ]);
             return response()->json(['message' => 'Error revealing photo'], 500);
+        }
+    }
+
+    /**
+     * Unlock a private photo using tokens
+     * 
+     * @OA\Post(
+     *   path="/photos/{id}/unlock",
+     *   tags={"Photos"},
+     *   summary="Unlock private photo",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Photo unlocked"),
+     *   @OA\Response(response=402, description="Insufficient tokens"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     * )
+     */
+    public function unlock(int $id): JsonResponse
+    {
+        try {
+            $user = auth()->user();
+            $photo = Photo::findOrFail($id);
+            
+            // 1. Check if already unlocked or owner
+            if ($photo->user_id === $user->id) {
+                return response()->json(['success' => true, 'message' => 'You own this photo', 'balance' => $user->token_balance]);
+            }
+
+            if (PhotoUnlock::where('user_id', $user->id)->where('photo_id', $photo->id)->exists()) {
+                return response()->json(['success' => true, 'message' => 'Already unlocked', 'balance' => $user->token_balance]);
+            }
+
+            // 2. Check balance
+            $cost = 50; // Hardcoded for now, could be dynamic
+            if ($user->token_balance < $cost) {
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Insufficient tokens. You need ' . $cost . ' tokens.',
+                    'required' => $cost,
+                    'balance' => $user->token_balance
+                ], 402);
+            }
+
+            // 3. Process Transaction
+            DB::beginTransaction();
+            try {
+                // Deduct tokens
+                $user->decrement('token_balance', $cost);
+                
+                // Record transaction
+                TokenTransaction::create([
+                    'user_id' => $user->id,
+                    'amount' => -$cost,
+                    'type' => 'photo_unlock',
+                    'description' => 'Unlocked private photo #' . $photo->id,
+                    'metadata' => ['photo_id' => $photo->id, 'owner_id' => $photo->user_id]
+                ]);
+
+                // Create unlock record
+                PhotoUnlock::create([
+                    'user_id' => $user->id,
+                    'photo_id' => $photo->id,
+                    'unlocked_at' => now(),
+                    'cost' => $cost
+                ]);
+
+                // Notify owner
+                $photo->user->notify(new PhotoUnlockedNotification($user, $photo));
+
+                DB::commit();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Photo unlocked successfully',
+                    'balance' => $user->fresh()->token_balance
+                ]);
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Photo unlock error', [
+                'user_id' => auth()->id(),
+                'photo_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json(['message' => 'Error unlocking photo'], 500);
         }
     }
 
