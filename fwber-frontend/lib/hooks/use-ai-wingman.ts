@@ -25,6 +25,20 @@ export interface FortuneResponse {
   fortune: string;
 }
 
+export interface CosmicMatchResponse {
+  best_match: string;
+  best_reason: string;
+  worst_match: string;
+  worst_reason: string;
+}
+
+export interface NemesisResponse {
+  nemesis_type: string;
+  clashing_traits: string[];
+  why_it_would_fail: string;
+  scientific_explanation: string;
+}
+
 export function useAiWingman() {
   const [error, setError] = useState<string | null>(null);
 
@@ -83,6 +97,24 @@ export function useAiWingman() {
     },
   });
 
+  const getCosmicMatch = useMutation({
+    mutationFn: async () => {
+      return api.get<CosmicMatchResponse>('/wingman/cosmic-match');
+    },
+    onError: (err: any) => {
+      setError(err.message || 'Failed to get cosmic match');
+    },
+  });
+
+  const findNemesis = useMutation({
+    mutationFn: async () => {
+      return api.get<NemesisResponse>('/wingman/nemesis');
+    },
+    onError: (err: any) => {
+      setError(err.message || 'Failed to find nemesis');
+    },
+  });
+
   return {
     getIceBreakers,
     getReplySuggestions,
@@ -90,6 +122,8 @@ export function useAiWingman() {
     roastProfile,
     checkVibe,
     predictFortune,
+    getCosmicMatch,
+    findNemesis,
     error,
     setError,
   };

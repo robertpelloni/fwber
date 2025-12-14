@@ -454,6 +454,40 @@ EOT;
         });
     }
 
+    /**
+     * Generate a "Cosmic Match" prediction for the user.
+     *
+     * @param User $user
+     * @return array
+     */
+    public function predictCosmicMatch(User $user): array
+    {
+        $profile = $user->profile;
+        $updatedAt = $profile ? $profile->updated_at->timestamp : 0;
+        $cacheKey = "wingman:cosmic_match:{$user->id}:{$updatedAt}";
+
+        return Cache::remember($cacheKey, 86400, function () use ($user, $profile) {
+            $prompt = $this->buildCosmicMatchPrompt($user, $profile);
+
+            try {
+                $response = $this->llmManager->driver()->chat([
+                    ['role' => 'system', 'content' => 'You are an expert astrologer and dating coach. Your job is to analyze profiles and determine the best and worst zodiac matches based on personality traits inferred from the bio and interests.'],
+                    ['role' => 'user', 'content' => $prompt]
+                ], ['temperature' => 0.8]);
+
+                return $this->parseCosmicMatch($response->content);
+            } catch (\Exception $e) {
+                Log::error("AiWingmanService: Failed to predict cosmic match: " . $e->getMessage());
+                return [
+                    'best_match' => 'Unknown',
+                    'best_reason' => 'The stars are cloudy today.',
+                    'worst_match' => 'Unknown',
+                    'worst_reason' => 'Try again later.'
+                ];
+            }
+        });
+    }
+
     protected function buildMatchExplanationPrompt(User $user, User $match): string
     {
         $userProfile = $user->profile;
@@ -552,6 +586,54 @@ It should be slightly mystical but grounded in their profile details if possible
 EOT;
     }
 
+    protected function buildCosmicMatchPrompt(User $user, $profile): string
+    {
+        $bio = $profile->bio ?? 'No bio provided.';
+        $interests = implode(', ', $profile->interests ?? []);
+        $job = $profile->occupation ?? 'Unknown';
+        $age = $profile->age ?? 'Unknown';
+        $zodiac = $profile->zodiac_sign ?? 'Unknown';
+
+        return <<<EOT
+Analyze this dating profile and determine their "Cosmic Match" (Best Zodiac Sign) and "Cosmic Clash" (Worst Zodiac Sign).
+
+Profile:
+- Zodiac Sign: {$zodiac}
+- Age: {$age}
+- Job: {$job}
+- Bio: "{$bio}"
+- Interests: {$interests}
+
+Output a JSON object with exactly these keys:
+- best_match: (string) The Zodiac sign that is their soulmate.
+- best_reason: (string) A short, witty explanation why (1-2 sentences).
+- worst_match: (string) The Zodiac sign they should avoid.
+- worst_reason: (string) A short, witty explanation why (1-2 sentences).
+EOT;
+    }
+
+    protected function parseCosmicMatch(string $content): array
+    {
+        $content = preg_replace('/^```json\s*|\s*```$/', '', trim($content));
+        $decoded = json_decode($content, true);
+
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            return [
+                'best_match' => $decoded['best_match'] ?? 'Leo',
+                'best_reason' => $decoded['best_reason'] ?? 'Because you need some drama.',
+                'worst_match' => $decoded['worst_match'] ?? 'Scorpio',
+                'worst_reason' => $decoded['worst_reason'] ?? 'Too intense for you.'
+            ];
+        }
+
+        return [
+            'best_match' => 'Libra',
+            'best_reason' => 'Balance is key.',
+            'worst_match' => 'Gemini',
+            'worst_reason' => 'Two faces are too many.'
+        ];
+    }
+
     protected function parseVibeCheck(string $content): array
     {
         $content = preg_replace('/^```json\s*|\s*```$/', '', trim($content));
@@ -567,6 +649,90 @@ EOT;
         return [
             'green_flags' => ['Good vibes only'],
             'red_flags' => ['AI confusion']
+        ];
+    }
+
+    /**
+     * Generate a "Scientific Nemesis" profile for the user.
+     *
+     * @param User $user
+     * @return array
+     */
+    public function findNemesis(User $user): array
+    {
+        $profile = $user->profile;
+        $updatedAt = $profile ? $profile->updated_at->timestamp : 0;
+        $cacheKey = "wingman:nemesis:{$user->id}:{$updatedAt}";
+
+        return Cache::remember($cacheKey, 86400, function () use ($user, $profile) {
+            $prompt = $this->buildNemesisPrompt($user, $profile);
+
+            try {
+                $response = $this->llmManager->driver()->chat([
+                    ['role' => 'system', 'content' => 'You are a "Scientific Matchmaker" gone rogue. Your job is to use psychological principles (Big Five, Myers-Briggs, etc.) to identify the absolute worst possible romantic match for a user. Be specific, analytical, but humorous.'],
+                    ['role' => 'user', 'content' => $prompt]
+                ], ['temperature' => 0.8]);
+
+                return $this->parseNemesis($response->content);
+            } catch (\Exception $e) {
+                Log::error("AiWingmanService: Failed to find nemesis: " . $e->getMessage());
+                return [
+                    'nemesis_type' => 'The Void',
+                    'clashing_traits' => ['Everything'],
+                    'why_it_would_fail' => 'Matter and anti-matter do not mix.',
+                    'scientific_explanation' => 'Total protonic reversal.'
+                ];
+            }
+        });
+    }
+
+    protected function buildNemesisPrompt(User $user, $profile): string
+    {
+        $bio = $profile->bio ?? 'No bio provided.';
+        $interests = implode(', ', $profile->interests ?? []);
+        $job = $profile->occupation ?? 'Unknown';
+        $age = $profile->age ?? 'Unknown';
+        $mbti = $profile->mbti ?? 'Unknown'; // Assuming we might have this, or just infer it
+
+        return <<<EOT
+Analyze this dating profile and construct their "Scientific Nemesis" (The person they are statistically least likely to succeed with).
+
+Profile:
+- Age: {$age}
+- Job: {$job}
+- Bio: "{$bio}"
+- Interests: {$interests}
+- MBTI/Personality: {$mbti}
+
+Output a JSON object with exactly these keys:
+- nemesis_type: (string) A creative name for this archetype (e.g., "The Chaos Agent", "The Rigid Bureaucrat").
+- clashing_traits: (array of 3 strings) Specific traits that would drive the user crazy.
+- why_it_would_fail: (string) A scenario describing a disastrous date or interaction (1-2 sentences).
+- scientific_explanation: (string) A pseudo-scientific explanation referencing personality theory (e.g., "High Openness vs. Extreme Conscientiousness clash").
+
+Keep it fun but sound "smart".
+EOT;
+    }
+
+    protected function parseNemesis(string $content): array
+    {
+        $content = preg_replace('/^```json\s*|\s*```$/', '', trim($content));
+        $decoded = json_decode($content, true);
+
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            return [
+                'nemesis_type' => $decoded['nemesis_type'] ?? 'The Unknown',
+                'clashing_traits' => $decoded['clashing_traits'] ?? ['Mystery', 'Silence', 'Void'],
+                'why_it_would_fail' => $decoded['why_it_would_fail'] ?? 'You would simply cease to exist.',
+                'scientific_explanation' => $decoded['scientific_explanation'] ?? 'Data insufficient for meaningful analysis.'
+            ];
+        }
+
+        return [
+            'nemesis_type' => 'The Mirror',
+            'clashing_traits' => ['Narcissism', 'Ego', 'Volume'],
+            'why_it_would_fail' => 'You would fight over who gets to talk first.',
+            'scientific_explanation' => 'Identical magnetic poles repel.'
         ];
     }
 }

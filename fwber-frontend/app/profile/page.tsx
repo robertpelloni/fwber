@@ -17,6 +17,8 @@ import { ProfileRoast } from '@/components/profile/ProfileRoast'
 import { ProfileAnalysis } from '@/components/profile/ProfileAnalysis'
 import { VibeCheck } from '@/components/profile/VibeCheck'
 import { DatingFortune } from '@/components/profile/DatingFortune'
+import { CosmicMatch } from '@/components/profile/CosmicMatch'
+import { NemesisFinder } from '@/components/profile/NemesisFinder'
 
 export default function ProfilePage() {
   const { isAuthenticated, user, token, isLoading: authLoading } = useAuth()
@@ -486,6 +488,8 @@ export default function ProfilePage() {
           <ProfileRoast />
           <VibeCheck />
           <DatingFortune />
+          <CosmicMatch />
+          <NemesisFinder />
         </div>
 
         {/* Profile Form */}

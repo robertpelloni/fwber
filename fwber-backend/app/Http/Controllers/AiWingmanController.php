@@ -188,4 +188,32 @@ class AiWingmanController extends Controller
 
         return response()->json(['fortune' => $result]);
     }
+
+    /**
+     * Generate a "Cosmic Match" prediction for the authenticated user.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getCosmicMatch(Request $request)
+    {
+        $user = Auth::user();
+        $result = $this->wingmanService->predictCosmicMatch($user);
+
+        return response()->json($result);
+    }
+
+    /**
+     * Generate a "Scientific Nemesis" profile for the authenticated user.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function findNemesis(Request $request)
+    {
+        $user = Auth::user();
+        $result = $this->wingmanService->findNemesis($user);
+
+        return response()->json($result);
+    }
 }
