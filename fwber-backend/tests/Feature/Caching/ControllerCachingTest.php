@@ -24,7 +24,7 @@ class ControllerCachingTest extends TestCase
             "gender" => "male",
             "location_name" => "Test City",
         ]);
-        $token = ApiToken::generateForUser($user, "test");
+        $token = $user->createToken("test")->plainTextToken;
 
         Cache::shouldReceive('tags')
             ->once()
@@ -55,7 +55,7 @@ class ControllerCachingTest extends TestCase
             'latitude' => 40.7128,
             'longitude' => -74.0060
         ]);
-        $token = ApiToken::generateForUser($user, "test");
+        $token = $user->createToken("test")->plainTextToken;
 
         $expectedKeyPart = 'proximity:feed:lat:40.713:lng:-74.006';
 
@@ -84,7 +84,7 @@ class ControllerCachingTest extends TestCase
             "gender" => "male",
             "location_name" => "Test City",
         ]);
-        $token = ApiToken::generateForUser($user, "test");
+        $token = $user->createToken("test")->plainTextToken;
 
         Cache::shouldReceive('tags')
             ->once()
