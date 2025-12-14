@@ -703,7 +703,7 @@ class PhotoController extends Controller
             }
 
             // 2. Check balance
-            $cost = 50; // Hardcoded for now, could be dynamic
+            $cost = config('economy.photo_unlock_cost', 50);
             if ($user->token_balance < $cost) {
                 return response()->json([
                     'success' => false, 

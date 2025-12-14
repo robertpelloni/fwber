@@ -16,6 +16,7 @@ class PhotoUnlockTest extends TestCase
     public function test_user_can_unlock_private_photo_with_sufficient_tokens()
     {
         Notification::fake();
+        $cost = config('economy.photo_unlock_cost', 50);
 
         $owner = User::factory()->create();
         $photo = Photo::factory()->create([
@@ -24,7 +25,7 @@ class PhotoUnlockTest extends TestCase
         ]);
 
         $unlocker = User::factory()->create([
-            'token_balance' => 100,
+            'token_balance' => $cost + 50,
         ]);
 
         $response = $this->actingAs($unlocker)
@@ -36,11 +37,12 @@ class PhotoUnlockTest extends TestCase
         $this->assertDatabaseHas('photo_unlocks', [
             'user_id' => $unlocker->id,
             'photo_id' => $photo->id,
+            'cost' => $cost,
         ]);
 
         $this->assertDatabaseHas('users', [
             'id' => $unlocker->id,
-            'token_balance' => 50, // 100 - 50
+            'token_balance' => 50, // ($cost + 50) - $cost
         ]);
 
         Notification::assertSentTo(

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { X, Clock, CheckCircle, UserCheck, Share2 } from 'lucide-react'
 import PhotoRevealGate from './PhotoRevealGate'
 import SecurePhotoReveal from './SecurePhotoReveal'
@@ -36,12 +37,13 @@ interface ProfileViewModalProps {
 }
 
 export default function ProfileViewModal({ isOpen, onClose, user, messagesExchanged, matchId }: ProfileViewModalProps) {
+  const router = useRouter()
   const [isVisible, setIsVisible] = useState(false)
   const [isUnlockedViaShare, setIsUnlockedViaShare] = useState(false)
   const [locallyUnlockedPhotos, setLocallyUnlockedPhotos] = useState<Set<number>>(new Set())
   const { isEnabled: faceRevealEnabled } = useFeatureFlag('face_reveal')
   const { onlineUsers } = usePresenceContext()
-  const { showSuccess, showError } = useToast()
+  const { showSuccess, showError, addToast } = useToast()
   
   const { 
     tierData,
@@ -111,7 +113,24 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
       }
     } catch (error) {
       console.error('Unlock failed', error)
-      showError("Unlock Failed", error instanceof Error ? error.message : "Could not unlock photo")
+      const errorMessage = error instanceof Error ? error.message : "Could not unlock photo"
+      
+      if (errorMessage.includes('Insufficient tokens')) {
+        addToast({
+          type: 'error',
+          title: 'Insufficient Tokens',
+          message: 'You need more tokens to unlock this photo.',
+          action: {
+            label: 'Buy Tokens',
+            onClick: () => {
+              onClose()
+              router.push('/wallet')
+            }
+          }
+        })
+      } else {
+        showError("Unlock Failed", errorMessage)
+      }
     }
   }
 

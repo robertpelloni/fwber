@@ -88,6 +88,12 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Frontend**: Created `VibeCheck` component with shareable UI.
     -   **Integration**: Added to `ProfilePage` and `EnhancedProfileEditor`.
     -   **Verification**: Feature tests (`AiProfileRoasterTest.php`) passing.
+7.  **Pay-to-Unlock Photos**:
+    -   **Concept**: Users can unlock private photos by paying tokens.
+    -   **Backend**: Implemented `PhotoUnlock` model and `PhotoController::unlock` with transaction safety.
+    -   **Frontend**: Updated `PhotoRevealGate` to show lock overlay and "Unlock" button. Wired `ProfileViewModal` to API.
+    -   **Notifications**: Implemented `PhotoUnlockedNotification` to alert owners.
+    -   **Verification**: Feature tests (`PhotoUnlockTest.php`) passing.
 
 ### ✅ Privacy Features (Dec 13)
 1.  **Incognito Mode (Ghost Mode)**:
