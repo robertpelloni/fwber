@@ -68,7 +68,12 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 3.  **Community Leaderboard**:
     -   **Backend**: Updated `TokenController` to return "Top Wingmen" stats.
     -   **Frontend**: Updated `LeaderboardPage` to display top matchmakers alongside token holders and referrers.
-4.  **Daily Streaks (Gamification)**:
+4.  **AI Profile Roast**:
+    -   **Concept**: Viral feature where AI humorously critiques a user's profile to encourage social sharing.
+    -   **Backend**: Implemented `roastProfile` in `AiWingmanService` using a "Roast Master" persona.
+    -   **API**: Added `POST /wingman/roast` endpoint.
+    -   **Verification**: Feature tests (`AiProfileRoasterTest.php`) passing.
+5.  **Daily Streaks (Gamification)**:
     -   **Concept**: Track consecutive days of user activity to encourage retention.
     -   **Backend**: Implemented `StreakService`, updated `User` model with `current_streak` and `last_active_at`.
     -   **Frontend**: Added "Daily Streak" stat card to Dashboard.

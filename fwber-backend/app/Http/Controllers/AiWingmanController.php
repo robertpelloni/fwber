@@ -140,4 +140,18 @@ class AiWingmanController extends Controller
 
         return response()->json(['ideas' => $ideas]);
     }
+
+    /**
+     * Generate a roast of the authenticated user's profile.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function roastProfile(Request $request)
+    {
+        $user = Auth::user();
+        $roast = $this->wingmanService->roastProfile($user);
+
+        return response()->json(['roast' => $roast]);
+    }
 }

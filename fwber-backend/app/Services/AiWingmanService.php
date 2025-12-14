@@ -357,6 +357,35 @@ EOT;
         ];
     }
 
+    /**
+     * Generate a humorous "roast" of the user's profile.
+     *
+     * @param User $user
+     * @return string
+     */
+    public function roastProfile(User $user): string
+    {
+        $profile = $user->profile;
+        $updatedAt = $profile ? $profile->updated_at->timestamp : 0;
+        $cacheKey = "wingman:roast:{$user->id}:{$updatedAt}";
+
+        return Cache::remember($cacheKey, 86400, function () use ($user, $profile) {
+            $prompt = $this->buildRoastPrompt($user, $profile);
+
+            try {
+                $response = $this->llmManager->driver()->chat([
+                    ['role' => 'system', 'content' => 'You are a professional comedian and roast master. Your goal is to humorously critique dating profiles. Be savage but keep it fun and safe (no hate speech).'],
+                    ['role' => 'user', 'content' => $prompt]
+                ], ['temperature' => 0.9]);
+
+                return $response->content;
+            } catch (\Exception $e) {
+                Log::error("AiWingmanService: Failed to roast profile: " . $e->getMessage());
+                return "Your profile is so perfect I can't even find anything to roast! (Or maybe my servers are just busy...)";
+            }
+        });
+    }
+
     protected function buildMatchExplanationPrompt(User $user, User $match): string
     {
         $userProfile = $user->profile;
@@ -383,6 +412,26 @@ Match (Them):
 
 Write a short, encouraging paragraph (2-3 sentences) explaining the compatibility. Address "Me" directly.
 Focus on shared interests, complementary vibes from the bio, or lifestyle compatibility.
+EOT;
+    }
+
+    protected function buildRoastPrompt(User $user, $profile): string
+    {
+        $bio = $profile->bio ?? 'No bio provided.';
+        $interests = implode(', ', $profile->interests ?? []);
+        $job = $profile->occupation ?? 'Unemployed';
+        $age = $profile->age ?? 'Unknown age';
+        
+        return <<<EOT
+Roast this dating profile. Be funny, witty, and slightly mean, but don't cross the line into harassment.
+
+Profile Details:
+- Age: {$age}
+- Job: {$job}
+- Bio: "{$bio}"
+- Interests: {$interests}
+
+Make fun of their clichés, their job, or their lack of effort. Keep it under 280 characters so it's tweetable.
 EOT;
     }
 }
