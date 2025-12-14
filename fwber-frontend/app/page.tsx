@@ -440,7 +440,7 @@ export default function HomePage() {
                   <h3 className="text-xl font-bold text-gray-900 mb-2">Open Source & Transparent</h3>
                   <p className="text-gray-600">
                     We have nothing to hide. Our code is open source, so you can verify our security claims yourself. 
-                    Built by the community, for the community.
+                    Built by the community, for the community. <a href="https://github.com/robertpelloni/fwber" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View on GitHub</a>
                   </p>
                 </div>
               </div>
