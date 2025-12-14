@@ -72,7 +72,9 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Concept**: Viral feature where AI humorously critiques a user's profile to encourage social sharing.
     -   **Backend**: Implemented `roastProfile` in `AiWingmanService` using a "Roast Master" persona.
     -   **API**: Added `POST /wingman/roast` endpoint.
-    -   **Verification**: Feature tests (`AiProfileRoasterTest.php`) passing.
+    -   **Frontend**: Created `ProfileRoast` component with "Roast Me" button and social sharing.
+    -   **Integration**: Added to `ProfilePage` and `EnhancedProfileEditor`.
+    -   **Verification**: Feature tests (`AiProfileRoasterTest.php`) passing. Frontend lint passing.
 5.  **Daily Streaks (Gamification)**:
     -   **Concept**: Track consecutive days of user activity to encourage retention.
     -   **Backend**: Implemented `StreakService`, updated `User` model with `current_streak` and `last_active_at`.

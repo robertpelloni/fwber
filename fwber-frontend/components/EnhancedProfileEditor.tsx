@@ -9,6 +9,7 @@ import {
 import { api } from '@/lib/api/client';
 import { BioGenerator } from '@/components/ai/BioGenerator';
 import { ProfileAnalysis } from '@/components/profile/ProfileAnalysis';
+import { ProfileRoast } from '@/components/profile/ProfileRoast';
 
 import { UserProfile } from '@/lib/api/types';
 
@@ -189,9 +190,10 @@ export default function EnhancedProfileEditor() {
         )}
       </div>
 
-      {/* AI Profile Analysis */}
-      <div className="mb-8">
+      {/* AI Profile Analysis & Roast */}
+      <div className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ProfileAnalysis />
+        <ProfileRoast />
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">

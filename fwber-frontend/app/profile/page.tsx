@@ -13,6 +13,8 @@ import PhysicalProfileEditor from '@/components/PhysicalProfileEditor'
 import { isFeatureEnabled } from '@/lib/featureFlags'
 import ProfileTabs from '@/components/profile/ProfileTabs'
 import VerificationCard from '@/components/VerificationCard'
+import { ProfileRoast } from '@/components/profile/ProfileRoast'
+import { ProfileAnalysis } from '@/components/profile/ProfileAnalysis'
 
 export default function ProfilePage() {
   const { isAuthenticated, user, token, isLoading: authLoading } = useAuth()
@@ -475,6 +477,12 @@ export default function ProfilePage() {
             />
           </CardContent>
         </Card>
+
+        {/* AI Wingman Features */}
+        <div className="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ProfileAnalysis />
+          <ProfileRoast />
+        </div>
 
         {/* Profile Form */}
         <div className="bg-white shadow rounded-lg">

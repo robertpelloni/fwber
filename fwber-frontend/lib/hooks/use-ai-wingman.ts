@@ -47,10 +47,20 @@ export function useAiWingman() {
     },
   });
 
+  const roastProfile = useMutation({
+    mutationFn: async () => {
+      return api.post<{ roast: string }>('/wingman/roast');
+    },
+    onError: (err: any) => {
+      setError(err.message || 'Failed to roast profile');
+    },
+  });
+
   return {
     getIceBreakers,
     getReplySuggestions,
     getDateIdeas,
+    roastProfile,
     error,
     setError,
   };
