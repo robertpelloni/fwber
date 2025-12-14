@@ -580,10 +580,6 @@ class WebSocketController extends Controller
 
     /**
      * Broadcast message to multiple users
-     * @OA\Post(
-     *     path="/websocket/broadcast",
-     *     tags={"WebSocket"},
-     *     summary="Broadcast message to multiple users",
      * 
      * @OA\Post(
      *     path="/websocket/broadcast",
@@ -599,7 +595,11 @@ class WebSocketController extends Controller
      *             @OA\Property(property="message", type="object",
      *                 required={"type", "content"},
      *                 @OA\Property(property="type", type="string", example="announcement"),
-     *                 @OA\Property(property="content", type="string", example="The system will be down for maintenance in 10 minutes.
+     *                 @OA\Property(property="content", type="string", example="The system will be down for maintenance in 10 minutes.")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Broadcast sent",
      *         @OA\JsonContent(
      *             @OA\Property(property="message", type="string"),
      *             @OA\Property(property="recipients", type="integer")
@@ -670,10 +670,6 @@ class WebSocketController extends Controller
      *     summary="Get WebSocket status",
      *     description="Returns the current status of the WebSocket server and the user's connection",
      *     security={{"bearerAuth":{}}},
-     *     @OA\Response(response=200, description="WebSocket status retrieved successfully",
-     *         @OA\JsonContent(ref="#/components/schemas/WebSocketStatusResponse")
-     *     description="Check the status of the WebSocket service",
-     *     security={{"bearerAuth":{}}},
      *     @OA\Response(response=200, description="WebSocket status",
      *         @OA\JsonContent(
      *             @OA\Property(property="websocket_enabled", type="boolean"),
@@ -682,8 +678,11 @@ class WebSocketController extends Controller
      *             @OA\Property(property="timestamp", type="string", format="date-time")
      *         )
      *     ),
-     *     @OA\Response(response=401, ref="#/components/responses/U
-        try {
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
+     * )
+     */
+    public function status(Request $request): JsonResponse
+    {
             $user = $request->user();
             if (!$user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
