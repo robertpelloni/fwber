@@ -13,6 +13,7 @@ import Communication from './Communication';
 import PhotoUpload from '../PhotoUpload';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Camera } from 'lucide-react';
+import { Photo } from '@/lib/api/photos';
 
 interface ProfileTabsProps {
   formData: any;
@@ -21,8 +22,11 @@ interface ProfileTabsProps {
   handleLookingForChange: (value: string, checked: boolean) => void;
   handlePreferenceChange: (field: string, value: any) => void;
   handleArrayPreferenceChange: (field: string, value: string, checked: boolean) => void;
-  photos: any[];
-  uploadPhotos: (files: File[], onProgress?: (fileIndex: number, progress: number, fileName: string) => void) => Promise<void>;
+  photos: Photo[];
+  uploadPhotos: (
+    items: Array<{ file: File; isPrivate?: boolean }> | File[],
+    onProgress?: (fileIndex: number, progress: number, fileName: string) => void
+  ) => Promise<void>;
   deletePhoto: (index: number) => void;
 }
 
@@ -105,7 +109,7 @@ export default function ProfileTabs({
                 <PhotoUpload
                   onUpload={uploadPhotos}
                   onRemove={deletePhoto}
-                  photos={photos.map((photo) => photo.url)}
+                  photos={photos}
                   maxPhotos={12}
                   maxSize={5}
                 />

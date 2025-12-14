@@ -57,6 +57,11 @@ class Photo extends Model
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     */
+    protected $appends = ['url', 'thumbnail_url', 'is_unlocked'];
+
+    /**
      * Get the user that owns the photo.
      */
     public function user(): BelongsTo
@@ -79,6 +84,33 @@ class Photo extends Model
     {
         $path = $this->thumbnail_path ?: $this->file_path;
         return Storage::disk('public')->url($path);
+    }
+
+    /**
+     * Check if the photo is unlocked for the current user.
+     */
+    public function getIsUnlockedAttribute(): bool
+    {
+        $user = auth()->user();
+        
+        if (!$user) {
+            return false;
+        }
+        
+        // Owner always has access
+        if ($this->user_id === $user->id) {
+            return true;
+        }
+        
+        // Public photos are always unlocked
+        if (!$this->is_private) {
+            return true;
+        }
+        
+        // Check if unlocked via tokens
+        return \App\Models\PhotoUnlock::where('user_id', $user->id)
+            ->where('photo_id', $this->id)
+            ->exists();
     }
 
     /**

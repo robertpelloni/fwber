@@ -374,9 +374,12 @@ export default function PhotoManagementPage() {
     })
   )
 
-  const handleUpload = async (files: File[], onProgress?: (fileIndex: number, progress: number, fileName: string) => void) => {
+  const handleUpload = async (
+    items: Array<{ file: File; isPrivate?: boolean }> | File[],
+    onProgress?: (fileIndex: number, progress: number, fileName: string) => void
+  ) => {
     try {
-      await uploadPhotos(files, onProgress)
+      await uploadPhotos(items, onProgress)
     } catch (error) {
       console.error('Upload failed:', error)
     }
@@ -582,7 +585,7 @@ export default function PhotoManagementPage() {
                   handleRemove(String(photo.id))
                 }
               }}
-              photos={photos.map(photo => photo.url)}
+              photos={photos}
               maxPhotos={settings?.max_photos || 12}
               maxSize={settings ? settings.max_file_size / (1024 * 1024) : 5}
             />

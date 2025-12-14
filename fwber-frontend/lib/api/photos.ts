@@ -8,6 +8,7 @@ export interface Photo {
   url: string
   thumbnail_url?: string
   is_primary: boolean
+  is_private?: boolean
   order: number
   created_at: string
   updated_at: string
@@ -79,14 +80,14 @@ class PhotoAPI {
 
   // Upload new photos (uploads one at a time since backend expects single 'photo' field)
   async uploadPhotos(
-    files: File[],
+    items: Array<{ file: File; isPrivate?: boolean }>,
     onProgress?: (fileIndex: number, progress: number, fileName: string) => void
   ): Promise<PhotoUploadResponse> {
     const uploadedPhotos: Photo[] = []
     
     // Upload files sequentially since backend expects single photo per request
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i]
+    for (let i = 0; i < items.length; i++) {
+      const { file, isPrivate } = items[i]
       const fileWithMetadata = file as FileWithFaceBlurMetadata
       
       // Report progress start
@@ -94,6 +95,9 @@ class PhotoAPI {
       
       const formData = new FormData()
       formData.append('photo', file) // Backend expects 'photo', not 'photos[...]'
+      if (isPrivate) {
+        formData.append('is_private', '1')
+      }
       if (fileWithMetadata.faceBlurMetadata) {
         formData.append('face_blur_metadata', JSON.stringify(fileWithMetadata.faceBlurMetadata))
       }
@@ -267,6 +271,13 @@ class PhotoAPI {
     })
   }
 
+  // Unlock photo with tokens
+  async unlockPhoto(photoId: string): Promise<{ success: boolean; message: string; balance: number }> {
+    return this.request<{ success: boolean; message: string; balance: number }>(`/photos/${photoId}/unlock`, {
+      method: 'POST',
+    })
+  }
+
   // Get original photo blob
   async getOriginalPhoto(photoId: string): Promise<Blob> {
     const url = `${this.baseUrl}/photos/${photoId}/original`
@@ -310,14 +321,19 @@ export function usePhotos() {
   }
 
   const uploadPhotos = async (
-    files: File[],
+    items: Array<{ file: File; isPrivate?: boolean }> | File[],
     onProgress?: (fileIndex: number, progress: number, fileName: string) => void
   ) => {
     setLoading(true)
     setError(null)
     
     try {
-      const response = await photoAPI.uploadPhotos(files, onProgress)
+      // Normalize input to array of objects
+      const normalizedItems = Array.isArray(items) && items.length > 0 && items[0] instanceof File
+        ? (items as File[]).map(f => ({ file: f, isPrivate: false }))
+        : (items as Array<{ file: File; isPrivate?: boolean }>)
+
+      const response = await photoAPI.uploadPhotos(normalizedItems, onProgress)
       if (response.success) {
         // Refetch all photos to get updated list with proper order
         const updatedPhotos = await photoAPI.getPhotos()
@@ -391,6 +407,20 @@ export function usePhotos() {
     }
   }
 
+  const unlockPhoto = async (photoId: string) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const result = await photoAPI.unlockPhoto(photoId)
+      return result
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unlock failed')
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
     fetchPhotos()
   }, [])
@@ -404,6 +434,7 @@ export function usePhotos() {
     deletePhoto,
     setPrimaryPhoto,
     reorderPhotos,
+    unlockPhoto,
     setPhotos, // Export for optimistic updates
   }
 }

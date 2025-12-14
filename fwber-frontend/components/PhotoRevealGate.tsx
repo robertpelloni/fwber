@@ -10,6 +10,8 @@ interface Photo {
   url: string
   isPrimary: boolean
   type: 'ai' | 'real'
+  isPrivate?: boolean
+  isUnlocked?: boolean
 }
 
 interface PhotoRevealGateProps {
@@ -18,6 +20,7 @@ interface PhotoRevealGateProps {
   messagesExchanged?: number
   daysConnected?: number
   onUnlockClick?: () => void
+  onTokenUnlock?: (photoId: string) => void
   className?: string
   isUnlockedViaShare?: boolean
 }
@@ -28,23 +31,26 @@ export default function PhotoRevealGate({
   messagesExchanged = 0,
   daysConnected = 0,
   onUnlockClick,
+  onTokenUnlock,
   className = '',
   isUnlockedViaShare = false
 }: PhotoRevealGateProps) {
-  const realPhotos = photos.filter(p => p.type === 'real')
+  // Filter out private photos first, they are handled separately
+  const privatePhotos = photos.filter(p => p.isPrivate)
+  const publicRealPhotos = photos.filter(p => p.type === 'real' && !p.isPrivate)
   const aiPhotos = photos.filter(p => p.type === 'ai')
   
-  let visibility = getVisiblePhotoCount(currentTier, realPhotos.length)
+  let visibility = getVisiblePhotoCount(currentTier, publicRealPhotos.length)
   
   // Override visibility if unlocked via share
   if (isUnlockedViaShare) {
-    visibility = { real: realPhotos.length, ai: 999, blurred: 0 }
+    visibility = { real: publicRealPhotos.length, ai: 999, blurred: 0 }
   }
   
-  // Separate photos by visibility status
-  const visibleRealPhotos = realPhotos.slice(0, visibility.real)
-  const blurredRealPhotos = realPhotos.slice(visibility.real, visibility.real + visibility.blurred)
-  const lockedRealPhotos = realPhotos.slice(visibility.real + visibility.blurred)
+  // Separate public photos by visibility status
+  const visibleRealPhotos = publicRealPhotos.slice(0, visibility.real)
+  const blurredRealPhotos = publicRealPhotos.slice(visibility.real, visibility.real + visibility.blurred)
+  const lockedRealPhotos = publicRealPhotos.slice(visibility.real + visibility.blurred)
   
   // Determine what's needed for next unlock
   const getUnlockMessage = () => {
@@ -95,6 +101,36 @@ export default function PhotoRevealGate({
             <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
               AI
             </div>
+          </div>
+        ))}
+
+        {/* Private Photos - Handled separately */}
+        {privatePhotos.map((photo) => (
+          <div key={photo.id} className="relative aspect-square rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-800 group">
+            <Image
+              src={photo.url}
+              alt="Private Photo"
+              fill
+              className={`object-cover ${!photo.isUnlocked ? 'blur-xl' : ''}`}
+            />
+            {photo.isUnlocked ? (
+              <div className="absolute top-2 right-2 bg-green-600 text-white text-xs px-2 py-1 rounded flex items-center gap-1">
+                <Unlock className="w-3 h-3" /> Unlocked
+              </div>
+            ) : (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm">
+                <Lock className="w-8 h-8 text-white mb-2" />
+                <p className="text-white text-xs font-bold mb-2">Private Photo</p>
+                {onTokenUnlock && (
+                  <button 
+                    onClick={() => onTokenUnlock(photo.id)}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-black text-xs font-bold py-1.5 px-3 rounded-full transition-colors flex items-center gap-1"
+                  >
+                    <Unlock className="w-3 h-3" /> Unlock (50 🪙)
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         ))}
 

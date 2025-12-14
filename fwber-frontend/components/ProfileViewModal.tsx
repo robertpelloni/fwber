@@ -10,6 +10,7 @@ import { useFeatureFlag } from '@/lib/hooks/use-feature-flags'
 import { PresenceIndicator, usePresenceContext } from './realtime/PresenceComponents'
 import { useRelationshipTier } from '@/lib/hooks/useRelationshipTier'
 import { apiClient } from '@/lib/api/client'
+import { photoAPI } from '@/lib/api/photos'
 import { useToast } from '@/components/ToastProvider'
 
 interface ProfileViewModalProps {
@@ -26,6 +27,7 @@ interface ProfileViewModalProps {
         url: string
         is_private: boolean
         is_primary: boolean
+        is_unlocked?: boolean
       }>
     }
   }
@@ -36,6 +38,7 @@ interface ProfileViewModalProps {
 export default function ProfileViewModal({ isOpen, onClose, user, messagesExchanged, matchId }: ProfileViewModalProps) {
   const [isVisible, setIsVisible] = useState(false)
   const [isUnlockedViaShare, setIsUnlockedViaShare] = useState(false)
+  const [locallyUnlockedPhotos, setLocallyUnlockedPhotos] = useState<Set<number>>(new Set())
   const { isEnabled: faceRevealEnabled } = useFeatureFlag('face_reveal')
   const { onlineUsers } = usePresenceContext()
   const { showSuccess, showError } = useToast()
@@ -94,6 +97,24 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
     }
   }
 
+  const handleTokenUnlock = async (photoId: string) => {
+    try {
+      const result = await photoAPI.unlockPhoto(photoId)
+      if (result.success) {
+        setLocallyUnlockedPhotos(prev => new Set(prev).add(parseInt(photoId)))
+        showSuccess(
+          "Photo Unlocked!",
+          `You spent 50 tokens. Remaining balance: ${result.balance}`
+        )
+      } else {
+        showError("Unlock Failed", result.message)
+      }
+    } catch (error) {
+      console.error('Unlock failed', error)
+      showError("Unlock Failed", error instanceof Error ? error.message : "Could not unlock photo")
+    }
+  }
+
   if (!isVisible && !isOpen) return null
 
   // Map API photos to PhotoRevealGate format
@@ -105,7 +126,9 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
     // or just treat all as 'real' if we want to test the blur logic on everything.
     // In a real app, we'd have a clear distinction.
     // For testing Face Reveal, we want 'real' photos to be blurred.
-    type: 'real' as const 
+    type: 'real' as const,
+    isPrivate: p.is_private,
+    isUnlocked: p.is_unlocked || locallyUnlockedPhotos.has(p.id)
   })) || []
 
   // Simple photo grid for when Face Reveal is disabled
@@ -256,6 +279,7 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
                 messagesExchanged={messagesExchanged}
                 daysConnected={1} // Mock
                 isUnlockedViaShare={isUnlockedViaShare}
+                onTokenUnlock={handleTokenUnlock}
               />
             ) : (
               <SimplePhotoGrid />

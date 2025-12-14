@@ -329,9 +329,12 @@ export default function ProfilePage() {
   }
 
   // Photo upload handlers
-  const handlePhotoUpload = async (files: File[], onProgress?: (fileIndex: number, progress: number, fileName: string) => void) => {
+  const handlePhotoUpload = async (
+    items: Array<{ file: File; isPrivate?: boolean }> | File[],
+    onProgress?: (fileIndex: number, progress: number, fileName: string) => void
+  ) => {
     try {
-      await uploadPhotos(files, onProgress)
+      await uploadPhotos(items, onProgress)
       setSuccess('Photos uploaded successfully!')
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to upload photos')
@@ -534,7 +537,7 @@ export default function ProfilePage() {
                 <PhotoUpload
                   onUpload={handlePhotoUpload}
                   onRemove={handlePhotoRemove}
-                  photos={photos.map(photo => photo.url)}
+                  photos={photos}
                   maxPhotos={12}
                   maxSize={5}
                 />

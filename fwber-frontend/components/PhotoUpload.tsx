@@ -3,11 +3,12 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import Image from 'next/image'
-import { Upload, X, Camera, RotateCcw, Download, Eye, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react'
+import { Upload, X, Camera, RotateCcw, Download, Eye, ChevronLeft, ChevronRight, Trash2, Lock, Unlock } from 'lucide-react'
 import { blurFacesOnFile, FaceBlurError } from '@/lib/faceBlur'
 import { isFeatureEnabled } from '@/lib/featureFlags'
 import { attachFaceBlurMetadata, FileWithFaceBlurMetadata } from '@/lib/faceBlurTelemetry'
 import { usePreviewTelemetry } from '@/lib/previewTelemetry'
+import { Photo } from '@/lib/api/photos'
 
 const generatePreviewId = () =>
   typeof crypto !== 'undefined' && crypto.randomUUID
@@ -15,9 +16,12 @@ const generatePreviewId = () =>
     : Math.random().toString(36).substring(2, 11)
 
 interface PhotoUploadProps {
-  onUpload: (photos: File[], onProgress?: (fileIndex: number, progress: number, fileName: string) => void) => Promise<void>
+  onUpload: (
+    items: Array<{ file: File; isPrivate?: boolean }> | File[],
+    onProgress?: (fileIndex: number, progress: number, fileName: string) => void
+  ) => Promise<void>
   onRemove: (index: number) => void
-  photos: string[]
+  photos: Photo[]
   maxPhotos?: number
   maxSize?: number // in MB
   className?: string
@@ -37,6 +41,7 @@ interface PhotoPreview {
   id: string
   facesDetected?: number
   blurApplied?: boolean
+  isPrivate: boolean
 }
 
 interface UploadProgress {
@@ -56,6 +61,7 @@ export default function PhotoUpload({
 }: PhotoUploadProps) {
   const [previews, setPreviews] = useState<PhotoPreview[]>([])
   const [isUploading, setIsUploading] = useState(false)
+  const [uploadAsPrivate, setUploadAsPrivate] = useState(false)
   const [uploadProgress, setUploadProgress] = useState<Map<string, UploadProgress>>(new Map())
   const [dragActive, setDragActive] = useState(false)
   const [clientProcessingMessage, setClientProcessingMessage] = useState<string | null>(null)
@@ -142,6 +148,7 @@ export default function PhotoUpload({
           },
           activeView: 'original' as PreviewView,
           id: generatePreviewId(),
+          isPrivate: uploadAsPrivate,
         }))
       }
 
@@ -189,6 +196,7 @@ export default function PhotoUpload({
               id: previewId,
               facesDetected: result.facesFound,
               blurApplied: result.blurred,
+              isPrivate: uploadAsPrivate,
             })
             emitPreviewReady(previewId, processedFile)
           } catch (error) {
@@ -217,6 +225,7 @@ export default function PhotoUpload({
               id: previewId,
               facesDetected: 0,
               blurApplied: false,
+              isPrivate: uploadAsPrivate,
             })
             emitPreviewReady(previewId, processedFile)
           }
@@ -234,7 +243,7 @@ export default function PhotoUpload({
         setClientProcessingMessage(null)
       }
     },
-    [faceBlurEnabled, emitPreviewReady]
+    [faceBlurEnabled, emitPreviewReady, uploadAsPrivate]
   )
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
@@ -295,7 +304,7 @@ export default function PhotoUpload({
       }
 
       void flushTelemetryQueue()
-      await onUpload(newPreviews.map(p => p.file), progressCallback)
+      await onUpload(newPreviews.map(p => ({ file: p.file, isPrivate: p.isPrivate })), progressCallback)
       
       // Mark all as completed
       setUploadProgress(prev => {
@@ -526,6 +535,21 @@ export default function PhotoUpload({
             Supported: JPEG, PNG, WebP, GIF
           </div>
 
+          <div className="flex items-center gap-2 mt-2" onClick={(e) => e.stopPropagation()}>
+            <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
+              <input
+                type="checkbox"
+                checked={uploadAsPrivate}
+                onChange={(e) => setUploadAsPrivate(e.target.checked)}
+                className="rounded border-gray-300 text-primary focus:ring-primary"
+              />
+              <span className="flex items-center gap-1">
+                {uploadAsPrivate ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+                Upload as Private (Locked)
+              </span>
+            </label>
+          </div>
+
           {faceBlurEnabled && (
             <div className="mt-3 text-xs font-medium text-primary">
               Client-side face blur active
@@ -647,11 +671,11 @@ export default function PhotoUpload({
               <div key={`photo-${index}`} className="relative group">
                 <div className="aspect-square rounded-lg overflow-hidden bg-muted">
                   <Image
-                    src={photo}
+                    src={photo.url || photo.thumbnail_url || ''}
                     alt={`Photo ${index + 1}`}
                     width={200}
                     height={200}
-                    className="w-full h-full object-cover"
+                    className={`w-full h-full object-cover ${photo.is_private ? 'blur-sm hover:blur-none transition-all duration-300' : ''}`}
                   />
                 </div>
                 
@@ -675,9 +699,16 @@ export default function PhotoUpload({
                 </div>
                 
                 {/* Primary Photo Badge */}
-                {index === 0 && (
+                {photo.is_primary && (
                   <div className="absolute top-2 left-2 bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium">
                     Primary
+                  </div>
+                )}
+
+                {/* Private Badge */}
+                {photo.is_private && (
+                  <div className="absolute top-2 right-2 bg-black/70 text-white p-1.5 rounded-full" title="Private Photo">
+                    <Lock className="w-3 h-3" />
                   </div>
                 )}
               </div>
@@ -772,6 +803,12 @@ export default function PhotoUpload({
                   }`}>
                     {isError ? 'Failed' : isCompleted ? 'Complete' : isUploadingPhoto ? 'Uploading...' : 'Pending'}
                   </div>
+
+                  {preview.isPrivate && (
+                    <div className="absolute top-2 right-2 bg-black/70 text-white p-1.5 rounded-full" title="Private Photo">
+                      <Lock className="w-3 h-3" />
+                    </div>
+                  )}
 
                   {preview.blurApplied && (
                     <div className="absolute bottom-2 left-2 bg-black/70 text-white text-[10px] px-2 py-0.5 rounded-full">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Photo;
+use App\Models\PhotoUnlock;
 use App\Models\User;
 use App\Services\MediaAnalysis\MediaAnalysisInterface;
 use App\Services\TelemetryService;
@@ -608,6 +609,11 @@ class PhotoController extends Controller
                 return response()->json(['success' => true, 'status' => 'owner']);
             }
 
+            // Check if photo is already unlocked via tokens
+            if (PhotoUnlock::where('user_id', $user->id)->where('photo_id', $photo->id)->exists()) {
+                return response()->json(['success' => true, 'status' => 'unlocked_via_tokens']);
+            }
+
             $matchId = $request->input('match_id');
             $match = \App\Models\UserMatch::where('id', $matchId)
                 ->where(function($q) use ($user) {
@@ -689,7 +695,12 @@ class PhotoController extends Controller
                 return Storage::disk('public')->download($photo->file_path, $photo->original_filename);
             }
 
-            // 2. Match check
+            // 2. Token Unlock Check
+            if (PhotoUnlock::where('user_id', $user->id)->where('photo_id', $photo->id)->exists()) {
+                return Storage::disk('public')->download($photo->file_path, $photo->original_filename);
+            }
+
+            // 3. Match check
             // Find any active match between these users
             $match = \App\Models\UserMatch::where(function($q) use ($user, $photo) {
                     $q->where('user_id_1', $user->id)->where('user_id_2', $photo->user_id);
