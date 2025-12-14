@@ -16,6 +16,7 @@ import VerificationCard from '@/components/VerificationCard'
 import { ProfileRoast } from '@/components/profile/ProfileRoast'
 import { ProfileAnalysis } from '@/components/profile/ProfileAnalysis'
 import { VibeCheck } from '@/components/profile/VibeCheck'
+import { DatingFortune } from '@/components/profile/DatingFortune'
 
 export default function ProfilePage() {
   const { isAuthenticated, user, token, isLoading: authLoading } = useAuth()
@@ -484,6 +485,7 @@ export default function ProfilePage() {
           <ProfileAnalysis />
           <ProfileRoast />
           <VibeCheck />
+          <DatingFortune />
         </div>
 
         {/* Profile Form */}

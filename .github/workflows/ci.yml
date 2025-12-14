@@ -70,4 +70,6 @@ jobs:
       continue-on-error: true # Don't fail build on lint errors for now
 
     - name: Build
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       run: npm run build

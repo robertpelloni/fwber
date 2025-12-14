@@ -346,6 +346,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('wingman/date-ideas/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'getDateIdeas']);
         Route::post('wingman/roast', [\App\Http\Controllers\AiWingmanController::class, 'roastProfile']);
         Route::get('wingman/vibe-check', [\App\Http\Controllers\AiWingmanController::class, 'checkVibe']);
+        Route::get('wingman/fortune', [\App\Http\Controllers\AiWingmanController::class, 'predictFortune']);
     });
 
     // Friend routes

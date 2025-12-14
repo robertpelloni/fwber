@@ -21,6 +21,10 @@ export interface VibeCheckResponse {
   red_flags: string[];
 }
 
+export interface FortuneResponse {
+  fortune: string;
+}
+
 export function useAiWingman() {
   const [error, setError] = useState<string | null>(null);
 
@@ -70,12 +74,22 @@ export function useAiWingman() {
     },
   });
 
+  const predictFortune = useMutation({
+    mutationFn: async () => {
+      return api.get<FortuneResponse>('/wingman/fortune');
+    },
+    onError: (err: any) => {
+      setError(err.message || 'Failed to predict fortune');
+    },
+  });
+
   return {
     getIceBreakers,
     getReplySuggestions,
     getDateIdeas,
     roastProfile,
     checkVibe,
+    predictFortune,
     error,
     setError,
   };

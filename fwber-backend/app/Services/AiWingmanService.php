@@ -425,6 +425,35 @@ EOT;
         });
     }
 
+    /**
+     * Generate a humorous "Dating Fortune" for the user.
+     *
+     * @param User $user
+     * @return string
+     */
+    public function predictFortune(User $user): string
+    {
+        $profile = $user->profile;
+        $updatedAt = $profile ? $profile->updated_at->timestamp : 0;
+        $cacheKey = "wingman:fortune:{$user->id}:{$updatedAt}";
+
+        return Cache::remember($cacheKey, 86400, function () use ($user, $profile) {
+            $prompt = $this->buildFortunePrompt($user, $profile);
+
+            try {
+                $response = $this->llmManager->driver()->chat([
+                    ['role' => 'system', 'content' => 'You are a mystical "Dating Oracle". Your job is to predict the user\'s romantic future in a humorous, fortune-cookie style. Be specific, slightly absurd, but encouraging.'],
+                    ['role' => 'user', 'content' => $prompt]
+                ], ['temperature' => 0.9]);
+
+                return $response->content;
+            } catch (\Exception $e) {
+                Log::error("AiWingmanService: Failed to predict fortune: " . $e->getMessage());
+                return "In the near future, you will encounter a server error that leads to a beautiful connection with customer support.";
+            }
+        });
+    }
+
     protected function buildMatchExplanationPrompt(User $user, User $match): string
     {
         $userProfile = $user->profile;
@@ -499,6 +528,27 @@ Output a JSON object with exactly these keys:
 - red_flags: (array of 3-5 strings) Humorous warning signs or playful critiques.
 
 Keep the flags short (2-5 words each).
+EOT;
+    }
+
+    protected function buildFortunePrompt(User $user, $profile): string
+    {
+        $bio = $profile->bio ?? 'No bio provided.';
+        $interests = implode(', ', $profile->interests ?? []);
+        $job = $profile->occupation ?? 'Unknown';
+        $age = $profile->age ?? 'Unknown';
+
+        return <<<EOT
+Predict the romantic future for this person based on their profile.
+
+Profile:
+- Age: {$age}
+- Job: {$job}
+- Bio: "{$bio}"
+- Interests: {$interests}
+
+Write a short, humorous "fortune cookie" style prediction (1-2 sentences).
+It should be slightly mystical but grounded in their profile details if possible.
 EOT;
     }
 

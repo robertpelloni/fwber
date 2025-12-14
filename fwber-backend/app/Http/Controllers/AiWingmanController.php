@@ -174,4 +174,18 @@ class AiWingmanController extends Controller
 
         return response()->json($result);
     }
+
+    /**
+     * Generate a humorous "Dating Fortune" for the authenticated user.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function predictFortune(Request $request)
+    {
+        $user = Auth::user();
+        $result = $this->wingmanService->predictFortune($user);
+
+        return response()->json(['fortune' => $result]);
+    }
 }
