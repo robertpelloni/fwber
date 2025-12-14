@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Message;
 use App\Services\Ai\AudioTranscriptionService;
+use App\Services\Ai\ContentModerationService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -27,7 +28,7 @@ class TranscribeAudioMessage implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(AudioTranscriptionService $transcriptionService): void
+    public function handle(AudioTranscriptionService $transcriptionService, ContentModerationService $moderationService): void
     {
         if ($this->message->message_type !== 'audio' || !$this->message->media_url) {
             return;
@@ -51,7 +52,17 @@ class TranscribeAudioMessage implements ShouldQueue
             $text = $transcriptionService->transcribe($fullPath);
 
             if ($text) {
-                $this->message->update(['transcription' => $text]);
+                $updateData = ['transcription' => $text];
+
+                // Moderate the content
+                $moderationResult = $moderationService->moderate($text);
+                
+                if ($moderationResult['flagged']) {
+                    $updateData['is_flagged'] = true;
+                    $updateData['flagged_reason'] = implode(', ', $moderationResult['categories']);
+                }
+
+                $this->message->update($updateData);
             }
         } catch (\Exception $e) {
             Log::error("TranscribeAudioMessage job failed: " . $e->getMessage());
