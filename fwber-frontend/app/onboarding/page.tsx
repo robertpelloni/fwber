@@ -145,7 +145,7 @@ export default function OnboardingPage() {
             </div>
             <h2 className="text-2xl font-bold">Welcome to FWBer!</h2>
             <p className="text-gray-600">
-              We're excited to have you here. Let's take a moment to set up your profile so you can start meeting people.
+              We&apos;re excited to have you here. Let&apos;s take a moment to set up your profile so you can start meeting people.
             </p>
             <p className="text-sm text-gray-500">
               This will only take a minute.
@@ -221,7 +221,9 @@ export default function OnboardingPage() {
             </div>
             <PhotoUpload 
               photos={photos} 
-              onUpload={uploadPhotos} 
+              onUpload={async (items, onProgress) => {
+                await uploadPhotos(items, onProgress)
+              }}
               onRemove={(index) => deletePhoto(photos[index].id)}
               maxPhotos={6}
             />
@@ -232,7 +234,7 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <div className="space-y-3">
-              <Label>I'm looking for...</Label>
+              <Label>I&apos;m looking for...</Label>
               <div className="grid grid-cols-2 gap-2">
                 {['Dating', 'Friends', 'Networking', 'Casual'].map(opt => (
                   <div key={opt} className="flex items-center space-x-2">
@@ -294,7 +296,7 @@ export default function OnboardingPage() {
             <div className="flex justify-center mb-6">
               <CheckCircle2 className="h-24 w-24 text-green-500" />
             </div>
-            <h2 className="text-2xl font-bold">You're All Set!</h2>
+            <h2 className="text-2xl font-bold">You&apos;re All Set!</h2>
             <p className="text-gray-600">
               Your profile is ready. Start exploring and meeting new people.
             </p>
