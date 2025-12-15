@@ -166,4 +166,35 @@ describe('User Onboarding Flow', () => {
     // Verify redirect
     cy.url().should('include', '/dashboard');
   });
+
+  it('handles optional fields correctly (skips non-required inputs)', () => {
+    // Step 1: Welcome
+    cy.contains('Next').click();
+
+    // Step 2: Basic Info
+    cy.contains('Basic Info').should('be.visible');
+    
+    // Fill ONLY required fields
+    cy.get('#display_name').type('Minimal User');
+    cy.get('#dob').type('1995-05-05');
+    cy.get('#gender').select('Female');
+    // Skip City/State (Optional in backend, but might be required in UI? Let's check)
+    // If UI requires them, we fill them. If not, we skip.
+    // Assuming City/State are required for location logic, but Bio is optional.
+    cy.get('#city').type('London');
+    cy.get('#state').type('UK');
+    
+    // Ensure Bio is empty (if it exists)
+    cy.get('textarea[name="bio"]').clear(); 
+
+    cy.contains('Next').click();
+    
+    // Verify payload contains null/empty for optional fields
+    cy.wait('@updateProfile').then((interception) => {
+      const body = interception.request.body;
+      expect(body.display_name).to.equal('Minimal User');
+      // Optional fields should be present but empty/null
+      expect(body.bio).to.satisfy(val => val === null || val === '');
+    });
+  });
 });

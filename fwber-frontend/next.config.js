@@ -24,6 +24,7 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   productionBrowserSourceMaps: false,
+  output: 'standalone', // Optimized for Docker/Shared Hosting
   
   // Experimental features for better performance
   experimental: {
