@@ -185,7 +185,9 @@ BACKUP_S3_PREFIX=backups
 
 ## Step 3: Web Server Configuration (20 minutes)
 
-### 3.1 Nginx Configuration
+### 3.1 Nginx Configuration (VPS/Dedicated)
+
+*Note: If using Shared Hosting (e.g., DreamHost), skip this section and use the provided `.htaccess` or panel configuration.*
 
 Create `/etc/nginx/sites-available/fwber`:
 
@@ -303,7 +305,7 @@ Check Sentry dashboard for the error.
 
 **For Docker/Kubernetes**: Logs already go to stderr, ship with Fluentd/Fluent Bit
 
-**For Bare Metal**: Set up Filebeat
+**For Bare Metal / VPS**: Set up Filebeat
 
 ```bash
 # Install Filebeat

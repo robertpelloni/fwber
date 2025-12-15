@@ -62,6 +62,9 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 2.  **API CORS Configuration**:
     -   **Issue**: Missing `config/cors.php` caused the backend to fail CORS checks or rely on defaults that blocked production domains.
     -   **Fix**: Created `fwber-backend/config/cors.php` explicitly allowing `https://fwber.me` and `https://www.fwber.me`.
+3.  **Deployment Architecture Cleanup**:
+    -   **Issue**: `docker-compose.prod.yml` was present but unused in production (DreamHost VPS/Shared), causing confusion.
+    -   **Fix**: Removed `docker-compose.prod.yml`. Updated `DEPLOYMENT.md` to clarify non-Docker deployment steps.
 
 ### ✅ Technical Maintenance (Dec 15)
 1.  **E2E Test Expansion**:
