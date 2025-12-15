@@ -174,6 +174,16 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Generation**: Successfully regenerated `api-docs.json`.
     -   **Guide**: Created `docs/API_REFERENCE.md` with access instructions.
 
+### ✅ Critical Fixes (Dec 15 - Part 3)
+1.  **Deployment Safety**:
+    -   **Issue**: Deployment failure left site in maintenance mode (503).
+    -   **Fix**: Added `trap cleanup EXIT` to `deploy.sh` to ensure `php artisan up` runs even if the script fails.
+    -   **Verification**: Verified script logic.
+2.  **Mercure CORS Fix**:
+    -   **Issue**: Duplicate `cors_origins` directive in `start_mercure_shared.sh` caused Caddy startup failure/conflicts.
+    -   **Fix**: Removed duplicate injection; `Caddyfile` now handles CORS exclusively.
+    -   **Verification**: Verified configuration files.
+
 ### ✅ User Experience Refinement (Dec 15 - Part 2)
 1.  **Onboarding Fix**:
     -   **Issue**: Resolved payload mismatch (`date_of_birth` vs `birthdate`) in `ProfileController` and `UserProfileResource`.
