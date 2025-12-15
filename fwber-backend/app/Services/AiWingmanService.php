@@ -358,6 +358,97 @@ EOT;
     }
 
     /**
+     * Analyze a draft message and provide feedback.
+     *
+     * @param User $user
+     * @param User $match
+     * @param string $draft
+     * @param array $history
+     * @return array
+     */
+    public function analyzeDraftMessage(User $user, User $match, string $draft, array $history): array
+    {
+        $prompt = $this->buildDraftAnalysisPrompt($user, $match, $draft, $history);
+
+        try {
+            $response = $this->llmManager->driver()->chat([
+                ['role' => 'system', 'content' => 'You are a communication coach. Your goal is to help users send better messages in a dating context. Analyze the tone, clarity, and potential impact of the draft message.'],
+                ['role' => 'user', 'content' => $prompt]
+            ], ['temperature' => 0.7]);
+
+            return $this->parseDraftAnalysis($response->content);
+        } catch (\Exception $e) {
+            Log::error("AiWingmanService: Failed to analyze draft: " . $e->getMessage());
+            return [
+                'score' => 50,
+                'tone' => 'Neutral',
+                'feedback' => 'Unable to analyze message at this time.',
+                'suggestion' => null
+            ];
+        }
+    }
+
+    protected function buildDraftAnalysisPrompt(User $user, User $match, string $draft, array $history): string
+    {
+        $conversation = "";
+        // Take last 5 messages for context
+        $recentHistory = array_slice($history, -5);
+        foreach ($recentHistory as $msg) {
+            $sender = ($msg['sender_id'] == $user->id) ? "Me" : "Match";
+            $content = $msg['content'];
+            if (!empty($msg['transcription'])) {
+                $content = $msg['transcription'];
+            } elseif (($msg['message_type'] ?? '') === 'audio') {
+                $content = "[Audio Message]";
+            }
+            $conversation .= "{$sender}: {$content}\n";
+        }
+
+        return <<<EOT
+Context (Last 5 messages):
+{$conversation}
+
+Draft Message (Me): "{$draft}"
+
+Analyze this draft message.
+1. Rate it from 0-100 based on effectiveness, politeness, and engagement.
+2. Identify the tone (e.g., Flirty, Aggressive, Passive, Funny, Neutral).
+3. Provide 1 sentence of feedback.
+4. If the score is below 80, provide a rewritten suggestion. If it's good, suggestion can be null.
+
+Output JSON:
+{
+    "score": 85,
+    "tone": "Friendly",
+    "feedback": "Great opener, very engaging.",
+    "suggestion": null
+}
+EOT;
+    }
+
+    protected function parseDraftAnalysis(string $content): array
+    {
+        $content = preg_replace('/^```json\s*|\s*```$/', '', trim($content));
+        $decoded = json_decode($content, true);
+
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            return [
+                'score' => $decoded['score'] ?? 50,
+                'tone' => $decoded['tone'] ?? 'Unknown',
+                'feedback' => $decoded['feedback'] ?? 'No feedback provided.',
+                'suggestion' => $decoded['suggestion'] ?? null
+            ];
+        }
+
+        return [
+            'score' => 50,
+            'tone' => 'Unknown',
+            'feedback' => 'Could not parse analysis.',
+            'suggestion' => null
+        ];
+    }
+
+    /**
      * Generate a humorous "roast" or enthusiastic "hype" of the user's profile.
      *
      * @param User $user

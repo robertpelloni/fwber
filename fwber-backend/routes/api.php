@@ -186,6 +186,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('analytics/boosts', [\App\Http\Controllers\AnalyticsController::class, 'boosts']);
     Route::get('analytics/retention', [\App\Http\Controllers\AnalyticsController::class, 'retention']);
     
+    // Logs (Admin)
+    Route::get('admin/logs', [\App\Http\Controllers\LogController::class, 'index']);
+    Route::get('admin/logs/{filename}', [\App\Http\Controllers\LogController::class, 'show']);
+
     // Failed Jobs (Admin)
     Route::get('analytics/failed-jobs', [\App\Http\Controllers\FailedJobController::class, 'index']);
     Route::post('analytics/failed-jobs/retry-all', [\App\Http\Controllers\FailedJobController::class, 'retryAll']);

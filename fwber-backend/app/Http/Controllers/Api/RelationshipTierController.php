@@ -4,14 +4,23 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\UpdateRelationshipTierRequest;
+use App\Models\User;
 use App\Models\UserMatch;
 use App\Models\RelationshipTier;
 use App\Models\Photo;
+use App\Services\AchievementService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
 class RelationshipTierController extends Controller
 {
+    protected $achievementService;
+
+    public function __construct(AchievementService $achievementService)
+    {
+        $this->achievementService = $achievementService;
+    }
+
     /**
      * Verify user is authorized to access this match and return the match with tier
      */
@@ -118,6 +127,31 @@ class RelationshipTierController extends Controller
         }
 
         $tierUpgraded = $tier->current_tier !== $previousTier;
+
+        if ($tierUpgraded) {
+            $tierMap = [
+                'discovery' => 1,
+                'matched' => 2,
+                'connected' => 3,
+                'established' => 4,
+                'verified' => 5,
+            ];
+            
+            $tierValue = $tierMap[$tier->current_tier] ?? 0;
+            
+            if ($tierValue > 0) {
+                // Unlock for both users
+                $user1 = User::find($match->user1_id);
+                $user2 = User::find($match->user2_id);
+                
+                if ($user1) {
+                    $this->achievementService->checkAndUnlock($user1, 'relationship_tier', $tierValue);
+                }
+                if ($user2) {
+                    $this->achievementService->checkAndUnlock($user2, 'relationship_tier', $tierValue);
+                }
+            }
+        }
 
         $userId = Auth::id();
         $userConfirmed = ($tier->user1_confirmed_meeting_at && $match->user1_id === $userId) || 

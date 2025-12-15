@@ -99,6 +99,58 @@ class AiWingmanController extends Controller
     }
 
     /**
+     * Analyze a draft message and provide feedback.
+     *
+     * @param Request $request
+     * @param string $matchId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function analyzeDraft(Request $request, string $matchId)
+    {
+        $request->validate([
+            'draft' => 'required|string|max:1000',
+        ]);
+
+        $user = Auth::user();
+        $match = User::findOrFail($matchId);
+
+        // Check if they are matched
+        $isMatched = \App\Models\UserMatch::where(function($q) use ($user, $matchId) {
+            $q->where('user1_id', $user->id)->where('user2_id', $matchId);
+        })->orWhere(function($q) use ($user, $matchId) {
+            $q->where('user1_id', $matchId)->where('user2_id', $user->id);
+        })->exists();
+
+        if (!$isMatched) {
+            return response()->json(['error' => 'You are not matched with this user.'], 403);
+        }
+
+        // Fetch last 10 messages for context
+        $messages = Message::where(function($q) use ($user, $matchId) {
+                $q->where('sender_id', $user->id)->where('receiver_id', $matchId);
+            })
+            ->orWhere(function($q) use ($user, $matchId) {
+                $q->where('sender_id', $matchId)->where('receiver_id', $user->id);
+            })
+            ->orderBy('created_at', 'asc')
+            ->take(10)
+            ->get()
+            ->map(function($msg) {
+                return [
+                    'sender_id' => $msg->sender_id,
+                    'content' => $msg->content,
+                    'transcription' => $msg->transcription ?? null,
+                    'message_type' => $msg->message_type ?? 'text',
+                ];
+            })
+            ->toArray();
+
+        $analysis = $this->wingmanService->analyzeDraftMessage($user, $match, $request->input('draft'), $messages);
+
+        return response()->json($analysis);
+    }
+
+    /**
      * Analyze the authenticated user's profile.
      *
      * @param Request $request
