@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class FeedbackTest extends TestCase
@@ -12,6 +13,8 @@ class FeedbackTest extends TestCase
 
     public function test_user_can_submit_feedback()
     {
+        Queue::fake();
+
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->postJson('/api/feedback', [
