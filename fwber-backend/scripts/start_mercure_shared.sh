@@ -34,7 +34,24 @@ if [ ! -f "$MERCURE_BIN" ]; then
     exit 1
 fi
 
-# 5. Start Mercure
+# 5. Kill existing Mercure processes
+echo "Checking for existing Mercure processes..."
+# Find PIDs of 'mercure run' but exclude this script and grep itself
+PIDS=$(ps aux | grep "$MERCURE_BIN" | grep -v "grep" | grep -v "start_mercure_shared.sh" | awk '{print $2}')
+
+if [ -n "$PIDS" ]; then
+    echo "Found running Mercure processes: $PIDS"
+    for PID in $PIDS; do
+        echo "Killing process $PID..."
+        kill $PID
+    done
+    echo "Waiting for processes to exit..."
+    sleep 2
+else
+    echo "No existing Mercure processes found."
+fi
+
+# 6. Start Mercure
 echo "Starting Mercure on $SERVER_NAME..."
 echo "CORS Allowed Origins: $MERCURE_CORS_ALLOWED_ORIGINS"
 
