@@ -796,7 +796,32 @@ class RecommendationService
      */
     private function getTrendingTopics(): array
     {
-        // This would get trending topics from analytics
-        return [];
+        // Get messages from the last 24 hours
+        $messages = BulletinMessage::where('created_at', '>=', now()->subHours(24))
+            ->limit(100) // Limit for performance
+            ->pluck('content');
+
+        if ($messages->isEmpty()) {
+            return [];
+        }
+
+        $text = $messages->implode(' ');
+        // Remove special characters and convert to lowercase
+        $text = preg_replace('/[^a-zA-Z0-9\s]/', '', strtolower($text));
+        
+        $words = str_word_count($text, 1);
+        $stopWords = [
+            'the', 'and', 'is', 'in', 'at', 'to', 'for', 'with', 'a', 'of', 'it', 'on', 'that', 'this', 'i', 'you', 'my', 'are',
+            'was', 'were', 'be', 'been', 'have', 'has', 'had', 'do', 'does', 'did', 'but', 'or', 'as', 'if', 'when', 'than',
+            'about', 'from', 'by', 'an', 'so', 'what', 'who', 'which', 'where', 'why', 'how', 'all', 'any', 'both', 'each',
+            'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too',
+            'very', 'can', 'will', 'just', 'should', 'now'
+        ];
+        
+        $filtered = array_filter($words, fn($w) => strlen($w) > 3 && !in_array($w, $stopWords));
+        $counts = array_count_values($filtered);
+        arsort($counts);
+        
+        return array_slice(array_keys($counts), 0, 5);
     }
 }

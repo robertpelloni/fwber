@@ -135,4 +135,40 @@ class RecommendationServiceTest extends TestCase
         // Freshness ~1.0. Score = 0.8 * 1.0 + 0.2 = 1.0
         $this->assertEqualsWithDelta(1.0, $score, 0.01);
     }
+
+    public function testGetTrendingTopics()
+    {
+        // Create messages with recurring keywords
+        $user = User::factory()->create();
+        $board = \App\Models\BulletinBoard::factory()->create();
+
+        \App\Models\BulletinMessage::create([
+            'user_id' => $user->id,
+            'bulletin_board_id' => $board->id,
+            'content' => 'I love coding with Laravel framework',
+        ]);
+
+        \App\Models\BulletinMessage::create([
+            'user_id' => $user->id,
+            'bulletin_board_id' => $board->id,
+            'content' => 'Laravel is a great framework for coding',
+        ]);
+
+        \App\Models\BulletinMessage::create([
+            'user_id' => $user->id,
+            'bulletin_board_id' => $board->id,
+            'content' => 'Coding in PHP is fun',
+        ]);
+
+        $reflection = new \ReflectionClass($this->service);
+        $method = $reflection->getMethod('getTrendingTopics');
+        $method->setAccessible(true);
+
+        $topics = $method->invoke($this->service);
+
+        // 'coding' appears 3 times, 'laravel' 2 times, 'framework' 2 times
+        $this->assertContains('coding', $topics);
+        $this->assertContains('laravel', $topics);
+        $this->assertContains('framework', $topics);
+    }
 }
