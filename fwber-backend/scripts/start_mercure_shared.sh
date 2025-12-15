@@ -26,9 +26,13 @@ export MERCURE_PUBLISHER_JWT_KEY=${MERCURE_PUBLISHER_JWT_KEY}
 export MERCURE_SUBSCRIBER_JWT_KEY=${MERCURE_SUBSCRIBER_JWT_KEY}
 
 # Optimize for Shared Hosting (Low Memory)
-export GOMEMLIMIT=128MiB
-export GOGC=50
+# Aggressive memory limits for shared hosting environments
+export GOMEMLIMIT=64MiB
+export GOGC=20
 echo "Memory limits set: GOMEMLIMIT=$GOMEMLIMIT, GOGC=$GOGC"
+
+# Disable internal metrics to save memory
+export MERCURE_METRICS_ENABLED=0
 
 # 4. Check for Mercure binary
 MERCURE_BIN="./mercure"
