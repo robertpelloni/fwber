@@ -459,6 +459,24 @@ log_success "Queue workers restarted (if running)"
 echo ""
 
 #############################################################################
+# Mercure Service
+#############################################################################
+
+log_info "Restarting Mercure service..."
+if [ -f "scripts/start_mercure_shared.sh" ]; then
+    if [ "$DRY_RUN" = false ]; then
+        chmod +x scripts/start_mercure_shared.sh
+        ./scripts/start_mercure_shared.sh
+        log_success "Mercure restart script executed"
+    else
+        log_info "[DRY RUN] Would execute scripts/start_mercure_shared.sh"
+    fi
+else
+    log_warning "Mercure startup script not found at scripts/start_mercure_shared.sh"
+fi
+echo ""
+
+#############################################################################
 # File Permissions
 #############################################################################
 
@@ -524,6 +542,7 @@ log_info "  1. Verify application is accessible"
 log_info "  2. Check logs: tail -f storage/logs/laravel.log"
 log_info "  3. Monitor error tracking (Sentry)"
 log_info "  4. Check queue workers: ps aux | grep queue"
+log_info "  5. Check Mercure logs: tail -f mercure.log"
 echo ""
 
 exit 0

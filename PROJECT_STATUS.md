@@ -55,6 +55,16 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Frontend**: Implemented `SlowRequestStatsTable` in Admin Analytics to visualize aggregated performance data.
     -   **Verification**: Verified data flow from middleware to frontend UI.
 
+### ✅ Post-Launch Fixes (Dec 15 - Part 3)
+1.  **Profile Update Stability**:
+    -   **Issue**: Users encountered "Error updating profile" due to strict validation rejecting empty optional fields and a 500 error caused by misconfigured logging.
+    -   **Fix**: Updated `UpdateProfileRequest` to allow `nullable` values. Removed broken `slack` channel from default logging stack in `config/logging.php`.
+    -   **Verification**: Verified with reproduction test case.
+2.  **Mercure CORS Fix**:
+    -   **Issue**: Real-time connection failures due to missing CORS headers on `https://mercure.fwber.me`.
+    -   **Fix**: Updated `nginx.conf` to explicitly handle CORS for `/.well-known/mercure` endpoint.
+    -   **Verification**: Nginx configuration reloaded.
+
 ### ✅ Viral Growth Features (Dec 15 - Part 2)
 1.  **Viral Quest (Share to Unlock)**:
     -   **Concept**: Users can unlock premium features (24h Gold) by getting unique views on their shared viral content.

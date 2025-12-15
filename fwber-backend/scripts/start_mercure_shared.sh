@@ -147,15 +147,7 @@ fi
 echo "Starting Mercure on $SERVER_NAME..."
 echo "CORS Allowed Origins: $MERCURE_CORS_ALLOWED_ORIGINS"
 
-# Run in background or foreground?
-# For testing/manual start:
-# Bind to localhost only to avoid firewall issues if using reverse proxy
-# If direct access is needed, use 0.0.0.0 or specific IP
-# But for debugging, let's try to run it and capture output
-
-# v0.11.0+ syntax:
-$MERCURE_BIN run --config Caddyfile --adapter caddyfile 2>&1 || $MERCURE_BIN run 2>&1
-
-# For background (uncomment to use):
-# nohup $MERCURE_BIN run > mercure.log 2>&1 &
-# echo "Mercure started in background. PID: $!"
+# Run in background using nohup
+nohup $MERCURE_BIN run --config Caddyfile --adapter caddyfile > mercure.log 2>&1 &
+echo "Mercure started in background. PID: $!"
+echo "Logs available in mercure.log"

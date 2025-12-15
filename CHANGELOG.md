@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.1] - 2025-12-15
+
+### Fixed
+- **Profile Update**: Fixed validation errors preventing users from updating profiles with empty optional fields.
+- **Profile Update**: Fixed 500 Internal Server Error caused by misconfigured Slack logging in production.
+- **Mercure**: Fixed CORS errors for real-time service by adding explicit headers in Nginx configuration.
+
 ## [0.2.0] - 2025-12-15
 
 ### Added

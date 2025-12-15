@@ -23,6 +23,8 @@
 		publisher_jwt {env.MERCURE_PUBLISHER_JWT_KEY} {env.MERCURE_PUBLISHER_JWT_ALG}
 		# Subscriber JWT key
 		subscriber_jwt {env.MERCURE_SUBSCRIBER_JWT_KEY} {env.MERCURE_SUBSCRIBER_JWT_ALG}
+		# CORS Configuration
+		cors_origins {$MERCURE_CORS_ALLOWED_ORIGINS:https://fwber.me https://www.fwber.me}
 		# Extra directives
 		{$MERCURE_EXTRA_DIRECTIVES}
 	}
