@@ -15,14 +15,43 @@ class ViralContentController extends Controller
      */
     public function show($id)
     {
-        $content = ViralContent::where('id', $id)->firstOrFail();
+        $content = ViralContent::with('user')->where('id', $id)->firstOrFail();
+
+        // Increment views if not the owner
+        $viewerId = auth('sanctum')->id();
+        
+        // Simple view counting (can be improved with IP tracking to prevent spam)
+        if (!$viewerId || $viewerId !== $content->user_id) {
+            $content->increment('views');
+            
+            // Check for reward (5 views)
+            // Reload to get updated views count
+            if ($content->fresh()->views >= 5 && !$content->reward_claimed) {
+                $owner = $content->user;
+                if ($owner) {
+                    // Grant 24 hours of Gold
+                    $currentExpiry = $owner->tier_expires_at ?: now();
+                    if ($currentExpiry->isPast()) {
+                        $currentExpiry = now();
+                    }
+                    
+                    $owner->update([
+                        'tier' => 'gold',
+                        'tier_expires_at' => $currentExpiry->addHours(24),
+                    ]);
+                    
+                    $content->update(['reward_claimed' => true]);
+                }
+            }
+        }
 
         return response()->json([
             'type' => $content->type,
             'content' => $content->content,
             'created_at' => $content->created_at,
-            // We might want to include some user info, but be careful about privacy.
-            // For now, let's just return the content.
+            'views' => $content->views,
+            'is_owner' => $viewerId === $content->user_id,
+            'reward_claimed' => $content->reward_claimed,
         ]);
     }
 }

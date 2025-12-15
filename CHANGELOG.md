@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2025-12-15
+
+### Added
+- **Viral Quest**: Implemented "Share to Unlock" mechanic for Viral Content.
+    - Users can now unlock 24h of Gold Premium by getting 5 unique views on their shared content (Roast, Vibe Check, etc.).
+    - Added progress tracking banner on the shared content page for the owner.
+- **Backend**:
+    - Added `views` and `reward_claimed` columns to `viral_contents` table.
+    - Updated `ViralContentController` to track unique views and automatically award Gold Premium.
+
 ## [0.1.0] - 2025-12-15
 
 ### Added

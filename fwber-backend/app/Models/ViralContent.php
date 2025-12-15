@@ -13,10 +13,14 @@ class ViralContent extends Model
         'user_id',
         'type',
         'content',
+        'views',
+        'reward_claimed',
     ];
 
     protected $casts = [
         'content' => 'array',
+        'views' => 'integer',
+        'reward_claimed' => 'boolean',
     ];
 
     public function user()

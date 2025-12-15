@@ -11,6 +11,9 @@ interface ViralContent {
   type: string;
   content: any;
   created_at: string;
+  views: number;
+  is_owner: boolean;
+  reward_claimed: boolean;
 }
 
 export function ShareContent({ id }: { id: string }) {
@@ -187,6 +190,31 @@ export function ShareContent({ id }: { id: string }) {
       <main className="flex-1 container max-w-2xl mx-auto p-4 flex flex-col justify-center">
         <Card className="bg-gray-900 border-gray-800 shadow-2xl">
           <CardContent className="p-8">
+            {data.is_owner && (
+              <div className="mb-6 p-4 bg-gradient-to-r from-purple-900/50 to-pink-900/50 border border-purple-500/30 rounded-lg">
+                <h3 className="text-lg font-bold text-white mb-2">Viral Quest 🚀</h3>
+                {data.reward_claimed ? (
+                  <div className="flex items-center gap-2 text-green-400">
+                    <CheckCircle2 className="w-5 h-5" />
+                    <span>Quest Complete! You earned 24h of Gold Premium.</span>
+                  </div>
+                ) : (
+                  <div>
+                    <p className="text-gray-300 mb-2">
+                      Get 5 views on this link to unlock <strong>24h of Gold Premium</strong>!
+                    </p>
+                    <div className="w-full bg-gray-700 rounded-full h-2.5 mb-1">
+                      <div 
+                        className="bg-purple-500 h-2.5 rounded-full transition-all duration-500" 
+                        style={{ width: `${Math.min((data.views / 5) * 100, 100)}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-xs text-right text-gray-400">{data.views} / 5 views</p>
+                  </div>
+                )}
+              </div>
+            )}
+
             {renderContent()}
             
             <div className="mt-8 pt-8 border-t border-gray-800 text-center space-y-4">
