@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.2] - 2025-12-15
+
+### Added
+- **E2E Testing**:
+    - Added `gifts.cy.js` to test virtual gifting flow.
+    - Added `report-user.cy.js` to test user reporting flow.
+    - Enhanced `video-chat.cy.js` to test incoming call simulation.
+
+### Fixed
+- **Deployment**: Hardened `deploy.sh` with `trap` to ensure site exits maintenance mode even if deployment fails.
+- **Mercure**: Removed conflicting CORS configuration in `start_mercure_shared.sh` to resolve startup issues.
+- **Documentation**: Fixed syntax error in `WebSocketController` to enable API documentation generation.
+
 ## [0.2.1] - 2025-12-15
 
 ### Fixed

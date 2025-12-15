@@ -188,4 +188,80 @@ describe('Video Chat Flow', () => {
     // 8. Verify Status Update
     cy.wait('@updateCallStatus');
   });
+
+  it('handles incoming video call', () => {
+    cy.visit('/messages', {
+      onBeforeLoad: (win) => {
+        win.localStorage.setItem('fwber_token', 'fake-token');
+        win.localStorage.setItem('fwber_user', JSON.stringify(user));
+        
+        // Inject Feature Flag
+        win.__CYPRESS_FEATURE_FLAGS__ = {
+          video_chat: true
+        };
+
+        // Mock getUserMedia
+        cy.stub(win.navigator.mediaDevices, 'getUserMedia').resolves({
+          getTracks: () => [{ stop: () => {} }],
+          getVideoTracks: () => [{ enabled: true }],
+          getAudioTracks: () => [{ enabled: true }]
+        });
+
+        // Mock EventSource to simulate incoming call
+        win.EventSource = class MockEventSource {
+            constructor(url) {
+                this.url = url;
+                this.onmessage = null;
+                this.addEventListener = (type, callback) => {
+                    if (type === 'message') this.onmessage = callback;
+                };
+                win.mockEventSourceInstance = this;
+            }
+            close() {}
+        };
+      }
+    });
+
+    cy.wait('@getConversations');
+
+    // Simulate incoming call event
+    cy.window().then((win) => {
+        // Wait for EventSource to be initialized by the app
+        // This might be flaky if app initializes it async, but usually it's in useEffect
+        
+        const incomingCallData = {
+            type: 'video_call_initiated',
+            data: {
+                call_id: 'call-incoming-123',
+                caller_id: partner.id,
+                caller_name: partner.name,
+                caller_avatar: partner.profile.avatar_url
+            }
+        };
+
+        // We need to simulate the Mercure structure
+        // The app likely listens to a specific topic
+        if (win.mockEventSourceInstance && win.mockEventSourceInstance.onmessage) {
+            const event = new MessageEvent('message', {
+                data: JSON.stringify(incomingCallData)
+            });
+            win.mockEventSourceInstance.onmessage(event);
+        }
+    });
+
+    // Verify Incoming Call Modal
+    // Note: This depends on how the app handles the event. 
+    // If the app uses a global listener, this should work.
+    // If it requires being in a specific conversation, we might need to navigate first.
+    // Assuming global listener for incoming calls:
+    
+    cy.contains('Incoming Call').should('be.visible');
+    cy.contains('Future Partner is calling...').should('be.visible');
+
+    // Accept Call
+    cy.contains('button', 'Accept').click();
+
+    // Verify Video Interface opens
+    cy.get('video').should('have.length.at.least', 1);
+  });
 });

@@ -55,6 +55,13 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Frontend**: Implemented `SlowRequestStatsTable` in Admin Analytics to visualize aggregated performance data.
     -   **Verification**: Verified data flow from middleware to frontend UI.
 
+### ✅ Technical Maintenance (Dec 15)
+1.  **E2E Test Expansion**:
+    -   **Gifts**: Created `cypress/e2e/gifts.cy.js` covering sending gifts and insufficient token scenarios.
+    -   **Reporting & Blocking**: Created `cypress/e2e/report-user.cy.js` covering user reporting and blocking flows.
+    -   **Video Chat**: Enhanced `video-chat.cy.js` to simulate incoming calls via mocked EventSource.
+    -   **Verification**: New tests created and ready for CI execution.
+
 ### ✅ Post-Launch Fixes (Dec 15 - Part 3)
 1.  **Profile Update Stability**:
     -   **Issue**: Users encountered "Error updating profile" due to strict validation rejecting empty optional fields and a 500 error caused by misconfigured logging.
