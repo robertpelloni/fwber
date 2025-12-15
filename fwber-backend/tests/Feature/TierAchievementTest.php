@@ -54,12 +54,12 @@ class TierAchievementTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson(['current_tier' => 'connected']);
 
-        $this->assertDatabaseHas('achievement_user', [
+        $this->assertDatabaseHas('user_achievements', [
             'user_id' => $user1->id,
             'achievement_id' => Achievement::where('name', 'Connected')->first()->id,
         ]);
 
-        $this->assertDatabaseHas('achievement_user', [
+        $this->assertDatabaseHas('user_achievements', [
             'user_id' => $user2->id,
             'achievement_id' => Achievement::where('name', 'Connected')->first()->id,
         ]);
@@ -93,7 +93,7 @@ class TierAchievementTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson(['current_tier' => 'established']);
 
-        $this->assertDatabaseHas('achievement_user', [
+        $this->assertDatabaseHas('user_achievements', [
             'user_id' => $user1->id,
             'achievement_id' => Achievement::where('name', 'Established')->first()->id,
         ]);
@@ -132,12 +132,12 @@ class TierAchievementTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson(['current_tier' => 'verified']);
 
-        $this->assertDatabaseHas('achievement_user', [
+        $this->assertDatabaseHas('user_achievements', [
             'user_id' => $user1->id,
             'achievement_id' => Achievement::where('name', 'Verified Connection')->first()->id,
         ]);
 
-        $this->assertDatabaseHas('achievement_user', [
+        $this->assertDatabaseHas('user_achievements', [
             'user_id' => $user2->id,
             'achievement_id' => Achievement::where('name', 'Verified Connection')->first()->id,
         ]);
