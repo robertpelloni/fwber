@@ -245,6 +245,14 @@ export async function updateUserProfile(
   token: string,
   updates: ProfileUpdateData
 ): Promise<UserProfile> {
+  // Map frontend fields to backend expected fields
+  const payload: any = { ...updates };
+  
+  if (updates.date_of_birth) {
+    payload.birthdate = updates.date_of_birth;
+    delete payload.date_of_birth;
+  }
+
   const response = await fetch(`${API_BASE_URL}/profile`, {
     method: 'PUT',
     headers: {
@@ -252,12 +260,13 @@ export async function updateUserProfile(
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     },
-    body: JSON.stringify(updates),
+    body: JSON.stringify(payload),
   });
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'Failed to update profile' }));
-    throw new Error(error.message || 'Failed to update profile');
+    console.error('Profile update failed:', error);
+    throw new Error(error.message || error.error || 'Failed to update profile');
   }
 
   const data = await response.json();

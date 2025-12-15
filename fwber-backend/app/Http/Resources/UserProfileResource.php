@@ -141,8 +141,8 @@ class UserProfileResource extends JsonResource
         $requiredFields = [
             'display_name',
             'gender',
-            'location_latitude',
-            'location_longitude',
+            'latitude',
+            'longitude',
             'looking_for',
         ];
 
@@ -153,12 +153,12 @@ class UserProfileResource extends JsonResource
         }
 
         // Require DOB and adulthood >= 18
-        if (empty($this->profile->date_of_birth)) {
+        if (empty($this->profile->birthdate)) {
             return false;
         }
-        $dob = $this->profile->date_of_birth instanceof \DateTimeInterface
-            ? Carbon::instance($this->profile->date_of_birth)
-            : Carbon::parse($this->profile->date_of_birth);
+        $dob = $this->profile->birthdate instanceof \DateTimeInterface
+            ? Carbon::instance($this->profile->birthdate)
+            : Carbon::parse($this->profile->birthdate);
         if ($dob->age < 18) {
             return false;
         }
@@ -178,15 +178,14 @@ class UserProfileResource extends JsonResource
         $allFields = [
             'display_name',
             'bio',
-            // Count DOB presence instead of raw age field
-            'date_of_birth',
+            'birthdate',
             'gender',
             'pronouns',
             'sexual_orientation',
             'relationship_style',
             'looking_for',
-            'location_latitude',
-            'location_longitude',
+            'latitude',
+            'longitude',
             'preferences',
         ];
         
