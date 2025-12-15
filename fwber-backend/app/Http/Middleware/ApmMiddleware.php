@@ -24,17 +24,29 @@ class ApmMiddleware
 
         $startTime = microtime(true);
         
-        // Enable query logging if not already enabled
-        // Note: In production with high traffic, this might add overhead.
-        // Ideally, we only enable this if we suspect slowness or sampling.
-        // For now, we'll enable it to capture the count.
-        DB::enableQueryLog();
-        DB::flushQueryLog();
+        $queryCount = 0;
+        $slowQueries = [];
+        
+        // Use DB::listen instead of enableQueryLog to save memory
+        // This is safer for production as it doesn't store the full query log in memory
+        DB::listen(function ($query) use (&$queryCount, &$slowQueries) {
+            $queryCount++;
+            // Capture queries taking longer than 50ms
+            if ($query->time > 50) {
+                // Limit the number of slow queries captured to prevent huge payloads
+                if (count($slowQueries) < 20) {
+                    $slowQueries[] = [
+                        'sql' => $query->sql,
+                        'time' => $query->time,
+                        'connection' => $query->connectionName,
+                    ];
+                }
+            }
+        });
 
         $response = $next($request);
 
         $duration = (microtime(true) - $startTime) * 1000; // in milliseconds
-        $queryCount = count(DB::getQueryLog());
         $memoryUsage = memory_get_peak_usage(true) / 1024; // KB
 
         // Log slow requests
@@ -49,6 +61,7 @@ class ApmMiddleware
                     'duration_ms' => $duration,
                     'db_query_count' => $queryCount,
                     'memory_usage_kb' => $memoryUsage,
+                    'slowest_queries' => !empty($slowQueries) ? $slowQueries : null,
                     'ip' => $request->ip(),
                     'user_agent' => $request->userAgent(),
                     'payload' => $request->isMethod('GET') ? null : $request->except(['password', 'password_confirmation']),

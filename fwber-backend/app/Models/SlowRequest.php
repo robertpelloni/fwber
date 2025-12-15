@@ -19,6 +19,7 @@ class SlowRequest extends Model
         'duration_ms',
         'db_query_count',
         'memory_usage_kb',
+        'slowest_queries',
         'ip',
         'user_agent',
         'payload',
@@ -28,6 +29,7 @@ class SlowRequest extends Model
         'duration_ms' => 'float',
         'db_query_count' => 'integer',
         'memory_usage_kb' => 'integer',
+        'slowest_queries' => 'array',
         'payload' => 'array',
     ];
 

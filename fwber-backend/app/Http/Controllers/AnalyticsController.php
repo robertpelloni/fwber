@@ -262,11 +262,22 @@ class AnalyticsController extends Controller
             }
 
             if (!empty($issues)) {
+                // Fetch a sample request to get the slowest queries
+                $sample = SlowRequest::where(function($query) use ($stat) {
+                        $query->where('route_name', $stat->endpoint)
+                              ->orWhere('action', $stat->endpoint)
+                              ->orWhere('url', $stat->endpoint);
+                    })
+                    ->whereNotNull('slowest_queries')
+                    ->latest()
+                    ->first();
+
                 $insights[] = [
                     'endpoint' => $stat->endpoint,
                     'method' => $stat->method,
                     'impact_score' => $stat->count * $stat->avg_duration, // Frequency * Duration
                     'issues' => $issues,
+                    'sample_slow_queries' => $sample ? $sample->slowest_queries : null,
                 ];
             }
         }

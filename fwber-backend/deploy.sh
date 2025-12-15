@@ -297,6 +297,7 @@ echo ""
 # Get current commit hash
 COMMIT_HASH=$(git rev-parse --short HEAD)
 log_info "Deployed commit: $COMMIT_HASH"
+export SENTRY_RELEASE="fwber-backend@$COMMIT_HASH"
 echo ""
 
 #############################################################################

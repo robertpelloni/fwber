@@ -138,4 +138,39 @@ class SlowRequestTest extends TestCase
         $this->assertNotEmpty($data);
         $this->assertStringContainsString('High database query count', $data[0]['issues'][0]);
     }
+
+    public function test_analytics_analysis_endpoint_returns_insights_with_slow_queries(): void
+    {
+        $user = User::factory()->create();
+        
+        // Create 5 slow requests with high DB query count (N+1 simulation)
+        for ($i = 0; $i < 5; $i++) {
+            SlowRequest::create([
+                'user_id' => $user->id,
+                'method' => 'GET',
+                'url' => 'http://localhost/api/n-plus-one',
+                'route_name' => 'api.n-plus-one',
+                'action' => 'BadController@index',
+                'duration_ms' => 500,
+                'ip' => '127.0.0.1',
+                'db_query_count' => 100, // High query count
+                'memory_usage_kb' => 2048,
+                'slowest_queries' => [
+                    ['sql' => 'SELECT * FROM users', 'time' => 100, 'connection' => 'mysql']
+                ]
+            ]);
+        }
+
+        $response = $this->actingAs($user)->getJson('/api/analytics/slow-requests/analysis');
+
+        $response->assertStatus(200)
+            ->assertJsonFragment([
+                'endpoint' => 'api.n-plus-one',
+            ]);
+            
+        $data = $response->json();
+        $this->assertNotEmpty($data);
+        $this->assertArrayHasKey('sample_slow_queries', $data[0]);
+        $this->assertEquals('SELECT * FROM users', $data[0]['sample_slow_queries'][0]['sql']);
+    }
 }
