@@ -20,12 +20,9 @@ use App\Http\Controllers\RateLimitController;
 use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\Api\RelationshipTierController;
-use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\UserPhysicalProfileController;
 use App\Http\Controllers\Api\BlockController;
 use App\Http\Controllers\Api\ReportController;
-use App\Http\Controllers\Api\GroupController;
-use App\Http\Controllers\Api\GroupMessageController;
 use App\Http\Controllers\WebSocketController;
 use App\Http\Controllers\ProximityArtifactController;
 use App\Http\Controllers\ModerationController;
@@ -216,7 +213,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('events/{id}/rsvp', [EventController::class, 'rsvp']);
 
     // Groups
-    Route::get('groups/my-groups', [\App\Http\Controllers\GroupController::class, 'myGroups']);
+    Route::get('groups/my-groups', [\App\Http\Controllers\GroupController::class, 'index']);
     Route::post('groups/{id}/join', [\App\Http\Controllers\GroupController::class, 'join']);
     Route::post('groups/{id}/leave', [\App\Http\Controllers\GroupController::class, 'leave']);
     Route::apiResource('groups', \App\Http\Controllers\GroupController::class);
@@ -255,12 +252,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('matches/action', [\App\Http\Controllers\MatchController::class, 'action'])->middleware('throttle:matching');
 
     // Direct Messages
-    Route::get('messages/unread-count', [\App\Http\Controllers\Api\MessageController::class, 'unreadCount']);
-    Route::post('messages', [\App\Http\Controllers\Api\MessageController::class, 'store'])->middleware('throttle:messaging');
+    Route::get('messages/unread-count', [\App\Http\Controllers\MessageController::class, 'unreadCount']);
+    Route::post('messages', [\App\Http\Controllers\MessageController::class, 'store'])->middleware('throttle:messaging');
     Route::post('messages/translate', [\App\Http\Controllers\TranslationController::class, 'translate'])->middleware('throttle:content_generation');
-    Route::get('messages/{userId}', [\App\Http\Controllers\Api\MessageController::class, 'index']);
-    Route::post('messages/{messageId}/read', [\App\Http\Controllers\Api\MessageController::class, 'markAsRead']);
-    Route::post('messages/mark-all-read/{senderId}', [\App\Http\Controllers\Api\MessageController::class, 'markAllAsRead']);
+    Route::get('messages/{userId}', [\App\Http\Controllers\MessageController::class, 'index']);
+    Route::post('messages/{messageId}/read', [\App\Http\Controllers\MessageController::class, 'markAsRead']);
+    Route::post('messages/mark-all-read/{senderId}', [\App\Http\Controllers\MessageController::class, 'markAllAsRead']);
 
     // Chatrooms
     Route::get('chatrooms/my', [\App\Http\Controllers\ChatroomController::class, 'myChatrooms']);

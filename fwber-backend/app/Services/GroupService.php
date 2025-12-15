@@ -22,11 +22,30 @@ class GroupService
             $group = Group::create([
                 'name' => $data['name'],
                 'description' => $data['description'] ?? null,
-                'visibility' => $data['visibility'] ?? 'public',
+                'icon' => $data['icon'] ?? null,
+                'privacy' => $data['privacy'] ?? 'public',
+                'visibility' => $data['visibility'] ?? 'visible',
                 'creator_id' => $userId,
+                'created_by_user_id' => $userId,
                 'max_members' => $data['max_members'] ?? 100,
                 'is_active' => true,
+                'member_count' => 1,
             ]);
+
+            // Create associated chatroom
+            $chatroom = \App\Models\Chatroom::create([
+                'name' => $group->name,
+                'description' => $group->description,
+                'type' => 'group',
+                'created_by' => $userId,
+                'is_public' => ($data['privacy'] ?? 'public') === 'public',
+                'is_active' => true,
+                'member_count' => 1,
+                'last_activity_at' => now(),
+            ]);
+
+            $group->update(['chatroom_id' => $chatroom->id]);
+            $chatroom->addMember(\App\Models\User::find($userId), 'admin');
 
             // Add creator as owner
             GroupMember::create([
@@ -43,7 +62,7 @@ class GroupService
 
     public function joinGroup(Group $group, int $userId): void
     {
-        if ($group->visibility === 'private') {
+        if ($group->privacy === 'private') {
             throw new \Exception('Cannot join private group', 403);
         }
 
@@ -83,6 +102,16 @@ class GroupService
                 'joined_at' => now(),
             ]);
         }
+
+        $group->increment('member_count');
+
+        // Add to chatroom if exists
+        if ($group->chatroom_id) {
+            $chatroom = \App\Models\Chatroom::find($group->chatroom_id);
+            if ($chatroom && !$chatroom->hasMember($userId)) {
+                $chatroom->addMember(\App\Models\User::find($userId), 'member');
+            }
+        }
     }
 
     public function leaveGroup(Group $group, int $userId): void
@@ -100,6 +129,16 @@ class GroupService
         $member->is_active = false;
         $member->left_at = now();
         $member->save();
+
+        $group->decrement('member_count');
+
+        // Remove from chatroom if exists
+        if ($group->chatroom_id) {
+            $chatroom = \App\Models\Chatroom::find($group->chatroom_id);
+            if ($chatroom) {
+                $chatroom->removeMember(\App\Models\User::find($userId));
+            }
+        }
     }
 
     public function setMemberRole(Group $group, int $actorId, int $memberUserId, string $newRole): void

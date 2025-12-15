@@ -713,6 +713,11 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   `DEPLOYMENT.md`: Production deployment guide.
 
 ## 🛠 Maintenance & Cleanup
+-   **Controller Cleanup (Dec 15)**:
+    -   **Consolidation**: Merged `Api/GroupController` into `GroupController` and updated namespace.
+    -   **Standardization**: Moved `Api/MessageController` to `MessageController`.
+    -   **Cleanup**: Removed duplicate `Api/MediaAnalysisController` and unused `Api/GroupMessageController`.
+    -   **Verification**: Updated `routes/api.php` to reflect changes.
 -   **Backend Route Restoration (Nov 28)**:
     -   Restored missing API routes for `Recommendations`, `Proximity Artifacts`, `Matches`, and `Chatrooms` in `fwber-backend/routes/api.php`.
     -   Fixed `RecommendationService` instantiation error (null config handling).
