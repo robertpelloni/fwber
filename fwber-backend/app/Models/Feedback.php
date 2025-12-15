@@ -13,6 +13,9 @@ class Feedback extends Model
         'page_url',
         'metadata',
         'status',
+        'sentiment',
+        'ai_analysis',
+        'is_analyzed',
     ];
 
     protected $casts = [

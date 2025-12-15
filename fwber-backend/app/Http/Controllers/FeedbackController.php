@@ -104,6 +104,9 @@ class FeedbackController extends Controller
                 'metadata' => $request->metadata,
             ]);
 
+            // Dispatch analysis job
+            \App\Jobs\AnalyzeFeedback::dispatch($feedback->id);
+
             Log::info('Feedback received', ['id' => $feedback->id, 'category' => $feedback->category]);
 
             return response()->json([
