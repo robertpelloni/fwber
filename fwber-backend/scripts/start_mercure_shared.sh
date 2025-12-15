@@ -28,10 +28,30 @@ export MERCURE_SUBSCRIBER_JWT_KEY=${MERCURE_SUBSCRIBER_JWT_KEY}
 MERCURE_BIN="./mercure"
 if [ ! -f "$MERCURE_BIN" ]; then
     echo "Mercure binary not found at $MERCURE_BIN"
-    echo "Please download it appropriate for your system (likely Linux x86_64):"
-    echo "wget https://github.com/dunglas/mercure/releases/download/v0.15.0/mercure_0.15.0_Linux_x86_64.tar.gz"
-    echo "tar xzvf mercure_0.15.0_Linux_x86_64.tar.gz"
-    exit 1
+    echo "Downloading Mercure binary..."
+    
+    # Use v0.19.0 (stable)
+    DOWNLOAD_URL="https://github.com/dunglas/mercure/releases/download/v0.19.0/mercure_0.19.0_Linux_x86_64.tar.gz"
+    
+    if command -v wget &> /dev/null; then
+        wget -O mercure.tar.gz "$DOWNLOAD_URL"
+    elif command -v curl &> /dev/null; then
+        curl -L -o mercure.tar.gz "$DOWNLOAD_URL"
+    else
+        echo "Error: Neither wget nor curl found. Cannot download Mercure."
+        exit 1
+    fi
+    
+    if [ -f "mercure.tar.gz" ]; then
+        echo "Extracting Mercure..."
+        tar xzvf mercure.tar.gz
+        rm mercure.tar.gz
+        chmod +x mercure
+        echo "Mercure installed successfully."
+    else
+        echo "Error: Download failed."
+        exit 1
+    fi
 fi
 
 # 5. Kill existing Mercure processes

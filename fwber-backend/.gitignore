@@ -35,3 +35,7 @@ yarn-error.log
 /database/database.sqlite
 /storage/app/public/photos/*
 !/storage/app/public/photos/.gitignore
+
+# Mercure binary
+mercure
+mercure_*.tar.gz
