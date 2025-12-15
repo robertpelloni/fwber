@@ -502,6 +502,38 @@ namespace App\Http\Controllers;
  *   @OA\Property(property="created_at", type="string", format="date-time"),
  *   @OA\Property(property="updated_at", type="string", format="date-time")
  * )
+ * 
+ * @OA\Schema(
+ *   schema="UserProfileResource",
+ *   type="object",
+ *   required={"id","email"},
+ *   @OA\Property(property="id", type="integer", example=1),
+ *   @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+ *   @OA\Property(property="email_verified", type="boolean", example=true),
+ *   @OA\Property(property="created_at", type="string", format="date-time"),
+ *   @OA\Property(property="last_online", type="string", format="date-time"),
+ *   @OA\Property(property="profile", type="object",
+ *     @OA\Property(property="display_name", type="string", example="John"),
+ *     @OA\Property(property="bio", type="string", nullable=true),
+ *     @OA\Property(property="birthdate", type="string", format="date", example="1990-01-01"),
+ *     @OA\Property(property="age", type="integer", example=30),
+ *     @OA\Property(property="gender", type="string", example="male"),
+ *     @OA\Property(property="pronouns", type="string", nullable=true),
+ *     @OA\Property(property="sexual_orientation", type="string", nullable=true),
+ *     @OA\Property(property="relationship_style", type="string", nullable=true),
+ *     @OA\Property(property="looking_for", type="array", @OA\Items(type="string")),
+ *     @OA\Property(property="interested_in", type="array", @OA\Items(type="string")),
+ *     @OA\Property(property="interests", type="array", @OA\Items(type="string")),
+ *     @OA\Property(property="location", type="object",
+ *       @OA\Property(property="latitude", type="number", format="float"),
+ *       @OA\Property(property="longitude", type="number", format="float"),
+ *       @OA\Property(property="location_name", type="string", nullable=true)
+ *     ),
+ *     @OA\Property(property="photos", type="array", @OA\Items(ref="#/components/schemas/Photo")),
+ *     @OA\Property(property="profile_complete", type="boolean"),
+ *     @OA\Property(property="completion_percentage", type="integer")
+ *   )
+ * )
  */
 class Schemas
 {

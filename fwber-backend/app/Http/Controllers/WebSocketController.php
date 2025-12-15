@@ -683,6 +683,7 @@ class WebSocketController extends Controller
      */
     public function status(Request $request): JsonResponse
     {
+        try {
             $user = $request->user();
             if (!$user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
