@@ -30,26 +30,39 @@ if [ ! -f "$MERCURE_BIN" ]; then
     echo "Mercure binary not found at $MERCURE_BIN"
     echo "Downloading Mercure binary..."
     
-    # Use v0.19.0 (stable)
-    DOWNLOAD_URL="https://github.com/dunglas/mercure/releases/download/v0.19.0/mercure_0.19.0_Linux_x86_64.tar.gz"
+    # Use v0.21.4 (stable)
+    DOWNLOAD_URL="https://github.com/dunglas/mercure/releases/download/v0.21.4/mercure_Linux_x86_64.tar.gz"
     
     if command -v wget &> /dev/null; then
-        wget -O mercure.tar.gz "$DOWNLOAD_URL"
+        if ! wget -O mercure.tar.gz "$DOWNLOAD_URL"; then
+            echo "Error: Download failed with wget."
+            rm -f mercure.tar.gz
+            exit 1
+        fi
     elif command -v curl &> /dev/null; then
-        curl -L -o mercure.tar.gz "$DOWNLOAD_URL"
+        if ! curl -L -o mercure.tar.gz "$DOWNLOAD_URL"; then
+            echo "Error: Download failed with curl."
+            rm -f mercure.tar.gz
+            exit 1
+        fi
     else
         echo "Error: Neither wget nor curl found. Cannot download Mercure."
         exit 1
     fi
     
-    if [ -f "mercure.tar.gz" ]; then
+    if [ -s "mercure.tar.gz" ]; then
         echo "Extracting Mercure..."
-        tar xzvf mercure.tar.gz
-        rm mercure.tar.gz
-        chmod +x mercure
-        echo "Mercure installed successfully."
+        if tar xzvf mercure.tar.gz; then
+            rm mercure.tar.gz
+            chmod +x mercure
+            echo "Mercure installed successfully."
+        else
+            echo "Error: Extraction failed."
+            rm mercure.tar.gz
+            exit 1
+        fi
     else
-        echo "Error: Download failed."
+        echo "Error: Downloaded file is empty or missing."
         exit 1
     fi
 fi
