@@ -59,50 +59,10 @@ Route::post('stripe/webhook', [\App\Http\Controllers\StripeWebhookController::cl
 // Public Viral Content
 Route::get('viral-content/{id}', [\App\Http\Controllers\ViralContentController::class, 'show']);
 
-        // Device Token routes for Push Notifications
-        Route::prefix('device-tokens')->group(function (): void {
-            Route::post('/', [DeviceTokenController::class, 'store']);
-            Route::delete('/{token}', [DeviceTokenController::class, 'destroy']);
-        });
-
-        // Device Token routes for Push Notifications
-        Route::prefix('device-tokens')->group(function (): void {
-            Route::post('/', [DeviceTokenController::class, 'store']);
-            Route::delete('/{token}', [DeviceTokenController::class, 'destroy']);
-        });
-
-        // Notification routes
-        Route::get('/notifications', [DeviceTokenController::class, 'index']);
-
-        // Friend routes
-        Route::prefix('friends')->group(function () {
-            Route::get('/', [FriendController::class, 'getFriends']);
-            Route::get('/requests', [FriendController::class, 'getFriendRequests']);
-            Route::post('/requests', [FriendController::class, 'sendFriendRequest']);
-            Route::post('/requests/{userId}', [FriendController::class, 'respondToFriendRequest']);
-            Route::delete('/{friendId}', [FriendController::class, 'removeFriend']);
-            Route::get('/search', [FriendController::class, 'search']);
-        });
-
-        // Notification routes
-        Route::get('/notifications', [DeviceTokenController::class, 'index']);
-
-        // Block routes
-        Route::prefix('blocks')->group(function (): void {
-            Route::post('/', [BlockController::class, 'store']);
-            Route::delete('/{blockedId}', [BlockController::class, 'destroy']);
-        });
-
 // Venue Partner Auth
 Route::prefix('venue')->group(function () {
     Route::post('register', [\App\Http\Controllers\VenueAuthController::class, 'register']);
     Route::post('login', [\App\Http\Controllers\VenueAuthController::class, 'login']);
-        // Report routes
-        Route::prefix('reports')->group(function (): void {
-            Route::post('/', [ReportController::class, 'store']);
-            Route::get('/', [ReportController::class, 'index']);
-            Route::put('/{reportId}', [ReportController::class, 'update']);
-        });
 
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('logout', [\App\Http\Controllers\VenueAuthController::class, 'logout']);
@@ -115,6 +75,26 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    // Device Token routes for Push Notifications
+    Route::prefix('device-tokens')->group(function (): void {
+        Route::post('/', [DeviceTokenController::class, 'store']);
+        Route::delete('/{token}', [DeviceTokenController::class, 'destroy']);
+    });
+    Route::get('/notifications', [DeviceTokenController::class, 'index']);
+
+    // Block routes
+    Route::prefix('blocks')->group(function (): void {
+        Route::post('/', [BlockController::class, 'store']);
+        Route::delete('/{blockedId}', [BlockController::class, 'destroy']);
+    });
+
+    // Report routes
+    Route::prefix('reports')->group(function (): void {
+        Route::post('/', [ReportController::class, 'store']);
+        Route::get('/', [ReportController::class, 'index']);
+        Route::put('/{reportId}', [ReportController::class, 'update']);
+    });
+
     // Auth
     Route::post('auth/logout', [\App\Http\Controllers\AuthController::class, 'logout']);
     Route::get('auth/me', [\App\Http\Controllers\AuthController::class, 'me']);
