@@ -19,6 +19,11 @@ class ChatroomMessageTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // Force register rate limiter to debug AppServiceProvider issue
+        \Illuminate\Support\Facades\RateLimiter::for('messaging', function ($request) {
+            return \Illuminate\Cache\RateLimiting\Limit::perMinute(60);
+        });
         
         // Mock ContentModerationService
         $this->mock(ContentModerationService::class, function ($mock) {
