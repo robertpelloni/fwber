@@ -181,6 +181,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('analytics/moderation', [\App\Http\Controllers\AnalyticsController::class, 'moderation']);
     Route::get('analytics/slow-requests', [\App\Http\Controllers\AnalyticsController::class, 'slowRequests']);
     Route::get('analytics/slow-requests/stats', [\App\Http\Controllers\AnalyticsController::class, 'slowRequestStats']);
+    Route::get('analytics/slow-requests/analysis', [\App\Http\Controllers\AnalyticsController::class, 'analyzeSlowRequests']);
     Route::get('analytics/boosts', [\App\Http\Controllers\AnalyticsController::class, 'boosts']);
     Route::get('analytics/retention', [\App\Http\Controllers\AnalyticsController::class, 'retention']);
     
@@ -348,6 +349,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('feature:ai_wingman')->group(function () {
         Route::get('wingman/ice-breakers/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'getIceBreakers']);
         Route::get('wingman/replies/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'getReplySuggestions']);
+        Route::post('wingman/message-feedback/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'analyzeDraft']);
         Route::get('wingman/profile-analysis', [\App\Http\Controllers\AiWingmanController::class, 'getProfileAnalysis']);
         Route::get('wingman/date-ideas/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'getDateIdeas']);
         Route::post('wingman/roast', [\App\Http\Controllers\AiWingmanController::class, 'roastProfile']);
@@ -399,5 +401,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Share Unlock
     Route::post('share-unlock', [\App\Http\Controllers\Api\ShareUnlockController::class, 'store']);
     Route::get('share-unlock/{targetProfileId}', [\App\Http\Controllers\Api\ShareUnlockController::class, 'check']);
+
+    // Achievements
+    Route::get('achievements', [\App\Http\Controllers\AchievementController::class, 'index']);
 });
 

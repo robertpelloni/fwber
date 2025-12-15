@@ -216,6 +216,68 @@ class AnalyticsController extends Controller
     }
 
     /**
+     * Analyze slow requests and provide actionable insights
+     *
+     * @OA\Get(
+     *   path="/analytics/slow-requests/analysis",
+     *   tags={"Analytics"},
+     *   summary="Analyze slow requests for optimization opportunities",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="Analysis insights")
+     * )
+     */
+    public function analyzeSlowRequests(): JsonResponse
+    {
+        $stats = SlowRequest::selectRaw('
+                COALESCE(route_name, action, url) as endpoint,
+                method,
+                COUNT(*) as count,
+                AVG(duration_ms) as avg_duration,
+                AVG(db_query_count) as avg_queries,
+                AVG(memory_usage_kb) as avg_memory
+            ')
+            ->where('created_at', '>=', now()->subDays(7))
+            ->groupBy('endpoint', 'method')
+            ->having('count', '>=', 5) // Only analyze frequent slow requests
+            ->get();
+
+        $insights = [];
+
+        foreach ($stats as $stat) {
+            $issues = [];
+            
+            // Check for N+1 queries
+            if ($stat->avg_queries > 50) {
+                $issues[] = "High database query count ({$stat->avg_queries}). Potential N+1 query problem.";
+            }
+
+            // Check for memory leaks or heavy processing
+            if ($stat->avg_memory > 50000) { // 50MB
+                $issues[] = "High memory usage (" . round($stat->avg_memory / 1024, 1) . "MB). Check for large collections or memory leaks.";
+            }
+
+            // Check for slow processing despite low DB usage
+            if ($stat->avg_duration > 1000 && $stat->avg_queries < 10) {
+                $issues[] = "Slow response time ({$stat->avg_duration}ms) with low DB usage. Potential CPU bottleneck or external API latency.";
+            }
+
+            if (!empty($issues)) {
+                $insights[] = [
+                    'endpoint' => $stat->endpoint,
+                    'method' => $stat->method,
+                    'impact_score' => $stat->count * $stat->avg_duration, // Frequency * Duration
+                    'issues' => $issues,
+                ];
+            }
+        }
+
+        // Sort by impact score
+        usort($insights, fn($a, $b) => $b['impact_score'] <=> $a['impact_score']);
+
+        return response()->json(array_values($insights));
+    }
+
+    /**
      * Get trend analytics
      */
     private function getTrendAnalytics(array $dateRange): array
