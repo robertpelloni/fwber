@@ -83,6 +83,23 @@ done
 # Helper Functions
 #############################################################################
 
+# Ensure site is brought back up on failure
+cleanup() {
+    EXIT_CODE=$?
+    if [ $EXIT_CODE -ne 0 ]; then
+        echo ""
+        log_error "Deployment failed with exit code $EXIT_CODE"
+        log_info "Attempting to bring application out of maintenance mode..."
+        
+        if [ -f "artisan" ]; then
+            php artisan up || true
+        elif [ -f "fwber-backend/artisan" ]; then
+            php fwber-backend/artisan up || true
+        fi
+    fi
+}
+trap cleanup EXIT
+
 log_info() {
     echo -e "${BLUE}[INFO]${NC} $1"
 }

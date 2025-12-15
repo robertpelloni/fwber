@@ -27,9 +27,8 @@ export MERCURE_SUBSCRIBER_JWT_KEY=${MERCURE_SUBSCRIBER_JWT_KEY}
 
 # Configure transport to use local file instead of default system path
 # This fixes "invalid transport: open ...: no such file or directory"
-# Also inject CORS origins explicitly for Caddyfile
-export MERCURE_EXTRA_DIRECTIVES="cors_origins $MERCURE_CORS_ALLOWED_ORIGINS
-transport_url bolt://$(pwd)/mercure.db"
+# CORS origins are already handled in Caddyfile via {$MERCURE_CORS_ALLOWED_ORIGINS}
+export MERCURE_EXTRA_DIRECTIVES="transport_url bolt://$(pwd)/mercure.db"
 
 # Optimize for Shared Hosting (Low Memory)
 # Aggressive memory limits for shared hosting environments
