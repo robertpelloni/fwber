@@ -20,9 +20,15 @@ fi
 
 # 3. Set other required Mercure variables if missing
 # These should ideally be in your .env, but defaults help
-export SERVER_NAME=${MERCURE_SERVER_NAME:-":3001"} # Port to listen on (must be open/allowed)
+# Use http:// to prevent Auto-HTTPS (which can cause issues on shared hosting)
+export SERVER_NAME=${MERCURE_SERVER_NAME:-"http://:3001"} 
 export MERCURE_PUBLISHER_JWT_KEY=${MERCURE_PUBLISHER_JWT_KEY}
 export MERCURE_SUBSCRIBER_JWT_KEY=${MERCURE_SUBSCRIBER_JWT_KEY}
+
+# Optimize for Shared Hosting (Low Memory)
+export GOMEMLIMIT=128MiB
+export GOGC=50
+echo "Memory limits set: GOMEMLIMIT=$GOMEMLIMIT, GOGC=$GOGC"
 
 # 4. Check for Mercure binary
 MERCURE_BIN="./mercure"
