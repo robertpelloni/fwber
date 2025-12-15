@@ -1,7 +1,7 @@
 # Fwber
 
-[![Agents & Docs](https://img.shields.io/badge/Agents-Docs-blue)](README-agents.md)
-[![Status: MVP Complete](https://img.shields.io/badge/Status-MVP%20Complete-green)](PROJECT_STATUS_2025-11-24.md)
+[![Agents & Docs](https://img.shields.io/badge/Agents-Docs-blue)](AGENTS.md)
+[![Status: Live](https://img.shields.io/badge/Status-Live-green)](PROJECT_STATUS.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![PHP 8.4+](https://img.shields.io/badge/PHP-8.4+-777BB4?logo=php)](https://www.php.net/)
 [![Laravel 12](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel)](https://laravel.com/)
@@ -9,21 +9,9 @@
 
 **fwber** is an open-source, privacy-first proximity dating platform that combines AI-generated avatars with location-based discovery. Built with modern technologies and a focus on user safety, fwber reimagines the casual dating experience.
 
-## Project Status & Roadmap
-
-For a detailed overview of the project's status, feature set, and roadmap, please see the **[Project Status & Roadmap](docs/PROJECT_STATUS.md)** document.
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?logo=typescript)](https://www.typescriptlang.org/)
-Fwber is a social networking application designed to connect people.
-
-## Project Status
-
-For a detailed overview of the project's current status, roadmap, and architectural decisions, please see [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
-
-## Project Structure
-
 ## 🟢 Project Status
-**Current Status: MVP Complete + Advanced Features**
-See [PROJECT_STATUS_2025-11-24.md](PROJECT_STATUS_2025-11-24.md) for the detailed breakdown of completed features and the active roadmap.
+**Current Status: Post-Launch Monitoring & Growth**
+See [PROJECT_STATUS.md](PROJECT_STATUS.md) for the detailed breakdown of completed features and the active roadmap.
 
 ## Table of Contents
 - [Features](#features)
@@ -258,18 +246,17 @@ fwber-frontend/
 
 ### Agents & development workflow
 
-To keep AI assistants aligned and shipping the MVP first, see:
+To keep AI assistants aligned and shipping high-quality code, see:
 
-- Agents quick launcher: [`README-agents.md`](README-agents.md)
-- Repository standards & guardrails: [`AGENTS.md`](AGENTS.md)
-- Copilot project instructions: [`copilot-instructions.md`](copilot-instructions.md)
-- Claude model guide: [`docs/ai-models/CLAUDE.md`](docs/ai-models/CLAUDE.md)
-- Feature flags reference: [`docs/FEATURE_FLAGS.md`](docs/FEATURE_FLAGS.md)
+- **Master Protocol**: [`AGENTS.md`](AGENTS.md)
+- **Copilot Instructions**: [`copilot-instructions.md`](copilot-instructions.md)
+- **Claude Guidelines**: [`CLAUDE.md`](CLAUDE.md)
+- **Feature Flags**: [`docs/FEATURE_FLAGS.md`](docs/FEATURE_FLAGS.md)
 
 Key principles:
-- Keep non‑MVP features behind feature flags (404 when disabled).
-- Make small, targeted, reversible patches.
-- Validate routes (`php artisan route:list`) and regenerate OpenAPI docs (`php artisan l5-swagger:generate`) for API changes.
+- **Versioning**: Every build must have a new version number.
+- **Feature Flags**: Keep non-MVP features behind flags.
+- **Testing**: Validate routes and run E2E tests.
 
 ### Running Tests
 

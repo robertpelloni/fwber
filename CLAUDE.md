@@ -1,3 +1,17 @@
+# Claude Assistant Guidelines
+
+## 🧠 Project Context
+- **Project**: FWBer (Social Network for Adults).
+- **Primary Rules**: See `AGENTS.md` for the master protocol.
+- **Status**: See `PROJECT_STATUS.md`.
+
+## 📜 Critical Instructions
+1.  **Versioning**: You MUST increment the version number in `package.json` and update `CHANGELOG.md` after every significant task.
+2.  **Testing**: Always verify your changes with `php artisan test` or `npx cypress run`.
+3.  **Documentation**: Keep `PROJECT_STATUS.md` up to date.
+
+## 🛠 Tool Usage (Byterover MCP)
+
 [byterover-mcp]
 
 [byterover-mcp]
