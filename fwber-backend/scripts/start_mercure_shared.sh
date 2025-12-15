@@ -25,6 +25,10 @@ export SERVER_NAME=${MERCURE_SERVER_NAME:-"http://:3001"}
 export MERCURE_PUBLISHER_JWT_KEY=${MERCURE_PUBLISHER_JWT_KEY}
 export MERCURE_SUBSCRIBER_JWT_KEY=${MERCURE_SUBSCRIBER_JWT_KEY}
 
+# Configure transport to use local file instead of default system path
+# This fixes "invalid transport: open ...: no such file or directory"
+export MERCURE_EXTRA_DIRECTIVES="transport_url bolt://$(pwd)/mercure.db"
+
 # Optimize for Shared Hosting (Low Memory)
 # Aggressive memory limits for shared hosting environments
 export GOMEMLIMIT=32MiB
@@ -112,12 +116,17 @@ $MERCURE_BIN --version || {
     chmod +x mercure
     
     echo "Retrying with v0.11.0..."
-    $MERCURE_BIN --version || { echo "Error: Even v0.11.0 failed. Please check hosting restrictions."; exit 1; }
+    # v0.11.0 uses 'caddy run' syntax or just 'mercure' depending on build
+    # The error "[ERROR] first argument must be a subcommand; see 'caddy help'" suggests it's based on Caddy v2
+    # and expects a command.
+    
+    # Try running with 'run' command for version check if --version fails
+    $MERCURE_BIN version || $MERCURE_BIN --version || echo "Version check failed, but binary might be runnable."
 }
 
 # 5. Kill existing Mercure processes
 echo "Checking for existing Mercure processes..."
-# Find PIDs of 'mercure run' but exclude this script and grep itself
+# Find PIDs of 'mercure' but exclude this script and grep itself
 PIDS=$(ps aux | grep "$MERCURE_BIN" | grep -v "grep" | grep -v "start_mercure_shared.sh" | awk '{print $2}')
 
 if [ -n "$PIDS" ]; then
@@ -141,7 +150,9 @@ echo "CORS Allowed Origins: $MERCURE_CORS_ALLOWED_ORIGINS"
 # Bind to localhost only to avoid firewall issues if using reverse proxy
 # If direct access is needed, use 0.0.0.0 or specific IP
 # But for debugging, let's try to run it and capture output
-$MERCURE_BIN run --debug
+
+# v0.11.0+ syntax:
+$MERCURE_BIN run --config Caddyfile --adapter caddyfile 2>&1 || $MERCURE_BIN run 2>&1
 
 # For background (uncomment to use):
 # nohup $MERCURE_BIN run > mercure.log 2>&1 &
