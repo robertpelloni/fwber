@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
+use App\Models\UserPublicKey;
 
 class E2EKeyManagementController extends Controller
 {
@@ -28,13 +30,23 @@ class E2EKeyManagementController extends Controller
     {
         $request->validate([
             'public_key' => 'required|string',
+            'key_type' => 'nullable|string',
+            'device_id' => 'nullable|string',
         ]);
 
         $user = Auth::user();
-        $user->public_key = $request->public_key;
-        $user->save();
+        
+        UserPublicKey::updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'public_key' => Crypt::encryptString($request->public_key),
+                'key_type' => $request->input('key_type', 'ECDH'),
+                'device_id' => $request->input('device_id'),
+                'last_rotated_at' => now(),
+            ]
+        );
 
-        return response()->json(['message' => 'Public key updated']);
+        return response()->json(['message' => 'Public key stored successfully.']);
     }
 
     /**
@@ -50,12 +62,33 @@ class E2EKeyManagementController extends Controller
      */
     public function show($userId)
     {
-        $user = User::findOrFail($userId);
+        $key = UserPublicKey::where('user_id', $userId)->first();
 
-        if (!$user->public_key) {
+        if (!$key) {
             return response()->json(['error' => 'Public key not found for this user'], 404);
         }
 
-        return response()->json(['public_key' => $user->public_key]);
+        return response()->json([
+            'user_id' => $key->user_id,
+            'public_key' => Crypt::decryptString($key->public_key),
+            'key_type' => $key->key_type,
+            'device_id' => $key->device_id,
+        ]);
+    }
+
+    public function me()
+    {
+        $user = Auth::user();
+        $key = UserPublicKey::where('user_id', $user->id)->first();
+
+        if (!$key) {
+            return response()->json(['error' => 'Public key not found'], 404);
+        }
+
+        return response()->json([
+            'public_key' => Crypt::decryptString($key->public_key),
+            'key_type' => $key->key_type,
+            'device_id' => $key->device_id,
+        ]);
     }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { api as apiClient } from '@/lib/api/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -26,21 +26,23 @@ export function LogViewer() {
   const [loading, setLoading] = useState(false);
   const [loadingContent, setLoadingContent] = useState(false);
 
-  const fetchLogs = async () => {
+  const fetchLogs = useCallback(async () => {
     setLoading(true);
     try {
       const data = await apiClient.get<LogFile[]>('/admin/logs');
       setLogs(data);
-      if (data.length > 0 && !selectedLog) {
-        // Select the first log by default (usually the most recent)
-        setSelectedLog(data[0].name);
-      }
+      setSelectedLog(prev => {
+        if (data.length > 0 && !prev) {
+          return data[0].name;
+        }
+        return prev;
+      });
     } catch (error) {
       console.error('Failed to fetch logs:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const fetchLogContent = async (filename: string) => {
     setLoadingContent(true);
@@ -57,7 +59,7 @@ export function LogViewer() {
 
   useEffect(() => {
     fetchLogs();
-  }, []);
+  }, [fetchLogs]);
 
   useEffect(() => {
     if (selectedLog) {

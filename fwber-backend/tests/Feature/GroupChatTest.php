@@ -46,7 +46,7 @@ class GroupChatTest extends TestCase
             'name' => 'Test Group',
             'privacy' => 'public',
         ]);
-        $groupId = $groupResponse->json('id');
+        $groupId = $groupResponse->json('group.id');
         $group = Group::find($groupId);
 
         $this->actingAs($user);
@@ -68,7 +68,7 @@ class GroupChatTest extends TestCase
             'name' => 'Test Group',
             'privacy' => 'public',
         ]);
-        $groupId = $groupResponse->json('id');
+        $groupId = $groupResponse->json('group.id');
         $group = Group::find($groupId);
 
         $this->actingAs($user);

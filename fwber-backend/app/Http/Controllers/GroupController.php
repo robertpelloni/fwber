@@ -43,6 +43,38 @@ class GroupController extends Controller
      */
     public function index(): JsonResponse
     {
+        // Return all public/discoverable groups
+        $groups = Group::public()
+            ->active()
+            ->with(['creator'])
+            ->withCount('activeMembers')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json(['groups' => $groups]);
+    }
+
+    /**
+     * List user's groups
+     *
+     * @OA\Get(
+     *   path="/groups/my-groups",
+     *   tags={"Groups"},
+     *   summary="List groups the authenticated user belongs to",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(
+     *     response=200,
+     *     description="List of groups",
+     *     @OA\JsonContent(
+     *       type="object",
+     *       @OA\Property(property="groups", type="array", @OA\Items(ref="#/components/schemas/Group"))
+     *     )
+     *   ),
+     *   @OA\Response(response=401, ref="#/components/responses/Unauthorized")
+     * )
+     */
+    public function myGroups(): JsonResponse
+    {
         $userId = Auth::id();
         
         $groups = Group::whereHas('activeMembers', function ($query) use ($userId) {
@@ -94,7 +126,7 @@ class GroupController extends Controller
             $group = $this->groupService->createGroup(Auth::id(), $validated);
             return response()->json(['group' => $group->load('creator', 'activeMembers')], 201);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to create group'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
@@ -237,7 +269,7 @@ class GroupController extends Controller
             $this->groupService->joinGroup($group, Auth::id());
             return response()->json(['message' => 'Joined group successfully']);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 400);
+            return response()->json(['error' => $e->getMessage()], ($c = (int)$e->getCode()) && $c >= 100 && $c < 600 ? $c : 400);
         }
     }
 
@@ -262,7 +294,7 @@ class GroupController extends Controller
             $this->groupService->leaveGroup($group, Auth::id());
             return response()->json(['message' => 'Left group successfully']);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 400);
+            return response()->json(['error' => $e->getMessage()], ($c = (int)$e->getCode()) && $c >= 100 && $c < 600 ? $c : 400);
         }
     }
 
@@ -296,7 +328,7 @@ class GroupController extends Controller
             $this->groupService->setMemberRole($group, Auth::id(), $memberUserId, $validated['role']);
             return response()->json(['message' => 'Role updated']);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 400);
+            return response()->json(['error' => $e->getMessage()], ($c = (int)$e->getCode()) && $c >= 100 && $c < 600 ? $c : 400);
         }
     }
 
@@ -328,7 +360,7 @@ class GroupController extends Controller
             $this->groupService->transferOwnership($group, Auth::id(), $validated['new_owner_user_id']);
             return response()->json(['message' => 'Ownership transferred']);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 400);
+            return response()->json(['error' => $e->getMessage()], ($c = (int)$e->getCode()) && $c >= 100 && $c < 600 ? $c : 400);
         }
     }
 
@@ -355,7 +387,7 @@ class GroupController extends Controller
             $this->groupService->banMember($group, Auth::id(), $memberUserId, request()->input('reason'));
             return response()->json(['message' => 'Member banned']);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 400);
+            return response()->json(['error' => $e->getMessage()], ($c = (int)$e->getCode()) && $c >= 100 && $c < 600 ? $c : 400);
         }
     }
 
@@ -382,7 +414,7 @@ class GroupController extends Controller
             $this->groupService->unbanMember($group, Auth::id(), $memberUserId);
             return response()->json(['message' => 'Member unbanned']);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 400);
+            return response()->json(['error' => $e->getMessage()], ($c = (int)$e->getCode()) && $c >= 100 && $c < 600 ? $c : 400);
         }
     }
 
@@ -423,7 +455,7 @@ class GroupController extends Controller
             );
             return response()->json(['message' => 'Member muted', 'muted_until' => $mutedUntil]);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 400);
+            return response()->json(['error' => $e->getMessage()], ($c = (int)$e->getCode()) && $c >= 100 && $c < 600 ? $c : 400);
         }
     }
 
@@ -450,7 +482,7 @@ class GroupController extends Controller
             $this->groupService->unmuteMember($group, Auth::id(), $memberUserId);
             return response()->json(['message' => 'Member unmuted']);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 400);
+            return response()->json(['error' => $e->getMessage()], ($c = (int)$e->getCode()) && $c >= 100 && $c < 600 ? $c : 400);
         }
     }
 
@@ -530,7 +562,7 @@ class GroupController extends Controller
             $this->groupService->kickMember($group, Auth::id(), $memberUserId);
             return response()->json(['message' => 'Member removed']);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], $e->getCode() ?: 400);
+            return response()->json(['error' => $e->getMessage()], ($c = (int)$e->getCode()) && $c >= 100 && $c < 600 ? $c : 400);
         }
     }
 

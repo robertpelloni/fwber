@@ -16,7 +16,7 @@ return new class extends Migration
                 $table->id();
                 $table->string('name', 100);
                 $table->string('description', 500)->nullable();
-                $table->enum('type', ['interest', 'city', 'event', 'private']);
+                $table->enum('type', ['interest', 'city', 'event', 'private', 'group']);
                 $table->string('category', 50)->nullable();
                 $table->string('city', 100)->nullable();
                 $table->string('neighborhood', 100)->nullable();

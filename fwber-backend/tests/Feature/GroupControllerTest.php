@@ -21,7 +21,7 @@ class GroupControllerTest extends TestCase
             ->getJson('/api/groups');
 
         $response->assertStatus(200)
-            ->assertJsonCount(3);
+            ->assertJsonCount(3, 'groups');
     }
 
     public function test_can_create_group()
@@ -44,7 +44,7 @@ class GroupControllerTest extends TestCase
         $this->assertDatabaseHas('groups', ['name' => 'Test Group']);
         $this->assertDatabaseHas('group_members', [
             'user_id' => $user->id,
-            'role' => 'admin'
+            'role' => 'owner'
         ]);
     }
 
@@ -85,9 +85,10 @@ class GroupControllerTest extends TestCase
 
         $response->assertStatus(200);
         
-        $this->assertDatabaseMissing('group_members', [
+        $this->assertDatabaseHas('group_members', [
             'group_id' => $group->id,
             'user_id' => $leaver->id,
+            'is_active' => false,
         ]);
     }
 }

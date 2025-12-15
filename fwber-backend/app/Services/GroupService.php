@@ -108,8 +108,9 @@ class GroupService
         // Add to chatroom if exists
         if ($group->chatroom_id) {
             $chatroom = \App\Models\Chatroom::find($group->chatroom_id);
-            if ($chatroom && !$chatroom->hasMember($userId)) {
-                $chatroom->addMember(\App\Models\User::find($userId), 'member');
+            $user = \App\Models\User::find($userId);
+            if ($chatroom && $user && !$chatroom->hasMember($user)) {
+                $chatroom->addMember($user, 'member');
             }
         }
     }

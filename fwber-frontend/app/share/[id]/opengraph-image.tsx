@@ -162,7 +162,7 @@ export default async function Image({ params }: { params: { id: string } }) {
             fontStyle: 'italic',
             whiteSpace: 'pre-wrap',
           }}>
-            "{text}"
+            &quot;{text}&quot;
           </div>
         </div>
 

@@ -213,7 +213,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('events/{id}/rsvp', [EventController::class, 'rsvp']);
 
     // Groups
-    Route::get('groups/my-groups', [\App\Http\Controllers\GroupController::class, 'index']);
+    Route::get('groups/my-groups', [\App\Http\Controllers\GroupController::class, 'myGroups']);
     Route::post('groups/{id}/join', [\App\Http\Controllers\GroupController::class, 'join']);
     Route::post('groups/{id}/leave', [\App\Http\Controllers\GroupController::class, 'leave']);
     Route::apiResource('groups', \App\Http\Controllers\GroupController::class);
