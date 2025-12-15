@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/lib/hooks/use-toast';
-import { Gift, Copy, Ticket, Users } from 'lucide-react';
+import { Gift, Copy, Ticket, Users, Twitter, Mail, MessageCircle, Share2 } from 'lucide-react';
 
 interface ReferralModalProps {
   trigger?: React.ReactNode;
@@ -28,9 +28,48 @@ export function ReferralModal({ trigger }: ReferralModalProps) {
     ? `${window.location.origin}/register?ref=${user.referral_code}`
     : `https://fwber.me/register?ref=${user.referral_code}`;
 
+  const shareText = "Join me on FWBer - The Definitive Social Network for Adults! Get 3 days of Gold Premium with my link:";
+  const encodedText = encodeURIComponent(shareText);
+  const encodedLink = encodeURIComponent(referralLink);
+
+  const shareLinks = [
+    { 
+      name: 'X / Twitter', 
+      icon: Twitter, 
+      url: `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedLink}`,
+      color: 'hover:text-blue-400'
+    },
+    { 
+      name: 'WhatsApp', 
+      icon: MessageCircle, 
+      url: `https://wa.me/?text=${encodedText}%20${encodedLink}`,
+      color: 'hover:text-green-500'
+    },
+    { 
+      name: 'Email', 
+      icon: Mail, 
+      url: `mailto:?subject=Join me on FWBer&body=${shareText}%0A%0A${referralLink}`,
+      color: 'hover:text-red-500'
+    },
+  ];
+
   const copyToClipboard = () => {
     navigator.clipboard.writeText(referralLink);
     success('Referral link copied to clipboard.');
+  };
+
+  const handleNativeShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Join me on FWBer',
+          text: shareText,
+          url: referralLink,
+        });
+      } catch (err) {
+        console.error('Error sharing:', err);
+      }
+    }
   };
 
   return (
@@ -71,6 +110,31 @@ export function ReferralModal({ trigger }: ReferralModalProps) {
             <p className="text-xs text-amber-800 dark:text-amber-200 mt-2">
               Friends who sign up with your link get <strong>3 Days of Gold Premium</strong> instantly!
             </p>
+          </div>
+
+          {/* Share Buttons */}
+          <div className="flex justify-center gap-4">
+            {shareLinks.map((link) => (
+              <a
+                key={link.name}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`p-3 rounded-full bg-muted hover:bg-muted/80 transition-colors ${link.color}`}
+                title={`Share on ${link.name}`}
+              >
+                <link.icon className="w-5 h-5" />
+              </a>
+            ))}
+            {typeof navigator !== 'undefined' && 'share' in navigator && (
+              <button
+                onClick={handleNativeShare}
+                className="p-3 rounded-full bg-muted hover:bg-muted/80 transition-colors hover:text-primary"
+                title="More Options"
+              >
+                <Share2 className="w-5 h-5" />
+              </button>
+            )}
           </div>
 
           {/* Referral Link Section */}
