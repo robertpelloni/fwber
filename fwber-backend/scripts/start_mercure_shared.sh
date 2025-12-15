@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# FWBer Mercure Startup Script for Shared Hosting (No Sudo)
+# Usage: ./start_mercure_shared.sh
+
+# 1. Load environment variables from .env
+if [ -f .env ]; then
+    export $(cat .env | grep -v '^#' | xargs)
+else
+    echo "Error: .env file not found in current directory."
+    exit 1
+fi
+
+# 2. Set CORS Allowed Origins explicitly if not set in .env
+# This fixes the "Cross-Origin Request Blocked" error
+if [ -z "$MERCURE_CORS_ALLOWED_ORIGINS" ]; then
+    export MERCURE_CORS_ALLOWED_ORIGINS="https://fwber.me https://www.fwber.me"
+    echo "Set default CORS origins: $MERCURE_CORS_ALLOWED_ORIGINS"
+fi
+
+# 3. Set other required Mercure variables if missing
+# These should ideally be in your .env, but defaults help
+export SERVER_NAME=${MERCURE_SERVER_NAME:-":3001"} # Port to listen on (must be open/allowed)
+export MERCURE_PUBLISHER_JWT_KEY=${MERCURE_PUBLISHER_JWT_KEY}
+export MERCURE_SUBSCRIBER_JWT_KEY=${MERCURE_SUBSCRIBER_JWT_KEY}
+
+# 4. Check for Mercure binary
+MERCURE_BIN="./mercure"
+if [ ! -f "$MERCURE_BIN" ]; then
+    echo "Mercure binary not found at $MERCURE_BIN"
+    echo "Please download it appropriate for your system (likely Linux x86_64):"
+    echo "wget https://github.com/dunglas/mercure/releases/download/v0.15.0/mercure_0.15.0_Linux_x86_64.tar.gz"
+    echo "tar xzvf mercure_0.15.0_Linux_x86_64.tar.gz"
+    exit 1
+fi
+
+# 5. Start Mercure
+echo "Starting Mercure on $SERVER_NAME..."
+echo "CORS Allowed Origins: $MERCURE_CORS_ALLOWED_ORIGINS"
+
+# Run in background or foreground?
+# For testing/manual start:
+$MERCURE_BIN run
+
+# For background (uncomment to use):
+# nohup $MERCURE_BIN run > mercure.log 2>&1 &
+# echo "Mercure started in background. PID: $!"
