@@ -88,7 +88,32 @@ fi
 
 # Verify binary works
 echo "Verifying Mercure binary..."
-$MERCURE_BIN --version || { echo "Error: Mercure binary failed to run."; exit 1; }
+echo "File info:"
+file $MERCURE_BIN || echo "file command not found"
+echo "LDD info:"
+ldd $MERCURE_BIN || echo "ldd command not found"
+
+echo "Attempting to run version check..."
+$MERCURE_BIN --version || { 
+    echo "Error: Mercure binary failed to run."
+    echo "Trying to download an older, potentially more compatible version (v0.11.0)..."
+    
+    rm -f $MERCURE_BIN
+    DOWNLOAD_URL="https://github.com/dunglas/mercure/releases/download/v0.11.0/mercure_0.11.0_Linux_x86_64.tar.gz"
+    
+    if command -v wget &> /dev/null; then
+        wget -O mercure.tar.gz "$DOWNLOAD_URL"
+    else
+        curl -L -o mercure.tar.gz "$DOWNLOAD_URL"
+    fi
+    
+    tar xzvf mercure.tar.gz
+    rm mercure.tar.gz
+    chmod +x mercure
+    
+    echo "Retrying with v0.11.0..."
+    $MERCURE_BIN --version || { echo "Error: Even v0.11.0 failed. Please check hosting restrictions."; exit 1; }
+}
 
 # 5. Kill existing Mercure processes
 echo "Checking for existing Mercure processes..."
