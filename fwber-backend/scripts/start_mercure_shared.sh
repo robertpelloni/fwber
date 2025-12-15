@@ -29,7 +29,9 @@ export MERCURE_SUBSCRIBER_JWT_KEY=${MERCURE_SUBSCRIBER_JWT_KEY}
 # Aggressive memory limits for shared hosting environments
 export GOMEMLIMIT=32MiB
 export GOGC=10
-echo "Memory limits set: GOMEMLIMIT=$GOMEMLIMIT, GOGC=$GOGC"
+# Limit threads to prevent resource exhaustion on shared CPUs
+export GOMAXPROCS=1
+echo "Memory limits set: GOMEMLIMIT=$GOMEMLIMIT, GOGC=$GOGC, GOMAXPROCS=$GOMAXPROCS"
 
 # Disable internal metrics and UI to save memory
 export MERCURE_METRICS_ENABLED=0
@@ -84,6 +86,10 @@ if [ ! -f "$MERCURE_BIN" ]; then
     fi
 fi
 
+# Verify binary works
+echo "Verifying Mercure binary..."
+$MERCURE_BIN --version || { echo "Error: Mercure binary failed to run."; exit 1; }
+
 # 5. Kill existing Mercure processes
 echo "Checking for existing Mercure processes..."
 # Find PIDs of 'mercure run' but exclude this script and grep itself
@@ -107,7 +113,10 @@ echo "CORS Allowed Origins: $MERCURE_CORS_ALLOWED_ORIGINS"
 
 # Run in background or foreground?
 # For testing/manual start:
-$MERCURE_BIN run
+# Bind to localhost only to avoid firewall issues if using reverse proxy
+# If direct access is needed, use 0.0.0.0 or specific IP
+# But for debugging, let's try to run it and capture output
+$MERCURE_BIN run --debug
 
 # For background (uncomment to use):
 # nohup $MERCURE_BIN run > mercure.log 2>&1 &
