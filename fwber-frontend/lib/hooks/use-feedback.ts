@@ -9,6 +9,9 @@ export interface FeedbackItem {
   page_url: string | null;
   metadata: any;
   status: 'new' | 'reviewed' | 'resolved' | 'dismissed';
+  sentiment: 'positive' | 'neutral' | 'negative' | null;
+  ai_analysis: string | null;
+  is_analyzed: boolean;
   created_at: string;
   user?: {
     id: number;

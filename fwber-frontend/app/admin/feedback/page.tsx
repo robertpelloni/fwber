@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useFeedback, FeedbackItem } from '@/lib/hooks/use-feedback';
 import { format } from 'date-fns';
-import { Loader2, CheckCircle, XCircle, AlertCircle, MessageSquare, Sparkles, Shield } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, AlertCircle, MessageSquare, Sparkles, Shield, Brain } from 'lucide-react';
 
 export default function FeedbackPage() {
   const [page, setPage] = useState(1);
@@ -20,6 +20,15 @@ export default function FeedbackPage() {
       case 'resolved': return 'bg-green-100 text-green-800';
       case 'dismissed': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getSentimentColor = (sentiment: string | null) => {
+    switch (sentiment) {
+      case 'positive': return 'bg-green-100 text-green-800 border-green-200';
+      case 'negative': return 'bg-red-100 text-red-800 border-red-200';
+      case 'neutral': return 'bg-gray-100 text-gray-800 border-gray-200';
+      default: return 'bg-gray-50 text-gray-500 border-gray-200';
     }
   };
 
@@ -53,6 +62,7 @@ export default function FeedbackPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Message</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">AI Analysis</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -83,6 +93,25 @@ export default function FeedbackPage() {
                       <div className="text-xs text-gray-500 mt-1 truncate max-w-xs">
                         {item.page_url}
                       </div>
+                    )}
+                  </td>
+                  <td className="px-6 py-4">
+                    {item.is_analyzed ? (
+                      <div className="space-y-2">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${getSentimentColor(item.sentiment)} capitalize`}>
+                          {item.sentiment || 'Unknown'}
+                        </span>
+                        {item.ai_analysis && (
+                          <div className="flex items-start gap-1.5 text-xs text-gray-600 max-w-xs">
+                            <Brain className="w-3 h-3 mt-0.5 flex-shrink-0 text-purple-500" />
+                            <span className="line-clamp-2" title={item.ai_analysis}>
+                              {item.ai_analysis}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-gray-400 italic">Pending analysis...</span>
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
