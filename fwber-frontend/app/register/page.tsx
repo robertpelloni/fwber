@@ -32,7 +32,11 @@ function RegisterForm() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      router.push('/dashboard')
+      // Use setTimeout to avoid blocking the render cycle
+      const timer = setTimeout(() => {
+        router.push('/dashboard')
+      }, 100)
+      return () => clearTimeout(timer)
     }
   }, [isAuthenticated, router])
 
@@ -87,6 +91,8 @@ function RegisterForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (isLoading) return
+
     setIsLoading(true)
     clearError()
     setValidationError(null)
@@ -120,14 +126,12 @@ function RegisterForm() {
 
       await register(formData.name, formData.email, formData.password, formData.passwordConfirmation, finalAvatar, formData.referralCode)
       setSuccessMessage('Account created successfully! Redirecting...')
-      setTimeout(() => {
-        router.push('/dashboard')
-      }, 1500)
+      // Note: The useEffect hook will handle the redirect since isAuthenticated becomes true
     } catch (error) {
       setValidationError(error instanceof Error ? error.message : 'Registration failed. Please try again.')
-    } finally {
       setIsLoading(false)
     }
+    // Note: We don't set isLoading(false) in finally block if successful
   }
 
   return (

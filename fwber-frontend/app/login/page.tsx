@@ -19,12 +19,18 @@ export default function LoginPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      router.push('/dashboard')
+      // Use setTimeout to avoid blocking the render cycle and ensure state is settled
+      const timer = setTimeout(() => {
+        router.push('/dashboard')
+      }, 100)
+      return () => clearTimeout(timer)
     }
   }, [isAuthenticated, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (isLoading) return
+
     setIsLoading(true)
     clearError()
 
@@ -32,14 +38,18 @@ export default function LoginPage() {
       await login(email, password)
       // If 2FA is required, the UI will update automatically due to requiresTwoFactor
     } catch (error) {
+      console.error('Login error:', error)
       // Error is handled by the auth context
-    } finally {
       setIsLoading(false)
     }
+    // Note: We don't set isLoading(false) in finally block if successful
+    // to prevent UI flash before redirect
   }
 
   const handleTwoFactorSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (isLoading) return
+
     setIsLoading(true)
     clearError()
 
@@ -47,10 +57,11 @@ export default function LoginPage() {
       await verifyTwoFactor(twoFactorCode, isRecovery ? recoveryCode : undefined)
       // If successful, isAuthenticated becomes true and the useEffect redirects
     } catch (error) {
+      console.error('2FA error:', error)
       // Error is handled by the auth context
-    } finally {
       setIsLoading(false)
     }
+    // Note: We don't set isLoading(false) in finally block if successful
   }
 
   if (requiresTwoFactor) {
