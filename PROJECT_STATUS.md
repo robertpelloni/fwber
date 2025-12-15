@@ -167,6 +167,13 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **UI**: Added "Infrastructure Metrics" section to Admin Settings page (Redis Memory, Clients, DB Threads).
     -   **Verification**: Verified integration with `/health/metrics` endpoint.
 
+### ✅ Documentation Updates (Dec 15)
+1.  **API Documentation**:
+    -   **Fix**: Resolved syntax error in `WebSocketController` preventing Swagger generation.
+    -   **Schema**: Added missing `UserProfileResource` schema to `Schemas.php`.
+    -   **Generation**: Successfully regenerated `api-docs.json`.
+    -   **Guide**: Created `docs/API_REFERENCE.md` with access instructions.
+
 ### ✅ User Experience Refinement (Dec 15 - Part 2)
 1.  **Onboarding Fix**:
     -   **Issue**: Resolved payload mismatch (`date_of_birth` vs `birthdate`) in `ProfileController` and `UserProfileResource`.
