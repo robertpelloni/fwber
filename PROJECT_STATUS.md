@@ -137,6 +137,15 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Frontend**: Updated `AdminFeedbackPage` to display sentiment badges and AI analysis insights.
     -   **Verification**: Feature tests (`FeedbackAnalysisTest`) passing. Frontend lint passing.
 
+### ✅ User Experience Refinement (Dec 15 - Part 2)
+1.  **Onboarding Fix**:
+    -   **Issue**: Resolved payload mismatch (`date_of_birth` vs `birthdate`) in `ProfileController` and `UserProfileResource`.
+    -   **Fix**: Updated `lib/api/profile.ts` to map fields correctly and fixed property access in `UserProfileResource`.
+    -   **Verification**: Updated `onboarding.cy.js` to verify payload structure and fixed test mocks. E2E test passing.
+2.  **Project Hygiene**:
+    -   **Changelog**: Created `CHANGELOG.md` to track version history.
+    -   **Version Display**: Added version number (v0.1.0) to the application footer.
+
 ### ✅ User Experience Refinement (Dec 15)
 1.  **RealTimeChat Integration**:
     -   **Refactor**: Rebuilt `RealTimeChat` component to integrate standalone features directly into the chat interface.

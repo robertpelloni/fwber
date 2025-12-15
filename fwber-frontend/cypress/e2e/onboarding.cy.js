@@ -27,25 +27,34 @@ describe('User Onboarding Flow', () => {
     }).as('getProfile');
 
     // Mock Profile Update
-    cy.intercept('PUT', '/api/profile', {
-      statusCode: 200,
-      body: { message: 'Profile updated' },
+    cy.intercept('PUT', '/api/profile', (req) => {
+      // Verify payload transformation (date_of_birth -> birthdate)
+      if (req.body.birthdate) {
+        expect(req.body.birthdate).to.match(/^\d{4}-\d{2}-\d{2}$/);
+      }
+      req.reply({
+        statusCode: 200,
+        body: { message: 'Profile updated' },
+      });
     }).as('updateProfile');
 
     // Mock Photo Upload
     cy.intercept('POST', '/api/photos', {
       statusCode: 201,
       body: {
-        id: 101,
-        url: 'https://example.com/photo.jpg',
-        is_primary: true,
+        success: true,
+        data: {
+          id: 101,
+          url: 'https://example.com/photo.jpg',
+          is_primary: true,
+        }
       },
     }).as('uploadPhoto');
 
     // Mock Photos List
     cy.intercept('GET', '/api/photos', {
       statusCode: 200,
-      body: [],
+      body: { success: true, data: [] },
     }).as('getPhotos');
 
     // Mock Onboarding Complete
@@ -99,7 +108,10 @@ describe('User Onboarding Flow', () => {
     // We can intercept the GET /api/photos to return a photo after 'upload'
     cy.intercept('GET', '/api/photos', {
       statusCode: 200,
-      body: [{ id: 101, url: 'https://example.com/photo.jpg', is_primary: true }],
+      body: { 
+        success: true, 
+        data: [{ id: 101, url: 'https://example.com/photo.jpg', is_primary: true }] 
+      },
     }).as('getPhotosWithData');
 
     // Simulate upload by triggering the hook refresh or UI update
@@ -115,6 +127,7 @@ describe('User Onboarding Flow', () => {
     }, { force: true });
 
     cy.wait('@uploadPhoto');
+    cy.wait('@getPhotosWithData');
     
     // Verify photo appears (mocked response)
     cy.contains('Next').click();
@@ -127,8 +140,8 @@ describe('User Onboarding Flow', () => {
     cy.contains('Please select what you are looking for').should('be.visible');
 
     // Select options
-    cy.get('label[for=\'looking_dating\']').click();
-    cy.get('label[for=\'looking_friends\']').click();
+    cy.get('label[for=\'looking_Dating\']').click();
+    cy.get('label[for=\'looking_Friends\']').click();
     
     cy.contains('Next').click();
     cy.wait('@updateProfile');
