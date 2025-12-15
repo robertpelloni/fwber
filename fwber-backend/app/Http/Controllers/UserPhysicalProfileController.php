@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\RequestAvatarRequest;
 use App\Http\Requests\Api\UpsertPhysicalProfileRequest;
 use App\Models\UserPhysicalProfile;

@@ -19,15 +19,15 @@ use App\Http\Controllers\ProximityChatroomMessageController;
 use App\Http\Controllers\RateLimitController;
 use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\HealthController;
-use App\Http\Controllers\Api\RelationshipTierController;
-use App\Http\Controllers\Api\UserPhysicalProfileController;
-use App\Http\Controllers\Api\BlockController;
-use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\RelationshipTierController;
+use App\Http\Controllers\UserPhysicalProfileController;
+use App\Http\Controllers\BlockController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\WebSocketController;
 use App\Http\Controllers\ProximityArtifactController;
 use App\Http\Controllers\ModerationController;
-use App\Http\Controllers\Api\DeviceTokenController;
-use App\Http\Controllers\Api\FriendController;
+use App\Http\Controllers\DeviceTokenController;
+use App\Http\Controllers\FriendController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventController;
 
@@ -129,9 +129,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // E2E Encryption Keys
     Route::prefix('security/keys')->group(function () {
-        Route::post('/', [\App\Http\Controllers\Api\E2EKeyManagementController::class, 'store']);
-        Route::get('/me', [\App\Http\Controllers\Api\E2EKeyManagementController::class, 'me']);
-        Route::get('/{userId}', [\App\Http\Controllers\Api\E2EKeyManagementController::class, 'show']);
+        Route::post('/', [\App\Http\Controllers\E2EKeyManagementController::class, 'store']);
+        Route::get('/me', [\App\Http\Controllers\E2EKeyManagementController::class, 'me']);
+        Route::get('/{userId}', [\App\Http\Controllers\E2EKeyManagementController::class, 'show']);
     });
 
     // Profile
@@ -147,9 +147,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('onboarding/complete', [\App\Http\Controllers\OnboardingController::class, 'complete']);
 
     // Physical Profile
-    Route::get('physical-profile', [\App\Http\Controllers\Api\UserPhysicalProfileController::class, 'show']);
-    Route::put('physical-profile', [\App\Http\Controllers\Api\UserPhysicalProfileController::class, 'upsert']);
-    Route::post('physical-profile/avatar/request', [\App\Http\Controllers\Api\UserPhysicalProfileController::class, 'requestAvatar']);
+    Route::get('physical-profile', [\App\Http\Controllers\UserPhysicalProfileController::class, 'show']);
+    Route::put('physical-profile', [\App\Http\Controllers\UserPhysicalProfileController::class, 'upsert']);
+    Route::post('physical-profile/avatar/request', [\App\Http\Controllers\UserPhysicalProfileController::class, 'requestAvatar']);
 
     // Dashboard
     Route::get('dashboard/stats', [\App\Http\Controllers\DashboardController::class, 'getStats']);
@@ -317,9 +317,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Relationship Tiers (Face Reveal)
     Route::middleware('feature:face_reveal')->group(function () {
-        Route::get('matches/{matchId}/tier', [\App\Http\Controllers\Api\RelationshipTierController::class, 'show']);
-        Route::put('matches/{matchId}/tier', [\App\Http\Controllers\Api\RelationshipTierController::class, 'update']);
-        Route::get('matches/{matchId}/tier/photos', [\App\Http\Controllers\Api\RelationshipTierController::class, 'getPhotos']);
+        Route::get('matches/{matchId}/tier', [\App\Http\Controllers\RelationshipTierController::class, 'show']);
+        Route::put('matches/{matchId}/tier', [\App\Http\Controllers\RelationshipTierController::class, 'update']);
+        Route::get('matches/{matchId}/tier/photos', [\App\Http\Controllers\RelationshipTierController::class, 'getPhotos']);
     });
 
     // AI Avatar Generation
@@ -392,9 +392,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('feedback/{id}', [\App\Http\Controllers\FeedbackController::class, 'update']);
 
     // Token / Wallet
-    Route::get('wallet', [\App\Http\Controllers\Api\TokenController::class, 'balance']);
-    Route::post('wallet/address', [\App\Http\Controllers\Api\TokenController::class, 'updateAddress']);
-    Route::get('leaderboard', [\App\Http\Controllers\Api\TokenController::class, 'leaderboard']);
+    Route::get('wallet', [\App\Http\Controllers\TokenController::class, 'balance']);
+    Route::post('wallet/address', [\App\Http\Controllers\TokenController::class, 'updateAddress']);
+    Route::get('leaderboard', [\App\Http\Controllers\TokenController::class, 'leaderboard']);
 
     // Gifts
     Route::get('gifts', [\App\Http\Controllers\GiftController::class, 'index']);
@@ -405,8 +405,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('wingman/assist', [\App\Http\Controllers\WingmanController::class, 'recordAssist']);
 
     // Share Unlock
-    Route::post('share-unlock', [\App\Http\Controllers\Api\ShareUnlockController::class, 'store']);
-    Route::get('share-unlock/{targetProfileId}', [\App\Http\Controllers\Api\ShareUnlockController::class, 'check']);
+    Route::post('share-unlock', [\App\Http\Controllers\ShareUnlockController::class, 'store']);
+    Route::get('share-unlock/{targetProfileId}', [\App\Http\Controllers\ShareUnlockController::class, 'check']);
 
     // Achievements
     Route::get('achievements', [\App\Http\Controllers\AchievementController::class, 'index']);
