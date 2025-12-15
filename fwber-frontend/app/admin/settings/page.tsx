@@ -252,6 +252,12 @@ export default function AdminSettingsPage() {
                   Refresh
                 </button>
                 <a
+                  href="/admin/logs"
+                  className="rounded-md bg-slate-600 px-4 py-2 text-sm font-medium text-white hover:bg-slate-500"
+                >
+                  View Logs
+                </a>
+                <a
                   href="/analytics"
                   className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500"
                 >

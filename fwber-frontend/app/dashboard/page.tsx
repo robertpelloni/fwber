@@ -12,6 +12,7 @@ import { ProximityPresenceCompact } from '@/components/realtime';
 import AppHeader from '@/components/AppHeader';
 import { ActivityFeed } from '@/components/ActivityFeed';
 import BoostButton from '@/components/BoostButton';
+import { AchievementsList } from '@/components/dashboard/AchievementsList';
 import { ReferralModal } from '@/components/viral/ReferralModal';
 
 interface DashboardStats {
@@ -153,34 +154,7 @@ export default function DashboardPage() {
                 <ProximityPresenceCompact nearbyUsers={[]} />
 
                 {/* Achievements */}
-                <div className="bg-white rounded-xl border border-gray-200 p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <Award className="w-5 h-5 text-yellow-500" />
-                    Achievements
-                  </h3>
-                  <div className="space-y-3">
-                    <Achievement
-                      title="Profile Complete"
-                      description="Filled out all profile sections"
-                      unlocked={stats?.profile_views ? stats.profile_views > 0 : false}
-                    />
-                    <Achievement
-                      title="First Match"
-                      description="Received your first match"
-                      unlocked={(stats?.total_matches || 0) > 0}
-                    />
-                    <Achievement
-                      title="Conversationalist"
-                      description="Had 5 conversations"
-                      unlocked={(stats?.conversations || 0) >= 5}
-                    />
-                    <Achievement
-                      title="Popular"
-                      description="Got 50+ profile views"
-                      unlocked={(stats?.profile_views || 0) >= 50}
-                    />
-                  </div>
-                </div>
+                <AchievementsList />
 
                 {/* Account Info */}
                 <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl border border-purple-200 p-6">
@@ -461,17 +435,3 @@ function ActionButton({ href, label, icon, color }: { href: string; label: strin
   );
 }
 
-function Achievement({ title, description, unlocked }: { title: string; description: string; unlocked: boolean }) {
-  return (
-    <div className={`flex items-start gap-3 p-3 rounded-lg ${unlocked ? 'bg-yellow-50' : 'bg-gray-50'}`}>
-      <div className={`text-2xl ${unlocked ? 'filter-none' : 'grayscale opacity-40'}`}>
-        🏆
-      </div>
-      <div className="flex-1">
-        <p className={`text-sm font-medium ${unlocked ? 'text-gray-900' : 'text-gray-500'}`}>{title}</p>
-        <p className="text-xs text-gray-600">{description}</p>
-      </div>
-      {unlocked && <span className="text-xs text-yellow-600 font-medium">✓</span>}
-    </div>
-  );
-}

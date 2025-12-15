@@ -107,6 +107,30 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Fix**: Wrapped `useSearchParams` in `Suspense` to fix Next.js static build.
     -   **Verification**: Frontend build passing. Manual verification of UI logic.
 
+### ✅ Completed Operational Improvements (Dec 15)
+1.  **Slow Request Analysis (Performance)**:
+    -   **Backend**: Added `analyzeSlowRequests` to `AnalyticsController` to aggregate slow request data by route and action.
+    -   **Testing**: Implemented `SlowRequestTest` to verify analysis logic and API response.
+    -   **Infrastructure**: Configured persistent SQLite database for Docker-based testing to resolve migration issues.
+    -   **Verification**: Feature tests passing.
+2.  **Infrastructure Metrics (Scaling)**:
+    -   **Backend**: Added `metrics` method to `HealthController` exposing Redis memory/ops and MySQL thread count.
+    -   **API**: Added `/health/metrics` endpoint.
+    -   **Testing**: Implemented `HealthCheckTest` to verify metrics payload structure.
+    -   **Verification**: Feature tests passing.
+3.  **Admin Log Viewer (Observability)**:
+    -   **Backend**: Implemented `LogController` to list and read log files securely.
+    -   **Frontend**: Created `LogViewer` component with file list and content view.
+    -   **Integration**: Added "View Logs" link to Admin Settings page.
+    -   **Verification**: Feature tests (`LogViewerTest`) passing.
+
+### ✅ Advanced AI Features (Dec 15)
+1.  **AI Conversation Coach**:
+    -   **Backend**: Implemented `analyzeDraftMessage` in `AiWingmanService` and `AiWingmanController`.
+    -   **Frontend**: Created `ConversationCoach` component with real-time feedback (Score, Tone, Tips).
+    -   **Integration**: Embedded into `RealTimeChat` input field.
+    -   **Verification**: Backend tests (`AiConversationCoachTest`) passing. Frontend integration complete.
+
 ### ✅ User Experience Refinement (Dec 14)
 1.  **User Onboarding Wizard**:
     -   **Concept**: A multi-step wizard to guide new users through profile setup (Basics, Photos, Preferences).

@@ -17,6 +17,7 @@ import { storeOfflineChatMessage } from '@/lib/offline-store';
 import { useToast } from '@/components/ToastProvider';
 import GiftShopModal from '@/components/gifts/GiftShopModal';
 import { useE2EEncryption } from '@/lib/hooks/use-e2e-encryption';
+import { ConversationCoach } from '@/components/chat/ConversationCoach';
 
 interface RealTimeChatProps {
   recipientId: string;
@@ -375,14 +376,26 @@ export default function RealTimeChat({
           />
           {!isRecordingVoice && (
             <>
-              <input
-                type="text"
-                value={message}
-                onChange={handleMessageChange}
-                placeholder={isE2EReady ? "Type an encrypted message..." : "Type a message..."}
-                className="flex-1 bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-                disabled={!isConnected}
-              />
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  value={message}
+                  onChange={handleMessageChange}
+                  placeholder={isE2EReady ? "Type an encrypted message..." : "Type a message..."}
+                  className="w-full bg-gray-700 text-white px-4 py-2 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                  disabled={!isConnected}
+                />
+                <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                  <ConversationCoach 
+                    matchId={recipientId} 
+                    draft={message} 
+                    onApplySuggestion={(suggestion) => {
+                      setMessage(suggestion);
+                      handleTypingChange(suggestion);
+                    }}
+                  />
+                </div>
+              </div>
               <button
                 type="submit"
                 disabled={!message.trim() || !isConnected}
