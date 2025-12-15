@@ -55,6 +55,14 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Frontend**: Implemented `SlowRequestStatsTable` in Admin Analytics to visualize aggregated performance data.
     -   **Verification**: Verified data flow from middleware to frontend UI.
 
+### ✅ Critical Fixes (Dec 15 - Part 4)
+1.  **Mercure Double CORS Fix**:
+    -   **Issue**: Nginx and Mercure were both adding `Access-Control-Allow-Origin` headers, causing browsers to block connections with `The 'Access-Control-Allow-Origin' header contains multiple values`.
+    -   **Fix**: Removed manual CORS headers from `nginx.conf` for `/.well-known/mercure`. Nginx now proxies the headers from the Mercure service directly.
+2.  **API CORS Configuration**:
+    -   **Issue**: Missing `config/cors.php` caused the backend to fail CORS checks or rely on defaults that blocked production domains.
+    -   **Fix**: Created `fwber-backend/config/cors.php` explicitly allowing `https://fwber.me` and `https://www.fwber.me`.
+
 ### ✅ Technical Maintenance (Dec 15)
 1.  **E2E Test Expansion**:
     -   **Gifts**: Created `cypress/e2e/gifts.cy.js` covering sending gifts and insufficient token scenarios.
