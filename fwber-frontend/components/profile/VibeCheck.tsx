@@ -34,10 +34,14 @@ export function VibeCheck() {
     if (result && navigator.share) {
       const text = `My Vibe Check:\n\n🟢 Green Flags:\n${result.green_flags.map(f => `- ${f}`).join('\n')}\n\n🚩 Red Flags:\n${result.red_flags.map(f => `- ${f}`).join('\n')}`;
       try {
+        const url = result.share_id 
+          ? `${window.location.origin}/share/${result.share_id}`
+          : window.location.origin;
+
         await navigator.share({
           title: 'My FWBer Vibe Check',
           text: text,
-          url: window.location.origin,
+          url: url,
         });
       } catch (err) {
         console.error('Error sharing:', err);

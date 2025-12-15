@@ -58,6 +58,10 @@ Route::get('health/metrics', [\App\Http\Controllers\HealthController::class, 'me
 
 // Stripe Webhook
 Route::post('stripe/webhook', [\App\Http\Controllers\StripeWebhookController::class, 'handleWebhook']);
+
+// Public Viral Content
+Route::get('viral-content/{id}', [\App\Http\Controllers\ViralContentController::class, 'show']);
+
         // Device Token routes for Push Notifications
         Route::prefix('device-tokens')->group(function (): void {
             Route::post('/', [DeviceTokenController::class, 'store']);

@@ -8,6 +8,8 @@ use App\Services\AiWingmanService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+use App\Models\ViralContent;
+
 class AiWingmanController extends Controller
 {
     protected AiWingmanService $wingmanService;
@@ -15,6 +17,16 @@ class AiWingmanController extends Controller
     public function __construct(AiWingmanService $wingmanService)
     {
         $this->wingmanService = $wingmanService;
+    }
+
+    protected function saveViralContent(User $user, string $type, array $content): string
+    {
+        $viral = ViralContent::create([
+            'user_id' => $user->id,
+            'type' => $type,
+            'content' => $content,
+        ]);
+        return $viral->id;
     }
 
     /**
@@ -210,7 +222,12 @@ class AiWingmanController extends Controller
 
         $result = $this->wingmanService->roastProfile($user, $mode);
 
-        return response()->json(['roast' => $result]);
+        $shareId = $this->saveViralContent($user, $mode, ['text' => $result]);
+
+        return response()->json([
+            'roast' => $result,
+            'share_id' => $shareId
+        ]);
     }
 
     /**
@@ -224,7 +241,9 @@ class AiWingmanController extends Controller
         $user = Auth::user();
         $result = $this->wingmanService->checkVibe($user);
 
-        return response()->json($result);
+        $shareId = $this->saveViralContent($user, 'vibe', $result);
+
+        return response()->json(array_merge($result, ['share_id' => $shareId]));
     }
 
     /**
@@ -238,7 +257,12 @@ class AiWingmanController extends Controller
         $user = Auth::user();
         $result = $this->wingmanService->predictFortune($user);
 
-        return response()->json(['fortune' => $result]);
+        $shareId = $this->saveViralContent($user, 'fortune', ['text' => $result]);
+
+        return response()->json([
+            'fortune' => $result,
+            'share_id' => $shareId
+        ]);
     }
 
     /**
@@ -252,7 +276,9 @@ class AiWingmanController extends Controller
         $user = Auth::user();
         $result = $this->wingmanService->predictCosmicMatch($user);
 
-        return response()->json($result);
+        $shareId = $this->saveViralContent($user, 'cosmic', $result);
+
+        return response()->json(array_merge($result, ['share_id' => $shareId]));
     }
 
     /**
@@ -266,6 +292,8 @@ class AiWingmanController extends Controller
         $user = Auth::user();
         $result = $this->wingmanService->findNemesis($user);
 
-        return response()->json($result);
+        $shareId = $this->saveViralContent($user, 'nemesis', $result);
+
+        return response()->json(array_merge($result, ['share_id' => $shareId]));
     }
 }

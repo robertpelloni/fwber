@@ -32,6 +32,7 @@ $checks = [
         'STRIPE_KEY' => 'Stripe Public Key',
         'STRIPE_SECRET' => 'Stripe Secret Key',
         'STRIPE_WEBHOOK_SECRET' => 'Stripe Webhook Secret',
+        'PAYMENT_DRIVER' => 'Payment Driver',
     ],
     'AI' => [
         'OPENAI_API_KEY' => 'OpenAI API Key',

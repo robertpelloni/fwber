@@ -10,12 +10,14 @@ export function ProfileRoast() {
   const { roastProfile } = useAiWingman();
   const { toast } = useToast();
   const [content, setContent] = React.useState<string | null>(null);
+  const [shareId, setShareId] = React.useState<string | null>(null);
   const [mode, setMode] = React.useState<'roast' | 'hype'>('roast');
 
   const handleGenerate = async () => {
     try {
       const result = await roastProfile.mutateAsync(mode);
       setContent(result.roast);
+      setShareId(result.share_id || null);
     } catch (error) {
       // Error is handled by the hook
     }
@@ -24,6 +26,7 @@ export function ProfileRoast() {
   // Reset content when mode changes
   React.useEffect(() => {
     setContent(null);
+    setShareId(null);
   }, [mode]);
 
   const handleCopy = () => {
@@ -39,10 +42,14 @@ export function ProfileRoast() {
   const handleShare = async () => {
     if (content && navigator.share) {
       try {
+        const url = shareId 
+          ? `${window.location.origin}/share/${shareId}`
+          : window.location.origin;
+          
         await navigator.share({
           title: `My FWBer Profile ${mode === 'roast' ? 'Roast' : 'Hype'}`,
           text: content,
-          url: window.location.origin,
+          url: url,
         });
       } catch (err) {
         console.error('Error sharing:', err);

@@ -19,10 +19,12 @@ interface DateIdeasResponse {
 export interface VibeCheckResponse {
   green_flags: string[];
   red_flags: string[];
+  share_id?: string;
 }
 
 export interface FortuneResponse {
   fortune: string;
+  share_id?: string;
 }
 
 export interface CosmicMatchResponse {
@@ -30,6 +32,7 @@ export interface CosmicMatchResponse {
   best_reason: string;
   worst_match: string;
   worst_reason: string;
+  share_id?: string;
 }
 
 export interface NemesisResponse {
@@ -37,6 +40,7 @@ export interface NemesisResponse {
   clashing_traits: string[];
   why_it_would_fail: string;
   scientific_explanation: string;
+  share_id?: string;
 }
 
 export function useAiWingman() {
@@ -72,7 +76,7 @@ export function useAiWingman() {
 
   const roastProfile = useMutation({
     mutationFn: async (mode: 'roast' | 'hype' = 'roast') => {
-      return api.post<{ roast: string }>('/wingman/roast', { mode });
+      return api.post<{ roast: string; share_id?: string }>('/wingman/roast', { mode });
     },
     onError: (err: any) => {
       setError(err.message || 'Failed to generate content');
