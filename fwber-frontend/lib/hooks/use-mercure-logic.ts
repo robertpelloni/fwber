@@ -102,6 +102,10 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
   const decryptRef = useRef(decrypt);
   const encryptRef = useRef(encrypt);
   const isE2EReadyRef = useRef(isE2EReady);
+  
+  // Ref for status to avoid dependency cycles in connect/disconnect
+  const statusRef = useRef(status);
+  useEffect(() => { statusRef.current = status; }, [status]);
 
   useEffect(() => { decryptRef.current = decrypt; }, [decrypt]);
   useEffect(() => { encryptRef.current = encrypt; }, [encrypt]);
@@ -315,7 +319,10 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
   }, [user?.id]);
 
   const connect = useCallback(() => {
-    if (status.connected || status.connecting || !user?.id) return;
+    // Check if we are already connected or connecting
+    // We check eventSourceRef to ensure we don't have an active connection
+    // We check statusRef.current.connecting to avoid double-invocation during connection phase
+    if ((statusRef.current.connected && eventSourceRef.current) || statusRef.current.connecting || !user?.id) return;
 
     setStatus(prev => ({ ...prev, connecting: true, error: null }));
 
@@ -356,7 +363,7 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
     es.addEventListener('video_signal', (e: MessageEvent) => handleMessage(JSON.parse(e.data)));
 
     eventSourceRef.current = es;
-  }, [user?.id, status.connected, status.connecting]);
+  }, [user?.id]);
 
   const disconnect = useCallback(() => {
     if (eventSourceRef.current) {
@@ -374,13 +381,13 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
   const clearNotifications = useCallback(() => setNotifications([]), []);
 
   useEffect(() => {
-    if (options.autoConnect && isAuthenticated && !status.connected && !status.connecting) {
+    if (options.autoConnect && isAuthenticated) {
       connect();
     }
     return () => {
       disconnect();
     };
-  }, [options.autoConnect, isAuthenticated, connect, disconnect, status.connected, status.connecting]);
+  }, [options.autoConnect, isAuthenticated, connect, disconnect]);
 
   return useMemo(() => ({
     connectionStatus: {
