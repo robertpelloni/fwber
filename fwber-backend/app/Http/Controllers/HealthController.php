@@ -234,4 +234,57 @@ class HealthController extends Controller
         
         return $uptime;
     }
+
+    /**
+     * Expose infrastructure metrics for scaling decisions.
+     *
+     * @OA\Get(
+     *   path="/health/metrics",
+     *   tags={"Health"},
+     *   summary="Infrastructure metrics",
+     *   description="Returns Redis and Database load metrics.",
+     *   @OA\Response(
+     *     response=200,
+     *     description="Metrics retrieved",
+     *     @OA\JsonContent(
+     *       type="object",
+     *       @OA\Property(property="redis", type="object"),
+     *       @OA\Property(property="database", type="object")
+     *     )
+     *   )
+     * )
+     */
+    public function metrics(): JsonResponse
+    {
+        $metrics = [];
+
+        // Redis Metrics
+        try {
+            $info = Redis::info();
+            $metrics['redis'] = [
+                'used_memory_human' => $info['used_memory_human'] ?? null,
+                'connected_clients' => $info['connected_clients'] ?? null,
+                'instantaneous_ops_per_sec' => $info['instantaneous_ops_per_sec'] ?? null,
+            ];
+        } catch (\Throwable $e) {
+            $metrics['redis'] = ['error' => $e->getMessage()];
+        }
+
+        // Database Metrics (MySQL specific)
+        try {
+            $driver = DB::connection()->getDriverName();
+            if ($driver === 'mysql') {
+                $threads = DB::select('SHOW GLOBAL STATUS LIKE "Threads_connected"');
+                $metrics['database'] = [
+                    'threads_connected' => $threads[0]->Value ?? null,
+                ];
+            } else {
+                $metrics['database'] = ['info' => 'Metrics only available for MySQL'];
+            }
+        } catch (\Throwable $e) {
+            $metrics['database'] = ['error' => $e->getMessage()];
+        }
+
+        return response()->json($metrics);
+    }
 }

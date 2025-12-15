@@ -54,6 +54,7 @@ Route::post('auth/two-factor-challenge', [\App\Http\Controllers\TwoFactorChallen
 Route::get('health', [\App\Http\Controllers\HealthController::class, 'check']);
 Route::get('health/liveness', [\App\Http\Controllers\HealthController::class, 'liveness']);
 Route::get('health/readiness', [\App\Http\Controllers\HealthController::class, 'readiness']);
+Route::get('health/metrics', [\App\Http\Controllers\HealthController::class, 'metrics']);
 
 // Stripe Webhook
 Route::post('stripe/webhook', [\App\Http\Controllers\StripeWebhookController::class, 'handleWebhook']);

@@ -59,4 +59,26 @@ class HealthCheckTest extends TestCase
         // For now, let's just verify the structure of the success case.
         $this->assertTrue(true);
     }
+
+    public function test_metrics_endpoint_returns_data()
+    {
+        // Mock Redis info
+        Redis::shouldReceive('info')->andReturn([
+            'used_memory_human' => '1.5M',
+            'connected_clients' => 5,
+            'instantaneous_ops_per_sec' => 100,
+        ]);
+
+        $response = $this->getJson('/api/health/metrics');
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'redis' => [
+                    'used_memory_human',
+                    'connected_clients',
+                    'instantaneous_ops_per_sec',
+                ],
+                'database',
+            ]);
+    }
 }
