@@ -75,4 +75,20 @@ class AuthController extends Controller
     {
         return $request->user()->load('profile');
     }
+
+    public function checkReferralCode($code)
+    {
+        $referrer = User::where('referral_code', $code)->first();
+
+        if (!$referrer) {
+            return response()->json(['valid' => false], 404);
+        }
+
+        return response()->json([
+            'valid' => true,
+            'referrer_name' => $referrer->name,
+            'referrer_avatar' => $referrer->avatar_url, // Assuming this exists
+            'has_golden_tickets' => $referrer->golden_tickets_remaining > 0,
+        ]);
+    }
 }
