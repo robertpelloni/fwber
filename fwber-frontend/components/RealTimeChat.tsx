@@ -8,7 +8,7 @@ import { UserAvatar, PresenceIndicator, PresenceStatus } from '@/components/Pres
 import { WingmanSuggestions } from '@/components/ai/WingmanSuggestions';
 import AudioRecorder from '@/components/AudioRecorder';
 import { api } from '@/lib/api';
-import { Languages, Loader2, Sparkles, Gift as GiftIcon, Lock } from 'lucide-react';
+import { Languages, Loader2, Sparkles, Gift as GiftIcon, Lock, Video, MoreVertical, Paperclip, X } from 'lucide-react';
 import { useTranslation } from '@/lib/hooks/use-translation';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { MatchInsights } from '@/components/matches/MatchInsights';
@@ -18,11 +18,16 @@ import { useToast } from '@/components/ToastProvider';
 import GiftShopModal from '@/components/gifts/GiftShopModal';
 import { useE2EEncryption } from '@/lib/hooks/use-e2e-encryption';
 import { ConversationCoach } from '@/components/chat/ConversationCoach';
+import Image from 'next/image';
 
 interface RealTimeChatProps {
   recipientId: string;
   recipientName?: string;
   className?: string;
+  onVideoCall?: () => void;
+  onProfileView?: () => void;
+  onReport?: () => void;
+  onBlock?: () => void;
 }
 
 function TranslateButton({ text, isOwnMessage }: { text: string, isOwnMessage: boolean }) {
@@ -104,14 +109,24 @@ function EncryptedMessageContent({ content, senderId, isOwnMessage }: { content:
 export default function RealTimeChat({ 
   recipientId, 
   recipientName = 'User',
-  className = '' 
+  className = '',
+  onVideoCall,
+  onProfileView,
+  onReport,
+  onBlock
 }: RealTimeChatProps) {
   const [message, setMessage] = useState('');
   const [isRecordingVoice, setIsRecordingVoice] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [isGiftModalOpen, setIsGiftModalOpen] = useState(false);
+  const [showSafetyMenu, setShowSafetyMenu] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isSending, setIsSending] = useState(false);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const { user } = useAuth();
   const { showSuccess, showError } = useToast();
   const { encrypt, isReady: isE2EReady } = useE2EEncryption();
@@ -126,6 +141,8 @@ export default function RealTimeChat({
   } = useWebSocketChat(recipientId);
 
   const { loadConversationHistory, connectionStatus } = useWebSocket();
+
+  const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:8000';
 
   // Update isConnected based on global connection status
   useEffect(() => {
@@ -156,22 +173,57 @@ export default function RealTimeChat({
     indicator => indicator.from_user_id === recipientId && indicator.is_typing
   );
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (message.trim() && recipientId) {
-      let payload = message.trim();
-      
-      // Encrypt if E2E is ready
-      if (isE2EReady) {
-        try {
-          payload = await encrypt(parseInt(recipientId), payload);
-        } catch (error) {
-          console.error('Encryption failed, sending plain text', error);
-        }
-      }
+    if ((message.trim() || selectedFile) && recipientId) {
+      setIsSending(true);
+      try {
+        if (selectedFile) {
+            // Handle file upload via API
+            const formData = new FormData();
+            formData.append('receiver_id', recipientId);
+            formData.append('content', message.trim());
+            formData.append('media', selectedFile);
+            
+            // Auto-detect type
+            if (selectedFile.type.startsWith('image/')) formData.append('message_type', 'image');
+            else if (selectedFile.type.startsWith('video/')) formData.append('message_type', 'video');
+            else if (selectedFile.type.startsWith('audio/')) formData.append('message_type', 'audio');
+            else formData.append('message_type', 'file');
 
-      sendMessage(payload);
-      setMessage('');
+            await api.post('/messages', formData);
+            // Message will be received via WebSocket
+        } else {
+            // Handle text message via WebSocket
+            let payload = message.trim();
+            
+            // Encrypt if E2E is ready
+            if (isE2EReady) {
+                try {
+                payload = await encrypt(parseInt(recipientId), payload);
+                } catch (error) {
+                console.error('Encryption failed, sending plain text', error);
+                }
+            }
+
+            sendMessage(payload);
+        }
+        
+        setMessage('');
+        setSelectedFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      } catch (error) {
+        console.error('Failed to send message:', error);
+        showError('Error', 'Failed to send message');
+      } finally {
+        setIsSending(false);
+      }
     }
   };
 
@@ -233,17 +285,17 @@ export default function RealTimeChat({
   };
 
   return (
-    <div className={`flex flex-col h-96 bg-gray-800 rounded-lg ${className}`}>
+    <div className={`flex flex-col h-full bg-gray-800 rounded-lg ${className}`}>
       {/* Chat Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-700">
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-3 cursor-pointer" onClick={onProfileView}>
           <UserAvatar 
             name={recipientName}
             status={recipientStatus}
             size="md"
           />
           <div>
-            <h3 className="text-white font-semibold flex items-center gap-2">
+            <h3 className="text-white font-semibold flex items-center gap-2 hover:underline">
               {recipientName}
               {isE2EReady && (
                 <span title="End-to-End Encrypted">
@@ -261,6 +313,16 @@ export default function RealTimeChat({
         <div className="flex items-center space-x-2">
           <DatePlanner matchId={recipientId} matchName={recipientName} />
           
+          {onVideoCall && (
+            <button 
+              onClick={onVideoCall}
+              className="p-2 hover:bg-gray-700 rounded-full text-gray-400 hover:text-blue-400 transition-colors"
+              title="Video Call"
+            >
+              <Video className="w-5 h-5" />
+            </button>
+          )}
+
           <button 
             onClick={() => setIsGiftModalOpen(true)}
             className="p-2 hover:bg-gray-700 rounded-full text-gray-400 hover:text-pink-400 transition-colors"
@@ -282,6 +344,44 @@ export default function RealTimeChat({
               <MatchInsights matchId={recipientId} />
             </DialogContent>
           </Dialog>
+
+          <div className="relative">
+            <button
+              onClick={() => setShowSafetyMenu(!showSafetyMenu)}
+              className="p-2 hover:bg-gray-700 rounded-full text-gray-400 hover:text-white transition-colors"
+              title="Options"
+            >
+              <MoreVertical className="w-5 h-5" />
+            </button>
+            {showSafetyMenu && (
+              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg z-10 border border-gray-200 dark:border-gray-600">
+                <div className="py-1">
+                  {onReport && (
+                    <button
+                      onClick={() => {
+                        onReport();
+                        setShowSafetyMenu(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
+                    >
+                      Report User
+                    </button>
+                  )}
+                  {onBlock && (
+                    <button
+                      onClick={() => {
+                        onBlock();
+                        setShowSafetyMenu(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600"
+                    >
+                      Block User
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
           {recipientTyping && (
             <div className="flex items-center space-x-1 text-gray-400 text-sm">
@@ -311,6 +411,8 @@ export default function RealTimeChat({
           (messages as ChatMessage[]).map((msg, index) => {
             const isOwnMessage = msg.from_user_id === user?.id;
             const content = msg.message?.content || msg.content || '';
+            const messageType = msg.message_type || msg.message?.type || 'text';
+            const mediaUrl = msg.media_url;
             
             return (
               <div
@@ -324,25 +426,63 @@ export default function RealTimeChat({
                       : 'bg-gray-700 text-white'
                   }`}
                 >
-                  {(msg.message_type === 'audio' || msg.message?.type === 'audio') ? (
-                    <div className="flex flex-col gap-1 min-w-[200px]">
-                        <audio controls src={msg.media_url} className="w-full h-8" />
-                        <div className="flex justify-between items-center">
-                          {msg.media_duration && <span className="text-xs opacity-75">{msg.media_duration}s</span>}
-                        </div>
-                        {msg.transcription && (
-                          <div className="mt-1 p-2 bg-black/20 rounded text-sm italic text-gray-200">
-                            &quot;{msg.transcription}&quot;
-                          </div>
+                  {mediaUrl && (
+                    <div className="mb-2">
+                        {messageType === 'image' ? (
+                            <Image 
+                                src={mediaUrl.startsWith('http') ? mediaUrl : `${BACKEND_URL}${mediaUrl}`} 
+                                alt="Attachment" 
+                                width={200}
+                                height={200}
+                                className="w-full h-auto rounded-lg"
+                                loading="lazy"
+                            />
+                        ) : messageType === 'video' ? (
+                            <video 
+                                src={mediaUrl.startsWith('http') ? mediaUrl : `${BACKEND_URL}${mediaUrl}`} 
+                                controls 
+                                className="max-w-full rounded-lg"
+                            />
+                        ) : messageType === 'audio' ? (
+                            <div className="flex flex-col gap-1 min-w-[200px]">
+                                <audio 
+                                    controls 
+                                    src={mediaUrl.startsWith('http') ? mediaUrl : `${BACKEND_URL}${mediaUrl}`} 
+                                    className="w-full h-8" 
+                                />
+                                <div className="flex justify-between items-center">
+                                    {msg.media_duration && <span className="text-xs opacity-75">{msg.media_duration}s</span>}
+                                </div>
+                                {msg.transcription && (
+                                    <div className="mt-1 p-2 bg-black/20 rounded text-sm italic text-gray-200">
+                                        &quot;{msg.transcription}&quot;
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <a 
+                                href={mediaUrl.startsWith('http') ? mediaUrl : `${BACKEND_URL}${mediaUrl}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 underline text-white"
+                            >
+                                <Paperclip className="h-4 w-4" />
+                                Download File
+                            </a>
                         )}
                     </div>
-                  ) : (
+                  )}
+
+                  {!mediaUrl && messageType === 'text' && (
                     <EncryptedMessageContent 
                       content={content} 
                       senderId={parseInt(msg.from_user_id || '0')} 
                       isOwnMessage={isOwnMessage} 
                     />
                   )}
+                  
+                  {mediaUrl && content && <p className="text-sm mt-1">{content}</p>}
+
                   <MessageMetadata 
                     timestamp={msg.timestamp}
                     status={msg.status}
@@ -369,11 +509,45 @@ export default function RealTimeChat({
             mode={(messages as ChatMessage[]).length === 0 ? 'ice-breaker' : 'reply'}
           />
         </div>
+        
+        {selectedFile && (
+            <div className="mb-2 px-3 py-1 bg-gray-700 rounded flex justify-between items-center">
+                <span className="text-sm text-gray-300 truncate max-w-xs">{selectedFile.name}</span>
+                <button 
+                onClick={() => {
+                    setSelectedFile(null);
+                    if (fileInputRef.current) fileInputRef.current.value = '';
+                }}
+                className="text-gray-400 hover:text-red-400"
+                >
+                <X className="w-4 h-4" />
+                </button>
+            </div>
+        )}
+
         <form onSubmit={handleSendMessage} className="flex space-x-2 items-center">
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-full transition-colors"
+            title="Attach file"
+          >
+            <Paperclip className="w-5 h-5" />
+          </button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileSelect}
+            className="hidden"
+            accept="image/*,video/*,audio/*"
+          />
+
           <AudioRecorder 
             onRecordingComplete={handleVoiceMessage} 
             onRecordingStateChange={setIsRecordingVoice}
+            isSending={isSending}
           />
+          
           {!isRecordingVoice && (
             <>
               <div className="flex-1 relative">
@@ -383,7 +557,7 @@ export default function RealTimeChat({
                   onChange={handleMessageChange}
                   placeholder={isE2EReady ? "Type an encrypted message..." : "Type a message..."}
                   className="w-full bg-gray-700 text-white px-4 py-2 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-                  disabled={!isConnected}
+                  disabled={!isConnected || isSending}
                 />
                 <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
                   <ConversationCoach 
@@ -398,10 +572,10 @@ export default function RealTimeChat({
               </div>
               <button
                 type="submit"
-                disabled={!message.trim() || !isConnected}
+                disabled={(!message.trim() && !selectedFile) || !isConnected || isSending}
                 className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition-colors"
               >
-                Send
+                {isSending ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Send'}
               </button>
             </>
           )}
