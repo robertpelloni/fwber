@@ -6,10 +6,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   getFeatureFlags,
   getSystemHealth,
+  getInfrastructureMetrics,
   updateFeatureFlags,
   type FeatureFlags,
   type FeatureFlagsResponse,
   type SystemHealth,
+  type InfrastructureMetrics,
 } from '@/lib/api/config';
 
 interface ConfigQueryOptions {
@@ -62,6 +64,22 @@ export function useSystemHealth(options: ConfigQueryOptions = {}) {
     enabled: options.enabled ?? true,
     refetchInterval: options.refetchInterval ?? 30_000, // Every 30 seconds
     staleTime: options.staleTime ?? 15_000, // 15 seconds
+    gcTime: DEFAULT_GC_TIME,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
+}
+
+/**
+ * Hook to fetch infrastructure metrics
+ */
+export function useInfrastructureMetrics(options: ConfigQueryOptions = {}) {
+  return useQuery<InfrastructureMetrics>({
+    queryKey: ['config', 'metrics'],
+    queryFn: getInfrastructureMetrics,
+    enabled: options.enabled ?? true,
+    refetchInterval: options.refetchInterval ?? 10_000, // Every 10 seconds
+    staleTime: options.staleTime ?? 5_000,
     gcTime: DEFAULT_GC_TIME,
     refetchOnWindowFocus: false,
     retry: 1,

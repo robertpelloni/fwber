@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import { useBackendFeatureFlags, useUpdateFeatureFlags, useSystemHealth } from '@/lib/hooks/use-config';
+import { useBackendFeatureFlags, useUpdateFeatureFlags, useSystemHealth, useInfrastructureMetrics } from '@/lib/hooks/use-config';
 import type { FeatureFlags } from '@/lib/api/config';
 import {
   Settings,
@@ -15,6 +15,7 @@ import {
   X,
   RefreshCw,
   AlertTriangle,
+  Server,
 } from 'lucide-react';
 
 const FEATURE_DESCRIPTIONS: Record<keyof FeatureFlags, { label: string; description: string; category: string }> = {
@@ -166,10 +167,12 @@ export default function AdminSettingsPage() {
 
   const featuresQuery = useBackendFeatureFlags();
   const healthQuery = useSystemHealth();
+  const metricsQuery = useInfrastructureMetrics();
   const updateMutation = useUpdateFeatureFlags();
 
   const features = featuresQuery.data?.features;
   const health = healthQuery.data;
+  const metrics = metricsQuery.data;
 
   const handleToggle = (flag: keyof FeatureFlags, value: boolean) => {
     setPendingChanges((prev) => ({ ...prev, [flag]: value }));
@@ -244,11 +247,12 @@ export default function AdminSettingsPage() {
                   onClick={() => {
                     featuresQuery.refetch();
                     healthQuery.refetch();
+                    metricsQuery.refetch();
                   }}
-                  disabled={featuresQuery.isFetching || healthQuery.isFetching}
+                  disabled={featuresQuery.isFetching || healthQuery.isFetching || metricsQuery.isFetching}
                   className="flex items-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                 >
-                  <RefreshCw className={`h-4 w-4 ${featuresQuery.isFetching ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`h-4 w-4 ${featuresQuery.isFetching || metricsQuery.isFetching ? 'animate-spin' : ''}`} />
                   Refresh
                 </button>
                 <a
@@ -316,6 +320,48 @@ export default function AdminSettingsPage() {
                   <HealthStatusBadge status={health?.services.queue ?? 'unknown'} />
                 </div>
                 <p className="text-sm text-gray-500">Driver: {health?.details.queue_driver ?? 'unknown'}</p>
+              </div>
+            </div>
+          </section>
+
+          {/* Infrastructure Metrics Section */}
+          <section className="mb-8">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Server className="h-5 w-5" />
+              Infrastructure Metrics
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Redis Memory */}
+              <div className="bg-white rounded-lg border border-gray-200 p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-gray-900">Redis Memory</span>
+                  <span className="text-xs font-medium bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                    {metrics?.redis.used_memory_human ?? '...'}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-500">Used Memory</p>
+              </div>
+
+              {/* Redis Clients */}
+              <div className="bg-white rounded-lg border border-gray-200 p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-gray-900">Redis Clients</span>
+                  <span className="text-xs font-medium bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">
+                    {metrics?.redis.connected_clients ?? '...'}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-500">Connected Clients</p>
+              </div>
+
+              {/* DB Threads */}
+              <div className="bg-white rounded-lg border border-gray-200 p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-gray-900">DB Threads</span>
+                  <span className="text-xs font-medium bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
+                    {metrics?.database.threads_connected ?? (metrics?.database.info ? 'N/A' : '...')}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-500">Active Connections</p>
               </div>
             </div>
           </section>

@@ -590,6 +590,20 @@ export interface SlowRequestStats {
   last_occurrence: string
 }
 
+export interface SlowQuery {
+  sql: string
+  time: number
+  connection: string
+}
+
+export interface SlowRequestAnalysis {
+  endpoint: string
+  method: string
+  impact_score: number
+  issues: string[]
+  sample_slow_queries?: SlowQuery[]
+}
+
 export interface RealtimeMetrics {
   active_connections: number
   messages_per_minute: number

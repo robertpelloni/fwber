@@ -36,6 +36,10 @@ export function getSlowRequestStats() {
   return api.get<SlowRequestStats[]>('/analytics/slow-requests/stats');
 }
 
+export function getSlowRequestAnalysis() {
+  return api.get<import('./types').SlowRequestAnalysis[]>('/analytics/slow-requests/analysis');
+}
+
 export function getBoostAnalytics() {
   return api.get<BoostAnalyticsResponse>('/analytics/boosts');
 }

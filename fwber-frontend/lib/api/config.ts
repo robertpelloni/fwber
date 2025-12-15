@@ -51,6 +51,20 @@ export interface SystemHealth {
   timestamp: string;
 }
 
+export interface InfrastructureMetrics {
+  redis: {
+    used_memory_human?: string;
+    connected_clients?: number;
+    instantaneous_ops_per_sec?: number;
+    error?: string;
+  };
+  database: {
+    threads_connected?: number;
+    info?: string;
+    error?: string;
+  };
+}
+
 /**
  * Get current feature flag states from backend
  */
@@ -72,4 +86,11 @@ export function updateFeatureFlags(
  */
 export function getSystemHealth(): Promise<SystemHealth> {
   return api.get<SystemHealth>('/config/health');
+}
+
+/**
+ * Get infrastructure metrics (Redis/DB load)
+ */
+export function getInfrastructureMetrics(): Promise<InfrastructureMetrics> {
+  return api.get<InfrastructureMetrics>('/health/metrics');
 }

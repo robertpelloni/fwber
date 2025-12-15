@@ -8,6 +8,7 @@ import {
   getRetentionAnalytics,
   getSlowRequests,
   getSlowRequestStats,
+  getSlowRequestAnalysis,
 } from '@/lib/api/admin';
 import type {
   AnalyticsRange,
@@ -20,6 +21,7 @@ import type {
   RetentionResponse,
   SlowRequest,
   SlowRequestStats,
+  SlowRequestAnalysis,
 } from '@/lib/api/types';
 
 interface AdminQueryOptions {
@@ -107,6 +109,18 @@ export function useSlowRequestStats(options: AdminQueryOptions = {}) {
   return useQuery<SlowRequestStats[]>({
     queryKey: ['analytics', 'slow-requests', 'stats'],
     queryFn: getSlowRequestStats,
+    enabled: options.enabled ?? true,
+    refetchInterval: options.refetchInterval ?? 60_000,
+    staleTime: options.staleTime ?? 30_000,
+    gcTime: DEFAULT_GC_TIME,
+    refetchOnWindowFocus: false,
+  });
+}
+
+export function useSlowRequestAnalysis(options: AdminQueryOptions = {}) {
+  return useQuery<SlowRequestAnalysis[]>({
+    queryKey: ['analytics', 'slow-requests', 'analysis'],
+    queryFn: getSlowRequestAnalysis,
     enabled: options.enabled ?? true,
     refetchInterval: options.refetchInterval ?? 60_000,
     staleTime: options.staleTime ?? 30_000,

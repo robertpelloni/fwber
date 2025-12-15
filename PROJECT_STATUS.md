@@ -153,6 +153,19 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
     -   **Database**: Added `sentiment`, `ai_analysis`, and `is_analyzed` columns to `feedback` table.
     -   **Frontend**: Updated `AdminFeedbackPage` to display sentiment badges and AI analysis insights.
     -   **Verification**: Feature tests (`FeedbackAnalysisTest`) passing. Frontend lint passing.
+5.  **Performance Tuning (Deep Dive)**:
+    -   **Backend**: Optimized `ApmMiddleware` to use `DB::listen` for memory-safe query capturing.
+    -   **Backend**: Updated `SlowRequest` model to store `slowest_queries` JSON.
+    -   **Backend**: Updated `AnalyticsController` to expose sample slow queries.
+    -   **Frontend**: Created `SlowRequestAnalysis` component to visualize N+1 queries and SQL snippets.
+    -   **Verification**: Verified with `SlowRequestTest`.
+6.  **Sentry Release Tracking**:
+    -   **DevOps**: Updated `fwber-backend/deploy.sh` to export `SENTRY_RELEASE` using git commit hash.
+    -   **Verification**: Verified script modification.
+8.  **Infrastructure Monitoring (Dashboard)**:
+    -   **Frontend**: Implemented `useInfrastructureMetrics` hook.
+    -   **UI**: Added "Infrastructure Metrics" section to Admin Settings page (Redis Memory, Clients, DB Threads).
+    -   **Verification**: Verified integration with `/health/metrics` endpoint.
 
 ### ✅ User Experience Refinement (Dec 15 - Part 2)
 1.  **Onboarding Fix**:
