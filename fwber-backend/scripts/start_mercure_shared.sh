@@ -27,12 +27,19 @@ export MERCURE_SUBSCRIBER_JWT_KEY=${MERCURE_SUBSCRIBER_JWT_KEY}
 
 # Optimize for Shared Hosting (Low Memory)
 # Aggressive memory limits for shared hosting environments
-export GOMEMLIMIT=64MiB
-export GOGC=20
+export GOMEMLIMIT=32MiB
+export GOGC=10
 echo "Memory limits set: GOMEMLIMIT=$GOMEMLIMIT, GOGC=$GOGC"
 
-# Disable internal metrics to save memory
+# Disable internal metrics and UI to save memory
 export MERCURE_METRICS_ENABLED=0
+export MERCURE_DEMO=0
+export MERCURE_SWAGGER_UI=0
+
+# Debugging: Print system limits
+echo "System Limits (ulimit -a):"
+ulimit -a
+echo "--------------------------------"
 
 # 4. Check for Mercure binary
 MERCURE_BIN="./mercure"
