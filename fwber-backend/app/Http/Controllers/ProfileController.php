@@ -598,4 +598,45 @@ class ProfileController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * @OA\Put(
+     *     path="/profile/password",
+     *     tags={"Profile"},
+     *     summary="Update user password",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"current_password", "password", "password_confirmation"},
+     *             @OA\Property(property="current_password", type="string", format="password"),
+     *             @OA\Property(property="password", type="string", format="password", minLength=8),
+     *             @OA\Property(property="password_confirmation", type="string", format="password")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Password updated successfully"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error"
+     *     )
+     * )
+     */
+    public function updatePassword(Request $request): JsonResponse
+    {
+        $request->validate([
+            'current_password' => 'required|current_password',
+            'password' => 'required|confirmed|min:8',
+        ]);
+
+        $user = auth()->user();
+        $user->password = \Illuminate\Support\Facades\Hash::make($request->password);
+        $user->save();
+
+        return response()->json([
+            'message' => 'Password updated successfully',
+        ]);
+    }
 }

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 use App\Models\User;
 use App\Models\BulletinBoard;
 use App\Models\BulletinMessage;
@@ -15,10 +16,15 @@ use App\Services\ContentModerationService;
 class AnalyticsController extends Controller
 {
     protected ContentModerationService $moderationService;
+    protected \App\Services\WebSocketService $webSocketService;
 
-    public function __construct(ContentModerationService $moderationService)
+    public function __construct(
+        ContentModerationService $moderationService,
+        \App\Services\WebSocketService $webSocketService
+    )
     {
         $this->moderationService = $moderationService;
+        $this->webSocketService = $webSocketService;
     }
 
     /**
@@ -68,7 +74,7 @@ class AnalyticsController extends Controller
     private function getUserAnalytics(array $dateRange): array
     {
         $totalUsers = User::count();
-        $activeUsers = User::where('last_seen_at', '>=', $dateRange['start'])->count();
+        $activeUsers = User::where('last_active_at', '>=', $dateRange['start'])->count();
         $newToday = User::whereDate('created_at', today())->count();
         
         // Calculate growth rate
@@ -154,12 +160,42 @@ class AnalyticsController extends Controller
         $avgResponseTime = SlowRequest::where('created_at', '>=', now()->subDay())->avg('duration_ms') ?? 0;
         $slowRequestCount = SlowRequest::where('created_at', '>=', now()->subDay())->count();
         
+        // Real SSE Connections
+        $sseConnections = 0;
+        try {
+            $sseConnections = count($this->webSocketService->getOnlineUsers());
+        } catch (\Exception $e) {}
+
+        // Real Cache Hit Rate (Redis)
+        $cacheHitRate = 0;
+        try {
+            $info = Redis::info('stats');
+            $hits = $info['keyspace_hits'] ?? 0;
+            $misses = $info['keyspace_misses'] ?? 0;
+            $total = $hits + $misses;
+            if ($total > 0) {
+                $cacheHitRate = round(($hits / $total) * 100, 1);
+            }
+        } catch (\Exception $e) {}
+
+        // Real Error Rate
+        $errorRate = 0;
+        try {
+            $today = now()->format('Y-m-d');
+            $requests = Redis::get("apm:requests:{$today}") ?? 0;
+            $errors = Redis::get("apm:errors:{$today}") ?? 0;
+            
+            if ($requests > 0) {
+                $errorRate = round(($errors / $requests) * 100, 2);
+            }
+        } catch (\Exception $e) {}
+        
         return [
             'api_response_time' => round($avgResponseTime, 2), // Average of slow requests (biased, but useful)
             'slow_requests_24h' => $slowRequestCount,
-            'sse_connections' => rand(100, 500), // Still simulated
-            'cache_hit_rate' => rand(85, 95), // Still simulated
-            'error_rate' => rand(0, 2), // Still simulated
+            'sse_connections' => $sseConnections,
+            'cache_hit_rate' => $cacheHitRate,
+            'error_rate' => $errorRate,
         ];
     }
 
@@ -237,8 +273,8 @@ class AnalyticsController extends Controller
                 AVG(memory_usage_kb) as avg_memory
             ')
             ->where('created_at', '>=', now()->subDays(7))
-            ->groupBy('endpoint', 'method')
-            ->having('count', '>=', 5) // Only analyze frequent slow requests
+            ->groupByRaw('COALESCE(route_name, action, url), method')
+            ->havingRaw('COUNT(*) >= 5') // Only analyze frequent slow requests
             ->get();
 
         $insights = [];
@@ -248,7 +284,7 @@ class AnalyticsController extends Controller
             
             // Check for N+1 queries
             if ($stat->avg_queries > 50) {
-                $issues[] = "High database query count ({$stat->avg_queries}). Potential N+1 query problem.";
+                $issues[] = "High database query count (" . round($stat->avg_queries) . "). Potential N+1 query problem.";
             }
 
             // Check for memory leaks or heavy processing
@@ -258,7 +294,12 @@ class AnalyticsController extends Controller
 
             // Check for slow processing despite low DB usage
             if ($stat->avg_duration > 1000 && $stat->avg_queries < 10) {
-                $issues[] = "Slow response time ({$stat->avg_duration}ms) with low DB usage. Potential CPU bottleneck or external API latency.";
+                $issues[] = "Slow response time (" . round($stat->avg_duration) . "ms) with low DB usage. Potential CPU bottleneck or external API latency.";
+            }
+
+            // Always include if it's very slow (> 2s) even if no specific pattern matched above
+            if (empty($issues) && $stat->avg_duration > 2000) {
+                $issues[] = "Very slow response time (" . round($stat->avg_duration) . "ms). Needs investigation.";
             }
 
             if (!empty($issues)) {
@@ -268,6 +309,7 @@ class AnalyticsController extends Controller
                               ->orWhere('action', $stat->endpoint)
                               ->orWhere('url', $stat->endpoint);
                     })
+                    ->where('method', $stat->method)
                     ->whereNotNull('slowest_queries')
                     ->latest()
                     ->first();
@@ -276,6 +318,8 @@ class AnalyticsController extends Controller
                     'endpoint' => $stat->endpoint,
                     'method' => $stat->method,
                     'impact_score' => $stat->count * $stat->avg_duration, // Frequency * Duration
+                    'avg_duration' => round($stat->avg_duration, 2),
+                    'request_count' => $stat->count,
                     'issues' => $issues,
                     'sample_slow_queries' => $sample ? $sample->slowest_queries : null,
                 ];
@@ -295,14 +339,23 @@ class AnalyticsController extends Controller
     {
         // Hourly activity for the last 24 hours (Optimized)
         $start24h = now()->subHours(24);
+        $driver = DB::connection()->getDriverName();
         
-        $messagesByHour = BulletinMessage::selectRaw('DATE_FORMAT(created_at, "%Y-%m-%d %H") as hour_key, COUNT(*) as count')
+        if ($driver === 'sqlite') {
+            $msgHourSql = 'strftime("%Y-%m-%d %H", created_at)';
+            $userHourSql = 'strftime("%Y-%m-%d %H", last_active_at)';
+        } else {
+            $msgHourSql = 'DATE_FORMAT(created_at, "%Y-%m-%d %H")';
+            $userHourSql = 'DATE_FORMAT(last_active_at, "%Y-%m-%d %H")';
+        }
+
+        $messagesByHour = BulletinMessage::selectRaw("$msgHourSql as hour_key, COUNT(*) as count")
             ->where('created_at', '>=', $start24h)
             ->groupBy('hour_key')
             ->pluck('count', 'hour_key');
             
-        $usersByHour = User::selectRaw('DATE_FORMAT(last_seen_at, "%Y-%m-%d %H") as hour_key, COUNT(*) as count')
-            ->where('last_seen_at', '>=', $start24h)
+        $usersByHour = User::selectRaw("$userHourSql as hour_key, COUNT(*) as count")
+            ->where('last_active_at', '>=', $start24h)
             ->groupBy('hour_key')
             ->pluck('count', 'hour_key');
 
@@ -319,13 +372,14 @@ class AnalyticsController extends Controller
         }
 
         // Daily activity for the date range (Optimized)
+        // DATE() function is supported by both MySQL and SQLite
         $messagesByDay = BulletinMessage::selectRaw('DATE(created_at) as date_key, COUNT(*) as count')
             ->where('created_at', '>=', $dateRange['start'])
             ->groupBy('date_key')
             ->pluck('count', 'date_key');
             
-        $usersByDay = User::selectRaw('DATE(last_seen_at) as date_key, COUNT(*) as count')
-            ->where('last_seen_at', '>=', $dateRange['start'])
+        $usersByDay = User::selectRaw('DATE(last_active_at) as date_key, COUNT(*) as count')
+            ->where('last_active_at', '>=', $dateRange['start'])
             ->groupBy('date_key')
             ->pluck('count', 'date_key');
 

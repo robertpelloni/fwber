@@ -23,7 +23,6 @@ import {
   CheckCircle,
   Plane,
   Ghost,
-  Trash2,
   Download,
 } from 'lucide-react';
 
@@ -169,19 +168,6 @@ export default function SettingsPage() {
     }
   };
 
-  const handleDeleteAccount = async () => {
-    if (window.confirm('Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently lost.')) {
-      try {
-        await apiClient.delete('/profile');
-        await logout();
-        window.location.href = '/login';
-      } catch (error) {
-        console.error('Failed to delete account', error);
-        alert('Failed to delete account. Please try again.');
-      }
-    }
-  };
-
   const handleExportData = async () => {
     try {
       const response = await apiClient.get('/profile/export');
@@ -234,6 +220,12 @@ export default function SettingsPage() {
                 icon={<User className="w-5 h-5" />}
                 title="Profile"
                 description="Edit your profile information and photos"
+              />
+              <SettingsLink
+                href="/settings/account"
+                icon={<Settings className="w-5 h-5" />}
+                title="Account Settings"
+                description="Manage email, password, and account deletion"
               />
               <SettingsLink
                 href="/location-settings"
@@ -309,7 +301,7 @@ export default function SettingsPage() {
                 badge={faceRevealEnabled ? 'Face Reveal' : undefined}
               />
               <SettingsLink
-                href="/friends"
+                href="/settings/blocked"
                 icon={<Shield className="w-5 h-5" />}
                 title="Blocked Users"
                 description="Manage blocked users and privacy settings"
@@ -376,52 +368,6 @@ export default function SettingsPage() {
                 title="Help & Support"
                 description="Get help with your account"
               />
-            </div>
-          </section>
-
-          {/* Account Info */}
-          <section className="mb-8">
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h3 className="text-sm font-semibold text-gray-900 mb-4">Account Information</h3>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Email</span>
-                  <span className="text-gray-900">{user?.email || 'Not set'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Member since</span>
-                  <span className="text-gray-900">
-                    {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown'}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Email verified</span>
-                  <span className={user?.emailVerifiedAt ? 'text-green-600' : 'text-yellow-600'}>
-                    {user?.emailVerifiedAt ? 'Yes' : 'No'}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Danger Zone */}
-          <section className="mb-8">
-            <h2 className="text-sm font-semibold text-red-600 uppercase tracking-wider mb-4">
-              Danger Zone
-            </h2>
-            <div className="space-y-3">
-              <button
-                onClick={handleDeleteAccount}
-                className="w-full flex items-center gap-4 p-4 bg-red-50 rounded-lg border border-red-200 hover:bg-red-100 transition-colors group text-left"
-              >
-                <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center text-red-600 group-hover:bg-red-200 transition-colors">
-                  <Trash2 className="w-5 h-5" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-medium text-red-900">Delete Account</h3>
-                  <p className="text-sm text-red-700">Permanently delete your account and all data</p>
-                </div>
-              </button>
             </div>
           </section>
 

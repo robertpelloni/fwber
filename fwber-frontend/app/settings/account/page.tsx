@@ -1,0 +1,261 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { useAuth } from '@/lib/auth-context';
+import { apiClient } from '@/lib/api/client';
+import { ArrowLeft, Mail, Lock, Trash2, AlertTriangle } from 'lucide-react';
+import Link from 'next/link';
+
+export default function AccountSettingsPage() {
+  const { user, logout } = useAuth();
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  // Email State
+  const [email, setEmail] = useState(user?.email || '');
+  
+  // Password State
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  // Delete Account State
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+
+  const handleUpdateEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setMessage(null);
+    try {
+      await apiClient.put('/profile', { email });
+      setMessage({ type: 'success', text: 'Email updated successfully' });
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.response?.data?.message || 'Failed to update email' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      setMessage({ type: 'error', text: 'New passwords do not match' });
+      return;
+    }
+    setIsLoading(true);
+    setMessage(null);
+    try {
+      await apiClient.put('/profile/password', { 
+        current_password: currentPassword,
+        password: newPassword,
+        password_confirmation: confirmPassword
+      });
+      setMessage({ type: 'success', text: 'Password updated successfully' });
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.response?.data?.message || 'Failed to update password' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      await apiClient.delete('/profile', { data: { password: deletePassword } });
+      await logout();
+      router.push('/login');
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.response?.data?.message || 'Failed to delete account' });
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white shadow-sm sticky top-0 z-10">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center gap-4">
+              <Link href="/settings" className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors">
+                <ArrowLeft className="w-5 h-5 text-gray-600" />
+              </Link>
+              <h1 className="text-xl font-bold text-gray-900">Account Settings</h1>
+            </div>
+          </div>
+        </header>
+
+        <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+          {message && (
+            <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+              {message.text}
+            </div>
+          )}
+
+          {/* Email Section */}
+          <section className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
+                  <Mail className="w-5 h-5" />
+                </div>
+                <h2 className="text-lg font-semibold text-gray-900">Email Address</h2>
+              </div>
+              <form onSubmit={handleUpdateEmail} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isLoading || email === user?.email}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {isLoading ? 'Saving...' : 'Save Changes'}
+                </button>
+              </form>
+            </div>
+          </section>
+
+          {/* Password Section */}
+          <section className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-purple-100 rounded-lg text-purple-600">
+                  <Lock className="w-5 h-5" />
+                </div>
+                <h2 className="text-lg font-semibold text-gray-900">Change Password</h2>
+              </div>
+              <form onSubmit={handleUpdatePassword} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+                  <input
+                    type="password"
+                    name="current_password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                  <input
+                    type="password"
+                    name="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    required
+                    minLength={8}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+                  <input
+                    type="password"
+                    name="password_confirmation"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    required
+                    minLength={8}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isLoading || !currentPassword || !newPassword}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {isLoading ? 'Updating...' : 'Update Password'}
+                </button>
+              </form>
+            </div>
+          </section>
+
+          {/* Delete Account Section */}
+          <section className="bg-white rounded-lg shadow-sm border border-red-200 overflow-hidden">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-red-100 rounded-lg text-red-600">
+                  <Trash2 className="w-5 h-5" />
+                </div>
+                <h2 className="text-lg font-semibold text-red-600">Delete Account</h2>
+              </div>
+              
+              {!showDeleteConfirm ? (
+                <div>
+                  <p className="text-gray-600 mb-4">
+                    Permanently delete your account and all of your content. This action cannot be undone.
+                  </p>
+                  <button
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="px-4 py-2 border border-red-600 text-red-600 rounded-md hover:bg-red-50 transition-colors"
+                  >
+                    Delete Account
+                  </button>
+                </div>
+              ) : (
+                <div className="bg-red-50 p-4 rounded-md border border-red-100">
+                  <div className="flex items-start gap-3 mb-4">
+                    <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="font-medium text-red-800">Are you sure?</h3>
+                      <p className="text-sm text-red-700 mt-1">
+                        This action cannot be undone. Please enter your password to confirm.
+                      </p>
+                    </div>
+                  </div>
+                  <form onSubmit={handleDeleteAccount} className="space-y-4">
+                    <input
+                      type="password"
+                      name="confirm_password"
+                      placeholder="Enter your password"
+                      value={deletePassword}
+                      onChange={(e) => setDeletePassword(e.target.value)}
+                      className="w-full px-3 py-2 border border-red-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                      required
+                    />
+                    <div className="flex gap-3">
+                      <button
+                        type="submit"
+                        disabled={isLoading || !deletePassword}
+                        className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {isLoading ? 'Deleting...' : 'Delete My Account'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowDeleteConfirm(false);
+                          setDeletePassword('');
+                        }}
+                        className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+            </div>
+          </section>
+        </main>
+      </div>
+    </ProtectedRoute>
+  );
+}

@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\SlowRequest;
 
@@ -18,6 +19,15 @@ class ApmMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Basic Request Counting (Always enabled for Analytics)
+        try {
+            $today = now()->format('Y-m-d');
+            Redis::incr("apm:requests:{$today}");
+            Redis::expire("apm:requests:{$today}", 172800); // 48h TTL
+        } catch (\Exception $e) {
+            // Fail silently if Redis is down
+        }
+
         if (!config('apm.enabled', false)) {
             return $next($request);
         }
@@ -45,6 +55,17 @@ class ApmMiddleware
         });
 
         $response = $next($request);
+
+        // Track Errors (Always enabled for Analytics)
+        if ($response->getStatusCode() >= 500) {
+            try {
+                $today = now()->format('Y-m-d');
+                Redis::incr("apm:errors:{$today}");
+                Redis::expire("apm:errors:{$today}", 172800);
+            } catch (\Exception $e) {
+                // Fail silently
+            }
+        }
 
         $duration = (microtime(true) - $startTime) * 1000; // in milliseconds
         $memoryUsage = memory_get_peak_usage(true) / 1024; // KB

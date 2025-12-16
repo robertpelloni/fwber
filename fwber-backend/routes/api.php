@@ -86,6 +86,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('blocks')->group(function (): void {
         Route::post('/', [BlockController::class, 'store']);
         Route::delete('/{blockedId}', [BlockController::class, 'destroy']);
+        Route::get('/', [BlockController::class, 'index']);
     });
 
     // Report routes
@@ -118,6 +119,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('users/{id}', [\App\Http\Controllers\ProfileController::class, 'showPublic']);
     Route::get('profile', [\App\Http\Controllers\ProfileController::class, 'show']);
     Route::put('profile', [\App\Http\Controllers\ProfileController::class, 'update']);
+    Route::put('profile/password', [\App\Http\Controllers\ProfileController::class, 'updatePassword']);
     Route::delete('profile', [\App\Http\Controllers\ProfileController::class, 'destroy']);
     Route::get('profile/completeness', [\App\Http\Controllers\ProfileController::class, 'completeness']);
     Route::get('profile/export', [\App\Http\Controllers\ProfileController::class, 'export']);
