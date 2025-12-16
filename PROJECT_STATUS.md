@@ -62,6 +62,9 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 2.  **Mercure Double CORS Fix**:
     -   **Issue**: Nginx and Mercure were both adding `Access-Control-Allow-Origin` headers.
     -   **Fix**: Removed manual CORS headers from `nginx.conf`.
+3.  **Shared Hosting Diagnostics**:
+    -   **Issue**: Uncertainty about `mod_proxy` and `mod_security` availability on DreamHost Shared Hosting for Mercure.
+    -   **Fix**: Created `scripts/check_hosting_env.php` and `scripts/mercure_proxy_htaccess` to verify environment capabilities and configure proxying if supported.
 
 ### ✅ Technical Maintenance (Dec 15)
 1.  **E2E Test Expansion**:

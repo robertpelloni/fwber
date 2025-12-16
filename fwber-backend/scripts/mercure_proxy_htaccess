@@ -1,0 +1,16 @@
+# .htaccess for mercure.fwber.me
+# Upload this to the web root of the mercure.fwber.me subdomain
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Proxy all requests to the local Mercure instance running on port 3001
+    # This requires mod_proxy and mod_proxy_http to be enabled
+    RewriteRule ^(.*)$ http://127.0.0.1:3001/$1 [P,L]
+</IfModule>
+
+<IfModule mod_security.c>
+    # Attempt to disable ModSecurity for this subdomain to prevent false positives
+    # Note: This might not work on all shared hosting environments
+    SecRuleEngine Off
+</IfModule>
