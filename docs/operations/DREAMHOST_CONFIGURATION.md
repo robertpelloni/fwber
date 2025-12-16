@@ -8,12 +8,25 @@ DreamHost allows multiple PHP versions. Ensure you are using PHP 8.2 or higher.
 
 **Find your PHP path:**
 ```bash
-which php8.2
-# Output example: /usr/bin/php8.2
+# We confirmed this is version 8.2+
+/usr/bin/php -v
 ```
-*Use this full path in all your cron jobs.*
+*Use `/usr/bin/php` in all your cron jobs.*
 
-## 2. Cron Jobs (Critical)
+## 2. Environment Optimization (Database Driver)
+
+Since Shared Hosting typically does not provide Redis, use the **Database** driver for Cache, Queue, and Sessions. This is much faster and more reliable than the `file` driver.
+
+**Update your `.env` file:**
+```dotenv
+CACHE_DRIVER=database
+QUEUE_CONNECTION=database
+SESSION_DRIVER=database
+```
+
+*Note: The necessary tables (`cache`, `jobs`, `sessions`) are already created by your migrations.*
+
+## 3. Cron Jobs (Critical)
 
 You must set up Cron jobs to handle scheduled tasks, background queues, and service uptime.
 
@@ -27,7 +40,7 @@ crontab -e
 ### A. Laravel Scheduler (Every Minute)
 Runs scheduled tasks like database backups, cleanup, and subscription checks.
 ```cron
-* * * * * /usr/bin/php8.2 /home/username/fwber/fwber-backend/artisan schedule:run >> /dev/null 2>&1
+* * * * * /usr/bin/php /home/username/fwber/fwber-backend/artisan schedule:run >> /dev/null 2>&1
 ```
 
 ### B. Queue Worker (Keep-Alive)
@@ -37,7 +50,7 @@ Ensure `app/Console/Kernel.php` or `routes/console.php` schedules the queue work
 **Recommended for Shared Hosting:**
 Run a worker that processes jobs for 55 seconds then exits. Cron restarts it every minute.
 ```cron
-* * * * * /usr/bin/php8.2 /home/username/fwber/fwber-backend/artisan queue:work --stop-when-empty --max-time=55 >> /home/username/fwber/fwber-backend/storage/logs/queue.log 2>&1
+* * * * * /usr/bin/php /home/username/fwber/fwber-backend/artisan queue:work --stop-when-empty --max-time=55 >> /home/username/fwber/fwber-backend/storage/logs/queue.log 2>&1
 ```
 
 ### C. Mercure Real-Time Hub (Keep-Alive)
