@@ -226,7 +226,7 @@ const sentryWebpackPluginOptions = {
   // See the following for more information:
   // https://docs.sentry.io/product/crons/
   // https://vercel.com/docs/cron-jobs
-  automaticVercelMonitors: true,
+  automaticVercelMonitors: false,
 };
 
 // Make sure adding Sentry options is the last code to run before exporting

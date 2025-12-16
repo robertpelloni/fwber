@@ -65,6 +65,9 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 3.  **Shared Hosting Diagnostics**:
     -   **Issue**: Uncertainty about `mod_proxy` and `mod_security` availability on DreamHost Shared Hosting for Mercure.
     -   **Fix**: Created `scripts/check_hosting_env.php` and `scripts/mercure_proxy_htaccess` to verify environment capabilities and configure proxying if supported.
+4.  **Vercel Artifact Cleanup**:
+    -   **Issue**: `next.config.js` had `automaticVercelMonitors: true`, causing the Vercel Toolbar to inject scripts that failed (404) on non-Vercel hosting.
+    -   **Fix**: Disabled `automaticVercelMonitors`.
 
 ### ✅ Technical Maintenance (Dec 15)
 1.  **E2E Test Expansion**:
