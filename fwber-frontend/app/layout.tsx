@@ -105,7 +105,7 @@ export default function RootLayout({
                   <FeedbackModal />
                   <PerformanceMonitor />
                   <div className="fixed bottom-1 right-1 text-[10px] text-muted-foreground opacity-50 pointer-events-none z-50">
-                    v0.1.0
+                    v0.2.3
                   </div>
                 </ToastProvider>
               </MercureProvider>
