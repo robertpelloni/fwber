@@ -30,7 +30,7 @@ export default function BlockedUsersPage() {
 
   const fetchBlockedUsers = async () => {
     try {
-      const response = await apiClient.get('/blocks');
+      const response = await apiClient.get<{ data: BlockedUser[] }>('/blocks');
       setBlockedUsers(response.data.data || []);
     } catch (error) {
       console.error('Failed to fetch blocked users', error);
