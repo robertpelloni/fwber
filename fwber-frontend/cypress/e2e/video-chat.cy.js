@@ -264,4 +264,92 @@ describe('Video Chat Flow', () => {
     // Verify Video Interface opens
     cy.get('video').should('have.length.at.least', 1);
   });
+
+  it('handles camera permission denial gracefully', () => {
+    cy.visit('/messages', {
+      onBeforeLoad: (win) => {
+        win.localStorage.setItem('fwber_token', 'fake-token');
+        win.localStorage.setItem('fwber_user', JSON.stringify(user));
+        
+        win.__CYPRESS_FEATURE_FLAGS__ = {
+          video_chat: true
+        };
+
+        // Mock getUserMedia to throw error
+        cy.stub(win.navigator.mediaDevices, 'getUserMedia').rejects(new Error('Permission denied'));
+      }
+    });
+
+    cy.wait('@getConversations');
+    cy.contains('Future Partner').click();
+    cy.wait('@getMessages');
+
+    cy.get('button[title="Video Call"]').click();
+
+    // Verify Error Toast/Message
+    // Adjust selector based on your Toast implementation
+    cy.contains('Camera/Microphone permission denied').should('be.visible');
+    
+    // Verify Modal did NOT open or closed immediately
+    cy.contains('Calling Future Partner...').should('not.exist');
+  });
+
+  it('allows declining an incoming call', () => {
+    cy.visit('/messages', {
+      onBeforeLoad: (win) => {
+        win.localStorage.setItem('fwber_token', 'fake-token');
+        win.localStorage.setItem('fwber_user', JSON.stringify(user));
+        
+        win.__CYPRESS_FEATURE_FLAGS__ = {
+          video_chat: true
+        };
+
+        // Mock EventSource
+        win.EventSource = class MockEventSource {
+            constructor(url) {
+                this.url = url;
+                this.onmessage = null;
+                this.addEventListener = (type, callback) => {
+                    if (type === 'message') this.onmessage = callback;
+                };
+                win.mockEventSourceInstance = this;
+            }
+            close() {}
+        };
+      }
+    });
+
+    cy.wait('@getConversations');
+
+    // Simulate incoming call
+    cy.window().then((win) => {
+        const incomingCallData = {
+            type: 'video_call_initiated',
+            data: {
+                call_id: 'call-incoming-456',
+                caller_id: partner.id,
+                caller_name: partner.name,
+                caller_avatar: partner.profile.avatar_url
+            }
+        };
+
+        if (win.mockEventSourceInstance && win.mockEventSourceInstance.onmessage) {
+            const event = new MessageEvent('message', {
+                data: JSON.stringify(incomingCallData)
+            });
+            win.mockEventSourceInstance.onmessage(event);
+        }
+    });
+
+    cy.contains('Incoming Call').should('be.visible');
+    
+    // Click Decline
+    cy.contains('button', 'Decline').click();
+
+    // Verify Modal Closes
+    cy.contains('Incoming Call').should('not.exist');
+    
+    // Verify Video Interface is NOT open
+    cy.get('video').should('not.exist');
+  });
 });
