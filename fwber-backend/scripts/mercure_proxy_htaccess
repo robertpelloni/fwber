@@ -4,6 +4,10 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # Do NOT proxy Let's Encrypt validation requests
+    # This ensures SSL certificate generation/renewal works
+    RewriteRule ^\.well-known/acme-challenge/ - [L]
+
     # Proxy all requests to the local Mercure instance running on port 3001
     # This requires mod_proxy and mod_proxy_http to be enabled
     RewriteRule ^(.*)$ http://127.0.0.1:3001/$1 [P,L]

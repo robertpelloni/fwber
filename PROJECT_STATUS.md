@@ -68,6 +68,9 @@ The project has successfully completed the MVP, Secondary Systems, and Productio
 4.  **Vercel Artifact Cleanup**:
     -   **Issue**: `next.config.js` had `automaticVercelMonitors: true`, causing the Vercel Toolbar to inject scripts that failed (404) on non-Vercel hosting.
     -   **Fix**: Disabled `automaticVercelMonitors`.
+5.  **Mercure SSL Fix**:
+    -   **Issue**: `MOZILLA_PKIX_ERROR_SELF_SIGNED_CERT` on `mercure.fwber.me` due to Let's Encrypt validation failing (proxying `.well-known` requests).
+    -   **Fix**: Updated `scripts/mercure_proxy_htaccess` to exclude `.well-known/acme-challenge/` from proxying, allowing SSL certificate generation.
 
 ### ✅ Technical Maintenance (Dec 15)
 1.  **E2E Test Expansion**:
