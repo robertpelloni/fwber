@@ -858,5 +858,19 @@ The project has received critical infrastructure fixes for CORS, Vercel integrat
     -   **Cleanup**: Removed redundant `Attendee` model (replaced by `EventAttendee`).
     -   **Verification**: Implemented and passed `SafetyAndModerationTest` and `RemainingModelsTest`. Fixed `Report` model relationships. Full test suite passing.
 
+### ✅ Deployment Refinement (Dec 15 - Part 6)
+1.  **Shared Hosting Optimization**:
+    -   **Drivers**: Switched Cache, Queue, and Session drivers from `file` to `database` to prevent file locking issues on DreamHost shared hosting.
+    -   **Configuration**: Published and updated `cache.php`, `queue.php`, and `session.php` to default to `database` driver while respecting `.env` overrides.
+    -   **Documentation**: Created `DREAMHOST_ENV_SETUP.md` with a copy-paste configuration block for the server's `.env` file.
+2.  **SEO & Discovery**:
+    -   **Dynamic Sitemap**: Replaced static `sitemap.xml` with `app/sitemap.ts` for dynamic route generation.
+    -   **Dynamic Robots**: Replaced static `robots.txt` with `app/robots.ts`.
+    -   **Verification**: Verified generation logic.
+3.  **CORS Flexibility**:
+    -   **Backend**: Updated `config/cors.php` to use `env('CORS_ALLOWED_ORIGINS')` instead of hardcoded values, allowing easier environment-specific configuration.
+4.  **Testing**:
+    -   **Video Chat**: Enhanced `video-chat.cy.js` with edge cases for permission denial and call rejection.
+
 ## 🚀 Next Phase: Post-Launch Monitoring
 See `docs/ROADMAP.md` for future plans.
