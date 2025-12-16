@@ -9,12 +9,18 @@ Use this checklist to verify that your deployment on DreamHost is fully function
     -   **Fix**: Ensure Let's Encrypt is enabled in DreamHost Panel and the `.htaccess` allows `.well-known` requests.
 
 ## 2. Environment Configuration
-- [ ] **Frontend Env**: Verify `.env.production` on the server.
+- [ ] **Frontend Env (Vercel)**: Go to your Vercel Dashboard -> Project Settings -> Environment Variables.
+    -   Ensure `NEXT_PUBLIC_MERCURE_URL` is set to:
+        `https://mercure.fwber.me/.well-known/mercure`
+    -   Ensure `NEXT_PUBLIC_API_URL` is set to:
+        `https://api.fwber.me/api`
+    -   **Action**: If you changed these, you must **Redeploy** the project in Vercel for them to take effect.
+
+- [ ] **Backend Env (DreamHost)**: Verify `.env` on the server.
     ```bash
-    cat ~/fwber/fwber-frontend/.env.production
+    cat ~/fwber/fwber-backend/.env
     ```
-    -   Ensure `NEXT_PUBLIC_MERCURE_URL` starts with `https://`.
-    -   Example: `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`
+    -   Ensure `CORS_ALLOWED_ORIGINS` includes your Vercel domain (e.g., `https://fwber.vercel.app` or `https://fwber.me`).
 
 ## 3. Real-Time Connection
 - [ ] **Open Console**: Open your browser's Developer Tools (F12) -> Console.
