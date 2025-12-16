@@ -73,6 +73,9 @@ The project has received critical infrastructure fixes for CORS, Vercel integrat
 5.  **Mercure SSL Fix**:
     -   **Issue**: `MOZILLA_PKIX_ERROR_SELF_SIGNED_CERT` on `mercure.fwber.me` due to Let's Encrypt validation failing (proxying `.well-known` requests).
     -   **Fix**: Updated `scripts/mercure_proxy_htaccess` to exclude `.well-known/acme-challenge/` from proxying, allowing SSL certificate generation.
+6.  **DreamHost PHP Version**:
+    -   **Confirmed**: `/usr/bin/php` on the shared host is version **8.2.29**, which meets Laravel 12 requirements.
+    -   **Action**: Cron jobs configured to use `/usr/bin/php`.
 
 ### ✅ Technical Maintenance (Dec 15)
 1.  **E2E Test Expansion**:
