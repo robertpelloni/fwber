@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.3] - 2025-12-15
+
+### Fixed
+- **Infrastructure**: Resolved "Double CORS" header issues by removing hardcoded headers from `.htaccess` and Nginx, allowing Laravel to handle CORS exclusively.
+- **Mercure**: Created `mercure_proxy_htaccess` to correctly proxy real-time traffic on shared hosting while allowing Let's Encrypt SSL validation.
+- **Frontend**: Disabled `automaticVercelMonitors` in `next.config.js` to prevent 404 errors on non-Vercel hosting.
+
 ## [0.2.2] - 2025-12-15
 
 ### Added

@@ -2,14 +2,16 @@
 
 **Last Updated:** December 15, 2025
 **Status:** 🚀 LIVE / DEPLOYED
+**Version:** v0.2.3
 
-## 🟢 Current Status: Production Deployed
-The project has successfully completed the MVP, Secondary Systems, and Production Hardening phases. It is now **deployed and live**.
+## 🟢 Current Status: Waiting for Verification (SSL)
+The project has received critical infrastructure fixes for CORS, Vercel integration, and Mercure proxying. We are currently waiting for the **SSL Certificate** to be generated for `mercure.fwber.me` to verify real-time features.
 
 ### ⚠️ Known Issues / Technical Debt
-*   **None**: No critical technical debt currently tracked.
+*   **SSL Verification**: Waiting for Let's Encrypt to validate `mercure.fwber.me`.
+*   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
 
-### ✅ Backend Stabilization (Dec 13)
+### ✅ Critical Fixes (Dec 15 - Part 5)
 1.  **Merge Artifact Cleanup**:
     -   **Issue**: Identified and resolved "Bad Merge" artifacts (duplicate class definitions) in `FriendController`, `GenerateAvatar` Job, and `UserPhysicalProfileController`.
     -   **Fix**: Removed duplicate code blocks and ensured correct versioning of methods.
