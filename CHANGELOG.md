@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.4] - 2025-12-15
+
+### Added
+- **Performance**: Added database indexes for `token_balance`, `current_streak`, `last_active_at`, and `match_assists(status, matchmaker_id)` to optimize Leaderboard and Gamification queries.
+
+### Verified
+- **Viral Growth**: Confirmed full implementation of Achievements, Wingman, and Token systems across Backend and Frontend.
+- **Monitoring**: Confirmed Sentry configuration is present for both Backend and Frontend.
+
 ## [0.2.3] - 2025-12-15
 
 ### Fixed
