@@ -103,7 +103,7 @@ export function ReferralModal({ trigger }: ReferralModalProps) {
               <div>
                 <h4 className="font-bold text-amber-900 dark:text-amber-100">Golden Tickets</h4>
                 <p className="text-sm text-amber-700 dark:text-amber-300">
-                  You have <span className="font-bold">{user.golden_tickets_remaining || 0}</span> tickets left.
+                  You have <span className="font-bold">{user.golden_tickets_remaining || 0}</span> Golden Tickets remaining.
                 </p>
               </div>
             </div>
