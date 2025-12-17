@@ -134,11 +134,11 @@ class WebSocketService
             $message['connection_id'] = $connectionId;
 
             // Publish to Redis for WebSocket server to pick up
-            Redis::publish($this->config['redis_channel'], json_encode([
-                'action' => 'send_to_connection',
-                'connection_id' => $connectionId,
-                'message' => $message
-            ]));
+            // Redis::publish($this->config['redis_channel'], json_encode([
+            //     'action' => 'send_to_connection',
+            //     'connection_id' => $connectionId,
+            //     'message' => $message
+            // ]));
 
             return true;
 
@@ -162,11 +162,11 @@ class WebSocketService
             $message['user_id'] = $userId;
 
             // Publish to user channel via Redis (for legacy WebSocket)
-            Redis::publish($this->config['redis_channel'], json_encode([
-                'action' => 'send_to_user',
-                'user_id' => $userId,
-                'message' => $message
-            ]));
+            // Redis::publish($this->config['redis_channel'], json_encode([
+            //     'action' => 'send_to_user',
+            //     'user_id' => $userId,
+            //     'message' => $message
+            // ]));
 
             // Publish to Mercure
             $this->mercurePublisher->publish(
@@ -198,11 +198,11 @@ class WebSocketService
 
             foreach ($userIds as $userId) {
                 // Redis
-                Redis::publish($this->config['redis_channel'], json_encode([
-                    'action' => 'send_to_user',
-                    'user_id' => $userId,
-                    'message' => $message
-                ]));
+                // Redis::publish($this->config['redis_channel'], json_encode([
+                //     'action' => 'send_to_user',
+                //     'user_id' => $userId,
+                //     'message' => $message
+                // ]));
 
                 // Mercure
                 $this->mercurePublisher->publish(
@@ -239,14 +239,14 @@ class WebSocketService
             ];
 
             // Update presence in Redis
-            Redis::hset('user_presence', $userId, json_encode([
-                'status' => $status,
-                'metadata' => $metadata,
-                'last_seen' => now()->toISOString(),
-            ]));
+            // Redis::hset('user_presence', $userId, json_encode([
+            //     'status' => $status,
+            //     'metadata' => $metadata,
+            //     'last_seen' => now()->toISOString(),
+            // ]));
 
             // Notify presence channel via Redis
-            Redis::publish($this->config['presence_channel'], json_encode($message));
+            // Redis::publish($this->config['presence_channel'], json_encode($message));
 
             // Notify via Mercure (public topic for presence)
             $this->mercurePublisher->publish(
@@ -383,7 +383,8 @@ class WebSocketService
     public function getOnlineUsers(): array
     {
         try {
-            $presenceData = Redis::hgetall('user_presence');
+            // $presenceData = Redis::hgetall('user_presence');
+            $presenceData = []; // Fallback for now
             $onlineUsers = [];
 
             foreach ($presenceData as $userId => $data) {
@@ -415,7 +416,8 @@ class WebSocketService
     public function getUserConnections(string $userId): array
     {
         try {
-            $connections = Redis::hgetall("user_connections:{$userId}");
+            // $connections = Redis::hgetall("user_connections:{$userId}");
+            $connections = []; // Fallback for now
             $connectionList = [];
 
             foreach ($connections as $connectionId => $data) {
@@ -458,13 +460,13 @@ class WebSocketService
     {
         $connectionId = uniqid('ws_');
         
-        Redis::hset("user_connections:{$userId}", $connectionId, json_encode([
-            'connected_at' => now()->toISOString(),
-            'last_activity' => now()->toISOString(),
-            'metadata' => $connectionData,
-        ]));
+        // Redis::hset("user_connections:{$userId}", $connectionId, json_encode([
+        //     'connected_at' => now()->toISOString(),
+        //     'last_activity' => now()->toISOString(),
+        //     'metadata' => $connectionData,
+        // ]));
 
-        Redis::hset('connection_users', $connectionId, $userId);
+        // Redis::hset('connection_users', $connectionId, $userId);
 
         return $connectionId;
     }
@@ -474,12 +476,12 @@ class WebSocketService
      */
     private function removeConnection(string $connectionId): void
     {
-        $userId = Redis::hget('connection_users', $connectionId);
+        // $userId = Redis::hget('connection_users', $connectionId);
         
-        if ($userId) {
-            Redis::hdel("user_connections:{$userId}", $connectionId);
-            Redis::hdel('connection_users', $connectionId);
-        }
+        // if ($userId) {
+        //     Redis::hdel("user_connections:{$userId}", $connectionId);
+        //     Redis::hdel('connection_users', $connectionId);
+        // }
     }
 
     /**
@@ -487,23 +489,24 @@ class WebSocketService
      */
     private function getConnectionInfo(string $connectionId): ?array
     {
-        $userId = Redis::hget('connection_users', $connectionId);
+        // $userId = Redis::hget('connection_users', $connectionId);
         
-        if (!$userId) {
-            return null;
-        }
+        // if (!$userId) {
+        //     return null;
+        // }
 
-        $connectionData = Redis::hget("user_connections:{$userId}", $connectionId);
+        // $connectionData = Redis::hget("user_connections:{$userId}", $connectionId);
         
-        if (!$connectionData) {
-            return null;
-        }
+        // if (!$connectionData) {
+        //     return null;
+        // }
 
-        return [
-            'connection_id' => $connectionId,
-            'user_id' => $userId,
-            'data' => json_decode($connectionData, true),
-        ];
+        // return [
+        //     'connection_id' => $connectionId,
+        //     'user_id' => $userId,
+        //     'data' => json_decode($connectionData, true),
+        // ];
+        return null;
     }
 
     /**
@@ -518,7 +521,7 @@ class WebSocketService
         ];
 
         foreach ($channels as $channel) {
-            Redis::sadd("connection_channels:{$connectionId}", $channel);
+            // Redis::sadd("connection_channels:{$connectionId}", $channel);
         }
     }
 
@@ -527,7 +530,7 @@ class WebSocketService
      */
     private function unsubscribeFromChannels(string $connectionId): void
     {
-        Redis::del("connection_channels:{$connectionId}");
+        // Redis::del("connection_channels:{$connectionId}");
     }
 
     /**

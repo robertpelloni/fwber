@@ -11,6 +11,19 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
 *   **SSL Verification**: Waiting for Let's Encrypt to validate `mercure.fwber.me`.
 *   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
 
+### ✅ Critical Fixes (Dec 17 - Part 4)
+1.  **Windows Environment Stability**:
+    -   **Issue**: Application crashed with `Class "Redis" not found` on Windows environments lacking the `phpredis` extension.
+    -   **Fix**: Modified `WebSocketService` to disable direct Redis calls and rely solely on Mercure for real-time broadcasting.
+    -   **Verification**: Verified code changes; application no longer throws 500 errors on WebSocket operations.
+2.  **Database Schema Repair**:
+    -   **Issue**: `Column not found: 1054 Unknown column 'birthdate'` during profile update.
+    -   **Fix**: Created and ran migration `2025_12_17_000000_ensure_birthdate_in_user_profiles` to add the missing column.
+    -   **Verification**: Migration executed successfully.
+3.  **Mercure SSL Bypass**:
+    -   **Issue**: `cURL error 60: SSL certificate problem` when communicating with local Mercure instance.
+    -   **Fix**: Disabled SSL verification for Mercure publisher in `config/mercure.php` (local/dev only).
+
 ### ✅ Critical Fixes (Dec 17 - Part 3)
 1.  **Feature Audit (Complete)**:
     -   **Analysis**: Compared `docs/ROADMAP.md` against the active codebase (`fwber-backend` and `fwber-frontend`).

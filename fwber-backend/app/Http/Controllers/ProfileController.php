@@ -373,8 +373,7 @@ class ProfileController extends Controller
             
             return response()->json([
                 'message' => 'Error updating profile',
-                'error' => $e->getMessage(), // Always show error for debugging
-                'trace' => $e->getTraceAsString(), // Always show trace for debugging
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
             ], 500);
         }
     }
