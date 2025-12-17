@@ -243,6 +243,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'AUTH_START' })
     
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
@@ -250,7 +253,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           'Accept': 'application/json',
         },
         body: JSON.stringify({ email, password }),
+        signal: controller.signal
       })
+      clearTimeout(timeoutId);
 
       const data = await response.json()
 

@@ -34,6 +34,19 @@ export default function LoginPage() {
     }
   }, [requiresTwoFactor])
 
+  // Safety timeout for loading state
+  useEffect(() => {
+    if (isLoading) {
+      const timer = setTimeout(() => {
+        if (!isAuthenticated && !requiresTwoFactor) {
+           setIsLoading(false);
+           console.warn('Login timed out or stalled.');
+        }
+      }, 15000);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, isAuthenticated, requiresTwoFactor]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (isLoading) return
@@ -42,7 +55,9 @@ export default function LoginPage() {
     clearError()
 
     try {
+      console.log('Attempting login...');
       await login(email, password)
+      console.log('Login successful, waiting for redirect or 2FA...');
       // If 2FA is required, the UI will update automatically due to requiresTwoFactor
     } catch (error) {
       console.error('Login error:', error)
