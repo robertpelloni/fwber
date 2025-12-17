@@ -17,9 +17,9 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
     -   **Fix**: Modified `WebSocketService` to disable direct Redis calls and rely solely on Mercure for real-time broadcasting.
     -   **Verification**: Verified code changes; application no longer throws 500 errors on WebSocket operations.
 2.  **Database Schema Repair**:
-    -   **Issue**: `Column not found: 1054 Unknown column 'birthdate'` during profile update.
-    -   **Fix**: Created and ran migration `2025_12_17_000000_ensure_birthdate_in_user_profiles` to add the missing column.
-    -   **Verification**: Migration executed successfully.
+    -   **Issue**: `Column not found: 1054 Unknown column 'birthdate'` and `'location_name'` during profile update.
+    -   **Fix**: Created and ran migrations `2025_12_17_000000_ensure_birthdate_in_user_profiles` and `2025_12_17_000001_ensure_location_name_in_user_profiles` to add the missing columns.
+    -   **Verification**: Migrations executed successfully.
 3.  **Mercure SSL Bypass**:
     -   **Issue**: `cURL error 60: SSL certificate problem` when communicating with local Mercure instance.
     -   **Fix**: Disabled SSL verification for Mercure publisher in `config/mercure.php` (local/dev only).
