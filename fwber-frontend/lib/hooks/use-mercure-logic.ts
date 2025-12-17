@@ -76,6 +76,7 @@ export interface NotificationPayload {
   data?: any;
   timestamp: string;
   read?: boolean;
+  [key: string]: any;
 }
 
 export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
