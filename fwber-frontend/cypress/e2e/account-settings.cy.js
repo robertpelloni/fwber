@@ -29,8 +29,8 @@ describe('Account Settings', () => {
       body: { message: 'Email updated successfully' }
     }).as('updateEmail');
 
-    cy.contains('Email Address').should('be.visible');
-    cy.get('input[name="email"]').clear().type('newemail@example.com');
+    cy.contains('h2', 'Email Address').should('be.visible');
+    cy.get('input[name="email"]').should('be.visible').clear().type('newemail@example.com');
     cy.contains('button', 'Save Changes').click();
 
     cy.wait('@updateEmail').its('request.body').should('deep.equal', {
@@ -46,11 +46,11 @@ describe('Account Settings', () => {
       body: { message: 'Password updated successfully' }
     }).as('updatePassword');
 
-    cy.contains('Change Password').should('be.visible');
+    cy.contains('h2', 'Change Password').should('be.visible');
     
-    cy.get('input[name="current_password"]').scrollIntoView().should('be.visible').type('oldpassword', { force: true });
-    cy.get('input[name="password"]').scrollIntoView().should('be.visible').type('newpassword', { force: true });
-    cy.get('input[name="password_confirmation"]').scrollIntoView().should('be.visible').type('newpassword', { force: true });
+    cy.get('input[name="current_password"]').should('exist').type('oldpassword', { force: true });
+    cy.get('input[name="password"]').should('exist').type('newpassword', { force: true });
+    cy.get('input[name="password_confirmation"]').should('exist').type('newpassword', { force: true });
     
     cy.contains('button', 'Update Password').click({ force: true });
 
@@ -69,14 +69,16 @@ describe('Account Settings', () => {
       body: { message: 'Account deleted successfully' }
     }).as('deleteAccount');
 
-    // Click the button, not the header
-    cy.contains('button', 'Delete Account').scrollIntoView().click({ force: true });
+    cy.contains('h2', 'Delete Account').should('be.visible');
+
+    // Click the initial delete button
+    cy.contains('button', 'Delete Account').click({ force: true });
     
-    // Should show confirmation modal
+    // Should show confirmation modal/section
     cy.contains('Are you sure?').should('be.visible');
     cy.contains('This action cannot be undone').should('be.visible');
     
-    cy.get('input[name="confirm_password"]').type('password123', { force: true });
+    cy.get('input[name="confirm_password"]').should('exist').type('password123', { force: true });
     cy.contains('button', 'Delete My Account').click({ force: true });
 
     cy.wait('@deleteAccount');

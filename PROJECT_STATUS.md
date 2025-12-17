@@ -882,7 +882,10 @@ The project has received critical infrastructure fixes for CORS, Vercel integrat
     -   **Verification**: Verified with updated tests.
 3.  **Gap Analysis & Coverage**:
     -   **Analysis**: Identified missing E2E tests for Account Settings, Blocked Users, and Notifications.
-    -   **Testing**: Created `account-settings.cy.js`, `blocking.cy.js`, and `notifications.cy.js`. Unskipped `two-factor-auth.cy.js`.    -   **Status**: `blocking.cy.js` and `notifications.cy.js` passing. `account-settings.cy.js` partially passing (Email update verified).4.  **Feature Implementation (Settings)**:
+    -   **Testing**: Created `account-settings.cy.js`, `blocking.cy.js`, and `notifications.cy.js`. Unskipped `two-factor-auth.cy.js`.
+    -   **Status**: `notifications.cy.js` and `blocking.cy.js` **PASSING**. `account-settings.cy.js` partially passing (Email update verified).
+    -   **Fixes**: Resolved TypeScript build errors in `app/settings/account/page.tsx` and `app/settings/blocked/page.tsx`.
+4.  **Feature Implementation (Settings)**:
     -   **Frontend**: Implemented missing "Account Settings" page (Email, Password, Delete Account).
     -   **Frontend**: Implemented missing "Blocked Users" page (List, Unblock).
     -   **Frontend**: Updated main Settings page navigation.
