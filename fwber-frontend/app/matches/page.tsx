@@ -74,6 +74,7 @@ export default function MatchesPage() {
   if (matches.length === 0 || currentIndex >= matches.length) {
     return (
       <div className="container mx-auto p-4 max-w-md text-center">
+        <ToastContainer />
         <h2 className="text-2xl font-bold mb-4">No more matches</h2>
         <p className="text-gray-500 mb-6">Check back later or adjust your filters.</p>
         <Button onClick={() => fetchMatches()}>Refresh</Button>

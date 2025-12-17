@@ -43,28 +43,30 @@ describe('Matching Flow', () => {
     cy.intercept('GET', '**/api/matches*', {
       statusCode: 200,
       body: {
-        matches: [
-          {
-            id: 2,
-            name: 'Potential Match',
-            bio: 'I like hiking',
-            age: 25,
-            locationDescription: 'New York, NY',
-            avatarUrl: '/images/test-avatar.svg',
-            compatibilityScore: 0.9,
-            distance: 5
-          },
-          {
-            id: 3,
-            name: 'Another Match',
-            bio: 'Coffee lover',
-            age: 28,
-            locationDescription: 'Brooklyn, NY',
-            avatarUrl: '/images/test-avatar.svg',
-            compatibilityScore: 0.85,
-            distance: 10
-          }
-        ]
+        data: {
+          matches: [
+            {
+              id: 2,
+              name: 'Potential Match',
+              bio: 'I like hiking',
+              age: 25,
+              locationDescription: 'New York, NY',
+              avatarUrl: '/images/test-avatar.svg',
+              compatibilityScore: 0.9,
+              distance: 5
+            },
+            {
+              id: 3,
+              name: 'Another Match',
+              bio: 'Coffee lover',
+              age: 28,
+              locationDescription: 'Brooklyn, NY',
+              avatarUrl: '/images/test-avatar.svg',
+              compatibilityScore: 0.85,
+              distance: 10
+            }
+          ]
+        }
       }
     }).as('getMatches');
 
@@ -72,9 +74,11 @@ describe('Matching Flow', () => {
     cy.intercept('POST', '**/api/matches/action', {
       statusCode: 200,
       body: {
-        action: 'like',
-        is_match: false,
-        message: 'Action recorded'
+        data: {
+          action: 'like',
+          is_match: false,
+          message: 'Action recorded'
+        }
       }
     }).as('matchAction');
 
@@ -93,6 +97,7 @@ describe('Matching Flow', () => {
     name: 'Test User',
     email: 'test@example.com',
     emailVerifiedAt: new Date().toISOString(),
+    onboarding_completed_at: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     profile: {
@@ -136,16 +141,24 @@ describe('Matching Flow', () => {
     // Check if first match is visible
     cy.url().should('include', '/matches');
     
-    cy.get('.animate-spin', { timeout: 10000 }).should('not.exist');
+    // Wait for loading to finish
+    cy.contains('Loading matches...').should('not.exist');
+    
+    // Debug: Check if we hit the empty state
+    cy.get('body').then($body => {
+      if ($body.text().includes('No more matches')) {
+        throw new Error('Matches list is empty, mock failed?');
+      }
+    });
     
     cy.contains('Potential Match', { timeout: 10000 }).should('be.visible');
 
-    cy.contains('Potential Match', { timeout: 10000 }).should('be.visible');
-    cy.contains('25 years old').should('be.visible');
+    // The component renders "Name, Age" e.g. "Potential Match, 25"
+    cy.contains('25').should('be.visible');
     cy.contains('I like hiking').should('be.visible');
 
-    // Perform Like action (click Like button)
-    cy.contains('button', 'Like').click({ force: true });
+    // Perform Like action (click Like button - Green Heart)
+    cy.get('button.text-green-500').click({ force: true });
 
     // Verify API call
     cy.wait('@matchAction').its('request.body').should('deep.equal', {
@@ -157,13 +170,15 @@ describe('Matching Flow', () => {
     cy.contains('Another Match').should('be.visible');
   });
 
-  it('shows match modal on mutual like', () => {
+  it('shows match toast on mutual like', () => {
     cy.intercept('POST', '**/api/matches/action', {
       statusCode: 200,
       body: {
-        action: 'like',
-        is_match: true,
-        message: "It's a match!"
+        data: {
+          action: 'like',
+          is_match: true,
+          message: "It's a match!"
+        }
       }
     }).as('mutualMatch');
 
@@ -177,16 +192,12 @@ describe('Matching Flow', () => {
 
     // cy.wait('@getMatches');
 
-    cy.contains('button', 'Like', { timeout: 10000 }).click({ force: true });
+    // Click Like button
+    cy.get('button.text-green-500').click({ force: true });
 
     cy.wait('@mutualMatch');
 
-    // Verify modal appears
-    cy.contains("It's a Match!", { timeout: 10000 }).should('be.visible');
-    cy.contains('liked each other').should('be.visible');
-    
-    // Close modal
-    cy.contains('button', 'Keep Swiping').click();
-    cy.contains("It's a Match!").should('not.exist');
+    // Verify toast appears
+    cy.contains("You matched with Potential Match!", { timeout: 10000 }).should('be.visible');
   });
 });
