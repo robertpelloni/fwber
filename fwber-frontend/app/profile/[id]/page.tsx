@@ -9,6 +9,7 @@ import { getPublicProfile, type UserProfile } from '@/lib/api/profile';
 import { performMatchAction } from '@/lib/api/matches';
 import { api } from '@/lib/api/client';
 import { PresenceIndicator } from '@/components/realtime';
+import TipButton from '@/components/tipping/TipButton';
 
 export default function PublicProfilePage() {
   const { id } = useParams();
@@ -110,13 +111,18 @@ export default function PublicProfilePage() {
           <div className="p-8">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                  {p.display_name}, {p.age}
-                  <PresenceIndicator userId={String(profile.id)} />
-                </h1>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {p.location?.city}, {p.location?.state}
-                </p>
+                <div className="flex justify-between items-center w-full">
+                  <div>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                      {p.display_name}, {p.age}
+                      <PresenceIndicator userId={String(profile.id)} />
+                    </h1>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      {p.location?.city}, {p.location?.state}
+                    </p>
+                  </div>
+                  <TipButton recipientId={profile.id} recipientName={p.display_name || 'User'} />
+                </div>
               </div>
             </div>
 
