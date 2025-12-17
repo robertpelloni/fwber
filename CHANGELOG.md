@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.5] - 2025-12-17
+
+### Fixed
+- **Login**: Fixed an issue where the login screen would freeze or hang indefinitely if the backend was unreachable or the request timed out. Added safeguards and timeouts to `AuthContext` and `LoginPage`.
+
 ## [0.2.4] - 2025-12-15
 
 ### Added
