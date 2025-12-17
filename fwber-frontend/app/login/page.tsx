@@ -27,6 +27,13 @@ export default function LoginPage() {
     }
   }, [isAuthenticated, router])
 
+  // Reset loading state when 2FA is required
+  useEffect(() => {
+    if (requiresTwoFactor) {
+      setIsLoading(false)
+    }
+  }, [requiresTwoFactor])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (isLoading) return

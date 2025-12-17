@@ -24,8 +24,8 @@ class ApmMiddleware
             $today = now()->format('Y-m-d');
             Redis::incr("apm:requests:{$today}");
             Redis::expire("apm:requests:{$today}", 172800); // 48h TTL
-        } catch (\Exception $e) {
-            // Fail silently if Redis is down
+        } catch (\Throwable $e) {
+            // Fail silently if Redis is down or extension is missing
         }
 
         if (!config('apm.enabled', false)) {
@@ -62,7 +62,7 @@ class ApmMiddleware
                 $today = now()->format('Y-m-d');
                 Redis::incr("apm:errors:{$today}");
                 Redis::expire("apm:errors:{$today}", 172800);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 // Fail silently
             }
         }
