@@ -9,7 +9,7 @@ use Tests\TestCase;
 
 class OnboardingProfileUpdateTest extends TestCase
 {
-    use RefreshDatabase; // Don't use RefreshDatabase on production/shared DB
+    // use RefreshDatabase; // Don't use RefreshDatabase on production/shared DB
 
     public function test_onboarding_basics_step()
     {
