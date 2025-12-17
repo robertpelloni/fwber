@@ -120,7 +120,7 @@ export default function HomePage() {
             </p>
             
             <div className="mb-8 transform hover:scale-105 transition-transform duration-300">
-              <p className="text-2xl md:text-3xl text-orange-600 dark:text-orange-400 font-serif italic">
+              <p className="text-2xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 font-serif italic drop-shadow-sm">
                 &ldquo;Everybody wants to get laid.&rdquo;
               </p>
             </div>

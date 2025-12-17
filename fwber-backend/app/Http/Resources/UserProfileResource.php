@@ -104,7 +104,9 @@ class UserProfileResource extends JsonResource
                     'latitude' => $this->profile?->latitude,
                     'longitude' => $this->profile?->longitude,
                     'location_name' => $this->profile?->location_name,
-                    'max_distance' => $this->profile?->preferences['max_distance'] ?? 25,
+                    'city' => $this->extractCityFromLocation(),
+                    'state' => $this->extractStateFromLocation(),
+                    'max_distance' => data_get($this->profile?->preferences, 'max_distance', 25),
                 ],
                 
                 // Preferences
@@ -204,11 +206,11 @@ class UserProfileResource extends JsonResource
      */
     private function extractCityFromLocation(): ?string
     {
-        if (!$this->profile?->location_description) {
+        if (!$this->profile?->location_name) {
             return null;
         }
         
-        $parts = explode(',', $this->profile->location_description);
+        $parts = explode(',', $this->profile->location_name);
         return trim($parts[0]) ?: null;
     }
     
@@ -217,11 +219,11 @@ class UserProfileResource extends JsonResource
      */
     private function extractStateFromLocation(): ?string
     {
-        if (!$this->profile?->location_description) {
+        if (!$this->profile?->location_name) {
             return null;
         }
         
-        $parts = explode(',', $this->profile->location_description);
+        $parts = explode(',', $this->profile->location_name);
         return isset($parts[1]) ? trim($parts[1]) : null;
     }
 }

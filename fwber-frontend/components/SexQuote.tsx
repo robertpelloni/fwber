@@ -63,10 +63,16 @@ export default function SexQuote() {
   if (!quote) return null;
 
   return (
-    <div className="bg-orange-50 border-l-4 border-orange-500 p-4 mb-6 rounded-r-lg shadow-sm">
-      <div className="flex items-start gap-3">
-        <Quote className="h-6 w-6 text-orange-400 flex-shrink-0" />
-        <p className="text-orange-800 italic font-medium text-lg leading-relaxed">
+    <div className="relative p-6 mb-8 rounded-2xl bg-slate-950 border border-slate-800 shadow-[0_0_40px_-10px_rgba(124,58,237,0.15)] overflow-hidden group">
+      {/* Ambient Glow Effects */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-pink-500/10 to-orange-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+      
+      <div className="relative flex items-start gap-4 z-10">
+        <div className="p-2 rounded-lg bg-slate-900/50 border border-slate-800 backdrop-blur-sm">
+          <Quote className="h-5 w-5 text-slate-400" />
+        </div>
+        <p className="text-lg md:text-xl font-light leading-relaxed text-transparent bg-clip-text bg-gradient-to-r from-slate-100 via-slate-300 to-slate-400 italic tracking-wide">
           &ldquo;{quote}&rdquo;
         </p>
       </div>
