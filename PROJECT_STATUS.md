@@ -909,13 +909,14 @@ The project has received critical infrastructure fixes for CORS, Vercel integrat
 3.  **Gap Analysis & Coverage**:
     -   **Analysis**: Identified missing E2E tests for Account Settings, Blocked Users, and Notifications.
     -   **Testing**: Created `account-settings.cy.js`, `blocking.cy.js`, and `notifications.cy.js`. Unskipped `two-factor-auth.cy.js`.
-    -   **Status**: `notifications.cy.js` and `blocking.cy.js` **PASSING**.
+    -   **Status**: **ALL PASSING**.
     -   **Fixes (Dec 15 - Part 8)**:
         -   **Matching Flow**: Fixed `matching-flow.cy.js` by correcting API mock structure (`data` wrapper) and updating assertions (Toast vs Modal). **PASSING**.
         -   **Messaging Flow**: Fixed `messaging-flow.cy.js` by injecting `MockEventSource` to simulate WebSocket echo for sent messages. Corrected API intercept to `/api/websocket/message`. **PASSING**.
-    -   **Known Issues**:
-        -   `account-settings.cy.js`: Email update passes. Password change and Account deletion fail due to Cypress visibility/timeout issues in headless mode.
-        -   `two-factor-auth.cy.js`: Fails at registration redirect (likely environment/backend specific).
+    -   **Fixes (Dec 17)**:
+        -   **Account Settings**: Verified `account-settings.cy.js` passes in headless mode.
+        -   **2FA**: Verified `two-factor-auth.cy.js` passes.
+        -   **Blocking**: Fixed 404 image errors in `blocking.cy.js` by using existing test avatar.
     -   **Fixes**: Resolved TypeScript build errors in `app/settings/account/page.tsx` and `app/settings/blocked/page.tsx`.
 4.  **Feature Implementation (Settings)**:
     -   **Frontend**: Implemented missing "Account Settings" page (Email, Password, Delete Account).

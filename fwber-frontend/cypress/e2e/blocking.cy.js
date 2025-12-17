@@ -10,13 +10,13 @@ describe('User Blocking', () => {
     {
       id: 2,
       name: 'Blocked User 1',
-      profile: { displayName: 'Blocked User 1', avatarUrl: '/images/avatar1.png' },
+      profile: { displayName: 'Blocked User 1', avatarUrl: '/images/test-avatar.svg' },
       blocked_at: new Date().toISOString()
     },
     {
       id: 3,
       name: 'Blocked User 2',
-      profile: { displayName: 'Blocked User 2', avatarUrl: '/images/avatar2.png' },
+      profile: { displayName: 'Blocked User 2', avatarUrl: '/images/test-avatar.svg' },
       blocked_at: new Date().toISOString()
     }
   ];
