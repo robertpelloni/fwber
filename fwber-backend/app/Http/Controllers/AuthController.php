@@ -73,7 +73,11 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
-        return $request->user()->load('profile');
+        $user = $request->user()->load('profile')->loadCount('referrals');
+
+        // Ensure the count is accessible via the attribute name expected by frontend
+        // loadCount adds 'referrals_count' attribute.
+        return $user;
     }
 
     public function checkReferralCode($code)
