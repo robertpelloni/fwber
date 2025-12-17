@@ -12,8 +12,17 @@ class TokenTest extends TestCase
 
     public function test_user_can_transfer_tokens()
     {
-        $sender = User::factory()->create(['token_balance' => 100]);
-        $recipient = User::factory()->create(['token_balance' => 0]);
+        // Users are created with last_daily_bonus_at = null by default.
+        // The CheckDailyBonus middleware runs on API requests, awarding 10 tokens.
+        // We set last_daily_bonus_at to now() to prevent the bonus from firing during the test.
+        $sender = User::factory()->create([
+            'token_balance' => 100,
+            'last_daily_bonus_at' => now(),
+        ]);
+        $recipient = User::factory()->create([
+            'token_balance' => 0,
+            'last_daily_bonus_at' => now(),
+        ]);
 
         $response = $this->actingAs($sender)
             ->postJson('/api/wallet/transfer', [
@@ -63,12 +72,18 @@ class TokenTest extends TestCase
             ),
         ]);
 
-        $user = User::factory()->create(['token_balance' => 100]);
+        $user = User::factory()->create([
+            'token_balance' => 100,
+            'last_daily_bonus_at' => now(), // Prevent daily bonus
+        ]);
+
+        // Valid Solana address (base58, no 0, O, I, l)
+        $validSolanaAddress = '7AESM9x1q23456789112345678911234567891123456';
 
         $response = $this->actingAs($user)
             ->postJson('/api/wallet/withdraw', [
                 'amount' => 50,
-                'destination_address' => 'SolanaAddress123'
+                'destination_address' => $validSolanaAddress
             ]);
 
         $response->assertStatus(200)
