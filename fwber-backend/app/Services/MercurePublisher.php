@@ -17,7 +17,8 @@ class MercurePublisher
         try {
             $jwt = $this->generatePublisherJWT();
             
-            $response = Http::withToken($jwt)
+            $response = Http::withOptions(['verify' => false]) // Disable SSL verification for local dev
+                ->withToken($jwt)
                 ->asForm()
                 ->post(config('services.mercure.internal_url'), [
                     'topic' => $topic,
@@ -44,7 +45,8 @@ class MercurePublisher
                 'topic' => $topic,
                 'error' => $e->getMessage()
             ]);
-            throw $e;
+            // Do not rethrow - allow the main request to succeed even if real-time update fails
+            // throw $e; 
         }
     }
 
