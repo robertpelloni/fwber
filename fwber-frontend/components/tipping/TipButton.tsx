@@ -8,9 +8,10 @@ import { useWallet } from '@/lib/hooks/useWallet';
 interface TipButtonProps {
   recipientId: number;
   recipientName: string;
+  compact?: boolean;
 }
 
-export default function TipButton({ recipientId, recipientName }: TipButtonProps) {
+export default function TipButton({ recipientId, recipientName, compact = false }: TipButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [amount, setAmount] = useState('10');
   const [loading, setLoading] = useState(false);
@@ -36,10 +37,19 @@ export default function TipButton({ recipientId, recipientName }: TipButtonProps
   return (
     <Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
       <Dialog.Trigger asChild>
-        <button className="flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-full hover:bg-purple-200 transition-colors font-medium dark:bg-purple-900/40 dark:text-purple-300">
-          <Coins className="w-4 h-4" />
-          Tip
-        </button>
+        {compact ? (
+          <button
+            className="p-2 hover:bg-gray-700 rounded-full text-gray-400 hover:text-yellow-400 transition-colors"
+            title={`Tip ${recipientName}`}
+          >
+            <Coins className="w-5 h-5" />
+          </button>
+        ) : (
+          <button className="flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-full hover:bg-purple-200 transition-colors font-medium dark:bg-purple-900/40 dark:text-purple-300">
+            <Coins className="w-4 h-4" />
+            Tip
+          </button>
+        )}
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/50 z-50" />
