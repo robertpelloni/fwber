@@ -36,8 +36,8 @@ class TokenController extends Controller
 
         $process = Process::path(base_path())
             ->env([
-                'SOLANA_SERVER_SECRET_KEY' => env('SOLANA_SERVER_SECRET_KEY'),
-                'SOLANA_MINT_ADDRESS' => env('SOLANA_MINT_ADDRESS'),
+                'SOLANA_SERVER_SECRET_KEY' => env('SERVER_WALLET_SECRET') ?? env('SOLANA_SERVER_SECRET_KEY'),
+                'SOLANA_MINT_ADDRESS' => env('MINT_ADDRESS') ?? env('SOLANA_MINT_ADDRESS'),
                 'SOLANA_RPC_URL' => env('SOLANA_RPC_URL'),
             ])
             ->run(['node', $scriptPath, $request->destination_address, (string)$amount]);

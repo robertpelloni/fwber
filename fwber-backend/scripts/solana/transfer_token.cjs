@@ -12,12 +12,12 @@ async function main() {
         process.exit(1);
     }
 
-    const secretKeyString = process.env.SOLANA_SERVER_SECRET_KEY;
-    const mintAddressString = process.env.SOLANA_MINT_ADDRESS;
+    const secretKeyString = process.env.SOLANA_SERVER_SECRET_KEY || process.env.SERVER_WALLET_SECRET;
+    const mintAddressString = process.env.SOLANA_MINT_ADDRESS || process.env.MINT_ADDRESS;
     const rpcUrl = process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com';
 
     if (!secretKeyString || !mintAddressString) {
-        console.error("Missing env vars: SOLANA_SERVER_SECRET_KEY or SOLANA_MINT_ADDRESS");
+        console.error("Missing env vars: SERVER_WALLET_SECRET or MINT_ADDRESS");
         process.exit(1);
     }
 
