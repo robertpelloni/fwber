@@ -152,7 +152,9 @@ export default function OnboardingPage() {
 
       setCurrentStep(prev => prev + 1)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      console.error('Onboarding error:', err)
+      const msg = err instanceof Error ? err.message : 'An error occurred'
+      setError(`${msg} (Please check console for details)`)
     } finally {
       setIsLoading(false)
     }

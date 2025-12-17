@@ -231,6 +231,11 @@ class ProfileController extends Controller
             
             $validated = $request->validated();
             
+            Log::info('Profile update request', [
+                'user_id' => $user->id,
+                'data' => $validated
+            ]);
+            
             // Get or create profile
             $profile = $user->profile;
             if (!$profile) {

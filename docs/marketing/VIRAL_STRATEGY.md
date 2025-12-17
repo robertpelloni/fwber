@@ -45,3 +45,40 @@
 
 **Status**: Ready for deployment.
 **Next Step**: Select one tactic and execute.
+
+---
+
+# Phase 2: Deep Space Expansion (New Intel)
+
+## 5. IRL Gamification (Operation "Star Map")
+*Focus: Turning the city into a playground.*
+
+*   **"The Monolith" Installations**: Install temporary, shiny metal monoliths (reminiscent of 2001: A Space Odyssey) in parks or city centers. They contain nothing but a QR code leading to a "First Contact" landing page with exclusive invites.
+*   **"Supply Drop" Geocaching**: Hide branded, waterproof "Survival Kits" (condoms, stickers, lube, promo codes) in geocache locations. Release coordinates on social media daily.
+*   **"Find the Droid"**: A cosplayer dressed as a specific robot wanders a convention or festival. The first person to find them and say the code phrase ("I'm looking for the droids") gets a Lifetime Premium subscription.
+
+## 6. Intergalactic Alliances (Brand Collabs)
+*Focus: Sci-fi themed partnerships.*
+
+*   **"Zero-G" Lube**: Partner with a boutique lube brand to release a "Space Edition" bottle. "Frictionless entry into the atmosphere."
+*   **"Rocket Fuel" Cocktails**: Partner with trendy bars to serve a signature FWBer drink (something with dry ice/smoke). Ordering it gets you a coaster with a profile QR code.
+*   **"Space Suit" Merch Drop**: Limited edition, high-quality silver bomber jackets or hoodies. Make them look like streetwear, not cheap swag. Send to micro-influencers.
+
+## 7. Subculture Infiltration
+*Focus: Niche communities that align with "future/tech/alt".*
+
+*   **The "Cantina" Parties**: Host after-parties at Comic-Cons or Tech Conferences. Theme: "Mos Eisley Cantina" (wretched hive of scum and villainy... and dating).
+*   **Hackathons for Hookups**: Host a hackathon where devs build "The Future of Intimacy" tools (teledildonics integration, VR dates) on top of the FWBer API.
+*   **Cyberpunk Photo Shoots**: Set up a free professional photo booth with neon/cyberpunk aesthetics at events. Users get a cool profile pic (watermarked) for their dating profiles.
+
+## 8. The "Space Program" (Events & Education)
+*Focus: Skill-building and retention.*
+
+*   **"Astronaut Training"**: Flirting and social skills workshops. "How to initiate first contact without causing an intergalactic incident."
+*   **"Launch Control" Concierge**: A high-tier service where a human "Mission Specialist" helps plan your date night (reservations, itinerary) so you don't crash and burn.
+*   **"Full Moon" Werewolf Parties**: Monthly outdoor events on full moons. "Unleash the beast." (Costumes encouraged).
+
+## 🚫 DECLASSIFIED: PHASE 2 REJECTED IDEAS
+*   **Broadcasting to Actual Aliens**: SETI might get mad if we spam deep space with "U up?" signals.
+*   **Zero-G Orgy Plane**: Insurance premiums are astronomical.
+*   **Kidnapping Elon Musk**: While on-brand for "Space", legal advises against it.
