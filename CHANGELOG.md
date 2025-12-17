@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.6] - 2025-12-17
+
+### Fixed
+- **Onboarding**: Fixed "Error updating profile" issue where empty location fields (city, state) or zero coordinates caused validation failures. Implemented client-side sanitization to remove empty fields before submission.
+- **Testing**: Added `cypress/e2e/onboarding-flow.cy.js` to verify profile update payload sanitization.
+
 ## [0.2.5] - 2025-12-17
 
 ### Fixed

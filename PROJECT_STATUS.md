@@ -1,8 +1,8 @@
 # Project Status
 
-**Last Updated:** December 15, 2025
+**Last Updated:** December 17, 2025
 **Status:** 🚀 LIVE / DEPLOYED
-**Version:** v0.2.3
+**Version:** v0.2.6
 
 ## 🟢 Current Status: Waiting for Verification (SSL)
 The project has received critical infrastructure fixes for CORS, Vercel integration, and Mercure proxying. We are currently waiting for the **SSL Certificate** to be generated for `mercure.fwber.me` to verify real-time features.
@@ -10,6 +10,12 @@ The project has received critical infrastructure fixes for CORS, Vercel integrat
 ### ⚠️ Known Issues / Technical Debt
 *   **SSL Verification**: Waiting for Let's Encrypt to validate `mercure.fwber.me`.
 *   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
+
+### ✅ Critical Fixes (Dec 17 - Part 2)
+1.  **Onboarding Profile Update**:
+    -   **Issue**: Users encountered "Error updating profile" during onboarding due to empty location fields being sent to the API.
+    -   **Fix**: Implemented payload sanitization in `app/onboarding/page.tsx` to remove empty strings and zero coordinates.
+    -   **Verification**: Created and passed `cypress/e2e/onboarding-flow.cy.js`.
 
 ### ✅ Critical Fixes (Dec 15 - Part 5)
 1.  **Merge Artifact Cleanup**:

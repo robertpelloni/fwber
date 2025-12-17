@@ -33,6 +33,7 @@ export function VideoCallModal({ recipientId, isOpen, onClose, isIncoming = fals
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [incomingOffer, setIncomingOffer] = useState<RTCSessionDescriptionInit | null>(null);
   const [callId, setCallId] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
   
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
@@ -142,7 +143,7 @@ export function VideoCallModal({ recipientId, isOpen, onClose, isIncoming = fals
 
   // Initialize local stream
   useEffect(() => {
-    if (isOpen && !localStream) {
+    if (isOpen && !localStream && !error) {
       navigator.mediaDevices.getUserMedia({ video: true, audio: true })
         .then(stream => {
           setLocalStream(stream);
@@ -157,14 +158,14 @@ export function VideoCallModal({ recipientId, isOpen, onClose, isIncoming = fals
         })
         .catch(err => {
           console.error('Error accessing media devices:', err);
-          // onClose(); // Don't close immediately, let user see error or retry
+          setError('Could not access camera/microphone. Please check permissions.');
         });
     }
     
     return () => {
       // Cleanup handled in separate effect or onClose
     };
-  }, [isOpen, isIncoming, localStream, startCall]);
+  }, [isOpen, isIncoming, localStream, startCall, error]);
 
   // Handle incoming signals
   useEffect(() => {
@@ -215,30 +216,46 @@ export function VideoCallModal({ recipientId, isOpen, onClose, isIncoming = fals
     <Dialog open={isOpen} onOpenChange={() => endCall()}>
       <DialogContent className="sm:max-w-[900px] h-[80vh] bg-gray-950 border-gray-800 p-0 overflow-hidden flex flex-col">
         <div className="relative flex-1 bg-black">
-          {/* Remote Video */}
-          {remoteStream ? (
-            <video 
-              ref={remoteVideoRef} 
-              autoPlay 
-              playsInline 
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-500">
-              {callStatus === 'calling' ? 'Calling...' : 'Waiting for video...'}
+          {/* Error State */}
+          {error ? (
+            <div className="w-full h-full flex flex-col items-center justify-center text-red-500 p-4 text-center">
+              <p className="text-xl font-semibold mb-2">Camera Error</p>
+              <p className="mb-4">{error}</p>
+              <button 
+                onClick={onClose} 
+                className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded"
+              >
+                Close
+              </button>
             </div>
-          )}
+          ) : (
+            <>
+              {/* Remote Video */}
+              {remoteStream ? (
+                <video 
+                  ref={remoteVideoRef} 
+                  autoPlay 
+                  playsInline 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-500">
+                  {callStatus === 'calling' ? 'Calling...' : 'Waiting for video...'}
+                </div>
+              )}
 
-          {/* Local Video (PIP) */}
-          <div className="absolute bottom-4 right-4 w-48 h-36 bg-gray-900 rounded-lg overflow-hidden border border-gray-700 shadow-xl">
-            <video 
-              ref={localVideoRef} 
-              autoPlay 
-              playsInline 
-              muted 
-              className="w-full h-full object-cover"
-            />
-          </div>
+              {/* Local Video (PIP) */}
+              <div className="absolute bottom-4 right-4 w-48 h-36 bg-gray-900 rounded-lg overflow-hidden border border-gray-700 shadow-xl">
+                <video 
+                  ref={localVideoRef} 
+                  autoPlay 
+                  playsInline 
+                  muted 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </>
+          )}
 
           {/* Incoming Call Overlay */}
           {callStatus === 'ringing' && isIncoming && (

@@ -352,7 +352,7 @@ describe('Video Chat Flow', () => {
     cy.get('video').should('have.length.at.least', 1);
   });
 
-  it.skip('handles camera permission denial gracefully', () => {
+  it('handles camera permission denial gracefully', () => {
     cy.visit('/messages', {
       onBeforeLoad: (win) => {
         win.localStorage.setItem('fwber_token', 'fake-token');
@@ -391,24 +391,36 @@ describe('Video Chat Flow', () => {
     // Verify list is populated
     cy.get('.overflow-y-auto > div').should('have.length.at.least', 1);
 
-    // Force click in case of overlay/layout issues
+    // Click the first conversation
     cy.get('.overflow-y-auto > div').first().click({ force: true });
-    cy.wait(3000); // Increased wait further
+    
+    // Verify selection (check for active class)
+    cy.get('.overflow-y-auto > div').first().should('have.class', 'bg-blue-50');
+    
+    // Wait for messages to load
     cy.wait('@getMessages');
 
-    // Verify chat is open
-    cy.contains('Type a message...').should('be.visible');
+    // Verify chat header is visible to ensure component mounted
+    cy.contains('Future Partner').should('be.visible');
+
+    // Verify chat is open by checking for the input field
+    // Note: placeholder might vary based on encryption status, so we check partial match or just existence
+    cy.get('input[type="text"]').should('be.visible');
 
     cy.get('button[title="Video Call"]').should('be.visible').click();
 
-    // Verify Modal Opens (it opens before getUserMedia)
+    // Verify Modal Opens
     cy.get('div[role="dialog"]').should('be.visible');
     
-    // Since we don't have a specific error UI, we just verify the modal is open
-    // and maybe check that local video is NOT playing (no srcObject)
-    // But checking srcObject in Cypress is tricky.
-    // We can check that the video element exists but might be black/empty.
-    cy.get('video').should('exist');
+    // Verify Error Message
+    cy.contains('Camera Error').should('be.visible');
+    cy.contains('Could not access camera/microphone').should('be.visible');
+    
+    // Verify Close Button works
+    cy.contains('button', 'Close').click();
+    
+    // Verify Modal Closes
+    cy.get('div[role="dialog"]').should('not.exist');
   });
 
   it('allows declining an incoming call', () => {

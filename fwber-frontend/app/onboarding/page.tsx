@@ -105,11 +105,25 @@ export default function OnboardingPage() {
         if (!formData.display_name || !formData.date_of_birth || !formData.gender) {
           throw new Error('Please fill in all required fields.')
         }
+
+        // Sanitize location data
+        const locationUpdate: any = { ...formData.location };
+        
+        // Remove 0 coordinates if they haven't been set by geolocation
+        if (locationUpdate.latitude === 0 && locationUpdate.longitude === 0) {
+            delete locationUpdate.latitude;
+            delete locationUpdate.longitude;
+        }
+        
+        // Remove empty strings
+        if (!locationUpdate.city) delete locationUpdate.city;
+        if (!locationUpdate.state) delete locationUpdate.state;
+
         await updateUserProfile(token!, {
           display_name: formData.display_name,
           date_of_birth: formData.date_of_birth,
           gender: formData.gender,
-          location: formData.location,
+          location: locationUpdate,
         })
       } else if (STEPS[currentStep].id === 'photos') {
         if (photos.length === 0) {
