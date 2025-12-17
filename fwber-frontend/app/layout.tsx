@@ -10,6 +10,7 @@ import SentryInitializer from '@/components/SentryInitializer'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import FeedbackModal from '@/components/FeedbackModal'
 import { MercureProvider } from '@/lib/contexts/MercureContext'
+import NotificationListener from '@/components/realtime/NotificationListener'
 
 const inter = Inter({
   variable: '--font-inter',
@@ -99,6 +100,7 @@ export default function RootLayout({
                 <NotificationPermissionHandler />
                 <SentryInitializer />
                 <ToastProvider>
+                  <NotificationListener />
                   <div className="relative flex min-h-screen flex-col">
                     <div className="flex-1">{children}</div>
                   </div>

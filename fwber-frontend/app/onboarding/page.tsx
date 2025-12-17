@@ -268,15 +268,23 @@ export default function OnboardingPage() {
             <div className="space-y-3">
               <Label>I&apos;m looking for...</Label>
               <div className="grid grid-cols-2 gap-2">
-                {['Dating', 'Friends', 'Networking', 'Casual'].map(opt => (
+                {['Dating', 'Friends', 'Networking', 'Casual'].map(opt => {
+                  const mapping: Record<string, string> = {
+                    'Dating': 'dating',
+                    'Friends': 'friendship',
+                    'Networking': 'networking',
+                    'Casual': 'casual'
+                  }
+                  const val = mapping[opt] || opt.toLowerCase()
+                  
+                  return (
                   <div key={opt} className="flex items-center space-x-2">
                     <input
                       type="checkbox"
                       id={`looking_${opt}`}
                       className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      checked={formData.looking_for.includes(opt.toLowerCase())}
+                      checked={formData.looking_for.includes(val)}
                       onChange={e => {
-                        const val = opt.toLowerCase()
                         setFormData(prev => ({
                           ...prev,
                           looking_for: e.target.checked 
@@ -287,7 +295,7 @@ export default function OnboardingPage() {
                     />
                     <Label htmlFor={`looking_${opt}`}>{opt}</Label>
                   </div>
-                ))}
+                )})}
               </div>
             </div>
 

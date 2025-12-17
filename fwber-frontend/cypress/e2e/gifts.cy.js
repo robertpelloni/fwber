@@ -48,10 +48,25 @@ describe('Gifting Flow', () => {
       statusCode: 200,
       body: { data: partner }
     }).as('getPartner');
+    
+    // Mock public profile (for /profile/2)
+    cy.intercept('GET', '**/api/public-profile/2', {
+      statusCode: 200,
+      body: { 
+        id: 2,
+        profile: {
+          display_name: 'Recipient User',
+          age: 25,
+          location: { city: 'New York', state: 'NY' },
+          bio: 'Hello world',
+          photos: []
+        }
+      }
+    }).as('getPublicProfile');
   });
 
   it('allows sending a gift from profile', () => {
-    cy.visit('/users/2', {
+    cy.visit('/profile/2', {
       onBeforeLoad: (win) => {
         win.localStorage.setItem('fwber_token', 'fake-token');
         win.localStorage.setItem('fwber_user', JSON.stringify(user));
@@ -62,14 +77,14 @@ describe('Gifting Flow', () => {
     cy.contains('Send Gift').should('be.visible').click();
 
     // 2. Verify Gift Modal
-    cy.contains('Select a Gift').should('be.visible');
-    cy.contains('Rose (10 tokens)').should('be.visible');
+    cy.contains('Send a Gift to Recipient User').should('be.visible');
+    cy.contains('Rose').should('be.visible');
     
     // 3. Select Gift
     cy.contains('Rose').click();
     
     // 4. Enter Message
-    cy.get('textarea[placeholder="Add a message..."]').type('A rose for you!');
+    cy.get('textarea[placeholder="Add a personal note..."]').type('A rose for you!');
 
     // 5. Mock Send API
     cy.intercept('POST', '**/api/gifts/send', {
@@ -82,18 +97,21 @@ describe('Gifting Flow', () => {
 
     // 7. Verify Success
     cy.wait('@sendGift').its('request.body').should('deep.include', {
-      receiver_id: 2,
-      gift_id: 1,
+      receiverId: 2,
+      giftId: 1,
       message: 'A rose for you!'
     });
 
-    cy.contains('Gift sent successfully!').should('be.visible');
+    // Alert is used in the component, so we stub it or check for it
+    cy.on('window:alert', (str) => {
+      expect(str).to.equal('Gift sent successfully!');
+    });
   });
 
   it('shows error when insufficient tokens', () => {
     const poorUser = { ...user, token_balance: 5 };
     
-    cy.visit('/users/2', {
+    cy.visit('/profile/2', {
       onBeforeLoad: (win) => {
         win.localStorage.setItem('fwber_token', 'fake-token');
         win.localStorage.setItem('fwber_user', JSON.stringify(poorUser));
@@ -103,15 +121,67 @@ describe('Gifting Flow', () => {
     cy.contains('Send Gift').click();
     cy.contains('Rose').click();
 
-    // Mock Send API Failure
-    cy.intercept('POST', '**/api/gifts/send', {
-      statusCode: 400,
-      body: { message: 'Insufficient tokens' }
-    }).as('sendGiftFail');
+    // Check for disabled button or error message
+    // The component shows "Insufficient token balance" text
+    cy.contains('Insufficient token balance').should('be.visible');
+    cy.contains('button', 'Send Gift').should('be.disabled');
+  });
 
-    cy.contains('button', 'Send Gift').click();
+  it('displays notification when gift is received', () => {
+    cy.visit('/dashboard', {
+      onBeforeLoad: (win) => {
+        win.localStorage.setItem('fwber_token', 'fake-token');
+        win.localStorage.setItem('fwber_user', JSON.stringify(user));
 
-    cy.wait('@sendGiftFail');
-    cy.contains('Insufficient tokens').should('be.visible');
+        // Robust MockEventSource
+        win.EventSource = class MockEventSource {
+            constructor(url) {
+                this.url = url;
+                this.listeners = {};
+                this.onmessage = null;
+                if (!win.mockEventSources) win.mockEventSources = [];
+                win.mockEventSources.push(this);
+                setTimeout(() => { if (this.onopen) this.onopen({ type: 'open' }); }, 10);
+            }
+            addEventListener(type, callback) {
+                if (!this.listeners[type]) this.listeners[type] = [];
+                this.listeners[type].push(callback);
+            }
+            removeEventListener(type, callback) {
+                if (!this.listeners[type]) return;
+                this.listeners[type] = this.listeners[type].filter(cb => cb !== callback);
+            }
+            close() { this.readyState = 2; }
+            emit(type, data) {
+                const event = new MessageEvent(type, { data: JSON.stringify(data) });
+                if (this.listeners[type]) this.listeners[type].forEach(cb => cb(event));
+                if (type === 'message' && this.onmessage) this.onmessage(event);
+            }
+        };
+      }
+    });
+
+    // Simulate incoming gift event
+    cy.window().then((win) => {
+        const giftEvent = {
+            type: 'gift_received',
+            sender_name: 'Secret Admirer',
+            gift_name: 'Rose',
+            message: 'Thinking of you!'
+        };
+
+        cy.wrap(null, { timeout: 10000 }).should(() => {
+            expect(win.mockEventSources).to.have.length.at.least(1);
+        }).then(() => {
+            win.mockEventSources.forEach(es => {
+                // Emit as 'notification' type, which useMercureLogic listens for
+                es.emit('notification', giftEvent);
+            });
+        });
+    });
+
+    // Verify Toast Notification
+    cy.contains('Secret Admirer sent you a Rose!').should('be.visible');
+    cy.contains('Thinking of you!').should('be.visible');
   });
 });

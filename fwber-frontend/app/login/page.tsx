@@ -23,7 +23,17 @@ export default function LoginPage() {
       const timer = setTimeout(() => {
         router.push('/dashboard')
       }, 100)
-      return () => clearTimeout(timer)
+
+      // Safety fallback: if we are still here after 3s, force hard navigation
+      const fallbackTimer = setTimeout(() => {
+         console.warn('Router push stalled. Forcing hard navigation.');
+         window.location.href = '/dashboard';
+      }, 3000);
+
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(fallbackTimer);
+      }
     }
   }, [isAuthenticated, router])
 

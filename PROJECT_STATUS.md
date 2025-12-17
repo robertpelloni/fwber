@@ -872,6 +872,13 @@ The project has received critical infrastructure fixes for CORS, Vercel integrat
 4.  **Testing**:
     -   **Video Chat**: Enhanced `video-chat.cy.js` with edge cases for permission denial and call rejection.
 
+### ✅ Critical Fixes (Dec 15 - Part 10)
+1.  **Login Freeze Fix**:
+    -   **Issue**: Users reported "Login button freeze" where the button remained disabled ("Signing in...") indefinitely.
+    -   **Root Cause**: The login flow relied on `router.push` to complete the transition, but if navigation stalled (e.g., network latency or client-side routing issues), the loading state was never reset.
+    -   **Fix**: Implemented a safety fallback in `LoginPage`. If authenticated but still on the login page after 3 seconds, it forces a hard navigation (`window.location.href`) to the dashboard.
+    -   **Verification**: Verified with reproduction test case `login-freeze.cy.js` (happy path passes, error handling works).
+
 ### ✅ Critical Fixes (Dec 15 - Part 9)
 1.  **Video Chat E2E Stabilization**:
     -   **Issue**: `video-chat.cy.js` was failing due to missing WebRTC mocks (`RTCPeerConnection`, `MediaStreamTrack`) and flaky API intercepts.

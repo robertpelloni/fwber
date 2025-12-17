@@ -68,7 +68,7 @@ class UpdateProfileRequest extends FormRequest
             'social_media' => 'sometimes|nullable|array',
             
             'looking_for' => 'sometimes|nullable|array',
-            "looking_for.*" => 'string|in:friendship,dating,relationship,casual,marriage,networking',
+            "looking_for.*" => 'string|in:friendship,friends,dating,relationship,casual,marriage,networking',
             'interested_in' => 'sometimes|nullable|array',
             
             'location' => 'sometimes|nullable|array',
