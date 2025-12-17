@@ -5,6 +5,7 @@ import { useWallet as useInternalWallet } from '@/lib/hooks/useWallet';
 import { useState } from 'react';
 import { apiClient } from '@/lib/api/client';
 import { Loader2 } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 
 const WalletMultiButton = dynamic(
   () => import('@solana/wallet-adapter-react-ui').then((mod) => mod.WalletMultiButton),
@@ -60,7 +61,12 @@ export default function WalletDashboard() {
 
         {publicKey ? (
           <div className="p-4 border rounded-xl space-y-4 dark:border-gray-700">
-            <p className="text-sm break-all font-mono bg-gray-100 dark:bg-gray-900 p-2 rounded">
+            <div className="flex flex-col items-center justify-center p-4 bg-white rounded-lg shadow-sm border border-gray-100 dark:bg-gray-800 dark:border-gray-600">
+                <QRCodeSVG value={publicKey.toBase58()} size={160} className="p-2 bg-white rounded" />
+                <p className="mt-2 text-xs text-gray-500">Scan to deposit SOL or SPL Tokens</p>
+            </div>
+
+            <p className="text-sm break-all font-mono bg-gray-100 dark:bg-gray-900 p-2 rounded text-center">
               {publicKey.toBase58()}
             </p>
 
