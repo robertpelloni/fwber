@@ -220,7 +220,7 @@ export async function createPassphraseVerifier(
   const encoder = new TextEncoder();
   const verificationData = 'VAULT_VERIFY_V1';
   const encrypted = await encryptData(
-    encoder.encode(verificationData).buffer,
+    encoder.encode(verificationData).buffer as any,
     passphrase,
     salt
   );
