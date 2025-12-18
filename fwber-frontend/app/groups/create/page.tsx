@@ -17,6 +17,7 @@ const formSchema = z.object({
   description: z.string().optional(),
   icon: z.string().optional(),
   privacy: z.enum(['public', 'private']),
+  token_entry_fee: z.string().optional().transform(val => val ? parseFloat(val) : 0),
 });
 
 export default function CreateGroupPage() {
@@ -79,6 +80,19 @@ export default function CreateGroupPage() {
                 <option value="private">Private - Invite only</option>
               </select>
               {errors.privacy && <p className="text-sm text-red-500">{errors.privacy.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="token_entry_fee">Entry Fee (Tokens)</Label>
+              <Input
+                id="token_entry_fee"
+                type="number"
+                step="0.1"
+                placeholder="0"
+                {...register('token_entry_fee')}
+              />
+              <p className="text-xs text-muted-foreground">Optional: Charge tokens to join this group.</p>
+              {errors.token_entry_fee && <p className="text-sm text-red-500">{errors.token_entry_fee.message}</p>}
             </div>
 
             <div className="flex justify-end gap-4">
