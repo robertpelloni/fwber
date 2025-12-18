@@ -358,7 +358,7 @@ export default function PhotoUpload({
         setUploadProgress(new Map())
       }, 2000)
     }
-  }, [flushTelemetryQueue, maxSize, onUpload, processFilesForPreview, revokePreviewUrls])
+  }, [flushTelemetryQueue, maxSize, onUpload, processFilesForPreview, revokePreviewUrls, unlockPrice])
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop,

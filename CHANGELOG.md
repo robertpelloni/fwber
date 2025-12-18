@@ -10,6 +10,8 @@ All notable changes to this project will be documented in this file.
 - **Dependencies**: Upgraded `typescript` to latest (5.9.3) in `fwber-frontend` to satisfy `ox` peer dependency.
 - **Frontend**: Fixed `useMemo` dependency warning in `SolanaProvider`.
 - **Frontend**: Fixed TypeScript build error in `lib/e2e/crypto.ts` regarding `BufferSource` type mismatch.
+- **Frontend**: Fixed TypeScript build error in `lib/vault/crypto.ts` regarding `BufferSource` type mismatch.
+- **Frontend**: Added `pino-pretty` to `devDependencies` to resolve build warning.
 
 ## [0.2.6] - 2025-12-17
 
