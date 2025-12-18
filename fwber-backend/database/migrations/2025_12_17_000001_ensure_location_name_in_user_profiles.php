@@ -8,6 +8,7 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * Fixed to handle missing longitude column.
      */
     public function up(): void
     {
