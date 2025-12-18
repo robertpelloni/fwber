@@ -28,7 +28,7 @@ export function ReferralModal({ trigger }: ReferralModalProps) {
     ? `${window.location.origin}/register?ref=${user.referral_code}`
     : `https://fwber.me/register?ref=${user.referral_code}`;
 
-  const shareText = "Join me on FWBer - The Definitive Social Network for Adults! Get 3 days of Gold Premium with my link:";
+  const shareText = "🔥 Join me on FWBer! Use my link to get 50 Tokens and 3 Days of Gold Premium instantly. Don't miss out!";
   const encodedText = encodeURIComponent(shareText);
   const encodedLink = encodeURIComponent(referralLink);
 
@@ -103,7 +103,7 @@ export function ReferralModal({ trigger }: ReferralModalProps) {
               <div>
                 <h4 className="font-bold text-amber-900 dark:text-amber-100">Golden Tickets</h4>
                 <p className="text-sm text-amber-700 dark:text-amber-300">
-                  You have <span className="font-bold">{user.golden_tickets_remaining || 0}</span> tickets left.
+                  You have <span className="font-bold">{user.golden_tickets_remaining || 0}</span> Golden Tickets remaining.
                 </p>
               </div>
             </div>
@@ -160,7 +160,7 @@ export function ReferralModal({ trigger }: ReferralModalProps) {
             </div>
             <div className="bg-muted p-3 rounded-lg text-center">
               <div className="text-2xl font-bold text-primary flex items-center justify-center gap-1">
-                {/* We don't have referral count in user object yet, maybe add it later */}
+                {user.referrals_count || 0}
                 <Users className="w-4 h-4" />
               </div>
               <div className="text-xs text-muted-foreground">Friends Invited</div>
