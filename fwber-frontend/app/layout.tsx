@@ -102,26 +102,17 @@ export default function RootLayout({
                   <NotificationPermissionHandler />
                   <SentryInitializer />
                   <ToastProvider>
+                    <NotificationListener />
                     <div className="relative flex min-h-screen flex-col">
                       <div className="flex-1">{children}</div>
                     </div>
                     <FeedbackModal />
                     <PerformanceMonitor />
+                    <div className="fixed bottom-1 right-1 text-[10px] text-muted-foreground opacity-50 pointer-events-none z-50">
+                      v0.2.6
+                    </div>
                   </ToastProvider>
                 </SolanaProvider>
-                <NotificationPermissionHandler />
-                <SentryInitializer />
-                <ToastProvider>
-                  <NotificationListener />
-                  <div className="relative flex min-h-screen flex-col">
-                    <div className="flex-1">{children}</div>
-                  </div>
-                  <FeedbackModal />
-                  <PerformanceMonitor />
-                  <div className="fixed bottom-1 right-1 text-[10px] text-muted-foreground opacity-50 pointer-events-none z-50">
-                    v0.2.3
-                  </div>
-                </ToastProvider>
               </MercureProvider>
             </AuthProvider>
           </QueryProvider>
