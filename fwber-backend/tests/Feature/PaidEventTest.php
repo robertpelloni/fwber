@@ -35,7 +35,7 @@ class PaidEventTest extends TestCase
 
     public function test_can_pay_for_event_with_tokens()
     {
-        $user = User::factory()->create(['token_balance' => 200]);
+        $user = User::factory()->create(['token_balance' => 200, 'last_daily_bonus_at' => now()]);
         $event = Event::factory()->create(['price' => 10.00]); // 100 Tokens
 
         $response = $this->actingAs($user)
@@ -58,7 +58,7 @@ class PaidEventTest extends TestCase
 
     public function test_cannot_pay_with_insufficient_tokens()
     {
-        $user = User::factory()->create(['token_balance' => 50]);
+        $user = User::factory()->create(['token_balance' => 50, 'last_daily_bonus_at' => now()]);
         $event = Event::factory()->create(['price' => 10.00]); // 100 Tokens
 
         $response = $this->actingAs($user)
@@ -68,7 +68,7 @@ class PaidEventTest extends TestCase
             ]);
 
         $response->assertStatus(400)
-            ->assertJson(['error' => 'Insufficient token balance.']);
+            ->assertJson(['error' => 'Insufficient tokens']);
     }
 
     public function test_can_pay_for_event_with_stripe()
@@ -103,7 +103,7 @@ class PaidEventTest extends TestCase
 
     public function test_does_not_charge_again_if_already_paid()
     {
-        $user = User::factory()->create(['token_balance' => 200]);
+        $user = User::factory()->create(['token_balance' => 200, 'last_daily_bonus_at' => now()]);
         $event = Event::factory()->create(['price' => 10.00]);
 
         // First RSVP (Pay)

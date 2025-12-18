@@ -26,6 +26,7 @@ class PhotoUnlockTest extends TestCase
 
         $unlocker = User::factory()->create([
             'token_balance' => $cost + 50,
+            'last_daily_bonus_at' => now(),
         ]);
 
         $response = $this->actingAs($unlocker)
@@ -77,6 +78,7 @@ class PhotoUnlockTest extends TestCase
     {
         $owner = User::factory()->create([
             'token_balance' => 100,
+            'last_daily_bonus_at' => now(),
         ]);
         $photo = Photo::factory()->create([
             'user_id' => $owner->id,

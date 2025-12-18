@@ -30,7 +30,7 @@ class GiftTest extends TestCase
 
     public function test_can_send_gift_with_sufficient_tokens()
     {
-        $sender = User::factory()->create(['token_balance' => 100]);
+        $sender = User::factory()->create(['token_balance' => 100, 'last_daily_bonus_at' => now()]);
         $receiver = User::factory()->create();
         $gift = Gift::where('name', 'Rose')->first(); // Cost 10
 
@@ -57,7 +57,7 @@ class GiftTest extends TestCase
 
     public function test_cannot_send_gift_with_insufficient_tokens()
     {
-        $sender = User::factory()->create(['token_balance' => 5]);
+        $sender = User::factory()->create(['token_balance' => 5, 'last_daily_bonus_at' => now()]);
         $receiver = User::factory()->create();
         $gift = Gift::where('name', 'Rose')->first(); // Cost 10
 

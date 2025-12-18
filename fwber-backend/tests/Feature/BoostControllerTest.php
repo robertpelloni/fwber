@@ -185,7 +185,7 @@ class BoostControllerTest extends TestCase
 
     public function test_can_purchase_boost_with_tokens()
     {
-        $user = User::factory()->create(['token_balance' => 100]);
+        $user = User::factory()->create(['token_balance' => 100, 'last_daily_bonus_at' => now()]);
 
         $response = $this->actingAs($user)
             ->postJson('/api/boosts/purchase', [
@@ -209,7 +209,7 @@ class BoostControllerTest extends TestCase
 
     public function test_cannot_purchase_boost_with_insufficient_tokens()
     {
-        $user = User::factory()->create(['token_balance' => 10]);
+        $user = User::factory()->create(['token_balance' => 10, 'last_daily_bonus_at' => now()]);
 
         $response = $this->actingAs($user)
             ->postJson('/api/boosts/purchase', [

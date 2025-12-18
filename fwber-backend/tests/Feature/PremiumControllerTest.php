@@ -46,7 +46,7 @@ class PremiumControllerTest extends TestCase
 
     public function test_can_purchase_premium_with_tokens()
     {
-        $user = User::factory()->create(['token_balance' => 300]);
+        $user = User::factory()->create(['token_balance' => 300, 'last_daily_bonus_at' => now()]);
 
         $response = $this->actingAs($user)
             ->postJson('/api/premium/purchase', [
