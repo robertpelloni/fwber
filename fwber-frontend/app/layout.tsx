@@ -10,6 +10,7 @@ import SentryInitializer from '@/components/SentryInitializer'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import FeedbackModal from '@/components/FeedbackModal'
 import { MercureProvider } from '@/lib/contexts/MercureContext'
+import { SolanaProvider } from '@/components/SolanaProvider'
 import NotificationListener from '@/components/realtime/NotificationListener'
 
 const inter = Inter({
@@ -27,10 +28,10 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://fwber.me'),
-  title: 'FWBer - Join the Revolution in Adult Social Networking',
-  description: 'Sign up now to get 50 Tokens and 3 Days of Gold Premium! FWBer is the definitive privacy-first adult social network for dating, friends, and lifestyle matching.',
+  title: 'FWBer.me - Adult Social Network - Join the Revolution in Adult Social Networking',
+  description: 'Adult Social Network - Friends, Dating, Hookups, Ads, Groups, Fun, Love, Lust, and More! Sign up now to get 50 Tokens and 3 Days of Gold Premium! FWBer is the definitive privacy-first adult social network for dating, friends, and lifestyle matching.',
   keywords: ['dating', 'adult', 'matching', 'relationships', 'hookups', 'friends', 'groups', 'ads', 'free tokens', 'premium dating'],
-  authors: [{ name: 'FWBer Team' }],
+  authors: [{ name: 'FWBer.me Team' }],
   manifest: '/manifest.json',
   icons: {
     icon: [
@@ -42,15 +43,15 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: 'FWBer - Join the Revolution & Get Free Gold Premium!',
+    title: 'FWBer.me - Adult Social Network - Join the Revolution & Get Free Gold Premium!',
     description: 'Sign up today with a referral link to unlock 50 Tokens and 3 Days of Gold Premium instantly. Experience the best in adult social networking.',
     type: 'website',
     locale: 'en_US',
-    siteName: 'FWBer',
+    siteName: 'FWBer.me',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FWBer - Get Free Gold Premium!',
+    title: 'FWBer.me - Adult Social Network - Get Free Gold Premium!',
     description: 'Sign up today with a referral link to unlock 50 Tokens and 3 Days of Gold Premium instantly.',
   },
   alternates: {
@@ -97,6 +98,17 @@ export default function RootLayout({
           <QueryProvider>
             <AuthProvider>
               <MercureProvider>
+                <SolanaProvider>
+                  <NotificationPermissionHandler />
+                  <SentryInitializer />
+                  <ToastProvider>
+                    <div className="relative flex min-h-screen flex-col">
+                      <div className="flex-1">{children}</div>
+                    </div>
+                    <FeedbackModal />
+                    <PerformanceMonitor />
+                  </ToastProvider>
+                </SolanaProvider>
                 <NotificationPermissionHandler />
                 <SentryInitializer />
                 <ToastProvider>

@@ -9,6 +9,10 @@ import { getPublicProfile, type UserProfile } from '@/lib/api/profile';
 import { performMatchAction } from '@/lib/api/matches';
 import { api } from '@/lib/api/client';
 import { PresenceIndicator } from '@/components/realtime';
+import TipButton from '@/components/tipping/TipButton';
+import PhotoRevealGate from '@/components/PhotoRevealGate';
+import { RelationshipTier } from '@/lib/relationshipTiers';
+import { photoAPI } from '@/lib/api/photos';
 import GiftShopModal from '@/components/gifts/GiftShopModal';
 import { Gift } from 'lucide-react';
 
@@ -77,6 +81,18 @@ export default function PublicProfilePage() {
     }
   };
 
+  const handleTokenUnlock = async (photoId: string) => {
+    try {
+      const res = await photoAPI.unlockPhoto(photoId);
+      if (res.success) {
+        alert(res.message);
+        loadProfile(); // Refresh
+      }
+    } catch (e: any) {
+      alert(e.message || 'Unlock failed');
+    }
+  };
+
   if (isLoading) return <div className="flex justify-center p-8">Loading...</div>;
   if (error) return <div className="text-red-500 p-8">{error}</div>;
   if (!profile) return <div className="p-8">Profile not found</div>;
@@ -87,6 +103,42 @@ export default function PublicProfilePage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
         <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden">
+          {/* Photo Gate */}
+          <div className="bg-gray-100 dark:bg-gray-800 p-4">
+             <PhotoRevealGate
+                photos={p.photos?.map(ph => ({
+                    id: String(ph.id),
+                    url: ph.url,
+                    isPrimary: ph.is_primary,
+                    type: 'real',
+                    isPrivate: ph.is_private,
+                    isUnlocked: ph.is_unlocked,
+                    unlockPrice: ph.unlock_price
+                })) || []}
+                currentTier={RelationshipTier.DISCOVERY}
+                onTokenUnlock={handleTokenUnlock}
+             />
+          </div>
+
+          {/* Info */}
+          <div className="p-8">
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <div className="flex justify-between items-center w-full">
+                  <div>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                      {p.display_name}, {p.age}
+                      <PresenceIndicator userId={String(profile.id)} />
+                    </h1>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      {p.location?.city}, {p.location?.state}
+                    </p>
+                  </div>
+                  <TipButton recipientId={profile.id} recipientName={p.display_name || 'User'} />
+                </div>
+              </div>
+            </div>
+
           {/* Photo */}
           <div className="relative h-96 w-full bg-gray-200">
             {p.photos?.[0] ? (
@@ -108,21 +160,7 @@ export default function PublicProfilePage() {
               </div>
             )}
           </div>
-
-          {/* Info */}
-          <div className="p-8">
-            <div className="flex justify-between items-start mb-6">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                  {p.display_name}, {p.age}
-                  <PresenceIndicator userId={String(profile.id)} />
-                </h1>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {p.location?.city}, {p.location?.state}
-                </p>
-              </div>
-            </div>
-
+          
             <div className="prose dark:prose-invert mb-8">
               <h3 className="text-lg font-semibold mb-2">About</h3>
               <p>{p.bio || 'No bio yet.'}</p>

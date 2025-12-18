@@ -12,6 +12,7 @@ export interface Event {
   ends_at: string;
   max_attendees: number | null;
   price: number | null;
+  token_cost?: number | null;
   created_by_user_id: number;
   status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
   attendees_count: number;
@@ -29,6 +30,7 @@ export interface CreateEventRequest {
   ends_at: string;
   max_attendees?: number;
   price?: number;
+  token_cost?: number;
 }
 
 export async function getNearbyEvents(latitude?: number, longitude?: number, radius: number = 50): Promise<PaginatedResponse<Event>> {

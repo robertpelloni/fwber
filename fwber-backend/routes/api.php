@@ -374,9 +374,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('feedback/{id}', [\App\Http\Controllers\FeedbackController::class, 'update']);
 
     // Token / Wallet
-    Route::get('wallet', [\App\Http\Controllers\TokenController::class, 'balance']);
-    Route::post('wallet/address', [\App\Http\Controllers\TokenController::class, 'updateAddress']);
-    Route::get('leaderboard', [\App\Http\Controllers\TokenController::class, 'leaderboard']);
+    Route::get('wallet', [\App\Http\Controllers\Api\TokenController::class, 'balance']);
+    Route::post('wallet/withdraw', [\App\Http\Controllers\Api\TokenController::class, 'withdraw']);
+    Route::post('wallet/transfer', [\App\Http\Controllers\Api\TokenController::class, 'transfer']);
+    Route::post('wallet/address', [\App\Http\Controllers\Api\TokenController::class, 'updateAddress']);
+    Route::get('leaderboard', [\App\Http\Controllers\Api\TokenController::class, 'leaderboard']);
 
     // Gifts
     Route::get('gifts', [\App\Http\Controllers\GiftController::class, 'index']);

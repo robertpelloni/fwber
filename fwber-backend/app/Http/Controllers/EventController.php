@@ -7,6 +7,7 @@ use App\Http\Requests\StoreEventRequest;
 use App\Models\Event;
 use App\Models\EventAttendee;
 use App\Models\Payment;
+use App\Models\TokenTransaction;
 use App\Services\Payment\PaymentGatewayInterface;
 use App\Services\TokenDistributionService;
 use Illuminate\Http\Request;
@@ -265,8 +266,8 @@ class EventController extends Controller
      */
     public function rsvp(EventRsvpRequest $request, $id)
     {
-        // Eager load attendees to avoid N+1 queries
-        $event = Event::with('attendees')->findOrFail($id);
+        // Eager load attendees and creator
+        $event = Event::with(['attendees', 'creator'])->findOrFail($id);
         $user = Auth::user();
 
         // Check max attendees
@@ -289,7 +290,9 @@ class EventController extends Controller
         $paymentData = [];
 
         // Handle Payment Logic if switching to attending and not paid
-        if ($request->status === 'attending' && $event->price > 0 && !$alreadyPaid) {
+        $hasPrice = $event->price > 0 || $event->token_cost > 0;
+
+        if ($request->status === 'attending' && $hasPrice && !$alreadyPaid) {
             $paymentMethod = $request->input('payment_method');
             
             // If no payment method provided for a paid event, return error
@@ -300,17 +303,52 @@ class EventController extends Controller
             $transactionId = null;
 
             if ($paymentMethod === 'token') {
-                // Conversion: 1 USD = 10 Tokens
-                $tokenCost = $event->price * 10;
+                $tokenCost = $event->token_cost ?? ($event->price * 10);
                 
-                try {
-                    $this->tokenService->spendTokens($user, $tokenCost, "Ticket for event: {$event->title}");
-                    $transactionId = 'token_' . uniqid();
-                } catch (\Exception $e) {
-                    return response()->json(['error' => $e->getMessage()], 400);
+                if ($tokenCost > 0) {
+                    try {
+                        // P2P Payment: Deduct from Attendee, Credit Organizer
+                        DB::transaction(function() use ($user, $event, $tokenCost) {
+                            // Atomic Check & Deduct
+                            $deducted = \App\Models\User::where('id', $user->id)
+                                ->where('token_balance', '>=', $tokenCost)
+                                ->decrement('token_balance', $tokenCost);
+
+                            if (!$deducted) {
+                                throw new \Exception('Insufficient tokens');
+                            }
+
+                            // Credit Organizer
+                            $event->creator->increment('token_balance', $tokenCost);
+
+                            // Log Transactions
+                            TokenTransaction::create([
+                                'user_id' => $user->id,
+                                'amount' => -$tokenCost,
+                                'type' => 'event_ticket',
+                                'description' => "Ticket for event: {$event->title}",
+                                'metadata' => ['event_id' => $event->id]
+                            ]);
+
+                            TokenTransaction::create([
+                                'user_id' => $event->created_by_user_id,
+                                'amount' => $tokenCost,
+                                'type' => 'event_revenue',
+                                'description' => "Ticket sale for: {$event->title}",
+                                'metadata' => ['event_id' => $event->id, 'attendee_id' => $user->id]
+                            ]);
+                        });
+
+                        $transactionId = 'token_' . uniqid();
+                    } catch (\Exception $e) {
+                        return response()->json(['error' => $e->getMessage()], 400);
+                    }
                 }
             } else {
-                // Stripe
+                // Stripe (Only checks fiat price)
+                if ($event->price <= 0) {
+                     return response()->json(['error' => 'This event has no fiat price.'], 400);
+                }
                 $paymentMethodId = $request->input('payment_method_id');
                 if (!$paymentMethodId) {
                         return response()->json(['error' => 'Payment method ID required for paid events'], 400);

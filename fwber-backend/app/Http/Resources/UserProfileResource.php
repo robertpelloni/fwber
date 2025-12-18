@@ -120,6 +120,8 @@ class UserProfileResource extends JsonResource
                             'url' => $photo->url,
                             'is_private' => (bool) $photo->is_private,
                             'is_primary' => (bool) $photo->is_primary,
+                            'unlock_price' => $photo->unlock_price,
+                            'is_unlocked' => $photo->is_unlocked,
                         ];
                     });
                 }),

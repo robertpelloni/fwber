@@ -808,6 +808,26 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
     -   **Fix**: Resolved `AIMatchingService` bug where `date_of_birth` was used instead of `birthdate`.
     -   **Verification**: Verified with `MatchInsightsTest`.
 
+### ✅ Crypto Economy Integration (Dec 15)
+1.  **Solana Bridge**:
+    -   **Backend**: Node.js scripts for on-chain interaction (`create_token.cjs`, `transfer_token.cjs`).
+    -   **Status**: Active on Devnet. Mint: `ALFbr2kBadQqMBbBiApg5SawiVJ67AMrukLm24mMCDbK`.
+    -   **API**: `TokenController` for wallet management, withdrawals, and leaderboards.
+2.  **Hybrid Wallet**:
+    -   **Concept**: "Trojan Horse" strategy with internal database ledger for instant, gas-free transfers + on-chain withdrawal.
+    -   **Frontend**: `WalletDashboard` with balance, history, and QR deposits.
+3.  **Token Utility**:
+    -   **Tipping**: P2P tipping via `TipButton` in Profiles and Chat.
+    -   **Premium/Boosts**: Purchase Gold/Boosts using tokens.
+    -   **Paid Events**: Token-gated events with P2P revenue sharing.
+    -   **Paid Content**: Token-gated photos with P2P unlocking.
+4.  **Gamification**:
+    -   **Daily Bonus**: `CheckDailyBonus` middleware awards tokens daily.
+    -   **Leaderboard**: Top Holders/Referrers/Wingmen ranking.
+5.  **Security**:
+    -   **Atomic Operations**: Race-condition-proof balance updates (`where(>=)->decrement`).
+    -   **Validation**: Regex validation for addresses and safe process execution.
+
 ### 🎯 Production Readiness Checklist
 1.  **Feature Flags**: All advanced features properly gated via `config/features.php`.
 2.  **API Documentation**: OpenAPI/Swagger docs available at `/api/docs`.
