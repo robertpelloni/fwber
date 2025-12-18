@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 - **Deployment**: Fixed `npm ci` failure on deployment environments by resolving `viem` peer dependency conflicts.
 - **Dependencies**: Added `viem` (2.23.11) to `fwber-frontend/package.json` to satisfy `@reown/appkit` requirements.
 - **Dependencies**: Upgraded `typescript` to latest (5.9.3) in `fwber-frontend` to satisfy `ox` peer dependency.
+- **Frontend**: Fixed `useMemo` dependency warning in `SolanaProvider`.
+- **Frontend**: Fixed TypeScript build error in `lib/e2e/crypto.ts` regarding `BufferSource` type mismatch.
 
 ## [0.2.6] - 2025-12-17
 

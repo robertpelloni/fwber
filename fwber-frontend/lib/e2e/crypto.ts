@@ -91,7 +91,7 @@ export async function encryptMessage(
       iv: iv,
     },
     sharedKey,
-    data
+    data as any
   );
 
   // Pack IV and Ciphertext into a portable format
@@ -121,7 +121,7 @@ export async function decryptMessage(
         iv: iv,
       },
       sharedKey,
-      data
+      data as any
     );
 
     const decoder = new TextDecoder();
