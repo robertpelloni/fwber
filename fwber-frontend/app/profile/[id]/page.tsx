@@ -9,6 +9,10 @@ import { getPublicProfile, type UserProfile } from '@/lib/api/profile';
 import { performMatchAction } from '@/lib/api/matches';
 import { api } from '@/lib/api/client';
 import { PresenceIndicator } from '@/components/realtime';
+import TipButton from '@/components/tipping/TipButton';
+import PhotoRevealGate from '@/components/PhotoRevealGate';
+import { RelationshipTier } from '@/lib/relationshipTiers';
+import { photoAPI } from '@/lib/api/photos';
 
 export default function PublicProfilePage() {
   const { id } = useParams();
@@ -74,6 +78,18 @@ export default function PublicProfilePage() {
     }
   };
 
+  const handleTokenUnlock = async (photoId: string) => {
+    try {
+      const res = await photoAPI.unlockPhoto(photoId);
+      if (res.success) {
+        alert(res.message);
+        loadProfile(); // Refresh
+      }
+    } catch (e: any) {
+      alert(e.message || 'Unlock failed');
+    }
+  };
+
   if (isLoading) return <div className="flex justify-center p-8">Loading...</div>;
   if (error) return <div className="text-red-500 p-8">{error}</div>;
   if (!profile) return <div className="p-8">Profile not found</div>;
@@ -84,39 +100,39 @@ export default function PublicProfilePage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
         <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden">
-          {/* Photo */}
-          <div className="relative h-96 w-full bg-gray-200">
-            {p.photos?.[0] ? (
-              <Image
-                src={p.photos[0].url}
-                alt={p.display_name || 'User'}
-                fill
-                className="object-cover"
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full text-4xl text-gray-400">
-                {p.display_name?.[0]}
-              </div>
-            )}
-            
-            {wingmanId && (
-              <div className="absolute top-4 left-4 bg-purple-600 text-white px-4 py-2 rounded-full shadow-lg animate-bounce">
-                🧚 Wingman Recommended!
-              </div>
-            )}
+          {/* Photo Gate */}
+          <div className="bg-gray-100 dark:bg-gray-800 p-4">
+             <PhotoRevealGate
+                photos={p.photos?.map(ph => ({
+                    id: String(ph.id),
+                    url: ph.url,
+                    isPrimary: ph.is_primary,
+                    type: 'real',
+                    isPrivate: ph.is_private,
+                    isUnlocked: ph.is_unlocked,
+                    unlockPrice: ph.unlock_price
+                })) || []}
+                currentTier={RelationshipTier.DISCOVERY}
+                onTokenUnlock={handleTokenUnlock}
+             />
           </div>
 
           {/* Info */}
           <div className="p-8">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                  {p.display_name}, {p.age}
-                  <PresenceIndicator userId={String(profile.id)} />
-                </h1>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {p.location?.city}, {p.location?.state}
-                </p>
+                <div className="flex justify-between items-center w-full">
+                  <div>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                      {p.display_name}, {p.age}
+                      <PresenceIndicator userId={String(profile.id)} />
+                    </h1>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      {p.location?.city}, {p.location?.state}
+                    </p>
+                  </div>
+                  <TipButton recipientId={profile.id} recipientName={p.display_name || 'User'} />
+                </div>
               </div>
             </div>
 

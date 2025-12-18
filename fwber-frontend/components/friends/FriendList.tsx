@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { PresenceIndicator } from '@/components/realtime';
+import TipButton from '@/components/tipping/TipButton';
 import { MessageSquare, User, Trash2 } from 'lucide-react';
 
 interface Friend {
@@ -62,6 +63,11 @@ export default function FriendList({ friends, onRemoveFriend }: FriendListProps)
           
           {/* Actions */}
           <div className="flex items-center gap-2">
+            <TipButton
+              recipientId={friend.id}
+              recipientName={friend.profile?.display_name || friend.name}
+              variant="compact"
+            />
             <Link
               href={`/messages?user=${friend.id}`}
               className="flex items-center gap-1 px-3 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg text-sm font-medium transition-colors"

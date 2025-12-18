@@ -39,7 +39,7 @@ export default function EventPaymentModal({ isOpen, onClose, event }: EventPayme
   };
 
   const tokenBalance = parseFloat(wallet?.balance || '0');
-  const tokenPrice = (event.price || 0) * 10; // 1 USD = 10 Tokens
+  const tokenPrice = event.token_cost ?? ((event.price || 0) * 10);
   const usdPrice = event.price || 0;
 
   return (
