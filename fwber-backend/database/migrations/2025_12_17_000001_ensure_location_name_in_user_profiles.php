@@ -12,8 +12,23 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user_profiles', function (Blueprint $table) {
+            // Ensure latitude exists
+            if (!Schema::hasColumn('user_profiles', 'latitude')) {
+                $table->decimal('latitude', 10, 8)->nullable();
+            }
+
+            // Ensure longitude exists
+            if (!Schema::hasColumn('user_profiles', 'longitude')) {
+                $table->decimal('longitude', 11, 8)->nullable();
+            }
+
+            // Ensure location_name exists
             if (!Schema::hasColumn('user_profiles', 'location_name')) {
-                $table->string('location_name')->nullable()->after('longitude');
+                if (Schema::hasColumn('user_profiles', 'longitude')) {
+                    $table->string('location_name')->nullable()->after('longitude');
+                } else {
+                    $table->string('location_name')->nullable();
+                }
             }
         });
     }
@@ -27,6 +42,7 @@ return new class extends Migration
             if (Schema::hasColumn('user_profiles', 'location_name')) {
                 $table->dropColumn('location_name');
             }
+            // We don't drop latitude/longitude here as they might have existed before
         });
     }
 };
