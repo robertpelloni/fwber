@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.7] - 2025-12-18
+
+### Fixed
+- **Deployment**: Fixed `npm ci` failure on deployment environments by resolving `viem` peer dependency conflicts.
+- **Dependencies**: Added `viem` (2.23.11) to `fwber-frontend/package.json` to satisfy `@reown/appkit` requirements.
+- **Dependencies**: Upgraded `typescript` to latest (5.9.3) in `fwber-frontend` to satisfy `ox` peer dependency.
+
 ## [0.2.6] - 2025-12-17
 
 ### Fixed

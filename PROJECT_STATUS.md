@@ -11,6 +11,14 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
 *   **SSL Verification**: Waiting for Let's Encrypt to validate `mercure.fwber.me`.
 *   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
 
+### ✅ Critical Fixes (Dec 18)
+1.  **Deployment Dependency Fix**:
+    -   **Issue**: `npm ci` failed on deployment environments due to `viem` peer dependency conflicts (`ELSPROBLEMS`) and `typescript` version mismatch.
+    -   **Fix**:
+        -   Added `viem` (2.23.11) to `fwber-frontend/package.json` to satisfy `@reown/appkit` requirements.
+        -   Upgraded `typescript` to latest (5.9.3) in `fwber-frontend` to satisfy `ox` peer dependency.
+    -   **Verification**: `npm list` confirms clean dependency tree.
+
 ### ✅ Critical Fixes (Dec 17 - Part 4)
 1.  **Windows Environment Stability**:
     -   **Issue**: Application crashed with `Class "Redis" not found` on Windows environments lacking the `phpredis` extension.
