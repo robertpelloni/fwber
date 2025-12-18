@@ -99,6 +99,8 @@ export interface UserProfile {
       url: string;
       is_private: boolean;
       is_primary: boolean;
+      is_unlocked?: boolean;
+      unlock_price?: number;
     }>;
     profile_complete: boolean;
     completion_percentage: number;

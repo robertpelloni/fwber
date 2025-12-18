@@ -21,6 +21,7 @@ class Group extends Model
         'is_active',
         'chatroom_id',
         'max_members',
+        'token_entry_fee',
     ];
 
     protected $casts = [
