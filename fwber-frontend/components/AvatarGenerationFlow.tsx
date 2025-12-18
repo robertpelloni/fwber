@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
-import { Loader2, Sparkles, RefreshCw, Check, X, Settings, Image as ImageIcon } from 'lucide-react';
+import { Loader2, Sparkles, RefreshCw, Check, X, Settings, Image as ImageIcon, Lock, Share2, Users } from 'lucide-react';
 import Image from 'next/image';
 import axios from 'axios';
 import { useWebSocket } from '@/lib/hooks/use-websocket';
+import { useAuth } from '@/lib/auth-context';
 
 interface AvatarGenerationProps {
   userId: number;
@@ -48,8 +49,26 @@ export default function AvatarGenerationFlow({
   const [customModel, setCustomModel] = useState<string>('');
   const [loraScale, setLoraScale] = useState<number>(0.8);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showReferralModal, setShowReferralModal] = useState(false);
 
+  const { user } = useAuth();
   const { messages, clearMessages } = useWebSocket();
+
+  const styleOptions = [
+    { id: 'realistic', name: 'Realistic' },
+    { id: 'anime', name: 'Anime' },
+    { id: 'fantasy', name: 'Fantasy' },
+    { id: 'sci-fi', name: 'Sci-Fi' },
+    { id: 'cartoon', name: 'Cartoon' },
+    { id: 'pixel-art', name: 'Pixel Art' },
+    { id: 'neon', name: 'Neon Cyberpunk', premium: true },
+    { id: 'oil-painting', name: 'Oil Painting', premium: true },
+  ];
+
+  const isStyleLocked = (option: any) => {
+    if (!option.premium) return false;
+    return (user?.referrals_count || 0) < 1;
+  };
 
   const queryClient = useQueryClient();
 
@@ -162,6 +181,13 @@ export default function AvatarGenerationFlow({
       }
     },
   });
+
+  const handleShare = () => {
+    if (!user?.referral_code) return;
+    const text = encodeURIComponent("Check out my AI Avatar on @FWBer! Sign up for 50 free tokens:");
+    const url = encodeURIComponent(`https://fwber.me/?ref=${user.referral_code}`);
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+  };
 
   const handleGenerate = () => {
     clearMessages();
@@ -457,21 +483,66 @@ export default function AvatarGenerationFlow({
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {['realistic', 'anime', 'fantasy', 'sci-fi', 'cartoon', 'pixel-art'].map((s) => (
-              <div
-                key={s}
-                onClick={() => setStyle(s)}
-                className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                  style === s ? 'border-purple-600 bg-purple-50' : 'border-gray-300'
-                }`}
-              >
-                <div className="w-full h-24 bg-gray-200 rounded-md mb-2 flex items-center justify-center">
-                  <span className="text-gray-500 text-sm">{s.replace('-', ' ')}</span>
+            {styleOptions.map((option) => {
+              const locked = isStyleLocked(option);
+              return (
+                <div
+                  key={option.id}
+                  onClick={() => {
+                    if (locked) {
+                        setShowReferralModal(true);
+                    } else {
+                        setStyle(option.id);
+                    }
+                  }}
+                  className={`relative p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                    style === option.id ? 'border-purple-600 bg-purple-50' : 'border-gray-300'
+                  } ${locked ? 'opacity-70 bg-gray-50' : 'hover:border-purple-300'}`}
+                >
+                  {locked && (
+                      <div className="absolute top-2 right-2 p-1 bg-gray-900/10 rounded-full z-10">
+                          <Lock className="w-4 h-4 text-gray-600" />
+                      </div>
+                  )}
+                  {option.premium && !locked && (
+                      <div className="absolute top-2 right-2 p-1 bg-yellow-100 rounded-full z-10">
+                          <Sparkles className="w-4 h-4 text-yellow-600" />
+                      </div>
+                  )}
+                  <div className="w-full h-24 bg-gray-200 rounded-md mb-2 flex items-center justify-center">
+                    <span className="text-gray-500 text-sm">{option.name}</span>
+                  </div>
+                  <p className="text-center font-medium capitalize">{option.name}</p>
                 </div>
-                <p className="text-center font-medium capitalize">{s.replace('-', ' ')}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
+
+          {showReferralModal && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                  <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl animate-in fade-in zoom-in duration-200">
+                      <div className="flex justify-between items-start mb-4">
+                          <div className="p-3 bg-purple-100 rounded-full">
+                            <Users className="w-6 h-6 text-purple-600" />
+                          </div>
+                          <button onClick={() => setShowReferralModal(false)} className="text-gray-400 hover:text-gray-600">
+                              <X className="w-5 h-5" />
+                          </button>
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">Unlock Premium Styles</h3>
+                      <p className="text-gray-600 mb-6">
+                          Invite just 1 friend to unlock Neon Cyberpunk, Oil Painting, and other premium styles forever.
+                      </p>
+                      <button
+                          onClick={handleShare}
+                          className="w-full py-3 bg-purple-600 text-white rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-purple-700 transition-colors"
+                      >
+                          <Share2 className="w-5 h-5" />
+                          Invite a Friend
+                      </button>
+                  </div>
+              </div>
+          )}
 
           {/* Advanced Settings Toggle */}
           <div className="border-t pt-4">
@@ -586,6 +657,16 @@ export default function AvatarGenerationFlow({
                 <Sparkles className="w-5 h-5" />
               </div>
             </div>
+          </div>
+
+          <div className="flex justify-center mb-6">
+             <button
+                onClick={handleShare}
+                className="w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+             >
+                <Share2 className="w-5 h-5" />
+                Share & Earn 50 $FWB
+             </button>
           </div>
 
           <div className="grid grid-cols-2 gap-4">

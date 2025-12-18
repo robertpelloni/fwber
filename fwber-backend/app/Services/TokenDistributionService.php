@@ -58,8 +58,8 @@ class TokenDistributionService
                     // Award Referrer
                     $this->awardTokens($referrer, self::REFERRAL_BONUS, 'referral_bonus', "Referral Bonus for user {$user->id}");
                     
-                    // Award Referee (extra bonus for being referred?)
-                    $this->awardTokens($user, 10, 'referral_accepted_bonus', "Bonus for using referral code");
+                    // Award Referee (Double-sided airdrop: both get 50)
+                    $this->awardTokens($user, self::REFERRAL_BONUS, 'referral_accepted_bonus', "Bonus for using referral code");
                 }
             }
         });

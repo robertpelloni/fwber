@@ -9,7 +9,8 @@ import SexQuote from '@/components/SexQuote'
 import PWAInstallPrompt from '@/components/PWAInstallPrompt'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { Shield, Heart, Zap, MapPin, MessageCircle, Users, Menu, X, Lock, Ghost, Layers, FileText, Code, Building2, CheckCircle2, Sparkles, GitMerge, Shirt, RefreshCw, Flame, Link as LinkIcon, Rainbow, Video, Gift } from 'lucide-react'
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
+import ReferralBanner from '@/components/ReferralBanner'
 
 export default function HomePage() {
   const { isAuthenticated, isLoading } = useAuth()
@@ -46,6 +47,9 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
+      <Suspense fallback={null}>
+        <ReferralBanner />
+      </Suspense>
       {/* Navigation */}
       <nav className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

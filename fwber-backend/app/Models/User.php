@@ -52,15 +52,9 @@ class User extends Authenticatable
 
     protected $appends = [
         'two_factor_enabled',
-        'referral_count',
     ];
 
     // Relationships
-
-    public function getReferralCountAttribute(): int
-    {
-        return $this->referrals()->count();
-    }
 
     public function referrer()
     {
