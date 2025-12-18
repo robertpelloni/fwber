@@ -27,10 +27,10 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://fwber.me'),
-  title: 'FWBer.me - Adult Social Network',
-  description: 'Adult Social Network - Friends, Dating, Hookups, Ads, Groups, Fun, Love, Lust, and More!',
-  keywords: ['dating', 'adult', 'matching', 'relationships', 'hookups', 'friends', 'groups', 'ads'],
-  authors: [{ name: 'FWBer.me Team' }],
+  title: 'FWBer - Join the Revolution in Adult Social Networking',
+  description: 'Sign up now to get 50 Tokens and 3 Days of Gold Premium! FWBer is the definitive privacy-first adult social network for dating, friends, and lifestyle matching.',
+  keywords: ['dating', 'adult', 'matching', 'relationships', 'hookups', 'friends', 'groups', 'ads', 'free tokens', 'premium dating', 'ai avatars', 'nsfw art'],
+  authors: [{ name: 'FWBer Team' }],
   manifest: '/manifest.json',
   icons: {
     icon: [
@@ -42,16 +42,16 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: 'FWBer.me - Adult Dating Platform',
-    description: 'A modern adult dating platform with advanced matching algorithms',
+    title: 'FWBer - Free Tokens for AI Avatars & Gold Premium!',
+    description: 'Sign up today to unlock 50 Tokens for custom AI Avatars and 3 Days of Gold Premium instantly. Join the revolution in adult social networking.',
     type: 'website',
     locale: 'en_US',
-    siteName: 'FWBer.me',
+    siteName: 'FWBer',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FWBer.me - Adult Dating Platform',
-    description: 'A modern adult dating platform with advanced matching algorithms',
+    title: 'FWBer - Get Free Tokens & Gold Premium!',
+    description: 'Sign up today to unlock 50 Tokens for custom AI Avatars and 3 Days of Gold Premium instantly.',
   },
   alternates: {
     types: {
