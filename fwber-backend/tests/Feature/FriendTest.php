@@ -113,7 +113,7 @@ class FriendTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonFragment(['name' => 'John Doe']);
         User::factory()->create(['name' => 'John Doe']);
-        User::factory()->create(['name' => 'Jane Doe']);
+        User::factory()->create(['name' => 'Jane Doe', 'email' => 'jane.doe@example.com']);
 
         $response = $this->actingAs($user)->getJson('/api/friends/search?query=John');
 
