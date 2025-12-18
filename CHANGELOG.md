@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - **Frontend**: Fixed TypeScript build error in `lib/e2e/crypto.ts` regarding `BufferSource` type mismatch.
 - **Frontend**: Fixed TypeScript build error in `lib/vault/crypto.ts` regarding `BufferSource` type mismatch.
 - **Frontend**: Added `pino-pretty` to `devDependencies` to resolve build warning.
+- **Frontend**: Updated `package-lock.json` to include `pino-pretty` and ensure sync with `package.json`.
 
 ## [0.2.6] - 2025-12-17
 
