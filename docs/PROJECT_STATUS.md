@@ -1,4 +1,4 @@
-# FWBer Project Status & Roadmap (November 24, 2025)
+# FWBer Project Status & Roadmap
 
 This document provides a single, authoritative overview of the "fwber" project's status, features, and roadmap. It is intended to be the primary source of truth for all contributors.
 
@@ -12,6 +12,7 @@ This document provides a single, authoritative overview of the "fwber" project's
 
 *   **Backend:** A RESTful API built with **Laravel 12** and **PHP 8.4**.
 *   **Frontend:** A responsive single-page application built with **Next.js 14**, **React 18**, and **TypeScript**.
+*   **Crypto:** **Solana Blockchain** integration (Devnet/Mainnet) via `@solana/web3.js`.
 *   **Real-time:** **Mercure** (built on Server-Sent Events) powers real-time chat, notifications, and location updates.
 *   **Database:** **MySQL 8.0**, with **SQLite** for testing and local development.
 *   **Environment:** The entire stack is containerized using **Docker**.
@@ -30,6 +31,11 @@ These features are considered complete and are ready for a production environmen
     *   [x] **Profile Management:** Create, edit, and view user profiles.
     *   [x] **Matching System:** The core "swipe" and matching logic is functional.
     *   [x] **Direct Messaging:** Real-time one-on-one chat between matched users.
+*   **Crypto Economy (New):**
+    *   [x] **Trojan Horse Integration:** Internal ledger for instant/free micro-transactions (Tips, Gifts, Photos).
+    *   [x] **Solana Bridge:** Users can withdraw accumulated tokens to external wallets (Phantom, Solflare).
+    *   [x] **Wallet Dashboard:** PWA-ready wallet UI with QR code deposits and transaction history.
+    *   [x] **Tokenomics:** Signup bonuses (Early Adopter Curve), Referral Rewards, and Daily Login Bonuses.
 *   **Safety & Security:**
     *   [x] **Geo-Spoofing Detection:** Protects against location manipulation.
     *   [x] **Moderation Dashboard:** Tools for moderators to review flagged content.
@@ -73,45 +79,3 @@ The immediate focus is on stabilizing the existing feature set and preparing for
     *   Establish a basic monitoring and alerting pipeline to track application health.
 
 This document should be updated as the project evolves. For more detailed technical information, refer to the OpenAPI documentation and the `docs/` directory.
-# Project Status & Roadmap
-
-This document provides a centralized, up-to-date overview of the project's status, roadmap, and key architectural decisions. It is intended to be the single source of truth for all contributors.
-
-## Current Status: In Progress
-
-- **Phase 1: Project Cleanup & Documentation Consolidation:** In Progress.
-- **Phase 2: Core Feature Implementation (Friends System):** Not Started.
-
-## Roadmap
-
-The following is a high-level overview of the planned features and their priorities.
-
-### P1: Core Social Features (Immediate Priority)
-
--   [ ] **Friends System:** Users can add, remove, and manage friends.
--   [ ] **User Profiles:** Enhance user profiles with more details (bio, interests, etc.).
--   [ ] **Real-time Chat:** Implement a real-time chat system for friends.
-
-### P2: Content & Interaction
-
--   [ ] **Content Feed:** A simple feed where users can see updates from their friends.
--   [ ] **Likes & Comments:** Users can like and comment on feed items.
--   [ ] **Notifications:** A system for notifying users of new friend requests, messages, and other interactions.
-
-### P3: Moderation & Safety
-
--   [ ] **Blocking:** Users can block other users.
--   [ ] **Reporting:** Users can report inappropriate content or behavior.
--   [ ] **Admin Panel:** A basic admin panel for managing users and content.
-
-## Key Architectural Decisions
-
--   **Backend:** Laravel (PHP) API.
--   **Frontend:** Next.js (React/TypeScript).
--   **Authentication:** JWT-based authentication.
--   **Database:** MySQL.
--   **Deployment:** Dockerized for portability.
-
-## Getting Started
-
-Please refer to the `README.md` files in the `fwber-backend` and `fwber-frontend` directories for instructions on how to set up and run the development environments.
