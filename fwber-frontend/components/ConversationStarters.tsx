@@ -88,8 +88,11 @@ export default function ConversationStarters() {
               disabled={isLoading}
               className="w-full bg-blue-500 text-white py-3 px-6 rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {isLoading ? 'Generating...' : 'Generate Starters'}
+              {isLoading ? 'Generating...' : 'Generate Starters (5 🪙)'}
             </button>
+            <p className="text-xs text-center text-gray-500 mt-2">
+                Generating conversation starters costs 5 tokens.
+            </p>
           </div>
         </div>
 
