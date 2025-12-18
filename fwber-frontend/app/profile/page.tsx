@@ -330,7 +330,7 @@ export default function ProfilePage() {
 
   // Photo upload handlers
   const handlePhotoUpload = async (
-    items: Array<{ file: File; isPrivate?: boolean }> | File[],
+    items: Array<{ file: File; isPrivate?: boolean; unlockPrice?: number }> | File[],
     onProgress?: (fileIndex: number, progress: number, fileName: string) => void
   ) => {
     try {

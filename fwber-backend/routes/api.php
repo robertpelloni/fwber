@@ -384,6 +384,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Token / Wallet
     Route::get('wallet', [\App\Http\Controllers\Api\TokenController::class, 'balance']);
+    Route::post('wallet/withdraw', [\App\Http\Controllers\Api\TokenController::class, 'withdraw']);
+    Route::post('wallet/transfer', [\App\Http\Controllers\Api\TokenController::class, 'transfer']);
     Route::post('wallet/address', [\App\Http\Controllers\Api\TokenController::class, 'updateAddress']);
     Route::get('leaderboard', [\App\Http\Controllers\Api\TokenController::class, 'leaderboard']);
 

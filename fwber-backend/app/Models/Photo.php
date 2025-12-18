@@ -40,6 +40,7 @@ class Photo extends Model
         'metadata',
         'original_path',
         'is_encrypted',
+        'unlock_price',
     ];
 
     /**
@@ -54,6 +55,7 @@ class Photo extends Model
         'width' => 'integer',
         'height' => 'integer',
         'sort_order' => 'integer',
+        'unlock_price' => 'decimal:2',
     ];
 
     /**

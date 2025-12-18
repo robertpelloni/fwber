@@ -223,8 +223,11 @@ export default function AIProfileBuilder({
             >
               {isGenerating || isLoading ? (
                 <span data-testid="generation-loading">Generating Profile...</span>
-              ) : 'Generate AI Profile'}
+              ) : 'Generate AI Profile (20 🪙)'}
             </button>
+            <p className="text-xs text-center text-gray-500 mt-2">
+                Generating an AI profile costs 20 tokens.
+            </p>
           </div>
         </div>
 
