@@ -26,7 +26,14 @@ def verify_vouch_loop():
             expect(safe_btn).to_be_visible()
 
             print("Clicking 'Trustworthy'...")
-            safe_btn.click()
+            # Verify backend API call
+            with page.expect_response("**/public/vouch") as response_info:
+                safe_btn.click()
+
+            response = response_info.value
+            print(f"Vouch API status: {response.status}")
+            if response.status != 200 and response.status != 429:
+                raise Exception(f"Vouch API failed with status {response.status}")
 
             print("Checking for success state...")
             success_msg = page.get_by_text("Vouch Recorded!")

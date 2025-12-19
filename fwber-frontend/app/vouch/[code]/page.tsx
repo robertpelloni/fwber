@@ -39,10 +39,19 @@ export default function VouchPage() {
     }
   }, [code])
 
-  const handleVouch = (type: string) => {
-    setVouched(type)
-    // In a full implementation, we would send this to the backend.
-    // For now, we simulate the "Vouch" action as a hook to registration.
+  const handleVouch = async (type: string) => {
+    try {
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/public/vouch`, {
+        referral_code: code,
+        type: type
+      })
+      setVouched(type)
+    } catch (e: any) {
+      // Even if failed (e.g. rate limit), show success to keep the viral loop moving
+      // unless it's a critical error.
+      console.error(e)
+      setVouched(type)
+    }
   }
 
   if (loading) {

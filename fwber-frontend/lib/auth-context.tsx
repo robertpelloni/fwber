@@ -14,6 +14,7 @@ interface User {
   two_factor_enabled?: boolean
   referral_code?: string
   referrals_count?: number
+  vouches_count?: number
   golden_tickets_remaining?: number
   token_balance?: number
   onboarding_completed_at?: string | null

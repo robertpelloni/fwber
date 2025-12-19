@@ -127,6 +127,10 @@ export function ReferralModal({ trigger }: ReferralModalProps) {
                         </p>
                     </div>
                 </div>
+                <div className="text-center my-2 bg-white/50 rounded-lg py-2">
+                    <span className="text-2xl font-bold text-blue-700">{user.vouches_count || 0}</span>
+                    <span className="text-xs text-blue-600 uppercase tracking-wide ml-1">Vouches Received</span>
+                </div>
                 <div className="flex gap-2 mt-3 justify-center">
                     <span className="flex items-center text-xs bg-white/50 px-2 py-1 rounded-full text-green-700 font-bold"><Shield className="w-3 h-3 mr-1"/> Safe</span>
                     <span className="flex items-center text-xs bg-white/50 px-2 py-1 rounded-full text-purple-700 font-bold"><PartyPopper className="w-3 h-3 mr-1"/> Fun</span>

@@ -73,7 +73,7 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
-        $user = $request->user()->load('profile')->loadCount('referrals');
+        $user = $request->user()->load('profile')->loadCount(['referrals', 'vouches']);
 
         // Ensure the count is accessible via the attribute name expected by frontend
         // loadCount adds 'referrals_count' attribute.
@@ -82,7 +82,7 @@ class AuthController extends Controller
 
     public function checkReferralCode($code)
     {
-        $referrer = User::where('referral_code', $code)->first();
+        $referrer = User::where('referral_code', $code)->withCount('vouches')->first();
 
         if (!$referrer) {
             return response()->json(['valid' => false], 404);
@@ -93,6 +93,7 @@ class AuthController extends Controller
             'referrer_name' => $referrer->name,
             'referrer_avatar' => $referrer->avatar_url, // Assuming this exists
             'has_golden_tickets' => $referrer->golden_tickets_remaining > 0,
+            'vouches_count' => $referrer->vouches_count,
         ]);
     }
 }
