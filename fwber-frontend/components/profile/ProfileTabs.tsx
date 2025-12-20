@@ -14,7 +14,6 @@ import PhotoUpload from '../PhotoUpload';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Camera } from 'lucide-react';
 import { Photo } from '@/lib/api/photos';
-import { ViralContentGenerator } from '@/components/viral/ViralContentGenerator';
 
 interface ProfileTabsProps {
   formData: any;
@@ -120,7 +119,6 @@ export default function ProfileTabs({
         </Tabs>
       ) : (
         <div className="space-y-6">
-          <ViralContentGenerator />
           <BasicInformation formData={formData} handleInputChange={() => {}} handleLocationChange={() => {}} />
           <Bio formData={formData} handleInputChange={() => {}} />
           <LookingFor formData={formData} handleLookingForChange={() => {}} />

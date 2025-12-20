@@ -610,10 +610,10 @@ EOT;
 
     protected function buildRoastPrompt(User $user, $profile, string $mode = 'roast'): string
     {
-        $bio = $profile?->bio ?? 'No bio provided.';
-        $interests = implode(', ', $profile?->interests ?? []);
-        $job = $profile?->occupation ?? 'Unemployed';
-        $age = $profile?->age ?? 'Unknown age';
+        $bio = $profile->bio ?? 'No bio provided.';
+        $interests = implode(', ', $profile->interests ?? []);
+        $job = $profile->occupation ?? 'Unemployed';
+        $age = $profile->age ?? 'Unknown age';
         
         $instruction = $mode === 'hype'
             ? "Write a hype intro for this person. Make them sound irresistible. Focus on their best qualities and spin their flaws into features."
@@ -634,10 +634,10 @@ EOT;
 
     protected function buildVibeCheckPrompt(User $user, $profile): string
     {
-        $bio = $profile?->bio ?? 'No bio provided.';
-        $interests = implode(', ', $profile?->interests ?? []);
-        $job = $profile?->occupation ?? 'Unknown';
-        $age = $profile?->age ?? 'Unknown';
+        $bio = $profile->bio ?? 'No bio provided.';
+        $interests = implode(', ', $profile->interests ?? []);
+        $job = $profile->occupation ?? 'Unknown';
+        $age = $profile->age ?? 'Unknown';
 
         return <<<EOT
 Analyze this dating profile and list "Green Flags" and "Red Flags".
@@ -658,10 +658,10 @@ EOT;
 
     protected function buildFortunePrompt(User $user, $profile): string
     {
-        $bio = $profile?->bio ?? 'No bio provided.';
-        $interests = implode(', ', $profile?->interests ?? []);
-        $job = $profile?->occupation ?? 'Unknown';
-        $age = $profile?->age ?? 'Unknown';
+        $bio = $profile->bio ?? 'No bio provided.';
+        $interests = implode(', ', $profile->interests ?? []);
+        $job = $profile->occupation ?? 'Unknown';
+        $age = $profile->age ?? 'Unknown';
 
         return <<<EOT
 Predict the romantic future for this person based on their profile.
@@ -679,11 +679,11 @@ EOT;
 
     protected function buildCosmicMatchPrompt(User $user, $profile): string
     {
-        $bio = $profile?->bio ?? 'No bio provided.';
-        $interests = implode(', ', $profile?->interests ?? []);
-        $job = $profile?->occupation ?? 'Unknown';
-        $age = $profile?->age ?? 'Unknown';
-        $zodiac = $profile?->zodiac_sign ?? 'Unknown';
+        $bio = $profile->bio ?? 'No bio provided.';
+        $interests = implode(', ', $profile->interests ?? []);
+        $job = $profile->occupation ?? 'Unknown';
+        $age = $profile->age ?? 'Unknown';
+        $zodiac = $profile->zodiac_sign ?? 'Unknown';
 
         return <<<EOT
 Analyze this dating profile and determine their "Cosmic Match" (Best Zodiac Sign) and "Cosmic Clash" (Worst Zodiac Sign).
@@ -779,11 +779,11 @@ EOT;
 
     protected function buildNemesisPrompt(User $user, $profile): string
     {
-        $bio = $profile?->bio ?? 'No bio provided.';
-        $interests = implode(', ', $profile?->interests ?? []);
-        $job = $profile?->occupation ?? 'Unknown';
-        $age = $profile?->age ?? 'Unknown';
-        $mbti = $profile?->mbti ?? 'Unknown'; // Assuming we might have this, or just infer it
+        $bio = $profile->bio ?? 'No bio provided.';
+        $interests = implode(', ', $profile->interests ?? []);
+        $job = $profile->occupation ?? 'Unknown';
+        $age = $profile->age ?? 'Unknown';
+        $mbti = $profile->mbti ?? 'Unknown'; // Assuming we might have this, or just infer it
 
         return <<<EOT
 Analyze this dating profile and construct their "Scientific Nemesis" (The person they are statistically least likely to succeed with).
