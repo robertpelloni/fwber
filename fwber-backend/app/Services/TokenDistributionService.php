@@ -4,8 +4,10 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\TokenTransaction;
+use App\Notifications\PushMessage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TokenDistributionService
 {
@@ -76,6 +78,18 @@ class TokenDistributionService
             'type' => $type,
             'description' => $description,
         ]);
+
+        try {
+            $user->notify(new PushMessage(
+                "💰 Tokens Received!",
+                "You received {$amount} tokens: {$description}",
+                "/wallet",
+                "wallet"
+            ));
+        } catch (\Exception $e) {
+            // Fail silently if notification service is down or configured incorrectly
+            Log::error("Notification failed in awardTokens: " . $e->getMessage());
+        }
     }
 
     public function spendTokens(User $user, float $amount, string $description): void

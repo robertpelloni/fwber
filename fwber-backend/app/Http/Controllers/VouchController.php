@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Vouch;
+use App\Notifications\PushMessage;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -53,6 +54,24 @@ class VouchController extends Controller
             'type' => $request->type,
             'ip_address' => $ip,
         ]);
+
+        try {
+            $emoji = match($request->type) {
+                'safe' => '🛡️',
+                'fun' => '🎉',
+                'hot' => '🔥',
+                default => '👍',
+            };
+
+            $user->notify(new PushMessage(
+                "New Vouch! $emoji",
+                "Someone verified you as {$request->type}!",
+                "/profile",
+                "social"
+            ));
+        } catch (\Exception $e) {
+            // Ignore notification failures
+        }
 
         return response()->json(['message' => 'Vouch recorded successfully.']);
     }

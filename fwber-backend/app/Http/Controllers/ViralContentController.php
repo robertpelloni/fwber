@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ViralContent;
+use App\Notifications\PushMessage;
 use Illuminate\Http\Request;
 
 class ViralContentController extends Controller
@@ -41,6 +42,17 @@ class ViralContentController extends Controller
                     ]);
                     
                     $content->update(['reward_claimed' => true]);
+
+                    try {
+                        $owner->notify(new PushMessage(
+                            "Viral Gold Unlocked! 🏆",
+                            "Your content is taking off! You've earned 24h of Gold status.",
+                            "/profile",
+                            "reward"
+                        ));
+                    } catch (\Exception $e) {
+                        // Ignore
+                    }
                 }
             }
         }
