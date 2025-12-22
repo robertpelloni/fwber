@@ -26,6 +26,7 @@ class Chatroom extends Model
         'message_count',
         'last_activity_at',
         'settings',
+        'token_entry_fee',
     ];
 
     protected $casts = [
