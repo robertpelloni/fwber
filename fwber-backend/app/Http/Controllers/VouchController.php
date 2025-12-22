@@ -5,11 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Vouch;
 use App\Notifications\PushMessage;
+use App\Services\AchievementService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class VouchController extends Controller
 {
+    protected $achievementService;
+
+    public function __construct(AchievementService $achievementService)
+    {
+        $this->achievementService = $achievementService;
+    }
+
     /**
      * @OA\Post(
      *     path="/public/vouch",
@@ -54,6 +62,13 @@ class VouchController extends Controller
             'type' => $request->type,
             'ip_address' => $ip,
         ]);
+
+        try {
+            $vouchCount = $user->vouches()->count();
+            $this->achievementService->checkAndUnlock($user, 'vouches_received', $vouchCount);
+        } catch (\Exception $e) {
+            // Ignore achievement check failures
+        }
 
         try {
             $emoji = match($request->type) {

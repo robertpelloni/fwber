@@ -59,6 +59,15 @@ class TokenDistributionService
 
                     // Award Referrer
                     $this->awardTokens($referrer, self::REFERRAL_BONUS, 'referral_bonus', "Referral Bonus for user {$user->id}");
+
+                    // Check for Referral Achievements
+                    try {
+                        $achievementService = app(\App\Services\AchievementService::class);
+                        $referralCount = $referrer->referrals()->count();
+                        $achievementService->checkAndUnlock($referrer, 'referrals_count', $referralCount);
+                    } catch (\Exception $e) {
+                        Log::error("Achievement check failed: " . $e->getMessage());
+                    }
                     
                     // Award Referee (Double-sided airdrop: both get 50)
                     $this->awardTokens($user, self::REFERRAL_BONUS, 'referral_accepted_bonus', "Bonus for using referral code");
