@@ -30,8 +30,8 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL('https://fwber.me'),
   title: 'FWBer.me - Adult Social Network - Join the Revolution in Adult Social Networking',
-  description: 'Adult Social Network - Friends, Dating, Hookups, Ads, Groups, Fun, Love, Lust, and More! Sign up now to get 50 Tokens and 3 Days of Gold Premium! FWBer is the definitive privacy-first adult social network for dating, friends, and lifestyle matching.',
-  keywords: ['dating', 'adult', 'matching', 'relationships', 'hookups', 'friends', 'groups', 'ads', 'free tokens', 'premium dating'],
+  description: 'Adult Social Network - Friends, Dating, Hookups, Ads, Groups, Fun, Love, Lust, and More! Sign up now to get 50 Tokens for AI Avatars and 3 Days of Gold Premium! FWBer is the definitive privacy-first adult social network for dating, friends, and lifestyle matching.',
+  keywords: ['dating', 'adult', 'matching', 'relationships', 'hookups', 'friends', 'groups', 'ads', 'free tokens', 'premium dating', 'ai avatars', 'nsfw art'],
   authors: [{ name: 'FWBer.me Team' }],
   manifest: '/manifest.json',
   icons: {
@@ -44,16 +44,16 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: 'FWBer.me - Adult Social Network - Join the Revolution & Get Free Gold Premium!',
-    description: 'Sign up today with a referral link to unlock 50 Tokens and 3 Days of Gold Premium instantly. Experience the best in adult social networking.',
+    title: 'FWBer.me - Adult Social Network - Free Tokens for AI Avatars & Gold Premium!',
+    description: 'Sign up today with a referral link to unlock 50 Tokens for custom AI Avatars and 3 Days of Gold Premium instantly. Experience the best in adult social networking.',
     type: 'website',
     locale: 'en_US',
-    siteName: 'FWBer.me',
+    siteName: 'FWBer',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FWBer.me - Adult Social Network - Get Free Gold Premium!',
-    description: 'Sign up today with a referral link to unlock 50 Tokens and 3 Days of Gold Premium instantly.',
+    title: 'FWBer.me - Adult Social Network - Get Free Tokens & Gold Premium!',
+    description: 'Sign up today to unlock 50 Tokens for custom AI Avatars and 3 Days of Gold Premium instantly.',
   },
   alternates: {
     types: {

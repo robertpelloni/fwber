@@ -3,10 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\ViralContent;
+use App\Notifications\PushMessage;
+use App\Services\AchievementService;
 use Illuminate\Http\Request;
 
 class ViralContentController extends Controller
 {
+    protected $achievementService;
+
+    public function __construct(AchievementService $achievementService)
+    {
+        $this->achievementService = $achievementService;
+    }
+
     /**
      * Retrieve viral content by its UUID.
      *
@@ -41,6 +50,23 @@ class ViralContentController extends Controller
                     ]);
                     
                     $content->update(['reward_claimed' => true]);
+
+                    try {
+                        $this->achievementService->checkAndUnlock($owner, 'viral_views', $content->views);
+                    } catch (\Exception $e) {
+                        // Ignore
+                    }
+
+                    try {
+                        $owner->notify(new PushMessage(
+                            "Viral Gold Unlocked! 🏆",
+                            "Your content is taking off! You've earned 24h of Gold status.",
+                            "/profile",
+                            "reward"
+                        ));
+                    } catch (\Exception $e) {
+                        // Ignore
+                    }
                 }
             }
         }

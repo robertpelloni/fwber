@@ -9,9 +9,10 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/lib/hooks/use-toast';
-import { Gift, Copy, Ticket, Users, Twitter, Mail, MessageCircle, Share2 } from 'lucide-react';
+import { Gift, Copy, Ticket, Users, Twitter, Mail, MessageCircle, Share2, Shield, Flame, PartyPopper } from 'lucide-react';
 
 interface ReferralModalProps {
   trigger?: React.ReactNode;
@@ -24,48 +25,22 @@ export function ReferralModal({ trigger }: ReferralModalProps) {
 
   if (!user) return null;
 
-  const referralLink = typeof window !== 'undefined' 
-    ? `${window.location.origin}/register?ref=${user.referral_code}`
-    : `https://fwber.me/register?ref=${user.referral_code}`;
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://fwber.me';
+  const referralLink = `${origin}/register?ref=${user.referral_code}`;
+  const vouchLink = `${origin}/vouch/${user.referral_code}`;
 
-  const shareText = "🔥 Join me on FWBer! Use my link to get 50 Tokens and 3 Days of Gold Premium instantly. Don't miss out!";
-  const encodedText = encodeURIComponent(shareText);
-  const encodedLink = encodeURIComponent(referralLink);
+  const shareText = "🔥 Join me on FWBer! Use my link to get 50 Tokens and 3 Days of Gold Premium instantly.";
+  const vouchText = "Can you vouch for me? I'm building my reputation on FWBer. Click to verify I'm legit!";
 
-  const shareLinks = [
-    { 
-      name: 'X / Twitter', 
-      icon: Twitter, 
-      url: `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedLink}`,
-      color: 'hover:text-blue-400'
-    },
-    { 
-      name: 'WhatsApp', 
-      icon: MessageCircle, 
-      url: `https://wa.me/?text=${encodedText}%20${encodedLink}`,
-      color: 'hover:text-green-500'
-    },
-    { 
-      name: 'Email', 
-      icon: Mail, 
-      url: `mailto:?subject=Join me on FWBer&body=${shareText}%0A%0A${referralLink}`,
-      color: 'hover:text-red-500'
-    },
-  ];
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(referralLink);
-    success('Referral link copied to clipboard.');
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    success('Link copied to clipboard.');
   };
 
-  const handleNativeShare = async () => {
-    if (navigator.share) {
+  const handleNativeShare = async (title: string, text: string, url: string) => {
+    if (typeof navigator !== 'undefined' && navigator.share) {
       try {
-        await navigator.share({
-          title: 'Join me on FWBer',
-          text: shareText,
-          url: referralLink,
-        });
+        await navigator.share({ title, text, url });
       } catch (err) {
         console.error('Error sharing:', err);
       }
@@ -78,7 +53,7 @@ export function ReferralModal({ trigger }: ReferralModalProps) {
         {trigger || (
           <Button variant="outline" className="gap-2">
             <Gift className="w-4 h-4" />
-            Invite Friends
+            Invite & Earn
           </Button>
         )}
       </DialogTrigger>
@@ -86,90 +61,120 @@ export function ReferralModal({ trigger }: ReferralModalProps) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Gift className="w-6 h-6 text-primary" />
-            Invite Friends & Earn Rewards
+            Viral Rewards
           </DialogTitle>
           <DialogDescription>
-            Share the love and get rewarded! Earn 50 Tokens for every friend who joins.
+            Grow your network and earn tokens by inviting friends.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-6 py-4">
-          {/* Golden Ticket Section */}
-          <div className="bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900/20 dark:to-yellow-900/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-amber-500 rounded-full text-white">
-                <Ticket className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="font-bold text-amber-900 dark:text-amber-100">Golden Tickets</h4>
-                <p className="text-sm text-amber-700 dark:text-amber-300">
-                  You have <span className="font-bold">{user.golden_tickets_remaining || 0}</span> Golden Tickets remaining.
+        <Tabs defaultValue="invite" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="invite">Invite Friends</TabsTrigger>
+            <TabsTrigger value="vouch">Get Vouched</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="invite" className="space-y-4 py-4">
+             {/* Golden Ticket Section */}
+            <div className="bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900/20 dark:to-yellow-900/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
+                <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-amber-500 rounded-full text-white">
+                    <Ticket className="w-5 h-5" />
+                </div>
+                <div>
+                    <h4 className="font-bold text-amber-900 dark:text-amber-100">Golden Tickets</h4>
+                    <p className="text-sm text-amber-700 dark:text-amber-300">
+                    <span className="font-bold">{user.golden_tickets_remaining || 0}</span> tickets remaining.
+                    </p>
+                </div>
+                </div>
+                <p className="text-xs text-amber-800 dark:text-amber-200 mt-2">
+                Friends get <strong>3 Days of Gold Premium</strong> instantly!
                 </p>
-              </div>
             </div>
-            <p className="text-xs text-amber-800 dark:text-amber-200 mt-2">
-              Friends who sign up with your link get <strong>3 Days of Gold Premium</strong> instantly!
-            </p>
-          </div>
 
-          {/* Share Buttons */}
-          <div className="flex justify-center gap-4">
-            {shareLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`p-3 rounded-full bg-muted hover:bg-muted/80 transition-colors ${link.color}`}
-                title={`Share on ${link.name}`}
-              >
-                <link.icon className="w-5 h-5" />
-              </a>
-            ))}
-            {typeof navigator !== 'undefined' && 'share' in navigator && (
-              <button
-                onClick={handleNativeShare}
-                className="p-3 rounded-full bg-muted hover:bg-muted/80 transition-colors hover:text-primary"
-                title="More Options"
-              >
-                <Share2 className="w-5 h-5" />
-              </button>
-            )}
-          </div>
-
-          {/* Referral Link Section */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Your Unique Referral Link</label>
-            <div className="flex items-center gap-2">
-              <Input 
-                readOnly 
-                value={referralLink} 
-                className="font-mono text-sm bg-muted"
-              />
-              <Button size="icon" onClick={copyToClipboard}>
-                <Copy className="w-4 h-4" />
-              </Button>
+            <div className="space-y-2">
+                <label className="text-sm font-medium">Your Invite Link</label>
+                <div className="flex items-center gap-2">
+                <Input readOnly value={referralLink} className="font-mono text-sm bg-muted" />
+                <Button size="icon" onClick={() => copyToClipboard(referralLink)}>
+                    <Copy className="w-4 h-4" />
+                </Button>
+                </div>
             </div>
-          </div>
 
-          {/* Stats Section */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-muted p-3 rounded-lg text-center">
-              <div className="text-2xl font-bold text-primary">{user.token_balance || 0}</div>
-              <div className="text-xs text-muted-foreground">Your Tokens</div>
+            <div className="flex gap-2 justify-center">
+                 <Button variant="outline" size="sm" className="gap-2" onClick={() => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(referralLink)}`, '_blank')}>
+                    <Twitter className="w-4 h-4" /> Post
+                 </Button>
+                 <Button variant="outline" size="sm" className="gap-2" onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + referralLink)}`, '_blank')}>
+                    <MessageCircle className="w-4 h-4" /> Chat
+                 </Button>
+                 <Button variant="outline" size="sm" className="gap-2" onClick={() => handleNativeShare('Join FWBer', shareText, referralLink)}>
+                    <Share2 className="w-4 h-4" /> Share
+                 </Button>
             </div>
-            <div className="bg-muted p-3 rounded-lg text-center">
-              <div className="text-2xl font-bold text-primary flex items-center justify-center gap-1">
+          </TabsContent>
+
+          <TabsContent value="vouch" className="space-y-4 py-4">
+             <div className="bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                <div className="flex items-center gap-3 mb-2">
+                    <Shield className="w-8 h-8 text-blue-600" />
+                    <div>
+                        <h4 className="font-bold text-blue-900 dark:text-blue-100">Build Your Reputation</h4>
+                        <p className="text-sm text-blue-800 dark:text-blue-200">
+                            Ask friends to vouch for you as <strong>Safe</strong>, <strong>Fun</strong>, or <strong>Hot</strong>.
+                        </p>
+                    </div>
+                </div>
+                <div className="text-center my-2 bg-white/50 rounded-lg py-2">
+                    <span className="text-2xl font-bold text-blue-700">{user.vouches_count || 0}</span>
+                    <span className="text-xs text-blue-600 uppercase tracking-wide ml-1">Vouches Received</span>
+                </div>
+                <div className="flex gap-2 mt-3 justify-center">
+                    <span className="flex items-center text-xs bg-white/50 px-2 py-1 rounded-full text-green-700 font-bold"><Shield className="w-3 h-3 mr-1"/> Safe</span>
+                    <span className="flex items-center text-xs bg-white/50 px-2 py-1 rounded-full text-purple-700 font-bold"><PartyPopper className="w-3 h-3 mr-1"/> Fun</span>
+                    <span className="flex items-center text-xs bg-white/50 px-2 py-1 rounded-full text-orange-700 font-bold"><Flame className="w-3 h-3 mr-1"/> Hot</span>
+                </div>
+            </div>
+
+            <div className="space-y-2">
+                <label className="text-sm font-medium">Your Vouch Link</label>
+                <div className="flex items-center gap-2">
+                <Input readOnly value={vouchLink} className="font-mono text-sm bg-muted" />
+                <Button size="icon" onClick={() => copyToClipboard(vouchLink)}>
+                    <Copy className="w-4 h-4" />
+                </Button>
+                </div>
+            </div>
+
+            <div className="flex gap-2 justify-center">
+                 <Button variant="outline" size="sm" className="gap-2" onClick={() => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(vouchText)}&url=${encodeURIComponent(vouchLink)}`, '_blank')}>
+                    <Twitter className="w-4 h-4" /> Ask
+                 </Button>
+                 <Button variant="outline" size="sm" className="gap-2" onClick={() => window.open(`mailto:?subject=Vouch for me?&body=${encodeURIComponent(vouchText + '\n\n' + vouchLink)}`, '_blank')}>
+                    <Mail className="w-4 h-4" /> Email
+                 </Button>
+                 <Button variant="outline" size="sm" className="gap-2" onClick={() => handleNativeShare('Vouch for Me', vouchText, vouchLink)}>
+                    <Share2 className="w-4 h-4" /> Share
+                 </Button>
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        {/* Stats Footer */}
+        <div className="border-t pt-4 grid grid-cols-2 gap-4">
+            <div className="bg-muted p-2 rounded text-center">
+              <div className="text-xl font-bold text-primary">{user.token_balance || 0}</div>
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Tokens</div>
+            </div>
+            <div className="bg-muted p-2 rounded text-center">
+              <div className="text-xl font-bold text-primary flex items-center justify-center gap-1">
                 {user.referrals_count || 0}
                 <Users className="w-4 h-4" />
               </div>
-              <div className="text-xs text-muted-foreground">Friends Invited</div>
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Invites</div>
             </div>
-          </div>
-        </div>
-
-        <div className="flex justify-end">
-          <Button onClick={() => setIsOpen(false)}>Close</Button>
         </div>
       </DialogContent>
     </Dialog>

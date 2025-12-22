@@ -4,8 +4,10 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\TokenTransaction;
+use App\Notifications\PushMessage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TokenDistributionService
 {
@@ -57,9 +59,18 @@ class TokenDistributionService
 
                     // Award Referrer
                     $this->awardTokens($referrer, self::REFERRAL_BONUS, 'referral_bonus', "Referral Bonus for user {$user->id}");
+
+                    // Check for Referral Achievements
+                    try {
+                        $achievementService = app(\App\Services\AchievementService::class);
+                        $referralCount = $referrer->referrals()->count();
+                        $achievementService->checkAndUnlock($referrer, 'referrals_count', $referralCount);
+                    } catch (\Exception $e) {
+                        Log::error("Achievement check failed: " . $e->getMessage());
+                    }
                     
-                    // Award Referee (extra bonus for being referred?)
-                    $this->awardTokens($user, 10, 'referral_accepted_bonus', "Bonus for using referral code");
+                    // Award Referee (Double-sided airdrop: both get 50)
+                    $this->awardTokens($user, self::REFERRAL_BONUS, 'referral_accepted_bonus', "Bonus for using referral code");
                 }
             }
         });
@@ -76,6 +87,18 @@ class TokenDistributionService
             'type' => $type,
             'description' => $description,
         ]);
+
+        try {
+            $user->notify(new PushMessage(
+                "💰 Tokens Received!",
+                "You received {$amount} tokens: {$description}",
+                "/wallet",
+                "wallet"
+            ));
+        } catch (\Exception $e) {
+            // Fail silently if notification service is down or configured incorrectly
+            Log::error("Notification failed in awardTokens: " . $e->getMessage());
+        }
     }
 
     public function spendTokens(User $user, float $amount, string $description): void

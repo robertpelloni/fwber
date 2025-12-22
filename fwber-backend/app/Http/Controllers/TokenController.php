@@ -191,10 +191,22 @@ class TokenController extends Controller
                 ];
             });
 
+        $topVouched = User::withCount('vouches')
+            ->orderByDesc('vouches_count')
+            ->take(10)
+            ->get(['id', 'name'])
+            ->map(function ($user) {
+                return [
+                    'name' => substr($user->name, 0, 3) . '***',
+                    'vouches' => $user->vouches_count,
+                ];
+            });
+
         return response()->json([
             'top_holders' => $topHolders,
             'top_referrers' => $topReferrers,
             'top_wingmen' => $topWingmen,
+            'top_vouched' => $topVouched,
         ]);
     }
 }

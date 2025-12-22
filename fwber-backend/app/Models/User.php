@@ -66,6 +66,11 @@ class User extends Authenticatable
         return $this->hasMany(User::class, 'referrer_id');
     }
 
+    public function vouches()
+    {
+        return $this->hasMany(Vouch::class, 'to_user_id');
+    }
+
     public function tokenTransactions()
     {
         return $this->hasMany(TokenTransaction::class);
