@@ -239,6 +239,10 @@ export function getErrorMessage(error: ApiError): string {
       case HttpStatus.BAD_GATEWAY:
       case HttpStatus.SERVICE_UNAVAILABLE:
       case HttpStatus.GATEWAY_TIMEOUT:
+        // In development, show the actual error message
+        if (process.env.NODE_ENV === 'development' && error.message) {
+          return `Server Error: ${error.message}`;
+        }
         return 'Server error. Please try again later.';
       default:
         return error.message;

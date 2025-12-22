@@ -47,6 +47,132 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 94.1%;
   }
+
+  /* Speakeasy Theme */
+  [data-theme-style="speakeasy"] {
+    --background: 60 56% 91%; /* Beige */
+    --foreground: 0 0% 20%;
+    --card: 60 56% 95%;
+    --card-foreground: 0 0% 20%;
+    --popover: 60 56% 95%;
+    --popover-foreground: 0 0% 20%;
+    --primary: 30 61% 50%; /* Bronze */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 40 20% 90%;
+    --secondary-foreground: 0 0% 20%;
+    --muted: 40 20% 85%;
+    --muted-foreground: 0 0% 40%;
+    --accent: 30 61% 50%;
+    --accent-foreground: 0 0% 100%;
+    --border: 30 30% 80%;
+    --input: 30 30% 80%;
+    --ring: 30 61% 50%;
+    --radius: 0.25rem; /* Sharper corners */
+  }
+
+  [data-theme-style="speakeasy"].dark {
+    --background: 0 0% 7%; /* Charcoal */
+    --foreground: 46 65% 90%; /* Light Gold */
+    --card: 0 0% 10%;
+    --card-foreground: 46 65% 90%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 46 65% 90%;
+    --primary: 46 65% 52%; /* Gold */
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 46 65% 90%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 46 40% 60%;
+    --accent: 46 65% 52%;
+    --accent-foreground: 0 0% 0%;
+    --border: 46 30% 20%;
+    --input: 46 30% 20%;
+    --ring: 46 65% 52%;
+  }
+
+  /* Neon Theme */
+  [data-theme-style="neon"] {
+    --background: 290 45% 96%; /* Light Lavender */
+    --foreground: 270 76% 10%;
+    --card: 290 45% 98%;
+    --card-foreground: 270 76% 10%;
+    --popover: 290 45% 98%;
+    --popover-foreground: 270 76% 10%;
+    --primary: 291 64% 42%; /* Purple */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 184 100% 40%; /* Dark Cyan */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 290 20% 90%;
+    --muted-foreground: 270 40% 40%;
+    --accent: 324 100% 45%; /* Pink */
+    --accent-foreground: 0 0% 100%;
+    --border: 291 30% 80%;
+    --input: 291 30% 80%;
+    --ring: 291 64% 42%;
+    --radius: 1rem; /* Rounded */
+  }
+
+  [data-theme-style="neon"].dark {
+    --background: 270 76% 10%; /* Deep Purple */
+    --foreground: 184 100% 90%; /* Light Cyan */
+    --card: 270 76% 13%;
+    --card-foreground: 184 100% 90%;
+    --popover: 270 76% 13%;
+    --popover-foreground: 184 100% 90%;
+    --primary: 184 100% 50%; /* Cyan */
+    --primary-foreground: 270 76% 10%;
+    --secondary: 324 100% 50%; /* Hot Pink */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 270 50% 20%;
+    --muted-foreground: 184 60% 70%;
+    --accent: 324 100% 50%;
+    --accent-foreground: 0 0% 100%;
+    --border: 184 50% 30%;
+    --input: 184 50% 30%;
+    --ring: 184 100% 50%;
+  }
+
+  /* Clean Theme */
+  [data-theme-style="clean"] {
+    --background: 240 5% 98%; /* Off-white */
+    --foreground: 200 19% 18%; /* Dark Slate */
+    --card: 0 0% 100%;
+    --card-foreground: 200 19% 18%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 200 19% 18%;
+    --primary: 174 100% 29%; /* Teal */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 93%;
+    --secondary-foreground: 200 19% 18%;
+    --muted: 240 5% 93%;
+    --muted-foreground: 200 10% 50%;
+    --accent: 14 100% 57%; /* Burnt Orange */
+    --accent-foreground: 0 0% 100%;
+    --border: 200 10% 85%;
+    --input: 200 10% 85%;
+    --ring: 174 100% 29%;
+    --radius: 0.75rem;
+  }
+
+  [data-theme-style="clean"].dark {
+    --background: 200 19% 18%; /* Dark Slate */
+    --foreground: 240 5% 98%;
+    --card: 200 19% 22%;
+    --card-foreground: 240 5% 98%;
+    --popover: 200 19% 22%;
+    --popover-foreground: 240 5% 98%;
+    --primary: 174 42% 65%; /* Light Teal */
+    --primary-foreground: 200 19% 18%;
+    --secondary: 200 19% 25%;
+    --secondary-foreground: 240 5% 98%;
+    --muted: 200 19% 25%;
+    --muted-foreground: 200 10% 70%;
+    --accent: 14 80% 65%; /* Light Orange */
+    --accent-foreground: 200 19% 18%;
+    --border: 200 10% 30%;
+    --input: 200 10% 30%;
+    --ring: 174 42% 65%;
+  }
 }
 
 @layer base {

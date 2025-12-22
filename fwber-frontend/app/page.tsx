@@ -8,13 +8,14 @@ import { Logo } from '@/components/Logo'
 import SexQuote from '@/components/SexQuote'
 import PWAInstallPrompt from '@/components/PWAInstallPrompt'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { Shield, Heart, Zap, MapPin, MessageCircle, Users, Menu, X, Lock, Ghost, Layers, FileText, Code, Building2, CheckCircle2, Sparkles, GitMerge, Shirt, RefreshCw, Flame, Link as LinkIcon, Rainbow, Video, Gift } from 'lucide-react'
+import { useThemeStyle } from '@/components/ThemeProvider'
+import { Shield, Heart, Zap, MapPin, MessageCircle, Users, Menu, X, Lock, Ghost, Layers, FileText, Code, Building2, CheckCircle2, Sparkles, GitMerge, Shirt, RefreshCw, Flame, Link as LinkIcon, Rainbow, Video, Gift, Home, UserPlus, Star } from 'lucide-react'
 import { useState } from 'react'
 
 export default function HomePage() {
   const { isAuthenticated, isLoading } = useAuth()
   const router = useRouter()
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { themeStyle } = useThemeStyle()
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
@@ -71,40 +72,21 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Mobile menu button */}
+            {/* Mobile Theme Toggle */}
             <div className="md:hidden flex items-center gap-4">
               <ThemeToggle />
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-gray-600 hover:text-gray-900 focus:outline-none dark:text-gray-300 dark:hover:text-white"
-              >
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </button>
             </div>
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 py-4">
-            <div className="flex flex-col space-y-4 px-4">
-              <Link href="#features" className="text-gray-600 dark:text-gray-300 font-medium">Features</Link>
-              <Link href="#safety" className="text-gray-600 dark:text-gray-300 font-medium">Safety</Link>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600 dark:text-gray-300 font-medium">Theme</span>
-                <ThemeToggle />
-              </div>
-              <Link href="/login" className="text-gray-900 dark:text-white font-medium">Log in</Link>
-              <Link href="/register" className="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-medium text-center">
-                Sign up
-              </Link>
-            </div>
-          </div>
-        )}
       </nav>
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 pt-16 pb-4 lg:pt-32 lg:pb-8">
+      <div className={`relative overflow-hidden pt-16 pb-4 lg:pt-32 lg:pb-8 transition-colors duration-500
+        ${themeStyle === 'speakeasy' ? 'bg-gradient-to-b from-stone-100 to-stone-50 dark:from-stone-950 dark:to-black' : ''}
+        ${themeStyle === 'neon' ? 'bg-gradient-to-b from-slate-900 via-purple-900/10 to-black dark:from-black dark:via-purple-900/10 dark:to-black' : ''}
+        ${themeStyle === 'clean' ? 'bg-white dark:bg-gray-50' : ''}
+        ${themeStyle === 'classic' ? 'bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800' : ''}
+      `}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
             <div className="mb-6 flex justify-center">
@@ -112,16 +94,16 @@ export default function HomePage() {
             </div>
             
             <h2 className="text-3xl md:text-5xl font-bold mb-4 animate-gradient-x bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent bg-[length:200%_auto]">
-              Adult Social Network
+              Real Connections. Zero Trace.
             </h2>
             
             <p className="text-lg md:text-xl font-medium text-black dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-              Friends, Dating, Hookups, Ads, Groups, Fun, Love, Lust, and More!
+              The open-source adult network built on privacy. Meet locals, verify with AI, and chat with end-to-end encryption.
             </p>
             
             <div className="mb-8 transform hover:scale-105 transition-transform duration-300">
               <p className="text-2xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 font-serif italic drop-shadow-sm">
-                &ldquo;Everybody wants to get laid.&rdquo;
+                &ldquo;Connect freely. Date privately.&rdquo;
               </p>
             </div>
 
@@ -141,7 +123,7 @@ export default function HomePage() {
                 className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-10 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
               >
                 <Heart className="w-5 h-5 mr-2 fill-current" />
-                Start Dating Now
+                Create Anonymous Account
               </Link>
               <Link
                 href="/login"
@@ -153,18 +135,12 @@ export default function HomePage() {
 
             <div className="mt-12 pt-8 border-t border-gray-200/60 dark:border-gray-700/60">
               <p className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-6">
-                Inclusive Community Support
+                A Community for Every Orientation and Identity
               </p>
               <div className="flex flex-wrap justify-center gap-3">
                 {[
-                  { name: 'Straight', icon: Users },
-                  { name: 'Couples', icon: Heart },
-                  { name: 'Bisexual', icon: GitMerge },
-                  { name: 'Gay', icon: Rainbow },
-                  { name: 'Trans', icon: Sparkles },
-                  { name: 'Crossdress', icon: Shirt },
-                  { name: 'Swingers', icon: RefreshCw },
-                  { name: 'Mild to Wild', icon: Flame },
+                  { name: 'Inclusive', icon: Users },
+                  { name: 'Kink-Friendly', icon: Flame },
                   { name: 'Sex Positive', icon: CheckCircle2 },
                   { name: 'Safer Sex Workers', icon: Shield },
                   { name: 'Fetish Community Support', icon: LinkIcon },
@@ -183,8 +159,18 @@ export default function HomePage() {
         </div>
         
         {/* Decorative blobs */}
-        <div className="absolute top-0 left-0 -ml-20 -mt-20 w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
-        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div className={`absolute top-0 left-0 -ml-20 -mt-20 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob transition-colors duration-500
+          ${themeStyle === 'clean' ? 'hidden' : ''}
+          ${themeStyle === 'speakeasy' ? 'bg-amber-200 dark:bg-amber-900/20' : ''}
+          ${themeStyle === 'neon' ? 'bg-fuchsia-500/30 dark:bg-fuchsia-600/20' : ''}
+          ${themeStyle === 'classic' ? 'bg-blue-100' : ''}
+        `}></div>
+        <div className={`absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000 transition-colors duration-500
+          ${themeStyle === 'clean' ? 'hidden' : ''}
+          ${themeStyle === 'speakeasy' ? 'bg-red-200 dark:bg-red-900/20' : ''}
+          ${themeStyle === 'neon' ? 'bg-cyan-500/30 dark:bg-cyan-600/20' : ''}
+          ${themeStyle === 'classic' ? 'bg-purple-100' : ''}
+        `}></div>
       </div>
 
       {/* Why FWBer Section (Moved Up) */}
@@ -192,7 +178,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16 max-w-3xl mx-auto">
             <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-6">
-              Yet another hookup site? <br/>
+              The Future of Adult Socializing <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">What makes this one better?</span>
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300">
@@ -218,9 +204,9 @@ export default function HomePage() {
                 <Zap className="w-6 h-6 text-yellow-500" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Hyper-Local Proximity</h3>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Find Who’s Nearby</h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Why wait? Discover matches within walking distance in real-time for spontaneous connections.
+                  See active matches in your immediate vicinity without compromising your exact coordinates. Perfect for conventions, clubs, or spontaneous meetups.
                 </p>
               </div>
             </div>
@@ -230,9 +216,9 @@ export default function HomePage() {
                 <Layers className="w-6 h-6 text-pink-500" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Progressive Trust Tiers</h3>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Earn Their Trust</h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  The game of seduction. Unlock clearer photos and private details only as you chat and build trust.
+                  Start as an avatar. As your connection deepens, your profile reveals more. You control exactly when and what your match sees.
                 </p>
               </div>
             </div>
@@ -447,10 +433,9 @@ export default function HomePage() {
                   <Code className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Open Source & Transparent</h3>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Trust Through Transparency</h3>
                   <p className="text-gray-600">
-                    We have nothing to hide. Our code is open source, so you can verify our security claims yourself. 
-                    Built by the community, for the community. <a href="https://github.com/robertpelloni/fwber" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View on GitHub</a>
+                    Unlike corporate dating apps, we don&apos;t sell your data. Our code is open-source and auditable by anyone. Your secrets stay on your device, not our servers. <a href="https://github.com/robertpelloni/fwber" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View on GitHub</a>
                   </p>
                 </div>
               </div>
@@ -523,6 +508,28 @@ export default function HomePage() {
         </div>
       </footer>
       
+      {/* Mobile Bottom Navigation */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-50 pb-safe">
+        <div className="flex justify-around items-center h-16">
+          <Link href="/" className="flex flex-col items-center justify-center w-full h-full text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-500">
+            <Home className="w-6 h-6 mb-1" />
+            <span className="text-xs font-medium">Home</span>
+          </Link>
+          <Link href="#features" className="flex flex-col items-center justify-center w-full h-full text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-500">
+            <Star className="w-6 h-6 mb-1" />
+            <span className="text-xs font-medium">Features</span>
+          </Link>
+          <Link href="#safety" className="flex flex-col items-center justify-center w-full h-full text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-500">
+            <Shield className="w-6 h-6 mb-1" />
+            <span className="text-xs font-medium">Safety</span>
+          </Link>
+          <Link href="/register" className="flex flex-col items-center justify-center w-full h-full text-blue-600 dark:text-blue-500 font-semibold">
+            <UserPlus className="w-6 h-6 mb-1" />
+            <span className="text-xs">Join</span>
+          </Link>
+        </div>
+      </div>
+
       <PWAInstallPrompt />
     </div>
   )
