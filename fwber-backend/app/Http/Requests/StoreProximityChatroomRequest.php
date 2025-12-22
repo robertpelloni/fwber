@@ -68,6 +68,7 @@ class StoreProximityChatroomRequest extends FormRequest
             'max_members' => 'nullable|integer|min:2|max:1000',
             'requires_approval' => 'boolean',
             'expires_at' => 'nullable|date|after:now',
+            'token_entry_fee' => 'sometimes|numeric|min:0',
         ];
     }
 

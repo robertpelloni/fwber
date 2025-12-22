@@ -66,7 +66,7 @@ export default function FriendList({ friends, onRemoveFriend }: FriendListProps)
             <TipButton
               recipientId={friend.id}
               recipientName={friend.profile?.display_name || friend.name}
-              compact={true}
+              variant="compact"
             />
             <Link
               href={`/messages?user=${friend.id}`}

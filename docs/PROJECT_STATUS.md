@@ -31,11 +31,19 @@ These features are considered complete and are ready for a production environmen
     *   [x] **Profile Management:** Create, edit, and view user profiles.
     *   [x] **Matching System:** The core "swipe" and matching logic is functional.
     *   [x] **Direct Messaging:** Real-time one-on-one chat between matched users.
-*   **Crypto Economy (New):**
-    *   [x] **Trojan Horse Integration:** Internal ledger for instant/free micro-transactions (Tips, Gifts, Photos).
+*   **Crypto Economy (Fully Integrated):**
+    *   [x] **Trojan Horse Integration:** Internal ledger for instant/free micro-transactions.
     *   [x] **Solana Bridge:** Users can withdraw accumulated tokens to external wallets (Phantom, Solflare).
     *   [x] **Wallet Dashboard:** PWA-ready wallet UI with QR code deposits and transaction history.
-    *   [x] **Tokenomics:** Signup bonuses (Early Adopter Curve), Referral Rewards, and Daily Login Bonuses.
+    *   [x] **Tokenomics:** Signup bonuses, Referral Rewards, and Daily Login Bonuses.
+    *   [x] **P2P Tipping:** Send tokens in Chat, Profiles, and Friend Lists.
+    *   [x] **Token-Gated Content:** Pay-to-unlock private photos and paid events.
+    *   [x] **Paid Groups:** Token entry fees for exclusive communities.
+    *   [x] **Paid AI Features:** Token costs for Profile Generation, Conversation Starters, and Optimization.
+*   **Social & Engagement:**
+    *   [x] **Friends System:** Send, accept, manage friends, and send tips.
+    *   [x] **Push Notifications:** Real-time alerts for Tips, Friend Requests, and Matches (WebPush/VAPID).
+    *   [x] **Groups:** Create and join public/private/paid groups.
 *   **Safety & Security:**
     *   [x] **Geo-Spoofing Detection:** Protects against location manipulation.
     *   [x] **Moderation Dashboard:** Tools for moderators to review flagged content.
@@ -48,33 +56,24 @@ These features are considered complete and are ready for a production environmen
 
 These features are in progress but require further work before they are considered stable.
 
-*   **Social & Engagement:**
-    *   [ ] **Friends System:** Users can send, accept, and manage friend requests. *Backend is complete, but frontend UI needs refinement.*
-    *   [ ] **Push Notifications:** Groundwork is in place, but requires full implementation and testing.
-    *   [ ] **Advanced Match Filtering:** Filtering by lifestyle preferences is functional but needs more comprehensive UI controls.
 *   **AI-Powered Features:**
     *   [ ] **Recommendation Engine:** The API exists but needs to be fully integrated with the frontend.
-    *   [ ] **Content Generation & Optimization:** The APIs are in place but are not yet fully integrated into the user workflow.
+    *   [ ] **Advanced Match Filtering:** Filtering by lifestyle preferences is functional but needs more comprehensive UI controls.
 
 ### Not Yet Implemented
 
 These features are planned but have not yet been started.
 
-*   [ ] **Groups:** Functionality for users to create and join interest-based groups.
-*   [ ] **Premium Features (Monetization):** Premium subscriptions, paid visibility boosts, etc.
-*   [ ] **Dedicated Mobile App:** A React Native app is planned for a future phase.
+*   [ ] **Premium Features (Fiat):** Traditional fiat subscriptions (Stripe) alongside token payments.
+*   [ ] **Dedicated Mobile App:** A React Native app is planned for a future phase (PWA currently serves this role).
 
 ## 4. Immediate Roadmap
 
 The immediate focus is on stabilizing the existing feature set and preparing for a production release.
 
-1.  **Stabilize Partially Implemented Features:**
-    *   **Friends System:** Complete the frontend UI for managing friends and friend requests.
-    *   **Push Notifications:** Fully implement and test the push notification system.
-    *   **Advanced Match Filtering:** Add a more comprehensive set of UI controls for match filtering.
-2.  **End-to-End Testing:**
+1.  **End-to-End Testing:**
     *   Conduct a thorough end-to-end testing pass of all core features to identify and fix any remaining bugs.
-3.  **Operational Readiness:**
+2.  **Operational Readiness:**
     *   Review and finalize all environment configurations for a production deployment.
     *   Establish a basic monitoring and alerting pipeline to track application health.
 

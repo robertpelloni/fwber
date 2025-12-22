@@ -12,6 +12,7 @@ import FeedbackModal from '@/components/FeedbackModal'
 import { MercureProvider } from '@/lib/contexts/MercureContext'
 import { SolanaProvider } from '@/components/SolanaProvider'
 import NotificationListener from '@/components/realtime/NotificationListener'
+import PWAInstallPrompt from '@/components/PWAInstallPrompt'
 
 const inter = Inter({
   variable: '--font-inter',
@@ -101,6 +102,7 @@ export default function RootLayout({
                 <SolanaProvider>
                   <NotificationPermissionHandler />
                   <SentryInitializer />
+                  <PWAInstallPrompt />
                   <ToastProvider>
                     <NotificationListener />
                     <div className="relative flex min-h-screen flex-col">
@@ -109,7 +111,7 @@ export default function RootLayout({
                     <FeedbackModal />
                     <PerformanceMonitor />
                     <div className="fixed bottom-1 right-1 text-[10px] text-muted-foreground opacity-50 pointer-events-none z-50">
-                      v0.2.6
+                      v0.2.8
                     </div>
                   </ToastProvider>
                 </SolanaProvider>
