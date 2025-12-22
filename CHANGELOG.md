@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.8] - 2025-12-22
+
+### Changed
+- **Landing Page**: Complete redesign of the landing page (`page.tsx`) to remove "bro" tone and emphasize privacy and professionalism.
+- **Theming**: Implemented a multi-theme engine supporting "Classic", "Speakeasy", "Neon", and "Clean" styles alongside Light/Dark mode.
+- **UI**: Replaced simple Theme Toggle with a Dropdown Menu for selecting both Mode and Style.
+- **Navigation**: Implemented "Mobile-First" bottom navigation bar for better usability on small screens.
+- **Content**: Updated Hero section copy to "Real Connections. Zero Trace." and curated quotes to be more romantic/intimate.
+
 ## [0.2.7] - 2025-12-18
 
 ### Fixed

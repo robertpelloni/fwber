@@ -1,8 +1,8 @@
 # Project Status
 
-**Last Updated:** December 17, 2025
+**Last Updated:** December 22, 2025
 **Status:** 🚀 LIVE / DEPLOYED / FEATURE COMPLETE
-**Version:** v0.2.7
+**Version:** v0.2.8
 
 ## 🟢 Current Status: Ready for Marketing & Growth
 The project has successfully passed a comprehensive **Feature Audit**. All planned features from the Roadmap (including "Future Features" originally slated for 2026) are implemented in the codebase. The focus now shifts to **Operations**, **Marketing**, and **Growth**.
@@ -10,6 +10,15 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
 ### ⚠️ Known Issues / Technical Debt
 *   **SSL Verification**: Waiting for Let's Encrypt to validate `mercure.fwber.me`.
 *   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
+
+### ✅ Critical Fixes (Dec 22)
+1.  **Landing Page Redesign**:
+    -   **Goal**: Pivot branding from "hookup site" to "privacy-first adult social network".
+    -   **Implementation**:
+        -   **Theming**: Added 4 distinct visual themes (Classic, Speakeasy, Neon, Clean) selectable via a new Dropdown UI.
+        -   **Copy**: Rewrote Hero section ("Real Connections. Zero Trace.") and removed "bro-y" language/quotes.
+        -   **Mobile**: Added a fixed bottom navigation bar for mobile users.
+    -   **Verification**: Visual inspection of all themes and mobile responsiveness.
 
 ### ✅ Critical Fixes (Dec 18)
 1.  **Deployment Dependency Fix**:
