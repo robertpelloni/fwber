@@ -138,6 +138,15 @@ class MatchController extends Controller
             'drinking' => 'nullable|string|in:non-drinker,occasional,regular,social,sober',
             'body_type' => 'nullable|string|in:slim,athletic,average,curvy,plus-size,muscular',
             'height_min' => 'nullable|integer|min:120|max:250',
+            // Premium Filters
+            'cannabis' => 'nullable|string|in:non-smoker,occasional,regular',
+            'diet' => 'nullable|string|in:omnivore,vegetarian,vegan,keto,paleo,halal,kosher',
+            'politics' => 'nullable|string|in:liberal,moderate,conservative,apolitical,other',
+            'religion' => 'nullable|string',
+            'zodiac' => 'nullable|string',
+            'has_pets' => 'nullable|string|in:yes,no',
+            'has_children' => 'nullable|string|in:yes,no',
+            'wants_children' => 'nullable|string|in:yes,no',
         ]);
 
         // Cache feed for 60 seconds per user with filter params
@@ -155,6 +164,15 @@ class MatchController extends Controller
                 'height_min' => $request->get('height_min'),
                 'has_bio' => $request->get('has_bio'),
                 'verified_only' => $request->get('verified_only'),
+                // Premium
+                'cannabis' => $request->get('cannabis'),
+                'diet' => $request->get('diet'),
+                'politics' => $request->get('politics'),
+                'religion' => $request->get('religion'),
+                'zodiac' => $request->get('zodiac'),
+                'has_pets' => $request->get('has_pets'),
+                'has_children' => $request->get('has_children'),
+                'wants_children' => $request->get('wants_children'),
             ];
 
             $candidates = $this->matchingService->findAdvancedMatches($user, $filters);

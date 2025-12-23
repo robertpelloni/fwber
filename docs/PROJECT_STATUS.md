@@ -51,6 +51,7 @@ These features are considered complete and are ready for a production environmen
     *   [x] **Block & Report:** Users can block and report others.
 *   **API & Documentation:**
     *   [x] **OpenAPI Documentation:** The backend API is extensively documented using OpenAPI (Swagger).
+    *   [x] **Advanced Match Filtering:** Filtering by lifestyle preferences (Diet, Politics, etc.) is fully functional and token-gated for premium users.
 
 ### Partially Implemented
 
@@ -58,7 +59,7 @@ These features are in progress but require further work before they are consider
 
 *   **AI-Powered Features:**
     *   [ ] **Recommendation Engine:** The API exists but needs to be fully integrated with the frontend.
-    *   [ ] **Advanced Match Filtering:** Filtering by lifestyle preferences is functional but needs more comprehensive UI controls.
+
 
 ### Not Yet Implemented
 
