@@ -18,6 +18,7 @@ class StoreGroupRequest extends FormRequest
             'description' => 'nullable|string|max:1000',
             'visibility' => 'sometimes|in:public,private',
             'max_members' => 'sometimes|integer|min:2|max:500',
+            'token_entry_fee' => 'sometimes|numeric|min:0',
         ];
     }
 }

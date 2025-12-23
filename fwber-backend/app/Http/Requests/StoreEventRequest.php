@@ -31,6 +31,7 @@ class StoreEventRequest extends FormRequest
             'ends_at' => 'required|date|after:starts_at',
             'max_attendees' => 'nullable|integer|min:1|max:10000',
             'price' => 'nullable|numeric|min:0|max:9999.99',
+            'token_cost' => 'nullable|numeric|min:0',
         ];
     }
 

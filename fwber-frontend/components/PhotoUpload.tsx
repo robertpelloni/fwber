@@ -17,7 +17,7 @@ const generatePreviewId = () =>
 
 interface PhotoUploadProps {
   onUpload: (
-    items: Array<{ file: File; isPrivate?: boolean }> | File[],
+    items: Array<{ file: File; isPrivate?: boolean; unlockPrice?: number }> | File[],
     onProgress?: (fileIndex: number, progress: number, fileName: string) => void
   ) => Promise<void>
   onRemove: (index: number) => void
@@ -62,6 +62,7 @@ export default function PhotoUpload({
   const [previews, setPreviews] = useState<PhotoPreview[]>([])
   const [isUploading, setIsUploading] = useState(false)
   const [uploadAsPrivate, setUploadAsPrivate] = useState(false)
+  const [unlockPrice, setUnlockPrice] = useState('50')
   const [uploadProgress, setUploadProgress] = useState<Map<string, UploadProgress>>(new Map())
   const [dragActive, setDragActive] = useState(false)
   const [clientProcessingMessage, setClientProcessingMessage] = useState<string | null>(null)
@@ -304,7 +305,11 @@ export default function PhotoUpload({
       }
 
       void flushTelemetryQueue()
-      await onUpload(newPreviews.map(p => ({ file: p.file, isPrivate: p.isPrivate })), progressCallback)
+      await onUpload(newPreviews.map(p => ({
+        file: p.file,
+        isPrivate: p.isPrivate,
+        unlockPrice: p.isPrivate ? parseFloat(unlockPrice) : undefined
+      })), progressCallback)
       
       // Mark all as completed
       setUploadProgress(prev => {
@@ -549,6 +554,20 @@ export default function PhotoUpload({
               </span>
             </label>
           </div>
+
+          {uploadAsPrivate && (
+             <div className="flex items-center gap-2 mt-2 animate-in fade-in slide-in-from-top-1" onClick={(e) => e.stopPropagation()}>
+                <span className="text-sm text-muted-foreground">Unlock Price (FWB):</span>
+                <input
+                  type="number"
+                  value={unlockPrice}
+                  onChange={(e) => setUnlockPrice(e.target.value)}
+                  className="w-20 p-1 border rounded text-sm text-black"
+                  min="0"
+                  placeholder="50"
+                />
+             </div>
+          )}
 
           {faceBlurEnabled && (
             <div className="mt-3 text-xs font-medium text-primary">

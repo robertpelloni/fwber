@@ -12,6 +12,7 @@ interface Photo {
   type: 'ai' | 'real'
   isPrivate?: boolean
   isUnlocked?: boolean
+  unlockPrice?: number
 }
 
 interface PhotoRevealGateProps {
@@ -126,7 +127,7 @@ export default function PhotoRevealGate({
                     onClick={() => onTokenUnlock(photo.id)}
                     className="bg-yellow-500 hover:bg-yellow-600 text-black text-xs font-bold py-1.5 px-3 rounded-full transition-colors flex items-center gap-1"
                   >
-                    <Unlock className="w-3 h-3" /> Unlock (50 🪙)
+                    <Unlock className="w-3 h-3" /> Unlock ({photo.unlockPrice || 50} 🪙)
                   </button>
                 )}
               </div>

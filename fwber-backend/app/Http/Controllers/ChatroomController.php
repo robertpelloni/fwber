@@ -9,6 +9,7 @@ use App\Models\Chatroom;
 use App\Models\ChatroomMessage;
 use App\Models\User;
 use App\Services\ContentModerationService;
+use App\Services\TokenDistributionService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -19,10 +20,12 @@ use Illuminate\Support\Facades\Cache;
 class ChatroomController extends Controller
 {
     protected $contentModeration;
+    protected $tokenService;
 
-    public function __construct(ContentModerationService $contentModeration)
+    public function __construct(ContentModerationService $contentModeration, TokenDistributionService $tokenService)
     {
         $this->contentModeration = $contentModeration;
+        $this->tokenService = $tokenService;
     }
 
     /**
@@ -174,6 +177,7 @@ class ChatroomController extends Controller
             'message_count' => 0,
             'last_activity_at' => now(),
             'settings' => $request->settings ?? [],
+            'token_entry_fee' => $request->input('token_entry_fee', 0),
         ]);
 
         // Add creator as admin member
@@ -205,23 +209,49 @@ class ChatroomController extends Controller
     public function join(Request $request, int $id): JsonResponse
     {
         $chatroom = Chatroom::findOrFail($id);
+        $user = Auth::user();
 
         // Check if already a member
-        if ($chatroom->hasMember(Auth::user())) {
+        if ($chatroom->hasMember($user)) {
             return response()->json(['message' => 'You are already a member of this chatroom'], 400);
         }
 
         // Check if user is banned
-        if ($chatroom->isBanned(Auth::user())) {
+        if ($chatroom->isBanned($user)) {
             return response()->json(['message' => 'You are banned from this chatroom'], 403);
         }
 
+        // Handle Entry Fee
+        if ($chatroom->token_entry_fee > 0) {
+            try {
+                // Deduct from user
+                $this->tokenService->spendTokens(
+                    $user,
+                    $chatroom->token_entry_fee,
+                    "Entry fee for chatroom: {$chatroom->name}"
+                );
+
+                // Credit Creator
+                $creator = $chatroom->creator;
+                if ($creator) {
+                    $this->tokenService->awardTokens(
+                        $creator,
+                        $chatroom->token_entry_fee,
+                        'chatroom_entry_fee',
+                        "Entry fee from {$user->name} for chatroom: {$chatroom->name}"
+                    );
+                }
+            } catch (\Exception $e) {
+                return response()->json(['error' => 'Insufficient tokens to join this chatroom'], 400);
+            }
+        }
+
         // Add user as member
-        $chatroom->addMember(Auth::user(), 'member');
+        $chatroom->addMember($user, 'member');
 
         Log::info('User joined chatroom', [
             'chatroom_id' => $chatroom->id,
-            'user_id' => Auth::id(),
+            'user_id' => $user->id,
         ]);
 
         return response()->json(['message' => 'Successfully joined chatroom']);

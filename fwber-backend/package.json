@@ -16,8 +16,12 @@
         "vite": "^7.0.4"
     },
     "dependencies": {
+        "@solana/spl-token": "^0.4.14",
+        "@solana/web3.js": "^1.98.4",
         "@stripe/react-stripe-js": "^5.4.1",
         "@stripe/stripe-js": "^8.5.3",
+        "bs58": "^6.0.0",
+        "dotenv": "^17.2.3",
         "qrcode.react": "^4.2.0"
     }
 }
