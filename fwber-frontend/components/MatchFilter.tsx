@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { LockClosedIcon } from '@heroicons/react/24/solid';
+import LockClosedIcon from '@heroicons/react/24/solid/LockClosedIcon';
 import Link from 'next/link';
 
 interface MatchFilterProps {
