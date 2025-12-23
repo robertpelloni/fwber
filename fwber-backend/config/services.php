@@ -49,6 +49,7 @@ return [
         'internal_url' => env('MERCURE_INTERNAL_URL', 'http://mercure/.well-known/mercure'),
         'publisher_key' => env('MERCURE_PUBLISHER_JWT_KEY'),
         'subscriber_key' => env('MERCURE_SUBSCRIBER_JWT_KEY'),
+        'cookie_domain' => env('MERCURE_COOKIE_DOMAIN'),
     ],
 
 ];
