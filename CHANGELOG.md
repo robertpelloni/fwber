@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2025-12-22
+
+### Added
+- **Solana Integration**: Merged `feature/solana-crypto-integration` into `main`.
+    - Added `SolanaProvider` for wallet connection.
+    - Added `TipButton` for crypto tipping.
+    - Updated `events` table to support token costs.
+
+### Fixed
+- **Frontend Build**: Added missing `@heroicons/react` dependency to `fwber-frontend/package.json`.
+- **Merge Conflicts**: Resolved conflicts in `FriendList.tsx`, `RealTimeChat.tsx`, `layout.tsx`, `profile/[id]/page.tsx`, `GroupService.php`, and migrations.
+
 ## [0.2.9] - 2025-12-22
 
 ### Fixed
