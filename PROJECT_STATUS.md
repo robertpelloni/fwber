@@ -2,7 +2,7 @@
 
 **Last Updated:** December 22, 2025
 **Status:** 🚀 LIVE / DEPLOYED / FEATURE COMPLETE
-**Version:** v0.2.9
+**Version:** v0.3.0
 
 ## 🟢 Current Status: Ready for Marketing & Growth
 The project has successfully passed a comprehensive **Feature Audit**. All planned features from the Roadmap (including "Future Features" originally slated for 2026) are implemented in the codebase. The focus now shifts to **Operations**, **Marketing**, and **Growth**.
@@ -10,6 +10,13 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
 ### ⚠️ Known Issues / Technical Debt
 *   **SSL Verification**: Waiting for Let's Encrypt to validate `mercure.fwber.me`.
 *   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
+
+### ✅ Critical Fixes (Dec 22 - Part 3)
+1.  **Solana Integration**:
+    -   **Feature**: Merged `feature/solana-crypto-integration` into `main`.
+    -   **Components**: Added `SolanaProvider` and `TipButton`.
+    -   **Backend**: Updated `events` table for token costs.
+    -   **Fix**: Resolved build error by adding `@heroicons/react`.
 
 ### ✅ Critical Fixes (Dec 22 - Part 2)
 1.  **Frontend Build Stabilization**:
