@@ -112,6 +112,7 @@ class ProfileController extends Controller
      */
     public function show(Request $request): JsonResponse
     {
+        Log::info('DEBUG: ProfileController::show hit for user ' . auth()->id());
         try {
             $user = auth()->user();
             
