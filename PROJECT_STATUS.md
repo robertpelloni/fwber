@@ -2,7 +2,7 @@
 
 **Last Updated:** December 22, 2025
 **Status:** 🚀 LIVE / DEPLOYED / FEATURE COMPLETE
-**Version:** v0.2.8
+**Version:** v0.2.9
 
 ## 🟢 Current Status: Ready for Marketing & Growth
 The project has successfully passed a comprehensive **Feature Audit**. All planned features from the Roadmap (including "Future Features" originally slated for 2026) are implemented in the codebase. The focus now shifts to **Operations**, **Marketing**, and **Growth**.
@@ -10,6 +10,16 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
 ### ⚠️ Known Issues / Technical Debt
 *   **SSL Verification**: Waiting for Let's Encrypt to validate `mercure.fwber.me`.
 *   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
+
+### ✅ Critical Fixes (Dec 22 - Part 2)
+1.  **Frontend Build Stabilization**:
+    -   **Issue**: Build failed with "Module not found" for `react-hook-form` and SWC binary corruption.
+    -   **Fix**: Performed clean install with `--ignore-scripts` to bypass failing post-install scripts in `@stellar/stellar-sdk`.
+    -   **Verification**: `npm run build` passing.
+2.  **Component Prop Fix**:
+    -   **Issue**: `FriendList` was passing invalid `variant` prop to `TipButton`.
+    -   **Fix**: Updated to use `compact={true}`.
+    -   **Verification**: TypeScript check passing.
 
 ### ✅ Critical Fixes (Dec 22)
 1.  **Landing Page Redesign**:

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.9] - 2025-12-22
+
+### Fixed
+- **Frontend Build**: Resolved "Module not found" errors for `react-hook-form` and `@hookform/resolvers` by performing a clean install with `--ignore-scripts` to bypass corrupted binaries.
+- **Frontend Build**: Fixed TypeScript error in `FriendList.tsx` where `TipButton` was receiving an invalid `variant` prop. Updated to use `compact={true}`.
+- **Frontend**: Fixed `useMemo` dependency warning in `SolanaProvider.tsx`.
+
 ## [0.2.8] - 2025-12-22
 
 ### Changed
