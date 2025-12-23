@@ -30,6 +30,7 @@ class StoreChatroomRequest extends FormRequest
             'neighborhood' => 'nullable|string|max:100',
             'is_public' => 'boolean',
             'settings' => 'nullable|array',
+            'token_entry_fee' => 'sometimes|numeric|min:0',
         ];
     }
 

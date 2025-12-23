@@ -1,39 +1,37 @@
 import React from 'react';
 import Link from 'next/link';
-import { Users, Lock, Globe } from 'lucide-react';
+import { Users, Lock, Globe, Coins } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Group } from '@/lib/api/groups';
 import { useJoinGroup, useLeaveGroup } from '@/lib/hooks/use-groups';
+import { useWallet } from '@/lib/hooks/useWallet';
 
 interface GroupCardProps {
-  group: Group;
+  group: Group & { token_entry_fee?: number };
 }
 
 export function GroupCard({ group }: GroupCardProps) {
   const joinGroup = useJoinGroup();
   const leaveGroup = useLeaveGroup();
+  const { data: wallet } = useWallet();
 
-  const isMember = group.is_member; // Assuming backend returns this or we handle it elsewhere
-  // Note: The backend response might not include is_member directly unless we added it to the model/resource.
-  // For now, we'll assume the API handles it or we check against myGroups list.
-  // Since we didn't implement is_member in the backend explicitly (except maybe via `withCount` or similar), 
-  // we might need to fetch myGroups to check membership.
-  // However, for this component, let's assume we pass membership status or the group object has it.
-  // If the backend doesn't return it, we might need to check `myGroups` in the parent component.
-  
-  // Let's assume the parent handles the logic or we just show "View" if we don't know.
-  // But the requirements say "Join/Leave button".
+  const isMember = group.is_member;
   
   const handleJoin = (e: React.MouseEvent) => {
     e.preventDefault();
+    if (group.token_entry_fee && group.token_entry_fee > 0) {
+        if (!confirm(`Join this group for ${group.token_entry_fee} tokens?`)) return;
+    }
     joinGroup.mutate(group.id);
   };
 
   const handleLeave = (e: React.MouseEvent) => {
     e.preventDefault();
-    leaveGroup.mutate(group.id);
+    if (confirm('Are you sure you want to leave this group?')) {
+        leaveGroup.mutate(group.id);
+    }
   };
 
   return (
@@ -45,21 +43,30 @@ export function GroupCard({ group }: GroupCardProps) {
               <span className="text-2xl">{group.icon || '👥'}</span>
               <CardTitle className="text-lg">{group.name}</CardTitle>
             </div>
-            {group.privacy === 'private' ? (
-              <Badge variant="secondary"><Lock className="w-3 h-3 mr-1" /> Private</Badge>
-            ) : (
-              <Badge variant="outline"><Globe className="w-3 h-3 mr-1" /> Public</Badge>
-            )}
-            {isMember && <Badge variant="default" className="ml-2">Member</Badge>}
+            <div className="flex flex-col gap-1 items-end">
+                {group.privacy === 'private' ? (
+                <Badge variant="secondary"><Lock className="w-3 h-3 mr-1" /> Private</Badge>
+                ) : (
+                <Badge variant="outline"><Globe className="w-3 h-3 mr-1" /> Public</Badge>
+                )}
+                {group.token_entry_fee && group.token_entry_fee > 0 && (
+                    <Badge className="bg-yellow-500 hover:bg-yellow-600 text-black">
+                        <Coins className="w-3 h-3 mr-1" /> {group.token_entry_fee} FWB
+                    </Badge>
+                )}
+            </div>
           </div>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
             {group.description || 'No description provided.'}
           </p>
-          <div className="flex items-center text-sm text-muted-foreground">
-            <Users className="w-4 h-4 mr-1" />
-            {group.member_count} members
+          <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <div className="flex items-center">
+                <Users className="w-4 h-4 mr-1" />
+                {group.member_count} members
+            </div>
+            {isMember && <span className="text-green-600 font-medium text-xs">Joined</span>}
           </div>
         </CardContent>
         <CardFooter>
@@ -68,7 +75,7 @@ export function GroupCard({ group }: GroupCardProps) {
             variant={isMember ? "outline" : "default"}
             onClick={isMember ? handleLeave : handleJoin}
           >
-            {isMember ? 'Leave Group' : 'Join Group'}
+            {isMember ? 'Leave Group' : (group.token_entry_fee && group.token_entry_fee > 0 ? `Join (${group.token_entry_fee} 🪙)` : 'Join Group')}
           </Button>
         </CardFooter>
       </Card>

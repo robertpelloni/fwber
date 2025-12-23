@@ -9,6 +9,7 @@ export interface Photo {
   thumbnail_url?: string
   is_primary: boolean
   is_private?: boolean
+  unlock_price?: number
   order: number
   created_at: string
   updated_at: string
@@ -80,14 +81,14 @@ class PhotoAPI {
 
   // Upload new photos (uploads one at a time since backend expects single 'photo' field)
   async uploadPhotos(
-    items: Array<{ file: File; isPrivate?: boolean }>,
+    items: Array<{ file: File; isPrivate?: boolean; unlockPrice?: number }>,
     onProgress?: (fileIndex: number, progress: number, fileName: string) => void
   ): Promise<PhotoUploadResponse> {
     const uploadedPhotos: Photo[] = []
     
     // Upload files sequentially since backend expects single photo per request
     for (let i = 0; i < items.length; i++) {
-      const { file, isPrivate } = items[i]
+      const { file, isPrivate, unlockPrice } = items[i]
       const fileWithMetadata = file as FileWithFaceBlurMetadata
       
       // Report progress start
@@ -97,6 +98,9 @@ class PhotoAPI {
       formData.append('photo', file) // Backend expects 'photo', not 'photos[...]'
       if (isPrivate) {
         formData.append('is_private', '1')
+        if (unlockPrice) {
+          formData.append('unlock_price', String(unlockPrice))
+        }
       }
       if (fileWithMetadata.faceBlurMetadata) {
         formData.append('face_blur_metadata', JSON.stringify(fileWithMetadata.faceBlurMetadata))
@@ -321,7 +325,7 @@ export function usePhotos() {
   }
 
   const uploadPhotos = async (
-    items: Array<{ file: File; isPrivate?: boolean }> | File[],
+    items: Array<{ file: File; isPrivate?: boolean; unlockPrice?: number }> | File[],
     onProgress?: (fileIndex: number, progress: number, fileName: string) => void
   ) => {
     setLoading(true)
@@ -331,7 +335,7 @@ export function usePhotos() {
       // Normalize input to array of objects
       const normalizedItems = Array.isArray(items) && items.length > 0 && items[0] instanceof File
         ? (items as File[]).map(f => ({ file: f, isPrivate: false }))
-        : (items as Array<{ file: File; isPrivate?: boolean }>)
+        : (items as Array<{ file: File; isPrivate?: boolean; unlockPrice?: number }>)
 
       const response = await photoAPI.uploadPhotos(normalizedItems, onProgress)
       if (response.success) {

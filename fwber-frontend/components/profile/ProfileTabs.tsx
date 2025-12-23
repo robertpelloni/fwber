@@ -24,7 +24,7 @@ interface ProfileTabsProps {
   handleArrayPreferenceChange: (field: string, value: string, checked: boolean) => void;
   photos: Photo[];
   uploadPhotos: (
-    items: Array<{ file: File; isPrivate?: boolean }> | File[],
+    items: Array<{ file: File; isPrivate?: boolean; unlockPrice?: number }> | File[],
     onProgress?: (fileIndex: number, progress: number, fileName: string) => void
   ) => Promise<void>;
   deletePhoto: (index: number) => void;

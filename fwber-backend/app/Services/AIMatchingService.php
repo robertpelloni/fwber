@@ -184,6 +184,48 @@ class AIMatchingService
             if (!empty($filters['has_bio']) && $filters['has_bio']) {
                 $q->whereNotNull('bio')->where('bio', '!=', '');
             }
+
+            // -- Premium Filters --
+
+            // Cannabis
+            if (!empty($filters['cannabis'])) {
+                $q->where('cannabis_status', $filters['cannabis']);
+            }
+
+            // Diet
+            if (!empty($filters['diet'])) {
+                $q->where('dietary_preferences', $filters['diet']);
+            }
+
+            // Politics
+            if (!empty($filters['politics'])) {
+                $q->where('political_views', $filters['politics']);
+            }
+
+            // Religion
+            if (!empty($filters['religion'])) {
+                $q->where('religion', $filters['religion']);
+            }
+
+            // Zodiac
+            if (!empty($filters['zodiac'])) {
+                $q->where('zodiac_sign', $filters['zodiac']);
+            }
+
+            // Has Pets (Frontend sends 'yes'/'no', DB is boolean)
+            if (!empty($filters['has_pets'])) {
+                $q->where('has_pets', $filters['has_pets'] === 'yes');
+            }
+
+            // Has Children
+            if (!empty($filters['has_children'])) {
+                $q->where('has_children', $filters['has_children'] === 'yes');
+            }
+
+            // Wants Children
+            if (!empty($filters['wants_children'])) {
+                $q->where('wants_children', $filters['wants_children'] === 'yes');
+            }
         });
 
         // Verified Only

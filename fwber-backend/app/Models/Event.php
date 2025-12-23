@@ -19,6 +19,7 @@ class Event extends Model
         'ends_at',
         'max_attendees',
         'price',
+        'token_cost',
         'created_by_user_id',
         'status',
         'reminder_sent',
@@ -30,6 +31,7 @@ class Event extends Model
         'latitude' => 'float',
         'longitude' => 'float',
         'price' => 'decimal:2',
+        'token_cost' => 'decimal:2',
         'reminder_sent' => 'boolean',
     ];
 

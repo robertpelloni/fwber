@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { X, Clock, CheckCircle, UserCheck, Share2 } from 'lucide-react'
+import { X, Clock, CheckCircle, UserCheck, Share2, Brain, Lock } from 'lucide-react'
 import PhotoRevealGate from './PhotoRevealGate'
 import SecurePhotoReveal from './SecurePhotoReveal'
 import { RelationshipTier } from '@/lib/relationshipTiers'
@@ -45,6 +45,9 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
   const { onlineUsers } = usePresenceContext()
   const { showSuccess, showError, addToast } = useToast()
   
+  const [insights, setInsights] = useState<any>(null)
+  const [insightLoading, setInsightLoading] = useState(false)
+
   const { 
     tierData,
     isLoading: tierLoading,
@@ -66,6 +69,14 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
       apiClient.get<{ unlocked: boolean }>(`/share-unlock/${user.id}`)
         .then(res => setIsUnlockedViaShare(res.data.unlocked))
         .catch(() => setIsUnlockedViaShare(false))
+
+      // Fetch insights
+      setInsightLoading(true)
+      apiClient.get(`/matches/${user.id}/insights`)
+        .then(res => setInsights(res.data.data))
+        .catch(err => console.error('Failed to load insights', err))
+        .finally(() => setInsightLoading(false))
+
     } else {
       const timer = setTimeout(() => setIsVisible(false), 300)
       return () => clearTimeout(timer)
@@ -96,6 +107,33 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
         "Share failed",
         "Could not copy link."
       )
+    }
+  }
+
+  const handleInsightUnlock = async () => {
+    try {
+      await apiClient.post(`/matches/${user.id}/insights/unlock`)
+      showSuccess("Unlocked!", "AI Insights revealed.")
+      // Refresh
+      const res = await apiClient.get(`/matches/${user.id}/insights`)
+      setInsights(res.data.data)
+    } catch (error: any) {
+      if (error.response?.status === 402) {
+        addToast({
+            type: 'error',
+            title: 'Insufficient Tokens',
+            message: 'You need 10 tokens to unlock this report.',
+            action: {
+              label: 'Buy Tokens',
+              onClick: () => {
+                onClose()
+                router.push('/wallet')
+              }
+            }
+          })
+      } else {
+        showError("Unlock Failed", "Could not unlock report.")
+      }
     }
   }
 
@@ -236,6 +274,69 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
               <p className="text-gray-800 dark:text-gray-200">{user.profile.bio}</p>
             </div>
           )}
+
+          {/* AI Insights Section */}
+          <div className="mb-6 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl p-5 border border-indigo-100 dark:border-indigo-800">
+            <h3 className="text-sm font-semibold text-indigo-900 dark:text-indigo-300 mb-3 flex items-center gap-2">
+              <Brain className="w-4 h-4" />
+              AI Compatibility Report
+            </h3>
+
+            {insightLoading ? (
+               <div className="animate-pulse h-20 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+            ) : insights ? (
+               <div className="space-y-4">
+                  {/* Score */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600 dark:text-gray-400 text-sm">Overall Match Score</span>
+                    <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{insights.total_score}%</span>
+                  </div>
+
+                  {insights.is_locked ? (
+                    <div className="bg-white/50 dark:bg-black/20 p-4 rounded-lg backdrop-blur-sm border border-white/20 text-center">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 filter blur-[3px]">
+                           Based on your lifestyle and preferences, we found that you are highly compatible in...
+                        </p>
+                        <button
+                          onClick={handleInsightUnlock}
+                          className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center gap-2 mx-auto transition-colors"
+                        >
+                          <Lock className="w-3 h-3" />
+                          Unlock Analysis (10 Tokens)
+                        </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                        <div className="text-sm text-gray-800 dark:text-gray-200 italic">
+                           "{insights.ai_explanation}"
+                        </div>
+                        {insights.breakdown && (
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                                <div className="bg-white dark:bg-gray-800 p-2 rounded">
+                                   <span className="text-gray-500 block">Base</span>
+                                   <span className="font-bold">{insights.breakdown.base}%</span>
+                                </div>
+                                <div className="bg-white dark:bg-gray-800 p-2 rounded">
+                                   <span className="text-gray-500 block">Lifestyle</span>
+                                   <span className="font-bold">{insights.breakdown.preferences}%</span>
+                                </div>
+                                <div className="bg-white dark:bg-gray-800 p-2 rounded">
+                                   <span className="text-gray-500 block">Communication</span>
+                                   <span className="font-bold">{insights.breakdown.communication}%</span>
+                                </div>
+                                <div className="bg-white dark:bg-gray-800 p-2 rounded">
+                                   <span className="text-gray-500 block">Mutual</span>
+                                   <span className="font-bold">{insights.breakdown.mutual}%</span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                  )}
+               </div>
+            ) : (
+                <p className="text-xs text-gray-500">Analysis unavailable.</p>
+            )}
+          </div>
 
           {/* Meeting Confirmation Section */}
           {currentTier === RelationshipTier.ESTABLISHED && (

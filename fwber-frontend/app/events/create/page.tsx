@@ -60,12 +60,12 @@ export default function CreateEventPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Location</label>
+          <label className="block text-sm font-medium mb-1">Location Name</label>
           <input
-            {...register('location', { required: 'Location is required' })}
+            {...register('location_name', { required: 'Location name is required' })}
             className="w-full border rounded-md p-2"
           />
-          {errors.location && <span className="text-red-500 text-sm">{errors.location.message as string}</span>}
+          {errors.location_name && <span className="text-red-500 text-sm">{errors.location_name.message as string}</span>}
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -105,7 +105,7 @@ export default function CreateEventPage() {
             <label className="block text-sm font-medium mb-1">Start Time</label>
             <input
               type="datetime-local"
-              {...register('start_time', { required: 'Start time is required' })}
+              {...register('starts_at', { required: 'Start time is required' })}
               className="w-full border rounded-md p-2"
             />
           </div>
@@ -113,13 +113,13 @@ export default function CreateEventPage() {
             <label className="block text-sm font-medium mb-1">End Time</label>
             <input
               type="datetime-local"
-              {...register('end_time', { required: 'End time is required' })}
+              {...register('ends_at', { required: 'End time is required' })}
               className="w-full border rounded-md p-2"
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
             <div>
                 <label className="block text-sm font-medium mb-1">Max Attendees</label>
                 <input
@@ -129,11 +129,20 @@ export default function CreateEventPage() {
                 />
             </div>
             <div>
-                <label className="block text-sm font-medium mb-1">Price</label>
+                <label className="block text-sm font-medium mb-1">Price (USD)</label>
                 <input
                     type="number"
                     step="0.01"
                     {...register('price')}
+                    className="w-full border rounded-md p-2"
+                />
+            </div>
+            <div>
+                <label className="block text-sm font-medium mb-1">Token Cost (FWB)</label>
+                <input
+                    type="number"
+                    step="1"
+                    {...register('token_cost')}
                     className="w-full border rounded-md p-2"
                 />
             </div>
