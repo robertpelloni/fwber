@@ -9,6 +9,7 @@
         "php": "^8.2",
         "aws/aws-sdk-php": "^3.364",
         "darkaonline/l5-swagger": "^9.0",
+        "firebase/php-jwt": "^7.0",
         "intervention/image-laravel": "^1.5",
         "laravel-notification-channels/webpush": "^10.3",
         "laravel/framework": "^12.0",
