@@ -116,10 +116,11 @@ Route::get('debug/user-manual', function () {
 // Debug Route to test Sanctum Token Logic Manually
 Route::get('debug/sanctum-manual', function (Request $request) {
     try {
-        $token = $request->bearerToken();
+        // Try getting token from Bearer header OR query parameter
+        $token = $request->bearerToken() ?? $request->query('token');
         
         if (!$token) {
-            return response()->json(['error' => 'No Bearer Token provided'], 400);
+            return response()->json(['error' => 'No Bearer Token provided. Pass ?token=... or use Authorization header'], 400);
         }
 
         // 1. Find the token in DB
@@ -127,21 +128,22 @@ Route::get('debug/sanctum-manual', function (Request $request) {
         $accessToken = $model::findToken($token);
 
         if (!$accessToken) {
-            return response()->json(['error' => 'Invalid Token'], 401);
+            return response()->json(['error' => 'Invalid Token (Not found in DB)'], 401);
         }
 
         // 2. Check if token is valid
-        $isValid = $accessToken->tokenable; // This triggers the relationship to User
+        $user = $accessToken->tokenable; // This triggers the relationship to User
 
-        if (!$isValid) {
-             return response()->json(['error' => 'Token has no user'], 401);
+        if (!$user) {
+             return response()->json(['error' => 'Token has no user associated'], 401);
         }
 
         return response()->json([
             'status' => 'success',
             'token_id' => $accessToken->id,
             'user_id' => $accessToken->tokenable_id,
-            'user_email' => $accessToken->tokenable->email,
+            'user_email' => $user->email,
+            'user_class' => get_class($user),
         ]);
 
     } catch (\Throwable $e) {
