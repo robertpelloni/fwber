@@ -2,9 +2,8 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
-use Lcobucci\JWT\Configuration;
-use Lcobucci\JWT\Signer\Hmac\Sha256;
-use Lcobucci\JWT\Signer\Key\InMemory;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 // Load .env
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
@@ -21,17 +20,15 @@ echo "Testing Mercure Publisher...\n";
 echo "URL: $mercureUrl\n";
 echo "Key: " . substr($jwtKey, 0, 5) . "...\n";
 
-// 1. Generate JWT
-$config = Configuration::forSymmetricSigner(
-    new Sha256(),
-    InMemory::plainText($jwtKey)
-);
+// 1. Generate JWT using firebase/php-jwt
+$payload = [
+    'mercure' => [
+        'publish' => ['*']
+    ]
+];
 
-$token = $config->builder()
-    ->withClaim('mercure', ['publish' => ['*']])
-    ->getToken($config->signer(), $config->signingKey());
-
-$jwt = $token->toString();
+// firebase/php-jwt requires the key to be passed directly for HS256
+$jwt = JWT::encode($payload, $jwtKey, 'HS256');
 echo "Generated JWT: " . substr($jwt, 0, 10) . "...\n";
 
 // 2. Send POST request to Mercure
