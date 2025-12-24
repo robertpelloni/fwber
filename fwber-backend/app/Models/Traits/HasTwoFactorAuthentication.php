@@ -8,8 +8,12 @@ trait HasTwoFactorAuthentication
 {
     public function hasEnabledTwoFactorAuthentication(): bool
     {
-        return ! is_null($this->two_factor_secret) &&
-               ! is_null($this->two_factor_confirmed_at);
+        try {
+            return ! is_null($this->two_factor_secret) &&
+                   ! is_null($this->two_factor_confirmed_at);
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function getTwoFactorRecoveryCodes(): array
