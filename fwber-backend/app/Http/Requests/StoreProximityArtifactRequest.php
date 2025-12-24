@@ -35,7 +35,8 @@ class StoreProximityArtifactRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => 'required|in:chat,board_post,announce',
+            'type' => 'required|in:chat,board_post,announce,token_drop',
+            'amount' => 'required_if:type,token_drop|numeric|min:1',
             'content' => 'required|string|max:500',
             'lat' => 'required|numeric|between:-90,90',
             'lng' => 'required|numeric|between:-180,180',

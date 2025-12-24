@@ -43,6 +43,7 @@ These features are considered complete and are ready for a production environmen
     *   [x] **Paid AI Features:** Token costs for Profile Generation, Conversation Starters, and Optimization.
     *   [x] **Paid Match Insights:** Token costs to unlock detailed AI compatibility reports and explanations.
     *   [x] **Payment Requests:** "Venmo-style" invoicing allowing users to request tokens from friends and matches.
+    *   [x] **Geo-Fenced Token Drops:** Users can drop tokens at physical locations for others to find and claim ("Pokemon GO" style).
 *   **Social & Engagement:**
     *   [x] **Friends System:** Send, accept, manage friends, and send tips.
     *   [x] **Push Notifications:** Real-time alerts for Tips, Friend Requests, and Matches (WebPush/VAPID).

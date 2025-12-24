@@ -233,6 +233,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('proximity/feed', [\App\Http\Controllers\ProximityArtifactController::class, 'index']);
     Route::post('proximity/artifacts', [\App\Http\Controllers\ProximityArtifactController::class, 'store']);
     Route::get('proximity/artifacts/{id}', [\App\Http\Controllers\ProximityArtifactController::class, 'show']);
+    Route::post('proximity/artifacts/{id}/claim', [\App\Http\Controllers\ProximityArtifactController::class, 'claim']);
     Route::post('proximity/artifacts/{id}/flag', [\App\Http\Controllers\ProximityArtifactController::class, 'flag']);
     Route::delete('proximity/artifacts/{id}', [\App\Http\Controllers\ProximityArtifactController::class, 'destroy']);
     Route::get('proximity/local-pulse', [\App\Http\Controllers\ProximityArtifactController::class, 'localPulse']);
