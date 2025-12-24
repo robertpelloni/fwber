@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import LockClosedIcon from '@heroicons/react/24/solid/LockClosedIcon';
+import { Lock } from 'lucide-react';
 import Link from 'next/link';
 
 interface MatchFilterProps {
@@ -45,7 +45,7 @@ export default function MatchFilter({ onFilterChange }: MatchFilterProps) {
 
   const PremiumOverlay = () => (
     <div className="absolute inset-0 bg-gray-100 bg-opacity-60 backdrop-blur-[1px] flex flex-col items-center justify-center z-10 rounded-lg border-2 border-dashed border-gray-300">
-      <LockClosedIcon className="h-8 w-8 text-gray-500 mb-2" />
+      <Lock className="h-8 w-8 text-gray-500 mb-2" />
       <p className="text-sm font-semibold text-gray-700">Premium Filters</p>
       <p className="text-xs text-gray-500 text-center px-4 mb-3">
         Hold {PREMIUM_THRESHOLD}+ FWB Tokens to unlock advanced lifestyle filters.
