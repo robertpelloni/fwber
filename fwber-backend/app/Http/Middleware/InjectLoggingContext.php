@@ -23,33 +23,50 @@ class InjectLoggingContext
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Generate or retrieve request ID
-        $requestId = $request->header('X-Request-ID') ?? Str::uuid()->toString();
-        $request->attributes->set('request_id', $requestId);
+        try {
+            // Generate or retrieve request ID
+            $requestId = $request->header('X-Request-ID') ?? Str::uuid()->toString();
+            $request->attributes->set('request_id', $requestId);
 
-        // Context to be added to all logs
-        $context = [
-            'request_id' => $requestId,
-            'ip' => $request->ip(),
-            'user_id' => $request->user()?->id, // Might be null at this stage if auth middleware runs later
-            'url' => $request->fullUrl(),
-            'method' => $request->method(),
-        ];
+            // Context to be added to all logs
+            $context = [
+                'request_id' => $requestId,
+                'ip' => $request->ip(),
+                'user_id' => null, // Default to null
+                'url' => $request->fullUrl(),
+                'method' => $request->method(),
+            ];
 
-        // Pass correlation ID through if present (for microservice tracing)
-        if ($correlationId = $request->header('X-Correlation-ID')) {
-            $request->attributes->set('correlation_id', $correlationId);
-            $context['correlation_id'] = $correlationId;
+            // Safely attempt to get user ID
+            try {
+                if ($user = $request->user()) {
+                    $context['user_id'] = $user->id;
+                }
+            } catch (\Throwable $e) {
+                // Ignore auth errors during logging context setup
+            }
+
+            // Pass correlation ID through if present (for microservice tracing)
+            if ($correlationId = $request->header('X-Correlation-ID')) {
+                $request->attributes->set('correlation_id', $correlationId);
+                $context['correlation_id'] = $correlationId;
+            }
+
+            // Register context with Laravel's logger
+            Log::withContext($context);
+        } catch (\Throwable $e) {
+            // Fail silently if logging setup fails
         }
-
-        // Register context with Laravel's logger
-        Log::withContext($context);
 
         $response = $next($request);
 
-        // Inject request ID into response headers for client-side debugging
-        if ($response instanceof Response) {
-            $response->headers->set('X-Request-ID', $requestId);
+        try {
+            // Inject request ID into response headers for client-side debugging
+            if ($response instanceof Response) {
+                $response->headers->set('X-Request-ID', $requestId ?? '');
+            }
+        } catch (\Throwable $e) {
+            // Fail silently
         }
 
         return $response;
