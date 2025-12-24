@@ -24,7 +24,7 @@
 		# Subscriber JWT key
 		subscriber_jwt {env.MERCURE_SUBSCRIBER_JWT_KEY} HS256
 		# CORS Configuration
-		cors_origins {env.MERCURE_CORS_ALLOWED_ORIGINS}
+		cors_origins *
 		# Extra directives
 		{$MERCURE_EXTRA_DIRECTIVES}
 	}

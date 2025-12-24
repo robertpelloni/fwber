@@ -16,7 +16,7 @@ fi
 # 2. Set CORS Allowed Origins explicitly if not set in .env
 # This fixes the "Cross-Origin Request Blocked" error
 if [ -z "$MERCURE_CORS_ALLOWED_ORIGINS" ]; then
-    export MERCURE_CORS_ALLOWED_ORIGINS="https://fwber.me https://www.fwber.me https://*.vercel.app https://vercel.live"
+    export MERCURE_CORS_ALLOWED_ORIGINS="*"
     echo "Set default CORS origins: $MERCURE_CORS_ALLOWED_ORIGINS"
 fi
 
