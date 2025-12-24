@@ -80,6 +80,57 @@ class TokenController extends Controller
         ]);
     }
 
+    public function deposit(Request $request)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0.1',
+            'signature' => 'required|string',
+        ]);
+
+        // Check for duplicate signature
+        $exists = TokenTransaction::whereJsonContains('metadata->signature', $request->signature)->exists();
+        // Fallback for SQLite which sometimes struggles with JSON path in whereJsonContains depending on version
+        if (!$exists) {
+             $exists = TokenTransaction::where('metadata', 'like', '%"'.$request->signature.'"%')->exists();
+        }
+
+        if ($exists) {
+             return response()->json(['error' => 'Transaction already processed'], 400);
+        }
+
+        $user = $request->user();
+
+        // Verify via Node script
+        $scriptPath = base_path('scripts/solana/verify_transaction.cjs');
+
+        $process = Process::path(base_path())
+            ->env([
+                'SOLANA_SERVER_SECRET_KEY' => env('SERVER_WALLET_SECRET') ?? env('SOLANA_SERVER_SECRET_KEY'),
+                'SOLANA_MINT_ADDRESS' => env('MINT_ADDRESS') ?? env('SOLANA_MINT_ADDRESS'),
+                'SOLANA_RPC_URL' => env('SOLANA_RPC_URL'),
+            ])
+            ->run(['node', $scriptPath, $request->signature, (string)$request->amount]);
+
+        if ($process->failed()) {
+             \Log::error('Deposit Verification Failed: ' . $process->errorOutput());
+             return response()->json(['error' => 'Verification failed or transaction not found'], 400);
+        }
+
+        // Credit User
+        $user->increment('token_balance', $request->amount);
+
+        $user->tokenTransactions()->create([
+            'amount' => $request->amount,
+            'type' => 'deposit',
+            'description' => 'Deposit from Solana',
+            'metadata' => [
+                'signature' => $request->signature,
+                'chain' => 'solana'
+            ]
+        ]);
+
+        return response()->json(['message' => 'Deposit successful', 'new_balance' => $user->fresh()->token_balance]);
+    }
     public function transfer(Request $request)
     {
         $request->validate([
@@ -150,6 +201,17 @@ class TokenController extends Controller
     {
         $user = $request->user();
         
+        $treasury = \Cache::rememberForever('treasury_address', function() {
+             $script = base_path('scripts/solana/get_server_pubkey.cjs');
+             if (!file_exists($script)) return null;
+
+             $process = Process::path(base_path())
+                ->env(['SOLANA_SERVER_SECRET_KEY' => env('SERVER_WALLET_SECRET')])
+                ->run(['node', $script]);
+
+             return trim($process->output());
+        });
+
         return response()->json([
             'balance' => $user->token_balance,
             'referral_code' => $user->referral_code,
@@ -157,6 +219,8 @@ class TokenController extends Controller
             'transactions' => $user->tokenTransactions()->latest()->take(20)->get(),
             'referral_count' => $user->referrals()->count(),
             'golden_tickets_remaining' => $user->golden_tickets_remaining,
+            'treasury_address' => $treasury,
+            'mint_address' => env('MINT_ADDRESS'),
         ]);
     }
 

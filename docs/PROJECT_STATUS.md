@@ -34,6 +34,7 @@ These features are considered complete and are ready for a production environmen
 *   **Crypto Economy (Fully Integrated):**
     *   [x] **Trojan Horse Integration:** Internal ledger for instant/free micro-transactions.
     *   [x] **Solana Bridge:** Users can withdraw accumulated tokens to external wallets (Phantom, Solflare).
+    *   [x] **Crypto Deposits:** Users can deposit SOL/SPL tokens from external wallets to their internal ledger.
     *   [x] **Wallet Dashboard:** PWA-ready wallet UI with QR code deposits and transaction history.
     *   [x] **Tokenomics:** Signup bonuses, Referral Rewards, and Daily Login Bonuses.
     *   [x] **P2P Tipping:** Send tokens in Chat, Profiles, and Friend Lists.
@@ -41,6 +42,8 @@ These features are considered complete and are ready for a production environmen
     *   [x] **Paid Groups:** Token entry fees for exclusive communities.
     *   [x] **Paid AI Features:** Token costs for Profile Generation, Conversation Starters, and Optimization.
     *   [x] **Paid Match Insights:** Token costs to unlock detailed AI compatibility reports and explanations.
+    *   [x] **Payment Requests:** "Venmo-style" invoicing allowing users to request tokens from friends and matches.
+    *   [x] **Geo-Fenced Token Drops:** Users can drop tokens at physical locations for others to find and claim ("Pokemon GO" style).
 *   **Social & Engagement:**
     *   [x] **Friends System:** Send, accept, manage friends, and send tips.
     *   [x] **Push Notifications:** Real-time alerts for Tips, Friend Requests, and Matches (WebPush/VAPID).

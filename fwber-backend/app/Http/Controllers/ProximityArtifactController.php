@@ -122,6 +122,7 @@ class ProximityArtifactController extends Controller
                 'location_lat' => $lat,
                 'location_lng' => $lng,
                 'visibility_radius_m' => (int)($validated['radius'] ?? 1000),
+                'amount' => $validated['amount'] ?? 0,
             ]);
         } catch (\Throwable $e) {
             return response()->json(['error' => $e->getMessage()], 422);
@@ -186,6 +187,40 @@ class ProximityArtifactController extends Controller
             'meta' => $artifact->meta,
             'user_id' => $artifact->user_id,
         ]]);
+    }
+
+    /**
+     * @OA\Post(
+     *   path="/proximity/artifacts/{id}/claim",
+     *   tags={"Proximity Artifacts"},
+     *   summary="Claim a token drop",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(required=true, @OA\JsonContent(required={"lat","lng"}, @OA\Property(property="lat", type="number"), @OA\Property(property="lng", type="number"))),
+     *   @OA\Response(response=200, description="Claim successful"),
+     *   @OA\Response(response=400, description="Claim failed")
+     * )
+     */
+    public function claim(int $id, Request $request, ProximityArtifactService $service): JsonResponse
+    {
+        $request->validate([
+            'lat' => 'required|numeric',
+            'lng' => 'required|numeric',
+        ]);
+
+        $user = auth()->user();
+        $artifact = ProximityArtifact::active()->findOrFail($id);
+
+        try {
+            $amount = $service->claimArtifact($artifact, $user, (float)$request->lat, (float)$request->lng);
+            return response()->json([
+                'message' => "Claimed {$amount} tokens!",
+                'amount' => $amount,
+                'new_balance' => $user->fresh()->token_balance
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
     }
 
     /**

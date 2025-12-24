@@ -41,6 +41,7 @@ class CheckDailyBonus
         } catch (\Exception $e) {
             // Fail silently
         }
+        }
 
         return $next($request);
     }

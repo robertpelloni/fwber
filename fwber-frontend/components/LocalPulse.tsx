@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useLocalPulse, useCreateProximityArtifact, useFlagProximityArtifact } from '@/lib/hooks/use-proximity';
 import { useLocalPulseRealtime } from '@/lib/hooks/use-local-pulse-realtime';
+import { apiClient } from '@/lib/api/client';
 import { 
   MapPin, 
   MessageCircle, 
@@ -16,6 +17,7 @@ import {
   Megaphone,
   StickyNote,
   Sparkles,
+  Coins,
 } from 'lucide-react';
 import type { ProximityArtifact, MatchCandidate, ArtifactType } from '@/types/proximity';
 
@@ -33,15 +35,19 @@ const ArtifactTypeIcon = ({ type }: { type: ArtifactType }) => {
       return <StickyNote className="h-5 w-5" />;
     case 'announce':
       return <Megaphone className="h-5 w-5" />;
+    case 'token_drop':
+      return <Coins className="h-5 w-5" />;
   }
 };
 
 const ArtifactCard = ({ 
   artifact, 
-  onFlag 
+  onFlag,
+  onClaim
 }: { 
   artifact: ProximityArtifact; 
   onFlag: (id: number) => void;
+  onClaim: (id: number) => void;
 }) => {
   const getTimeRemaining = (expiresAt: string) => {
     const now = new Date();
@@ -59,7 +65,11 @@ const ArtifactCard = ({
     chat: 'bg-blue-50 border-blue-200 text-blue-800',
     board_post: 'bg-green-50 border-green-200 text-green-800',
     announce: 'bg-purple-50 border-purple-200 text-purple-800',
+    token_drop: 'bg-yellow-50 border-yellow-200 text-yellow-800',
   };
+
+  const isClaimed = artifact.meta?.claimed;
+  const amount = artifact.meta?.amount;
 
   return (
     <div className={`rounded-lg border p-4 ${typeColors[artifact.type]}`}>
@@ -67,6 +77,9 @@ const ArtifactCard = ({
         <div className="flex items-center space-x-2">
           <ArtifactTypeIcon type={artifact.type} />
           <span className="text-xs font-medium uppercase">{artifact.type.replace('_', ' ')}</span>
+          {artifact.type === 'token_drop' && amount && (
+             <span className="text-xs font-bold bg-yellow-200 px-2 py-0.5 rounded-full">{amount} FWB</span>
+          )}
         </div>
         <button
           onClick={() => onFlag(artifact.id)}
@@ -78,6 +91,24 @@ const ArtifactCard = ({
       </div>
 
       <p className="text-sm mb-3">{artifact.content}</p>
+
+      {artifact.type === 'token_drop' && !isClaimed && (
+         <div className="mb-3">
+            <button
+              onClick={() => onClaim(artifact.id)}
+              className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 rounded shadow-sm flex justify-center items-center gap-2"
+            >
+               <Coins className="w-4 h-4" />
+               Claim {amount} FWB
+            </button>
+         </div>
+      )}
+
+      {artifact.type === 'token_drop' && isClaimed && (
+         <div className="mb-3 text-center text-xs font-bold text-gray-500 bg-gray-100 py-2 rounded">
+            CLAIMED
+         </div>
+      )}
 
       <div className="flex items-center justify-between text-xs text-gray-600">
         <div className="flex items-center space-x-1">
@@ -157,6 +188,7 @@ export default function LocalPulse() {
     type: 'chat' as ArtifactType,
     content: '',
   });
+  const [dropAmount, setDropAmount] = useState('');
 
   const createArtifact = useCreateProximityArtifact();
   const flagArtifact = useFlagProximityArtifact();
@@ -207,15 +239,18 @@ export default function LocalPulse() {
           lat: location.latitude,
           lng: location.longitude,
           radius,
+          amount: newArtifact.type === 'token_drop' ? parseFloat(dropAmount) : undefined
         },
         token,
       });
 
       setNewArtifact({ type: 'chat', content: '' });
+      setDropAmount('');
       setShowCreateForm(false);
       refetch();
     } catch (err) {
       console.error('Failed to create artifact:', err);
+      alert('Failed to post artifact. Do you have enough tokens?');
     }
   };
 
@@ -226,6 +261,20 @@ export default function LocalPulse() {
       await flagArtifact.mutateAsync({ id, token });
     } catch (err) {
       console.error('Failed to flag artifact:', err);
+    }
+  };
+
+  const handleClaimArtifact = async (id: number) => {
+    if (!location.latitude || !location.longitude || !token) return;
+    try {
+      await apiClient.post(`/proximity/artifacts/${id}/claim`, {
+        lat: location.latitude,
+        lng: location.longitude
+      });
+      alert('Claimed successfully! Check your wallet.');
+      refetch();
+    } catch (e: any) {
+      alert(e.response?.data?.error || 'Claim failed. You might be too far away.');
     }
   };
 
@@ -298,23 +347,37 @@ export default function LocalPulse() {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
-              <div className="grid grid-cols-3 gap-2">
-                {(['chat', 'board_post', 'announce'] as const).map((type) => (
+              <div className="grid grid-cols-4 gap-2">
+                {(['chat', 'board_post', 'announce', 'token_drop'] as const).map((type) => (
                   <button
                     key={type}
                     onClick={() => setNewArtifact({ ...newArtifact, type })}
-                    className={`p-3 rounded-lg border-2 transition-colors ${
+                    className={`p-3 rounded-lg border-2 transition-colors flex flex-col items-center justify-center ${
                       newArtifact.type === type
                         ? 'border-blue-600 bg-blue-50'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
                     <ArtifactTypeIcon type={type} />
-                    <span className="text-xs block mt-1 capitalize">{type.replace('_', ' ')}</span>
+                    <span className="text-xs block mt-1 capitalize text-center">{type.replace('_', ' ')}</span>
                   </button>
                 ))}
               </div>
             </div>
+
+            {newArtifact.type === 'token_drop' && (
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Amount (FWB)</label>
+                    <input
+                        type="number"
+                        min="1"
+                        value={dropAmount}
+                        onChange={(e) => setDropAmount(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="How many tokens to drop?"
+                    />
+                </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
@@ -323,7 +386,7 @@ export default function LocalPulse() {
                 onChange={(e) => setNewArtifact({ ...newArtifact, content: e.target.value })}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="What's happening nearby?"
+                placeholder={newArtifact.type === 'token_drop' ? "Message for the finder..." : "What's happening nearby?"}
                 maxLength={500}
               />
               <p className="text-xs text-gray-500 mt-1">
@@ -340,7 +403,7 @@ export default function LocalPulse() {
               </button>
               <button
                 onClick={handleCreateArtifact}
-                disabled={!newArtifact.content.trim() || createArtifact.isPending}
+                disabled={!newArtifact.content.trim() || createArtifact.isPending || (newArtifact.type === 'token_drop' && !dropAmount)}
                 className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
               >
                 {createArtifact.isPending ? 'Posting...' : 'Post'}
@@ -402,6 +465,7 @@ export default function LocalPulse() {
                     key={artifact.id}
                     artifact={artifact}
                     onFlag={handleFlagArtifact}
+                    onClaim={handleClaimArtifact}
                   />
                 ))}
               </div>

@@ -17,8 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // $middleware->append(\App\Http\Middleware\InjectLoggingContext::class);
         
         $middleware->api(append: [
-            // \App\Http\Middleware\TrackUserActivity::class,
-            // \App\Http\Middleware\CheckDailyBonus::class,
+            \App\Http\Middleware\TrackUserActivity::class,
+            \App\Http\Middleware\CheckDailyBonus::class,
         ]);
 
         $middleware->alias([
