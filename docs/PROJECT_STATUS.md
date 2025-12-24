@@ -40,6 +40,7 @@ These features are considered complete and are ready for a production environmen
     *   [x] **Token-Gated Content:** Pay-to-unlock private photos and paid events.
     *   [x] **Paid Groups:** Token entry fees for exclusive communities.
     *   [x] **Paid AI Features:** Token costs for Profile Generation, Conversation Starters, and Optimization.
+    *   [x] **Paid Match Insights:** Token costs to unlock detailed AI compatibility reports and explanations.
 *   **Social & Engagement:**
     *   [x] **Friends System:** Send, accept, manage friends, and send tips.
     *   [x] **Push Notifications:** Real-time alerts for Tips, Friend Requests, and Matches (WebPush/VAPID).
@@ -58,8 +59,7 @@ These features are considered complete and are ready for a production environmen
 These features are in progress but require further work before they are considered stable.
 
 *   **AI-Powered Features:**
-    *   [ ] **Recommendation Engine:** The API exists but needs to be fully integrated with the frontend.
-
+    *   [x] **Recommendation Engine:** Fully integrated with "For You" feed and backend AI logic.
 
 ### Not Yet Implemented
 
