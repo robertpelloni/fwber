@@ -12,6 +12,7 @@ interface MatchFilterProps {
 export default function MatchFilter({ onFilterChange }: MatchFilterProps) {
   const { user } = useAuth();
   // Threshold for Premium Filters: 100 FWB tokens
+  // Ensure we use Lucide icons for consistency
   const PREMIUM_THRESHOLD = 100;
   const isPremium = (user?.token_balance || 0) >= PREMIUM_THRESHOLD;
 
