@@ -184,6 +184,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('websocket/status', [\App\Http\Controllers\WebSocketController::class, 'status']);
     Route::post('websocket/broadcast', [\App\Http\Controllers\WebSocketController::class, 'broadcast']);
 
+    // Mercure Auth
+    Route::get('mercure/cookie', [\App\Http\Controllers\MercureAuthController::class, 'cookie']);
+    Route::get('mercure/status', [\App\Http\Controllers\MercureAuthController::class, 'status']);
+
     // Video Chat
     Route::middleware('feature:video_chat')->group(function () {
         Route::post('video/signal', [\App\Http\Controllers\VideoChatController::class, 'signal']);

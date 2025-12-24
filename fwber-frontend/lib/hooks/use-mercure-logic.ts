@@ -319,13 +319,21 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
     }
   }, [user?.id]);
 
-  const connect = useCallback(() => {
+  const connect = useCallback(async () => {
     // Check if we are already connected or connecting
     // We check eventSourceRef to ensure we don't have an active connection
     // We check statusRef.current.connecting to avoid double-invocation during connection phase
     if ((statusRef.current.connected && eventSourceRef.current) || statusRef.current.connecting || !user?.id) return;
 
     setStatus(prev => ({ ...prev, connecting: true, error: null }));
+
+    try {
+        // Fetch the authorization cookie first
+        await api.get('/mercure/cookie');
+    } catch (e) {
+        console.error('Failed to get Mercure cookie', e);
+        // We continue anyway, as the cookie might already be set or we might be in a mode that doesn't require it
+    }
 
     const hubUrl = new URL(process.env.NEXT_PUBLIC_MERCURE_URL || 'http://localhost:3000/.well-known/mercure');
     hubUrl.searchParams.append('topic', `/users/${user.id}`);
