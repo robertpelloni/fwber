@@ -3,13 +3,22 @@
 # FWBer Mercure Startup Script for Shared Hosting (No Sudo)
 # Usage: ./start_mercure_shared.sh
 
-# 1. Load environment variables from .env
-if [ -f .env ]; then
+# Get the directory where the script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+# Assume .env is in the parent directory of scripts/ (i.e., project root)
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+if [ -f "$PROJECT_ROOT/.env" ]; then
+    set -a
+    source "$PROJECT_ROOT/.env"
+    set +a
+elif [ -f ".env" ]; then
+    # Fallback to current directory
     set -a
     source .env
     set +a
 else
-    echo "Error: .env file not found in current directory."
+    echo "Error: .env file not found."
     exit 1
 fi
 
