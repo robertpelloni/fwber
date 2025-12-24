@@ -51,7 +51,7 @@ class User extends Authenticatable
     ];
 
     protected $appends = [
-        'two_factor_enabled',
+        // 'two_factor_enabled', // Commented out to prevent crashes during schema drift
     ];
 
     // Relationships
