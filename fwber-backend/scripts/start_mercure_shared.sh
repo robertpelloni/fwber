@@ -162,7 +162,13 @@ fi
 echo "Starting Mercure on $SERVER_NAME..."
 echo "CORS Allowed Origins: $MERCURE_CORS_ALLOWED_ORIGINS"
 
-# Run in background using nohup
-nohup $MERCURE_BIN run --config Caddyfile --adapter caddyfile > mercure.log 2>&1 &
+# Generate a runtime Caddyfile with keys substituted to avoid env var issues in older Caddy versions
+echo "Generating Caddyfile.run with substituted keys..."
+sed -e "s|{env.MERCURE_PUBLISHER_JWT_KEY}|$MERCURE_PUBLISHER_JWT_KEY|g" \
+    -e "s|{env.MERCURE_SUBSCRIBER_JWT_KEY}|$MERCURE_SUBSCRIBER_JWT_KEY|g" \
+    Caddyfile > Caddyfile.run
+
+# Run in background using nohup and the generated config
+nohup $MERCURE_BIN run --config Caddyfile.run --adapter caddyfile > mercure.log 2>&1 &
 echo "Mercure started in background. PID: $!"
 echo "Logs available in mercure.log"
