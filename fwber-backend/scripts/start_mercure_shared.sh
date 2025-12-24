@@ -38,6 +38,9 @@ export MERCURE_SUBSCRIBER_JWT_KEY=${MERCURE_SUBSCRIBER_JWT_KEY}
 export MERCURE_PUBLISHER_JWT_ALG=HS256
 export MERCURE_SUBSCRIBER_JWT_ALG=HS256
 
+echo "DEBUG: MERCURE_SUBSCRIBER_JWT_KEY is set to: '${MERCURE_SUBSCRIBER_JWT_KEY}'"
+echo "DEBUG: MERCURE_PUBLISHER_JWT_KEY is set to: '${MERCURE_PUBLISHER_JWT_KEY}'"
+
 # Configure transport to use local file instead of default system path
 # This fixes "invalid transport: open ...: no such file or directory"
 # CORS origins are already handled in Caddyfile via {$MERCURE_CORS_ALLOWED_ORIGINS}
