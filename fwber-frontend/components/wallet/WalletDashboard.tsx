@@ -1,10 +1,12 @@
 'use client';
-import { useWallet as useSolanaWallet } from '@solana/wallet-adapter-react';
+import { useConnection, useWallet as useSolanaWallet } from '@solana/wallet-adapter-react';
+import { PublicKey, Transaction } from '@solana/web3.js';
+import { getAssociatedTokenAddress, createTransferInstruction, createAssociatedTokenAccountInstruction } from '@solana/spl-token';
 import dynamic from 'next/dynamic';
 import { useWallet as useInternalWallet } from '@/lib/hooks/useWallet';
 import { useState } from 'react';
 import { apiClient } from '@/lib/api/client';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import PaymentRequests from './PaymentRequests';
 
@@ -14,9 +16,12 @@ const WalletMultiButton = dynamic(
 );
 
 export default function WalletDashboard() {
-  const { publicKey } = useSolanaWallet();
+  const { connection } = useConnection();
+  const { publicKey, sendTransaction } = useSolanaWallet();
   const { data: internalWallet, refresh } = useInternalWallet();
+
   const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [depositAmount, setDepositAmount] = useState('');
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'wallet' | 'requests'>('wallet');
 
@@ -35,6 +40,56 @@ export default function WalletDashboard() {
       alert('Withdrawal failed: ' + (e.response?.data?.error || e.message));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeposit = async () => {
+    if (!publicKey || !depositAmount || !internalWallet?.treasury_address || !internalWallet?.mint_address) return;
+
+    setLoading(true);
+    try {
+        const mint = new PublicKey(internalWallet.mint_address);
+        const treasury = new PublicKey(internalWallet.treasury_address);
+        const amount = Math.floor(parseFloat(depositAmount) * 1_000_000_000); // 9 decimals
+
+        // Get ATAs
+        const fromATA = await getAssociatedTokenAddress(mint, publicKey);
+        const toATA = await getAssociatedTokenAddress(mint, treasury);
+
+        const transaction = new Transaction();
+
+        // Check if Treasury ATA exists (it should, but good practice to handle creation if we were sending to user)
+        // For Treasury, we assume it exists.
+
+        transaction.add(
+            createTransferInstruction(
+                fromATA,
+                toATA,
+                publicKey,
+                amount
+            )
+        );
+
+        const signature = await sendTransaction(transaction, connection);
+
+        const confirmation = await connection.confirmTransaction(signature, 'confirmed');
+        if (confirmation.value.err) throw new Error('Transaction failed on-chain');
+
+        // Notify Backend
+        await apiClient.post('/wallet/deposit', {
+            amount: parseFloat(depositAmount),
+            signature: signature
+        });
+
+        refresh();
+        setDepositAmount('');
+        alert('Deposit successful!');
+
+    } catch (e: any) {
+        console.error(e);
+        alert('Deposit failed: ' + (e.message || 'Unknown error'));
+    } finally {
+        setLoading(false);
     }
   };
 
@@ -80,52 +135,71 @@ export default function WalletDashboard() {
                 <p className="text-xs text-gray-500 mt-1">Use for instant tips and boosts.</p>
             </div>
 
-            {/* External Wallet */}
-            <div className="space-y-4">
-                <div className="flex justify-between items-center">
+            {/* External Wallet Connection */}
+            <div className="flex justify-between items-center">
                 <h3 className="font-medium">External Wallet (Solana)</h3>
                 <WalletMultiButton className="!bg-purple-600 hover:!bg-purple-700" />
-                </div>
-
-                {publicKey ? (
-                <div className="p-4 border rounded-xl space-y-4 dark:border-gray-700">
-                    <div className="flex flex-col items-center justify-center p-4 bg-white rounded-lg shadow-sm border border-gray-100 dark:bg-gray-800 dark:border-gray-600">
-                        <QRCodeSVG value={publicKey.toBase58()} size={160} className="p-2 bg-white rounded" />
-                        <p className="mt-2 text-xs text-gray-500">Scan to deposit SOL or SPL Tokens</p>
-                    </div>
-
-                    <p className="text-sm break-all font-mono bg-gray-100 dark:bg-gray-900 p-2 rounded text-center">
-                    {publicKey.toBase58()}
-                    </p>
-
-                    <div className="flex gap-2 items-end">
-                    <div className="flex-1">
-                        <label className="text-xs font-medium mb-1 block">Withdraw Amount</label>
-                        <input
-                        type="number"
-                        value={withdrawAmount}
-                        onChange={e => setWithdrawAmount(e.target.value)}
-                        className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
-                        placeholder="100"
-                        />
-                    </div>
-                    <button
-                        onClick={handleWithdraw}
-                        disabled={loading || !withdrawAmount}
-                        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50 flex items-center gap-2 h-[42px]"
-                    >
-                        {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                        Withdraw
-                    </button>
-                    </div>
-                    <p className="text-xs text-gray-500">Withdrawals are processed on the Solana Devnet.</p>
-                </div>
-                ) : (
-                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-xl text-center">
-                    <p className="text-sm text-gray-500 mb-2">Connect your Phantom or Solflare wallet to withdraw tokens to the blockchain.</p>
-                </div>
-                )}
             </div>
+
+            {publicKey ? (
+                <div className="grid md:grid-cols-2 gap-4">
+                    {/* Withdraw */}
+                    <div className="p-4 border rounded-xl space-y-4 dark:border-gray-700 bg-white dark:bg-gray-800">
+                        <div className="flex items-center gap-2 text-red-600 dark:text-red-400 font-medium">
+                            <ArrowUpCircle className="w-5 h-5" /> Withdraw
+                        </div>
+                        <div className="space-y-2">
+                            <input
+                                type="number"
+                                value={withdrawAmount}
+                                onChange={e => setWithdrawAmount(e.target.value)}
+                                className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
+                                placeholder="Amount (FWB)"
+                            />
+                            <button
+                                onClick={handleWithdraw}
+                                disabled={loading || !withdrawAmount}
+                                className="w-full bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 disabled:opacity-50 flex justify-center items-center gap-2"
+                            >
+                                {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                                Withdraw to Wallet
+                            </button>
+                        </div>
+                        <p className="text-xs text-gray-500">To: {publicKey.toBase58().slice(0, 4)}...{publicKey.toBase58().slice(-4)}</p>
+                    </div>
+
+                    {/* Deposit */}
+                    <div className="p-4 border rounded-xl space-y-4 dark:border-gray-700 bg-white dark:bg-gray-800">
+                        <div className="flex items-center gap-2 text-green-600 dark:text-green-400 font-medium">
+                            <ArrowDownCircle className="w-5 h-5" /> Deposit
+                        </div>
+                        <div className="space-y-2">
+                            <input
+                                type="number"
+                                value={depositAmount}
+                                onChange={e => setDepositAmount(e.target.value)}
+                                className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
+                                placeholder="Amount (FWB)"
+                            />
+                            <button
+                                onClick={handleDeposit}
+                                disabled={loading || !depositAmount || !internalWallet?.treasury_address}
+                                className="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50 flex justify-center items-center gap-2"
+                            >
+                                {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                                Deposit to App
+                            </button>
+                        </div>
+                        <div className="flex justify-center">
+                             <QRCodeSVG value={internalWallet?.treasury_address || ''} size={64} className="p-1 bg-white rounded border" />
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-xl text-center">
+                    <p className="text-sm text-gray-500 mb-2">Connect your wallet to deposit or withdraw tokens.</p>
+                </div>
+            )}
 
             {/* Referral */}
             {internalWallet?.referral_code && (

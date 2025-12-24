@@ -34,6 +34,7 @@ These features are considered complete and are ready for a production environmen
 *   **Crypto Economy (Fully Integrated):**
     *   [x] **Trojan Horse Integration:** Internal ledger for instant/free micro-transactions.
     *   [x] **Solana Bridge:** Users can withdraw accumulated tokens to external wallets (Phantom, Solflare).
+    *   [x] **Crypto Deposits:** Users can deposit SOL/SPL tokens from external wallets to their internal ledger.
     *   [x] **Wallet Dashboard:** PWA-ready wallet UI with QR code deposits and transaction history.
     *   [x] **Tokenomics:** Signup bonuses, Referral Rewards, and Daily Login Bonuses.
     *   [x] **P2P Tipping:** Send tokens in Chat, Profiles, and Friend Lists.
