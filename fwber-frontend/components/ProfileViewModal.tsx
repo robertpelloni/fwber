@@ -308,7 +308,7 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
                   ) : (
                     <div className="space-y-3">
                         <div className="text-sm text-gray-800 dark:text-gray-200 italic">
-                           &quot;{insights.ai_explanation}&quot;
+                           &ldquo;{insights.ai_explanation}&rdquo;
                         </div>
                         {insights.breakdown && (
                             <div className="grid grid-cols-2 gap-2 text-xs">

@@ -42,6 +42,14 @@ class MatchInsightsTest extends TestCase
                 ->andReturn('You are a perfect match because you both like coding.');
         });
 
+        // Unlock the content first
+        \App\Models\ContentUnlock::create([
+            'user_id' => $user->id,
+            'content_type' => 'match_insight',
+            'content_id' => $match->id,
+            'cost' => 10
+        ]);
+
         $response = $this->getJson("/api/matches/{$match->id}/insights");
 
         $response->assertStatus(200)
