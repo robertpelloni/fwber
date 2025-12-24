@@ -69,6 +69,12 @@ class MercurePublisher
      */
     private function generatePublisherJWT(): string
     {
+        $key = config('services.mercure.publisher_key');
+
+        if (empty($key)) {
+            throw new \RuntimeException('Mercure publisher key is not configured.');
+        }
+
         $payload = [
             'mercure' => [
                 'publish' => ['*'] // Allow publishing to all topics
@@ -77,7 +83,7 @@ class MercurePublisher
             'iat' => time()
         ];
 
-        return JWT::encode($payload, config('services.mercure.publisher_key'), 'HS256');
+        return JWT::encode($payload, $key, 'HS256');
     }
 
     /**
@@ -85,6 +91,12 @@ class MercurePublisher
      */
     public function generateSubscriberJWT(array $topics, int $userId, int $expiryMinutes = 60): string
     {
+        $key = config('services.mercure.subscriber_key');
+        
+        if (empty($key)) {
+            throw new \RuntimeException('Mercure subscriber key is not configured.');
+        }
+
         $payload = [
             'mercure' => [
                 'subscribe' => $topics
@@ -94,7 +106,7 @@ class MercurePublisher
             'iat' => time()
         ];
 
-        return JWT::encode($payload, config('services.mercure.subscriber_key'), 'HS256');
+        return JWT::encode($payload, $key, 'HS256');
     }
 
     /**
