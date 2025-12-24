@@ -157,6 +157,33 @@ Route::get('debug/sanctum-manual', function (Request $request) {
     }
 });
 
+// Debug Route to Generate a Token for the First User
+Route::get('debug/get-token', function () {
+    try {
+        $user = \App\Models\User::first();
+        if (!$user) {
+            return response()->json(['error' => 'No users found in database'], 404);
+        }
+        
+        // Create a new token
+        $token = $user->createToken('debug-token')->plainTextToken;
+        
+        return response()->json([
+            'status' => 'success',
+            'user_id' => $user->id,
+            'email' => $user->email,
+            'token' => $token,
+            'usage_url' => url('/api/debug/sanctum-manual?token=' . $token),
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'error' => 'Token Generation Failed',
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
+
 // Health Checks
 Route::get('health', [\App\Http\Controllers\HealthController::class, 'check']);
 Route::get('health/liveness', [\App\Http\Controllers\HealthController::class, 'liveness']);
