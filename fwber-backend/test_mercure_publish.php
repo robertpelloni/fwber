@@ -53,6 +53,9 @@ $error = curl_error($ch);
 curl_close($ch);
 
 echo "Response Code: $httpCode\n";
+if ($error) {
+    echo "Curl Error: $error\n";
+}
 echo "Response Body: $response\n";
 
 if ($httpCode == 200) {
