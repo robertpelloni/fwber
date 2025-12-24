@@ -122,10 +122,24 @@ class ProfileController extends Controller
                 ], 401);
             }
             
-            // Eager load profile relationship
-            $user->load('profile');
+            // Eager load profile relationship with error handling
+            try {
+                $user->load('profile');
+            } catch (\Exception $e) {
+                Log::error('Failed to load profile relationship', ['error' => $e->getMessage()]);
+                // Continue without profile loaded
+            }
             
-            if (!$user->profile) {
+            // Safely check for profile existence
+            $hasProfile = false;
+            try {
+                $hasProfile = $user->profile !== null;
+            } catch (\Exception $e) {
+                Log::error('Failed to access profile attribute', ['error' => $e->getMessage()]);
+                $hasProfile = false;
+            }
+
+            if (!$hasProfile) {
                 return response()->json([
                     'message' => 'Profile not found. Please complete your profile.',
                     'profile_complete' => false,

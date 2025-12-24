@@ -64,7 +64,8 @@ class MercureAuthController extends Controller
             $response = response()->json([
                 'message' => 'Mercure authorization cookie set',
                 'topics' => $topics,
-                'expires_in' => 3600 // 1 hour
+                'expires_in' => 3600, // 1 hour
+                'token' => $jwt, // Return token for manual handling if cookies fail
             ]);
 
             $response->cookie(

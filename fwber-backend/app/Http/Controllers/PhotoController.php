@@ -92,10 +92,18 @@ class PhotoController extends Controller
                 return response()->json(['message' => 'Unauthenticated'], 401);
             }
             
-            $photos = $user->photos()
-                ->ordered()
-                ->get()
-                ->map(function ($photo) {
+            try {
+                // Try to get photos with ordering
+                $photos = $user->photos()
+                    ->ordered()
+                    ->get();
+            } catch (\Exception $e) {
+                // Fallback if sort_order column is missing
+                Log::warning('Failed to fetch ordered photos, falling back to basic query', ['error' => $e->getMessage()]);
+                $photos = $user->photos()->get();
+            }
+
+            $mappedPhotos = $photos->map(function ($photo) {
                     return [
                         'id' => $photo->id,
                         'filename' => $photo->filename,
@@ -108,8 +116,8 @@ class PhotoController extends Controller
                         'height' => $photo->height,
                         'is_primary' => $photo->is_primary,
                         'is_private' => $photo->is_private,
-                        'unlock_price' => $photo->unlock_price,
-                        'sort_order' => $photo->sort_order,
+                        'unlock_price' => $photo->unlock_price ?? 0, // Default to 0 if missing
+                        'sort_order' => $photo->sort_order ?? 0, // Default to 0 if missing
                         'created_at' => $photo->created_at,
                         'updated_at' => $photo->updated_at,
                     ];
@@ -117,8 +125,8 @@ class PhotoController extends Controller
             
             return response()->json([
                 'success' => true,
-                'data' => $photos,
-                'count' => $photos->count(),
+                'data' => $mappedPhotos,
+                'count' => $mappedPhotos->count(),
                 'max_photos' => self::MAX_PHOTOS_PER_USER,
             ]);
             

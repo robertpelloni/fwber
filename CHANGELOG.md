@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 2025-12-24
+
+### Fixed
+- **Backend Stability**: Implemented robust defensive coding in `PhotoController` and `ProfileController` to prevent 500 Server Errors when database schema is out of sync (missing columns/tables).
+- **Mercure**: Fixed CORS issues by whitelisting Vercel preview domains in `start_mercure_shared.sh`.
+- **Mercure**: Added JWT token to `MercureAuthController` response body to allow manual token handling when cross-domain cookies fail.
+- **Database**: Added `schema:fix-missing` artisan command for manual database repair in production environments where migrations fail to run.
+
 ## [0.3.0] - 2025-12-22
 
 ### Added
