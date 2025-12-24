@@ -29,6 +29,7 @@ class User extends Authenticatable
         'last_active_at',
         'golden_tickets_remaining',
         'onboarding_completed_at',
+        'last_daily_bonus_at',
     ];
 
     protected $hidden = [
@@ -48,6 +49,7 @@ class User extends Authenticatable
         'last_active_at' => 'datetime',
         'current_streak' => 'integer',
         'golden_tickets_remaining' => 'integer',
+        'last_daily_bonus_at' => 'datetime',
         'onboarding_completed_at' => 'datetime',
     ];
 

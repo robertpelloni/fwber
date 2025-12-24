@@ -20,6 +20,9 @@ class CheckDailyBonus
                 // Use try-catch for property access in case column is missing from model definition but not DB, or vice versa
                 try {
                     $lastBonus = $user->last_daily_bonus_at;
+                    if (is_string($lastBonus)) {
+                        $lastBonus = \Illuminate\Support\Carbon::parse($lastBonus);
+                    }
                 } catch (\Exception $e) {
                     $lastBonus = null;
                 }
@@ -40,7 +43,6 @@ class CheckDailyBonus
             }
         } catch (\Exception $e) {
             // Fail silently
-        }
         }
 
         return $next($request);
