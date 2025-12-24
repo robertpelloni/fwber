@@ -348,7 +348,10 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
     }
     
     const es = new EventSource(hubUrl.toString(), {
-      withCredentials: true
+      // Only use credentials (cookies) if we don't have a token.
+      // If we have a token, we don't need cookies, and disabling credentials
+      // relaxes CORS requirements (avoids "wildcard origin not allowed with credentials").
+      withCredentials: !token 
     });
     
     es.onopen = () => {
