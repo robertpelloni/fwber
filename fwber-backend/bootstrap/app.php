@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'feature' => \App\Http\Middleware\FeatureEnabled::class,
+            'debug.auth' => \App\Http\Middleware\DebugAuth::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

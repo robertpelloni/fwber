@@ -119,7 +119,7 @@ Route::get('debug/user-manual', function () {
 // Empty Auth Route (Test Middleware Only)
 Route::get('debug/empty-auth', function () {
     return response()->json(['status' => 'ok', 'message' => 'Middleware passed']);
-})->middleware('auth:sanctum');
+})->middleware('debug.auth');
 
 // Debug Route to test Sanctum Token Logic Manually
 Route::get('debug/sanctum-manual', function (Request $request) {
