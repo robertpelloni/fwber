@@ -72,7 +72,7 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
 
       // Fetch insights
       setInsightLoading(true)
-      apiClient.get(`/matches/${user.id}/insights`)
+      apiClient.get<{ data: any }>(`/matches/${user.id}/insights`)
         .then(res => setInsights(res.data.data))
         .catch(err => console.error('Failed to load insights', err))
         .finally(() => setInsightLoading(false))
@@ -115,7 +115,7 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
       await apiClient.post(`/matches/${user.id}/insights/unlock`)
       showSuccess("Unlocked!", "AI Insights revealed.")
       // Refresh
-      const res = await apiClient.get(`/matches/${user.id}/insights`)
+      const res = await apiClient.get<{ data: any }>(`/matches/${user.id}/insights`)
       setInsights(res.data.data)
     } catch (error: any) {
       if (error.response?.status === 402) {
@@ -308,7 +308,7 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
                   ) : (
                     <div className="space-y-3">
                         <div className="text-sm text-gray-800 dark:text-gray-200 italic">
-                           "{insights.ai_explanation}"
+                           &quot;{insights.ai_explanation}&quot;
                         </div>
                         {insights.breakdown && (
                             <div className="grid grid-cols-2 gap-2 text-xs">
