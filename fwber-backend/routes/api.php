@@ -77,6 +77,42 @@ Route::get('debug/user', function (Request $request) {
     }
 })->middleware('auth:sanctum');
 
+// Manual User Fetch Debug Route (No Middleware)
+Route::get('debug/user-manual', function () {
+    try {
+        // 1. Test basic query
+        $user = \App\Models\User::first();
+        
+        if (!$user) {
+            return response()->json(['status' => 'no users found']);
+        }
+
+        // 2. Test attribute access (which might trigger accessors)
+        $data = [
+            'id' => $user->id,
+            'email' => $user->email,
+            'has_two_factor' => $user->hasEnabledTwoFactorAuthentication(), // Test trait method
+        ];
+
+        // 3. Test serialization (toArray)
+        $array = $user->toArray();
+
+        return response()->json([
+            'status' => 'success',
+            'manual_data' => $data,
+            'serialized_user' => $array,
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'error' => 'Manual Fetch Failed',
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
+
 // Health Checks
 Route::get('health', [\App\Http\Controllers\HealthController::class, 'check']);
 Route::get('health/liveness', [\App\Http\Controllers\HealthController::class, 'liveness']);
