@@ -48,6 +48,15 @@ Route::get('auth/referral/{code}', [\App\Http\Controllers\AuthController::class,
 Route::post('public/vouch', [\App\Http\Controllers\VouchController::class, 'store'])->middleware('throttle:60,1');
 Route::post('auth/two-factor-challenge', [\App\Http\Controllers\TwoFactorChallengeController::class, 'store'])->middleware('throttle:auth');
 
+// Public Debug Route (No Auth)
+Route::get('debug/public', function () {
+    return response()->json([
+        'status' => 'ok',
+        'timestamp' => now()->toIso8601String(),
+        'database' => \Illuminate\Support\Facades\DB::connection()->getDatabaseName(),
+    ]);
+});
+
 // Debug Route to diagnose 500 errors
 Route::get('debug/user', function (Request $request) {
     try {
