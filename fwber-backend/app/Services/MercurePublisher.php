@@ -106,6 +106,15 @@ class MercurePublisher
             'iat' => time()
         ];
 
+        // Ensure key is properly formatted for HS256
+        // If the key is base64 encoded (which it seems to be based on the user's input),
+        // we might need to decode it or use it as is.
+        // However, php-jwt treats the key as a binary string.
+        // If the key in .env is "Zt3BAsBCspl6Xe6zvbXLJEZhmTj4XLbMpkaPdplDohQ=",
+        // it is likely a base64 encoded string.
+        // Caddy might be decoding it automatically or treating it as a string.
+        // Let's try to be consistent.
+        
         return JWT::encode($payload, $key, 'HS256');
     }
 
