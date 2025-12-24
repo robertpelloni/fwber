@@ -57,12 +57,24 @@ class GiftController extends Controller
 
         try {
             DB::transaction(function () use ($sender, $receiver, $gift, $request) {
-                // Deduct tokens
+                // Deduct tokens from Sender
                 $this->tokenService->spendTokens(
                     $sender,
                     $gift->cost,
                     "Sent gift '{$gift->name}' to {$receiver->name}"
                 );
+
+                // Credit Receiver (P2P Transfer)
+                $receiver->increment('token_balance', $gift->cost);
+
+                // Record Transaction for Receiver
+                \App\Models\TokenTransaction::create([
+                    'user_id' => $receiver->id,
+                    'amount' => $gift->cost,
+                    'type' => 'gift_received',
+                    'description' => "Received gift '{$gift->name}' from {$sender->name}",
+                    'metadata' => ['sender_id' => $sender->id, 'gift_id' => $gift->id]
+                ]);
 
                 // Create UserGift record
                 UserGift::create([

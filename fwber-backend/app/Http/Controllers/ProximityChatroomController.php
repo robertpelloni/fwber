@@ -10,6 +10,7 @@ use App\Http\Requests\UpdateChatroomLocationRequest;
 use App\Models\ProximityChatroom;
 use App\Models\User;
 use App\Services\ContentModerationService;
+use App\Services\TokenDistributionService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -20,10 +21,12 @@ use Illuminate\Support\Facades\Cache;
 class ProximityChatroomController extends Controller
 {
     protected $contentModeration;
+    protected $tokenService;
 
-    public function __construct(ContentModerationService $contentModeration)
+    public function __construct(ContentModerationService $contentModeration, TokenDistributionService $tokenService)
     {
         $this->contentModeration = $contentModeration;
+        $this->tokenService = $tokenService;
     }
 
     /**
@@ -160,6 +163,7 @@ class ProximityChatroomController extends Controller
             'message_count' => 0,
             'last_activity_at' => now(),
             'expires_at' => $validated['expires_at'] ?? null,
+            'token_entry_fee' => $request->input('token_entry_fee', 0),
         ]);
 
         // Add creator as admin member
@@ -261,8 +265,35 @@ class ProximityChatroomController extends Controller
             return response()->json(['message' => 'This chatroom is full'], 403);
         }
 
+        $user = Auth::user();
+
+        // Handle Entry Fee
+        if ($chatroom->token_entry_fee > 0) {
+            try {
+                // Deduct from user
+                $this->tokenService->spendTokens(
+                    $user,
+                    $chatroom->token_entry_fee,
+                    "Entry fee for proximity chatroom: {$chatroom->name}"
+                );
+
+                // Credit Creator
+                $creator = $chatroom->creator;
+                if ($creator) {
+                    $this->tokenService->awardTokens(
+                        $creator,
+                        $chatroom->token_entry_fee,
+                        'proximity_chatroom_entry_fee',
+                        "Entry fee from {$user->name} for chatroom: {$chatroom->name}"
+                    );
+                }
+            } catch (\Exception $e) {
+                return response()->json(['error' => 'Insufficient tokens to join this chatroom'], 400);
+            }
+        }
+
         // Add user as member with location and preferences
-        $chatroom->addMember(Auth::user(), [
+        $chatroom->addMember($user, [
             'latitude' => $validated['latitude'],
             'longitude' => $validated['longitude'],
             'distance_meters' => $chatroom->calculateDistance($validated['latitude'], $validated['longitude']),

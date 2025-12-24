@@ -85,8 +85,17 @@ class TokenDistributionService
         }
 
         DB::transaction(function () use ($user, $amount, $description) {
-            $user->token_balance -= $amount;
-            $user->save();
+            // Atomic decrement with check
+            $updated = User::where('id', $user->id)
+                ->where('token_balance', '>=', $amount)
+                ->decrement('token_balance', $amount);
+
+            if (!$updated) {
+                throw new \Exception("Insufficient token balance (race condition detected).");
+            }
+
+            // Refresh model instance to keep in sync
+            $user->refresh();
 
             TokenTransaction::create([
                 'user_id' => $user->id,

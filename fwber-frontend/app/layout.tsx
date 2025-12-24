@@ -10,6 +10,8 @@ import SentryInitializer from '@/components/SentryInitializer'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import FeedbackModal from '@/components/FeedbackModal'
 import { MercureProvider } from '@/lib/contexts/MercureContext'
+import { SolanaProvider } from '@/components/SolanaProvider'
+import PWAInstallPrompt from '@/components/PWAInstallPrompt'
 
 const inter = Inter({
   variable: '--font-inter',
@@ -95,15 +97,18 @@ export default function RootLayout({
           <QueryProvider>
             <AuthProvider>
               <MercureProvider>
-                <NotificationPermissionHandler />
-                <SentryInitializer />
-                <ToastProvider>
-                  <div className="relative flex min-h-screen flex-col">
-                    <div className="flex-1">{children}</div>
-                  </div>
-                  <FeedbackModal />
-                  <PerformanceMonitor />
-                </ToastProvider>
+                <SolanaProvider>
+                  <NotificationPermissionHandler />
+                  <SentryInitializer />
+                  <PWAInstallPrompt />
+                  <ToastProvider>
+                    <div className="relative flex min-h-screen flex-col">
+                      <div className="flex-1">{children}</div>
+                    </div>
+                    <FeedbackModal />
+                    <PerformanceMonitor />
+                  </ToastProvider>
+                </SolanaProvider>
               </MercureProvider>
             </AuthProvider>
           </QueryProvider>

@@ -17,6 +17,7 @@ import { storeOfflineChatMessage } from '@/lib/offline-store';
 import { useToast } from '@/components/ToastProvider';
 import GiftShopModal from '@/components/gifts/GiftShopModal';
 import { useE2EEncryption } from '@/lib/hooks/use-e2e-encryption';
+import TipButton from '@/components/tipping/TipButton';
 
 interface RealTimeChatProps {
   recipientId: string;
@@ -267,6 +268,8 @@ export default function RealTimeChat({
           >
             <GiftIcon className="w-5 h-5" />
           </button>
+
+          <TipButton recipientId={parseInt(recipientId)} recipientName={recipientName} compact />
 
           <Dialog>
             <DialogTrigger asChild>

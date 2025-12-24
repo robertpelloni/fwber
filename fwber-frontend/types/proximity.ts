@@ -1,6 +1,6 @@
 // Proximity Artifacts & Local Pulse Types
 
-export type ArtifactType = 'chat' | 'board_post' | 'announce';
+export type ArtifactType = 'chat' | 'board_post' | 'announce' | 'token_drop';
 
 export interface ProximityArtifact {
   id: number;
@@ -12,6 +12,11 @@ export interface ProximityArtifact {
   expires_at: string;
   created_at: string;
   user_id?: number;
+  meta?: {
+    amount?: number;
+    claimed?: boolean;
+    claimed_by?: number;
+  };
 }
 
 export interface MatchCandidate {
@@ -41,6 +46,7 @@ export interface CreateArtifactRequest {
   lat: number;
   lng: number;
   radius?: number;
+  amount?: number;
 }
 
 export interface LocalPulseParams {
