@@ -222,6 +222,40 @@ Route::get('debug/throttle-test', function () {
     return response()->json(['status' => 'ok']);
 })->middleware('throttle:api');
 
+// Debug Route: List Event Listeners for Authenticated Event
+Route::get('debug/listeners', function () {
+    $events = [
+        'Illuminate\Auth\Events\Authenticated',
+        'Illuminate\Auth\Events\Login',
+        'Laravel\Sanctum\Events\TokenAuthenticated',
+    ];
+    
+    $results = [];
+    
+    foreach ($events as $eventName) {
+        $listeners = \Illuminate\Support\Facades\Event::getListeners($eventName);
+        $listenerNames = [];
+        
+        foreach ($listeners as $listener) {
+            if (is_array($listener)) {
+                $class = is_object($listener[0]) ? get_class($listener[0]) : $listener[0];
+                $method = $listener[1];
+                $listenerNames[] = "$class@$method";
+            } elseif (is_object($listener) && $listener instanceof \Closure) {
+                $listenerNames[] = 'Closure';
+            } elseif (is_string($listener)) {
+                $listenerNames[] = $listener;
+            } else {
+                $listenerNames[] = 'Unknown';
+            }
+        }
+        
+        $results[$eventName] = $listenerNames;
+    }
+    
+    return response()->json($results);
+});
+
 // Health Checks
 Route::get('health', [\App\Http\Controllers\HealthController::class, 'check']);
 Route::get('health/liveness', [\App\Http\Controllers\HealthController::class, 'liveness']);
