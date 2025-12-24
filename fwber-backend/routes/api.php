@@ -121,6 +121,11 @@ Route::get('debug/empty-auth', function () {
     return response()->json(['status' => 'ok', 'message' => 'Middleware passed']);
 })->middleware('debug.auth');
 
+// Real Auth Empty Route (Test Actual Middleware)
+Route::get('debug/real-auth-empty', function () {
+    return response()->json(['status' => 'ok', 'message' => 'Real Auth Middleware passed']);
+})->middleware('auth:sanctum');
+
 // Debug Route to test Sanctum Token Logic Manually
 Route::get('debug/sanctum-manual', function (Request $request) {
     try {
