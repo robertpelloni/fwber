@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\SafelyHydratesAttributes;
 
 class UserProfile extends Model
 {
-    use HasFactory;
+    use HasFactory, SafelyHydratesAttributes;
 
     protected $fillable = [
         'user_id',

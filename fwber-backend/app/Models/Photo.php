@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Traits\SafelyHydratesAttributes;
 
 /**
  * Photo Model - User Photo Management
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\Storage;
  */
 class Photo extends Model
 {
-    use HasFactory;
+    use HasFactory, SafelyHydratesAttributes;
 
     /**
      * The attributes that are mass assignable.
