@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
+# Ensure this script and others are executable for future runs
+chmod +x "$0"
+if [ -f "scripts/start_mercure_shared.sh" ]; then
+    chmod +x scripts/start_mercure_shared.sh
+fi
+
 #############################################################################
 # FWBer Laravel Backend Deployment Script
 #
