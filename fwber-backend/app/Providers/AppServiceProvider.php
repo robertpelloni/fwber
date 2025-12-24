@@ -49,9 +49,13 @@ class AppServiceProvider extends ServiceProvider
 
         // Configure rate limiting for bulletin board messages
         RateLimiter::for('bulletin-message', function (Request $request) {
-            return $request->user()
-                ? Limit::perMinute(10)->by('user:' . $request->user()->id) // 10 messages per minute for authenticated users
-                : Limit::perMinute(5)->by('ip:' . $request->ip()); // 5 messages per minute for anonymous users
+            try {
+                return $request->user()
+                    ? Limit::perMinute(10)->by('user:' . $request->user()->id) // 10 messages per minute for authenticated users
+                    : Limit::perMinute(5)->by('ip:' . $request->ip()); // 5 messages per minute for anonymous users
+            } catch (\Throwable $e) {
+                return Limit::perMinute(5)->by('ip:' . $request->ip());
+            }
         });
         
         // Configure rate limiting for authentication
@@ -61,58 +65,90 @@ class AppServiceProvider extends ServiceProvider
         
         // Configure rate limiting for general API usage
         RateLimiter::for('api', function (Request $request) {
-            return $request->user()
-                ? Limit::perMinute(100)->by('user:' . $request->user()->id) // 100 requests per minute for authenticated users
-                : Limit::perMinute(60)->by('ip:' . $request->ip()); // 60 requests per minute for anonymous users
+            try {
+                return $request->user()
+                    ? Limit::perMinute(100)->by('user:' . $request->user()->id) // 100 requests per minute for authenticated users
+                    : Limit::perMinute(60)->by('ip:' . $request->ip()); // 60 requests per minute for anonymous users
+            } catch (\Throwable $e) {
+                return Limit::perMinute(60)->by('ip:' . $request->ip());
+            }
         });
         
         // Configure rate limiting for AI content generation (expensive operations)
         RateLimiter::for('content_generation', function (Request $request) {
-            return $request->user()
-                ? Limit::perMinute(10)->by('user:' . $request->user()->id) // 10 generations per minute
-                : Limit::perMinute(3)->by('ip:' . $request->ip()); // 3 generations per minute for guests
+            try {
+                return $request->user()
+                    ? Limit::perMinute(10)->by('user:' . $request->user()->id) // 10 generations per minute
+                    : Limit::perMinute(3)->by('ip:' . $request->ip()); // 3 generations per minute for guests
+            } catch (\Throwable $e) {
+                return Limit::perMinute(3)->by('ip:' . $request->ip());
+            }
         });
         
         // Configure rate limiting for photo uploads
         RateLimiter::for('photo_uploads', function (Request $request) {
-            return $request->user()
-                ? Limit::perMinute(20)->by('user:' . $request->user()->id) // 20 photo operations per minute
-                : Limit::perMinute(5)->by('ip:' . $request->ip()); // 5 uploads per minute for guests
+            try {
+                return $request->user()
+                    ? Limit::perMinute(20)->by('user:' . $request->user()->id) // 20 photo operations per minute
+                    : Limit::perMinute(5)->by('ip:' . $request->ip()); // 5 uploads per minute for guests
+            } catch (\Throwable $e) {
+                return Limit::perMinute(5)->by('ip:' . $request->ip());
+            }
         });
 
         // Configure rate limiting for messaging
         RateLimiter::for('messaging', function (Request $request) {
-            return $request->user()
-                ? Limit::perMinute(30)->by('user:' . $request->user()->id)
-                : Limit::perMinute(5)->by('ip:' . $request->ip());
+            try {
+                return $request->user()
+                    ? Limit::perMinute(30)->by('user:' . $request->user()->id)
+                    : Limit::perMinute(5)->by('ip:' . $request->ip());
+            } catch (\Throwable $e) {
+                return Limit::perMinute(5)->by('ip:' . $request->ip());
+            }
         });
 
         // Configure rate limiting for matching (swipes)
         RateLimiter::for('matching', function (Request $request) {
-            return $request->user()
-                ? Limit::perMinute(60)->by('user:' . $request->user()->id)
-                : Limit::perMinute(10)->by('ip:' . $request->ip());
+            try {
+                return $request->user()
+                    ? Limit::perMinute(60)->by('user:' . $request->user()->id)
+                    : Limit::perMinute(10)->by('ip:' . $request->ip());
+            } catch (\Throwable $e) {
+                return Limit::perMinute(10)->by('ip:' . $request->ip());
+            }
         });
 
         // Configure rate limiting for friend requests
         RateLimiter::for('friend_requests', function (Request $request) {
-            return $request->user()
-                ? Limit::perMinute(10)->by('user:' . $request->user()->id)
-                : Limit::perMinute(3)->by('ip:' . $request->ip());
+            try {
+                return $request->user()
+                    ? Limit::perMinute(10)->by('user:' . $request->user()->id)
+                    : Limit::perMinute(3)->by('ip:' . $request->ip());
+            } catch (\Throwable $e) {
+                return Limit::perMinute(3)->by('ip:' . $request->ip());
+            }
         });
 
         // Configure rate limiting for verification
         RateLimiter::for('verification', function (Request $request) {
-            return $request->user()
-                ? Limit::perMinute(3)->by('user:' . $request->user()->id)
-                : Limit::perMinute(1)->by('ip:' . $request->ip());
+            try {
+                return $request->user()
+                    ? Limit::perMinute(3)->by('user:' . $request->user()->id)
+                    : Limit::perMinute(1)->by('ip:' . $request->ip());
+            } catch (\Throwable $e) {
+                return Limit::perMinute(1)->by('ip:' . $request->ip());
+            }
         });
 
         // Configure rate limiting for feedback
         RateLimiter::for('feedback', function (Request $request) {
-            return $request->user()
-                ? Limit::perMinute(5)->by('user:' . $request->user()->id)
-                : Limit::perMinute(2)->by('ip:' . $request->ip());
+            try {
+                return $request->user()
+                    ? Limit::perMinute(5)->by('user:' . $request->user()->id)
+                    : Limit::perMinute(2)->by('ip:' . $request->ip());
+            } catch (\Throwable $e) {
+                return Limit::perMinute(2)->by('ip:' . $request->ip());
+            }
         });
 
         // Query Monitoring: Log slow queries (>100ms) for performance analysis
