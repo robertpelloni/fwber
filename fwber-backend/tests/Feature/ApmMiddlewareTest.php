@@ -25,7 +25,7 @@ class ApmMiddlewareTest extends TestCase
         Route::get('/test-slow-route', function () {
             usleep(1100000); // Sleep for 1.1 seconds
             return 'slow response';
-        });
+        })->middleware(\App\Http\Middleware\ApmMiddleware::class);
 
         // Make the request
         $response = $this->get('/test-slow-route');
@@ -47,7 +47,7 @@ class ApmMiddlewareTest extends TestCase
         // Define a fast route
         Route::get('/test-fast-route', function () {
             return 'fast response';
-        });
+        })->middleware(\App\Http\Middleware\ApmMiddleware::class);
 
         // Make the request
         $response = $this->get('/test-fast-route');
