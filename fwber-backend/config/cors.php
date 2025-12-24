@@ -21,7 +21,7 @@ return [
 
     'allowed_origins' => explode(',', env('CORS_ALLOWED_ORIGINS', 'https://fwber.me,https://www.fwber.me,http://localhost:3000,http://localhost:3005,http://localhost:3007')),
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => ['*.vercel.app', 'vercel.live'],
 
     'allowed_headers' => ['*'],
 
