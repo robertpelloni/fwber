@@ -509,7 +509,11 @@ export default function PhotoUpload({
           }
           ${totalPhotos >= maxPhotos ? 'opacity-50 cursor-not-allowed' : 'pointer-events-auto'}
         `}
-        onClick={() => {
+        onClick={(e) => {
+          // Prevent opening if clicking on interactive elements
+          if ((e.target as HTMLElement).closest('input, label, button')) {
+            return
+          }
           if (totalPhotos < maxPhotos) {
             open()
           }
