@@ -113,6 +113,48 @@ Route::get('debug/user-manual', function () {
     }
 });
 
+// Debug Route to test Sanctum Token Logic Manually
+Route::get('debug/sanctum-manual', function (Request $request) {
+    try {
+        $token = $request->bearerToken();
+        
+        if (!$token) {
+            return response()->json(['error' => 'No Bearer Token provided'], 400);
+        }
+
+        // 1. Find the token in DB
+        $model = \Laravel\Sanctum\Sanctum::personalAccessTokenModel();
+        $accessToken = $model::findToken($token);
+
+        if (!$accessToken) {
+            return response()->json(['error' => 'Invalid Token'], 401);
+        }
+
+        // 2. Check if token is valid
+        $isValid = $accessToken->tokenable; // This triggers the relationship to User
+
+        if (!$isValid) {
+             return response()->json(['error' => 'Token has no user'], 401);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'token_id' => $accessToken->id,
+            'user_id' => $accessToken->tokenable_id,
+            'user_email' => $accessToken->tokenable->email,
+        ]);
+
+    } catch (\Throwable $e) {
+        return response()->json([
+            'error' => 'Sanctum Manual Check Failed',
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
+
 // Health Checks
 Route::get('health', [\App\Http\Controllers\HealthController::class, 'check']);
 Route::get('health/liveness', [\App\Http\Controllers\HealthController::class, 'liveness']);
