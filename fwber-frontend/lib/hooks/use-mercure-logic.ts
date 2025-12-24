@@ -338,6 +338,9 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
     }
 
     const hubUrl = new URL(process.env.NEXT_PUBLIC_MERCURE_URL || 'http://localhost:3000/.well-known/mercure');
+    // Use absolute URL for topic to match backend authorization
+    // Also include relative path as fallback in case of configuration mismatch
+    hubUrl.searchParams.append('topic', `https://fwber.me/users/${user.id}`);
     hubUrl.searchParams.append('topic', `/users/${user.id}`);
     
     if (token) {
