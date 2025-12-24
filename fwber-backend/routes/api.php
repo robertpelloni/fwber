@@ -87,14 +87,17 @@ Route::get('debug/user-manual', function () {
             return response()->json(['status' => 'no users found']);
         }
 
-        // 2. Test attribute access (which might trigger accessors)
+        // 2. Test attribute access
         $data = [
             'id' => $user->id,
             'email' => $user->email,
-            'has_two_factor' => $user->hasEnabledTwoFactorAuthentication(), // Test trait method
+            'has_two_factor' => $user->hasEnabledTwoFactorAuthentication(),
         ];
 
-        // 3. Test serialization (toArray)
+        // 3. Test Relationship Loading (CRITICAL STEP)
+        $user->load(['profile', 'photos']);
+
+        // 4. Test serialization (toArray)
         $array = $user->toArray();
 
         return response()->json([
@@ -112,6 +115,11 @@ Route::get('debug/user-manual', function () {
         ], 500);
     }
 });
+
+// Empty Auth Route (Test Middleware Only)
+Route::get('debug/empty-auth', function () {
+    return response()->json(['status' => 'ok', 'message' => 'Middleware passed']);
+})->middleware('auth:sanctum');
 
 // Debug Route to test Sanctum Token Logic Manually
 Route::get('debug/sanctum-manual', function (Request $request) {
