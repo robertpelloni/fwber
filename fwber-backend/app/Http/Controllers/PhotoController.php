@@ -108,6 +108,7 @@ class PhotoController extends Controller
                         'height' => $photo->height,
                         'is_primary' => $photo->is_primary,
                         'is_private' => $photo->is_private,
+                        'unlock_price' => $photo->unlock_price,
                         'sort_order' => $photo->sort_order,
                         'created_at' => $photo->created_at,
                         'updated_at' => $photo->updated_at,
@@ -192,6 +193,7 @@ class PhotoController extends Controller
             $validator = Validator::make($request->all(), [
                 'photo' => 'required|file|mimes:jpeg,png,gif,webp|max:5120', // 5MB max
                 'is_private' => 'sometimes|boolean',
+                'unlock_price' => 'nullable|numeric|min:0',
             ]);
             
             if ($validator->fails()) {
@@ -277,6 +279,7 @@ class PhotoController extends Controller
                 'height' => $height,
                 'is_primary' => $currentPhotoCount === 0, // First photo is primary
                 'is_private' => $request->boolean('is_private', false),
+                'unlock_price' => $request->input('unlock_price'),
                 'sort_order' => $currentPhotoCount,
                 'metadata' => [
                     'uploaded_at' => now()->toISOString(),
@@ -309,6 +312,7 @@ class PhotoController extends Controller
                     'height' => $photo->height,
                     'is_primary' => $photo->is_primary,
                     'is_private' => $photo->is_private,
+                    'unlock_price' => $photo->unlock_price,
                     'sort_order' => $photo->sort_order,
                     'created_at' => $photo->created_at,
                 ],
@@ -372,6 +376,7 @@ class PhotoController extends Controller
             $validator = Validator::make($request->all(), [
                 'is_primary' => 'sometimes|boolean',
                 'is_private' => 'sometimes|boolean',
+                'unlock_price' => 'nullable|numeric|min:0',
                 'sort_order' => 'sometimes|integer|min:0',
             ]);
             
@@ -386,7 +391,7 @@ class PhotoController extends Controller
             if ($request->has('is_primary') && $request->boolean('is_primary')) {
                 $photo->setAsPrimary();
             } else {
-                $photo->update($request->only(['is_private', 'sort_order']));
+                $photo->update($request->only(['is_private', 'unlock_price', 'sort_order']));
             }
             
             Log::info('Photo updated', [
@@ -410,6 +415,7 @@ class PhotoController extends Controller
                     'height' => $photo->height,
                     'is_primary' => $photo->is_primary,
                     'is_private' => $photo->is_private,
+                    'unlock_price' => $photo->unlock_price,
                     'sort_order' => $photo->sort_order,
                     'updated_at' => $photo->updated_at,
                 ],
@@ -702,8 +708,10 @@ class PhotoController extends Controller
                 return response()->json(['success' => true, 'message' => 'Already unlocked', 'balance' => $user->token_balance]);
             }
 
-            // 2. Check balance
-            $cost = config('economy.photo_unlock_cost', 50);
+            // 2. Determine Cost
+            $cost = $photo->unlock_price ?? config('economy.photo_unlock_cost', 50);
+
+            // 3. Check Balance Atomically
             if ($user->token_balance < $cost) {
                 return response()->json([
                     'success' => false, 
@@ -716,16 +724,34 @@ class PhotoController extends Controller
             // 3. Process Transaction
             DB::beginTransaction();
             try {
-                // Deduct tokens
-                $user->decrement('token_balance', $cost);
+                // Deduct tokens (Atomic Check & Update)
+                $deducted = User::where('id', $user->id)
+                    ->where('token_balance', '>=', $cost)
+                    ->decrement('token_balance', $cost);
+
+                if (!$deducted) {
+                    throw new \Exception('Insufficient tokens (race condition).');
+                }
                 
-                // Record transaction
+                // Record spend transaction
                 TokenTransaction::create([
                     'user_id' => $user->id,
                     'amount' => -$cost,
                     'type' => 'photo_unlock',
                     'description' => 'Unlocked private photo #' . $photo->id,
                     'metadata' => ['photo_id' => $photo->id, 'owner_id' => $photo->user_id]
+                ]);
+
+                // Credit Owner
+                $photo->user->increment('token_balance', $cost);
+
+                // Record earn transaction
+                TokenTransaction::create([
+                    'user_id' => $photo->user_id,
+                    'amount' => $cost,
+                    'type' => 'photo_earned',
+                    'description' => 'Earned tokens from photo unlock',
+                    'metadata' => ['photo_id' => $photo->id, 'viewer_id' => $user->id]
                 ]);
 
                 // Create unlock record

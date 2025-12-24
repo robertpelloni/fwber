@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\OptimizeContentRequest;
 use App\Services\ContentGenerationService;
 use App\Services\ContentOptimizationService;
+use App\Services\TokenDistributionService;
 use App\Models\User;
 use App\Models\BulletinBoard;
 use Illuminate\Http\JsonResponse;
@@ -17,13 +18,16 @@ class ContentGenerationController extends Controller
 {
     protected ContentGenerationService $contentGenerationService;
     protected ContentOptimizationService $contentOptimizationService;
+    protected TokenDistributionService $tokenService;
 
     public function __construct(
         ContentGenerationService $contentGenerationService,
-        ContentOptimizationService $contentOptimizationService
+        ContentOptimizationService $contentOptimizationService,
+        TokenDistributionService $tokenService
     ) {
         $this->contentGenerationService = $contentGenerationService;
         $this->contentOptimizationService = $contentOptimizationService;
+        $this->tokenService = $tokenService;
     }
 
     /**
@@ -80,6 +84,9 @@ class ContentGenerationController extends Controller
         ]);
 
         try {
+            // Deduct cost
+            $this->tokenService->spendTokens($user, 20, 'Generated AI Profile Content');
+
             $result = $this->contentGenerationService->generateProfileContent($user, $preferences);
             
             return response()->json([
@@ -149,6 +156,9 @@ class ContentGenerationController extends Controller
         $context = $request->input('context', []);
 
         try {
+            // Deduct cost
+            $this->tokenService->spendTokens($user, 10, 'Generated AI Post Suggestions');
+
             $result = $this->contentGenerationService->generatePostSuggestions($board, $user, $context);
             
             return response()->json([
@@ -211,6 +221,9 @@ class ContentGenerationController extends Controller
         $context = $request->input('context', []);
 
         try {
+            // Deduct cost
+            $this->tokenService->spendTokens($user, 5, 'Generated AI Conversation Starters');
+
             $result = $this->contentGenerationService->generateConversationStarters($user, $context);
             
             return response()->json([
@@ -261,6 +274,9 @@ class ContentGenerationController extends Controller
         $optimizationTypes = $request->validated('optimization_types', ['engagement', 'clarity', 'safety', 'relevance']);
 
         try {
+            // Deduct cost
+            $this->tokenService->spendTokens($request->user(), 10, 'AI Content Optimization');
+
             $result = $this->contentOptimizationService->optimizeContent($content, $context);
             
             // Filter results based on requested optimization types

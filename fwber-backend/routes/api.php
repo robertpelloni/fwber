@@ -241,6 +241,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('matches', [\App\Http\Controllers\MatchController::class, 'index']);
     Route::get('matches/established', [\App\Http\Controllers\MatchController::class, 'establishedMatches']);
     Route::get('matches/{id}/insights', [\App\Http\Controllers\MatchInsightsController::class, 'show']);
+    Route::post('matches/{id}/insights/unlock', [\App\Http\Controllers\MatchInsightsController::class, 'unlock']);
     Route::post('matches/action', [\App\Http\Controllers\MatchController::class, 'action'])->middleware('throttle:matching');
 
     // Direct Messages
@@ -384,8 +385,16 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Token / Wallet
     Route::get('wallet', [\App\Http\Controllers\Api\TokenController::class, 'balance']);
+    Route::post('wallet/withdraw', [\App\Http\Controllers\Api\TokenController::class, 'withdraw']);
+    Route::post('wallet/transfer', [\App\Http\Controllers\Api\TokenController::class, 'transfer']);
     Route::post('wallet/address', [\App\Http\Controllers\Api\TokenController::class, 'updateAddress']);
     Route::get('leaderboard', [\App\Http\Controllers\Api\TokenController::class, 'leaderboard']);
+
+    // Payment Requests
+    Route::get('wallet/requests', [\App\Http\Controllers\Api\PaymentRequestController::class, 'index']);
+    Route::post('wallet/requests', [\App\Http\Controllers\Api\PaymentRequestController::class, 'store']);
+    Route::post('wallet/requests/{id}/pay', [\App\Http\Controllers\Api\PaymentRequestController::class, 'pay']);
+    Route::post('wallet/requests/{id}/cancel', [\App\Http\Controllers\Api\PaymentRequestController::class, 'cancel']);
 
     // Gifts
     Route::get('gifts', [\App\Http\Controllers\GiftController::class, 'index']);

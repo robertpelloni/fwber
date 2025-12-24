@@ -1,4 +1,4 @@
-# FWBer Project Status & Roadmap (November 24, 2025)
+# FWBer Project Status & Roadmap
 
 This document provides a single, authoritative overview of the "fwber" project's status, features, and roadmap. It is intended to be the primary source of truth for all contributors.
 
@@ -12,6 +12,7 @@ This document provides a single, authoritative overview of the "fwber" project's
 
 *   **Backend:** A RESTful API built with **Laravel 12** and **PHP 8.4**.
 *   **Frontend:** A responsive single-page application built with **Next.js 14**, **React 18**, and **TypeScript**.
+*   **Crypto:** **Solana Blockchain** integration (Devnet/Mainnet) via `@solana/web3.js`.
 *   **Real-time:** **Mercure** (built on Server-Sent Events) powers real-time chat, notifications, and location updates.
 *   **Database:** **MySQL 8.0**, with **SQLite** for testing and local development.
 *   **Environment:** The entire stack is containerized using **Docker**.
@@ -30,6 +31,21 @@ These features are considered complete and are ready for a production environmen
     *   [x] **Profile Management:** Create, edit, and view user profiles.
     *   [x] **Matching System:** The core "swipe" and matching logic is functional.
     *   [x] **Direct Messaging:** Real-time one-on-one chat between matched users.
+*   **Crypto Economy (Fully Integrated):**
+    *   [x] **Trojan Horse Integration:** Internal ledger for instant/free micro-transactions.
+    *   [x] **Solana Bridge:** Users can withdraw accumulated tokens to external wallets (Phantom, Solflare).
+    *   [x] **Wallet Dashboard:** PWA-ready wallet UI with QR code deposits and transaction history.
+    *   [x] **Tokenomics:** Signup bonuses, Referral Rewards, and Daily Login Bonuses.
+    *   [x] **P2P Tipping:** Send tokens in Chat, Profiles, and Friend Lists.
+    *   [x] **Token-Gated Content:** Pay-to-unlock private photos and paid events.
+    *   [x] **Paid Groups:** Token entry fees for exclusive communities.
+    *   [x] **Paid AI Features:** Token costs for Profile Generation, Conversation Starters, and Optimization.
+    *   [x] **Paid Match Insights:** Token costs to unlock detailed AI compatibility reports and explanations.
+    *   [x] **Payment Requests:** "Venmo-style" invoicing allowing users to request tokens from friends and matches.
+*   **Social & Engagement:**
+    *   [x] **Friends System:** Send, accept, manage friends, and send tips.
+    *   [x] **Push Notifications:** Real-time alerts for Tips, Friend Requests, and Matches (WebPush/VAPID).
+    *   [x] **Groups:** Create and join public/private/paid groups.
 *   **Safety & Security:**
     *   [x] **Geo-Spoofing Detection:** Protects against location manipulation.
     *   [x] **Moderation Dashboard:** Tools for moderators to review flagged content.
@@ -37,81 +53,30 @@ These features are considered complete and are ready for a production environmen
     *   [x] **Block & Report:** Users can block and report others.
 *   **API & Documentation:**
     *   [x] **OpenAPI Documentation:** The backend API is extensively documented using OpenAPI (Swagger).
+    *   [x] **Advanced Match Filtering:** Filtering by lifestyle preferences (Diet, Politics, etc.) is fully functional and token-gated for premium users.
 
 ### Partially Implemented
 
 These features are in progress but require further work before they are considered stable.
 
-*   **Social & Engagement:**
-    *   [ ] **Friends System:** Users can send, accept, and manage friend requests. *Backend is complete, but frontend UI needs refinement.*
-    *   [ ] **Push Notifications:** Groundwork is in place, but requires full implementation and testing.
-    *   [ ] **Advanced Match Filtering:** Filtering by lifestyle preferences is functional but needs more comprehensive UI controls.
 *   **AI-Powered Features:**
-    *   [ ] **Recommendation Engine:** The API exists but needs to be fully integrated with the frontend.
-    *   [ ] **Content Generation & Optimization:** The APIs are in place but are not yet fully integrated into the user workflow.
+    *   [x] **Recommendation Engine:** Fully integrated with "For You" feed and backend AI logic.
 
 ### Not Yet Implemented
 
 These features are planned but have not yet been started.
 
-*   [ ] **Groups:** Functionality for users to create and join interest-based groups.
-*   [ ] **Premium Features (Monetization):** Premium subscriptions, paid visibility boosts, etc.
-*   [ ] **Dedicated Mobile App:** A React Native app is planned for a future phase.
+*   [ ] **Premium Features (Fiat):** Traditional fiat subscriptions (Stripe) alongside token payments.
+*   [ ] **Dedicated Mobile App:** A React Native app is planned for a future phase (PWA currently serves this role).
 
 ## 4. Immediate Roadmap
 
 The immediate focus is on stabilizing the existing feature set and preparing for a production release.
 
-1.  **Stabilize Partially Implemented Features:**
-    *   **Friends System:** Complete the frontend UI for managing friends and friend requests.
-    *   **Push Notifications:** Fully implement and test the push notification system.
-    *   **Advanced Match Filtering:** Add a more comprehensive set of UI controls for match filtering.
-2.  **End-to-End Testing:**
+1.  **End-to-End Testing:**
     *   Conduct a thorough end-to-end testing pass of all core features to identify and fix any remaining bugs.
-3.  **Operational Readiness:**
+2.  **Operational Readiness:**
     *   Review and finalize all environment configurations for a production deployment.
     *   Establish a basic monitoring and alerting pipeline to track application health.
 
 This document should be updated as the project evolves. For more detailed technical information, refer to the OpenAPI documentation and the `docs/` directory.
-# Project Status & Roadmap
-
-This document provides a centralized, up-to-date overview of the project's status, roadmap, and key architectural decisions. It is intended to be the single source of truth for all contributors.
-
-## Current Status: In Progress
-
-- **Phase 1: Project Cleanup & Documentation Consolidation:** In Progress.
-- **Phase 2: Core Feature Implementation (Friends System):** Not Started.
-
-## Roadmap
-
-The following is a high-level overview of the planned features and their priorities.
-
-### P1: Core Social Features (Immediate Priority)
-
--   [ ] **Friends System:** Users can add, remove, and manage friends.
--   [ ] **User Profiles:** Enhance user profiles with more details (bio, interests, etc.).
--   [ ] **Real-time Chat:** Implement a real-time chat system for friends.
-
-### P2: Content & Interaction
-
--   [ ] **Content Feed:** A simple feed where users can see updates from their friends.
--   [ ] **Likes & Comments:** Users can like and comment on feed items.
--   [ ] **Notifications:** A system for notifying users of new friend requests, messages, and other interactions.
-
-### P3: Moderation & Safety
-
--   [ ] **Blocking:** Users can block other users.
--   [ ] **Reporting:** Users can report inappropriate content or behavior.
--   [ ] **Admin Panel:** A basic admin panel for managing users and content.
-
-## Key Architectural Decisions
-
--   **Backend:** Laravel (PHP) API.
--   **Frontend:** Next.js (React/TypeScript).
--   **Authentication:** JWT-based authentication.
--   **Database:** MySQL.
--   **Deployment:** Dockerized for portability.
-
-## Getting Started
-
-Please refer to the `README.md` files in the `fwber-backend` and `fwber-frontend` directories for instructions on how to set up and run the development environments.

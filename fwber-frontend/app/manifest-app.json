@@ -63,6 +63,18 @@
           "sizes": "192x192"
         }
       ]
+    },
+    {
+      "name": "My Wallet",
+      "short_name": "Wallet",
+      "description": "Manage your crypto and payments",
+      "url": "/wallet",
+      "icons": [
+        {
+          "src": "/android-chrome-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ],
   "screenshots": [

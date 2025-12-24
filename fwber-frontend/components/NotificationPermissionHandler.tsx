@@ -24,72 +24,59 @@ export default function NotificationPermissionHandler() {
   const { isAuthenticated, token } = useAuth();
 
   useEffect(() => {
-    const registerDeviceToken = async () => {
-      try {
-        const registration = await navigator.serviceWorker.getRegistration();
-        if (registration && process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) {
-          const subscription = await registration.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY),
-          });
+    // Only run if authenticated
+    if (!isAuthenticated || !token) return;
 
-          await api.post(
-            '/notifications/subscribe',
-            subscription.toJSON()
-          );
+    // Check if browser supports notifications
+    if (!('Notification' in window)) return;
+
+    // Helper to register the token with the backend
+    const registerWithBackend = async (subscription: PushSubscription) => {
+        try {
+            await api.post(
+                '/notifications/subscribe',
+                subscription.toJSON()
+            );
+            console.log('Push notification subscription active');
+        } catch (error) {
+            console.error('Failed to sync subscription with backend:', error);
         }
-      } catch (error) {
-        console.error('Error registering device token:', error);
-      }
     };
 
-    const requestNotificationPermission = async () => {
-      if ('Notification' in window) {
-        const permission = await Notification.requestPermission();
-        if (permission === 'granted') {
-          registerDeviceToken();
+    // Main registration logic
+    const initializeNotifications = async () => {
+        try {
+            // Get SW registration
+            const registration = await navigator.serviceWorker.ready;
+
+            // Check existing subscription
+            let subscription = await registration.pushManager.getSubscription();
+
+            // If permission is already granted but no subscription, create one
+            if (!subscription && Notification.permission === 'granted' && process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) {
+                subscription = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY),
+                });
+            }
+
+            // Sync with backend if we have a subscription
+            if (subscription) {
+                await registerWithBackend(subscription);
+            } else if (Notification.permission === 'default') {
+                // If default, we can prompt (or show a UI to prompt)
+                // For now, we'll silently wait for user action or a better prompt time
+                // to avoid annoying popups on load.
+            }
+
+        } catch (error) {
+            console.error('Error initializing notifications:', error);
         }
-      }
     };
 
-    if (isAuthenticated && token) {
-      requestNotificationPermission();
-    }
+    initializeNotifications();
+
   }, [isAuthenticated, token]);
-
-  const requestNotificationPermission = async () => {
-    if ('Notification' in window) {
-      const permission = await Notification.requestPermission();
-      if (permission === 'granted') {
-        registerDeviceToken();
-      }
-    }
-  };
-
-  const registerDeviceToken = async () => {
-    try {
-      const registration = await navigator.serviceWorker.getRegistration();
-      if (registration) {
-        const subscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
-        });
-
-        await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}/device-tokens`,
-          {
-            token: subscription.endpoint,
-            type: 'web',
-          },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-      }
-    } catch (error) {
-      console.error('Error registering device token:', error);
-    }
-  };
 
   return null;
 }

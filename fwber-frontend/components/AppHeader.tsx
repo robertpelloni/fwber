@@ -22,7 +22,8 @@ import {
   Radio,
   Zap,
   Wallet,
-  Trophy
+  Trophy,
+  Sparkles
 } from 'lucide-react'
 
 interface AppHeaderProps {
@@ -32,6 +33,7 @@ interface AppHeaderProps {
 
 const navLinks = [
   { href: '/dashboard', label: 'Dashboard', icon: Home },
+  { href: '/recommendations', label: 'For You', icon: Sparkles },
   { href: '/matches', label: 'Matches', icon: Heart },
   { href: '/messages', label: 'Messages', icon: MessageSquare },
   { href: '/events', label: 'Events', icon: Calendar },

@@ -13,6 +13,8 @@ use App\Events\GroupMemberMuted;
 use App\Events\GroupMemberUnmuted;
 use App\Events\GroupMemberKicked;
 use Illuminate\Support\Facades\DB;
+use App\Services\TokenDistributionService;
+use App\Models\User;
 
 class GroupService
 {
@@ -26,6 +28,7 @@ class GroupService
                 'creator_id' => $userId,
                 'max_members' => $data['max_members'] ?? 100,
                 'is_active' => true,
+                'token_entry_fee' => $data['token_entry_fee'] ?? 0,
             ]);
 
             // Add creator as owner
@@ -60,6 +63,31 @@ class GroupService
 
         if ($group->isFull()) {
             throw new \Exception('Group is full', 400);
+        }
+
+        // Handle Entry Fee
+        if ($group->token_entry_fee > 0) {
+            $user = User::findOrFail($userId);
+            $tokenService = app(TokenDistributionService::class);
+
+            // Spend Tokens (Deduct from user)
+            $tokenService->spendTokens(
+                $user,
+                $group->token_entry_fee,
+                "Entry fee for group: {$group->name}"
+            );
+
+            // Award Tokens (Credit to Group Creator)
+            $creator = $group->creator;
+            if ($creator) {
+                // Take 10% platform fee if desired, for now 100% to creator
+                $tokenService->awardTokens(
+                    $creator,
+                    $group->token_entry_fee,
+                    'group_entry_fee',
+                    "Entry fee from {$user->name} for group: {$group->name}"
+                );
+            }
         }
 
         // If there is a historical membership record (e.g., left, kicked, or previously banned but now unbanned), reactivate it

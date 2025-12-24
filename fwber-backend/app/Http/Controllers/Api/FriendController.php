@@ -9,6 +9,7 @@ use App\Models\Friend;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Services\PushNotificationService;
 use OpenApi\Attributes as OA;
 
 /**
@@ -19,6 +20,13 @@ use OpenApi\Attributes as OA;
  */
 class FriendController extends Controller
 {
+    protected $pushService;
+
+    public function __construct(PushNotificationService $pushService)
+    {
+        $this->pushService = $pushService;
+    }
+
     /**
      * @OA\Get(
      *     path="/api/friends",
@@ -127,6 +135,17 @@ class FriendController extends Controller
             'status' => 'pending'
         ]);
 
+        // Send Push Notification
+        $this->pushService->send(
+            User::find($friendId),
+            [
+                'title' => 'New Friend Request',
+                'body' => "{$user->name} wants to be friends!",
+                'url' => '/friends'
+            ],
+            'social'
+        );
+
         return response()->json($friendRequest, 201);
     }
 
@@ -177,6 +196,18 @@ class FriendController extends Controller
                 ['user_id' => $user->id, 'friend_id' => $userId],
                 ['status' => 'accepted']
             );
+
+            // Send Push Notification
+            $this->pushService->send(
+                User::find($userId),
+                [
+                    'title' => 'Friend Request Accepted',
+                    'body' => "{$user->name} accepted your friend request!",
+                    'url' => '/friends'
+                ],
+                'social'
+            );
+
             return response()->json($friendRequest);
         } else {
             $friendRequest->delete();
