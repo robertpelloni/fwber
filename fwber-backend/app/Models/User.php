@@ -8,10 +8,11 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use NotificationChannels\WebPush\HasPushSubscriptions;
 use App\Models\Traits\HasTwoFactorAuthentication;
+use App\Models\Traits\SafelyHydratesAttributes;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasPushSubscriptions, HasTwoFactorAuthentication;
+    use HasApiTokens, HasFactory, Notifiable, HasPushSubscriptions, HasTwoFactorAuthentication, SafelyHydratesAttributes;
 
     protected $fillable = [
         'name',
