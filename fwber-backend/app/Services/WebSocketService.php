@@ -34,7 +34,7 @@ class WebSocketService
     public function getMercureToken(string $userId): string
     {
         $topics = [
-            "https://fwber.me/user/{$userId}",
+            "https://fwber.me/users/{$userId}",
             "https://fwber.me/presence"
         ];
 
@@ -170,7 +170,7 @@ class WebSocketService
 
             // Publish to Mercure
             $this->mercurePublisher->publish(
-                "https://fwber.me/user/{$userId}",
+                "https://fwber.me/users/{$userId}",
                 $message,
                 true // Private update
             );
@@ -206,7 +206,7 @@ class WebSocketService
 
                 // Mercure
                 $this->mercurePublisher->publish(
-                    "https://fwber.me/user/{$userId}",
+                    "https://fwber.me/users/{$userId}",
                     $message,
                     true
                 );

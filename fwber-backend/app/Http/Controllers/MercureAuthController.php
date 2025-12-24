@@ -46,10 +46,16 @@ class MercureAuthController extends Controller
             }
 
             // Define topics the user can subscribe to
+            // We authorize both absolute and relative paths to ensure compatibility
             $topics = [
+                "https://fwber.me/users/{$user->id}",
                 "https://fwber.me/users/{$user->id}/*",
                 "https://fwber.me/bulletin-boards/*",
-                "https://fwber.me/public/*"
+                "https://fwber.me/public/*",
+                "/users/{$user->id}",
+                "/users/{$user->id}/*",
+                "/bulletin-boards/*",
+                "/public/*"
             ];
 
             // Generate subscriber JWT
