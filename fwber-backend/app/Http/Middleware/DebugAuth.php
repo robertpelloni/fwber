@@ -12,6 +12,11 @@ class DebugAuth
     public function handle(Request $request, Closure $next)
     {
         try {
+            // Manually inject token from query param if header is missing
+            if (!$request->bearerToken() && $request->has('token')) {
+                $request->headers->set('Authorization', 'Bearer ' . $request->query('token'));
+            }
+
             Log::info('DebugAuth: Attempting authentication...');
             
             if (Auth::guard('sanctum')->check()) {
