@@ -48,6 +48,26 @@ Route::get('auth/referral/{code}', [\App\Http\Controllers\AuthController::class,
 Route::post('public/vouch', [\App\Http\Controllers\VouchController::class, 'store'])->middleware('throttle:60,1');
 Route::post('auth/two-factor-challenge', [\App\Http\Controllers\TwoFactorChallengeController::class, 'store'])->middleware('throttle:auth');
 
+// Debug Route to diagnose 500 errors
+Route::get('debug/user', function (Request $request) {
+    try {
+        $user = $request->user();
+        return response()->json([
+            'user' => $user,
+            'profile' => $user->profile,
+            'photos' => $user->photos,
+            'two_factor' => $user->hasEnabledTwoFactorAuthentication(),
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+})->middleware('auth:sanctum');
+
 // Health Checks
 Route::get('health', [\App\Http\Controllers\HealthController::class, 'check']);
 Route::get('health/liveness', [\App\Http\Controllers\HealthController::class, 'liveness']);

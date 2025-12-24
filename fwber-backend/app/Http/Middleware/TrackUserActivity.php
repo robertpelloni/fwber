@@ -21,24 +21,36 @@ class TrackUserActivity
 
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check()) {
-            $user = Auth::user();
-            $today = now()->toDateString();
-            $cacheKey = "user_active:{$user->id}:{$today}";
+        try {
+            if (Auth::check()) {
+                $user = Auth::user();
+                $today = now()->toDateString();
+                $cacheKey = "user_active:{$user->id}:{$today}";
 
-            if (!Cache::has($cacheKey)) {
-                // Record DAU
-                DailyActiveUser::firstOrCreate([
-                    'user_id' => $user->id,
-                    'date' => $today,
-                ]);
+                if (!Cache::has($cacheKey)) {
+                    // Record DAU
+                    try {
+                        DailyActiveUser::firstOrCreate([
+                            'user_id' => $user->id,
+                            'date' => $today,
+                        ]);
+                    } catch (\Exception $e) {
+                        // Ignore if table missing
+                    }
 
-                // Update Streak and Last Active
-                $this->streakService->updateStreak($user);
+                    // Update Streak and Last Active
+                    try {
+                        $this->streakService->updateStreak($user);
+                    } catch (\Exception $e) {
+                        // Ignore if streak service fails
+                    }
 
-                // Cache for 24 hours
-                Cache::put($cacheKey, true, now()->addDay());
+                    // Cache for 24 hours
+                    Cache::put($cacheKey, true, now()->addDay());
+                }
             }
+        } catch (\Exception $e) {
+            // Fail silently to prevent blocking the request
         }
 
         return $next($request);
