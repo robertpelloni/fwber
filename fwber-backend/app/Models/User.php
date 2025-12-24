@@ -12,9 +12,7 @@ use App\Models\Traits\SafelyHydratesAttributes;
 
 class User extends Authenticatable
 {
-    // use HasApiTokens, HasFactory, Notifiable, HasPushSubscriptions, HasTwoFactorAuthentication, SafelyHydratesAttributes;
-    // Temporarily removing HasPushSubscriptions to isolate 500 error
-    use HasApiTokens, HasFactory, Notifiable, HasTwoFactorAuthentication, SafelyHydratesAttributes;
+    use HasApiTokens, HasFactory, Notifiable, HasPushSubscriptions, HasTwoFactorAuthentication, SafelyHydratesAttributes;
 
     protected $fillable = [
         'name',
