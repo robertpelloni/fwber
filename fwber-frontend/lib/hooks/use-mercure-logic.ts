@@ -327,9 +327,11 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
 
     setStatus(prev => ({ ...prev, connecting: true, error: null }));
 
+    let token = null;
     try {
         // Fetch the authorization cookie first
-        await api.get('/mercure/cookie');
+        const response = await api.get<{ token: string }>('/mercure/cookie');
+        token = response.token;
     } catch (e) {
         console.error('Failed to get Mercure cookie', e);
         // We continue anyway, as the cookie might already be set or we might be in a mode that doesn't require it
@@ -337,6 +339,10 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
 
     const hubUrl = new URL(process.env.NEXT_PUBLIC_MERCURE_URL || 'http://localhost:3000/.well-known/mercure');
     hubUrl.searchParams.append('topic', `/users/${user.id}`);
+    
+    if (token) {
+        hubUrl.searchParams.append('authorization', token);
+    }
     
     const es = new EventSource(hubUrl.toString(), {
       withCredentials: true
