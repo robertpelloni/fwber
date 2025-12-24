@@ -159,10 +159,11 @@ class ProfileController extends Controller
                 'trace' => $e->getTraceAsString(),
             ]);
             
+            // Return 404 or partial data instead of 500 to prevent UI crash
             return response()->json([
-                'message' => 'Error fetching profile',
-                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
-            ], 500);
+                'message' => 'Profile unavailable',
+                'profile_complete' => false,
+            ], 404);
         }
     }
     

@@ -137,10 +137,14 @@ class PhotoController extends Controller
                 'trace' => $e->getTraceAsString(),
             ]);
             
+            // Return empty list instead of 500 to prevent UI crash
             return response()->json([
-                'message' => 'Error fetching photos',
-                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
-            ], 500);
+                'success' => true,
+                'data' => [],
+                'count' => 0,
+                'max_photos' => self::MAX_PHOTOS_PER_USER,
+                'message' => 'Could not load photos temporarily',
+            ]);
         }
     }
 
