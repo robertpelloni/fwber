@@ -507,7 +507,7 @@ export default function PhotoUpload({
             ? 'border-primary bg-primary/5' 
             : 'border-muted-foreground/25 hover:border-primary/50'
           }
-          ${totalPhotos >= maxPhotos ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'pointer-events-auto'}
+          ${totalPhotos >= maxPhotos ? 'opacity-50 cursor-not-allowed' : 'pointer-events-auto'}
         `}
         onClick={() => {
           if (totalPhotos < maxPhotos) {
@@ -540,7 +540,7 @@ export default function PhotoUpload({
             Supported: JPEG, PNG, WebP, GIF
           </div>
 
-          <div className="flex items-center gap-2 mt-2" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center gap-2 mt-2 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
             <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
               <input
                 type="checkbox"
@@ -556,7 +556,7 @@ export default function PhotoUpload({
           </div>
 
           {uploadAsPrivate && (
-             <div className="flex items-center gap-2 mt-2 animate-in fade-in slide-in-from-top-1" onClick={(e) => e.stopPropagation()}>
+             <div className="flex items-center gap-2 mt-2 animate-in fade-in slide-in-from-top-1 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
                 <span className="text-sm text-muted-foreground">Unlock Price (FWB):</span>
                 <input
                   type="number"
