@@ -20,9 +20,9 @@
 
 	mercure {
 		# Publisher JWT key
-		publisher_jwt {env.MERCURE_PUBLISHER_JWT_KEY} {env.MERCURE_PUBLISHER_JWT_ALG}
+		publisher_jwt {env.MERCURE_PUBLISHER_JWT_KEY} HS256
 		# Subscriber JWT key
-		subscriber_jwt {env.MERCURE_SUBSCRIBER_JWT_KEY} {env.MERCURE_SUBSCRIBER_JWT_ALG}
+		subscriber_jwt {env.MERCURE_SUBSCRIBER_JWT_KEY} HS256
 		# CORS Configuration
 		cors_origins *
 		# Extra directives

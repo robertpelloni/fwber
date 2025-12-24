@@ -26,6 +26,8 @@ fi
 export SERVER_NAME=${MERCURE_SERVER_NAME:-"http://:3001"} 
 export MERCURE_PUBLISHER_JWT_KEY=${MERCURE_PUBLISHER_JWT_KEY}
 export MERCURE_SUBSCRIBER_JWT_KEY=${MERCURE_SUBSCRIBER_JWT_KEY}
+export MERCURE_PUBLISHER_JWT_ALG=HS256
+export MERCURE_SUBSCRIBER_JWT_ALG=HS256
 
 # Configure transport to use local file instead of default system path
 # This fixes "invalid transport: open ...: no such file or directory"
