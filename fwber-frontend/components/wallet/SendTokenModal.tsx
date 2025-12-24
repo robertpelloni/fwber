@@ -13,25 +13,27 @@ interface SendTokenModalProps {
 
 export default function SendTokenModal({ isOpen, onClose, onSuccess }: SendTokenModalProps) {
   const [friends, setFriends] = useState<any[]>([]);
+  const [recipientType, setRecipientType] = useState<'friend' | 'email'>('friend');
   const [selectedRecipient, setSelectedRecipient] = useState('');
+  const [email, setEmail] = useState('');
   const [amount, setAmount] = useState('');
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && recipientType === 'friend') {
       apiClient.get('/friends').then(res => setFriends(res.data.data || res.data));
     }
-  }, [isOpen]);
+  }, [isOpen, recipientType]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedRecipient || !amount) return;
+    if ((recipientType === 'friend' && !selectedRecipient) || (recipientType === 'email' && !email) || !amount) return;
 
     setSubmitting(true);
     try {
       await apiClient.post('/wallet/transfer', {
-        recipient_id: selectedRecipient,
+        ...(recipientType === 'friend' ? { recipient_id: selectedRecipient } : { recipient_email: email }),
         amount: parseFloat(amount),
         message
       });
@@ -41,6 +43,7 @@ export default function SendTokenModal({ isOpen, onClose, onSuccess }: SendToken
       setAmount('');
       setMessage('');
       setSelectedRecipient('');
+      setEmail('');
     } catch (error: any) {
       alert(error.response?.data?.error || 'Failed to send tokens');
     } finally {
@@ -59,21 +62,57 @@ export default function SendTokenModal({ isOpen, onClose, onSuccess }: SendToken
           </Dialog.Title>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Recipient (Friend)</label>
-              <select
-                value={selectedRecipient}
-                onChange={e => setSelectedRecipient(e.target.value)}
-                className="w-full p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700"
-                required
-              >
-                <option value="">Select a friend...</option>
-                {friends.map(f => (
-                  <option key={f.id} value={f.id}>{f.name}</option>
-                ))}
-              </select>
-              {friends.length === 0 && <p className="text-xs text-red-500 mt-1">You need to add friends first.</p>}
+            {/* Recipient Toggle */}
+            <div className="flex gap-2 mb-4 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                <button
+                    type="button"
+                    onClick={() => setRecipientType('friend')}
+                    className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${
+                        recipientType === 'friend' ? 'bg-white shadow text-indigo-600' : 'text-gray-500'
+                    }`}
+                >
+                    Select Friend
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setRecipientType('email')}
+                    className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${
+                        recipientType === 'email' ? 'bg-white shadow text-indigo-600' : 'text-gray-500'
+                    }`}
+                >
+                    Enter Email
+                </button>
             </div>
+
+            {recipientType === 'friend' ? (
+                <div>
+                <label className="block text-sm font-medium mb-1">Recipient</label>
+                <select
+                    value={selectedRecipient}
+                    onChange={e => setSelectedRecipient(e.target.value)}
+                    className="w-full p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700"
+                    required={recipientType === 'friend'}
+                >
+                    <option value="">Select a friend...</option>
+                    {friends.map(f => (
+                    <option key={f.id} value={f.id}>{f.name}</option>
+                    ))}
+                </select>
+                {friends.length === 0 && <p className="text-xs text-gray-500 mt-1">No friends found.</p>}
+                </div>
+            ) : (
+                <div>
+                    <label className="block text-sm font-medium mb-1">Recipient Email</label>
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        className="w-full p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700"
+                        placeholder="friend@example.com"
+                        required={recipientType === 'email'}
+                    />
+                </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium mb-1">Amount (FWB)</label>
@@ -111,7 +150,7 @@ export default function SendTokenModal({ isOpen, onClose, onSuccess }: SendToken
               </button>
               <button
                 type="submit"
-                disabled={submitting || !selectedRecipient}
+                disabled={submitting || (recipientType === 'friend' ? !selectedRecipient : !email)}
                 className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 flex justify-center items-center gap-2"
               >
                 {submitting && <Loader2 className="w-4 h-4 animate-spin" />}

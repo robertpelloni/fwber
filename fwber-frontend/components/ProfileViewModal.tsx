@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { X, Clock, CheckCircle, UserCheck, Share2, Brain, Lock } from 'lucide-react'
+import { X, Clock, CheckCircle, UserCheck, Share2, Brain, Lock, Crown, UserPlus } from 'lucide-react'
 import PhotoRevealGate from './PhotoRevealGate'
 import SecurePhotoReveal from './SecurePhotoReveal'
 import { RelationshipTier } from '@/lib/relationshipTiers'
@@ -13,6 +13,7 @@ import { useRelationshipTier } from '@/lib/hooks/useRelationshipTier'
 import { apiClient } from '@/lib/api/client'
 import { photoAPI } from '@/lib/api/photos'
 import { useToast } from '@/components/ToastProvider'
+import { useAuth } from '@/lib/auth-context'
 
 interface ProfileViewModalProps {
   isOpen: boolean
@@ -23,6 +24,7 @@ interface ProfileViewModalProps {
       display_name: string | null
       age: number | null
       bio?: string
+      subscription_price?: number
       photos?: Array<{
         id: number
         url: string
@@ -38,6 +40,7 @@ interface ProfileViewModalProps {
 
 export default function ProfileViewModal({ isOpen, onClose, user, messagesExchanged, matchId }: ProfileViewModalProps) {
   const router = useRouter()
+  const { user: currentUser } = useAuth()
   const [isVisible, setIsVisible] = useState(false)
   const [isUnlockedViaShare, setIsUnlockedViaShare] = useState(false)
   const [locallyUnlockedPhotos, setLocallyUnlockedPhotos] = useState<Set<number>>(new Set())
@@ -47,6 +50,7 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
   
   const [insights, setInsights] = useState<any>(null)
   const [insightLoading, setInsightLoading] = useState(false)
+  const [isSubscribed, setIsSubscribed] = useState(false)
 
   const { 
     tierData,
@@ -77,11 +81,18 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
         .catch(err => console.error('Failed to load insights', err))
         .finally(() => setInsightLoading(false))
 
+      // Check subscription
+      if (user.profile?.subscription_price && user.profile.subscription_price > 0 && currentUser?.id !== user.id) {
+          apiClient.get(`/subscriptions/creator/${user.id}`)
+            .then(res => setIsSubscribed(res.data.is_subscribed))
+            .catch(console.error)
+      }
+
     } else {
       const timer = setTimeout(() => setIsVisible(false), 300)
       return () => clearTimeout(timer)
     }
-  }, [isOpen, user.id])
+  }, [isOpen, user.id, currentUser?.id, user.profile?.subscription_price])
 
   const handleShare = async () => {
     try {
@@ -107,6 +118,17 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
         "Share failed",
         "Could not copy link."
       )
+    }
+  }
+
+  const handleSubscribe = async () => {
+    if (!confirm(`Subscribe to ${user.profile?.display_name} for ${(user.profile as any)?.subscription_price} FWB?`)) return
+    try {
+        await apiClient.post(`/subscriptions/creator/${user.id}`)
+        setIsSubscribed(true)
+        showSuccess('Subscribed!', 'You now have full access to this profile.')
+    } catch (e: any) {
+        showError('Subscription failed', e.response?.data?.error || 'Insufficient funds')
     }
   }
 
@@ -185,7 +207,7 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
     // For testing Face Reveal, we want 'real' photos to be blurred.
     type: 'real' as const,
     isPrivate: p.is_private,
-    isUnlocked: p.is_unlocked || locallyUnlockedPhotos.has(p.id)
+    isUnlocked: p.is_unlocked || locallyUnlockedPhotos.has(p.id) || isSubscribed
   })) || []
 
   // Simple photo grid for when Face Reveal is disabled
@@ -268,6 +290,28 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
 
         {/* Body */}
         <div className="p-6 overflow-y-auto max-h-[80vh]">
+          {/* Subscription Banner */}
+          {user.profile?.subscription_price && user.profile.subscription_price > 0 && !isSubscribed && currentUser?.id !== user.id && (
+            <div className="mb-6 bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900/40 dark:to-yellow-900/40 border border-amber-200 dark:border-amber-800 rounded-xl p-4 flex items-center justify-between">
+                <div>
+                    <h3 className="text-amber-900 dark:text-amber-100 font-bold flex items-center gap-2">
+                        <Crown className="w-5 h-5" />
+                        Creator Subscription
+                    </h3>
+                    <p className="text-sm text-amber-800 dark:text-amber-200">
+                        Unlock all private photos and insights.
+                    </p>
+                </div>
+                <button
+                    onClick={handleSubscribe}
+                    className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition-colors flex flex-col items-center leading-tight"
+                >
+                    <span>Subscribe</span>
+                    <span className="text-xs opacity-90">{user.profile.subscription_price} FWB/mo</span>
+                </button>
+            </div>
+          )}
+
           {user.profile?.bio && (
             <div className="mb-6">
               <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">About</h3>
@@ -292,7 +336,7 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
                     <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{insights.total_score}%</span>
                   </div>
 
-                  {insights.is_locked ? (
+                  {insights.is_locked && !isSubscribed ? (
                     <div className="bg-white/50 dark:bg-black/20 p-4 rounded-lg backdrop-blur-sm border border-white/20 text-center">
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 filter blur-[3px]">
                            Based on your lifestyle and preferences, we found that you are highly compatible in...

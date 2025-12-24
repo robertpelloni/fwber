@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import { useWallet as useInternalWallet } from '@/lib/hooks/useWallet';
 import { useState } from 'react';
 import { apiClient } from '@/lib/api/client';
-import { Loader2, ArrowDownCircle, ArrowUpCircle, Send } from 'lucide-react';
+import { Loader2, ArrowDownCircle, ArrowUpCircle, Send, Key, Copy } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import PaymentRequests from './PaymentRequests';
 import SendTokenModal from './SendTokenModal';
@@ -24,8 +24,9 @@ export default function WalletDashboard() {
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [depositAmount, setDepositAmount] = useState('');
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'wallet' | 'requests'>('wallet');
+  const [activeTab, setActiveTab] = useState<'wallet' | 'requests' | 'merchant'>('wallet');
   const [isSendOpen, setIsSendOpen] = useState(false);
+  const [merchantKeys, setMerchantKeys] = useState<{ merchant_secret: string } | null>(null);
 
   const handleWithdraw = async () => {
     if (!publicKey || !withdrawAmount) return;
@@ -52,32 +53,18 @@ export default function WalletDashboard() {
     try {
         const mint = new PublicKey(internalWallet.mint_address);
         const treasury = new PublicKey(internalWallet.treasury_address);
-        const amount = Math.floor(parseFloat(depositAmount) * 1_000_000_000); // 9 decimals
+        const amount = Math.floor(parseFloat(depositAmount) * 1_000_000_000);
 
-        // Get ATAs
         const fromATA = await getAssociatedTokenAddress(mint, publicKey);
         const toATA = await getAssociatedTokenAddress(mint, treasury);
 
         const transaction = new Transaction();
-
-        // Check if Treasury ATA exists (it should, but good practice to handle creation if we were sending to user)
-        // For Treasury, we assume it exists.
-
-        transaction.add(
-            createTransferInstruction(
-                fromATA,
-                toATA,
-                publicKey,
-                amount
-            )
-        );
+        transaction.add(createTransferInstruction(fromATA, toATA, publicKey, amount));
 
         const signature = await sendTransaction(transaction, connection);
-
         const confirmation = await connection.confirmTransaction(signature, 'confirmed');
         if (confirmation.value.err) throw new Error('Transaction failed on-chain');
 
-        // Notify Backend
         await apiClient.post('/wallet/deposit', {
             amount: parseFloat(depositAmount),
             signature: signature
@@ -95,6 +82,15 @@ export default function WalletDashboard() {
     }
   };
 
+  const generateMerchantKeys = async () => {
+      try {
+          const res = await apiClient.post('/merchant/keys');
+          setMerchantKeys(res.data);
+      } catch (e: any) {
+          alert('Failed to generate keys');
+      }
+  };
+
   return (
     <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md space-y-6">
       <div className="flex justify-between items-center">
@@ -103,27 +99,20 @@ export default function WalletDashboard() {
       </div>
 
       {/* Tabs */}
-      <div className="flex space-x-1 p-1 bg-gray-100 dark:bg-gray-700/50 rounded-lg">
-        <button
-            onClick={() => setActiveTab('wallet')}
-            className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
-                activeTab === 'wallet'
-                ? 'bg-white dark:bg-gray-700 shadow text-gray-900 dark:text-white'
-                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
-            }`}
-        >
-            Dashboard
-        </button>
-        <button
-            onClick={() => setActiveTab('requests')}
-            className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
-                activeTab === 'requests'
-                ? 'bg-white dark:bg-gray-700 shadow text-gray-900 dark:text-white'
-                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
-            }`}
-        >
-            Requests
-        </button>
+      <div className="flex space-x-1 p-1 bg-gray-100 dark:bg-gray-700/50 rounded-lg overflow-x-auto">
+        {(['wallet', 'requests', 'merchant'] as const).map(tab => (
+            <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all whitespace-nowrap capitalize ${
+                    activeTab === tab
+                    ? 'bg-white dark:bg-gray-700 shadow text-gray-900 dark:text-white'
+                    : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+                }`}
+            >
+                {tab}
+            </button>
+        ))}
       </div>
 
       <SendTokenModal
@@ -132,7 +121,7 @@ export default function WalletDashboard() {
         onSuccess={refresh}
       />
 
-      {activeTab === 'wallet' ? (
+      {activeTab === 'wallet' && (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
             {/* Internal Balance */}
             <div className="p-4 border border-purple-200 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
@@ -220,14 +209,6 @@ export default function WalletDashboard() {
                 </div>
             )}
 
-            {/* Referral */}
-            {internalWallet?.referral_code && (
-                <div className="p-4 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-xl">
-                    <p className="text-sm opacity-90">Refer a friend & earn 50 FWB</p>
-                    <p className="text-2xl font-mono font-bold mt-1 tracking-wider">{internalWallet.referral_code}</p>
-                </div>
-            )}
-
             {/* Transaction History */}
             <div className="space-y-4">
                 <h3 className="font-medium">Transaction History</h3>
@@ -237,6 +218,9 @@ export default function WalletDashboard() {
                             <div key={tx.id} className="flex justify-between items-center p-3 border rounded dark:border-gray-700 text-sm bg-gray-50 dark:bg-gray-900/50">
                                 <div>
                                     <p className="font-medium">{tx.description}</p>
+                                    {tx.metadata?.message && (
+                                        <p className="text-xs text-gray-500 italic">"{tx.metadata.message}"</p>
+                                    )}
                                     <p className="text-gray-500 text-xs">{new Date(tx.created_at).toLocaleDateString()}</p>
                                 </div>
                                 <span className={`font-bold ${parseFloat(tx.amount) > 0 ? 'text-green-600' : 'text-red-600'}`}>
@@ -250,9 +234,64 @@ export default function WalletDashboard() {
                 </div>
             </div>
         </div>
-      ) : (
+      )}
+
+      {activeTab === 'requests' && (
         <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             <PaymentRequests />
+        </div>
+      )}
+
+      {activeTab === 'merchant' && (
+        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-6">
+            <div className="p-6 bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded-xl">
+                <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
+                    <Key className="w-5 h-5" />
+                    Merchant API
+                </h3>
+                <p className="text-gray-300 text-sm mb-4">
+                    Accept FWB tokens on your website or app. Generate a secret key to use the FWBer Merchant API.
+                </p>
+
+                {!merchantKeys ? (
+                    <button
+                        onClick={generateMerchantKeys}
+                        className="bg-white text-gray-900 px-4 py-2 rounded-lg font-bold hover:bg-gray-100 transition-colors"
+                    >
+                        Generate API Keys
+                    </button>
+                ) : (
+                    <div className="bg-black/30 p-4 rounded-lg space-y-2">
+                        <p className="text-xs text-gray-400 uppercase font-bold">Secret Key (Keep Safe)</p>
+                        <div className="flex items-center gap-2">
+                            <code className="font-mono text-green-400 break-all">{merchantKeys.merchant_secret}</code>
+                            <button onClick={() => navigator.clipboard.writeText(merchantKeys.merchant_secret)} className="text-gray-400 hover:text-white">
+                                <Copy className="w-4 h-4" />
+                            </button>
+                        </div>
+                        <p className="text-xs text-red-400 mt-2">Do not share this key.</p>
+                    </div>
+                )}
+            </div>
+
+            <div className="border dark:border-gray-700 rounded-lg p-4">
+                <h4 className="font-bold mb-2">Integration Guide</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    1. Create a payment intent via API:
+                </p>
+                <pre className="bg-gray-100 dark:bg-gray-900 p-2 rounded text-xs overflow-x-auto">
+{`POST /api/merchant/checkout
+Headers: { "X-Merchant-Secret": "sk_..." }
+Body: {
+  "amount": 100,
+  "description": "Order #123",
+  "redirect_url": "https://yoursite.com/success"
+}`}
+                </pre>
+                <p className="text-sm text-gray-600 dark:text-gray-400 my-2">
+                    2. Redirect user to the returned `checkout_url`.
+                </p>
+            </div>
         </div>
       )}
     </div>

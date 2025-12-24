@@ -49,6 +49,10 @@ Route::post('auth/register', [\App\Http\Controllers\AuthController::class, 'regi
 Route::post('auth/login', [\App\Http\Controllers\AuthController::class, 'login'])->middleware('throttle:auth');
 Route::post('auth/two-factor-challenge', [\App\Http\Controllers\TwoFactorChallengeController::class, 'store'])->middleware('throttle:auth');
 
+// Merchant API (Public / Key Auth)
+Route::post('merchant/checkout', [\App\Http\Controllers\Api\MerchantController::class, 'createPayment']);
+Route::get('merchant/payment/{id}', [\App\Http\Controllers\Api\MerchantController::class, 'show']);
+
 // Health Checks
 Route::get('health', [\App\Http\Controllers\HealthController::class, 'check']);
 Route::get('health/liveness', [\App\Http\Controllers\HealthController::class, 'liveness']);
@@ -302,6 +306,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('subscriptions/history', [\App\Http\Controllers\SubscriptionController::class, 'history']);
     Route::post('subscriptions/cancel', [\App\Http\Controllers\SubscriptionController::class, 'cancel']);
     Route::apiResource('subscriptions', \App\Http\Controllers\SubscriptionController::class);
+
+    // Creator Subscriptions
+    Route::post('subscriptions/creator/{creatorId}', [\App\Http\Controllers\Api\CreatorSubscriptionController::class, 'subscribe']);
+    Route::get('subscriptions/creator/{creatorId}', [\App\Http\Controllers\Api\CreatorSubscriptionController::class, 'check']);
+
+    // Creator Subscriptions
+    Route::post('subscriptions/creators/{creatorId}/subscribe', [\App\Http\Controllers\CreatorSubscriptionController::class, 'subscribe']);
+    Route::get('subscriptions/creators/{creatorId}/check', [\App\Http\Controllers\CreatorSubscriptionController::class, 'check']);
+
+    // Merchant API (Authenticated)
+    Route::post('merchant/keys', [\App\Http\Controllers\Api\MerchantController::class, 'generateKeys']);
+    Route::post('merchant/payment/{id}/confirm', [\App\Http\Controllers\Api\MerchantController::class, 'confirm']);
 
     // Venue Check-ins
     Route::post('venues/{id}/checkin', [\App\Http\Controllers\VenueCheckinController::class, 'store']);

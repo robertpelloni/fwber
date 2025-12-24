@@ -136,12 +136,19 @@ class TokenController extends Controller
     {
         $request->validate([
             'amount' => 'required|numeric|min:1',
-            'recipient_id' => 'required|exists:users,id',
+            'recipient_id' => 'required_without:recipient_email|exists:users,id',
+            'recipient_email' => 'required_without:recipient_id|email|exists:users,email',
             'message' => 'nullable|string|max:255',
         ]);
 
         $sender = $request->user();
-        $recipient = User::findOrFail($request->recipient_id);
+
+        if ($request->has('recipient_id')) {
+            $recipient = User::findOrFail($request->recipient_id);
+        } else {
+            $recipient = User::where('email', $request->recipient_email)->firstOrFail();
+        }
+
         $amount = $request->amount;
         $message = $request->message;
 

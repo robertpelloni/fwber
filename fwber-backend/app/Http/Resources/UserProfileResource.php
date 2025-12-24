@@ -90,6 +90,7 @@ class UserProfileResource extends JsonResource
                 'has_children' => $this->profile?->has_children,
                 'wants_children' => $this->profile?->wants_children,
                 'has_pets' => $this->profile?->has_pets,
+                'subscription_price' => $this->profile?->subscription_price,
 
                 // Social & Personality
                 'love_language' => $this->profile?->love_language,

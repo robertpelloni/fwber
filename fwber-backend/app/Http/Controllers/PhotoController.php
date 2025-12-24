@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CreatorSubscription;
 use App\Models\Photo;
 use App\Models\PhotoUnlock;
+use App\Models\CreatorSubscription;
 use App\Models\TokenTransaction;
 use App\Models\User;
 use App\Notifications\PhotoUnlockedNotification;
@@ -623,6 +625,11 @@ class PhotoController extends Controller
                 return response()->json(['success' => true, 'status' => 'unlocked_via_tokens']);
             }
 
+            // Check Creator Subscription
+            if (CreatorSubscription::where('user_id', $user->id)->where('creator_id', $photo->user_id)->active()->exists()) {
+                return response()->json(['success' => true, 'status' => 'subscriber_access']);
+            }
+
             $matchId = $request->input('match_id');
             $match = \App\Models\UserMatch::where('id', $matchId)
                 ->where(function($q) use ($user) {
@@ -706,6 +713,11 @@ class PhotoController extends Controller
 
             if (PhotoUnlock::where('user_id', $user->id)->where('photo_id', $photo->id)->exists()) {
                 return response()->json(['success' => true, 'message' => 'Already unlocked', 'balance' => $user->token_balance]);
+            }
+
+            // Check Creator Subscription
+            if (CreatorSubscription::where('user_id', $user->id)->where('creator_id', $photo->user_id)->active()->exists()) {
+                return response()->json(['success' => true, 'message' => 'Unlocked via Subscription', 'balance' => $user->token_balance]);
             }
 
             // 2. Determine Cost
@@ -818,7 +830,17 @@ class PhotoController extends Controller
                 return Storage::disk('public')->download($photo->file_path, $photo->original_filename);
             }
 
-            // 3. Match check
+            // 3. Creator Subscription Check
+            if (CreatorSubscription::where('user_id', $user->id)->where('creator_id', $photo->user_id)->active()->exists()) {
+                return Storage::disk('public')->download($photo->file_path, $photo->original_filename);
+            }
+
+            // 3. Creator Subscription Check
+            if (CreatorSubscription::where('user_id', $user->id)->where('creator_id', $photo->user_id)->active()->exists()) {
+                return Storage::disk('public')->download($photo->file_path, $photo->original_filename);
+            }
+
+            // 4. Match check
             // Find any active match between these users
             $match = \App\Models\UserMatch::where(function($q) use ($user, $photo) {
                     $q->where('user_id_1', $user->id)->where('user_id_2', $photo->user_id);
