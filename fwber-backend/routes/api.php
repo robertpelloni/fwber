@@ -184,6 +184,44 @@ Route::get('debug/get-token', function () {
     }
 });
 
+// Simulation Route: Manually invoke the Auth Guard
+Route::get('debug/simulate-guard', function (Request $request) {
+    try {
+        // Force the request to use the token from query param if header is missing
+        if (!$request->bearerToken() && $request->has('token')) {
+            $request->headers->set('Authorization', 'Bearer ' . $request->query('token'));
+        }
+
+        // Attempt to authenticate using the Sanctum guard
+        // This runs the exact logic that auth:sanctum middleware runs
+        $user = \Illuminate\Support\Facades\Auth::guard('sanctum')->user();
+
+        if (!$user) {
+            return response()->json(['status' => 'failed', 'reason' => 'Auth::guard(sanctum)->user() returned null']);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'user_id' => $user->id,
+            'message' => 'Auth guard successfully resolved user',
+        ]);
+
+    } catch (\Throwable $e) {
+        return response()->json([
+            'error' => 'Auth Guard Crashed',
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
+
+// Throttle Test Route
+Route::get('debug/throttle-test', function () {
+    return response()->json(['status' => 'ok']);
+})->middleware('throttle:api');
+
 // Health Checks
 Route::get('health', [\App\Http\Controllers\HealthController::class, 'check']);
 Route::get('health/liveness', [\App\Http\Controllers\HealthController::class, 'liveness']);
