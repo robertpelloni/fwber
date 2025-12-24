@@ -93,26 +93,31 @@ class Photo extends Model
      */
     public function getIsUnlockedAttribute(): bool
     {
-        $user = auth()->user();
-        
-        if (!$user) {
+        try {
+            $user = auth()->user();
+            
+            if (!$user) {
+                return false;
+            }
+            
+            // Owner always has access
+            if ($this->user_id === $user->id) {
+                return true;
+            }
+            
+            // Public photos are always unlocked
+            if (!$this->is_private) {
+                return true;
+            }
+            
+            // Check if unlocked via tokens
+            return \App\Models\PhotoUnlock::where('user_id', $user->id)
+                ->where('photo_id', $this->id)
+                ->exists();
+        } catch (\Exception $e) {
+            // Fail safe if table doesn't exist or other DB error
             return false;
         }
-        
-        // Owner always has access
-        if ($this->user_id === $user->id) {
-            return true;
-        }
-        
-        // Public photos are always unlocked
-        if (!$this->is_private) {
-            return true;
-        }
-        
-        // Check if unlocked via tokens
-        return \App\Models\PhotoUnlock::where('user_id', $user->id)
-            ->where('photo_id', $this->id)
-            ->exists();
     }
 
     /**

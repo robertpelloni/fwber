@@ -138,36 +138,40 @@ class UserProfileResource extends JsonResource
      */
     private function isProfileComplete(): bool
     {
-        if (!$this->profile) {
-            return false;
-        }
-        
-        $requiredFields = [
-            'display_name',
-            'gender',
-            'latitude',
-            'longitude',
-            'looking_for',
-        ];
-
-        foreach ($requiredFields as $field) {
-            if (empty($this->profile->$field)) {
+        try {
+            if (!$this->profile) {
                 return false;
             }
-        }
+            
+            $requiredFields = [
+                'display_name',
+                'gender',
+                'latitude',
+                'longitude',
+                'looking_for',
+            ];
 
-        // Require DOB and adulthood >= 18
-        if (empty($this->profile->birthdate)) {
+            foreach ($requiredFields as $field) {
+                if (empty($this->profile->$field)) {
+                    return false;
+                }
+            }
+
+            // Require DOB and adulthood >= 18
+            if (empty($this->profile->birthdate)) {
+                return false;
+            }
+            $dob = $this->profile->birthdate instanceof \DateTimeInterface
+                ? Carbon::instance($this->profile->birthdate)
+                : Carbon::parse($this->profile->birthdate);
+            if ($dob->age < 18) {
+                return false;
+            }
+
+            return true;
+        } catch (\Exception $e) {
             return false;
         }
-        $dob = $this->profile->birthdate instanceof \DateTimeInterface
-            ? Carbon::instance($this->profile->birthdate)
-            : Carbon::parse($this->profile->birthdate);
-        if ($dob->age < 18) {
-            return false;
-        }
-
-        return true;
     }
     
     /**
@@ -175,32 +179,36 @@ class UserProfileResource extends JsonResource
      */
     private function getCompletionPercentage(): int
     {
-        if (!$this->profile) {
+        try {
+            if (!$this->profile) {
+                return 0;
+            }
+            
+            $allFields = [
+                'display_name',
+                'bio',
+                'birthdate',
+                'gender',
+                'pronouns',
+                'sexual_orientation',
+                'relationship_style',
+                'looking_for',
+                'latitude',
+                'longitude',
+                'preferences',
+            ];
+            
+            $completed = 0;
+            foreach ($allFields as $field) {
+                if (!empty($this->profile->$field)) {
+                    $completed++;
+                }
+            }
+            
+            return round(($completed / count($allFields)) * 100);
+        } catch (\Exception $e) {
             return 0;
         }
-        
-        $allFields = [
-            'display_name',
-            'bio',
-            'birthdate',
-            'gender',
-            'pronouns',
-            'sexual_orientation',
-            'relationship_style',
-            'looking_for',
-            'latitude',
-            'longitude',
-            'preferences',
-        ];
-        
-        $completed = 0;
-        foreach ($allFields as $field) {
-            if (!empty($this->profile->$field)) {
-                $completed++;
-            }
-        }
-        
-        return round(($completed / count($allFields)) * 100);
     }
     
     /**
