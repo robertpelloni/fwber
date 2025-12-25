@@ -227,7 +227,7 @@ export default function WalletDashboard() {
                                 <div>
                                     <p className="font-medium">{tx.description}</p>
                                     {tx.metadata?.message && (
-                                        <p className="text-xs text-gray-500 italic">"{tx.metadata.message}"</p>
+                                        <p className="text-xs text-gray-500 italic">&quot;{tx.metadata.message}&quot;</p>
                                     )}
                                     <p className="text-gray-500 text-xs">{new Date(tx.created_at).toLocaleDateString()}</p>
                                 </div>
