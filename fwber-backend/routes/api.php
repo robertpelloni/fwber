@@ -47,6 +47,7 @@ use App\Http\Controllers\EventController;
 
 Route::post('auth/register', [\App\Http\Controllers\AuthController::class, 'register'])->middleware('throttle:auth');
 Route::post('auth/login', [\App\Http\Controllers\AuthController::class, 'login'])->middleware('throttle:auth');
+Route::post('auth/login-wallet', [\App\Http\Controllers\AuthController::class, 'loginWithWallet'])->middleware('throttle:auth');
 Route::post('auth/two-factor-challenge', [\App\Http\Controllers\TwoFactorChallengeController::class, 'store'])->middleware('throttle:auth');
 
 // Merchant API (Public / Key Auth)

@@ -75,4 +75,60 @@ class AuthController extends Controller
     {
         return $request->user()->load('profile');
     }
+
+    public function loginWithWallet(Request $request)
+    {
+        $validated = $request->validate([
+            'wallet_address' => 'required|string',
+            'signature' => 'required|string',
+            'message' => 'required|string',
+        ]);
+
+        $walletAddress = $validated['wallet_address'];
+        $signature = $validated['signature'];
+        $message = $validated['message'];
+
+        // Verify the signature using the Node.js script
+        $scriptPath = base_path('scripts/solana/verify_signature.cjs');
+        $command = "node {$scriptPath} " . escapeshellarg($message) . " " . escapeshellarg($signature) . " " . escapeshellarg($walletAddress);
+
+        $output = shell_exec($command);
+        $result = json_decode($output, true);
+
+        if (!$result || !isset($result['verified']) || !$result['verified']) {
+            throw ValidationException::withMessages([
+                'signature' => ['Invalid wallet signature.'],
+            ]);
+        }
+
+        // Check if user exists with this wallet address
+        $user = User::where('wallet_address', $walletAddress)->first();
+
+        if (!$user) {
+            // Create a new user for this wallet
+            // We use a placeholder email and a random password
+            $shortAddress = substr($walletAddress, 0, 6) . '...' . substr($walletAddress, -4);
+            $user = User::create([
+                'name' => "Wallet User {$shortAddress}",
+                'email' => "wallet_{$walletAddress}@fwber.com", // Unique placeholder
+                'password' => Hash::make(\Illuminate\Support\Str::random(32)),
+                'wallet_address' => $walletAddress,
+                'token_balance' => 0, // Signup bonus handled below
+            ]);
+
+            // Distribute signup bonus for new wallet user
+             /** @var \App\Services\TokenDistributionService $tokenService */
+             $tokenService = app(\App\Services\TokenDistributionService::class);
+             $tokenService->processSignupBonus($user);
+        }
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user,
+            'is_new_user' => $user->wasRecentlyCreated,
+        ]);
+    }
 }

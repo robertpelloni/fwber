@@ -56,6 +56,7 @@ type AuthAction =
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>
+  loginWithWallet: (walletAddress: string, signature: string, message: string) => Promise<void>
   verifyTwoFactor: (code: string, recoveryCode?: string) => Promise<void>
   register: (name: string, email: string, password: string, passwordConfirmation: string, avatar?: File | null, referralCode?: string) => Promise<void>
   logout: () => void
@@ -282,6 +283,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [API_BASE_URL]);
 
+  // Login with Wallet function
+  const loginWithWallet = useCallback(async (walletAddress: string, signature: string, message: string) => {
+    dispatch({ type: 'AUTH_START' })
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/login-wallet`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ wallet_address: walletAddress, signature, message }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        logAuth.login(walletAddress, false, data.message)
+        throw new Error(data.message || 'Wallet login failed')
+      }
+
+      logAuth.login(walletAddress, true)
+      setUserContext(data.user)
+      dispatch({
+        type: 'AUTH_SUCCESS',
+        payload: {
+          user: data.user,
+          token: data.access_token || data.token
+        }
+      })
+    } catch (error) {
+      dispatch({
+        type: 'AUTH_FAILURE',
+        payload: error instanceof Error ? error.message : 'Wallet login failed'
+      })
+      throw error
+    }
+  }, [API_BASE_URL]);
+
   // Verify Two Factor function
   const verifyTwoFactor = useCallback(async (code: string, recoveryCode?: string) => {
     dispatch({ type: 'AUTH_START' })
@@ -405,12 +445,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthContextType = useMemo(() => ({
     ...state,
     login,
+    loginWithWallet,
     verifyTwoFactor,
     register,
     logout,
     clearError,
     updateUser,
-  }), [state, login, verifyTwoFactor, register, logout, clearError, updateUser]);
+  }), [state, login, loginWithWallet, verifyTwoFactor, register, logout, clearError, updateUser]);
 
   return (
     <AuthContext.Provider value={value}>
