@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\CreatorSubscription;
 use App\Models\Photo;
 use App\Models\PhotoUnlock;
-use App\Models\CreatorSubscription;
 use App\Models\TokenTransaction;
 use App\Models\User;
 use App\Notifications\PhotoUnlockedNotification;
