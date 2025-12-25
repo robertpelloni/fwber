@@ -83,7 +83,7 @@ class MercurePublisher
             'iat' => time()
         ];
 
-        return $this->encodeJWT($payload, $key);
+        return JWT::encode($payload, $key, 'HS256');
     }
 
     /**
@@ -106,16 +106,7 @@ class MercurePublisher
             'iat' => time()
         ];
 
-        // Ensure key is properly formatted for HS256
-        // If the key is base64 encoded (which it seems to be based on the user's input),
-        // we might need to decode it or use it as is.
-        // However, php-jwt treats the key as a binary string.
-        // If the key in .env is "Zt3BAsBCspl6Xe6zvbXLJEZhmTj4XLbMpkaPdplDohQ=",
-        // it is likely a base64 encoded string.
-        // Caddy might be decoding it automatically or treating it as a string.
-        // Let's try to be consistent.
-        
-        return $this->encodeJWT($payload, $key);
+        return JWT::encode($payload, $key, 'HS256');
     }
 
     /**
@@ -124,35 +115,10 @@ class MercurePublisher
     public function validateJWT(string $token, string $key): bool
     {
         try {
-            // Note: This might fail with short keys due to library restrictions
             JWT::decode($token, new Key($key, 'HS256'));
             return true;
         } catch (\Exception $e) {
             return false;
         }
-    }
-
-    /**
-     * Custom JWT encoding to bypass key length checks in firebase/php-jwt
-     */
-    private function encodeJWT(array $payload, string $key, string $alg = 'HS256'): string
-    {
-        $header = ['typ' => 'JWT', 'alg' => $alg];
-        
-        $segments = [];
-        $segments[] = $this->urlsafeB64Encode(json_encode($header));
-        $segments[] = $this->urlsafeB64Encode(json_encode($payload));
-        
-        $signing_input = implode('.', $segments);
-        
-        $signature = hash_hmac('sha256', $signing_input, $key, true);
-        $segments[] = $this->urlsafeB64Encode($signature);
-        
-        return implode('.', $segments);
-    }
-
-    private function urlsafeB64Encode(string $input): string
-    {
-        return str_replace('=', '', strtr(base64_encode($input), '+/', '-_'));
     }
 }

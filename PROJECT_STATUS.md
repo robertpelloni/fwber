@@ -11,6 +11,16 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
 *   **SSL Verification**: Waiting for Let's Encrypt to validate `mercure.fwber.me`.
 *   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
 
+### ✅ Critical Fixes (Dec 25)
+1.  **Mercure 503/401 Error Resolution**:
+    -   **Issue**: Mercure real-time updates were failing with 503 (Service Unavailable) and 401 (Unauthorized) errors.
+    -   **Root Cause 1**: The JWT key `!ChangeMe!` was too short (< 32 bytes) for the `firebase/php-jwt` library (HS256 algorithm), causing a `DomainException`.
+    -   **Root Cause 2**: The Mercure Demo Hub requires a specific key (`!ChangeThisMercureHubJWTSecretKey!`) to accept tokens.
+    -   **Fix**:
+        -   Updated `.env`, `.env.example`, and `.env.testing` with the correct key.
+        -   Reverted the temporary custom JWT encoding hack in `MercurePublisher.php` to use the standard `JWT::encode` method (now safe with the longer key).
+    -   **Verification**: Verified connectivity via `curl` with the new key. Backend tests passing.
+
 ### ✅ Critical Fixes (Dec 24)
 1.  **Mercure & Photo Uploads**:
     -   **Issue**: Users reported "Mercure connection error" (401/CORS) and "Please upload at least one photo" (403 Forbidden) during onboarding.

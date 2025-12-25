@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.5] - 2025-12-25
+
+### Fixed
+- **Mercure**: Fixed 503 Service Unavailable and 401 Unauthorized errors by updating the JWT key to the correct value required by the Mercure Demo Hub (`!ChangeThisMercureHubJWTSecretKey!`).
+- **Mercure**: Reverted temporary custom JWT encoding hack in `MercurePublisher.php` to use the standard and secure `firebase/php-jwt` library now that the key length issue is resolved.
+- **Configuration**: Updated `.env`, `.env.example`, and `.env.testing` with the correct Mercure credentials.
+
 ## [0.3.4] - 2025-12-24
 
 ### Fixed
