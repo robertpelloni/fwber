@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.4] - 2025-12-24
+
+### Fixed
+- **Photo Upload**: Forced file input to `display: block` (with `sr-only` class) to ensure it remains interactive and accessible, fixing issues where `display: none` prevented the file dialog from opening.
+
 ## [0.3.3] - 2025-12-24
 
 ### Fixed

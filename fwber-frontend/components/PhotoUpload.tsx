@@ -519,7 +519,13 @@ export default function PhotoUpload({
           }
         }}
       >
-        <input {...getInputProps()} ref={fileInputRef} className="sr-only" />
+        <input 
+          {...getInputProps({
+            style: { display: 'block' }
+          })} 
+          ref={fileInputRef} 
+          className="sr-only" 
+        />
         
         <div 
           className="flex flex-col items-center space-y-4 pointer-events-none"
