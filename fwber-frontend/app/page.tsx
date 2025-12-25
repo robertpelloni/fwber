@@ -419,6 +419,17 @@ export default function HomePage() {
               </p>
             </div>
 
+            {/* Creator Economy */}
+            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-amber-50 transition-colors duration-300 border border-gray-100">
+              <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mb-6 text-amber-600">
+                <Sparkles className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Creator Economy</h3>
+              <p className="text-gray-600">
+                Monetize your influence. Create exclusive, token-gated chatrooms and earn from your community.
+              </p>
+            </div>
+
             {/* Travel Mode */}
             <div className="p-8 rounded-2xl bg-gray-50 hover:bg-teal-50 transition-colors duration-300 border border-gray-100">
               <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center mb-6 text-teal-600">

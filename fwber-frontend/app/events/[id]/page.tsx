@@ -18,7 +18,9 @@ export default function EventDetailPage() {
   if (!event) return <div className="p-8">Event not found</div>;
 
   const handleRsvp = (status: string) => {
-    if (status === 'attending' && event.price && Number(event.price) > 0) {
+    const hasPrice = (event.price && Number(event.price) > 0) || (event.token_cost && Number(event.token_cost) > 0);
+    
+    if (status === 'attending' && hasPrice) {
       setIsPaymentModalOpen(true);
       return;
     }
