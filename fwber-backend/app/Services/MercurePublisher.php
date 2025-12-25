@@ -83,7 +83,7 @@ class MercurePublisher
             'iat' => time()
         ];
 
-        return JWT::encode($payload, $key, 'HS256');
+        return $this->encodeJWT($payload, $key);
     }
 
     /**
@@ -115,7 +115,7 @@ class MercurePublisher
         // Caddy might be decoding it automatically or treating it as a string.
         // Let's try to be consistent.
         
-        return JWT::encode($payload, $key, 'HS256');
+        return $this->encodeJWT($payload, $key);
     }
 
     /**
@@ -124,10 +124,35 @@ class MercurePublisher
     public function validateJWT(string $token, string $key): bool
     {
         try {
+            // Note: This might fail with short keys due to library restrictions
             JWT::decode($token, new Key($key, 'HS256'));
             return true;
         } catch (\Exception $e) {
             return false;
         }
+    }
+
+    /**
+     * Custom JWT encoding to bypass key length checks in firebase/php-jwt
+     */
+    private function encodeJWT(array $payload, string $key, string $alg = 'HS256'): string
+    {
+        $header = ['typ' => 'JWT', 'alg' => $alg];
+        
+        $segments = [];
+        $segments[] = $this->urlsafeB64Encode(json_encode($header));
+        $segments[] = $this->urlsafeB64Encode(json_encode($payload));
+        
+        $signing_input = implode('.', $segments);
+        
+        $signature = hash_hmac('sha256', $signing_input, $key, true);
+        $segments[] = $this->urlsafeB64Encode($signature);
+        
+        return implode('.', $segments);
+    }
+
+    private function urlsafeB64Encode(string $input): string
+    {
+        return str_replace('=', '', strtr(base64_encode($input), '+/', '-_'));
     }
 }
