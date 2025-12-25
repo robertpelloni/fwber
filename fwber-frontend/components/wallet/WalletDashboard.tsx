@@ -85,7 +85,7 @@ export default function WalletDashboard() {
   const generateMerchantKeys = async () => {
       try {
           const res = await apiClient.post('/merchant/keys');
-          setMerchantKeys(res.data);
+          setMerchantKeys(res.data as { merchant_secret: string });
       } catch (e: any) {
           alert('Failed to generate keys');
       }
