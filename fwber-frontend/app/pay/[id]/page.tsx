@@ -35,8 +35,10 @@ export default function CheckoutPage() {
     setPaying(true);
     try {
       const res = await apiClient.post(`/merchant/payment/${params.id}/confirm`);
-      if (res.data.success && res.data.redirect_url) {
-          window.location.href = res.data.redirect_url;
+      const data = res.data as { success: boolean; redirect_url?: string };
+      
+      if (data.success && data.redirect_url) {
+          window.location.href = data.redirect_url;
       } else {
           alert('Payment successful!');
           router.push('/wallet');
