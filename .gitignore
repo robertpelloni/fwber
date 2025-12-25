@@ -126,5 +126,4 @@ archive
 archive
 archive
 fwber-frontend/.env.local.production
-fwber-frontend/.env.example
-fwber-frontend/.env.example
+
