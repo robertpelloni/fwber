@@ -256,6 +256,12 @@ export default function AdminSettingsPage() {
                   Refresh
                 </button>
                 <a
+                  href="/admin/dashboard"
+                  className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500"
+                >
+                  Project Dashboard
+                </a>
+                <a
                   href="/admin/logs"
                   className="rounded-md bg-slate-600 px-4 py-2 text-sm font-medium text-white hover:bg-slate-500"
                 >

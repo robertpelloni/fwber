@@ -3,6 +3,36 @@
 // Note that this config is unrelated to the Vercel Edge Runtime and is also required when running locally.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
+const fs = require('fs');
+const path = require('path');
+
+// Read versions
+const getVersion = () => {
+  try {
+    return fs.readFileSync(path.join(__dirname, '../VERSION'), 'utf8').trim();
+  } catch (e) {
+    return '0.0.0-unknown';
+  }
+};
+
+const getBackendVersion = () => {
+  try {
+    const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '../fwber-backend/package.json'), 'utf8'));
+    return pkg.version;
+  } catch (e) {
+    return '0.0.0-unknown';
+  }
+};
+
+const getFrontendVersion = () => {
+  try {
+    const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8'));
+    return pkg.version;
+  } catch (e) {
+    return '0.0.0-unknown';
+  }
+};
+
 const { withSentryConfig } = require('@sentry/nextjs');
 const withPWA = require('next-pwa')({
   dest: 'public',
@@ -26,6 +56,14 @@ const nextConfig = {
   productionBrowserSourceMaps: false,
   output: 'standalone', // Optimized for Docker/Shared Hosting
   
+  // Environment variables
+  env: {
+    // NEXTAUTH_URL and API_BASE_URL are read from runtime environment
+    NEXT_PUBLIC_PROJECT_VERSION: getVersion(),
+    NEXT_PUBLIC_BACKEND_VERSION: getBackendVersion(),
+    NEXT_PUBLIC_FRONTEND_VERSION: getFrontendVersion(),
+  },
+
   // Experimental features for better performance
   experimental: {
     turbo: {
@@ -190,6 +228,9 @@ const nextConfig = {
   // Environment variables
   env: {
     // NEXTAUTH_URL and API_BASE_URL are read from runtime environment
+    NEXT_PUBLIC_PROJECT_VERSION: getVersion(),
+    NEXT_PUBLIC_BACKEND_VERSION: getBackendVersion(),
+    NEXT_PUBLIC_FRONTEND_VERSION: getFrontendVersion(),
   },
 }
 

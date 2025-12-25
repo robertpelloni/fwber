@@ -11,6 +11,13 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
 *   **SSL Verification**: Waiting for Let's Encrypt to validate `mercure.fwber.me`.
 *   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
 
+### ✅ Critical Fixes (Dec 25 - Part 2)
+1.  **Token-Gated Chatrooms**:
+    -   **Feature**: Implemented the ability for creators to charge an entry fee (FWB Tokens) for chatrooms.
+    -   **Backend**: Updated `ChatroomController` to handle token deduction and creator crediting upon join.
+    -   **Frontend**: Added "Entry Fee" field to creation form and "Pay & Join" overlay to chatroom view.
+    -   **Verification**: Code implementation complete.
+
 ### ✅ Critical Fixes (Dec 25)
 1.  **Mercure 503/401 Error Resolution**:
     -   **Issue**: Mercure real-time updates were failing with 503 (Service Unavailable) and 401 (Unauthorized) errors.

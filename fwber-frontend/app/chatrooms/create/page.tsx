@@ -25,6 +25,7 @@ export default function CreateChatroomPage() {
     latitude: 0,
     longitude: 0,
     radius_meters: 1000,
+    token_entry_fee: 0,
   });
 
   const [locationStatus, setLocationStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -104,6 +105,10 @@ export default function CreateChatroomPage() {
       }
     }
 
+    if (formData.token_entry_fee < 0) {
+      newErrors.token_entry_fee = 'Entry fee cannot be negative';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -136,6 +141,7 @@ export default function CreateChatroomPage() {
           city: formData.city,
           neighborhood: formData.neighborhood,
           is_public: formData.is_public,
+          token_entry_fee: Number(formData.token_entry_fee),
         });
         router.push(`/chatrooms/${chatroom.id}`);
       }
@@ -413,7 +419,33 @@ export default function CreateChatroomPage() {
                   Make this chatroom public
                 </label>
               </div>
-              <p className="mt-1 text-sm text-gray-500">
+              <pToken Entry Fee */}
+            {formData.type !== 'proximity' && (
+              <div>
+                <label htmlFor="token_entry_fee" className="block text-sm font-medium text-gray-700 mb-2">
+                  Entry Fee (Tokens)
+                </label>
+                <input
+                  type="number"
+                  id="token_entry_fee"
+                  name="token_entry_fee"
+                  value={formData.token_entry_fee}
+                  onChange={handleInputChange}
+                  min="0"
+                  className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                    errors.token_entry_fee ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                />
+                <p className="mt-1 text-sm text-gray-500">
+                  Set a token amount required to join this chatroom (0 for free).
+                </p>
+                {errors.token_entry_fee && (
+                  <p className="mt-1 text-sm text-red-600">{errors.token_entry_fee}</p>
+                )}
+              </div>
+            )}
+
+            {/*  className="mt-1 text-sm text-gray-500">
                 Public chatrooms can be discovered by anyone. Private chatrooms require an invitation.
               </p>
             </div>

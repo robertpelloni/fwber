@@ -16,6 +16,7 @@ export interface Chatroom {
   message_count: number;
   last_activity_at: string;
   settings?: Record<string, any>;
+  token_entry_fee?: number;
   creator?: {
     id: number;
     name: string;
@@ -106,6 +107,7 @@ export interface CreateChatroomRequest {
   neighborhood?: string;
   is_public?: boolean;
   settings?: Record<string, any>;
+  token_entry_fee?: number;
 }
 
 export interface SendMessageRequest {
@@ -180,8 +182,15 @@ export async function getChatrooms(filters: ChatroomFilters = {}): Promise<Chatr
 export async function getChatroom(id: number): Promise<{
   chatroom: Chatroom;
   messages: MessageResponse;
+  is_member?: boolean;
+  preview_mode?: boolean;
 }> {
-  const response = await apiClient.get<{ chatroom: Chatroom; messages: MessageResponse }>(`/chatrooms/${id}`);
+  const response = await apiClient.get<{ 
+    chatroom: Chatroom; 
+    messages: MessageResponse;
+    is_member?: boolean;
+    preview_mode?: boolean;
+  }>(`/chatrooms/${id}`);
   return response.data;
 }
 

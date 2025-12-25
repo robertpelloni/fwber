@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.7] - 2025-12-25
+
+### Added
+- **Chatrooms**: Implemented Token-Gated Chatrooms.
+    - **Backend**: Updated `ChatroomController` to support `token_entry_fee` in `store` and `join` methods.
+    - **Frontend**: Updated `CreateChatroom` form to allow setting an entry fee.
+    - **Frontend**: Updated `ChatroomPage` to show a "Pay & Join" overlay for non-members in preview mode.
+    - **API**: Updated `Chatroom` interface and response structures.
+
 ## [0.3.6] - 2025-12-25
 
 ### Added

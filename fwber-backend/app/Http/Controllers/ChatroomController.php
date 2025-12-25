@@ -122,9 +122,16 @@ class ChatroomController extends Controller
         $chatroom = Chatroom::with(['creator', 'members'])
             ->findOrFail($id);
 
-        // Check if user is a member
-        if (!$chatroom->hasMember(Auth::user())) {
-            return response()->json(['message' => 'You are not a member of this chatroom'], 403);
+        $isMember = $chatroom->hasMember(Auth::user());
+
+        // If not a member, return preview
+        if (!$isMember) {
+            return response()->json([
+                'chatroom' => $chatroom,
+                'messages' => [],
+                'is_member' => false,
+                'preview_mode' => true,
+            ]);
         }
 
         // Get recent messages
@@ -136,6 +143,7 @@ class ChatroomController extends Controller
         return response()->json([
             'chatroom' => $chatroom,
             'messages' => $messages,
+            'is_member' => true,
         ]);
     }
 

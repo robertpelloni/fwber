@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { useChatroom, useChatroomMessages, useSendMessage, useAddReaction, useRemoveReaction } from '@/lib/hooks/use-chatrooms';
+import { useChatroom, useChatroomMessages, useSendMessage, useAddReaction, useRemoveReaction, useJoinChatroom } from '@/lib/hooks/use-chatrooms';
 import { 
   useProximityChatroom, 
   useProximityChatroomMessages, 
@@ -56,6 +56,7 @@ export default function ChatroomPage() {
   const sendStandardMessageMutation = useSendMessage();
   const addStandardReactionMutation = useAddReaction();
   const removeStandardReactionMutation = useRemoveReaction();
+  const joinChatroomMutation = useJoinChatroom();
 
   // Proximity Chatroom Hooks
   const { data: proximityChatroomData, isLoading: proximityChatroomLoading } = useProximityChatroom(chatroomId, location || undefined);
@@ -117,6 +118,17 @@ export default function ChatroomPage() {
     typingTimeoutRef.current = setTimeout(() => {
       setIsTyping(false);
     }, 1000);
+  };
+
+  const handleJoin = async () => {
+    try {
+      await joinChatroomMutation.mutateAsync(chatroomId);
+      // The query invalidation in the hook will trigger a re-fetch, 
+      // which should return is_member=true and preview_mode=false
+    } catch (error) {
+      console.error('Failed to join chatroom:', error);
+      alert('Failed to join chatroom. You may not have enough tokens.');
+    }
   };
 
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -281,8 +293,42 @@ export default function ChatroomPage() {
 
         {/* Chat Interface */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-[600px]">
+          
+          {/* Preview Mode Overlay */}
+          {(standardChatroomData?.preview_mode && !isProximity) && (
+            <div className="absolute inset-0 z-10 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-lg">
+              <div className="bg-white p-8 rounded-xl shadow-2xl border border-gray-200 max-w-md w-full text-center">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">🔒</span>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Join to Chat</h2>
+                <p className="text-gray-600 mb-6">
+                  {chatroom?.token_entry_fee && chatroom.token_entry_fee > 0 
+                    ? `This chatroom requires an entry fee of ${chatroom.token_entry_fee} tokens.` 
+                    : "You need to join this chatroom to view messages and participate."}
+                </p>
+                <button
+                  onClick={handleJoin}
+                  disabled={joinChatroomMutation.isPending}
+                  className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-md transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {joinChatroomMutation.isPending ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Joining...
+                    </>
+                  ) : (
+                    <>
+                      {chatroom?.token_entry_fee && chatroom.token_entry_fee > 0 ? 'Pay & Join' : 'Join Chatroom'}
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          <div className={`flex-1 overflow-y-auto p-6 space-y-4 ${(standardChatroomData?.preview_mode && !isProximity) ? 'filter blur-sm select-none overflow-hidden' : ''}`}>
             {messagesLoading ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
