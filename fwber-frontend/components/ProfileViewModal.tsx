@@ -84,7 +84,10 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
       // Check subscription
       if (user.profile?.subscription_price && user.profile.subscription_price > 0 && currentUser?.id !== user.id) {
           apiClient.get(`/subscriptions/creator/${user.id}`)
-            .then(res => setIsSubscribed(res.data.is_subscribed))
+            .then(res => {
+                const data = res.data as { is_subscribed: boolean };
+                setIsSubscribed(data.is_subscribed);
+            })
             .catch(console.error)
       }
 
