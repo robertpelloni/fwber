@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.3] - 2025-12-24
+
+### Fixed
+- **Mercure**: Fixed 401 Unauthorized and CORS errors on production by updating `Caddyfile` to include `fwber.vercel.app` and hardcoding correct JWT keys.
+- **Photo Upload**: Fixed file selection dialog not opening on some devices by replacing `display: none` with `sr-only` class for the file input.
+- **Photo Upload**: Added a visible "Select Photos" button as a fallback for drag-and-drop.
+
 ## [0.3.2] - 2025-12-24
 
 ### Fixed

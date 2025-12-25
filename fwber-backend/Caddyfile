@@ -20,11 +20,11 @@
 
 	mercure {
 		# Publisher JWT key
-		publisher_jwt {env.MERCURE_PUBLISHER_JWT_KEY} HS256
+		publisher_jwt fwber_mercure_secret_key_2025_secure_and_long HS256
 		# Subscriber JWT key
-		subscriber_jwt {env.MERCURE_SUBSCRIBER_JWT_KEY} HS256
+		subscriber_jwt fwber_mercure_secret_key_2025_secure_and_long HS256
 		# CORS Configuration
-		cors_origins *
+		cors_origins https://fwber.me https://www.fwber.me https://fwber.vercel.app https://fwber-frontend.vercel.app
 		# Extra directives
 		{$MERCURE_EXTRA_DIRECTIVES}
 	}
