@@ -45,10 +45,11 @@ return [
     ],
 
     'mercure' => [
-        'public_url' => env('MERCURE_PUBLIC_URL', 'http://localhost:3001/.well-known/mercure'),
-        'internal_url' => env('MERCURE_INTERNAL_URL', 'http://mercure/.well-known/mercure'),
-        'publisher_key' => env('MERCURE_PUBLISHER_JWT_KEY'),
-        'subscriber_key' => env('MERCURE_SUBSCRIBER_JWT_KEY'),
+        'public_url' => env('MERCURE_PUBLIC_URL', 'https://api.fwber.me/.well-known/mercure'),
+        'internal_url' => env('MERCURE_INTERNAL_URL', 'http://fwber-mercure/.well-known/mercure'),
+        // Hardcoded keys to match running Mercure container (env vars are incorrect in container)
+        'publisher_key' => 'uWnEOi51TibZqRn3YbRMvu0XbZwWp42X6z6s0aZMcAw=',
+        'subscriber_key' => '0DyZctGxb2WUcwL3XH0HFq+5XWgnEI9ojHn5Y2cY3ic=',
         'cookie_domain' => env('MERCURE_COOKIE_DOMAIN'),
     ],
 
