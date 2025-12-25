@@ -14,9 +14,14 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
 ### ✅ Critical Fixes (Dec 24)
 1.  **Mercure & Photo Uploads**:
     -   **Issue**: Users reported "Mercure connection error" (401/CORS) and "Please upload at least one photo" (403 Forbidden) during onboarding.
-    -   **Fix (Mercure)**: Updated `MercureAuthController` to dynamically set `Secure` and `SameSite` cookie attributes based on the environment (HTTP vs HTTPS), resolving localhost connection issues.
-    -   **Fix (Photos)**: Changed default `avatar_mode` in `PhotoController` from `generated-only` to `upload`, enabling photo uploads by default.
-    -   **Verification**: Backend tests passing. Manual verification of code logic.
+    -   **Root Cause (Mercure)**: Configuration mismatch. Local backend was generating tokens with local keys, but Frontend was trying to connect to Production Mercure (which requires production keys), resulting in 401 Unauthorized.
+    -   **Root Cause (Photos)**: `PhotoController` defaulted to `generated-only` mode.
+    -   **Fix**:
+        -   Created `fix_local_env.ps1` to align local `.env` files with `docker-compose.dev.yml`.
+        -   Updated `MercureAuthController` to handle secure cookies dynamically.
+        -   Updated `PhotoController` to allow uploads by default.
+        -   Started local Mercure service via Docker.
+    -   **Verification**: Backend tests passing. Local environment configuration corrected.
 
 ### ✅ Critical Fixes (Dec 24 - Part 1)
 1.  **500 Error Resolution**:
