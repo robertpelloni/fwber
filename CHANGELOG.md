@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.6] - 2025-12-25
+
+### Added
+- **Crypto**: Merged `feature/solana-crypto-integration` into `main`, adding `auth/login-wallet` endpoint and resolving conflicts in `api.php`.
+
+### Changed
+- **Documentation**: Updated `ROADMAP.md` to reflect current status (Post-Launch Monitoring) and completed milestones (Mercure Stability, Solana Integration).
+
 ## [0.3.5] - 2025-12-25
 
 ### Fixed

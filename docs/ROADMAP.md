@@ -1,6 +1,6 @@
 # Project Roadmap
 
-**Last Updated:** December 13, 2025
+**Last Updated:** December 25, 2025
 **Status:** Post-Launch Monitoring & Growth
 
 ## 🟢 Current Phase: Post-Launch Monitoring & Growth
@@ -14,9 +14,9 @@ The application is live. The focus is on monitoring system health, optimizing pe
 - [x] **Gamification**: Local Leaderboards (Top Connector, Most Active) and Daily Streaks.
 
 #### 2. Operational Excellence
-- [ ] **Monitor Sentry**: Triage and fix production errors as they appear.
-- [ ] **Performance Tuning**: Analyze `SlowRequest` logs and optimize bottlenecks.
-- [ ] **Infrastructure Scaling**: Monitor Redis and Database load; scale resources if needed.
+- [x] **Monitor Sentry**: Triage and fix production errors as they appear.
+- [x] **Performance Tuning**: Analyze `SlowRequest` logs and optimize bottlenecks.
+- [x] **Infrastructure Scaling**: Monitor Redis and Database load; scale resources if needed.
 
 #### 2. User Experience Refinement
 - [x] **PWA Verification**: Verify Push Notifications and Offline mode on a wider range of devices.
@@ -31,6 +31,7 @@ The application is live. The focus is on monitoring system health, optimizing pe
 - [x] **Performance**: Redis Caching, Database Indexing, Frontend Optimization.
 - [x] **Security**: Audit, Rate Limiting, Headers, Data Retention.
 - [x] **Monitoring**: Sentry, APM Scaffolding, Uptime Checks.
+- [x] **Mercure Stability**: Fixed 503/401 errors with correct JWT keys and configuration.
 
 #### MVP & Secondary Systems (2025)
 - [x] Authentication, Profiles, Matching, Messaging.
@@ -53,6 +54,7 @@ The application is live. The focus is on monitoring system health, optimizing pe
 - [x] **Behavioral Matching**: AI matching based on interaction patterns (Engagement, Activity, Content).
 - [x] **Token Utility**: Pay for Boosts and Premium with FWB Tokens.
 - [x] **Travel Mode**: Virtual location for matching in other cities (Passport).
+- [x] **Solana Integration**: Hybrid wallet, on-chain bridging, and crypto login.
 
 ### MVP (Q3 2025)
 - [x] Authentication & Profiles
