@@ -22,7 +22,10 @@ export default function SendTokenModal({ isOpen, onClose, onSuccess }: SendToken
 
   useEffect(() => {
     if (isOpen && recipientType === 'friend') {
-      apiClient.get('/friends').then(res => setFriends(res.data.data || res.data));
+      apiClient.get('/friends').then(res => {
+          const data = res.data as { data?: any[] } | any[];
+          setFriends(Array.isArray(data) ? data : (data.data || []));
+      });
     }
   }, [isOpen, recipientType]);
 
