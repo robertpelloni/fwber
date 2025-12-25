@@ -308,11 +308,11 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
                   ) : (
                     <div className="space-y-3">
                         <div className="text-sm text-gray-800 dark:text-gray-200 italic">
-<<<<<<< HEAD
                            &ldquo;{insights.ai_explanation}&rdquo;
-=======
-                           "{insights.ai_explanation}"
-                           &ldquo;{insights.ai_explanation}&rdquo;y-800 p-2 rounded">
+                        </div>
+                        {insights.breakdown && (
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                                <div className="bg-white dark:bg-gray-800 p-2 rounded">
                                    <span className="text-gray-500 block">Base</span>
                                    <span className="font-bold">{insights.breakdown.base}%</span>
                                 </div>

@@ -99,10 +99,6 @@ export default function WalletDashboard() {
         <div className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">Devnet</div>
       </div>
 
-<<<<<<< HEAD
-      {/* Internal Balance */}
-      <div className="p-4 border border-purple-200 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
-        <h3 className="text-sm font-medium text-purple-800 dark:text-purple-300">Internal Balance ($FWB)</h3>
       {/* Tabs */}
       <div className="flex space-x-1 p-1 bg-gray-100 dark:bg-gray-700/50 rounded-lg">
         <button
@@ -239,3 +235,6 @@ export default function WalletDashboard() {
             <PaymentRequests />
         </div>
       )}
+    </div>
+  );
+}

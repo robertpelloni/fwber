@@ -15,6 +15,11 @@ interface Request {
   created_at: string;
 }
 
+interface RequestsResponse {
+  incoming: Request[];
+  outgoing: Request[];
+}
+
 export default function PaymentRequests() {
   const [incoming, setIncoming] = useState<Request[]>([]);
   const [outgoing, setOutgoing] = useState<Request[]>([]);
@@ -24,7 +29,7 @@ export default function PaymentRequests() {
   const fetchRequests = async () => {
     try {
       setLoading(true);
-      const { data } = await apiClient.get('/wallet/requests');
+      const { data } = await apiClient.get<RequestsResponse>('/wallet/requests');
       setIncoming(data.incoming);
       setOutgoing(data.outgoing);
     } catch (error) {
@@ -174,7 +179,7 @@ function CreateRequestModal({ isOpen, onClose, onSuccess }: { isOpen: boolean; o
 
   useEffect(() => {
     if (isOpen) {
-      apiClient.get('/friends').then(res => setFriends(res.data.data || res.data));
+      apiClient.get<any>('/friends').then(res => setFriends(res.data.data || res.data));
     }
   }, [isOpen]);
 
