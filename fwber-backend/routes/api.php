@@ -49,6 +49,7 @@ Route::get('auth/login', function () {
 })->name('login');
 Route::get('auth/referral/{code}', [\App\Http\Controllers\AuthController::class, 'checkReferralCode']);
 Route::post('public/vouch', [\App\Http\Controllers\VouchController::class, 'store'])->middleware('throttle:60,1');
+Route::post('auth/login-wallet', [\App\Http\Controllers\AuthController::class, 'loginWithWallet'])->middleware('throttle:auth');
 Route::post('auth/two-factor-challenge', [\App\Http\Controllers\TwoFactorChallengeController::class, 'store'])->middleware('throttle:auth');
 
 // Public Debug Route (No Auth)

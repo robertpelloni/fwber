@@ -126,4 +126,5 @@ archive
 archive
 archive
 fwber-frontend/.env.local.production
-
+fwber-backend/node_modules/
+fwber-frontend/node_modules/

@@ -5,6 +5,9 @@ import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { useWallet } from '@solana/wallet-adapter-react'
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
+import bs58 from 'bs58'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -13,8 +16,9 @@ export default function LoginPage() {
   const [recoveryCode, setRecoveryCode] = useState('')
   const [isRecovery, setIsRecovery] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const { login, verifyTwoFactor, error, clearError, isAuthenticated, requiresTwoFactor } = useAuth()
+  const { login, loginWithWallet, verifyTwoFactor, error, clearError, isAuthenticated, requiresTwoFactor } = useAuth()
   const router = useRouter()
+  const { publicKey, signMessage, disconnect } = useWallet()
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -76,6 +80,28 @@ export default function LoginPage() {
     }
     // Note: We don't set isLoading(false) in finally block if successful
     // to prevent UI flash before redirect
+  }
+
+  const handleWalletLogin = async () => {
+    if (!publicKey || !signMessage) return
+    setIsLoading(true)
+    clearError()
+
+    try {
+        const message = `Sign this message to login to FWBer.\n\nWallet: ${publicKey.toBase58()}\nTimestamp: ${Date.now()}`
+        const encodedMessage = new TextEncoder().encode(message)
+        const signature = await signMessage(encodedMessage)
+
+        await loginWithWallet(
+            publicKey.toBase58(),
+            bs58.encode(signature),
+            message
+        )
+    } catch (error) {
+        console.error('Wallet login failed:', error)
+    } finally {
+        setIsLoading(false)
+    }
   }
 
   const handleTwoFactorSubmit = async (e: React.FormEvent) => {
@@ -266,6 +292,33 @@ export default function LoginPage() {
               API Test Page
             </Link>
           </div>
+
+          <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-gray-50 dark:bg-gray-900 text-gray-500">
+                  Or continue with
+                </span>
+              </div>
+          </div>
+
+          <div className="flex flex-col items-center justify-center space-y-4">
+               {!publicKey ? (
+                   <WalletMultiButton />
+               ) : (
+                   <button
+                       type="button"
+                       onClick={handleWalletLogin}
+                       disabled={isLoading}
+                       className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
+                   >
+                       {isLoading ? 'Verifying Wallet...' : 'Login with Wallet'}
+                   </button>
+               )}
+          </div>
+
         </form>
       </div>
     </div>
