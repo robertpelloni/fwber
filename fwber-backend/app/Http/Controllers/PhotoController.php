@@ -185,7 +185,7 @@ class PhotoController extends Controller
             }
             
             // Enforce generated-avatars-only mode for MVP
-            if (config('app.avatar_mode', 'generated-only') === 'generated-only') {
+            if (config('app.avatar_mode', 'upload') === 'generated-only') {
                 return response()->json([
                     'message' => 'Photo uploads disabled. Using generated avatars only.',
                     'avatar_mode' => 'generated-only',

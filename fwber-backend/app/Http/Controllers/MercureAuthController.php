@@ -66,6 +66,10 @@ class MercureAuthController extends Controller
             $publicUrl = config('services.mercure.public_url');
             $host = parse_url($publicUrl, PHP_URL_HOST) ?: $domain;
 
+            // Determine security settings based on environment
+            $isSecure = app()->environment('production') || $request->secure();
+            $sameSite = $isSecure ? 'None' : 'Lax';
+
             // Set the authorization cookie
             $response = response()->json([
                 'message' => 'Mercure authorization cookie set',
@@ -80,10 +84,10 @@ class MercureAuthController extends Controller
                 60, // 1 hour
                 '/.well-known/mercure',
                 $domain ?: $host,
-                true, // secure
+                $isSecure, // secure
                 true, // httpOnly
                 false, // raw
-                'None' // sameSite
+                $sameSite // sameSite
             );
 
             Log::info('Mercure authorization cookie set', [

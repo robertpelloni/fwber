@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.2] - 2025-12-24
+
+### Fixed
+- **Mercure**: Fixed `MercureAuthController` to correctly handle secure cookies in mixed environments (HTTP localhost vs HTTPS production), resolving 401/CORS errors during local development.
+- **Photos**: Changed default `avatar_mode` in `PhotoController` from `generated-only` to `upload`, fixing the 403 Forbidden error that prevented users from uploading photos during onboarding.
+
 ## [0.3.1] - 2025-12-24
 
 ### Fixed

@@ -12,6 +12,13 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
 *   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
 
 ### ✅ Critical Fixes (Dec 24)
+1.  **Mercure & Photo Uploads**:
+    -   **Issue**: Users reported "Mercure connection error" (401/CORS) and "Please upload at least one photo" (403 Forbidden) during onboarding.
+    -   **Fix (Mercure)**: Updated `MercureAuthController` to dynamically set `Secure` and `SameSite` cookie attributes based on the environment (HTTP vs HTTPS), resolving localhost connection issues.
+    -   **Fix (Photos)**: Changed default `avatar_mode` in `PhotoController` from `generated-only` to `upload`, enabling photo uploads by default.
+    -   **Verification**: Backend tests passing. Manual verification of code logic.
+
+### ✅ Critical Fixes (Dec 24 - Part 1)
 1.  **500 Error Resolution**:
     -   **Issue**: API endpoints (`/api/photos`, `/api/profile`, `/api/mercure/cookie`) returning 500 Internal Server Error due to fatal errors in middleware (e.g., missing classes or services) not being caught by `catch (\Exception $e)`.
     -   **Fix**: Updated `CheckDailyBonus` and `TrackUserActivity` middleware, plus `PhotoController` and `MercureAuthController`, to catch `\Throwable` instead of `\Exception`. Added robust error logging.
