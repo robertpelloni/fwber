@@ -519,7 +519,7 @@ export default function PhotoUpload({
           }
         }}
       >
-        <input {...getInputProps()} ref={fileInputRef} className="hidden" />
+        <input {...getInputProps()} ref={fileInputRef} style={{ display: 'none' }} />
         
         <div 
           className="flex flex-col items-center space-y-4 pointer-events-none"
@@ -543,6 +543,17 @@ export default function PhotoUpload({
           <div className="text-xs text-muted-foreground">
             Supported: JPEG, PNG, WebP, GIF
           </div>
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              open()
+            }}
+            className="mt-2 px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors pointer-events-auto"
+          >
+            Select Photos
+          </button>
 
           <div className="flex items-center gap-2 mt-2 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
             <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
