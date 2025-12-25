@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.8] - 2025-12-25
+
+### Added
+- **Testing**: Added `cypress/e2e/token-gated-chatrooms.cy.js` to verify creation and join flows for paid chatrooms.
+- **UI**: Added "Premium" badge (💎) to chatroom cards in the list view to indicate entry fees.
+
 ## [0.3.7] - 2025-12-25
 
 ### Added

@@ -11,6 +11,12 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
 *   **SSL Verification**: Waiting for Let's Encrypt to validate `mercure.fwber.me`.
 *   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
 
+### ✅ Critical Fixes (Dec 25 - Part 3)
+1.  **Token-Gated Chatrooms (Polish)**:
+    -   **Testing**: Created `cypress/e2e/token-gated-chatrooms.cy.js` covering creation, preview mode, and payment flow.
+    -   **UI**: Added visual indicators (Diamond Badge) to chatroom lists for paid rooms.
+    -   **Verification**: E2E tests created.
+
 ### ✅ Critical Fixes (Dec 25 - Part 2)
 1.  **Token-Gated Chatrooms**:
     -   **Feature**: Implemented the ability for creators to charge an entry fee (FWB Tokens) for chatrooms.

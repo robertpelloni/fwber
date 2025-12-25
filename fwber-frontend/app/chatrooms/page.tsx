@@ -205,7 +205,14 @@ export default function ChatroomsPage() {
                 >
                   <div className="flex items-start justify-between mb-2">
                     <h3 className="font-medium text-gray-900">{chatroom.display_name}</h3>
-                    <span className="text-sm text-gray-500">{chatroom.member_count} members</span>
+                    <div className="flex flex-col items-end gap-1">
+                      <span className="text-sm text-gray-500">{chatroom.member_count} members</span>
+                      {chatroom.token_entry_fee && chatroom.token_entry_fee > 0 && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-100 text-amber-800 border border-amber-200">
+                          💎 {chatroom.token_entry_fee}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   {chatroom.description && (
                     <p className="text-sm text-gray-600 mb-2 line-clamp-2">{chatroom.description}</p>
@@ -265,6 +272,12 @@ export default function ChatroomsPage() {
                               ? `${Math.round((chatroom as any).distance_meters)}m` 
                               : `${((chatroom as any).distance_meters / 1000).toFixed(1)}km`
                             )} away
+                          </span>
+                        )}
+                        {/* Show Entry Fee Badge */}
+                        {chatroom.token_entry_fee && chatroom.token_entry_fee > 0 && (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
+                            💎 {chatroom.token_entry_fee} Tokens
                           </span>
                         )}
                       </div>
