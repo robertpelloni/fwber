@@ -101,7 +101,7 @@ export default function PaymentRequests() {
                   </div>
                   <span className="font-bold text-indigo-600 dark:text-indigo-400">{req.amount} FWB</span>
                 </div>
-                {req.note && <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 bg-gray-50 dark:bg-gray-900 p-2 rounded">"{req.note}"</p>}
+                {req.note && <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 bg-gray-50 dark:bg-gray-900 p-2 rounded">&quot;{req.note}&quot;</p>}
 
                 {req.status === 'pending' ? (
                   <div className="flex gap-2">
@@ -141,7 +141,7 @@ export default function PaymentRequests() {
                   </div>
                   <span className="font-bold text-gray-600 dark:text-gray-400">{req.amount} FWB</span>
                 </div>
-                {req.note && <p className="text-sm text-gray-500 mb-3 italic">"{req.note}"</p>}
+                {req.note && <p className="text-sm text-gray-500 mb-3 italic">&quot;{req.note}&quot;</p>}
 
                 <div className="flex justify-between items-center">
                    <span className={`text-xs font-bold px-2 py-1 rounded uppercase ${
