@@ -131,29 +131,37 @@ class TokenController extends Controller
 
         return response()->json(['message' => 'Deposit successful', 'new_balance' => $user->fresh()->token_balance]);
     }
+
     public function transfer(Request $request)
     {
         $request->validate([
             'amount' => 'required|numeric|min:1',
-            'recipient_id' => 'required|exists:users,id',
+            'recipient_id' => 'required_without:recipient_email|exists:users,id',
+            'recipient_email' => 'required_without:recipient_id|email|exists:users,email',
+            'message' => 'nullable|string|max:255',
         ]);
 
         $sender = $request->user();
-        $recipient = User::findOrFail($request->recipient_id);
-        $amount = $request->amount;
 
-        if ($sender->id === $recipient->id) {
-             return response()->json(['error' => 'Cannot tip yourself'], 400);
+        if ($request->has('recipient_id')) {
+            $recipient = User::findOrFail($request->recipient_id);
+        } else {
+            $recipient = User::where('email', $request->recipient_email)->firstOrFail();
         }
 
-        // Check balance atomically inside transaction? Or before?
-        // Better to check before but enforce atomic decrement inside.
+        $amount = $request->amount;
+        $message = $request->message;
+
+        if ($sender->id === $recipient->id) {
+             return response()->json(['error' => 'Cannot send tokens to yourself'], 400);
+        }
+
         if ($sender->token_balance < $amount) {
             return response()->json(['error' => 'Insufficient balance'], 400);
         }
 
         try {
-            \DB::transaction(function () use ($sender, $recipient, $amount) {
+            \DB::transaction(function () use ($sender, $recipient, $amount, $message) {
                 $deducted = User::where('id', $sender->id)
                     ->where('token_balance', '>=', $amount)
                     ->decrement('token_balance', $amount);
@@ -165,26 +173,30 @@ class TokenController extends Controller
                 $recipient->increment('token_balance', $amount);
 
                 $sender->tokenTransactions()->create([
-                'amount' => -$amount,
-                'type' => 'tip_sent',
-                'description' => "Tip to {$recipient->name}",
-                'metadata' => ['recipient_id' => $recipient->id],
-            ]);
+                    'amount' => -$amount,
+                    'type' => 'tip_sent',
+                    'description' => "Sent to {$recipient->name}",
+                    'metadata' => ['recipient_id' => $recipient->id, 'message' => $message],
+                ]);
 
-            $recipient->tokenTransactions()->create([
-                'amount' => $amount,
-                'type' => 'tip_received',
-                'description' => "Tip from {$sender->name}",
-                'metadata' => ['sender_id' => $sender->id],
+                $recipient->tokenTransactions()->create([
+                    'amount' => $amount,
+                    'type' => 'tip_received',
+                    'description' => "Received from {$sender->name}",
+                    'metadata' => ['sender_id' => $sender->id, 'message' => $message],
                 ]);
             });
 
             // Send Push Notification
+            $body = $message
+                ? "{$sender->name} sent {$amount} FWB: \"{$message}\""
+                : "{$sender->name} sent you {$amount} FWB.";
+
             $this->pushService->send(
                 $recipient,
                 [
-                    'title' => '💰 Tip Received!',
-                    'body' => "You received {$amount} FWB from {$sender->name}.",
+                    'title' => '💰 Payment Received!',
+                    'body' => $body,
                     'url' => '/wallet'
                 ],
                 'transaction'

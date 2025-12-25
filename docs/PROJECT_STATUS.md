@@ -34,10 +34,12 @@ These features are considered complete and are ready for a production environmen
 *   **Crypto Economy (Fully Integrated):**
     *   [x] **Trojan Horse Integration:** Internal ledger for instant/free micro-transactions.
     *   [x] **Solana Bridge:** Users can withdraw accumulated tokens to external wallets (Phantom, Solflare).
+    *   [x] **Merchant API:** "Pay with FWBer" infrastructure allowing third-party sites to accept FWB tokens.
     *   [x] **Crypto Deposits:** Users can deposit SOL/SPL tokens from external wallets to their internal ledger.
     *   [x] **Wallet Dashboard:** PWA-ready wallet UI with QR code deposits and transaction history.
     *   [x] **Tokenomics:** Signup bonuses, Referral Rewards, and Daily Login Bonuses.
-    *   [x] **P2P Tipping:** Send tokens in Chat, Profiles, and Friend Lists.
+    *   [x] **P2P Transfers:** Send tokens with messages via Wallet, Chat, or Profile.
+    *   [x] **Creator Subscriptions:** Monthly recurring token payments to unlock all private content from a creator.
     *   [x] **Token-Gated Content:** Pay-to-unlock private photos and paid events.
     *   [x] **Paid Groups:** Token entry fees for exclusive communities.
     *   [x] **Paid AI Features:** Token costs for Profile Generation, Conversation Starters, and Optimization.

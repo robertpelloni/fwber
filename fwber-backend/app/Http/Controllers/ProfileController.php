@@ -313,6 +313,7 @@ class ProfileController extends Controller
                     'fetishes',
                     'sti_status',
                     'is_incognito',
+                    'subscription_price',
                 ])));
                 
                 // Handle location fields

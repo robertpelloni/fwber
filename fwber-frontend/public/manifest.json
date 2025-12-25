@@ -1,7 +1,7 @@
 {
   "name": "FWBer.me — Adult Dating Platform",
   "short_name": "FWBer",
-  "description": "\"Everybody wants to get laid.\" Meet bold people nearby, swap stories, and share blurred selfies safely.",
+  "description": "\"Everybody wants to get laid.\" Meet bold people nearby, swap stories, share blurred selfies, and send secure crypto payments.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",
@@ -43,6 +43,12 @@
       "short_name": "Pulse",
       "description": "See what's happening nearby",
       "url": "/pulse"
+    },
+    {
+      "name": "My Wallet",
+      "short_name": "Wallet",
+      "description": "Manage FWB tokens and payments",
+      "url": "/wallet"
     }
   ],
   "prefer_related_applications": false

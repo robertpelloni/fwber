@@ -98,6 +98,7 @@ class UserProfileResource extends JsonResource
                 'has_children' => $profile?->has_children,
                 'wants_children' => $profile?->wants_children,
                 'has_pets' => $profile?->has_pets,
+                'subscription_price' => $profile?->subscription_price,
 
                 // Social & Personality
                 'love_language' => $profile?->love_language,
