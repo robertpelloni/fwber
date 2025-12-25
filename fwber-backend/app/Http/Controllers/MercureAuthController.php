@@ -93,7 +93,7 @@ class MercureAuthController extends Controller
 
             return $response;
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Failed to set Mercure authorization cookie', [
                 'user_id' => $user->id ?? null,
                 'error' => $e->getMessage()

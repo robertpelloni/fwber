@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
 - **Mercure**: Fixed CORS issues by whitelisting Vercel preview domains in `start_mercure_shared.sh`.
 - **Mercure**: Added JWT token to `MercureAuthController` response body to allow manual token handling when cross-domain cookies fail.
 - **Database**: Added `schema:fix-missing` artisan command for manual database repair in production environments where migrations fail to run.
+- **Middleware**: Updated `CheckDailyBonus` and `TrackUserActivity` to catch `Throwable` instead of `Exception`, preventing fatal errors (like missing classes or services) from crashing the entire API.
+- **Controllers**: Updated `PhotoController` and `MercureAuthController` to catch `Throwable` to prevent 500 errors during file uploads or auth checks.
 
 ## [0.3.0] - 2025-12-22
 

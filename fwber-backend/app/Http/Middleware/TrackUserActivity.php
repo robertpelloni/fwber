@@ -49,8 +49,9 @@ class TrackUserActivity
                     Cache::put($cacheKey, true, now()->addDay());
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Fail silently to prevent blocking the request
+            \Illuminate\Support\Facades\Log::error('TrackUserActivity error: ' . $e->getMessage());
         }
 
         return $next($request);

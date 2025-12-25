@@ -23,7 +23,7 @@ class CheckDailyBonus
                     if (is_string($lastBonus)) {
                         $lastBonus = \Illuminate\Support\Carbon::parse($lastBonus);
                     }
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     $lastBonus = null;
                 }
 
@@ -36,13 +36,15 @@ class CheckDailyBonus
 
                         $user->last_daily_bonus_at = $now;
                         $user->save();
-                    } catch (\Exception $e) {
+                    } catch (\Throwable $e) {
                         // Ignore if token service fails or save fails (missing column)
+                        \Illuminate\Support\Facades\Log::error('CheckDailyBonus error: ' . $e->getMessage());
                     }
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Fail silently
+            \Illuminate\Support\Facades\Log::error('CheckDailyBonus fatal error: ' . $e->getMessage());
         }
 
         return $next($request);

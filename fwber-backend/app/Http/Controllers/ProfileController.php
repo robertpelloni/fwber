@@ -152,7 +152,7 @@ class ProfileController extends Controller
                 'profile_complete' => $this->isProfileComplete($user->profile),
             ]);
             
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Profile fetch error', [
                 'user_id' => auth()->id(),
                 'error' => $e->getMessage(),

@@ -130,7 +130,7 @@ class PhotoController extends Controller
                 'max_photos' => self::MAX_PHOTOS_PER_USER,
             ]);
             
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Photos fetch error', [
                 'user_id' => auth()->id(),
                 'error' => $e->getMessage(),
@@ -330,7 +330,7 @@ class PhotoController extends Controller
                 ],
             ], 201);
             
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Photo upload error', [
                 'user_id' => auth()->id(),
                 'error' => $e->getMessage(),

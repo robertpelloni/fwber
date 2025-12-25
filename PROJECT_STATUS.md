@@ -11,6 +11,12 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
 *   **SSL Verification**: Waiting for Let's Encrypt to validate `mercure.fwber.me`.
 *   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
 
+### ✅ Critical Fixes (Dec 24)
+1.  **500 Error Resolution**:
+    -   **Issue**: API endpoints (`/api/photos`, `/api/profile`, `/api/mercure/cookie`) returning 500 Internal Server Error due to fatal errors in middleware (e.g., missing classes or services) not being caught by `catch (\Exception $e)`.
+    -   **Fix**: Updated `CheckDailyBonus` and `TrackUserActivity` middleware, plus `PhotoController` and `MercureAuthController`, to catch `\Throwable` instead of `\Exception`. Added robust error logging.
+    -   **Verification**: Code changes applied. Waiting for deployment verification.
+
 ### ✅ Critical Fixes (Dec 22 - Part 3)
 1.  **Solana Integration**:
     -   **Feature**: Merged `feature/solana-crypto-integration` into `main`.
