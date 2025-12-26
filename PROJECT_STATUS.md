@@ -12,6 +12,12 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
 *   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
 
 ### ✅ Critical Fixes (Dec 26)
+1.  **Photo Uploads**:
+    -   **Issue**: "Select Photos" button was unresponsive.
+    -   **Fix**: Removed conflicting `ref` on file input in `PhotoUpload` component.
+    -   **Verification**: Code review.
+
+### ✅ Critical Fixes (Dec 26 - Part 1)
 1.  **Mercure Configuration**:
     -   **Issue**: Backend was using `localhost` for internal Mercure URL, causing connection refused errors in Docker.
     -   **Fix**: Updated `.env` to use `http://fwber-mercure/.well-known/mercure`.

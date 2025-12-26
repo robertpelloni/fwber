@@ -419,7 +419,12 @@ export default function CreateChatroomPage() {
                   Make this chatroom public
                 </label>
               </div>
-              <pToken Entry Fee */}
+              <p className="mt-1 text-sm text-gray-500">
+                Public chatrooms can be discovered by anyone. Private chatrooms require an invitation.
+              </p>
+            </div>
+
+            {/* Token Entry Fee */}
             {formData.type !== 'proximity' && (
               <div>
                 <label htmlFor="token_entry_fee" className="block text-sm font-medium text-gray-700 mb-2">

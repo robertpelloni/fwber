@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.10] - 2025-12-26
+
+### Fixed
+- **Photo Upload**: Fixed "Select Photos" button not working by removing conflicting `ref` on the file input in `PhotoUpload` component.
+- **Mercure**: Reverted frontend production configuration to use `demo.mercure.rocks` as requested.
+
 ## [0.3.9] - 2025-12-26
 
 ### Fixed

@@ -50,11 +50,10 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Performance optimizations
-  swcMinify: true,
   compress: true,
   poweredByHeader: false,
   productionBrowserSourceMaps: false,
-  output: 'standalone', // Optimized for Docker/Shared Hosting
+  // output: 'standalone', // Optimized for Docker/Shared Hosting
   
   // Environment variables
   env: {
@@ -66,14 +65,6 @@ const nextConfig = {
 
   // Experimental features for better performance
   experimental: {
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
-      },
-    },
     optimizeCss: true, // Enabled - requires 'critters' package
     optimizePackageImports: ['@tanstack/react-query', 'lucide-react'],
   },
@@ -267,7 +258,7 @@ const sentryWebpackPluginOptions = {
   // See the following for more information:
   // https://docs.sentry.io/product/crons/
   // https://vercel.com/docs/cron-jobs
-  automaticVercelMonitors: false,
+  // automaticVercelMonitors: false,
 };
 
 // Make sure adding Sentry options is the last code to run before exporting

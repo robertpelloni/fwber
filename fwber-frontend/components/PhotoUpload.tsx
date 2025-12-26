@@ -523,7 +523,6 @@ export default function PhotoUpload({
           {...getInputProps({
             style: { display: 'block' }
           })} 
-          ref={fileInputRef} 
           className="sr-only" 
         />
         

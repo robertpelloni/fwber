@@ -337,7 +337,7 @@ export function useMercureLogic(options: { autoConnect?: boolean } = {}) {
         // We continue anyway, as the cookie might already be set or we might be in a mode that doesn't require it
     }
 
-    const hubUrl = new URL(process.env.NEXT_PUBLIC_MERCURE_URL || 'http://localhost:3000/.well-known/mercure');
+    const hubUrl = new URL(process.env.NEXT_PUBLIC_MERCURE_URL || 'http://localhost:3001/.well-known/mercure');
     // Use absolute URL for topic to match backend authorization
     // Also include relative path as fallback in case of configuration mismatch
     hubUrl.searchParams.append('topic', `https://fwber.me/users/${user.id}`);

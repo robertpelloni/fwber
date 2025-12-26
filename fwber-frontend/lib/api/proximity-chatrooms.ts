@@ -43,6 +43,7 @@ export interface ProximityChatroom {
   is_within_proximity?: boolean;
   url: string;
   display_name: string;
+  token_entry_fee?: number;
 }
 
 export interface ProximityChatroomMember {
