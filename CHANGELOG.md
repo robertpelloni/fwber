@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.9] - 2025-12-26
+
+### Fixed
+- **Mercure**: Fixed Docker networking issue where backend could not publish updates due to incorrect `MERCURE_INTERNAL_URL`. Updated `.env` to use container hostname `fwber-mercure`.
+- **Photos**: Fixed photo upload failure in local development caused by OpenAI quota limits. Disabled `FEATURE_MEDIA_ANALYSIS` in `.env` to bypass the check.
+
 ## [0.3.8] - 2025-12-25
 
 ### Added

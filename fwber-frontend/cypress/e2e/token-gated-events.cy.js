@@ -1,17 +1,19 @@
 describe('Token-Gated Events', () => {
   beforeEach(() => {
     // Login as a user with tokens
+    const user = {
+      id: 1,
+      name: 'Rich User',
+      email: 'rich@example.com',
+      wallet: {
+        balance: 1000,
+        address: 'SOL_WALLET_ADDRESS'
+      }
+    };
+
     cy.intercept('GET', '/api/user', {
       statusCode: 200,
-      body: {
-        id: 1,
-        name: 'Rich User',
-        email: 'rich@example.com',
-        wallet: {
-          balance: 1000,
-          address: 'SOL_WALLET_ADDRESS'
-        }
-      }
+      body: user
     }).as('getUser');
   });
 
@@ -35,9 +37,16 @@ describe('Token-Gated Events', () => {
     }).as('getEvent');
 
     // Mock wallet
-    cy.intercept('GET', '/api/wallet/balance', {
+    cy.intercept('GET', '/api/wallet', {
       statusCode: 200,
-      body: { balance: '1000.00' }
+      body: { 
+        balance: '1000.00',
+        transactions: [],
+        referral_code: 'REF123',
+        wallet_address: 'SOL_ADDR',
+        referral_count: 0,
+        golden_tickets_remaining: 0
+      }
     }).as('getWallet');
 
     // Mock RSVP/Purchase
@@ -46,7 +55,20 @@ describe('Token-Gated Events', () => {
       body: { status: 'attending', paid: true }
     }).as('rsvpEvent');
 
-    cy.visit('/events/101');
+    cy.visit('/events/101', {
+      onBeforeLoad(win) {
+        win.localStorage.setItem('fwber_token', 'mock-token');
+        win.localStorage.setItem('fwber_user', JSON.stringify({
+          id: 1,
+          name: 'Rich User',
+          email: 'rich@example.com',
+          wallet: {
+            balance: 1000,
+            address: 'SOL_WALLET_ADDRESS'
+          }
+        }));
+      },
+    });
 
     // Click Attend
     cy.contains('button', 'Attend').click();

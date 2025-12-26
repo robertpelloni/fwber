@@ -1,9 +1,9 @@
 {
   "name": "fwber-frontend",
-  "version": "0.3.8",
+  "version": "0.3.9",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -H 0.0.0.0",
     "dev:3005": "next dev -p 3005",
     "build": "next build",
     "start": "next start",

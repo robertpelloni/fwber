@@ -26,7 +26,7 @@ WORKDIR /var/www/html
 COPY composer.json composer.lock ./
 
 # Install PHP dependencies
-RUN composer install --optimize-autoloader
+RUN composer install --optimize-autoloader --no-scripts
 
 # Copy application code
 COPY . .
@@ -37,10 +37,10 @@ RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/bootstrap/cache
 
 # Install Node.js dependencies
-RUN npm install
+# RUN npm install
 
 # Build frontend assets
-RUN npm run build
+# RUN npm run build
 
 # Expose port
 EXPOSE 8000

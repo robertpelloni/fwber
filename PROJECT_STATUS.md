@@ -11,6 +11,16 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
 *   **SSL Verification**: Waiting for Let's Encrypt to validate `mercure.fwber.me`.
 *   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
 
+### ✅ Critical Fixes (Dec 26)
+1.  **Mercure Configuration**:
+    -   **Issue**: Backend was using `localhost` for internal Mercure URL, causing connection refused errors in Docker.
+    -   **Fix**: Updated `.env` to use `http://fwber-mercure/.well-known/mercure`.
+    -   **Verification**: Verified publishing via `curl` to a test route.
+2.  **Photo Uploads**:
+    -   **Issue**: Uploads failed due to OpenAI quota limits in `MediaAnalysisService`.
+    -   **Fix**: Disabled `FEATURE_MEDIA_ANALYSIS` in `.env` for local development.
+    -   **Verification**: Successfully uploaded a photo via `curl`.
+
 ### ✅ Critical Fixes (Dec 25 - Part 3)
 1.  **Token-Gated Chatrooms (Polish)**:
     -   **Testing**: Created `cypress/e2e/token-gated-chatrooms.cy.js` covering creation, preview mode, and payment flow.

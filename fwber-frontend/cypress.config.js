@@ -3,7 +3,7 @@ const { authenticator } = require('otplib')
 
 module.exports = defineConfig({
   e2e: {
-    baseUrl: 'http://127.0.0.1:3005',
+    baseUrl: 'http://127.0.0.1:3000',
     supportFile: false,
     specPattern: 'cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',
     viewportWidth: 1280,
@@ -36,7 +36,7 @@ module.exports = defineConfig({
     },
   },
   env: {
-    API_URL: 'http://localhost:8000/api',
+    API_URL: 'http://localhost:8002/api',
     MERCURE_URL: 'http://localhost:3001',
   },
 })

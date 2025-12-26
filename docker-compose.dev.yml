@@ -44,6 +44,7 @@ services:
       - MERCURE_SUBSCRIBER_JWT_KEY=0DyZctGxb2WUcwL3XH0HFq+5XWgnEI9ojHn5Y2cY3ic=
       - MERCURE_PUBLIC_URL=http://localhost:3001
       - MERCURE_INTERNAL_URL=http://mercure:80
+    command: php artisan serve --host=0.0.0.0 --port=8000
     depends_on:
       - mysql
       - mercure
