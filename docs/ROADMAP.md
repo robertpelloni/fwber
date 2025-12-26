@@ -1,6 +1,6 @@
 # Project Roadmap
 
-**Last Updated:** December 25, 2025
+**Last Updated:** December 26, 2025
 **Status:** Post-Launch Monitoring & Growth
 
 ## 🟢 Current Phase: Post-Launch Monitoring & Growth
@@ -18,7 +18,7 @@ The application is live. The focus is on monitoring system health, optimizing pe
 - [x] **Performance Tuning**: Analyze `SlowRequest` logs and optimize bottlenecks.
 - [x] **Infrastructure Scaling**: Monitor Redis and Database load; scale resources if needed.
 
-#### 2. User Experience Refinement
+#### 3. User Experience Refinement
 - [x] **PWA Verification**: Verify Push Notifications and Offline mode on a wider range of devices.
 - [x] **Feedback Loop**: Implement mechanisms to gather and analyze user feedback.
 - [x] **Voice Messages**: Enable voice recording in chat.
@@ -32,6 +32,7 @@ The application is live. The focus is on monitoring system health, optimizing pe
 - [x] **Security**: Audit, Rate Limiting, Headers, Data Retention.
 - [x] **Monitoring**: Sentry, APM Scaffolding, Uptime Checks.
 - [x] **Mercure Stability**: Fixed 503/401 errors with correct JWT keys and configuration.
+- [x] **Token-Gated Chatrooms**: Entry fees and payment flow.
 
 #### MVP & Secondary Systems (2025)
 - [x] Authentication, Profiles, Matching, Messaging.
