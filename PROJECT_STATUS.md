@@ -11,6 +11,17 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
 *   **SSL Verification**: Waiting for Let's Encrypt to validate `mercure.fwber.me`.
 *   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
 
+### ✅ Critical Fixes (Dec 27 - Part 3)
+1.  **Face Blur Circular Dependency Fix**:
+    -   **Issue**: "Module factory not available" crash on `/onboarding` due to circular imports between `PhotoUpload`, `api/photos`, and `faceBlurTelemetry`.
+    -   **Fix**:
+        -   Refactored `lib/api/photos.ts` to define local interfaces instead of importing from `faceBlurTelemetry`.
+        -   Created `lib/types/faceBlur.ts` for shared type definitions.
+        -   Updated `lib/faceBlurTelemetry.ts` and `components/PhotoUpload.tsx` to use the new shared types.
+    -   **Verification**:
+        -   Static analysis confirms dependency cycle is broken.
+        -   Created `cypress/e2e/face-blur.cy.js` to verify the component loads and processes files without crashing.
+
 ### ✅ Critical Fixes (Dec 27 - Part 2)
 1.  **Event Types**:
     -   **Feature**: Implemented support for different event types (Standard, Speed Dating, Party, Meetup, Workshop).
