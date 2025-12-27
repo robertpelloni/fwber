@@ -2,7 +2,7 @@
 
 ## 🚨 Critical Action Required
 
-The Mercure configuration has been updated to use the self-hosted instance (`api.fwber.me`) instead of the public demo hub (`demo.mercure.rocks`). This is required to fix the 401 Unauthorized and CORS errors.
+The Mercure configuration has been updated to use the **Mercure Demo Hub** (`demo.mercure.rocks`) because self-hosting is not possible on the current shared hosting environment.
 
 ### 1. Pull Latest Changes
 ```bash
@@ -14,22 +14,22 @@ You MUST update your production `.env` file on the server (VPS/DreamHost) to mat
 
 **Find these lines:**
 ```dotenv
-MERCURE_PUBLIC_URL=https://demo.mercure.rocks/.well-known/mercure
-MERCURE_INTERNAL_URL=https://demo.mercure.rocks/.well-known/mercure
+MERCURE_PUBLIC_URL=https://api.fwber.me/.well-known/mercure
+MERCURE_INTERNAL_URL=http://mercure/.well-known/mercure
 ```
 
 **Replace with:**
 ```dotenv
-MERCURE_PUBLIC_URL=https://api.fwber.me/.well-known/mercure
-MERCURE_INTERNAL_URL=http://mercure/.well-known/mercure
-# OR if running on host without Docker networking:
-# MERCURE_INTERNAL_URL=http://localhost:3001/.well-known/mercure
+MERCURE_PUBLIC_URL=https://demo.mercure.rocks/.well-known/mercure
+MERCURE_INTERNAL_URL=https://demo.mercure.rocks/.well-known/mercure
 ```
 
-**Verify JWT Secret:**
-Ensure `MERCURE_JWT_SECRET` matches the key in `fwber-backend/Caddyfile`:
+**CRITICAL: Update JWT Secret**
+The Demo Hub requires a specific secret key. You MUST set this exact value:
 ```dotenv
-MERCURE_JWT_SECRET=fwber_mercure_secret_key_2025_secure_and_long
+MERCURE_JWT_SECRET="!ChangeThisMercureHubJWTSecretKey!"
+MERCURE_PUBLISHER_JWT_KEY="!ChangeThisMercureHubJWTSecretKey!"
+MERCURE_SUBSCRIBER_JWT_KEY="!ChangeThisMercureHubJWTSecretKey!"
 ```
 
 ### 3. Redeploy Backend
@@ -47,7 +47,7 @@ The frontend configuration (`NEXT_PUBLIC_MERCURE_URL`) must be updated.
 
 **If using Vercel:**
 1.  Go to Vercel Dashboard -> Settings -> Environment Variables.
-2.  Update `NEXT_PUBLIC_MERCURE_URL` to `https://api.fwber.me/.well-known/mercure`.
+2.  Update `NEXT_PUBLIC_MERCURE_URL` to `https://demo.mercure.rocks/.well-known/mercure`.
 3.  Redeploy the project.
 
 **If using Docker/VPS:**
@@ -61,9 +61,10 @@ The frontend configuration (`NEXT_PUBLIC_MERCURE_URL`) must be updated.
 1.  Open the app at `https://fwber.me`.
 2.  Open Developer Tools -> Network Tab.
 3.  Filter for `mercure`.
-4.  Verify the request goes to `https://api.fwber.me/.well-known/mercure...`.
+4.  Verify the request goes to `https://demo.mercure.rocks/.well-known/mercure...`.
 5.  Verify the status is **200 OK** (EventStream).
 
 ## Why This Was Changed
--   **Previous State**: Frontend was pointing to `demo.mercure.rocks`, but Backend was signing tokens with a custom secret. This caused 401 errors because the demo hub didn't know our secret.
--   **New State**: Frontend points to our self-hosted Mercure instance (`api.fwber.me`), which is configured with the correct secret and CORS headers.
+-   **Constraint**: Shared hosting prevents running a custom Mercure instance.
+-   **Solution**: Use the public Demo Hub (`demo.mercure.rocks`).
+-   **Fix**: The backend was previously signing tokens with a custom key, which the Demo Hub rejected (401). We have now updated the backend to use the Demo Hub's required key (`!ChangeThisMercureHubJWTSecretKey!`).
