@@ -62,8 +62,8 @@ services:
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_DATABASE=fwber_dev
-      - DB_USERNAME=fwber_user
-      - DB_PASSWORD=fwber_password
+      - DB_USERNAME=root
+      - DB_PASSWORD=root_password
 
       - CACHE_DRIVER=redis
       - QUEUE_CONNECTION=redis
