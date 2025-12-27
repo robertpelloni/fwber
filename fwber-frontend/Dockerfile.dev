@@ -7,7 +7,9 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+ENV CYPRESS_INSTALL_BINARY=0
+RUN apk add --no-cache python3 make g++
+RUN npm install --legacy-peer-deps
 
 # Copy application code
 COPY . .
