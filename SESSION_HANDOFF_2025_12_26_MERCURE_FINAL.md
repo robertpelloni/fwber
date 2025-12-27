@@ -43,13 +43,19 @@ docker-compose restart backend
 ```
 
 ### 4. Redeploy Frontend
-The frontend configuration (`NEXT_PUBLIC_MERCURE_URL`) has been updated in `.env.production`. You must rebuild and redeploy the frontend.
+The frontend configuration (`NEXT_PUBLIC_MERCURE_URL`) must be updated.
 
-```bash
-# If using Vercel, this happens automatically on push.
-# If using Docker/VPS:
-./deploy.sh --env=production
-```
+**If using Vercel:**
+1.  Go to Vercel Dashboard -> Settings -> Environment Variables.
+2.  Update `NEXT_PUBLIC_MERCURE_URL` to `https://api.fwber.me/.well-known/mercure`.
+3.  Redeploy the project.
+
+**If using Docker/VPS:**
+1.  Update `fwber-frontend/.env.production` on the server.
+2.  Rebuild and redeploy:
+    ```bash
+    ./deploy.sh --env=production
+    ```
 
 ## Verification
 1.  Open the app at `https://fwber.me`.
