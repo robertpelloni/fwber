@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.13] - 2025-12-27
+
+### Added
+- **Video Chat**: Implemented Real-time Face Blur for privacy.
+    - **Frontend**: Created `useVideoFaceBlur` hook using `face-api.js` and Canvas API.
+    - **UI**: Added "Ghost" toggle button to Video Call controls.
+    - **Performance**: Optimized face detection loop to run every 200ms while rendering at 30fps.
+
 ## [0.3.12] - 2025-12-27
 
 ### Changed

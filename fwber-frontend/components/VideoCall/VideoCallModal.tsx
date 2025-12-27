@@ -5,8 +5,9 @@ import { useMercure } from '@/lib/contexts/MercureContext';
 import { useAuth } from '@/lib/auth-context';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Phone, PhoneOff, Video, Mic, MicOff, VideoOff } from 'lucide-react';
+import { Phone, PhoneOff, Video, Mic, MicOff, VideoOff, Ghost } from 'lucide-react';
 import { initiateCall, updateCallStatus } from '@/lib/api/video';
+import { useVideoFaceBlur } from '@/lib/hooks/use-video-face-blur';
 
 interface VideoCallModalProps {
   recipientId: string;
@@ -141,19 +142,16 @@ export function VideoCallModal({ recipientId, isOpen, onClose, isIncoming = fals
     }
   }, [endCall]);
 
+  const { processedStream, isBlurEnabled, toggleBlur, isModelLoaded } = useVideoFaceBlur(localStream);
+
   // Initialize local stream
   useEffect(() => {
     if (isOpen && !localStream && !error) {
       navigator.mediaDevices.getUserMedia({ video: true, audio: true })
         .then(stream => {
           setLocalStream(stream);
-          if (localVideoRef.current) {
-            localVideoRef.current.srcObject = stream;
-          }
           if (isIncoming) {
             setCallStatus('ringing');
-          } else {
-            startCall(stream);
           }
         })
         .catch(err => {
@@ -161,11 +159,21 @@ export function VideoCallModal({ recipientId, isOpen, onClose, isIncoming = fals
           setError('Could not access camera/microphone. Please check permissions.');
         });
     }
-    
-    return () => {
-      // Cleanup handled in separate effect or onClose
-    };
-  }, [isOpen, isIncoming, localStream, startCall, error]);
+  }, [isOpen, isIncoming, localStream, error]);
+
+  // Start call when processed stream is ready
+  useEffect(() => {
+    if (processedStream && !isIncoming && callStatus === 'idle') {
+      startCall(processedStream);
+    }
+  }, [processedStream, isIncoming, callStatus, startCall]);
+
+  // Update local video preview with processed stream
+  useEffect(() => {
+    if (localVideoRef.current && processedStream) {
+      localVideoRef.current.srcObject = processedStream;
+    }
+  }, [processedStream]);
 
   // Handle incoming signals
   useEffect(() => {
@@ -176,9 +184,9 @@ export function VideoCallModal({ recipientId, isOpen, onClose, isIncoming = fals
   }, [videoSignals, recipientId, handleSignal]);
 
   const acceptCall = async () => {
-    if (!localStream || !incomingOffer) return;
+    if (!processedStream || !incomingOffer) return;
     
-    const pc = createPeerConnection(localStream);
+    const pc = createPeerConnection(processedStream);
     await pc.setRemoteDescription(new RTCSessionDescription(incomingOffer));
     
     // Process pending candidates now that remote description is set
@@ -309,6 +317,18 @@ export function VideoCallModal({ recipientId, isOpen, onClose, isIncoming = fals
           >
             {isVideoOff ? <VideoOff /> : <Video />}
           </Button>
+
+          {isModelLoaded && (
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className={`rounded-full w-12 h-12 ${isBlurEnabled ? 'bg-blue-500/20 text-blue-500' : 'bg-gray-800 text-white'}`}
+              onClick={toggleBlur}
+              title="Toggle Face Blur"
+            >
+              <Ghost />
+            </Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>

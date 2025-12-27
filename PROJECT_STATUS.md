@@ -11,6 +11,15 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
 *   **SSL Verification**: Waiting for Let's Encrypt to validate `mercure.fwber.me`.
 *   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
 
+### ✅ Critical Fixes (Dec 27)
+1.  **Video Chat Privacy (Face Blur)**:
+    -   **Feature**: Implemented real-time face blurring for video calls.
+    -   **Implementation**: Created `useVideoFaceBlur` hook using `face-api.js` and Canvas API.
+    -   **Integration**: Updated `VideoCallModal` to process the video stream before sending it via WebRTC.
+    -   **UI**: Added "Ghost" toggle button to the video call controls.
+    -   **Performance**: Optimized detection loop (every 200ms) while maintaining 30fps rendering.
+    -   **Verification**: Code implementation complete. Feature flag `NEXT_PUBLIC_FEATURE_CLIENT_FACE_BLUR` enabled.
+
 ### ✅ Critical Fixes (Dec 26 - Part 2)
 1.  **Real-Time Infrastructure Migration (Mercure -> Pusher)**:
     -   **Goal**: Switch from Mercure to Pusher for more robust and standard real-time capabilities.
