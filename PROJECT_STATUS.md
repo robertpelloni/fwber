@@ -1,8 +1,8 @@
 # Project Status
 
-**Last Updated:** December 22, 2025
+**Last Updated:** December 26, 2025
 **Status:** 🚀 LIVE / DEPLOYED / FEATURE COMPLETE
-**Version:** v0.3.0
+**Version:** v0.3.1
 
 ## 🟢 Current Status: Ready for Marketing & Growth
 The project has successfully passed a comprehensive **Feature Audit**. All planned features from the Roadmap (including "Future Features" originally slated for 2026) are implemented in the codebase. The focus now shifts to **Operations**, **Marketing**, and **Growth**.
@@ -10,6 +10,19 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
 ### ⚠️ Known Issues / Technical Debt
 *   **SSL Verification**: Waiting for Let's Encrypt to validate `mercure.fwber.me`.
 *   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
+
+### ✅ Critical Fixes (Dec 26 - Part 2)
+1.  **Real-Time Infrastructure Migration (Mercure -> Pusher)**:
+    -   **Goal**: Switch from Mercure to Pusher for more robust and standard real-time capabilities.
+    -   **Backend**:
+        -   Configured `routes/channels.php` and `bootstrap/app.php` for Laravel Broadcasting.
+        -   Rewrote `WebSocketService` to use Laravel Events (`ChatMessageSent`, `NotificationSent`, etc.).
+        -   Created Event classes implementing `ShouldBroadcast`.
+    -   **Frontend**:
+        -   Created `usePusherLogic` hook using `laravel-echo` and `pusher-js`.
+        -   Shimmed `useMercureLogic` to use `usePusherLogic` for backward compatibility.
+    -   **Documentation**: Created `docs/MIGRATION_TO_PUSHER.md` with setup instructions.
+    -   **Verification**: Code implementation complete. Requires `.env` updates.
 
 ### ✅ Critical Fixes (Dec 26)
 1.  **Photo Uploads**:
