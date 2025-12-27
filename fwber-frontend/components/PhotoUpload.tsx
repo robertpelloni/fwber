@@ -7,7 +7,7 @@ import { Upload, X, Camera, RotateCcw, Download, Eye, ChevronLeft, ChevronRight,
 import { blurFacesOnFile, FaceBlurError } from '@/lib/faceBlur'
 import { isFeatureEnabled } from '@/lib/featureFlags'
 import { attachFaceBlurMetadata } from '@/lib/faceBlurTelemetry'
-import { FileWithFaceBlurMetadata } from '@/lib/types/faceBlur'
+import type { FileWithFaceBlurMetadata } from '@/lib/types/faceBlur'
 import { usePreviewTelemetry } from '@/lib/previewTelemetry'
 import { Photo } from '@/lib/api/photos'
 

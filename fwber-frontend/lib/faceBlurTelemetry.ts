@@ -1,6 +1,6 @@
-import { FaceBlurTelemetryMetadata, FileWithFaceBlurMetadata } from '@/lib/types/faceBlur'
+import type { FaceBlurTelemetryMetadata, FileWithFaceBlurMetadata } from '@/lib/types/faceBlur'
 
-export { FaceBlurTelemetryMetadata, FileWithFaceBlurMetadata }
+export type { FaceBlurTelemetryMetadata, FileWithFaceBlurMetadata }
 
 export const attachFaceBlurMetadata = (
   file: File,
