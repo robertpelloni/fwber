@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\BulletinBoardActivity;
+use App\Events\BulletinMessageCreated;
 use App\Models\BulletinBoard;
 use App\Models\BulletinMessage;
 use App\Models\User;
-use App\Services\MercurePublisher;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -13,12 +14,6 @@ use Illuminate\Support\Facades\Validator;
 
 class BulletinBoardController extends Controller
 {
-    protected MercurePublisher $mercurePublisher;
-
-    public function __construct(MercurePublisher $mercurePublisher)
-    {
-        $this->mercurePublisher = $mercurePublisher;
-    }
     /**
      * Get bulletin boards near a location
      *
@@ -368,30 +363,11 @@ class BulletinBoardController extends Controller
     private function publishMessage(BulletinBoard $board, BulletinMessage $message): void
     {
         try {
-            // Publish to Mercure for real-time updates
-            $topic = "https://fwber.me/bulletin-boards/{$board->id}";
-            
-            $data = [
-                'type' => 'new_message',
-                'data' => $message->load('user'),
-                'board_id' => $board->id,
-                'timestamp' => now()->toISOString(),
-            ];
-            
-            $this->mercurePublisher->publish($topic, $data, true);
-            
-            // Also publish to public topic for discovery
-            $publicTopic = "https://fwber.me/public/bulletin-boards";
-            $this->mercurePublisher->publish($publicTopic, [
-                'type' => 'board_activity',
-                'board_id' => $board->id,
-                'message_count' => $board->message_count + 1,
-                'timestamp' => now()->toISOString(),
-            ], false);
-            
+            BulletinMessageCreated::dispatch($message);
+            BulletinBoardActivity::dispatch($board);
         } catch (\Exception $e) {
             // Log error but don't fail the request
-            \Log::error('Failed to publish message to Mercure', [
+            \Log::error('Failed to publish message to Pusher', [
                 'board_id' => $board->id,
                 'message_id' => $message->id,
                 'error' => $e->getMessage()

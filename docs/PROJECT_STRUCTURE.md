@@ -16,7 +16,7 @@
 
 ### Backend (`/fwber-backend`)
 *   **Framework:** Laravel 12 (PHP 8.2+)
-*   **Role:** API, WebSocket Server (Mercure), Queue Worker, Scheduler.
+*   **Role:** API, WebSocket Server (Pusher/Reverb), Queue Worker, Scheduler.
 *   **Key Directories:**
     *   `app/Http/Controllers`: API Logic.
     *   `routes/api.php`: API Endpoints.

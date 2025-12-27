@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.11] - 2025-12-27
+
+### Changed
+- **Real-Time**: Migrated Bulletin Boards from Mercure to Pusher (Laravel Echo).
+    - **Frontend**: Refactored `use-bulletin-boards.ts` to use `usePusherLogic`.
+    - **Frontend**: Shimmed `use-mercure-sse.ts` to redirect legacy calls to Pusher.
+    - **Frontend**: Removed Mercure rewrite rules from `next.config.js`.
+    - **Backend**: Created `BulletinMessageCreated` and `BulletinBoardActivity` events.
+    - **Backend**: Updated `BulletinBoardController` to use standard Laravel Broadcasting.
+    - **Config**: Updated `broadcasting.php` to respect `BROADCAST_DRIVER` env var.
+
 ## [0.3.10] - 2025-12-26
 
 ### Fixed
