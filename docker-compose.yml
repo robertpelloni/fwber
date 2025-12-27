@@ -129,7 +129,7 @@ services:
     container_name: fwber-mysql
     restart: unless-stopped
     ports:
-      - "3306:3306"
+      - "3307:3306"
     environment:
       - MYSQL_DATABASE=fwber_dev
       - MYSQL_USER=fwber_user
