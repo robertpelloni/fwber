@@ -8,8 +8,11 @@ COPY package*.json ./
 
 # Install dependencies
 ENV CYPRESS_INSTALL_BINARY=0
-RUN apk add --no-cache python3 make g++
-RUN npm install --legacy-peer-deps
+RUN apk add --no-cache python3 make g++ linux-headers eudev-dev
+RUN npm config set fetch-retry-maxtimeout 600000 \
+    && npm config set fetch-retry-mintimeout 10000 \
+    && npm config set fetch-retries 5 \
+    && npm install --legacy-peer-deps
 
 # Copy application code
 COPY . .
