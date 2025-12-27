@@ -1,17 +1,6 @@
-export interface FaceBlurTelemetryMetadata {
-  facesDetected?: number
-  blurApplied?: boolean
-  processingTimeMs?: number
-  skippedReason?: string
-  originalFileName?: string
-  processedFileName?: string
-  warningMessage?: string
-  previewId?: string
-}
+import { FaceBlurTelemetryMetadata, FileWithFaceBlurMetadata } from '@/lib/types/faceBlur'
 
-export type FileWithFaceBlurMetadata = File & {
-  faceBlurMetadata?: FaceBlurTelemetryMetadata;
-}
+export { FaceBlurTelemetryMetadata, FileWithFaceBlurMetadata }
 
 export const attachFaceBlurMetadata = (
   file: File,

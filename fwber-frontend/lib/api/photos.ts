@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { FileWithFaceBlurMetadata } from '@/lib/faceBlurTelemetry'
+import type { FileWithFaceBlurMetadata } from '@/lib/types/faceBlur'
 
 export interface Photo {
   id: string
