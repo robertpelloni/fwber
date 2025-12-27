@@ -1,49 +1,55 @@
-# Project Structure & Architecture
+# Project Structure & Dashboard
 
-**Version:** [Read from VERSION file]
-**Last Updated:** December 25, 2025
+**Last Updated:** 2025-12-27
+**Current Version:** 0.3.11 (See `VERSION` file)
 
-## 📂 Directory Layout
+## 📂 Repository Layout
 
-### Root (`/`)
-*   `VERSION`: Single source of truth for project version.
-*   `AGENTS.md`, `CLAUDE.md`, etc.: AI Assistant guidelines.
-*   `CHANGELOG.md`: Version history.
-*   `PROJECT_STATUS.md`: High-level status report.
-*   `deploy.sh`: Master deployment script.
-*   `docker-compose.yml`: Production orchestration.
-*   `docker-compose.dev.yml`: Development orchestration.
+This is a **Monorepo** structure containing both the frontend and backend applications.
 
-### Backend (`/fwber-backend`)
-*   **Framework:** Laravel 12 (PHP 8.2+)
-*   **Role:** API, WebSocket Server (Pusher/Reverb), Queue Worker, Scheduler.
-*   **Key Directories:**
-    *   `app/Http/Controllers`: API Logic.
-    *   `routes/api.php`: API Endpoints.
-    *   `config/`: Configuration (Features, Mercure, Services).
-    *   `tests/`: PHPUnit Feature and Unit tests.
+```
+fwber/
+├── VERSION                 # Single Source of Truth for Project Version
+├── CHANGELOG.md            # Detailed history of changes
+├── docs/                   # Documentation & Protocols
+│   ├── LLM_INSTRUCTIONS.md # Master Protocol for AI Agents
+│   ├── PROJECT_STRUCTURE.md# This file
+│   └── ...
+├── fwber-frontend/         # Next.js Application (Directory)
+│   ├── package.json        # Frontend Dependencies (v0.3.10)
+│   ├── app/                # App Router Pages & Layouts
+│   ├── lib/                # Shared Utilities & Hooks
+│   └── ...
+├── fwber-backend/          # Laravel Application (Directory)
+│   ├── composer.json       # Backend Dependencies
+│   ├── app/                # Core Business Logic
+│   ├── routes/             # API Definitions
+│   └── ...
+└── docker-compose.yml      # Orchestration for Dev Environment
+```
 
-### Frontend (`/fwber-frontend`)
-*   **Framework:** Next.js 14 (React 18, TypeScript)
-*   **Role:** User Interface, PWA, Admin Dashboard.
-*   **Key Directories:**
-    *   `app/`: App Router pages.
-    *   `components/`: Reusable UI components.
-    *   `lib/`: Utilities, Hooks, Contexts.
-    *   `cypress/`: End-to-End Tests.
+## 📦 Sub-Projects (Directories)
 
-### Documentation (`/docs`)
-*   `LLM_INSTRUCTIONS.md`: Master protocol for AI agents.
-*   `ROADMAP.md`: Feature roadmap.
-*   `API_DOCS.md`: API Reference.
-*   `DEPLOYMENT.md`: Deployment guide.
+### Frontend (`fwber-frontend`)
+*   **Type:** Next.js 14 Application
+*   **Language:** TypeScript
+*   **State:** Active Development
+*   **Version:** 0.3.10 (Syncing to Root Version recommended)
+*   **Key Tech:** React 19, Tailwind, Pusher-JS, Shadcn/UI.
 
-## 🧩 Submodules / Components
+### Backend (`fwber-backend`)
+*   **Type:** Laravel 12 API
+*   **Language:** PHP 8.2+
+*   **State:** Active Development
+*   **Key Tech:** MySQL 8 (Spatial), Redis, Laravel Echo Server (Pusher).
 
-| Component | Location | Version Source | Description |
-| :--- | :--- | :--- | :--- |
-| **Root** | `/` | `VERSION` | Orchestration & Docs |
-| **Backend** | `/fwber-backend` | `fwber-backend/package.json` | Laravel API |
-| **Frontend** | `/fwber-frontend` | `fwber-frontend/package.json` | Next.js App |
+## 🔄 Versioning Strategy
+The root `VERSION` file dictates the release version.
+*   **Frontend:** `package.json` version should track the root version.
+*   **Backend:** Version is generally tracked via Git Tags, but `config/app.php` or `composer.json` can be updated if configured.
 
-*(Note: This project uses a Monorepo structure. `fwber-backend` and `fwber-frontend` are directories, not git submodules.)*
+## 🛠️ Infrastructure
+*   **Docker:** `docker-compose.yml` spins up Frontend, Backend, MySQL, Redis, and Queue Workers.
+*   **Production:**
+    *   Frontend -> Vercel
+    *   Backend -> VPS (DreamHost) via `deploy.sh`

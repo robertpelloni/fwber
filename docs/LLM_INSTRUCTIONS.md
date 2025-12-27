@@ -1,56 +1,67 @@
-# Universal LLM Instructions & Context
+# Universal LLM Instructions & Master Protocol
 
-**Project:** FWBer (Social Network for Adults)
-**Stack:** Laravel 12 (Backend) + Next.js 14 (Frontend)
-**Current Version:** [Read from VERSION file]
+> **⚠️ CRITICAL:** This is the **Source of Truth** for all AI agents and models working on FWBer.
 
-## 🧠 Core Identity & Role
-You are an expert Senior Full-Stack Engineer. You value precision, stability, security, and documentation. You are working on a high-stakes production application.
+## 🌍 Project Context
+*   **Name:** FWBer
+*   **Type:** Location-based Social Network & Dating Application.
+*   **Stack:**
+    *   **Frontend:** Next.js 14 (App Router), React 19 (via overrides), TypeScript, TailwindCSS, Shadcn/UI.
+    *   **Backend:** Laravel 12, PHP 8.2+, MySQL 8.0 (Spatial), Redis.
+    *   **Realtime:** Pusher (Laravel Echo).
+    *   **Infrastructure:** Docker Compose (Dev), Vercel (Frontend Prod), DreamHost/VPS (Backend Prod).
 
-## 📜 The Golden Rules
+## 📜 The Golden Protocol
 
-### 1. Versioning & Changelog
-*   **Single Source of Truth:** The project version is stored in the `VERSION` file in the root directory.
-*   **Incrementing:**
-    *   **Patch (x.x.X):** Bug fixes, minor tweaks, documentation.
-    *   **Minor (x.X.x):** New features, significant improvements.
-    *   **Major (X.x.x):** Breaking changes, major rewrites.
-*   **Protocol:**
-    1.  Read `VERSION`.
-    2.  Increment the number based on the change type.
-    3.  Update `VERSION`.
-    4.  Update `package.json` (root, frontend, backend) to match.
-    5.  Add a detailed entry to `CHANGELOG.md` under the new version header.
-    6.  Commit message must include "Bump version to vX.X.X".
+### 1. Versioning & Release Cycle
+**The `VERSION` file in the root is the Single Source of Truth.**
 
-### 2. Code Quality & Safety
-*   **Strict Typing:** Use TypeScript strict mode. No `any` unless absolutely necessary.
-*   **Error Handling:** Catch specific exceptions. Log errors with context.
-*   **Security:**
-    *   Validate all inputs.
-    *   Sanitize outputs.
-    *   Check authorization (Policies/Gates) for every action.
-    *   Never commit secrets (check `.env.example`).
-*   **Testing:**
-    *   Backend: `php artisan test --filter YourTest`
-    *   Frontend: `npm run lint` / `npm run type-check`
-    *   E2E: `npx cypress run --spec cypress/e2e/relevant-test.cy.js`
+When completing a task or session:
+1.  **Read** the current version from `VERSION`.
+2.  **Determine** the increment:
+    *   `Patch` (0.0.x): Bug fixes, docs, minor refactors.
+    *   `Minor` (0.x.0): New features, substantial changes.
+    *   `Major` (x.0.0): Breaking changes.
+3.  **Update** `VERSION` with the new number.
+4.  **Sync** version numbers in:
+    *   `package.json` (Root)
+    *   `fwber-frontend/package.json`
+    *   `fwber-backend/package.json` (if applicable)
+    *   `fwber-backend/composer.json` (if applicable)
+5.  **Update** `CHANGELOG.md`:
+    *   Add a new header: `## [Version] - YYYY-MM-DD`
+    *   List changes under `### Added`, `### Changed`, `### Fixed`, `### Removed`.
+6.  **Commit**: Message format: `chore(release): bump version to [Version] - [Summary]`
 
-### 3. Project Structure Awareness
-*   **Root:** Orchestration, docs, scripts.
-*   **fwber-backend:** Laravel API.
-*   **fwber-frontend:** Next.js App.
-*   **docs:** Documentation.
+### 2. Documentation & Handoff
+*   **Session Handoff:** At the end of every session, create a file `SESSION_HANDOFF_YYYY_MM_DD.md` in the root.
+    *   Include: Summary of work, technical decisions, modified files, and **Next Steps**.
+*   **Project Status:** Keep `PROJECT_STATUS.md` updated with high-level progress.
+*   **Structure:** Maintain `docs/PROJECT_STRUCTURE.md` reflecting the current codebase layout.
 
-## 🔄 Standard Operating Procedure (SOP)
+### 3. Code Standards
+*   **Frontend:**
+    *   Use `usePusherLogic` for all realtime features. **Do not use** `EventSource` directly.
+    *   Strict TypeScript. No `any` casts unless fixing a library bug (document why).
+    *   Server Components by default. Use `'use client'` only when necessary.
+*   **Backend:**
+    *   Strict Types (`declare(strict_types=1);`).
+    *   Use Laravel Events & Listeners for business logic side effects.
+    *   **Broadcasting:** Use `ShouldBroadcast` interface and `BulletinMessageCreated` style events.
 
-1.  **Context:** Read `PROJECT_STATUS.md` and `docs/ROADMAP.md`.
-2.  **Plan:** Break down tasks. Check for existing patterns.
-3.  **Implement:** Atomic changes. Update tests.
-4.  **Verify:** Run tests. Check linting.
-5.  **Document:** Update `CHANGELOG.md`, `VERSION`, and relevant `docs/`.
+### 4. Submodules & Monorepo
+*   **Structure:** This is a monorepo. `fwber-frontend` and `fwber-backend` are **directories**, not git submodules (unless `.gitmodules` exists).
+*   **Operations:** When asked to "update submodules", verify if they exist. If not, treat them as standard directories and ensure dependencies (`npm install`, `composer install`) are up to date.
 
-## 🤖 Model-Specific Overrides
-*   **Copilot:** See `copilot-instructions.md`.
-*   **Claude:** See `CLAUDE.md`.
-*   **Gemini:** See `GEMINI.md`.
+## 🤖 Agent Specifics
+
+### Research & Planning
+*   Use `runSubagent` with `Plan` for complex architectural queries.
+*   Always validate assumptions by reading the code (`read_file`).
+
+### Execution
+*   **Atomic Commits:** Commit often.
+*   **Verification:** Run the build (`npm run build` in frontend) before marking a task complete.
+
+## 📂 Directory Map
+See `docs/PROJECT_STRUCTURE.md` for the detailed breakdown of the workspace.

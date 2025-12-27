@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.12] - 2025-12-27
+
+### Changed
+- **Documentation**: Centralized all LLM instructions into `docs/LLM_INSTRUCTIONS.md`.
+- **Documentation**: Created `docs/PROJECT_STRUCTURE.md` to document the monorepo layout.
+- **Documentation**: Updated `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `GPT.md` to reference the master protocol.
+- **Process**: Formalized the versioning and handoff protocols.
+
 ## [0.3.11] - 2025-12-27
 
 ### Changed
