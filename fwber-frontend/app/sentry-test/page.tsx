@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { logger, logAuth, logWebSocket, logLocation, logAPI, logUI } from '@/lib/logger'
 
+export const dynamic = 'force-dynamic'
+
 export default function SentryTestPage() {
   const [testResult, setTestResult] = useState<string>('')
 

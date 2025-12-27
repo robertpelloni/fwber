@@ -111,9 +111,10 @@ class AuthController extends Controller
 
         // Verify the signature using the Node.js script
         $scriptPath = base_path('scripts/solana/verify_signature.cjs');
-        $command = "node {$scriptPath} " . escapeshellarg($message) . " " . escapeshellarg($signature) . " " . escapeshellarg($walletAddress);
+        $command = "node {$scriptPath} " . escapeshellarg($message) . " " . escapeshellarg($signature) . " " . escapeshellarg($walletAddress) . " 2>&1";
 
         $output = shell_exec($command);
+        \Illuminate\Support\Facades\Log::info("Signature verification output: " . $output);
         $result = json_decode($output, true);
 
         if (!$result || !isset($result['verified']) || !$result['verified']) {
