@@ -18,6 +18,7 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
         -   Refactored `lib/api/photos.ts` to define local interfaces instead of importing from `faceBlurTelemetry`.
         -   Created `lib/types/faceBlur.ts` for shared type definitions.
         -   Updated `lib/faceBlurTelemetry.ts` and `components/PhotoUpload.tsx` to use the new shared types.
+        -   **Refactored `lib/previewTelemetry.ts`** to remove dependency on `lib/api/client.ts` (using `fetch` directly), breaking the final link in the dependency cycle.
     -   **Verification**:
         -   Static analysis confirms dependency cycle is broken.
         -   Created `cypress/e2e/face-blur.cy.js` to verify the component loads and processes files without crashing.
