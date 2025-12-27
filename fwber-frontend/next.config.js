@@ -218,10 +218,6 @@ const nextConfig = {
 
   async rewrites() {
     return [
-      {
-        source: '/mercure',
-        destination: 'https://demo.mercure.rocks/.well-known/mercure',
-      },
     ];
   },
   

@@ -223,18 +223,7 @@ export class BulletinBoardAPI {
     return this.request(`/bulletin-boards/${boardId}/messages?${params}`);
   }
 
-  /**
-   * Create Server-Sent Events connection for real-time updates via Mercure
-   */
-  createEventSource(boardId: number): EventSource {
-    const mercureHubUrl = process.env.NEXT_PUBLIC_MERCURE_URL || 'http://localhost:3001/.well-known/mercure';
-    const topic = encodeURIComponent(`https://fwber.me/bulletin-boards/${boardId}`);
-    const url = `${mercureHubUrl}?topic=${topic}`;
-    
-    return new EventSource(url, {
-      withCredentials: true,
-    });
-  }
+
 }
 
 /**

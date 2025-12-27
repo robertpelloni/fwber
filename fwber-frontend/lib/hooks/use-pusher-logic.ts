@@ -400,6 +400,7 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
     clearMessages,
     clearNotifications,
     isReady: !status.connecting,
+    echo: echoRef.current,
   }), [
     status.connected,
     status.connecting,

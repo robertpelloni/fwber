@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import { useAuth } from '@/lib/auth-context';
+import { useEffect, useState } from 'react';
+import { usePusherLogic } from './use-pusher-logic';
 
 interface MercureSSEOptions {
   topics: string[];
@@ -12,121 +12,13 @@ interface MercureSSEOptions {
 }
 
 export const useMercureSSE = (options: MercureSSEOptions) => {
-  const { token } = useAuth();
-  const [isConnected, setIsConnected] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const eventSourceRef = useRef<EventSource | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const {
-    topics,
-    onMessage,
-    onError,
-    onOpen,
-    onClose,
-    autoReconnect = true,
-    reconnectInterval = 5000
-  } = options;
-
-  // Stable topics key for dependency tracking
-  const topicsKey = useMemo(() => topics.join(','), [topics]);
-
-  const connect = useCallback(async () => {
-    if (!token) {
-      setError('No authentication token available');
-      return;
-    }
-
-    try {
-      // First, get the Mercure authorization cookie
-      const cookieResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/mercure/cookie`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Important for cookies
-      });
-
-      if (!cookieResponse.ok) {
-        throw new Error('Failed to get Mercure authorization');
-      }
-
-      // Build the Mercure URL with topics
-      const mercureUrl = new URL(`${process.env.NEXT_PUBLIC_MERCURE_URL}/.well-known/mercure`);
-      topics.forEach(topic => {
-        mercureUrl.searchParams.append('topic', topic);
-      });
-
-      // Create EventSource connection
-      const eventSource = new EventSource(mercureUrl.toString(), {
-        withCredentials: true // Include cookies for authorization
-      });
-
-      eventSource.onopen = () => {
-        setIsConnected(true);
-        setError(null);
-        onOpen?.();
-      };
-
-      eventSource.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          onMessage?.(data);
-        } catch (e) {
-          console.error('Failed to parse SSE message:', e);
-        }
-      };
-
-      eventSource.onerror = (error) => {
-        setIsConnected(false);
-        setError('Connection error');
-        onError?.(error);
-        
-        if (autoReconnect) {
-          reconnectTimeoutRef.current = setTimeout(() => {
-            connect();
-          }, reconnectInterval);
-        }
-      };
-
-      eventSourceRef.current = eventSource;
-
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Connection failed');
-      setIsConnected(false);
-    }
-  }, [token, topics, onMessage, onError, onOpen, autoReconnect, reconnectInterval]);
-
-  const disconnect = useCallback(() => {
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-      eventSourceRef.current = null;
-    }
-    
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current);
-      reconnectTimeoutRef.current = null;
-    }
-    
-    setIsConnected(false);
-    onClose?.();
-  }, [onClose]);
-
-  useEffect(() => {
-    if (token && topics.length > 0) {
-      connect();
-    }
-
-    return () => {
-      disconnect();
-    };
-  }, [token, topicsKey, connect, disconnect, topics.length]);
-
+  // Shim: Do nothing, or maybe use Pusher if topics can be mapped
+  console.warn('useMercureSSE is deprecated. Please migrate to usePusherLogic.');
   return {
-    isConnected,
-    error,
-    connect,
-    disconnect
+    isConnected: false,
+    error: null,
+    connect: () => {},
+    disconnect: () => {}
   };
 };
 
@@ -134,27 +26,36 @@ export const useMercureSSE = (options: MercureSSEOptions) => {
 export const useBulletinBoardMercure = (boardId: number) => {
   const [messages, setMessages] = useState<any[]>([]);
   const [boardActivity, setBoardActivity] = useState<any>(null);
+  const { echo } = usePusherLogic();
+  const [isConnected, setIsConnected] = useState(false);
 
-  const { isConnected, error } = useMercureSSE({
-    topics: [
-      `https://fwber.me/bulletin-boards/${boardId}`,
-      'https://fwber.me/public/bulletin-boards'
-    ],
-    onMessage: (data) => {
-      if (data.type === 'new_message') {
-        setMessages(prev => [...prev, data.data]);
-      } else if (data.type === 'board_activity' && data.board_id === boardId) {
-        setBoardActivity(data);
-      }
-    },
-    onError: (error) => {
-      console.error('Bulletin board SSE error:', error);
-    }
-  });
+  useEffect(() => {
+      if (!echo || !boardId) return;
+      
+      const channel = echo.channel(`bulletin-board.${boardId}`);
+      channel.listen('.message.created', (e: any) => {
+          setMessages(prev => [...prev, e.message]);
+      });
+      
+      const publicChannel = echo.channel('bulletin-boards.public');
+      publicChannel.listen('.board.activity', (e: any) => {
+          if (e.boardId === boardId) {
+              setBoardActivity(e);
+          }
+      });
+      
+      setIsConnected(true);
+      
+      return () => {
+          echo.leave(`bulletin-board.${boardId}`);
+          echo.leave('bulletin-boards.public');
+          setIsConnected(false);
+      };
+  }, [echo, boardId]);
 
   return {
     isConnected,
-    error,
+    error: null,
     messages,
     boardActivity
   };

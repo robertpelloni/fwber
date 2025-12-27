@@ -4,6 +4,7 @@ import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { useBulletinBoardAPI, BulletinBoard, BulletinMessage, LocationCoords } from '../api/bulletin-boards';
 import { useAuth } from '../auth-context';
 import { useState, useEffect, useRef } from 'react';
+import { usePusherLogic } from './use-pusher-logic';
 
 export function useBulletinBoards(filters: {
   lat: number;
@@ -85,33 +86,18 @@ export function usePostMessage() {
 }
 
 export function useBulletinBoardSSE(boardId: number) {
-  const { token } = useAuth();
-  const api = useBulletinBoardAPI();
+  const { echo } = usePusherLogic();
   const queryClient = useQueryClient();
-  const eventSourceRef = useRef<EventSource | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    if (!token || !boardId) return;
+    if (!echo || !boardId) return;
 
-    // Clean up previous connection
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-    }
+    const channel = echo.channel(`bulletin-board.${boardId}`);
 
-    // Create new EventSource connection
-    const eventSource = api.createEventSource(boardId);
-    eventSourceRef.current = eventSource;
-
-    eventSource.onopen = () => {
-      setIsConnected(true);
-    };
-
-    eventSource.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
+    channel.listen('.message.created', (e: any) => {
+        const message = e.message;
         
-        if (data.type === 'new_message') {
           // Update the messages cache with the new message
           queryClient.setQueryData(
             ['bulletin-board-messages', boardId],
@@ -120,13 +106,13 @@ export function useBulletinBoardSSE(boardId: number) {
               
               // Check if message already exists to avoid duplicates
               const existingIndex = old.messages.data.findIndex(
-                (msg: BulletinMessage) => msg.id === data.data.id
+                (msg: BulletinMessage) => msg.id === message.id
               );
               
               if (existingIndex >= 0) {
                 // Update existing message
                 const newData = [...old.messages.data];
-                newData[existingIndex] = data.data;
+                newData[existingIndex] = message;
                 return {
                   ...old,
                   messages: {
@@ -140,31 +126,22 @@ export function useBulletinBoardSSE(boardId: number) {
                   ...old,
                   messages: {
                     ...old.messages,
-                    data: [data.data, ...old.messages.data],
+                    data: [message, ...old.messages.data],
                     total: old.messages.total + 1,
                   }
                 };
               }
             }
           );
-        } else if (data.type === 'connected') {
-          console.log('Connected to bulletin board stream');
-        }
-      } catch (err) {
-        console.error('Error parsing SSE message:', err);
-      }
-    };
-
-    eventSource.onerror = (error) => {
-      console.error('SSE connection error:', error);
-      setIsConnected(false);
-    };
+    });
+    
+    setIsConnected(true);
 
     return () => {
-      eventSource.close();
+      echo.leave(`bulletin-board.${boardId}`);
       setIsConnected(false);
     };
-  }, [boardId, token, api, queryClient]);
+  }, [boardId, echo, queryClient]);
 
   return { isConnected };
 }

@@ -1,7 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, ReactNode } from 'react';
-import { useMercureLogic, MercureConnectionStatus, OnlineUser, PresenceUpdate, ChatMessage, TypingIndicator, NotificationPayload, VideoSignal } from '@/lib/hooks/use-mercure-logic';
+import { usePusherLogic } from '@/lib/hooks/use-pusher-logic';
+import { OnlineUser, PresenceUpdate, ChatMessage, TypingIndicator, NotificationPayload, VideoSignal } from '@/lib/hooks/use-mercure-logic';
 
 interface MercureContextType {
   connectionStatus: {
@@ -33,7 +34,7 @@ interface MercureContextType {
 export const MercureContext = createContext<MercureContextType | null>(null);
 
 export function MercureProvider({ children }: { children: ReactNode }) {
-  const mercure = useMercureLogic({ autoConnect: true });
+  const mercure = usePusherLogic({ autoConnect: true });
 
   return (
     <MercureContext.Provider value={mercure}>
