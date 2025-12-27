@@ -1,7 +1,20 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { FileWithFaceBlurMetadata } from '@/lib/types/faceBlur'
+
+// Define local interface to avoid circular dependency with faceBlur types
+interface FileWithFaceBlurMetadata extends File {
+  faceBlurMetadata?: {
+    facesDetected?: number
+    blurApplied?: boolean
+    processingTimeMs?: number
+    skippedReason?: string
+    originalFileName?: string
+    processedFileName?: string
+    warningMessage?: string
+    previewId?: string
+  }
+}
 
 export interface Photo {
   id: string
