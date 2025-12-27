@@ -18,6 +18,8 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
         -   Configured `routes/channels.php` and `bootstrap/app.php` for Laravel Broadcasting.
         -   Rewrote `WebSocketService` to use Laravel Events (`ChatMessageSent`, `NotificationSent`, etc.).
         -   Created Event classes implementing `ShouldBroadcast`.
+        -   **Cleanup**: Removed `MercurePublisher` service and `MercureAuthController`.
+        -   **Refactor**: Migrated `VideoChatController` and `ProximityArtifactController` to use Laravel Events.
     -   **Frontend**:
         -   Created `usePusherLogic` hook using `laravel-echo` and `pusher-js`.
         -   Shimmed `useMercureLogic` to use `usePusherLogic` for backward compatibility.

@@ -3,19 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Services\MercurePublisher;
+use App\Events\VideoSignal;
 use Illuminate\Support\Facades\Auth;
 use App\Models\VideoCall;
 
 class VideoChatController extends Controller
 {
-    protected $mercure;
-
-    public function __construct(MercurePublisher $mercure)
-    {
-        $this->mercure = $mercure;
-    }
-
     /**
      * Handle WebRTC signaling messages
      */
@@ -32,17 +25,8 @@ class VideoChatController extends Controller
         $signal = $request->input('signal');
         $callId = $request->input('call_id');
 
-        // Publish to recipient's private topic
-        $this->mercure->publish(
-            "https://fwber.me/user/{$recipientId}",
-            [
-                'type' => 'video_signal',
-                'from_user_id' => $sender->id,
-                'signal' => $signal,
-                'call_id' => $callId,
-                'timestamp' => now()->toIso8601String(),
-            ]
-        );
+        // Publish to recipient's private channel via Pusher
+        VideoSignal::dispatch($sender->id, $recipientId, $signal, $callId);
 
         return response()->json(['status' => 'sent']);
     }

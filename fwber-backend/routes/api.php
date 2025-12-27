@@ -10,7 +10,6 @@ use App\Http\Controllers\ContentGenerationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\MatchController;
-use App\Http\Controllers\MercureAuthController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfileViewController;
@@ -193,10 +192,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('broadcasting/auth', function (Request $request) {
         return Broadcast::auth($request);
     });
-
-    // Mercure Auth
-    Route::get('mercure/cookie', [\App\Http\Controllers\MercureAuthController::class, 'cookie']);
-    Route::get('mercure/status', [\App\Http\Controllers\MercureAuthController::class, 'status']);
 
     // Video Chat
     Route::middleware('feature:video_chat')->group(function () {

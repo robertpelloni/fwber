@@ -6,7 +6,7 @@ use App\Http\Requests\LocalPulseRequest;
 use App\Http\Requests\ProximityFeedRequest;
 use App\Http\Requests\StoreProximityArtifactRequest;
 use App\Models\ProximityArtifact;
-use App\Services\MercurePublisher;
+use App\Events\ProximityArtifactEvent;
 use App\Services\ProximityArtifactService;
 use App\Services\ShadowThrottleService;
 use App\Services\GeoSpoofDetectionService;
@@ -17,8 +17,7 @@ class ProximityArtifactController extends Controller
 {
     public function __construct(
         private ShadowThrottleService $shadowThrottleService,
-        private GeoSpoofDetectionService $geoSpoofService,
-        private MercurePublisher $mercurePublisher
+        private GeoSpoofDetectionService $geoSpoofService
     ) {}
     /**
      * @OA\Get(
@@ -130,18 +129,12 @@ class ProximityArtifactController extends Controller
 
         // Publish a lightweight real-time event (clients can refresh Local Pulse)
         try {
-            $this->mercurePublisher->publish(
-                'https://fwber.me/public/local-pulse',
-                [
-                    'type' => 'artifact_created',
-                    'artifact_id' => $artifact->id,
-                    'user_id' => $user->id,
-                    'timestamp' => now()->toISOString(),
-                ],
-                false // public topic
-            );
+            ProximityArtifactEvent::dispatch('artifact_created', [
+                'artifact_id' => $artifact->id,
+                'user_id' => $user->id,
+            ]);
         } catch (\Throwable $e) {
-            \Log::warning('Mercure publish failed for artifact_created', [
+            \Log::warning('Pusher publish failed for artifact_created', [
                 'artifact_id' => $artifact->id,
                 'error' => $e->getMessage(),
             ]);
@@ -242,18 +235,12 @@ class ProximityArtifactController extends Controller
 
         // Publish real-time flag event
         try {
-            $this->mercurePublisher->publish(
-                'https://fwber.me/public/local-pulse',
-                [
-                    'type' => 'artifact_flagged',
-                    'artifact_id' => $artifact->id,
-                    'flagged_by' => $user->id,
-                    'timestamp' => now()->toISOString(),
-                ],
-                false
-            );
+            ProximityArtifactEvent::dispatch('artifact_flagged', [
+                'artifact_id' => $artifact->id,
+                'flagged_by' => $user->id,
+            ]);
         } catch (\Throwable $e) {
-            \Log::warning('Mercure publish failed for artifact_flagged', [
+            \Log::warning('Pusher publish failed for artifact_flagged', [
                 'artifact_id' => $artifact->id,
                 'error' => $e->getMessage(),
             ]);
@@ -286,18 +273,12 @@ class ProximityArtifactController extends Controller
 
         // Publish real-time removal event
         try {
-            $this->mercurePublisher->publish(
-                'https://fwber.me/public/local-pulse',
-                [
-                    'type' => 'artifact_removed',
-                    'artifact_id' => $artifact->id,
-                    'removed_by' => $user->id,
-                    'timestamp' => now()->toISOString(),
-                ],
-                false
-            );
+            ProximityArtifactEvent::dispatch('artifact_removed', [
+                'artifact_id' => $artifact->id,
+                'removed_by' => $user->id,
+            ]);
         } catch (\Throwable $e) {
-            \Log::warning('Mercure publish failed for artifact_removed', [
+            \Log::warning('Pusher publish failed for artifact_removed', [
                 'artifact_id' => $artifact->id,
                 'error' => $e->getMessage(),
             ]);
