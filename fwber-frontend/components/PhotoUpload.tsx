@@ -515,7 +515,12 @@ export default function PhotoUpload({
             return
           }
           if (totalPhotos < maxPhotos) {
-            open()
+            // Use fileInputRef if available, otherwise fallback to open()
+            if (fileInputRef.current) {
+                fileInputRef.current.click();
+            } else {
+                open();
+            }
           }
         }}
       >
@@ -524,6 +529,7 @@ export default function PhotoUpload({
             style: { display: 'block' }
           })} 
           className="sr-only" 
+          ref={fileInputRef}
         />
         
         <div 
@@ -553,7 +559,11 @@ export default function PhotoUpload({
             type="button"
             onClick={(e) => {
               e.stopPropagation()
-              open()
+              if (fileInputRef.current) {
+                fileInputRef.current.click();
+              } else {
+                open();
+              }
             }}
             className="mt-2 px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors pointer-events-auto"
           >
