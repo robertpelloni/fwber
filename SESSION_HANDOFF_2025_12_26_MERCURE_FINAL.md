@@ -40,6 +40,10 @@ docker-compose restart backend
 
 # If using the deploy script
 ./deploy.sh --env=production
+
+# IMPORTANT: Clear config cache to ensure new keys are loaded
+php artisan config:clear
+php artisan config:cache
 ```
 
 ### 4. Redeploy Frontend
