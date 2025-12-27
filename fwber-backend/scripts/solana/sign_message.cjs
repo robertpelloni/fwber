@@ -1,5 +1,5 @@
 const nacl = require('tweetnacl');
-const bs58 = require('bs58');
+const bs58 = require('bs58').default || require('bs58');
 
 // Generate a random keypair
 const keypair = nacl.sign.keyPair();

@@ -195,15 +195,15 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
 
         setStatus({ connected: true, connecting: false, error: null });
 
-        echo.connector.pusher.connection.bind('connected', () => {
+        (echo.connector as any).pusher.connection.bind('connected', () => {
             setStatus({ connected: true, connecting: false, error: null });
         });
 
-        echo.connector.pusher.connection.bind('disconnected', () => {
+        (echo.connector as any).pusher.connection.bind('disconnected', () => {
             setStatus({ connected: false, connecting: false, error: null });
         });
 
-        echo.connector.pusher.connection.bind('error', (err: any) => {
+        (echo.connector as any).pusher.connection.bind('error', (err: any) => {
             console.error('Pusher connection error:', err);
             setStatus({ connected: false, connecting: false, error: err });
         });
