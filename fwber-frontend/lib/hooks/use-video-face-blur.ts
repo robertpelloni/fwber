@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { loadModels, FaceBlurError } from '@/lib/faceblur';
+import { loadModels, FaceBlurError } from '@/lib/faceBlur';
 import { isFeatureEnabled } from '@/lib/featureFlags';
 
 // Dynamic import type for face-api
@@ -93,6 +93,7 @@ export function useVideoFaceBlur(originalStream: MediaStream | null): UseVideoFa
         api.detectAllFaces(video, options).then(detections => {
           detectionRef.current = detections;
           lastDetectionTimeRef.current = now;
+          return detections;
         }).catch(err => console.error('Face detection error:', err));
       }
 

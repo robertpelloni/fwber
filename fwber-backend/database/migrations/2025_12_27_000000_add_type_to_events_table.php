@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('events', function (Blueprint $table) {
-            $table->enum('type', ['standard', 'speed_dating', 'party', 'meetup', 'workshop'])->default('standard')->after('description');
+            if (!Schema::hasColumn('events', 'type')) {
+                $table->enum('type', ['standard', 'speed_dating', 'party', 'meetup', 'workshop'])->default('standard')->after('description');
+            }
         });
     }
 

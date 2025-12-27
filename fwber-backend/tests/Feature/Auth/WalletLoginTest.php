@@ -18,7 +18,16 @@ class WalletLoginTest extends TestCase
         $command = "node {$scriptPath} " . escapeshellarg($message);
 
         $output = shell_exec($command);
+        
+        if (!$output) {
+            $this->markTestSkipped('Node.js script failed or returned no output. Ensure node is installed and script exists.');
+        }
+
         $data = json_decode($output, true);
+
+        if (!$data) {
+             $this->markTestSkipped('Failed to decode JSON from node script: ' . $output);
+        }
 
         $walletAddress = $data['wallet_address'];
         $signature = $data['signature'];
