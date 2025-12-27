@@ -1,5 +1,4 @@
 import { useCallback } from 'react'
-import { apiClient } from '@/lib/api/client'
 
 export type PreviewTelemetryEventName =
   | 'face_blur_preview_ready'
@@ -130,7 +129,30 @@ const enqueueEvent = (name: PreviewTelemetryEventName, payload: Record<string, u
 
 const postBatch = async (events: PendingTelemetryEvent[]) => {
   try {
-    await apiClient.post(ENDPOINT, { events }, { retry: 1 })
+    const token = typeof window !== 'undefined' ? localStorage.getItem('fwber_token') : null
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    }
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
+    }
+
+    let baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+    if (!baseUrl.endsWith('/api')) {
+      baseUrl += '/api'
+    }
+    const url = `${baseUrl}${ENDPOINT}`
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ events }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Telemetry upload failed: ${response.status}`)
+    }
   } catch (error) {
     console.warn('[telemetry] failed to upload preview events', error)
     throw error
