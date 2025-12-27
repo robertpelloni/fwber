@@ -80,6 +80,7 @@ class EventController extends Controller
             'lon' => $request->longitude,
             'radius' => $request->radius,
             'status' => $request->status,
+            'type' => $request->type,
             'page' => $request->input('page', 1),
         ]));
 
@@ -118,6 +119,11 @@ class EventController extends Controller
                 $query->where('status', $request->status);
             } else {
                 $query->where('status', '!=', 'cancelled');
+            }
+
+            // Type filter
+            if ($request->has('type')) {
+                $query->where('type', $request->type);
             }
 
             return $query->withCount('attendees')->paginate(20);

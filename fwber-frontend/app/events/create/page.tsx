@@ -60,6 +60,21 @@ export default function CreateEventPage() {
         </div>
 
         <div>
+          <label className="block text-sm font-medium mb-1">Event Type</label>
+          <select
+            {...register('type')}
+            className="w-full border rounded-md p-2"
+            defaultValue="standard"
+          >
+            <option value="standard">Standard</option>
+            <option value="speed_dating">Speed Dating</option>
+            <option value="party">Party</option>
+            <option value="meetup">Meetup</option>
+            <option value="workshop">Workshop</option>
+          </select>
+        </div>
+
+        <div>
           <label className="block text-sm font-medium mb-1">Location Name</label>
           <input
             {...register('location_name', { required: 'Location name is required' })}

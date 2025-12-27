@@ -13,6 +13,7 @@ export default function EventsPage() {
     longitude: null,
     error: null,
   });
+  const [selectedType, setSelectedType] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -37,7 +38,9 @@ export default function EventsPage() {
 
   const { data, isLoading } = useNearbyEvents(
     location.latitude || undefined,
-    location.longitude || undefined
+    location.longitude || undefined,
+    50,
+    selectedType
   );
 
   return (
@@ -58,6 +61,24 @@ export default function EventsPage() {
           <Plus className="w-4 h-4 mr-2" />
           Create Event
         </Link>
+      </div>
+
+      <div className="flex space-x-2 mb-6 overflow-x-auto pb-2">
+        <button
+          onClick={() => setSelectedType(undefined)}
+          className={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${!selectedType ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+        >
+          All Events
+        </button>
+        {['standard', 'speed_dating', 'party', 'meetup', 'workshop'].map((type) => (
+          <button
+            key={type}
+            onClick={() => setSelectedType(type)}
+            className={`px-4 py-2 rounded-full text-sm whitespace-nowrap capitalize ${selectedType === type ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+          >
+            {type.replace('_', ' ')}
+          </button>
+        ))}
       </div>
 
       {location.error && (

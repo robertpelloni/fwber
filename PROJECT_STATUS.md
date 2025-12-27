@@ -11,6 +11,18 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
 *   **SSL Verification**: Waiting for Let's Encrypt to validate `mercure.fwber.me`.
 *   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
 
+### ✅ Critical Fixes (Dec 27 - Part 2)
+1.  **Event Types**:
+    -   **Feature**: Implemented support for different event types (Standard, Speed Dating, Party, Meetup, Workshop).
+    -   **Backend**:
+        -   Created migration `2025_12_27_000000_add_type_to_events_table`.
+        -   Updated `Event` model and `EventController` to handle `type` field.
+        -   Added filtering by `type` to `index` endpoint.
+    -   **Frontend**:
+        -   Updated `CreateEventPage` to allow selecting event type.
+        -   Updated `EventsPage` to filter events by type.
+    -   **Verification**: Created `EventTypesTest` covering creation, filtering, and validation.
+
 ### ✅ Critical Fixes (Dec 27)
 1.  **Video Chat Privacy (Face Blur)**:
     -   **Feature**: Implemented real-time face blurring for video calls.

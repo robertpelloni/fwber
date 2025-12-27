@@ -24,6 +24,7 @@ class StoreEventRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'description' => 'required|string|max:5000',
+            'type' => 'nullable|string|in:standard,speed_dating,party,meetup,workshop',
             'location_name' => 'required|string|max:255',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',

@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.14] - 2025-12-27
+
+### Added
+- **Event Types**: Implemented support for categorizing events.
+    - **Backend**: Added `type` column to `events` table (Standard, Speed Dating, Party, Meetup, Workshop).
+    - **Backend**: Updated `EventController` to support filtering by `type`.
+    - **Frontend**: Updated `CreateEventPage` to allow selecting event type.
+    - **Frontend**: Updated `EventsPage` to filter events by type.
+
 ## [0.3.13] - 2025-12-27
 
 ### Added

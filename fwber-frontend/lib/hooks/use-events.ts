@@ -11,12 +11,12 @@ import {
 
 export type { Event };
 
-export function useNearbyEvents(latitude?: number, longitude?: number, radius: number = 50) {
+export function useNearbyEvents(latitude?: number, longitude?: number, radius: number = 50, type?: string) {
   const { token } = useAuth();
 
   return useQuery({
-    queryKey: ['events', 'nearby', latitude, longitude, radius],
-    queryFn: () => getNearbyEvents(latitude, longitude, radius),
+    queryKey: ['events', 'nearby', latitude, longitude, radius, type],
+    queryFn: () => getNearbyEvents(latitude, longitude, radius, type),
     enabled: !!token,
   });
 }

@@ -5,6 +5,7 @@ export interface Event {
   id: number;
   title: string;
   description: string;
+  type?: 'standard' | 'speed_dating' | 'party' | 'meetup' | 'workshop';
   location_name: string;
   latitude: number;
   longitude: number;
@@ -23,6 +24,7 @@ export interface Event {
 export interface CreateEventRequest {
   title: string;
   description: string;
+  type?: 'standard' | 'speed_dating' | 'party' | 'meetup' | 'workshop';
   location_name: string;
   latitude: number;
   longitude: number;
@@ -33,11 +35,14 @@ export interface CreateEventRequest {
   token_cost?: number;
 }
 
-export async function getNearbyEvents(latitude?: number, longitude?: number, radius: number = 50): Promise<PaginatedResponse<Event>> {
+export async function getNearbyEvents(latitude?: number, longitude?: number, radius: number = 50, type?: string): Promise<PaginatedResponse<Event>> {
   const params: any = { radius };
   if (latitude && longitude) {
     params.latitude = latitude;
     params.longitude = longitude;
+  }
+  if (type) {
+    params.type = type;
   }
   const response = await apiClient.get<PaginatedResponse<Event>>('/events', { params });
   return response.data;

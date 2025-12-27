@@ -15,6 +15,7 @@ class EventFactory extends Factory
         return [
             'title' => $this->faker->sentence,
             'description' => $this->faker->paragraph,
+            'type' => $this->faker->randomElement(['standard', 'speed_dating', 'party', 'meetup', 'workshop']),
             'location_name' => $this->faker->city,
             'latitude' => $this->faker->latitude,
             'longitude' => $this->faker->longitude,
