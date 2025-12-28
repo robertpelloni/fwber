@@ -1,14 +1,37 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAiWingman, NemesisResponse } from '@/lib/hooks/use-ai-wingman';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, FlaskConical, Skull, Share2, Copy, RefreshCw, Atom, Zap } from 'lucide-react';
+import { Loader2, FlaskConical, Skull, Share2, Copy, RefreshCw, Atom, Zap, Lock } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { ShareToUnlock } from '@/components/viral/ShareToUnlock';
 
-export function NemesisFinder() {
+interface NemesisFinderProps {
+  userId?: string;
+}
+
+export function NemesisFinder({ userId }: NemesisFinderProps) {
   const { findNemesis } = useAiWingman();
   const { toast } = useToast();
   const [result, setResult] = React.useState<NemesisResponse | null>(null);
+  const [isUnlocked, setIsUnlocked] = React.useState(false);
+
+  // Check local storage for unlock status on mount
+  useEffect(() => {
+    if (userId) {
+      const unlocked = localStorage.getItem(`fwber_unlocked_nemesis_${userId}`);
+      if (unlocked === 'true') {
+        setIsUnlocked(true);
+      }
+    }
+  }, [userId]);
+
+  const handleUnlock = () => {
+    setIsUnlocked(true);
+    if (userId) {
+      localStorage.setItem(`fwber_unlocked_nemesis_${userId}`, 'true');
+    }
+  };
 
   const handleGenerate = async () => {
     try {
@@ -128,21 +151,55 @@ export function NemesisFinder() {
                 </div>
             </div>
 
-            {/* Analysis */}
-            <div className="space-y-3">
-                <div className="bg-emerald-900/10 rounded-lg p-3 border border-emerald-500/20">
-                    <h4 className="text-emerald-300 font-medium text-sm mb-1">Hypothesis:</h4>
-                    <p className="text-sm text-gray-300 italic">
-                        &quot;{result?.why_it_would_fail}&quot;
-                    </p>
+            {/* Analysis - GATED BEHIND SHARE */}
+            {!isUnlocked ? (
+              <ShareToUnlock
+                targetId={userId || 'me'}
+                title="Unlock the Scientific Truth"
+                description="Share to reveal the brutal scientific explanation of why you will fail!"
+                onUnlock={handleUnlock}
+              >
+                <div className="space-y-3 cursor-pointer group">
+                    <div className="bg-emerald-900/5 rounded-lg p-3 border border-emerald-500/10 relative overflow-hidden">
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center p-4 text-center transition-opacity group-hover:bg-black/50">
+                             <Lock className="w-6 h-6 text-emerald-400 mb-2 animate-pulse" />
+                             <h4 className="text-white font-bold text-sm mb-1">Unlock the Analysis</h4>
+                             <Button size="sm" variant="outline" className="mt-2 pointer-events-none border-emerald-500/50 text-emerald-400 hover:text-emerald-300">
+                                Share to Read
+                             </Button>
+                        </div>
+                        
+                        <div className="opacity-30 blur-sm pointer-events-none select-none">
+                            <h4 className="text-emerald-300 font-medium text-sm mb-1">Hypothesis:</h4>
+                            <p className="text-sm text-gray-300 italic">
+                                "You will fight over the thermostat setting until one of you leaves."
+                            </p>
+                            <div className="mt-3">
+                                <h4 className="text-blue-300 font-medium text-sm mb-1">Scientific Basis:</h4>
+                                <p className="text-sm text-gray-300">
+                                    Thermodynamic incompatibility suggests a 99% failure rate.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div className="bg-blue-900/10 rounded-lg p-3 border border-blue-500/20">
-                    <h4 className="text-blue-300 font-medium text-sm mb-1">Scientific Basis:</h4>
-                    <p className="text-sm text-gray-300">
-                        {result?.scientific_explanation}
-                    </p>
+              </ShareToUnlock>
+            ) : (
+                <div className="space-y-3 animate-in fade-in duration-500">
+                    <div className="bg-emerald-900/10 rounded-lg p-3 border border-emerald-500/20">
+                        <h4 className="text-emerald-300 font-medium text-sm mb-1">Hypothesis:</h4>
+                        <p className="text-sm text-gray-300 italic">
+                            &quot;{result?.why_it_would_fail}&quot;
+                        </p>
+                    </div>
+                    <div className="bg-blue-900/10 rounded-lg p-3 border border-blue-500/20">
+                        <h4 className="text-blue-300 font-medium text-sm mb-1">Scientific Basis:</h4>
+                        <p className="text-sm text-gray-300">
+                            {result?.scientific_explanation}
+                        </p>
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
         
         <div className="flex justify-center pt-2">

@@ -1,14 +1,37 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAiWingman, CosmicMatchResponse } from '@/lib/hooks/use-ai-wingman';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Moon, Star, Share2, Copy, RefreshCw, Heart, XCircle } from 'lucide-react';
+import { Loader2, Moon, Star, Share2, Copy, RefreshCw, Heart, XCircle, Lock } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { ShareToUnlock } from '@/components/viral/ShareToUnlock';
 
-export function CosmicMatch() {
+interface CosmicMatchProps {
+  userId?: string;
+}
+
+export function CosmicMatch({ userId }: CosmicMatchProps) {
   const { getCosmicMatch } = useAiWingman();
   const { toast } = useToast();
   const [result, setResult] = React.useState<CosmicMatchResponse | null>(null);
+  const [isUnlocked, setIsUnlocked] = React.useState(false);
+
+  // Check local storage for unlock status on mount
+  useEffect(() => {
+    if (userId) {
+      const unlocked = localStorage.getItem(`fwber_unlocked_cosmic_${userId}`);
+      if (unlocked === 'true') {
+        setIsUnlocked(true);
+      }
+    }
+  }, [userId]);
+
+  const handleUnlock = () => {
+    setIsUnlocked(true);
+    if (userId) {
+      localStorage.setItem(`fwber_unlocked_cosmic_${userId}`, 'true');
+    }
+  };
 
   const handleGenerate = async () => {
     try {
@@ -116,16 +139,47 @@ export function CosmicMatch() {
                 </p>
             </div>
 
-            {/* Worst Match */}
-            <div className="bg-red-900/10 rounded-lg p-4 border border-red-500/20">
-                <div className="flex items-center gap-2 mb-2">
-                    <XCircle className="w-5 h-5 text-red-500" />
-                    <h4 className="text-red-200 font-medium">Avoid: <span className="text-white font-bold text-lg">{result?.worst_match}</span></h4>
+            {/* Worst Match - GATED BEHIND SHARE */}
+            {!isUnlocked ? (
+              <ShareToUnlock 
+                targetId={userId || 'me'} 
+                title="Unlock Your Worst Nightmare" 
+                description="Share to see who you should absolutely avoid dating (and why)!"
+                onUnlock={handleUnlock}
+              >
+                <div className="bg-red-900/5 rounded-lg p-4 border border-red-500/10 relative overflow-hidden group cursor-pointer hover:border-red-500/30 transition-all">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center p-4 text-center">
+                        <Lock className="w-8 h-8 text-red-400 mb-2 animate-pulse" />
+                        <h4 className="text-white font-bold text-lg mb-1">Who to AVOID?</h4>
+                        <p className="text-xs text-gray-300 mb-3">Unlock your dating Kryptonite.</p>
+                        <Button size="sm" variant="destructive" className="pointer-events-none">
+                           Share to Unlock
+                        </Button>
+                    </div>
+                    
+                    {/* Blurred Content Placeholder */}
+                    <div className="opacity-30 blur-sm pointer-events-none select-none">
+                        <div className="flex items-center gap-2 mb-2">
+                            <XCircle className="w-5 h-5 text-red-500" />
+                            <h4 className="text-red-200 font-medium">Avoid: <span className="text-white font-bold text-lg">Scorpios</span></h4>
+                        </div>
+                        <p className="text-sm text-gray-300 italic">
+                            "They will ruin your life and steal your cat."
+                        </p>
+                    </div>
                 </div>
-                <p className="text-sm text-gray-300 italic">
-                    &quot;{result?.worst_reason}&quot;
-                </p>
-            </div>
+              </ShareToUnlock>
+            ) : (
+              <div className="bg-red-900/10 rounded-lg p-4 border border-red-500/20 animate-in fade-in duration-500">
+                  <div className="flex items-center gap-2 mb-2">
+                      <XCircle className="w-5 h-5 text-red-500" />
+                      <h4 className="text-red-200 font-medium">Avoid: <span className="text-white font-bold text-lg">{result?.worst_match}</span></h4>
+                  </div>
+                  <p className="text-sm text-gray-300 italic">
+                      &quot;{result?.worst_reason}&quot;
+                  </p>
+              </div>
+            )}
         </div>
         
         <div className="flex justify-center pt-2">

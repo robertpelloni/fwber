@@ -12,6 +12,8 @@ The application is live. The focus is on monitoring system health, optimizing pe
 - [x] **Wingman Bounties**: Reward users for successfully matching friends (Matchmaker system).
 - [x] **Viral Loops**: "Unlock via Share" mechanics for premium filters/content.
 - [x] **Gamification**: Local Leaderboards (Top Connector, Most Active) and Daily Streaks.
+- [x] **Roast My Profile**: Viral sharing loop with dynamic OG images and AI roasts.
+
 
 #### 2. Operational Excellence
 - [x] **Monitor Sentry**: Triage and fix production errors as they appear.

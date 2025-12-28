@@ -513,7 +513,7 @@ export default function ProfilePage() {
           </Card>
           <VibeCheck />
           <DatingFortune />
-          <CosmicMatch />
+          <CosmicMatch userId={user?.id || 'me'} />
           <NemesisFinder />
         </div>
 
