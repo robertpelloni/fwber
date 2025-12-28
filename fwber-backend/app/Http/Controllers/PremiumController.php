@@ -33,7 +33,40 @@ class PremiumController extends Controller
             
         $likers = User::with(['profile', 'photos'])->whereIn('id', $likerIds)->get();
 
-        return response()->json($likers);
+        // Check premium status
+        $isPremium = $user->tier === 'gold' && 
+                     $user->tier_expires_at && 
+                     Carbon::parse($user->tier_expires_at)->isFuture();
+
+        if ($isPremium) {
+            return response()->json($likers);
+        }
+
+        // If not premium, check which profiles have been unlocked via sharing
+        $unlockedProfileIds = \App\Models\ShareUnlock::where('user_id', $user->id)
+            ->whereIn('target_profile_id', $likerIds)
+            ->pluck('target_profile_id')
+            ->toArray();
+
+        // Sanitize the response for non-premium users
+        $sanitizedLikers = $likers->map(function ($liker) use ($unlockedProfileIds) {
+            if (in_array($liker->id, $unlockedProfileIds)) {
+                return $liker;
+            }
+
+            // Return obfuscated data for locked profiles
+            return [
+                'id' => $liker->id,
+                'is_locked' => true,
+                'age' => $liker->age, // Show age as a teaser
+                'name' => 'Someone', // Hide name
+                'avatar_url' => null, // Hide avatar
+                'photos' => [], // Hide photos
+                'blur_hash' => 'LEHV6nWB2yk8pyo0adR*.7kCMdnj', // Generic blur hash
+            ];
+        });
+
+        return response()->json($sanitizedLikers);
     }
 
     public function initiatePurchase(Request $request)
