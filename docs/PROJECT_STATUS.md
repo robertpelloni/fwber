@@ -58,6 +58,7 @@ These features are considered complete and are ready for a production environmen
     *   [x] **Sentry Integration:** Error tracking for Frontend and Backend.
     *   [x] **APM:** Basic Application Performance Monitoring (Slow Request logging).
     *   [x] **PWA Polish:** Verified manifest, icons, and service worker for full installability.
+    *   [x] **End-to-End Testing:** Cypress tests for critical paths (Auth, Matching, Messaging, Wallet).
 *   **Safety & Security:**
     *   [x] **Geo-Spoofing Detection:** Protects against location manipulation.
     *   [x] **Moderation Dashboard:** Tools for moderators to review flagged content.
@@ -85,8 +86,9 @@ These features are planned but have not yet been started.
 
 The immediate focus is on stabilizing the existing feature set and preparing for a production release.
 
-1.  **End-to-End Testing:**
-    *   Conduct a thorough end-to-end testing pass of all core features to identify and fix any remaining bugs.
+1.  **Viral & Engagement:**
+    *   Launch the "Roast My Profile" campaign.
+    *   Monitor viral loops and adjust incentives.
 2.  **Operational Readiness:**
     *   Review and finalize all environment configurations for a production deployment.
     *   Establish a basic monitoring and alerting pipeline to track application health.
