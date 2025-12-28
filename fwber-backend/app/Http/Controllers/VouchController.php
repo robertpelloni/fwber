@@ -8,6 +8,7 @@ use App\Notifications\PushMessage;
 use App\Services\AchievementService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\URL;
 
 class VouchController extends Controller
 {
@@ -20,6 +21,35 @@ class VouchController extends Controller
 
     /**
      * @OA\Post(
+     *     path="/vouch/generate-link",
+     *     tags={"Viral"},
+     *     summary="Generate a unique vouch link for the user",
+     *     @OA\Response(response=200, description="Vouch link generated")
+     * )
+     */
+    public function generateLink(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        // Generate a signed URL that expires in 7 days
+        // This ensures the link is tied to this specific user and adds a layer of trust
+        // We use 'vouch.create' as the named route on the frontend (conceptually), 
+        // but here we just return the URL string.
+        
+        // Actually, for a simple public link, we can just use the referral code or ID.
+        // But a signed URL is safer if we want to prevent enumeration.
+        // Let's stick to referral_code for simplicity and shareability as established in other viral features.
+        // However, the instructions mentioned "generateLink".
+        
+        $url = config('app.frontend_url') . '/vouch/' . $user->referral_code;
+
+        return response()->json([
+            'url' => $url,
+            'referral_code' => $user->referral_code
+        ]);
+    }
+
+    /**
+     * @OA\Post(
      *     path="/public/vouch",
      *     tags={"Viral"},
      *     summary="Submit a public vouch",
@@ -27,7 +57,10 @@ class VouchController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             @OA\Property(property="referral_code", type="string"),
-     *             @OA\Property(property="type", type="string", enum={"safe", "fun", "hot"})
+     *             @OA\Property(property="type", type="string", enum={"safe", "fun", "hot"}),
+     *             @OA\Property(property="relationship_type", type="string"),
+     *             @OA\Property(property="comment", type="string"),
+     *             @OA\Property(property="voucher_name", type="string")
      *         )
      *     ),
      *     @OA\Response(response=200, description="Vouch recorded")
@@ -38,6 +71,9 @@ class VouchController extends Controller
         $request->validate([
             'referral_code' => 'required|string|exists:users,referral_code',
             'type' => 'required|string|in:safe,fun,hot',
+            'relationship_type' => 'nullable|string|max:50',
+            'comment' => 'nullable|string|max:500',
+            'voucher_name' => 'nullable|string|max:100',
         ]);
 
         $user = User::where('referral_code', $request->referral_code)->firstOrFail();
@@ -51,15 +87,15 @@ class VouchController extends Controller
             ->exists();
 
         if ($exists) {
-            // We return 200 even if duplicate to avoid leaking info or confusing UI,
-            // but maybe 429 is better for debugging.
-            // Let's return success message but not create.
-             return response()->json(['message' => 'Vouch recorded successfully.']);
+            return response()->json(['message' => 'Vouch recorded successfully.']);
         }
 
         Vouch::create([
             'to_user_id' => $user->id,
             'type' => $request->type,
+            'relationship_type' => $request->relationship_type,
+            'comment' => $request->comment,
+            'voucher_name' => $request->voucher_name,
             'ip_address' => $ip,
         ]);
 
@@ -78,9 +114,10 @@ class VouchController extends Controller
                 default => '👍',
             };
 
+            $voucher = $request->voucher_name ?? 'Someone';
             $user->notify(new PushMessage(
                 "New Vouch! $emoji",
-                "Someone verified you as {$request->type}!",
+                "$voucher vouched for you as {$request->type}!",
                 "/profile",
                 "social"
             ));

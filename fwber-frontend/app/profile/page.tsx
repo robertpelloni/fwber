@@ -24,6 +24,7 @@ import { VibeCheck } from '@/components/profile/VibeCheck'
 import { DatingFortune } from '@/components/profile/DatingFortune'
 import { CosmicMatch } from '@/components/profile/CosmicMatch'
 import { NemesisFinder } from '@/components/profile/NemesisFinder'
+import { VouchLinkCard } from '@/components/profile/VouchLinkCard'
 
 export default function ProfilePage() {
   const { isAuthenticated, user, token, isLoading: authLoading } = useAuth()
@@ -515,6 +516,7 @@ export default function ProfilePage() {
           <DatingFortune />
           <CosmicMatch userId={user?.id || 'me'} />
           <NemesisFinder />
+          <VouchLinkCard />
         </div>
 
 

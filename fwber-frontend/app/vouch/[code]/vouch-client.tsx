@@ -17,6 +17,13 @@ export function VouchClient({ code }: VouchClientProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [vouched, setVouched] = useState<string | null>(null)
+  
+  // New Form State
+  const [relationshipType, setRelationshipType] = useState('')
+  const [comment, setComment] = useState('')
+  const [voucherName, setVoucherName] = useState('')
+  const [step, setStep] = useState<'type' | 'details'>('type')
+  const [selectedType, setSelectedType] = useState<string>('')
 
   useEffect(() => {
     if (code) {
@@ -41,16 +48,25 @@ export function VouchClient({ code }: VouchClientProps) {
     }
   }, [code])
 
-  const handleVouch = async (type: string) => {
+  const handleTypeSelect = (type: string) => {
+    setSelectedType(type)
+    setStep('details')
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
     try {
       await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/public/vouch`, {
         referral_code: code,
-        type: type
+        type: selectedType,
+        relationship_type: relationshipType,
+        comment: comment,
+        voucher_name: voucherName
       })
-      setVouched(type)
+      setVouched(selectedType)
     } catch (e: any) {
       console.error(e)
-      setVouched(type)
+      setVouched(selectedType) // Show success even on duplicate error for UX
     }
   }
 
@@ -97,50 +113,109 @@ export function VouchClient({ code }: VouchClientProps) {
         <div className="p-8">
           {!vouched ? (
             <>
-              <p className="text-center text-gray-700 font-medium mb-6">
-                How do you know {referrer.name}?
-              </p>
+              {step === 'type' ? (
+                <>
+                  <p className="text-center text-gray-700 font-medium mb-6">
+                    How do you know {referrer.name}?
+                  </p>
 
-              <div className="space-y-3">
-                <button
-                  onClick={() => handleVouch('safe')}
-                  className="w-full flex items-center p-4 rounded-xl border-2 border-gray-100 hover:border-green-500 hover:bg-green-50 transition-all group"
-                >
-                  <div className="p-2 bg-green-100 rounded-full mr-4 group-hover:bg-green-200">
-                    <Shield className="w-6 h-6 text-green-600" />
-                  </div>
-                  <div className="text-left">
-                    <span className="block font-bold text-gray-900">Trustworthy & Safe</span>
-                    <span className="text-sm text-gray-500">I&apos;d trust them with my drink</span>
-                  </div>
-                </button>
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => handleTypeSelect('safe')}
+                      className="w-full flex items-center p-4 rounded-xl border-2 border-gray-100 hover:border-green-500 hover:bg-green-50 transition-all group"
+                    >
+                      <div className="p-2 bg-green-100 rounded-full mr-4 group-hover:bg-green-200">
+                        <Shield className="w-6 h-6 text-green-600" />
+                      </div>
+                      <div className="text-left">
+                        <span className="block font-bold text-gray-900">Trustworthy & Safe</span>
+                        <span className="text-sm text-gray-500">I&apos;d trust them with my drink</span>
+                      </div>
+                    </button>
 
-                <button
-                  onClick={() => handleVouch('fun')}
-                  className="w-full flex items-center p-4 rounded-xl border-2 border-gray-100 hover:border-purple-500 hover:bg-purple-50 transition-all group"
-                >
-                  <div className="p-2 bg-purple-100 rounded-full mr-4 group-hover:bg-purple-200">
-                    <PartyPopper className="w-6 h-6 text-purple-600" />
-                  </div>
-                  <div className="text-left">
-                    <span className="block font-bold text-gray-900">Fun & Social</span>
-                    <span className="text-sm text-gray-500">Life of the party</span>
-                  </div>
-                </button>
+                    <button
+                      onClick={() => handleTypeSelect('fun')}
+                      className="w-full flex items-center p-4 rounded-xl border-2 border-gray-100 hover:border-purple-500 hover:bg-purple-50 transition-all group"
+                    >
+                      <div className="p-2 bg-purple-100 rounded-full mr-4 group-hover:bg-purple-200">
+                        <PartyPopper className="w-6 h-6 text-purple-600" />
+                      </div>
+                      <div className="text-left">
+                        <span className="block font-bold text-gray-900">Fun & Social</span>
+                        <span className="text-sm text-gray-500">Life of the party</span>
+                      </div>
+                    </button>
 
-                <button
-                  onClick={() => handleVouch('hot')}
-                  className="w-full flex items-center p-4 rounded-xl border-2 border-gray-100 hover:border-orange-500 hover:bg-orange-50 transition-all group"
-                >
-                  <div className="p-2 bg-orange-100 rounded-full mr-4 group-hover:bg-orange-200">
-                    <Flame className="w-6 h-6 text-orange-600" />
+                    <button
+                      onClick={() => handleTypeSelect('hot')}
+                      className="w-full flex items-center p-4 rounded-xl border-2 border-gray-100 hover:border-orange-500 hover:bg-orange-50 transition-all group"
+                    >
+                      <div className="p-2 bg-orange-100 rounded-full mr-4 group-hover:bg-orange-200">
+                        <Flame className="w-6 h-6 text-orange-600" />
+                      </div>
+                      <div className="text-left">
+                        <span className="block font-bold text-gray-900">Hot & Sexy</span>
+                        <span className="text-sm text-gray-500">Total catch</span>
+                      </div>
+                    </button>
                   </div>
-                  <div className="text-left">
-                    <span className="block font-bold text-gray-900">Hot & Sexy</span>
-                    <span className="text-sm text-gray-500">Total catch</span>
-                  </div>
-                </button>
-              </div>
+                </>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                   <button 
+                     type="button" 
+                     onClick={() => setStep('type')}
+                     className="text-sm text-gray-500 hover:text-gray-800 mb-2 flex items-center"
+                   >
+                     ← Back
+                   </button>
+                   
+                   <div>
+                     <label className="block text-sm font-medium text-gray-700 mb-1">Your Name (Optional)</label>
+                     <input 
+                        type="text" 
+                        value={voucherName}
+                        onChange={(e) => setVoucherName(e.target.value)}
+                        placeholder="Anonymous Friend"
+                        className="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                     />
+                   </div>
+
+                   <div>
+                     <label className="block text-sm font-medium text-gray-700 mb-1">Relationship to {referrer.name}</label>
+                     <select 
+                        value={relationshipType}
+                        onChange={(e) => setRelationshipType(e.target.value)}
+                        className="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                     >
+                        <option value="">Select relationship...</option>
+                        <option value="friend">Friend</option>
+                        <option value="bestie">Best Friend</option>
+                        <option value="ex">Ex (Good Terms)</option>
+                        <option value="colleague">Colleague</option>
+                        <option value="roommate">Roommate</option>
+                     </select>
+                   </div>
+
+                   <div>
+                     <label className="block text-sm font-medium text-gray-700 mb-1">Vouch Comment</label>
+                     <textarea 
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        placeholder={`Tell us why ${referrer.name} is a catch...`}
+                        rows={3}
+                        className="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                     />
+                   </div>
+
+                   <button 
+                     type="submit"
+                     className="w-full py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-colors shadow-lg"
+                   >
+                     Submit Vouch
+                   </button>
+                </form>
+              )}
             </>
           ) : (
             <div className="text-center animate-in fade-in zoom-in duration-300">
