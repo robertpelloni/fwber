@@ -449,6 +449,58 @@ EOT;
     }
 
     /**
+     * Generate a humorous "roast" or enthusiastic "hype" for a generic input (public/guest mode).
+     *
+     * @param string $name
+     * @param string $job
+     * @param string $trait
+     * @param string $mode 'roast' or 'hype'
+     * @return string
+     */
+    public function roastGeneric(string $name, string $job, string $trait, string $mode = 'roast'): string
+    {
+        // Simple cache key based on inputs to prevent spamming the exact same request
+        $cacheKey = "wingman:generic:{$mode}:" . md5($name . $job . $trait);
+
+        return Cache::remember($cacheKey, 3600, function () use ($name, $job, $trait, $mode) {
+            $prompt = $this->buildGenericRoastPrompt($name, $job, $trait, $mode);
+
+            $systemPrompt = $mode === 'hype'
+                ? 'You are an enthusiastic hype man. Your goal is to make this person sound like a legend based on limited info. Use slang, emojis, and high energy.'
+                : 'You are a professional comedian. Your goal is to humorously roast someone based on their job and a specific trait. Be savage but fun.';
+
+            try {
+                $response = $this->llmManager->driver()->chat([
+                    ['role' => 'system', 'content' => $systemPrompt],
+                    ['role' => 'user', 'content' => $prompt]
+                ], ['temperature' => 0.9]);
+
+                return $response->content;
+            } catch (\Exception $e) {
+                Log::error("AiWingmanService: Failed to generate generic {$mode}: " . $e->getMessage());
+                return "You broke the roast machine! That's how un-roastable you are. (Try again later)";
+            }
+        });
+    }
+
+    protected function buildGenericRoastPrompt(string $name, string $job, string $trait, string $mode = 'roast'): string
+    {
+        $instruction = $mode === 'hype'
+            ? "Write a short hype intro for {$name}."
+            : "Roast {$name}.";
+
+        return <<<EOT
+{$instruction}
+
+Details:
+- Job: {$job}
+- Specific Trait/Flaw: {$trait}
+
+Keep it under 280 characters. Make it punchy.
+EOT;
+    }
+
+    /**
      * Generate a humorous "roast" or enthusiastic "hype" of the user's profile.
      *
      * @param User $user

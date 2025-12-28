@@ -2,12 +2,15 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { roastProfile } from "@/lib/api/content-generation";
-import { Flame, Share2, Sparkles, RefreshCw } from "lucide-react";
+import { roastProfile, roastPublic } from "@/lib/api/content-generation"; // Updated import
+import { Flame, Share2, Sparkles, RefreshCw, User, Briefcase, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import Link from "next/link";
 
 export default function RoastPage() {
   const { toast } = useToast();
@@ -15,25 +18,61 @@ export default function RoastPage() {
   const [result, setResult] = useState<string | null>(null);
   const [shareId, setShareId] = useState<string | null>(null);
   const [mode, setMode] = useState<"roast" | "hype">("roast");
+  
+  // Public/Guest State
+  const [isGuest, setIsGuest] = useState(false);
+  const [guestForm, setGuestForm] = useState({
+    name: "",
+    job: "",
+    trait: ""
+  });
 
   const handleGenerate = async () => {
+    // Basic validation for guests
+    if (isGuest && (!guestForm.name || !guestForm.job || !guestForm.trait)) {
+      toast({
+        title: "Missing Info",
+        description: "We need a little ammo to roast you properly.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setLoading(true);
     setResult(null);
     setShareId(null);
 
     try {
-      const response = await roastProfile(mode);
+      let response;
+      if (isGuest) {
+        response = await roastPublic(guestForm.name, guestForm.job, guestForm.trait, mode);
+      } else {
+        response = await roastProfile(mode);
+      }
+      
       setResult(response.roast);
-      setShareId(response.share_id);
+      
+      if (response.share_id) {
+        setShareId(response.share_id);
+      } else if (response.is_preview) {
+        // Handle guest preview mode (no permanent share ID yet)
+        setShareId(null); 
+      }
+
     } catch (error: any) {
       if (error?.response?.status === 401) {
+        // Instead of hard redirect, switch to Guest Mode UI
+        setIsGuest(true);
         toast({
-          title: "Login Required",
-          description: "You need to be logged in to get roasted!",
-          variant: "destructive",
+          title: "Not Logged In",
+          description: "Switching to Guest Mode. Enter your details manually!",
         });
-        // Ideally redirect to login
-        window.location.href = "/login?redirect=/roast";
+      } else if (error?.response?.status === 429) {
+        toast({
+            title: "Whoa there!",
+            description: "You're roasting too hard. Cool down for a minute.",
+            variant: "destructive",
+          });
       } else {
         toast({
           title: "Error",
@@ -56,7 +95,16 @@ export default function RoastPage() {
   };
 
   const handleShare = () => {
+    if (!shareId && isGuest) {
+         toast({
+            title: "Sign Up Required",
+            description: "You need an account to create a permanent share link!",
+            action: <Link href="/register" className="underline font-bold">Sign Up</Link>
+          });
+        return;
+    }
     if (!shareId) return;
+    
     const shareUrl = `${window.location.origin}/share/${shareId}`;
     navigator.clipboard.writeText(`Check out my FWBer ${mode}! \n\n"${result}"\n\nSee it here: ${shareUrl}`);
     toast({
@@ -136,41 +184,101 @@ export default function RoastPage() {
                     </div>
                   </div>
                   
-                  <div className="flex gap-4 justify-center">
-                    <Button onClick={copyToClipboard} variant="outline" className="border-white/20 hover:bg-white/10 text-white">
-                      Copy Text
-                    </Button>
-                    <Button onClick={handleShare} className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white">
-                      <Share2 className="w-4 h-4 mr-2" />
-                      Share Result
-                    </Button>
+                  <div className="flex flex-col gap-4">
+                     <div className="flex gap-4 justify-center">
+                        <Button onClick={copyToClipboard} variant="outline" className="border-white/20 hover:bg-white/10 text-white">
+                        Copy Text
+                        </Button>
+                        <Button onClick={handleShare} className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white">
+                        <Share2 className="w-4 h-4 mr-2" />
+                        {isGuest ? 'Share (Requires Signup)' : 'Share Result'}
+                        </Button>
+                     </div>
+                     {isGuest && (
+                         <div className="bg-blue-900/30 border border-blue-500/30 p-3 rounded-md text-center">
+                             <p className="text-sm text-blue-200 mb-2">Want to save this and roast your friends?</p>
+                             <Link href="/register">
+                                <Button size="sm" variant="secondary" className="w-full">Create Free Account</Button>
+                             </Link>
+                         </div>
+                     )}
                   </div>
+
                 </motion.div>
               ) : (
                 <motion.div
                   key="empty"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="text-center max-w-md mx-auto space-y-4"
+                  className="w-full max-w-md mx-auto space-y-6"
                 >
-                  <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/10">
-                    {mode === 'roast' ? (
-                       <Flame className="w-12 h-12 text-red-500/50" />
-                    ) : (
-                       <Sparkles className="w-12 h-12 text-purple-500/50" />
-                    )}
-                  </div>
-                  <h3 className="text-2xl font-bold text-white">Ready for the truth?</h3>
-                  <p className="text-white/60">
-                    We'll analyze your profile details to generate a unique {mode === 'roast' ? 'roast' : 'hype message'}.
-                    Don't take it personally.
-                  </p>
+                  {isGuest ? (
+                      <div className="space-y-4 bg-white/5 p-6 rounded-lg border border-white/10">
+                          <div className="flex items-center gap-2 text-orange-300 mb-2">
+                              <AlertCircle className="w-5 h-5" />
+                              <span className="text-sm font-bold uppercase tracking-wider">Guest Mode</span>
+                          </div>
+                          
+                          <div className="space-y-2">
+                              <Label htmlFor="name" className="text-white/70">Your Name</Label>
+                              <div className="relative">
+                                  <User className="absolute left-3 top-3 w-4 h-4 text-white/40" />
+                                  <Input 
+                                    id="name" 
+                                    placeholder="e.g. Alex" 
+                                    className="pl-10 bg-black/40 border-white/20 text-white"
+                                    value={guestForm.name}
+                                    onChange={(e) => setGuestForm({...guestForm, name: e.target.value})}
+                                  />
+                              </div>
+                          </div>
+
+                          <div className="space-y-2">
+                              <Label htmlFor="job" className="text-white/70">Occupation</Label>
+                              <div className="relative">
+                                  <Briefcase className="absolute left-3 top-3 w-4 h-4 text-white/40" />
+                                  <Input 
+                                    id="job" 
+                                    placeholder="e.g. Graphic Designer" 
+                                    className="pl-10 bg-black/40 border-white/20 text-white"
+                                    value={guestForm.job}
+                                    onChange={(e) => setGuestForm({...guestForm, job: e.target.value})}
+                                  />
+                              </div>
+                          </div>
+
+                          <div className="space-y-2">
+                              <Label htmlFor="trait" className="text-white/70">Worst Habit / Trait</Label>
+                              <Input 
+                                id="trait" 
+                                placeholder="e.g. Always sends voice notes, Obsessed with crypto" 
+                                className="bg-black/40 border-white/20 text-white"
+                                value={guestForm.trait}
+                                onChange={(e) => setGuestForm({...guestForm, trait: e.target.value})}
+                              />
+                          </div>
+                      </div>
+                  ) : (
+                    <div className="text-center">
+                        <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/10">
+                            {mode === 'roast' ? (
+                            <Flame className="w-12 h-12 text-red-500/50" />
+                            ) : (
+                            <Sparkles className="w-12 h-12 text-purple-500/50" />
+                            )}
+                        </div>
+                        <h3 className="text-2xl font-bold text-white">Ready for the truth?</h3>
+                        <p className="text-white/60 mt-2">
+                            We'll analyze your profile details to generate a unique {mode === 'roast' ? 'roast' : 'hype message'}.
+                        </p>
+                    </div>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
           </CardContent>
 
-          <CardFooter className="bg-black/40 p-4 flex justify-center">
+          <CardFooter className="bg-black/40 p-4 flex flex-col gap-3 justify-center">
             {!loading && !result && (
               <Button 
                 size="lg" 
@@ -184,6 +292,17 @@ export default function RoastPage() {
                 {mode === 'roast' ? '🔥 ROAST ME' : '✨ HYPE ME UP'}
               </Button>
             )}
+            
+            {!loading && !result && !isGuest && (
+                <Button 
+                    variant="link" 
+                    className="text-white/40 text-xs hover:text-white"
+                    onClick={() => setIsGuest(true)}
+                >
+                    Or try manual entry mode (Guest)
+                </Button>
+            )}
+
             {!loading && result && (
                <Button 
                variant="ghost" 

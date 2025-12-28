@@ -96,6 +96,10 @@ Route::post('stripe/webhook', [\App\Http\Controllers\StripeWebhookController::cl
 // Public Viral Content
 Route::get('viral-content/{id}', [\App\Http\Controllers\ViralContentController::class, 'show']);
 
+// Public Roast Generator (Rate Limited strictly)
+Route::post('public/roast', [\App\Http\Controllers\AiWingmanController::class, 'roastPublic'])
+    ->middleware('throttle:5,1'); // 5 requests per minute per IP
+
 // Venue Partner Auth
 Route::prefix('venue')->group(function () {
     Route::post('register', [\App\Http\Controllers\VenueAuthController::class, 'register']);

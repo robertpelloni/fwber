@@ -206,6 +206,43 @@ class AiWingmanController extends Controller
     }
 
     /**
+     * Generate a roast or hype for an unauthenticated user (Public "Tease").
+     * Rate limited by IP.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function roastPublic(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:50',
+            'job' => 'required|string|max:50',
+            'trait' => 'required|string|max:100', // e.g., "always late", "obsessed with gym"
+            'mode' => 'in:roast,hype'
+        ]);
+
+        $mode = $request->input('mode', 'roast');
+        
+        $result = $this->wingmanService->roastGeneric(
+            $request->input('name'),
+            $request->input('job'),
+            $request->input('trait'),
+            $mode
+        );
+
+        // We do NOT save this to ViralContent database to avoid cluttering DB with guest data.
+        // The user must sign up to save/share it permanently.
+        // However, to allow the "Share" preview to work, we can return a temporary structured response
+        // or a signed temporary URL if we wanted. For now, just the text.
+
+        return response()->json([
+            'roast' => $result,
+            'is_preview' => true,
+            'cta' => 'Sign up to save this roast and share it with friends!'
+        ]);
+    }
+
+    /**
      * Generate a roast or hype of the authenticated user's profile.
      *
      * @param Request $request

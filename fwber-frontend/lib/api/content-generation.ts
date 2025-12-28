@@ -130,6 +130,14 @@ export interface GenerationHistory {
 export interface RoastProfileResponse {
   roast: string;
   share_id: string;
+  is_preview?: boolean; // Add optional property here
+}
+
+export interface RoastPublicResponse {
+  roast: string;
+  is_preview?: boolean;
+  cta?: string;
+  share_id?: string;
 }
 
 /**
@@ -137,6 +145,14 @@ export interface RoastProfileResponse {
  */
 export async function roastProfile(mode: 'roast' | 'hype' = 'roast'): Promise<RoastProfileResponse> {
   const response = await apiClient.post<RoastProfileResponse>('/wingman/roast', { mode });
+  return response.data;
+}
+
+/**
+ * Generate a generic roast or hype for public/guest users.
+ */
+export async function roastPublic(name: string, job: string, trait: string, mode: 'roast' | 'hype' = 'roast'): Promise<RoastPublicResponse> {
+  const response = await apiClient.post<RoastPublicResponse>('/public/roast', { name, job, trait, mode });
   return response.data;
 }
 
