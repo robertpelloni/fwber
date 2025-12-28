@@ -1,84 +1,58 @@
-# Operation Supernova: Viral Growth Strategy
+# VIRAL GROWTH STRATEGY
 
-**Mission Objective**: Achieve critical mass for FWBer through high-impact, asymmetric marketing warfare.
-**Tone**: Bold, Space-Age, Sex-Positive, Legal.
+## 1. Executive Summary
 
-## 1. Guerrilla Marketing (The "Ground War")
-*Focus: High visibility in nightlife districts and adult-friendly spaces.*
+FWBer's growth strategy relies on product-led viral loops rather than paid acquisition. By leveraging "social currency" (reputation, humor, status), we incentivize users to share FWBer content naturally.
 
-*   **"Alien Abduction" Street Teams**: Hire actors in "Men in Black" suits or silver alien costumes to "abduct" people into the app (via QR code scans) outside popular clubs.
-    *   *Prop*: "Neuralyzer" flashlights that give out promo codes.
-*   **Videobombing**: Stand behind live news reporters with a sign that says "I'd rather be on FWBer" or "Make Love, Not News - FWBer.com". (Check local laws/permits).
-*   **"Crop Circle" Chalk Art**: Use temporary spray chalk to draw FWBer logos or "Landing Zone" targets on sidewalks near bars and universities (18+ areas).
-*   **The "Lost Phone" Stunt**: Leave "lost" phones (dummy units or locked cheap phones) with a lock screen notification saying: "If found, please return to [Hot Person] on FWBer. Keep the phone, I just want my date."
+**Core Philosophy:** "Come for the Roast, Stay for the Community."
 
-## 2. Digital Viral Loops (The "Air War")
-*Focus: Product-led growth and social sharing.*
+## 2. The Core Viral Loops
 
-*   **The "Golden Ticket" Airdrop**: Create a scarcity-based invite system. "Only 500 tickets available for [City Name]." Users must beg/barter for invites on Twitter/Reddit.
-*   **"Roast My Profile" AI Challenge**: Create a standalone landing page where the AI (Gemini) ruthlessly roasts a user's dating profile (uploaded screenshot). The result is a shareable, branded image. "FWBer AI says I'm 'terminally single'. Can you do better?"
-*   **Wingman Bounties**: Gamify referrals. "Bring 3 friends, unlock 'X-Ray Vision' (see who likes you) for 24 hours."
-*   **"Missed Connections" 2.0**: A dedicated feed for "I saw you at [Venue]." If the other person claims it, both get a "Destiny Bonus" (free tokens).
+### A. The "Roast" Loop (High Velocity / Top of Funnel)
+*   **Hook:** Curiosity & Humor. "What does AI think of my dating profile?"
+*   **Action:** User uploads a profile screenshot or enters text.
+*   **Variable Reward:** A funny, slightly mean, shareable AI "Roast" image.
+*   **Investment/Share:** User shares the image on IG Stories/Twitter with a deep link.
+*   **Conversion:** Viewers click to "Roast Themselves" or "Defend this User."
 
-## 3. Content & PR (The "Propaganda War")
-*Focus: Data journalism and controversy.*
+### B. The "Vouch" Loop (Social Proof / Mid-Funnel)
+*   **Hook:** Need for Trust & Status. "I'm not a creep, let me prove it."
+*   **Action:** User sends a "Vouch Link" to friends (even non-users).
+*   **Variable Reward:** "Verified Safe," "Fun," or "Hot" badges on their profile.
+*   **Investment:** Friends visit the landing page to vote.
+*   **Conversion:** Friends are prompted to "Claim Your Own Vouch Profile" after voting.
 
-*   **Data Journalism**: Publish "The FWBer Census".
-    *   "Which city has the highest 'kink' score?"
-    *   "Zodiac signs most likely to ghost."
-    *   "The 'Thirstiest' time of day in NYC."
-*   **The "Sex in Space" Scholarship**: Announce a (tongue-in-cheek) fund to send the first couple to space for... science. It's a PR stunt, but the press release will go viral.
-*   **Influencer "Mating Rituals"**: Pay sex-positive influencers to livestream their "FWBer Hunting" sessions (using the app to find dates in real-time).
+### C. The Referral Loop (Incentive / Bottom Funnel)
+*   **Hook:** Greed/Utility. "I need tokens to see who liked me."
+*   **Action:** User shares a unique referral code.
+*   **Reward:** Both parties get +50 Tokens.
+*   **Investment:** New user signs up and completes onboarding.
 
-## 4. Community (The "Colony")
-*Focus: Retention and brand loyalty.*
+## 3. Implementation Status
 
-*   **"Mission Commanders"**: Campus/City reps who host "Docking Parties" (mixers). They get a cut of premium subscriptions.
-*   **"Verified Human" Badges**: In the age of AI, make "Verified Human" a status symbol. Send physical "Verified" pins to power users.
+| Feature | Status | Details |
+| :--- | :--- | :--- |
+| **AI Roast** | ✅ Live | Generates viral images via OpenGraph. |
+| **Vouch System** | ✅ Live | "Safe/Fun/Hot" voting categories. |
+| **Referral Codes** | ✅ Live | Token rewards for signups. |
+| **Share to Unlock** | 🚧 Beta | Content gating mechanism. |
 
-## 🚫 DECLASSIFIED: REJECTED STRATEGIES (DO NOT ATTEMPT)
-*The following have been flagged as **Mission Critical Failures** by Legal Command:*
-*   **Threatening Officials**: Immediate disqualification and federal prison. Zero user growth.
-*   **Bank Robbery**: High customer acquisition cost (years of life). Negative ROI.
-*   **Water Supply Tampering**: Mass casualty event. Not the kind of "viral" we want.
-*   **100-Day Sit-In**: Low energy. We need dynamic movement, not static protests.
+## 4. Metrics & KPIs
 
-**Status**: Ready for deployment.
-**Next Step**: Select one tactic and execute.
+*   **Viral Coefficient (K-Factor):** Target > 1.2 (Each user brings >1.2 users).
+*   **Referral Conversion:** % of share clicks that result in a signup.
+*   **Social Share Rate:** % of generated Roasts that are actually shared.
 
----
+## 5. Strategic Recommendations
 
-# Phase 2: Deep Space Expansion (New Intel)
+### Immediate Actions
+1.  **Optimize "Roast" Landing Page:** Ensure the "Roast Me Too" CTA is dominant on shared pages.
+2.  **Gamify Vouches:** Add a "Trusted Member" leaderboard to encourage collecting vouches.
 
-## 5. IRL Gamification (Operation "Star Map")
-*Focus: Turning the city into a playground.*
+### New Viral Features (Low Effort)
+1.  **"Matchmaker Bounty":** Allow users to create a public "Bounty" link. "Find me a date, get 100 Tokens." If a third party sets them up (via a specific link), the matchmaker gets the tokens.
+2.  **"Red Flag Checker":** A tool where users input their own quirks, and AI tells them if it's a "Beige," "Red," or "Green" flag. Highly shareable results.
 
-*   **"The Monolith" Installations**: Install temporary, shiny metal monoliths (reminiscent of 2001: A Space Odyssey) in parks or city centers. They contain nothing but a QR code leading to a "First Contact" landing page with exclusive invites.
-*   **"Supply Drop" Geocaching**: Hide branded, waterproof "Survival Kits" (condoms, stickers, lube, promo codes) in geocache locations. Release coordinates on social media daily.
-*   **"Find the Droid"**: A cosplayer dressed as a specific robot wanders a convention or festival. The first person to find them and say the code phrase ("I'm looking for the droids") gets a Lifetime Premium subscription.
+## 6. Long-Term Vision
 
-## 6. Intergalactic Alliances (Brand Collabs)
-*Focus: Sci-fi themed partnerships.*
-
-*   **"Zero-G" Lube**: Partner with a boutique lube brand to release a "Space Edition" bottle. "Frictionless entry into the atmosphere."
-*   **"Rocket Fuel" Cocktails**: Partner with trendy bars to serve a signature FWBer drink (something with dry ice/smoke). Ordering it gets you a coaster with a profile QR code.
-*   **"Space Suit" Merch Drop**: Limited edition, high-quality silver bomber jackets or hoodies. Make them look like streetwear, not cheap swag. Send to micro-influencers.
-
-## 7. Subculture Infiltration
-*Focus: Niche communities that align with "future/tech/alt".*
-
-*   **The "Cantina" Parties**: Host after-parties at Comic-Cons or Tech Conferences. Theme: "Mos Eisley Cantina" (wretched hive of scum and villainy... and dating).
-*   **Hackathons for Hookups**: Host a hackathon where devs build "The Future of Intimacy" tools (teledildonics integration, VR dates) on top of the FWBer API.
-*   **Cyberpunk Photo Shoots**: Set up a free professional photo booth with neon/cyberpunk aesthetics at events. Users get a cool profile pic (watermarked) for their dating profiles.
-
-## 8. The "Space Program" (Events & Education)
-*Focus: Skill-building and retention.*
-
-*   **"Astronaut Training"**: Flirting and social skills workshops. "How to initiate first contact without causing an intergalactic incident."
-*   **"Launch Control" Concierge**: A high-tier service where a human "Mission Specialist" helps plan your date night (reservations, itinerary) so you don't crash and burn.
-*   **"Full Moon" Werewolf Parties**: Monthly outdoor events on full moons. "Unleash the beast." (Costumes encouraged).
-
-## 🚫 DECLASSIFIED: PHASE 2 REJECTED IDEAS
-*   **Broadcasting to Actual Aliens**: SETI might get mad if we spam deep space with "U up?" signals.
-*   **Zero-G Orgy Plane**: Insurance premiums are astronomical.
-*   **Kidnapping Elon Musk**: While on-brand for "Space", legal advises against it.
+Move beyond 1:1 dating. Position FWBer as a *social reputation protocol* for the dating world. Your FWBer score (Vouches + Roast resilience) becomes your "Dating Credit Score."
