@@ -251,71 +251,73 @@ class TokenController extends Controller
 
     public function leaderboard()
     {
-        // Cache this query in production!
-        $topHolders = User::orderByDesc('token_balance')
-            ->take(10)
-            ->get(['id', 'name', 'token_balance', 'created_at'])
-            ->map(function ($user) {
-                return [
-                    'name' => substr($user->name, 0, 3) . '***', // Privacy
-                    'balance' => $user->token_balance,
-                    'joined' => $user->created_at->diffForHumans(),
-                ];
-            });
+        // Cache for 15 minutes to reduce database load on expensive aggregations
+        return \Cache::remember('leaderboard_stats', 900, function () {
+            $topHolders = User::orderByDesc('token_balance')
+                ->take(10)
+                ->get(['id', 'name', 'token_balance', 'created_at'])
+                ->map(function ($user) {
+                    return [
+                        'name' => substr($user->name, 0, 3) . '***', // Privacy
+                        'balance' => $user->token_balance,
+                        'joined' => $user->created_at->diffForHumans(),
+                    ];
+                });
 
-        $topReferrers = User::withCount('referrals')
-            ->orderByDesc('referrals_count')
-            ->take(10)
-            ->get(['id', 'name', 'referrals_count'])
-            ->map(function ($user) {
-                return [
-                    'name' => substr($user->name, 0, 3) . '***',
-                    'referrals' => $user->referrals_count,
-                ];
-            });
+            $topReferrers = User::withCount('referrals')
+                ->orderByDesc('referrals_count')
+                ->take(10)
+                ->get(['id', 'name', 'referrals_count'])
+                ->map(function ($user) {
+                    return [
+                        'name' => substr($user->name, 0, 3) . '***',
+                        'referrals' => $user->referrals_count,
+                    ];
+                });
 
-        $topWingmen = \App\Models\MatchAssist::select('matchmaker_id', \DB::raw('count(*) as assists_count'))
-            ->where('status', 'matched')
-            ->groupBy('matchmaker_id')
-            ->orderByDesc('assists_count')
-            ->take(10)
-            ->with('matchmaker:id,name')
-            ->get()
-            ->map(function ($assist) {
-                return [
-                    'name' => substr($assist->matchmaker->name, 0, 3) . '***',
-                    'assists' => $assist->assists_count,
-                ];
-            });
+            $topWingmen = \App\Models\MatchAssist::select('matchmaker_id', \DB::raw('count(*) as assists_count'))
+                ->where('status', 'matched')
+                ->groupBy('matchmaker_id')
+                ->orderByDesc('assists_count')
+                ->take(10)
+                ->with('matchmaker:id,name')
+                ->get()
+                ->map(function ($assist) {
+                    return [
+                        'name' => substr($assist->matchmaker->name, 0, 3) . '***',
+                        'assists' => $assist->assists_count,
+                    ];
+                });
 
-        $topVouched = User::withCount('vouches')
-            ->orderByDesc('vouches_count')
-            ->take(10)
-            ->get(['id', 'name'])
-            ->map(function ($user) {
-                return [
-                    'name' => substr($user->name, 0, 3) . '***',
-                    'vouches' => $user->vouches_count,
-                ];
-            });
+            $topVouched = User::withCount('vouches')
+                ->orderByDesc('vouches_count')
+                ->take(10)
+                ->get(['id', 'name'])
+                ->map(function ($user) {
+                    return [
+                        'name' => substr($user->name, 0, 3) . '***',
+                        'vouches' => $user->vouches_count,
+                    ];
+                });
 
-        $topStreaks = User::where('current_streak', '>', 0)
-            ->orderByDesc('current_streak')
-            ->take(10)
-            ->get(['id', 'name', 'current_streak'])
-            ->map(function ($user) {
-                return [
-                    'name' => substr($user->name, 0, 3) . '***',
-                    'streak' => $user->current_streak,
-                ];
-            });
+            $topStreaks = User::where('current_streak', '>', 0)
+                ->orderByDesc('current_streak')
+                ->take(10)
+                ->get(['id', 'name', 'current_streak'])
+                ->map(function ($user) {
+                    return [
+                        'name' => substr($user->name, 0, 3) . '***',
+                        'streak' => $user->current_streak,
+                    ];
+                });
 
-        return response()->json([
-            'top_holders' => $topHolders,
-            'top_referrers' => $topReferrers,
-            'top_wingmen' => $topWingmen,
-            'top_vouched' => $topVouched,
-            'top_streaks' => $topStreaks,
-        ]);
+            return response()->json([
+                'top_holders' => $topHolders,
+                'top_referrers' => $topReferrers,
+                'top_wingmen' => $topWingmen,
+                'top_vouched' => $topVouched,
+                'top_streaks' => $topStreaks,
+            ]);
+        });
     }
 }
