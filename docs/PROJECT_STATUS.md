@@ -52,6 +52,12 @@ These features are considered complete and are ready for a production environmen
     *   [x] **Groups:** Create and join public/private/paid groups.
     *   [x] **Gamification:** Daily Streak tracking (UI & Backend Logic) and Community Leaderboards.
     *   [x] **Vouch System:** Social proof system allowing friends to vouch for users.
+    *   [x] **Voice Messages:** Record and send voice notes in chat (with transcription support).
+    *   [x] **Feedback Loop:** In-app feedback submission with AI categorization and sentiment analysis.
+*   **Operational Excellence:**
+    *   [x] **Sentry Integration:** Error tracking for Frontend and Backend.
+    *   [x] **APM:** Basic Application Performance Monitoring (Slow Request logging).
+    *   [x] **PWA Polish:** Verified manifest, icons, and service worker for full installability.
 *   **Safety & Security:**
     *   [x] **Geo-Spoofing Detection:** Protects against location manipulation.
     *   [x] **Moderation Dashboard:** Tools for moderators to review flagged content.
