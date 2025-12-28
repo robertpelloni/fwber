@@ -23,6 +23,10 @@ interface LeaderboardData {
     name: string
     vouches: number
   }>
+  top_streaks: Array<{
+    name: string
+    streak: number
+  }>
 }
 
 export default function LeaderboardPage() {
@@ -170,9 +174,43 @@ export default function LeaderboardPage() {
                 )}
               </div>
             </div>
+
+            {/* Top Streaks */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div className="p-6 bg-gradient-to-r from-green-500 to-emerald-500 text-white flex items-center gap-3">
+                <TrendingUp className="w-6 h-6" />
+                <h2 className="text-xl font-bold">Longest Streaks</h2>
+              </div>
+              <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                {data.top_streaks?.map((user, index) => (
+                  <div key={index} className="p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className={`w-8 h-8 flex items-center justify-center rounded-full font-bold ${
+                        index === 0 ? 'bg-yellow-100 text-yellow-700' :
+                        index === 1 ? 'bg-gray-100 text-gray-700' :
+                        index === 2 ? 'bg-orange-100 text-orange-700' :
+                        'text-gray-500'
+                      }`}>
+                        {index + 1}
+                      </span>
+                      <p className="font-medium text-gray-900 dark:text-white">{user.name}</p>
+                    </div>
+                    <div className="flex items-center gap-1 font-bold text-gray-900 dark:text-white">
+                      {user.streak} <span className="text-sm font-normal text-gray-500">days</span>
+                    </div>
+                  </div>
+                ))}
+                {(!data.top_streaks || data.top_streaks.length === 0) && (
+                  <div className="p-8 text-center text-gray-500">
+                    No active streaks yet.
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </ProtectedRoute>
   )
 }
+

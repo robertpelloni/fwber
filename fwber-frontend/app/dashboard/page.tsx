@@ -14,6 +14,8 @@ import { ActivityFeed } from '@/components/ActivityFeed';
 import BoostButton from '@/components/BoostButton';
 import { AchievementsList } from '@/components/dashboard/AchievementsList';
 import { ReferralModal } from '@/components/viral/ReferralModal';
+import { DailyStreakModal } from '@/components/gamification/DailyStreakModal';
+import { useEffect, useState } from 'react';
 
 interface DashboardStats {
   total_matches: number;
@@ -34,21 +36,47 @@ export default function DashboardPage() {
   const { user } = useAuth();
   // Activity feed now uses its own component with real-time presence
 
+  const [showStreakModal, setShowStreakModal] = useState(false);
+
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
       const token = localStorage.getItem('fwber_token');
-      const response = await axios.get<DashboardStats>(
+      const response = await axios.get<DashboardStats & { streak_just_updated: boolean }>(
         `${process.env.NEXT_PUBLIC_API_URL}/dashboard/stats`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      
       return response.data;
     },
   });
 
+  // Effect to check if we should show the streak modal
+  useEffect(() => {
+    // Priority: Explicit backend flag (most reliable for real-time update)
+    // Fallback: LocalStorage check (prevents spam on page reload)
+    if (stats?.streak_just_updated) {
+        setShowStreakModal(true);
+    } else if (stats?.current_streak && stats.current_streak > 0) {
+      const today = new Date().toDateString();
+      const lastShown = localStorage.getItem('fwber_streak_shown_date');
+      
+      // If we haven't shown it today, and user has a streak, show it
+      if (lastShown !== today) {
+        setShowStreakModal(true);
+        localStorage.setItem('fwber_streak_shown_date', today);
+      }
+    }
+  }, [stats]);
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+        <DailyStreakModal 
+            isOpen={showStreakModal} 
+            onClose={() => setShowStreakModal(false)}
+            currentStreak={stats?.current_streak || 1}
+        />
         {/* Unified App Header with Navigation & Notifications */}
         <AppHeader />
 

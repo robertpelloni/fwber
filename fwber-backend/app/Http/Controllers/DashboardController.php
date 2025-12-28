@@ -109,6 +109,7 @@ class DashboardController extends Controller
             'response_rate' => (int) $responseRate,
             'days_active' => (int) $daysActive,
             'current_streak' => (int) $user->current_streak,
+            'streak_just_updated' => (bool) $user->streakJustUpdated, // This relies on the transient property being set by StreakService
             'last_login' => $user->updated_at->toISOString(),
         ]);
     }

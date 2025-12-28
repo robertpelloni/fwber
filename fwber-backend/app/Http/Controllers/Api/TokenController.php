@@ -299,11 +299,23 @@ class TokenController extends Controller
                 ];
             });
 
+        $topStreaks = User::where('current_streak', '>', 0)
+            ->orderByDesc('current_streak')
+            ->take(10)
+            ->get(['id', 'name', 'current_streak'])
+            ->map(function ($user) {
+                return [
+                    'name' => substr($user->name, 0, 3) . '***',
+                    'streak' => $user->current_streak,
+                ];
+            });
+
         return response()->json([
             'top_holders' => $topHolders,
             'top_referrers' => $topReferrers,
             'top_wingmen' => $topWingmen,
             'top_vouched' => $topVouched,
+            'top_streaks' => $topStreaks,
         ]);
     }
 }

@@ -27,6 +27,9 @@ class StreakService
         if ($lastActive->isYesterday()) {
             $user->increment('current_streak');
             $user->update(['last_active_at' => $now]);
+            
+            // Set flag on user object instance so frontend knows to celebrate
+            $user->streakJustUpdated = true;
         } else {
             // Missed a day (or more)
             $user->update([

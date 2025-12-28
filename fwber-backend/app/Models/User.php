@@ -55,7 +55,19 @@ class User extends Authenticatable
 
     protected $appends = [
         // 'two_factor_enabled', // Commented out to prevent crashes during schema drift
+        'streak_just_updated',
     ];
+
+    /**
+     * Transient property to track if streak was incremented in this request.
+     * Not stored in database.
+     */
+    public $streakJustUpdated = false;
+
+    public function getStreakJustUpdatedAttribute(): bool
+    {
+        return $this->streakJustUpdated;
+    }
 
     // Relationships
 
