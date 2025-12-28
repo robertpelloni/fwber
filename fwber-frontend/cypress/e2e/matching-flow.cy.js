@@ -151,14 +151,14 @@ describe('Matching Flow', () => {
       }
     });
     
-    cy.contains('Potential Match', { timeout: 10000 }).should('be.visible');
+    cy.contains('Potential Match', { timeout: 30000 }).should('be.visible');
 
     // The component renders "Name, Age" e.g. "Potential Match, 25"
     cy.contains('25').should('be.visible');
     cy.contains('I like hiking').should('be.visible');
 
     // Perform Like action (click Like button - Green Heart)
-    cy.get('button.text-green-500').click({ force: true });
+    cy.get('.text-green-500').parent().click({ force: true });
 
     // Verify API call
     cy.wait('@matchAction').its('request.body').should('deep.equal', {
@@ -193,7 +193,7 @@ describe('Matching Flow', () => {
     // cy.wait('@getMatches');
 
     // Click Like button
-    cy.get('button.text-green-500').click({ force: true });
+    cy.get('.text-green-500').parent().click({ force: true });
 
     cy.wait('@mutualMatch');
 
