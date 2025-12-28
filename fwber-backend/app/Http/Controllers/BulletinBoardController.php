@@ -167,7 +167,7 @@ class BulletinBoardController extends Controller
         );
         
         // Update MySQL spatial location if it's null
-        if (!$board->location) {
+        if (!$board->location && DB::connection()->getDriverName() !== 'sqlite') {
             DB::statement(
                 'UPDATE bulletin_boards SET location = POINT(?, ?) WHERE id = ?',
                 [$lng, $lat, $board->id]
@@ -247,10 +247,12 @@ class BulletinBoardController extends Controller
         ]);
         
         // Set MySQL spatial location for the message
-        DB::statement(
-            'UPDATE bulletin_messages SET location = POINT(?, ?) WHERE id = ?',
-            [$lng, $lat, $message->id]
-        );
+        if (DB::connection()->getDriverName() !== 'sqlite') {
+            DB::statement(
+                'UPDATE bulletin_messages SET location = POINT(?, ?) WHERE id = ?',
+                [$lng, $lat, $message->id]
+            );
+        }
 
         // Publish to Redis for real-time updates
         $this->publishMessage($board, $message);

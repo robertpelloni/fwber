@@ -403,6 +403,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('wingman/nemesis', [\App\Http\Controllers\AiWingmanController::class, 'findNemesis']);
     });
 
+    // Bulletin Board
+    Route::get('bulletin-boards', [BulletinBoardController::class, 'index']);
+    Route::post('bulletin-boards', [BulletinBoardController::class, 'createOrFind']);
+    Route::get('bulletin-boards/{id}', [BulletinBoardController::class, 'show']);
+    Route::post('bulletin-boards/{id}/messages', [BulletinBoardController::class, 'postMessage']);
+    Route::get('bulletin-boards/{id}/messages', [BulletinBoardController::class, 'getMessages']);
+    // Route::post('bulletin-boards/{id}/subscribe', [BulletinBoardController::class, 'subscribe']);
+    // Route::post('bulletin-boards/{id}/unsubscribe', [BulletinBoardController::class, 'unsubscribe']);
+
     // Friend routes
     Route::prefix('friends')->group(function () {
         Route::get('/', [FriendController::class, 'getFriends']);

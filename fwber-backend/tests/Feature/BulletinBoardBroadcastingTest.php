@@ -42,7 +42,7 @@ class BulletinBoardBroadcastingTest extends TestCase
         });
 
         Event::assertDispatched(BulletinBoardActivity::class, function ($event) use ($board) {
-            return $event->board->id === $board->id;
+            return $event->boardId === $board->id;
         });
     }
 }
