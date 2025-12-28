@@ -127,6 +127,19 @@ export interface GenerationHistory {
   generated_at: string;
 }
 
+export interface RoastProfileResponse {
+  roast: string;
+  share_id: string;
+}
+
+/**
+ * Generate a roast or hype of the authenticated user's profile.
+ */
+export async function roastProfile(mode: 'roast' | 'hype' = 'roast'): Promise<RoastProfileResponse> {
+  const response = await apiClient.post<RoastProfileResponse>('/wingman/roast', { mode });
+  return response.data;
+}
+
 /**
  * Generate personalized profile content
  */

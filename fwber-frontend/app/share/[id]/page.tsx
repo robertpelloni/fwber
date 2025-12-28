@@ -6,15 +6,68 @@ export default function SharePage({ params }: { params: { id: string } }) {
   return <ShareContent id={params.id} />;
 }
 
-// Optional: Generate metadata for social sharing cards
+// Generate dynamic metadata for social sharing
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  return {
-    title: 'Check out this FWBer Result!',
-    description: 'See what AI thinks about this profile on FWBer.',
-    openGraph: {
-      title: 'FWBer - AI Dating Wingman',
-      description: 'See what AI thinks about this profile on FWBer.',
-      images: ['/images/og-share.png'], // You might want to add a generic share image
-    },
-  };
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+  
+  try {
+    const res = await fetch(`${apiUrl}/viral-content/${params.id}`);
+    
+    if (!res.ok) {
+        return {
+            title: 'FWBer - Viral Profile Analysis',
+            description: 'Check out this AI-generated profile analysis on FWBer.',
+        };
+    }
+
+    const data = await res.json();
+    const userName = data.user_name || 'Someone';
+    
+    let title = 'FWBer Analysis';
+    let description = 'See what AI thinks about this profile.';
+
+    switch (data.type) {
+      case 'roast':
+        title = `Roast of ${userName} 🔥`;
+        description = `Read this brutal AI roast of ${userName}'s dating profile.`;
+        break;
+      case 'hype':
+        title = `${userName}'s Hype ✨`;
+        description = `See why ${userName} is a catch according to AI.`;
+        break;
+      case 'fortune':
+        title = `${userName}'s Dating Fortune 🔮`;
+        description = `See what the future holds for ${userName}'s love life.`;
+        break;
+      case 'nemesis':
+        title = `Scientific Nemesis 🧬`;
+        description = `Find out who ${userName} should absolutely avoid dating.`;
+        break;
+      case 'vibe':
+        title = `${userName}'s Vibe Check 🚩`;
+        description = `Green flags, red flags, and everything in between.`;
+        break;
+    }
+
+    return {
+      title,
+      description,
+      openGraph: {
+        title,
+        description,
+        type: 'article',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+      }
+    };
+
+  } catch (error) {
+    return {
+      title: 'FWBer - Viral Profile Analysis',
+      description: 'Check out this AI-generated profile analysis on FWBer.',
+    };
+  }
 }

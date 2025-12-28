@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '@/lib/api/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, Flame, Sparkles, Flag, AlertTriangle, CheckCircle2, Star, Skull } from 'lucide-react';
 import Link from 'next/link';
@@ -14,7 +14,9 @@ interface ViralContent {
   views: number;
   is_owner: boolean;
   reward_claimed: boolean;
+  user_name?: string;
 }
+
 
 export function ShareContent({ id }: { id: string }) {
   const [data, setData] = useState<ViralContent | null>(null);
@@ -74,6 +76,25 @@ export function ShareContent({ id }: { id: string }) {
             </div>
           </div>
         );
+
+      case 'roast':
+        return (
+          <div className="space-y-6">
+            <div className="flex justify-center">
+              <div className="p-4 rounded-full bg-orange-500/20">
+                <Flame className="w-12 h-12 text-orange-500" />
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold text-center text-white">
+               {data.user_name ? `Roast of ${data.user_name} 🔥` : 'Profile Roast 🔥'}
+            </h2>
+            <div className="bg-orange-900/20 border border-orange-500/30 rounded-lg p-6">
+              <p className="text-lg text-gray-200 italic leading-relaxed">
+                &quot;{data.content.text}&quot;
+              </p>
+            </div>
+          </div>
+        );
       
       case 'hype':
         return (
@@ -83,7 +104,9 @@ export function ShareContent({ id }: { id: string }) {
                 <Sparkles className="w-12 h-12 text-blue-500" />
               </div>
             </div>
-            <h2 className="text-2xl font-bold text-center text-white">Profile Hype ✨</h2>
+            <h2 className="text-2xl font-bold text-center text-white">
+                {data.user_name ? `${data.user_name}'s Hype ✨` : 'Profile Hype ✨'}
+            </h2>
             <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-6">
               <p className="text-lg text-gray-200 italic leading-relaxed">
                 &quot;{data.content.text}&quot;
@@ -91,6 +114,66 @@ export function ShareContent({ id }: { id: string }) {
             </div>
           </div>
         );
+
+      case 'vibe':
+        return (
+          <div className="space-y-6">
+            <div className="flex justify-center">
+              <div className="p-4 rounded-full bg-purple-500/20">
+                <Flag className="w-12 h-12 text-purple-500" />
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold text-center text-white">
+                {data.user_name ? `${data.user_name}'s Vibe Check` : 'Vibe Check Result'}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <h4 className="text-green-400 font-medium flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4" /> Green Flags
+                </h4>
+                <ul className="space-y-2">
+                  {data.content.green_flags.map((flag: string, i: number) => (
+                    <li key={i} className="bg-green-900/20 border border-green-500/20 rounded px-3 py-2 text-sm text-green-100">
+                      {flag}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="space-y-3">
+                <h4 className="text-red-400 font-medium flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4" /> Red Flags
+                </h4>
+                <ul className="space-y-2">
+                  {data.content.red_flags.map((flag: string, i: number) => (
+                    <li key={i} className="bg-red-900/20 border border-red-500/20 rounded px-3 py-2 text-sm text-red-100">
+                      {flag}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'fortune':
+        return (
+          <div className="space-y-6">
+            <div className="flex justify-center">
+              <div className="p-4 rounded-full bg-yellow-500/20">
+                <Star className="w-12 h-12 text-yellow-500" />
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold text-center text-white">
+                {data.user_name ? `${data.user_name}'s Fortune 🔮` : 'Dating Fortune 🔮'}
+            </h2>
+            <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-6">
+              <p className="text-lg text-gray-200 italic leading-relaxed">
+                &quot;{data.content.text}&quot;
+              </p>
+            </div>
+          </div>
+        );
+
 
       case 'vibe':
         return (

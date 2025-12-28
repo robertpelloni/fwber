@@ -78,6 +78,7 @@ class ViralContentController extends Controller
             'views' => $content->views,
             'is_owner' => $viewerId === $content->user_id,
             'reward_claimed' => $content->reward_claimed,
+            'user_name' => $content->user ? $content->user->name : 'Anonymous',
         ]);
     }
 }

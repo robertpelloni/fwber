@@ -1,4 +1,46 @@
-# Project Status
+# Project Status - v0.3.16
+
+**Date:** 2025-12-28
+**Current Phase:** Post-Launch Stabilization
+**Version:** v0.3.16
+
+## 🚨 Immediate Priorities (Next 24 Hours)
+
+1.  **Deployment Verification**:
+    *   [x] Route fixes for Bulletin Boards committed and pushed.
+    *   [x] `BulletinBoardBroadcastingTest` passing.
+    *   [ ] Monitor deployment logs for v0.3.16.
+    *   [ ] Verify Bulletin Board functionality in production (API + Real-time).
+
+2.  **Environment Stability**:
+    *   [x] Frontend build stabilized.
+    *   [ ] Investigate transient DNS issues in CI/Test environment (seen in `AiConversationCoachTest` previously, though passed now).
+
+3.  **Documentation**:
+    *   [x] `docs/dashboard/PROJECT_STRUCTURE_DASHBOARD.md` created.
+    *   [x] `CHANGELOG.md` updated.
+
+## 🟢 Recent Accomplishments
+
+*   **Fixed Critical Route Mapping**: Corrected `fwber-backend/routes/api.php` to point to existing `BulletinBoardController` methods (`createOrFind`, `postMessage`).
+*   **Database Integrity**: Added migration `2025_12_28_085030_add_missing_columns_to_bulletin_messages.php` to ensure `bulletin_messages` table has all required columns (`is_anonymous`, `expires_at`, etc.).
+*   **Test Suite Improvements**:
+    *   Made `BulletinBoardController` compatible with SQLite for in-memory testing (bypassed MySQL-specific `POINT()` functions when using SQLite driver).
+    *   Fixed event property access in `BulletinBoardBroadcastingTest`.
+    *   Verified `AiConversationCoachTest` is passing locally.
+
+## 🟡 Known Issues / Watchlist
+
+*   **CI/CD**: `fwber-mysql` host resolution failures occasionally appear in test logs. This seems to be environment-specific (likely Docker networking in the test runner).
+*   **Frontend**: Build warns about multiple lockfiles. This is a low-priority maintenance item but should be cleaned up eventually.
+
+## 🔜 Upcoming Tasks
+
+*   **Security Drill**: Execute `docs/security/PRODUCTION_SECURITY_AUDIT.md`.
+*   **Marketing**: Begin implementation of `docs/marketing/VIRAL_STRATEGY.md`.
+*   **Performance**: Review `slow_requests` table after 24h of production traffic.
+
+# Project Status (Archived)
 
 **Last Updated:** December 27, 2025
 **Status:** 🚀 LIVE / DEPLOYED / FEATURE COMPLETE
