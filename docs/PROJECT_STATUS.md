@@ -50,6 +50,8 @@ These features are considered complete and are ready for a production environmen
     *   [x] **Friends System:** Send, accept, manage friends, and send tips.
     *   [x] **Push Notifications:** Real-time alerts for Tips, Friend Requests, and Matches (WebPush/VAPID).
     *   [x] **Groups:** Create and join public/private/paid groups.
+    *   [x] **Gamification:** Daily Streak tracking (UI & Backend Logic) and Community Leaderboards.
+    *   [x] **Vouch System:** Social proof system allowing friends to vouch for users.
 *   **Safety & Security:**
     *   [x] **Geo-Spoofing Detection:** Protects against location manipulation.
     *   [x] **Moderation Dashboard:** Tools for moderators to review flagged content.
