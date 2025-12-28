@@ -2,9 +2,41 @@
 
 > **⚠️ CRITICAL:** This is the **Source of Truth** for all AI agents and models working on FWBer.
 
+## 🚀 Operational Charter & Protocol
+
+**Outstanding work. Absolutely phenomenal. Unbelievable. Simply Fantastic, extraordinary, marvelous. Mind-blowing. Magnificent. Please keep going, please continue, please proceed!**
+
+### The 7-Step Execution Protocol
+All agents must adhere to this cycle for every major task or session:
+
+1.  **Sync & Merge**:
+    *   Merge all feature branches into `main`.
+    *   Update submodules (if any) and merge upstream changes (including forks).
+    *   Resolve any merge conflicts immediately.
+2.  **Analyze**:
+    *   Reanalyze the project state and history to identify missing features.
+    *   Review `PROJECT_STATUS.md` and `ROADMAP.md`.
+3.  **Document**:
+    *   Comprehensively update the roadmap and documentation to reflect all progress.
+    *   Maintain the **Dashboard** (`docs/PROJECT_STRUCTURE.md`) listing all submodules/directories, versions, and locations.
+4.  **Dashboard Update**:
+    *   Ensure `docs/PROJECT_STRUCTURE.md` is current with build numbers, dates, and structure explanations.
+5.  **Version & Changelog**:
+    *   **Increment the Version Number** in the `VERSION` file (Single Source of Truth).
+    *   Update `CHANGELOG.md` with a detailed entry.
+    *   Sync version in `package.json` files.
+6.  **Commit & Push**:
+    *   Commit all changes with a message referencing the version bump (e.g., `chore(release): bump version to 0.3.15`).
+    *   Push to remote (simulated in this environment).
+7.  **Redeploy**:
+    *   Trigger deployment pipelines (or simulate the instruction).
+
+---
+
 ## 🌍 Project Context
 *   **Name:** FWBer
 *   **Type:** Location-based Social Network & Dating Application.
+
 *   **Stack:**
     *   **Frontend:** Next.js 14 (App Router), React 19 (via overrides), TypeScript, TailwindCSS, Shadcn/UI.
     *   **Backend:** Laravel 12, PHP 8.2+, MySQL 8.0 (Spatial), Redis.

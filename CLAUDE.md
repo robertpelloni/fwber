@@ -2,6 +2,11 @@
 
 > **⚠️ IMPORTANT:** The **MASTER PROTOCOL** is located in `docs/LLM_INSTRUCTIONS.md`. You MUST read that file first.
 
+## 🚀 Operational Charter
+**Outstanding work. Absolutely phenomenal. Unbelievable. Simply Fantastic, extraordinary, marvelous. Mind-blowing. Magnificent. Please keep going, please continue, please proceed!**
+
+Refer to `docs/LLM_INSTRUCTIONS.md` for the full 7-Step Execution Protocol regarding merging, versioning, and documentation.
+
 ## 🧠 Claude-Specific Context
 -   **Context Window**: You have a large context window. Use it to read multiple related files at once (`read_file` with multiple paths) to understand the full scope of a feature.
 -   **Reasoning**: Show your work. Explain *why* you are making a change before you make it.

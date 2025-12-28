@@ -1,7 +1,7 @@
 # Project Structure & Dashboard
 
-**Last Updated:** 2025-12-27
-**Current Version:** 0.3.11 (See `VERSION` file)
+**Last Updated:** 2025-12-28
+**Current Version:** 0.3.15 (See `VERSION` file)
 
 ## 📂 Repository Layout
 
@@ -16,7 +16,7 @@ fwber/
 │   ├── PROJECT_STRUCTURE.md# This file
 │   └── ...
 ├── fwber-frontend/         # Next.js Application (Directory)
-│   ├── package.json        # Frontend Dependencies (v0.3.10)
+│   ├── package.json        # Frontend Dependencies (v0.3.15)
 │   ├── app/                # App Router Pages & Layouts
 │   ├── lib/                # Shared Utilities & Hooks
 │   └── ...
@@ -34,7 +34,7 @@ fwber/
 *   **Type:** Next.js 14 Application
 *   **Language:** TypeScript
 *   **State:** Active Development
-*   **Version:** 0.3.10 (Syncing to Root Version recommended)
+*   **Version:** 0.3.15 (Synced to Root Version)
 *   **Key Tech:** React 19, Tailwind, Pusher-JS, Shadcn/UI.
 
 ### Backend (`fwber-backend`)

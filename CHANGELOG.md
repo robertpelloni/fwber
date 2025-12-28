@@ -2,7 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.15] - 2025-12-28
+
+### Changed
+- **Protocol**: Established a formal "Operational Charter & Protocol" in `docs/LLM_INSTRUCTIONS.md` to standardize agent behavior, versioning, and documentation.
+- **Documentation**: Updated `AGENTS.md`, `CLAUDE.md`, and `copilot-instructions.md` to reference the new Master Protocol.
+- **Dashboard**: Updated `docs/PROJECT_STRUCTURE.md` to serve as the central dashboard for project layout and version tracking.
+- **Versioning**: Bumped version to 0.3.15 to mark the protocol enforcement.
+
 ## [0.3.2] - 2025-12-27
+
 
 ### Fixed
 - **Critical**: Resolved "Module factory not available" crash on production by refactoring `PhotoUpload` to break circular dependencies with `PhotoGallery` and using dynamic imports.
