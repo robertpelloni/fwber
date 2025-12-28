@@ -16,9 +16,9 @@ The application is live. The focus is on monitoring system health, optimizing pe
 - [x] **Vouch for Me**: Social proof system where friends can verify and tag users (Safe/Fun/Hot).
 
 #### 2. Operational Excellence
-- [x] **Monitor Sentry**: Triage and fix production errors as they appear.
-- [x] **Performance Tuning**: Analyze `SlowRequest` logs and optimize bottlenecks.
-- [x] **Infrastructure Scaling**: Monitor Redis and Database load; scale resources if needed.
+- [ ] **Monitor Sentry**: Triage and fix production errors as they appear.
+- [ ] **Performance Tuning**: Analyze `SlowRequest` logs and optimize bottlenecks.
+- [ ] **Infrastructure Scaling**: Monitor Redis and Database load; scale resources if needed.
 
 #### 3. User Experience Refinement
 - [x] **PWA Verification**: Verify Push Notifications and Offline mode on a wider range of devices.
