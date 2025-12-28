@@ -36,12 +36,12 @@ class ApmTest extends TestCase
 
         // Assert it was logged
         $this->assertDatabaseHas('slow_requests', [
-            'url' => 'http://localhost/test/slow',
+            'url' => 'http://localhost:8000/test/slow',
             'method' => 'GET',
         ]);
         
         // Verify duration is recorded
-        $log = SlowRequest::where('url', 'http://localhost/test/slow')->first();
+        $log = SlowRequest::where('url', 'http://localhost:8000/test/slow')->first();
         $this->assertNotNull($log);
         $this->assertGreaterThan(100, $log->duration_ms);
     }

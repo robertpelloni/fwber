@@ -22,15 +22,16 @@ class ViralContentController extends Controller
      * @param string $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show($id)
+    public function show($id, Request $request)
     {
         $content = ViralContent::with('user')->where('id', $id)->firstOrFail();
 
-        // Increment views if not the owner
+        // Increment views if not the owner and not in preview mode
         $viewerId = auth('sanctum')->id();
+        $isPreview = $request->query('preview') === 'true';
         
         // Simple view counting (can be improved with IP tracking to prevent spam)
-        if (!$viewerId || $viewerId !== $content->user_id) {
+        if (!$isPreview && (!$viewerId || $viewerId !== $content->user_id)) {
             $content->increment('views');
             
             // Check for reward (5 views)

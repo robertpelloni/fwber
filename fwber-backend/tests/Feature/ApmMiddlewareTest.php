@@ -34,11 +34,11 @@ class ApmMiddlewareTest extends TestCase
 
         // Assert it was logged
         $this->assertDatabaseHas('slow_requests', [
-            'url' => 'http://localhost/test-slow-route',
+            'url' => 'http://localhost:8000/test-slow-route',
             'method' => 'GET',
         ]);
 
-        $log = SlowRequest::where('url', 'http://localhost/test-slow-route')->first();
+        $log = SlowRequest::where('url', 'http://localhost:8000/test-slow-route')->first();
         $this->assertGreaterThan(1000, $log->duration_ms);
     }
 

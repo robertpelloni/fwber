@@ -141,6 +141,7 @@ export default async function Image({ params }: { params: { id: string } }) {
           backgroundImage: gradient,
           position: 'relative',
           overflow: 'hidden',
+          fontFamily: 'sans-serif',
         }}
       >
         {/* Decorative background elements */}
@@ -167,6 +168,18 @@ export default async function Image({ params }: { params: { id: string } }) {
           borderRadius: '50%',
         }} />
 
+        {/* Wanted Poster / Card Border Effect */}
+        <div style={{
+          position: 'absolute',
+          top: 20,
+          left: 20,
+          right: 20,
+          bottom: 20,
+          border: `2px solid ${accentColor}40`,
+          borderRadius: 20,
+          pointerEvents: 'none',
+        }} />
+
         {/* Header */}
         <div style={{ 
           display: 'flex', 
@@ -174,6 +187,7 @@ export default async function Image({ params }: { params: { id: string } }) {
           gap: 20,
           width: '100%',
           justifyContent: 'center',
+          zIndex: 10,
         }}>
           <div style={{ fontSize: 72 }}>{icon}</div>
           <div style={{ 
@@ -200,10 +214,12 @@ export default async function Image({ params }: { params: { id: string } }) {
           padding: '40px 60px',
           borderRadius: 32,
           border: `2px solid ${accentColor}40`,
-          width: '100%',
+          width: '90%',
           flex: 1,
-          margin: '40px 0',
+          margin: '30px 0',
           boxShadow: `0 20px 50px -10px ${accentColor}20`,
+          zIndex: 10,
+          backdropFilter: 'blur(12px)',
         }}>
           <div style={{
             fontSize: 48,
@@ -226,6 +242,8 @@ export default async function Image({ params }: { params: { id: string } }) {
           justifyContent: 'space-between',
           width: '100%',
           marginTop: 10,
+          zIndex: 10,
+          padding: '0 20px',
         }}>
           <div style={{
             display: 'flex',
@@ -248,11 +266,11 @@ export default async function Image({ params }: { params: { id: string } }) {
           </div>
 
           <div style={{
-            fontSize: 28,
+            fontSize: 24,
             color: '#9ca3af',
             fontWeight: 500,
           }}>
-            Get your own AI analysis at fwber.me
+            Get yours at fwber.me
           </div>
         </div>
       </div>
