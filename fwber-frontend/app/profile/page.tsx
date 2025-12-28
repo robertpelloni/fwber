@@ -3,10 +3,15 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { getUserProfile, updateUserProfile, getProfileCompleteness, type UserProfile, type ProfileUpdateData } from '@/lib/api/profile'
 import { usePhotos } from '@/lib/api/photos'
-import PhotoUpload from '@/components/PhotoUpload'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+
+const PhotoUpload = dynamic(() => import('@/components/PhotoUpload'), {
+  ssr: false,
+  loading: () => <div className="h-64 bg-muted animate-pulse rounded-lg" />
+})
 import { Camera, ShieldCheck, Star } from 'lucide-react'
 import { ProfileCompletenessBar, ProfileCompletenessChecklist, calculateProfileCompleteness, type ProfileField } from '@/lib/profileCompleteness'
 import PhysicalProfileEditor from '@/components/PhysicalProfileEditor'

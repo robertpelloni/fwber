@@ -6,9 +6,14 @@ import { useRouter } from 'next/navigation'
 import { updateUserProfile, completeOnboarding, getUserProfile, type UserProfile } from '@/lib/api/profile'
 import { usePhotos } from '@/lib/api/photos'
 import { getCurrentGeolocation } from '@/lib/api/location'
-import PhotoUpload from '@/components/PhotoUpload'
+import dynamic from 'next/dynamic'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card'
+
+const PhotoUpload = dynamic(() => import('@/components/PhotoUpload'), {
+  ssr: false,
+  loading: () => <div className="h-64 bg-muted animate-pulse rounded-lg" />
+})
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader2, CheckCircle2, Camera, MapPin, User, Heart } from 'lucide-react'

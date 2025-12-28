@@ -10,10 +10,15 @@ import Lifestyle from './Lifestyle';
 import Dating from './Dating';
 import Interests from './Interests';
 import Communication from './Communication';
-import PhotoUpload from '../PhotoUpload';
+import dynamic from 'next/dynamic';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Camera } from 'lucide-react';
 import { Photo } from '@/lib/api/photos';
+
+const PhotoUpload = dynamic(() => import('../PhotoUpload'), {
+  ssr: false,
+  loading: () => <div className="h-64 bg-muted animate-pulse rounded-lg" />
+});
 
 interface ProfileTabsProps {
   formData: any;

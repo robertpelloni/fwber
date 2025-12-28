@@ -5,10 +5,15 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, rectSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import Image from 'next/image'
+import dynamic from 'next/dynamic'
 import { usePhotos, usePhotoSettings } from '@/lib/api/photos'
-import PhotoUpload from '@/components/PhotoUpload'
-import { PhotoGallery } from '@/components/PhotoUpload'
+import PhotoGallery from '@/components/PhotoGallery'
 import { Button } from '@/components/ui/button'
+
+const PhotoUpload = dynamic(() => import('@/components/PhotoUpload'), {
+  ssr: false,
+  loading: () => <div className="h-64 bg-muted animate-pulse rounded-lg" />
+})
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { 
