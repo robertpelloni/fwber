@@ -21,9 +21,12 @@ This session focused on formalizing the project's operational protocols and reso
 *   `docs/PROJECT_STRUCTURE.md` (Dashboard)
 *   `CHANGELOG.md`
 *   `VERSION`
+*   `fwber-frontend/cypress/e2e/presence-stability.cy.js` (New Test)
+*   `fwber-backend/tests/Feature/BulletinBoardBroadcastingTest.php` (New Test)
 
 ## ⏭️ Next Steps
 1.  **Monitor Production**: Verify the "Module factory not available" error is gone.
-2.  **Feature Implementation**: Resume work on the Roadmap (e.g., further testing of Realtime features).
-3.  **Submodule Check**: Verify if `fwber-frontend` and `fwber-backend` need to be treated as git submodules (currently treated as directories in a monorepo).
+2.  **Feature Implementation**: Resume work on the Roadmap.
+3.  **Submodule Status**: Confirmed that `fwber-frontend` and `fwber-backend` are standard directories (no `.gitmodules`).
+
 
