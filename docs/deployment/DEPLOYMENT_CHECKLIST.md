@@ -92,15 +92,14 @@ This checklist ensures that both the frontend and backend are fully prepared for
 ### Static Assets
 
 - [ ] All images optimized (WebP with fallbacks)
-- [ ] Favicon and PWA icons generated
-  ```bash
-  # Ensure these exist:
-  ls public/favicon.svg
-  ls public/icon.svg
-  ls public/manifest.json
-  ```
-- [ ] manifest.json configured correctly
-- [ ] robots.txt configured
+- [x] Favicon and PWA icons generated
+  - [x] PNG icons (72x72 to 512x512) generated in `public/icons/`
+  - [x] Manifest updated with all icon sizes and shortcuts
+- [x] Service worker configured (PWA)
+  - [x] `next-pwa` configured in `next.config.js`
+  - [x] Push notification support in `sw-push.js`
+  - [x] Offline caching enabled
+
 - [ ] sitemap.xml generated (if applicable)
 
 ### Performance

@@ -19,6 +19,48 @@
       "purpose": "any maskable"
     },
     {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
       "src": "/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
@@ -30,25 +72,29 @@
       "name": "Matches",
       "short_name": "Matches",
       "description": "Jump straight to your hottest leads",
-      "url": "/dashboard"
+      "url": "/dashboard",
+      "icons": [{ "src": "/icons/shortcut-matches-96x96.png", "sizes": "96x96", "type": "image/png" }]
     },
     {
       "name": "Messages",
       "short_name": "Messages",
       "description": "Continue your spicy chats",
-      "url": "/messages"
+      "url": "/messages",
+      "icons": [{ "src": "/icons/shortcut-messages-96x96.png", "sizes": "96x96", "type": "image/png" }]
     },
     {
       "name": "Pulse",
       "short_name": "Pulse",
       "description": "See what's happening nearby",
-      "url": "/pulse"
+      "url": "/pulse",
+      "icons": [{ "src": "/icons/shortcut-pulse-96x96.png", "sizes": "96x96", "type": "image/png" }]
     },
     {
       "name": "My Wallet",
       "short_name": "Wallet",
       "description": "Manage FWB tokens and payments",
-      "url": "/wallet"
+      "url": "/wallet",
+      "icons": [{ "src": "/icons/shortcut-wallet-96x96.png", "sizes": "96x96", "type": "image/png" }]
     }
   ],
   "prefer_related_applications": false

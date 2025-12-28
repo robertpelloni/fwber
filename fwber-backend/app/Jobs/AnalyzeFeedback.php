@@ -67,7 +67,7 @@ Page URL: "{$feedback->page_url}"
 Current Category: "{$feedback->category}"
 
 Output a JSON object with:
-- category: (string) One of: "bug", "feature_request", "ux_issue", "praise", "other".
+- category: (string) One of: "bug", "feature_request", "ux_issue", "praise", "safety", "other".
 - sentiment: (string) One of: "positive", "negative", "neutral".
 - summary: (string) A 1-sentence summary of the core issue or request.
 EOT;
