@@ -11,6 +11,15 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
 *   **SSL Verification**: Waiting for Let's Encrypt to validate `mercure.fwber.me`.
 *   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
 
+### ✅ Critical Fixes (Dec 27 - Part 6)
+1.  **Runtime Crash Fix (Realtime Components Circular Dependency)**:
+    -   **Issue**: "Module factory not available" error persisting due to another circular dependency in `components/realtime`.
+    -   **Root Cause**: The barrel file `components/realtime/index.ts` was creating a cycle between `AuthenticatedRealtimeProvider`, `PresenceComponents`, and `MercureBridge`.
+    -   **Fix**:
+        -   **Deleted `components/realtime/index.ts`**.
+        -   Refactored 10 consuming files (`AuthenticatedRealtimeProvider`, `NotificationBell`, `FriendList`, `ActivityFeed`, `AppHeader`, etc.) to import components directly.
+    -   **Verification**: `npm run build` passed successfully.
+
 ### ✅ Critical Fixes (Dec 27 - Part 5)
 1.  **Runtime Crash Fix (Module Factory Not Available)**:
     -   **Issue**: Persistent "Module factory not available" error on `www.fwber.me` (runtime crash) despite successful build.
