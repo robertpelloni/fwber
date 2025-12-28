@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.2] - 2025-12-27
+
+### Fixed
+- **Critical**: Resolved "Module factory not available" crash on production by refactoring `PhotoUpload` to break circular dependencies with `PhotoGallery` and using dynamic imports.
+
+### Changed
+- **Maintenance**: Comprehensive update of all project dependencies.
+    - **Backend**: Upgraded Laravel Framework (v12.44.0), Sentry, and Stripe SDKs.
+    - **Frontend**: Updated 77 NPM packages to latest stable versions.
+- **Documentation**: Added `docs/PROJECT_STRUCTURE.md` detailing the monorepo layout and module status.
+
 ## [0.3.14] - 2025-12-27
 
 ### Added

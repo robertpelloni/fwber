@@ -1,8 +1,8 @@
 # Project Status
 
-**Last Updated:** December 26, 2025
+**Last Updated:** December 27, 2025
 **Status:** 🚀 LIVE / DEPLOYED / FEATURE COMPLETE
-**Version:** v0.3.1
+**Version:** v0.3.2
 
 ## 🟢 Current Status: Ready for Marketing & Growth
 The project has successfully passed a comprehensive **Feature Audit**. All planned features from the Roadmap (including "Future Features" originally slated for 2026) are implemented in the codebase. The focus now shifts to **Operations**, **Marketing**, and **Growth**.
@@ -10,6 +10,12 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
 ### ⚠️ Known Issues / Technical Debt
 *   **SSL Verification**: Waiting for Let's Encrypt to validate `mercure.fwber.me`.
 *   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
+
+### ✅ Critical Fixes (Dec 27 - Part 4)
+1.  **Dependency & Structure Update**:
+    -   **Maintenance**: Updated all backend (Laravel 12.44) and frontend (NPM) dependencies to latest stable versions.
+    -   **Documentation**: Created `docs/PROJECT_STRUCTURE.md` to document the monorepo layout and module status.
+    -   **Versioning**: Bumped version to v0.3.2.
 
 ### ✅ Critical Fixes (Dec 27 - Part 3)
 1.  **Face Blur Circular Dependency Fix**:
