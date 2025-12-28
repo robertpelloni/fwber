@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\ApiToken;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class AuthenticateApi
@@ -20,12 +21,20 @@ class AuthenticateApi
         }
 
         if (! str_starts_with($header, 'Bearer ')) {
+            Log::warning('API Auth Failed: Missing Bearer header', [
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent()
+            ]);
             return $this->unauthorized();
         }
 
         $plainToken = trim(substr($header, 7));
 
         if ($plainToken === '') {
+            Log::warning('API Auth Failed: Empty token', [
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent()
+            ]);
             return $this->unauthorized();
         }
 
@@ -48,6 +57,10 @@ class AuthenticateApi
                 }
 
                 auth()->setUser($user);
+                Log::info('API Auth Success (Dev Bypass)', [
+                    'user_id' => $user->id,
+                    'ip' => $request->ip()
+                ]);
                 return $next($request);
             }
         }
@@ -56,12 +69,22 @@ class AuthenticateApi
         $apiToken = ApiToken::query()->with('user')->where('token', $hashed)->first();
 
         if (! $apiToken || ! $apiToken->user) {
+            Log::warning('API Auth Failed: Invalid token', [
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'token_prefix' => substr($plainToken, 0, 6) . '...'
+            ]);
             return $this->unauthorized();
         }
 
         $apiToken->forceFill(['last_used_at' => now()])->save();
 
         auth()->setUser($apiToken->user);
+
+        Log::info('API Auth Success', [
+            'user_id' => $apiToken->user->id,
+            'ip' => $request->ip()
+        ]);
 
         return $next($request);
     }
