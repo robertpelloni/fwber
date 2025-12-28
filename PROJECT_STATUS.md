@@ -11,6 +11,21 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
 *   **SSL Verification**: Waiting for Let's Encrypt to validate `mercure.fwber.me`.
 *   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
 
+### ✅ Critical Fixes (Dec 28)
+1.  **Backend Module Resolution Fix**:
+    -   **Issue**: `scripts/solana/sign_message.cjs` failed with `Cannot find module 'tweetnacl'` in containerized environments.
+    -   **Fix**:
+        -   Updated `Dockerfile.dev` to ensure `npm install` runs during build.
+        -   Updated `sign_message.cjs` to robustly resolve modules from project root if local resolution fails.
+    -   **Verification**: Script successfully executes and generates signatures.
+2.  **Frontend Circular Dependency Fix**:
+    -   **Issue**: "Module factory not available" runtime crash due to circular dependency in Realtime stack (`MercureBridge` <-> `PresenceComponents` <-> `MercureContext`).
+    -   **Fix**:
+        -   Created `lib/contexts/PresenceContext.tsx` to decouple presence state from the main Mercure context.
+        -   Refactored `PresenceComponents.tsx` to consume `PresenceContext`.
+        -   Refactored `MercureBridge.tsx` to bridge data from `MercureContext` to `PresenceContext`.
+    -   **Verification**: Dependency graph is now acyclic.
+
 ### ✅ Critical Fixes (Dec 27 - Part 6)
 1.  **Runtime Crash Fix (Realtime Components Circular Dependency)**:
     -   **Issue**: "Module factory not available" error persisting due to another circular dependency in `components/realtime`.

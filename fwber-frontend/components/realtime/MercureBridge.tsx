@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useMercure, MercureProvider } from '@/lib/contexts/MercureContext';
-import { PresenceProvider, WebSocketContextValue, OnlineUser, TypingIndicatorData } from './PresenceComponents';
+import { PresenceProvider, WebSocketContextValue, OnlineUser, TypingIndicatorData } from '@/lib/contexts/PresenceContext';
 
 /**
  * Bridge component that connects MercureContext to PresenceComponents

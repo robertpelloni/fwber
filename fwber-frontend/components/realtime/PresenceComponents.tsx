@@ -1,86 +1,16 @@
 'use client';
 
-import { useEffect, useMemo, useContext, createContext, useState } from 'react';
-import { MercureContext } from '@/lib/contexts/MercureContext';
+import { useEffect, useMemo, useState } from 'react';
+import { 
+  usePresenceContext, 
+  OnlineUser, 
+  TypingIndicatorData, 
+  WebSocketContextValue 
+} from '@/lib/contexts/PresenceContext';
 
-// Create a fallback context for when WebSocketProvider is not available
-const FallbackWebSocketContext = createContext<WebSocketContextValue | null>(null);
-
-// Type definitions for WebSocket context - exported for bridge usage
-export interface OnlineUser {
-  user_id: string;
-  status: string;
-}
-
-export interface TypingIndicatorData {
-  from_user_id: string;
-  chatroom_id?: string;
-  is_typing: boolean;
-}
-
-export interface WebSocketContextValue {
-  onlineUsers?: OnlineUser[];
-  typingIndicators?: TypingIndicatorData[];
-  connectionStatus: {
-    connected: boolean;
-    reconnectAttempts: number;
-  };
-  sendTypingIndicator?: (recipientId: string, isTyping: boolean, chatroomId?: string) => void;
-}
-
-// Default context value when not in provider
-const defaultContextValue: WebSocketContextValue = {
-  onlineUsers: [],
-  typingIndicators: [],
-  connectionStatus: {
-    connected: false,
-    reconnectAttempts: 0,
-  },
-};
-
-// Export a provider wrapper that can be used to inject context
-export function PresenceProvider({ 
-  children, 
-  value 
-}: { 
-  children: React.ReactNode; 
-  value?: WebSocketContextValue;
-}) {
-  return (
-    <FallbackWebSocketContext.Provider value={value || defaultContextValue}>
-      {children}
-    </FallbackWebSocketContext.Provider>
-  );
-}
-
-// Hook to use the presence context
-export function usePresenceContext(): WebSocketContextValue {
-  const fallbackContext = useContext(FallbackWebSocketContext);
-  const mercureContext = useContext(MercureContext);
-
-  if (mercureContext) {
-    return {
-      onlineUsers: mercureContext.onlineUsers.map(u => ({
-        user_id: u.user_id,
-        status: u.status || 'online'
-      })),
-      typingIndicators: mercureContext.typingIndicators.map(t => ({
-        from_user_id: t.from_user_id,
-        chatroom_id: t.chatroom_id,
-        is_typing: t.is_typing
-      })),
-      connectionStatus: {
-        connected: mercureContext.connectionStatus.connected,
-        reconnectAttempts: mercureContext.connectionStatus.reconnectAttempts,
-      },
-      sendTypingIndicator: (recipientId, isTyping, chatroomId) => {
-        mercureContext.sendTypingIndicator(recipientId, isTyping, chatroomId);
-      }
-    };
-  }
-
-  return fallbackContext || defaultContextValue;
-}
+// Re-export types and hook for backward compatibility
+export type { OnlineUser, TypingIndicatorData, WebSocketContextValue };
+export { usePresenceContext, PresenceProvider } from '@/lib/contexts/PresenceContext';
 
 interface PresenceIndicatorProps {
   userId: string;
