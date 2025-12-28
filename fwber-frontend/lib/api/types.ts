@@ -562,7 +562,21 @@ export interface PlatformAnalyticsResponse {
   messages: PlatformAnalyticsMessageStats
   locations: PlatformAnalyticsLocationStats
   performance: PlatformAnalyticsPerformanceStats
+  feedback?: PlatformAnalyticsFeedbackStats
   trends: PlatformAnalyticsTrends
+}
+
+export interface PlatformAnalyticsFeedbackStats {
+  total: number
+  sentiment: {
+    positive: number
+    neutral: number
+    negative: number
+  }
+  top_categories: Array<{
+    category: string
+    count: number
+  }>
 }
 
 export interface SlowRequest {

@@ -64,7 +64,52 @@ class AnalyticsController extends Controller
             'messages' => $this->getMessageAnalytics($dateRange),
             'locations' => $this->getLocationAnalytics($dateRange),
             'performance' => $this->getPerformanceAnalytics(),
+            'feedback' => $this->getFeedbackAnalytics($dateRange),
             'trends' => $this->getTrendAnalytics($dateRange),
+        ];
+    }
+
+    /**
+     * Get feedback analytics
+     */
+    private function getFeedbackAnalytics(array $dateRange): array
+    {
+        $feedbackQuery = \App\Models\Feedback::whereBetween('created_at', [
+            $dateRange['start'],
+            $dateRange['end']
+        ]);
+
+        $total = (clone $feedbackQuery)->count();
+        
+        // Sentiment breakdown
+        $sentiment = (clone $feedbackQuery)
+            ->select('sentiment', DB::raw('count(*) as count'))
+            ->groupBy('sentiment')
+            ->pluck('count', 'sentiment')
+            ->toArray();
+
+        // Category breakdown
+        $categories = (clone $feedbackQuery)
+            ->select('category', DB::raw('count(*) as count'))
+            ->groupBy('category')
+            ->orderByDesc('count')
+            ->limit(5)
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'category' => $item->category,
+                    'count' => $item->count
+                ];
+            });
+
+        return [
+            'total' => $total,
+            'sentiment' => [
+                'positive' => $sentiment['positive'] ?? 0,
+                'neutral' => $sentiment['neutral'] ?? 0,
+                'negative' => $sentiment['negative'] ?? 0,
+            ],
+            'top_categories' => $categories
         ];
     }
 
