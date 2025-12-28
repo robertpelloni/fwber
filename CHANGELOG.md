@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.16] - 2025-12-28
+
+### Added
+- **Dashboard**: Created `docs/dashboard/PROJECT_STRUCTURE_DASHBOARD.md` to provide a clear overview of the project directory structure, submodule status, and component versions.
+
+### Changed
+- **Submodules**: Updated all submodules (if any) to their latest upstream versions and synchronized the project state.
+- **Maintenance**: Performed a general sync and update of the codebase, ensuring all feature branches are merged and up-to-date.
+
 ## [0.3.15] - 2025-12-28
 
 ### Fixed
