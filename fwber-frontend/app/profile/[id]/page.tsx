@@ -14,7 +14,8 @@ import PhotoRevealGate from '@/components/PhotoRevealGate';
 import { RelationshipTier } from '@/lib/relationshipTiers';
 import { photoAPI } from '@/lib/api/photos';
 import GiftShopModal from '@/components/gifts/GiftShopModal';
-import { Gift } from 'lucide-react';
+import { Gift, ShieldCheck } from 'lucide-react';
+import { VouchBadge } from '@/components/profile/VouchBadge';
 
 export default function PublicProfilePage() {
   const { id } = useParams();
@@ -130,7 +131,17 @@ export default function PublicProfilePage() {
                       {p.display_name}, {p.age}
                       <PresenceIndicator userId={String(profile.id)} />
                     </h1>
-                    <p className="text-gray-600 dark:text-gray-400">
+                    
+                    {/* Vouches Summary */}
+                    {(p.vouches && p.vouches.length > 0) && (
+                         <div className="flex gap-2 mt-2 flex-wrap">
+                            <VouchBadge type="safe" count={p.vouches.filter((v: any) => v.type === 'safe').length} />
+                            <VouchBadge type="fun" count={p.vouches.filter((v: any) => v.type === 'fun').length} />
+                            <VouchBadge type="hot" count={p.vouches.filter((v: any) => v.type === 'hot').length} />
+                         </div>
+                    )}
+
+                    <p className="text-gray-600 dark:text-gray-400 mt-1">
                       {p.location?.city}, {p.location?.state}
                     </p>
                   </div>

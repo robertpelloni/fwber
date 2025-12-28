@@ -13,7 +13,7 @@ The application is live. The focus is on monitoring system health, optimizing pe
 - [x] **Viral Loops**: "Unlock via Share" mechanics for premium filters/content.
 - [x] **Gamification**: Local Leaderboards (Top Connector, Most Active) and Daily Streaks.
 - [x] **Roast My Profile**: Viral sharing loop with dynamic OG images and AI roasts.
-
+- [x] **Vouch for Me**: Social proof system where friends can verify and tag users (Safe/Fun/Hot).
 
 #### 2. Operational Excellence
 - [x] **Monitor Sentry**: Triage and fix production errors as they appear.

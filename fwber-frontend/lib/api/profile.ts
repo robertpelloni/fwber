@@ -102,6 +102,13 @@ export interface UserProfile {
       is_unlocked?: boolean;
       unlock_price?: number;
     }>;
+    vouches?: Array<{
+        type: 'safe' | 'fun' | 'hot';
+        relationship_type: string;
+        comment: string;
+        voucher_name: string;
+        created_at: string;
+    }>;
     profile_complete: boolean;
     completion_percentage: number;
   };
