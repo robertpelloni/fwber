@@ -1,5 +1,3 @@
-import { isFeatureEnabled } from './featureFlags'
-
 // Dynamic import type for face-api
 type FaceApi = typeof import('@vladmandic/face-api')
 
@@ -72,15 +70,6 @@ export interface FaceBlurResult {
 }
 
 export const blurFacesOnFile = async (file: File, options?: FaceBlurOptions): Promise<FaceBlurResult> => {
-  if (!isFeatureEnabled('clientFaceBlur')) {
-    return {
-      file,
-      facesFound: 0,
-      blurred: false,
-      processingTimeMs: 0
-    }
-  }
-
   const startTime = performance.now()
 
   if (typeof window === 'undefined') {

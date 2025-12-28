@@ -22,6 +22,12 @@ All notable changes to this project will be documented in this file.
     - **Frontend**: Updated `CreateEventPage` to allow selecting event type.
     - **Frontend**: Updated `EventsPage` to filter events by type.
 
+## [0.3.14] - 2025-12-27
+
+### Fixed
+- **Critical**: Resolved "Module factory not available" crash on production by removing circular dependency between `lib/faceBlur.ts` and `lib/featureFlags.ts`.
+- **Refactor**: Decoupled `lib/faceBlur.ts` from feature flags, moving the check to the consumer components (`PhotoUpload.tsx`, `register/page.tsx`).
+
 ## [0.3.13] - 2025-12-27
 
 ### Added

@@ -11,6 +11,16 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
 *   **SSL Verification**: Waiting for Let's Encrypt to validate `mercure.fwber.me`.
 *   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
 
+### ✅ Critical Fixes (Dec 27 - Part 5)
+1.  **Runtime Crash Fix (Module Factory Not Available)**:
+    -   **Issue**: Persistent "Module factory not available" error on `www.fwber.me` (runtime crash) despite successful build.
+    -   **Root Cause**: Circular dependency caused by the barrel file `lib/api/index.ts` re-exporting `client` and `types`, which were then imported by hooks (`usePusherLogic`, `useProfileAnalysis`) and components (`RealTimeChat`) that also had indirect dependencies.
+    -   **Fix**:
+        -   Identified all consumers of `@/lib/api`.
+        -   Refactored `lib/hooks/use-pusher-logic.ts`, `lib/hooks/use-profile-analysis.ts`, and `components/RealTimeChat.tsx` to import directly from `@/lib/api/client`.
+        -   **Deleted `lib/api/index.ts`** to permanently eliminate the barrel file risk.
+    -   **Verification**: `npm run build` passed. Static analysis confirms no more imports from the barrel file.
+
 ### ✅ Critical Fixes (Dec 27 - Part 4)
 1.  **Dependency & Structure Update**:
     -   **Maintenance**: Updated all backend (Laravel 12.44) and frontend (NPM) dependencies to latest stable versions.

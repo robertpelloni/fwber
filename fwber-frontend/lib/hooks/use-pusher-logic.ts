@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { api } from '@/lib/api';
+import { api } from '@/lib/api/client';
 import { storeOfflineChatMessage } from '@/lib/offline-store';
 import { useE2EEncryption } from '@/lib/hooks/use-e2e-encryption';
 import { initEcho } from '@/lib/echo';
