@@ -14,6 +14,9 @@ class Vouch extends Model
         'from_user_id',
         'type',
         'ip_address',
+        'relationship_type',
+        'comment',
+        'voucher_name',
     ];
 
     public function recipient()
