@@ -4,7 +4,7 @@ const { authenticator } = require('otplib')
 module.exports = defineConfig({
   e2e: {
     baseUrl: 'http://127.0.0.1:3000',
-    supportFile: false,
+    supportFile: 'cypress/support/e2e.js',
     specPattern: 'cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',
     viewportWidth: 1280,
     viewportHeight: 720,
