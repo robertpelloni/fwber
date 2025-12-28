@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import Link from 'next/link';
 import { MapPin, Users, Wifi, WifiOff } from 'lucide-react';
-import { OnlineUsersList, PresenceIndicator, ConnectionStatusBadge } from '@/components/realtime';
+import { OnlineUsersList, PresenceIndicator, ConnectionStatusBadge } from './PresenceComponents';
 
 interface NearbyUser {
   id: string;
