@@ -15,7 +15,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
-import { PresenceIndicator, usePresenceContext } from './realtime';
+import { PresenceIndicator, usePresenceContext } from './realtime/PresenceComponents';
 
 interface ActivityItem {
   id: string;

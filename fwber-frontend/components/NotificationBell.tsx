@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Bell, X, Check, MessageSquare, Heart, UserPlus, Eye, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
-import { PresenceIndicator } from '@/components/realtime';
+import { PresenceIndicator } from '@/components/realtime/PresenceComponents';
 
 interface Notification {
   id: string;

@@ -8,7 +8,7 @@ import axios from 'axios';
 import Image from 'next/image';
 import Link from 'next/link';
 import ProfileCompletenessWidget from '@/components/ProfileCompletenessWidget';
-import { ProximityPresenceCompact } from '@/components/realtime';
+import { ProximityPresenceCompact } from '@/components/realtime/ProximityPresenceView';
 import AppHeader from '@/components/AppHeader';
 import { ActivityFeed } from '@/components/ActivityFeed';
 import BoostButton from '@/components/BoostButton';

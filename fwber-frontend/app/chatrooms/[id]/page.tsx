@@ -18,7 +18,7 @@ import {
   TypingIndicator,
   OnlineUsersList,
   PresenceProvider
-} from '@/components/realtime';
+} from '@/components/realtime/PresenceComponents';
 
 export default function ChatroomPage() {
   const params = useParams();

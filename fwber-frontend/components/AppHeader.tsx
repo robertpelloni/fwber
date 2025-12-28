@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
 import { Logo } from '@/components/Logo'
-import { ConnectionStatusBadge } from './realtime'
+import { ConnectionStatusBadge } from './realtime/PresenceComponents'
 import { NotificationBell } from './NotificationBell'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { 

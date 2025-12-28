@@ -8,7 +8,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import { getPublicProfile, type UserProfile } from '@/lib/api/profile';
 import { performMatchAction } from '@/lib/api/matches';
 import { api } from '@/lib/api/client';
-import { PresenceIndicator } from '@/components/realtime';
+import { PresenceIndicator } from '@/components/realtime/PresenceComponents';
 import TipButton from '@/components/tipping/TipButton';
 import PhotoRevealGate from '@/components/PhotoRevealGate';
 import { RelationshipTier } from '@/lib/relationshipTiers';

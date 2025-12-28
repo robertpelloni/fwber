@@ -8,9 +8,9 @@ import Link from 'next/link'
 import { 
   PresenceIndicator, 
   ConnectionStatusBadge, 
-  OnlineUsersList,
-  ProximityPresenceView 
-} from '@/components/realtime'
+  OnlineUsersList
+} from '@/components/realtime/PresenceComponents'
+import { ProximityPresenceView } from '@/components/realtime/ProximityPresenceView'
 import { MapPin, Users, RefreshCw, Wifi } from 'lucide-react'
 
 export default function NearbyPage() {

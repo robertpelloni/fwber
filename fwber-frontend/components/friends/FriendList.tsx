@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { PresenceIndicator } from '@/components/realtime';
+import { PresenceIndicator } from '@/components/realtime/PresenceComponents';
 import TipButton from '@/components/tipping/TipButton';
 import { MessageSquare, User, Trash2 } from 'lucide-react';
 

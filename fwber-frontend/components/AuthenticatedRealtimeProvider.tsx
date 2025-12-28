@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/lib/auth-context';
-import { MercureRealtimeProvider } from '@/components/realtime';
+import { MercureRealtimeProvider } from '@/components/realtime/MercureBridge';
 
 interface AuthenticatedRealtimeProviderProps {
   children: React.ReactNode;
