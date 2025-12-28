@@ -138,6 +138,17 @@ class UserProfileResource extends JsonResource
                 // Completion status
                 'profile_complete' => $this->isProfileComplete($profile),
                 'completion_percentage' => $this->getCompletionPercentage($profile),
+                'vouches' => $this->when($this->relationLoaded('vouches'), function () {
+                    return $this->vouches->map(function ($vouch) {
+                        return [
+                            'type' => $vouch->type,
+                            'relationship_type' => $vouch->relationship_type,
+                            'comment' => $vouch->comment,
+                            'voucher_name' => $vouch->voucher_name,
+                            'created_at' => $vouch->created_at->toISOString(),
+                        ];
+                    });
+                }),
             ],
         ];
     }

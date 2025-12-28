@@ -50,7 +50,7 @@ class ProfileController extends Controller
      */
     public function showPublic(int $id): JsonResponse
     {
-        $user = User::with(['profile', 'photos'])->findOrFail($id);
+        $user = User::with(['profile', 'photos', 'vouches'])->findOrFail($id);
         
         // Ensure profile exists
         if (!$user->profile) {
