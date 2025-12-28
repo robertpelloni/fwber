@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.3] - 2025-12-28
+
+### Added
+- **Viral Growth**: "Roast Your Date" feature.
+    - **Frontend**: Public page (`app/roast-date/page.tsx`) to generate shareable AI roasts.
+    - **Sharing**: Integrated `navigator.share` for mobile and clipboard copy for desktop.
+- **Viral Growth**: "Who Likes You" Unlock.
+    - **Frontend**: Updated Premium page to show blurred admirer cards.
+    - **Mechanism**: Implemented "Share to Unlock" allowing users to reveal admirers by sharing the app.
+    - **Backend**: `PremiumController` now supports sanitizing admirer data for non-premium users.
+
 ## [0.3.16] - 2025-12-28
 
 ### Added
