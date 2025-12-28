@@ -111,7 +111,7 @@ export default function RootLayout({
                     <FeedbackModal />
                     <PerformanceMonitor />
                     <div className="fixed bottom-1 right-1 text-[10px] text-muted-foreground opacity-50 pointer-events-none z-50">
-                      v0.2.8
+                      v0.3.2
                     </div>
                   </ToastProvider>
                 </SolanaProvider>

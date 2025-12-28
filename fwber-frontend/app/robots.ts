@@ -6,7 +6,11 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: '*',
-      allow: '/',
+      allow: [
+        '/',
+        '/share/', // Viral content
+        '/venue/', // Venue portal
+      ],
       disallow: [
         '/api/',
         '/admin/',

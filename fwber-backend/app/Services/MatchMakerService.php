@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\MatchAssist;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class MatchMakerService
 {
@@ -72,6 +73,8 @@ class MatchMakerService
 
             $wingman = $assist->matchmaker;
             
+            Log::info("Wingman Reward: User {$wingman->id} matched {$assist->subject_id} and {$assist->target_id}");
+
             $this->tokenService->awardTokens(
                 $wingman,
                 self::MATCHMAKER_BONUS,

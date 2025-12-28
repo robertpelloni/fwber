@@ -11,6 +11,17 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
 *   **SSL Verification**: Waiting for Let's Encrypt to validate `mercure.fwber.me`.
 *   **Manual Env Update**: `.env.production` on the server must be manually updated to `NEXT_PUBLIC_MERCURE_URL=https://mercure.fwber.me/.well-known/mercure`.
 
+### ✅ Critical Fixes (Dec 28 - Part 2)
+1.  **SEO & Growth Optimization**:
+    -   **Sitemap**: Updated `sitemap.ts` to include `/venue` (Venue Partner Portal).
+    -   **Robots**: Updated `robots.ts` to explicitly allow indexing of `/share/` (Viral Content) and `/venue/`.
+    -   **Metadata**: Updated application version to `v0.3.2` in `layout.tsx`.
+2.  **Referral System Monitoring**:
+    -   **Logging**: Added structured logging to `MatchMakerService` ("Wingman Reward") and `TokenDistributionService` ("Referral Conversion") to track viral growth metrics in production logs.
+3.  **Safety Drills (E2E)**:
+    -   **Testing**: Created `cypress/e2e/safety-drills.cy.js` to verify the Admin UI for handling Geo-Spoofing detections and Shadow Bans (Throttles).
+    -   **Coverage**: Tests confirm moderators can "Confirm & Throttle" spoofs and "Remove" active throttles.
+
 ### ✅ Critical Fixes (Dec 28)
 1.  **Backend Module Resolution Fix**:
     -   **Issue**: `scripts/solana/sign_message.cjs` failed with `Cannot find module 'tweetnacl'` in containerized environments.

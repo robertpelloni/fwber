@@ -44,6 +44,8 @@ class TokenDistributionService
             if ($referrerCode) {
                 $referrer = User::where('referral_code', $referrerCode)->first();
                 if ($referrer) {
+                    Log::info("Referral Conversion: User {$user->id} referred by {$referrer->id}");
+
                     $user->referrer_id = $referrer->id;
                     $user->save();
 

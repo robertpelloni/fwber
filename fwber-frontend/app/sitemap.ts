@@ -11,6 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/about',
     '/privacy',
     '/terms',
+    '/venue', // Venue Partner Portal
   ].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),

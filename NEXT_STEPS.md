@@ -16,13 +16,13 @@ The `fwber-backend` Docker image has been modified to ensure dependencies are in
 
 ### 2. Marketing & Growth (Non-Technical)
 Once the platform is stable:
-- **SEO Optimization**: Ensure `sitemap.xml` and `robots.txt` are perfectly configured for the new landing pages.
+- **SEO Optimization**: `sitemap.ts` and `robots.ts` have been optimized (Dec 28). Monitor search console for indexing status.
 - **A/B Testing**: Experiment with different Landing Page headlines and CTAs.
-- **Referral Program**: Monitor the "Wingman Bounties" system to ensure it's driving growth.
+- **Referral Program**: "Wingman Bounties" logging is active. Monitor logs for "Wingman Reward" and "Referral Conversion" events.
 
 ### 3. Community & Safety
 - **Moderation Policies**: Define clear guidelines for the "Moderation Dashboard" operators.
-- **Safety Drills**: Test the "Geo-spoofing" and "Shadow Ban" features with real scenarios to ensure they are effective but fair.
+- **Safety Drills**: E2E tests (`safety-drills.cy.js`) verify the UI tools work. Conduct a live drill with a test account to verify the *backend* throttle logic in production.
 
 ### 4. Technical Maintenance (Low Priority)
 - **Dependency Updates**: Schedule a monthly review of `npm` and `composer` dependencies.
