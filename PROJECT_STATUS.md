@@ -29,6 +29,14 @@
     *   Fixed event property access in `BulletinBoardBroadcastingTest`.
     *   Verified `AiConversationCoachTest` is passing locally.
 
+### ✅ Critical Fixes (Dec 29 - Part 2)
+1.  **Security Hardening (Production)**:
+    -   **CORS**: Updated `config/cors.php` to strictly enforce `CORS_ALLOWED_ORIGINS` in production, removing wildcard access. Restricted allowed methods/headers.
+    -   **CSP**: Updated `SecurityHeaders` middleware to enforce strict Content Security Policy (no `unsafe-inline`) in production environments.
+    -   **Verification**: Code changes committed.
+2.  **Bulletin Board Verification**:
+    -   **Tests**: Verified `BulletinBoardTest` and `BulletinBoardBroadcastingTest` are passing locally after route fixes.
+
 ### ✅ Critical Fixes (Dec 29)
 1.  **Pusher Connection Fix**:
     -   **Issue**: Users encountered `App key your_app_key not in this cluster` error due to environment variable placeholder leakage.
