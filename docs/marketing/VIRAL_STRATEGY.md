@@ -36,6 +36,8 @@ FWBer's growth strategy relies on product-led viral loops rather than paid acqui
 | **Vouch System** | ✅ Live | "Safe/Fun/Hot" voting categories. |
 | **Referral Codes** | ✅ Live | Token rewards for signups. |
 | **Share to Unlock** | 🚧 Beta | Content gating mechanism. |
+| **Matchmaker Bounty** | ✅ Live | Public bounty links for setting up dates. |
+| **Red Flag Checker** | ✅ Live | AI analysis of user quirks. |
 
 ## 4. Metrics & KPIs
 
@@ -48,10 +50,6 @@ FWBer's growth strategy relies on product-led viral loops rather than paid acqui
 ### Immediate Actions
 1.  **Optimize "Roast" Landing Page:** Ensure the "Roast Me Too" CTA is dominant on shared pages.
 2.  **Gamify Vouches:** Add a "Trusted Member" leaderboard to encourage collecting vouches.
-
-### New Viral Features (Low Effort)
-1.  **"Matchmaker Bounty":** Allow users to create a public "Bounty" link. "Find me a date, get 100 Tokens." If a third party sets them up (via a specific link), the matchmaker gets the tokens.
-2.  **"Red Flag Checker":** A tool where users input their own quirks, and AI tells them if it's a "Beige," "Red," or "Green" flag. Highly shareable results.
 
 ## 6. Long-Term Vision
 
