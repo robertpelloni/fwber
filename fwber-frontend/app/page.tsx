@@ -306,141 +306,18 @@ export default function HomePage() {
                 </p>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Notable Features Section */}
-      <div id="features" className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Notable Features</h2>
-            <p className="text-xl text-gray-600">Unique tools designed for the modern dating experience.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Proximity */}
-            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-blue-50 transition-colors duration-300 border border-gray-100">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-6 text-blue-600">
-                <MapPin className="w-6 h-6" />
+             <div className="flex gap-4 md:col-span-2">
+              <div className="flex-shrink-0 mt-1">
+                <Code className="w-6 h-6 text-gray-700 dark:text-gray-300" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Real-Time Proximity</h3>
-              <p className="text-gray-600">
-                See who&apos;s nearby right now. Our proximity artifacts let you discover matches within walking distance.
-              </p>
-            </div>
-
-            {/* AI Avatars */}
-            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-purple-50 transition-colors duration-300 border border-gray-100">
-              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-6 text-purple-600">
-                <Ghost className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">No Embarrassment</h3>
-              <p className="text-gray-600">
-                Browse anonymously with AI-generated avatars. Reveal your true self only when you&apos;re ready.
-              </p>
-            </div>
-
-            {/* Gamified Tiers */}
-            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-pink-50 transition-colors duration-300 border border-gray-100">
-              <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center mb-6 text-pink-600">
-                <Layers className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Gamified Tiers</h3>
-              <p className="text-gray-600">
-                Unlock more features as you build trust. Progress from Discovery to Verified status to access exclusive perks.
-              </p>
-            </div>
-
-            {/* Backpage Replacement */}
-            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-orange-50 transition-colors duration-300 border border-gray-100">
-              <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-6 text-orange-600">
-                <FileText className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Classifieds Are Back</h3>
-              <p className="text-gray-600">
-                Miss the old days? Our Bulletin Boards bring back the classic, no-nonsense classifieds experience you loved.
-              </p>
-            </div>
-
-            {/* Client-side Encryption */}
-            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-green-50 transition-colors duration-300 border border-gray-100">
-              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-6 text-green-600">
-                <Lock className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Client-Side Encryption</h3>
-              <p className="text-gray-600">
-                Your secrets stay yours. Photos and messages are encrypted on your device before they ever touch our servers.
-              </p>
-            </div>
-
-            {/* Venue Support */}
-            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-indigo-50 transition-colors duration-300 border border-gray-100">
-              <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-6 text-indigo-600">
-                <Building2 className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Venue Check-Ins</h3>
-              <p className="text-gray-600">
-                Meet safely in public. Check in to partner venues and see who else is there looking for a connection.
-              </p>
-            </div>
-
-            {/* Video Chat */}
-            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-red-50 transition-colors duration-300 border border-gray-100">
-              <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-6 text-red-600">
-                <Video className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Private Video Chat</h3>
-              <p className="text-gray-600">
-                Verify your chemistry before you meet. Secure, peer-to-peer video calls built right into the app.
-              </p>
-            </div>
-
-            {/* Virtual Gifts */}
-            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-pink-50 transition-colors duration-300 border border-gray-100">
-              <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center mb-6 text-pink-600">
-                <Gift className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Virtual Gifts</h3>
-              <p className="text-gray-600">
-                Break the ice or show appreciation. Send virtual roses, drinks, and more using FWB Tokens.
-              </p>
-            </div>
-
-            {/* Creator Economy */}
-            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-amber-50 transition-colors duration-300 border border-gray-100">
-              <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mb-6 text-amber-600">
-                <Sparkles className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Creator Economy</h3>
-              <p className="text-gray-600">
-                Monetize your influence. Create exclusive, token-gated chatrooms and earn from your community.
-              </p>
-            </div>
-
-            {/* Travel Mode */}
-            <div className="p-8 rounded-2xl bg-gray-50 hover:bg-teal-50 transition-colors duration-300 border border-gray-100">
-              <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center mb-6 text-teal-600">
-                <MapPin className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Travel Mode</h3>
-              <p className="text-gray-600">
-                Planning a trip? Set your location to your destination and start matching with locals before you arrive.
-              </p>
-            </div>
-
-             {/* Open Source */}
-             <div className="p-8 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors duration-300 border border-gray-100 md:col-span-2 lg:col-span-3">
-              <div className="flex flex-col md:flex-row items-center text-center md:text-left">
-                <div className="w-12 h-12 bg-gray-200 rounded-xl flex items-center justify-center mb-4 md:mb-0 md:mr-6 text-gray-700 shrink-0">
-                  <Code className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Trust Through Transparency</h3>
-                  <p className="text-gray-600">
-                    Unlike corporate dating apps, we don&apos;t sell your data. Our code is open-source and auditable by anyone. Your secrets stay on your device, not our servers. <a href="https://github.com/robertpelloni/fwber" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View on GitHub</a>
-                  </p>
-                </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                  Trust Through Transparency
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Unlike corporate dating apps, we don&apos;t sell your data. Our code is open-source and auditable by anyone. Your secrets stay on your device, not our servers. <a href="https://github.com/robertpelloni/fwber" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View on GitHub</a>
+                </p>
               </div>
             </div>
           </div>
