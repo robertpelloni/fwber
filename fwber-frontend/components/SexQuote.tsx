@@ -43,16 +43,16 @@ export default function SexQuote() {
   if (!quote) return null;
 
   return (
-    <div className="relative p-6 mb-8 rounded-2xl bg-slate-950 border border-slate-800 shadow-[0_0_40px_-10px_rgba(124,58,237,0.15)] overflow-hidden group">
+    <div className="relative p-6 mb-8 rounded-2xl bg-[#2A0A4A] border border-[#FF0099]/30 shadow-[0_0_30px_rgba(255,0,153,0.3)] overflow-hidden group">
       {/* Ambient Glow Effects */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-pink-500/10 to-orange-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+      <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#00F0FF]/30 to-[#FF0099]/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none animate-pulse"></div>
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-[#FF0099]/20 to-[#00F0FF]/30 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none animate-pulse animation-delay-1000"></div>
       
       <div className="relative flex items-start gap-4 z-10">
-        <div className="p-2 rounded-lg bg-slate-900/50 border border-slate-800 backdrop-blur-sm">
-          <Quote className="h-5 w-5 text-slate-400" />
+        <div className="p-2 rounded-lg bg-[#2A0A4A]/80 border border-[#00F0FF]/50 backdrop-blur-sm shadow-[0_0_10px_rgba(0,240,255,0.2)]">
+          <Quote className="h-5 w-5 text-[#00F0FF]" />
         </div>
-        <p className="text-lg md:text-xl font-light leading-relaxed text-transparent bg-clip-text bg-gradient-to-r from-slate-100 via-slate-300 to-slate-400 italic tracking-wide">
+        <p className="text-lg md:text-xl font-light leading-relaxed text-transparent bg-clip-text bg-gradient-to-r from-[#00F0FF] via-[#d4fafa] to-[#FF0099] italic tracking-wide drop-shadow-[0_0_2px_rgba(0,240,255,0.5)]">
           &ldquo;{quote}&rdquo;
         </p>
       </div>
