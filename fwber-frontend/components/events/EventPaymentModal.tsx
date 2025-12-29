@@ -123,9 +123,20 @@ export default function EventPaymentModal({ isOpen, onClose, event }: EventPayme
             </button>
             
             {paymentMethod === 'token' && tokenBalance < tokenPrice && (
-                <p className="text-center text-sm text-red-500">
-                    Insufficient token balance.
-                </p>
+                <div className="text-center space-y-2">
+                    <p className="text-sm text-red-500 font-medium">
+                        Insufficient token balance.
+                    </p>
+                    <a 
+                        href="/wallet" 
+                        className="text-sm text-purple-600 hover:text-purple-700 underline"
+                        onClick={(e) => {
+                             // Let navigation happen naturally
+                        }}
+                    >
+                        Top up your wallet
+                    </a>
+                </div>
             )}
           </div>
 

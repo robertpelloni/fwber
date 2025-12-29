@@ -18,12 +18,20 @@ export default function EventDetailPage() {
   if (!event) return <div className="p-8">Event not found</div>;
 
   const handleRsvp = (status: string) => {
+    // If declining or just 'maybe', proceed directly
+    if (status !== 'attending') {
+       rsvp.mutate({ id: event.id, status });
+       return;
+    }
+
     const hasPrice = (event.price && Number(event.price) > 0) || (event.token_cost && Number(event.token_cost) > 0);
     
-    if (status === 'attending' && hasPrice) {
+    if (hasPrice) {
       setIsPaymentModalOpen(true);
       return;
     }
+    
+    // Free event confirmation
     rsvp.mutate({ id: event.id, status });
   };
 

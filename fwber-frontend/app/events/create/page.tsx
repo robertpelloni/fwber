@@ -29,7 +29,16 @@ export default function CreateEventPage() {
   };
 
   const onSubmit = (data: any) => {
-    createEvent.mutate(data, {
+    const payload = {
+      ...data,
+      latitude: parseFloat(data.latitude),
+      longitude: parseFloat(data.longitude),
+      max_attendees: data.max_attendees ? parseInt(data.max_attendees) : undefined,
+      price: data.price ? parseFloat(data.price) : undefined,
+      token_cost: data.token_cost ? parseInt(data.token_cost) : undefined,
+    };
+
+    createEvent.mutate(payload, {
       onSuccess: () => {
         router.push('/events');
       },
