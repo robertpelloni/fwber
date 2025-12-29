@@ -17,13 +17,13 @@ return [
 
     'paths' => ['api/*', 'sanctum/csrf-cookie', 'broadcasting/auth', 'up', 'health/*'],
 
-    'allowed_methods' => ['*'],
+    'allowed_methods' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 
     'allowed_origins' => explode(',', env('CORS_ALLOWED_ORIGINS', 'https://fwber.me,https://www.fwber.me,http://localhost:3000,http://localhost:3005,http://localhost:3007,http://127.0.0.1:3000,http://127.0.0.1:3005')),
 
     'allowed_origins_patterns' => ['*.vercel.app', 'vercel.live'],
 
-    'allowed_headers' => ['*'],
+    'allowed_headers' => ['Content-Type', 'X-Requested-With', 'Authorization', 'X-XSRF-TOKEN', 'X-Socket-ID'],
 
     'exposed_headers' => [],
 

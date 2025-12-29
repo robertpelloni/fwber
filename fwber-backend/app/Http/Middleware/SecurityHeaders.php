@@ -49,6 +49,8 @@ class SecurityHeaders
             ? "style-src 'self' 'unsafe-inline'"
             : "style-src 'self'";
 
+        $frameAncestors = $isProd ? "frame-ancestors 'none'" : "frame-ancestors 'self'";
+
         $csp = implode('; ', [
             "default-src 'self'",
             $scriptDirectives,
@@ -56,7 +58,7 @@ class SecurityHeaders
             "img-src 'self' data: https:",
             "font-src 'self' data:",
             "connect-src 'self' https: wss:",
-            "frame-ancestors 'self'",
+            $frameAncestors,
             "base-uri 'self'",
             "form-action 'self'",
         ]);
