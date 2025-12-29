@@ -252,14 +252,55 @@ export default function EnhancedProfileEditor() {
               error={errors.birthdate}
               touched={touched.has('birthdate')}
             >
-              <input
-                title="Date of Birth"
-                type="date"
-                value={profile.birthdate || ''}
-                onChange={(e) => handleChange('birthdate', e.target.value)}
-                onBlur={() => setTouched(prev => new Set(prev).add('birthdate'))}
-                className={inputClassName(errors.birthdate, touched.has('birthdate'))}
-              />
+              <div className="grid grid-cols-3 gap-2">
+                <select
+                  title="Month"
+                  value={profile.birthdate ? profile.birthdate.split('-')[1] : ''}
+                  onChange={(e) => {
+                    const [y, m, d] = profile.birthdate ? profile.birthdate.split('-') : [`${new Date().getFullYear() - 18}`, '01', '01'];
+                    handleChange('birthdate', `${y}-${e.target.value}-${d}`);
+                  }}
+                  onBlur={() => setTouched(prev => new Set(prev).add('birthdate'))}
+                  className={inputClassName(errors.birthdate, touched.has('birthdate'))}
+                >
+                  <option value="">Month</option>
+                  {["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].map((month, i) => (
+                    <option key={i} value={(i + 1).toString().padStart(2, '0')}>{month}</option>
+                  ))}
+                </select>
+                <select
+                  title="Day"
+                  value={profile.birthdate ? profile.birthdate.split('-')[2] : ''}
+                  onChange={(e) => {
+                    const [y, m, d] = profile.birthdate ? profile.birthdate.split('-') : [`${new Date().getFullYear() - 18}`, '01', '01'];
+                    handleChange('birthdate', `${y}-${m}-${e.target.value}`);
+                  }}
+                  onBlur={() => setTouched(prev => new Set(prev).add('birthdate'))}
+                  className={inputClassName(errors.birthdate, touched.has('birthdate'))}
+                >
+                  <option value="">Day</option>
+                  {Array.from({length: 31}, (_, i) => {
+                    const d = (i + 1).toString().padStart(2, '0');
+                    return <option key={d} value={d}>{i + 1}</option>
+                  })}
+                </select>
+                <select
+                  title="Year"
+                  value={profile.birthdate ? profile.birthdate.split('-')[0] : ''}
+                  onChange={(e) => {
+                    const [y, m, d] = profile.birthdate ? profile.birthdate.split('-') : [`${new Date().getFullYear() - 18}`, '01', '01'];
+                    handleChange('birthdate', `${e.target.value}-${m}-${d}`);
+                  }}
+                  onBlur={() => setTouched(prev => new Set(prev).add('birthdate'))}
+                  className={inputClassName(errors.birthdate, touched.has('birthdate'))}
+                >
+                  <option value="">Year</option>
+                  {Array.from({length: 100}, (_, i) => {
+                    const year = new Date().getFullYear() - 18 - i;
+                    return <option key={year} value={year}>{year}</option>
+                  })}
+                </select>
+              </div>
             </FormField>
 
             <FormField label="Gender" required>

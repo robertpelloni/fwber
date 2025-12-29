@@ -208,13 +208,50 @@ export default function OnboardingPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="dob">Date of Birth</Label>
-              <Input 
-                id="dob" 
-                type="date"
-                value={formData.date_of_birth} 
-                onChange={e => setFormData({...formData, date_of_birth: e.target.value})}
-              />
+              <Label>Date of Birth</Label>
+              <div className="grid grid-cols-3 gap-2">
+                <select
+                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  value={formData.date_of_birth ? formData.date_of_birth.split('-')[1] : ''}
+                  onChange={e => {
+                    const [y, m, d] = formData.date_of_birth ? formData.date_of_birth.split('-') : [`${new Date().getFullYear() - 18}`, '01', '01'];
+                    setFormData({...formData, date_of_birth: `${y}-${e.target.value}-${d}`});
+                  }}
+                >
+                  <option value="">Month</option>
+                  {["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].map((month, i) => (
+                    <option key={i} value={(i + 1).toString().padStart(2, '0')}>{month}</option>
+                  ))}
+                </select>
+                <select
+                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  value={formData.date_of_birth ? formData.date_of_birth.split('-')[2] : ''}
+                  onChange={e => {
+                    const [y, m, d] = formData.date_of_birth ? formData.date_of_birth.split('-') : [`${new Date().getFullYear() - 18}`, '01', '01'];
+                    setFormData({...formData, date_of_birth: `${y}-${m}-${e.target.value}`});
+                  }}
+                >
+                  <option value="">Day</option>
+                  {Array.from({length: 31}, (_, i) => {
+                    const d = (i + 1).toString().padStart(2, '0');
+                    return <option key={d} value={d}>{i + 1}</option>
+                  })}
+                </select>
+                <select
+                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  value={formData.date_of_birth ? formData.date_of_birth.split('-')[0] : ''}
+                  onChange={e => {
+                    const [y, m, d] = formData.date_of_birth ? formData.date_of_birth.split('-') : [`${new Date().getFullYear() - 18}`, '01', '01'];
+                    setFormData({...formData, date_of_birth: `${e.target.value}-${m}-${d}`});
+                  }}
+                >
+                  <option value="">Year</option>
+                  {Array.from({length: 100}, (_, i) => {
+                    const year = new Date().getFullYear() - 18 - i;
+                    return <option key={year} value={year}>{year}</option>
+                  })}
+                </select>
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="gender">Gender</Label>

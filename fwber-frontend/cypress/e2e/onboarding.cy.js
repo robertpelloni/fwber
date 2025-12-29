@@ -93,7 +93,12 @@ describe('User Onboarding Flow', () => {
 
     // Fill form
     cy.get('#display_name').type('Test User');
-    cy.get('#dob').type('1990-01-01');
+    
+    // Select date parts
+    cy.get('select').eq(1).select('01'); // Month (January)
+    cy.get('select').eq(2).select('01'); // Day
+    cy.get('select').eq(3).select('1990'); // Year
+    
     cy.get('#gender').select('Male');
     cy.get('#city').type('New York');
     cy.get('#state').type('NY');
@@ -176,7 +181,12 @@ describe('User Onboarding Flow', () => {
     
     // Fill ONLY required fields
     cy.get('#display_name').type('Minimal User');
-    cy.get('#dob').type('1995-05-05');
+    
+    // Select date parts
+    cy.get('select').eq(1).select('05'); // Month (May)
+    cy.get('select').eq(2).select('05'); // Day
+    cy.get('select').eq(3).select('1995'); // Year
+
     cy.get('#gender').select('Female');
     // Skip City/State (Optional in backend, but might be required in UI? Let's check)
     // If UI requires them, we fill them. If not, we skip.

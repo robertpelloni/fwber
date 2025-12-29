@@ -31,16 +31,52 @@ export default function BasicInformation({ formData, handleInputChange, handleLo
           </div>
 
           <div>
-            <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700">
               Date of Birth
             </label>
-            <input
-              type="date"
-              id="date_of_birth"
-              value={formData.date_of_birth || ''}
-              onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            />
+            <div className="grid grid-cols-3 gap-2 mt-1">
+              <select
+                className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                value={formData.date_of_birth ? formData.date_of_birth.split('-')[1] : ''}
+                onChange={(e) => {
+                   const [y, m, d] = formData.date_of_birth ? formData.date_of_birth.split('-') : [`${new Date().getFullYear() - 18}`, '01', '01'];
+                   handleInputChange('date_of_birth', `${y}-${e.target.value}-${d}`);
+                }}
+              >
+                <option value="">Month</option>
+                {["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].map((month, i) => (
+                  <option key={i} value={(i + 1).toString().padStart(2, '0')}>{month}</option>
+                ))}
+              </select>
+              <select
+                className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                value={formData.date_of_birth ? formData.date_of_birth.split('-')[2] : ''}
+                onChange={(e) => {
+                  const [y, m, d] = formData.date_of_birth ? formData.date_of_birth.split('-') : [`${new Date().getFullYear() - 18}`, '01', '01'];
+                  handleInputChange('date_of_birth', `${y}-${m}-${e.target.value}`);
+                }}
+              >
+                <option value="">Day</option>
+                {Array.from({length: 31}, (_, i) => {
+                  const d = (i + 1).toString().padStart(2, '0');
+                  return <option key={d} value={d}>{i + 1}</option>
+                })}
+              </select>
+              <select
+                className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                value={formData.date_of_birth ? formData.date_of_birth.split('-')[0] : ''}
+                onChange={(e) => {
+                  const [y, m, d] = formData.date_of_birth ? formData.date_of_birth.split('-') : [`${new Date().getFullYear() - 18}`, '01', '01'];
+                  handleInputChange('date_of_birth', `${e.target.value}-${m}-${d}`);
+                }}
+              >
+                <option value="">Year</option>
+                {Array.from({length: 100}, (_, i) => {
+                  const year = new Date().getFullYear() - 18 - i;
+                  return <option key={year} value={year}>{year}</option>
+                })}
+              </select>
+            </div>
           </div>
 
           <div>
