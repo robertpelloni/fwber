@@ -22,10 +22,17 @@ export const initEcho = (token?: string) => {
     // If they are missing in production, falling back to 127.0.0.1 is wrong if the user is visiting the site.
     
     const isDev = process.env.NODE_ENV === 'development';
+    
+    // Handle the case where the user has 'your_app_key' in their .env file (common copy-paste error)
+    let appKey = process.env.NEXT_PUBLIC_PUSHER_APP_KEY || 'app-key';
+    if (appKey === 'your_app_key') {
+        console.warn('FWBer: Detected placeholder "your_app_key" in environment variables. Falling back to "app-key" for local development.');
+        appKey = 'app-key';
+    }
 
     const options: any = {
         broadcaster: 'pusher',
-        key: process.env.NEXT_PUBLIC_PUSHER_APP_KEY || 'app-key',
+        key: appKey,
         cluster: process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER || 'mt1',
         forceTLS: process.env.NEXT_PUBLIC_PUSHER_SCHEME === 'https',
         disableStats: true,
