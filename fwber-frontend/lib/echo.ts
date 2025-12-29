@@ -15,9 +15,14 @@ export const initEcho = (token?: string) => {
 
     const options: any = {
         broadcaster: 'pusher',
-        key: process.env.NEXT_PUBLIC_PUSHER_APP_KEY,
-        cluster: process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER,
-        forceTLS: true,
+        key: process.env.NEXT_PUBLIC_PUSHER_APP_KEY || 'app-key',
+        cluster: process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER || 'mt1',
+        wsHost: process.env.NEXT_PUBLIC_PUSHER_HOST || '127.0.0.1',
+        wsPort: process.env.NEXT_PUBLIC_PUSHER_PORT ? parseInt(process.env.NEXT_PUBLIC_PUSHER_PORT) : 8080,
+        wssPort: process.env.NEXT_PUBLIC_PUSHER_PORT ? parseInt(process.env.NEXT_PUBLIC_PUSHER_PORT) : 8080,
+        forceTLS: process.env.NEXT_PUBLIC_PUSHER_SCHEME === 'https',
+        disableStats: true,
+        enabledTransports: ['ws', 'wss'],
     };
 
     if (token) {

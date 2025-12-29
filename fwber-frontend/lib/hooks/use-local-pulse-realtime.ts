@@ -34,7 +34,7 @@ export function useLocalPulseRealtime() {
   }, [invalidate]);
 
   // Fixed public topic for Local Pulse updates
-  const topics = useMemo(() => ['https://fwber.me/public/local-pulse'], []);
+  const topics = useMemo(() => [`${process.env.NEXT_PUBLIC_APP_URL || 'https://fwber.me'}/public/local-pulse`], []);
 
   const { isConnected, error, connect, disconnect } = useMercureSSE({
     topics,
