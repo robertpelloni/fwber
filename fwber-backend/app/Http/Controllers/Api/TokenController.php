@@ -44,9 +44,9 @@ class TokenController extends Controller
 
         $process = Process::path(base_path())
             ->env([
-                'SOLANA_SERVER_SECRET_KEY' => env('SERVER_WALLET_SECRET') ?? env('SOLANA_SERVER_SECRET_KEY'),
-                'SOLANA_MINT_ADDRESS' => env('MINT_ADDRESS') ?? env('SOLANA_MINT_ADDRESS'),
-                'SOLANA_RPC_URL' => env('SOLANA_RPC_URL'),
+                'SOLANA_SERVER_SECRET_KEY' => config('services.solana.server_secret_key'),
+                'SOLANA_MINT_ADDRESS' => config('services.solana.mint_address'),
+                'SOLANA_RPC_URL' => config('services.solana.rpc_url'),
             ])
             ->run(['node', $scriptPath, $request->destination_address, (string)$amount]);
 
@@ -105,9 +105,9 @@ class TokenController extends Controller
 
         $process = Process::path(base_path())
             ->env([
-                'SOLANA_SERVER_SECRET_KEY' => env('SERVER_WALLET_SECRET') ?? env('SOLANA_SERVER_SECRET_KEY'),
-                'SOLANA_MINT_ADDRESS' => env('MINT_ADDRESS') ?? env('SOLANA_MINT_ADDRESS'),
-                'SOLANA_RPC_URL' => env('SOLANA_RPC_URL'),
+                'SOLANA_SERVER_SECRET_KEY' => config('services.solana.server_secret_key'),
+                'SOLANA_MINT_ADDRESS' => config('services.solana.mint_address'),
+                'SOLANA_RPC_URL' => config('services.solana.rpc_url'),
             ])
             ->run(['node', $scriptPath, $request->signature, (string)$request->amount]);
 
@@ -218,7 +218,7 @@ class TokenController extends Controller
              if (!file_exists($script)) return null;
 
              $process = Process::path(base_path())
-                ->env(['SOLANA_SERVER_SECRET_KEY' => env('SERVER_WALLET_SECRET')])
+                ->env(['SOLANA_SERVER_SECRET_KEY' => config('services.solana.server_secret_key')])
                 ->run(['node', $script]);
 
              return trim($process->output());
@@ -232,7 +232,7 @@ class TokenController extends Controller
             'referral_count' => $user->referrals()->count(),
             'golden_tickets_remaining' => $user->golden_tickets_remaining,
             'treasury_address' => $treasury,
-            'mint_address' => env('MINT_ADDRESS'),
+            'mint_address' => config('services.solana.mint_address'),
         ]);
     }
 

@@ -165,7 +165,7 @@ class ConfigController extends Controller
      */
     public function getHealth(): JsonResponse
     {
-        $mercureUrl = config('mercure.public_url') ?? env('MERCURE_PUBLIC_URL');
+        $mercureUrl = config('services.mercure.public_url');
         $mercureConfigured = !empty($mercureUrl);
 
         // Check Database connectivity

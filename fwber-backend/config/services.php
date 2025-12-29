@@ -52,4 +52,10 @@ return [
         'cookie_domain' => env('MERCURE_COOKIE_DOMAIN'),
     ],
 
+    'solana' => [
+        'server_secret_key' => env('SERVER_WALLET_SECRET') ?? env('SOLANA_SERVER_SECRET_KEY'),
+        'mint_address' => env('MINT_ADDRESS') ?? env('SOLANA_MINT_ADDRESS'),
+        'rpc_url' => env('SOLANA_RPC_URL'),
+    ],
+
 ];

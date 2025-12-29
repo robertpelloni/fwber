@@ -54,33 +54,35 @@ Route::post('auth/login-wallet', [\App\Http\Controllers\AuthController::class, '
 Route::post('auth/two-factor-challenge', [\App\Http\Controllers\TwoFactorChallengeController::class, 'store'])->middleware('throttle:auth');
 
 // Public Debug Route (No Auth)
-Route::get('debug/public', function () {
-    return response()->json([
-        'status' => 'ok',
-        'timestamp' => now()->toIso8601String(),
-        'database' => \Illuminate\Support\Facades\DB::connection()->getDatabaseName(),
-    ]);
-});
-
-// Debug Route to diagnose 500 errors
-Route::get('debug/user', function (Request $request) {
-    try {
-        $user = $request->user();
+if (!app()->isProduction()) {
+    Route::get('debug/public', function () {
         return response()->json([
-            'user' => $user,
-            'profile' => $user->profile,
-            'photos' => $user->photos,
-            'two_factor' => $user->hasEnabledTwoFactorAuthentication(),
+            'status' => 'ok',
+            'timestamp' => now()->toIso8601String(),
+            'database' => \Illuminate\Support\Facades\DB::connection()->getDatabaseName(),
         ]);
-    } catch (\Throwable $e) {
-        return response()->json([
-            'error' => $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-            'trace' => $e->getTraceAsString()
-        ], 500);
-    }
-})->middleware('auth:sanctum');
+    });
+
+    // Debug Route to diagnose 500 errors
+    Route::get('debug/user', function (Request $request) {
+        try {
+            $user = $request->user();
+            return response()->json([
+                'user' => $user,
+                'profile' => $user->profile,
+                'photos' => $user->photos,
+                'two_factor' => $user->hasEnabledTwoFactorAuthentication(),
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ], 500);
+        }
+    })->middleware('auth:sanctum');
+}
 
 // Merchant API (Public / Key Auth)
 Route::post('merchant/checkout', [\App\Http\Controllers\Api\MerchantController::class, 'createPayment']);

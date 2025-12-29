@@ -44,7 +44,7 @@ class AuthenticateApi
         // to authenticate as a development user without DB tokens.
         // This is safe only for local development and is disabled in non-local envs.
         if (app()->environment('local')) {
-            $devBypass = (string) env('API_DEV_BYPASS_TOKEN', '');
+            $devBypass = (string) config('auth.dev_bypass_token', '');
             if ($devBypass !== '' && hash_equals($devBypass, $plainToken)) {
                 // Find or create a development user
                 $userModel = \App\Models\User::class;

@@ -127,4 +127,15 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Development Bypass Token
+    |--------------------------------------------------------------------------
+    |
+    | This token allows bypassing authentication for development purposes.
+    | It should ONLY be set in the local environment.
+    |
+    */
+    'dev_bypass_token' => env('API_DEV_BYPASS_TOKEN', ''),
+
 ];
