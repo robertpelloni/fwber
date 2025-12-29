@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Facades\SecurityLog;
 use Closure;
 use Illuminate\Http\Request;
 use App\Services\AdvancedRateLimitingService;
@@ -38,12 +39,19 @@ class AdvancedRateLimiting
             $suspiciousActivity = $this->rateLimitingService->detectSuspiciousActivity($userId);
             
             if ($suspiciousActivity['suspicious']) {
-                Log::warning('Suspicious rate limiting activity detected', [
+                SecurityLog::suspiciousActivity([
                     'user_id' => $userId,
                     'action' => $action,
                     'reasons' => $suspiciousActivity['reasons'],
                     'ip' => $request->ip(),
                     'user_agent' => $request->userAgent(),
+                ]);
+            } else {
+                 SecurityLog::rateLimitExceeded([
+                    'user_id' => $userId,
+                    'action' => $action,
+                    'limit' => $rateLimitResult['limit'] ?? 'unknown', 
+                    'ip' => $request->ip(),
                 ]);
             }
 
