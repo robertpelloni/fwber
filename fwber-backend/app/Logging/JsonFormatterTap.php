@@ -16,7 +16,7 @@ class JsonFormatterTap
     public function __invoke(Logger $logger): void
     {
         // Only apply JSON formatting when explicitly requested via env
-        $format = env('LOG_FORMAT', 'text');
+        $format = config('logging.format', 'text');
         if (strtolower((string) $format) !== 'json') {
             return;
         }
