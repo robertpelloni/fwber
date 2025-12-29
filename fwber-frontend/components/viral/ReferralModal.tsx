@@ -25,7 +25,7 @@ export function ReferralModal({ trigger }: ReferralModalProps) {
 
   if (!user) return null;
 
-  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://fwber.me';
+  const origin = typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL || 'https://fwber.me');
   const referralLink = `${origin}/register?ref=${user.referral_code}`;
   const vouchLink = `${origin}/vouch/${user.referral_code}`;
 

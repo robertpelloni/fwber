@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     type: 'rich',
     title: 'FWBer.me - Adult Social Network',
     provider_name: 'FWBer.me',
-    provider_url: 'https://fwber.me',
+    provider_url: process.env.NEXT_PUBLIC_APP_URL || 'https://fwber.me',
     width: 600,
     height: 400,
     html: `<iframe src="${url}" width="600" height="400" frameborder="0"></iframe>`,

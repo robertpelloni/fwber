@@ -132,10 +132,11 @@ const nextConfig = {
       };
     }
 
-    // Ignore face-api.js critical dependency warning
+    // Ignore face-api.js critical dependency warning and zustand deprecation warning
     config.ignoreWarnings = [
       ...(config.ignoreWarnings || []),
-      { module: /node_modules\/@vladmandic\/face-api/ }
+      { module: /node_modules\/@vladmandic\/face-api/ },
+      { module: /node_modules\/zustand/ }
     ];
 
     // Production optimizations

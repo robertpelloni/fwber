@@ -28,7 +28,7 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://fwber.me'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://fwber.me'),
   title: 'FWBer.me - Adult Social Network - Join the Revolution in Adult Social Networking',
   description: 'Adult Social Network - Friends, Dating, Hookups, Ads, Groups, Fun, Love, Lust, and More! Sign up now to get 50 Tokens for AI Avatars and 3 Days of Gold Premium! FWBer is the definitive privacy-first adult social network for dating, friends, and lifestyle matching.',
   keywords: ['dating', 'adult', 'matching', 'relationships', 'hookups', 'friends', 'groups', 'ads', 'free tokens', 'premium dating', 'ai avatars', 'nsfw art'],
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
   },
   alternates: {
     types: {
-      'application/json+oembed': 'https://fwber.me/api/oembed',
+      'application/json+oembed': `${process.env.NEXT_PUBLIC_APP_URL || 'https://fwber.me'}/api/oembed`,
     },
   },
   robots: {

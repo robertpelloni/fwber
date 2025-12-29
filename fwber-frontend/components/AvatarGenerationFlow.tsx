@@ -185,7 +185,7 @@ export default function AvatarGenerationFlow({
   const handleShare = () => {
     if (!user?.referral_code) return;
     const text = encodeURIComponent("Check out my AI Avatar on @FWBer! Sign up for 50 free tokens:");
-    const url = encodeURIComponent(`https://fwber.me/?ref=${user.referral_code}`);
+    const url = encodeURIComponent(`${process.env.NEXT_PUBLIC_APP_URL || 'https://fwber.me'}/?ref=${user.referral_code}`);
     window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
   };
 
