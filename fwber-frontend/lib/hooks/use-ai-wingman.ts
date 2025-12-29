@@ -43,7 +43,15 @@ export interface NemesisResponse {
   share_id?: string;
 }
 
+export interface QuirkCheckResponse {
+  flag_type: 'Green Flag' | 'Beige Flag' | 'Red Flag';
+  reason: string;
+  emoji: string;
+  share_id?: string;
+}
+
 export function useAiWingman() {
+
   const [error, setError] = useState<string | null>(null);
 
   const getIceBreakers = useMutation({
@@ -119,6 +127,15 @@ export function useAiWingman() {
     },
   });
 
+  const checkQuirk = useMutation({
+    mutationFn: async (quirk: string) => {
+      return api.post<QuirkCheckResponse>('/wingman/quirk-check', { quirk });
+    },
+    onError: (err: any) => {
+      setError(err.message || 'Failed to check quirk');
+    },
+  });
+
   return {
     getIceBreakers,
     getReplySuggestions,
@@ -128,7 +145,9 @@ export function useAiWingman() {
     predictFortune,
     getCosmicMatch,
     findNemesis,
+    checkQuirk,
     error,
     setError,
   };
 }
+

@@ -409,7 +409,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('wingman/fortune', [\App\Http\Controllers\AiWingmanController::class, 'predictFortune']);
         Route::get('wingman/cosmic-match', [\App\Http\Controllers\AiWingmanController::class, 'getCosmicMatch']);
         Route::get('wingman/nemesis', [\App\Http\Controllers\AiWingmanController::class, 'findNemesis']);
+        Route::post('wingman/quirk-check', [\App\Http\Controllers\AiWingmanController::class, 'checkQuirk']);
     });
+
 
     // Bulletin Board
     Route::get('bulletin-boards', [BulletinBoardController::class, 'index']);

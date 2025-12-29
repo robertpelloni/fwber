@@ -871,11 +871,75 @@ EOT;
             ];
         }
 
+    /**
+     * Analyze a specific user quirk and classify it as Green, Beige, or Red flag.
+     *
+     * @param string $quirk
+     * @return array
+     */
+    public function analyzeQuirk(string $quirk): array
+    {
+        // Simple cache key based on quirk hash to prevent re-processing identical inputs immediately
+        $cacheKey = "wingman:quirk_check:" . md5(strtolower(trim($quirk)));
+
+        return Cache::remember($cacheKey, 86400, function () use ($quirk) {
+            $prompt = $this->buildQuirkAnalysisPrompt($quirk);
+
+            try {
+                $response = $this->llmManager->driver()->chat([
+                    ['role' => 'system', 'content' => 'You are a witty "Red Flag Checker". Your job is to analyze user-submitted quirks or habits and classify them as a "Green Flag" (Good), "Beige Flag" (Weird/Neutral), or "Red Flag" (Bad). Provide a short, roasting, or complimentary reason.'],
+                    ['role' => 'user', 'content' => $prompt]
+                ], ['temperature' => 0.8]);
+
+                return $this->parseQuirkAnalysis($response->content);
+            } catch (\Exception $e) {
+                Log::error("AiWingmanService: Failed to analyze quirk: " . $e->getMessage());
+                return [
+                    'flag_type' => 'Beige Flag',
+                    'reason' => 'My servers are confused by this behavior.',
+                    'emoji' => '🟫'
+                ];
+            }
+        });
+    }
+
+    protected function buildQuirkAnalysisPrompt(string $quirk): string
+    {
+        return <<<EOT
+Analyze this user quirk/habit:
+"{$quirk}"
+
+Classify it as one of the following:
+1. Green Flag (Positive, attractive, healthy)
+2. Beige Flag (Odd, boring, specific but harmless)
+3. Red Flag (Toxic, dangerous, warning sign)
+
+Output a JSON object with exactly these keys:
+- flag_type: (string) "Green Flag", "Beige Flag", or "Red Flag"
+- reason: (string) A short, witty 1-sentence explanation. If it's a red flag, roast them slightly.
+- emoji: (string) A single emoji representing the flag (🟢, 🟫, 🚩).
+
+EOT;
+    }
+
+    protected function parseQuirkAnalysis(string $content): array
+    {
+        $content = preg_replace('/^```json\s*|\s*```$/', '', trim($content));
+        $decoded = json_decode($content, true);
+
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            return [
+                'flag_type' => $decoded['flag_type'] ?? 'Beige Flag',
+                'reason' => $decoded['reason'] ?? 'Indeterminate vibe.',
+                'emoji' => $decoded['emoji'] ?? '🟫'
+            ];
+        }
+
         return [
-            'nemesis_type' => 'The Mirror',
-            'clashing_traits' => ['Narcissism', 'Ego', 'Volume'],
-            'why_it_would_fail' => 'You would fight over who gets to talk first.',
-            'scientific_explanation' => 'Identical magnetic poles repel.'
+            'flag_type' => 'Beige Flag',
+            'reason' => 'Analysis failed, assuming it\'s just weird.',
+            'emoji' => '🟫'
         ];
     }
 }
+
