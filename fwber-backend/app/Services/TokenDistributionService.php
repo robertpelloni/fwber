@@ -130,4 +130,43 @@ class TokenDistributionService
             ]);
         });
     }
+
+    public function transferTokens(User $sender, User $recipient, float $amount, string $type, string $description, array $metadata = []): void
+    {
+        if ($sender->token_balance < $amount) {
+            throw new \Exception("Insufficient tokens");
+        }
+
+        DB::transaction(function () use ($sender, $recipient, $amount, $type, $description, $metadata) {
+            // 1. Deduct from Sender
+            $deducted = User::where('id', $sender->id)
+                ->where('token_balance', '>=', $amount)
+                ->decrement('token_balance', $amount);
+
+            if (!$deducted) {
+                throw new \Exception("Insufficient tokens");
+            }
+
+            // 2. Credit Recipient
+            $recipient->increment('token_balance', $amount);
+
+            // 3. Log Sender Transaction
+            TokenTransaction::create([
+                'user_id' => $sender->id,
+                'amount' => -$amount,
+                'type' => $type,
+                'description' => $description,
+                'metadata' => $metadata
+            ]);
+
+            // 4. Log Recipient Transaction
+            TokenTransaction::create([
+                'user_id' => $recipient->id,
+                'amount' => $amount,
+                'type' => $type . '_revenue', // e.g., event_ticket_revenue
+                'description' => "Revenue: " . $description,
+                'metadata' => array_merge($metadata, ['sender_id' => $sender->id])
+            ]);
+        });
+    }
 }

@@ -314,36 +314,14 @@ class EventController extends Controller
                 if ($tokenCost > 0) {
                     try {
                         // P2P Payment: Deduct from Attendee, Credit Organizer
-                        DB::transaction(function() use ($user, $event, $tokenCost) {
-                            // Atomic Check & Deduct
-                            $deducted = \App\Models\User::where('id', $user->id)
-                                ->where('token_balance', '>=', $tokenCost)
-                                ->decrement('token_balance', $tokenCost);
-
-                            if (!$deducted) {
-                                throw new \Exception('Insufficient tokens');
-                            }
-
-                            // Credit Organizer
-                            $event->creator->increment('token_balance', $tokenCost);
-
-                            // Log Transactions
-                            TokenTransaction::create([
-                                'user_id' => $user->id,
-                                'amount' => -$tokenCost,
-                                'type' => 'event_ticket',
-                                'description' => "Ticket for event: {$event->title}",
-                                'metadata' => ['event_id' => $event->id]
-                            ]);
-
-                            TokenTransaction::create([
-                                'user_id' => $event->created_by_user_id,
-                                'amount' => $tokenCost,
-                                'type' => 'event_revenue',
-                                'description' => "Ticket sale for: {$event->title}",
-                                'metadata' => ['event_id' => $event->id, 'attendee_id' => $user->id]
-                            ]);
-                        });
+                        $this->tokenService->transferTokens(
+                            $user, 
+                            $event->creator, 
+                            $tokenCost, 
+                            'event_ticket', 
+                            "Ticket for event: {$event->title}",
+                            ['event_id' => $event->id]
+                        );
 
                         $transactionId = 'token_' . uniqid();
                     } catch (\Exception $e) {
