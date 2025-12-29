@@ -1,6 +1,6 @@
 # Project Status - v0.3.16
 
-**Date:** 2025-12-28
+**Date:** 2025-12-29
 **Current Phase:** Post-Launch Stabilization
 **Version:** v0.3.16
 
@@ -22,12 +22,16 @@
 
 ## 🟢 Recent Accomplishments
 
-*   **Fixed Critical Route Mapping**: Corrected `fwber-backend/routes/api.php` to point to existing `BulletinBoardController` methods (`createOrFind`, `postMessage`).
-*   **Database Integrity**: Added migration `2025_12_28_085030_add_missing_columns_to_bulletin_messages.php` to ensure `bulletin_messages` table has all required columns (`is_anonymous`, `expires_at`, etc.).
-*   **Test Suite Improvements**:
-    *   Made `BulletinBoardController` compatible with SQLite for in-memory testing (bypassed MySQL-specific `POINT()` functions when using SQLite driver).
-    *   Fixed event property access in `BulletinBoardBroadcastingTest`.
-    *   Verified `AiConversationCoachTest` is passing locally.
+### ✅ Critical Fixes (Dec 29 - Part 3)
+1.  **Deployment Fixes**:
+    -   **404 Errors**: Fixed routing for Contact, Terms, and Privacy pages.
+    -   **Landing Page**: Simplified content and removed redundant sections for a cleaner user experience.
+2.  **Marketing (Viral)**:
+    -   **Red Flag Checker**: Implemented "Red Flag Checker" (AI-powered quirk analysis) to drive social sharing.
+    -   **Matchmaker Bounty**: Launched "Matchmaker Bounty" allowing users to generate public links to solicit matches with token rewards.
+3.  **Documentation**:
+    -   **Strategy**: Updated `docs/marketing/VIRAL_STRATEGY.md`.
+    -   **Roadmap**: Updated `docs/ROADMAP.md` with new priorities.
 
 ### ✅ Critical Fixes (Dec 29 - Part 2)
 1.  **Security Hardening (Production)**:
@@ -58,6 +62,8 @@
 
 ## 🔜 Upcoming Tasks
 
+*   **Token-Gated Events**: Design and implementation.
+*   **Monitor**: Production health check after recent deployments.
 *   **Security Drill**: Execute `docs/security/PRODUCTION_SECURITY_AUDIT.md`.
 *   **Marketing**: Begin implementation of `docs/marketing/VIRAL_STRATEGY.md`.
 *   **Performance**: Review `slow_requests` table after 24h of production traffic.
