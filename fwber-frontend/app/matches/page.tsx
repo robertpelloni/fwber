@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import MatchFilter from '@/components/MatchFilter';
 import Image from 'next/image';
 import ProfileViewModal from '@/components/ProfileViewModal';
+import CreateBountyModal from '@/components/CreateBountyModal';
 
 export default function MatchesPage() {
   const [matches, setMatches] = useState<any[]>([]);
@@ -87,7 +88,8 @@ export default function MatchesPage() {
   return (
     <div className="container mx-auto p-4 max-w-md">
       <ToastContainer />
-      <div className="mb-4">
+      <div className="mb-4 space-y-4">
+        <CreateBountyModal />
         <MatchFilter onFilterChange={handleFilterChange} />
       </div>
 

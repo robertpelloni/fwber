@@ -104,6 +104,9 @@ Route::get('viral-content/{id}', [\App\Http\Controllers\ViralContentController::
 Route::post('public/roast', [\App\Http\Controllers\AiWingmanController::class, 'roastPublic'])
     ->middleware('throttle:5,1'); // 5 requests per minute per IP
 
+// Public Matchmaker Bounty
+Route::get('matchmaker/bounty/{slug}', [\App\Http\Controllers\MatchMakerController::class, 'showBounty']);
+
 // Venue Partner Auth
 Route::prefix('venue')->group(function () {
     Route::post('register', [\App\Http\Controllers\VenueAuthController::class, 'register']);
@@ -422,6 +425,13 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::post('bulletin-boards/{id}/subscribe', [BulletinBoardController::class, 'subscribe']);
     // Route::post('bulletin-boards/{id}/unsubscribe', [BulletinBoardController::class, 'unsubscribe']);
 
+    // Matchmaker Bounty
+    Route::post('bounties', [\App\Http\Controllers\API\MatchBountyController::class, 'store']);
+    Route::get('bounties/{slug}/suggest', function ($slug) {
+         return response()->json(['message' => 'Use POST to suggest']);
+    });
+    Route::post('bounties/{slug}/suggest', [\App\Http\Controllers\API\MatchBountyController::class, 'suggest']);
+
     // Friend routes
     Route::prefix('friends')->group(function () {
         Route::get('/', [FriendController::class, 'getFriends']);
@@ -470,6 +480,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // Wingman
     Route::post('wingman/assist', [\App\Http\Controllers\WingmanController::class, 'recordAssist']);
 
+    // Matchmaker Bounty
+    Route::post('matchmaker/bounty', [\App\Http\Controllers\MatchMakerController::class, 'createBounty']);
+    Route::post('matchmaker/bounty/{slug}/suggest', [\App\Http\Controllers\MatchMakerController::class, 'suggest']);
+    
     // Share Unlock
     Route::post('share-unlock', [\App\Http\Controllers\ShareUnlockController::class, 'store']);
     Route::get('share-unlock/{targetProfileId}', [\App\Http\Controllers\ShareUnlockController::class, 'check']);
