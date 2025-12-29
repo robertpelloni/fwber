@@ -64,4 +64,9 @@ class DeviceTokenController extends Controller
 
         return response()->json(['message' => 'Device token removed']);
     }
+
+    public function index()
+    {
+        return response()->json(DeviceToken::where('user_id', Auth::id())->get());
+    }
 }
