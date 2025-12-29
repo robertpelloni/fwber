@@ -2,10 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Facades\SecurityLog;
 use App\Models\ApiToken;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class AuthenticateApi
@@ -21,7 +21,8 @@ class AuthenticateApi
         }
 
         if (! str_starts_with($header, 'Bearer ')) {
-            Log::warning('API Auth Failed: Missing Bearer header', [
+            SecurityLog::authFailed([
+                'reason' => 'Missing Bearer header',
                 'ip' => $request->ip(),
                 'user_agent' => $request->userAgent()
             ]);
@@ -31,7 +32,8 @@ class AuthenticateApi
         $plainToken = trim(substr($header, 7));
 
         if ($plainToken === '') {
-            Log::warning('API Auth Failed: Empty token', [
+            SecurityLog::authFailed([
+                'reason' => 'Empty token',
                 'ip' => $request->ip(),
                 'user_agent' => $request->userAgent()
             ]);
@@ -57,7 +59,8 @@ class AuthenticateApi
                 }
 
                 auth()->setUser($user);
-                Log::info('API Auth Success (Dev Bypass)', [
+                SecurityLog::authSuccess([
+                    'type' => 'dev_bypass',
                     'user_id' => $user->id,
                     'ip' => $request->ip()
                 ]);
@@ -69,21 +72,35 @@ class AuthenticateApi
         $apiToken = ApiToken::query()->with('user')->where('token', $hashed)->first();
 
         if (! $apiToken || ! $apiToken->user) {
-            Log::warning('API Auth Failed: Invalid token', [
+            SecurityLog::authFailed([
+                'reason' => 'Invalid token',
                 'ip' => $request->ip(),
                 'user_agent' => $request->userAgent(),
-                'token_prefix' => substr($plainToken, 0, 6) . '...'
+                'token_prefix' => substr($plainToken, 0, 8) . '...'
             ]);
             return $this->unauthorized();
+        }
+
+        // Check for token expiration (Default: 30 days)
+        // TODO: Move expiration time to config
+        $expirationDays = 30;
+        if ($apiToken->created_at->addDays($expirationDays)->isPast()) {
+            SecurityLog::tokenExpired([
+                'user_id' => $apiToken->user->id,
+                'ip' => $request->ip(),
+                'token_created_at' => $apiToken->created_at->toIso8601String()
+            ]);
+            return response()->json(['message' => 'Token expired. Please login again.'], 401);
         }
 
         $apiToken->forceFill(['last_used_at' => now()])->save();
 
         auth()->setUser($apiToken->user);
 
-        Log::info('API Auth Success', [
+        SecurityLog::authSuccess([
             'user_id' => $apiToken->user->id,
-            'ip' => $request->ip()
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent()
         ]);
 
         return $next($request);
