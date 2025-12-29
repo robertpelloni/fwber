@@ -3,14 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateLocationRequest;
+use App\Http\Requests\GetNearbyUsersRequest;
+use App\Http\Requests\UpdateLocationPrivacyRequest;
 use App\Models\UserLocation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
 
 /**
  * Location Controller - Real-time Location Tracking API
+
  * 
  * AI Model: Claude 4.5 - Multi-AI Orchestration
  * Phase: Location-Based Social Features Implementation
@@ -55,21 +57,6 @@ class LocationController extends Controller
                 return response()->json(['message' => 'Unauthenticated'], 401);
             }
 
-            // Additional validation for optional fields (FormRequest handles lat/lon/accuracy)
-            $validator = Validator::make($request->all(), [
-                'heading' => 'sometimes|numeric|between:0,360',
-                'speed' => 'sometimes|numeric|min:0|max:100',
-                'altitude' => 'sometimes|numeric|min:-1000|max:50000',
-                'privacy_level' => 'sometimes|in:public,friends,private',
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' => 'Validation failed',
-                    'errors' => $validator->errors(),
-                ], 422);
-            }
-
             // Get or create user location
             $location = UserLocation::where('user_id', $user->id)->first();
             
@@ -79,15 +66,7 @@ class LocationController extends Controller
             }
 
             // Update location data
-            $location->fill($request->only([
-                'latitude',
-                'longitude',
-                'accuracy',
-                'heading',
-                'speed',
-                'altitude',
-                'privacy_level',
-            ]));
+            $location->fill($request->validated());
             
             $location->last_updated = now();
             $location->is_active = true;
@@ -115,6 +94,7 @@ class LocationController extends Controller
             ]);
 
         } catch (\Exception $e) {
+
             Log::error('Location update error', [
                 'user_id' => auth()->id(),
                 'error' => $e->getMessage(),
@@ -146,7 +126,7 @@ class LocationController extends Controller
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */
-    public function nearby(Request $request): JsonResponse
+    public function nearby(GetNearbyUsersRequest $request): JsonResponse
     {
         try {
             $user = auth()->user();
@@ -155,28 +135,15 @@ class LocationController extends Controller
                 return response()->json(['message' => 'Unauthenticated'], 401);
             }
 
-            // Validation rules
-            $validator = Validator::make($request->all(), [
-                'latitude' => 'required|numeric|between:-90,90',
-                'longitude' => 'required|numeric|between:-180,180',
-                'radius' => 'sometimes|integer|min:100|max:10000', // 100m to 10km
-                'limit' => 'sometimes|integer|min:1|max:100',
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' => 'Validation failed',
-                    'errors' => $validator->errors(),
-                ], 422);
-            }
-
-            $latitude = $request->latitude;
-            $longitude = $request->longitude;
-            $radius = $request->get('radius', 1000); // Default 1km
-            $limit = $request->get('limit', 20); // Default 20 users
+            $validated = $request->validated();
+            $latitude = $validated['latitude'];
+            $longitude = $validated['longitude'];
+            $radius = $validated['radius'] ?? 1000; // Default 1km
+            $limit = $validated['limit'] ?? 20; // Default 20 users
 
             // Get nearby users based on privacy settings
             $nearbyUsers = UserLocation::active()
+
                 ->with(['user.profile'])
                 ->where('user_id', '!=', $user->id) // Exclude current user
                 // Incognito Mode Logic
@@ -286,25 +253,13 @@ class LocationController extends Controller
         *   @OA\Response(response=401, description="Unauthenticated")
         * )
      */
-    public function updatePrivacy(Request $request): JsonResponse
+    public function updatePrivacy(UpdateLocationPrivacyRequest $request): JsonResponse
     {
         try {
             $user = auth()->user();
             
             if (!$user) {
                 return response()->json(['message' => 'Unauthenticated'], 401);
-            }
-
-            // Validation rules
-            $validator = Validator::make($request->all(), [
-                'privacy_level' => 'required|in:public,friends,private',
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' => 'Validation failed',
-                    'errors' => $validator->errors(),
-                ], 422);
             }
 
             $location = UserLocation::where('user_id', $user->id)->first();
@@ -317,6 +272,7 @@ class LocationController extends Controller
 
             $location->privacy_level = $request->privacy_level;
             $location->save();
+
 
             Log::info('Location privacy updated', [
                 'user_id' => $user->id,
