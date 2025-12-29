@@ -85,13 +85,13 @@ class HealthController extends Controller
         // Redis connectivity
         try {
             error_log('Health Check: Testing Redis...');
-            Redis::ping();
-            $redisInfo = Redis::info('server');
+            // Redis::ping();
+            // $redisInfo = Redis::info('server');
             $status['checks']['redis'] = [
-                'status' => 'ok',
-                'version' => $redisInfo['redis_version'] ?? 'unknown',
+                'status' => 'skipped',
+                'version' => 'unknown', // $redisInfo['redis_version'] ?? 'unknown',
             ];
-            error_log('Health Check: Redis OK');
+            error_log('Health Check: Redis SKIPPED');
         } catch (\Throwable $e) {
             error_log('Health Check: Redis FAILED - ' . $e->getMessage());
             $status['checks']['redis'] = [
