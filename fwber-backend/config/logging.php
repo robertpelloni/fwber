@@ -141,6 +141,20 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 7,
         ],
+
+        'security' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/security.log'),
+            'level' => 'info',
+            'days' => 90,
+        ],
+
+        'audit' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/audit.log'),
+            'level' => 'info',
+            'days' => 365,
+        ],
     ],
 
 ];
