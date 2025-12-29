@@ -97,7 +97,7 @@ export default function HomePage() {
               <Logo className="text-6xl md:text-8xl" showDotMe={true} />
             </div>
             
-            <h2 className="text-3xl md:text-5xl font-bold mb-4 animate-gradient-x bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent bg-[length:200%_auto]">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 animate-gradient-x bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent bg-[length:200%_auto] hover:animate-bounce cursor-default">
               Real Connections. Zero Trace.
             </h2>
             
@@ -105,22 +105,10 @@ export default function HomePage() {
               The open-source adult network built on privacy. Meet locals, verify with AI, and chat with end-to-end encryption.
             </p>
             
-            <div className="mb-8 transform hover:scale-105 transition-transform duration-300">
-              <p className="text-2xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 font-serif italic drop-shadow-sm">
-                &ldquo;Connect freely. Date privately.&rdquo;
-              </p>
-            </div>
-
             <div className="w-full max-w-2xl mx-auto mb-10 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 shadow-sm">
               <SexQuote />
             </div>
 
-            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-10 max-w-4xl mx-auto leading-relaxed">
-              Find your perfect partner(s) wherever you are—at home, at a convention, or on vacation.
-              Whether you&apos;re new to the scene, exploring what&apos;s out there, or passing profiles to your partner for approval, we&apos;ve got you covered.
-              Find new best friends, a fling, the whole team, or a life mate. Just for tonight, for right now, or for the rest of your life—we cover all scenarios.
-            </p>
-            
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
               <Link
                 href="/register"
