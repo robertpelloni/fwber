@@ -53,6 +53,7 @@ class HealthController extends Controller
 
         // Database connectivity
         try {
+            error_log('Health Check: Testing Database...');
             DB::connection()->getPdo();
             
             $driver = DB::connection()->getDriverName();
@@ -71,7 +72,9 @@ class HealthController extends Controller
                 'version' => $dbVersion,
                 'connection' => DB::connection()->getDatabaseName(),
             ];
+            error_log('Health Check: Database OK');
         } catch (\Throwable $e) {
+            error_log('Health Check: Database FAILED - ' . $e->getMessage());
             $status['checks']['database'] = [
                 'status' => 'failed',
                 'error' => $e->getMessage(),
@@ -81,13 +84,16 @@ class HealthController extends Controller
 
         // Redis connectivity
         try {
+            error_log('Health Check: Testing Redis...');
             Redis::ping();
             $redisInfo = Redis::info('server');
             $status['checks']['redis'] = [
                 'status' => 'ok',
                 'version' => $redisInfo['redis_version'] ?? 'unknown',
             ];
+            error_log('Health Check: Redis OK');
         } catch (\Throwable $e) {
+            error_log('Health Check: Redis FAILED - ' . $e->getMessage());
             $status['checks']['redis'] = [
                 'status' => 'failed',
                 'error' => $e->getMessage(),
