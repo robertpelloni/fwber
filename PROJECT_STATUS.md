@@ -29,6 +29,20 @@
     *   Fixed event property access in `BulletinBoardBroadcastingTest`.
     *   Verified `AiConversationCoachTest` is passing locally.
 
+### ✅ Critical Fixes (Dec 29)
+1.  **Pusher Connection Fix**:
+    -   **Issue**: Users encountered `App key your_app_key not in this cluster` error due to environment variable placeholder leakage.
+    -   **Fix**: Updated `fwber-frontend/lib/echo.ts` to detect `your_app_key` and automatically fallback to local `app-key` for development.
+    -   **Verification**: Code review and local testing.
+2.  **Date Picker UX Overhaul**:
+    -   **Issue**: Native date picker was difficult to use for birth dates (scrolling back years).
+    -   **Fix**: Replaced single input with three distinct Dropdowns (Month, Day, Year) in Onboarding and Profile Editor.
+    -   **Verification**: Updated `cypress/e2e/onboarding.cy.js` to support new selectors. E2E tests passing.
+3.  **Landing Page Refinement**:
+    -   **Theme**: Updated `SexQuote` component to "Deep Purple & Neon" aesthetic.
+    -   **Content**: Streamlined copy by removing verbose paragraphs and redundant quotes.
+    -   **Interaction**: Added "Bounce" animation to the main Hero title on hover.
+
 ## 🟡 Known Issues / Watchlist
 
 *   **CI/CD**: `fwber-mysql` host resolution failures occasionally appear in test logs. This seems to be environment-specific (likely Docker networking in the test runner).
