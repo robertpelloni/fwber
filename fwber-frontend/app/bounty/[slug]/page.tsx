@@ -133,7 +133,8 @@ export default function BountyPage() {
 
   const handleStartSuggestion = () => {
       if (!currentUser) {
-          router.push(`/auth/login?return_url=/bounty/${slug}?action=suggest`);
+          const returnUrl = encodeURIComponent(`/bounty/${slug}?action=suggest`);
+          router.push(`/auth/login?return_url=${returnUrl}`);
       } else {
           setShowSuggestUI(true);
       }
