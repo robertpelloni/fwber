@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useEvent, useRsvpEvent } from '@/lib/hooks/use-events';
 import { useParams } from 'next/navigation';
-import { Calendar, MapPin, Users, DollarSign, UserPlus } from 'lucide-react';
+import { Calendar, MapPin, Users, DollarSign, UserPlus, Coins } from 'lucide-react';
 import InviteUserModal from '@/components/events/InviteUserModal';
 import EventPaymentModal from '@/components/events/EventPaymentModal';
 
@@ -70,6 +70,12 @@ export default function EventDetailPage() {
                 <div className="flex items-center text-gray-600 dark:text-gray-300">
                   <DollarSign className="w-5 h-5 mr-3" />
                   <span>${Number(event.price).toFixed(2)}</span>
+                </div>
+              )}
+              {event.token_cost && Number(event.token_cost) > 0 && (
+                <div className="flex items-center text-gray-600 dark:text-gray-300">
+                  <Coins className="w-5 h-5 mr-3 text-purple-500" />
+                  <span className="text-purple-600 font-semibold">{Number(event.token_cost)} Tokens</span>
                 </div>
               )}
             </div>
