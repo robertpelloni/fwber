@@ -29,5 +29,15 @@ export const initEcho = (token?: string) => {
         };
     }
 
-    return new Echo(options);
+    // Fix for Pusher connection error by explicitly disabling stats
+    if (process.env.NODE_ENV === 'development') {
+         // @ts-ignore
+         Pusher.logToConsole = true;
+    }
+
+    return new Echo({
+        ...options,
+        disableStats: true,
+        enabledTransports: ['ws', 'wss'],
+    });
 };
