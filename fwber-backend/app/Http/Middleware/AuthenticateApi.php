@@ -82,8 +82,7 @@ class AuthenticateApi
         }
 
         // Check for token expiration (Default: 30 days)
-        // TODO: Move expiration time to config
-        $expirationDays = 30;
+        $expirationDays = config('auth.api_token_expiration', 30);
         if ($apiToken->created_at->addDays($expirationDays)->isPast()) {
             SecurityLog::tokenExpired([
                 'user_id' => $apiToken->user->id,

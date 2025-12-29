@@ -138,4 +138,14 @@ return [
     */
     'dev_bypass_token' => env('API_DEV_BYPASS_TOKEN', ''),
 
+    /*
+    |--------------------------------------------------------------------------
+    | API Token Expiration
+    |--------------------------------------------------------------------------
+    |
+    | The number of days an API token is valid for.
+    |
+    */
+    'api_token_expiration' => env('API_TOKEN_EXPIRATION', 30),
+
 ];
