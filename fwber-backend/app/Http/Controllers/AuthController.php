@@ -66,7 +66,19 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        $user = $request->user();
+        $token = $user->currentAccessToken();
+
+        // Log the logout event
+        \App\Facades\SecurityLog::authSuccess([
+            'action' => 'logout',
+            'user_id' => $user->id,
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'token_id' => $token->id,
+        ]);
+
+        $token->delete();
 
         return response()->json(['message' => 'Logged out successfully']);
     }
