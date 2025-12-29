@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import {
@@ -39,12 +39,13 @@ import {
 } from 'lucide-react';
 
 interface ProximityChatroomPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-export default function ProximityChatroomPage({ params }: ProximityChatroomPageProps) {
+export default function ProximityChatroomPage(props: ProximityChatroomPageProps) {
+  const params = use(props.params);
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
   const chatroomId = parseInt(params.id);
