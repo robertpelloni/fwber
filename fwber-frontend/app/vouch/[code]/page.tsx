@@ -2,10 +2,11 @@ import { Metadata } from 'next'
 import { VouchClient } from './vouch-client'
 
 interface Props {
-  params: { code: string }
+  params: Promise<{ code: string }>
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params
   const code = params.code
 
   // Try to fetch user details for viral metadata
@@ -43,6 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default function VouchPage({ params }: Props) {
+export default async function VouchPage(props: Props) {
+  const params = await props.params;
   return <VouchClient code={params.code} />
 }

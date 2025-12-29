@@ -39,32 +39,34 @@ function log(
   // Always log to console
   const consoleMessage = `[${context.toUpperCase()}] ${message}`;
   
-  switch (level) {
-    case 'debug':
-      if (isDevelopment) console.debug(consoleMessage, data);
-      break;
-    case 'info':
-      console.info(consoleMessage, data);
-      break;
-    case 'warn':
-      console.warn(consoleMessage, data);
-      // Send warnings to Sentry with breadcrumb
-      Sentry.addBreadcrumb({
-        category: context,
-        message,
-        level: 'warning',
-        data,
-      });
-      break;
-    case 'error':
-      console.error(consoleMessage, data);
-      // Send errors to Sentry
-      Sentry.captureException(new Error(message), {
-        level: 'error',
-        tags: { context },
-        extra: data,
-      });
-      break;
+  if (typeof window !== 'undefined') {
+    switch (level) {
+      case 'debug':
+        if (isDevelopment) console.debug(consoleMessage, data);
+        break;
+      case 'info':
+        console.info(consoleMessage, data);
+        break;
+      case 'warn':
+        console.warn(consoleMessage, data);
+        // Send warnings to Sentry with breadcrumb
+        Sentry.addBreadcrumb({
+          category: context,
+          message,
+          level: 'warning',
+          data,
+        });
+        break;
+      case 'error':
+        console.error(consoleMessage, data);
+        // Send errors to Sentry
+        Sentry.captureException(new Error(message), {
+          level: 'error',
+          tags: { context },
+          extra: data,
+        });
+        break;
+    }
   }
 }
 

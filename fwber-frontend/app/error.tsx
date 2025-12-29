@@ -26,14 +26,14 @@ export default function Error({
   }, [error])
 
   // Determine error type and messaging
-  const isNetworkError = error.message.includes('fetch') ||
-                         error.message.includes('network') ||
-                         error.message.includes('Failed to fetch')
+  const isNetworkError = error.message?.includes('fetch') ||
+                         error.message?.includes('network') ||
+                         error.message?.includes('Failed to fetch')
 
-  const isAuthError = error.message.includes('401') ||
-                      error.message.includes('403') ||
-                      error.message.includes('Unauthorized') ||
-                      error.message.includes('authentication')
+  const isAuthError = error.message?.includes('401') ||
+                      error.message?.includes('403') ||
+                      error.message?.includes('Unauthorized') ||
+                      error.message?.includes('authentication')
 
   const getErrorTitle = () => {
     if (isNetworkError) return 'Connection Problem'
