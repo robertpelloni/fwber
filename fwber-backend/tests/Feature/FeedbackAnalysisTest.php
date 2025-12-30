@@ -50,7 +50,8 @@ class FeedbackAnalysisTest extends TestCase
                 content: json_encode([
                     'category' => 'bug',
                     'sentiment' => 'negative',
-                    'summary' => 'Login button issue on mobile.'
+                    'summary' => 'Login button issue on mobile.',
+                    'tags' => ['mobile', 'auth']
                 ]),
                 provider: 'mock'
             ));
@@ -67,5 +68,6 @@ class FeedbackAnalysisTest extends TestCase
         $this->assertEquals('negative', $feedback->sentiment);
         $this->assertEquals('Login button issue on mobile.', $feedback->ai_analysis);
         $this->assertTrue((bool)$feedback->is_analyzed);
+        $this->assertEquals(['ai_tags' => ['mobile', 'auth']], $feedback->metadata);
     }
 }

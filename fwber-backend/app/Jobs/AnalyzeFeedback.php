@@ -50,6 +50,7 @@ class AnalyzeFeedback implements ShouldQueue
                 'sentiment' => $analysis['sentiment'] ?? 'neutral',
                 'ai_analysis' => $analysis['summary'] ?? null,
                 'is_analyzed' => true,
+                'metadata' => array_merge($feedback->metadata ?? [], ['ai_tags' => $analysis['tags'] ?? []]),
             ]);
 
         } catch (\Exception $e) {
@@ -70,6 +71,7 @@ Output a JSON object with:
 - category: (string) One of: "bug", "feature_request", "ux_issue", "praise", "safety", "other".
 - sentiment: (string) One of: "positive", "negative", "neutral".
 - summary: (string) A 1-sentence summary of the core issue or request.
+- tags: (array<string>) Relevant feature tags (e.g., "bounty", "events", "tokens", "matchmaking", "viral_card", "profile").
 EOT;
     }
 
