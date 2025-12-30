@@ -54,6 +54,11 @@ export const initEcho = (token?: string) => {
         options.wsPort = 8080;
         options.wssPort = 8080;
         options.forceTLS = false;
+    } else {
+        // Production fallback if ENV vars are missing
+        // Since we are on shared hosting without a dedicated WebSocket server,
+        // we likely want to default to Pusher Cloud unless explicitly told otherwise.
+        // However, if the user intends to use Reverb on a different port, they MUST set the env vars.
     }
 
     if (token) {
