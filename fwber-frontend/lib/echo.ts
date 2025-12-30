@@ -50,7 +50,9 @@ export const initEcho = (token?: string) => {
         options.wssPort = process.env.NEXT_PUBLIC_PUSHER_PORT ? parseInt(process.env.NEXT_PUBLIC_PUSHER_PORT) : 443;
     } else if (isDev) {
         // Local Reverb defaults
-        options.wsHost = '127.0.0.1';
+        // Use window.location.hostname to allow testing on local network devices (e.g. mobile)
+        // assuming the Reverb server is reachable on the same host as the frontend
+        options.wsHost = window.location.hostname;
         options.wsPort = 8080;
         options.wssPort = 8080;
         options.forceTLS = false;
