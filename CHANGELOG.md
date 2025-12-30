@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.18] - 2025-12-30
+
+### Fixed
+- **Deployment**: Resolved memory allocation failure during build process by increasing Node memory limit.
+- **Dependencies**: Successfully synced and verified dependency installation in `fwber-frontend`.
+
 ## [0.3.17] - 2025-12-30
 
 ### Fixed
