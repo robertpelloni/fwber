@@ -870,6 +870,7 @@ EOT;
                 'scientific_explanation' => $decoded['scientific_explanation'] ?? 'Data insufficient for meaningful analysis.'
             ];
         }
+    }
 
     /**
      * Analyze a specific user quirk and classify it as Green, Beige, or Red flag.

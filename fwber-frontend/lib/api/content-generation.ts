@@ -1,4 +1,5 @@
 import { apiClient } from './client';
+import { wingmanApi } from './wingman';
 
 export interface ProfileContentRequest {
   personality?: string;
@@ -144,16 +145,14 @@ export interface RoastPublicResponse {
  * Generate a roast or hype of the authenticated user's profile.
  */
 export async function roastProfile(mode: 'roast' | 'hype' = 'roast'): Promise<RoastProfileResponse> {
-  const response = await apiClient.post<RoastProfileResponse>('/wingman/roast', { mode });
-  return response.data;
+  return wingmanApi.roastProfile({ mode });
 }
 
 /**
  * Generate a generic roast or hype for public/guest users.
  */
 export async function roastPublic(name: string, job: string, trait: string, mode: 'roast' | 'hype' = 'roast'): Promise<RoastPublicResponse> {
-  const response = await apiClient.post<RoastPublicResponse>('/public/roast', { name, job, trait, mode });
-  return response.data;
+  return wingmanApi.roastPublic({ name, job, trait, mode });
 }
 
 /**

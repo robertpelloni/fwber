@@ -14,6 +14,7 @@ import { ActivityFeed } from '@/components/ActivityFeed';
 import BoostButton from '@/components/BoostButton';
 import { AchievementsList } from '@/components/dashboard/AchievementsList';
 import { ReferralModal } from '@/components/viral/ReferralModal';
+import { RoastGenerator } from '@/components/viral/RoastGenerator';
 import { DailyStreakModal } from '@/components/gamification/DailyStreakModal';
 import { useEffect, useState } from 'react';
 
@@ -84,6 +85,8 @@ export default function DashboardPage() {
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="px-4 py-6 sm:px-0">
             <div className="mb-8 flex justify-between items-end">
+
+
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                   Dashboard
@@ -92,6 +95,17 @@ export default function DashboardPage() {
               </div>
               <div className="flex gap-2">
                 <ReferralModal />
+                <RoastGenerator />
+                <BoostButton />
+              </div>
+              <div className="flex gap-2">
+                <ReferralModal />
+                <RoastGenerator />
+                <BoostButton />
+              </div>
+              <div className="flex gap-2">
+                <ReferralModal />
+                <RoastGenerator />
                 <BoostButton />
               </div>
             </div>

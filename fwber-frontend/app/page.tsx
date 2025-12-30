@@ -118,6 +118,13 @@ export default function HomePage() {
                 Create Anonymous Account
               </Link>
               <Link
+                href="/roast"
+                className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold py-4 px-10 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
+              >
+                <Flame className="w-5 h-5 mr-2 fill-current" />
+                Roast My Profile
+              </Link>
+              <Link
                 href="/login"
                 className="w-full sm:w-auto bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-bold py-4 px-10 rounded-full text-lg border-2 border-gray-200 dark:border-gray-700 hover:border-blue-600 dark:hover:border-blue-500 transition-all duration-200"
               >
