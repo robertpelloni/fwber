@@ -1,13 +1,14 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import * as Sentry from '@sentry/nextjs'
+// import * as Sentry from '@sentry/nextjs'
 
 export default function SentryInitializer() {
   const initialized = useRef(false)
 
   useEffect(() => {
     if (!initialized.current) {
+      /*
       const clientOptions: Sentry.BrowserOptions = {
         dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
         tracesSampleRate: 1.0,
@@ -42,6 +43,7 @@ export default function SentryInitializer() {
       };
 
       Sentry.init(clientOptions);
+      */
       initialized.current = true
     }
   }, [])

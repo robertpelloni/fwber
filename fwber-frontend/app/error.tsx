@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import * as Sentry from '@sentry/nextjs'
+// import * as Sentry from '@sentry/nextjs'
 import { AlertTriangle, Home, RefreshCcw, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
@@ -21,8 +21,8 @@ export default function Error({
     // Log error for debugging
     console.error('App error:', error)
 
-    // Send error to error tracking service
-    Sentry.captureException(error)
+// Send error to error tracking service
+    // Sentry.captureException(error)
   }, [error])
 
   // Determine error type and messaging

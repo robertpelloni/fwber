@@ -3,7 +3,7 @@
  * Logs to console in development, sends to Sentry in production
  */
 
-import * as Sentry from '@sentry/nextjs';
+// import * as Sentry from '@sentry/nextjs';
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 type LogContext = 'auth' | 'websocket' | 'location' | 'api' | 'ui' | 'general';
@@ -50,21 +50,21 @@ function log(
       case 'warn':
         console.warn(consoleMessage, data);
         // Send warnings to Sentry with breadcrumb
-        Sentry.addBreadcrumb({
-          category: context,
-          message,
-          level: 'warning',
-          data,
-        });
+        // Sentry.addBreadcrumb({
+        //   category: context,
+        //   message,
+        //   level: 'warning',
+        //   data,
+        // });
         break;
       case 'error':
         console.error(consoleMessage, data);
         // Send errors to Sentry
-        Sentry.captureException(new Error(message), {
-          level: 'error',
-          tags: { context },
-          extra: data,
-        });
+        // Sentry.captureException(new Error(message), {
+        //   level: 'error',
+        //   tags: { context },
+        //   extra: data,
+        // });
         break;
     }
   }
@@ -249,18 +249,18 @@ export const logger = {
  * Set user context for Sentry
  */
 export const setUserContext = (user: { id: string | number; email: string; name?: string }) => {
-  Sentry.setUser({
-    id: String(user.id),
-    email: user.email,
-    username: user.name,
-  });
+  // Sentry.setUser({
+  //   id: String(user.id),
+  //   email: user.email,
+  //   username: user.name,
+  // });
 };
 
 /**
  * Clear user context (on logout)
  */
 export const clearUserContext = () => {
-  Sentry.setUser(null);
+  // Sentry.setUser(null);
 };
 
 /**
@@ -272,11 +272,11 @@ export const addBreadcrumb = (
   data?: any,
   level: 'debug' | 'info' | 'warning' | 'error' = 'info'
 ) => {
-  Sentry.addBreadcrumb({
-    category,
-    message,
-    level,
-    data,
-    timestamp: Date.now() / 1000,
-  });
+// Sentry.addBreadcrumb({
+  //   category,
+  //   message,
+  //   level,
+  //   data,
+  //   timestamp: Date.now() / 1000,
+  // });
 };

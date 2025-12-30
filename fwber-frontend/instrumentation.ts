@@ -1,6 +1,7 @@
-import type { NodeOptions, EdgeOptions } from '@sentry/nextjs';
+// import type { NodeOptions, EdgeOptions } from '@sentry/nextjs';
 
 export async function register() {
+  /*
   if (process.env.NEXT_RUNTIME === 'edge') {
     const Sentry = await import('@sentry/nextjs');
     
@@ -45,5 +46,6 @@ export async function register() {
 
     Sentry.init(serverOptions);
   }
+  */
 }
 
