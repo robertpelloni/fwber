@@ -168,16 +168,6 @@ export default function HomePage() {
       {/* Why FWBer Section (Moved Up) */}
       <div className="py-24 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16 max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-6">
-              The Future of Adult Socializing <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">What makes this one better?</span>
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
-              We&apos;re building the future of adult dating. A perfect blend of privacy, fun, and cutting-edge tech.
-            </p>
-          </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
             <div className="flex gap-4">
               <div className="flex-shrink-0 mt-1">
