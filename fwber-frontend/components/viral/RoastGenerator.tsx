@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { Button, ButtonProps } from '@/components/ui/button';
 import { useToast } from '@/lib/hooks/use-toast';
 import { useAuth } from '@/lib/auth-context';
 import { wingmanApi } from '@/lib/api/wingman';
@@ -92,7 +92,7 @@ export function RoastGenerator({ trigger }: RoastGeneratorProps) {
         </DialogHeader>
 
         {!result ? (
-          <Tabs defaultValue="roast" onValueChange={(val) => setMode(val as 'roast' | 'hype')} className="w-full">
+          <Tabs defaultValue="roast" onValueChange={(val: string) => setMode(val as 'roast' | 'hype')} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="roast">🔥 Roast Me</TabsTrigger>
               <TabsTrigger value="hype">✨ Hype Me</TabsTrigger>

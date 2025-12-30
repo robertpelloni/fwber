@@ -22,7 +22,7 @@ export function useVideoFaceBlur(originalStream: MediaStream | null): UseVideoFa
   const isBlurEnabledRef = useRef(isBlurEnabled);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const requestRef = useRef<number>();
+  const requestRef = useRef<number | undefined>(undefined);
   const detectionRef = useRef<any[]>([]);
   const lastDetectionTimeRef = useRef<number>(0);
   const faceApiRef = useRef<FaceApi | null>(null);

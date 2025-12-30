@@ -3,7 +3,9 @@
   "dependencies": {
     "@tanstack/react-query": "^5.90.16",
     "composer": "^4.1.0",
+    "laravel-echo": "^2.2.7",
     "lucide-react": "^0.562.0",
+    "pusher-js": "^8.4.0",
     "uv": "^1.4.0"
   }
 }

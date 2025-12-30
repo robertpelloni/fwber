@@ -33,7 +33,7 @@ export default function ChatroomPage() {
   const [showOnlineUsers, setShowOnlineUsers] = useState(false);
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const typingTimeoutRef = useRef<NodeJS.Timeout>();
+  const typingTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   // Get location for proximity chatrooms
   useEffect(() => {
