@@ -158,7 +158,7 @@ describe('Matching Flow', () => {
     cy.contains('I like hiking').should('be.visible');
 
     // Perform Like action (click Like button - Green Heart)
-    cy.get('.text-green-500').parent().click({ force: true });
+    cy.get('.text-green-500').click({ force: true });
 
     // Verify API call
     cy.wait('@matchAction').its('request.body').should('deep.equal', {

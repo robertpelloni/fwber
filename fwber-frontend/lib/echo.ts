@@ -52,10 +52,17 @@ export const initEcho = (token?: string) => {
         // Local Reverb defaults
         // Use window.location.hostname to allow testing on local network devices (e.g. mobile)
         // assuming the Reverb server is reachable on the same host as the frontend
+        
+        // However, if we are running in Cypress or automated environments where the websocket server might not be running,
+        // we might want to avoid crashing.
+        
         options.wsHost = window.location.hostname;
         options.wsPort = 8080;
         options.wssPort = 8080;
         options.forceTLS = false;
+
+        // Note: If you get a WebSocket connection error in the console, it likely means the Laravel Reverb server is not running locally.
+        // You can start it with `php artisan reverb:start` in the backend directory.
     } else {
         // Production fallback if ENV vars are missing
         // Since we are on shared hosting without a dedicated WebSocket server,
