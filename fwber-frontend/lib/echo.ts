@@ -81,7 +81,7 @@ export const initEcho = (token?: string) => {
                 if (err.type === 'WebSocketError' || err?.error?.data?.code === 4004) {
                     // silent
                 } else {
-                    console.error('Pusher connection error:', err);
+                    // console.error('Pusher connection error:', err);
                 }
             });
             // Also bind to state change to catch 'unavailable' state without error
