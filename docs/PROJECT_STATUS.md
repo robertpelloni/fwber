@@ -55,11 +55,12 @@ These features are considered complete and are ready for a production environmen
     *   [x] **Vouch System:** Social proof system allowing friends to vouch for users.
     *   [x] **Voice Messages:** Record and send voice notes in chat (with transcription support).
     *   [x] **Feedback Loop:** In-app feedback submission with AI categorization and sentiment analysis.
+    *   [x] **Share to Unlock (Viral):** Users can unlock premium features by sharing content (e.g. Roasts, Profile links) and getting views.
 *   **Operational Excellence:**
     *   [x] **Sentry Integration:** Error tracking for Frontend and Backend.
     *   [x] **APM:** Basic Application Performance Monitoring (Slow Request logging).
     *   [x] **PWA Polish:** Verified manifest, icons, and service worker for full installability.
-    *   [x] **End-to-End Testing:** Cypress tests for critical paths (Auth, Matching, Messaging, Wallet).
+    *   [x] **End-to-End Testing:** Cypress tests for critical paths (Auth, Matching, Messaging, Wallet, Match Insights).
 *   **Safety & Security:**
     *   [x] **Geo-Spoofing Detection:** Protects against location manipulation.
     *   [x] **Moderation Dashboard:** Tools for moderators to review flagged content.
