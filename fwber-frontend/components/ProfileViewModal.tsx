@@ -77,11 +77,7 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
       // Fetch insights
       setInsightLoading(true)
       apiClient.get<{ data: any }>(`/matches/${user.id}/insights`)
-        .then(res => {
-            console.log('Insights response:', res.data);
-            console.log('Setting insights to:', res.data.data);
-            setInsights(res.data.data)
-        })
+        .then(res => setInsights(res.data.data))
         .catch(err => console.error('Failed to load insights', err))
         .finally(() => setInsightLoading(false))
 
@@ -344,8 +340,7 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
                   </div>
 
                   {insights.is_locked && !isSubscribed ? (
-                    <div data-testid="locked-insights-view" className="bg-white/50 dark:bg-black/20 p-4 rounded-lg backdrop-blur-sm border border-white/20 text-center">
-                        <div className="hidden">{JSON.stringify(insights)}</div>
+                    <div className="bg-white/50 dark:bg-black/20 p-4 rounded-lg backdrop-blur-sm border border-white/20 text-center">
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 filter blur-[3px]">
                            Based on your lifestyle and preferences, we found that you are highly compatible in...
                         </p>
@@ -358,7 +353,7 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
                         </button>
                     </div>
                   ) : (
-                    <div data-testid="unlocked-insights-view" className="space-y-3">
+                    <div className="space-y-3">
                         <div className="text-sm text-gray-800 dark:text-gray-200 italic">
                            &ldquo;{insights.ai_explanation}&rdquo;
                         </div>

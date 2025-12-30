@@ -144,25 +144,13 @@ describe('Match Insights Integration', () => {
 
       // Wait for the insights request to actually happen
       cy.wait('@getLockedInsights');
-      
-      // Debugging: Check if we are in a loading state or error state
-      cy.get('body').then(($body) => {
-        if ($body.find('div.animate-pulse').length > 0) {
-            cy.log('STILL LOADING INSIGHTS');
-        }
-        if ($body.text().includes('Analysis unavailable')) {
-            cy.log('ANALYSIS UNAVAILABLE DETECTED');
-        }
-      });
 
       // Verify locked state elements
       cy.contains('85%').should('be.visible');
       cy.contains('Unlock Analysis (10 Tokens)').should('be.visible');
       
-      // Click unlock
-      cy.contains('Unlock Analysis (10 Tokens)').click();
-
-      // Now override the intercept to return UNLOCKED insights
+      // Override the intercept to return UNLOCKED insights BEFORE we click
+      // The initial load has already finished, so this new intercept will catch the re-fetch
       cy.intercept('GET', `**/api/matches/${match.id}/insights`, {
         statusCode: 200,
         body: {
@@ -179,6 +167,9 @@ describe('Match Insights Integration', () => {
             }
         }
       }).as('getUnlockedInsights');
+
+      // Click unlock
+      cy.contains('Unlock Analysis (10 Tokens)').click();
 
       // Verify API call and UI update
       cy.wait('@unlockInsights');
