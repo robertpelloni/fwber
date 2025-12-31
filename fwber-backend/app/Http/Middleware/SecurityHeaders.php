@@ -21,6 +21,11 @@ class SecurityHeaders
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Force HTTPS in production
+        if (!$request->secure() && app()->environment('production')) {
+            return redirect()->secure($request->getRequestUri());
+        }
+
         $response = $next($request);
 
         // Prevent MIME type sniffing
@@ -41,17 +46,13 @@ class SecurityHeaders
         $isProd = app()->environment('production');
         $relaxed = (bool) env('CSP_RELAXED', !$isProd);
 
-        $scriptDirectives = $relaxed
-            ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
-            : "script-src 'self'";
+        $scriptDirectives = "script-src 'self'";
 
         // Production: remove unsafe-inline if possible, or strictly document why it is needed.
         // For now, we will default to 'self' in production unless CSP_RELAXED is true.
         // If your frontend needs inline scripts (e.g. for some libs), you might need to add hashes or nonces.
         
-        $styleDirectives = $relaxed
-            ? "style-src 'self' 'unsafe-inline'"
-            : "style-src 'self' 'unsafe-inline'"; // Kept unsafe-inline for styles as it's common for CSS-in-JS frameworks
+        $styleDirectives = "style-src 'self' 'unsafe-inline'"; // Kept unsafe-inline for styles as it's common for CSS-in-JS frameworks
         
         $frameAncestors = "frame-ancestors 'none'";
 
