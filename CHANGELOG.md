@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.19] - 2025-12-31
+
+### Added
+- **Solana Integration**: Full merge of Solana crypto features, including wallet connection and token management.
+- **Vouch Leaderboard**: Added detailed breakdown (Safe/Fun/Hot) to the leaderboard API and UI.
+- **Token-Gated Events**: Implemented backend logic and frontend UI for events requiring FWB tokens for entry.
+- **Media Analysis**: Verified AWS Rekognition and OpenAI Vision drivers are in place for content safety.
+
+### Fixed
+- **Database Schema**: Confirmed `token_cost` column exists in `events` table via migration.
+- **Event Creation**: ensured `token_cost` is properly handled in `StoreEventRequest` and `EventController`.
+
 ## [0.3.18] - 2025-12-30
 
 ### Fixed
