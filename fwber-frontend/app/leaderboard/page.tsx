@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { apiClient } from '@/lib/api/client'
-import { Trophy, Users, TrendingUp, Star } from 'lucide-react'
+import VouchLeaderboard from '@/components/VouchLeaderboard'
+import { Trophy, Users, TrendingUp } from 'lucide-react'
+
 
 interface LeaderboardData {
   top_holders: Array<{
@@ -22,6 +24,11 @@ interface LeaderboardData {
   top_vouched: Array<{
     name: string
     vouches: number
+    breakdown?: {
+      safe: number
+      fun: number
+      hot: number
+    }
   }>
   top_streaks: Array<{
     name: string
@@ -143,37 +150,7 @@ export default function LeaderboardPage() {
             </div>
 
             {/* Top Vouched */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-              <div className="p-6 bg-gradient-to-r from-indigo-500 to-violet-500 text-white flex items-center gap-3">
-                <Star className="w-6 h-6" />
-                <h2 className="text-xl font-bold">Most Vouched</h2>
-              </div>
-              <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                {data.top_vouched?.map((user, index) => (
-                  <div key={index} className="p-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className={`w-8 h-8 flex items-center justify-center rounded-full font-bold ${
-                        index === 0 ? 'bg-yellow-100 text-yellow-700' :
-                        index === 1 ? 'bg-gray-100 text-gray-700' :
-                        index === 2 ? 'bg-orange-100 text-orange-700' :
-                        'text-gray-500'
-                      }`}>
-                        {index + 1}
-                      </span>
-                      <p className="font-medium text-gray-900 dark:text-white">{user.name}</p>
-                    </div>
-                    <span className="font-bold text-gray-900 dark:text-white">
-                      {user.vouches}
-                    </span>
-                  </div>
-                ))}
-                {(!data.top_vouched || data.top_vouched.length === 0) && (
-                  <div className="p-8 text-center text-gray-500">
-                    No vouches yet.
-                  </div>
-                )}
-              </div>
-            </div>
+            <VouchLeaderboard data={data.top_vouched} />
 
             {/* Top Streaks */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">

@@ -289,7 +289,18 @@ class TokenController extends Controller
                     ];
                 });
 
-            $topVouched = User::withCount('vouches')
+            $topVouched = User::withCount([
+                    'vouches',
+                    'vouches as safe_count' => function ($query) {
+                        $query->where('type', 'safe');
+                    },
+                    'vouches as fun_count' => function ($query) {
+                        $query->where('type', 'fun');
+                    },
+                    'vouches as hot_count' => function ($query) {
+                        $query->where('type', 'hot');
+                    }
+                ])
                 ->orderByDesc('vouches_count')
                 ->take(10)
                 ->get(['id', 'name'])
@@ -297,6 +308,11 @@ class TokenController extends Controller
                     return [
                         'name' => substr($user->name, 0, 3) . '***',
                         'vouches' => $user->vouches_count,
+                        'breakdown' => [
+                            'safe' => $user->safe_count,
+                            'fun' => $user->fun_count,
+                            'hot' => $user->hot_count,
+                        ]
                     ];
                 });
 
