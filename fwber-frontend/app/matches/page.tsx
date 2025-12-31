@@ -11,6 +11,7 @@ import MatchFilter from '@/components/MatchFilter';
 import Image from 'next/image';
 import ProfileViewModal from '@/components/ProfileViewModal';
 import CreateBountyModal from '@/components/CreateBountyModal';
+import BoostButton from '@/components/BoostButton';
 
 export default function MatchesPage() {
   const [matches, setMatches] = useState<any[]>([]);
@@ -89,7 +90,10 @@ export default function MatchesPage() {
     <div className="container mx-auto p-4 max-w-md">
       <ToastContainer />
       <div className="mb-4 space-y-4">
-        <CreateBountyModal />
+        <div className="flex justify-between items-center">
+            <CreateBountyModal />
+            <BoostButton />
+        </div>
         <MatchFilter onFilterChange={handleFilterChange} />
       </div>
 
