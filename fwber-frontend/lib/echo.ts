@@ -51,6 +51,7 @@ export const initEcho = (token?: string) => {
     } else {
         // Production defaults if no host specified (assume standard Pusher)
         options.cluster = process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER || 'mt1';
+        options.forceTLS = true;
     }
 
     if (token) {
