@@ -48,6 +48,9 @@ export const initEcho = (token?: string) => {
         options.wsPort = 8080;
         options.wssPort = 8080;
         options.forceTLS = false;
+    } else {
+        // Production defaults if no host specified (assume standard Pusher)
+        options.cluster = process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER || 'mt1';
     }
 
     if (token) {
