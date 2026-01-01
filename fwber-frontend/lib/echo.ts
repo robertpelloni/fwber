@@ -19,7 +19,7 @@ export const initEcho = (token?: string) => {
     const isDev = process.env.NODE_ENV === 'development';
     
     // Handle the case where the user has 'your_app_key' in their .env file (common copy-paste error)
-    let appKey = process.env.NEXT_PUBLIC_PUSHER_APP_KEY || 'app-key';
+    let appKey = process.env.NEXT_PUBLIC_REVERB_APP_KEY || process.env.NEXT_PUBLIC_PUSHER_APP_KEY || 'app-key';
     if (appKey === 'your_app_key') {
         // Only warn once to avoid spamming
         if (!window.localStorage.getItem('fwber_suppress_app_key_warn')) {
@@ -30,28 +30,35 @@ export const initEcho = (token?: string) => {
     }
 
     const options: any = {
-        broadcaster: 'pusher',
+        broadcaster: 'reverb',
         key: appKey,
-        cluster: process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER || 'mt1',
-        forceTLS: process.env.NEXT_PUBLIC_PUSHER_SCHEME === 'https',
-        disableStats: true,
+        wsHost: process.env.NEXT_PUBLIC_REVERB_HOST,
+        wsPort: process.env.NEXT_PUBLIC_REVERB_PORT,
+        wssPort: process.env.NEXT_PUBLIC_REVERB_PORT,
+        forceTLS: (process.env.NEXT_PUBLIC_REVERB_SCHEME ?? 'https') === 'https',
         enabledTransports: ['ws', 'wss'],
     };
 
     if (process.env.NEXT_PUBLIC_PUSHER_HOST) {
+        options.broadcaster = 'pusher';
         options.wsHost = process.env.NEXT_PUBLIC_PUSHER_HOST;
         options.wsPort = process.env.NEXT_PUBLIC_PUSHER_PORT ? parseInt(process.env.NEXT_PUBLIC_PUSHER_PORT) : 80;
         options.wssPort = process.env.NEXT_PUBLIC_PUSHER_PORT ? parseInt(process.env.NEXT_PUBLIC_PUSHER_PORT) : 443;
+        options.forceTLS = process.env.NEXT_PUBLIC_PUSHER_SCHEME === 'https';
+        options.cluster = process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER || 'mt1';
     } else if (isDev) {
         // Local Reverb defaults
-        options.wsHost = window.location.hostname;
-        options.wsPort = 8080;
-        options.wssPort = 8080;
-        options.forceTLS = false;
+        if (!options.wsHost) options.wsHost = window.location.hostname;
+        if (!options.wsPort) options.wsPort = 8080;
+        if (!options.wssPort) options.wssPort = 8080;
+        if (!options.forceTLS) options.forceTLS = false;
     } else {
         // Production defaults if no host specified (assume standard Pusher)
-        options.cluster = process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER || 'mt1';
-        options.forceTLS = true;
+        if (!options.wsHost) { // Fallback to pusher if Reverb vars missing
+             options.broadcaster = 'pusher';
+             options.cluster = process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER || 'mt1';
+             options.forceTLS = true;
+        }
     }
 
     if (token) {
@@ -61,7 +68,20 @@ export const initEcho = (token?: string) => {
                 Authorization: `Bearer ${token}`,
             },
         };
+    } else {
+        options.authEndpoint = `${process.env.NEXT_PUBLIC_API_URL}/broadcasting/auth`;
+        options.auth = {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        };
     }
+
+    // Always ensure credentials are sent for Sanctum cookie auth
+    options.withCredentials = true;
+    // Ensure auth options also carry the flag if the library expects it there
+    if (!options.auth) options.auth = {};
+    options.auth.withCredentials = true;
 
     if (isDev) {
          // @ts-ignore
