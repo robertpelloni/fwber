@@ -52,4 +52,10 @@ class Event extends Model
                     ->withPivot('status')
                     ->withTimestamps();
     }
+
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class, 'event_groups')
+                    ->withTimestamps();
+    }
 }

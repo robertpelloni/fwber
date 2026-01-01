@@ -33,6 +33,7 @@ export interface CreateEventRequest {
   max_attendees?: number;
   price?: number;
   token_cost?: number;
+  shared_group_ids?: number[];
 }
 
 export async function getNearbyEvents(latitude?: number, longitude?: number, radius: number = 50, type?: string): Promise<PaginatedResponse<Event>> {

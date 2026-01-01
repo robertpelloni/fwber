@@ -22,12 +22,21 @@ class Group extends Model
         'chatroom_id',
         'max_members',
         'token_entry_fee',
+        'category',
+        'tags',
+        'matching_enabled',
+        'location_lat',
+        'location_lon',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'member_count' => 'integer',
         'max_members' => 'integer',
+        'matching_enabled' => 'boolean',
+        'tags' => 'array',
+        'location_lat' => 'double',
+        'location_lon' => 'double',
     ];
 
     public function creator()
@@ -82,5 +91,10 @@ class Group extends Model
     public function scopePublic($query)
     {
         return $query->where('privacy', 'public');
+    }
+
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'event_groups');
     }
 }

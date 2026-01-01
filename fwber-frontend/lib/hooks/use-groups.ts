@@ -9,6 +9,13 @@ import {
   getGroupPosts,
   createGroupPost,
   deleteGroupPost,
+  getGroupMatches,
+  requestGroupMatch,
+  getGroupMatchRequests,
+  getConnectedGroups,
+  acceptGroupMatchRequest,
+  rejectGroupMatchRequest,
+  getGroupEvents, // Added
   CreateGroupRequest,
   CreateGroupPostRequest,
 } from '../api/groups';
@@ -99,4 +106,69 @@ export function useDeleteGroupPost() {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
     },
   });
+}
+
+export function useGroupMatches(groupId: number) {
+  return useQuery({
+    queryKey: ['groups', groupId, 'matches'],
+    queryFn: () => getGroupMatches(groupId),
+    enabled: !!groupId,
+  });
+}
+
+export function useRequestGroupMatch(groupId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (targetGroupId: number) => requestGroupMatch(groupId, targetGroupId),
+    onSuccess: () => {
+      // Invalidate matches list to reflect status changes if any (e.g. if we show pending status)
+      queryClient.invalidateQueries({ queryKey: ['groups', groupId, 'matches'] });
+      queryClient.invalidateQueries({ queryKey: ['groups', groupId, 'requests'] });
+    },
+  });
+}
+
+export function useGroupMatchRequests(groupId: number) {
+    return useQuery({
+        queryKey: ['groups', groupId, 'requests'],
+        queryFn: () => getGroupMatchRequests(groupId),
+        enabled: !!groupId,
+    });
+}
+
+export function useConnectedGroups(groupId: number) {
+    return useQuery({
+        queryKey: ['groups', groupId, 'connected'],
+        queryFn: () => getConnectedGroups(groupId),
+        enabled: !!groupId,
+    });
+}
+
+export function useAcceptMatchRequest(groupId: number) {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (matchId: number) => acceptGroupMatchRequest(groupId, matchId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['groups', groupId, 'requests'] });
+            // Potentially invalidate connections/established matches list if we add one
+        },
+    });
+}
+
+export function useRejectMatchRequest(groupId: number) {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (matchId: number) => rejectGroupMatchRequest(groupId, matchId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['groups', groupId, 'requests'] });
+        },
+    });
+}
+
+export function useGroupEvents(groupId: number) {
+    return useQuery({
+        queryKey: ['groups', groupId, 'events'],
+        queryFn: () => getGroupEvents(groupId),
+        enabled: !!groupId,
+    });
 }

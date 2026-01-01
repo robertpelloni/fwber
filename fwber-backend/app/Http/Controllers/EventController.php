@@ -150,7 +150,8 @@ class EventController extends Controller
      *             @OA\Property(property="starts_at", type="string", format="date-time"),
      *             @OA\Property(property="ends_at", type="string", format="date-time"),
      *             @OA\Property(property="max_attendees", type="integer", nullable=true),
-     *             @OA\Property(property="price", type="number", format="float", nullable=true)
+     *             @OA\Property(property="price", type="number", format="float", nullable=true),
+     *             @OA\Property(property="shared_group_ids", type="array", @OA\Items(type="integer"), nullable=true)
      *         )
      *     ),
      *     @OA\Response(
@@ -170,6 +171,14 @@ class EventController extends Controller
             'created_by_user_id' => Auth::id(),
             'status' => 'upcoming',
         ]);
+
+        // Attach shared groups if provided
+        if ($request->has('shared_group_ids')) {
+             $groupIds = $request->input('shared_group_ids');
+             // Validate user is admin of these groups or they are connected?
+             // For now, simple attachment
+             $event->groups()->attach($groupIds);
+        }
 
         // Invalidate events cache
         Cache::tags(['events'])->flush();
@@ -199,7 +208,7 @@ class EventController extends Controller
      */
     public function show($id)
     {
-        $event = Event::with(['creator', 'attendees.user'])
+        $event = Event::with(['creator', 'attendees.user', 'groups'])
             ->withCount('attendees')
             ->findOrFail($id);
             

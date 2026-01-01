@@ -18,19 +18,28 @@ const formSchema = z.object({
   icon: z.string().optional(),
   privacy: z.enum(['public', 'private']),
   token_entry_fee: z.string().optional().transform(val => val ? parseFloat(val) : 0),
+  category: z.string().optional(),
+  tags: z.string().optional().transform(val => val ? val.split(',').map(tag => tag.trim()).filter(Boolean) : []),
+  matching_enabled: z.boolean().default(false),
 });
+
+import { Controller } from 'react-hook-form';
+import { Switch } from '@/components/ui/switch';
+
+// ... (existing imports and schema code)
 
 export default function CreateGroupPage() {
   const router = useRouter();
   const createGroup = useCreateGroup();
 
-  const { register, handleSubmit, formState: { errors } } = useForm<z.infer<typeof formSchema>>({
+  const { register, handleSubmit, control, formState: { errors } } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
       description: '',
       icon: '👥',
       privacy: 'public',
+      matching_enabled: false,
     },
   });
 
@@ -62,11 +71,38 @@ export default function CreateGroupPage() {
               {errors.description && <p className="text-sm text-red-500">{errors.description.message}</p>}
             </div>
 
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="category">Category</Label>
+                  <select 
+                    id="category" 
+                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    {...register('category')}
+                  >
+                    <option value="">Select a category</option>
+                    <option value="social">Social</option>
+                    <option value="hobbies">Hobbies</option>
+                    <option value="tech">Technology</option>
+                    <option value="sports">Sports</option>
+                    <option value="music">Music</option>
+                    <option value="gaming">Gaming</option>
+                    <option value="other">Other</option>
+                  </select>
+                  {errors.category && <p className="text-sm text-red-500">{errors.category.message}</p>}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="icon">Icon (Emoji)</Label>
+                  <Input id="icon" placeholder="⛰️" {...register('icon')} />
+                  {errors.icon && <p className="text-sm text-red-500">{errors.icon.message}</p>}
+                </div>
+            </div>
+
             <div className="space-y-2">
-              <Label htmlFor="icon">Icon (Emoji)</Label>
-              <Input id="icon" placeholder="⛰️" {...register('icon')} />
-              <p className="text-xs text-muted-foreground">Enter an emoji to represent your group.</p>
-              {errors.icon && <p className="text-sm text-red-500">{errors.icon.message}</p>}
+              <Label htmlFor="tags">Tags (comma separated)</Label>
+              <Input id="tags" placeholder="hiking, outdoors, nature" {...register('tags')} />
+              <p className="text-xs text-muted-foreground">Helps people find your group.</p>
+              {errors.tags && <p className="text-sm text-red-500">{errors.tags.message}</p>}
             </div>
 
             <div className="space-y-2">
@@ -80,6 +116,24 @@ export default function CreateGroupPage() {
                 <option value="private">Private - Invite only</option>
               </select>
               {errors.privacy && <p className="text-sm text-red-500">{errors.privacy.message}</p>}
+            </div>
+
+            <div className="flex items-center space-x-2">
+                <Controller
+                    control={control}
+                    name="matching_enabled"
+                    render={({ field }) => (
+                        <Switch
+                            id="matching_enabled"
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                        />
+                    )}
+                />
+                <div className="grid gap-1.5 leading-none">
+                    <Label htmlFor="matching_enabled">Enable Group Matching</Label>
+                    <p className="text-sm text-muted-foreground">Allows your group to be matched with other groups nearby.</p>
+                </div>
             </div>
 
             <div className="space-y-2">

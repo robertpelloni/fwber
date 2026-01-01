@@ -33,6 +33,11 @@ class GroupService
                 'is_active' => true,
                 'token_entry_fee' => $data['token_entry_fee'] ?? 0,
                 'member_count' => 1,
+                'category' => $data['category'] ?? null,
+                'tags' => $data['tags'] ?? null,
+                'matching_enabled' => $data['matching_enabled'] ?? false,
+                'location_lat' => $data['location_lat'] ?? null,
+                'location_lon' => $data['location_lon'] ?? null,
             ]);
 
             // Create associated chatroom

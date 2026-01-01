@@ -251,6 +251,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('groups/my-groups', [\App\Http\Controllers\GroupController::class, 'myGroups']);
     Route::post('groups/{id}/join', [\App\Http\Controllers\GroupController::class, 'join']);
     Route::post('groups/{id}/leave', [\App\Http\Controllers\GroupController::class, 'leave']);
+    Route::get('groups/{id}/matches', [\App\Http\Controllers\GroupController::class, 'matches']);
+    Route::get('groups/{id}/matches/requests', [\App\Http\Controllers\GroupController::class, 'matchRequests']);
+    Route::get('groups/{id}/matches/connected', [\App\Http\Controllers\GroupController::class, 'connectedMatches']);
+    Route::post('groups/{id}/matches/{targetGroupId}/connect', [\App\Http\Controllers\GroupController::class, 'requestMatch']);
+    Route::post('groups/{id}/matches/requests/{matchId}/accept', [\App\Http\Controllers\GroupController::class, 'acceptMatchRequest']);
+    Route::post('groups/{id}/matches/requests/{matchId}/reject', [\App\Http\Controllers\GroupController::class, 'rejectMatchRequest']);
+    Route::get('groups/{id}/events', [\App\Http\Controllers\GroupController::class, 'events']);
     Route::apiResource('groups', \App\Http\Controllers\GroupController::class);
 
     // Premium

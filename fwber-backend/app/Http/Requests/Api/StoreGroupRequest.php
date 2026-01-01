@@ -19,6 +19,11 @@ class StoreGroupRequest extends FormRequest
             'visibility' => 'sometimes|in:public,private',
             'max_members' => 'sometimes|integer|min:2|max:500',
             'token_entry_fee' => 'sometimes|numeric|min:0',
+            'category' => 'nullable|string|max:50',
+            'tags' => 'nullable|array',
+            'matching_enabled' => 'boolean',
+            'location_lat' => 'nullable|numeric',
+            'location_lon' => 'nullable|numeric',
         ];
     }
 }
