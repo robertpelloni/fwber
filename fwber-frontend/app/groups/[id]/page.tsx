@@ -159,64 +159,121 @@ export default function GroupDetailPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Feed */}
+        {/* Main Content Area */}
         <div className="lg:col-span-2 space-y-6">
-          {isMember ? (
-            <Card>
-              <CardContent className="pt-6">
-                <form onSubmit={handlePostSubmit} className="flex gap-4">
-                  <Input 
-                    placeholder="Share something with the group..." 
-                    value={postContent}
-                    onChange={(e) => setPostContent(e.target.value)}
-                    className="flex-1"
-                  />
-                  <Button type="submit" disabled={createPost.isPending || !postContent.trim()}>
-                    <Send className="w-4 h-4" />
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card className="bg-muted/50">
-              <CardContent className="py-8 text-center text-muted-foreground">
-                Join this group to view and create posts.
-              </CardContent>
-            </Card>
-          )}
+          <Tabs defaultValue="feed" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsTrigger value="feed">Discussion Feed</TabsTrigger>
+              <TabsTrigger value="events">Events</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="feed" className="space-y-6">
+              {isMember ? (
+                <Card>
+                  <CardContent className="pt-6">
+                    <form onSubmit={handlePostSubmit} className="flex gap-4">
+                      <Input 
+                        placeholder="Share something with the group..." 
+                        value={postContent}
+                        onChange={(e) => setPostContent(e.target.value)}
+                        className="flex-1"
+                      />
+                      <Button type="submit" disabled={createPost.isPending || !postContent.trim()}>
+                        <Send className="w-4 h-4" />
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card className="bg-muted/50">
+                  <CardContent className="py-8 text-center text-muted-foreground">
+                    Join this group to view and create posts.
+                  </CardContent>
+                </Card>
+              )}
 
-          {isLoadingPosts ? (
-            <div className="text-center py-8">Loading posts...</div>
-          ) : posts?.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">No posts yet. Be the first to share!</div>
-          ) : (
-            posts?.map(post => (
-              <Card key={post.id}>
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        {post.user?.name?.[0] || 'U'}
-                      </div>
-                      <div>
-                        <div className="font-semibold">{post.user?.name || 'Unknown User'}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {new Date(post.created_at).toLocaleDateString()}
+              {isLoadingPosts ? (
+                <div className="text-center py-8">Loading posts...</div>
+              ) : posts?.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">No posts yet. Be the first to share!</div>
+              ) : (
+                posts?.map(post => (
+                  <Card key={post.id}>
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-start">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            {post.user?.name?.[0] || 'U'}
+                          </div>
+                          <div>
+                            <div className="font-semibold">{post.user?.name || 'Unknown User'}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {new Date(post.created_at).toLocaleDateString()}
+                            </div>
+                          </div>
                         </div>
+                        {/* Allow deletion if it's my post (logic simplified here, ideally check user ID) */}
+                        <Button variant="ghost" size="icon" onClick={() => handleDeletePost(post.id)}>
+                          <Trash2 className="w-4 h-4 text-muted-foreground hover:text-destructive" />
+                        </Button>
                       </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="whitespace-pre-wrap">{post.content}</p>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </TabsContent>
+
+            <TabsContent value="events" className="space-y-6">
+                 {isLoadingEvents ? (
+                    <div className="text-center py-8">Loading events...</div>
+                  ) : events?.length === 0 ? (
+                    <Card className="bg-muted/50">
+                      <CardContent className="py-12 text-center text-muted-foreground">
+                        <Calendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                        <h3 className="text-lg font-semibold mb-2">No Upcoming Events</h3>
+                        <p>This group hasn't planned or shared any events yet.</p>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <div className="space-y-4">
+                        {events?.map((event: any) => (
+                            <Link href={`/events/${event.id}`} key={event.id} className="block">
+                                <Card className="hover:border-primary/50 transition-colors">
+                                    <CardContent className="p-4 flex gap-4">
+                                        <div className="w-16 h-16 bg-primary/10 rounded-lg flex flex-col items-center justify-center text-primary shrink-0">
+                                            <span className="text-xs font-bold uppercase">{new Date(event.start_time).toLocaleString('default', { month: 'short' })}</span>
+                                            <span className="text-xl font-bold">{new Date(event.start_time).getDate()}</span>
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <h3 className="font-semibold text-lg truncate">{event.title}</h3>
+                                            <div className="flex items-center text-sm text-muted-foreground mt-1 gap-4">
+                                                <span className="flex items-center gap-1">
+                                                    <Clock className="w-3 h-3" />
+                                                    {new Date(event.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </span>
+                                                <span className="flex items-center gap-1">
+                                                    <MapPin className="w-3 h-3" />
+                                                    {event.location_name || 'TBD'}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-2 mt-2">
+                                                <Badge variant="secondary" className="text-xs">
+                                                    {event.attendees_count || 0} attending
+                                                </Badge>
+                                                {/* If we had shared_by info, we could show it here */}
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </Link>
+                        ))}
                     </div>
-                    {/* Allow deletion if it's my post (logic simplified here, ideally check user ID) */}
-                    <Button variant="ghost" size="icon" onClick={() => handleDeletePost(post.id)}>
-                      <Trash2 className="w-4 h-4 text-muted-foreground hover:text-destructive" />
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="whitespace-pre-wrap">{post.content}</p>
-                </CardContent>
-              </Card>
-            ))
-          )}
+                  )}
+            </TabsContent>
+          </Tabs>
         </div>
 
         {/* Sidebar - Members */}
