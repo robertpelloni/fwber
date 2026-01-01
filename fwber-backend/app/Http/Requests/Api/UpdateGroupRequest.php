@@ -18,6 +18,11 @@ class UpdateGroupRequest extends FormRequest
             'description' => 'nullable|string|max:1000',
             'visibility' => 'sometimes|in:public,private',
             'max_members' => 'sometimes|integer|min:2|max:500',
+            'category' => 'nullable|string|max:50',
+            'tags' => 'nullable|array',
+            'matching_enabled' => 'boolean',
+            'location_lat' => 'nullable|numeric',
+            'location_lon' => 'nullable|numeric',
         ];
     }
 }

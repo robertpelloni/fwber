@@ -13,13 +13,236 @@ use App\Services\GroupService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
+use App\Services\GroupMatchingService;
+
 class GroupController extends Controller
 {
     protected GroupService $groupService;
+    protected GroupMatchingService $matchingService;
 
-    public function __construct(GroupService $groupService)
+    public function __construct(GroupService $groupService, GroupMatchingService $matchingService)
     {
         $this->groupService = $groupService;
+        $this->matchingService = $matchingService;
+    }
+
+    /**
+     * Get matching groups suggestions
+     *
+     * @OA\Get(
+     *   path="/groups/{groupId}/matches",
+     *   tags={"Groups"},
+     *   summary="Get matching groups for a group (owner/admin)",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="radius", in="query", required=false, @OA\Schema(type="integer", default=50)),
+     *   @OA\Response(response=200, description="List of matching groups"),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     * )
+     */
+    public function matches(int $groupId): JsonResponse
+    {
+        $group = Group::findOrFail($groupId);
+        $userId = Auth::id();
+
+        // Ensure user is admin or owner
+        $member = $group->activeMembers()->where('user_id', $userId)->first();
+        if (!$member || !$member->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $radius = request()->input('radius', 50);
+        $matches = $this->matchingService->findMatches($group, $radius);
+
+        // Calculate scores for each match
+        $scoredMatches = $matches->map(function ($match) use ($group) {
+            $match->match_score = $this->matchingService->calculateCompatibilityScore($group, $match);
+            return $match;
+        })->sortByDesc('match_score')->values();
+
+        return response()->json(['matches' => $scoredMatches]);
+    }
+
+    /**
+     * Request a match with another group
+     *
+     * @OA\Post(
+     *   path="/groups/{groupId}/matches/{targetGroupId}/connect",
+     *   tags={"Groups"},
+     *   summary="Request a match with another group",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="targetGroupId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=201, description="Match requested"),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *   @OA\Response(response=400, description="Invalid request (e.g. already matched)")
+     * )
+     */
+    public function requestMatch(int $groupId, int $targetGroupId): JsonResponse
+    {
+        $group = Group::findOrFail($groupId);
+        $targetGroup = Group::findOrFail($targetGroupId);
+        $user = Auth::user();
+
+        try {
+            $match = $this->matchingService->requestMatch($group, $targetGroup, $user);
+            return response()->json(['message' => 'Match request sent', 'match' => $match], 201);
+        } catch (\Exception $e) {
+             return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * Get pending match requests for a group (Incoming and Outgoing)
+     *
+     * @OA\Get(
+     *   path="/groups/{groupId}/matches/requests",
+     *   tags={"Groups"},
+     *   summary="Get pending match requests",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="List of requests"),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
+     * )
+     */
+    public function matchRequests(int $groupId): JsonResponse
+    {
+        $group = Group::findOrFail($groupId);
+        $user = Auth::user();
+
+        // Check admin permission
+        $member = $group->activeMembers()->where('user_id', $user->id)->first();
+        if (!$member || !$member->isAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $allPending = $this->matchingService->getPendingRequests($group);
+
+        // Separate into Incoming vs Outgoing
+        $incoming = [];
+        $outgoing = [];
+
+        foreach ($allPending as $match) {
+            // If initiator is a member of THIS group, it's outgoing.
+            // Note: $match->initiated_by_user_id
+            $isInitiatedByThisGroup = $group->members()->where('user_id', $match->initiated_by_user_id)->exists();
+            
+            // Format the "other" group for display
+            $otherGroup = ($match->group_id_1 === $group->id) ? $match->group2 : $match->group1;
+            
+            $data = [
+                'id' => $match->id,
+                'status' => $match->status,
+                'created_at' => $match->created_at,
+                'other_group' => $otherGroup,
+                'initiator' => $match->initiator
+            ];
+
+            if ($isInitiatedByThisGroup) {
+                $outgoing[] = $data;
+            } else {
+                $incoming[] = $data;
+            }
+        }
+
+        return response()->json([
+            'incoming' => $incoming,
+            'outgoing' => $outgoing
+        ]);
+    }
+
+    /**
+     * Get connected groups (accepted matches)
+     *
+     * @OA\Get(
+     *   path="/groups/{groupId}/matches/connected",
+     *   tags={"Groups"},
+     *   summary="Get connected groups",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="List of connected groups"),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
+     * )
+     */
+    public function connectedMatches(int $groupId): JsonResponse
+    {
+        $group = Group::findOrFail($groupId);
+        $user = Auth::user();
+
+        // Check membership (any member can see connected groups?)
+        // Let's say yes, any member can see who they are matched with.
+        if (!$group->hasMember($user->id)) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $connectedGroups = $this->matchingService->getConnectedGroups($group);
+
+        return response()->json(['connected' => $connectedGroups]);
+    }
+
+    /**
+     * Accept a match request
+     *
+     * @OA\Post(
+     *   path="/groups/{groupId}/matches/requests/{matchId}/accept",
+     *   tags={"Groups"},
+     *   summary="Accept a match request",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="matchId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Match accepted"),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
+     * )
+     */
+    public function acceptMatchRequest(int $groupId, int $matchId): JsonResponse
+    {
+        $match = \App\Models\GroupMatch::findOrFail($matchId);
+        $user = Auth::user();
+        
+        // Verify group context (ensure request url matches logic, though service handles auth)
+        if ($match->group_id_1 !== $groupId && $match->group_id_2 !== $groupId) {
+             return response()->json(['error' => 'Match does not involve this group'], 404);
+        }
+
+        try {
+            $this->matchingService->acceptMatch($match, $user);
+            return response()->json(['message' => 'Match accepted']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * Reject a match request
+     *
+     * @OA\Post(
+     *   path="/groups/{groupId}/matches/requests/{matchId}/reject",
+     *   tags={"Groups"},
+     *   summary="Reject a match request",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(name="matchId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Match rejected"),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
+     * )
+     */
+    public function rejectMatchRequest(int $groupId, int $matchId): JsonResponse
+    {
+        $match = \App\Models\GroupMatch::findOrFail($matchId);
+        $user = Auth::user();
+
+        if ($match->group_id_1 !== $groupId && $match->group_id_2 !== $groupId) {
+             return response()->json(['error' => 'Match does not involve this group'], 404);
+        }
+
+        try {
+            $this->matchingService->rejectMatch($match, $user);
+            return response()->json(['message' => 'Match rejected']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
     }
 
     /**
@@ -600,5 +823,42 @@ class GroupController extends Controller
             ->paginate($validated['per_page'] ?? 20);
 
         return response()->json($groups);
+    }
+
+    /**
+     * Get events for a group
+     *
+     * @OA\Get(
+     *   path="/groups/{groupId}/events",
+     *   tags={"Groups"},
+     *   summary="Get events for a group (shared and owned)",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="groupId", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="List of events"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *   @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
+    public function events(int $groupId): JsonResponse
+    {
+        $group = Group::findOrFail($groupId);
+        $user = Auth::user();
+
+        // Check if user has permission to view group events
+        // If private, must be a member
+        if ($group->visibility === 'private' && !$group->hasMember($user->id)) {
+             return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        // Fetch events associated with the group (via pivot table)
+        // Also fetch events created by the group if we add that column later, but for now relies on event_groups
+        $events = $group->events()
+            ->with(['creator', 'attendees'])
+            ->withCount('attendees')
+            ->orderBy('start_time', 'asc')
+            ->where('end_time', '>', now()) // Only future/ongoing events? Or all? Let's do upcoming by default
+            ->get();
+
+        return response()->json(['events' => $events]);
     }
 }

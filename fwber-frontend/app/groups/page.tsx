@@ -12,16 +12,24 @@ export default function GroupsPage() {
   const { data: groupsData, isLoading: isLoadingGroups } = useGroups();
   const { data: myGroupsData, isLoading: isLoadingMyGroups } = useMyGroups();
   const [search, setSearch] = React.useState('');
+  const [selectedCategory, setSelectedCategory] = React.useState<string>('');
 
   const groups = groupsData?.data || [];
   const myGroups = myGroupsData?.data || [];
 
-  const filteredGroups = groups.filter((group) => 
-    group.name.toLowerCase().includes(search.toLowerCase()) ||
-    (group.description && group.description.toLowerCase().includes(search.toLowerCase()))
-  );
+  const filteredGroups = groups.filter((group) => {
+    const matchesSearch = group.name.toLowerCase().includes(search.toLowerCase()) ||
+    (group.description && group.description.toLowerCase().includes(search.toLowerCase())) ||
+    (group.tags && group.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase())));
+
+    const matchesCategory = selectedCategory ? group.category === selectedCategory : true;
+
+    return matchesSearch && matchesCategory;
+  });
 
   const myGroupIds = new Set(myGroups.map(g => g.id));
+  
+  const categories = Array.from(new Set(groups.map(g => g.category).filter(Boolean)));
 
   if (isLoadingGroups || isLoadingMyGroups) {
     return <div className="p-8 text-center">Loading groups...</div>;
@@ -39,13 +47,23 @@ export default function GroupsPage() {
         </Link>
       </div>
 
-      <div className="mb-8">
+      <div className="mb-8 flex flex-col sm:flex-row gap-4">
         <Input 
-          placeholder="Search groups..." 
+          placeholder="Search groups by name, description, or tags..." 
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="max-w-md"
+          className="max-w-md flex-1"
         />
+        <select
+            className="flex h-10 w-full sm:w-[200px] items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+        >
+            <option value="">All Categories</option>
+            {categories.map((category) => (
+                <option key={category as string} value={category as string} className="capitalize">{category}</option>
+            ))}
+        </select>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

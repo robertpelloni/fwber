@@ -33,6 +33,8 @@ class StoreEventRequest extends FormRequest
             'max_attendees' => 'nullable|integer|min:1|max:10000',
             'price' => 'nullable|numeric|min:0|max:9999.99',
             'token_cost' => 'nullable|numeric|min:0',
+            'shared_group_ids' => 'nullable|array',
+            'shared_group_ids.*' => 'integer|exists:groups,id',
         ];
     }
 

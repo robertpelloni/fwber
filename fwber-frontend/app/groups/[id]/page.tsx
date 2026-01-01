@@ -2,12 +2,15 @@
 
 import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Users, Lock, Globe, Send, Trash2, MessageCircle } from 'lucide-react';
+import { Users, Lock, Globe, Send, Trash2, MessageCircle, MapPin, Calendar, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useGroup, useGroupPosts, useCreateGroupPost, useJoinGroup, useLeaveGroup, useDeleteGroupPost, useMyGroups } from '@/lib/hooks/use-groups';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useGroup, useGroupPosts, useCreateGroupPost, useJoinGroup, useLeaveGroup, useDeleteGroupPost, useMyGroups, useGroupMatchRequests, useConnectedGroups, useGroupEvents } from '@/lib/hooks/use-groups';
+
+import Link from 'next/link';
 
 export default function GroupDetailPage() {
   const params = useParams();
@@ -17,6 +20,19 @@ export default function GroupDetailPage() {
   const { data: group, isLoading: isLoadingGroup } = useGroup(groupId);
   const { data: posts, isLoading: isLoadingPosts } = useGroupPosts(groupId);
   const { data: myGroupsData } = useMyGroups();
+  const { data: events, isLoading: isLoadingEvents } = useGroupEvents(groupId);
+  
+  // Only fetch requests if user is a member/admin (optimization)
+  // We can't conditionally call hooks based on data inside component easily without complex logic or skipping queries
+  // But react-query handles 'enabled' flag.
+  const isMember = myGroupsData?.data.some(g => g.id === groupId);
+  // Simplified admin check: for now, if member, assume can view requests or add logic later.
+  // Ideally, useGroup should return role.
+  const userRole = group?.user_role;
+  const isAdmin = userRole === 'admin' || userRole === 'owner';
+
+  const { data: requests } = useGroupMatchRequests(groupId);
+  const { data: connectedGroups } = useConnectedGroups(groupId);
   
   const createPost = useCreateGroupPost(groupId);
   const deletePost = useDeleteGroupPost();
@@ -25,10 +41,16 @@ export default function GroupDetailPage() {
   
   const [postContent, setPostContent] = React.useState('');
 
-  const isMember = myGroupsData?.data.some(g => g.id === groupId);
+  // const isMember = myGroupsData?.data.some(g => g.id === groupId); // Already declared above
+  // Assume current user is the creator for simplicity or add user context later to check admin rights properly
+  // For now, we'll just check if the current user created the group if we had that info readily available in context
+  // But we can check if the group creator id matches a stored user id. 
+  // Since we don't have global user context here, we'll just show the button if they are a member (simplified logic for prototype)
+  // const canViewMatches = isMember; // Removed, using isAdmin logic now
 
   const handleJoin = () => joinGroup.mutate(groupId);
   const handleLeave = () => leaveGroup.mutate(groupId);
+
 
   const handlePostSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,7 +89,45 @@ export default function GroupDetailPage() {
                 )}
               </h1>
               <p className="text-muted-foreground mt-1">{group.description}</p>
-              <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+              
+              <div className="flex flex-wrap gap-2 mt-2">
+                 {group.category && (
+                    <Badge variant="outline" className="capitalize">{group.category}</Badge>
+                 )}
+                 {group.tags && group.tags.map((tag: string) => (
+                    <Badge key={tag} variant="secondary" className="text-xs">#{tag}</Badge>
+                 ))}
+                  {group.matching_enabled && (
+                     <Badge className="bg-green-100 text-green-800 hover:bg-green-200 border-green-200">
+                         Matching Enabled
+                     </Badge>
+                  )}
+               </div>
+
+               <div className="flex flex-wrap gap-2 mt-4">
+               {isAdmin && group.matching_enabled && (
+                    <>
+                    <Button variant="outline" size="sm" asChild>
+                        <Link href={`/groups/${group.id}/matches`}>
+                            <Users className="w-4 h-4 mr-2" />
+                            Find Groups
+                        </Link>
+                    </Button>
+                    <Button variant="outline" size="sm" asChild className="relative">
+                        <Link href={`/groups/${group.id}/requests`}>
+                            Requests
+                            {requests?.incoming && requests.incoming.length > 0 && (
+                                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center border-2 border-background">
+                                    {requests.incoming.length}
+                                </span>
+                            )}
+                        </Link>
+                    </Button>
+                    </>
+               )}
+               </div>
+
+               <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
                 <span className="flex items-center">
                   <Users className="w-4 h-4 mr-1" />
                   {group.member_count} members
@@ -161,6 +221,30 @@ export default function GroupDetailPage() {
 
         {/* Sidebar - Members */}
         <div className="space-y-6">
+          {/* Connected Groups Section */}
+          {group.matching_enabled && connectedGroups && connectedGroups.length > 0 && (
+            <Card>
+                <CardHeader>
+                    <CardTitle className="text-lg">Connected Groups</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-4">
+                        {connectedGroups.map(connectedGroup => (
+                            <Link href={`/groups/${connectedGroup.id}`} key={connectedGroup.id} className="flex items-center gap-3 hover:bg-muted/50 p-2 rounded transition-colors">
+                                <div className="text-2xl bg-muted p-2 rounded-full">
+                                    {connectedGroup.icon || '👥'}
+                                </div>
+                                <div>
+                                    <div className="font-medium text-sm">{connectedGroup.name}</div>
+                                    <div className="text-xs text-muted-foreground">{connectedGroup.member_count} members</div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
+          )}
+
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Members</CardTitle>
