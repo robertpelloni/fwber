@@ -77,7 +77,7 @@ This checklist ensures that both the frontend and backend are fully prepared for
 
 - [ ] Production build created and tested
   ```bash
-  npm run build
+  npm run build -- --webpack # Use webpack to avoid Turbopack issues
   npm run start # Test production build locally
   ```
 - [ ] Bundle size is acceptable (<300KB main bundle gzipped)
@@ -133,7 +133,7 @@ This checklist ensures that both the frontend and backend are fully prepared for
 - [ ] Environment variables set on platform
 - [ ] Build settings optimized
   ```
-  Build Command: npm run build
+  Build Command: npm run build -- --webpack
   Output Directory: .next
   Install Command: npm ci
   Node Version: 18.x (or latest LTS)
@@ -141,6 +141,9 @@ This checklist ensures that both the frontend and backend are fully prepared for
 - [ ] Preview deployments configured for PRs
 - [ ] Auto-deploy on main branch enabled (or disabled if manual)
 - [ ] Rollback capability tested
+
+### Backend Deployment Note
+The `deploy.sh` script in `fwber-backend` handles the backend deployment correctly, including pulling changes, installing dependencies, migrating the database, and restarting services. Ensure you have the necessary permissions to execute it.
 
 ---
 
