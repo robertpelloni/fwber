@@ -24,6 +24,7 @@ class Event extends Model
         'created_by_user_id',
         'status',
         'reminder_sent',
+        'chatroom_id',
     ];
 
     protected $casts = [
@@ -57,5 +58,10 @@ class Event extends Model
     {
         return $this->belongsToMany(Group::class, 'event_groups')
                     ->withTimestamps();
+    }
+
+    public function chatroom()
+    {
+        return $this->belongsTo(Chatroom::class);
     }
 }

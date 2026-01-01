@@ -3,9 +3,11 @@
 import React, { useState } from 'react';
 import { useEvent, useRsvpEvent } from '@/lib/hooks/use-events';
 import { useParams } from 'next/navigation';
-import { Calendar, MapPin, Users, DollarSign, UserPlus, Coins } from 'lucide-react';
+import { Calendar, MapPin, Users, DollarSign, UserPlus, Coins, MessageCircle } from 'lucide-react';
 import InviteUserModal from '@/components/events/InviteUserModal';
 import EventPaymentModal from '@/components/events/EventPaymentModal';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import Chatroom from '@/components/chatrooms/Chatroom';
 
 export default function EventDetailPage() {
   const { id } = useParams();
@@ -90,8 +92,37 @@ export default function EventDetailPage() {
           </div>
 
           <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-2">About this event</h2>
-            <p className="text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{event.description}</p>
+            <Tabs defaultValue="about" className="w-full">
+              <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent space-x-6">
+                <TabsTrigger 
+                  value="about"
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 px-0 py-3"
+                >
+                  About
+                </TabsTrigger>
+                {event.chatroom_id && (
+                  <TabsTrigger 
+                    value="discussion"
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 px-0 py-3 flex items-center gap-2"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    Discussion
+                  </TabsTrigger>
+                )}
+              </TabsList>
+              
+              <TabsContent value="about" className="pt-6">
+                 <div className="prose dark:prose-invert max-w-none">
+                    <p className="text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{event.description}</p>
+                 </div>
+              </TabsContent>
+              
+              {event.chatroom_id && (
+                <TabsContent value="discussion" className="pt-6">
+                  <Chatroom chatroomId={event.chatroom_id} />
+                </TabsContent>
+              )}
+            </Tabs>
           </div>
 
           <div className="border-t pt-6">

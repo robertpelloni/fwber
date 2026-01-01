@@ -19,6 +19,7 @@ export interface Event {
   attendees_count: number;
   creator?: any;
   attendees?: any[];
+  chatroom_id?: number;
 }
 
 export interface CreateEventRequest {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\EventRsvpRequest;
 use App\Http\Requests\StoreEventRequest;
+use App\Models\Chatroom;
 use App\Models\Event;
 use App\Models\EventAttendee;
 use App\Models\Payment;
@@ -172,6 +173,24 @@ class EventController extends Controller
             'status' => 'upcoming',
         ]);
 
+        // Create a dedicated chatroom for this event
+        $chatroom = Chatroom::create([
+            'name' => $event->title,
+            'description' => 'Official discussion for event: ' . $event->title,
+            'type' => 'event',
+            'category' => 'event',
+            'created_by' => Auth::id(),
+            'is_public' => false, // Only accessible by attendees? Or public?
+            'is_active' => true,
+            'settings' => ['event_id' => $event->id],
+        ]);
+
+        // Add creator as admin
+        $chatroom->addMember(Auth::user(), 'admin');
+
+        // Link chatroom to event
+        $event->update(['chatroom_id' => $chatroom->id]);
+
         // Attach shared groups if provided
         if ($request->has('shared_group_ids')) {
              $groupIds = $request->input('shared_group_ids');
@@ -208,7 +227,7 @@ class EventController extends Controller
      */
     public function show($id)
     {
-        $event = Event::with(['creator', 'attendees.user', 'groups'])
+        $event = Event::with(['creator', 'attendees.user', 'groups', 'chatroom'])
             ->withCount('attendees')
             ->findOrFail($id);
             
@@ -381,6 +400,23 @@ class EventController extends Controller
             ['event_id' => $event->id, 'user_id' => $user->id],
             array_merge(['status' => $request->status], $paymentData)
         );
+
+        // Add user to the event chatroom if they are attending
+        if ($event->chatroom_id && $request->status === 'attending') {
+            $chatroom = Chatroom::find($event->chatroom_id);
+            if ($chatroom && !$chatroom->hasMember($user)) {
+                $chatroom->addMember($user, 'member');
+            }
+        }
+        // Remove from chatroom if declined/not attending (optional policy choice)
+        // For now, let's keep them in unless they leave manually, or maybe remove them?
+        // Let's implement removal logic if status is 'declined'
+        if ($event->chatroom_id && $request->status === 'declined') {
+            $chatroom = Chatroom::find($event->chatroom_id);
+            if ($chatroom && $chatroom->hasMember($user)) {
+                 $chatroom->removeMember($user);
+            }
+        }
 
         // Invalidate events cache (attendee counts changed)
         Cache::tags(['events'])->flush();
