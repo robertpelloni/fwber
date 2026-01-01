@@ -22,6 +22,13 @@
 
 ## 🟢 Recent Accomplishments
 
+### ✅ Critical Fixes (Jan 01)
+1.  **Shared Event Invitations**:
+    -   **Feature**: Users can invite an entire group to an event with one click.
+    -   **Backend**: `EventInvitationController` updated to handle `group_id` payload.
+    -   **Frontend**: `InviteUserModal` updated with "My Groups" tab.
+    -   **Verification**: Feature tests (`EventInvitationTest`) and E2E tests (`event-group-invites.cy.js`) passing.
+
 ### ✅ Critical Fixes (Dec 31)
 1.  **Event Discussion Boards**:
     -   **Feature**: Implemented dedicated discussion boards for events.
