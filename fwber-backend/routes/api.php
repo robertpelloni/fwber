@@ -47,7 +47,7 @@ Route::get('auth/login', function () {
     return response()->json(['message' => 'Unauthenticated. Please login.'], 401);
 })->name('login');
 Route::get('auth/referral/{code}', [\App\Http\Controllers\AuthController::class, 'checkReferralCode']);
-Route::post('public/vouch', [\App\Http\Controllers\VouchController::class, 'store'])->middleware('throttle:60,1');
+Route::post('public/vouch', [\App\Http\Controllers\VouchController::class, 'store'])->middleware('rate_limit_advanced:api_call');
 Route::post('vouch/generate-link', [\App\Http\Controllers\VouchController::class, 'generateLink'])->middleware('auth:sanctum');
 
 Route::post('auth/login-wallet', [\App\Http\Controllers\AuthController::class, 'loginWithWallet'])->middleware('throttle:auth');
@@ -102,7 +102,7 @@ Route::get('viral-content/{id}', [\App\Http\Controllers\ViralContentController::
 
 // Public Roast Generator (Rate Limited strictly)
 Route::post('public/roast', [\App\Http\Controllers\AiWingmanController::class, 'roastPublic'])
-    ->middleware('throttle:5,1'); // 5 requests per minute per IP
+    ->middleware('rate_limit_advanced:content_generation'); // Use advanced token bucket limiter
 
 // Public Matchmaker Bounty
 Route::get('matchmaker/bounty/{slug}', [\App\Http\Controllers\MatchMakerController::class, 'showBounty']);

@@ -4,6 +4,8 @@ This document provides a single, authoritative overview of the "fwber" project's
 
 ## 1. Project Overview
 
+**Current Status:** PRE-DEPLOYMENT STAGING
+
 **Concept:** "fwber" is a privacy-first, proximity-based dating and social networking application. Its core mission is to create a safer, more inclusive, and less superficial online dating experience by prioritizing user privacy and authenticity.
 
 **Key Differentiator:** The flagship feature is "Avatar Mode," which encourages users to represent themselves with AI-generated avatars instead of actual photos. This reduces appearance-based bias and fosters connections based on personality and shared interests.
@@ -66,6 +68,8 @@ These features are considered complete and are ready for a production environmen
     *   [x] **Moderation Dashboard:** Tools for moderators to review flagged content.
     *   [x] **Rate Limiting:** Prevents abuse and spam.
     *   [x] **Block & Report:** Users can block and report others.
+    *   [x] **Backend Hardening:** Strict CSP, Restricted CORS, Safe .env defaults.
+    *   [x] **Frontend Build:** Turbopack disabled for stability.
 *   **API & Documentation:**
     *   [x] **OpenAPI Documentation:** The backend API is extensively documented using OpenAPI (Swagger).
     *   [x] **Advanced Match Filtering:** Filtering by lifestyle preferences (Diet, Politics, etc.) is fully functional and token-gated for premium users.

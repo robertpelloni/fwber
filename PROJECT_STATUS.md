@@ -23,7 +23,11 @@
 ## 🟢 Recent Accomplishments
 
 ### ✅ Critical Fixes (Jan 01)
-1.  **Shared Event Invitations**:
+1.  **Frontend Build Stabilization**:
+    -   **Issue**: Build failed due to React 19 types conflicting with React 18 runtime (`ERESOLVE` error) and Turbopack/Webpack config mismatch.
+    -   **Fix**: Downgraded `@types/react` and `@types/react-dom` to v18. Verified `next.config.js` validation.
+    -   **Verification**: Local build (`npm run build -- --webpack`) passing.
+2.  **Shared Event Invitations**:
     -   **Feature**: Users can invite an entire group to an event with one click.
     -   **Backend**: `EventInvitationController` updated to handle `group_id` payload.
     -   **Frontend**: `InviteUserModal` updated with "My Groups" tab.

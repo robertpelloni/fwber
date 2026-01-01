@@ -1,0 +1,14 @@
+[
+  {
+    "id": 2,
+    "name": "Friend One",
+    "avatar_url": "https://via.placeholder.com/50",
+    "is_online": true
+  },
+  {
+    "id": 3,
+    "name": "Friend Two",
+    "avatar_url": null,
+    "is_online": false
+  }
+]

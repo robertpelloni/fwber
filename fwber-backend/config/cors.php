@@ -24,7 +24,7 @@ return [
     'allowed_origins_patterns' => [],
 
     // Restrict allowed headers for security
-    'allowed_headers' => ['Content-Type', 'X-Requested-With', 'Authorization', 'X-XSRF-TOKEN', 'X-Socket-ID'],
+    'allowed_headers' => ['Content-Type', 'X-Requested-With', 'Authorization', 'X-XSRF-TOKEN', 'X-Socket-ID', 'X-Pusher-Socket-ID'],
 
     'exposed_headers' => [],
 

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.20] - 2026-01-01
+
+### Security
+- **Backend Hardening**: Implemented strict Content Security Policy (CSP) in `SecurityHeaders.php` (blocks unsafe-inline/eval in production).
+- **CORS Restricted**: Tightened `config/cors.php` to disallow wildcard origins and only permit specific headers/methods.
+- **Environment**: Updated `.env.example` to ensure safe defaults (APP_DEBUG=false, empty keys).
+
+### Fixed
+- **Frontend Build**: Disabled Turbopack in `next.config.js` to resolve build failures with custom webpack config.
+
 ## [0.3.19] - 2025-12-31
 
 ### Added

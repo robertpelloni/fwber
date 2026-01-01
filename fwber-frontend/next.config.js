@@ -67,6 +67,7 @@ const nextConfig = {
   experimental: {
     optimizeCss: true, // Enabled - requires 'critters' package
     optimizePackageImports: ['@tanstack/react-query', 'lucide-react'],
+    turbopack: false, // explicitly disable to fix build error
   },
   
   // Image optimization

@@ -78,7 +78,7 @@ export const initEcho = (token?: string) => {
             connector.pusher.connection.bind('error', (err: any) => {
                 // If it's a connection refused/timeout error (WebSocketError), suppress it in dev
                 // because it just means the developer hasn't started 'php artisan reverb:start'
-                if (err.type === 'WebSocketError' || err?.error?.data?.code === 4004) {
+                if (err.type === 'WebSocketError' || err?.error?.data?.code === 4004 || err?.error?.data?.code === 4005) {
                     // silent
                 } else {
                     // console.error('Pusher connection error:', err);

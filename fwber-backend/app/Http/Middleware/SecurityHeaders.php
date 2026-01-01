@@ -52,7 +52,10 @@ class SecurityHeaders
         // For now, we will default to 'self' in production unless CSP_RELAXED is true.
         // If your frontend needs inline scripts (e.g. for some libs), you might need to add hashes or nonces.
         
-        $styleDirectives = "style-src 'self' 'unsafe-inline'"; // Kept unsafe-inline for styles as it's common for CSS-in-JS frameworks
+        // Strict style-src in production (no unsafe-inline) unless relaxed
+        $styleDirectives = ($isProd && !$relaxed) 
+            ? "style-src 'self'" 
+            : "style-src 'self' 'unsafe-inline'";
         
         $frameAncestors = "frame-ancestors 'none'";
 
