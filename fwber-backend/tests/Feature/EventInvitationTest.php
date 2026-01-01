@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Models\Event;
 use App\Models\EventInvitation;
 use App\Models\User;
+use App\Models\Group;
+use App\Models\GroupMember;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -36,6 +38,43 @@ class EventInvitationTest extends TestCase
 
         \Illuminate\Support\Facades\Notification::assertSentTo(
             $invitee,
+            \App\Notifications\EventInvitationReceived::class
+        );
+    }
+
+    public function test_user_can_invite_group_to_event()
+    {
+        \Illuminate\Support\Facades\Notification::fake();
+
+        $inviter = User::factory()->create();
+        $event = Event::factory()->create(['created_by_user_id' => $inviter->id]);
+        
+        $group = Group::factory()->create();
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
+        $user3 = User::factory()->create();
+
+        GroupMember::create(['group_id' => $group->id, 'user_id' => $user1->id, 'role' => 'member']);
+        GroupMember::create(['group_id' => $group->id, 'user_id' => $user2->id, 'role' => 'member']);
+        GroupMember::create(['group_id' => $group->id, 'user_id' => $user3->id, 'role' => 'member']);
+        // Add inviter to group too (should not be invited)
+        GroupMember::create(['group_id' => $group->id, 'user_id' => $inviter->id, 'role' => 'member']);
+
+        $response = $this->actingAs($inviter)
+            ->postJson("/api/events/{$event->id}/invite", [
+                'group_id' => $group->id,
+            ]);
+
+        $response->assertStatus(201)
+            ->assertJson(['count' => 3]);
+
+        $this->assertDatabaseHas('event_invitations', ['event_id' => $event->id, 'invitee_id' => $user1->id, 'status' => 'pending']);
+        $this->assertDatabaseHas('event_invitations', ['event_id' => $event->id, 'invitee_id' => $user2->id, 'status' => 'pending']);
+        $this->assertDatabaseHas('event_invitations', ['event_id' => $event->id, 'invitee_id' => $user3->id, 'status' => 'pending']);
+        $this->assertDatabaseMissing('event_invitations', ['event_id' => $event->id, 'invitee_id' => $inviter->id]);
+
+        \Illuminate\Support\Facades\Notification::assertSentTo(
+            [$user1, $user2, $user3],
             \App\Notifications\EventInvitationReceived::class
         );
     }

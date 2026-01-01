@@ -1,6 +1,6 @@
 # Project Status - v0.3.16
 
-**Date:** 2025-12-29
+**Date:** 2025-12-31
 **Current Phase:** Post-Launch Stabilization
 **Version:** v0.3.16
 
@@ -21,6 +21,20 @@
     *   [x] `CHANGELOG.md` updated.
 
 ## 🟢 Recent Accomplishments
+
+### ✅ Critical Fixes (Dec 31)
+1.  **Event Discussion Boards**:
+    -   **Feature**: Implemented dedicated discussion boards for events.
+    -   **Backend**: 
+        -   Created migration `2026_01_01_020105_add_chatroom_id_to_events_table` to link Events to Chatrooms.
+        -   Updated `Event` model and `EventController` to auto-create chatrooms and manage attendee membership (join/leave).
+    -   **Frontend**: 
+        -   Created reusable `Chatroom` component.
+        -   Updated `EventDetailsPage` with a Tab interface (About/Discussion).
+    -   **Verification**: `EventDiscussionTest` passing.
+2.  **Group Matching**:
+    -   **Feature**: Merged `group-matching-shared-events` into `main`.
+    -   **Conflicts**: Resolved merge conflicts in `sw.js` and `package-lock.json`.
 
 ### ✅ Critical Fixes (Dec 29 - Part 4)
 1.  **Token-Gated Events**:
