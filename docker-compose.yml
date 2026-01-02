@@ -54,7 +54,58 @@ services:
     depends_on:
       - mysql
       - redis
+<<<<<<< HEAD
     command: sh -c "php artisan serve --host=0.0.0.0 --port=8000 & php artisan reverb:start --host=0.0.0.0 --port=8080"
+=======
+    command: php artisan serve --host=0.0.0.0 --port=8000
+
+  # =============================================================================
+  # Reverb - WebSocket Server
+  # =============================================================================
+  reverb:
+    build:
+      context: ./fwber-backend
+      dockerfile: Dockerfile.dev
+    container_name: fwber-reverb
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./fwber-backend:/var/www/html
+      - backend_storage:/var/www/html/storage
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_KEY=base64:CHANGEME_RUN_php_artisan_key:generate
+      - APP_URL=http://localhost:8005
+      
+      - DB_CONNECTION=mysql
+      - DB_HOST=fwber-mysql
+      - DB_PORT=3306
+      - DB_DATABASE=fwber_dev
+      - DB_USERNAME=root
+      - DB_PASSWORD=root_password
+
+      - REDIS_HOST=fwber-redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=null
+      
+      - BROADCAST_DRIVER=reverb
+      - REVERB_APP_ID=app-id
+      - REVERB_APP_KEY=app-key
+      - REVERB_APP_SECRET=app-secret
+      - REVERB_HOST=0.0.0.0
+      - REVERB_PORT=8080
+      - REVERB_SCHEME=http
+
+    networks:
+      - fwber-network
+    depends_on:
+      - mysql
+      - redis
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080
+
+>>>>>>> 5cf646839
   frontend:
     build:
       context: ./fwber-frontend
@@ -172,7 +223,7 @@ services:
     container_name: fwber-phpmyadmin
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "8081:80"
     environment:
       - PMA_HOST=mysql
       - PMA_USER=root
