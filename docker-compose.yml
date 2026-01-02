@@ -54,9 +54,6 @@ services:
     depends_on:
       - mysql
       - redis
-<<<<<<< HEAD
-    command: sh -c "php artisan serve --host=0.0.0.0 --port=8000 & php artisan reverb:start --host=0.0.0.0 --port=8080"
-=======
     command: php artisan serve --host=0.0.0.0 --port=8000
 
   # =============================================================================
@@ -105,7 +102,6 @@ services:
       - redis
     command: php artisan reverb:start --host=0.0.0.0 --port=8080
 
->>>>>>> 5cf646839
   frontend:
     build:
       context: ./fwber-frontend
