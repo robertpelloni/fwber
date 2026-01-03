@@ -204,8 +204,14 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
         });
 
         (echo.connector as any).pusher.connection.bind('error', (err: any) => {
-            console.error('Pusher connection error:', err);
-            setStatus({ connected: false, connecting: false, error: err });
+             // Only log significant errors that aren't just dev connection issues
+             if (process.env.NODE_ENV === 'development') {
+                 if (err?.type === 'WebSocketError' || err?.error?.data?.code === 4004 || err?.error?.data?.code === 4005) {
+                    return;
+                 }
+             }
+             console.error('Pusher connection error:', err);
+             setStatus({ connected: false, connecting: false, error: err });
         });
 
     } catch (e) {

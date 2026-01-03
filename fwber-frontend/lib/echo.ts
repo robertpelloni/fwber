@@ -115,18 +115,6 @@ export const initEcho = (token?: string) => {
                 }
             });
         }
-        
-        // Monkey patch console.error locally for this instance's context if we can isolate it
-        // Or more aggressively, intercept the log mechanism if Pusher JS exposes it
-        // Pusher JS doesn't use console.error for everything if logToConsole is false, but connection errors might bypass.
-        // Actually, the log you see "Pusher connection error" is coming from OUR code above on line 83!
-        // Wait, line 83 says console.error.
-        // The error stack trace in the user prompt shows:
-        // common-5616e786936ccf72.js:5031:80874
-        // which implies it's coming from the compiled JS bundle.
-        // If the stack trace points to our file (lib/echo.ts), then WE are logging it.
-        
-        // Let's remove our own console.error!
     }
 
     return echo;
