@@ -53,7 +53,7 @@ export default function TestAuthPage() {
 
   return (
     <div className="p-8 max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">FWBer API Integration Test</h1>
+      <h1 className="text-3xl font-bold mb-6">fwber API Integration Test</h1>
       
       <div className="space-y-4">
         <div>

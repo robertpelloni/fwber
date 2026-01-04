@@ -55,7 +55,7 @@ describe('Onboarding Flow', () => {
     });
 
     // Welcome step
-    cy.contains('Welcome to FWBer!').should('be.visible');
+    cy.contains('Welcome to fwber!').should('be.visible');
     cy.contains('Next').click();
 
     // Basic Info step

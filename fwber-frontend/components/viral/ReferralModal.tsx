@@ -29,8 +29,8 @@ export function ReferralModal({ trigger }: ReferralModalProps) {
   const referralLink = `${origin}/register?ref=${user.referral_code}`;
   const vouchLink = `${origin}/vouch/${user.referral_code}`;
 
-  const shareText = "🔥 Join me on FWBer! Use my link to get 50 Tokens and 3 Days of Gold Premium instantly.";
-  const vouchText = "Can you vouch for me? I'm building my reputation on FWBer. Click to verify I'm legit!";
+  const shareText = "🔥 Join me on fwber! Use my link to get 50 Tokens and 3 Days of Gold Premium instantly.";
+  const vouchText = "Can you vouch for me? I'm building my reputation on fwber. Click to verify I'm legit!";
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -110,7 +110,7 @@ export function ReferralModal({ trigger }: ReferralModalProps) {
                  <Button variant="outline" size="sm" className="gap-2" onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + referralLink)}`, '_blank')}>
                     <MessageCircle className="w-4 h-4" /> Chat
                  </Button>
-                 <Button variant="outline" size="sm" className="gap-2" onClick={() => handleNativeShare('Join FWBer', shareText, referralLink)}>
+                 <Button variant="outline" size="sm" className="gap-2" onClick={() => handleNativeShare('Join fwber', shareText, referralLink)}>
                     <Share2 className="w-4 h-4" /> Share
                  </Button>
             </div>

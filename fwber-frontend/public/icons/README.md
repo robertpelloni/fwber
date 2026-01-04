@@ -1,4 +1,4 @@
-# FWBer App Icons
+# fwber App Icons
 
 ## Current Status
 This directory should contain PNG icons in various sizes for the PWA manifest.

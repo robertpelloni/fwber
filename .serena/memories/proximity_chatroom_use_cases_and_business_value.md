@@ -106,7 +106,7 @@
 - Local market penetration
 - Word-of-mouth marketing amplification
 
-### For Platform (FWBer)
+### For Platform (fwber)
 **User Engagement**
 - Increased time spent on platform
 - Higher user retention rates

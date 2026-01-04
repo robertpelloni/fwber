@@ -2,7 +2,7 @@
 // fix-database-user.php
 // Script to fix database user creation issues
 
-echo "Fixing FWBer database user...\n";
+echo "Fixing fwber database user...\n";
 
 // Try to connect as root first
 $root_password = ''; // You may need to set this

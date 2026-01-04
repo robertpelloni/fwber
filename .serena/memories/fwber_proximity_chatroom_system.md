@@ -1,7 +1,7 @@
-# FWBer Proximity Chatroom System - Complete Implementation
+# fwber Proximity Chatroom System - Complete Implementation
 
 ## System Overview
-The FWBer Proximity Chatroom System is a comprehensive location-based networking and social interaction platform that enables users to connect with people nearby for various purposes including professional networking, social interaction, and casual meetups.
+The fwber Proximity Chatroom System is a comprehensive location-based networking and social interaction platform that enables users to connect with people nearby for various purposes including professional networking, social interaction, and casual meetups.
 
 ## Key Features Implemented
 

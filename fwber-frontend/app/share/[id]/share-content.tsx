@@ -226,7 +226,7 @@ export function ShareContent({ id }: { id: string }) {
     <div className="min-h-screen bg-black text-white flex flex-col">
       <header className="p-4 border-b border-gray-800 flex justify-between items-center">
         <Link href="/" className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
-          FWBer
+          fwber
         </Link>
         <Link href="/auth/register">
           <Button variant="outline" className="border-gray-700 hover:bg-gray-800">
@@ -280,7 +280,7 @@ export function ShareContent({ id }: { id: string }) {
       </main>
 
       <footer className="p-6 text-center text-gray-600 text-sm">
-        &copy; {new Date().getFullYear()} FWBer. All rights reserved.
+        &copy; {new Date().getFullYear()} fwber. All rights reserved.
       </footer>
     </div>
   );

@@ -2,7 +2,7 @@
 
 ## 1. Executive Summary
 
-FWBer's growth strategy relies on product-led viral loops rather than paid acquisition. By leveraging "social currency" (reputation, humor, status), we incentivize users to share FWBer content naturally.
+fwber's growth strategy relies on product-led viral loops rather than paid acquisition. By leveraging "social currency" (reputation, humor, status), we incentivize users to share fwber content naturally.
 
 **Core Philosophy:** "Come for the Roast, Stay for the Community."
 
@@ -53,4 +53,4 @@ FWBer's growth strategy relies on product-led viral loops rather than paid acqui
 
 ## 6. Long-Term Vision
 
-Move beyond 1:1 dating. Position FWBer as a *social reputation protocol* for the dating world. Your FWBer score (Vouches + Roast resilience) becomes your "Dating Credit Score."
+Move beyond 1:1 dating. Position fwber as a *social reputation protocol* for the dating world. Your fwber score (Vouches + Roast resilience) becomes your "Dating Credit Score."

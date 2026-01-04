@@ -1,4 +1,4 @@
-// FWBer.me Service Worker - PWA Offline Support
+// fwber.me Service Worker - PWA Offline Support
 const CACHE_NAME = 'fwber-v1.0.0';
 const API_CACHE_NAME = 'fwber-api-v1.0.0';
 const STATIC_CACHE_NAME = 'fwber-static-v1.0.0';
@@ -118,7 +118,7 @@ self.addEventListener('sync', (event) => {
 self.addEventListener('push', (event) => {
   console.log('Push notification received:', event);
   
-  let data = { title: 'FWBer.me', body: 'New notification', url: '/' };
+  let data = { title: 'fwber.me', body: 'New notification', url: '/' };
   
   try {
     data = event.data ? event.data.json() : data;
@@ -145,7 +145,7 @@ self.addEventListener('push', (event) => {
   };
   
   event.waitUntil(
-    self.registration.showNotification(data.title || 'FWBer.me', options)
+    self.registration.showNotification(data.title || 'fwber.me', options)
   );
 });
 

@@ -106,7 +106,7 @@ export function VouchClient({ code }: VouchClientProps) {
             </div>
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Vouch for {referrer.name}</h1>
-          <p className="text-gray-500 mt-2">Help them verify their reputation on FWBer.</p>
+          <p className="text-gray-500 mt-2">Help them verify their reputation on fwber.</p>
         </div>
 
         {/* Action Area */}
@@ -240,7 +240,7 @@ export function VouchClient({ code }: VouchClientProps) {
                </Link>
 
                <p className="mt-4 text-xs text-gray-400">
-                 Join {referrer.name} and thousands of others on FWBer.
+                 Join {referrer.name} and thousands of others on fwber.
                </p>
             </div>
           )}

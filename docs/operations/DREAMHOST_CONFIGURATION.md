@@ -1,6 +1,6 @@
 # DreamHost Shared Hosting Configuration Guide
 
-This guide provides specific instructions for configuring FWBer on DreamHost Shared Hosting, where you do not have `sudo` access or `supervisor`/`systemd` for background processes.
+This guide provides specific instructions for configuring fwber on DreamHost Shared Hosting, where you do not have `sudo` access or `supervisor`/`systemd` for background processes.
 
 ## 1. PHP Configuration
 

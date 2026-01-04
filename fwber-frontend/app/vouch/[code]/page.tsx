@@ -18,17 +18,17 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
         const data = await res.json()
         if (data.valid) {
             return {
-                title: `Do you trust ${data.referrer_name}? - FWBer`,
-                description: `Vouch for ${data.referrer_name} on FWBer. Is this person Safe, Fun, or Hot? Verify their reputation now.`,
+                title: `Do you trust ${data.referrer_name}? - fwber`,
+                description: `Vouch for ${data.referrer_name} on fwber. Is this person Safe, Fun, or Hot? Verify their reputation now.`,
                 openGraph: {
                     title: `Do you trust ${data.referrer_name}?`,
-                    description: `Vouch for ${data.referrer_name} on FWBer. Verify their reputation now.`,
+                    description: `Vouch for ${data.referrer_name} on fwber. Verify their reputation now.`,
                     images: data.referrer_avatar ? [data.referrer_avatar] : [],
                 },
                 twitter: {
                     card: 'summary_large_image',
                     title: `Do you trust ${data.referrer_name}?`,
-                    description: `Vouch for ${data.referrer_name} on FWBer.`,
+                    description: `Vouch for ${data.referrer_name} on fwber.`,
                     images: data.referrer_avatar ? [data.referrer_avatar] : [],
                 }
             }
@@ -39,8 +39,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   }
 
   return {
-    title: 'Vouch for a Friend - FWBer',
-    description: 'Help your friends build their reputation on FWBer.',
+    title: 'Vouch for a Friend - fwber',
+    description: 'Help your friends build their reputation on fwber.',
   }
 }
 

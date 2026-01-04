@@ -1,5 +1,5 @@
 # User AI Orchestration Instructions
-## FWBer Proximity Chatroom System Development
+## fwber Proximity Chatroom System Development
 
 ## 🎯 Complete User Command Set
 
@@ -77,7 +77,7 @@ This memory contains all specific instructions given by the user for AI model or
 
 ## 🎯 Specific Project Instructions
 
-### FWBer Development Focus
+### fwber Development Focus
 - **"Please proceed with the proximity based chat"** - Focus on proximity chat features
 - **"It's not just for romantic interest, it's for chatting in general"** - Broader use case than just dating
 - **"Journalists may go to a conference and want to chat with developers"** - Professional networking use case
@@ -137,7 +137,7 @@ This memory contains all specific instructions given by the user for AI model or
 - User assistance
 
 ### 6. Specific Project Instructions (6 commands)
-- FWBer development focus
+- fwber development focus
 - Use case clarification
 - Technical requirements
 - Risk assessment
@@ -199,4 +199,4 @@ This memory contains all specific instructions given by the user for AI model or
 - **Project Files**: Markdown documentation
 - **MCP Servers**: Tool integration and orchestration
 
-This memory serves as the definitive reference for all user instructions regarding AI model orchestration, fixes, and project workflow commands for the FWBer Proximity Chatroom System development.
+This memory serves as the definitive reference for all user instructions regarding AI model orchestration, fixes, and project workflow commands for the fwber Proximity Chatroom System development.

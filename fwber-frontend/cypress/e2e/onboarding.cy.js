@@ -81,7 +81,7 @@ describe('User Onboarding Flow', () => {
 
   it('completes the full onboarding wizard', () => {
     // Step 1: Welcome
-    cy.contains('Welcome to FWBer!').should('be.visible');
+    cy.contains('Welcome to fwber!').should('be.visible');
     cy.contains('Next').click();
 
     // Step 2: Basic Info

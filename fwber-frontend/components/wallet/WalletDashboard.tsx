@@ -258,7 +258,7 @@ export default function WalletDashboard() {
                     Merchant API
                 </h3>
                 <p className="text-gray-300 text-sm mb-4">
-                    Accept FWB tokens on your website or app. Generate a secret key to use the FWBer Merchant API.
+                    Accept FWB tokens on your website or app. Generate a secret key to use the fwber Merchant API.
                 </p>
 
                 {!merchantKeys ? (

@@ -1,7 +1,7 @@
 # Job Failures Runbook
 
 ## Overview
-This runbook details the procedures for identifying, diagnosing, and resolving failed background jobs in the FWBer application.
+This runbook details the procedures for identifying, diagnosing, and resolving failed background jobs in the fwber application.
 
 ## 1. Identification
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# FWBer Mercure Status Check & Auto-Restart
+# fwber Mercure Status Check & Auto-Restart
 # Usage: Add to crontab to run every minute:
 # * * * * * /path/to/fwber-backend/scripts/check_mercure_status.sh
 

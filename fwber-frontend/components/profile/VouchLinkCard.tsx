@@ -83,8 +83,8 @@ export function VouchLinkCard() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Vouch for me on FWBer!',
-          text: 'Be my wingman! Write a vouch for me on FWBer to help me find a match.',
+          title: 'Vouch for me on fwber!',
+          text: 'Be my wingman! Write a vouch for me on fwber to help me find a match.',
           url: link
         })
       } catch (err) {

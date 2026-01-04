@@ -3,7 +3,7 @@ set -e
 shopt -s expand_aliases
 
 #############################################################################
-# FWBer Next.js Frontend Deployment Script
+# fwber Next.js Frontend Deployment Script
 # 
 # Purpose: Automated deployment with validation, build, and restart
 # Usage: ./deploy.sh [--env=production] [--branch=main]
@@ -97,7 +97,7 @@ run_or_dry() {
 #############################################################################
 
 log_info "=========================================="
-log_info "FWBer Frontend Deployment Script"
+log_info "fwber Frontend Deployment Script"
 log_info "Environment: $ENVIRONMENT"
 log_info "Branch: $BRANCH"
 log_info "=========================================="

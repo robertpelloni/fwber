@@ -25,7 +25,7 @@ export function Logo({ className = '', showDotMe = true }: LogoProps) {
         aria-hidden="true"
       >
         <span className={outlineClass}>
-          FWBer
+          fwber
         </span>
       </div>
 
@@ -35,11 +35,11 @@ export function Logo({ className = '', showDotMe = true }: LogoProps) {
         style={{ animationDuration: '3s' }}
       >
         <span className={`relative text-transparent bg-clip-text ${gradientClass}`}>
-          FWBer
+          fwber
           
           {/* Layer 3: Inner Shine/Highlight */}
           <span className="absolute inset-0 bg-gradient-to-tr from-white/60 via-transparent to-transparent bg-clip-text text-transparent pointer-events-none">
-            FWBer
+            fwber
           </span>
         </span>
         

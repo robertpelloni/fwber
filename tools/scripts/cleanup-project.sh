@@ -1,5 +1,5 @@
 #!/bin/bash
-# FWBer Project Cleanup Script
+# fwber Project Cleanup Script
 # Generated: 2025-11-15
 #
 # This script reorganizes the project structure by:
@@ -23,12 +23,12 @@ FILES_REMOVED=0
 FILES_MOVED=0
 DIRS_CREATED=0
 
-echo -e "${GREEN}=== FWBer Project Cleanup Script ===${NC}"
+echo -e "${GREEN}=== fwber Project Cleanup Script ===${NC}"
 echo ""
 
 # Safety check - ensure we're in the right directory
 if [ ! -f "README.md" ] || [ ! -d "fwber-backend" ]; then
-    echo -e "${RED}ERROR: Not in FWBer project root directory!${NC}"
+    echo -e "${RED}ERROR: Not in fwber project root directory!${NC}"
     exit 1
 fi
 

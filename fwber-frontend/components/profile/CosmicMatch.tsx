@@ -58,7 +58,7 @@ export function CosmicMatch({ userId }: CosmicMatchProps) {
       const text = `✨ My Cosmic Match:\n\n❤️ Soulmate: ${result.best_match}\n"${result.best_reason}"\n\n🚫 Avoid: ${result.worst_match}\n"${result.worst_reason}"`;
       try {
         await navigator.share({
-          title: 'My FWBer Cosmic Match',
+          title: 'My fwber Cosmic Match',
           text: text,
           url: window.location.origin,
         });

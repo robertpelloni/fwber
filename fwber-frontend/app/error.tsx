@@ -110,7 +110,7 @@ export default function Error({
 
           {isAuthError && (
             <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md text-sm text-amber-800 dark:text-amber-300">
-              <p>For security, sessions expire after a period of inactivity. Please log in again to continue using FWBer.</p>
+              <p>For security, sessions expire after a period of inactivity. Please log in again to continue using fwber.</p>
             </div>
           )}
         </CardContent>

@@ -47,7 +47,7 @@ export function ProfileRoast() {
           : window.location.origin;
           
         await navigator.share({
-          title: `My FWBer Profile ${mode === 'roast' ? 'Roast' : 'Hype'}`,
+          title: `My fwber Profile ${mode === 'roast' ? 'Roast' : 'Hype'}`,
           text: content,
           url: url,
         });

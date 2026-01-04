@@ -1,7 +1,7 @@
 # Cache Strategy & Invalidation Guide
 
 ## Overview
-FWBer uses Redis with tag-based caching to provide high-performance data retrieval while maintaining data consistency. This document outlines the caching architecture, key structure, and invalidation strategies.
+fwber uses Redis with tag-based caching to provide high-performance data retrieval while maintaining data consistency. This document outlines the caching architecture, key structure, and invalidation strategies.
 
 ## Configuration
 - **Driver**: Redis

@@ -88,7 +88,7 @@ export default function LoginPage() {
     clearError()
 
     try {
-        const message = `Sign this message to login to FWBer.\n\nWallet: ${publicKey.toBase58()}\nTimestamp: ${Date.now()}`
+        const message = `Sign this message to login to fwber.\n\nWallet: ${publicKey.toBase58()}\nTimestamp: ${Date.now()}`
         const encodedMessage = new TextEncoder().encode(message)
         const signature = await signMessage(encodedMessage)
 
@@ -219,7 +219,7 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-            Sign in to FWBer
+            Sign in to fwber
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             Or{' '}

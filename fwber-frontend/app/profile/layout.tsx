@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'My Profile | FWBer',
+  title: 'My Profile | fwber',
   description: 'Manage your profile and photos.',
 }
 

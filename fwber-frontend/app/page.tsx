@@ -172,7 +172,7 @@ export default function HomePage() {
         `}></div>
       </div>
 
-      {/* Why FWBer Section (Moved Up) */}
+      {/* Why fwber Section (Moved Up) */}
       <div className="py-24 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
@@ -299,7 +299,7 @@ export default function HomePage() {
                   Native Mobile Experience
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  The full FWBer experience in your pocket. Install directly to your home screen.
+                  The full fwber experience in your pocket. Install directly to your home screen.
                 </p>
               </div>
             </div>
@@ -374,7 +374,7 @@ export default function HomePage() {
               <div className="flex items-baseline gap-1">
                 <Logo className="text-3xl" />
               </div>
-              <p className="text-gray-500 mt-2">© 2025 FWBer. All rights reserved.</p>
+              <p className="text-gray-500 mt-2">© 2025 fwber. All rights reserved.</p>
             </div>
             <div className="flex space-x-8">
               <Link href="/privacy" className="text-gray-600 hover:text-gray-900">Privacy Policy</Link>

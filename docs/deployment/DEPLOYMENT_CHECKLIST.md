@@ -1,4 +1,4 @@
-# FWBer Deployment & Production Readiness Checklist
+# fwber Deployment & Production Readiness Checklist
 
 This checklist ensures that both the frontend and backend are fully prepared for production deployment. Use this before any production release.
 
@@ -180,7 +180,7 @@ The `deploy.sh` script in `fwber-backend` handles the backend deployment correct
   MAIL_PASSWORD=<mail-password>
   MAIL_ENCRYPTION=tls
   MAIL_FROM_ADDRESS=noreply@fwber.me
-  MAIL_FROM_NAME="FWBer"
+  MAIL_FROM_NAME="fwber"
 
   AWS_ACCESS_KEY_ID=<aws-key>
   AWS_SECRET_ACCESS_KEY=<aws-secret>

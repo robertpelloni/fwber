@@ -1,6 +1,6 @@
 # API Reference
 
-The FWBer API documentation is automatically generated from the codebase using OpenAPI (Swagger) annotations.
+The fwber API documentation is automatically generated from the codebase using OpenAPI (Swagger) annotations.
 
 ## Accessing the Documentation
 

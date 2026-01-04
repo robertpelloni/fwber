@@ -1,6 +1,6 @@
 # Viral Growth Features
 
-This document outlines the viral growth features implemented in FWBer to drive user acquisition and engagement.
+This document outlines the viral growth features implemented in fwber to drive user acquisition and engagement.
 
 ## Overview
 

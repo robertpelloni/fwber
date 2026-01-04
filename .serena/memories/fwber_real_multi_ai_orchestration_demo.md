@@ -1,4 +1,4 @@
-FWBer REAL Multi-AI Orchestration Demonstration - January 19, 2025
+fwber REAL Multi-AI Orchestration Demonstration - January 19, 2025
 
 🚀 ACTUAL MULTI-AI ORCHESTRATION IN ACTION! 🚀
 

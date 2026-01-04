@@ -1,4 +1,4 @@
-# FWBer Project Strategic Analysis - January 19, 2025
+# fwber Project Strategic Analysis - January 19, 2025
 
 ## CURRENT STATE ASSESSMENT
 - **Architecture**: Mixed legacy PHP + modern Laravel/Next.js stack

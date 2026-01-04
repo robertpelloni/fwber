@@ -17,15 +17,15 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
     
     if (!res.ok) {
         return {
-            title: 'FWBer - Viral Profile Analysis',
-            description: 'Check out this AI-generated profile analysis on FWBer.',
+            title: 'fwber - Viral Profile Analysis',
+            description: 'Check out this AI-generated profile analysis on fwber.',
         };
     }
 
     const data = await res.json();
     const userName = data.user_name || 'Someone';
     
-    let title = 'FWBer Analysis';
+    let title = 'fwber Analysis';
     let description = 'See what AI thinks about this profile.';
 
     switch (data.type) {
@@ -68,8 +68,8 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
 
   } catch (error) {
     return {
-      title: 'FWBer - Viral Profile Analysis',
-      description: 'Check out this AI-generated profile analysis on FWBer.',
+      title: 'fwber - Viral Profile Analysis',
+      description: 'Check out this AI-generated profile analysis on fwber.',
     };
   }
 }

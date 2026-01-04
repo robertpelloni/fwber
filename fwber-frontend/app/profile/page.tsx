@@ -554,7 +554,7 @@ export default function ProfilePage() {
                     <div>
                       <p className="font-semibold">Client-side face blur is active</p>
                       <p className="text-xs text-primary-800">
-                        New uploads blur detected faces locally before they leave your device so only redacted images reach FWBer servers.
+                        New uploads blur detected faces locally before they leave your device so only redacted images reach fwber servers.
                       </p>
                     </div>
                   </div>

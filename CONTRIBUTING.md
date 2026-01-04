@@ -1,7 +1,7 @@
-# Contributing to FWBer
+# Contributing to fwber
 
 ## 🚀 Project Overview
-FWBer is a comprehensive social networking platform built with **Laravel 12 (API)** and **Next.js 14 (Frontend)**. We are currently in the **Post-Launch Monitoring & Growth** phase.
+fwber is a comprehensive social networking platform built with **Laravel 12 (API)** and **Next.js 14 (Frontend)**. We are currently in the **Post-Launch Monitoring & Growth** phase.
 
 ## 🛠 Tech Stack
 - **Backend**: Laravel 12, PHP 8.2+, MySQL 8, Redis.

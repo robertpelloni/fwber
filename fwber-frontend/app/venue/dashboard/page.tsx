@@ -44,7 +44,7 @@ export default function VenueDashboard() {
     <div className="min-h-screen bg-slate-900 text-white">
       <nav className="bg-slate-800 border-b border-slate-700 p-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <h1 className="text-xl font-bold text-purple-400">FWBer Partner</h1>
+          <h1 className="text-xl font-bold text-purple-400">fwber Partner</h1>
           <div className="flex items-center gap-4">
             <span className="font-medium">{venue.name}</span>
             <button 

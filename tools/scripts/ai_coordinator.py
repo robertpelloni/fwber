@@ -264,7 +264,7 @@ def main():
     print("-" * 50)
     
     models = ["codex", "claude"]
-    prompt = "Review the main PHP files in the FWBer project. List any security concerns."
+    prompt = "Review the main PHP files in the fwber project. List any security concerns."
     
     results = coordinator.parallel_execution(models, prompt, timeout=60)
     coordinator.save_results(results, f"parallel_review_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
@@ -276,7 +276,7 @@ def main():
     workflow = [
         {
             "model": "claude",
-            "prompt": "Analyze the FWBer project structure and identify the main components."
+            "prompt": "Analyze the fwber project structure and identify the main components."
         },
         {
             "model": "codex",

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# FWBer Vercel Ignored Build Step Script
+# fwber Vercel Ignored Build Step Script
 # Usage: Set "Ignored Build Step" in Vercel to: bash vercel-ignore-build.sh
 
 # Determine the path to check

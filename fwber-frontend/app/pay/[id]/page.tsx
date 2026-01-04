@@ -80,7 +80,7 @@ export default function CheckoutPage() {
                 </div>
             </div>
 
-            <h1 className="text-2xl font-bold text-center mb-1 dark:text-white">Pay with FWBer</h1>
+            <h1 className="text-2xl font-bold text-center mb-1 dark:text-white">Pay with fwber</h1>
             <p className="text-center text-gray-500 mb-8">Secure Token Payment</p>
 
             <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg mb-6 border border-gray-200 dark:border-gray-700">

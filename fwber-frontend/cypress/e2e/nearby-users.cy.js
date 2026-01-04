@@ -118,7 +118,7 @@ describe('Nearby Users', () => {
 
   it('loads login page', () => {
     cy.visit('/login');
-    cy.contains('Sign in to FWBer').should('be.visible');
+    cy.contains('Sign in to fwber').should('be.visible');
   });
 
   it('redirects to login if unauthenticated', () => {

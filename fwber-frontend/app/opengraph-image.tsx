@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og'
  
 export const runtime = 'edge'
  
-export const alt = 'FWBer - The Definitive Social Network for Adults'
+export const alt = 'fwber - The Definitive Social Network for Adults'
 export const size = {
   width: 1200,
   height: 630,
@@ -62,7 +62,7 @@ export default async function Image() {
               alignItems: 'baseline',
             }}
           >
-            FWBer
+            fwber
             <span style={{ fontSize: 40, color: '#9ca3af', marginLeft: 10 }}>.me</span>
           </div>
 

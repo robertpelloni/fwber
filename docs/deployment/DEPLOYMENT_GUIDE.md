@@ -1,6 +1,6 @@
-# FWBer Deployment Guide
+# fwber Deployment Guide
 
-Complete guide for deploying FWBer in local development, staging, and production environments.
+Complete guide for deploying fwber in local development, staging, and production environments.
 
 ## Table of Contents
 
@@ -138,7 +138,7 @@ Create `fwber-backend/.env` with the following:
 
 ```env
 # Application
-APP_NAME="FWBer"
+APP_NAME="fwber"
 APP_ENV=local
 APP_KEY=base64:your-key-here
 APP_DEBUG=true

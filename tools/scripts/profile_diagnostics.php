@@ -75,7 +75,7 @@ header('Content-Type: text/html; charset=utf-8');
 <!doctype html>
 <html>
 <head>
-  <title>FWBer Diagnostics</title>
+  <title>fwber Diagnostics</title>
   <style>
     body{font-family:system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; margin:20px}
     code{background:#f5f5f5;padding:2px 4px;border-radius:4px}
@@ -87,7 +87,7 @@ header('Content-Type: text/html; charset=utf-8');
   </style>
 </head>
 <body>
-<h1>FWBer Diagnostics</h1>
+<h1>fwber Diagnostics</h1>
 <p>User ID: <strong><?=htmlspecialchars((string)$userId)?></strong></p>
 
 <h2>Users Table Columns</h2>

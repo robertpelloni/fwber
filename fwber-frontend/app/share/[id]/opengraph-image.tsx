@@ -5,7 +5,7 @@ export const runtime = 'edge';
 // We reuse the cached font if possible, but for simplicity here we just use system fonts
 // or fetch a font if needed. For Edge Runtime, fetch is standard.
 
-export const alt = 'FWBer Viral Content';
+export const alt = 'fwber Viral Content';
 export const size = {
   width: 1200,
   height: 630,
@@ -50,7 +50,7 @@ export default async function Image({ params }: { params: { id: string } }) {
             marginBottom: 20,
             letterSpacing: '-0.05em',
           }}>
-            FWBer
+            fwber
           </div>
           <div style={{ fontSize: 36, color: '#9ca3af', fontWeight: 500 }}>
             The Definitive Social Network for Adults
@@ -62,7 +62,7 @@ export default async function Image({ params }: { params: { id: string } }) {
   }
 
   const { type, content, user_name } = data;
-  let title = 'FWBer Analysis';
+  let title = 'fwber Analysis';
   let text = '';
   // Default to branding colors
   let bgColor = '#0f0f0f'; 
@@ -262,7 +262,7 @@ export default async function Image({ params }: { params: { id: string } }) {
               fontWeight: 'bold',
               fontSize: 24
              }}>F</div>
-             <div style={{ fontSize: 32, color: 'white', fontWeight: 700 }}>FWBer</div>
+             <div style={{ fontSize: 32, color: 'white', fontWeight: 700 }}>fwber</div>
           </div>
 
           <div style={{

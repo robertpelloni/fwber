@@ -1,6 +1,6 @@
 # Universal LLM Instructions & Master Protocol
 
-> **⚠️ CRITICAL:** This is the **Source of Truth** for all AI agents and models working on FWBer.
+> **⚠️ CRITICAL:** This is the **Source of Truth** for all AI agents and models working on fwber.
 
 ## 🚀 Operational Charter & Protocol
 
@@ -34,7 +34,7 @@ All agents must adhere to this cycle for every major task or session:
 ---
 
 ## 🌍 Project Context
-*   **Name:** FWBer
+*   **Name:** fwber
 *   **Type:** Location-based Social Network & Dating Application.
 
 *   **Stack:**

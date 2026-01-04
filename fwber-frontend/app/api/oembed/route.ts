@@ -10,8 +10,8 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     version: '1.0',
     type: 'rich',
-    title: 'FWBer.me - Adult Social Network',
-    provider_name: 'FWBer.me',
+    title: 'fwber.me - Adult Social Network',
+    provider_name: 'fwber.me',
     provider_url: process.env.NEXT_PUBLIC_APP_URL || 'https://fwber.me',
     width: 600,
     height: 400,

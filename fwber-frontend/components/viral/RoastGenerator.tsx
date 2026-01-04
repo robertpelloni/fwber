@@ -56,7 +56,7 @@ export function RoastGenerator({ trigger }: RoastGeneratorProps) {
     if (typeof navigator !== 'undefined' && navigator.share && shareUrl) {
       try {
         await navigator.share({
-          title: mode === 'roast' ? 'My FWBer Roast' : 'My FWBer Hype',
+          title: mode === 'roast' ? 'My fwber Roast' : 'My fwber Hype',
           text: `Check out this AI ${mode} of my profile!`,
           url: shareUrl,
         });
@@ -132,7 +132,7 @@ export function RoastGenerator({ trigger }: RoastGeneratorProps) {
               </p>
               
               <div className="flex gap-2 justify-center">
-                <Button variant="outline" size="sm" onClick={() => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`AI just ${mode}ed me on FWBer: "${result}"\n\nSee yours here:`)}&url=${encodeURIComponent(shareUrl)}`, '_blank')}>
+                <Button variant="outline" size="sm" onClick={() => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`AI just ${mode}ed me on fwber: "${result}"\n\nSee yours here:`)}&url=${encodeURIComponent(shareUrl)}`, '_blank')}>
                   <Twitter className="w-4 h-4 mr-2" />
                   Tweet
                 </Button>

@@ -1,6 +1,6 @@
-# Deploying FWBer to DreamHost
+# Deploying fwber to DreamHost
 
-This guide walks you through deploying FWBer (Laravel Backend + Next.js Frontend) to a DreamHost server.
+This guide walks you through deploying fwber (Laravel Backend + Next.js Frontend) to a DreamHost server.
 
 ## Prerequisites
 
@@ -118,7 +118,7 @@ In the DreamHost Panel:
 ### Option B: Shared Hosting (Static Export)
 
 If your Next.js app can be static (no SSR), you can export it.
-*Note: FWBer likely uses SSR, so this might not work fully.*
+*Note: fwber likely uses SSR, so this might not work fully.*
 
 1.  Build locally: `npm run build` (ensure `output: 'export'` is in `next.config.js`).
 2.  Upload the `out` folder to your domain's web directory on DreamHost.

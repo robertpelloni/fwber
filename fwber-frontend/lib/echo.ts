@@ -23,7 +23,7 @@ export const initEcho = (token?: string) => {
     if (appKey === 'your_app_key') {
         // Only warn once to avoid spamming
         if (!window.localStorage.getItem('fwber_suppress_app_key_warn')) {
-             console.warn('FWBer: Detected placeholder "your_app_key". Falling back to "app-key" for local development.');
+             console.warn('fwber: Detected placeholder "your_app_key". Falling back to "app-key" for local development.');
              window.localStorage.setItem('fwber_suppress_app_key_warn', 'true');
         }
         appKey = 'app-key';

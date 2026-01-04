@@ -4,7 +4,7 @@
 **Status:** Post-Launch Stabilization & Verification
 
 ## 🏁 Current State
-The FWBer platform is live. Critical fixes for the **Backend Module Resolution** (tweetnacl error) and **Frontend Circular Dependency** (runtime crash) have been applied. The system requires a full rebuild to propagate these changes.
+The fwber platform is live. Critical fixes for the **Backend Module Resolution** (tweetnacl error) and **Frontend Circular Dependency** (runtime crash) have been applied. The system requires a full rebuild to propagate these changes.
 
 ## 🚀 Immediate Actions (Critical)
 

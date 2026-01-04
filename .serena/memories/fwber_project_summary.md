@@ -1,4 +1,4 @@
-FWBer.me Project State Summary:
+fwber.me Project State Summary:
 - Dating app originally from 2011, modernized with security hardening
 - Three concurrent implementations: Legacy PHP (production-ready), Laravel backend (60-70%), Next.js frontend (60-70%)
 - Core features: AI avatar generation, location-based matching, B2B venue platform, comprehensive profiles

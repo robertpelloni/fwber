@@ -1,6 +1,6 @@
 # Docker Development Environment Setup
 
-This guide explains how to use Docker Compose to run the entire FWBer development environment.
+This guide explains how to use Docker Compose to run the entire fwber development environment.
 
 ## Prerequisites
 

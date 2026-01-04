@@ -5,7 +5,7 @@
 
 ## 📂 Project Structure Overview
 
-The FWBer project is a monorepo-style workspace containing the backend API, frontend application, and documentation.
+The fwber project is a monorepo-style workspace containing the backend API, frontend application, and documentation.
 
 ```
 fwber/

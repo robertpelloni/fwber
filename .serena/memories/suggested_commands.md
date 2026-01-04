@@ -1,4 +1,4 @@
-# Suggested Commands for FWBer.me Development
+# Suggested Commands for fwber.me Development
 
 ## Setup Commands
 ```bash

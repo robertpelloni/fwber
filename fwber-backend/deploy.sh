@@ -8,7 +8,7 @@ if [ -f "scripts/start_mercure_shared.sh" ]; then
 fi
 
 #############################################################################
-# FWBer Laravel Backend Deployment Script
+# fwber Laravel Backend Deployment Script
 #
 # Purpose: Automated deployment with validation, migrations, cache clearing
 # Usage: ./deploy.sh [--env=production] [--branch=main] [--skip-migrations]
@@ -142,7 +142,7 @@ run_or_dry() {
 #############################################################################
 
 log_info "=========================================="
-log_info "FWBer Deployment Script"
+log_info "fwber Deployment Script"
 log_info "Environment: $ENVIRONMENT"
 log_info "Branch: $BRANCH"
 log_info "=========================================="

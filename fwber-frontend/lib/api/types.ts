@@ -1,7 +1,7 @@
 /**
  * Comprehensive API Response Type Definitions
  *
- * This file contains TypeScript interfaces for all API responses from the FWBer backend.
+ * This file contains TypeScript interfaces for all API responses from the fwber backend.
  * These types ensure type safety across the frontend application and make API integration easier.
  */
 

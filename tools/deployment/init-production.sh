@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# FWBer.me Production Initialization Script
+# fwber.me Production Initialization Script
 # One-command production deployment and migration
 
 set -e  # Exit on any error
 
 echo "=================================================="
-echo "FWBer.me Production Initialization"
+echo "fwber.me Production Initialization"
 echo "=================================================="
 echo ""
 

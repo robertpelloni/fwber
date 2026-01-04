@@ -1,7 +1,7 @@
 # Webhook Handling Guide
 
 ## Overview
-FWBer relies on webhooks primarily for Stripe integration to handle asynchronous payment events and subscription lifecycle updates.
+fwber relies on webhooks primarily for Stripe integration to handle asynchronous payment events and subscription lifecycle updates.
 
 ## Stripe Webhooks
 

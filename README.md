@@ -513,13 +513,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Legacy Documentation
 
-### FWBer.me Modernization Project
+### fwber.me Modernization Project
 
-This document outlines the historical state of the FWBer.me application following a comprehensive security and architectural overhaul from the legacy 2011 PHP codebase.
+This document outlines the historical state of the fwber.me application following a comprehensive security and architectural overhaul from the legacy 2011 PHP codebase.
 
 #### Legacy Overview
 
-The original FWBer.me application was a legacy PHP project from 2011. The primary goal of the modernization effort was to address critical security vulnerabilities and refactor the core application to use modern, professional-grade development practices.
+The original fwber.me application was a legacy PHP project from 2011. The primary goal of the modernization effort was to address critical security vulnerabilities and refactor the core application to use modern, professional-grade development practices.
 
 #### Legacy Technology Stack
 - **Technology Stack:** PHP 8+, PDO for database access, Composer for dependency management.

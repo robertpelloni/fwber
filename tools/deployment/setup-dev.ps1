@@ -1,8 +1,8 @@
 ################################################################################
-# FWBer.me Development Environment Setup Script (PowerShell)
+# fwber.me Development Environment Setup Script (PowerShell)
 ################################################################################
 #
-# This script automates the setup of the FWBer.me development environment for both
+# This script automates the setup of the fwber.me development environment for both
 # frontend (Next.js) and backend (Laravel) applications on Windows.
 #
 # Prerequisites:

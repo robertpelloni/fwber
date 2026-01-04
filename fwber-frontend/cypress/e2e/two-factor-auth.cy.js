@@ -51,7 +51,7 @@ describe('Two-Factor Authentication Flow', () => {
       statusCode: 200,
       body: {
         svg: '<svg>...</svg>',
-        url: `otpauth://totp/FWBer:${email}?secret=${secret}&issuer=FWBer`
+        url: `otpauth://totp/fwber:${email}?secret=${secret}&issuer=fwber`
       }
     }).as('getQrCode');
 

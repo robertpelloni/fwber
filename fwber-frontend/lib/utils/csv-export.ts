@@ -210,7 +210,7 @@ export function exportAllAnalyticsToCSV(
   const timestamp = new Date().toISOString().split('T')[0];
   const filename = `full-analytics-report-${range}-${timestamp}.csv`;
 
-  let csvContent = 'FWBer Analytics Report\n';
+  let csvContent = 'fwber Analytics Report\n';
   csvContent += `Generated: ${new Date().toLocaleString()}\n`;
   csvContent += `Range: ${range}\n`;
   csvContent += '\n';

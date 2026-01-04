@@ -58,7 +58,7 @@ export function NemesisFinder({ userId }: NemesisFinderProps) {
       const text = `🧪 My Scientific Nemesis:\n\n⚠️ Type: ${result.nemesis_type}\n🧬 Clashing Traits: ${result.clashing_traits.join(', ')}\n💥 Why we'd fail: "${result.why_it_would_fail}"\n🔬 Science says: "${result.scientific_explanation}"`;
       try {
         await navigator.share({
-          title: 'My FWBer Scientific Nemesis',
+          title: 'My fwber Scientific Nemesis',
           text: text,
           url: window.location.origin,
         });

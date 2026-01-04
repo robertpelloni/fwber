@@ -775,9 +775,9 @@ The project has successfully passed a comprehensive **Feature Audit**. All plann
     -   **Fix**: Extracted logic to `sw-push.js` and configured `next.config.js` to import it via `importScripts`. Added missing `date-fns` dependency to fix production build.
     -   **Verification**: Frontend build (`npm run build`) passing locally. Service Worker registration confirmed.
 12. **Frontend Launch Polish** (Dec 04 - Complete):
-    -   **Branding**: Updated Landing Page copy to "FWBer.me" and "The Definitive Social Network for Adults".
+    -   **Branding**: Updated Landing Page copy to "fwber.me" and "The Definitive Social Network for Adults".
     -   **Visuals**: Added `gradient-x` animation to Hero subtitle.
-    -   **Layout**: Reordered Landing Page sections (moved "Why FWBer" above "Notable Features") and refined spacing.
+    -   **Layout**: Reordered Landing Page sections (moved "Why fwber" above "Notable Features") and refined spacing.
     -   **Verification**: Verified layout and content changes.
 13. **Group Chat Integration** (Dec 04 - Complete):
     -   **Backend**: Updated `GroupController` to automatically create a linked `Chatroom` upon group creation.

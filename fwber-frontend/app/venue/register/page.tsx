@@ -64,7 +64,7 @@ export default function VenueRegisterPage() {
             Register as Venue Partner
           </h2>
           <p className="mt-2 text-center text-sm text-gray-400">
-            Join the FWBer network and grow your business
+            Join the fwber network and grow your business
           </p>
         </div>
         

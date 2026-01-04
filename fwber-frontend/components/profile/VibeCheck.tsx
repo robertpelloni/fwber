@@ -64,7 +64,7 @@ export function VibeCheck() {
           : window.location.origin;
 
         await navigator.share({
-          title: 'My FWBer Vibe Check',
+          title: 'My fwber Vibe Check',
           text: text,
           url: url,
         });
@@ -85,7 +85,7 @@ export function VibeCheck() {
               : window.location.origin;
     
             await navigator.share({
-              title: 'FWBer Quirk Check',
+              title: 'fwber Quirk Check',
               text: text,
               url: url,
             });

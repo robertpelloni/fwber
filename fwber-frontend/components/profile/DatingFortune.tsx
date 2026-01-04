@@ -35,7 +35,7 @@ export function DatingFortune() {
       const text = `🔮 My Dating Fortune:\n\n"${result.fortune}"`;
       try {
         await navigator.share({
-          title: 'My FWBer Dating Fortune',
+          title: 'My fwber Dating Fortune',
           text: text,
           url: window.location.origin,
         });

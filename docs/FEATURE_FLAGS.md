@@ -1,6 +1,6 @@
 # Feature Flags
 
-This document outlines the feature flags used in the FWBer application to gate functionality.
+This document outlines the feature flags used in the fwber application to gate functionality.
 Flags are managed via environment variables in the backend (`.env`) and frontend (`.env.local`).
 
 ## Backend Flags (`fwber-backend/config/features.php`)

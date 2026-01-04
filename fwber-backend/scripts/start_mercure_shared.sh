@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# FWBer Mercure Startup Script for Shared Hosting (No Sudo)
+# fwber Mercure Startup Script for Shared Hosting (No Sudo)
 # Usage: ./start_mercure_shared.sh
 
 # Get the directory where the script is located

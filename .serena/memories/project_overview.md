@@ -1,7 +1,7 @@
-# FWBer.me Project Overview
+# fwber.me Project Overview
 
 ## Purpose
-FWBer.me is a modernized dating/hookup application originally built in 2011. The project has been completely overhauled with modern security practices, professional architecture, and comprehensive matching capabilities.
+fwber.me is a modernized dating/hookup application originally built in 2011. The project has been completely overhauled with modern security practices, professional architecture, and comprehensive matching capabilities.
 
 ## Core Features
 - **AI-Generated Avatars**: Custom cartoon avatars based on user physical attributes

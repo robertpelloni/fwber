@@ -8,7 +8,7 @@
 Refer to `docs/LLM_INSTRUCTIONS.md` for the full 7-Step Execution Protocol regarding merging, versioning, and documentation.
 
 ## 🧠 Project Context
-- **Project**: FWBer.
+- **Project**: fwber.
 - **Master Instructions**: docs/LLM_INSTRUCTIONS.md.
 
 ## 📜 Critical Instructions

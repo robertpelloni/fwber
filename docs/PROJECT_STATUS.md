@@ -1,4 +1,4 @@
-# FWBer Project Status & Roadmap
+# fwber Project Status & Roadmap
 
 This document provides a single, authoritative overview of the "fwber" project's status, features, and roadmap. It is intended to be the primary source of truth for all contributors.
 
@@ -36,7 +36,7 @@ These features are considered complete and are ready for a production environmen
 *   **Crypto Economy (Fully Integrated):**
     *   [x] **Trojan Horse Integration:** Internal ledger for instant/free micro-transactions.
     *   [x] **Solana Bridge:** Users can withdraw accumulated tokens to external wallets (Phantom, Solflare).
-    *   [x] **Merchant API:** "Pay with FWBer" infrastructure allowing third-party sites to accept FWB tokens.
+    *   [x] **Merchant API:** "Pay with fwber" infrastructure allowing third-party sites to accept FWB tokens.
     *   [x] **Crypto Deposits:** Users can deposit SOL/SPL tokens from external wallets to their internal ledger.
     *   [x] **Wallet Dashboard:** PWA-ready wallet UI with QR code deposits and transaction history.
     *   [x] **Tokenomics:** Signup bonuses, Referral Rewards, and Daily Login Bonuses.

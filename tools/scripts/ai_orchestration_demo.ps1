@@ -5,7 +5,7 @@ Write-Host "=== AI Multi-Model Orchestration Demo ===" -ForegroundColor Cyan
 Write-Host ""
 
 # Define the task
-$task = "Analyze the FWBer project structure and suggest improvements"
+$task = "Analyze the fwber project structure and suggest improvements"
 $projectPath = "C:\Users\hyper\fwber"
 
 Write-Host "Task: $task" -ForegroundColor Yellow
@@ -78,7 +78,7 @@ Write-Host ""
 
 Write-Host "Step 1: Codex analyzes project structure..." -ForegroundColor Cyan
 $step1Output = "$outputDir\step1_codex_analysis.txt"
-codex -p "List the main PHP files in the FWBer project and describe their purpose" | Out-File -FilePath $step1Output
+codex -p "List the main PHP files in the fwber project and describe their purpose" | Out-File -FilePath $step1Output
 
 if (Test-Path $step1Output) {
     Write-Host "✓ Step 1 completed" -ForegroundColor Green

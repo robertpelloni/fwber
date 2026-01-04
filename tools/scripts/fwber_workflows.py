@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-FWBer Development Workflows
-Specific AI orchestration workflows for FWBer project development
+fwber Development Workflows
+Specific AI orchestration workflows for fwber project development
 """
 
 from ai_coordinator import AICoordinator
@@ -9,8 +9,8 @@ from datetime import datetime
 from pathlib import Path
 import json
 
-class FWBerWorkflows:
-    """Pre-configured workflows for FWBer development"""
+class fwberWorkflows:
+    """Pre-configured workflows for fwber development"""
     
     def __init__(self):
         self.coordinator = AICoordinator(r"C:\Users\hyper\fwber")
@@ -18,14 +18,14 @@ class FWBerWorkflows:
         self.workflows_dir.mkdir(parents=True, exist_ok=True)
     
     def security_audit(self):
-        """Multi-model security audit of FWBer"""
-        print("🔒 FWBer Security Audit")
+        """Multi-model security audit of fwber"""
+        print("🔒 fwber Security Audit")
         print("=" * 60)
         
         workflow = [
             {
                 "model": "codex",
-                "prompt": """Analyze the FWBer PHP codebase for security vulnerabilities.
+                "prompt": """Analyze the fwber PHP codebase for security vulnerabilities.
                 Focus on:
                 1. SQL injection risks
                 2. XSS vulnerabilities
@@ -60,12 +60,12 @@ class FWBerWorkflows:
         return results
     
     def matching_algorithm_optimization(self):
-        """Optimize the FWBer matching algorithm"""
+        """Optimize the fwber matching algorithm"""
         print("🎯 Matching Algorithm Optimization")
         print("=" * 60)
         
         # Parallel analysis
-        prompt = """Analyze the FWBer matching algorithm (MatchingEngine.php).
+        prompt = """Analyze the fwber matching algorithm (MatchingEngine.php).
         Suggest 3 specific optimizations to:
         1. Improve match quality
         2. Increase performance
@@ -107,7 +107,7 @@ class FWBerWorkflows:
         workflow = [
             {
                 "model": "claude",
-                "prompt": """Review the FWBer database setup files (setup-database.sql).
+                "prompt": """Review the fwber database setup files (setup-database.sql).
                 Analyze:
                 1. Table structure and relationships
                 2. Index optimization
@@ -147,7 +147,7 @@ class FWBerWorkflows:
         print(f"Feature: {feature_description}")
         print("=" * 60)
         
-        topic = f"""How should we implement this feature in FWBer: {feature_description}
+        topic = f"""How should we implement this feature in fwber: {feature_description}
         
         Consider:
         - Architecture approach
@@ -175,7 +175,7 @@ class FWBerWorkflows:
         print(f"📝 Parallel Code Review: {file_pattern}")
         print("=" * 60)
         
-        prompt = f"""Review all {file_pattern} files in the FWBer project.
+        prompt = f"""Review all {file_pattern} files in the fwber project.
         For each file, identify:
         1. Code quality issues
         2. Potential bugs
@@ -199,14 +199,14 @@ class FWBerWorkflows:
         return results
     
     def mvp_validation(self):
-        """Validate FWBer MVP implementation"""
+        """Validate fwber MVP implementation"""
         print("✨ MVP Validation")
         print("=" * 60)
         
         workflow = [
             {
                 "model": "claude",
-                "prompt": """Review the FWBer MVP specification (B2B_MVP_SPEC.md).
+                "prompt": """Review the fwber MVP specification (B2B_MVP_SPEC.md).
                 Check current implementation against the spec:
                 1. Which features are implemented?
                 2. Which features are missing?
@@ -249,9 +249,9 @@ class FWBerWorkflows:
         print("=" * 60)
         
         tasks = [
-            ("API Documentation", "Generate API documentation for all FWBer endpoints"),
-            ("User Guide", "Create a user guide for FWBer venue partners"),
-            ("Developer Guide", "Write a developer setup guide for FWBer")
+            ("API Documentation", "Generate API documentation for all fwber endpoints"),
+            ("User Guide", "Create a user guide for fwber venue partners"),
+            ("Developer Guide", "Write a developer setup guide for fwber")
         ]
         
         all_results = []
@@ -273,10 +273,10 @@ class FWBerWorkflows:
         return all_results
 
 def main():
-    """Run FWBer workflows"""
-    workflows = FWBerWorkflows()
+    """Run fwber workflows"""
+    workflows = fwberWorkflows()
     
-    print("=== FWBer Development Workflows ===")
+    print("=== fwber Development Workflows ===")
     print()
     print("Available workflows:")
     print("1. Security Audit")

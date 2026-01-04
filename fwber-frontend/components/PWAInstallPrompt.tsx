@@ -51,7 +51,7 @@ export default function PWAInstallPrompt() {
         <div className="flex-1">
           <h3 className="text-lg font-bold text-gray-900 mb-1">Install Payment App</h3>
           <p className="text-sm text-gray-600 mb-3">
-            Install FWBer to enable crypto wallet features, offline access, and instant payment notifications.
+            Install fwber to enable crypto wallet features, offline access, and instant payment notifications.
           </p>
           <button
             onClick={handleInstallClick}

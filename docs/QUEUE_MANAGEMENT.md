@@ -1,7 +1,7 @@
 # Queue Management Strategy
 
 ## Overview
-FWBer uses Laravel Queues backed by Redis to handle background tasks asynchronously. This ensures the application remains responsive even when performing heavy operations like sending emails, processing payments, or cleaning up data.
+fwber uses Laravel Queues backed by Redis to handle background tasks asynchronously. This ensures the application remains responsive even when performing heavy operations like sending emails, processing payments, or cleaning up data.
 
 ## Queue Architecture
 
