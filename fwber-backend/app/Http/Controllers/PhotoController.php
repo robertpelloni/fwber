@@ -169,7 +169,7 @@ class PhotoController extends Controller
      *     )
      *   ),
      *   @OA\Response(response=201, description="Photo uploaded"),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
      *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
      * )
      * 
@@ -238,25 +238,47 @@ class PhotoController extends Controller
             $originalFilename = $file->getClientOriginalName();
             
             // Get image dimensions and create manager
-            $manager = new ImageManager(new Driver());
-            $image = $manager->read($file->getRealPath());
-            // Downscale very large originals to reduce memory usage
-            $image = $image->scaleDown(width: 2000, height: 2000);
-            $width = $image->width();
-            $height = $image->height();
+            // Check if Intervention Image drivers are available
+            try {
+                $manager = new ImageManager(new Driver());
+                $image = $manager->read($file->getRealPath());
+                // Downscale very large originals to reduce memory usage
+                $image = $image->scaleDown(width: 2000, height: 2000);
+                $width = $image->width();
+                $height = $image->height();
+            } catch (\Throwable $e) {
+                // Fallback for when GD is not available or memory issues occur
+                Log::warning('Image processing failed, using raw file properties', [
+                   'error' => $e->getMessage()
+                ]);
+                $width = 0;
+                $height = 0;
+                // Just use the file directly without intervention if image processing fails
+                // But we still need an image object for thumbnails if we want them
+            }
             
             // Store the original image
             $filePath = 'photos/' . $user->id . '/' . $filename;
-            Storage::disk('public')->put($filePath, (string) $image->encode());
+            
+            // Use stream if image object isn't available
+            if (isset($image)) {
+                Storage::disk('public')->put($filePath, (string) $image->encode());
+            } else {
+                 Storage::disk('public')->putFileAs('photos/' . $user->id, $file, $filename);
+            }
             
             // Create thumbnail
             $thumbnailFilename = 'thumb_' . $filename;
             $thumbnailPath = 'photos/' . $user->id . '/thumbnails/' . $thumbnailFilename;
             
             // Scale down to 300x300 max while maintaining aspect ratio
-            $thumbnail = $image->scaleDown(width: 300, height: 300);
-            
-            Storage::disk('public')->put($thumbnailPath, (string) $thumbnail->encode());
+            if (isset($image)) {
+                 $thumbnail = $image->scaleDown(width: 300, height: 300);
+                 Storage::disk('public')->put($thumbnailPath, (string) $thumbnail->encode());
+            } else {
+                // If we couldn't process image, use original as thumbnail (not ideal but works)
+                Storage::disk('public')->putFileAs('photos/' . $user->id . '/thumbnails', $file, $thumbnailFilename);
+            }
             
             // Analyze photo if feature is enabled
             $analysisMetadata = [];
@@ -363,7 +385,7 @@ class PhotoController extends Controller
      *     )
      *   ),
      *   @OA\Response(response=200, description="Photo updated"),
-    *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
      * )
      * 
@@ -459,7 +481,7 @@ class PhotoController extends Controller
      *   security={{"bearerAuth":{}}},
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Response(response=200, description="Photo deleted"),
-    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      * 
      * @param int $id
@@ -619,6 +641,10 @@ class PhotoController extends Controller
      *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
      *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
+     * 
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
      */
     public function reveal(Request $request, int $id): JsonResponse
     {
@@ -710,6 +736,9 @@ class PhotoController extends Controller
      *   @OA\Response(response=402, description="Insufficient tokens"),
      *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
+     * 
+     * @param int $id
+     * @return JsonResponse
      */
     public function unlock(int $id): JsonResponse
     {
@@ -824,6 +853,10 @@ class PhotoController extends Controller
      *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
      *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
+     * 
+     * @param Request $request
+     * @param int $id
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse|JsonResponse
      */
     public function original(Request $request, int $id)
     {
