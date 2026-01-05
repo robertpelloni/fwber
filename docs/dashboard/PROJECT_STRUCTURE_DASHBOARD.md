@@ -1,7 +1,7 @@
 # Project Directory Structure & Submodule Dashboard
 
 **Last Updated:** January 05, 2026
-**Version:** v0.3.20
+**Version:** v0.3.21
 
 ## 📂 Project Directory Structure
 

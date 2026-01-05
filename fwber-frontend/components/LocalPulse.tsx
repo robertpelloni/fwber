@@ -18,8 +18,10 @@ import {
   StickyNote,
   Sparkles,
   Coins,
+  Camera,
 } from 'lucide-react';
 import type { ProximityArtifact, MatchCandidate, ArtifactType } from '@/types/proximity';
+import ARView from './ar/ARView';
 
 interface LocationState {
   latitude: number | null;
@@ -184,6 +186,7 @@ export default function LocalPulse() {
   });
   const [radius, setRadius] = useState(1000);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showAR, setShowAR] = useState(false);
   const [newArtifact, setNewArtifact] = useState({
     type: 'chat' as ArtifactType,
     content: '',
@@ -303,13 +306,22 @@ export default function LocalPulse() {
             </div>
           </div>
 
-          <button
-            onClick={() => setShowCreateForm(!showCreateForm)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2"
-          >
-            <Send className="h-4 w-4" />
-            <span>Post</span>
-          </button>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setShowAR(true)}
+              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 flex items-center space-x-2"
+            >
+              <Camera className="h-4 w-4" />
+              <span>AR View</span>
+            </button>
+            <button
+              onClick={() => setShowCreateForm(!showCreateForm)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+            >
+              <Send className="h-4 w-4" />
+              <span>Post</span>
+            </button>
+          </div>
         </div>
 
         {/* Radius Selector */}
@@ -500,6 +512,19 @@ export default function LocalPulse() {
             )}
           </div>
         </div>
+      )}
+
+      {/* AR View Overlay */}
+      {showAR && localPulse && location.latitude && location.longitude && (
+        <ARView
+          artifacts={localPulse.artifacts}
+          candidates={localPulse.candidates}
+          userLocation={{
+            latitude: location.latitude,
+            longitude: location.longitude,
+          }}
+          onClose={() => setShowAR(false)}
+        />
       )}
 
       {/* Meta Info */}

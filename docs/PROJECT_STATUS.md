@@ -48,6 +48,7 @@ These features are considered complete and are ready for a production environmen
     *   [x] **Paid Match Insights:** Token costs to unlock detailed AI compatibility reports and explanations.
     *   [x] **Payment Requests:** "Venmo-style" invoicing allowing users to request tokens from friends and matches.
     *   [x] **Geo-Fenced Token Drops:** Users can drop tokens at physical locations for others to find and claim ("Pokemon GO" style).
+    *   [x] **AR View:** Augmented Reality camera view for locating nearby drops and events overlayed on the real world.
 *   **Viral & Engagement:**
     *   [x] **"Roast My Profile":** Viral marketing tool allowing users to generate shareable AI roasts/hype of their profiles.
     *   [x] **Friends System:** Send, accept, manage friends, and send tips.
