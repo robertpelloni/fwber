@@ -1,7 +1,7 @@
 # Project Directory Structure & Submodule Dashboard
 
-**Last Updated:** December 28, 2025
-**Version:** v0.3.2
+**Last Updated:** January 05, 2026
+**Version:** v0.3.20
 
 ## 📂 Project Directory Structure
 
@@ -10,35 +10,37 @@ The `fwber` project is a monorepo containing the following key components:
 ### Core Directories
 - **`fwber-backend/`**: Laravel 12 API application. Handles authentication, database interactions, business logic, and API endpoints.
   - Location: `./fwber-backend`
-  - Tech Stack: PHP, Laravel, MySQL, Redis.
-- **`fwber-frontend/`**: Next.js 14 Web Application. Provides the user interface and client-side logic.
+  - Tech Stack: PHP 8.2, Laravel 12, MySQL, Redis, Reverb (Websockets).
+- **`fwber-frontend/`**: Next.js 16 Web Application. Provides the user interface and client-side logic.
   - Location: `./fwber-frontend`
-  - Tech Stack: TypeScript, React, Next.js, Tailwind CSS.
+  - Tech Stack: TypeScript, React 18, Next.js 16, Tailwind CSS.
 - **`docs/`**: Comprehensive project documentation.
   - Location: `./docs`
   - Contains architecture guides, API references, deployment checklists, and operational runbooks.
-- **`tools/`**: Utility scripts and configuration tools for development and deployment.
-  - Location: `./tools`
-- **`ssl/`**: SSL certificate management (locally).
-  - Location: `./ssl`
+- **`docker/`**: Infrastructure configuration.
+  - Location: `./docker`
+  - Contains MySQL and other service definitions.
 
 ### 📦 Submodules
 
-*Note: No active submodules are currently registered in this repository based on the latest scan. All components are integrated directly into the monorepo structure.*
+*Note: No active git submodules are currently registered. Dependencies are managed via Composer (Backend) and NPM (Frontend).*
 
 ## 📊 Component Versioning
 
 | Component | Version | Build/Commit | Date |
 | :--- | :--- | :--- | :--- |
-| **fwber-backend** | v0.3.2 | `HEAD` | Dec 28, 2025 |
-| **fwber-frontend** | v0.3.2 | `HEAD` | Dec 28, 2025 |
-| **Documentation** | v0.3.2 | `HEAD` | Dec 28, 2025 |
+| **fwber-backend** | v0.3.20 | `HEAD` | Jan 05, 2026 |
+| **fwber-frontend** | v0.3.20 | `HEAD` | Jan 05, 2026 |
+| **Documentation** | v0.3.20 | `HEAD` | Jan 05, 2026 |
 
 ## 🛠️ Operational Status
 
 - **Build Status**: ✅ Stable
-- **Test Coverage**: ✅ 100% Core Features
+- **Test Coverage**: ✅ Core Features Verified
 - **Deployment**: ✅ Production Ready
+- **Recent Fixes**:
+  - Onboarding Photo Upload: Face blur models localized, UI stabilized.
+  - Merged Features: Event Discussions, Group Matching, Shared Invitations.
 
 ---
 *This dashboard is automatically updated by the deployment agent.*
