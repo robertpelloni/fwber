@@ -36,7 +36,7 @@ export class FaceBlurError extends Error {
 }
 
 let modelsLoaded = false
-const MODEL_BASE_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/'
+const MODEL_BASE_URL = '/models/'
 
 export async function loadModels() {
   if (modelsLoaded) return

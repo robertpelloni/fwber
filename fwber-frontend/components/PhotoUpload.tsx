@@ -275,15 +275,18 @@ export default function PhotoUpload({
 
     // Auto-upload immediately after selection
     setIsUploading(true)
-    const progressMap = new Map<string, UploadProgress>()
-    newPreviews.forEach(preview => {
-      progressMap.set(preview.id, {
-        fileName: preview.file.name,
-        progress: 0,
-        status: 'pending'
+    
+    setUploadProgress(prev => {
+      const newMap = new Map(prev)
+      newPreviews.forEach(preview => {
+        newMap.set(preview.id, {
+          fileName: preview.file.name,
+          progress: 0,
+          status: 'pending'
+        })
       })
+      return newMap
     })
-    setUploadProgress(progressMap)
 
     try {
       const progressCallback = (fileIndex: number, progress: number, fileName: string) => {
@@ -608,12 +611,12 @@ export default function PhotoUpload({
         </div>
       </div>
 
-      {clientProcessingMessage && (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <RotateCcw className="w-4 h-4 animate-spin" />
-          {clientProcessingMessage}
-        </div>
-      )}
+        {clientProcessingMessage && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <RotateCcw className="w-4 h-4 animate-spin scale-x-[-1]" />
+            {clientProcessingMessage}
+          </div>
+        )}
 
       {processingWarnings.length > 0 && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900 space-y-2">
@@ -663,18 +666,23 @@ export default function PhotoUpload({
                       {isError ? 'Failed' : isCompleted ? 'Complete' : `${Math.round(percent)}%`}
                     </span>
                   </div>
-                  <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-                    <div 
-                      className={`h-2 rounded-full transition-all duration-300 ${
-                        isError 
-                          ? 'bg-red-500' 
-                          : isCompleted 
-                            ? 'bg-green-500' 
-                            : 'bg-primary'
-                      }`}
-                      style={{ width: `${percent}%` }}
-                    />
-                  </div>
+                    <div className="w-full bg-muted rounded-full h-2 overflow-hidden relative">
+                      {/* Bouncing Background */}
+                      {(status === 'uploading' || status === 'pending') && (
+                         <div className="absolute inset-0 bg-primary/20 animate-pulse" />
+                      )}
+                      
+                      <div 
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          isError 
+                            ? 'bg-red-500' 
+                            : isCompleted 
+                              ? 'bg-green-500' 
+                              : 'bg-primary'
+                        }`}
+                        style={{ width: `${percent}%` }}
+                      />
+                    </div>
                   {error && (
                     <p className="text-xs text-red-600 mt-1">{error}</p>
                   )}
@@ -693,7 +701,10 @@ export default function PhotoUpload({
                 )}%
               </span>
             </div>
-            <div className="w-full bg-muted rounded-full h-2">
+            <div className="w-full bg-muted rounded-full h-2 overflow-hidden relative">
+              {(Array.from(uploadProgress.values()).some(p => p.status === 'uploading' || p.status === 'pending')) && (
+                 <div className="absolute inset-0 bg-primary/20 animate-pulse" />
+              )}
               <div 
                 className="bg-primary h-2 rounded-full transition-all duration-300"
                 style={{ 
