@@ -2,11 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.3.20] - 2026-01-01
+## [0.3.20] - 2026-01-05
+
+### Added
+- **Local Face Models**: Moved face-api.js models to `public/models/` for reliable offline/non-CDN access.
+- **Onboarding UX**: Improved photo upload progress bar with bounce/pulse animations for better feedback.
+- **Dashboard**: Created `docs/dashboard/PROJECT_STRUCTURE_DASHBOARD.md` to track project structure and versions.
+
+### Fixed
+- **Photo Upload**: Corrected the rotation of the loading spinner icon (mirrored) to match the clockwise animation direction.
+- **Progress Stability**: Fixed "bouncing" progress bar behavior where the state would reset incorrectly during multiple file uploads.
+- **Feature Merges**: Merged `feature/event-discussions`, `feature/group-matching-shared-events`, and `feature/shared-event-invitations` into main.
 
 ### Security
-- **Backend Hardening**: Implemented strict Content Security Policy (CSP) in `SecurityHeaders.php` (blocks unsafe-inline/eval in production).
-- **CORS Restricted**: Tightened `config/cors.php` to disallow wildcard origins and only permit specific headers/methods.
+- **Backend Hardening**: Implemented strict Content Security Policy (CSP) in `SecurityHeaders.php`.
+- **CORS Restricted**: Tightened `config/cors.php`.
+
 - **Environment**: Updated `.env.example` to ensure safe defaults (APP_DEBUG=false, empty keys).
 
 ### Fixed
