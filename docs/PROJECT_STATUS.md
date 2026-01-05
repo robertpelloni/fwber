@@ -73,6 +73,8 @@ These features are considered complete and are ready for a production environmen
 *   **API & Documentation:**
     *   [x] **OpenAPI Documentation:** The backend API is extensively documented using OpenAPI (Swagger).
     *   [x] **Advanced Match Filtering:** Filtering by lifestyle preferences (Diet, Politics, etc.) is fully functional and token-gated for premium users.
+    *   [x] **AI Wingman:** Real-time chat suggestions, ice-breakers, and profile analysis.
+    *   [x] **Group Matching:** Find and match with other friend groups for shared events.
 
 ### Partially Implemented
 

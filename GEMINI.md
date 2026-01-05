@@ -1,6 +1,6 @@
 # Gemini Instructions
 
-> **⚠️ IMPORTANT:** The **MASTER PROTOCOL** is located in `docs/LLM_INSTRUCTIONS.md`. You MUST read that file first.
+> **⚠️ IMPORTANT:** The **MASTER PROTOCOL** is located in `docs/UNIVERSAL_LLM_INSTRUCTIONS.md`. You MUST read that file first.
 
 ## 🧠 Gemini-Specific Context
 -   **Multimodality**: You can process images if provided. Use this for UI verification if screenshots are available.

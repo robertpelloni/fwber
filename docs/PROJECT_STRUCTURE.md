@@ -1,7 +1,7 @@
 # Project Structure & Dashboard
 
-**Last Updated:** 2025-12-31
-**Current Version:** 0.3.19 (See `VERSION` file)
+**Last Updated:** 2026-01-05
+**Current Version:** 0.3.20 (See `VERSION` file)
 
 ## 📂 Repository Layout
 
@@ -12,11 +12,11 @@ fwber/
 ├── VERSION                 # Single Source of Truth for Project Version
 ├── CHANGELOG.md            # Detailed history of changes
 ├── docs/                   # Documentation & Protocols
-│   ├── LLM_INSTRUCTIONS.md # Master Protocol for AI Agents
+│   ├── UNIVERSAL_LLM_INSTRUCTIONS.md # Master Protocol for AI Agents
 │   ├── PROJECT_STRUCTURE.md# This file
 │   └── ...
 ├── fwber-frontend/         # Next.js Application (Directory)
-│   ├── package.json        # Frontend Dependencies (v0.3.19)
+│   ├── package.json        # Frontend Dependencies (v0.3.20)
 │   ├── app/                # App Router Pages & Layouts
 │   ├── lib/                # Shared Utilities & Hooks
 │   └── ...
@@ -34,7 +34,7 @@ fwber/
 *   **Type:** Next.js 14 Application
 *   **Language:** TypeScript
 *   **State:** Active Development
-*   **Version:** 0.3.19 (Synced to Root Version)
+*   **Version:** 0.3.20 (Synced to Root Version)
 *   **Key Tech:** React 19, Tailwind, Pusher-JS, Shadcn/UI.
 
 ### Backend (`fwber-backend`)

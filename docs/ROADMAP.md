@@ -22,11 +22,11 @@
 - [x] Events & Ticketing
 
 ## 🔮 Phase 4: Advanced Features (Q1 2026)
-- [ ] Group Matching (Find other groups)
+- [x] Group Matching (Find other groups)
     - [x] Database Schema Updates
-    - [ ] Matching Algorithm Implementation
-    - [ ] Frontend UI for Group Discovery
-- [ ] AI Wingman (Chat suggestions)
+    - [x] Matching Algorithm Implementation
+    - [x] Frontend UI for Group Discovery
+- [x] AI Wingman (Chat suggestions)
 - [ ] Augmented Reality (AR) Meetups
 - [ ] Merchant Integration (Local business promotions)
 - [ ] Advanced Analytics Dashboard

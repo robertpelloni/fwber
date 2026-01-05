@@ -1,6 +1,6 @@
 # GPT Instructions
 
-> **⚠️ IMPORTANT:** The **MASTER PROTOCOL** is located in `docs/LLM_INSTRUCTIONS.md`. You MUST read that file first.
+> **⚠️ IMPORTANT:** The **MASTER PROTOCOL** is located in `docs/UNIVERSAL_LLM_INSTRUCTIONS.md`. You MUST read that file first.
 
 ## 🧠 GPT-Specific Context
 -   **Reasoning**: You excel at complex logic and architectural planning. Use this for refactoring and system design.
