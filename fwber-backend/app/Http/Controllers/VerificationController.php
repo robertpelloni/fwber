@@ -75,9 +75,17 @@ class VerificationController extends Controller
             // Resize to reasonable size for analysis
             $manager = new ImageManager(new Driver());
             $image = $manager->read($file->getRealPath());
-            $image = $image->scaleDown(width: 1000, height: 1000);
+            $image->scaleDown(width: 1000, height: 1000);
             
-            Storage::disk('public')->put($path, (string) $image->encode());
+            $extension = $file->getClientOriginalExtension();
+            $encoded = match(strtolower($extension)) {
+                'png' => $image->toPng(),
+                'webp' => $image->toWebp(),
+                'gif' => $image->toGif(),
+                default => $image->toJpeg(80),
+            };
+            
+            Storage::disk('public')->put($path, (string) $encoded);
 
             // Compare faces
             try {

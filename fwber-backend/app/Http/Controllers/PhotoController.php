@@ -262,7 +262,13 @@ class PhotoController extends Controller
             
             // Use stream if image object isn't available
             if (isset($image)) {
-                Storage::disk('public')->put($filePath, (string) $image->encode());
+                $encoded = match(strtolower($extension)) {
+                    'png' => $image->toPng(),
+                    'webp' => $image->toWebp(),
+                    'gif' => $image->toGif(),
+                    default => $image->toJpeg(80),
+                };
+                Storage::disk('public')->put($filePath, (string) $encoded);
             } else {
                  Storage::disk('public')->putFileAs('photos/' . $user->id, $file, $filename);
             }
@@ -273,8 +279,18 @@ class PhotoController extends Controller
             
             // Scale down to 300x300 max while maintaining aspect ratio
             if (isset($image)) {
-                 $thumbnail = $image->scaleDown(width: 300, height: 300);
-                 Storage::disk('public')->put($thumbnailPath, (string) $thumbnail->encode());
+                 // Clone image to prevent modifying the original instance if we were to use it later
+                 // (Though we don't use it later in this specific flow, it's safer)
+                 $thumbnail = clone $image;
+                 $thumbnail->scaleDown(width: 300, height: 300);
+                 
+                 $encodedThumb = match(strtolower($extension)) {
+                    'png' => $thumbnail->toPng(),
+                    'webp' => $thumbnail->toWebp(),
+                    'gif' => $thumbnail->toGif(),
+                    default => $thumbnail->toJpeg(80),
+                };
+                 Storage::disk('public')->put($thumbnailPath, (string) $encodedThumb);
             } else {
                 // If we couldn't process image, use original as thumbnail (not ideal but works)
                 Storage::disk('public')->putFileAs('photos/' . $user->id . '/thumbnails', $file, $thumbnailFilename);
