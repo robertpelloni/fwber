@@ -361,6 +361,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('subscriptions/creators/{creatorId}/subscribe', [\App\Http\Controllers\CreatorSubscriptionController::class, 'subscribe']);
     Route::get('subscriptions/creators/{creatorId}/check', [\App\Http\Controllers\CreatorSubscriptionController::class, 'check']);
 
+    // Merchant Portal (Phase 4B)
+    Route::prefix('merchant-portal')->group(function () {
+        Route::post('register', [\App\Http\Controllers\MerchantController::class, 'register']);
+        Route::get('profile', [\App\Http\Controllers\MerchantController::class, 'getProfile']);
+        Route::put('profile', [\App\Http\Controllers\MerchantController::class, 'updateProfile']);
+        Route::get('promotions', [\App\Http\Controllers\MerchantController::class, 'getPromotions']);
+        Route::post('promotions', [\App\Http\Controllers\MerchantController::class, 'storePromotion']);
+    });
+
     // Merchant API (Authenticated)
     Route::post('merchant/keys', [\App\Http\Controllers\Api\MerchantController::class, 'generateKeys']);
     Route::post('merchant/payment/{id}/confirm', [\App\Http\Controllers\Api\MerchantController::class, 'confirm']);

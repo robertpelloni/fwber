@@ -7,6 +7,7 @@ import { logAuth, setUserContext, clearUserContext } from './logger'
 interface User {
   id: number
   email: string
+  role?: string
   name: string
   emailVerifiedAt: string | null
   createdAt: string

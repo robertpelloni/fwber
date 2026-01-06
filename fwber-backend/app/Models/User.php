@@ -30,6 +30,7 @@ class User extends Authenticatable
         'golden_tickets_remaining',
         'onboarding_completed_at',
         'last_daily_bonus_at',
+        'role',
     ];
 
     protected $hidden = [
@@ -70,6 +71,11 @@ class User extends Authenticatable
     }
 
     // Relationships
+
+    public function merchantProfile()
+    {
+        return $this->hasOne(MerchantProfile::class);
+    }
 
     public function referrer()
     {
