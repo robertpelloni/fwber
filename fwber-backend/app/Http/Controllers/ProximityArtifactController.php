@@ -367,20 +367,55 @@ class ProximityArtifactController extends Controller
                         'radius' => $a->visibility_radius_m,
                         'expires_at' => $a->expires_at?->toIso8601String(),
                         'created_at' => $a->created_at?->toIso8601String(),
+                        'meta' => $a->meta,
+                        'user_id' => $a->user_id,
                     ];
                 });
+
+            // Get active promotions
+            $promotions = Promotion::query()
+                ->where('is_active', true)
+                ->where('starts_at', '<=', now())
+                ->where('expires_at', '>', now())
+                ->withinBox($lat, $lng, $radius)
+                ->with('merchantProfile')
+                ->limit(20)
+                ->get()
+                ->map(function (Promotion $p) {
+                    return [
+                        'id' => $p->id,
+                        'type' => 'promotion',
+                        'content' => $p->description ?? $p->title,
+                        'lat' => $p->lat,
+                        'lng' => $p->lng,
+                        'radius' => $p->radius,
+                        'expires_at' => $p->expires_at?->toIso8601String(),
+                        'created_at' => $p->starts_at?->toIso8601String(),
+                        'meta' => [
+                            'title' => $p->title,
+                            'discount' => $p->discount_value,
+                            'merchant_name' => $p->merchantProfile->business_name ?? 'Merchant',
+                            'promo_code' => $p->promo_code,
+                            'is_sponsored' => true,
+                        ],
+                        'user_id' => null,
+                    ];
+                });
+
+            // Merge artifacts and promotions
+            $mixedArtifacts = $artifacts->concat($promotions)->sortByDesc('created_at')->values();
 
             // Get nearby match candidates (lightweight previews)
             $candidates = $this->getNearbyCompatibleCandidates($user, $profile, $lat, $lng, $radius, 10);
 
             return [
-                'artifacts' => $artifacts,
+                'artifacts' => $mixedArtifacts,
                 'candidates' => $candidates,
                 'meta' => [
                     'center_lat' => $lat,
                     'center_lng' => $lng,
                     'radius_m' => $radius,
-                    'artifacts_count' => $artifacts->count(),
+                    'artifacts_count' => $mixedArtifacts->count(),
                     'candidates_count' => count($candidates),
                     'generated_at' => now()->toISOString(),
                 ],
