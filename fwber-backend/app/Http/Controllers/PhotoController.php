@@ -243,7 +243,7 @@ class PhotoController extends Controller
                 $manager = new ImageManager(new Driver());
                 $image = $manager->read($file->getRealPath());
                 // Downscale very large originals to reduce memory usage
-                $image = $image->scaleDown(width: 2000, height: 2000);
+                $image->scaleDown(width: 2000, height: 2000);
                 $width = $image->width();
                 $height = $image->height();
             } catch (\Throwable $e) {

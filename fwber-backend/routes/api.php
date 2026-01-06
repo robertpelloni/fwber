@@ -53,6 +53,8 @@ Route::post('vouch/generate-link', [\App\Http\Controllers\VouchController::class
 Route::post('auth/login-wallet', [\App\Http\Controllers\AuthController::class, 'loginWithWallet'])->middleware('throttle:auth');
 Route::post('auth/two-factor-challenge', [\App\Http\Controllers\TwoFactorChallengeController::class, 'store'])->middleware('throttle:auth');
 
+Route::post('telemetry/client-events', [\App\Http\Controllers\TelemetryController::class, 'storeClientEvents']);
+
 // Public Debug Route (No Auth)
 if (!app()->isProduction()) {
     Route::get('debug/public', function () {
