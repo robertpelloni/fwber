@@ -6,6 +6,7 @@ use App\Http\Requests\LocalPulseRequest;
 use App\Http\Requests\ProximityFeedRequest;
 use App\Http\Requests\StoreProximityArtifactRequest;
 use App\Models\ProximityArtifact;
+use App\Models\Promotion;
 use App\Events\ProximityArtifactEvent;
 use App\Services\ProximityArtifactService;
 use App\Services\ShadowThrottleService;
