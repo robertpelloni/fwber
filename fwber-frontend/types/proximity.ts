@@ -1,6 +1,6 @@
 // Proximity Artifacts & Local Pulse Types
 
-export type ArtifactType = 'chat' | 'board_post' | 'announce' | 'token_drop';
+export type ArtifactType = 'chat' | 'board_post' | 'announce' | 'token_drop' | 'promotion';
 
 export interface ProximityArtifact {
   id: number;
@@ -16,6 +16,12 @@ export interface ProximityArtifact {
     amount?: number;
     claimed?: boolean;
     claimed_by?: number;
+    // Promotion specific fields
+    title?: string;
+    discount?: number;
+    merchant_name?: string;
+    promo_code?: string;
+    is_sponsored?: boolean;
   };
 }
 

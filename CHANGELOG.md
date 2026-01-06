@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.22] - 2026-01-06
+
+### Fixed
+- **Build Stability**: Resolved critical TypeScript errors in `LocationPicker` by stabilizing `react-leaflet` version to 4.2.1 and removing conflicting custom type definitions.
+
+### Added
+- **Local Pulse**: Enhanced the feed to support "Merchant Promotions" with distinct "Sponsored" styling, including discount badges and merchant names.
+
 ## [0.3.21] - 2026-01-05
 
 ### Added

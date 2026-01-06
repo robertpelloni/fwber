@@ -613,7 +613,7 @@ export default function PhotoUpload({
 
         {clientProcessingMessage && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <RotateCcw className="w-4 h-4 animate-spin scale-x-[-1]" />
+            <RotateCcw className="w-4 h-4 animate-spin" style={{ animationDirection: 'reverse' }} />
             {clientProcessingMessage}
           </div>
         )}

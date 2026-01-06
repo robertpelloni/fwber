@@ -254,17 +254,33 @@ export default function ProximityFeed() {
           </div>
         ) : (
           artifacts.map((artifact) => (
-            <div key={artifact.id} className="bg-white shadow rounded-lg p-4">
+            <div key={artifact.id} className={`bg-white shadow rounded-lg p-4 ${artifact.type === 'promotion' ? 'border border-amber-300 bg-amber-50/30' : ''}`}>
               <div className="flex justify-between items-start mb-2">
                 <div className="flex items-center gap-2">
-                  <div className="bg-gray-100 p-1 rounded-full">
-                    <User className="h-4 w-4 text-gray-600" />
+                  <div className={`p-1 rounded-full ${artifact.type === 'promotion' ? 'bg-amber-100 text-amber-600' : 'bg-gray-100'}`}>
+                    {artifact.type === 'promotion' ? (
+                       <div className="h-4 w-4 flex items-center justify-center font-bold">P</div>
+                    ) : (
+                       <User className="h-4 w-4 text-gray-600" />
+                    )}
                   </div>
-                  <span className="font-medium text-sm">User #{artifact.user_id}</span>
-                  <span className="text-xs text-gray-400 flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    {new Date(artifact.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
+                  <div className="flex flex-col leading-tight">
+                    <span className="font-medium text-sm">
+                      {artifact.type === 'promotion' 
+                        ? (artifact.meta?.merchant_name || "Merchant Promotion") 
+                        : `User #${artifact.user_id}`
+                      }
+                    </span>
+                    {artifact.type === 'promotion' && (
+                       <span className="text-[10px] text-amber-600 font-bold uppercase tracking-wider">Sponsored</span>
+                    )}
+                  </div>
+                  {!artifact.type?.includes('promotion') && (
+                    <span className="text-xs text-gray-400 flex items-center gap-1 ml-1">
+                      <Clock className="h-3 w-3" />
+                      {new Date(artifact.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  )}
                 </div>
                 <div className="flex gap-2">
                   {user?.id === artifact.user_id ? (
@@ -287,6 +303,17 @@ export default function ProximityFeed() {
                 </div>
               </div>
               
+              {/* Promotion Content */}
+              {artifact.type === 'promotion' && artifact.meta && (
+                <div className="mb-2 p-2 bg-amber-100/50 rounded border border-amber-200">
+                  {artifact.meta.title && <h4 className="font-bold text-gray-900 leading-tight mb-1">{artifact.meta.title}</h4>}
+                  <div className="flex justify-between items-center">
+                    {artifact.meta.discount && <span className="text-green-700 font-bold bg-green-100 px-2 py-0.5 rounded text-xs">-{artifact.meta.discount}% OFF</span>}
+                    {artifact.meta.promo_code && <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-600 border border-gray-200">CODE: {artifact.meta.promo_code}</span>}
+                  </div>
+                </div>
+              )}
+
               <p className="text-gray-800 mb-3 whitespace-pre-wrap">{artifact.content}</p>
               
               <div className="text-xs text-gray-500 flex items-center gap-4">

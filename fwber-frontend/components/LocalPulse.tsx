@@ -19,6 +19,8 @@ import {
   Sparkles,
   Coins,
   Camera,
+  Tag,
+  ShoppingBag,
 } from 'lucide-react';
 import type { ProximityArtifact, MatchCandidate, ArtifactType } from '@/types/proximity';
 import ARView from './ar/ARView';
@@ -39,6 +41,8 @@ const ArtifactTypeIcon = ({ type }: { type: ArtifactType }) => {
       return <Megaphone className="h-5 w-5" />;
     case 'token_drop':
       return <Coins className="h-5 w-5" />;
+    case 'promotion':
+      return <ShoppingBag className="h-5 w-5" />;
   }
 };
 
@@ -68,19 +72,28 @@ const ArtifactCard = ({
     board_post: 'bg-green-50 border-green-200 text-green-800',
     announce: 'bg-purple-50 border-purple-200 text-purple-800',
     token_drop: 'bg-yellow-50 border-yellow-200 text-yellow-800',
+    promotion: 'bg-amber-50 border-amber-200 text-amber-900 ring-1 ring-amber-300',
   };
 
   const isClaimed = artifact.meta?.claimed;
   const amount = artifact.meta?.amount;
+  const isPromotion = artifact.type === 'promotion';
 
   return (
-    <div className={`rounded-lg border p-4 ${typeColors[artifact.type]}`}>
+    <div className={`rounded-lg border p-4 ${typeColors[artifact.type]} ${isPromotion ? 'shadow-sm' : ''}`}>
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-center space-x-2">
           <ArtifactTypeIcon type={artifact.type} />
           <span className="text-xs font-medium uppercase">{artifact.type.replace('_', ' ')}</span>
+          
           {artifact.type === 'token_drop' && amount && (
              <span className="text-xs font-bold bg-yellow-200 px-2 py-0.5 rounded-full">{amount} FWB</span>
+          )}
+          
+          {isPromotion && artifact.meta?.discount && (
+             <span className="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
+               {artifact.meta.discount}% OFF
+             </span>
           )}
         </div>
         <button
@@ -92,7 +105,22 @@ const ArtifactCard = ({
         </button>
       </div>
 
-      <p className="text-sm mb-3">{artifact.content}</p>
+      {isPromotion && artifact.meta?.merchant_name && (
+        <div className="text-xs font-semibold text-amber-800 mb-1">
+          {artifact.meta.merchant_name}
+        </div>
+      )}
+
+      <p className="text-sm mb-3 font-medium">{artifact.content}</p>
+
+      {isPromotion && artifact.meta?.promo_code && (
+        <div className="mb-3 bg-white/50 p-2 rounded border border-amber-200 border-dashed text-center">
+          <span className="text-xs text-amber-800 block mb-1">PROMO CODE</span>
+          <span className="font-mono font-bold text-lg tracking-wider select-all">
+            {artifact.meta.promo_code}
+          </span>
+        </div>
+      )}
 
       {artifact.type === 'token_drop' && !isClaimed && (
          <div className="mb-3">
