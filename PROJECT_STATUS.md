@@ -1,26 +1,34 @@
-# Project Status - v0.3.16
+# Project Status - v0.3.22
 
-**Date:** 2025-12-31
+**Date:** 2026-01-06
 **Current Phase:** Post-Launch Stabilization
-**Version:** v0.3.16
+**Version:** v0.3.22
 
 ## 🚨 Immediate Priorities (Next 24 Hours)
 
 1.  **Deployment Verification**:
-    *   [x] Route fixes for Bulletin Boards committed and pushed.
-    *   [x] `BulletinBoardBroadcastingTest` passing.
-    *   [ ] Monitor deployment logs for v0.3.16.
-    *   [ ] Verify Bulletin Board functionality in production (API + Real-time).
+    *   [x] Frontend build stabilized (LocationPicker fixed).
+    *   [x] Merchant Promotions integrated into Local Pulse.
+    *   [ ] Deploy v0.3.22 to production.
+    *   [ ] Verify "Sponsored" promotions appear correctly in the live feed.
 
-2.  **Environment Stability**:
-    *   [x] Frontend build stabilized.
-    *   [ ] Investigate transient DNS issues in CI/Test environment (seen in `AiConversationCoachTest` previously, though passed now).
-
-3.  **Documentation**:
-    *   [x] `docs/dashboard/PROJECT_STRUCTURE_DASHBOARD.md` created.
+2.  **Documentation & Handoff**:
     *   [x] `CHANGELOG.md` updated.
+    *   [x] `PROJECT_STATUS.md` updated.
+    *   [ ] Update `docs/dashboard/PROJECT_STRUCTURE_DASHBOARD.md` with new components.
 
 ## 🟢 Recent Accomplishments
+
+### ✅ Critical Fixes (Jan 06)
+1.  **Frontend Build Stabilization (LocationPicker)**:
+    -   **Issue**: Build failed due to `react-leaflet` v5.0.0 type definition conflicts (`center` prop missing on `MapContainer`).
+    -   **Fix**: Downgraded to stable `react-leaflet@4.2.1` and removed conflicting custom type definitions (`types/leaflet-custom.d.ts`).
+    -   **Verification**: `npm run build` and `npm run type-check` passing.
+2.  **Merchant Promotions (Local Pulse)**:
+    -   **Feature**: Integrated "Merchant Promotions" into the local proximity feed.
+    -   **Frontend**: Updated `ProximityFeed.tsx` to render promotions with distinct "Sponsored" styling, discount badges, and merchant branding.
+    -   **Backend**: Verified `ProximityArtifactController` correctly merges promotion artifacts.
+    -   **Verification**: Manual verification of UI rendering logic.
 
 ### ✅ Critical Fixes (Jan 01)
 1.  **Frontend Build Stabilization**:
