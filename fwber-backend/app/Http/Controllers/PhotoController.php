@@ -243,6 +243,10 @@ class PhotoController extends Controller
             try {
                 $manager = new ImageManager(new Driver());
                 $image = $manager->read($file->getRealPath());
+                
+                // Fix orientation based on EXIF data
+                $image = $image->orientate();
+
                 // Downscale very large originals to reduce memory usage
                 // V3 is immutable, so we must assign the result back to $image
                 $image = $image->scaleDown(width: 2000, height: 2000);
