@@ -283,7 +283,7 @@ class PhotoController extends Controller
                  // Clone image to prevent modifying the original instance if we were to use it later
                  // (Though we don't use it later in this specific flow, it's safer)
                  $thumbnail = clone $image;
-                 $thumbnail->scaleDown(width: 300, height: 300);
+                 $thumbnail = $thumbnail->scaleDown(width: 300, height: 300);
                  
                  $encodedThumb = match(strtolower($extension)) {
                     'png' => $thumbnail->toPng(),
@@ -338,6 +338,11 @@ class PhotoController extends Controller
                     'user_agent' => $request->userAgent(),
                     'analysis' => $analysisMetadata,
                 ],
+            ]);
+            
+            // Update user profile status to approved since they have a photo now
+            $user->profile()->update([
+                'avatar_status' => 'approved'
             ]);
             
             $this->emitFaceBlurTelemetry($user, $filename, $originalFilename, $faceBlurMetadata);

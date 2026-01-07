@@ -75,7 +75,7 @@ class VerificationController extends Controller
             // Resize to reasonable size for analysis
             $manager = new ImageManager(new Driver());
             $image = $manager->read($file->getRealPath());
-            $image->scaleDown(width: 1000, height: 1000);
+            $image = $image->scaleDown(width: 1000, height: 1000);
             
             $extension = $file->getClientOriginalExtension();
             $encoded = match(strtolower($extension)) {
