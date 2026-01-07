@@ -352,7 +352,13 @@ export function usePhotos() {
 
       const response = await photoAPI.uploadPhotos(normalizedItems, onProgress)
       if (response.success) {
-        // Refetch all photos to get updated list with proper order
+        setPhotos(prev => {
+            const newPhotos = response.photos;
+            const existingIds = new Set(prev.map(p => String(p.id)));
+            const uniqueNewPhotos = newPhotos.filter(p => !existingIds.has(String(p.id)));
+            return [...prev, ...uniqueNewPhotos];
+        });
+
         const updatedPhotos = await photoAPI.getPhotos()
         setPhotos(updatedPhotos)
         return response

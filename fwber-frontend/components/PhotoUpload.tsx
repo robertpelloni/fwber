@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import Image from 'next/image'
-import { Upload, X, Camera, RotateCcw, Download, Eye, ChevronLeft, ChevronRight, Trash2, Lock, Unlock } from 'lucide-react'
+import { Upload, X, Camera, RotateCw, Download, Eye, ChevronLeft, ChevronRight, Trash2, Lock, Unlock } from 'lucide-react'
 import { blurFacesOnFile, FaceBlurError } from '@/lib/faceBlur'
 import { isFeatureEnabled } from '@/lib/featureFlags'
 import { attachFaceBlurMetadata } from '@/lib/faceBlurTelemetry'
@@ -613,7 +613,7 @@ export default function PhotoUpload({
 
         {clientProcessingMessage && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <RotateCcw className="w-4 h-4 animate-spin" style={{ animationDirection: 'reverse' }} />
+            <RotateCw className="w-4 h-4 animate-spin" />
             {clientProcessingMessage}
           </div>
         )}
