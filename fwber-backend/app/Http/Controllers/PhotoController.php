@@ -306,22 +306,43 @@ class PhotoController extends Controller
             // Analyze photo if feature is enabled
             $analysisMetadata = [];
             if (config('features.media_analysis')) {
-                // Use the full URL or path depending on what the service expects.
-                // The mock service uses the string to generate hash, so path is fine.
-                $analysisResult = $this->mediaAnalysis->analyze($filePath, 'image');
-                
-                if (!$analysisResult->safe) {
-                    // Delete the file we just uploaded
+                try {
+                    // Use the full URL or path depending on what the service expects.
+                    // The mock service uses the string to generate hash, so path is fine.
+                    $analysisResult = $this->mediaAnalysis->analyze($filePath, 'image');
+                    
+                    if (!$analysisResult->safe) {
+                        // Delete the file we just uploaded
+                        Storage::disk('public')->delete($filePath);
+                        Storage::disk('public')->delete($thumbnailPath);
+                        
+                        return response()->json([
+                            'message' => 'Photo rejected by safety filter',
+                            'errors' => ['photo' => $analysisResult->moderationLabels]
+                        ], 422);
+                    }
+                    
+                    $analysisMetadata = $analysisResult->toArray();
+                } catch (\Throwable $e) {
+                    Log::error('Media Analysis Service Failed', [
+                        'error' => $e->getMessage(),
+                        'file' => $filePath,
+                        'trace' => $e->getTraceAsString()
+                    ]);
+
+                    // If analysis is strictly required, fail the upload.
+                    // If it's a soft requirement, we could proceed. 
+                    // Assuming STRICT safety for this platform.
+                    
+                    // Cleanup
                     Storage::disk('public')->delete($filePath);
                     Storage::disk('public')->delete($thumbnailPath);
-                    
+
                     return response()->json([
-                        'message' => 'Photo rejected by safety filter',
-                        'errors' => ['photo' => $analysisResult->moderationLabels]
-                    ], 422);
+                        'message' => 'Photo verification service unavailable. Please try again.',
+                        'debug_error' => config('app.debug') ? $e->getMessage() : null
+                    ], 503);
                 }
-                
-                $analysisMetadata = $analysisResult->toArray();
             }
 
             // Create photo record
