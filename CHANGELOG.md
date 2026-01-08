@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.24] - 2026-01-08
+
+### Maintenance
+- **Documentation**: Generated specialized `AGENTS.md` files for backend migrations, frontend components, and app router.
+- **Structure**: Created `docs/dashboard/PROJECT_STRUCTURE_DASHBOARD.md` to map the monorepo layout.
+- **Cleanup**: Verified standard directory structure and standardized versioning.
+
 ## [0.3.23] - 2026-01-07
 
 ### Fixed

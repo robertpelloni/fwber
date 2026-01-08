@@ -1,46 +1,47 @@
-# Project Directory Structure & Submodule Dashboard
+# Project Structure Dashboard
 
-**Last Updated:** January 05, 2026
-**Version:** v0.3.21
+**Last Updated:** 2026-01-08
+**Version:** v0.3.24 (Target)
 
-## 📂 Project Directory Structure
+## OVERVIEW
+`fwber` is a monolithic repository containing both the backend API and frontend application.
+**Note:** `fwber-backend` and `fwber-frontend` are standard directories within this repository, NOT git submodules.
 
-The `fwber` project is a monorepo containing the following key components:
+## DIRECTORY LAYOUT
 
-### Core Directories
-- **`fwber-backend/`**: Laravel 12 API application. Handles authentication, database interactions, business logic, and API endpoints.
-  - Location: `./fwber-backend`
-  - Tech Stack: PHP 8.2, Laravel 12, MySQL, Redis, Reverb (Websockets).
-- **`fwber-frontend/`**: Next.js 16 Web Application. Provides the user interface and client-side logic.
-  - Location: `./fwber-frontend`
-  - Tech Stack: TypeScript, React 18, Next.js 16, Tailwind CSS.
-- **`docs/`**: Comprehensive project documentation.
-  - Location: `./docs`
-  - Contains architecture guides, API references, deployment checklists, and operational runbooks.
-- **`docker/`**: Infrastructure configuration.
-  - Location: `./docker`
-  - Contains MySQL and other service definitions.
+### 📂 Root (`/`)
+| Path | Description |
+|------|-------------|
+| `fwber-backend/` | Laravel 12 API & Application Logic |
+| `fwber-frontend/` | Next.js 14 Web Application |
+| `docker/` | Docker Compose & Container Configurations |
+| `docs/` | Project Documentation & Knowledge Base |
+| `AGENTS.md` | Master Context Index for AI Agents |
+| `VERSION` | Current Project Version |
 
-### 📦 Submodules
+### 🐘 Backend (`fwber-backend/`)
+**Stack:** Laravel 12, PHP 8.4, MySQL 8
+| Key Path | Purpose | Context File |
+|----------|---------|--------------|
+| `app/` | Core Application Code | `AGENTS.md` (Root) |
+| `database/migrations/` | Database Schema Definitions | [`database/migrations/AGENTS.md`](../../fwber-backend/database/migrations/AGENTS.md) |
+| `routes/` | API & Web Routes | |
+| `tests/` | PHPUnit / Pest Tests | |
 
-*Note: No active git submodules are currently registered. Dependencies are managed via Composer (Backend) and NPM (Frontend).*
+### ⚛️ Frontend (`fwber-frontend/`)
+**Stack:** Next.js 14, React, Tailwind, Shadcn UI
+| Key Path | Purpose | Context File |
+|----------|---------|--------------|
+| `app/` | App Router (Pages, Layouts) | [`app/AGENTS.md`](../../fwber-frontend/app/AGENTS.md) |
+| `components/` | Reusable UI Components | [`components/AGENTS.md`](../../fwber-frontend/components/AGENTS.md) |
+| `lib/` | Utilities & Helper Functions | |
+| `public/` | Static Assets | |
 
-## 📊 Component Versioning
+## INFRASTRUCTURE
+- **Docker:** Development environment defined in `docker-compose.yml` (if present at root) or `docker/` configs.
+- **CI/CD:** GitHub Actions (workflows in `.github/workflows/`).
 
-| Component | Version | Build/Commit | Date |
-| :--- | :--- | :--- | :--- |
-| **fwber-backend** | v0.3.20 | `HEAD` | Jan 05, 2026 |
-| **fwber-frontend** | v0.3.20 | `HEAD` | Jan 05, 2026 |
-| **Documentation** | v0.3.20 | `HEAD` | Jan 05, 2026 |
-
-## 🛠️ Operational Status
-
-- **Build Status**: ✅ Stable
-- **Test Coverage**: ✅ Core Features Verified
-- **Deployment**: ✅ Production Ready
-- **Recent Fixes**:
-  - Onboarding Photo Upload: Face blur models localized, UI stabilized.
-  - Merged Features: Event Discussions, Group Matching, Shared Invitations.
-
----
-*This dashboard is automatically updated by the deployment agent.*
+## DOCUMENTATION MAP
+- **Master Protocol:** [`docs/UNIVERSAL_LLM_INSTRUCTIONS.md`](../UNIVERSAL_LLM_INSTRUCTIONS.md)
+- **Status:** [`docs/PROJECT_STATUS.md`](../PROJECT_STATUS.md)
+- **Changelog:** [`CHANGELOG.md`](../../CHANGELOG.md)
