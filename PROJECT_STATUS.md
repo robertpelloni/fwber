@@ -1,23 +1,31 @@
-# Project Status - v0.3.22
+# Project Status - v0.3.25
 
-**Date:** 2026-01-06
+**Date:** 2026-01-08
 **Current Phase:** Post-Launch Stabilization
-**Version:** v0.3.22
+**Version:** v0.3.25
 
 ## 🚨 Immediate Priorities (Next 24 Hours)
 
 1.  **Deployment Verification**:
     *   [x] Frontend build stabilized (LocationPicker fixed).
     *   [x] Merchant Promotions integrated into Local Pulse.
-    *   [ ] Deploy v0.3.22 to production.
-    *   [ ] Verify "Sponsored" promotions appear correctly in the live feed.
+    *   [x] Photo Uploads stabilized (EXIF check added).
+    *   [ ] Deploy v0.3.25 to production.
 
 2.  **Documentation & Handoff**:
     *   [x] `CHANGELOG.md` updated.
     *   [x] `PROJECT_STATUS.md` updated.
-    *   [ ] Update `docs/dashboard/PROJECT_STRUCTURE_DASHBOARD.md` with new components.
+    *   [x] `docs/SUBMODULE_DASHBOARD.md` created.
 
 ## 🟢 Recent Accomplishments
+
+### ✅ Critical Fixes (Jan 08)
+1.  **PhotoController Crash Fix**:
+    -   **Issue**: Uploads crashed with 500 error (`Call to undefined method`) because the server lacks the `exif` PHP extension required by Intervention Image's `orient()` method.
+    -   **Fix**: Added `extension_loaded('exif')` check. Rotation is now skipped gracefully if the extension is missing, preventing the crash.
+    -   **Verification**: Code review.
+2.  **Documentation**:
+    -   **Submodules**: Created `docs/SUBMODULE_DASHBOARD.md` to document the current monolithic structure and future strategy.
 
 ### ✅ Critical Fixes (Jan 06)
 1.  **Frontend Build Stabilization (LocationPicker)**:

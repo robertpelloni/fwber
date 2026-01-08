@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.25] - 2026-01-08
+
+### Fixed
+- **Photo Uploads**: Added safety check for `exif` extension in `PhotoController`. Prevents 500 error crashes on servers where the extension is missing by skipping image auto-orientation.
+
+### Documentation
+- **Submodules**: Created `docs/SUBMODULE_DASHBOARD.md` to document monolithic state.
+
 ## [0.3.24] - 2026-01-08
 
 ### Maintenance

@@ -248,7 +248,9 @@ class PhotoController extends Controller
                 $image = $manager->read($file->getRealPath());
                 
                 // Fix orientation based on EXIF data
-                $image = $image->orient();
+                if (extension_loaded('exif')) {
+                    $image = $image->orient();
+                }
 
                 // Downscale very large originals to reduce memory usage
                 // V3 is immutable, so we must assign the result back to $image
