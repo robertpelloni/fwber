@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  backend:
+    container_name: fwber-laravel-prod
+    build:
+      context: ./fwber-backend
+      dockerfile: Dockerfile.prod
+    image: fwber-backend:latest
+    restart: always
+    environment:
+      APP_ENV: production
+      APP_DEBUG: false
+    volumes:
+      - ./fwber-backend/storage:/var/www/html/storage
+      - ./fwber-backend/.env:/var/www/html/.env
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - fwber-network
+    expose:
+      - "9000"
+
+  frontend:
+    container_name: fwber-next-prod
+    build:
+      context: ./fwber-frontend
+      dockerfile: Dockerfile.prod
+    image: fwber-frontend:latest
+    restart: always
+    environment:
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    networks:
+      - fwber-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: fwber-mysql-prod
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-fwber}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - fwber-mysql-data:/var/lib/mysql
+    networks:
+      - fwber-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  redis:
+    image: redis:alpine
+    container_name: fwber-redis-prod
+    restart: always
+    volumes:
+      - fwber-redis-data:/data
+    networks:
+      - fwber-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: fwber-nginx-prod
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./fwber-backend/public:/var/www/html/public
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - fwber-network
+
+networks:
+  fwber-network:
+    driver: bridge
+
+volumes:
+  fwber-mysql-data:
+  fwber-redis-data:
