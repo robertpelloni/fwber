@@ -38,6 +38,7 @@ export default function DashboardPage() {
   // Activity feed now uses its own component with real-time presence
 
   const [showStreakModal, setShowStreakModal] = useState(false);
+  const [showLegacyFeatures, setShowLegacyFeatures] = useState(true);
 
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard-stats'],
@@ -213,15 +214,13 @@ export default function DashboardPage() {
             {/* Legacy Feature Cards - Collapsed */}
             <div className="mt-8">
               <button
-                onClick={() => {
-                  const el = document.getElementById('legacy-cards');
-                  if (el) el.classList.toggle('hidden');
-                }}
-                className="text-sm text-gray-600 hover:text-gray-900 mb-4"
+                onClick={() => setShowLegacyFeatures(!showLegacyFeatures)}
+                className="text-sm text-gray-600 hover:text-gray-900 mb-4 flex items-center gap-2"
               >
-                ▼ Show all features
+                <span>{showLegacyFeatures ? '▲' : '▼'}</span>
+                {showLegacyFeatures ? 'Hide extra features' : 'Show all features'}
               </button>
-              <div id="legacy-cards" className="hidden">
+              <div className={showLegacyFeatures ? '' : 'hidden'}>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
                   {/* Profile Card */}
                   <div className="bg-white p-6 rounded-lg shadow">
