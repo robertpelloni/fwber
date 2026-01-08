@@ -98,16 +98,6 @@ export default function DashboardPage() {
                 <RoastGenerator />
                 <BoostButton />
               </div>
-              <div className="flex gap-2">
-                <ReferralModal />
-                <RoastGenerator />
-                <BoostButton />
-              </div>
-              <div className="flex gap-2">
-                <ReferralModal />
-                <RoastGenerator />
-                <BoostButton />
-              </div>
             </div>
 
             {/* Stats Grid */}

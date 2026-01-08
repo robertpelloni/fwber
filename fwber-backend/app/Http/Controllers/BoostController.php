@@ -162,10 +162,10 @@ class BoostController extends Controller
             ->first();
 
         if (!$boost) {
-            return response()->json(['message' => 'No active boost'], 404);
+            return response()->json(['data' => null, 'message' => 'No active boost'], 200);
         }
 
-        return response()->json($boost);
+        return response()->json(['data' => $boost]);
     }
 
     /**
