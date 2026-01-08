@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.23] - 2026-01-07
+
+### Fixed
+- **Image Processing**: Fixed silent failure in image rotation fallback by properly handling errors and increasing memory limit to prevent OOM.
+- **Frontend Assets**: Disabled experimental CSS optimization to resolve MIME type mismatch errors on CSS files.
+- **Realtime Connection**: Corrected Reverb connection logic in production to properly use self-hosted instance instead of defaulting to public Pusher.
+
 ## [0.3.22] - 2026-01-06
 
 ### Fixed

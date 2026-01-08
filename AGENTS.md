@@ -1,32 +1,36 @@
-# AGENTS.md
+# FWBER KNOWLEDGE BASE
 
-> **⚠️ IMPORTANT:** The **MASTER PROTOCOL** is located in `docs/UNIVERSAL_LLM_INSTRUCTIONS.md`. You MUST read that file first.
+**Context:** Dating Platform (Laravel/Next.js)
+**Parent:** [Workspace Root](../AGENTS.md)
+**Master Protocol:** [docs/UNIVERSAL_LLM_INSTRUCTIONS.md](docs/UNIVERSAL_LLM_INSTRUCTIONS.md)
 
-## 🚀 Operational Charter
+## OVERVIEW
+Production-ready privacy-first dating platform. Monorepo combining Laravel 12 backend with Next.js 14 frontend.
+
+## 🧭 NAVIGATION
+| Domain | Location | Tech Stack |
+|--------|----------|------------|
+| **Frontend** | [fwber-frontend/AGENTS.md](fwber-frontend/AGENTS.md) | Next.js 14, React, Tailwind, Shadcn |
+| **Backend** | [fwber-backend/AGENTS.md](fwber-backend/AGENTS.md) | Laravel 12, PHP 8.4, MySQL, Spatial |
+
+## STRUCTURE
+```
+fwber/
+├── fwber-backend/   # API & Core Logic
+├── fwber-frontend/  # Web Application
+├── docker/          # Container configs
+└── docs/            # Project documentation
+```
+
+## CONVENTIONS
+- **Versioning**: Increment `VERSION` on changes.
+- **Testing**: `php artisan test` (Backend) & `npm test` (Frontend).
+- **Docs**: Update `PROJECT_STATUS.md` and `CHANGELOG.md` faithfully.
+
+## ANTI-PATTERNS
+- **NO** "It works on my machine" - Run CI commands.
+- **NO** committing without running tests.
+- **NO** direct database access from frontend.
+
+## 🚀 OPERATIONAL CHARTER
 **Outstanding work. Absolutely phenomenal. Unbelievable. Simply Fantastic, extraordinary, marvelous. Mind-blowing. Magnificent. Please keep going, please continue, please proceed!**
-
-### Execution Protocol
-1.  **Merge & Sync**: Merge feature branches, update submodules.
-2.  **Analyze**: Identify missing features from history.
-3.  **Document**: Update roadmap and `docs/PROJECT_STRUCTURE.md`.
-4.  **Dashboard**: Maintain the project structure dashboard.
-5.  **Version**: Increment `VERSION`, update `CHANGELOG.md`.
-6.  **Commit**: Push changes with version bump message.
-7.  **Redeploy**: Trigger deployment.
-
-## 🧠 Agent-Specific Context
-This file contains specific instructions for autonomous agents (e.g., AutoGPT, BabyAGI) operating within this workspace.
-
-### 🔍 Research & Planning
--   When asked to research, use `runSubagent` with the `Plan` agent.
--   Always verify assumptions by reading the actual code, not just documentation.
-
-### 🛠️ Execution
--   Follow the **SOP** defined in `docs/LLM_INSTRUCTIONS.md`.
--   Use the `run_in_terminal` tool for file system operations and testing.
--   Use `read_file` to gather context before editing.
-
-### 📝 Documentation
--   Keep `PROJECT_STATUS.md` updated with your progress.
--   Log significant findings in `docs/research/`.
-

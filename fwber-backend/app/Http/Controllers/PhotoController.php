@@ -241,6 +241,9 @@ class PhotoController extends Controller
             // Get image dimensions and create manager
             // Check if Intervention Image drivers are available
             try {
+                // Temporarily increase memory limit for image processing
+                ini_set('memory_limit', '512M');
+
                 $manager = new ImageManager(new Driver());
                 $image = $manager->read($file->getRealPath());
                 
@@ -253,54 +256,50 @@ class PhotoController extends Controller
                 $width = $image->width();
                 $height = $image->height();
             } catch (\Throwable $e) {
-                // Fallback for when GD is not available or memory issues occur
-                Log::warning('Image processing failed, using raw file properties', [
-                   'error' => $e->getMessage()
+                // Log the specific error for debugging
+                Log::error('Image processing failed during upload', [
+                   'error' => $e->getMessage(),
+                   'trace' => $e->getTraceAsString(),
+                   'file_size' => $file->getSize(),
+                   'mime' => $file->getMimeType()
                 ]);
-                $width = 0;
-                $height = 0;
-                // Just use the file directly without intervention if image processing fails
-                // But we still need an image object for thumbnails if we want them
+
+                // Fail the upload rather than saving a potentially broken/rotated image
+                return response()->json([
+                    'message' => 'Unable to process image. Please try a different photo or smaller file.',
+                    'debug_error' => config('app.debug') ? $e->getMessage() : null
+                ], 422);
             }
             
             // Store the original image
             $filePath = 'photos/' . $user->id . '/' . $filename;
             
             // Use stream if image object isn't available
-            if (isset($image)) {
-                $encoded = match(strtolower($extension)) {
-                    'png' => $image->toPng(),
-                    'webp' => $image->toWebp(),
-                    'gif' => $image->toGif(),
-                    default => $image->toJpeg(80),
-                };
-                Storage::disk('public')->put($filePath, (string) $encoded);
-            } else {
-                 Storage::disk('public')->putFileAs('photos/' . $user->id, $file, $filename);
-            }
+            $encoded = match(strtolower($extension)) {
+                'png' => $image->toPng(),
+                'webp' => $image->toWebp(),
+                'gif' => $image->toGif(),
+                default => $image->toJpeg(80),
+            };
+            Storage::disk('public')->put($filePath, (string) $encoded);
             
             // Create thumbnail
             $thumbnailFilename = 'thumb_' . $filename;
             $thumbnailPath = 'photos/' . $user->id . '/thumbnails/' . $thumbnailFilename;
             
             // Scale down to 300x300 max while maintaining aspect ratio
-            if (isset($image)) {
-                 // Clone image to prevent modifying the original instance if we were to use it later
-                 // (Though we don't use it later in this specific flow, it's safer)
-                 $thumbnail = clone $image;
-                 $thumbnail = $thumbnail->scaleDown(width: 300, height: 300);
-                 
-                 $encodedThumb = match(strtolower($extension)) {
-                    'png' => $thumbnail->toPng(),
-                    'webp' => $thumbnail->toWebp(),
-                    'gif' => $thumbnail->toGif(),
-                    default => $thumbnail->toJpeg(80),
-                };
-                 Storage::disk('public')->put($thumbnailPath, (string) $encodedThumb);
-            } else {
-                // If we couldn't process image, use original as thumbnail (not ideal but works)
-                Storage::disk('public')->putFileAs('photos/' . $user->id . '/thumbnails', $file, $thumbnailFilename);
-            }
+            // Clone image to prevent modifying the original instance if we were to use it later
+            // (Though we don't use it later in this specific flow, it's safer)
+            $thumbnail = clone $image;
+            $thumbnail = $thumbnail->scaleDown(width: 300, height: 300);
+            
+            $encodedThumb = match(strtolower($extension)) {
+                'png' => $thumbnail->toPng(),
+                'webp' => $thumbnail->toWebp(),
+                'gif' => $thumbnail->toGif(),
+                default => $thumbnail->toJpeg(80),
+            };
+            Storage::disk('public')->put($thumbnailPath, (string) $encodedThumb);
             
             // Analyze photo if feature is enabled
             $analysisMetadata = [];

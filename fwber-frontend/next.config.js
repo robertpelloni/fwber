@@ -65,7 +65,7 @@ const nextConfig = {
 
   // Experimental features for better performance
   experimental: {
-    optimizeCss: true, // Enabled - requires 'critters' package
+    optimizeCss: false,
     optimizePackageImports: ['@tanstack/react-query', 'lucide-react'],
     // turbopack: false, // Removed invalid key
   },

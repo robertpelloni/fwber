@@ -113,6 +113,30 @@ class ProfileUpdateTest extends TestCase
         ]);
     }
 
+    public function test_preferences_age_range_validation()
+    {
+        $user = User::factory()->create();
+        
+        // Test valid range
+        $response = $this->actingAs($user)->putJson('/api/profile', [
+            'preferences' => [
+                'age_range_min' => 25,
+                'age_range_max' => 35,
+            ]
+        ]);
+        $response->assertStatus(200);
+
+        // Test invalid range (min > max)
+        $response = $this->actingAs($user)->putJson('/api/profile', [
+            'preferences' => [
+                'age_range_min' => 40,
+                'age_range_max' => 30,
+            ]
+        ]);
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['preferences.age_range_min', 'preferences.age_range_max']);
+    }
+
     public function test_profile_update_with_empty_birthdate()
     {
         $user = User::factory()->create();

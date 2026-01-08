@@ -53,11 +53,22 @@ export const initEcho = (token?: string) => {
         if (!options.wssPort) options.wssPort = 8080;
         if (!options.forceTLS) options.forceTLS = false;
     } else {
-        // Production defaults if no host specified (assume standard Pusher)
-        if (!options.wsHost) { // Fallback to pusher if Reverb vars missing
-             options.broadcaster = 'pusher';
-             options.cluster = process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER || 'mt1';
-             options.forceTLS = true;
+        // Production defaults if no host specified
+        if (!options.wsHost) { 
+             // If Reverb vars are missing, check if we really wanted Pusher.
+             // If we don't have a pusher cluster set, we probably wanted Reverb on the current host.
+             if (!process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER) {
+                 // Assume Reverb on the same host
+                 options.wsHost = window.location.hostname;
+                 options.wsPort = 8080;
+                 options.wssPort = 8080;
+                 options.forceTLS = window.location.protocol === 'https:';
+             } else {
+                 // Fallback to pusher if Reverb vars missing AND we have a cluster
+                 options.broadcaster = 'pusher';
+                 options.cluster = process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER || 'mt1';
+                 options.forceTLS = true;
+             }
         }
     }
 

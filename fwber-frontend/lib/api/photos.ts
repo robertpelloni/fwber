@@ -125,11 +125,20 @@ class PhotoAPI {
       try {
         // Simulate progress for better UX
         if (onProgress) {
-          // Simulate upload progress (50% before request completes)
+          // Initialize progress
+          let currentProgress = 0
+          // Start at 10%
+          currentProgress = 10
+          onProgress(i, currentProgress, file.name)
+          
+          // Increment progress smoothly up to 90%
           const progressInterval = setInterval(() => {
+            // Increment by small random amount (1-5%) but accumulate
+            // This prevents "bouncing" where it jumps back and forth
+            currentProgress = Math.min(90, currentProgress + (Math.random() * 5))
+            
             if (onProgress) {
-              const current = Math.min(50, Math.random() * 30 + 20)
-              onProgress(i, current, file.name)
+              onProgress(i, currentProgress, file.name)
             }
           }, 200)
           
@@ -144,13 +153,11 @@ class PhotoAPI {
           
           clearInterval(progressInterval)
           
-          // Progress to 80% during processing
-          if (onProgress) onProgress(i, 80, file.name)
-          
           if (!response.ok) {
             const errorData = await response.json().catch(() => ({}))
-            if (onProgress) onProgress(i, 100, file.name) // Complete even on error for UI
-            throw new Error(errorData.message || `Upload failed for ${file.name}: ${response.status}`)
+            console.error('Upload error details:', { status: response.status, data: errorData })
+            if (onProgress) onProgress(i, 0, file.name) // Reset progress on error
+            throw new Error(errorData.message || `Upload failed with status ${response.status}`)
           }
           
           const result = await response.json()
@@ -200,7 +207,7 @@ class PhotoAPI {
           }
         }
       } catch (error) {
-        if (onProgress) onProgress(i, 100, file.name) // Mark as complete even on error
+        if (onProgress) onProgress(i, 0, file.name)
         throw error
       }
     }

@@ -667,11 +667,6 @@ export default function PhotoUpload({
                     </span>
                   </div>
                     <div className="w-full bg-muted rounded-full h-2 overflow-hidden relative">
-                      {/* Bouncing Background */}
-                      {(status === 'uploading' || status === 'pending') && (
-                         <div className="absolute inset-0 bg-primary/20 animate-pulse" />
-                      )}
-                      
                       <div 
                         className={`h-2 rounded-full transition-all duration-300 ${
                           isError 
@@ -680,7 +675,7 @@ export default function PhotoUpload({
                               ? 'bg-green-500' 
                               : 'bg-primary'
                         }`}
-                        style={{ width: `${percent}%` }}
+                        style={{ width: `${Math.max(5, percent)}%` }}
                       />
                     </div>
                   {error && (

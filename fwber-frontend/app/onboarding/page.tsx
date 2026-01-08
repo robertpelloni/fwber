@@ -17,6 +17,7 @@ const PhotoUpload = dynamic(() => import('@/components/PhotoUpload'), {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader2, CheckCircle2, Camera, MapPin, User, Heart } from 'lucide-react'
+import { PreferencesStep } from '@/components/onboarding/PreferencesStep'
 
 const STEPS = [
   { id: 'welcome', title: 'Welcome' },
@@ -137,6 +138,9 @@ export default function OnboardingPage() {
       } else if (STEPS[currentStep].id === 'preferences') {
         if (formData.looking_for.length === 0) {
           throw new Error('Please select what you are looking for.')
+        }
+        if (formData.preferences.age_range_min > formData.preferences.age_range_max) {
+          throw new Error('Minimum age cannot be greater than maximum age.')
         }
         await updateUserProfile(token!, {
           looking_for: formData.looking_for,
@@ -322,70 +326,7 @@ export default function OnboardingPage() {
 
       case 'preferences':
         return (
-          <div className="space-y-6">
-            <div className="space-y-3">
-              <Label>I&apos;m looking for...</Label>
-              <div className="grid grid-cols-2 gap-2">
-                {['Dating', 'Friends', 'Networking', 'Casual'].map(opt => {
-                  const mapping: Record<string, string> = {
-                    'Dating': 'dating',
-                    'Friends': 'friendship',
-                    'Networking': 'networking',
-                    'Casual': 'casual'
-                  }
-                  const val = mapping[opt] || opt.toLowerCase()
-                  
-                  return (
-                  <div key={opt} className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id={`looking_${opt}`}
-                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      checked={formData.looking_for.includes(val)}
-                      onChange={e => {
-                        setFormData(prev => ({
-                          ...prev,
-                          looking_for: e.target.checked 
-                            ? [...prev.looking_for, val]
-                            : prev.looking_for.filter(i => i !== val)
-                        }))
-                      }}
-                    />
-                    <Label htmlFor={`looking_${opt}`}>{opt}</Label>
-                  </div>
-                )})}
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <Label>Age Range ({formData.preferences.age_range_min} - {formData.preferences.age_range_max})</Label>
-              <div className="flex items-center space-x-4">
-                <Input 
-                  type="number" 
-                  min={18} 
-                  max={99}
-                  value={formData.preferences.age_range_min}
-                  onChange={e => setFormData({
-                    ...formData, 
-                    preferences: { ...formData.preferences, age_range_min: parseInt(e.target.value) }
-                  })}
-                  className="w-20"
-                />
-                <span>to</span>
-                <Input 
-                  type="number" 
-                  min={18} 
-                  max={99}
-                  value={formData.preferences.age_range_max}
-                  onChange={e => setFormData({
-                    ...formData, 
-                    preferences: { ...formData.preferences, age_range_max: parseInt(e.target.value) }
-                  })}
-                  className="w-20"
-                />
-              </div>
-            </div>
-          </div>
+          <PreferencesStep formData={formData} setFormData={setFormData} />
         )
 
       case 'complete':
