@@ -76,6 +76,8 @@ These features are considered complete and are ready for a production environmen
     *   [x] **Advanced Match Filtering:** Filtering by lifestyle preferences (Diet, Politics, etc.) is fully functional and token-gated for premium users.
     *   [x] **AI Wingman:** Real-time chat suggestions, ice-breakers, and profile analysis.
     *   [x] **Group Matching:** Find and match with other friend groups for shared events.
+    *   [x] **Event Discussions:** Real-time chat threads specific to shared events.
+    *   [x] **Shared Event Invitations:** Invite friends and groups to shared events.
 
 ### Partially Implemented
 
@@ -93,12 +95,19 @@ These features are planned but have not yet been started.
 
 ## 4. Immediate Roadmap
 
-The immediate focus is on stabilizing the existing feature set and preparing for a production release.
+The immediate focus is on **Maintenance & Standardization** (The "Mega-Maintenance Protocol") to prepare the codebase for scale, followed by the **Viral Launch**.
 
-1.  **Viral & Engagement:**
+1.  **Mega-Maintenance Protocol (In Progress):**
+    *   [x] **Monorepo Structure:** Verify and document standard directory layout (no submodules).
+    *   [x] **Context Standardization:** Generate `AGENTS.md` files for all critical subdirectories to aid AI agents.
+    *   [ ] **Test Coverage:** Ensure all critical paths have passing tests in the verified monorepo structure.
+    *   [ ] **Documentation:** Finalize the "Single Source of Truth" (`docs/UNIVERSAL_LLM_INSTRUCTIONS.md`).
+
+2.  **Viral & Engagement (Post-Maintenance):**
     *   Launch the "Roast My Profile" campaign.
     *   Monitor viral loops and adjust incentives.
-2.  **Operational Readiness:**
+
+3.  **Operational Readiness:**
     *   Review and finalize all environment configurations for a production deployment.
     *   Establish a basic monitoring and alerting pipeline to track application health.
 
