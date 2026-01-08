@@ -11,12 +11,12 @@ export interface OnboardingFormData {
   [key: string]: any
 }
 
-interface PreferencesStepProps {
-  formData: OnboardingFormData
-  setFormData: Dispatch<SetStateAction<OnboardingFormData>>
+interface PreferencesStepProps<T extends OnboardingFormData> {
+  formData: T
+  setFormData: Dispatch<SetStateAction<T>>
 }
 
-export function PreferencesStep({ formData, setFormData }: PreferencesStepProps) {
+export function PreferencesStep<T extends OnboardingFormData>({ formData, setFormData }: PreferencesStepProps<T>) {
   const handleLookingForChange = (val: string, checked: boolean) => {
     setFormData((prev) => ({
       ...prev,

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Dispatch, SetStateAction } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import { updateUserProfile, completeOnboarding, getUserProfile, type UserProfile } from '@/lib/api/profile'
@@ -17,7 +17,7 @@ const PhotoUpload = dynamic(() => import('@/components/PhotoUpload'), {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader2, CheckCircle2, Camera, MapPin, User, Heart } from 'lucide-react'
-import { PreferencesStep } from '@/components/onboarding/PreferencesStep'
+import { PreferencesStep, type OnboardingFormData } from '@/components/onboarding/PreferencesStep'
 
 const STEPS = [
   { id: 'welcome', title: 'Welcome' },
