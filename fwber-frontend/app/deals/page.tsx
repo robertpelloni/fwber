@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import AppHeader from '@/components/AppHeader'
 import { apiClient } from '@/lib/api/client'
-import { useGeolocation } from '@/hooks/useGeolocation'
+import { useLocation } from '@/lib/hooks/use-location'
 import { 
   Tag, MapPin, Clock, Percent, Store, Filter, ChevronDown,
   ArrowLeft, Sparkles, Gift, Coffee, Utensils, ShoppingBag,
@@ -105,13 +105,13 @@ export default function DealsPage() {
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(false)
 
-  const { latitude, longitude, error: geoError, loading: geoLoading } = useGeolocation()
+  const { location, error: geoError, loading: geoLoading } = useLocation()
 
   useEffect(() => {
     async function fetchCategories() {
       try {
         const response = await apiClient.get<{ categories: string[] }>('/deals/categories')
-        setCategories(response.categories || [])
+        setCategories(response.data.categories || [])
       } catch (err) {
         console.error('Failed to fetch categories:', err)
       }
@@ -121,15 +121,15 @@ export default function DealsPage() {
 
   useEffect(() => {
     async function fetchDeals() {
-      if (!latitude || !longitude) return
+      if (!location?.latitude || !location?.longitude) return
 
       setLoading(true)
       setError(null)
 
       try {
         const params = new URLSearchParams({
-          lat: latitude.toString(),
-          lng: longitude.toString(),
+          lat: location.latitude.toString(),
+          lng: location.longitude.toString(),
           radius: radius.toString(),
           sort: sortBy,
           page: page.toString(),
@@ -143,12 +143,12 @@ export default function DealsPage() {
         const response = await apiClient.get<DealsResponse>(`/deals?${params}`)
         
         if (page === 1) {
-          setDeals(response.data || [])
+          setDeals(response.data.data || [])
         } else {
-          setDeals(prev => [...prev, ...(response.data || [])])
+          setDeals(prev => [...prev, ...(response.data.data || [])])
         }
         
-        setHasMore(response.current_page < response.last_page)
+        setHasMore(response.data.current_page < response.data.last_page)
       } catch (err) {
         console.error('Failed to fetch deals:', err)
         setError('Failed to load deals. Please try again.')
@@ -158,7 +158,7 @@ export default function DealsPage() {
     }
 
     fetchDeals()
-  }, [latitude, longitude, radius, sortBy, selectedCategory, page])
+  }, [location?.latitude, location?.longitude, radius, sortBy, selectedCategory, page])
 
   const handleFilterChange = (newCategory: string) => {
     setSelectedCategory(newCategory)
