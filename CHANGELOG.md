@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.27] - 2026-01-09
+
+### Added
+- **Achievements Page**: New `/achievements` page with full gamification UI - category tabs (onboarding, social, activity, growth, viral), progress tracking, token earnings display, and visual distinction for locked/unlocked achievements.
+- **Profile Views Page**: New `/profile-views` page ("Who Viewed You") - stats cards (total/today/week/unique views), viewer list with avatars and timestamps, tips section for increasing visibility.
+
+### Fixed
+- **Documentation Accuracy**: Corrected `docs/MISSING_FEATURES.md` - several features previously listed as missing were found to have complete implementations (PhotoRevealGate, ShareToUnlock, BulletinBoards, ProximityChatrooms, GroupMatching).
+
+## [0.3.26] - 2026-01-09
+
+### Added
+- **Documentation**: Created `docs/DEVELOPMENT_MASTER_PLAN.md` - comprehensive reference document consolidating all codebase analysis findings.
+
+### Updated
+- **PROJECT_STATUS.md**: Updated architecture details (78 controllers, 53 services, 200+ tests), version info, and immediate roadmap.
+- **ROADMAP.md**: Expanded Phase 4 with detailed Merchant Integration and Analytics Dashboard subtasks; added Phase 5 planning.
+
+### Analysis Summary
+- Completed exhaustive codebase discovery via parallel background agents
+- Mapped 78 backend controllers, 53 services
+- Cataloged 18+ frontend pages, 150+ components
+- Verified 200+ test files with comprehensive coverage
+- Confirmed codebase is clean (no TODO/FIXME/HACK comments)
+- Documented full development history (Dec 2025 - Jan 2026)
+
 ## [0.3.25] - 2026-01-08
 
 ### Fixed
