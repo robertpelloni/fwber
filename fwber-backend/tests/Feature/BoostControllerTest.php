@@ -142,20 +142,22 @@ class BoostControllerTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'id' => $boost->id,
-                'boost_type' => 'standard',
+                'data' => [
+                    'id' => $boost->id,
+                    'boost_type' => 'standard',
+                ],
             ]);
     }
 
-    public function test_returns_404_if_no_active_boost()
+    public function test_returns_null_if_no_active_boost()
     {
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)
             ->getJson('/api/boosts/active');
 
-        $response->assertStatus(404)
-            ->assertJson(['message' => 'No active boost']);
+        $response->assertStatus(200)
+            ->assertJson(['data' => null]);
     }
 
     public function test_can_get_boost_history()

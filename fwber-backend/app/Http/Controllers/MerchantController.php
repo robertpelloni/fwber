@@ -144,4 +144,63 @@ class MerchantController extends Controller
 
         return response()->json($promotions);
     }
+
+    /**
+     * Consumer-facing: Browse active deals/promotions nearby.
+     */
+    public function browseDeals(Request $request)
+    {
+        $request->validate([
+            'lat' => 'required|numeric|between:-90,90',
+            'lng' => 'required|numeric|between:-180,180',
+            'radius' => 'nullable|integer|min:100|max:50000', // meters, default 5km
+            'category' => 'nullable|string|max:50',
+        ]);
+
+        $lat = $request->lat;
+        $lng = $request->lng;
+        $radius = $request->radius ?? 5000; // 5km default
+
+        $query = Promotion::with(['merchant:id,business_name,category,address'])
+            ->where('is_active', true)
+            ->where('starts_at', '<=', now())
+            ->where('expires_at', '>', now())
+            ->withinBox($lat, $lng, $radius);
+
+        // Filter by merchant category if provided
+        if ($request->has('category')) {
+            $query->whereHas('merchant', function ($q) use ($request) {
+                $q->where('category', $request->category);
+            });
+        }
+
+        // Sort options
+        $sort = $request->sort ?? 'distance';
+        if ($sort === 'newest') {
+            $query->orderByDesc('created_at');
+        } elseif ($sort === 'expiring') {
+            $query->orderBy('expires_at');
+        } elseif ($sort === 'discount') {
+            $query->orderByDesc('discount_value');
+        }
+        // Default: distance-based (withinBox already filters, but we could add raw distance calc)
+
+        $deals = $query->paginate($request->per_page ?? 20);
+
+        return response()->json($deals);
+    }
+
+    /**
+     * Get merchant categories for filtering.
+     */
+    public function getCategories()
+    {
+        $categories = MerchantProfile::select('category')
+            ->distinct()
+            ->whereNotNull('category')
+            ->orderBy('category')
+            ->pluck('category');
+
+        return response()->json(['categories' => $categories]);
+    }
 }

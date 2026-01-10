@@ -18,10 +18,14 @@ import { Gift, ShieldCheck } from 'lucide-react';
 import { VouchBadge } from '@/components/profile/VouchBadge';
 
 export default function PublicProfilePage() {
-  const { id } = useParams();
+  const params = useParams();
   const searchParams = useSearchParams();
   const wingmanId = searchParams.get('wingman');
   const { token, user } = useAuth();
+  
+  // Safely extract id - useParams returns string | string[] | undefined
+  const id = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : null;
+  const numericId = id ? parseInt(id, 10) : NaN;
   
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,16 +34,22 @@ export default function PublicProfilePage() {
   const [isGiftModalOpen, setIsGiftModalOpen] = useState(false);
 
   const loadProfile = useCallback(async () => {
+    if (!token || !id || isNaN(numericId)) {
+      setError('Invalid profile ID');
+      setIsLoading(false);
+      return;
+    }
+    
     try {
       setIsLoading(true);
-      const data = await getPublicProfile(token!, Number(id));
+      const data = await getPublicProfile(token, numericId);
       setProfile(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load profile');
     } finally {
       setIsLoading(false);
     }
-  }, [token, id]);
+  }, [token, id, numericId]);
 
   const recordAssist = useCallback(async () => {
     try {

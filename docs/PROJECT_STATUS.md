@@ -4,7 +4,9 @@ This document provides a single, authoritative overview of the "fwber" project's
 
 ## 1. Project Overview
 
-**Current Status:** PRE-DEPLOYMENT STAGING
+**Current Status:** PRE-DEPLOYMENT STAGING  
+**Version:** v0.3.26  
+**Last Updated:** January 9, 2026
 
 **Concept:** "fwber" is a privacy-first, proximity-based dating and social networking application. Its core mission is to create a safer, more inclusive, and less superficial online dating experience by prioritizing user privacy and authenticity.
 
@@ -12,12 +14,13 @@ This document provides a single, authoritative overview of the "fwber" project's
 
 ## 2. Architecture
 
-*   **Backend:** A RESTful API built with **Laravel 12** and **PHP 8.4**.
-*   **Frontend:** A responsive single-page application built with **Next.js 14**, **React 18**, and **TypeScript**.
+*   **Backend:** A RESTful API built with **Laravel 12** and **PHP 8.4** (78 controllers, 53 services).
+*   **Frontend:** A responsive single-page application built with **Next.js 16**, **React 18**, and **TypeScript** (18+ pages, 150+ components).
 *   **Crypto:** **Solana Blockchain** integration (Devnet/Mainnet) via `@solana/web3.js`.
-*   **Real-time:** **Mercure** (built on Server-Sent Events) powers real-time chat, notifications, and location updates.
-*   **Database:** **MySQL 8.0**, with **SQLite** for testing and local development.
+*   **Real-time:** **Laravel Reverb + Echo** powers real-time chat, notifications, and location updates (migrated from Mercure → Pusher Dec 2025).
+*   **Database:** **MySQL 8.0** with Spatial extensions, **SQLite** for testing.
 *   **Environment:** The entire stack is containerized using **Docker**.
+*   **Testing:** 200+ test files with comprehensive coverage.
 
 ## 3. MVP Feature Status
 
@@ -79,36 +82,87 @@ These features are considered complete and are ready for a production environmen
     *   [x] **Event Discussions:** Real-time chat threads specific to shared events.
     *   [x] **Shared Event Invitations:** Invite friends and groups to shared events.
 
-### Partially Implemented
+### Backend Complete - Frontend Missing
 
-These features are in progress but require further work before they are considered stable.
+These features have complete backend implementations but lack frontend UI. See `docs/MISSING_FEATURES.md` for full details.
 
-*   **AI-Powered Features:**
-    *   [x] **Recommendation Engine:** Fully integrated with "For You" feed and backend AI logic.
+**Critical Priority (High User Impact):**
+*   [ ] **Achievements System:** Full gamification backend (achievements, categories, token rewards) - needs profile/dashboard UI
+*   [ ] **Proximity Chatrooms Discovery:** Full API exists - needs browsing/create/join UI
+*   [ ] **Bulletin Boards:** Full threaded discussion API - needs discovery and posting UI
+*   [ ] **Profile View Tracking:** "Who viewed you" feature - needs dedicated page
 
-### Not Yet Implemented
+**High Priority (Revenue Impact):**
+*   [ ] **Paid Photo Reveals:** Token-based photo unlock - needs blurred preview + payment UI
+*   [ ] **Content Unlock System:** Generic premium content framework - needs gate components
+*   [ ] **Merchant Promotions Discovery:** API complete - needs consumer browsing/map UI
 
-These features are planned but have not yet been started.
+**Medium Priority (Engagement Impact):**
+*   [ ] **Share-to-Unlock:** Viral growth feature - needs share buttons + progress UI
+*   [ ] **Message Reactions:** Placeholder in chatrooms - needs reaction picker
+*   [ ] **Group-to-Group Matching:** Full backend - needs discovery/match UI
+*   [ ] **Matchmaker Bounties:** Token rewards for introductions - needs bounty browser
+*   [ ] **Extended Viral Content:** Fortunes, cosmic matches, nemesis finder - only roasts have UI
 
-*   [ ] **Premium Features (Fiat):** Traditional fiat subscriptions (Stripe) alongside token payments.
-*   [ ] **Dedicated Mobile App:** A React Native app is planned for a future phase (PWA currently serves this role).
+**Low Priority (Future):**
+*   [ ] **E2E Encryption:** Key infrastructure exists - needs UI for key management
+*   [ ] **Premium Features (Fiat):** Stripe subscriptions (LOW - token economy preferred)
+*   [ ] **Dedicated Mobile App:** React Native (LOW - PWA serves role)
 
 ## 4. Immediate Roadmap
 
-The immediate focus is on **Maintenance & Standardization** (The "Mega-Maintenance Protocol") to prepare the codebase for scale, followed by the **Viral Launch**.
+### Phase 4A: Documentation & Analysis (Completed Jan 9, 2026)
 
-1.  **Mega-Maintenance Protocol (In Progress):**
-    *   [x] **Monorepo Structure:** Verify and document standard directory layout (no submodules).
-    *   [x] **Context Standardization:** Generate `AGENTS.md` files for all critical subdirectories to aid AI agents.
-    *   [ ] **Test Coverage:** Ensure all critical paths have passing tests in the verified monorepo structure.
-    *   [ ] **Documentation:** Finalize the "Single Source of Truth" (`docs/UNIVERSAL_LLM_INSTRUCTIONS.md`).
+*   [x] **Comprehensive Codebase Analysis:** 78 controllers, 53 services, 200+ tests mapped
+*   [x] **DEVELOPMENT_MASTER_PLAN.md:** Created authoritative reference document
+*   [x] **Monorepo Structure:** Verified and documented (no submodules)
+*   [x] **Context Standardization:** `AGENTS.md` files for all critical subdirectories
+*   [x] **Test Coverage Audit:** No critical gaps found
 
-2.  **Viral & Engagement (Post-Maintenance):**
-    *   Launch the "Roast My Profile" campaign.
-    *   Monitor viral loops and adjust incentives.
+### Phase 4B: Frontend UI Implementation (Current Focus - Jan 2026)
 
-3.  **Operational Readiness:**
-    *   Review and finalize all environment configurations for a production deployment.
-    *   Establish a basic monitoring and alerting pipeline to track application health.
+**Critical - Must Have:**
+| Feature | Backend | Frontend | Priority | Effort |
+|---------|---------|----------|----------|--------|
+| Achievements UI | ✅ Complete | ❌ Missing | Critical | Medium |
+| Proximity Chatrooms | ✅ Complete | 🔶 Partial | Critical | High |
+| Paid Photo Reveals | ✅ Complete | ❌ Missing | Critical | Low |
+
+**High - Should Have:**
+| Feature | Backend | Frontend | Priority | Effort |
+|---------|---------|----------|----------|--------|
+| Share-to-Unlock | ✅ Complete | ❌ Missing | High | Medium |
+| Merchant Discovery | ✅ Complete | 🔶 Partial | High | Medium |
+| Profile Views | ✅ Complete | ❌ Missing | High | Low |
+
+**Medium - Nice to Have:**
+| Feature | Backend | Frontend | Priority | Effort |
+|---------|---------|----------|----------|--------|
+| Bulletin Boards | ✅ Complete | ❌ Missing | Medium | Medium |
+| Message Reactions | 🔶 Partial | ❌ Placeholder | Medium | Low |
+| Group Matching UI | ✅ Complete | ❌ Missing | Medium | Medium |
+| Extended Viral (Fortunes, etc.) | ✅ Complete | ❌ Missing | Medium | Low |
+
+### Phase 4C: Technical Debt (Ongoing)
+
+*   [ ] **Feature Flags:** Enable `chatrooms`, `recommendations`, `ai_wingman`, `video_chat` in production
+*   [ ] **Mock Replacements:** Replace mock content safety with real AWS Rekognition/Google Vision
+*   [ ] **Sentry Integration:** Re-enable commented-out error tracking in frontend
+*   [ ] **Commented Routes:** Re-enable WebSocket and Bulletin Board routes
+*   [ ] **Legacy Cleanup:** Remove Mercure references (migrated to Reverb Dec 2025)
+
+### Phase 5: Scale & Production
+
+*   [ ] **Kubernetes Deployment:** Container orchestration
+*   [ ] **Horizontal Scaling:** Load balancing strategy
+*   [ ] **Redis Caching:** Performance optimization
+*   [ ] **Feature Flag Rollout:** Gradual production enablement
+
+### Key References
+
+*   **Master Plan:** `docs/DEVELOPMENT_MASTER_PLAN.md`
+*   **Feature Flags:** `docs/FEATURE_FLAGS.md`
+*   **API Docs:** OpenAPI/Swagger
+*   **Architecture:** `docs/PROJECT_STRUCTURE.md`
 
 This document should be updated as the project evolves. For more detailed technical information, refer to the OpenAPI documentation and the `docs/` directory.

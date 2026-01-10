@@ -21,6 +21,43 @@ class MatchBountyController extends Controller
     }
 
     /**
+     * List all active bounties for discovery.
+     */
+    public function index(Request $request)
+    {
+        $query = MatchBounty::with(['user:id,name,avatar_url'])
+            ->where('status', 'active')
+            ->where(function ($q) {
+                $q->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            });
+
+        // Optional filters
+        if ($request->has('min_reward')) {
+            $query->where('token_reward', '>=', $request->min_reward);
+        }
+
+        if ($request->has('sort')) {
+            $sort = $request->sort;
+            if ($sort === 'reward_high') {
+                $query->orderByDesc('token_reward');
+            } elseif ($sort === 'reward_low') {
+                $query->orderBy('token_reward');
+            } elseif ($sort === 'newest') {
+                $query->orderByDesc('created_at');
+            } elseif ($sort === 'expiring') {
+                $query->whereNotNull('expires_at')->orderBy('expires_at');
+            }
+        } else {
+            $query->orderByDesc('token_reward'); // Default: highest reward first
+        }
+
+        $bounties = $query->paginate($request->per_page ?? 20);
+
+        return response()->json($bounties);
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)

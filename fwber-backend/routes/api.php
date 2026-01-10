@@ -443,8 +443,14 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::post('bulletin-boards/{id}/subscribe', [BulletinBoardController::class, 'subscribe']);
     // Route::post('bulletin-boards/{id}/unsubscribe', [BulletinBoardController::class, 'unsubscribe']);
 
+    // Consumer Deals/Promotions Discovery
+    Route::get('deals', [\App\Http\Controllers\MerchantController::class, 'browseDeals']);
+    Route::get('deals/categories', [\App\Http\Controllers\MerchantController::class, 'getCategories']);
+
     // Matchmaker Bounty
+    Route::get('bounties', [\App\Http\Controllers\API\MatchBountyController::class, 'index']);
     Route::post('bounties', [\App\Http\Controllers\API\MatchBountyController::class, 'store']);
+    Route::get('bounties/{slug}', [\App\Http\Controllers\API\MatchBountyController::class, 'show']);
     Route::get('bounties/{slug}/suggest', function ($slug) {
          return response()->json(['message' => 'Use POST to suggest']);
     });
