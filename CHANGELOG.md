@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.28] - 2026-01-09
+
+### Added
+- **Deals Page**: New `/deals` page for consumer deals and local merchant promotions discovery with location-based filtering.
+- **Bounties Page**: New `/bounties` page for matchmaker bounties - browse bounties, filter by reward amount, see bounty details.
+- **Wingman Fortune Page**: New `/wingman/fortune` page for AI-generated dating fortune predictions with mystical theming.
+- **Wingman Cosmic Match Page**: New `/wingman/cosmic` page for zodiac-based compatibility analysis.
+- **Wingman Vibe Check Page**: New `/wingman/vibe` page for green/red flag analysis of user profiles.
+- **Wingman Roast Page**: New `/wingman/roast` page for AI-generated profile roasts and hype modes.
+- **Wingman Nemesis Page**: New `/wingman/nemesis` page for discovering dating nemesis personality types.
+- **Photo Reveals Page**: New `/photos/reveals` page showing all photos user has unlocked from matches.
+- **Share-to-Unlock Page**: New `/share-unlock` page with social sharing incentives and reward tracking.
+- **Group Matching Page**: New `/groups/matching` page for group-to-group matching with compatibility scores.
+
+### Frontend
+- All new pages follow consistent dark purple/pink gradient theme
+- Full TypeScript compliance with strict type checking
+- Responsive design for mobile and desktop
+
 ## [0.3.27] - 2026-01-09
 
 ### Added

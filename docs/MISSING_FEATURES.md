@@ -101,24 +101,19 @@ This document catalogs features discovered during exhaustive codebase analysis t
 
 ## High Priority (Revenue Impact)
 
-### 5. Paid Photo Reveals 📸
+### 5. Paid Photo Reveals 📸 ✅ COMPLETE
 **Backend Status:** Complete  
-**Frontend Status:** No UI
+**Frontend Status:** ✅ UI Implemented (v0.3.28)
 
 **What Exists:**
 - Database: `photo_unlocks` table
 - Logic: Token-based photo unlock system
 - API: Unlock endpoints exist
-
-**What's Missing:**
-- Blurred photo preview with unlock button
-- Token payment flow for photos
-- Unlock history
-
-**User Impact:** Monetization feature unavailable to users.
+- ✅ UI: `fwber-frontend/app/photos/reveals/page.tsx`
 
 **Files:**
 - `fwber-backend/database/migrations/2025_12_14_000000_create_photo_unlocks_table.php`
+- `fwber-frontend/app/photos/reveals/page.tsx` ✅
 
 ---
 
@@ -143,51 +138,40 @@ This document catalogs features discovered during exhaustive codebase analysis t
 
 ---
 
-### 7. Merchant Promotions Discovery 🏪
+### 7. Merchant Promotions Discovery 🏪 ✅ COMPLETE
 **Backend Status:** Complete  
-**Frontend Status:** Partial
+**Frontend Status:** ✅ UI Implemented (v0.3.28)
 
 **What Exists:**
 - Database: `merchant_profiles`, `promotions` tables
 - Controllers: Full merchant and promotion management
 - Features: Geolocated promotions, discount codes, payment tracking
 - UI: Basic merchant dashboard, "Sponsored" styling in Local Pulse
-
-**What's Missing:**
-- User-facing promotion discovery/browsing
-- Nearby deals map
-- Promotion redemption flow
-- Merchant search
-
-**User Impact:** Local commerce feature unusable for consumers.
+- ✅ UI: `fwber-frontend/app/deals/page.tsx` - Consumer deals discovery
 
 **Files:**
 - `fwber-backend/app/Http/Controllers/MerchantController.php`
 - `fwber-backend/database/migrations/2026_01_06_042019_create_merchant_profiles_table.php`
+- `fwber-frontend/app/deals/page.tsx` ✅
 
 ---
 
 ## Medium Priority (Engagement Impact)
 
-### 8. Share-to-Unlock 🔗
+### 8. Share-to-Unlock 🔗 ✅ COMPLETE
 **Backend Status:** Complete  
-**Frontend Status:** No UI
+**Frontend Status:** ✅ UI Implemented (v0.3.28)
 
 **What Exists:**
 - Database: `share_unlocks` table
 - Logic: Track shares, view counts, unlock thresholds
 - Documented in `docs/features/VIRAL_GROWTH.md`
-
-**What's Missing:**
-- Share buttons with unlock incentives
-- Progress tracking ("3 more shares to unlock X")
-- Social platform integrations
-
-**User Impact:** Viral growth feature not implemented.
+- ✅ UI: `fwber-frontend/app/share-unlock/page.tsx`
 
 **Files:**
 - `fwber-backend/database/migrations/2025_12_13_035232_create_share_unlocks_table.php`
 - `docs/features/VIRAL_GROWTH.md`
+- `fwber-frontend/app/share-unlock/page.tsx` ✅
 
 ---
 
@@ -212,47 +196,36 @@ This document catalogs features discovered during exhaustive codebase analysis t
 
 ---
 
-### 10. Group-to-Group Matching 👥
+### 10. Group-to-Group Matching 👥 ✅ COMPLETE
 **Backend Status:** Complete  
-**Frontend Status:** No UI
+**Frontend Status:** ✅ UI Implemented (v0.3.28)
 
 **What Exists:**
 - Database: `group_matches` table
 - Service: `GroupMatchingService` with matching logic
 - API: Group match endpoints
-
-**What's Missing:**
-- Group matching discovery page
-- Match request/accept flow
-- Group compatibility display
-
-**User Impact:** Group social dynamics not implemented.
+- ✅ UI: `fwber-frontend/app/groups/matching/page.tsx`
 
 **Files:**
 - `fwber-backend/database/migrations/2025_12_31_182517_create_group_matches_table.php`
 - `fwber-backend/app/Services/GroupMatchingService.php`
+- `fwber-frontend/app/groups/matching/page.tsx` ✅
 
 ---
 
-### 11. Matchmaker Bounties 💰
+### 11. Matchmaker Bounties 💰 ✅ COMPLETE
 **Backend Status:** Complete  
-**Frontend Status:** Basic
+**Frontend Status:** ✅ UI Implemented (v0.3.28)
 
 **What Exists:**
 - Database: `match_bounties`, `match_assists` tables
 - Controller: `MatchBountyController`
 - Logic: Token rewards for successful matches
-
-**What's Missing:**
-- Bounty browsing/discovery
-- Friend suggestion interface
-- Bounty claim flow
-- Success tracking
-
-**User Impact:** Social matching feature underutilized.
+- ✅ UI: `fwber-frontend/app/bounties/page.tsx`
 
 **Files:**
 - `fwber-backend/database/migrations/2025_12_29_000000_create_match_bounties_table.php`
+- `fwber-frontend/app/bounties/page.tsx` ✅
 
 ---
 
@@ -276,25 +249,28 @@ This document catalogs features discovered during exhaustive codebase analysis t
 
 ---
 
-### 13. Extended Viral Content 🤖
+### 13. Extended Viral Content 🤖 ✅ COMPLETE
 **Backend Status:** Complete  
-**Frontend Status:** Partial (only roasts)
+**Frontend Status:** ✅ UI Implemented (v0.3.28)
 
 **What Exists:**
 - Database: `viral_contents` table
 - Types: roasts, fortunes, cosmic matches, nemesis finder
 - AI generation logic for all types
-
-**What's Missing:**
-- Fortune generation UI
-- Cosmic match UI
-- Nemesis finder UI
-- Content sharing for non-roast types
-
-**User Impact:** Rich AI content features hidden.
+- ✅ UI Pages:
+  - `fwber-frontend/app/wingman/fortune/page.tsx` - Fortune predictions
+  - `fwber-frontend/app/wingman/cosmic/page.tsx` - Zodiac compatibility
+  - `fwber-frontend/app/wingman/vibe/page.tsx` - Vibe check (flags)
+  - `fwber-frontend/app/wingman/roast/page.tsx` - Roast/Hype generator
+  - `fwber-frontend/app/wingman/nemesis/page.tsx` - Nemesis finder
 
 **Files:**
 - `fwber-backend/database/migrations/2025_12_15_121931_create_viral_contents_table.php`
+- `fwber-frontend/app/wingman/fortune/page.tsx` ✅
+- `fwber-frontend/app/wingman/cosmic/page.tsx` ✅
+- `fwber-frontend/app/wingman/vibe/page.tsx` ✅
+- `fwber-frontend/app/wingman/roast/page.tsx` ✅
+- `fwber-frontend/app/wingman/nemesis/page.tsx` ✅
 
 ---
 
