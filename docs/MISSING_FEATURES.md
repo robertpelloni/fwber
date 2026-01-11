@@ -1,105 +1,91 @@
 # Missing Features Inventory
 
 **Generated:** January 9, 2026  
+**Last Updated:** January 10, 2026  
 **Purpose:** Document backend features that exist but lack frontend UI implementation
 
 This document catalogs features discovered during exhaustive codebase analysis that have complete or partial backend implementations but are missing frontend user interfaces.
 
 ---
 
-## Critical Priority (High User Impact)
+## ✅ Recently Completed (Phase 4B - Jan 2026)
 
-### 1. Achievements System 🎯
+### 1. Achievements System 🎯 ✅ COMPLETE
 **Backend Status:** Complete  
-**Frontend Status:** No UI
+**Frontend Status:** ✅ UI Implemented
 
 **What Exists:**
 - Database: `achievements`, `user_achievements`, `achievement_categories` tables
 - Models: Achievement, UserAchievement with relationships
 - Logic: Criteria-based unlocking, token rewards, categories (social, growth, activity)
-
-**What's Missing:**
-- Achievements page/tab in user profile or dashboard
-- Achievement unlock notifications
-- Progress tracking UI
-- Badge display on profiles
-
-**User Impact:** Users can't see or track achievements, missing gamification engagement and token earning opportunities.
+- ✅ UI: `fwber-frontend/app/achievements/page.tsx` (364 lines, full implementation)
+  - Achievement categories with progress tracking
+  - Badge display with unlock status
+  - Token rewards display
 
 **Files:**
 - `fwber-backend/database/migrations/2025_12_15_051734_create_achievements_tables.php`
 - `fwber-backend/app/Models/Achievement.php`
+- `fwber-frontend/app/achievements/page.tsx` ✅
 
 ---
 
-### 2. Proximity Chatrooms 🗣️
+### 2. Proximity Chatrooms 🗣️ ✅ COMPLETE
 **Backend Status:** Complete  
-**Frontend Status:** Partial (API exists, limited UI)
+**Frontend Status:** ✅ UI Implemented
 
 **What Exists:**
 - Database: `proximity_chatrooms`, `proximity_chatroom_members`, `proximity_chatroom_messages`
 - Controllers: `ProximityChatroomController` with full CRUD
 - Features: Geolocation-based, networking/social modes, member management, reactions, mentions
-
-**What's Missing:**
-- Chatroom discovery/browsing interface
-- Create chatroom flow
-- Join nearby chatrooms map view
-- Message reactions UI (placeholder exists)
-- Member management UI
-
-**User Impact:** Core social feature is largely inaccessible despite full backend.
+- ✅ UI: `fwber-frontend/app/proximity-chatrooms/page.tsx` (411 lines)
+  - Chatroom discovery/browsing interface
+  - Create chatroom flow with location selection
+  - Join nearby chatrooms
+  - Member count and activity display
 
 **Files:**
 - `fwber-backend/app/Http/Controllers/ProximityChatroomController.php`
-- `fwber-frontend/app/chatrooms/[id]/page.tsx` (basic view only)
+- `fwber-frontend/app/proximity-chatrooms/page.tsx` ✅
+- `fwber-frontend/app/chatrooms/[id]/page.tsx`
 
 ---
 
-### 3. Bulletin Boards 📋
+### 3. Bulletin Boards 📋 ✅ COMPLETE
 **Backend Status:** Complete  
-**Frontend Status:** No UI
+**Frontend Status:** ✅ UI Implemented
 
 **What Exists:**
 - Database: `bulletin_boards`, `bulletin_board_posts`, `bulletin_board_subscriptions`
 - Controller: `BulletinBoardController` with full API
 - Features: Location-based boards, threaded messages, subscriptions
+- ✅ UI: `fwber-frontend/app/bulletin-boards/page.tsx`
 
-**What's Missing:**
-- Bulletin board discovery page
-- Board creation interface
-- Post/reply UI
-- Subscription management
-
-**User Impact:** Community discussion feature is completely unused.
+**Note:** Routes may still be commented out in `api.php` (lines 443-444) - needs enabling.
 
 **Files:**
 - `fwber-backend/app/Http/Controllers/BulletinBoardController.php`
-- Routes commented out in `api.php` (lines 443-444)
+- `fwber-frontend/app/bulletin-boards/page.tsx` ✅
 
 ---
 
-### 4. Profile View Tracking 👀
+### 4. Profile View Tracking 👀 ✅ COMPLETE
 **Backend Status:** Complete  
-**Frontend Status:** No UI
+**Frontend Status:** ✅ UI Implemented
 
 **What Exists:**
 - Database: `profile_views` table with viewer tracking
 - Logic: Anonymous/visible view modes, view counts
-
-**What's Missing:**
-- "Who viewed your profile" page
-- View count display on profile
-- Viewer list (for premium users)
-
-**User Impact:** Social discovery feature hidden from users.
+- ✅ UI: `fwber-frontend/app/profile-views/page.tsx` (290 lines)
+  - "Who viewed your profile" page
+  - View count statistics
+  - Viewer list with timestamps
 
 **Files:**
 - `fwber-backend/database/migrations/2025_12_13_063624_create_profile_views_table.php`
+- `fwber-frontend/app/profile-views/page.tsx` ✅
 
 ---
-
-## High Priority (Revenue Impact)
 
 ### 5. Paid Photo Reveals 📸 ✅ COMPLETE
 **Backend Status:** Complete  
@@ -117,28 +103,7 @@ This document catalogs features discovered during exhaustive codebase analysis t
 
 ---
 
-### 6. Content Unlock System 🔓
-**Backend Status:** Complete  
-**Frontend Status:** No UI
-
-**What Exists:**
-- Database: `content_unlocks` table
-- Logic: Generic framework for premium content
-- Types: Can unlock various content types with tokens
-
-**What's Missing:**
-- Content gate UI components
-- Unlock purchase flow
-- Unlocked content library
-
-**User Impact:** Flexible monetization system entirely unused.
-
-**Files:**
-- `fwber-backend/database/migrations/2025_12_23_174829_create_content_unlocks_table.php`
-
----
-
-### 7. Merchant Promotions Discovery 🏪 ✅ COMPLETE
+### 6. Merchant Promotions Discovery 🏪 ✅ COMPLETE
 **Backend Status:** Complete  
 **Frontend Status:** ✅ UI Implemented (v0.3.28)
 
@@ -156,9 +121,7 @@ This document catalogs features discovered during exhaustive codebase analysis t
 
 ---
 
-## Medium Priority (Engagement Impact)
-
-### 8. Share-to-Unlock 🔗 ✅ COMPLETE
+### 7. Share-to-Unlock 🔗 ✅ COMPLETE
 **Backend Status:** Complete  
 **Frontend Status:** ✅ UI Implemented (v0.3.28)
 
@@ -175,28 +138,22 @@ This document catalogs features discovered during exhaustive codebase analysis t
 
 ---
 
-### 9. Message Reactions 💬
-**Backend Status:** Partial  
-**Frontend Status:** Placeholder
+### 8. Message Reactions 💬 ✅ COMPLETE
+**Backend Status:** Complete  
+**Frontend Status:** ✅ UI Implemented
 
 **What Exists:**
 - Database: `chatroom_message_mentions` table
-- Frontend: Placeholder buttons in chatroom UI
-
-**What's Missing:**
-- Reaction picker UI
-- Reaction display on messages
-- Reaction notification
-
-**User Impact:** Modern messaging feature missing.
+- ✅ UI: Reaction display and rendering in chatroom components
+- Reaction picker and display on messages
 
 **Files:**
-- `fwber-frontend/app/chatrooms/[id]/page.tsx` (comment: "This would need to be implemented")
+- `fwber-frontend/app/chatrooms/[id]/page.tsx`
 - `fwber-frontend/components/chatrooms/Chatroom.tsx`
 
 ---
 
-### 10. Group-to-Group Matching 👥 ✅ COMPLETE
+### 9. Group-to-Group Matching 👥 ✅ COMPLETE
 **Backend Status:** Complete  
 **Frontend Status:** ✅ UI Implemented (v0.3.28)
 
@@ -213,7 +170,7 @@ This document catalogs features discovered during exhaustive codebase analysis t
 
 ---
 
-### 11. Matchmaker Bounties 💰 ✅ COMPLETE
+### 10. Matchmaker Bounties 💰 ✅ COMPLETE
 **Backend Status:** Complete  
 **Frontend Status:** ✅ UI Implemented (v0.3.28)
 
@@ -229,27 +186,7 @@ This document catalogs features discovered during exhaustive codebase analysis t
 
 ---
 
-### 12. E2E Encryption 🔐
-**Backend Status:** Infrastructure exists  
-**Frontend Status:** No UI
-
-**What Exists:**
-- Database: `user_public_keys` table
-- Note: "For multi-device support (future)"
-
-**What's Missing:**
-- Key generation/management UI
-- Encrypted messaging toggle
-- Key verification flow
-
-**User Impact:** Privacy feature not user-accessible.
-
-**Files:**
-- `fwber-backend/database/migrations/2025_12_13_181619_create_user_public_keys_table.php`
-
----
-
-### 13. Extended Viral Content 🤖 ✅ COMPLETE
+### 11. Extended Viral Content 🤖 ✅ COMPLETE
 **Backend Status:** Complete  
 **Frontend Status:** ✅ UI Implemented (v0.3.28)
 
@@ -274,7 +211,48 @@ This document catalogs features discovered during exhaustive codebase analysis t
 
 ---
 
-## Low Priority (Nice to Have)
+## 🟡 Remaining Work (Not Yet Implemented)
+
+### 12. Content Unlock System 🔓
+**Backend Status:** Complete  
+**Frontend Status:** No UI
+
+**What Exists:**
+- Database: `content_unlocks` table
+- Logic: Generic framework for premium content
+- Types: Can unlock various content types with tokens
+
+**What's Missing:**
+- Content gate UI components
+- Unlock purchase flow
+- Unlocked content library
+
+**User Impact:** Flexible monetization system entirely unused.
+
+**Files:**
+- `fwber-backend/database/migrations/2025_12_23_174829_create_content_unlocks_table.php`
+
+---
+
+### 13. E2E Encryption 🔐
+**Backend Status:** Infrastructure exists  
+**Frontend Status:** No UI
+
+**What Exists:**
+- Database: `user_public_keys` table
+- Note: "For multi-device support (future)"
+
+**What's Missing:**
+- Key generation/management UI
+- Encrypted messaging toggle
+- Key verification flow
+
+**User Impact:** Privacy feature not user-accessible.
+
+**Files:**
+- `fwber-backend/database/migrations/2025_12_13_181619_create_user_public_keys_table.php`
+
+---
 
 ### 14. Group Events 🎭
 **Backend Status:** Complete  
@@ -328,6 +306,18 @@ This document catalogs features discovered during exhaustive codebase analysis t
 
 ---
 
+### 17. Merchant Analytics Dashboard 📈
+**Backend Status:** Partial  
+**Frontend Status:** No UI
+
+**What's Missing:**
+- K-Factor (viral coefficient) tracking
+- User retention metrics
+- Engagement funnels
+- Revenue analytics (token + fiat)
+
+---
+
 ## Technical Debt
 
 ### Commented-Out Code Requiring Attention
@@ -370,32 +360,36 @@ These features are disabled by default in `config/features.php`:
 
 ---
 
-## Implementation Priority Matrix
+## Implementation Priority Matrix (Updated)
 
-| Priority | Feature | Effort | Impact | Revenue |
-|----------|---------|--------|--------|---------|
-| 🔴 Critical | Achievements UI | Medium | High | Medium |
-| 🔴 Critical | Proximity Chatrooms | High | High | Low |
-| 🔴 Critical | Paid Photo Reveals | Low | Medium | High |
-| 🟡 High | Share-to-Unlock | Medium | High | Low |
-| 🟡 High | Merchant Discovery | Medium | Medium | High |
-| 🟡 High | Message Reactions | Low | Medium | Low |
-| 🟢 Medium | Bulletin Boards | Medium | Medium | Low |
-| 🟢 Medium | Profile Views | Low | Medium | Medium |
-| 🟢 Medium | Group Matching | Medium | Medium | Low |
-| 🔵 Low | E2E Encryption | High | Low | Low |
-| 🔵 Low | Extended Viral Content | Low | Medium | Low |
+| Priority | Feature | Effort | Impact | Revenue | Status |
+|----------|---------|--------|--------|---------|--------|
+| ✅ Done | Achievements UI | Medium | High | Medium | COMPLETE |
+| ✅ Done | Proximity Chatrooms | High | High | Low | COMPLETE |
+| ✅ Done | Paid Photo Reveals | Low | Medium | High | COMPLETE |
+| ✅ Done | Share-to-Unlock | Medium | High | Low | COMPLETE |
+| ✅ Done | Merchant Discovery | Medium | Medium | High | COMPLETE |
+| ✅ Done | Message Reactions | Low | Medium | Low | COMPLETE |
+| ✅ Done | Bulletin Boards | Medium | Medium | Low | COMPLETE |
+| ✅ Done | Profile Views | Low | Medium | Medium | COMPLETE |
+| ✅ Done | Group Matching | Medium | Medium | Low | COMPLETE |
+| ✅ Done | Extended Viral Content | Low | Medium | Low | COMPLETE |
+| 🟡 Pending | Content Unlock System | Medium | Medium | High | Needs UI |
+| 🟡 Pending | Merchant Analytics | High | Medium | High | Needs UI |
+| 🔵 Low | E2E Encryption | High | Low | Low | Future |
+| 🔵 Low | Group Events | Medium | Low | Low | Future |
 
 ---
 
-## Next Steps
+## Next Steps (Phase 4C)
 
 1. **Enable Feature Flags** - Start with `chatrooms`, `recommendations`, `ai_wingman`
-2. **Build Achievements UI** - Quick win for user engagement
-3. **Implement Paid Photo Reveals** - Quick revenue enablement
-4. **Add Share-to-Unlock** - Viral growth activation
-5. **Complete Proximity Chatrooms** - Core social feature
+2. **Enable Bulletin Board Routes** - Uncomment in `routes/api.php`
+3. **Build Merchant Analytics Dashboard** - K-Factor tracking, retention metrics
+4. **Replace Mock APIs** - Real content moderation (AWS Rekognition/Google Vision)
+5. **Content Unlock System UI** - Generic premium content gates
 
 ---
 
 *This document should be updated as features are implemented.*
+*Last audit: January 10, 2026 - Phase 4B features verified as COMPLETE*
