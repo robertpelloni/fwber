@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.29] - 2026-01-11
+
+### Added
+- **Premium Unlocks Page**: New `/premium/unlocks` page for content unlock system - view unlocked insights, photos, and profiles with token costs.
+- **Gift History Page**: New `/gifts/history` page with animated gift tracking - sent and received gifts, gift type icons, custom messages.
+- **Merchant Analytics Page**: New `/merchant/analytics` page with K-Factor tracking, retention metrics (Day 1/7/30), top promotions table, revenue stats.
+
+### Documentation
+- Updated `docs/MISSING_FEATURES.md` - marked Content Unlock System, Gift System Enhancement, and Merchant Analytics as complete.
+
 ## [0.3.28] - 2026-01-09
 
 ### Added
