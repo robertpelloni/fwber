@@ -440,8 +440,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('bulletin-boards/{id}', [BulletinBoardController::class, 'show']);
     Route::post('bulletin-boards/{id}/messages', [BulletinBoardController::class, 'postMessage']);
     Route::get('bulletin-boards/{id}/messages', [BulletinBoardController::class, 'getMessages']);
-    // Route::post('bulletin-boards/{id}/subscribe', [BulletinBoardController::class, 'subscribe']);
-    // Route::post('bulletin-boards/{id}/unsubscribe', [BulletinBoardController::class, 'unsubscribe']);
+    Route::post('bulletin-boards/{id}/subscribe', [BulletinBoardController::class, 'subscribe']);
+    Route::post('bulletin-boards/{id}/unsubscribe', [BulletinBoardController::class, 'unsubscribe']);
 
     // Consumer Deals/Promotions Discovery
     Route::get('deals', [\App\Http\Controllers\MerchantController::class, 'browseDeals']);
