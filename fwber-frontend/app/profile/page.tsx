@@ -69,17 +69,17 @@ export default function ProfilePage() {
     penis_length_cm?: number
     penis_girth_cm?: number
     breast_size?: string
-    tattoos?: string
-    piercings?: string
+    tattoos?: boolean
+    piercings?: boolean
     smoking_status?: string
     drinking_status?: string
     cannabis_status?: string
     dietary_preferences?: string
     zodiac_sign?: string
     relationship_goals?: string
-    has_children?: boolean
-    wants_children?: boolean
-    has_pets?: boolean
+    has_children?: boolean | string
+    wants_children?: boolean | string
+    has_pets?: boolean | string
     languages?: string[]
     interests?: string[]
   }
@@ -145,17 +145,17 @@ export default function ProfilePage() {
     penis_length_cm: undefined,
     penis_girth_cm: undefined,
     breast_size: '',
-    tattoos: '',
-    piercings: '',
+    tattoos: false,
+    piercings: false,
     smoking_status: '',
     drinking_status: '',
     cannabis_status: '',
     dietary_preferences: '',
     zodiac_sign: '',
     relationship_goals: '',
-    has_children: false,
-    wants_children: false,
-    has_pets: false,
+    has_children: '',
+    wants_children: '',
+    has_pets: '',
     languages: [],
     interests: [],
   })
