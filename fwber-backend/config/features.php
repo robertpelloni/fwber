@@ -20,14 +20,14 @@ return [
     'bounties' => env('FEATURE_BOUNTIES', true),
 
     // Infrastructure features - enable as needed
-    'websocket' => env('FEATURE_WEBSOCKET', false),
+    'websocket' => env('FEATURE_WEBSOCKET', true),
     'rate_limits' => env('FEATURE_RATE_LIMITS', true),
     'analytics' => env('FEATURE_ANALYTICS', true),
 
-    // Advanced features - disabled by default (require additional setup)
-    'face_reveal' => env('FEATURE_FACE_REVEAL', false),
-    'local_media_vault' => env('FEATURE_LOCAL_MEDIA_VAULT', false),
-    'moderation' => env('FEATURE_MODERATION', false),
-    'media_analysis' => env('FEATURE_MEDIA_ANALYSIS', false),
-    'video_chat' => env('FEATURE_VIDEO_CHAT', false),
+    // Advanced features - enabled for testing
+    'face_reveal' => env('FEATURE_FACE_REVEAL', true),
+    'local_media_vault' => env('FEATURE_LOCAL_MEDIA_VAULT', true),
+    'moderation' => env('FEATURE_MODERATION', true),
+    'media_analysis' => env('FEATURE_MEDIA_ANALYSIS', true),
+    'video_chat' => env('FEATURE_VIDEO_CHAT', true),
 ];

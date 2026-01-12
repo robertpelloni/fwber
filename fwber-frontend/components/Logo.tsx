@@ -31,8 +31,7 @@ export function Logo({ className = '', showDotMe = true }: LogoProps) {
 
       {/* Layer 2: Fill (Foreground) with Color Cycle */}
       <div 
-        className={`${fontClasses} relative z-10 select-none animate-hue-cycle`}
-        style={{ animationDuration: '3s' }}
+        className={`${fontClasses} relative z-10 select-none animate-gradient-chaos`}
       >
         <span className={`relative text-transparent bg-clip-text ${gradientClass}`}>
           fwber

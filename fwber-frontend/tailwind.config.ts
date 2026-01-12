@@ -56,6 +56,7 @@ const config: Config = {
       animation: {
         'gradient-x': 'gradient-x 3s ease infinite',
         'blob': 'blob 7s infinite',
+        'gradient-chaos': 'gradient-chaos 1s ease infinite',
       },
       keyframes: {
         'gradient-x': {
@@ -66,6 +67,28 @@ const config: Config = {
           '50%': {
             'background-size': '200% 200%',
             'background-position': 'right center',
+          },
+        },
+        'gradient-chaos': {
+          '0%': {
+            'background-size': '200% 200%',
+            'background-position': 'left top',
+          },
+          '25%': {
+            'background-size': '200% 200%',
+            'background-position': 'right bottom',
+          },
+          '50%': {
+            'background-size': '200% 200%',
+            'background-position': 'left bottom',
+          },
+          '75%': {
+            'background-size': '200% 200%',
+            'background-position': 'right top',
+          },
+          '100%': {
+            'background-size': '200% 200%',
+            'background-position': 'left top',
           },
         },
         blob: {

@@ -1,7 +1,9 @@
 'use client'
  
 import { useEffect } from 'react'
-import * as Sentry from "@sentry/nextjs"
+
+// TODO: Re-enable Sentry when @sentry/nextjs is compatible with Next.js 16 + Turbopack
+// import * as Sentry from "@sentry/nextjs"
  
 export default function GlobalError({
   error,
@@ -11,7 +13,8 @@ export default function GlobalError({
   reset: () => void
 }) {
   useEffect(() => {
-    Sentry.captureException(error)
+    // Sentry.captureException(error)
+    console.error('Global error:', error)
   }, [error])
  
   return (

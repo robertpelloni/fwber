@@ -34,14 +34,17 @@ const getFrontendVersion = () => {
 };
 
 // const { withSentryConfig } = require('@sentry/nextjs');
-const withPWA = require('next-pwa')({
-  dest: 'public',
-  disable: process.env.NODE_ENV === 'development',
-  register: true,
-  skipWaiting: true,
-  importScripts: ['/sw-push.js'],
-  maximumFileSizeToCacheInBytes: 7000000, // 7MB to accommodate large source maps
-});
+// PWA disabled due to next-pwa dependency issues with ajv
+// TODO: Replace next-pwa with @ducanh2912/next-pwa or serwist
+// const withPWA = require('next-pwa')({
+//   dest: 'public',
+//   disable: process.env.NODE_ENV === 'development',
+//   register: true,
+//   skipWaiting: true,
+//   importScripts: ['/sw-push.js'],
+//   maximumFileSizeToCacheInBytes: 7000000, // 7MB to accommodate large source maps
+// });
+const withPWA = (config) => config; // Passthrough until PWA is fixed
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
@@ -118,6 +121,8 @@ const nextConfig = {
     minimumCacheTTL: 60,
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Skip optimization for localhost images in development
+    unoptimized: process.env.NODE_ENV === 'development',
   },
   
   // Bundle optimization
