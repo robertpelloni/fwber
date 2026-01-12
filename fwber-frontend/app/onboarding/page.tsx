@@ -18,11 +18,19 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader2, CheckCircle2, Camera, MapPin, User, Heart } from 'lucide-react'
 import { PreferencesStep, type OnboardingFormData } from '@/components/onboarding/PreferencesStep'
+import PhysicalStep from '@/components/onboarding/PhysicalStep'
+import IntimateStep from '@/components/onboarding/IntimateStep'
+import LifestyleStep from '@/components/onboarding/LifestyleStep'
+import PersonalityStep from '@/components/onboarding/PersonalityStep'
 
 const STEPS = [
   { id: 'welcome', title: 'Welcome' },
   { id: 'basics', title: 'Basic Info' },
   { id: 'photos', title: 'Photos' },
+  { id: 'physical', title: 'Physical' },
+  { id: 'lifestyle', title: 'Lifestyle' },
+  { id: 'personality', title: 'Personality' },
+  { id: 'intimate', title: 'Intimate' },
   { id: 'preferences', title: 'Preferences' },
   { id: 'complete', title: 'All Set!' },
 ]
@@ -42,17 +50,50 @@ export default function OnboardingPage() {
     display_name: '',
     date_of_birth: '',
     gender: '',
+    bio: '',
     location: {
       city: '',
       state: '',
       latitude: 0,
-      longitude: 0, // In a real app, we'd get this from browser geolocation
+      longitude: 0,
     },
     looking_for: [] as string[],
     preferences: {
       age_range_min: 18,
       age_range_max: 50,
-    }
+    },
+    height_cm: null as number | null,
+    body_type: '',
+    hair_color: '',
+    eye_color: '',
+    skin_tone: '',
+    ethnicity: '',
+    facial_hair: '',
+    fitness_level: '',
+    tattoos: false,
+    piercings: false,
+    breast_size: '',
+    penis_length_cm: null as number | null,
+    penis_girth_cm: null as number | null,
+    sti_status: [] as string[],
+    fetishes: [] as string[],
+    occupation: '',
+    education: '',
+    smoking_status: '',
+    drinking_status: '',
+    cannabis_status: '',
+    dietary_preferences: '',
+    has_children: '',
+    wants_children: '',
+    has_pets: '',
+    zodiac_sign: '',
+    love_language: '',
+    personality_type: '',
+    political_views: '',
+    religion: '',
+    sleep_schedule: '',
+    relationship_style: '',
+    sexual_orientation: '',
   })
 
   // Load initial data
@@ -135,6 +176,51 @@ export default function OnboardingPage() {
         if (photos.length === 0) {
           throw new Error('Please upload at least one photo.')
         }
+      } else if (STEPS[currentStep].id === 'physical') {
+        await updateUserProfile(token!, {
+          height_cm: formData.height_cm,
+          body_type: formData.body_type,
+          hair_color: formData.hair_color,
+          eye_color: formData.eye_color,
+          skin_tone: formData.skin_tone,
+          ethnicity: formData.ethnicity,
+          facial_hair: formData.facial_hair,
+          fitness_level: formData.fitness_level,
+          tattoos: formData.tattoos,
+          piercings: formData.piercings,
+        })
+      } else if (STEPS[currentStep].id === 'lifestyle') {
+        await updateUserProfile(token!, {
+          occupation: formData.occupation,
+          education: formData.education,
+          smoking_status: formData.smoking_status,
+          drinking_status: formData.drinking_status,
+          cannabis_status: formData.cannabis_status,
+          dietary_preferences: formData.dietary_preferences,
+          has_children: formData.has_children,
+          wants_children: formData.wants_children,
+          has_pets: formData.has_pets,
+        })
+      } else if (STEPS[currentStep].id === 'personality') {
+        await updateUserProfile(token!, {
+          bio: formData.bio,
+          zodiac_sign: formData.zodiac_sign,
+          love_language: formData.love_language,
+          personality_type: formData.personality_type,
+          political_views: formData.political_views,
+          religion: formData.religion,
+          sleep_schedule: formData.sleep_schedule,
+          relationship_style: formData.relationship_style,
+          sexual_orientation: formData.sexual_orientation,
+        })
+      } else if (STEPS[currentStep].id === 'intimate') {
+        await updateUserProfile(token!, {
+          breast_size: formData.breast_size,
+          penis_length_cm: formData.penis_length_cm,
+          penis_girth_cm: formData.penis_girth_cm,
+          sti_status: formData.sti_status,
+          fetishes: formData.fetishes,
+        })
       } else if (STEPS[currentStep].id === 'preferences') {
         if (formData.looking_for.length === 0) {
           throw new Error('Please select what you are looking for.')
@@ -322,6 +408,26 @@ export default function OnboardingPage() {
               maxPhotos={6}
             />
           </div>
+        )
+
+      case 'physical':
+        return (
+          <PhysicalStep formData={formData} setFormData={setFormData} />
+        )
+
+      case 'lifestyle':
+        return (
+          <LifestyleStep formData={formData} setFormData={setFormData} />
+        )
+
+      case 'personality':
+        return (
+          <PersonalityStep formData={formData} setFormData={setFormData} />
+        )
+
+      case 'intimate':
+        return (
+          <IntimateStep formData={formData} setFormData={setFormData} />
         )
 
       case 'preferences':

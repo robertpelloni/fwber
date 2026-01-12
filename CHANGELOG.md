@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.30] - 2026-01-12
+
+### Added
+- **Expanded Onboarding Flow**: Added 4 new onboarding steps (Physical, Lifestyle, Personality, Intimate) to collect comprehensive profile data during signup.
+- **Profile Physical Tab**: New Physical tab in profile editor for height, body type, ethnicity, hair/eye color, skin tone, facial hair, fitness level, tattoos, piercings.
+- **Profile Intimate Tab**: New Intimate tab in profile editor for breast size, penis dimensions, STI status, fetishes/kinks.
+
+### Fixed
+- **Looking For Checkboxes**: Fixed checkbox styling in onboarding and profile pages - checkboxes now properly respond to clicks with visible styling (h-5 w-5, accent colors, cursor-pointer).
+
+### Changed
+- **ProfileUpdateData Type**: Extended API type to include all physical/intimate fields (height_cm, body_type, breast_size, penis_length_cm, penis_girth_cm, sti_status, fetishes, etc.).
+
 ## [0.3.29] - 2026-01-11
 
 ### Added

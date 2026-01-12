@@ -117,7 +117,6 @@ export interface UserProfile {
 export interface ProfileUpdateData {
   display_name?: string;
   bio?: string;
-  // ISO date string YYYY-MM-DD
   date_of_birth?: string;
   gender?: string;
   relationship_style?: string;
@@ -129,21 +128,40 @@ export interface ProfileUpdateData {
     city?: string;
     state?: string;
   };
-  // Travel Mode
   is_travel_mode?: boolean;
   travel_location?: {
     latitude?: number;
     longitude?: number;
     name?: string;
   };
-  // New Optional Attributes
+  height_cm?: number | null;
+  body_type?: string;
+  hair_color?: string;
+  eye_color?: string;
+  skin_tone?: string;
+  ethnicity?: string;
+  facial_hair?: string;
+  fitness_level?: string;
+  tattoos?: boolean;
+  piercings?: boolean;
+  clothing_style?: string;
+  dominant_hand?: string;
+  breast_size?: string;
+  penis_length_cm?: number | null;
+  penis_girth_cm?: number | null;
+  sti_status?: string[] | Record<string, any>;
+  fetishes?: string[];
+  occupation?: string;
+  education?: string;
+  has_children?: string;
+  wants_children?: string;
+  has_pets?: string;
   love_language?: string;
   personality_type?: string;
   chronotype?: string;
   social_media?: Record<string, string>;
   communication_style?: string;
   blood_type?: string;
-  sti_status?: Record<string, any>;
   family_plans?: string;
   relationship_goals?: string;
   languages?: string[];
@@ -156,13 +174,14 @@ export interface ProfileUpdateData {
   dietary_preferences?: string;
   exercise_habits?: string;
   sleep_habits?: string;
+  sleep_schedule?: string;
   pets?: string[];
   children?: string;
   religion?: string;
   political_views?: string;
+  interests?: string[];
   
   preferences?: {
-    // Lifestyle preferences
     smoking?: string;
     drinking?: string;
     exercise?: string;
@@ -172,7 +191,6 @@ export interface ProfileUpdateData {
     education?: string;
     occupation?: string;
     income?: string;
-    // Dating preferences
     age_range_min?: number;
     age_range_max?: number;
     height_min?: string;
@@ -181,14 +199,12 @@ export interface ProfileUpdateData {
     ethnicity?: string[];
     religion?: string;
     politics?: string;
-    // Interests
     hobbies?: string[];
     music?: string[];
     movies?: string[];
     books?: string[];
     sports?: string[];
     travel?: string;
-    // Communication
     communication_style?: string;
     response_time?: string;
     meeting_preference?: string;

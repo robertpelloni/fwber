@@ -1,10 +1,10 @@
 {
   "name": "fwber-frontend",
-  "version": "0.3.29",
+  "version": "0.3.30",
   "private": true,
   "scripts": {
-    "dev": "next dev -H 0.0.0.0",
-    "dev:3005": "next dev -p 3005",
+    "dev": "next dev -H 0.0.0.0 --webpack",
+    "dev:3005": "next dev -p 3005 --webpack",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint app components lib",

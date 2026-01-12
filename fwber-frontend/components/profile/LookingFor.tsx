@@ -16,14 +16,14 @@ export default function LookingFor({ formData, handleLookingForChange }: Looking
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {['friendship', 'dating', 'relationship', 'casual', 'marriage', 'networking'].map((option) => (
-            <label key={option} className="flex items-center">
+            <label key={option} className="flex items-center cursor-pointer">
               <input
                 type="checkbox"
                 checked={formData.looking_for.includes(option)}
                 onChange={(e) => handleLookingForChange(option, e.target.checked)}
-                className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                className="h-5 w-5 rounded border-2 border-gray-400 text-blue-600 accent-blue-600 cursor-pointer"
               />
-              <span className="ml-2 text-sm text-gray-700 capitalize">{option}</span>
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 capitalize select-none">{option}</span>
             </label>
           ))}
         </div>

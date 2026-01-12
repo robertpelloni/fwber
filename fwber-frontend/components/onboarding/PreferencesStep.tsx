@@ -52,16 +52,16 @@ export function PreferencesStep<T extends OnboardingFormData>({ formData, setFor
             const val = mapping[opt] || opt.toLowerCase()
             
             return (
-              <div key={opt} className="flex items-center space-x-2">
+              <label key={opt} className="flex items-center space-x-2 cursor-pointer">
                 <input
                   type="checkbox"
                   id={`looking_${opt}`}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="h-5 w-5 rounded border-2 border-gray-400 text-blue-600 focus:ring-blue-500 accent-blue-600 cursor-pointer"
                   checked={formData.looking_for.includes(val)}
                   onChange={e => handleLookingForChange(val, e.target.checked)}
                 />
-                <Label htmlFor={`looking_${opt}`}>{opt}</Label>
-              </div>
+                <span className="text-sm select-none">{opt}</span>
+              </label>
             )
           })}
         </div>

@@ -10,6 +10,8 @@ import Lifestyle from './Lifestyle';
 import Dating from './Dating';
 import Interests from './Interests';
 import Communication from './Communication';
+import Physical from './Physical';
+import Intimate from './Intimate';
 import dynamic from 'next/dynamic';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Camera } from 'lucide-react';
@@ -27,6 +29,7 @@ interface ProfileTabsProps {
   handleLookingForChange: (value: string, checked: boolean) => void;
   handlePreferenceChange: (field: string, value: any) => void;
   handleArrayPreferenceChange: (field: string, value: string, checked: boolean) => void;
+  handleArrayChange: (field: string, value: string, checked: boolean) => void;
   photos: Photo[];
   uploadPhotos: (
     items: Array<{ file: File; isPrivate?: boolean; unlockPrice?: number }> | File[],
@@ -42,6 +45,7 @@ export default function ProfileTabs({
   handleLookingForChange,
   handlePreferenceChange,
   handleArrayPreferenceChange,
+  handleArrayChange,
   photos,
   uploadPhotos,
   deletePhoto,
@@ -65,6 +69,8 @@ export default function ProfileTabs({
           <TabsList>
             <TabsTrigger value="basic">Basic Info</TabsTrigger>
             <TabsTrigger value="bio">About You</TabsTrigger>
+            <TabsTrigger value="physical">Physical</TabsTrigger>
+            <TabsTrigger value="intimate">Intimate</TabsTrigger>
             <TabsTrigger value="lookingFor">Looking For</TabsTrigger>
             <TabsTrigger value="location">Location</TabsTrigger>
             <TabsTrigger value="lifestyle">Lifestyle</TabsTrigger>
@@ -78,6 +84,12 @@ export default function ProfileTabs({
           </TabsContent>
           <TabsContent value="bio">
             <Bio formData={formData} handleInputChange={handleInputChange} />
+          </TabsContent>
+          <TabsContent value="physical">
+            <Physical formData={formData} handleInputChange={handleInputChange} />
+          </TabsContent>
+          <TabsContent value="intimate">
+            <Intimate formData={formData} handleInputChange={handleInputChange} handleArrayChange={handleArrayChange} />
           </TabsContent>
           <TabsContent value="lookingFor">
             <LookingFor formData={formData} handleLookingForChange={handleLookingForChange} />
@@ -126,6 +138,8 @@ export default function ProfileTabs({
         <div className="space-y-6">
           <BasicInformation formData={formData} handleInputChange={() => {}} handleLocationChange={() => {}} />
           <Bio formData={formData} handleInputChange={() => {}} />
+          <Physical formData={formData} handleInputChange={() => {}} />
+          <Intimate formData={formData} handleInputChange={() => {}} handleArrayChange={() => {}} />
           <LookingFor formData={formData} handleLookingForChange={() => {}} />
           <Location formData={formData} handleLocationChange={() => {}} />
           <Lifestyle formData={formData} handlePreferenceChange={() => {}} />
