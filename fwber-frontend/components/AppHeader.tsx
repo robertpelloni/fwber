@@ -44,7 +44,7 @@ const navLinks = [
   { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
 ]
 
-export default function AppHeader({ title = 'fwber', showNav = true }: AppHeaderProps) {
+export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeaderProps) {
   const { user, logout } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)

@@ -262,7 +262,7 @@ export default async function Image({ params }: { params: { id: string } }) {
               fontWeight: 'bold',
               fontSize: 24
              }}>F</div>
-             <div style={{ fontSize: 32, color: 'white', fontWeight: 700 }}>fwber</div>
+             <div style={{ fontSize: 32, color: 'white', fontWeight: 700 }}>FWBer</div>
           </div>
 
           <div style={{

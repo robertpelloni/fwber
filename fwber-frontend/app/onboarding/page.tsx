@@ -189,7 +189,7 @@ export default function OnboardingPage() {
                 <User className="h-12 w-12 text-blue-600" />
               </div>
             </div>
-            <h2 className="text-2xl font-bold">Welcome to fwber!</h2>
+            <h2 className="text-2xl font-bold">Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-br from-pink-500 via-purple-500 to-cyan-500 animate-gradient-chaos">FWBer</span>!</h2>
             <p className="text-gray-600">
               We&apos;re excited to have you here. Let&apos;s take a moment to set up your profile so you can start meeting people.
             </p>

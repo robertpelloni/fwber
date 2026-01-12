@@ -138,7 +138,7 @@ function RegisterForm() {
     <div className="max-w-md w-full space-y-8">
       <div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-          Create your fwber account
+          Create your <span className="text-transparent bg-clip-text bg-gradient-to-br from-pink-500 via-purple-500 to-cyan-500 animate-gradient-chaos">FWBer</span> account
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
           Or{' '}
@@ -182,16 +182,16 @@ function RegisterForm() {
         <div className="space-y-4">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Full Name
+              Nickname (or first name)
             </label>
             <input
               id="name"
               name="name"
               type="text"
-              autoComplete="name"
+              autoComplete="given-name"
               required
               className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white dark:bg-gray-800 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="Enter your full name"
+              placeholder="What should we call you?"
               value={formData.name}
               onChange={handleChange}
             />
@@ -260,6 +260,9 @@ function RegisterForm() {
               value={formData.referralCode}
               onChange={handleChange}
             />
+            <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+              Both you and your referrer earn <span className="font-semibold text-amber-600 dark:text-amber-400">50 bonus tokens</span>! After signing up, find your own code in Settings to invite friends.
+            </p>
           </div>
           
           <div>

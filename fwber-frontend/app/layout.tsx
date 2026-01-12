@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     description: 'Sign up today with a referral link to unlock 50 Tokens for custom AI Avatars and 3 Days of Gold Premium instantly. Experience the best in adult social networking.',
     type: 'website',
     locale: 'en_US',
-    siteName: 'fwber',
+    siteName: 'FWBer',
   },
   twitter: {
     card: 'summary_large_image',

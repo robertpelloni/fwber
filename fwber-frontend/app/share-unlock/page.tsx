@@ -109,7 +109,7 @@ export default function ShareUnlockPage() {
                 Share to Unlock
               </h1>
               <p className="text-sm text-gray-400">
-                Share fwber and unlock exclusive features
+                Share <span className="text-transparent bg-clip-text bg-gradient-to-br from-pink-500 via-purple-500 to-cyan-500 animate-gradient-chaos font-semibold">FWBer</span> and unlock exclusive features
               </p>
             </div>
           </div>
