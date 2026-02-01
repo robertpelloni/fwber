@@ -1,4 +1,6 @@
-# Fwber
+# EXTREME WIP ALPHA DEVELOPED "IN THE OPEN," DON'T BOTHER TRYING TO USE IT UNLESS YOU PLAN ON HACKING ON IT TO GET IT WORKING
+
+# FWBer.me
 
 # Don't use this stupid website, it's a dumb bad idea. I don't really know if it is "encouraging sin", or if it has any genuine redeeming value in any way. So to stay on the spiritually safe side it's just a fancy portfolio piece!
 
