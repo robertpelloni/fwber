@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.31] - 2026-02-05
+
+### Added
+- **Documentation**: Created `VISION.md` to articulate the project's long-term philosophy and design pillars.
+- **LLM Instructions**: Consolidated AI agent protocols into `docs/UNIVERSAL_LLM_INSTRUCTIONS.md` and created aligned `CLAUDE.md` and `copilot-instructions.md`.
+- **Merchant Analytics Backend**:  Created `MerchantAnalyticsController` and `MerchantAnalyticsService` to power the merchant dashboard (currently serving mock data).
+
+### Analysis
+- Confirmed Phase 4B feature completeness.
+- Identified frontend-backend disconnect in Merchant Analytics as the next immediate technical debt to resolve.
+
 ## [0.3.30] - 2026-01-12
 
 ### Added
