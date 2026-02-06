@@ -370,6 +370,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('profile', [\App\Http\Controllers\MerchantController::class, 'updateProfile']);
         Route::get('promotions', [\App\Http\Controllers\MerchantController::class, 'getPromotions']);
         Route::post('promotions', [\App\Http\Controllers\MerchantController::class, 'storePromotion']);
+        Route::get('analytics', [\App\Http\Controllers\MerchantAnalyticsController::class, 'index']);
     });
 
     // Merchant API (Authenticated)
