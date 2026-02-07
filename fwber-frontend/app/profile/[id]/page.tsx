@@ -189,7 +189,6 @@ export default function PublicProfilePage() {
                   <TipButton recipientId={profile.id} recipientName={p.display_name || 'User'} />
                 </div>
               </div>
-            </div>
 
             <div className="prose dark:prose-invert mb-8">
               <h3 className="text-lg font-semibold mb-2">About</h3>

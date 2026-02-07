@@ -24,7 +24,10 @@ import {
   Wallet,
   Trophy,
   Sparkles,
-  HelpCircle
+  HelpCircle,
+  Tag,
+  Target,
+  Layout
 } from 'lucide-react'
 
 interface AppHeaderProps {
@@ -40,6 +43,9 @@ const navLinks = [
   { href: '/events', label: 'Events', icon: Calendar },
   { href: '/groups', label: 'Groups', icon: Users },
   { href: '/proximity-chatrooms', label: 'Local Chat', icon: Radio },
+  { href: '/bulletin-boards', label: 'Boards', icon: Layout },
+  { href: '/deals', label: 'Deals', icon: Tag },
+  { href: '/bounties', label: 'Bounties', icon: Target },
   { href: '/nearby', label: 'Nearby', icon: MapPin },
   { href: '/wallet', label: 'Wallet', icon: Wallet },
   { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
@@ -129,6 +135,15 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                     >
                       <User className="w-4 h-4" />
                       My Profile
+                    </Link>
+
+                    <Link
+                      href="/profile-views"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <Users className="w-4 h-4" />
+                      Who Viewed Me
                     </Link>
 
                     <Link

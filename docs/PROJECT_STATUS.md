@@ -5,7 +5,7 @@ This document provides a single, authoritative overview of the "fwber" project's
 ## 1. Project Overview
 
 **Current Status:** PRE-DEPLOYMENT STAGING  
-**Version:** v0.3.32
+**Version:** v0.3.33
 **Last Updated:** January 10, 2026
 
 **Concept:** "fwber" is a privacy-first, proximity-based dating and social networking application. Its core mission is to create a safer, more inclusive, and less superficial online dating experience by prioritizing user privacy and authenticity.
@@ -54,6 +54,9 @@ These features are considered complete and are ready for a production environmen
     *   [x] **Geo-Fenced Token Drops:** Users can drop tokens at physical locations for others to find and claim ("Pokemon GO" style).
     *   [x] **AR View:** Augmented Reality camera view for locating nearby drops and events overlayed on the real world.
     *   [x] **Paid Photo Reveals:** Token-based photo unlock with blurred preview and inline payment confirmation.
+    *   [x] **Content Unlock System:** Generic `ContentUnlockGate` component for premium feature gating.
+    *   [x] **Merchant Promotions:** "Local Deals" discovery UI with map/list views and category filtering.
+    *   [x] **Matchmaker Bounties:** Bounty browsing and submission UI with filters.
 *   **Viral & Engagement:**
     *   [x] **"Roast My Profile":** Viral marketing tool allowing users to generate shareable AI roasts/hype of their profiles.
     *   [x] **Friends System:** Send, accept, manage friends, and send tips.
@@ -66,6 +69,8 @@ These features are considered complete and are ready for a production environmen
     *   [x] **Feedback Loop:** In-app feedback submission with AI categorization and sentiment analysis.
     *   [x] **Share to Unlock (Viral):** Users can unlock premium features by sharing content (e.g. Roasts, Profile links) and getting views.
     *   [x] **Proximity Chatrooms:** Full discovery and chat UI with token-gated entry support.
+    *   [x] **Bulletin Boards:** Location-based community discussion boards.
+    *   [x] **Profile View Tracking:** "Who Viewed Me" feature with analytics and stats.
 *   **Operational Excellence:**
     *   [x] **Sentry Integration:** Error tracking for Frontend and Backend.
     *   [x] **APM:** Basic Application Performance Monitoring (Slow Request logging).
@@ -88,20 +93,11 @@ These features are considered complete and are ready for a production environmen
 
 ### Backend Complete - Frontend Missing
 
-These features have complete backend implementations but lack frontend UI. See `docs/MISSING_FEATURES.md` for full details.
-
-**High Priority (Revenue Impact):**
-*   [ ] **Content Unlock System:** Generic premium content framework - needs gate components
-*   [ ] **Merchant Promotions Discovery:** API complete - needs consumer browsing/map UI
+All critical and high-priority frontend features have been implemented.
 
 **Medium Priority (Engagement Impact):**
-*   [ ] **Share-to-Unlock:** Viral growth feature - needs share buttons + progress UI
-*   [ ] **Message Reactions:** Placeholder in chatrooms - needs reaction picker
-*   [ ] **Group-to-Group Matching:** Full backend - needs discovery/match UI
-*   [ ] **Matchmaker Bounties:** Token rewards for introductions - needs bounty browser
-*   [ ] **Extended Viral Content:** Fortunes, cosmic matches, nemesis finder - only roasts have UI
-*   [ ] **Bulletin Boards:** Full threaded discussion API - needs discovery and posting UI
-*   [ ] **Profile View Tracking:** "Who viewed you" feature - needs dedicated page
+*   [ ] **Message Reactions:** Placeholder in chatrooms - needs reaction picker (Verified partially present in Proximity Chatrooms).
+*   [ ] **Extended Viral Content:** Fortunes, cosmic matches, nemesis finder - components exist, need verification of full integration.
 
 **Low Priority (Future):**
 *   [ ] **E2E Encryption:** Key infrastructure exists - needs UI for key management
@@ -118,7 +114,7 @@ These features have complete backend implementations but lack frontend UI. See `
 *   [x] **Context Standardization:** `AGENTS.md` files for all critical subdirectories
 *   [x] **Test Coverage Audit:** No critical gaps found
 
-### Phase 4B: Frontend UI Implementation (Current Focus - Jan 2026)
+### Phase 4B: Frontend UI Implementation (Completed Jan 10, 2026)
 
 **Critical - Must Have:**
 | Feature | Backend | Frontend | Priority | Effort |
@@ -131,17 +127,11 @@ These features have complete backend implementations but lack frontend UI. See `
 **High - Should Have:**
 | Feature | Backend | Frontend | Priority | Effort |
 |---------|---------|----------|----------|--------|
-| Share-to-Unlock | ✅ Complete | ❌ Missing | High | Medium |
-| Merchant Discovery | ✅ Complete | 🔶 Partial | High | Medium |
-| Profile Views | ✅ Complete | ❌ Missing | High | Low |
-
-**Medium - Nice to Have:**
-| Feature | Backend | Frontend | Priority | Effort |
-|---------|---------|----------|----------|--------|
-| Bulletin Boards | ✅ Complete | ❌ Missing | Medium | Medium |
-| Message Reactions | 🔶 Partial | ❌ Placeholder | Medium | Low |
-| Group Matching UI | ✅ Complete | ❌ Missing | Medium | Medium |
-| Extended Viral (Fortunes, etc.) | ✅ Complete | ❌ Missing | Medium | Low |
+| Share-to-Unlock | ✅ Complete | ✅ Complete | High | Done |
+| Merchant Discovery | ✅ Complete | ✅ Complete | High | Done |
+| Profile Views | ✅ Complete | ✅ Complete | High | Done |
+| Bulletin Boards | ✅ Complete | ✅ Complete | Medium | Done |
+| Matchmaker Bounties | ✅ Complete | ✅ Complete | Medium | Done |
 
 ### Phase 4C: Technical Debt (Ongoing)
 
