@@ -23,7 +23,8 @@ import {
   Zap,
   Wallet,
   Trophy,
-  Sparkles
+  Sparkles,
+  HelpCircle
 } from 'lucide-react'
 
 interface AppHeaderProps {
@@ -111,6 +112,15 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                       </p>
                       <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                     </div>
+
+                    <Link
+                      href="/help"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <HelpCircle className="w-4 h-4" />
+                      Help Center
+                    </Link>
                     
                     <Link
                       href="/profile"
@@ -128,6 +138,15 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                     >
                       <Wallet className="w-4 h-4" />
                       My Wallet
+                    </Link>
+
+                    <Link
+                      href="/achievements"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <Trophy className="w-4 h-4" />
+                      Achievements
                     </Link>
 
                     <Link

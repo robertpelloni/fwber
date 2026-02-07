@@ -16,6 +16,7 @@ import { photoAPI } from '@/lib/api/photos';
 import GiftShopModal from '@/components/gifts/GiftShopModal';
 import { Gift, ShieldCheck } from 'lucide-react';
 import { VouchBadge } from '@/components/profile/VouchBadge';
+import { useToast } from '@/components/ToastProvider';
 
 export default function PublicProfilePage() {
   const params = useParams();
@@ -32,6 +33,7 @@ export default function PublicProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [actionPerformed, setActionPerformed] = useState(false);
   const [isGiftModalOpen, setIsGiftModalOpen] = useState(false);
+  const { showSuccess, showError } = useToast();
 
   const loadProfile = useCallback(async () => {
     if (!token || !id || isNaN(numericId)) {
@@ -96,11 +98,11 @@ export default function PublicProfilePage() {
     try {
       const res = await photoAPI.unlockPhoto(photoId);
       if (res.success) {
-        alert(res.message);
+        showSuccess('Photo Unlocked!', res.message);
         loadProfile(); // Refresh
       }
     } catch (e: any) {
-      alert(e.message || 'Unlock failed');
+      showError('Unlock Failed', e.message || 'Unlock failed');
     }
   };
 
@@ -114,26 +116,55 @@ export default function PublicProfilePage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
         <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden">
-          {/* Photo Gate */}
-          <div className="bg-gray-100 dark:bg-gray-800 p-4">
-             <PhotoRevealGate
-                photos={p.photos?.map(ph => ({
-                    id: String(ph.id),
-                    url: ph.url,
-                    isPrimary: ph.is_primary,
-                    type: 'real',
-                    isPrivate: ph.is_private,
-                    isUnlocked: ph.is_unlocked,
-                    unlockPrice: ph.unlock_price
-                })) || []}
-                currentTier={RelationshipTier.DISCOVERY}
-                onTokenUnlock={handleTokenUnlock}
-             />
+          {/* Main Photo & Header */}
+          <div className="relative h-96 w-full bg-gray-200">
+            {p.photos?.[0] ? (
+              <Image
+                src={p.photos[0].url}
+                alt={p.display_name || 'User'}
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full text-4xl text-gray-400">
+                {p.display_name?.[0]}
+              </div>
+            )}
+
+            {wingmanId && (
+              <div className="absolute top-4 left-4 bg-purple-600 text-white px-4 py-2 rounded-full shadow-lg animate-bounce z-10">
+                🧚 Wingman Recommended!
+              </div>
+            )}
+
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+
+            <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+                 <div className="flex justify-between items-end">
+                    <div>
+                        <h1 className="text-3xl font-bold flex items-center gap-2">
+                          {p.display_name}, {p.age}
+                          <PresenceIndicator userId={String(profile.id)} />
+                        </h1>
+                        <p className="text-gray-200 mt-1">
+                          {p.location?.city}, {p.location?.state}
+                        </p>
+                    </div>
+                    <TipButton recipientId={profile.id} recipientName={p.display_name || 'User'} />
+                 </div>
+            </div>
           </div>
 
-          {/* Info */}
+          {/* Body */}
           <div className="p-8">
-            <div className="flex justify-between items-start mb-6">
+
+            {(p.vouches && p.vouches.length > 0) && (
+                 <div className="flex gap-2 mb-6 flex-wrap">
+                    <VouchBadge type="safe" count={p.vouches.filter((v: any) => v.type === 'safe').length} />
+                    <VouchBadge type="fun" count={p.vouches.filter((v: any) => v.type === 'fun').length} />
+                    <VouchBadge type="hot" count={p.vouches.filter((v: any) => v.type === 'hot').length} />
+                 </div>
+            )}
               <div>
                 <div className="flex justify-between items-center w-full">
                   <div>
@@ -160,31 +191,27 @@ export default function PublicProfilePage() {
               </div>
             </div>
 
-          {/* Photo */}
-          <div className="relative h-96 w-full bg-gray-200">
-            {p.photos?.[0] ? (
-              <Image
-                src={p.photos[0].url}
-                alt={p.display_name || 'User'}
-                fill
-                className="object-cover"
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full text-4xl text-gray-400">
-                {p.display_name?.[0]}
-              </div>
-            )}
-            
-            {wingmanId && (
-              <div className="absolute top-4 left-4 bg-purple-600 text-white px-4 py-2 rounded-full shadow-lg animate-bounce">
-                🧚 Wingman Recommended!
-              </div>
-            )}
-          </div>
-          
             <div className="prose dark:prose-invert mb-8">
               <h3 className="text-lg font-semibold mb-2">About</h3>
               <p>{p.bio || 'No bio yet.'}</p>
+            </div>
+
+            {/* Photo Gate */}
+            <div className="mb-8">
+                <h3 className="text-lg font-semibold mb-4">Photos</h3>
+                <PhotoRevealGate
+                    photos={p.photos?.map(ph => ({
+                        id: String(ph.id),
+                        url: ph.url,
+                        isPrimary: ph.is_primary,
+                        type: 'real',
+                        isPrivate: ph.is_private,
+                        isUnlocked: ph.is_unlocked,
+                        unlockPrice: ph.unlock_price
+                    })) || []}
+                    currentTier={RelationshipTier.DISCOVERY}
+                    onTokenUnlock={handleTokenUnlock}
+                />
             </div>
 
             {/* Actions */}
