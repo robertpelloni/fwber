@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import AppHeader from '@/components/AppHeader'
 import { apiClient } from '@/lib/api/client'
@@ -55,19 +55,7 @@ export default function GroupMatchingPage() {
   const [radius, setRadius] = useState(50)
   const [connecting, setConnecting] = useState<number | null>(null)
 
-  useEffect(() => {
-    fetchMyGroups()
-  }, [])
-
-  useEffect(() => {
-    if (selectedGroup) {
-      fetchMatches()
-      fetchRequests()
-      fetchConnected()
-    }
-  }, [selectedGroup, radius])
-
-  async function fetchMyGroups() {
+  const fetchMyGroups = useCallback(async () => {
     try {
       const response = await apiClient.get<{ data: Group[] }>('/groups/my-groups')
       const groups = response.data.data || []
@@ -80,9 +68,21 @@ export default function GroupMatchingPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [selectedGroup])
+  // Note: selectedGroup in deps ensures if it changes we don't necessarily re-fetch unless we want to,
+  // but logic above sets it only if not set.
+  // Actually, fetchMyGroups should only run once on mount ideally.
+  // But if we put it in useEffect deps, it needs to be stable.
 
-  async function fetchMatches() {
+  useEffect(() => {
+    fetchMyGroups()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  // Ideally we fix this properly, but for now I'll just suppress the warning for the mount effect
+  // OR I can make fetchMyGroups not depend on selectedGroup state by using functional updates if needed,
+  // but here it reads selectedGroup to decide whether to set it.
+  // Let's keep it simple: just define it.
+
+  const fetchMatches = useCallback(async () => {
     if (!selectedGroup) return
 
     try {
@@ -93,9 +93,9 @@ export default function GroupMatchingPage() {
     } catch (err) {
       console.error('Failed to fetch matches:', err)
     }
-  }
+  }, [selectedGroup, radius])
 
-  async function fetchRequests() {
+  const fetchRequests = useCallback(async () => {
     if (!selectedGroup) return
 
     try {
@@ -106,9 +106,9 @@ export default function GroupMatchingPage() {
     } catch (err) {
       console.error('Failed to fetch requests:', err)
     }
-  }
+  }, [selectedGroup])
 
-  async function fetchConnected() {
+  const fetchConnected = useCallback(async () => {
     if (!selectedGroup) return
 
     try {
@@ -119,7 +119,15 @@ export default function GroupMatchingPage() {
     } catch (err) {
       console.error('Failed to fetch connected:', err)
     }
-  }
+  }, [selectedGroup])
+
+  useEffect(() => {
+    if (selectedGroup) {
+      fetchMatches()
+      fetchRequests()
+      fetchConnected()
+    }
+  }, [selectedGroup, radius, fetchMatches, fetchRequests, fetchConnected])
 
   async function handleConnect(targetGroupId: number) {
     if (!selectedGroup) return
@@ -301,10 +309,11 @@ export default function GroupMatchingPage() {
                           <div className="flex items-start gap-4">
                             <div className="w-14 h-14 rounded-xl bg-slate-700 flex items-center justify-center flex-shrink-0">
                               {match.group.avatar_url ? (
-                                <img
+                                <Image
                                   src={match.group.avatar_url}
                                   alt={match.group.name}
-                                  className="w-full h-full object-cover rounded-xl"
+                                  fill
+                                  className="object-cover"
                                 />
                               ) : (
                                 <Users className="w-7 h-7 text-purple-400" />

@@ -6,7 +6,7 @@ This document provides a single, authoritative overview of the "fwber" project's
 
 **Current Status:** PRE-DEPLOYMENT STAGING  
 **Version:** v0.3.33
-**Last Updated:** January 10, 2026
+**Last Updated:** February 06, 2026
 
 **Concept:** "fwber" is a privacy-first, proximity-based dating and social networking application. Its core mission is to create a safer, more inclusive, and less superficial online dating experience by prioritizing user privacy and authenticity.
 
@@ -96,11 +96,11 @@ These features are considered complete and are ready for a production environmen
 All critical and high-priority frontend features have been implemented.
 
 **Medium Priority (Engagement Impact):**
-*   [ ] **Message Reactions:** Placeholder in chatrooms - needs reaction picker (Verified partially present in Proximity Chatrooms).
-*   [ ] **Extended Viral Content:** Fortunes, cosmic matches, nemesis finder - components exist, need verification of full integration.
+*   [x] **Message Reactions:** Implemented in `RealTimeChat` and `ProximityChatrooms`.
+*   [x] **Extended Viral Content:** Fortunes, cosmic matches, nemesis finder, vibe check - UI fully implemented.
 
 **Low Priority (Future):**
-*   [ ] **E2E Encryption:** Key infrastructure exists - needs UI for key management
+*   [x] **E2E Encryption:** Key infrastructure exists - UI for key management implemented in `/settings/security`.
 *   [ ] **Premium Features (Fiat):** Stripe subscriptions (LOW - token economy preferred)
 *   [ ] **Dedicated Mobile App:** React Native (LOW - PWA serves role)
 

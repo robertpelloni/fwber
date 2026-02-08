@@ -12,6 +12,7 @@ import { useAuth } from "@/lib/auth-context";
 // import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar"; 
 import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 
 interface Bounty {
   slug: string;
@@ -209,7 +210,7 @@ export default function BountyPage() {
           <CardContent className="p-6 space-y-6">
              {bounty.user.profile?.bio && (
                  <div className="bg-gray-800/50 p-4 rounded-lg">
-                    <p className="italic text-gray-300">"{bounty.user.profile.bio}"</p>
+                    <p className="italic text-gray-300">&quot;{bounty.user.profile.bio}&quot;</p>
                  </div>
              )}
 
@@ -280,9 +281,9 @@ export default function BountyPage() {
                                     className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${selectedFriend?.id === friend.id ? 'bg-pink-900/40 border border-pink-500/50' : 'bg-gray-800 hover:bg-gray-700'}`}
                                 >
                                     <div className="flex items-center space-x-3">
-                                        <div className="h-10 w-10 rounded-full overflow-hidden bg-gray-700 flex items-center justify-center">
+                                        <div className="h-10 w-10 rounded-full overflow-hidden bg-gray-700 flex items-center justify-center relative">
                                             {friend.avatar_url ? (
-                                                <img src={friend.avatar_url} alt={friend.name} className="h-full w-full object-cover" />
+                                                <Image src={friend.avatar_url} alt={friend.name} fill className="object-cover" />
                                             ) : (
                                                 <span className="text-gray-400 font-bold">{friend.name.charAt(0)}</span>
                                             )}
