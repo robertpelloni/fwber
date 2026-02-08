@@ -12,11 +12,11 @@ export function MercurePresenceProvider({ children }: { children: React.ReactNod
   
   // Map MercureContext to PresenceProvider format
   const presenceValue: WebSocketContextValue = {
-    onlineUsers: mercureContext.onlineUsers.map((u): OnlineUser => ({
+    onlineUsers: mercureContext.onlineUsers.map((u: any): OnlineUser => ({
       user_id: String(u.user_id),
       status: u.status || 'offline',
     })),
-    typingIndicators: mercureContext.typingIndicators.map((t): TypingIndicatorData => ({
+    typingIndicators: mercureContext.typingIndicators.map((t: any): TypingIndicatorData => ({
       from_user_id: String(t.from_user_id),
       is_typing: t.is_typing,
     })),

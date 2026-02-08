@@ -171,7 +171,7 @@ export default function RealTimeChat({
 
   // Check if recipient is typing
   const recipientTyping = typingIndicators.find(
-    indicator => indicator.from_user_id === recipientId && indicator.is_typing
+    (indicator: any) => indicator.from_user_id === recipientId && indicator.is_typing
   );
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -505,13 +505,13 @@ export default function RealTimeChat({
 
                 {/* Message Reactions */}
                 <div className="flex gap-1 mt-1 opacity-0 hover:opacity-100 transition-opacity">
-                    <button onClick={() => handleReaction((msg.message_id || msg.id).toString(), '👍')} className="hover:scale-110 transition-transform" title="Like">
+                    <button onClick={() => handleReaction(String(msg.message_id || msg.id || ''), '👍')} className="hover:scale-110 transition-transform" title="Like">
                         <ThumbsUp className="w-3 h-3 text-gray-400 hover:text-blue-400" />
                     </button>
-                    <button onClick={() => handleReaction((msg.message_id || msg.id).toString(), '❤️')} className="hover:scale-110 transition-transform" title="Love">
+                    <button onClick={() => handleReaction(String(msg.message_id || msg.id || ''), '❤️')} className="hover:scale-110 transition-transform" title="Love">
                         <Heart className="w-3 h-3 text-gray-400 hover:text-pink-500" />
                     </button>
-                    <button onClick={() => handleReaction((msg.message_id || msg.id).toString(), '😂')} className="hover:scale-110 transition-transform" title="Haha">
+                    <button onClick={() => handleReaction(String(msg.message_id || msg.id || ''), '😂')} className="hover:scale-110 transition-transform" title="Haha">
                         <Laugh className="w-3 h-3 text-gray-400 hover:text-yellow-400" />
                     </button>
                 </div>
