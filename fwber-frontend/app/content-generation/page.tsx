@@ -7,6 +7,9 @@ import SmartContentEditor from '@/components/SmartContentEditor';
 import AIProfileBuilder from '@/components/AIProfileBuilder';
 import ConversationStarters from '@/components/ConversationStarters';
 import { useContentGenerationAnalytics } from '@/lib/hooks/use-content-generation';
+import { CosmicMatch } from '@/components/profile/CosmicMatch';
+import { NemesisFinder } from '@/components/profile/NemesisFinder';
+import { VibeCheck } from '@/components/profile/VibeCheck';
 
 export default function ContentGenerationPage() {
   const { user } = useAuth();
@@ -19,6 +22,7 @@ export default function ContentGenerationPage() {
     { id: 'profile', name: 'AI Profile Builder', icon: '👤' },
     { id: 'editor', name: 'Smart Content Editor', icon: '✍️' },
     { id: 'conversation', name: 'Conversation Starters', icon: '💬' },
+    { id: 'viral', name: 'Viral Tools', icon: '✨' },
     { id: 'analytics', name: 'Analytics Dashboard', icon: '📊' },
   ];
 
@@ -95,6 +99,22 @@ export default function ContentGenerationPage() {
             {activeTab === 'conversation' && (
               <div className="p-6">
                 <ConversationStarters />
+              </div>
+            )}
+
+            {activeTab === 'viral' && (
+              <div className="p-6">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold mb-2">Viral Content Tools</h2>
+                  <p className="text-gray-600">
+                    Fun, shareable AI tools to engage with friends and potential matches.
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <CosmicMatch />
+                  <NemesisFinder />
+                  <VibeCheck />
+                </div>
               </div>
             )}
 

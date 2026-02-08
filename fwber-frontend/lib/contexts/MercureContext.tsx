@@ -1,76 +1,43 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, ReactNode } from 'react';
 import { usePusherLogic } from '@/lib/hooks/use-pusher-logic';
-import { OnlineUser, PresenceUpdate, ChatMessage, TypingIndicator, NotificationPayload, VideoSignal } from '@/lib/hooks/use-mercure-logic';
 
-interface MercureContextType {
-  connectionStatus: {
-      connected: boolean;
-      connectionId: string | null;
-      userId: string | null;
-      reconnectAttempts: number;
-  };
+/**
+ * RealtimeContext (formerly MercureContext)
+ *
+ * Provides global access to the real-time websocket connection (now powered by Pusher/Reverb).
+ * This replaces the legacy Mercure context while maintaining a similar API structure for compatibility.
+ */
+
+// Define the shape of the context
+interface RealtimeContextType {
+  isConnected: boolean;
+  connectionStatus: any;
   messages: any[];
-  onlineUsers: OnlineUser[];
-  presenceUpdates: PresenceUpdate[];
-  notifications: NotificationPayload[];
-  chatMessages: ChatMessage[];
-  typingIndicators: TypingIndicator[];
-  videoSignals: VideoSignal[];
-  connect: () => void;
-  disconnect: () => void;
-  sendChatMessage: (recipientId: string, content: string, type?: string) => Promise<void>;
-  sendTypingIndicator: (recipientId: string, isTyping: boolean, chatroomId?: string) => Promise<void>;
-  sendVideoSignal: (recipientId: string, signal: any, callId?: number) => Promise<void>;
-  updatePresence: (status: 'online' | 'away' | 'busy' | 'offline', metadata?: Record<string, any>) => Promise<void>;
-  sendNotification: (recipientId: string, notification: any) => Promise<void>;
+  sendMessage: (recipientId: string, content: string) => Promise<void>;
   loadConversationHistory: (recipientId: string) => Promise<void>;
-  clearMessages: () => void;
-  clearNotifications: () => void;
-  isReady: boolean;
+  // Add other methods exposed by usePusherLogic as needed
 }
 
-export const MercureContext = createContext<MercureContextType | null>(null);
+const RealtimeContext = createContext<any>(null);
 
 export function MercureProvider({ children }: { children: ReactNode }) {
-  const mercure = usePusherLogic({ autoConnect: true });
+  // We now use Pusher logic under the hood instead of Mercure
+  const realtime = usePusherLogic();
 
   return (
-    <MercureContext.Provider value={mercure}>
+    <RealtimeContext.Provider value={realtime}>
       {children}
-    </MercureContext.Provider>
+    </RealtimeContext.Provider>
   );
 }
 
+// Hook to consume the context
 export function useMercure() {
-  const context = useContext(MercureContext);
+  const context = useContext(RealtimeContext);
   if (!context) {
-    // Return a dummy context to prevent build failures during static generation
-    // where the provider might not be available in the tree.
-    // Also return dummy context if window is defined but provider is missing (e.g. some build environments)
-    // to prevent build crashes.
-    return {
-      connectionStatus: { connected: false, connectionId: null, userId: null, reconnectAttempts: 0 },
-      messages: [],
-      onlineUsers: [],
-      presenceUpdates: [],
-      notifications: [],
-      chatMessages: [],
-      typingIndicators: [],
-      videoSignals: [],
-      connect: () => {},
-      disconnect: () => {},
-      sendChatMessage: async () => {},
-      sendTypingIndicator: async () => {},
-      sendVideoSignal: async () => {},
-      updatePresence: async () => {},
-      sendNotification: async () => {},
-      loadConversationHistory: async () => {},
-      clearMessages: () => {},
-      clearNotifications: () => {},
-      isReady: false,
-    };
+    throw new Error('useMercure must be used within a MercureProvider (which now wraps PusherLogic)');
   }
   return context;
 }
