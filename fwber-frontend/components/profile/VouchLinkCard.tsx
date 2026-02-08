@@ -111,9 +111,9 @@ export function VouchLinkCard() {
       
       <CardContent className="space-y-4">
         <p className="text-indigo-100/90 text-sm">
-          Social proof is sexy. Get your friends to write a "Vouch" for you. 
+          Social proof is sexy. Get your friends to write a &quot;Vouch&quot; for you.
           <br/>
-          <strong>3 Vouches = "Trusted" Badge 🛡️</strong>
+          <strong>3 Vouches = &quot;Trusted&quot; Badge 🛡️</strong>
         </p>
         
         {loading ? (

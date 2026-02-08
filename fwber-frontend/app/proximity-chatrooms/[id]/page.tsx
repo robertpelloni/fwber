@@ -52,6 +52,7 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
   const [newMessage, setNewMessage] = useState('');
   const [selectedTab, setSelectedTab] = useState<'all' | 'networking' | 'social'>('all');
   const [showMembers, setShowMembers] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Get user's current location
@@ -132,6 +133,12 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
       return;
     }
 
+    // Check for token entry fee
+    if (chatroom && (chatroom.token_entry_fee ?? 0) > 0 && !showPaymentModal) {
+      setShowPaymentModal(true);
+      return;
+    }
+
     try {
       await joinChatroom.mutateAsync({
         id: chatroomId,
@@ -140,8 +147,10 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
           longitude: location.longitude,
         },
       });
+      setShowPaymentModal(false);
     } catch (error) {
       console.error('Failed to join chatroom:', error);
+      alert('Failed to join. You may have insufficient tokens.');
     }
   };
 
@@ -262,6 +271,11 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
                   <Shield className="h-4 w-4" />
                   <span>Private</span>
                 </div>
+              )}
+              {(chatroom.token_entry_fee ?? 0) > 0 && (
+                 <div className="flex items-center space-x-1 text-sm text-amber-600 font-medium">
+                   <span>💎 {chatroom.token_entry_fee} Entry</span>
+                 </div>
               )}
             </div>
           </div>
@@ -546,6 +560,35 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
           </div>
         </div>
       </div>
+      {/* Payment Confirmation Modal */}
+      {showPaymentModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-sm w-full p-6 text-center">
+            <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">💎</span>
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Pay to Join?</h3>
+            <p className="text-gray-600 mb-6">
+              This chatroom requires an entry fee of <strong className="text-gray-900">{chatroom?.token_entry_fee} tokens</strong>.
+            </p>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowPaymentModal(false)}
+                className="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleJoinChatroom}
+                disabled={joinChatroom.isPending}
+                className="flex-1 bg-amber-600 text-white px-4 py-2 rounded-lg hover:bg-amber-700 disabled:opacity-50"
+              >
+                {joinChatroom.isPending ? 'Processing...' : 'Pay & Join'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

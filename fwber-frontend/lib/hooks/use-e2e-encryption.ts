@@ -72,5 +72,24 @@ export function useE2EEncryption() {
     return Crypto.decryptMessage(encryptedText, key);
   }, [getSharedKey]);
 
-  return { isReady, encrypt, decrypt };
+  const regenerateKeys = useCallback(async () => {
+    if (!user) return;
+    try {
+      console.log('Regenerating E2E key pair...');
+      const keyPair = await Crypto.generateKeyPair();
+      await Storage.storeKeyPair(user.id, keyPair);
+
+      const publicKeyString = await Crypto.exportPublicKey(keyPair.publicKey);
+      await securityApi.storePublicKey(publicKeyString);
+
+      // Clear cache
+      setSharedKeys({});
+      console.log('New E2E keys generated and uploaded.');
+    } catch (error) {
+      console.error('Failed to regenerate keys:', error);
+      throw error;
+    }
+  }, [user]);
+
+  return { isReady, encrypt, decrypt, regenerateKeys };
 }

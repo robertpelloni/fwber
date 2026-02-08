@@ -10,6 +10,7 @@ import {
   RefreshCw, Crown
 } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface BountyUser {
   id: number
@@ -308,10 +309,11 @@ export default function BountiesPage() {
                           <div className="relative">
                             <div className="w-14 h-14 rounded-full overflow-hidden bg-slate-700 flex items-center justify-center">
                               {primaryPhoto ? (
-                                <img 
+                                <Image
                                   src={primaryPhoto.url} 
                                   alt={displayName}
-                                  className="w-full h-full object-cover"
+                                  fill
+                                  className="object-cover"
                                 />
                               ) : (
                                 <Users className="w-7 h-7 text-gray-500" />
