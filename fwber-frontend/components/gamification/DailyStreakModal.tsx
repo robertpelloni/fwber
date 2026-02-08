@@ -66,7 +66,7 @@ export function DailyStreakModal({ currentStreak, isOpen, onClose }: StreakProps
             </h2>
             
             <p className="text-orange-100 mb-6 font-medium">
-                You're on fire! 🔥 Keep checking in daily to earn bonus tokens and boost your visibility.
+                You&apos;re on fire! 🔥 Keep checking in daily to earn bonus tokens and boost your visibility.
             </p>
 
             <div className="bg-black/20 rounded-xl p-4 mb-6 border border-white/10">

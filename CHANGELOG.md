@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.33] - 2026-02-06
+
+### Added
+- **System Dashboard**: New `/admin/system` page providing a high-level overview of project structure, submodule status, backend health, and version information.
+- **Frontend Feature Completion**:
+    - **Achievements UI**: Full implementation of gamification tracking at `/achievements`.
+    - **Help Center**: Comprehensive user guide and documentation portal at `/help`.
+    - **Security Settings**: End-to-end encryption key management at `/settings/security`.
+- **Refactoring**: Unified real-time logic into `useWebSocket`, replacing legacy Mercure hooks.
+- **Polish**: Resolved extensive linting errors and build warnings across the frontend codebase.
+
 ## [0.3.31] - 2026-02-05
 
 ### Added

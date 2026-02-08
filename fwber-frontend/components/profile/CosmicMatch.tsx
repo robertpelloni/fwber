@@ -164,7 +164,7 @@ export function CosmicMatch({ userId }: CosmicMatchProps) {
                             <h4 className="text-red-200 font-medium">Avoid: <span className="text-white font-bold text-lg">Scorpios</span></h4>
                         </div>
                         <p className="text-sm text-gray-300 italic">
-                            "They will ruin your life and steal your cat."
+                            &quot;They will ruin your life and steal your cat.&quot;
                         </p>
                     </div>
                 </div>

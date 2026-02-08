@@ -65,7 +65,14 @@ export default function ProximityChatroomsPage() {
     search: searchTerm || undefined,
   });
 
-  const handleCreateChatroom = async (formData: any) => {
+  const handleCreateChatroom = async (formData: {
+    name: string;
+    description: string;
+    type: any; // Type is constrained by select options but effectively string
+    radius_meters?: number;
+    is_public?: boolean;
+    token_entry_fee?: number | string;
+  }) => {
     if (!location.latitude || !location.longitude) {
       alert('Location is required to create a proximity chatroom');
       return;
@@ -77,9 +84,10 @@ export default function ProximityChatroomsPage() {
         description: formData.description,
         latitude: location.latitude,
         longitude: location.longitude,
-        radius_meters: formData.radius_meters || 500,
+        radius_meters: Number(formData.radius_meters) || 500,
         type: formData.type,
         is_public: formData.is_public !== false,
+        token_entry_fee: formData.token_entry_fee ? Number(formData.token_entry_fee) : 0,
       });
 
       router.push(`/proximity-chatrooms/${newChatroom.id}`);
@@ -269,6 +277,11 @@ export default function ProximityChatroomsPage() {
                         Private
                       </span>
                     )}
+                    {(chatroom.token_entry_fee ?? 0) > 0 && (
+                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-800 flex items-center gap-1">
+                        💎 {chatroom.token_entry_fee}
+                      </span>
+                    )}
                   </div>
                   
                   <p className="text-gray-600 mb-3">{chatroom.description}</p>
@@ -322,7 +335,15 @@ export default function ProximityChatroomsPage() {
               <form onSubmit={(e) => {
                 e.preventDefault();
                 const formData = new FormData(e.currentTarget);
-                handleCreateChatroom(Object.fromEntries(formData));
+                const data = Object.fromEntries(formData);
+                handleCreateChatroom({
+                  name: data.name as string,
+                  description: data.description as string,
+                  type: data.type,
+                  radius_meters: Number(data.radius_meters),
+                  is_public: data.is_public === 'on', // Checkbox value
+                  token_entry_fee: Number(data.token_entry_fee)
+                });
               }} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
@@ -372,6 +393,21 @@ export default function ProximityChatroomsPage() {
                     <option value={2000}>2km</option>
                     <option value={5000}>5km</option>
                   </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Entry Fee (Tokens)</label>
+                  <input
+                    type="number"
+                    name="token_entry_fee"
+                    min="0"
+                    defaultValue="0"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="0 for free"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Charge tokens for entry. You will earn a commission on every join.
+                  </p>
                 </div>
 
                 <div className="flex items-center">

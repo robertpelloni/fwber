@@ -323,7 +323,7 @@ function WebSocketPageContent() {
             {messages.length === 0 ? (
               <p className="text-gray-400 text-center py-4">No messages received</p>
             ) : (
-              messages.slice(-20).map((msg, index) => (
+              messages.slice(-20).map((msg: any, index: number) => (
                 <div key={index} className="bg-gray-700 p-3 rounded text-sm">
                   <div className="flex justify-between items-start mb-1">
                     <span className="text-red-400 font-medium">{msg.type}</span>

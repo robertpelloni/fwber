@@ -31,13 +31,13 @@ export function useWebSocketChat(recipientId?: string) {
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Filter messages for specific recipient
-  const recipientMessages = chatMessages.filter(msg => 
+  const recipientMessages = chatMessages.filter((msg: any) =>
     (msg.from_user_id === recipientId || msg.to_user_id === recipientId) ||
     (msg.from_user_id === recipientId || msg.to_user_id === recipientId)
   );
 
   // Filter typing indicators for specific recipient
-  const recipientTyping = typingIndicators.filter(indicator => 
+  const recipientTyping = typingIndicators.filter((indicator: any) =>
     (indicator.from_user_id === recipientId || indicator.to_user_id === recipientId)
   );
 
@@ -150,7 +150,7 @@ export function useWebSocketNotifications() {
 
   // Count unread notifications
   useEffect(() => {
-    const unread = notifications.filter(notification => !notification.read);
+    const unread = notifications.filter((notification: any) => !notification.read);
     setUnreadCount(unread.length);
   }, [notifications]);
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { api } from '@/lib/api/client';
 import { X, Search, UserPlus, Check, Users, User as UserIcon } from 'lucide-react';
@@ -36,17 +36,7 @@ export default function InviteUserModal({ eventId, isOpen, onClose }: InviteUser
   const [invitingGroup, setInvitingGroup] = useState<number | null>(null);
   const [invitedGroups, setInvitedGroups] = useState<number[]>([]);
 
-  useEffect(() => {
-    if (isOpen) {
-      if (activeTab === 'friends') {
-        fetchMatches();
-      } else {
-        fetchGroups();
-      }
-    }
-  }, [isOpen, activeTab]);
-
-  const fetchMatches = async () => {
+  const fetchMatches = useCallback(async () => {
     if (matches.length > 0) return;
     setLoadingMatches(true);
     try {
@@ -57,9 +47,9 @@ export default function InviteUserModal({ eventId, isOpen, onClose }: InviteUser
     } finally {
       setLoadingMatches(false);
     }
-  };
+  }, [matches.length]);
 
-  const fetchGroups = async () => {
+  const fetchGroups = useCallback(async () => {
     if (groups.length > 0) return;
     setLoadingGroups(true);
     try {
@@ -70,7 +60,17 @@ export default function InviteUserModal({ eventId, isOpen, onClose }: InviteUser
     } finally {
       setLoadingGroups(false);
     }
-  };
+  }, [groups.length]);
+
+  useEffect(() => {
+    if (isOpen) {
+      if (activeTab === 'friends') {
+        fetchMatches();
+      } else {
+        fetchGroups();
+      }
+    }
+  }, [isOpen, activeTab, fetchMatches, fetchGroups]);
 
   const handleInviteUser = async (userId: number) => {
     setInvitingUser(userId);

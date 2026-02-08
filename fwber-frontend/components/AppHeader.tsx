@@ -23,7 +23,11 @@ import {
   Zap,
   Wallet,
   Trophy,
-  Sparkles
+  Sparkles,
+  HelpCircle,
+  Tag,
+  Target,
+  Layout
 } from 'lucide-react'
 
 interface AppHeaderProps {
@@ -39,6 +43,9 @@ const navLinks = [
   { href: '/events', label: 'Events', icon: Calendar },
   { href: '/groups', label: 'Groups', icon: Users },
   { href: '/proximity-chatrooms', label: 'Local Chat', icon: Radio },
+  { href: '/bulletin-boards', label: 'Boards', icon: Layout },
+  { href: '/deals', label: 'Deals', icon: Tag },
+  { href: '/bounties', label: 'Bounties', icon: Target },
   { href: '/nearby', label: 'Nearby', icon: MapPin },
   { href: '/wallet', label: 'Wallet', icon: Wallet },
   { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
@@ -111,6 +118,15 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                       </p>
                       <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                     </div>
+
+                    <Link
+                      href="/help"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <HelpCircle className="w-4 h-4" />
+                      Help Center
+                    </Link>
                     
                     <Link
                       href="/profile"
@@ -122,12 +138,30 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                     </Link>
 
                     <Link
+                      href="/profile-views"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <Users className="w-4 h-4" />
+                      Who Viewed Me
+                    </Link>
+
+                    <Link
                       href="/wallet"
                       onClick={() => setUserMenuOpen(false)}
                       className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       <Wallet className="w-4 h-4" />
                       My Wallet
+                    </Link>
+
+                    <Link
+                      href="/achievements"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <Trophy className="w-4 h-4" />
+                      Achievements
                     </Link>
 
                     <Link

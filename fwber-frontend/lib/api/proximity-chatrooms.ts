@@ -157,6 +157,7 @@ export interface CreateProximityChatroomRequest {
   is_public?: boolean;
   requires_approval?: boolean;
   expires_at?: string;
+  token_entry_fee?: number;
 }
 
 export interface JoinProximityChatroomRequest {

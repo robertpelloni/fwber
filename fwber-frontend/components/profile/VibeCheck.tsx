@@ -187,7 +187,7 @@ export function VibeCheck() {
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-gray-300">
-                                What's your quirk?
+                                What&apos;s your quirk?
                             </label>
                             <Textarea
                                 placeholder="I clap when the plane lands..."
@@ -221,7 +221,7 @@ export function VibeCheck() {
                                 {quirkResult.flag_type}
                             </h3>
                             <p className="text-gray-300 italic">
-                                "{quirkResult.reason}"
+                                &quot;{quirkResult.reason}&quot;
                             </p>
                         </div>
                         

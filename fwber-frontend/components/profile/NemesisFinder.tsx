@@ -172,7 +172,7 @@ export function NemesisFinder({ userId }: NemesisFinderProps) {
                         <div className="opacity-30 blur-sm pointer-events-none select-none">
                             <h4 className="text-emerald-300 font-medium text-sm mb-1">Hypothesis:</h4>
                             <p className="text-sm text-gray-300 italic">
-                                "You will fight over the thermostat setting until one of you leaves."
+                                &quot;You will fight over the thermostat setting until one of you leaves.&quot;
                             </p>
                             <div className="mt-3">
                                 <h4 className="text-blue-300 font-medium text-sm mb-1">Scientific Basis:</h4>

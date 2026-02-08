@@ -8,7 +8,7 @@ import { UserAvatar, PresenceIndicator, PresenceStatus } from '@/components/Pres
 import { WingmanSuggestions } from '@/components/ai/WingmanSuggestions';
 import AudioRecorder from '@/components/AudioRecorder';
 import { api } from '@/lib/api/client';
-import { Languages, Loader2, Sparkles, Gift as GiftIcon, Lock, Video, MoreVertical, Paperclip, X } from 'lucide-react';
+import { Languages, Loader2, Sparkles, Gift as GiftIcon, Lock, Video, MoreVertical, Paperclip, X, ThumbsUp, Heart, Laugh } from 'lucide-react';
 import { useTranslation } from '@/lib/hooks/use-translation';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { MatchInsights } from '@/components/matches/MatchInsights';
@@ -171,7 +171,7 @@ export default function RealTimeChat({
 
   // Check if recipient is typing
   const recipientTyping = typingIndicators.find(
-    indicator => indicator.from_user_id === recipientId && indicator.is_typing
+    (indicator: any) => indicator.from_user_id === recipientId && indicator.is_typing
   );
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -282,6 +282,15 @@ export default function RealTimeChat({
       } else {
         showError('Error', 'Failed to send voice message');
       }
+    }
+  };
+
+  const handleReaction = async (messageId: string, emoji: string) => {
+    try {
+      await api.post(`/messages/${messageId}/react`, { emoji });
+      // The reaction will be broadcasted back via WebSocket/Pusher
+    } catch (err) {
+      console.error('Failed to react', err);
     }
   };
 
@@ -420,7 +429,7 @@ export default function RealTimeChat({
             return (
               <div
                 key={msg.message_id || msg.id || index}
-                className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}
+                className={`flex flex-col ${isOwnMessage ? 'items-end' : 'items-start'}`}
               >
                 <div
                   className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
@@ -493,6 +502,30 @@ export default function RealTimeChat({
                     className="mt-1"
                   />
                 </div>
+
+                {/* Message Reactions */}
+                <div className="flex gap-1 mt-1 opacity-0 hover:opacity-100 transition-opacity">
+                    <button onClick={() => handleReaction(String(msg.message_id || msg.id || ''), '👍')} className="hover:scale-110 transition-transform" title="Like">
+                        <ThumbsUp className="w-3 h-3 text-gray-400 hover:text-blue-400" />
+                    </button>
+                    <button onClick={() => handleReaction(String(msg.message_id || msg.id || ''), '❤️')} className="hover:scale-110 transition-transform" title="Love">
+                        <Heart className="w-3 h-3 text-gray-400 hover:text-pink-500" />
+                    </button>
+                    <button onClick={() => handleReaction(String(msg.message_id || msg.id || ''), '😂')} className="hover:scale-110 transition-transform" title="Haha">
+                        <Laugh className="w-3 h-3 text-gray-400 hover:text-yellow-400" />
+                    </button>
+                </div>
+
+                {/* Display Reactions */}
+                {msg.reactions && msg.reactions.length > 0 && (
+                    <div className="flex gap-1 mt-1 -translate-y-2 translate-x-2">
+                        {msg.reactions.map((r, i) => (
+                            <span key={i} className="bg-gray-800 border border-gray-600 rounded-full px-1 text-xs" title={r.user_name}>
+                                {r.emoji}
+                            </span>
+                        ))}
+                    </div>
+                )}
               </div>
             );
           })

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import axios from '@/lib/api/axios';
+import { apiClient } from '@/lib/api/client';
 import { AnalyticsRange } from '@/lib/api/types';
 
 interface KPIData {
@@ -36,8 +36,8 @@ export function useMerchantAnalytics(range: AnalyticsRange) {
     return useQuery<MerchantAnalyticsResponse>({
         queryKey: ['merchant-analytics', range],
         queryFn: async () => {
-            const { data } = await axios.get('/merchant-portal/analytics', { params: { range } });
-            return data;
+            const response = await apiClient.get<MerchantAnalyticsResponse>('/merchant-portal/analytics', { params: { range } });
+            return response.data;
         },
         // Keep generic placeholder data until backend is fully seeded in production
         placeholderData: (previousData) => previousData,

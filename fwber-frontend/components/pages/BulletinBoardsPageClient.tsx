@@ -11,7 +11,7 @@ import {
   usePostMessage, 
   useCreateBulletinBoard 
 } from '@/lib/hooks/use-bulletin-boards';
-import { useBulletinBoardMercure } from '@/lib/hooks/use-mercure-sse';
+import { useWebSocket } from '@/lib/hooks/use-websocket';
 import { PostSuggester } from '@/components/ai/PostSuggester';
 
 export default function BulletinBoardsPageClient() {
@@ -42,8 +42,9 @@ export default function BulletinBoardsPageClient() {
   const postMessageMutation = usePostMessage();
   const createBoardMutation = useCreateBulletinBoard();
   
-  // Set up real-time updates with Mercure
-  const { isConnected: mercureConnected } = useBulletinBoardMercure(selectedBoardId || 0);
+  // Set up real-time updates
+  const { connectionStatus } = useWebSocket();
+  const mercureConnected = connectionStatus.connected;
 
   // Get user's current location
   useEffect(() => {

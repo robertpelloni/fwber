@@ -51,6 +51,7 @@ export interface ChatMessage {
   media_url?: string;
   media_duration?: number;
   transcription?: string;
+  reactions?: Array<{ emoji: string; user_id: string; user_name: string }>;
 }
 
 export interface TypingIndicator {

@@ -1,7 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import { RelationshipTier, getVisiblePhotoCount } from '@/lib/relationshipTiers'
-import { Lock, Unlock, MessageCircle, Heart } from 'lucide-react'
+import { Lock, Unlock, MessageCircle, Heart, X } from 'lucide-react'
 import Image from 'next/image'
 import FaceReveal from './FaceReveal'
 
@@ -24,6 +25,38 @@ interface PhotoRevealGateProps {
   onTokenUnlock?: (photoId: string) => void
   className?: string
   isUnlockedViaShare?: boolean
+}
+
+function UnlockButton({ photoId, price, onUnlock }: { photoId: string, price: number, onUnlock: (id: string) => void }) {
+  const [confirming, setConfirming] = useState(false)
+
+  if (confirming) {
+    return (
+      <div className="flex gap-1 animate-in fade-in zoom-in duration-200" onClick={(e) => e.stopPropagation()}>
+        <button
+          onClick={(e) => { e.stopPropagation(); onUnlock(photoId) }}
+          className="bg-green-500 hover:bg-green-600 text-white text-xs font-bold py-1.5 px-3 rounded-full shadow-lg"
+        >
+          Confirm
+        </button>
+        <button
+          onClick={(e) => { e.stopPropagation(); setConfirming(false) }}
+          className="bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-1.5 px-2 rounded-full shadow-lg"
+        >
+          <X className="w-3 h-3" />
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <button
+      onClick={(e) => { e.stopPropagation(); setConfirming(true) }}
+      className="bg-yellow-500 hover:bg-yellow-600 text-black text-xs font-bold py-1.5 px-3 rounded-full transition-colors flex items-center gap-1 shadow-lg"
+    >
+      <Unlock className="w-3 h-3" /> Unlock ({price} 🪙)
+    </button>
+  )
 }
 
 export default function PhotoRevealGate({
@@ -123,12 +156,11 @@ export default function PhotoRevealGate({
                 <Lock className="w-8 h-8 text-white mb-2" />
                 <p className="text-white text-xs font-bold mb-2">Private Photo</p>
                 {onTokenUnlock && (
-                  <button 
-                    onClick={() => onTokenUnlock(photo.id)}
-                    className="bg-yellow-500 hover:bg-yellow-600 text-black text-xs font-bold py-1.5 px-3 rounded-full transition-colors flex items-center gap-1"
-                  >
-                    <Unlock className="w-3 h-3" /> Unlock ({photo.unlockPrice || 50} 🪙)
-                  </button>
+                  <UnlockButton
+                    photoId={photo.id}
+                    price={photo.unlockPrice || 50}
+                    onUnlock={onTokenUnlock}
+                  />
                 )}
               </div>
             )}
