@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useMercure } from '@/lib/contexts/MercureContext';
 import { usePusherLogic } from './use-pusher-logic';
 import { UseWebSocketOptions } from './use-websocket-logic';
 
@@ -7,18 +6,10 @@ import { UseWebSocketOptions } from './use-websocket-logic';
 export * from './use-websocket-logic';
 
 /**
- * Hook to access the Realtime (Mercure) context.
- * If used outside of a MercureProvider, it falls back to creating a local instance.
+ * Hook to access the Realtime (WebSocket) context.
  */
 export function useWebSocket(options: UseWebSocketOptions = {}) {
-  try {
-    return useMercure();
-  } catch (e) {
-    // Fallback for components not wrapped in Provider
-    console.warn('useWebSocket used outside of MercureProvider. Creating local instance.');
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    return usePusherLogic(options);
-  }
+  return usePusherLogic(options);
 }
 
 /**

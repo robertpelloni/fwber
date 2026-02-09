@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useMercure } from '@/lib/contexts/MercureContext';
+import { useWebSocket } from '@/lib/hooks/use-websocket';
 import { useToast } from '@/components/ToastProvider';
 import { useRouter } from 'next/navigation';
 
 export default function NotificationListener() {
-  const { notifications } = useMercure();
+  const { notifications } = useWebSocket();
   const { showMatch } = useToast();
   const router = useRouter();
   const lastNotificationRef = useRef<any>(null);
