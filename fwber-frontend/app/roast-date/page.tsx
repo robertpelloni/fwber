@@ -153,7 +153,7 @@ export default function RoastDatePage() {
               <div className="bg-white border-2 border-orange-100 rounded-xl p-6 shadow-inner relative">
                 <Flame className="absolute -top-3 -right-3 w-8 h-8 text-orange-400 rotate-12" />
                 <p className="text-lg font-medium text-gray-800 leading-relaxed italic">
-                  "{roast}"
+                  &quot;{roast}&quot;
                 </p>
               </div>
 

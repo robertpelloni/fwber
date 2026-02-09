@@ -44,12 +44,17 @@ export default function ARView({ artifacts, candidates, userLocation, onClose }:
 
   // Initialize Camera
   useEffect(() => {
+    // Capture the ref value at the start of the effect for cleanup
+    // This prevents the "ref value likely changed" warning in cleanup
+    const videoElement = videoRef.current;
+
     const startCamera = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ 
           video: { facingMode: 'environment' } 
         });
         
+        // Use the current ref for initialization to ensure we attach to the mounted element
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           setHasCameraPermission(true);
@@ -63,9 +68,9 @@ export default function ARView({ artifacts, candidates, userLocation, onClose }:
     startCamera();
 
     return () => {
-      // Cleanup stream
-      if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
+      // Cleanup stream using the captured variable
+      if (videoElement && videoElement.srcObject) {
+        const stream = videoElement.srcObject as MediaStream;
         stream.getTracks().forEach(track => track.stop());
       }
     };

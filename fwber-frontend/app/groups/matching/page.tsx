@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import AppHeader from '@/components/AppHeader'
 import { apiClient } from '@/lib/api/client'
@@ -11,6 +11,7 @@ import {
   Send, UserPlus, Crown, Tag
 } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface Group {
   id: number
@@ -55,19 +56,7 @@ export default function GroupMatchingPage() {
   const [radius, setRadius] = useState(50)
   const [connecting, setConnecting] = useState<number | null>(null)
 
-  useEffect(() => {
-    fetchMyGroups()
-  }, [])
-
-  useEffect(() => {
-    if (selectedGroup) {
-      fetchMatches()
-      fetchRequests()
-      fetchConnected()
-    }
-  }, [selectedGroup, radius])
-
-  async function fetchMyGroups() {
+  const fetchMyGroups = useCallback(async () => {
     try {
       const response = await apiClient.get<{ data: Group[] }>('/groups/my-groups')
       const groups = response.data.data || []
@@ -80,9 +69,13 @@ export default function GroupMatchingPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [selectedGroup])
 
-  async function fetchMatches() {
+  useEffect(() => {
+    fetchMyGroups()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const fetchMatches = useCallback(async () => {
     if (!selectedGroup) return
 
     try {
@@ -93,9 +86,9 @@ export default function GroupMatchingPage() {
     } catch (err) {
       console.error('Failed to fetch matches:', err)
     }
-  }
+  }, [selectedGroup, radius])
 
-  async function fetchRequests() {
+  const fetchRequests = useCallback(async () => {
     if (!selectedGroup) return
 
     try {
@@ -106,9 +99,9 @@ export default function GroupMatchingPage() {
     } catch (err) {
       console.error('Failed to fetch requests:', err)
     }
-  }
+  }, [selectedGroup])
 
-  async function fetchConnected() {
+  const fetchConnected = useCallback(async () => {
     if (!selectedGroup) return
 
     try {
@@ -119,7 +112,15 @@ export default function GroupMatchingPage() {
     } catch (err) {
       console.error('Failed to fetch connected:', err)
     }
-  }
+  }, [selectedGroup])
+
+  useEffect(() => {
+    if (selectedGroup) {
+      fetchMatches()
+      fetchRequests()
+      fetchConnected()
+    }
+  }, [selectedGroup, radius, fetchMatches, fetchRequests, fetchConnected])
 
   async function handleConnect(targetGroupId: number) {
     if (!selectedGroup) return
@@ -299,12 +300,13 @@ export default function GroupMatchingPage() {
                           className="bg-slate-800/50 rounded-xl border border-purple-500/20 p-4"
                         >
                           <div className="flex items-start gap-4">
-                            <div className="w-14 h-14 rounded-xl bg-slate-700 flex items-center justify-center flex-shrink-0">
+                            <div className="w-14 h-14 rounded-xl bg-slate-700 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
                               {match.group.avatar_url ? (
-                                <img
+                                <Image
                                   src={match.group.avatar_url}
                                   alt={match.group.name}
-                                  className="w-full h-full object-cover rounded-xl"
+                                  fill
+                                  className="object-cover"
                                 />
                               ) : (
                                 <Users className="w-7 h-7 text-purple-400" />

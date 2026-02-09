@@ -104,7 +104,7 @@ export function RoastGenerator({ trigger }: RoastGeneratorProps) {
               <p className="text-muted-foreground">
                 {mode === 'roast' 
                   ? "Ready to get humbled? Our AI will analyze your profile and roast you explicitly." 
-                  : "Need an ego boost? Let our AI tell you why you're a catch."}
+                  : "Need an ego boost? Let our AI tell you why you&apos;re a catch."}
               </p>
               <Button 
                 size="lg" 
@@ -122,7 +122,7 @@ export function RoastGenerator({ trigger }: RoastGeneratorProps) {
             <div className={`p-6 rounded-xl border-2 ${mode === 'roast' ? 'bg-orange-50 border-orange-200 dark:bg-orange-950/20 dark:border-orange-900' : 'bg-yellow-50 border-yellow-200 dark:bg-yellow-950/20 dark:border-yellow-900'}`}>
               <div className="text-4xl mb-4 text-center">{mode === 'roast' ? '💀' : '🤩'}</div>
               <p className="text-lg font-medium text-center italic leading-relaxed">
-                "{result}"
+                &quot;{result}&quot;
               </p>
             </div>
 

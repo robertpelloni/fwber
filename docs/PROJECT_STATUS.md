@@ -5,8 +5,8 @@ This document provides a single, authoritative overview of the "fwber" project's
 ## 1. Project Overview
 
 **Current Status:** PRE-DEPLOYMENT STAGING  
-**Version:** v0.3.26  
-**Last Updated:** January 9, 2026
+**Version:** v0.3.33
+**Last Updated:** February 06, 2026
 
 **Concept:** "fwber" is a privacy-first, proximity-based dating and social networking application. Its core mission is to create a safer, more inclusive, and less superficial online dating experience by prioritizing user privacy and authenticity.
 
@@ -36,6 +36,7 @@ These features are considered complete and are ready for a production environmen
     *   [x] **Profile Management:** Create, edit, and view user profiles.
     *   [x] **Matching System:** The core "swipe" and matching logic is functional.
     *   [x] **Direct Messaging:** Real-time one-on-one chat between matched users.
+    *   [x] **Help Center:** Comprehensive user documentation integrated into the frontend (`/help`).
 *   **Crypto Economy (Fully Integrated):**
     *   [x] **Trojan Horse Integration:** Internal ledger for instant/free micro-transactions.
     *   [x] **Solana Bridge:** Users can withdraw accumulated tokens to external wallets (Phantom, Solflare).
@@ -52,16 +53,24 @@ These features are considered complete and are ready for a production environmen
     *   [x] **Payment Requests:** "Venmo-style" invoicing allowing users to request tokens from friends and matches.
     *   [x] **Geo-Fenced Token Drops:** Users can drop tokens at physical locations for others to find and claim ("Pokemon GO" style).
     *   [x] **AR View:** Augmented Reality camera view for locating nearby drops and events overlayed on the real world.
+    *   [x] **Paid Photo Reveals:** Token-based photo unlock with blurred preview and inline payment confirmation.
+    *   [x] **Content Unlock System:** Generic `ContentUnlockGate` component for premium feature gating.
+    *   [x] **Merchant Promotions:** "Local Deals" discovery UI with map/list views and category filtering.
+    *   [x] **Matchmaker Bounties:** Bounty browsing and submission UI with filters.
 *   **Viral & Engagement:**
     *   [x] **"Roast My Profile":** Viral marketing tool allowing users to generate shareable AI roasts/hype of their profiles.
     *   [x] **Friends System:** Send, accept, manage friends, and send tips.
     *   [x] **Push Notifications:** Real-time alerts for Tips, Friend Requests, and Matches (WebPush/VAPID).
     *   [x] **Groups:** Create and join public/private/paid groups.
     *   [x] **Gamification:** Daily Streak tracking (UI & Backend Logic) and Community Leaderboards.
+    *   [x] **Achievements System:** Full gamification UI with progress tracking and rewards.
     *   [x] **Vouch System:** Social proof system allowing friends to vouch for users.
     *   [x] **Voice Messages:** Record and send voice notes in chat (with transcription support).
     *   [x] **Feedback Loop:** In-app feedback submission with AI categorization and sentiment analysis.
     *   [x] **Share to Unlock (Viral):** Users can unlock premium features by sharing content (e.g. Roasts, Profile links) and getting views.
+    *   [x] **Proximity Chatrooms:** Full discovery and chat UI with token-gated entry support.
+    *   [x] **Bulletin Boards:** Location-based community discussion boards.
+    *   [x] **Profile View Tracking:** "Who Viewed Me" feature with analytics and stats.
 *   **Operational Excellence:**
     *   [x] **Sentry Integration:** Error tracking for Frontend and Backend.
     *   [x] **APM:** Basic Application Performance Monitoring (Slow Request logging).
@@ -84,28 +93,14 @@ These features are considered complete and are ready for a production environmen
 
 ### Backend Complete - Frontend Missing
 
-These features have complete backend implementations but lack frontend UI. See `docs/MISSING_FEATURES.md` for full details.
-
-**Critical Priority (High User Impact):**
-*   [ ] **Achievements System:** Full gamification backend (achievements, categories, token rewards) - needs profile/dashboard UI
-*   [ ] **Proximity Chatrooms Discovery:** Full API exists - needs browsing/create/join UI
-*   [ ] **Bulletin Boards:** Full threaded discussion API - needs discovery and posting UI
-*   [ ] **Profile View Tracking:** "Who viewed you" feature - needs dedicated page
-
-**High Priority (Revenue Impact):**
-*   [ ] **Paid Photo Reveals:** Token-based photo unlock - needs blurred preview + payment UI
-*   [ ] **Content Unlock System:** Generic premium content framework - needs gate components
-*   [ ] **Merchant Promotions Discovery:** API complete - needs consumer browsing/map UI
+All critical and high-priority frontend features have been implemented.
 
 **Medium Priority (Engagement Impact):**
-*   [ ] **Share-to-Unlock:** Viral growth feature - needs share buttons + progress UI
-*   [ ] **Message Reactions:** Placeholder in chatrooms - needs reaction picker
-*   [ ] **Group-to-Group Matching:** Full backend - needs discovery/match UI
-*   [ ] **Matchmaker Bounties:** Token rewards for introductions - needs bounty browser
-*   [ ] **Extended Viral Content:** Fortunes, cosmic matches, nemesis finder - only roasts have UI
+*   [x] **Message Reactions:** Implemented in `RealTimeChat` and `ProximityChatrooms`.
+*   [x] **Extended Viral Content:** Fortunes, cosmic matches, nemesis finder, vibe check - UI fully implemented.
 
 **Low Priority (Future):**
-*   [ ] **E2E Encryption:** Key infrastructure exists - needs UI for key management
+*   [x] **E2E Encryption:** Key infrastructure exists - UI for key management implemented in `/settings/security`.
 *   [ ] **Premium Features (Fiat):** Stripe subscriptions (LOW - token economy preferred)
 *   [ ] **Dedicated Mobile App:** React Native (LOW - PWA serves role)
 
@@ -119,29 +114,24 @@ These features have complete backend implementations but lack frontend UI. See `
 *   [x] **Context Standardization:** `AGENTS.md` files for all critical subdirectories
 *   [x] **Test Coverage Audit:** No critical gaps found
 
-### Phase 4B: Frontend UI Implementation (Current Focus - Jan 2026)
+### Phase 4B: Frontend UI Implementation (Completed Jan 10, 2026)
 
 **Critical - Must Have:**
 | Feature | Backend | Frontend | Priority | Effort |
 |---------|---------|----------|----------|--------|
-| Achievements UI | ✅ Complete | ❌ Missing | Critical | Medium |
-| Proximity Chatrooms | ✅ Complete | 🔶 Partial | Critical | High |
-| Paid Photo Reveals | ✅ Complete | ❌ Missing | Critical | Low |
+| Achievements UI | ✅ Complete | ✅ Complete | Critical | Done |
+| Proximity Chatrooms | ✅ Complete | ✅ Complete | Critical | Done |
+| Paid Photo Reveals | ✅ Complete | ✅ Complete | Critical | Done |
+| Help Center | - | ✅ Complete | Critical | Done |
 
 **High - Should Have:**
 | Feature | Backend | Frontend | Priority | Effort |
 |---------|---------|----------|----------|--------|
-| Share-to-Unlock | ✅ Complete | ❌ Missing | High | Medium |
-| Merchant Discovery | ✅ Complete | 🔶 Partial | High | Medium |
-| Profile Views | ✅ Complete | ❌ Missing | High | Low |
-
-**Medium - Nice to Have:**
-| Feature | Backend | Frontend | Priority | Effort |
-|---------|---------|----------|----------|--------|
-| Bulletin Boards | ✅ Complete | ❌ Missing | Medium | Medium |
-| Message Reactions | 🔶 Partial | ❌ Placeholder | Medium | Low |
-| Group Matching UI | ✅ Complete | ❌ Missing | Medium | Medium |
-| Extended Viral (Fortunes, etc.) | ✅ Complete | ❌ Missing | Medium | Low |
+| Share-to-Unlock | ✅ Complete | ✅ Complete | High | Done |
+| Merchant Discovery | ✅ Complete | ✅ Complete | High | Done |
+| Profile Views | ✅ Complete | ✅ Complete | High | Done |
+| Bulletin Boards | ✅ Complete | ✅ Complete | Medium | Done |
+| Matchmaker Bounties | ✅ Complete | ✅ Complete | Medium | Done |
 
 ### Phase 4C: Technical Debt (Ongoing)
 
