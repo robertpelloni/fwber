@@ -222,6 +222,12 @@ export default function SettingsPage() {
                 description="Edit your profile information and photos"
               />
               <SettingsLink
+                href="/settings/physical-profile"
+                icon={<User className="w-5 h-5" />}
+                title="Physical Profile"
+                description="Manage your physical attributes and AI avatar"
+              />
+              <SettingsLink
                 href="/settings/account"
                 icon={<Settings className="w-5 h-5" />}
                 title="Account Settings"
