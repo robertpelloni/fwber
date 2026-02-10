@@ -21,7 +21,9 @@ import { api } from '@/lib/api/client';
 export type FeatureFlagName =
   | 'client_face_blur'
   | 'face_reveal'
-  | 'local_media_vault';
+  | 'local_media_vault'
+  | 'video_chat' // Added
+  | 'ai_wingman'; // Added
 
 /**
  * Environment variable mapping for feature flags
@@ -30,6 +32,8 @@ const ENV_VAR_MAP: Record<FeatureFlagName, string> = {
   client_face_blur: 'NEXT_PUBLIC_FEATURE_CLIENT_FACE_BLUR',
   face_reveal: 'NEXT_PUBLIC_FEATURE_FACE_REVEAL',
   local_media_vault: 'NEXT_PUBLIC_FEATURE_LOCAL_MEDIA_VAULT',
+  video_chat: 'NEXT_PUBLIC_FEATURE_VIDEO_CHAT', // Added
+  ai_wingman: 'NEXT_PUBLIC_FEATURE_AI_WINGMAN', // Added
 };
 
 /**
@@ -55,6 +59,12 @@ function getEnvFeatureFlag(name: FeatureFlagName): boolean {
     case 'local_media_vault':
       value = process.env.NEXT_PUBLIC_FEATURE_LOCAL_MEDIA_VAULT;
       break;
+    case 'video_chat':
+      value = process.env.NEXT_PUBLIC_FEATURE_VIDEO_CHAT;
+      break;
+    case 'ai_wingman':
+      value = process.env.NEXT_PUBLIC_FEATURE_AI_WINGMAN;
+      break;
   }
 
   return value === 'true' || value === '1';
@@ -68,6 +78,8 @@ export function getFeatureFlags(): Record<FeatureFlagName, boolean> {
     client_face_blur: getEnvFeatureFlag('client_face_blur'),
     face_reveal: getEnvFeatureFlag('face_reveal'),
     local_media_vault: getEnvFeatureFlag('local_media_vault'),
+    video_chat: getEnvFeatureFlag('video_chat'),
+    ai_wingman: getEnvFeatureFlag('ai_wingman'),
   };
 }
 
@@ -134,6 +146,8 @@ interface BackendFeatureFlags {
   content_generation: boolean;
   rate_limits: boolean;
   analytics: boolean;
+  video_chat: boolean; // Added
+  ai_wingman: boolean; // Added
 }
 
 /**
@@ -181,6 +195,10 @@ export function useCombinedFeatureFlags() {
       local_media_vault:
         frontendFlags.local_media_vault &&
         (backendQuery.data.local_media_vault ?? false),
+      video_chat:
+        frontendFlags.video_chat && (backendQuery.data.video_chat ?? false),
+      ai_wingman:
+        frontendFlags.ai_wingman && (backendQuery.data.ai_wingman ?? false),
     };
   }, [frontendFlags, backendQuery.data]);
 
