@@ -18,8 +18,7 @@ Broadcast::channel('users.{id}', function ($user, $id) {
 });
 
 Broadcast::channel('chatroom.{id}', function ($user, $id) {
-    // Add logic to check if user is part of the chatroom
-    return true; 
+    return \App\Models\Chatroom::find($id)->hasMember($user);
 });
 
 Broadcast::channel('online', function ($user) {
