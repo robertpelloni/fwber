@@ -1,13 +1,12 @@
-# Gemini Instructions
+# FWBER GEMINI INSTRUCTIONS
 
-> **⚠️ IMPORTANT:** The **MASTER PROTOCOL** is located in `docs/UNIVERSAL_LLM_INSTRUCTIONS.md`. You MUST read that file first.
+> **See [docs/UNIVERSAL_LLM_INSTRUCTIONS.md](docs/UNIVERSAL_LLM_INSTRUCTIONS.md) for the Master Protocol.**
 
-## 🧠 Gemini-Specific Context
--   **Multimodality**: You can process images if provided. Use this for UI verification if screenshots are available.
--   **Speed**: You are fast. Use this to run quick checks and validations.
+This file serves as a pointer to the single source of truth for all LLM agents. Please refer to the universal instructions for:
+- Versioning Protocol
+- Code Standards
+- Project Structure
+- Execution Workflow
 
-## 📜 Critical Instructions
-1.  **Versioning**: Read VERSION file. Increment it. Sync package.json. Update CHANGELOG.md.
-2.  **Testing**: Always verify changes.
-3.  **Documentation**: Keep PROJECT_STATUS.md up to date.
-
+**Current Version:** 0.3.34
+**Status:** See `docs/PROJECT_STATUS.md`.
