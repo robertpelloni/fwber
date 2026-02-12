@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
+import { apiClient } from '@/lib/api/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -50,31 +51,11 @@ interface PromotionPerformance {
   conversionRate: number;
 }
 
-// Mock data - will be replaced with API calls
-const mockKPIs: KPIData = {
-  kFactor: 1.34,
-  totalReach: 12847,
-  conversionRate: 4.7,
-  totalRevenue: 8420,
-  revenueChange: 12.3,
-};
-
-const mockRetention: RetentionData[] = [
-  { label: 'Day 1', value: 100, previousValue: 100 },
-  { label: 'Day 7', value: 68, previousValue: 62 },
-  { label: 'Day 14', value: 52, previousValue: 48 },
-  { label: 'Day 30', value: 38, previousValue: 35 },
-  { label: 'Day 60', value: 24, previousValue: 21 },
-  { label: 'Day 90', value: 18, previousValue: 15 },
-];
-
-const mockPromotions: PromotionPerformance[] = [
-  { id: '1', title: 'Summer Sale 20% Off', views: 4521, clicks: 892, redemptions: 156, revenue: 2340, conversionRate: 17.5 },
-  { id: '2', title: 'Happy Hour Special', views: 3892, clicks: 567, redemptions: 89, revenue: 1780, conversionRate: 15.7 },
-  { id: '3', title: 'New Customer Bonus', views: 2847, clicks: 423, redemptions: 78, revenue: 1560, conversionRate: 18.4 },
-  { id: '4', title: 'Weekend Flash Deal', views: 1987, clicks: 312, redemptions: 45, revenue: 900, conversionRate: 14.4 },
-  { id: '5', title: 'Loyalty Reward', views: 1600, clicks: 289, redemptions: 67, revenue: 1840, conversionRate: 23.2 },
-];
+interface AnalyticsResponse {
+  kpis: KPIData;
+  retention: RetentionData[];
+  promotions: PromotionPerformance[];
+}
 
 function AnalyticsSkeleton() {
   return (
@@ -264,13 +245,13 @@ function ConversionFunnel({ promotions }: { promotions: PromotionPerformance[] }
     { 
       name: 'Clicks', 
       value: totals.clicks, 
-      percentage: (totals.clicks / totals.views) * 100,
+      percentage: (totals.clicks / (totals.views || 1)) * 100,
       icon: <MousePointer className="h-5 w-5" />
     },
     { 
       name: 'Redemptions', 
       value: totals.redemptions, 
-      percentage: (totals.redemptions / totals.views) * 100,
+      percentage: (totals.redemptions / (totals.views || 1)) * 100,
       icon: <CheckCircle className="h-5 w-5" />
     },
   ];
@@ -316,13 +297,13 @@ function ConversionFunnel({ promotions }: { promotions: PromotionPerformance[] }
         <div className="grid grid-cols-2 gap-4 mt-6 pt-4 border-t">
           <div className="text-center">
             <div className="text-2xl font-bold text-amber-600">
-              {((totals.clicks / totals.views) * 100).toFixed(1)}%
+              {((totals.clicks / (totals.views || 1)) * 100).toFixed(1)}%
             </div>
             <div className="text-sm text-muted-foreground">Click-through Rate</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-amber-600">
-              {((totals.redemptions / totals.clicks) * 100).toFixed(1)}%
+              {((totals.redemptions / (totals.clicks || 1)) * 100).toFixed(1)}%
             </div>
             <div className="text-sm text-muted-foreground">Redemption Rate</div>
           </div>
@@ -357,40 +338,48 @@ function PromotionPerformanceTable({ promotions }: { promotions: PromotionPerfor
               </tr>
             </thead>
             <tbody>
-              {sortedPromotions.map((promo, i) => (
-                <tr key={promo.id} className="border-b last:border-0">
-                  <td className="py-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-amber-500" />
-                      <span className="font-medium truncate max-w-[200px]">{promo.title}</span>
-                    </div>
-                  </td>
-                  <td className="py-3 text-right text-muted-foreground">
-                    {promo.views.toLocaleString()}
-                  </td>
-                  <td className="py-3 text-right text-muted-foreground">
-                    {promo.clicks.toLocaleString()}
-                  </td>
-                  <td className="py-3 text-right text-muted-foreground">
-                    {promo.redemptions.toLocaleString()}
-                  </td>
-                  <td className="py-3 text-right">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      promo.conversionRate >= 20 
-                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                        : promo.conversionRate >= 15
-                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                        : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
-                    }`}>
-                      {promo.conversionRate.toFixed(1)}%
-                    </span>
-                  </td>
-                  <td className="py-3 text-right font-medium">
-                    <span className="text-amber-600">{promo.revenue.toLocaleString()}</span>
-                    <span className="text-xs text-muted-foreground ml-1">tokens</span>
+              {sortedPromotions.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-4 text-center text-muted-foreground">
+                    No promotions found
                   </td>
                 </tr>
-              ))}
+              ) : (
+                sortedPromotions.map((promo, i) => (
+                  <tr key={promo.id} className="border-b last:border-0">
+                    <td className="py-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-amber-500" />
+                        <span className="font-medium truncate max-w-[200px]">{promo.title}</span>
+                      </div>
+                    </td>
+                    <td className="py-3 text-right text-muted-foreground">
+                      {promo.views.toLocaleString()}
+                    </td>
+                    <td className="py-3 text-right text-muted-foreground">
+                      {promo.clicks.toLocaleString()}
+                    </td>
+                    <td className="py-3 text-right text-muted-foreground">
+                      {promo.redemptions.toLocaleString()}
+                    </td>
+                    <td className="py-3 text-right">
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${
+                        promo.conversionRate >= 20
+                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                          : promo.conversionRate >= 15
+                          ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                          : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
+                      }`}>
+                        {promo.conversionRate.toFixed(1)}%
+                      </span>
+                    </td>
+                    <td className="py-3 text-right font-medium">
+                      <span className="text-amber-600">{promo.revenue.toLocaleString()}</span>
+                      <span className="text-xs text-muted-foreground ml-1">tokens</span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -407,19 +396,20 @@ export default function MerchantAnalyticsPage() {
   const [promotions, setPromotions] = useState<PromotionPerformance[]>([]);
 
   useEffect(() => {
-    // Simulate API call - replace with actual API when available
     const loadAnalytics = async () => {
       setLoading(true);
-      
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Load mock data
-      setKpis(mockKPIs);
-      setRetention(mockRetention);
-      setPromotions(mockPromotions);
-      
-      setLoading(false);
+      try {
+        const response = await apiClient.get<AnalyticsResponse>('/merchant-portal/analytics');
+        if (response.data) {
+          setKpis(response.data.kpis);
+          setRetention(response.data.retention);
+          setPromotions(response.data.promotions);
+        }
+      } catch (error) {
+        console.error('Failed to load analytics', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     if (token) {
@@ -467,23 +457,23 @@ export default function MerchantAnalyticsPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <KPICard
               title="K-Factor"
-              value={kpis?.kFactor.toFixed(2) || '0'}
+              value={kpis?.kFactor.toFixed(2) || '0.00'}
               icon={<TrendingUp className="h-5 w-5" />}
-              change={8.2}
+              change={0} // Backend doesn't support historical comparison yet for K-Factor
             />
             <KPICard
               title="Total Reach"
               value={kpis?.totalReach.toLocaleString() || '0'}
               suffix="users"
               icon={<Users className="h-5 w-5" />}
-              change={15.4}
+              change={0}
             />
             <KPICard
               title="Conversion Rate"
-              value={kpis?.conversionRate.toFixed(1) || '0'}
+              value={kpis?.conversionRate.toFixed(1) || '0.0'}
               suffix="%"
               icon={<Target className="h-5 w-5" />}
-              change={2.1}
+              change={0}
             />
             <KPICard
               title="Total Revenue"

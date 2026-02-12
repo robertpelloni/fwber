@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.34] - 2026-02-06
+
+### Added
+- **Merchant Analytics Integration**: Connected the `/merchant/analytics` frontend page to the real backend endpoint `/api/merchant-portal/analytics`, replacing mock data with "estimated" metrics from the `MerchantAnalyticsService`.
+- **System Dashboard Integration**: Connected the `/admin/system` frontend page to the real backend health check endpoint `/api/health`, providing actual system status, version, and database connectivity info.
+- **Documentation**: Added `docs/dashboard/SUBMODULE_VERSIONS.md` to track logical module versions in the monorepo.
+
+### Changed
+- **System Health API**: Enhanced `HealthController` to return detailed checks for database, cache, and storage, consumed by the new System Dashboard.
+
 ## [0.3.33] - 2026-02-06
 
 ### Added
