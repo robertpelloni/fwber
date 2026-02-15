@@ -234,7 +234,7 @@ export default function GroupDetailPage() {
                       <CardContent className="py-12 text-center text-muted-foreground">
                         <Calendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
                         <h3 className="text-lg font-semibold mb-2">No Upcoming Events</h3>
-                        <p>This group hasn't planned or shared any events yet.</p>
+                        <p>This group hasn&apos;t planned or shared any events yet.</p>
                       </CardContent>
                     </Card>
                   ) : (

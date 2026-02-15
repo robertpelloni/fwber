@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Server, Database, FolderGit2, Activity, ShieldCheck, Cpu } from "lucide-react";
 import AppHeader from "@/components/AppHeader";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { apiClient } from "@/lib/api/client";
 
 interface SystemInfo {
   version: string;
@@ -21,27 +22,66 @@ interface SystemInfo {
   }[];
 }
 
-// Mock data until real endpoint exists
-const MOCK_SYSTEM_INFO: SystemInfo = {
-  version: "0.3.33",
-  environment: process.env.NODE_ENV || "development",
-  backend_status: "online",
-  database_status: "connected",
-  submodules: [
-    { name: "fwber-backend", path: "/fwber-backend", status: "active", version: "v0.3.33" },
-    { name: "fwber-frontend", path: "/fwber-frontend", status: "active", version: "v0.3.33" }
-  ]
-};
+interface HealthResponse {
+  status: string;
+  version: string;
+  environment: string;
+  checks: {
+    database?: { status: string; version: string };
+    redis?: { status: string; version: string };
+    cache?: { status: string };
+    storage?: { status: string };
+  };
+}
 
 export default function SystemDashboardPage() {
-  const [info, setInfo] = useState<SystemInfo>(MOCK_SYSTEM_INFO);
-  const [loading, setLoading] = useState(false); // Simulate loading if we had an API
+  const [info, setInfo] = useState<SystemInfo | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Ideally fetch from /api/admin/system-health
   useEffect(() => {
-    // In a real app, we'd fetch this from the backend
-    setInfo(MOCK_SYSTEM_INFO);
+    const fetchHealth = async () => {
+      try {
+        const response = await apiClient.get<HealthResponse>('/health');
+        const data = response.data;
+
+        const systemInfo: SystemInfo = {
+          version: data.version || "0.3.33", // Fallback if not returned
+          environment: data.environment,
+          backend_status: data.status === 'healthy' ? 'online' : 'offline',
+          database_status: data.checks.database?.status === 'ok' ? 'connected' : 'disconnected',
+          submodules: [
+            { name: "fwber-backend", path: "/fwber-backend", status: "active", version: process.env.NEXT_PUBLIC_BACKEND_VERSION || "0.3.33" },
+            { name: "fwber-frontend", path: "/fwber-frontend", status: "active", version: process.env.NEXT_PUBLIC_FRONTEND_VERSION || "0.3.33" }
+          ]
+        };
+        setInfo(systemInfo);
+      } catch (err) {
+        console.error("Failed to fetch system health:", err);
+        // Fallback or error state
+        setInfo({
+            version: "Unknown",
+            environment: "Unknown",
+            backend_status: "offline",
+            database_status: "disconnected",
+            submodules: []
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHealth();
   }, []);
+
+  if (loading || !info) {
+      return (
+        <ProtectedRoute>
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
+        </ProtectedRoute>
+      );
+  }
 
   return (
     <ProtectedRoute>

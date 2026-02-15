@@ -1,12 +1,12 @@
-# Claude Instructions
+# FWBER CLAUDE INSTRUCTIONS
 
-> **⚠️ IMPORTANT:** The **MASTER PROTOCOL** is located in `docs/UNIVERSAL_LLM_INSTRUCTIONS.md`. You MUST read that file first.
+> **See [docs/UNIVERSAL_LLM_INSTRUCTIONS.md](docs/UNIVERSAL_LLM_INSTRUCTIONS.md) for the Master Protocol.**
 
-## 🧠 Claude-Specific Context
--   **Capabilities**: You have a large context window. Use it to maintain a broad understanding of the project structure.
--   **Style**: Write concise, professional, and highly structured responses.
+This file serves as a pointer to the single source of truth for all LLM agents. Please refer to the universal instructions for:
+- Versioning Protocol
+- Code Standards
+- Project Structure
+- Execution Workflow
 
-## 📜 Critical Instructions
-1.  **Versioning**: Read VERSION file. Increment it. Sync package.json. Update CHANGELOG.md.
-2.  **Testing**: Always verify changes.
-3.  **Documentation**: Keep PROJECT_STATUS.md up to date.
+**Current Version:** 0.3.34
+**Status:** See `docs/PROJECT_STATUS.md`.

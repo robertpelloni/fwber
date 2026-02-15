@@ -515,7 +515,7 @@ export default function ProfilePage() {
              </CardHeader>
              <CardContent>
                 <p className="text-orange-100/80 mb-4">
-                  Ready to get humbled? Let our AI roast your profile choices. Or switch to "Hype Mode" for an ego boost.
+                  Ready to get humbled? Let our AI roast your profile choices. Or switch to &quot;Hype Mode&quot; for an ego boost.
                 </p>
                 <a href="/roast" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-white text-orange-900 hover:bg-orange-100 h-10 px-4 py-2 w-full">
                   Go to Roast Page
@@ -766,7 +766,7 @@ export default function ProfilePage() {
                 value={formData.bio}
                 onChange={(e) => handleInputChange('bio', e.target.value)}
                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="Tell others about yourself, your interests, and what you're looking for..."
+                placeholder="Tell others about yourself, your interests, and what you&apos;re looking for..."
               />
             </div>
 
@@ -976,7 +976,7 @@ export default function ProfilePage() {
                     value={formData.preferences.height_min}
                     onChange={(e) => handlePreferenceChange('height_min', e.target.value)}
                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    placeholder="e.g., 5'10&quot; or 178cm"
+                    placeholder="e.g., 5&apos;10&quot; or 178cm"
                   />
                 </div>
 

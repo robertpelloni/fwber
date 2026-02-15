@@ -9,7 +9,7 @@ import NotificationPermissionHandler from '@/components/NotificationPermissionHa
 import SentryInitializer from '@/components/SentryInitializer'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import FeedbackModal from '@/components/FeedbackModal'
-import { MercureProvider } from '@/lib/contexts/MercureContext'
+// import { MercureProvider } from '@/lib/contexts/MercureContext'
 import { SolanaProvider } from '@/components/SolanaProvider'
 import NotificationListener from '@/components/realtime/NotificationListener'
 import PWAInstallPrompt from '@/components/PWAInstallPrompt'
@@ -100,24 +100,22 @@ export default function RootLayout({
         >
           <QueryProvider>
             <AuthProvider>
-              <MercureProvider>
-                <SolanaProvider>
-                  <NotificationPermissionHandler />
-                  <SentryInitializer />
-                  <PWAInstallPrompt />
-                  <ToastProvider>
-                    <NotificationListener />
-                    <div className="relative flex min-h-screen flex-col">
-                      <div className="flex-1">{children}</div>
-                    </div>
-                    <FeedbackModal />
-                    <PerformanceMonitor />
-                    <div className="fixed bottom-1 right-1 text-[10px] text-muted-foreground opacity-50 pointer-events-none z-50">
-                      v0.3.2
-                    </div>
-                  </ToastProvider>
-                </SolanaProvider>
-              </MercureProvider>
+              <SolanaProvider>
+                <NotificationPermissionHandler />
+                <SentryInitializer />
+                <PWAInstallPrompt />
+                <ToastProvider>
+                  <NotificationListener />
+                  <div className="relative flex min-h-screen flex-col">
+                    <div className="flex-1">{children}</div>
+                  </div>
+                  <FeedbackModal />
+                  <PerformanceMonitor />
+                  <div className="fixed bottom-1 right-1 text-[10px] text-muted-foreground opacity-50 pointer-events-none z-50">
+                    v0.3.2
+                  </div>
+                </ToastProvider>
+              </SolanaProvider>
             </AuthProvider>
           </QueryProvider>
         </ThemeProvider>

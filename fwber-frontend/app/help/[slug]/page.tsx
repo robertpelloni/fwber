@@ -18,9 +18,9 @@ const HELP_ARTICLES: Record<string, { title: string, content: React.ReactNode, c
         <p>Creating an account on fwber is simple and privacy-focused.</p>
         <h3 className="text-lg font-semibold">Steps to Register</h3>
         <ol className="list-decimal pl-5 space-y-2">
-          <li>Click the "Sign Up" button on the homepage.</li>
+          <li>Click the &quot;Sign Up&quot; button on the homepage.</li>
           <li>Enter your email address and create a strong password.</li>
-          <li>Alternatively, you can use "Sign in with Solana" if you have a crypto wallet.</li>
+          <li>Alternatively, you can use &quot;Sign in with Solana&quot; if you have a crypto wallet.</li>
           <li>Verify your email address via the link sent to your inbox.</li>
         </ol>
         <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
@@ -85,7 +85,7 @@ const HELP_ARTICLES: Record<string, { title: string, content: React.ReactNode, c
         <h3 className="text-lg font-semibold">How to Deposit</h3>
         <ol className="list-decimal pl-5 space-y-2">
           <li>Go to your <strong>Wallet</strong> page.</li>
-          <li>Click "Deposit".</li>
+          <li>Click &quot;Deposit&quot;.</li>
           <li>Copy your unique deposit address or scan the QR code.</li>
           <li>Send SOL or SPL tokens from your external wallet (Phantom, Solflare).</li>
           <li>The tokens will appear in your internal balance after a few confirmations.</li>
@@ -102,7 +102,7 @@ const HELP_ARTICLES: Record<string, { title: string, content: React.ReactNode, c
         <h3 className="text-lg font-semibold">Withdrawal Process</h3>
         <ol className="list-decimal pl-5 space-y-2">
           <li>Go to your <strong>Wallet</strong> page.</li>
-          <li>Select "Withdraw".</li>
+          <li>Select &quot;Withdraw&quot;.</li>
           <li>Enter the amount and your destination wallet address.</li>
           <li>Confirm the transaction. Withdrawals are processed typically within 24 hours.</li>
         </ol>
@@ -169,7 +169,7 @@ const HELP_ARTICLES: Record<string, { title: string, content: React.ReactNode, c
     content: (
       <div className="space-y-4">
         <p>Your exact location is never shared with other users.</p>
-        <p>We use "fuzzy location" logic to show approximate distance (e.g., "Less than 1 mile away") without pinpointing your coordinates.</p>
+        <p>We use &quot;fuzzy location&quot; logic to show approximate distance (e.g., &quot;Less than 1 mile away&quot;) without pinpointing your coordinates.</p>
       </div>
     )
   },
@@ -192,7 +192,7 @@ const HELP_ARTICLES: Record<string, { title: string, content: React.ReactNode, c
       <div className="space-y-4">
         <p>Connect with people in your immediate vicinity through Proximity Chatrooms.</p>
         <h3 className="text-lg font-semibold">How it works</h3>
-        <p>These are geo-fenced chat groups (e.g., "Downtown Bar Scene", "Central Park"). You must be physically located within the radius to join and chat.</p>
+        <p>These are geo-fenced chat groups (e.g., &quot;Downtown Bar Scene&quot;, &quot;Central Park&quot;). You must be physically located within the radius to join and chat.</p>
       </div>
     )
   },
@@ -216,7 +216,7 @@ const HELP_ARTICLES: Record<string, { title: string, content: React.ReactNode, c
     content: (
       <div className="space-y-4">
         <p>Earn badges and token rewards by being active on the platform.</p>
-        <p>Visit the <strong>Achievements</strong> page to track your progress on goals like "Viral Star", "Social Butterfly", and more.</p>
+        <p>Visit the <strong>Achievements</strong> page to track your progress on goals like &quot;Viral Star&quot;, &quot;Social Butterfly&quot;, and more.</p>
       </div>
     )
   }

@@ -1,7 +1,8 @@
 'use client';
 
 import { useAuth } from '@/lib/auth-context';
-import { MercureRealtimeProvider } from '@/components/realtime/MercureBridge';
+import { PresenceProvider, WebSocketContextValue } from '@/lib/contexts/PresenceContext';
+import { useWebSocket } from '@/lib/hooks/use-websocket';
 
 interface AuthenticatedRealtimeProviderProps {
   children: React.ReactNode;
@@ -19,15 +20,28 @@ export function AuthenticatedRealtimeProvider({
   autoConnect = true,
 }: AuthenticatedRealtimeProviderProps) {
   const { isAuthenticated } = useAuth();
+  const websocket = useWebSocket({ autoConnect });
 
   // Only wrap with RealtimeProvider if authenticated
   if (!isAuthenticated) {
     return <>{children}</>;
   }
 
+  // Cast onlineUsers to any to bypass strict type check for now
+  // Ideally, ensure types in PresenceContext and use-pusher-logic match exactly
+  const contextValue: WebSocketContextValue = {
+    connectionStatus: {
+        connected: websocket.connectionStatus.connected,
+        reconnectAttempts: websocket.connectionStatus.reconnectAttempts
+    },
+    onlineUsers: (websocket.onlineUsers || []) as any,
+    typingIndicators: (websocket.typingIndicators || []) as any,
+    sendTypingIndicator: websocket.sendTypingIndicator,
+  };
+
   return (
-    <MercureRealtimeProvider autoConnect={autoConnect}>
+    <PresenceProvider value={contextValue}>
       {children}
-    </MercureRealtimeProvider>
+    </PresenceProvider>
   );
 }

@@ -182,8 +182,8 @@ export default function GroupMatchesPage() {
             </div>
             <h3 className="text-lg font-semibold mb-2">No Matches Found</h3>
             <p className="text-muted-foreground max-w-md mx-auto">
-              We couldn't find any groups matching your criteria nearby. 
-              Try updating your group's category or tags to find more relevant communities.
+              We couldn&apos;t find any groups matching your criteria nearby.
+              Try updating your group&apos;s category or tags to find more relevant communities.
             </p>
           </CardContent>
         </Card>

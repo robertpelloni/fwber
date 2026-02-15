@@ -12,7 +12,7 @@ import { blockUser, reportUser } from '@/lib/api/safety'
 import { PresenceIndicator } from '@/components/realtime/PresenceComponents'
 import { useToast } from '@/components/ToastProvider'
 import { VideoCallModal } from '@/components/VideoCall/VideoCallModal'
-import { useMercure } from '@/lib/contexts/MercureContext'
+import { useWebSocket } from '@/lib/hooks/use-websocket'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { CallHistory } from '@/components/VideoCall/CallHistory'
 import RealTimeChat from '@/components/RealTimeChat'
@@ -20,7 +20,7 @@ import RealTimeChat from '@/components/RealTimeChat'
 export default function MessagesPage() {
   const { token, isAuthenticated } = useAuth()
   const { showError } = useToast()
-  const { videoSignals } = useMercure()
+  const { videoSignals } = useWebSocket()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
   const [isLoading, setIsLoading] = useState(true)

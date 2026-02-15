@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { useMercure } from '@/lib/contexts/MercureContext';
+import { useWebSocket } from '@/lib/hooks/use-websocket';
 import { useAuth } from '@/lib/auth-context';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -25,7 +25,7 @@ const ICE_SERVERS = {
 
 export function VideoCallModal({ recipientId, isOpen, onClose, isIncoming = false }: VideoCallModalProps) {
   const { user, token } = useAuth();
-  const { sendVideoSignal, videoSignals } = useMercure();
+  const { sendVideoSignal, videoSignals } = useWebSocket();
   
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
@@ -170,8 +170,10 @@ export function VideoCallModal({ recipientId, isOpen, onClose, isIncoming = fals
 
   // Update local video preview with processed stream
   useEffect(() => {
-    if (localVideoRef.current && processedStream) {
-      localVideoRef.current.srcObject = processedStream;
+    // Check if the ref is available and has an element
+    const videoElement = localVideoRef.current;
+    if (videoElement && processedStream) {
+      videoElement.srcObject = processedStream;
     }
   }, [processedStream]);
 

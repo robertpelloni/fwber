@@ -11,6 +11,7 @@ import {
   Send, UserPlus, Crown, Tag
 } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface Group {
   id: number
@@ -69,18 +70,10 @@ export default function GroupMatchingPage() {
       setLoading(false)
     }
   }, [selectedGroup])
-  // Note: selectedGroup in deps ensures if it changes we don't necessarily re-fetch unless we want to,
-  // but logic above sets it only if not set.
-  // Actually, fetchMyGroups should only run once on mount ideally.
-  // But if we put it in useEffect deps, it needs to be stable.
 
   useEffect(() => {
     fetchMyGroups()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
-  // Ideally we fix this properly, but for now I'll just suppress the warning for the mount effect
-  // OR I can make fetchMyGroups not depend on selectedGroup state by using functional updates if needed,
-  // but here it reads selectedGroup to decide whether to set it.
-  // Let's keep it simple: just define it.
 
   const fetchMatches = useCallback(async () => {
     if (!selectedGroup) return
@@ -307,7 +300,7 @@ export default function GroupMatchingPage() {
                           className="bg-slate-800/50 rounded-xl border border-purple-500/20 p-4"
                         >
                           <div className="flex items-start gap-4">
-                            <div className="w-14 h-14 rounded-xl bg-slate-700 flex items-center justify-center flex-shrink-0">
+                            <div className="w-14 h-14 rounded-xl bg-slate-700 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
                               {match.group.avatar_url ? (
                                 <Image
                                   src={match.group.avatar_url}

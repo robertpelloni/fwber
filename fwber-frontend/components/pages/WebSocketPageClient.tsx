@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 import { useWebSocket, useWebSocketPresence, useWebSocketNotifications } from '@/lib/hooks/use-websocket';
-import { MercureProvider } from '@/lib/contexts/MercureContext';
 import RealTimeChat, { ChatList, OnlineUsers } from '@/components/RealTimeChat';
 
 function WebSocketPageContent() {
@@ -346,8 +345,6 @@ function WebSocketPageContent() {
 
 export default function WebSocketPageClient() {
   return (
-    <MercureProvider>
-      <WebSocketPageContent />
-    </MercureProvider>
+    <WebSocketPageContent />
   );
 }

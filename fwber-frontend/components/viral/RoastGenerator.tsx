@@ -104,7 +104,7 @@ export function RoastGenerator({ trigger }: RoastGeneratorProps) {
               <p className="text-muted-foreground">
                 {mode === 'roast' 
                   ? "Ready to get humbled? Our AI will analyze your profile and roast you explicitly." 
-                  : "Need an ego boost? Let our AI tell you why you're a catch."}
+                  : "Need an ego boost? Let our AI tell you why you&apos;re a catch."}
               </p>
               <Button 
                 size="lg" 

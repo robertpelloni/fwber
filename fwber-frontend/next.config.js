@@ -33,7 +33,7 @@ const getFrontendVersion = () => {
   }
 };
 
-// const { withSentryConfig } = require('@sentry/nextjs');
+const { withSentryConfig } = require('@sentry/nextjs');
 // PWA disabled due to next-pwa dependency issues with ajv
 // TODO: Replace next-pwa with @ducanh2912/next-pwa or serwist
 // const withPWA = require('next-pwa')({
@@ -283,5 +283,5 @@ const sentryWebpackPluginOptions = {
 };
 
 // Make sure adding Sentry options is the last code to run before exporting
-// module.exports = withSentryConfig(withPWA(withBundleAnalyzer(nextConfig)), sentryWebpackPluginOptions);
-module.exports = withPWA(withBundleAnalyzer(nextConfig));
+module.exports = withSentryConfig(withPWA(withBundleAnalyzer(nextConfig)), sentryWebpackPluginOptions);
+// module.exports = withPWA(withBundleAnalyzer(nextConfig));
