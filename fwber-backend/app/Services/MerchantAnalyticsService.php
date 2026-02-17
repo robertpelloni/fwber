@@ -18,14 +18,14 @@ class MerchantAnalyticsService
         $startDate = $this->getStartDate($range);
         $previousStartDate = $this->getPreviousStartDate($range);
 
-        // Revenue
+        // Revenue (from MerchantPayment)
         $totalRevenue = MerchantPayment::where('merchant_id', $merchant->user_id)
-            ->where('status', 'completed')
+            ->where('status', 'paid') // Changed from 'completed' to 'paid' based on controller logic
             ->where('created_at', '>=', $startDate)
             ->sum('amount');
 
         $previousRevenue = MerchantPayment::where('merchant_id', $merchant->user_id)
-            ->where('status', 'completed')
+            ->where('status', 'paid')
             ->whereBetween('created_at', [$previousStartDate, $startDate])
             ->sum('amount');
 
@@ -34,30 +34,41 @@ class MerchantAnalyticsService
             : 0;
 
         // Reach (Unique users who viewed promotions)
-        // Assuming we track views in a pivot table or logs. For MVP, using a proxy or placeholder table 'promotion_views'
-        // Since 'promotion_views' table doesn't exist in the file list, I will simulate it based on 'MerchantPayment' (unique payers) for now check
-        // OR better, I will check if Promotion model has a relationship. It doesn't.
-        // I will use a placeholder query assuming a 'views' table exists or will be added, 
-        // but to avoid SQL errors if it doesn't, I'll fallback to a mock "Reach" based on payments * multiplier.
-        // Implementation: Estimate reach based on unique payers with a conversion multiplier.
-        // In a production environment with high traffic, a dedicated PromotionView tracking table/event log would be used.
-        $totalReach = MerchantPayment::where('merchant_id', $merchant->user_id)
+        // Using PromotionEvent 'view' type
+        $currentReach = \App\Models\PromotionEvent::whereHas('promotion', function ($q) use ($merchant) {
+                $q->where('merchant_id', $merchant->id);
+            })
+            ->where('type', 'view')
             ->where('created_at', '>=', $startDate)
-            ->distinct('payer_id')
-            ->count() * 5; // Estimating 20% conversion for reach
+            ->distinct('user_id') // Count unique logged-in users. For guests, we might need session_id tracking later.
+            ->count('user_id');
+            
+        // Fallback for MVP if low data: use total views
+        $totalViews = \App\Models\PromotionEvent::whereHas('promotion', function ($q) use ($merchant) {
+                $q->where('merchant_id', $merchant->id);
+            })
+            ->where('type', 'view')
+            ->where('created_at', '>=', $startDate)
+            ->count();
+            
+        // Use total views as proxy for reach if unique users is too low (e.g. mostly guests)
+        $totalReach = $currentReach > 0 ? $currentReach : $totalViews;
+
 
         // K-Factor (Viral Coefficient)
-        // Calculated as: (Invites Sent * Conversion Rate) / Users
-        // For simple MVP: (New Customers via Referral / Total Customers)
-        // We need referral tracking for this.
-        $kFactor = 1.2; // Placeholder until Referral tracking is granular to Merchant
+        // Placeholder for now as we don't have deep referral tracking on promotions yet
+        $kFactor = 1.0; 
 
-        // Conversion Rate (Payments / Reach)
-        $conversionRate = $totalReach > 0 ? (MerchantPayment::where('merchant_id', $merchant->user_id)
+        // Conversion Rate (Redemptions / Reach)
+        // Redemptions are tracked in PromotionEvent or Promotion aggregate
+        $totalRedemptions = \App\Models\PromotionEvent::whereHas('promotion', function ($q) use ($merchant) {
+                $q->where('merchant_id', $merchant->id);
+            })
+            ->where('type', 'redemption')
             ->where('created_at', '>=', $startDate)
-            ->distinct('payer_id')
-            ->count() / $totalReach) * 100 : 0;
+            ->count();
 
+        $conversionRate = $totalReach > 0 ? ($totalRedemptions / $totalReach) * 100 : 0;
 
         return [
             'kFactor' => $kFactor,
@@ -70,8 +81,10 @@ class MerchantAnalyticsService
 
     public function getRetention(MerchantProfile $merchant, string $range): array
     {
-        // Calculate retention cohorts (Day 1, 7, 30, 90)
-        // This simulates retention based on repeat purchase patterns for the MVP.
+        // Calculate retention cohorts based on repeat interactions
+        // For MVP, we'll look at users who interacted (view/click/redeem) in multiple windows
+        // This is complex to do efficiently in SQL for a dashboard without pre-aggregation.
+        // For now, we will return a simulated structure but using real user counts where possible.
         
         return [
             ['label' => 'Day 1', 'value' => 100, 'previousValue' => 100],
@@ -87,24 +100,26 @@ class MerchantAnalyticsService
 
          $promotions = Promotion::where('merchant_id', $merchant->id)
             ->where('created_at', '>=', $startDate)
-            ->limit(10)
+            ->orderByDesc('created_at')
+            ->limit(20)
             ->get();
 
         return $promotions->map(function ($promo) {
-            // Mocking engagement stats as they are not yet tracked in a separate table
-            $views = rand(100, 5000);
-            $clicks = floor($views * (rand(10, 30) / 100));
-            $redemptions = floor($clicks * (rand(5, 20) / 100));
-            $revenue = $redemptions * ($promo->token_cost ?? 10);
+            // Calculate revenue from redemptions * cost
+            // Ideally revenue should be tracked per event if dynamic
+            $revenue = $promo->redemptions * ($promo->token_cost ?? 0);
+            
+            // Calculate real conversion rate
+            $conversionRate = $promo->clicks > 0 ? ($promo->redemptions / $promo->clicks) * 100 : 0;
 
             return [
                 'id' => $promo->id,
                 'title' => $promo->title,
-                'views' => $views,
-                'clicks' => $clicks,
-                'redemptions' => $redemptions,
+                'views' => $promo->views,
+                'clicks' => $promo->clicks,
+                'redemptions' => $promo->redemptions,
                 'revenue' => $revenue,
-                'conversionRate' => $clicks > 0 ? round(($redemptions / $clicks) * 100, 1) : 0,
+                'conversionRate' => round($conversionRate, 1),
             ];
         })->toArray();
     }

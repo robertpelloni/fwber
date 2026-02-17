@@ -25,8 +25,8 @@ return new class extends Migration
             $table->integer('radius')->default(100); // meters
             
             $table->integer('token_cost')->default(0); // Cost to claim/view
-            $table->timestamp('starts_at');
-            $table->timestamp('expires_at');
+            $table->dateTime('starts_at');
+            $table->dateTime('expires_at');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

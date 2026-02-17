@@ -22,6 +22,9 @@ class Promotion extends Model
         'starts_at',
         'expires_at',
         'is_active',
+        'views',
+        'clicks',
+        'redemptions',
     ];
 
     protected $casts = [

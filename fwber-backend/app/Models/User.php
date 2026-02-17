@@ -112,6 +112,11 @@ class User extends Authenticatable
         return $this->hasMany(Photo::class);
     }
 
+    public function primaryPhoto()
+    {
+        return $this->hasOne(Photo::class)->where('is_primary', true);
+    }
+
     public function boosts()
     {
         return $this->hasMany(Boost::class);

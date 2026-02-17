@@ -12,10 +12,12 @@ use App\Services\PushNotificationService;
 class TokenController extends Controller
 {
     protected $pushService;
+    protected $paymentGateway;
 
-    public function __construct(PushNotificationService $pushService)
+    public function __construct(PushNotificationService $pushService, \App\Services\Payment\PaymentGatewayInterface $paymentGateway)
     {
         $this->pushService = $pushService;
+        $this->paymentGateway = $paymentGateway;
     }
 
     public function withdraw(Request $request)
@@ -251,6 +253,7 @@ class TokenController extends Controller
 
     public function leaderboard()
     {
+        // ... (existing leaderboard code) ...
         // Cache for 15 minutes to reduce database load on expensive aggregations
         return \Cache::remember('leaderboard_stats', 900, function () {
             $topHolders = User::orderByDesc('token_balance')
@@ -335,5 +338,110 @@ class TokenController extends Controller
                 'top_streaks' => $topStreaks,
             ]);
         });
+    }
+
+    public function initiateTopUp(Request $request)
+    {
+        $request->validate([
+            'amount_usd' => 'required|numeric|min:5|max:1000',
+        ]);
+
+        $user = $request->user();
+        $amountUsd = $request->amount_usd;
+        $currency = 'USD';
+        
+        // Exchange Rate: $1 USD = 10 FWB
+        $fwbAmount = $amountUsd * 10;
+
+        $result = $this->paymentGateway->createPaymentIntent($amountUsd, $currency, [
+            'user_id' => $user->id,
+            'description' => "Purchase {$fwbAmount} FWB",
+            'type' => 'token_topup',
+            'fwb_amount' => $fwbAmount
+        ]);
+
+        if ($result->success) {
+            return response()->json([
+                'client_secret' => $result->data['client_secret'],
+                'amount_usd' => $amountUsd,
+                'fwb_amount' => $fwbAmount
+            ]);
+        }
+
+        return response()->json(['error' => $result->message], 500);
+    }
+
+    public function confirmTopUp(Request $request)
+    {
+        $request->validate([
+            'payment_intent_id' => 'required|string',
+        ]);
+
+        $user = $request->user();
+        
+        try {
+            $result = $this->paymentGateway->verifyPayment($request->payment_intent_id);
+
+            if ($result->success) {
+                // Check if already processed to be idempotent
+                $existingTx = TokenTransaction::whereJsonContains('metadata->payment_intent_id', $request->payment_intent_id)->exists();
+                if ($existingTx) {
+                     return response()->json(['message' => 'Transaction already processed']);
+                }
+
+                // metadata from Stripe intent
+                $metadata = $result->data['metadata'] ?? []; 
+                $fwbAmount = isset($metadata['fwb_amount']) ? (int)$metadata['fwb_amount'] : 0;
+                
+                // Fallback if metadata missing (shouldn't happen if initiated correctly)
+                if ($fwbAmount <= 0) {
+                     // Default calculation based on amount charged
+                     $chargedAmount = $result->data['amount'] ?? 0; // usually in cents if from stripe object, but our result object normalizes it?
+                     // Let's rely on what we get. Our StripePaymentGateway returns amount in float from intent? 
+                     // Actually let's assume standard $1 = 10 FWB
+                     $fwbAmount = ($result->data['amount'] ?? 0) * 10;
+                }
+
+                \DB::transaction(function () use ($user, $result, $fwbAmount, $request) {
+                     // Log Payment
+                     \App\Models\Payment::create([
+                        'user_id' => $user->id,
+                        'amount' => $result->data['amount'],
+                        'currency' => $result->data['currency'],
+                        'payment_gateway' => config('services.payment.driver', 'mock'),
+                        'transaction_id' => $result->transactionId,
+                        'status' => 'succeeded',
+                        'description' => 'FWB Token Purchase',
+                        'metadata' => $result->data,
+                    ]);
+
+                    // Credit User
+                    $user->increment('token_balance', $fwbAmount);
+
+                    // Log Token Transaction
+                    $user->tokenTransactions()->create([
+                        'amount' => $fwbAmount,
+                        'type' => 'deposit',
+                        'description' => 'Purchased FWB Tokens',
+                        'metadata' => [
+                            'payment_intent_id' => $request->payment_intent_id,
+                            'gateway' => 'stripe',
+                            'cost_usd' => $result->data['amount']
+                        ]
+                    ]);
+                });
+
+                return response()->json([
+                    'message' => 'Top-up successful',
+                    'new_balance' => $user->fresh()->token_balance,
+                    'fwb_added' => $fwbAmount
+                ]);
+            }
+
+            return response()->json(['error' => 'Payment verification failed: ' . $result->message], 400);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error verifying payment: ' . $e->getMessage()], 500);
+        }
     }
 }

@@ -100,7 +100,7 @@ class MerchantController extends Controller
     public function confirm(Request $request, string $id): JsonResponse
     {
         $user = $request->user();
-        $payment = MerchantPayment::findOrFail($id);
+        $payment = MerchantPayment::with('merchant')->findOrFail($id);
 
         if ($payment->status !== 'pending') {
             return response()->json(['error' => 'Payment already processed'], 400);

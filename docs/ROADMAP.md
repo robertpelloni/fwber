@@ -21,6 +21,11 @@
 - [x] Token Economy (Basic)
 - [x] Events & Ticketing
 
+### 5C. Optimization & Compliance
+- [ ] CDN Integration for Images.
+- [x] GDPR/CCPA Data Export Tools in `DataExportController`.
+- [ ] Performance Audit (N+1 Query Elimination).
+
 ## 🔮 Phase 4: Advanced Features (Q1 2026)
 - [x] Group Matching (Find other groups)
 - [x] AI Wingman (Chat suggestions)
@@ -50,16 +55,6 @@
 - [x] Real-time Migration (Mercure → Reverb, Feb 2026)
 - [x] Sentry Integration (Frontend/Backend)
 
-## 📊 Phase 5: Scale & Production (Current Focus)
-- [ ] **Infrastructure Hardening**:
-    - [ ] Kubernetes Manifests / Helm Charts
-    - [ ] Database Read Replicas configuration
-    - [ ] Redis Cluster setup
-- [ ] **Advanced Optimization**:
-    - [ ] Image CDN integration (Cloudinary/AWS CloudFront)
-    - [ ] Database Query Audit (using Slow Request logs)
-- [ ] **Compliance & Legal**:
-    - [ ] GDPR Data Export verification (Automated test)
     - [ ] Terms of Service / Privacy Policy final review
 
 ## 🔮 Phase 6: Future Horizons (Q3 2026)

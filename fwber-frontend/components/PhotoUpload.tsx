@@ -252,17 +252,17 @@ export default function PhotoUpload({
     const validFiles = acceptedFiles.filter(file => {
       const isValidType = file.type.startsWith('image/')
       const isValidSize = file.size <= maxSize * 1024 * 1024
-      
+
       if (!isValidType) {
         alert(`File ${file.name} is not a valid image type`)
         return false
       }
-      
+
       if (!isValidSize) {
         alert(`File ${file.name} is too large. Maximum size is ${maxSize}MB`)
         return false
       }
-      
+
       return true
     })
 
@@ -275,7 +275,7 @@ export default function PhotoUpload({
 
     // Auto-upload immediately after selection
     setIsUploading(true)
-    
+
     setUploadProgress(prev => {
       const newMap = new Map(prev)
       newPreviews.forEach(preview => {
@@ -292,18 +292,18 @@ export default function PhotoUpload({
       const progressCallback = (fileIndex: number, progress: number, fileName: string) => {
         const preview = newPreviews[fileIndex]
         if (!preview) return
-        
+
         setUploadProgress(prev => {
           const newMap = new Map(prev)
           const existing = newMap.get(preview.id) || { fileName, progress: 0, status: 'pending' as const }
-          
+
           newMap.set(preview.id, {
             ...existing,
             fileName,
             progress,
             status: progress === 100 ? 'completed' as const : 'uploading' as const
           })
-          
+
           return newMap
         })
       }
@@ -314,7 +314,7 @@ export default function PhotoUpload({
         isPrivate: p.isPrivate,
         unlockPrice: p.isPrivate ? parseFloat(unlockPrice) : undefined
       })), progressCallback)
-      
+
       // Mark all as completed
       setUploadProgress(prev => {
         const newMap = new Map(prev)
@@ -326,19 +326,19 @@ export default function PhotoUpload({
         })
         return newMap
       })
-      
+
       // Clean up previews and object URLs after upload
       const uploadedPreviewIds = new Set(newPreviews.map(preview => preview.id))
       newPreviews.forEach(preview => {
         revokePreviewUrls(preview)
       })
       setPreviews(prev => prev.filter(preview => !uploadedPreviewIds.has(preview.id)))
-      
+
       setTimeout(() => {
         setIsUploading(false)
         setUploadProgress(new Map())
       }, 1500)
-      
+
     } catch (error) {
       console.error('Upload failed:', error)
       // Mark all as error
@@ -347,16 +347,16 @@ export default function PhotoUpload({
         newPreviews.forEach(preview => {
           const existing = newMap.get(preview.id)
           if (existing && existing.status !== 'completed') {
-            newMap.set(preview.id, { 
-              ...existing, 
+            newMap.set(preview.id, {
+              ...existing,
               status: 'error' as const,
-              error: error instanceof Error ? error.message : 'Upload failed'
+              error: (error as any).response?.data?.message || (error instanceof Error ? error.message : 'Upload failed')
             })
           }
         })
         return newMap
       })
-      
+
       setTimeout(() => {
         setIsUploading(false)
         setUploadProgress(new Map())
@@ -418,7 +418,7 @@ export default function PhotoUpload({
       document.removeEventListener('drop', handleDrop)
     }
   }, [])
-  
+
 
   const removePreview = (id: string) => {
     const previewToRemove = previewsRef.current.find(p => p.id === id)
@@ -481,7 +481,7 @@ export default function PhotoUpload({
     <div className={`space-y-6 ${className}`}>
       {/* Full-page drag overlay */}
       {dragActive && (
-        <div 
+        <div
           {...getRootProps()}
           className="fixed inset-0 z-50 flex items-center justify-center bg-primary/10 backdrop-blur-sm pointer-events-auto"
         >
@@ -507,8 +507,8 @@ export default function PhotoUpload({
         className={`
           relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer
           transition-all duration-200 ease-in-out select-none min-h-[200px]
-          ${isDragActive || dragActive 
-            ? 'border-primary bg-primary/5' 
+          ${isDragActive || dragActive
+            ? 'border-primary bg-primary/5'
             : 'border-muted-foreground/25 hover:border-primary/50'
           }
           ${totalPhotos >= maxPhotos ? 'opacity-50 cursor-not-allowed' : 'pointer-events-auto'}
@@ -521,28 +521,28 @@ export default function PhotoUpload({
           if (totalPhotos < maxPhotos) {
             // Use fileInputRef if available, otherwise fallback to open()
             if (fileInputRef.current) {
-                fileInputRef.current.click();
+              fileInputRef.current.click();
             } else {
-                open();
+              open();
             }
           }
         }}
       >
-        <input 
+        <input
           {...getInputProps({
             style: { display: 'block' }
-          })} 
-          className="sr-only" 
+          })}
+          className="sr-only"
           ref={fileInputRef}
         />
-        
-        <div 
+
+        <div
           className="flex flex-col items-center space-y-4 pointer-events-none"
         >
           <div className="p-4 rounded-full bg-primary/10">
             <Camera className="w-8 h-8 text-primary" />
           </div>
-          
+
           <div>
             <h3 className="text-lg font-semibold text-foreground">
               {isDragActive || dragActive ? 'Drop photos here' : 'Upload Photos'}
@@ -554,7 +554,7 @@ export default function PhotoUpload({
               Max {maxPhotos} photos, {maxSize}MB each • Uploads automatically
             </p>
           </div>
-          
+
           <div className="text-xs text-muted-foreground">
             Supported: JPEG, PNG, WebP, GIF
           </div>
@@ -590,17 +590,17 @@ export default function PhotoUpload({
           </div>
 
           {uploadAsPrivate && (
-             <div className="flex items-center gap-2 mt-2 animate-in fade-in slide-in-from-top-1 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
-                <span className="text-sm text-muted-foreground">Unlock Price (FWB):</span>
-                <input
-                  type="number"
-                  value={unlockPrice}
-                  onChange={(e) => setUnlockPrice(e.target.value)}
-                  className="w-20 p-1 border rounded text-sm text-black"
-                  min="0"
-                  placeholder="50"
-                />
-             </div>
+            <div className="flex items-center gap-2 mt-2 animate-in fade-in slide-in-from-top-1 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+              <span className="text-sm text-muted-foreground">Unlock Price (FWB):</span>
+              <input
+                type="number"
+                value={unlockPrice}
+                onChange={(e) => setUnlockPrice(e.target.value)}
+                className="w-20 p-1 border rounded text-sm text-black"
+                min="0"
+                placeholder="50"
+              />
+            </div>
           )}
 
           {faceBlurEnabled && (
@@ -611,12 +611,12 @@ export default function PhotoUpload({
         </div>
       </div>
 
-        {clientProcessingMessage && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <RotateCw className="w-4 h-4 animate-spin" />
-            {clientProcessingMessage}
-          </div>
-        )}
+      {clientProcessingMessage && (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <RotateCw className="w-4 h-4 animate-spin" />
+          {clientProcessingMessage}
+        </div>
+      )}
 
       {processingWarnings.length > 0 && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900 space-y-2">
@@ -646,16 +646,16 @@ export default function PhotoUpload({
               {Array.from(uploadProgress.values()).filter(p => p.status === 'completed').length} / {uploadProgress.size} complete
             </span>
           </div>
-          
+
           <div className="space-y-3">
             {previews.map((preview) => {
               const progress = uploadProgress.get(preview.id)
               if (!progress) return null
-              
+
               const { progress: percent, status, fileName, error } = progress
               const isCompleted = status === 'completed'
               const isError = status === 'error'
-              
+
               return (
                 <div key={preview.id} className="space-y-1">
                   <div className="flex justify-between items-center text-xs">
@@ -666,18 +666,17 @@ export default function PhotoUpload({
                       {isError ? 'Failed' : isCompleted ? 'Complete' : `${Math.round(percent)}%`}
                     </span>
                   </div>
-                    <div className="w-full bg-muted rounded-full h-2 overflow-hidden relative">
-                      <div 
-                        className={`h-2 rounded-full transition-all duration-300 ${
-                          isError 
-                            ? 'bg-red-500' 
-                            : isCompleted 
-                              ? 'bg-green-500' 
-                              : 'bg-primary'
+                  <div className="w-full bg-muted rounded-full h-2 overflow-hidden relative">
+                    <div
+                      className={`h-2 rounded-full transition-all duration-300 ${isError
+                          ? 'bg-red-500'
+                          : isCompleted
+                            ? 'bg-green-500'
+                            : 'bg-primary'
                         }`}
-                        style={{ width: `${Math.max(5, percent)}%` }}
-                      />
-                    </div>
+                      style={{ width: `${Math.max(5, percent)}%` }}
+                    />
+                  </div>
                   {error && (
                     <p className="text-xs text-red-600 mt-1">{error}</p>
                   )}
@@ -685,7 +684,7 @@ export default function PhotoUpload({
               )
             })}
           </div>
-          
+
           {/* Overall Progress Bar */}
           <div className="pt-2 border-t border-border">
             <div className="flex justify-between text-xs mb-1">
@@ -698,12 +697,12 @@ export default function PhotoUpload({
             </div>
             <div className="w-full bg-muted rounded-full h-2 overflow-hidden relative">
               {(Array.from(uploadProgress.values()).some(p => p.status === 'uploading' || p.status === 'pending')) && (
-                 <div className="absolute inset-0 bg-primary/20 animate-pulse" />
+                <div className="absolute inset-0 bg-primary/20 animate-pulse" />
               )}
-              <div 
+              <div
                 className="bg-primary h-2 rounded-full transition-all duration-300"
-                style={{ 
-                  width: `${Array.from(uploadProgress.values()).reduce((sum, p) => sum + p.progress, 0) / uploadProgress.size}%` 
+                style={{
+                  width: `${Array.from(uploadProgress.values()).reduce((sum, p) => sum + p.progress, 0) / uploadProgress.size}%`
                 }}
               />
             </div>
@@ -720,7 +719,7 @@ export default function PhotoUpload({
               {totalPhotos} / {maxPhotos}
             </span>
           </div>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {/* Existing Photos */}
             {photos.map((photo, index) => (
@@ -734,7 +733,7 @@ export default function PhotoUpload({
                     className={`w-full h-full object-cover ${photo.is_private ? 'blur-sm hover:blur-none transition-all duration-300' : ''}`}
                   />
                 </div>
-                
+
                 {/* Photo Actions */}
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg">
                   <div className="flex items-center justify-center h-full space-x-2">
@@ -753,7 +752,7 @@ export default function PhotoUpload({
                     </button>
                   </div>
                 </div>
-                
+
                 {/* Primary Photo Badge */}
                 {photo.is_primary && (
                   <div className="absolute top-2 left-2 bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium">
@@ -769,7 +768,7 @@ export default function PhotoUpload({
                 )}
               </div>
             ))}
-            
+
             {/* Preview Photos */}
             {previews.map((preview) => {
               const progress = uploadProgress.get(preview.id)
@@ -781,7 +780,7 @@ export default function PhotoUpload({
                 preview.activeView === 'processed' && preview.previewUrls.processed
                   ? preview.previewUrls.processed
                   : preview.previewUrls.original
-              
+
               return (
                 <div key={preview.id} className="relative group">
                   <div className="aspect-square rounded-lg overflow-hidden bg-muted">
@@ -818,7 +817,7 @@ export default function PhotoUpload({
                       </div>
                     )}
                   </div>
-                  
+
                   {/* Preview Actions */}
                   {!isUploadingPhoto && (
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg">
@@ -846,17 +845,16 @@ export default function PhotoUpload({
                       </div>
                     </div>
                   )}
-                  
+
                   {/* Status Badge */}
-                  <div className={`absolute top-2 left-2 px-2 py-1 rounded text-xs font-medium ${
-                    isError 
-                      ? 'bg-red-500 text-white' 
-                      : isCompleted 
-                        ? 'bg-green-500 text-white' 
+                  <div className={`absolute top-2 left-2 px-2 py-1 rounded text-xs font-medium ${isError
+                      ? 'bg-red-500 text-white'
+                      : isCompleted
+                        ? 'bg-green-500 text-white'
                         : isUploadingPhoto
                           ? 'bg-blue-500 text-white'
                           : 'bg-yellow-500 text-white'
-                  }`}>
+                    }`}>
                     {isError ? 'Failed' : isCompleted ? 'Complete' : isUploadingPhoto ? 'Uploading...' : 'Pending'}
                   </div>
 
@@ -877,11 +875,10 @@ export default function PhotoUpload({
                       <button
                         type="button"
                         aria-pressed={preview.activeView === 'processed'}
-                        className={`px-2 py-0.5 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 ${
-                          preview.activeView === 'processed'
+                        className={`px-2 py-0.5 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 ${preview.activeView === 'processed'
                             ? 'bg-white text-black'
                             : 'text-white/80 hover:text-white'
-                        }`}
+                          }`}
                         onClick={(event) => {
                           event.stopPropagation()
                           togglePreviewView(preview.id, 'processed')
@@ -892,11 +889,10 @@ export default function PhotoUpload({
                       <button
                         type="button"
                         aria-pressed={preview.activeView === 'original'}
-                        className={`px-2 py-0.5 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 ${
-                          preview.activeView === 'original'
+                        className={`px-2 py-0.5 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 ${preview.activeView === 'original'
                             ? 'bg-white text-black'
                             : 'text-white/80 hover:text-white'
-                        }`}
+                          }`}
                         onClick={(event) => {
                           event.stopPropagation()
                           togglePreviewView(preview.id, 'original')

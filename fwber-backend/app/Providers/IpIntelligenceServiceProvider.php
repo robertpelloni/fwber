@@ -16,6 +16,7 @@ class IpIntelligenceServiceProvider extends ServiceProvider
 
             return match ($driver) {
                 'ip-api' => new IpApiDriver(),
+                'ipinfo' => new \App\Services\IpIntelligence\Drivers\IpInfoDriver(),
                 default => new MockIpIntelligenceDriver(),
             };
         });

@@ -27,28 +27,94 @@ class PrivacySecurityService
         $cacheKey = 'moderation_' . md5($content . $type);
         
         return Cache::remember($cacheKey, 3600, function () use ($content, $type) {
-            $result = [
-                'is_safe' => true,
-                'confidence' => 1.0,
-                'flags' => [],
-                'action' => 'approve',
-            ];
+            // Use configured moderation driver
+            $driver = config('services.content_moderation.driver', 'mock');
 
-            // Text content moderation
-            if ($type === 'text') {
-                $result = $this->moderateText($content);
-            }
-            
-            // Image content moderation
-            if ($type === 'image') {
-                $result = $this->moderateImage($content);
+            if ($driver === 'aws') {
+                return $this->moderateWithAws($content, $type);
+            } elseif ($driver === 'google') {
+                return $this->moderateWithGoogle($content, $type);
             }
 
-            return $result;
+            // Fallback to mock/regex
+            return $this->moderateWithMock($content, $type);
         });
     }
 
-    private function moderateText(string $text): array
+    private function moderateWithMock(string $content, string $type): array
+    {
+        // Text content moderation
+        if ($type === 'text') {
+            return $this->moderateTextRegex($content);
+        }
+        
+        // Image content moderation
+        if ($type === 'image') {
+            return $this->moderateImageBasic($content);
+        }
+
+        return ['is_safe' => true, 'confidence' => 1.0, 'flags' => [], 'action' => 'approve'];
+    }
+
+    private function moderateWithAws(string $contentUrl, string $type): array
+    {
+        // Use the AwsRekognitionDriver directly via the container or new instance
+        // Assuming content is a file path/URL
+        
+        try {
+            /** @var \App\Services\MediaAnalysis\Drivers\AwsRekognitionDriver $driver */
+            $driver = app(\App\Services\MediaAnalysis\Drivers\AwsRekognitionDriver::class);
+            
+            // Rekognition driver expects a file path relative to public disk
+            $result = $driver->analyze($contentUrl, $type);
+
+            return [
+                'is_safe' => $result->isSafe,
+                'confidence' => $result->confidence,
+                'flags' => $result->unsafeLabels,
+                'action' => $result->isSafe ? 'approve' : 'reject'
+            ];
+        } catch (\Exception $e) {
+            Log::error("PrivacySecurityService: AWS Moderation failed: " . $e->getMessage());
+            // Fallback to strict mock if service fails to avoid letting unsafe content through
+            return ['is_safe' => false, 'confidence' => 0.0, 'flags' => ['moderation_service_error'], 'action' => 'reject'];
+        }
+    }
+
+    private function moderateWithGoogle(string $contentUrl, string $type): array
+    {
+        try {
+            /** @var \App\Services\MediaAnalysis\Drivers\GoogleVisionDriver $driver */
+            $driver = app(\App\Services\MediaAnalysis\Drivers\GoogleVisionDriver::class);
+            
+            // Google driver expects a file path (local or url depending on setup)
+            // For now, assume it handles what AWS driver handled (path relative to storage or absolute)
+            // But GoogleVisionDriver uses file_get_contents($url) so it needs a reachable path.
+            // If $contentUrl is a relative storage path, we might need to resolve it.
+            // AWS driver used Storage::disk('public')->get(), Google driver currently does file_get_contents.
+            
+            // Let's ensure consistency. If it's a relative path in storage, resolve full path.
+            if (Storage::disk('public')->exists($contentUrl)) {
+                $fullPath = Storage::disk('public')->path($contentUrl);
+            } else {
+                $fullPath = $contentUrl;
+            }
+
+            $result = $driver->analyze($fullPath, $type);
+
+            return [
+                'is_safe' => $result->safe,
+                'confidence' => $result->confidence,
+                'flags' => $result->moderationLabels, // Using moderationLabels which maps to warnings/unsafe reasons
+                'action' => $result->safe ? 'approve' : 'reject'
+            ];
+        } catch (\Exception $e) {
+            Log::error("PrivacySecurityService: Google Moderation failed: " . $e->getMessage());
+            return ['is_safe' => false, 'confidence' => 0.0, 'flags' => ['moderation_service_error'], 'action' => 'reject'];
+        }
+    }
+
+    private function moderateTextRegex(string $text): array
     {
         $flags = [];
         $confidence = 1.0;
@@ -101,45 +167,49 @@ class PrivacySecurityService
         ];
     }
 
-    private function moderateImage(string $imagePath): array
+    private function moderateImageBasic(string $imagePath): array
     {
-        // In a real implementation, this would use AWS Rekognition, Google Vision API, etc.
-        // For now, we'll do basic file validation
-        
+        // Basic file validation
         $flags = [];
         $confidence = 1.0;
 
         // Check file size (max 10MB)
-        $fileSize = Storage::size($imagePath);
-        if ($fileSize > 10 * 1024 * 1024) {
-            $flags[] = 'file_too_large';
-            $confidence -= 0.3;
-        }
-
-        // Check file type
-        $mimeType = Storage::mimeType($imagePath);
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        if (!in_array($mimeType, $allowedTypes)) {
-            $flags[] = 'invalid_file_type';
-            $confidence -= 0.5;
-        }
-
-        // Basic image analysis (in real implementation, use AI)
-        $imageInfo = getimagesize(Storage::path($imagePath));
-        if ($imageInfo) {
-            $width = $imageInfo[0];
-            $height = $imageInfo[1];
-            
-            // Check for extremely small images (potential spam)
-            if ($width < 100 || $height < 100) {
-                $flags[] = 'image_too_small';
-                $confidence -= 0.2;
+        if (Storage::exists($imagePath)) {
+            $fileSize = Storage::size($imagePath);
+            if ($fileSize > 10 * 1024 * 1024) {
+                $flags[] = 'file_too_large';
+                $confidence -= 0.3;
             }
-            
-            // Check for extremely large images (potential abuse)
-            if ($width > 4000 || $height > 4000) {
-                $flags[] = 'image_too_large';
-                $confidence -= 0.1;
+
+            // Check file type
+            $mimeType = Storage::mimeType($imagePath);
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!in_array($mimeType, $allowedTypes)) {
+                $flags[] = 'invalid_file_type';
+                $confidence -= 0.5;
+            }
+
+            // Basic image analysis
+            try {
+                $imageInfo = getimagesize(Storage::path($imagePath));
+                if ($imageInfo) {
+                    $width = $imageInfo[0];
+                    $height = $imageInfo[1];
+                    
+                    // Check for extremely small images (potential spam)
+                    if ($width < 100 || $height < 100) {
+                        $flags[] = 'image_too_small';
+                        $confidence -= 0.2;
+                    }
+                    
+                    // Check for extremely large images (potential abuse)
+                    if ($width > 4000 || $height > 4000) {
+                        $flags[] = 'image_too_large';
+                        $confidence -= 0.1;
+                    }
+                }
+            } catch (\Exception $e) {
+                // Ignore errors reading image size for remote/S3 files if direct access fails
             }
         }
 

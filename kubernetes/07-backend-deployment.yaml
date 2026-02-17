@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fwber-backend
+  namespace: fwber
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fwber-backend
+  template:
+    metadata:
+      labels:
+        app: fwber-backend
+    spec:
+      containers:
+      - name: backend
+        image: fwber-backend:latest
+        imagePullPolicy: IfNotPresent
+        command: ["php-fpm"]
+        ports:
+        - containerPort: 9000
+        env:
+        - name: APP_ENV
+          value: "production"
+        - name: APP_DEBUG
+          value: "false"
+        - name: APP_KEY
+          valueFrom:
+            secretKeyRef:
+              name: fwber-secrets
+              key: APP_KEY
+        - name: DB_CONNECTION
+          value: "mysql"
+        - name: DB_HOST
+          value: "fwber-mysql"
+        - name: DB_READ_HOST
+          value: "fwber-mysql-read"
+        - name: DB_PORT
+          value: "3306"
+        - name: DB_DATABASE
+          value: "fwber_dev"
+        - name: DB_USERNAME
+          value: "fwber_user"
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: fwber-secrets
+              key: DB_PASSWORD
+        - name: REDIS_HOST
+          value: "fwber-redis-master"
+        - name: QUEUE_CONNECTION
+          value: "redis"
+        - name: CACHE_DRIVER
+          value: "redis"
+        - name: SESSION_DRIVER
+          value: "redis"
+        - name: BROADCAST_DRIVER
+          value: "reverb"
+        - name: REVERB_APP_ID
+          valueFrom:
+            secretKeyRef:
+              name: fwber-secrets
+              key: REVERB_APP_ID
+        - name: REVERB_APP_KEY
+          valueFrom:
+            secretKeyRef:
+              name: fwber-secrets
+              key: REVERB_APP_KEY
+        - name: REVERB_APP_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: fwber-secrets
+              key: REVERB_APP_SECRET
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fwber-backend
+  namespace: fwber
+spec:
+  ports:
+  - port: 9000
+  selector:
+    app: fwber-backend

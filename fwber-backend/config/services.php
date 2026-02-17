@@ -58,4 +58,11 @@ return [
         'rpc_url' => env('SOLANA_RPC_URL'),
     ],
 
+    'google' => [
+        'vision' => [
+            'enabled' => env('GOOGLE_VISION_ENABLED', false),
+            'credentials_path' => env('GOOGLE_APPLICATION_CREDENTIALS'),
+        ],
+    ],
+
 ];

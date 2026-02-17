@@ -21,12 +21,29 @@ class MediaUploadService
         $mediaUrl = Storage::url($path);
         $mediaType = $file->getMimeType();
 
-        $thumbnailUrl = null;
-        // Placeholder for future video thumbnail generation
+        // Video Thumbnail Generation
         if ($resolvedType === 'video') {
-            // In future: generate thumbnail and store under messages/{senderId}/thumbnails
-            // $thumbnailPath = ...
-            // $thumbnailUrl = Storage::url($thumbnailPath);
+            try {
+                // Check if FFMpeg is strictly required or optional
+                if (class_exists('FFMpeg\FFMpeg')) {
+                    $ffmpeg = \FFMpeg\FFMpeg::create();
+                    $video = $ffmpeg->open(Storage::path($path));
+                    
+                    $thumbnailPath = "messages/{$senderId}/thumbnails/" . pathinfo($path, PATHINFO_FILENAME) . '.jpg';
+                    
+                    // Extract frame at 1 second mark
+                    $frame = $video->frame(\FFMpeg\Coordinate\TimeCode::fromSeconds(1));
+                    $frame->save(Storage::path($thumbnailPath));
+                    
+                    $thumbnailUrl = Storage::url($thumbnailPath);
+                } else {
+                    // Fallback or log warning that FFMpeg is missing
+                    \Illuminate\Support\Facades\Log::warning("FFMpeg class not found. Skipping thumbnail generation for video: {$path}");
+                }
+            } catch (\Throwable $e) {
+                // Fail silently for thumbnails, don't block upload
+                \Illuminate\Support\Facades\Log::error("Video thumbnail generation failed: " . $e->getMessage());
+            }
         }
 
         return [

@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fwber-redis-master
+  namespace: fwber
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fwber-redis-master
+  template:
+    metadata:
+      labels:
+        app: fwber-redis-master
+    spec:
+      containers:
+      - name: redis
+        image: redis/redis-stack-server:latest
+        command: ["redis-server", "--appendonly", "yes"]
+        ports:
+        - containerPort: 6379
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+      volumes:
+      - name: redis-data
+        emptyDir: {} # ephemeral for now, use PVC in real prod
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fwber-redis-master
+  namespace: fwber
+spec:
+  ports:
+  - port: 6379
+  selector:
+    app: fwber-redis-master

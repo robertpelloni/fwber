@@ -10,6 +10,7 @@ use App\Http\Requests\UpdateChatroomLocationRequest;
 use App\Models\ProximityChatroom;
 use App\Models\User;
 use App\Services\ContentModerationService;
+use App\Services\LocationService;
 use App\Services\TokenDistributionService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -22,11 +23,16 @@ class ProximityChatroomController extends Controller
 {
     protected $contentModeration;
     protected $tokenService;
+    protected $locationService;
 
-    public function __construct(ContentModerationService $contentModeration, TokenDistributionService $tokenService)
-    {
+    public function __construct(
+        ContentModerationService $contentModeration,
+        TokenDistributionService $tokenService,
+        LocationService $locationService
+    ) {
         $this->contentModeration = $contentModeration;
         $this->tokenService = $tokenService;
+        $this->locationService = $locationService;
     }
 
     /**
@@ -83,7 +89,7 @@ class ProximityChatroomController extends Controller
 
         // Add distance information to each chatroom
         $chatrooms->each(function ($chatroom) use ($latitude, $longitude) {
-            $chatroom->distance_meters = $chatroom->calculateDistance($latitude, $longitude);
+            $chatroom->distance_meters = $this->locationService->calculateDistance($latitude, $longitude, $chatroom->latitude, $chatroom->longitude);
         });
 
         return response()->json([
@@ -134,7 +140,7 @@ class ProximityChatroomController extends Controller
         $validated = $request->validated();
 
         // Generate geohash for efficient proximity queries
-        $geohash = $this->generateGeohash($validated['latitude'], $validated['longitude']);
+        $geohash = $this->locationService->generateGeohash($validated['latitude'], $validated['longitude']);
 
         $chatroom = ProximityChatroom::create([
             'name' => $validated['name'],
@@ -296,7 +302,12 @@ class ProximityChatroomController extends Controller
         $chatroom->addMember($user, [
             'latitude' => $validated['latitude'],
             'longitude' => $validated['longitude'],
-            'distance_meters' => $chatroom->calculateDistance($validated['latitude'], $validated['longitude']),
+            'distance_meters' => $this->locationService->calculateDistance(
+                $validated['latitude'],
+                $validated['longitude'],
+                $chatroom->latitude,
+                $chatroom->longitude
+            ),
             'is_networking' => $validated['is_networking'] ?? false,
             'is_social' => $validated['is_social'] ?? true,
             'professional_info' => $validated['professional_info'] ?? [],
@@ -459,7 +470,7 @@ class ProximityChatroomController extends Controller
             ->wherePivot('is_visible', true)
             ->get()
             ->filter(function ($member) use ($latitude, $longitude, $radiusMeters) {
-                $distance = $this->calculateDistance(
+                $distance = $this->locationService->calculateDistance(
                     $latitude,
                     $longitude,
                     $member->pivot->latitude,
@@ -468,7 +479,7 @@ class ProximityChatroomController extends Controller
                 return $distance <= $radiusMeters;
             })
             ->map(function ($member) use ($latitude, $longitude) {
-                $member->distance_meters = $this->calculateDistance(
+                $member->distance_meters = $this->locationService->calculateDistance(
                     $latitude,
                     $longitude,
                     $member->pivot->latitude,
@@ -526,81 +537,5 @@ class ProximityChatroomController extends Controller
         return response()->json($analytics);
     }
 
-    /**
-     * Generate geohash for location
-     */
-    private function generateGeohash(float $latitude, float $longitude): string
-    {
-        // Simple geohash implementation (in production, use a proper geohash library)
-        $precision = 8;
-        $latRange = [-90, 90];
-        $lonRange = [-180, 180];
-        
-        $geohash = '';
-        $isEven = true;
-        $bit = 0;
-        $ch = 0;
-        
-        while (strlen($geohash) < $precision) {
-            if ($isEven) {
-                $mid = ($lonRange[0] + $lonRange[1]) / 2;
-                if ($longitude >= $mid) {
-                    $ch |= (1 << (4 - $bit));
-                    $lonRange[0] = $mid;
-                } else {
-                    $lonRange[1] = $mid;
-                }
-            } else {
-                $mid = ($latRange[0] + $latRange[1]) / 2;
-                if ($latitude >= $mid) {
-                    $ch |= (1 << (4 - $bit));
-                    $latRange[0] = $mid;
-                } else {
-                    $latRange[1] = $mid;
-                }
-            }
-            
-            $isEven = !$isEven;
-            
-            if ($bit < 4) {
-                $bit++;
-            } else {
-                $geohash .= $this->base32Encode($ch);
-                $bit = 0;
-                $ch = 0;
-            }
-        }
-        
-        return $geohash;
-    }
 
-    /**
-     * Base32 encoding for geohash
-     */
-    private function base32Encode(int $value): string
-    {
-        $base32 = '0123456789bcdefghjkmnpqrstuvwxyz';
-        return $base32[$value];
-    }
-
-    /**
-     * Calculate distance between two points
-     */
-    private function calculateDistance(float $lat1, float $lon1, float $lat2, float $lon2): int
-    {
-        $earthRadius = 6371000; // Earth's radius in meters
-        
-        $lat1 = deg2rad($lat1);
-        $lon1 = deg2rad($lon1);
-        $lat2 = deg2rad($lat2);
-        $lon2 = deg2rad($lon2);
-        
-        $dlat = $lat2 - $lat1;
-        $dlon = $lon2 - $lon1;
-        
-        $a = sin($dlat/2) * sin($dlat/2) + cos($lat1) * cos($lat2) * sin($dlon/2) * sin($dlon/2);
-        $c = 2 * atan2(sqrt($a), sqrt(1-$a));
-        
-        return round($earthRadius * $c);
-    }
 }

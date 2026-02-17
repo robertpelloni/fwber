@@ -174,6 +174,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('profile/completeness', [\App\Http\Controllers\ProfileController::class, 'completeness']);
     Route::get('profile/export', [\App\Http\Controllers\ProfileController::class, 'export']);
 
+    // GDPR Data Export
+    Route::post('user/export', [\App\Http\Controllers\DataExportController::class, 'requestExport'])->middleware('throttle:1,1440'); // Once per day
+    Route::get('user/export/status', [\App\Http\Controllers\DataExportController::class, 'checkStatus']);
+    Route::get('user/export/{filename}', [\App\Http\Controllers\DataExportController::class, 'download'])->name('api.user.export.download');
+
     // Onboarding
     Route::get('onboarding/status', [\App\Http\Controllers\OnboardingController::class, 'getStatus']);
     Route::post('onboarding/complete', [\App\Http\Controllers\OnboardingController::class, 'complete']);
@@ -447,6 +452,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Consumer Deals/Promotions Discovery
     Route::get('deals', [\App\Http\Controllers\MerchantController::class, 'browseDeals']);
     Route::get('deals/categories', [\App\Http\Controllers\MerchantController::class, 'getCategories']);
+    Route::post('promotions/{id}/track', [\App\Http\Controllers\MerchantController::class, 'trackPromotion']);
 
     // Matchmaker Bounty
     Route::get('bounties', [\App\Http\Controllers\API\MatchBountyController::class, 'index']);
@@ -487,6 +493,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('wallet', [\App\Http\Controllers\Api\TokenController::class, 'balance']);
     Route::post('wallet/withdraw', [\App\Http\Controllers\Api\TokenController::class, 'withdraw']);
     Route::post('wallet/deposit', [\App\Http\Controllers\Api\TokenController::class, 'deposit']);
+    Route::post('wallet/top-up/initiate', [\App\Http\Controllers\Api\TokenController::class, 'initiateTopUp']);
+    Route::post('wallet/top-up/confirm', [\App\Http\Controllers\Api\TokenController::class, 'confirmTopUp']);
     Route::post('wallet/transfer', [\App\Http\Controllers\Api\TokenController::class, 'transfer']);
     Route::post('wallet/address', [\App\Http\Controllers\Api\TokenController::class, 'updateAddress']);
     Route::get('leaderboard', [\App\Http\Controllers\Api\TokenController::class, 'leaderboard']);

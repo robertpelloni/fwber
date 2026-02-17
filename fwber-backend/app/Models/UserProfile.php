@@ -102,4 +102,12 @@ class UserProfile extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    protected static function booted()
+    {
+        static::saved(function ($profile) {
+            // Dispatch job to update vector embedding
+            \App\Jobs\ProcessProfileEmbedding::dispatch($profile);
+        });
+    }
 }

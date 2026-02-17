@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import AppHeader from '@/components/AppHeader'
 import { apiClient } from '@/lib/api/client'
 import { useLocation } from '@/lib/hooks/use-location'
-import { 
+import {
   Tag, MapPin, Clock, Percent, Store, Filter, ChevronDown,
   ArrowLeft, Sparkles, Gift, Coffee, Utensils, ShoppingBag,
   Ticket, Heart, Star, Navigation, RefreshCw
@@ -73,12 +73,12 @@ function getTimeRemaining(expiresAt: string): string {
   const now = new Date()
   const expires = new Date(expiresAt)
   const diff = expires.getTime() - now.getTime()
-  
+
   if (diff <= 0) return 'Expired'
-  
+
   const hours = Math.floor(diff / (1000 * 60 * 60))
   const days = Math.floor(hours / 24)
-  
+
   if (days > 0) return `${days}d left`
   if (hours > 0) return `${hours}h left`
   return 'Expiring soon!'
@@ -91,6 +91,102 @@ function getCategoryIcon(category: string | null): React.ComponentType<{ classNa
     if (lower.includes(key)) return icon
   }
   return categoryIcons.default
+}
+
+function DealCard({ deal }: { deal: Deal }) {
+  const CategoryIcon = getCategoryIcon(deal.merchant.category)
+  const timeLeft = getTimeRemaining(deal.expires_at)
+  const isExpiringSoon = timeLeft.includes('h') || timeLeft.includes('soon')
+  const hasTrackedView = useRef(false)
+
+  const trackInteraction = useCallback(async (type: 'view' | 'click' | 'redemption') => {
+    try {
+      await apiClient.post(`/promotions/${deal.id}/track`, { type })
+    } catch (err) {
+      console.error(`Failed to track ${type} for deal ${deal.id}`, err)
+    }
+  }, [deal.id])
+
+  useEffect(() => {
+    if (!hasTrackedView.current) {
+      trackInteraction('view')
+      hasTrackedView.current = true
+    }
+  }, [trackInteraction])
+
+  const handleClick = () => {
+    trackInteraction('click')
+    // In a real app, this might open a modal or navigate to details
+  }
+
+  const handleRedeem = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    trackInteraction('redemption')
+    alert(`Redeemed! Code: ${deal.promo_code || 'APPLIED'}`)
+  }
+
+  return (
+    <div
+      onClick={handleClick}
+      className="bg-white rounded-xl shadow-sm border border-amber-100 overflow-hidden hover:shadow-md transition cursor-pointer group"
+    >
+      <div className="p-4">
+        <div className="flex items-start gap-3">
+          <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
+            <CategoryIcon className="w-6 h-6 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-gray-900 truncate group-hover:text-amber-600 transition">{deal.title}</h3>
+            <p className="text-sm text-gray-500 flex items-center gap-1">
+              <Store className="w-3.5 h-3.5" />
+              {deal.merchant.business_name}
+            </p>
+          </div>
+          <div className="bg-red-500 text-white px-2 py-1 rounded-lg text-sm font-bold flex items-center gap-1">
+            <Percent className="w-3.5 h-3.5" />
+            {deal.discount_value}%
+          </div>
+        </div>
+
+        <p className="mt-3 text-sm text-gray-600 line-clamp-2">
+          {deal.description}
+        </p>
+
+        <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-gray-500">
+          {deal.merchant.address && (
+            <span className="flex items-center gap-1">
+              <MapPin className="w-3.5 h-3.5" />
+              {deal.merchant.address}
+            </span>
+          )}
+          <span className={`flex items-center gap-1 ${isExpiringSoon ? 'text-red-500 font-medium' : ''}`}>
+            <Clock className="w-3.5 h-3.5" />
+            {timeLeft}
+          </span>
+        </div>
+
+        {(deal.promo_code || deal.token_cost > 0) && (
+          <div className="mt-4 flex items-center justify-between gap-2">
+            {deal.token_cost > 0 ? (
+              <div className="flex items-center gap-1 text-sm text-amber-600 font-medium">
+                <Sparkles className="w-4 h-4" />
+                {deal.token_cost} tokens
+              </div>
+            ) : (
+              <div className="text-xs text-gray-400">Free to claim</div>
+            )}
+
+            <button
+              onClick={handleRedeem}
+              className="px-3 py-1.5 bg-amber-100 text-amber-700 text-sm font-medium rounded-lg hover:bg-amber-200 transition"
+            >
+              Redeem
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
 }
 
 export default function DealsPage() {
@@ -141,13 +237,13 @@ export default function DealsPage() {
         }
 
         const response = await apiClient.get<DealsResponse>(`/deals?${params}`)
-        
+
         if (page === 1) {
           setDeals(response.data.data || [])
         } else {
           setDeals(prev => [...prev, ...(response.data.data || [])])
         }
-        
+
         setHasMore(response.data.current_page < response.data.last_page)
       } catch (err) {
         console.error('Failed to fetch deals:', err)
@@ -203,7 +299,7 @@ export default function DealsPage() {
             <p className="text-gray-600 mb-6">
               We need your location to show nearby deals. Please enable location access in your browser.
             </p>
-            <Link 
+            <Link
               href="/home"
               className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition"
             >
@@ -220,13 +316,13 @@ export default function DealsPage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
         <AppHeader />
-        
+
         <main className="max-w-4xl mx-auto px-4 py-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <Link 
-                href="/home" 
+              <Link
+                href="/home"
                 className="p-2 -ml-2 hover:bg-amber-100 rounded-lg transition"
               >
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
@@ -276,11 +372,10 @@ export default function DealsPage() {
                 <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => handleFilterChange('all')}
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${
-                      selectedCategory === 'all'
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${selectedCategory === 'all'
                         ? 'bg-amber-500 text-white'
                         : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
-                    }`}
+                      }`}
                   >
                     All
                   </button>
@@ -288,11 +383,10 @@ export default function DealsPage() {
                     <button
                       key={cat}
                       onClick={() => handleFilterChange(cat)}
-                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${
-                        selectedCategory === cat
+                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${selectedCategory === cat
                           ? 'bg-amber-500 text-white'
                           : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
-                      }`}
+                        }`}
                     >
                       {cat}
                     </button>
@@ -308,11 +402,10 @@ export default function DealsPage() {
                     <button
                       key={opt.value}
                       onClick={() => handleRadiusChange(opt.value)}
-                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${
-                        radius === opt.value
+                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${radius === opt.value
                           ? 'bg-amber-500 text-white'
                           : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
-                      }`}
+                        }`}
                     >
                       {opt.label}
                     </button>
@@ -328,11 +421,10 @@ export default function DealsPage() {
                     <button
                       key={opt.value}
                       onClick={() => handleSortChange(opt.value)}
-                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${
-                        sortBy === opt.value
+                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${sortBy === opt.value
                           ? 'bg-amber-500 text-white'
                           : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
-                      }`}
+                        }`}
                     >
                       {opt.label}
                     </button>
@@ -395,77 +487,9 @@ export default function DealsPage() {
           ) : (
             <>
               <div className="grid gap-4 sm:grid-cols-2">
-                {deals.map(deal => {
-                  const CategoryIcon = getCategoryIcon(deal.merchant.category)
-                  const timeLeft = getTimeRemaining(deal.expires_at)
-                  const isExpiringSoon = timeLeft.includes('h') || timeLeft.includes('soon')
-
-                  return (
-                    <div
-                      key={deal.id}
-                      className="bg-white rounded-xl shadow-sm border border-amber-100 overflow-hidden hover:shadow-md transition"
-                    >
-                      {/* Deal Header */}
-                      <div className="p-4">
-                        <div className="flex items-start gap-3">
-                          <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <CategoryIcon className="w-6 h-6 text-white" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-gray-900 truncate">{deal.title}</h3>
-                            <p className="text-sm text-gray-500 flex items-center gap-1">
-                              <Store className="w-3.5 h-3.5" />
-                              {deal.merchant.business_name}
-                            </p>
-                          </div>
-                          <div className="bg-red-500 text-white px-2 py-1 rounded-lg text-sm font-bold flex items-center gap-1">
-                            <Percent className="w-3.5 h-3.5" />
-                            {deal.discount_value}%
-                          </div>
-                        </div>
-
-                        {/* Description */}
-                        <p className="mt-3 text-sm text-gray-600 line-clamp-2">
-                          {deal.description}
-                        </p>
-
-                        {/* Meta Info */}
-                        <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-gray-500">
-                          {deal.merchant.address && (
-                            <span className="flex items-center gap-1">
-                              <MapPin className="w-3.5 h-3.5" />
-                              {deal.merchant.address}
-                            </span>
-                          )}
-                          <span className={`flex items-center gap-1 ${isExpiringSoon ? 'text-red-500 font-medium' : ''}`}>
-                            <Clock className="w-3.5 h-3.5" />
-                            {timeLeft}
-                          </span>
-                        </div>
-
-                        {/* Promo Code */}
-                        {deal.promo_code && (
-                          <div className="mt-3 p-2 bg-amber-50 rounded-lg border border-dashed border-amber-300">
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs text-amber-600 font-medium">PROMO CODE</span>
-                              <span className="font-mono font-bold text-amber-700">{deal.promo_code}</span>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Token Cost */}
-                        {deal.token_cost > 0 && (
-                          <div className="mt-3 flex items-center gap-1 text-sm">
-                            <Sparkles className="w-4 h-4 text-yellow-500" />
-                            <span className="text-gray-600">
-                              Costs <span className="font-semibold text-yellow-600">{deal.token_cost} tokens</span> to unlock
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )
-                })}
+                {deals.map(deal => (
+                  <DealCard key={deal.id} deal={deal} />
+                ))}
               </div>
 
               {/* Load More */}

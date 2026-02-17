@@ -104,8 +104,8 @@ class AwsRekognitionDriver implements MediaAnalysisInterface
     public function compareFaces(string $sourcePath, string $targetPath): float
     {
         if (!$this->client) {
-            Log::warning('AWS Rekognition credentials not configured. Falling back to mock comparison.');
-            return 99.9; // Auto-pass if not configured (dev mode behavior)
+            Log::error('AWS Rekognition credentials not configured.');
+            throw new Exception('AWS Rekognition credentials not configured.');
         }
 
         try {

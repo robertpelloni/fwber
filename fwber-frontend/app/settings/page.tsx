@@ -146,7 +146,7 @@ export default function SettingsPage() {
   const { user, logout } = useAuth();
   const { isEnabled: vaultEnabled } = useFeatureFlag('local_media_vault');
   const { isEnabled: faceRevealEnabled } = useFeatureFlag('face_reveal');
-  
+
   const [isIncognito, setIsIncognito] = useState(user?.profile?.is_incognito || false);
   const [updatingIncognito, setUpdatingIncognito] = useState(false);
 
@@ -157,7 +157,7 @@ export default function SettingsPage() {
       setIsIncognito(checked);
       // Optimistically update user context if possible
       if (user && user.profile) {
-          user.profile.is_incognito = checked;
+        user.profile.is_incognito = checked;
       }
     } catch (error) {
       console.error('Failed to toggle incognito', error);
@@ -168,22 +168,54 @@ export default function SettingsPage() {
     }
   };
 
+  const [exportStatus, setExportStatus] = useState<'idle' | 'requesting' | 'processing' | 'ready' | 'error'>('idle');
+  const [exportUrl, setExportUrl] = useState<string | null>(null);
+
   const handleExportData = async () => {
+    if (exportStatus === 'requesting' || exportStatus === 'processing') return;
+
     try {
-      const response = await apiClient.get('/profile/export');
-      const dataStr = JSON.stringify(response, null, 2);
-      const blob = new Blob([dataStr], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `fwber-data-export-${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch (error) {
+      setExportStatus('requesting');
+      // Request the export
+      await apiClient.post('/user/export', {});
+
+      setExportStatus('processing');
+      alert('Your data export has been requested. We will notify you when it is ready (or check back here).');
+
+      // Start polling for status (simplified for this context, ideally use a hook or web socket)
+      const pollInterval = setInterval(async () => {
+        try {
+          const statusRes = await apiClient.get('/user/export/status');
+          // @ts-ignore - basic type assertion
+          const data = statusRes.data as any;
+
+          if (data.status === 'ready') {
+            setExportStatus('ready');
+            setExportUrl(data.url); // The backend should return the download URL
+            clearInterval(pollInterval);
+          } else if (data.status === 'failed') {
+            setExportStatus('error');
+            clearInterval(pollInterval);
+          }
+        } catch (e) {
+          // Ignore poll errors
+        }
+      }, 5000);
+
+    } catch (error: any) {
       console.error('Failed to export data', error);
-      alert('Failed to export data. Please try again.');
+      if (error.response?.status === 429) {
+        alert('You can only request a data export once per day.');
+      } else {
+        alert('Failed to request data export. Please try again.');
+      }
+      setExportStatus('error');
+    }
+  };
+
+  const handleDownloadExport = () => {
+    if (exportUrl) {
+      window.location.href = exportUrl;
     }
   };
 
@@ -313,10 +345,11 @@ export default function SettingsPage() {
                 description="Manage blocked users and privacy settings"
               />
               <SettingsButton
-                onClick={handleExportData}
+                onClick={exportStatus === 'ready' ? handleDownloadExport : handleExportData}
                 icon={<Download className="w-5 h-5" />}
-                title="Export Data"
-                description="Download a copy of your personal data"
+                title={exportStatus === 'ready' ? "Download Data Export" : (exportStatus === 'processing' ? "Exporting Data..." : "Export Data")}
+                description={exportStatus === 'ready' ? "Your data is ready to download" : (exportStatus === 'processing' ? "We are generating your export file" : "Request a copy of your personal data")}
+                disabled={exportStatus === 'requesting' || exportStatus === 'processing'}
               />
             </div>
           </section>
@@ -350,7 +383,7 @@ export default function SettingsPage() {
                   <h3 className="text-sm font-medium text-gray-900">Theme</h3>
                   <p className="text-sm text-gray-500">Choose your preferred color scheme</p>
                 </div>
-                <select 
+                <select
                   aria-label="Theme selection"
                   className="text-sm border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >

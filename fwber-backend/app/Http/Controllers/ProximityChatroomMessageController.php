@@ -78,12 +78,11 @@ class ProximityChatroomMessageController extends Controller
             $query->where('is_pinned', $request->boolean('pinned'));
         }
 
-        // Filter announcements
         if ($request->has('announcements')) {
             $query->where('is_announcement', $request->boolean('announcements'));
         }
 
-        $messages = $query->with(['user', 'reactions', 'mentions.mentionedUser'])
+        $messages = $query->with(['user.primaryPhoto', 'reactions.user.primaryPhoto', 'mentions.mentionedUser.primaryPhoto'])
             ->orderBy('created_at', 'desc')
             ->paginate(50);
 
@@ -171,7 +170,7 @@ class ProximityChatroomMessageController extends Controller
         }
 
         // Load relationships
-        $message->load(['user', 'reactions', 'mentions.mentionedUser']);
+        $message->load(['user.primaryPhoto', 'reactions.user.primaryPhoto', 'mentions.mentionedUser.primaryPhoto']);
 
         Log::info('Proximity chatroom message sent', [
             'chatroom_id' => $chatroomId,
@@ -207,7 +206,7 @@ class ProximityChatroomMessageController extends Controller
         }
 
         $message = $chatroom->messages()
-            ->with(['user', 'reactions', 'mentions.mentionedUser', 'parent.user'])
+            ->with(['user.primaryPhoto', 'reactions.user.primaryPhoto', 'mentions.mentionedUser.primaryPhoto', 'parent.user.primaryPhoto'])
             ->findOrFail($messageId);
 
         return response()->json($message);
@@ -283,7 +282,7 @@ class ProximityChatroomMessageController extends Controller
             'user_id' => Auth::id(),
         ]);
 
-        return response()->json($message->load(['user', 'reactions', 'mentions.mentionedUser']));
+        return response()->json($message->load(['user.primaryPhoto', 'reactions.user.primaryPhoto', 'mentions.mentionedUser.primaryPhoto']));
     }
 
     /**
@@ -467,7 +466,7 @@ class ProximityChatroomMessageController extends Controller
 
         $pinnedMessages = $chatroom->messages()
             ->pinned()
-            ->with(['user', 'reactions', 'mentions.mentionedUser'])
+            ->with(['user.primaryPhoto', 'reactions.user.primaryPhoto', 'mentions.mentionedUser.primaryPhoto'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -497,7 +496,7 @@ class ProximityChatroomMessageController extends Controller
 
         $message = $chatroom->messages()->findOrFail($messageId);
         $replies = $message->replies()
-            ->with(['user', 'reactions', 'mentions.mentionedUser'])
+            ->with(['user.primaryPhoto', 'reactions.user.primaryPhoto', 'mentions.mentionedUser.primaryPhoto'])
             ->orderBy('created_at', 'asc')
             ->get();
 
@@ -527,7 +526,7 @@ class ProximityChatroomMessageController extends Controller
         $networkingMessages = $chatroom->messages()
             ->networking()
             ->notDeleted()
-            ->with(['user', 'reactions', 'mentions.mentionedUser'])
+            ->with(['user.primaryPhoto', 'reactions.user.primaryPhoto', 'mentions.mentionedUser.primaryPhoto'])
             ->orderBy('created_at', 'desc')
             ->paginate(50);
 
@@ -557,7 +556,7 @@ class ProximityChatroomMessageController extends Controller
         $socialMessages = $chatroom->messages()
             ->social()
             ->notDeleted()
-            ->with(['user', 'reactions', 'mentions.mentionedUser'])
+            ->with(['user.primaryPhoto', 'reactions.user.primaryPhoto', 'mentions.mentionedUser.primaryPhoto'])
             ->orderBy('created_at', 'desc')
             ->paginate(50);
 

@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fwber-nginx-config
+  namespace: fwber
+data:
+  default.conf: |
+    upstream nextjs {
+        server fwber-frontend:3000;
+        keepalive 32;
+    }
+
+    upstream php_fpm {
+        server fwber-backend:9000;
+        keepalive 16;
+    }
+
+    upstream reverb {
+        server fwber-reverb:8080;
+        keepalive 8;
+    }
+
+    server {
+        listen 80;
+        server_name _;
+        server_tokens off;
+
+        # Frontend (Next.js)
+        location / {
+            proxy_pass http://nextjs;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+        }
+
+        # API -> Laravel (php-fpm)
+        location /api/ {
+            root /var/www/html/public;
+            try_files $uri /index.php?$query_string;
+        }
+
+        # Handle PHP execution
+        location ~ \.php$ {
+            root /var/www/html/public;
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_param PATH_INFO $fastcgi_path_info;
+            fastcgi_param QUERY_STRING $query_string;
+            fastcgi_pass php_fpm;
+            fastcgi_buffers 16 16k;
+            fastcgi_buffer_size 32k;
+        }
+
+        # Reverb WebSocket
+        location /app {
+            proxy_pass http://reverb;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_read_timeout 86400;
+        }
+        
+        # Security headers
+        add_header X-Content-Type-Options nosniff;
+        add_header Content-Security-Policy "frame-ancestors *";
+        add_header Referrer-Policy no-referrer-when-downgrade;
+        add_header X-XSS-Protection "1; mode=block";
+    }

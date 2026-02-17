@@ -326,6 +326,8 @@ class RealTimeCommunicationService
         return $call;
     }
 
+
+
     public function endVideoCall(string $callId, int $userId): void
     {
         $callData = $this->redis->get("call:{$callId}");
@@ -354,6 +356,33 @@ class RealTimeCommunicationService
             'initiator_id' => $call['initiator_id'],
             'target_id' => $call['target_id'],
             'action' => 'end',
+            'timestamp' => now()->toISOString(),
+        ]));
+    }
+
+    /**
+     * Send WebRTC signaling data (ICE candidates, Session Descriptions)
+     */
+    public function sendSignal(string $callId, int $senderId, array $signalData): void
+    {
+        $callData = $this->redis->get("call:{$callId}");
+        if (!$callData) {
+            throw new \Exception('Call not found');
+        }
+
+        $call = json_decode($callData, true);
+        if (!in_array($senderId, [$call['initiator_id'], $call['target_id']])) {
+            throw new \Exception('Unauthorized to signal in this call');
+        }
+
+        $targetId = ($senderId === $call['initiator_id']) ? $call['target_id'] : $call['initiator_id'];
+
+        $this->redis->publish('video_call_signal', json_encode([
+            'call_id' => $callId,
+            'sender_id' => $senderId,
+            'target_id' => $targetId,
+            'type' => $signalData['type'] ?? 'candidate',
+            'payload' => $signalData['payload'] ?? [],
             'timestamp' => now()->toISOString(),
         ]));
     }

@@ -203,4 +203,36 @@ class MerchantController extends Controller
 
         return response()->json(['categories' => $categories]);
     }
+
+    /**
+     * Track promotion interaction (View, Click, Redemption).
+     */
+    public function trackPromotion(Request $request, $id)
+    {
+        $request->validate([
+            'type' => 'required|in:view,click,redemption',
+            'metadata' => 'nullable|array',
+        ]);
+
+        $promotion = Promotion::findOrFail($id);
+
+        // Record the event
+        \App\Models\PromotionEvent::create([
+            'promotion_id' => $promotion->id,
+            'user_id' => Auth::id(), // Nullable for guests
+            'type' => $request->type,
+            'metadata' => $request->metadata,
+        ]);
+
+        // Update aggregate counters
+        if ($request->type === 'view') {
+            $promotion->increment('views');
+        } elseif ($request->type === 'click') {
+            $promotion->increment('clicks');
+        } elseif ($request->type === 'redemption') {
+            $promotion->increment('redemptions');
+        }
+
+        return response()->json(['success' => true]);
+    }
 }

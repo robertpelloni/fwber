@@ -110,8 +110,13 @@ class SubscriptionController extends Controller
             return response()->json(['message' => 'No active subscription found.'], 400);
         }
 
-        // In a real implementation, we would call Stripe API here to cancel
-        // $this->paymentGateway->cancelSubscription($subscription->stripe_id);
+        // Call Stripe API to cancel
+        try {
+            $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
+            $stripe->subscriptions->cancel($subscription->stripe_id, []);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Stripe cancellation failed: ' . $e->getMessage()], 500);
+        }
 
         $subscription->stripe_status = 'canceled';
         // We keep ends_at as is, so user has access until the end of the period
