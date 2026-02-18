@@ -12,7 +12,8 @@ import {
   MapPin,
   Sparkles,
   Search,
-  BookOpen
+  BookOpen,
+  Store
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { useState } from 'react'
@@ -50,6 +51,8 @@ const HELP_CATEGORIES = [
       { title: 'Photo Privacy & Blurring', slug: 'photo-privacy' },
       { title: 'Blocking & Reporting', slug: 'block-report' },
       { title: 'Location Privacy', slug: 'location-privacy' },
+      { title: 'Safety Tips', slug: 'safety-tips' },
+      { title: 'How to Report Users', slug: 'reporting' },
     ]
   },
   {
@@ -61,7 +64,18 @@ const HELP_CATEGORIES = [
       { title: 'How Matching works', slug: 'matching' },
       { title: 'Proximity Chatrooms', slug: 'chatrooms-guide' },
       { title: 'Creating & Joining Groups', slug: 'groups-guide' },
+      { title: 'Events & Ticketing', slug: 'events-guide' },
       { title: 'Achievements & Rewards', slug: 'achievements-guide' },
+    ]
+  },
+  {
+    id: 'merchant',
+    title: 'Merchant Features',
+    description: 'For business owners and event organizers accepting FWB tokens.',
+    icon: Store,
+    articles: [
+      { title: 'Introduction for Merchants', slug: 'merchant-intro' },
+      { title: 'Setting up Merchant API', slug: 'merchant-setup' },
     ]
   }
 ]

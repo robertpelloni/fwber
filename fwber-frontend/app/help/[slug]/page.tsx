@@ -219,6 +219,76 @@ const HELP_ARTICLES: Record<string, { title: string, content: React.ReactNode, c
         <p>Visit the <strong>Achievements</strong> page to track your progress on goals like &quot;Viral Star&quot;, &quot;Social Butterfly&quot;, and more.</p>
       </div>
     )
+  },
+  'events-guide': {
+    category: 'Platform Features',
+    title: 'Events & Ticketing',
+    content: (
+      <div className="space-y-4">
+        <p>Discover and create local events to meet people in real life.</p>
+        <h3 className="text-lg font-semibold">Creating Events</h3>
+        <p>Users can create public or private events. You can set a ticket price in FWB tokens or make it free.</p>
+        <h3 className="text-lg font-semibold">RSVP</h3>
+        <p>When you RSVP to a paid event, tokens are automatically transferred from your wallet to the organizer.</p>
+      </div>
+    )
+  },
+
+  // Merchant Features
+  'merchant-intro': {
+    category: 'Merchant Features',
+    title: 'For Merchants: Introduction',
+    content: (
+      <div className="space-y-4">
+        <p>Are you a business owner? You can accept FWB tokens for goods and services.</p>
+        <ul className="list-disc pl-5 space-y-2">
+          <li><strong>Promotions:</strong> Create sponsored posts in the Local Pulse feed.</li>
+          <li><strong>Payments:</strong> Use our API to accept token payments on your own website.</li>
+          <li><strong>Analytics:</strong> Track views and conversions in the Merchant Dashboard.</li>
+        </ul>
+      </div>
+    )
+  },
+  'merchant-setup': {
+    category: 'Merchant Features',
+    title: 'Setting up Merchant API',
+    content: (
+      <div className="space-y-4">
+        <p>Integrate FWB payments into your external application.</p>
+        <ol className="list-decimal pl-5 space-y-2">
+          <li>Go to <strong>Wallet &gt; Merchant</strong>.</li>
+          <li>Click &quot;Generate API Keys&quot; to get your Secret Key.</li>
+          <li>Use the <code>/api/merchant/checkout</code> endpoint to create payment intents.</li>
+        </ol>
+        <p className="text-red-500 font-bold">Keep your Secret Key safe! Do not share it.</p>
+      </div>
+    )
+  },
+
+  // Safety Extended
+  'safety-tips': {
+    category: 'Safety & Privacy',
+    title: 'Safety Tips',
+    content: (
+      <div className="space-y-4">
+        <p>Meeting new people is exciting, but safety comes first.</p>
+        <ul className="list-disc pl-5 space-y-2">
+          <li><strong>Keep it on the app:</strong> Do not move to WhatsApp or other messengers too quickly.</li>
+          <li><strong>Meet in public:</strong> Always choose a public place for first dates.</li>
+          <li><strong>Trust your gut:</strong> If something feels off, you can block the user immediately.</li>
+        </ul>
+      </div>
+    )
+  },
+  'reporting': {
+    category: 'Safety & Privacy',
+    title: 'How to Report Users',
+    content: (
+      <div className="space-y-4">
+        <p>If you encounter bad behavior, please report it so we can take action.</p>
+        <p>Click the <strong>Shield Icon</strong> or the three dots on any user profile to find the &quot;Report&quot; option. You can select reasons like Harassment, Fake Profile, or Spam.</p>
+      </div>
+    )
   }
 }
 

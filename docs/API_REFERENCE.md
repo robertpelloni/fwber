@@ -32,9 +32,22 @@ The API uses standard JSON resources. Key schemas include:
 - **DirectMessage**: Chat messages.
 - **ProximityArtifact**: Location-based content.
 
+## Merchant API
+
+The Merchant API allows third-party integrations to accept FWB tokens.
+
+### Authentication
+Merchant endpoints require a Secret Key header:
+`X-Merchant-Secret: <sk_live_...>`
+
+### Endpoints
+- `POST /api/merchant/checkout`: Create a payment intent.
+- `GET /api/merchant/payment/{id}`: Check payment status.
+- `POST /api/merchant/keys`: Generate new API keys (User auth required).
+
 ## Authentication
 
-All API endpoints (except login/register) require a Bearer Token.
+All standard API endpoints (except login/register) require a Bearer Token.
 Header: `Authorization: Bearer <token>`
 
 ## Rate Limiting

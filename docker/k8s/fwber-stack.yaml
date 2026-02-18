@@ -1,0 +1,109 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fwber-backend
+  labels:
+    app: fwber-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fwber-backend
+  template:
+    metadata:
+      labels:
+        app: fwber-backend
+    spec:
+      containers:
+      - name: fwber-backend
+        image: fwber-backend:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: APP_ENV
+          value: "production"
+        - name: DB_HOST
+          value: "mysql-service"
+        - name: REDIS_HOST
+          value: "redis-service"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fwber-backend-service
+spec:
+  selector:
+    app: fwber-backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fwber-frontend
+  labels:
+    app: fwber-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fwber-frontend
+  template:
+    metadata:
+      labels:
+        app: fwber-frontend
+    spec:
+      containers:
+      - name: fwber-frontend
+        image: fwber-frontend:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NEXT_PUBLIC_API_URL
+          value: "http://fwber-backend-service"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fwber-frontend-service
+spec:
+  selector:
+    app: fwber-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:alpine
+        ports:
+        - containerPort: 6379
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+spec:
+  selector:
+    app: redis
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379

@@ -1,0 +1,13 @@
+{
+  "timestamp": 1771386015.8732023,
+  "url": "http://127.0.0.1:8000/api/health",
+  "vus": 50,
+  "duration": 10,
+  "total_requests": 551,
+  "success_requests": 551,
+  "failed_requests": 0,
+  "success_rate": 100.0,
+  "avg_latency_ms": 841.05,
+  "p95_latency_ms": 1143.6,
+  "requests_per_second": 55.1
+}

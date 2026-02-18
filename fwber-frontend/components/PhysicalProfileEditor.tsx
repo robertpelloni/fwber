@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { physicalProfileApi, type PhysicalProfile } from '@/lib/api/physical-profile';
-import { Ruler, User, Palette, Shirt, Activity, Wand2 } from 'lucide-react';
+import { Ruler, User, Palette, Shirt, Activity, Wand2, HelpCircle } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default function PhysicalProfileEditor() {
   const { token, user } = useAuth();
@@ -125,10 +126,11 @@ export default function PhysicalProfileEditor() {
   if (isLoading) return <div className="p-4 text-center">Loading physical profile...</div>;
 
   return (
-    <div className="bg-white shadow rounded-lg p-6">
-      <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-        <User className="h-6 w-6 text-blue-600" /> Physical Attributes
-      </h2>
+    <TooltipProvider>
+      <div className="bg-white shadow rounded-lg p-6">
+        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+          <User className="h-6 w-6 text-blue-600" /> Physical Attributes
+        </h2>
 
       {message && (
         <div className={`p-4 mb-6 rounded-md ${message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
@@ -140,7 +142,17 @@ export default function PhysicalProfileEditor() {
         {/* Basic Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="height_cm" className="block text-sm font-medium text-gray-700 mb-1">Height (cm)</label>
+            <div className="flex items-center gap-2 mb-1">
+              <label htmlFor="height_cm" className="block text-sm font-medium text-gray-700">Height (cm)</label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-gray-400 cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Your height in centimeters. Used for matching preferences.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <div className="relative rounded-md shadow-sm">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Ruler className="h-4 w-4 text-gray-400" />
@@ -159,7 +171,17 @@ export default function PhysicalProfileEditor() {
           </div>
 
           <div>
-            <label htmlFor="body_type" className="block text-sm font-medium text-gray-700 mb-1">Body Type</label>
+            <div className="flex items-center gap-2 mb-1">
+              <label htmlFor="body_type" className="block text-sm font-medium text-gray-700">Body Type</label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-gray-400 cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Select the option that best describes your physique.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <select
               id="body_type"
               value={profile.body_type || ''}
@@ -263,9 +285,19 @@ export default function PhysicalProfileEditor() {
         {/* Lifestyle & Style */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
-            <label htmlFor="fitness_level" className="block text-sm font-medium text-gray-700 mb-1">
-              <div className="flex items-center gap-1"><Activity className="h-4 w-4" /> Fitness Level</div>
-            </label>
+            <div className="flex items-center gap-2 mb-1">
+              <label htmlFor="fitness_level" className="block text-sm font-medium text-gray-700">
+                <div className="flex items-center gap-1"><Activity className="h-4 w-4" /> Fitness Level</div>
+              </label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-gray-400 cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>How active is your lifestyle? Helps find compatible matches.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <select
               id="fitness_level"
               value={profile.fitness_level || ''}
@@ -310,9 +342,19 @@ export default function PhysicalProfileEditor() {
 
         {/* Avatar Generation Section */}
         <div className="border-t pt-6 mt-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-            <Wand2 className="h-5 w-5 text-purple-600" /> AI Avatar Generation
-          </h3>
+          <div className="flex items-center gap-2 mb-4">
+            <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
+              <Wand2 className="h-5 w-5 text-purple-600" /> AI Avatar Generation
+            </h3>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle className="h-4 w-4 text-gray-400 cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Generate a privacy-preserving avatar based on your physical description.</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
           
           <div className="bg-purple-50 p-4 rounded-md mb-4">
             <label htmlFor="avatar_prompt" className="block text-sm font-medium text-purple-900 mb-1">Avatar Prompt</label>
@@ -377,6 +419,7 @@ export default function PhysicalProfileEditor() {
           </button>
         </div>
       </form>
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }

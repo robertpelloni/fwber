@@ -6,10 +6,11 @@ import dynamic from 'next/dynamic';
 import { useWallet as useInternalWallet } from '@/lib/hooks/useWallet';
 import { useState } from 'react';
 import { apiClient } from '@/lib/api/client';
-import { Loader2, ArrowDownCircle, ArrowUpCircle, Send, Key, Copy } from 'lucide-react';
+import { Loader2, ArrowDownCircle, ArrowUpCircle, Send, Key, Copy, HelpCircle } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import PaymentRequests from './PaymentRequests';
 import SendTokenModal from './SendTokenModal';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const WalletMultiButton = dynamic(
   () => import('@solana/wallet-adapter-react-ui').then((mod) => mod.WalletMultiButton),
@@ -92,6 +93,7 @@ export default function WalletDashboard() {
   };
 
   return (
+    <TooltipProvider>
     <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Wallet & Crypto</h2>
@@ -127,7 +129,17 @@ export default function WalletDashboard() {
             <div className="p-4 border border-purple-200 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
                 <div className="flex justify-between items-start">
                     <div>
-                        <h3 className="text-sm font-medium text-purple-800 dark:text-purple-300">Internal Balance ($FWB)</h3>
+                        <div className="flex items-center gap-2">
+                            <h3 className="text-sm font-medium text-purple-800 dark:text-purple-300">Internal Balance ($FWB)</h3>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <HelpCircle className="h-3 w-3 text-purple-400 cursor-help" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>This balance is stored on the fwber database for instant, fee-less transactions within the app.</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </div>
                         <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
                         {internalWallet?.balance || '0.00'} FWB
                         </p>
@@ -145,7 +157,17 @@ export default function WalletDashboard() {
 
             {/* External Wallet Connection */}
             <div className="flex justify-between items-center">
-                <h3 className="font-medium">External Wallet (Solana)</h3>
+                <div className="flex items-center gap-2">
+                    <h3 className="font-medium">External Wallet (Solana)</h3>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <HelpCircle className="h-4 w-4 text-gray-400 cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>This is your personal Solana wallet (e.g., Phantom). Funds here are on the blockchain.</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </div>
                 <WalletMultiButton className="!bg-purple-600 hover:!bg-purple-700" />
             </div>
 
@@ -253,10 +275,20 @@ export default function WalletDashboard() {
       {activeTab === 'merchant' && (
         <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 space-y-6">
             <div className="p-6 bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded-xl">
-                <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
-                    <Key className="w-5 h-5" />
-                    Merchant API
-                </h3>
+                <div className="flex items-center gap-2 mb-2">
+                    <h3 className="text-xl font-bold flex items-center gap-2">
+                        <Key className="w-5 h-5" />
+                        Merchant API
+                    </h3>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <HelpCircle className="h-4 w-4 text-gray-400 cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>For business owners who want to accept FWB tokens for goods and services.</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </div>
                 <p className="text-gray-300 text-sm mb-4">
                     Accept FWB tokens on your website or app. Generate a secret key to use the fwber Merchant API.
                 </p>
@@ -303,5 +335,6 @@ Body: {
         </div>
       )}
     </div>
+    </TooltipProvider>
   );
 }

@@ -8,7 +8,8 @@ import Image from 'next/image'
 import { blurFacesOnFile } from '@/lib/faceBlur'
 import { isFeatureEnabled } from '@/lib/featureFlags'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { Ticket, Loader2 } from 'lucide-react'
+import { Ticket, Loader2, HelpCircle } from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -178,12 +179,23 @@ function RegisterForm() {
         </div>
       )}
       
+      <TooltipProvider>
       <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
         <div className="space-y-4">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Nickname (or first name)
-            </label>
+            <div className="flex items-center gap-2 mb-1">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Nickname (or first name)
+              </label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-gray-400 cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>This is how you will be seen by others. It doesn't have to be your real name.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <input
               id="name"
               name="name"
@@ -198,9 +210,19 @@ function RegisterForm() {
           </div>
           
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Email Address
-            </label>
+            <div className="flex items-center gap-2 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Email Address
+              </label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-gray-400 cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Used for account recovery and important notifications. Never shared publicly.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <input
               id="email"
               name="email"
@@ -215,9 +237,19 @@ function RegisterForm() {
           </div>
 
           <div>
-            <label htmlFor="avatar" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Profile Photo (Optional)
-            </label>
+            <div className="flex items-center gap-2 mb-1">
+              <label htmlFor="avatar" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Profile Photo (Optional)
+              </label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-gray-400 cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>We automatically blur faces for privacy. You can unlock unblurred photos for matches later.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <input
               id="avatar"
               name="avatar"
@@ -248,9 +280,19 @@ function RegisterForm() {
           </div>
 
           <div>
-            <label htmlFor="referralCode" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Referral Code (Optional)
-            </label>
+            <div className="flex items-center gap-2 mb-1">
+              <label htmlFor="referralCode" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Referral Code (Optional)
+              </label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-gray-400 cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Got a code from a friend? Enter it here to earn bonus tokens!</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <input
               id="referralCode"
               name="referralCode"
@@ -322,6 +364,7 @@ function RegisterForm() {
           </button>
         </div>
       </form>
+      </TooltipProvider>
     </div>
   )
 }
