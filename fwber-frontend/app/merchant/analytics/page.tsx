@@ -16,8 +16,10 @@ import {
   MousePointer,
   CheckCircle,
   Calendar,
-  ChevronDown
+  ChevronDown,
+  HelpCircle
 } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import Link from 'next/link';
 
 interface KPIData {
@@ -96,7 +98,22 @@ function KPICard({
     <Card>
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-muted-foreground">{title}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">{title}</span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle className="h-3 w-3 text-gray-400 cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  {title === 'K-Factor' && 'Average number of new users invited by each existing user.'}
+                  {title === 'Total Reach' && 'Unique users who have seen your promotions.'}
+                  {title === 'Conversion Rate' && 'Percentage of views that resulted in a redemption.'}
+                  {title === 'Total Revenue' && 'Total tokens earned from all promotions.'}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
           <span className="text-amber-600">{icon}</span>
         </div>
         <div className="flex items-baseline gap-1">
@@ -426,6 +443,7 @@ export default function MerchantAnalyticsPage() {
   }
 
   return (
+    <TooltipProvider>
     <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -498,5 +516,6 @@ export default function MerchantAnalyticsPage() {
         </>
       )}
     </div>
+    </TooltipProvider>
   );
 }

@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { useE2EEncryption } from '@/lib/hooks/use-e2e-encryption';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Lock, RefreshCw, Key, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { Lock, RefreshCw, Key, ShieldCheck, AlertTriangle, HelpCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import AppHeader from '@/components/AppHeader';
 
 export default function SecuritySettingsPage() {
@@ -37,6 +38,7 @@ export default function SecuritySettingsPage() {
   };
 
   return (
+    <TooltipProvider>
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <AppHeader />
 
@@ -53,8 +55,18 @@ export default function SecuritySettingsPage() {
                 <Lock className="w-5 h-5 text-blue-500" />
                 End-to-End Encryption
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="flex items-center gap-2">
                 Manage your encryption keys for secure messaging.
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircle className="h-4 w-4 text-gray-400 cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs">
+                      We use client-side encryption. Messages are encrypted on your device before sending, ensuring only the recipient can read them.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -105,5 +117,6 @@ export default function SecuritySettingsPage() {
         </div>
       </main>
     </div>
+    </TooltipProvider>
   );
 }
