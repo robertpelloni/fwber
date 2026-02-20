@@ -239,20 +239,26 @@ class MatchController extends Controller
 
             $users = User::with(['profile', 'photos'])->whereIn('id', $userIds)->get();
 
+            // Fetch all related messages at once to prevent N+1 queries
+            $allMessages = \App\Models\Message::where(function ($q) use ($user, $userIds) {
+                $q->where('sender_id', $user->id)->whereIn('receiver_id', $userIds);
+            })->orWhere(function ($q) use ($user, $userIds) {
+                $q->whereIn('sender_id', $userIds)->where('receiver_id', $user->id);
+            })->latest()->get();
+
             // Format as "Conversation" objects for frontend compatibility
-            return $users->map(function ($otherUser) use ($user, $matches) {
+            return $users->map(function ($otherUser) use ($user, $matches, $allMessages) {
                 // Find the match record
                 $match = $matches->first(function ($m) use ($user, $otherUser) {
                     return ($m->user1_id === $user->id && $m->user2_id === $otherUser->id) ||
                            ($m->user1_id === $otherUser->id && $m->user2_id === $user->id);
                 });
 
-                // Get last message
-                $lastMessage = \App\Models\Message::where(function ($q) use ($user, $otherUser) {
-                    $q->where('sender_id', $user->id)->where('receiver_id', $otherUser->id);
-                })->orWhere(function ($q) use ($user, $otherUser) {
-                    $q->where('sender_id', $otherUser->id)->where('receiver_id', $user->id);
-                })->latest()->first();
+                // Get last message from the eager-loaded collection
+                $lastMessage = $allMessages->first(function ($m) use ($user, $otherUser) {
+                    return ($m->sender_id === $user->id && $m->receiver_id === $otherUser->id) ||
+                           ($m->sender_id === $otherUser->id && $m->receiver_id === $user->id);
+                });
 
                 return [
                     'id' => $match->id, // Match ID acts as conversation ID
