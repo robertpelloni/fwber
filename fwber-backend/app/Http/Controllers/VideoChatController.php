@@ -6,19 +6,17 @@ use Illuminate\Http\Request;
 use App\Events\VideoSignal;
 use Illuminate\Support\Facades\Auth;
 use App\Models\VideoCall;
+use App\Http\Requests\VideoChat\InitiateVideoChatRequest;
+use App\Http\Requests\VideoChat\UpdateVideoCallStatusRequest;
+use App\Http\Requests\VideoChat\SignalVideoChatRequest;
 
 class VideoChatController extends Controller
 {
     /**
      * Handle WebRTC signaling messages
      */
-    public function signal(Request $request)
+    public function signal(SignalVideoChatRequest $request)
     {
-        $request->validate([
-            'recipient_id' => 'required|integer',
-            'signal' => 'required|array', // type (offer/answer/candidate/bye), sdp/candidate data
-            'call_id' => 'nullable|integer|exists:video_calls,id',
-        ]);
 
         $sender = Auth::user();
         $recipientId = $request->input('recipient_id');
@@ -34,11 +32,8 @@ class VideoChatController extends Controller
     /**
      * Initiate a new video call log
      */
-    public function initiate(Request $request)
+    public function initiate(InitiateVideoChatRequest $request)
     {
-        $request->validate([
-            'recipient_id' => 'required|integer|exists:users,id',
-        ]);
 
         $call = VideoCall::create([
             'caller_id' => Auth::id(),
@@ -53,12 +48,8 @@ class VideoChatController extends Controller
     /**
      * Update call status (connected, rejected, ended, etc.)
      */
-    public function updateStatus(Request $request, $id)
+    public function updateStatus(UpdateVideoCallStatusRequest $request, $id)
     {
-        $request->validate([
-            'status' => 'required|in:connected,missed,rejected,ended',
-            'duration' => 'nullable|integer',
-        ]);
 
         $call = VideoCall::findOrFail($id);
 

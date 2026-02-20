@@ -6,16 +6,15 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\TokenTransaction;
 use Illuminate\Support\Facades\Process;
+use App\Http\Requests\Token\WithdrawTokenRequest;
+use App\Http\Requests\Token\TransferTokenRequest;
+use App\Http\Requests\Token\GetBalanceRequest;
+use App\Http\Requests\Token\UpdateWalletAddressRequest;
 
 class TokenController extends Controller
 {
-    public function withdraw(Request $request)
+    public function withdraw(WithdrawTokenRequest $request)
     {
-        $request->validate([
-            'amount' => 'required|numeric|min:0.1',
-            'destination_address' => ['required', 'string', 'regex:/^[1-9A-HJ-NP-Za-km-z]{32,44}$/'],
-        ]);
-
         $user = $request->user();
         $amount = $request->amount;
 
@@ -71,13 +70,8 @@ class TokenController extends Controller
         ]);
     }
 
-    public function transfer(Request $request)
+    public function transfer(TransferTokenRequest $request)
     {
-        $request->validate([
-            'amount' => 'required|numeric|min:1',
-            'recipient_id' => 'required|exists:users,id',
-        ]);
-
         $sender = $request->user();
         $recipient = User::findOrFail($request->recipient_id);
         $amount = $request->amount;
@@ -125,7 +119,7 @@ class TokenController extends Controller
         return response()->json(['message' => 'Tip sent successfully', 'new_balance' => $sender->fresh()->token_balance]);
     }
 
-    public function balance(Request $request)
+    public function balance(GetBalanceRequest $request)
     {
         $user = $request->user();
         
@@ -139,12 +133,8 @@ class TokenController extends Controller
         ]);
     }
 
-    public function updateAddress(Request $request)
+    public function updateAddress(UpdateWalletAddressRequest $request)
     {
-        $request->validate([
-            'wallet_address' => 'required|string|max:255', // Add regex for ETH/SOL if needed
-        ]);
-
         $user = $request->user();
         $user->wallet_address = $request->wallet_address;
         $user->save();

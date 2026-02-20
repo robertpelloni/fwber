@@ -6,6 +6,9 @@ use App\Models\User;
 use App\Models\Message;
 use App\Services\AiWingmanService;
 use Illuminate\Http\Request;
+use App\Http\Requests\Wingman\AnalyzeDraftRequest;
+use App\Http\Requests\Wingman\AnalyzeQuirkRequest;
+use App\Http\Requests\Wingman\RoastPublicRequest;
 use Illuminate\Support\Facades\Auth;
 
 use App\Models\ViralContent;
@@ -117,12 +120,8 @@ class AiWingmanController extends Controller
      * @param string $matchId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function analyzeDraft(Request $request, string $matchId)
+    public function analyzeDraft(AnalyzeDraftRequest $request, string $matchId)
     {
-        $request->validate([
-            'draft' => 'required|string|max:1000',
-        ]);
-
         $user = Auth::user();
         $match = User::findOrFail($matchId);
 
@@ -212,15 +211,8 @@ class AiWingmanController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function roastPublic(Request $request)
+    public function roastPublic(RoastPublicRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:50',
-            'job' => 'required|string|max:50',
-            'trait' => 'required|string|max:100', // e.g., "always late", "obsessed with gym"
-            'mode' => 'in:roast,hype'
-        ]);
-
         $mode = $request->input('mode', 'roast');
         
         $result = $this->wingmanService->roastGeneric(
@@ -330,12 +322,8 @@ class AiWingmanController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function checkQuirk(Request $request)
+    public function checkQuirk(AnalyzeQuirkRequest $request)
     {
-        $request->validate([
-            'quirk' => 'required|string|max:200',
-        ]);
-
         $user = Auth::user();
         $quirk = $request->input('quirk');
         
