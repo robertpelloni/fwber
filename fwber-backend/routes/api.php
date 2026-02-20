@@ -54,6 +54,7 @@ Route::post('auth/login-wallet', [\App\Http\Controllers\AuthController::class, '
 Route::post('auth/two-factor-challenge', [\App\Http\Controllers\TwoFactorChallengeController::class, 'store'])->middleware('throttle:auth');
 
 Route::post('telemetry/client-events', [\App\Http\Controllers\TelemetryController::class, 'storeClientEvents']);
+Route::post('analytics/events', [\App\Http\Controllers\AnalyticsController::class, 'store']);
 
 // Public Debug Route (No Auth)
 if (!app()->isProduction()) {

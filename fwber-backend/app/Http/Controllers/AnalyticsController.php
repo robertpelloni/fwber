@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Services\AnalyticsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
@@ -17,14 +18,17 @@ class AnalyticsController extends Controller
 {
     protected ContentModerationService $moderationService;
     protected \App\Services\WebSocketService $webSocketService;
+    protected AnalyticsService $analyticsService;
 
     public function __construct(
         ContentModerationService $moderationService,
-        \App\Services\WebSocketService $webSocketService
+        \App\Services\WebSocketService $webSocketService,
+        AnalyticsService $analyticsService
     )
     {
         $this->moderationService = $moderationService;
         $this->webSocketService = $webSocketService;
+        $this->analyticsService = $analyticsService;
     }
 
     /**
@@ -50,6 +54,50 @@ class AnalyticsController extends Controller
         });
 
         return response()->json($analytics);
+    }
+
+    /**
+     * Store incoming clickstream events from the client
+     *
+     * @OA\Post(
+     *   path="/analytics/events",
+     *   tags={"Analytics"},
+     *   summary="Store client clickstream events",
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent()
+     *   ),
+     *   @OA\Response(response=200, description="Events recorded")
+     * )
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $request->validate([
+            'session_id' => 'required|string|max:255',
+            'events' => 'required|array',
+            'events.*.event_name' => 'required|string|max:255',
+            'events.*.payload' => 'nullable|array',
+            'events.*.url' => 'nullable|string|max:1000',
+        ]);
+
+        $sessionId = $request->input('session_id');
+        $userId = $request->user('sanctum')?->id; // Using auth guard explicitly if available
+        $ipAddress = $request->ip();
+        $userAgent = $request->userAgent();
+
+        foreach ($request->input('events') as $event) {
+            $this->analyticsService->recordEvent(
+                $sessionId,
+                $event['event_name'],
+                $event['payload'] ?? [],
+                $userId,
+                $event['url'] ?? null,
+                $ipAddress,
+                $userAgent
+            );
+        }
+
+        return response()->json(['status' => 'success']);
     }
 
     /**

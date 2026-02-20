@@ -56,8 +56,16 @@ class MerchantAnalyticsService
 
 
         // K-Factor (Viral Coefficient)
-        // Placeholder for now as we don't have deep referral tracking on promotions yet
-        $kFactor = 1.0; 
+        // Calculated as: (Total Invites / Active Users) * Conversion Rate
+        // For now, we use a simplified proxy: Shared Promotions / Unique Viewers
+        $totalShares = \App\Models\PromotionEvent::whereHas('promotion', function ($q) use ($merchant) {
+                $q->where('merchant_id', $merchant->id);
+            })
+            ->where('type', 'share')
+            ->where('created_at', '>=', $startDate)
+            ->count();
+
+        $kFactor = $totalReach > 0 ? round($totalShares / $totalReach, 2) : 0;
 
         // Conversion Rate (Redemptions / Reach)
         // Redemptions are tracked in PromotionEvent or Promotion aggregate
@@ -82,15 +90,39 @@ class MerchantAnalyticsService
     public function getRetention(MerchantProfile $merchant, string $range): array
     {
         // Calculate retention cohorts based on repeat interactions
-        // For MVP, we'll look at users who interacted (view/click/redeem) in multiple windows
-        // This is complex to do efficiently in SQL for a dashboard without pre-aggregation.
-        // For now, we will return a simulated structure but using real user counts where possible.
-        
+        // We look for users who interacted in the current window AND a previous window
+        $currentInteractors = \App\Models\PromotionEvent::whereHas('promotion', function ($q) use ($merchant) {
+                $q->where('merchant_id', $merchant->id);
+            })
+            ->where('created_at', '>=', Carbon::now()->subDays(7))
+            ->distinct('user_id')
+            ->pluck('user_id');
+
+        $calculateRetention = function ($daysInfo) use ($merchant, $currentInteractors) {
+            $pastInteractors = \App\Models\PromotionEvent::whereHas('promotion', function ($q) use ($merchant) {
+                    $q->where('merchant_id', $merchant->id);
+                })
+                ->where('created_at', '<', Carbon::now()->subDays($daysInfo['ago']))
+                ->where('created_at', '>=', Carbon::now()->subDays($daysInfo['ago'] + $daysInfo['window']))
+                ->distinct('user_id')
+                ->pluck('user_id');
+
+            $countStart = $pastInteractors->count();
+            // Users present in BOTH sets
+            $retainedCount = $currentInteractors->intersect($pastInteractors)->count();
+
+            return [
+                'label' => $daysInfo['label'],
+                'value' => $countStart > 0 ? round(($retainedCount / $countStart) * 100) : 0,
+                'previousValue' => 0, // Simplified for now
+            ];
+        };
+
         return [
-            ['label' => 'Day 1', 'value' => 100, 'previousValue' => 100],
-            ['label' => 'Day 7', 'value' => 65, 'previousValue' => 60],
-            ['label' => 'Day 30', 'value' => 35, 'previousValue' => 30],
-            ['label' => 'Day 90', 'value' => 20, 'previousValue' => 15],
+            $calculateRetention(['label' => 'Day 1', 'ago' => 1, 'window' => 1]),
+            $calculateRetention(['label' => 'Day 7', 'ago' => 7, 'window' => 7]),
+            $calculateRetention(['label' => 'Day 30', 'ago' => 30, 'window' => 30]),
+            $calculateRetention(['label' => 'Day 90', 'ago' => 90, 'window' => 90]),
         ];
     }
 

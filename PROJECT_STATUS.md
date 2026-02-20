@@ -1,31 +1,33 @@
-# Project Status - v0.3.25
+# Project Status - v0.3.34
 
-**Date:** 2026-01-08
-**Current Phase:** Post-Launch Stabilization
-**Version:** v0.3.25
+**Date:** 2026-02-19
+**Current Phase:** Hardening & Merchant Integration
+**Version:** v0.3.34
 
 ## 🚨 Immediate Priorities (Next 24 Hours)
 
-1.  **Deployment Verification**:
-    *   [x] Frontend build stabilized (LocationPicker fixed).
-    *   [x] Merchant Promotions integrated into Local Pulse.
-    *   [x] Photo Uploads stabilized (EXIF check added).
-    *   [ ] Deploy v0.3.25 to production.
-
-2.  **Documentation & Handoff**:
-    *   [x] `CHANGELOG.md` updated.
-    *   [x] `PROJECT_STATUS.md` updated.
-    *   [x] `docs/SUBMODULE_DASHBOARD.md` created.
+1.  **Merchant Analytics Hardening**:
+    *   [ ] Replace mock data in `MerchantAnalyticsService` with real calculations.
+    *   [ ] Verify `kFactor` and `retention` logic.
+2.  **Documentation Synchronization**:
+    *   [x] `PROJECT_STATUS.md` updated to v0.3.34.
+    *   [ ] `ROADMAP.md` updated.
+    *   [ ] `AGENTS.md` detailed with versioning protocols.
 
 ## 🟢 Recent Accomplishments
 
-### ✅ Critical Fixes (Jan 08)
-1.  **PhotoController Crash Fix**:
-    -   **Issue**: Uploads crashed with 500 error (`Call to undefined method`) because the server lacks the `exif` PHP extension required by Intervention Image's `orient()` method.
-    -   **Fix**: Added `extension_loaded('exif')` check. Rotation is now skipped gracefully if the extension is missing, preventing the crash.
-    -   **Verification**: Code review.
-2.  **Documentation**:
-    -   **Submodules**: Created `docs/SUBMODULE_DASHBOARD.md` to document the current monolithic structure and future strategy.
+### ✅ Critical Updates (v0.3.34 - Feb 06)
+1.  **Merchant Analytics Integration**: Connected `/merchant/analytics` frontend to real backend endpoints.
+2.  **System Dashboard**: Implemented `/admin/system` with real health check data.
+3.  **Documentation**: Added `docs/dashboard/SUBMODULE_VERSIONS.md`.
+
+### ✅ Critical Updates (v0.3.33 - Feb 06)
+1.  **Frontend Feature Completion**:
+    - **Achievements**: Full UI implementation at `/achievements`.
+    - **Help Center**: Documentation portal at `/help`.
+    - **Security Settings**: E2E encryption management.
+2.  **Refactoring**: Unified real-time logic into `useWebSocket`.
+
 
 ### ✅ Critical Fixes (Jan 06)
 1.  **Frontend Build Stabilization (LocationPicker)**:

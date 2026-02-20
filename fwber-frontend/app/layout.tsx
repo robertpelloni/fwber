@@ -13,6 +13,7 @@ import FeedbackModal from '@/components/FeedbackModal'
 import { SolanaProvider } from '@/components/SolanaProvider'
 import NotificationListener from '@/components/realtime/NotificationListener'
 import PWAInstallPrompt from '@/components/PWAInstallPrompt'
+import AnalyticsProvider from '@/components/AnalyticsProvider'
 
 const inter = Inter({
   variable: '--font-inter',
@@ -83,7 +84,7 @@ export default function RootLayout({
         {/* DNS prefetch for better performance */}
         <link rel="dns-prefetch" href="//localhost" />
         <link rel="preconnect" href="http://localhost:8001" />
-        
+
         {/* Preload critical resources */}
         {/* <link rel="preload" href="/_next/static/css/app/layout.css" as="style" /> */}
       </head>
@@ -104,6 +105,7 @@ export default function RootLayout({
                 <NotificationPermissionHandler />
                 <SentryInitializer />
                 <PWAInstallPrompt />
+                <AnalyticsProvider />
                 <ToastProvider>
                   <NotificationListener />
                   <div className="relative flex min-h-screen flex-col">
