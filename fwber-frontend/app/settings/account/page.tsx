@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useAuth } from '@/lib/auth-context';
 import { apiClient } from '@/lib/api/client';
-import { ArrowLeft, Mail, Lock, Trash2, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Mail, Lock, Trash2, AlertTriangle, Download, HelpCircle } from 'lucide-react';
 import Link from 'next/link';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default function AccountSettingsPage() {
   const { user, logout } = useAuth();
@@ -78,8 +79,27 @@ export default function AccountSettingsPage() {
     }
   };
 
+  const handleExportData = async () => {
+    try {
+      const response = await apiClient.get('/profile/export');
+      const blob = new Blob([JSON.stringify(response.data, null, 2)], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `fwber-data-export-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      setMessage({ type: 'success', text: 'Data export started' });
+    } catch (error: any) {
+      setMessage({ type: 'error', text: 'Failed to export data' });
+    }
+  };
+
   return (
     <ProtectedRoute>
+      <TooltipProvider>
       <div className="min-h-screen bg-gray-50">
         <header className="bg-white shadow-sm sticky top-0 z-10">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -187,6 +207,40 @@ export default function AccountSettingsPage() {
             </div>
           </section>
 
+          {/* Data Export Section */}
+          <section className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-100 rounded-lg text-green-600">
+                    <Download className="w-5 h-5" />
+                  </div>
+                  <h2 className="text-lg font-semibold text-gray-900">Your Data</h2>
+                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircle className="w-5 h-5 text-gray-400 cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs">
+                      Download a JSON file containing your profile info, messages, matches, and activity history in compliance with GDPR.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <p className="text-gray-600 mb-4 text-sm">
+                Request a copy of all your personal data stored on fwber.
+              </p>
+              <button
+                onClick={handleExportData}
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Download My Data
+              </button>
+            </div>
+          </section>
+
           {/* Delete Account Section */}
           <section className="bg-white rounded-lg shadow-sm border border-red-200 overflow-hidden">
             <div className="p-6">
@@ -256,6 +310,7 @@ export default function AccountSettingsPage() {
           </section>
         </main>
       </div>
+      </TooltipProvider>
     </ProtectedRoute>
   );
 }
