@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.35] - 2026-02-20
+
+### Added
+- **Phase 5D Parity Fulfillment**:
+  - **Privacy Controls**: Added "Ghost Mode" & "Location Fuzzing" preference toggles in user settings connected to `profile.preferences`.
+  - **Moderation Tools UI**: Admin settings dropdown switcher added to override `services.content_moderation.driver` configurations (`aws`, `google`, `mock`).
+  - **Merchant Analytics UI**: Replaced API endpoint mock data with real UI, including tracking views, click-through rates, and `kFactor` calculations.
+
 ## [0.3.34] - 2026-02-06
 
 ### Added

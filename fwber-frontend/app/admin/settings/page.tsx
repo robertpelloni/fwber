@@ -145,17 +145,15 @@ function FeatureToggle({
       <button
         onClick={() => onToggle(flag, !enabled)}
         disabled={isPending}
-        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
-          enabled ? 'bg-blue-600' : 'bg-gray-200'
-        }`}
+        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${enabled ? 'bg-blue-600' : 'bg-gray-200'
+          }`}
         role="switch"
         aria-checked={enabled}
         aria-label={`Toggle ${info.label}`}
       >
         <span
-          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-            enabled ? 'translate-x-5' : 'translate-x-0'
-          }`}
+          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${enabled ? 'translate-x-5' : 'translate-x-0'
+            }`}
         />
       </button>
     </div>
@@ -164,6 +162,7 @@ function FeatureToggle({
 
 export default function AdminSettingsPage() {
   const [pendingChanges, setPendingChanges] = useState<Partial<FeatureFlags>>({});
+  const [pendingDriver, setPendingDriver] = useState<string | null>(null);
 
   const featuresQuery = useBackendFeatureFlags();
   const healthQuery = useSystemHealth();
@@ -203,6 +202,26 @@ export default function AdminSettingsPage() {
       return pendingChanges[flag]!;
     }
     return features?.[flag] ?? false;
+  };
+
+  const currentDriver = pendingDriver !== null ? pendingDriver : (featuresQuery.data?.moderation_driver ?? 'aws');
+
+  const handleDriverChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newDriver = e.target.value;
+    setPendingDriver(newDriver);
+
+    updateMutation.mutate(
+      { moderation_driver: newDriver },
+      {
+        onSuccess: () => {
+          setPendingDriver(null);
+          featuresQuery.refetch();
+        },
+        onError: () => {
+          setPendingDriver(null);
+        },
+      }
+    );
   };
 
   if (featuresQuery.error) {
@@ -431,6 +450,36 @@ export default function AdminSettingsPage() {
                     after cache is cleared. For permanent changes, update the <code className="bg-yellow-100 px-1 rounded">.env</code> file
                     and run <code className="bg-yellow-100 px-1 rounded">php artisan config:cache</code>.
                   </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Machine Learning & Moderation */}
+          <section className="mt-8">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              Machine Learning & Moderation
+            </h2>
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900">Active Moderation Driver</h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Select the AI service responsible for media and text moderation. Reverts to default if service is unavailable.
+                  </p>
+                </div>
+                <div className="ml-4">
+                  <select
+                    value={currentDriver}
+                    onChange={handleDriverChange}
+                    disabled={pendingDriver !== null || featuresQuery.isLoading}
+                    className="block w-48 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm disabled:opacity-50"
+                  >
+                    <option value="aws">AWS Rekognition</option>
+                    <option value="google">Google Cloud Vision</option>
+                    <option value="mock">Fallback (Mock / Regex)</option>
+                  </select>
                 </div>
               </div>
             </div>

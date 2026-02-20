@@ -1,18 +1,18 @@
-# Project Status - v0.3.34
+# Project Status - v0.3.35
 
-**Date:** 2026-02-19
+**Date:** 2026-02-20
 **Current Phase:** Hardening & Merchant Integration
-**Version:** v0.3.34
+**Version:** v0.3.35
 
 ## 🚨 Immediate Priorities (Next 24 Hours)
 
 1.  **Merchant Analytics Hardening**:
-    *   [ ] Replace mock data in `MerchantAnalyticsService` with real calculations.
-    *   [ ] Verify `kFactor` and `retention` logic.
+    *   [x] Replace mock data in `MerchantAnalyticsService` with real calculations.
+    *   [x] Verify `kFactor` and `retention` logic.
 2.  **Documentation Synchronization**:
     *   [x] `PROJECT_STATUS.md` updated to v0.3.34.
-    *   [ ] `ROADMAP.md` updated.
-    *   [ ] `AGENTS.md` detailed with versioning protocols.
+    *   [x] `ROADMAP.md` updated.
+    *   [x] `AGENTS.md` detailed with versioning protocols.
 
 ## 🟢 Recent Accomplishments
 

@@ -47,6 +47,7 @@ class ConfigController extends Controller
 
         return response()->json([
             'features' => $features,
+            'moderation_driver' => Cache::get('feature_override:moderation_driver', config('services.content_moderation.driver', 'aws')),
             'source' => 'config',
             'timestamp' => now()->toISOString(),
         ]);
@@ -74,6 +75,12 @@ class ConfigController extends Controller
      *                 type="object",
      *                 description="Feature flags to update",
      *                 example={"chatrooms": true, "recommendations": false}
+     *             ),
+     *             @OA\Property(
+     *                 property="moderation_driver",
+     *                 type="string",
+     *                 description="The active moderation driver (e.g. aws, google, mock)",
+     *                 example="google"
      *             )
      *         )
      *     ),
@@ -84,6 +91,7 @@ class ConfigController extends Controller
      *             type="object",
      *             @OA\Property(property="message", type="string", example="Feature flags updated"),
      *             @OA\Property(property="features", type="object"),
+     *             @OA\Property(property="moderation_driver", type="string"),
      *             @OA\Property(property="updated", type="array", @OA\Items(type="string")),
      *             @OA\Property(property="timestamp", type="string", format="date-time")
      *         )
@@ -114,16 +122,27 @@ class ConfigController extends Controller
             $updated[] = $flag;
         }
 
+        if ($request->has('moderation_driver')) {
+            $driver = $request->input('moderation_driver');
+            if (in_array($driver, ['aws', 'google', 'mock'])) {
+                Cache::put('feature_override:moderation_driver', $driver, now()->addDays(7));
+                Config::set('services.content_moderation.driver', $driver);
+                $updated[] = 'moderation_driver';
+            }
+        }
+
         // Log the change for audit
         \Log::info('Feature flags updated', [
             'user_id' => Auth::id(),
             'updated_flags' => $updated,
             'new_values' => array_intersect_key($requestedFlags, array_flip($updated)),
+            'moderation_driver' => $request->input('moderation_driver') ?? config('services.content_moderation.driver', 'aws'),
         ]);
 
         return response()->json([
             'message' => 'Feature flags updated',
             'features' => config('features'),
+            'moderation_driver' => Cache::get('feature_override:moderation_driver', config('services.content_moderation.driver', 'aws')),
             'updated' => $updated,
             'timestamp' => now()->toISOString(),
         ]);

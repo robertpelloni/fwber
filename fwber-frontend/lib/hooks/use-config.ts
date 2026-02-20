@@ -46,7 +46,7 @@ export function useUpdateFeatureFlags() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (features: Partial<FeatureFlags>) => updateFeatureFlags(features),
+    mutationFn: (data: { features?: Partial<FeatureFlags>; moderation_driver?: string }) => updateFeatureFlags(data),
     onSuccess: () => {
       // Invalidate feature flags query to refetch
       queryClient.invalidateQueries({ queryKey: ['config', 'features'] });

@@ -23,6 +23,7 @@ export interface FeatureFlags {
 
 export interface FeatureFlagsResponse {
   features: FeatureFlags;
+  moderation_driver?: string;
   source: string;
   timestamp: string;
 }
@@ -30,6 +31,7 @@ export interface FeatureFlagsResponse {
 export interface FeatureFlagsUpdateResponse {
   message: string;
   features: FeatureFlags;
+  moderation_driver?: string;
   updated: string[];
   timestamp: string;
 }
@@ -76,9 +78,9 @@ export function getFeatureFlags(): Promise<FeatureFlagsResponse> {
  * Update feature flag states at runtime
  */
 export function updateFeatureFlags(
-  features: Partial<FeatureFlags>
+  data: { features?: Partial<FeatureFlags>; moderation_driver?: string }
 ): Promise<FeatureFlagsUpdateResponse> {
-  return api.put<FeatureFlagsUpdateResponse>('/config/features', { features });
+  return api.put<FeatureFlagsUpdateResponse>('/config/features', data);
 }
 
 /**

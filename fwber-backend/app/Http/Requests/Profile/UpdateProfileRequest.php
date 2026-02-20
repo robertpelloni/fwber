@@ -106,6 +106,7 @@ class UpdateProfileRequest extends FormRequest
             'preferences.communication_style' => 'sometimes|nullable|string|in:direct,diplomatic,humorous,serious,casual,formal',
             'preferences.response_time' => 'sometimes|nullable|string|in:immediate,within-hour,within-day,when-convenient,no-rush',
             'preferences.meeting_preference' => 'sometimes|nullable|string|in:public-places,coffee-dates,dinner-dates,outdoor-activities,virtual-first,flexible',
+            'preferences.location_fuzzing' => 'sometimes|boolean',
             'email' => 'sometimes|nullable|email|max:255',
         ];
     }

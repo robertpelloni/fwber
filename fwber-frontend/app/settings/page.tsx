@@ -149,6 +149,24 @@ export default function SettingsPage() {
 
   const [isIncognito, setIsIncognito] = useState(user?.profile?.is_incognito || false);
   const [updatingIncognito, setUpdatingIncognito] = useState(false);
+  const [isLocationFuzzing, setIsLocationFuzzing] = useState(user?.profile?.preferences?.location_fuzzing || false);
+  const [updatingLocationFuzzing, setUpdatingLocationFuzzing] = useState(false);
+
+  const toggleLocationFuzzing = async (checked: boolean) => {
+    setUpdatingLocationFuzzing(true);
+    try {
+      await apiClient.put('/profile', { preferences: { location_fuzzing: checked } });
+      setIsLocationFuzzing(checked);
+      if (user && user.profile) {
+        user.profile.preferences = { ...user.profile.preferences, location_fuzzing: checked };
+      }
+    } catch (error) {
+      console.error('Failed to toggle location fuzzing', error);
+      setIsLocationFuzzing(!checked);
+    } finally {
+      setUpdatingLocationFuzzing(false);
+    }
+  };
 
   const toggleIncognito = async (checked: boolean) => {
     setUpdatingIncognito(true);
@@ -310,6 +328,15 @@ export default function SettingsPage() {
                 onChange={toggleIncognito}
                 disabled={updatingIncognito}
                 badge="Ghost Mode"
+              />
+              <SettingsToggle
+                icon={<MapPin className="w-5 h-5" />}
+                title="Location Fuzzing"
+                description="Obscure your exact location on the map"
+                checked={isLocationFuzzing}
+                onChange={toggleLocationFuzzing}
+                disabled={updatingLocationFuzzing}
+                badge="Privacy"
               />
               <SettingsLink
                 href="/settings/two-factor"

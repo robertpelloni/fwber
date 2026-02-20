@@ -111,10 +111,30 @@ class MerchantAnalyticsService
             // Users present in BOTH sets
             $retainedCount = $currentInteractors->intersect($pastInteractors)->count();
 
+            // Calculate previous cohort retention
+            $previousPastInteractors = \App\Models\PromotionEvent::whereHas('promotion', function ($q) use ($merchant) {
+                    $q->where('merchant_id', $merchant->id);
+                })
+                ->where('created_at', '<', Carbon::now()->subDays($daysInfo['ago'] + $daysInfo['window']))
+                ->where('created_at', '>=', Carbon::now()->subDays($daysInfo['ago'] + ($daysInfo['window'] * 2)))
+                ->distinct('user_id')
+                ->pluck('user_id');
+
+            $previousCurrentInteractors = \App\Models\PromotionEvent::whereHas('promotion', function ($q) use ($merchant) {
+                    $q->where('merchant_id', $merchant->id);
+                })
+                ->where('created_at', '<', Carbon::now()->subDays($daysInfo['window']))
+                ->where('created_at', '>=', Carbon::now()->subDays($daysInfo['window'] * 2))
+                ->distinct('user_id')
+                ->pluck('user_id');
+
+            $previousCountStart = $previousPastInteractors->count();
+            $previousRetainedCount = $previousCurrentInteractors->intersect($previousPastInteractors)->count();
+
             return [
                 'label' => $daysInfo['label'],
                 'value' => $countStart > 0 ? round(($retainedCount / $countStart) * 100) : 0,
-                'previousValue' => 0, // Simplified for now
+                'previousValue' => $previousCountStart > 0 ? round(($previousRetainedCount / $previousCountStart) * 100) : 0,
             ];
         };
 
