@@ -11,7 +11,7 @@ class BrowseDealsRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,10 @@ class BrowseDealsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'lat' => 'required|numeric|between:-90,90',
+            'lng' => 'required|numeric|between:-180,180',
+            'radius' => 'nullable|integer|min:100|max:50000', // meters, default 5km
+            'category' => 'nullable|string|max:50',
         ];
     }
 }

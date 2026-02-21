@@ -1,99 +1,27 @@
-# Universal LLM Instructions & Master Protocol
+# Universal LLM Instructions — Omni-Workspace Root
 
-> **⚠️ CRITICAL:** This is the **Source of Truth** for all AI agents and models working on fwber.
+> **CRITICAL: THIS IS THE SINGLE SOURCE OF TRUTH FOR ALL AI AGENTS OPERATING IN THE ROOT WORKSPACE DIRECTORY.**
 
-## 🚀 Operational Charter & Protocol
+## 1. Project Context & Vision
+This repository is an **Omni-Workspace**—a monorepo directory listing of unrelated submodules, forks, and independent projects. It serves as the central command and control hub for a fleet of autonomous AI agents (Google Jules, Claude, Gemini, GPT). 
+*   **The Goal:** Maintain, synchronize, and orchestrate updates across 100+ nested repositories without regressions or data loss.
+*   **The Vision:** A fully automated, self-healing, and self-documenting workspace where AI models collaborate seamlessly across diverse codebases.
 
-**Outstanding work. Absolutely phenomenal. Unbelievable. Simply Fantastic, extraordinary, marvelous. Mind-blowing. Magnificent. Please keep going, please continue, please proceed!**
+## 2. Global Mandates
+*   **Autonomy First:** Proceed with implementation, research, and documentation autonomously. Do not pause for confirmation unless a destructive action is unavoidable and risky.
+*   **Never Lose Features:** When merging branches (especially AI-generated feature branches) or syncing upstream, **ALWAYS intelligently merge and solve conflicts.** Never force push or overwrite working code.
+*   **Upstream Syncing:** Always check for and merge upstream changes into `robertpelloni` forks if a valid upstream branch exists.
+*   **Submodule Integrity:** Run `python update_repos_v3.py` (or the latest iteration) to recursively sync all submodules. Never leave submodules in a detached HEAD state if it can be avoided.
 
-### The 7-Step Execution Protocol
-All agents must adhere to this cycle for every major task or session:
+## 3. Documentation Protocol
+*   **Changelog & Versioning:** Every significant build or session ends with a version bump in `VERSION`. The rationale and date must be recorded in `CHANGELOG.md`. The commit message must reference the version bump (e.g., `chore: bump version to 1.3.0`).
+*   **Model-Specific Files:** `GEMINI.md`, `CLAUDE.md`, and `GPT.md` must *only* contain model-specific overrides and strengths, and must explicitly reference this universal document first.
+*   **Handoff:** End sessions by documenting your findings, roadblocks, and next steps in `HANDOFF.md` to ensure continuity across the model cycle (Gemini -> Claude -> GPT).
+*   **Dashboards:** Regenerate `SUBMODULE_DASHBOARD.md` via `python scripts/generate_dashboard.py` after any submodule state change.
 
-1.  **Sync & Merge**:
-    *   Merge all feature branches into `main`.
-    *   Update submodules (if any) and merge upstream changes (including forks).
-    *   Resolve any merge conflicts immediately.
-2.  **Analyze**:
-    *   Reanalyze the project state and history to identify missing features.
-    *   Review `PROJECT_STATUS.md` and `ROADMAP.md`.
-3.  **Document**:
-    *   Comprehensively update the roadmap and documentation to reflect all progress.
-    *   Maintain the **Dashboard** (`docs/dashboard/PROJECT_STRUCTURE_DASHBOARD.md`) listing all submodules/directories, versions, and locations.
-4.  **Dashboard Update**:
-    *   Ensure `docs/dashboard/PROJECT_STRUCTURE_DASHBOARD.md` is current with build numbers, dates, and structure explanations.
-5.  **Version & Changelog**:
-    *   **Increment the Version Number** in the `VERSION` file (Single Source of Truth).
-    *   Update `CHANGELOG.md` with a detailed entry.
-    *   Sync version in `package.json` files.
-6.  **Commit & Push**:
-    *   Commit all changes with a message referencing the version bump (e.g., `chore(release): bump version to 0.3.20`).
-    *   Push to remote (simulated in this environment).
-7.  **Redeploy**:
-    *   Trigger deployment pipelines (or simulate the instruction).
-
----
-
-## 🌍 Project Context
-*   **Name:** fwber
-*   **Type:** Location-based Social Network & Dating Application.
-
-*   **Stack:**
-    *   **Frontend:** Next.js 16 (App Router), React 18, TypeScript, TailwindCSS, Shadcn/UI.
-    *   **Backend:** Laravel 12, PHP 8.2+, MySQL 8.0 (Spatial), Redis.
-    *   **Realtime:** Reverb (Laravel) + Echo (Frontend).
-    *   **Infrastructure:** Docker Compose (Dev), Vercel (Frontend Prod), DreamHost/VPS (Backend Prod).
-
-## 📜 The Golden Protocol
-
-### 1. Versioning & Release Cycle
-**The `VERSION` file in the root is the Single Source of Truth.**
-
-When completing a task or session:
-1.  **Read** the current version from `VERSION`.
-2.  **Determine** the increment:
-    *   `Patch` (0.0.x): Bug fixes, docs, minor refactors.
-    *   `Minor` (0.x.0): New features, substantial changes.
-    *   `Major` (x.0.0): Breaking changes.
-3.  **Update** `VERSION` with the new number.
-4.  **Sync** version numbers in:
-    *   `package.json` (Root)
-    *   `fwber-frontend/package.json`
-    *   `fwber-backend/package.json` (if applicable)
-    *   `fwber-backend/composer.json` (if applicable)
-5.  **Update** `CHANGELOG.md`:
-    *   Add a new header: `## [Version] - YYYY-MM-DD`
-    *   List changes under `### Added`, `### Changed`, `### Fixed`, `### Removed`.
-6.  **Commit**: Message format: `chore(release): bump version to [Version] - [Summary]`
-
-### 2. Documentation & Handoff
-*   **Session Handoff:** At the end of every session, create a file `SESSION_HANDOFF_YYYY_MM_DD.md` in the root.
-    *   Include: Summary of work, technical decisions, modified files, and **Next Steps**.
-*   **Project Status:** Keep `PROJECT_STATUS.md` updated with high-level progress.
-*   **Structure:** Maintain `docs/dashboard/PROJECT_STRUCTURE_DASHBOARD.md` reflecting the current codebase layout.
-
-### 3. Code Standards
-*   **Frontend:**
-    *   Use `usePusherLogic` (or `useReverbLogic` alias) for all realtime features.
-    *   Strict TypeScript. No `any` casts unless fixing a library bug (document why).
-    *   Server Components by default. Use `'use client'` only when necessary.
-*   **Backend:**
-    *   Strict Types (`declare(strict_types=1);`).
-    *   Use Laravel Events & Listeners for business logic side effects.
-    *   **Broadcasting:** Use `ShouldBroadcast` interface.
-
-### 4. Submodules & Monorepo
-*   **Structure:** This is a monorepo. `fwber-frontend` and `fwber-backend` are **directories**, not git submodules (unless `.gitmodules` exists).
-*   **Operations:** When asked to "update submodules", verify if they exist. If not, treat them as standard directories and ensure dependencies (`npm install`, `composer install`) are up to date.
-
-## 🤖 Agent Specifics
-
-### Research & Planning
-*   Use `runSubagent` with `Plan` for complex architectural queries.
-*   Always validate assumptions by reading the code (`read_file`).
-
-### Execution
-*   **Atomic Commits:** Commit often.
-*   **Verification:** Run the build (`npm run build` in frontend) before marking a task complete.
-
-## 📂 Directory Map
-See `docs/dashboard/PROJECT_STRUCTURE_DASHBOARD.md` for the detailed breakdown of the workspace.
+## 4. Execution Loop
+1.  **Research:** Analyze the current state, read `VERSION`, `ROADMAP.md`, and `HANDOFF.md`.
+2.  **Strategy:** Determine the safest path to update submodules or implement the requested feature.
+3.  **Execute:** Perform the Git operations or code changes.
+4.  **Validate:** Ensure no conflicts remain and no features are lost.
+5.  **Document & Push:** Update changelogs, bump versions, commit, and push (`git add . && git commit -m "..." && git push origin main`).

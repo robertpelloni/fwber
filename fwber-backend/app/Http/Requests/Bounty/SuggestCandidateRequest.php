@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Merchant;
+namespace App\Http\Requests\Bounty;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class TrackPromotionRequest extends FormRequest
+class SuggestCandidateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,8 +22,7 @@ class TrackPromotionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => 'required|in:view,click,redemption',
-            'metadata' => 'nullable|array',
+            'candidate_id' => 'required|exists:users,id',
         ];
     }
 }

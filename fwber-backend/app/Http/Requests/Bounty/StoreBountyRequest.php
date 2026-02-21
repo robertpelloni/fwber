@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Merchant;
+namespace App\Http\Requests\Bounty;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class TrackPromotionRequest extends FormRequest
+class StoreBountyRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,8 +22,9 @@ class TrackPromotionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => 'required|in:view,click,redemption',
-            'metadata' => 'nullable|array',
+            'token_reward' => 'required|integer|min:10',
+            'description' => 'nullable|string|max:500',
+            'expires_in_days' => 'nullable|integer|min:1|max:30',
         ];
     }
 }

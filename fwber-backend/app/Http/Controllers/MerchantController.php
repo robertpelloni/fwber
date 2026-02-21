@@ -8,13 +8,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use App\Http\Requests\Merchant\RegisterMerchantRequest;
+use App\Http\Requests\Merchant\UpdateMerchantProfileRequest;
+use App\Http\Requests\Merchant\StorePromotionRequest;
+use App\Http\Requests\Merchant\BrowseDealsRequest;
+use App\Http\Requests\Merchant\TrackPromotionRequest;
 
 class MerchantController extends Controller
 {
     /**
      * Register the current user as a merchant.
      */
-    public function register(Request $request)
+    public function register(RegisterMerchantRequest $request)
     {
         $user = Auth::user();
 
@@ -22,12 +27,7 @@ class MerchantController extends Controller
             return response()->json(['message' => 'User is already a merchant.'], 400);
         }
 
-        $validated = $request->validate([
-            'business_name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'category' => 'required|string|max:50',
-            'address' => 'nullable|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         DB::transaction(function () use ($user, $validated) {
             // Update user role if not already set (though check above handles it partially)
@@ -69,7 +69,7 @@ class MerchantController extends Controller
     /**
      * Update the merchant profile.
      */
-    public function updateProfile(Request $request)
+    public function updateProfile(UpdateMerchantProfileRequest $request)
     {
         $user = Auth::user();
         $profile = $user->merchantProfile;
@@ -78,12 +78,7 @@ class MerchantController extends Controller
             return response()->json(['message' => 'Merchant profile not found.'], 404);
         }
 
-        $validated = $request->validate([
-            'business_name' => 'sometimes|string|max:255',
-            'description' => 'nullable|string',
-            'category' => 'sometimes|string|max:50',
-            'address' => 'nullable|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         $profile->update($validated);
 
@@ -96,7 +91,7 @@ class MerchantController extends Controller
     /**
      * Create a new promotion.
      */
-    public function storePromotion(Request $request)
+    public function storePromotion(StorePromotionRequest $request)
     {
         $user = Auth::user();
         $profile = $user->merchantProfile;
@@ -107,18 +102,7 @@ class MerchantController extends Controller
 
         // In a real app, we might check: if ($profile->verification_status !== 'verified') ...
 
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'promo_code' => 'nullable|string|max:50',
-            'discount_value' => 'required|string|max:50',
-            'lat' => 'required|numeric|between:-90,90',
-            'lng' => 'required|numeric|between:-180,180',
-            'radius' => 'required|integer|min:10|max:5000',
-            'token_cost' => 'integer|min:0',
-            'starts_at' => 'required|date',
-            'expires_at' => 'required|date|after:starts_at',
-        ]);
+        $validated = $request->validated();
 
         $promotion = $profile->promotions()->create($validated);
 
@@ -148,15 +132,8 @@ class MerchantController extends Controller
     /**
      * Consumer-facing: Browse active deals/promotions nearby.
      */
-    public function browseDeals(Request $request)
+    public function browseDeals(BrowseDealsRequest $request)
     {
-        $request->validate([
-            'lat' => 'required|numeric|between:-90,90',
-            'lng' => 'required|numeric|between:-180,180',
-            'radius' => 'nullable|integer|min:100|max:50000', // meters, default 5km
-            'category' => 'nullable|string|max:50',
-        ]);
-
         $lat = $request->lat;
         $lng = $request->lng;
         $radius = $request->radius ?? 5000; // 5km default
@@ -207,13 +184,8 @@ class MerchantController extends Controller
     /**
      * Track promotion interaction (View, Click, Redemption).
      */
-    public function trackPromotion(Request $request, $id)
+    public function trackPromotion(TrackPromotionRequest $request, $id)
     {
-        $request->validate([
-            'type' => 'required|in:view,click,redemption',
-            'metadata' => 'nullable|array',
-        ]);
-
         $promotion = Promotion::findOrFail($id);
 
         // Record the event
