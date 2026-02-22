@@ -130,3 +130,10 @@ fwber-backend/node_modules/
 fwber-frontend/node_modules/
 /fwber-frontend/node_modules_locked_trash_1767127912
 /fwber-frontend/node_modules_locked_trash_1767128343
+fwber-backend/server.log
+fwber-backend/storage/logs/*.log
+fwber-backend/vendor/
+fwber-backend/node_modules/
+fwber-frontend/node_modules/
+fwber-frontend/.next/
+fwber-frontend/frontend.log

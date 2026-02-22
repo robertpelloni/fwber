@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.36] - 2026-02-20
+
+### Added
+- **Documentation Overhaul**: Created `docs/universal/UNIVERSAL_LLM_INSTRUCTIONS.md` as the master protocol. Added `VERSION` file for global version tracking.
+- **Infrastructure Dashboard**: Created `docs/dashboard/PROJECT_STRUCTURE_DASHBOARD.md` mapping the directory layout.
+- **Optimization**: Implemented caching for Dashboard stats.
+- **Compliance**: Added GDPR Data Export, Privacy Policy, and Terms of Service.
+
+## [0.3.35] - 2026-02-19
+
+### Added
+- **Infrastructure**: Kubernetes manifests with liveness probes and resource limits.
+- **Database**: MySQL Read/Write splitting support.
+- **UI Polish**: Comprehensive tooltips for Merchant Analytics and Security Settings.
+
 ## [0.3.34] - 2026-02-06
 
 ### Added
