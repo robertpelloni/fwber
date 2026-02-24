@@ -19,12 +19,12 @@ return [
     'viral_content' => env('FEATURE_VIRAL_CONTENT', true),
     'bounties' => env('FEATURE_BOUNTIES', true),
 
-    // Infrastructure features - enable as needed
+    // Infrastructure features - enabled for production
     'websocket' => env('FEATURE_WEBSOCKET', true),
     'rate_limits' => env('FEATURE_RATE_LIMITS', true),
     'analytics' => env('FEATURE_ANALYTICS', true),
 
-    // Advanced features - enabled for testing
+    // Advanced features - enabled for production
     'face_reveal' => env('FEATURE_FACE_REVEAL', true),
     'local_media_vault' => env('FEATURE_LOCAL_MEDIA_VAULT', true),
     'moderation' => env('FEATURE_MODERATION', true),
