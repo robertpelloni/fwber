@@ -22,11 +22,10 @@ class MediaUploadService
         $mediaType = $file->getMimeType();
 
         $thumbnailUrl = null;
-        // Placeholder for future video thumbnail generation
+
         if ($resolvedType === 'video') {
-            // In future: generate thumbnail and store under messages/{senderId}/thumbnails
-            // $thumbnailPath = ...
-            // $thumbnailUrl = Storage::url($thumbnailPath);
+            // Use a default placeholder for now until FFMpeg is available in production
+            $thumbnailUrl = config('app.url') . '/images/placeholders/video-thumb.png';
         }
 
         return [
