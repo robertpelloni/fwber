@@ -6,6 +6,8 @@ use App\Models\Feedback;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use App\Http\Requests\Feedback\UpdateFeedbackStatusRequest;
+use App\Http\Requests\Feedback\StoreFeedbackRequest;
 
 class FeedbackController extends Controller
 {
@@ -48,12 +50,8 @@ class FeedbackController extends Controller
      *   @OA\Response(response=200, description="Feedback updated")
      * )
      */
-    public function update(Request $request, $id)
+    public function update(UpdateFeedbackStatusRequest $request, $id)
     {
-        $request->validate([
-            'status' => 'required|in:new,reviewed,resolved,dismissed'
-        ]);
-
         $feedback = Feedback::findOrFail($id);
         $feedback->update(['status' => $request->status]);
 
@@ -82,19 +80,8 @@ class FeedbackController extends Controller
      *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
      * )
      */
-    public function store(Request $request)
+    public function store(StoreFeedbackRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'category' => 'required|string|in:bug,feature,general,safety',
-            'message' => 'required|string|max:2000',
-            'page_url' => 'nullable|string|max:255',
-            'metadata' => 'nullable|array',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
         try {
             $feedback = Feedback::create([
                 'user_id' => auth()->id(), // Nullable if not logged in, but usually we require auth

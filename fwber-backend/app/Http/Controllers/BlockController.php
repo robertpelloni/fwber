@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\User\StoreBlockRequest;
 
 class BlockController extends Controller
 {
@@ -25,12 +26,8 @@ class BlockController extends Controller
      *   @OA\Response(response=422, description="Cannot block yourself")
      * )
      */
-    public function store(Request $request)
+    public function store(StoreBlockRequest $request)
     {
-        $request->validate([
-            'user_id' => 'required|exists:users,id'
-        ]);
-
         $blockedId = $request->user_id;
         $blocker = Auth::user();
 

@@ -129,26 +129,6 @@ class MatchController extends Controller
             ], 400);
         }
 
-        // Validate filter parameters
-        $request->validate([
-            'age_min' => 'nullable|integer|min:18|max:100',
-            'age_max' => 'nullable|integer|min:18|max:100',
-            'max_distance' => 'nullable|integer|min:1|max:500',
-            'smoking' => 'nullable|string|in:non-smoker,occasional,regular,social,trying-to-quit',
-            'drinking' => 'nullable|string|in:non-drinker,occasional,regular,social,sober',
-            'body_type' => 'nullable|string|in:slim,athletic,average,curvy,plus-size,muscular',
-            'height_min' => 'nullable|integer|min:120|max:250',
-            // Premium Filters
-            'cannabis' => 'nullable|string|in:non-smoker,occasional,regular',
-            'diet' => 'nullable|string|in:omnivore,vegetarian,vegan,keto,paleo,halal,kosher',
-            'politics' => 'nullable|string|in:liberal,moderate,conservative,apolitical,other',
-            'religion' => 'nullable|string',
-            'zodiac' => 'nullable|string',
-            'has_pets' => 'nullable|string|in:yes,no',
-            'has_children' => 'nullable|string|in:yes,no',
-            'wants_children' => 'nullable|string|in:yes,no',
-        ]);
-
         // Cache feed for 60 seconds per user with filter params
         // Cache feed for 5 minutes per user with filter params
         $cacheKey = "feed:user_{$user->id}:" . md5($request->getQueryString() ?? '');

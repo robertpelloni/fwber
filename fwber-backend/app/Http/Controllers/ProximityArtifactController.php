@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\LocalPulseRequest;
 use App\Http\Requests\ProximityFeedRequest;
 use App\Http\Requests\StoreProximityArtifactRequest;
+use App\Http\Requests\Proximity\ClaimProximityArtifactRequest;
 use App\Models\ProximityArtifact;
 use App\Models\Promotion;
 use App\Events\ProximityArtifactEvent;
@@ -195,12 +196,8 @@ class ProximityArtifactController extends Controller
      *   @OA\Response(response=400, description="Claim failed")
      * )
      */
-    public function claim(int $id, Request $request, ProximityArtifactService $service): JsonResponse
+    public function claim(int $id, ClaimProximityArtifactRequest $request, ProximityArtifactService $service): JsonResponse
     {
-        $request->validate([
-            'lat' => 'required|numeric',
-            'lng' => 'required|numeric',
-        ]);
 
         $user = auth()->user();
         $artifact = ProximityArtifact::active()->findOrFail($id);

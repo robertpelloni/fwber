@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\Auth\LoginWithWalletRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -66,19 +67,25 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $user = $request->user();
-        $token = $user->currentAccessToken();
+        $header = (string) $request->header('Authorization');
+        if (str_starts_with($header, 'Bearer ')) {
+            $plainToken = trim(substr($header, 7));
+            $hashed = hash('sha256', $plainToken);
+            
+            $apiToken = \App\Models\ApiToken::where('token', $hashed)->first();
+            
+            if ($apiToken) {
+                // Log the logout event
+                \App\Facades\SecurityLog::authSuccess([
+                    'action' => 'logout',
+                    'user_id' => $apiToken->user_id,
+                    'ip' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                ]);
 
-        // Log the logout event
-        \App\Facades\SecurityLog::authSuccess([
-            'action' => 'logout',
-            'user_id' => $user->id,
-            'ip' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'token_id' => $token->id,
-        ]);
-
-        $token->delete();
+                $apiToken->delete();
+            }
+        }
 
         return response()->json(['message' => 'Logged out successfully']);
     }
@@ -109,13 +116,9 @@ class AuthController extends Controller
         ]);
     }
 
-    public function loginWithWallet(Request $request)
+    public function loginWithWallet(LoginWithWalletRequest $request)
     {
-        $validated = $request->validate([
-            'wallet_address' => 'required|string',
-            'signature' => 'required|string',
-            'message' => 'required|string',
-        ]);
+        $validated = $request->validated();
 
         $walletAddress = $validated['wallet_address'];
         $signature = $validated['signature'];

@@ -9,6 +9,7 @@ use App\Models\TokenTransaction;
 use App\Services\TokenDistributionService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Http\Requests\Merchant\CreatePaymentRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -41,7 +42,7 @@ class MerchantController extends Controller
     /**
      * Create a payment intent (Called by Merchant Server)
      */
-    public function createPayment(Request $request): JsonResponse
+    public function createPayment(CreatePaymentRequest $request): JsonResponse
     {
         $secret = $request->header('X-Merchant-Secret');
         if (!$secret) {
@@ -52,13 +53,6 @@ class MerchantController extends Controller
         if (!$merchant) {
             return response()->json(['error' => 'Invalid merchant secret'], 401);
         }
-
-        $request->validate([
-            'amount' => 'required|numeric|min:1',
-            'description' => 'required|string|max:255',
-            'redirect_url' => 'required|url',
-            'webhook_url' => 'nullable|url',
-        ]);
 
         $payment = MerchantPayment::create([
             'merchant_id' => $merchant->id,

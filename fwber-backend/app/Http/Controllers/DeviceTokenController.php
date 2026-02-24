@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\DeviceToken;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\Device\StoreDeviceTokenRequest;
 
 class DeviceTokenController extends Controller
 {
@@ -25,13 +26,8 @@ class DeviceTokenController extends Controller
      *   @OA\Response(response=200, description="Token registered")
      * )
      */
-    public function store(Request $request)
+    public function store(StoreDeviceTokenRequest $request)
     {
-        $request->validate([
-            'token' => 'required|string',
-            'platform' => 'required|in:ios,android,web',
-        ]);
-
         DeviceToken::updateOrCreate(
             [
                 'user_id' => Auth::id(),

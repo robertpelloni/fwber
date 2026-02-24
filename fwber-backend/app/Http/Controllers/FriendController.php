@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Friend;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\Friend\SendFriendRequest;
+use App\Http\Requests\Friend\RespondToFriendRequest;
+use App\Http\Requests\Friend\InviteFriendRequest;
 
 class FriendController extends Controller
 {
@@ -48,9 +51,8 @@ class FriendController extends Controller
         return response()->json($requests);
     }
 
-    public function sendFriendRequest(Request $request)
+    public function sendFriendRequest(SendFriendRequest $request)
     {
-        $request->validate(['friend_id' => 'required|exists:users,id']);
         $user = Auth::user();
         $friendId = $request->friend_id;
 
@@ -77,9 +79,8 @@ class FriendController extends Controller
         return response()->json(['message' => 'Friend request sent'], 201);
     }
 
-    public function respondToFriendRequest(Request $request, $requestId)
+    public function respondToFriendRequest(RespondToFriendRequest $request, $requestId)
     {
-        $request->validate(['status' => 'required|in:accepted,declined']);
         $user = Auth::user();
         
         // $requestId here is actually the user ID of the requester based on the test:
@@ -165,10 +166,8 @@ class FriendController extends Controller
      *   @OA\Response(response=200, description="Invitation sent")
      * )
      */
-    public function invite(Request $request)
+    public function invite(InviteFriendRequest $request)
     {
-        $request->validate(['email' => 'required|email']);
-        
         // Logic to send invitation email
         
         return response()->json(['message' => 'Invitation sent']);

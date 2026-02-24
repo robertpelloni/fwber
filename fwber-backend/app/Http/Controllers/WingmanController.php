@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\MatchMakerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\Social\RecordWingmanAssistRequest;
 
 class WingmanController extends Controller
 {
@@ -39,12 +40,8 @@ class WingmanController extends Controller
      *     )
      * )
      */
-    public function recordAssist(Request $request): JsonResponse
+    public function recordAssist(RecordWingmanAssistRequest $request): JsonResponse
     {
-        $request->validate([
-            'subject_id' => 'required|exists:users,id',
-            'wingman_id' => 'required|exists:users,id',
-        ]);
 
         $targetId = auth()->id();
         $subjectId = $request->subject_id;

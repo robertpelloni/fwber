@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Profile\UpdateProfileRequest;
+use App\Http\Requests\Profile\UpdatePasswordRequest;
 use App\Http\Resources\UserProfileResource;
 use App\Models\User;
 use App\Models\UserProfile;
@@ -665,12 +666,8 @@ class ProfileController extends Controller
      *     )
      * )
      */
-    public function updatePassword(Request $request): JsonResponse
+    public function updatePassword(UpdatePasswordRequest $request): JsonResponse
     {
-        $request->validate([
-            'current_password' => 'required|current_password',
-            'password' => 'required|confirmed|min:8',
-        ]);
 
         $user = auth()->user();
         $user->password = \Illuminate\Support\Facades\Hash::make($request->password);

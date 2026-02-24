@@ -13,6 +13,7 @@ use App\Models\BulletinBoard;
 use App\Models\BulletinMessage;
 use App\Models\SlowRequest;
 use App\Services\ContentModerationService;
+use App\Http\Requests\Analytics\StoreAnalyticsEventRequest;
 
 class AnalyticsController extends Controller
 {
@@ -70,16 +71,8 @@ class AnalyticsController extends Controller
      *   @OA\Response(response=200, description="Events recorded")
      * )
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreAnalyticsEventRequest $request): JsonResponse
     {
-        $request->validate([
-            'session_id' => 'required|string|max:255',
-            'events' => 'required|array',
-            'events.*.event_name' => 'required|string|max:255',
-            'events.*.payload' => 'nullable|array',
-            'events.*.url' => 'nullable|string|max:1000',
-        ]);
-
         $sessionId = $request->input('session_id');
         $userId = $request->user('sanctum')?->id; // Using auth guard explicitly if available
         $ipAddress = $request->ip();

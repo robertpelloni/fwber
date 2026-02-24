@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\UserPublicKey;
+use App\Http\Requests\Security\StoreE2EKeyRequest;
 
 class E2EKeyManagementController extends Controller
 {
@@ -26,14 +27,8 @@ class E2EKeyManagementController extends Controller
      *   @OA\Response(response=200, description="Key uploaded")
      * )
      */
-    public function store(Request $request)
+    public function store(StoreE2EKeyRequest $request)
     {
-        $request->validate([
-            'public_key' => 'required|string',
-            'key_type' => 'nullable|string',
-            'device_id' => 'nullable|string',
-        ]);
-
         $user = Auth::user();
         
         UserPublicKey::updateOrCreate(

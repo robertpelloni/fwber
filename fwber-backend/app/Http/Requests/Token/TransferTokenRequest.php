@@ -22,9 +22,10 @@ class TransferTokenRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'recipient_wallet' => 'required|string',
             'amount' => 'required|numeric|min:1',
-            'memo' => 'nullable|string|max:100',
+            'recipient_id' => 'required_without:recipient_email|exists:users,id',
+            'recipient_email' => 'required_without:recipient_id|email|exists:users,email',
+            'message' => 'nullable|string|max:255',
         ];
     }
 }

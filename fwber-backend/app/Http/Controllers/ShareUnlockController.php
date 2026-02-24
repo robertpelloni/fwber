@@ -3,15 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\Social\StoreShareUnlockRequest;
 
 class ShareUnlockController extends Controller
 {
-    public function store(Request $request)
+    public function store(StoreShareUnlockRequest $request)
     {
-        $request->validate([
-            'target_profile_id' => 'required|exists:users,id',
-            'platform' => 'required|string',
-        ]);
 
         $unlock = \App\Models\ShareUnlock::firstOrCreate(
             [

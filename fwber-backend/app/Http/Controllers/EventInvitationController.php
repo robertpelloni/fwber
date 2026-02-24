@@ -9,6 +9,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\Event\StoreEventInvitationRequest;
+use App\Http\Requests\Event\RespondEventInvitationRequest;
 
 class EventInvitationController extends Controller
 {
@@ -66,13 +68,8 @@ class EventInvitationController extends Controller
      *     )
      * )
      */
-    public function store(Request $request, $eventId)
+    public function store(StoreEventInvitationRequest $request, $eventId)
     {
-        $request->validate([
-            'user_id' => 'required_without:group_id|exists:users,id',
-            'group_id' => 'required_without:user_id|exists:groups,id',
-        ]);
-
         $event = Event::findOrFail($eventId);
         $inviterId = Auth::id();
 
@@ -189,12 +186,8 @@ class EventInvitationController extends Controller
      *     )
      * )
      */
-    public function respond(Request $request, $id)
+    public function respond(RespondEventInvitationRequest $request, $id)
     {
-        $request->validate([
-            'status' => 'required|in:accepted,declined',
-        ]);
-
         $invitation = EventInvitation::where('invitee_id', Auth::id())->findOrFail($id);
 
         if ($invitation->status !== 'pending') {

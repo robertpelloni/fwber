@@ -29,6 +29,15 @@ class MatchFilterRequest extends FormRequest
             'drinking' => 'nullable|string|in:non-drinker,occasional,regular,social,sober',
             'body_type' => 'nullable|string|in:slim,athletic,average,curvy,plus-size,muscular',
             'height_min' => 'nullable|integer|min:120|max:250',
+            // Premium Filters
+            'cannabis' => 'nullable|string|in:non-smoker,occasional,regular',
+            'diet' => 'nullable|string|in:omnivore,vegetarian,vegan,keto,paleo,halal,kosher',
+            'politics' => 'nullable|string|in:liberal,moderate,conservative,apolitical,other',
+            'religion' => 'nullable|string',
+            'zodiac' => 'nullable|string',
+            'has_pets' => 'nullable|string|in:yes,no',
+            'has_children' => 'nullable|string|in:yes,no',
+            'wants_children' => 'nullable|string|in:yes,no',
         ];
     }
 

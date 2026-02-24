@@ -6,6 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\TokenTransaction;
+use App\Http\Requests\Token\WithdrawTokenRequest;
+use App\Http\Requests\Token\DepositTokenRequest;
+use App\Http\Requests\Token\TransferTokenRequest;
+use App\Http\Requests\Token\UpdateWalletAddressRequest;
+use App\Http\Requests\Token\InitiateTopUpRequest;
+use App\Http\Requests\Token\ConfirmTopUpRequest;
 use Illuminate\Support\Facades\Process;
 use App\Services\PushNotificationService;
 
@@ -20,13 +26,8 @@ class TokenController extends Controller
         $this->paymentGateway = $paymentGateway;
     }
 
-    public function withdraw(Request $request)
+    public function withdraw(WithdrawTokenRequest $request)
     {
-        $request->validate([
-            'amount' => 'required|numeric|min:0.1',
-            'destination_address' => ['required', 'string', 'regex:/^[1-9A-HJ-NP-Za-km-z]{32,44}$/'],
-        ]);
-
         $user = $request->user();
         $amount = $request->amount;
 
@@ -82,13 +83,8 @@ class TokenController extends Controller
         ]);
     }
 
-    public function deposit(Request $request)
+    public function deposit(DepositTokenRequest $request)
     {
-        $request->validate([
-            'amount' => 'required|numeric|min:0.1',
-            'signature' => 'required|string',
-        ]);
-
         // Check for duplicate signature
         $exists = TokenTransaction::whereJsonContains('metadata->signature', $request->signature)->exists();
         // Fallback for SQLite which sometimes struggles with JSON path in whereJsonContains depending on version
@@ -134,15 +130,8 @@ class TokenController extends Controller
         return response()->json(['message' => 'Deposit successful', 'new_balance' => $user->fresh()->token_balance]);
     }
 
-    public function transfer(Request $request)
+    public function transfer(TransferTokenRequest $request)
     {
-        $request->validate([
-            'amount' => 'required|numeric|min:1',
-            'recipient_id' => 'required_without:recipient_email|exists:users,id',
-            'recipient_email' => 'required_without:recipient_id|email|exists:users,email',
-            'message' => 'nullable|string|max:255',
-        ]);
-
         $sender = $request->user();
 
         if ($request->has('recipient_id')) {
@@ -238,12 +227,8 @@ class TokenController extends Controller
         ]);
     }
 
-    public function updateAddress(Request $request)
+    public function updateAddress(UpdateWalletAddressRequest $request)
     {
-        $request->validate([
-            'wallet_address' => 'required|string|max:255', // Add regex for ETH/SOL if needed
-        ]);
-
         $user = $request->user();
         $user->wallet_address = $request->wallet_address;
         $user->save();
@@ -340,12 +325,8 @@ class TokenController extends Controller
         });
     }
 
-    public function initiateTopUp(Request $request)
+    public function initiateTopUp(InitiateTopUpRequest $request)
     {
-        $request->validate([
-            'amount_usd' => 'required|numeric|min:5|max:1000',
-        ]);
-
         $user = $request->user();
         $amountUsd = $request->amount_usd;
         $currency = 'USD';
@@ -371,12 +352,8 @@ class TokenController extends Controller
         return response()->json(['error' => $result->message], 500);
     }
 
-    public function confirmTopUp(Request $request)
+    public function confirmTopUp(ConfirmTopUpRequest $request)
     {
-        $request->validate([
-            'payment_intent_id' => 'required|string',
-        ]);
-
         $user = $request->user();
         
         try {

@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Http\Requests\Bounty\StoreBountyRequest;
+use App\Http\Requests\Bounty\SuggestCandidateRequest;
 
 class MatchBountyController extends Controller
 {
@@ -60,14 +62,8 @@ class MatchBountyController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreBountyRequest $request)
     {
-        $request->validate([
-            'token_reward' => 'required|integer|min:10',
-            'description' => 'nullable|string|max:500',
-            'expires_in_days' => 'nullable|integer|min:1|max:30',
-        ]);
-
         $user = $request->user();
         $tokenReward = $request->token_reward;
 
@@ -125,12 +121,8 @@ class MatchBountyController extends Controller
     /**
      * Suggest a candidate for the bounty.
      */
-    public function suggest(Request $request, $slug)
+    public function suggest(SuggestCandidateRequest $request, $slug)
     {
-        $request->validate([
-            'candidate_id' => 'required|exists:users,id',
-        ]);
-
         $bounty = MatchBounty::where('slug', $slug)->firstOrFail();
         
         if ($bounty->status !== 'active') {

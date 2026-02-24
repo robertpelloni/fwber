@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\PushNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Http\Requests\Payment\StorePaymentRequest;
 use Illuminate\Support\Facades\DB;
 
 class PaymentRequestController extends Controller
@@ -45,14 +46,8 @@ class PaymentRequestController extends Controller
     /**
      * Create a new payment request
      */
-    public function store(Request $request): JsonResponse
+    public function store(StorePaymentRequest $request): JsonResponse
     {
-        $request->validate([
-            'payer_id' => 'required|exists:users,id',
-            'amount' => 'required|numeric|min:1',
-            'note' => 'nullable|string|max:255',
-        ]);
-
         $user = $request->user();
         $payerId = $request->payer_id;
 

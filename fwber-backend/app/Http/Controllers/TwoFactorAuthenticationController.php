@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use PragmaRX\Google2FA\Google2FA;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\Auth\ConfirmTwoFactorRequest;
 use Illuminate\Validation\ValidationException;
 
 class TwoFactorAuthenticationController extends Controller
@@ -53,11 +54,8 @@ class TwoFactorAuthenticationController extends Controller
     /**
      * Confirm 2FA with a code.
      */
-    public function confirm(Request $request)
+    public function confirm(ConfirmTwoFactorRequest $request)
     {
-        $request->validate([
-            'code' => 'required|string',
-        ]);
 
         $user = $request->user();
 

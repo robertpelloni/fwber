@@ -10,6 +10,7 @@ use App\Services\TokenDistributionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\Gift\SendGiftRequest;
 
 class GiftController extends Controller
 {
@@ -35,14 +36,8 @@ class GiftController extends Controller
     /**
      * Send a gift to another user.
      */
-    public function send(Request $request)
+    public function send(SendGiftRequest $request)
     {
-        $request->validate([
-            'receiver_id' => 'required|exists:users,id',
-            'gift_id' => 'required|exists:gifts,id',
-            'message' => 'nullable|string|max:255',
-        ]);
-
         $sender = Auth::user();
         $receiver = User::findOrFail($request->receiver_id);
         $gift = Gift::findOrFail($request->gift_id);

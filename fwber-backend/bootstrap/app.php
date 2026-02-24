@@ -29,4 +29,18 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         \Sentry\Laravel\Integration::handles($exceptions);
+
+        $exceptions->render(function (Throwable $e, Request $request) {
+            if ($request->is('api/*')) {
+                // Never expose stack traces in production
+                if (!config('app.debug') || app()->environment('production')) {
+                    return response()->json([
+                        'message' => 'An error occurred processing your request.',
+                        'error_id' => uniqid('err_'),
+                    ], 500);
+                }
+                
+                // Allow default Laravel renderer in development
+            }
+        });
     })->create();

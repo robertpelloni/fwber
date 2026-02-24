@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\Notification\UpdateNotificationPreferenceRequest;
 
 class NotificationPreferenceController extends Controller
 {
@@ -90,17 +91,13 @@ class NotificationPreferenceController extends Controller
      *     )
      * )
      */
-    public function update(Request $request, $type)
+    public function update(UpdateNotificationPreferenceRequest $request, $type)
     {
         if (!array_key_exists($type, self::TYPES)) {
             return response()->json(['message' => 'Invalid notification type'], 400);
         }
 
-        $validated = $request->validate([
-            'mail' => 'boolean',
-            'push' => 'boolean',
-            'database' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         $preference = $request->user()->notificationPreferences()->updateOrCreate(
             ['type' => $type],

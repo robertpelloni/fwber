@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Services\MatchMakerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Http\Requests\MatchMaker\StoreBountyRequest;
+use App\Http\Requests\MatchMaker\SuggestCandidateRequest;
 
 use App\Models\User;
 
@@ -23,11 +25,8 @@ class MatchMakerController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function createBounty(Request $request)
+    public function createBounty(StoreBountyRequest $request)
     {
-        $request->validate([
-            'token_reward' => 'required|integer|min:10',
-        ]);
 
         $user = $request->user();
         
@@ -59,11 +58,8 @@ class MatchMakerController extends Controller
      * @param  string  $slug
      * @return \Illuminate\Http\JsonResponse
      */
-    public function suggest(Request $request, $slug)
+    public function suggest(SuggestCandidateRequest $request, $slug)
     {
-        $request->validate([
-            'candidate_id' => 'required|exists:users,id',
-        ]);
 
         $matchmaker = $request->user();
         

@@ -46,18 +46,18 @@ class SecurityHeaders
         $isProd = app()->environment('production');
         $relaxed = (bool) env('CSP_RELAXED', !$isProd);
 
-        $scriptDirectives = "script-src 'self'";
+        $scriptDirectives = ($isProd && !$relaxed)
+            ? "script-src 'self'"
+            : "script-src 'self' 'unsafe-inline' 'unsafe-eval'";
 
-        // Production: remove unsafe-inline if possible, or strictly document why it is needed.
-        // For now, we will default to 'self' in production unless CSP_RELAXED is true.
-        // If your frontend needs inline scripts (e.g. for some libs), you might need to add hashes or nonces.
-        
         // Strict style-src in production (no unsafe-inline) unless relaxed
         $styleDirectives = ($isProd && !$relaxed) 
             ? "style-src 'self'" 
             : "style-src 'self' 'unsafe-inline'";
         
-        $frameAncestors = "frame-ancestors 'none'";
+        $frameAncestors = ($isProd && !$relaxed)
+            ? "frame-ancestors 'none'"
+            : "frame-ancestors 'self'";
 
         $csp = implode('; ', [
             "default-src 'self'",

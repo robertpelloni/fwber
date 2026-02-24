@@ -8,6 +8,7 @@ use App\Notifications\PushMessage;
 use App\Services\AchievementService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Http\Requests\Social\StoreVouchRequest;
 use Illuminate\Support\Facades\URL;
 
 class VouchController extends Controller
@@ -66,15 +67,8 @@ class VouchController extends Controller
      *     @OA\Response(response=200, description="Vouch recorded")
      * )
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreVouchRequest $request): JsonResponse
     {
-        $request->validate([
-            'referral_code' => 'required|string|exists:users,referral_code',
-            'type' => 'required|string|in:safe,fun,hot',
-            'relationship_type' => 'nullable|string|max:50',
-            'comment' => 'nullable|string|max:500',
-            'voucher_name' => 'nullable|string|max:100',
-        ]);
 
         $user = User::where('referral_code', $request->referral_code)->firstOrFail();
 

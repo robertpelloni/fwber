@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use PragmaRX\Google2FA\Google2FA;
 use App\Models\User;
+use App\Http\Requests\Auth\TwoFactorChallengeRequest;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -13,13 +14,8 @@ class TwoFactorChallengeController extends Controller
     /**
      * Verify the 2FA code or recovery code and issue a token.
      */
-    public function store(Request $request)
+    public function store(TwoFactorChallengeRequest $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'code' => 'nullable|string',
-            'recovery_code' => 'nullable|string',
-        ]);
 
         $user = User::where('email', $request->email)->first();
 
@@ -39,10 +35,6 @@ class TwoFactorChallengeController extends Controller
         
         // However, to keep it simple and stateless:
         // The client sends email + password + code.
-        
-        $request->validate([
-            'password' => 'required|string',
-        ]);
 
         if (! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
