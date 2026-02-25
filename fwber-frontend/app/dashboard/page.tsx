@@ -13,6 +13,7 @@ import AppHeader from '@/components/AppHeader';
 import { ActivityFeed } from '@/components/ActivityFeed';
 import BoostButton from '@/components/BoostButton';
 import { AchievementsList } from '@/components/dashboard/AchievementsList';
+import VouchLeaderboard from '@/components/VouchLeaderboard';
 import { ReferralModal } from '@/components/viral/ReferralModal';
 import { RoastGenerator } from '@/components/viral/RoastGenerator';
 import { DailyStreakModal } from '@/components/gamification/DailyStreakModal';
@@ -48,7 +49,19 @@ export default function DashboardPage() {
         `${process.env.NEXT_PUBLIC_API_URL}/dashboard/stats`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
+
+      return response.data;
+    },
+  });
+
+  const { data: leaderboardData } = useQuery({
+    queryKey: ['vouch-leaderboard'],
+    queryFn: async () => {
+      const token = localStorage.getItem('fwber_token');
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/leaderboard`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       return response.data;
     },
   });
@@ -58,11 +71,11 @@ export default function DashboardPage() {
     // Priority: Explicit backend flag (most reliable for real-time update)
     // Fallback: LocalStorage check (prevents spam on page reload)
     if (stats?.streak_just_updated) {
-        setShowStreakModal(true);
+      setShowStreakModal(true);
     } else if (stats?.current_streak && stats.current_streak > 0) {
       const today = new Date().toDateString();
       const lastShown = localStorage.getItem('fwber_streak_shown_date');
-      
+
       // If we haven't shown it today, and user has a streak, show it
       if (lastShown !== today) {
         setShowStreakModal(true);
@@ -74,10 +87,10 @@ export default function DashboardPage() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-        <DailyStreakModal 
-            isOpen={showStreakModal} 
-            onClose={() => setShowStreakModal(false)}
-            currentStreak={stats?.current_streak || 1}
+        <DailyStreakModal
+          isOpen={showStreakModal}
+          onClose={() => setShowStreakModal(false)}
+          currentStreak={stats?.current_streak || 1}
         />
         {/* Unified App Header with Navigation & Notifications */}
         <AppHeader />
@@ -186,6 +199,11 @@ export default function DashboardPage() {
                 {/* Who's Nearby */}
                 <ProximityPresenceCompact nearbyUsers={[]} />
 
+                {/* Vouch Leaderboard */}
+                {leaderboardData?.top_vouched && (
+                  <VouchLeaderboard data={leaderboardData.top_vouched} />
+                )}
+
                 {/* Achievements */}
                 <AchievementsList />
 
@@ -226,7 +244,7 @@ export default function DashboardPage() {
                   <div className="bg-white p-6 rounded-lg shadow">
                     <h3 className="text-lg font-medium text-gray-900 mb-2">Profile</h3>
                     <p className="text-gray-600 mb-4">
-                      {user?.profile?.bio 
+                      {user?.profile?.bio
                         ? 'Profile set up'
                         : 'Complete your profile to get started'
                       }

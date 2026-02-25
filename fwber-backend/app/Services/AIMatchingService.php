@@ -89,12 +89,28 @@ class AIMatchingService
 
     public function fallbackToHeuristicMatching(User $user, array $filters = [], int $limit = 20): array
     {
-         // Original logic moved here...
          $userProfile = $user->profile;
-         // ... (existing implementation)
+         if (!$userProfile) {
+             return [];
+         }
+
          $candidates = $this->getCandidates($user, $userProfile, $filters);
-         // ...
-         return []; // Simplified for brevity in diff, but actually we should call original logic
+         
+         $behavioralPrefs = $this->analyzeUserBehavior($user);
+
+         $scoredCandidates = $candidates->map(function ($candidate) use ($user, $userProfile, $behavioralPrefs) {
+             if (!$candidate->profile) return null;
+
+             $score = $this->calculateAdvancedScore($user, $userProfile, $candidate, $behavioralPrefs);
+             $candidate->ai_score = $score;
+             return $candidate;
+         })->filter()->values();
+
+         return $scoredCandidates
+             ->sortByDesc('ai_score')
+             ->take($limit)
+             ->values()
+             ->all();
     }
 
     private function analyzeUserBehavior(User $user): array

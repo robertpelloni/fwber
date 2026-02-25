@@ -30,7 +30,7 @@ class RegisterRequest extends FormRequest
         return [
             "name" => ["required", "string", "max:255"],
             "email" => ["required", "string", "email", "max:255", "unique:users,email"],
-            "password" => ["required", "string", "min:8", "confirmed"],
+            "password" => ["required", "string", "confirmed", \Illuminate\Validation\Rules\Password::min(8)->letters()->mixedCase()->numbers()->symbols()],
             "profile" => ["nullable", "array"],
             "profile.display_name" => ["nullable", "string", "max:255"],
             "profile.date_of_birth" => ["nullable", "date"],

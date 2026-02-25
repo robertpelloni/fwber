@@ -36,7 +36,7 @@ class MerchantAnalyticsTest extends TestCase
         MerchantPayment::factory()->create([
             'merchant_id' => $this->merchantUser->id,
             'amount' => 100,
-            'status' => 'completed',
+            'status' => 'paid',
             'created_at' => Carbon::now()
         ]);
 

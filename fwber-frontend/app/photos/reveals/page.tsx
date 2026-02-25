@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import AppHeader from '@/components/AppHeader'
 import { apiClient } from '@/lib/api/client'
-import { 
+import {
   Eye, ArrowLeft, Lock, Unlock, User,
   Calendar, Heart, ImageOff, RefreshCw
 } from 'lucide-react'
@@ -53,7 +53,7 @@ function formatDate(dateStr: string): string {
   })
 }
 
-export default function PhotoRevealsPage() {
+function PhotoRevealsContent() {
   const [reveals, setReveals] = useState<RevealedPhoto[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -81,12 +81,12 @@ export default function PhotoRevealsPage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gradient-to-b from-purple-950 via-slate-900 to-black">
         <AppHeader />
-        
+
         <main className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <Link 
-                href="/home" 
+              <Link
+                href="/home"
                 className="p-2 -ml-2 hover:bg-purple-800/30 rounded-lg transition"
               >
                 <ArrowLeft className="w-5 h-5 text-gray-400" />
@@ -116,7 +116,7 @@ export default function PhotoRevealsPage() {
               <div>
                 <h3 className="font-semibold text-white mb-1">How Photo Reveals Work</h3>
                 <p className="text-sm text-gray-300">
-                  When you match with someone, you can unlock their hidden photos. 
+                  When you match with someone, you can unlock their hidden photos.
                   Revealed photos appear here for easy access. Some photos may require tokens to unlock.
                 </p>
               </div>
@@ -247,5 +247,13 @@ export default function PhotoRevealsPage() {
         </main>
       </div>
     </ProtectedRoute>
+  )
+}
+
+export default function PhotoRevealsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-900 flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div></div>}>
+      <PhotoRevealsContent />
+    </Suspense>
   )
 }

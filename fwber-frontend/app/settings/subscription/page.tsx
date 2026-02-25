@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api/client';
@@ -23,7 +23,7 @@ interface PremiumStatus {
   unlimited_swipes: boolean;
 }
 
-export default function SubscriptionPage() {
+function SubscriptionContent() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
@@ -59,7 +59,7 @@ export default function SubscriptionPage() {
       setPurchasing(true);
       setError(null);
       setSuccessMessage(null);
-      
+
       // Call the purchase endpoint (using mock gateway by default)
       await api.post('/premium/purchase', {
         payment_method_id: 'tok_visa' // Mock token
@@ -86,7 +86,7 @@ export default function SubscriptionPage() {
       setSuccessMessage(null);
 
       const response = await api.post<{ message: string; ends_at: string }>('/subscriptions/cancel', {});
-      
+
       setSuccessMessage(response.message);
       await fetchData(); // Refresh data
     } catch (err: any) {
@@ -141,14 +141,13 @@ export default function SubscriptionPage() {
                       )}
                     </h3>
                     <p className="text-gray-500 mt-1">
-                      {status?.is_premium 
+                      {status?.is_premium
                         ? `Your premium benefits are active until ${new Date(status.expires_at!).toLocaleDateString()}`
                         : 'Upgrade to unlock premium features'}
                     </p>
                   </div>
-                  <div className={`px-4 py-1 rounded-full text-sm font-medium ${
-                    status?.is_premium ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-600'
-                  }`}>
+                  <div className={`px-4 py-1 rounded-full text-sm font-medium ${status?.is_premium ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-600'
+                    }`}>
                     {status?.is_premium ? 'Active' : 'Free'}
                   </div>
                 </div>
@@ -234,9 +233,8 @@ export default function SubscriptionPage() {
                   {history.map((payment) => (
                     <div key={payment.id} className="p-4 hover:bg-gray-50 transition-colors flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className={`p-2 rounded-full ${
-                          payment.status === 'succeeded' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
-                        }`}>
+                        <div className={`p-2 rounded-full ${payment.status === 'succeeded' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
+                          }`}>
                           <CreditCard className="w-5 h-5" />
                         </div>
                         <div>
@@ -250,11 +248,10 @@ export default function SubscriptionPage() {
                         <p className="font-medium text-gray-900">
                           {payment.currency.toUpperCase()} {parseFloat(payment.amount).toFixed(2)}
                         </p>
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                          payment.status === 'succeeded' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
-                        }`}>
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${payment.status === 'succeeded'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                          }`}>
                           {payment.status}
                         </span>
                       </div>
@@ -268,4 +265,12 @@ export default function SubscriptionPage() {
       </div>
     </ProtectedRoute>
   );
+}
+
+export default function SubscriptionPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div></div>}>
+      <SubscriptionContent />
+    </Suspense>
+  )
 }

@@ -20,6 +20,7 @@ class MediaUploadService
         $path = $file->store("messages/{$senderId}", 'public');
         $mediaUrl = Storage::url($path);
         $mediaType = $file->getMimeType();
+        $thumbnailUrl = null;
 
         // Video Thumbnail Generation
         if ($resolvedType === 'video') {

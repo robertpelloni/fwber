@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { api } from '@/lib/api/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Flame, Sparkles, Flag, AlertTriangle, CheckCircle2, Star, Skull } from 'lucide-react';
+import { Loader2, Flame, Sparkles, Flag, AlertTriangle, CheckCircle2, Star, Skull, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 
 interface ViralContent {
@@ -70,7 +71,7 @@ export function ShareContent({ id }: { id: string }) {
               </div>
             </div>
             <h2 className="text-2xl font-bold text-center text-white">
-               {data.user_name ? `Roast of ${data.user_name} 🔥` : 'Profile Roast 🔥'}
+              {data.user_name ? `Roast of ${data.user_name} 🔥` : 'Profile Roast 🔥'}
             </h2>
             <div className="bg-orange-900/20 border border-orange-500/30 rounded-lg p-6">
               <p className="text-lg text-gray-200 italic leading-relaxed">
@@ -79,7 +80,7 @@ export function ShareContent({ id }: { id: string }) {
             </div>
           </div>
         );
-      
+
       case 'hype':
         return (
           <div className="space-y-6">
@@ -89,7 +90,7 @@ export function ShareContent({ id }: { id: string }) {
               </div>
             </div>
             <h2 className="text-2xl font-bold text-center text-white">
-                {data.user_name ? `${data.user_name}'s Hype ✨` : 'Profile Hype ✨'}
+              {data.user_name ? `${data.user_name}'s Hype ✨` : 'Profile Hype ✨'}
             </h2>
             <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-6">
               <p className="text-lg text-gray-200 italic leading-relaxed">
@@ -108,7 +109,7 @@ export function ShareContent({ id }: { id: string }) {
               </div>
             </div>
             <h2 className="text-2xl font-bold text-center text-white">
-                {data.user_name ? `${data.user_name}'s Vibe Check` : 'Vibe Check Result'}
+              {data.user_name ? `${data.user_name}'s Vibe Check` : 'Vibe Check Result'}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-3">
@@ -148,7 +149,7 @@ export function ShareContent({ id }: { id: string }) {
               </div>
             </div>
             <h2 className="text-2xl font-bold text-center text-white">
-                {data.user_name ? `${data.user_name}'s Fortune 🔮` : 'Dating Fortune 🔮'}
+              {data.user_name ? `${data.user_name}'s Fortune 🔮` : 'Dating Fortune 🔮'}
             </h2>
             <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-6">
               <p className="text-lg text-gray-200 italic leading-relaxed">
@@ -252,8 +253,8 @@ export function ShareContent({ id }: { id: string }) {
                       Get 5 views on this link to unlock <strong>24h of Gold Premium</strong>!
                     </p>
                     <div className="w-full bg-gray-700 rounded-full h-2.5 mb-1">
-                      <div 
-                        className="bg-purple-500 h-2.5 rounded-full transition-all duration-500" 
+                      <div
+                        className="bg-purple-500 h-2.5 rounded-full transition-all duration-500"
                         style={{ width: `${Math.min((data.views / 5) * 100, 100)}%` }}
                       ></div>
                     </div>
@@ -264,22 +265,43 @@ export function ShareContent({ id }: { id: string }) {
             )}
 
             {renderContent()}
-            
-            <div className="mt-8 pt-8 border-t border-gray-800 text-center space-y-4">
-              <p className="text-gray-400">
-                {cta.title}
-              </p>
-              <Link href={data.type === 'roast' || data.type === 'hype' ? "/roast" : "/auth/register"} className="block w-full">
-                <Button className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-bold py-6 text-lg">
-                  {cta.buttonText}
-                </Button>
-              </Link>
-            </div>
           </CardContent>
         </Card>
       </main>
 
-      <footer className="p-6 text-center text-gray-600 text-sm">
+      {/* Sticky Bottom CTA for Maximum Virality */}
+      <motion.div
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.5, type: "spring", stiffness: 200, damping: 20 }}
+        className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black via-black to-transparent z-50 pointer-events-none"
+      >
+        <div className="max-w-2xl mx-auto pointer-events-auto">
+          <Link href={data.type === 'roast' || data.type === 'hype' ? "/roast" : "/auth/register"} className="block w-full">
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Button className="w-full bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-500 hover:via-purple-500 hover:to-indigo-500 text-white font-black py-7 text-lg shadow-[0_0_30px_rgba(236,72,153,0.3)] border border-pink-500/50 rounded-2xl flex flex-col items-center justify-center group overflow-hidden relative">
+
+                {/* Animated shine effect */}
+                <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[-20deg]" />
+
+                <span className="flex items-center gap-2">
+                  <Flame className="w-5 h-5 text-orange-400 group-hover:animate-bounce" />
+                  {cta.buttonText}
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </span>
+                <span className="text-xs font-medium text-pink-200/70 mt-1">
+                  {cta.title}
+                </span>
+              </Button>
+            </motion.div>
+          </Link>
+        </div>
+      </motion.div>
+
+      <footer className="p-6 pb-28 text-center text-gray-600 text-sm">
         &copy; {new Date().getFullYear()} fwber. All rights reserved.
       </footer>
     </div>
