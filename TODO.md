@@ -15,6 +15,11 @@
 
 All previously commented-out routes and feature flags have been verified as already enabled/uncommented in prior sessions. The `MISSING_FEATURES.md` references were stale.
 
+## ~~🟡 High: Error Handling & Security Patterns~~ ✅ RESOLVED
+
+- [x] **API Client Error Handling**: Frontend `apiErrorHandling.ts` provides robust retry logic, exponential backoff, and strict `ApiError` normalization.
+- [x] **Backend Validation & Catching**: Backend utilizes 63+ `FormRequest` instances for input validation and consistently catches `\Throwable` instead of `\Exception`.
+
 ## 🟡 High: Feature Flags to Enable
 
 The following features are disabled by default in `config/features.php` and should be enabled for production:
