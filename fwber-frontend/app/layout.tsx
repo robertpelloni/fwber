@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
+import { Suspense } from 'react'
 import './globals.css'
 import { AuthProvider } from '@/lib/auth-context'
 import QueryProvider from '@/lib/query-client'
@@ -105,7 +106,9 @@ export default function RootLayout({
                 <NotificationPermissionHandler />
                 <SentryInitializer />
                 <PWAInstallPrompt />
-                <AnalyticsProvider />
+                <Suspense fallback={null}>
+                  <AnalyticsProvider />
+                </Suspense>
                 <ToastProvider>
                   <NotificationListener />
                   <div className="relative flex min-h-screen flex-col">

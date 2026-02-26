@@ -19,6 +19,7 @@ import GiftShopModal from '@/components/gifts/GiftShopModal';
 import { useE2EEncryption } from '@/lib/hooks/use-e2e-encryption';
 import TipButton from '@/components/tipping/TipButton';
 import { ConversationCoach } from '@/components/chat/ConversationCoach';
+import { TierUnlockGuide } from '@/components/chat/TierUnlockGuide';
 import Image from 'next/image';
 
 interface RealTimeChatProps {
@@ -52,7 +53,7 @@ function TranslateButton({ text, isOwnMessage }: { text: string, isOwnMessage: b
           {translatedText}
         </div>
       )}
-      <button 
+      <button
         onClick={handleTranslate}
         className="text-[10px] text-gray-400 hover:text-white flex items-center gap-1 mt-1 opacity-50 hover:opacity-100 transition-opacity"
         title="Translate"
@@ -98,17 +99,17 @@ function EncryptedMessageContent({ content, senderId, isOwnMessage }: { content:
     <div>
       <p className="text-sm">{decryptedText}</p>
       {!isOwnMessage && (
-        <TranslateButton 
-          text={decryptedText} 
-          isOwnMessage={isOwnMessage} 
+        <TranslateButton
+          text={decryptedText}
+          isOwnMessage={isOwnMessage}
         />
       )}
     </div>
   );
 }
 
-export default function RealTimeChat({ 
-  recipientId, 
+export default function RealTimeChat({
+  recipientId,
   recipientName = 'User',
   className = '',
   onVideoCall,
@@ -124,14 +125,14 @@ export default function RealTimeChat({
   const [showSafetyMenu, setShowSafetyMenu] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSending, setIsSending] = useState(false);
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const { user } = useAuth();
   const { showSuccess, showError } = useToast();
   const { encrypt, isReady: isE2EReady } = useE2EEncryption();
-  
+
   const {
     messages,
     typingIndicators,
@@ -186,36 +187,36 @@ export default function RealTimeChat({
       setIsSending(true);
       try {
         if (selectedFile) {
-            // Handle file upload via API
-            const formData = new FormData();
-            formData.append('receiver_id', recipientId);
-            formData.append('content', message.trim());
-            formData.append('media', selectedFile);
-            
-            // Auto-detect type
-            if (selectedFile.type.startsWith('image/')) formData.append('message_type', 'image');
-            else if (selectedFile.type.startsWith('video/')) formData.append('message_type', 'video');
-            else if (selectedFile.type.startsWith('audio/')) formData.append('message_type', 'audio');
-            else formData.append('message_type', 'file');
+          // Handle file upload via API
+          const formData = new FormData();
+          formData.append('receiver_id', recipientId);
+          formData.append('content', message.trim());
+          formData.append('media', selectedFile);
 
-            await api.post('/messages', formData);
-            // Message will be received via WebSocket
+          // Auto-detect type
+          if (selectedFile.type.startsWith('image/')) formData.append('message_type', 'image');
+          else if (selectedFile.type.startsWith('video/')) formData.append('message_type', 'video');
+          else if (selectedFile.type.startsWith('audio/')) formData.append('message_type', 'audio');
+          else formData.append('message_type', 'file');
+
+          await api.post('/messages', formData);
+          // Message will be received via WebSocket
         } else {
-            // Handle text message via WebSocket
-            let payload = message.trim();
-            
-            // Encrypt if E2E is ready
-            if (isE2EReady) {
-                try {
-                payload = await encrypt(parseInt(recipientId), payload);
-                } catch (error) {
-                console.error('Encryption failed, sending plain text', error);
-                }
-            }
+          // Handle text message via WebSocket
+          let payload = message.trim();
 
-            sendMessage(payload);
+          // Encrypt if E2E is ready
+          if (isE2EReady) {
+            try {
+              payload = await encrypt(parseInt(recipientId), payload);
+            } catch (error) {
+              console.error('Encryption failed, sending plain text', error);
+            }
+          }
+
+          sendMessage(payload);
         }
-        
+
         setMessage('');
         setSelectedFile(null);
         if (fileInputRef.current) fileInputRef.current.value = '';
@@ -249,35 +250,35 @@ export default function RealTimeChat({
       // Message will be received via WebSocket
     } catch (error) {
       console.error('Failed to send voice message:', error);
-      
+
       // Offline fallback
       if (!navigator.onLine || (error as any)?.message === 'Offline' || (error as any)?.code === 'ERR_NETWORK') {
         try {
           const token = localStorage.getItem('fwber_token');
           if (token) {
-             await storeOfflineChatMessage({
-                recipient_id: recipientId,
-                message: { 
-                    type: 'audio', 
-                    media: audioFile, 
-                    media_duration: duration 
-                },
-                token: token,
-                timestamp: new Date().toISOString()
+            await storeOfflineChatMessage({
+              recipient_id: recipientId,
+              message: {
+                type: 'audio',
+                media: audioFile,
+                media_duration: duration
+              },
+              token: token,
+              timestamp: new Date().toISOString()
             });
-            
+
             // Register background sync
             if ('serviceWorker' in navigator && 'SyncManager' in window) {
-                const registration = await navigator.serviceWorker.ready;
-                // @ts-ignore
-                await registration.sync.register('chat-message');
+              const registration = await navigator.serviceWorker.ready;
+              // @ts-ignore
+              await registration.sync.register('chat-message');
             }
-            
+
             showSuccess('Saved Offline', 'Voice message will be sent when online');
           }
         } catch (storeErr) {
-             console.error('Failed to store offline voice message:', storeErr);
-             showError('Error', 'Failed to save voice message offline');
+          console.error('Failed to store offline voice message:', storeErr);
+          showError('Error', 'Failed to save voice message offline');
         }
       } else {
         showError('Error', 'Failed to send voice message');
@@ -299,7 +300,7 @@ export default function RealTimeChat({
       {/* Chat Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-700">
         <div className="flex items-center space-x-3 cursor-pointer" onClick={onProfileView}>
-          <UserAvatar 
+          <UserAvatar
             name={recipientName}
             status={recipientStatus}
             size="md"
@@ -313,7 +314,7 @@ export default function RealTimeChat({
                 </span>
               )}
             </h3>
-            <PresenceIndicator 
+            <PresenceIndicator
               status={recipientStatus}
               lastSeen={recipientUser?.last_seen}
               showLabel
@@ -322,9 +323,9 @@ export default function RealTimeChat({
         </div>
         <div className="flex items-center space-x-2">
           <DatePlanner matchId={recipientId} matchName={recipientName} />
-          
+
           {onVideoCall && (
-            <button 
+            <button
               onClick={onVideoCall}
               className="p-2 hover:bg-gray-700 rounded-full text-gray-400 hover:text-blue-400 transition-colors"
               title="Video Call"
@@ -333,7 +334,7 @@ export default function RealTimeChat({
             </button>
           )}
 
-          <button 
+          <button
             onClick={() => setIsGiftModalOpen(true)}
             className="p-2 hover:bg-gray-700 rounded-full text-gray-400 hover:text-pink-400 transition-colors"
             title="Send Gift"
@@ -345,7 +346,7 @@ export default function RealTimeChat({
 
           <Dialog>
             <DialogTrigger asChild>
-              <button 
+              <button
                 className="p-2 hover:bg-gray-700 rounded-full text-gray-400 hover:text-yellow-400 transition-colors"
                 title="View Match Insights"
               >
@@ -408,6 +409,9 @@ export default function RealTimeChat({
         </div>
       </div>
 
+      {/* Tier Unlock Guide Overlay */}
+      <TierUnlockGuide matchId={recipientId} />
+
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {(messages as ChatMessage[]).length === 0 ? (
@@ -425,77 +429,76 @@ export default function RealTimeChat({
             const content = msg.message?.content || msg.content || '';
             const messageType = msg.message_type || msg.message?.type || 'text';
             const mediaUrl = msg.media_url;
-            
+
             return (
               <div
                 key={msg.message_id || msg.id || index}
                 className={`flex flex-col ${isOwnMessage ? 'items-end' : 'items-start'}`}
               >
                 <div
-                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                    isOwnMessage
+                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${isOwnMessage
                       ? 'bg-red-600 text-white'
                       : 'bg-gray-700 text-white'
-                  }`}
+                    }`}
                 >
                   {mediaUrl && (
                     <div className="mb-2">
-                        {messageType === 'image' ? (
-                            <Image 
-                                src={mediaUrl.startsWith('http') ? mediaUrl : `${BACKEND_URL}${mediaUrl}`} 
-                                alt="Attachment" 
-                                width={200}
-                                height={200}
-                                className="w-full h-auto rounded-lg"
-                                loading="lazy"
-                            />
-                        ) : messageType === 'video' ? (
-                            <video 
-                                src={mediaUrl.startsWith('http') ? mediaUrl : `${BACKEND_URL}${mediaUrl}`} 
-                                controls 
-                                className="max-w-full rounded-lg"
-                            />
-                        ) : messageType === 'audio' ? (
-                            <div className="flex flex-col gap-1 min-w-[200px]">
-                                <audio 
-                                    controls 
-                                    src={mediaUrl.startsWith('http') ? mediaUrl : `${BACKEND_URL}${mediaUrl}`} 
-                                    className="w-full h-8" 
-                                />
-                                <div className="flex justify-between items-center">
-                                    {msg.media_duration && <span className="text-xs opacity-75">{msg.media_duration}s</span>}
-                                </div>
-                                {msg.transcription && (
-                                    <div className="mt-1 p-2 bg-black/20 rounded text-sm italic text-gray-200">
-                                        &quot;{msg.transcription}&quot;
-                                    </div>
-                                )}
+                      {messageType === 'image' ? (
+                        <Image
+                          src={mediaUrl.startsWith('http') ? mediaUrl : `${BACKEND_URL}${mediaUrl}`}
+                          alt="Attachment"
+                          width={200}
+                          height={200}
+                          className="w-full h-auto rounded-lg"
+                          loading="lazy"
+                        />
+                      ) : messageType === 'video' ? (
+                        <video
+                          src={mediaUrl.startsWith('http') ? mediaUrl : `${BACKEND_URL}${mediaUrl}`}
+                          controls
+                          className="max-w-full rounded-lg"
+                        />
+                      ) : messageType === 'audio' ? (
+                        <div className="flex flex-col gap-1 min-w-[200px]">
+                          <audio
+                            controls
+                            src={mediaUrl.startsWith('http') ? mediaUrl : `${BACKEND_URL}${mediaUrl}`}
+                            className="w-full h-8"
+                          />
+                          <div className="flex justify-between items-center">
+                            {msg.media_duration && <span className="text-xs opacity-75">{msg.media_duration}s</span>}
+                          </div>
+                          {msg.transcription && (
+                            <div className="mt-1 p-2 bg-black/20 rounded text-sm italic text-gray-200">
+                              &quot;{msg.transcription}&quot;
                             </div>
-                        ) : (
-                            <a 
-                                href={mediaUrl.startsWith('http') ? mediaUrl : `${BACKEND_URL}${mediaUrl}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-2 underline text-white"
-                            >
-                                <Paperclip className="h-4 w-4" />
-                                Download File
-                            </a>
-                        )}
+                          )}
+                        </div>
+                      ) : (
+                        <a
+                          href={mediaUrl.startsWith('http') ? mediaUrl : `${BACKEND_URL}${mediaUrl}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 underline text-white"
+                        >
+                          <Paperclip className="h-4 w-4" />
+                          Download File
+                        </a>
+                      )}
                     </div>
                   )}
 
                   {!mediaUrl && messageType === 'text' && (
-                    <EncryptedMessageContent 
-                      content={content} 
-                      senderId={parseInt(msg.from_user_id || '0')} 
-                      isOwnMessage={isOwnMessage} 
+                    <EncryptedMessageContent
+                      content={content}
+                      senderId={parseInt(msg.from_user_id || '0')}
+                      isOwnMessage={isOwnMessage}
                     />
                   )}
-                  
+
                   {mediaUrl && content && <p className="text-sm mt-1">{content}</p>}
 
-                  <MessageMetadata 
+                  <MessageMetadata
                     timestamp={msg.timestamp}
                     status={msg.status}
                     isOwnMessage={isOwnMessage}
@@ -505,26 +508,26 @@ export default function RealTimeChat({
 
                 {/* Message Reactions */}
                 <div className="flex gap-1 mt-1 opacity-0 hover:opacity-100 transition-opacity">
-                    <button onClick={() => handleReaction(String(msg.message_id || msg.id || ''), '👍')} className="hover:scale-110 transition-transform" title="Like">
-                        <ThumbsUp className="w-3 h-3 text-gray-400 hover:text-blue-400" />
-                    </button>
-                    <button onClick={() => handleReaction(String(msg.message_id || msg.id || ''), '❤️')} className="hover:scale-110 transition-transform" title="Love">
-                        <Heart className="w-3 h-3 text-gray-400 hover:text-pink-500" />
-                    </button>
-                    <button onClick={() => handleReaction(String(msg.message_id || msg.id || ''), '😂')} className="hover:scale-110 transition-transform" title="Haha">
-                        <Laugh className="w-3 h-3 text-gray-400 hover:text-yellow-400" />
-                    </button>
+                  <button onClick={() => handleReaction(String(msg.message_id || msg.id || ''), '👍')} className="hover:scale-110 transition-transform" title="Like">
+                    <ThumbsUp className="w-3 h-3 text-gray-400 hover:text-blue-400" />
+                  </button>
+                  <button onClick={() => handleReaction(String(msg.message_id || msg.id || ''), '❤️')} className="hover:scale-110 transition-transform" title="Love">
+                    <Heart className="w-3 h-3 text-gray-400 hover:text-pink-500" />
+                  </button>
+                  <button onClick={() => handleReaction(String(msg.message_id || msg.id || ''), '😂')} className="hover:scale-110 transition-transform" title="Haha">
+                    <Laugh className="w-3 h-3 text-gray-400 hover:text-yellow-400" />
+                  </button>
                 </div>
 
                 {/* Display Reactions */}
                 {msg.reactions && msg.reactions.length > 0 && (
-                    <div className="flex gap-1 mt-1 -translate-y-2 translate-x-2">
-                        {msg.reactions.map((r, i) => (
-                            <span key={i} className="bg-gray-800 border border-gray-600 rounded-full px-1 text-xs" title={r.user_name}>
-                                {r.emoji}
-                            </span>
-                        ))}
-                    </div>
+                  <div className="flex gap-1 mt-1 -translate-y-2 translate-x-2">
+                    {msg.reactions.map((r, i) => (
+                      <span key={i} className="bg-gray-800 border border-gray-600 rounded-full px-1 text-xs" title={r.user_name}>
+                        {r.emoji}
+                      </span>
+                    ))}
+                  </div>
                 )}
               </div>
             );
@@ -536,7 +539,7 @@ export default function RealTimeChat({
       {/* Message Input */}
       <div className="p-4 border-t border-gray-700">
         <div className="mb-2">
-          <WingmanSuggestions 
+          <WingmanSuggestions
             matchId={recipientId}
             onSelectSuggestion={(suggestion) => {
               setMessage(suggestion);
@@ -545,20 +548,20 @@ export default function RealTimeChat({
             mode={(messages as ChatMessage[]).length === 0 ? 'ice-breaker' : 'reply'}
           />
         </div>
-        
+
         {selectedFile && (
-            <div className="mb-2 px-3 py-1 bg-gray-700 rounded flex justify-between items-center">
-                <span className="text-sm text-gray-300 truncate max-w-xs">{selectedFile.name}</span>
-                <button 
-                onClick={() => {
-                    setSelectedFile(null);
-                    if (fileInputRef.current) fileInputRef.current.value = '';
-                }}
-                className="text-gray-400 hover:text-red-400"
-                >
-                <X className="w-4 h-4" />
-                </button>
-            </div>
+          <div className="mb-2 px-3 py-1 bg-gray-700 rounded flex justify-between items-center">
+            <span className="text-sm text-gray-300 truncate max-w-xs">{selectedFile.name}</span>
+            <button
+              onClick={() => {
+                setSelectedFile(null);
+                if (fileInputRef.current) fileInputRef.current.value = '';
+              }}
+              className="text-gray-400 hover:text-red-400"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         )}
 
         <form onSubmit={handleSendMessage} className="flex space-x-2 items-center">
@@ -578,12 +581,12 @@ export default function RealTimeChat({
             accept="image/*,video/*,audio/*"
           />
 
-          <AudioRecorder 
-            onRecordingComplete={handleVoiceMessage} 
+          <AudioRecorder
+            onRecordingComplete={handleVoiceMessage}
             onRecordingStateChange={setIsRecordingVoice}
             isSending={isSending}
           />
-          
+
           {!isRecordingVoice && (
             <>
               <div className="flex-1 relative">
@@ -596,9 +599,9 @@ export default function RealTimeChat({
                   disabled={!isConnected || isSending}
                 />
                 <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
-                  <ConversationCoach 
-                    matchId={recipientId} 
-                    draft={message} 
+                  <ConversationCoach
+                    matchId={recipientId}
+                    draft={message}
                     onApplySuggestion={(suggestion) => {
                       setMessage(suggestion);
                       handleTypingChange(suggestion);
@@ -618,7 +621,7 @@ export default function RealTimeChat({
         </form>
       </div>
 
-      <GiftShopModal 
+      <GiftShopModal
         isOpen={isGiftModalOpen}
         onClose={() => setIsGiftModalOpen(false)}
         receiverId={parseInt(recipientId)}
@@ -633,7 +636,7 @@ export default function RealTimeChat({
  */
 export function ChatList({ className = '' }: { className?: string }) {
   const { chatMessages, onlineUsers } = useWebSocketChat();
-  
+
   // Group messages by conversation
   const conversations = (chatMessages as ChatMessage[]).reduce<Record<string, ChatMessage[]>>((acc, msg) => {
     const otherUserId = msg.from_user_id || msg.to_user_id || '';
@@ -649,12 +652,12 @@ export function ChatList({ className = '' }: { className?: string }) {
       <div className="p-4 border-b border-gray-700">
         <h3 className="text-white font-semibold">Active Conversations</h3>
       </div>
-      
+
       <div className="divide-y divide-gray-700">
         {Object.entries(conversations).map(([userId, messages]) => {
           const lastMessage = messages[messages.length - 1];
           const isOnline = (onlineUsers as OnlineUser[]).some(user => user.user_id === userId);
-          
+
           return (
             <div key={userId} className="p-4 hover:bg-gray-700 cursor-pointer transition-colors">
               <div className="flex items-center space-x-3">
@@ -691,13 +694,13 @@ export function ChatList({ className = '' }: { className?: string }) {
  */
 export function OnlineUsers({ className = '' }: { className?: string }) {
   const { onlineUsers } = useWebSocketChat();
-  
+
   return (
     <div className={`bg-gray-800 rounded-lg ${className}`}>
       <div className="p-4 border-b border-gray-700">
         <h3 className="text-white font-semibold">Online Users ({(onlineUsers as OnlineUser[]).length})</h3>
       </div>
-      
+
       <div className="p-4 space-y-3">
         {(onlineUsers as OnlineUser[]).length === 0 ? (
           <p className="text-gray-400 text-center py-4">No users online</p>
