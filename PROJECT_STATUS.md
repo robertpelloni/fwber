@@ -1,8 +1,8 @@
-# Project Status - v0.3.35
+# Project Status - v0.3.36
 
 **Date:** 2026-02-20
 **Current Phase:** Hardening & Merchant Integration
-**Version:** v0.3.35
+**Version:** v0.3.36
 
 ## 🚨 Immediate Priorities (Next 24 Hours)
 
