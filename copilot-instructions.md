@@ -1,12 +1,19 @@
 # FWBER COPILOT INSTRUCTIONS
 
 > **See [docs/UNIVERSAL_LLM_INSTRUCTIONS.md](docs/UNIVERSAL_LLM_INSTRUCTIONS.md) for the Master Protocol.**
+> **See [AGENTS.md](AGENTS.md) for shared protocols (versioning, code standards, git workflow).**
 
-This file serves as a pointer to the single source of truth for all LLM agents. Please refer to the universal instructions for:
-- Versioning Protocol
-- Code Standards
-- Project Structure
-- Execution Workflow
+**Current Version:** 0.3.37  
+**Status:** See `PROJECT_STATUS.md` and `TODO.md`.
 
-**Current Version:** 0.3.34
-**Status:** See `docs/PROJECT_STATUS.md`.
+---
+
+## 🧠 Copilot-Specific Role: Inline Assistance
+
+### Guidelines
+- Follow existing patterns in surrounding code.
+- Use TypeScript strict types — avoid `any`.
+- Prefer `useCallback` and `useMemo` for React hooks.
+- Use `framer-motion` for animations.
+- Gate new features behind `config/features.php` flags.
+- Comment non-obvious design decisions.

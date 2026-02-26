@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.37] - 2026-02-26
+
+### Added
+- **Comprehensive Documentation Overhaul**: Rewrote `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `GPT.md`, `copilot-instructions.md` with model-specific roles, detailed versioning protocol, code standards, and git workflow.
+- **New Files**: Created `TODO.md` (short-term task list with priorities), `MEMORY.md` (persistent codebase observations and user preferences), `IDEAS.md` (expanded creative improvement proposals).
+- **Version Sync**: Fixed hardcoded `v0.3.2` in `app/layout.tsx` to display the correct version.
+- **HANDOFF.md**: Updated with comprehensive session analysis for model handoff continuity.
+
+### Fixed
+- **Next.js Suspense Bailout**: Wrapped `<AnalyticsProvider>` in `<Suspense>` boundary in `app/layout.tsx` to fix CSR bailout during static page generation.
+- **Version Desync**: Synchronized version numbers across all model instruction files, `VERSION`, and `layout.tsx`.
+
+## [0.3.36] - 2026-02-26
+
+### Added
+- **Tier Unlock Guide UI**: New animated `TierUnlockGuide.tsx` component in `components/chat/` displaying relationship tier progress.
+  - Uses `useRelationshipTier` hook for real-time metrics (messages exchanged, days connected).
+  - `framer-motion` progress bars with gradient fills showing progress to next tier.
+  - Collapsible overlay integrated directly below the chat header in `RealTimeChat.tsx`.
+  - Shows unlock previews (e.g., "Next: Video Chat, Full Photo Gallery").
+
 ## [0.3.35] - 2026-02-20
 
 ### Added

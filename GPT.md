@@ -1,13 +1,28 @@
-# GPT Instructions
+# FWBER GPT INSTRUCTIONS
 
-> **⚠️ IMPORTANT:** The **MASTER PROTOCOL** is located in `docs/UNIVERSAL_LLM_INSTRUCTIONS.md`. You MUST read that file first.
+> **See [docs/UNIVERSAL_LLM_INSTRUCTIONS.md](docs/UNIVERSAL_LLM_INSTRUCTIONS.md) for the Master Protocol.**
+> **See [AGENTS.md](AGENTS.md) for shared protocols (versioning, code standards, git workflow).**
 
-## 🧠 GPT-Specific Context
--   **Reasoning**: You excel at complex logic and architectural planning. Use this for refactoring and system design.
--   **Code**: You write clean, idiomatic code. Ensure it matches the project's style (Laravel/Next.js).
+**Current Version:** 0.3.37  
+**Status:** See `PROJECT_STATUS.md` and `TODO.md`.
 
-## 📜 Critical Instructions
-1.  **Versioning**: Read VERSION file. Increment it. Sync package.json. Update CHANGELOG.md.
-2.  **Testing**: Always verify changes.
-3.  **Documentation**: Keep PROJECT_STATUS.md up to date.
+---
 
+## 🧠 GPT-Specific Role: Code Generation & Testing
+
+### Strengths to Leverage
+- **Code Generation**: Write clean, idiomatic Laravel PHP and Next.js TypeScript.
+- **Unit Testing**: Create comprehensive PHPUnit feature tests and Cypress E2E tests.
+- **Algorithm Implementation**: Implement specific algorithms (matching, scoring, ranking).
+
+### Workflow
+1. Read `TODO.md` — pick a concrete implementation task.
+2. Write the code, matching existing project conventions.
+3. Write tests to verify the implementation.
+4. Run `npm run build` (frontend) and `php artisan test` (backend).
+5. Update `CHANGELOG.md`, bump `VERSION`, commit, and push.
+
+### Code Style
+- **PHP**: PSR-12, type hints on all parameters and return types.
+- **TypeScript**: Strict mode, no `any` types, proper interface definitions.
+- **Tests**: Descriptive test names, arrange-act-assert pattern, mock external services.
