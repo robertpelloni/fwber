@@ -244,6 +244,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Notifications
     Route::get('notification-preferences', [\App\Http\Controllers\NotificationPreferenceController::class, 'index']);
     Route::put('notification-preferences/{type}', [\App\Http\Controllers\NotificationPreferenceController::class, 'update']);
+    Route::get('notifications', [\App\Http\Controllers\NotificationController::class, 'index']);
+    Route::post('notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead']);
+    Route::post('notifications/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead']);
     Route::post('notifications/subscribe', [\App\Http\Controllers\NotificationController::class, 'subscribe']);
     Route::post('notifications/unsubscribe', [\App\Http\Controllers\NotificationController::class, 'unsubscribe']);
 
