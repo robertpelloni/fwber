@@ -26,8 +26,7 @@ export function useWebSocketChat(recipientId?: string) {
 
   // Filter messages for specific recipient
   const recipientMessages = chatMessages.filter((msg: any) =>
-    (msg.from_user_id === recipientId || msg.to_user_id === recipientId) ||
-    (msg.from_user_id === recipientId || msg.to_user_id === recipientId)
+    msg.from_user_id === recipientId || msg.to_user_id === recipientId
   );
 
   // Filter typing indicators for specific recipient
