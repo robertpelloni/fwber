@@ -8,5 +8,5 @@ This file serves as a pointer to the single source of truth for all LLM agents. 
 - Project Structure
 - Execution Workflow
 
-**Current Version:** 0.3.34
+**Current Version:** 0.3.35
 **Status:** See `docs/PROJECT_STATUS.md`.
