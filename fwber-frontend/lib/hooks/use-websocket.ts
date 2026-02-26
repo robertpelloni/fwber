@@ -1,9 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePusherLogic } from './use-pusher-logic';
-import { UseWebSocketOptions } from './use-websocket-logic';
+import { api } from '@/lib/api/client';
+import type { UseWebSocketOptions } from '@/lib/types/realtime';
 
-// Re-export types
-export * from './use-websocket-logic';
+// Re-export types from centralized location
+export * from '@/lib/types/realtime';
+// Also re-export the WS-specific types for backwards compat
+export type { UseWebSocketOptions } from '@/lib/types/realtime';
 
 /**
  * Hook to access the Realtime (WebSocket) context.
@@ -17,7 +20,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
  */
 export function useWebSocketChat(recipientId?: string) {
   const { sendChatMessage, sendTypingIndicator, chatMessages, typingIndicators, onlineUsers } = useWebSocket();
-  
+
   const [isTyping, setIsTyping] = useState(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -55,12 +58,12 @@ export function useWebSocketChat(recipientId?: string) {
   const handleTypingChange = useCallback((value: string) => {
     if (value.length > 0) {
       handleStartTyping();
-      
+
       // Clear existing timeout
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
       }
-      
+
       // Set new timeout to stop typing
       typingTimeoutRef.current = setTimeout(() => {
         handleStopTyping();
@@ -95,7 +98,7 @@ export function useWebSocketChat(recipientId?: string) {
  */
 export function useWebSocketPresence() {
   const { updatePresence, onlineUsers, presenceUpdates } = useWebSocket();
-  
+
   const [currentStatus, setCurrentStatus] = useState<'online' | 'away' | 'busy' | 'offline'>('online');
 
   const setStatus = useCallback((status: 'online' | 'away' | 'busy' | 'offline', metadata?: Record<string, any>) => {
@@ -136,7 +139,7 @@ export function useWebSocketPresence() {
  */
 export function useWebSocketNotifications() {
   const { notifications, clearNotifications } = useWebSocket();
-  
+
   const [unreadCount, setUnreadCount] = useState(0);
 
   // Count unread notifications
@@ -145,14 +148,20 @@ export function useWebSocketNotifications() {
     setUnreadCount(unread.length);
   }, [notifications]);
 
-  const markAsRead = useCallback((notificationId: string) => {
-    // This would typically make an API call to mark as read
-    console.log('Marking notification as read:', notificationId);
+  const markAsRead = useCallback(async (notificationId: string) => {
+    try {
+      await api.post(`/notifications/${notificationId}/read`);
+    } catch (err) {
+      // Silently fail — notification read status is non-critical
+    }
   }, []);
 
-  const markAllAsRead = useCallback(() => {
-    // This would typically make an API call to mark all as read
-    console.log('Marking all notifications as read');
+  const markAllAsRead = useCallback(async () => {
+    try {
+      await api.post('/notifications/read-all');
+    } catch (err) {
+      // Silently fail — notification read status is non-critical
+    }
   }, []);
 
   return {

@@ -4,80 +4,31 @@ import { createWebSocketClient, WebSocketClient, WebSocketMessage as WSMessage }
 import { logWebSocket } from '@/lib/logger';
 import { storeMessage, updateMessageStatus, getConversationMessages } from '@/lib/messageStorage';
 
-export interface WebSocketConnectionStatus {
-  connected: boolean;
-  connectionId: string | null;
-  userId: string | null;
-  reconnectAttempts: number;
-}
+// Import shared types from centralized location
+import type {
+  ConnectionStatus as WebSocketConnectionStatus,
+  RealtimeMessage as WebSocketMessage,
+  OnlineUser,
+  PresenceUpdate,
+  ChatMessage,
+  TypingIndicator,
+  NotificationPayload,
+  MessageStatus,
+  UseWebSocketOptions,
+} from '@/lib/types/realtime';
 
-export interface WebSocketMessage {
-  type: string;
-  data: any;
-  timestamp: string;
-  connection_id?: string;
-  user_id?: string;
-}
-
-export interface OnlineUser {
-  user_id: string;
-  status?: string;
-  last_seen?: string;
-  metadata?: Record<string, any>;
-}
-
-export interface PresenceUpdate {
-  user_id: string;
-  status: string;
-  timestamp: string;
-  metadata?: Record<string, any>;
-}
-
-export type MessageStatus = 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
-
-export interface ChatMessage {
-  id?: string;
-  message_id?: string;
-  from_user_id: string;
-  to_user_id: string;
-  message?: { content?: string; type?: string; id?: string };
-  content?: string;
-  timestamp: string | number | Date;
-  status?: MessageStatus;
-  delivered_at?: string;
-  read_at?: string;
-  metadata?: Record<string, any>;
-  message_type?: string;
-  media_url?: string;
-  media_duration?: number;
-  transcription?: string;
-  reactions?: Array<{ emoji: string; user_id: string; user_name: string }>;
-}
-
-export interface TypingIndicator {
-  from_user_id: string;
-  to_user_id: string;
-  is_typing: boolean;
-  timestamp: string;
-}
-
-export interface NotificationPayload {
-  id?: string;
-  type: string;
-  title?: string;
-  message?: string;
-  data?: any;
-  timestamp: string;
-  read?: boolean;
-}
-
-export interface UseWebSocketOptions {
-  autoConnect?: boolean;
-  heartbeatInterval?: number;
-  maxReconnectAttempts?: number;
-  reconnectDelay?: number;
-  wsUrl?: string;
-}
+// Re-export types for consumers that import from this file
+export type {
+  WebSocketConnectionStatus,
+  WebSocketMessage,
+  OnlineUser,
+  PresenceUpdate,
+  ChatMessage,
+  TypingIndicator,
+  NotificationPayload,
+  MessageStatus,
+  UseWebSocketOptions,
+};
 
 export function useWebSocketLogic(options: UseWebSocketOptions = {}) {
   const { user, isAuthenticated, token: authToken } = useAuth();
@@ -292,7 +243,7 @@ export function useWebSocketLogic(options: UseWebSocketOptions = {}) {
   const sendChatMessage = useCallback((recipientId: string, content: string, type: string = 'text') => {
     if (client) {
       const messageId = client.sendChatMessage(recipientId, content, type);
-      
+
       const optimisticMessage: ChatMessage = {
         message_id: messageId as string,
         from_user_id: user?.id || '',
@@ -302,18 +253,18 @@ export function useWebSocketLogic(options: UseWebSocketOptions = {}) {
         timestamp: new Date().toISOString(),
         status: 'sending',
       };
-      
+
       setChatMessages(prev => [...prev.slice(-99), optimisticMessage]);
-      
+
       storeMessage(optimisticMessage).catch(err =>
         console.error('Failed to store optimistic message:', err)
       );
-      
+
       setTimeout(() => {
-        setChatMessages(prev => prev.map(msg => 
+        setChatMessages(prev => prev.map(msg =>
           msg.message_id === messageId ? { ...msg, status: 'sent' as MessageStatus } : msg
         ));
-        
+
         updateMessageStatus(messageId as string, 'sent').catch(err =>
           console.error('Failed to update sent status:', err)
         );
@@ -328,8 +279,8 @@ export function useWebSocketLogic(options: UseWebSocketOptions = {}) {
         data: { message_id: messageId, read_at: new Date().toISOString() },
         timestamp: new Date().toISOString(),
       });
-      
-      setChatMessages(prev => prev.map(msg => 
+
+      setChatMessages(prev => prev.map(msg =>
         (msg.message_id === messageId || msg.id === messageId)
           ? { ...msg, status: 'read' as MessageStatus, read_at: new Date().toISOString() }
           : msg
@@ -382,7 +333,7 @@ export function useWebSocketLogic(options: UseWebSocketOptions = {}) {
 
   const loadConversationHistory = useCallback(async (recipientId: string) => {
     if (!user?.id) return;
-    
+
     try {
       const messages = await getConversationMessages(user.id, recipientId);
       setChatMessages(messages);

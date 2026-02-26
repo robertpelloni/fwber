@@ -5,79 +5,33 @@ import { storeOfflineChatMessage } from '@/lib/offline-store';
 import { useE2EEncryption } from '@/lib/hooks/use-e2e-encryption';
 import { initEcho } from '@/lib/echo';
 
-// Re-using interfaces from Mercure logic for compatibility
+// Import shared types from centralized location
+import type {
+  OnlineUser,
+  PresenceUpdate,
+  ChatMessage,
+  TypingIndicator,
+  VideoSignal,
+  NotificationPayload,
+  MessageStatus,
+} from '@/lib/types/realtime';
+
+// Re-export shared types for consumers that import from this file
+export type { OnlineUser, PresenceUpdate, ChatMessage, TypingIndicator, VideoSignal, NotificationPayload, MessageStatus };
+
+// Pusher-specific connection status (differs from raw WS — adds `connecting` and `error`)
 export interface ConnectionStatus {
   connected: boolean;
   connecting: boolean;
   error: Error | null;
 }
 
+// Pusher-specific message envelope (differs from RealtimeMessage — simpler shape)
 export interface Message {
   id?: string;
   type: string;
   data: any;
   timestamp: string;
-}
-
-export interface OnlineUser {
-  user_id: string;
-  status?: string;
-  last_seen?: string;
-  metadata?: Record<string, any>;
-}
-
-export interface PresenceUpdate {
-  user_id: string;
-  status: string;
-  timestamp: string;
-  metadata?: Record<string, any>;
-}
-
-export type MessageStatus = 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
-
-export interface ChatMessage {
-  id?: string;
-  message_id?: string;
-  from_user_id: string;
-  to_user_id: string;
-  message?: { content?: string; type?: string; id?: string };
-  content?: string;
-  timestamp: string | number | Date;
-  status?: MessageStatus;
-  delivered_at?: string;
-  read_at?: string;
-  metadata?: Record<string, any>;
-  message_type?: string;
-  media_url?: string;
-  media_duration?: number;
-  is_encrypted?: boolean;
-  transcription?: string;
-}
-
-export interface TypingIndicator {
-  from_user_id: string;
-  to_user_id?: string;
-  chatroom_id?: string;
-  is_typing: boolean;
-  timestamp: string;
-}
-
-export interface VideoSignal {
-  from_user_id: string;
-  signal: any;
-  call_id?: number;
-  timestamp: string;
-}
-
-export interface NotificationPayload {
-  id?: string;
-  type: string;
-  title?: string;
-  message?: string;
-  data?: any;
-  timestamp: string;
-  read?: boolean;
-  [key: string]: any;
 }
 
 export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
@@ -88,7 +42,7 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
     connecting: false,
     error: null,
   });
-  
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   const [presenceUpdates, setPresenceUpdates] = useState<PresenceUpdate[]>([]);
@@ -98,12 +52,12 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
   const [videoSignals, setVideoSignals] = useState<VideoSignal[]>([]);
 
   const echoRef = useRef<any>(null);
-  
+
   // Refs for E2E to avoid stale closures in callbacks
   const decryptRef = useRef(decrypt);
   const encryptRef = useRef(encrypt);
   const isE2EReadyRef = useRef(isE2EReady);
-  
+
   useEffect(() => { decryptRef.current = decrypt; }, [decrypt]);
   useEffect(() => { encryptRef.current = encrypt; }, [encrypt]);
   useEffect(() => { isE2EReadyRef.current = isE2EReady; }, [isE2EReady]);
@@ -113,17 +67,17 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
 
     // Decrypt if needed
     if (data.type === 'chat_message' && data.is_encrypted && isE2EReadyRef.current) {
-        try {
-            const peerId = parseInt(data.from_user_id);
-            if (!isNaN(peerId)) {
-                const decrypted = await decryptRef.current(peerId, data.content);
-                data.content = decrypted;
-                data.is_encrypted = false;
-            }
-        } catch (e) {
-            console.error('Decryption failed for incoming message', e);
-            data.content = '🔒 Encrypted Message (Decryption Failed)';
+      try {
+        const peerId = parseInt(data.from_user_id);
+        if (!isNaN(peerId)) {
+          const decrypted = await decryptRef.current(peerId, data.content);
+          data.content = decrypted;
+          data.is_encrypted = false;
         }
+      } catch (e) {
+        console.error('Decryption failed for incoming message', e);
+        data.content = '🔒 Encrypted Message (Decryption Failed)';
+      }
     }
 
     switch (data.type) {
@@ -133,16 +87,16 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
       case 'presence_update':
         setPresenceUpdates(prev => [...prev.slice(-49), data]);
         if (data.status) {
-            setOnlineUsers(prev => {
-              const existingIndex = prev.findIndex(u => u.user_id === data.user_id);
-              if (existingIndex >= 0) {
-                const updated = [...prev];
-                updated[existingIndex] = { ...updated[existingIndex], ...data };
-                return updated;
-              } else {
-                return [...prev, { user_id: data.user_id, status: data.status, last_seen: data.timestamp, metadata: data.metadata }];
-              }
-            });
+          setOnlineUsers(prev => {
+            const existingIndex = prev.findIndex(u => u.user_id === data.user_id);
+            if (existingIndex >= 0) {
+              const updated = [...prev];
+              updated[existingIndex] = { ...updated[existingIndex], ...data };
+              return updated;
+            } else {
+              return [...prev, { user_id: data.user_id, status: data.status, last_seen: data.timestamp, metadata: data.metadata }];
+            }
+          });
         }
         break;
       case 'notification':
@@ -150,13 +104,13 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
         break;
       case 'typing_indicator':
         setTypingIndicators(prev => {
-            const filtered = prev.filter(item => {
-              if (data.chatroom_id) {
-                return !(item.from_user_id === data.from_user_id && item.chatroom_id === data.chatroom_id);
-              }
-              return !(item.from_user_id === data.from_user_id && item.to_user_id === data.to_user_id);
-            });
-            return [...filtered, data].slice(-20);
+          const filtered = prev.filter(item => {
+            if (data.chatroom_id) {
+              return !(item.from_user_id === data.from_user_id && item.chatroom_id === data.chatroom_id);
+            }
+            return !(item.from_user_id === data.from_user_id && item.to_user_id === data.to_user_id);
+          });
+          return [...filtered, data].slice(-20);
         });
         break;
       case 'video_signal':
@@ -173,50 +127,50 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
     setStatus(prev => ({ ...prev, connecting: true, error: null }));
 
     try {
-        const echo = initEcho(token);
-        if (!echo) {
-            throw new Error('Failed to initialize Echo');
-        }
+      const echo = initEcho(token);
+      if (!echo) {
+        throw new Error('Failed to initialize Echo');
+      }
 
-        echoRef.current = echo;
+      echoRef.current = echo;
 
-        // Subscribe to private user channel
-        echo.private(`users.${user.id}`)
-            .listen('.ChatMessageSent', (e: any) => handleMessage({ ...e, type: 'chat_message' }))
-            .listen('.NotificationSent', (e: any) => handleMessage({ ...e, type: 'notification' }))
-            .listen('.TypingIndicator', (e: any) => handleMessage({ ...e, type: 'typing_indicator' }))
-            .listen('.VideoSignal', (e: any) => handleMessage({ ...e, type: 'video_signal' }));
+      // Subscribe to private user channel
+      echo.private(`users.${user.id}`)
+        .listen('.ChatMessageSent', (e: any) => handleMessage({ ...e, type: 'chat_message' }))
+        .listen('.NotificationSent', (e: any) => handleMessage({ ...e, type: 'notification' }))
+        .listen('.TypingIndicator', (e: any) => handleMessage({ ...e, type: 'typing_indicator' }))
+        .listen('.VideoSignal', (e: any) => handleMessage({ ...e, type: 'video_signal' }));
 
-        // Subscribe to presence channel (if needed)
-        // echo.join('online')
-        //     .here((users: any) => setOnlineUsers(users))
-        //     .joining((user: any) => console.log(user.name))
-        //     .leaving((user: any) => console.log(user.name));
+      // Subscribe to presence channel (if needed)
+      // echo.join('online')
+      //     .here((users: any) => setOnlineUsers(users))
+      //     .joining((user: any) => console.log(user.name))
+      //     .leaving((user: any) => console.log(user.name));
 
+      setStatus({ connected: true, connecting: false, error: null });
+
+      (echo.connector as any).pusher.connection.bind('connected', () => {
         setStatus({ connected: true, connecting: false, error: null });
+      });
 
-        (echo.connector as any).pusher.connection.bind('connected', () => {
-            setStatus({ connected: true, connecting: false, error: null });
-        });
+      (echo.connector as any).pusher.connection.bind('disconnected', () => {
+        setStatus({ connected: false, connecting: false, error: null });
+      });
 
-        (echo.connector as any).pusher.connection.bind('disconnected', () => {
-            setStatus({ connected: false, connecting: false, error: null });
-        });
-
-        (echo.connector as any).pusher.connection.bind('error', (err: any) => {
-             // Only log significant errors that aren't just dev connection issues
-             if (process.env.NODE_ENV === 'development') {
-                 if (err?.type === 'WebSocketError' || err?.error?.data?.code === 4004 || err?.error?.data?.code === 4005) {
-                    return;
-                 }
-             }
-             console.error('Pusher connection error:', err);
-             setStatus({ connected: false, connecting: false, error: err });
-        });
+      (echo.connector as any).pusher.connection.bind('error', (err: any) => {
+        // Only log significant errors that aren't just dev connection issues
+        if (process.env.NODE_ENV === 'development') {
+          if (err?.type === 'WebSocketError' || err?.error?.data?.code === 4004 || err?.error?.data?.code === 4005) {
+            return;
+          }
+        }
+        console.error('Pusher connection error:', err);
+        setStatus({ connected: false, connecting: false, error: err });
+      });
 
     } catch (e) {
-        console.error('Failed to connect to Pusher', e);
-        setStatus({ connected: false, connecting: false, error: e as Error });
+      console.error('Failed to connect to Pusher', e);
+      setStatus({ connected: false, connecting: false, error: e as Error });
     }
   }, [user?.id, token]);
 
@@ -240,10 +194,10 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
 
       if (type === 'text' && isE2EReadyRef.current) {
         try {
-            finalContent = await encryptRef.current(parseInt(recipientId), content);
-            isEncrypted = true;
+          finalContent = await encryptRef.current(parseInt(recipientId), content);
+          isEncrypted = true;
         } catch (e) {
-            console.error('Encryption failed, falling back to plain text', e);
+          console.error('Encryption failed, falling back to plain text', e);
         }
       }
 
@@ -251,10 +205,10 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
         recipient_id: recipientId,
         message: { type, content: finalContent, is_encrypted: isEncrypted }
       });
-      
+
     } catch (err) {
       console.error('Failed to send message:', err);
-      
+
       // Offline fallback
       if (!navigator.onLine || (err as any)?.message === 'Offline' || (err as any)?.code === 'ERR_NETWORK') {
         try {
@@ -264,14 +218,14 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
             token: token,
             timestamp: new Date().toISOString()
           });
-          
+
           // Register background sync
           if ('serviceWorker' in navigator && 'SyncManager' in window) {
             const registration = await navigator.serviceWorker.ready;
             // @ts-ignore
             await registration.sync.register('chat-message');
           }
-          
+
           // Optimistic update
           const offlineMsg: ChatMessage = {
             id: `offline-${Date.now()}`,
@@ -283,7 +237,7 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
             message_type: type
           };
           setChatMessages(prev => [...prev, offlineMsg]);
-          
+
         } catch (storeErr) {
           console.error('Failed to store offline message:', storeErr);
         }
@@ -336,26 +290,26 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
       const history = await Promise.all((response.messages || response.data || []).map(async (msg: any) => {
         let content = msg.content;
         if (msg.is_encrypted && isE2EReadyRef.current) {
-            try {
-                const peerId = msg.sender_id === user?.id ? msg.receiver_id : msg.sender_id;
-                content = await decryptRef.current(peerId, content);
-            } catch (e) {
-                console.error('Failed to decrypt history message', e);
-                content = '🔒 Encrypted Message';
-            }
+          try {
+            const peerId = msg.sender_id === user?.id ? msg.receiver_id : msg.sender_id;
+            content = await decryptRef.current(peerId, content);
+          } catch (e) {
+            console.error('Failed to decrypt history message', e);
+            content = '🔒 Encrypted Message';
+          }
         }
 
         return {
-            id: msg.id,
-            from_user_id: msg.sender_id,
-            to_user_id: msg.receiver_id,
-            content: content,
-            timestamp: msg.created_at,
-            status: msg.read_at ? 'read' : 'delivered',
-            message_type: msg.message_type,
-            media_url: msg.media_url,
-            media_duration: msg.media_duration,
-            is_encrypted: false
+          id: msg.id,
+          from_user_id: msg.sender_id,
+          to_user_id: msg.receiver_id,
+          content: content,
+          timestamp: msg.created_at,
+          status: msg.read_at ? 'read' : 'delivered',
+          message_type: msg.message_type,
+          media_url: msg.media_url,
+          media_duration: msg.media_duration,
+          is_encrypted: false
         };
       }));
 
@@ -383,10 +337,10 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
 
   return useMemo(() => ({
     connectionStatus: {
-        connected: status.connected,
-        connectionId: 'pusher',
-        userId: user?.id || null,
-        reconnectAttempts: 0
+      connected: status.connected,
+      connectionId: 'pusher',
+      userId: user?.id || null,
+      reconnectAttempts: 0
     },
     messages,
     onlineUsers,

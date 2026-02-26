@@ -15,7 +15,7 @@ export * from './PresenceComponents';
  */
 export function WebSocketPresenceProvider({ children }: { children: React.ReactNode }) {
   const wsContext = useWebSocketContext();
-  
+
   // Map WebSocketContext to PresenceProvider format
   const presenceValue: WebSocketContextValue = {
     onlineUsers: wsContext.onlineUsers.map((u): OnlineUser => ({
@@ -28,7 +28,7 @@ export function WebSocketPresenceProvider({ children }: { children: React.ReactN
     })),
     connectionStatus: {
       connected: wsContext.connectionStatus.connected,
-      reconnectAttempts: wsContext.connectionStatus.reconnectAttempts,
+      reconnectAttempts: wsContext.connectionStatus.reconnectAttempts ?? 0,
     },
     sendTypingIndicator: wsContext.sendTypingIndicator,
   };
@@ -46,11 +46,11 @@ export function WebSocketPresenceProvider({ children }: { children: React.ReactN
  * Use this at the layout level to provide both WebSocket and Presence
  * functionality to all child components.
  */
-export function RealtimeProvider({ 
+export function RealtimeProvider({
   children,
   autoConnect = true,
   wsUrl,
-}: { 
+}: {
   children: React.ReactNode;
   autoConnect?: boolean;
   wsUrl?: string;
