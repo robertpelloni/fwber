@@ -4,6 +4,7 @@ import { api } from '@/lib/api/client';
 import { storeOfflineChatMessage } from '@/lib/offline-store';
 import { useE2EEncryption } from '@/lib/hooks/use-e2e-encryption';
 import { initEcho } from '@/lib/echo';
+import { logWebSocket } from '@/lib/logger';
 
 // Import shared types from centralized location
 import type {
@@ -63,7 +64,7 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
   useEffect(() => { isE2EReadyRef.current = isE2EReady; }, [isE2EReady]);
 
   const handleMessage = async (data: any) => {
-    console.log('Pusher message received:', data);
+    logWebSocket.messageReceived(data.type || 'pusher_message', data.from_user_id || 'unknown');
 
     // Decrypt if needed
     if (data.type === 'chat_message' && data.is_encrypted && isE2EReadyRef.current) {

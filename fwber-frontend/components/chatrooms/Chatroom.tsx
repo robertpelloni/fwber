@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { useChatroom, useChatroomMessages, useSendMessage, useAddReaction, useRemoveReaction, useJoinChatroom } from '@/lib/hooks/use-chatrooms';
 import { useAuth } from '@/lib/auth-context';
-import { 
-  ConnectionStatusBadge, 
+import {
+  ConnectionStatusBadge,
   PresenceIndicator,
   TypingIndicator,
   OnlineUsersList,
@@ -16,7 +16,7 @@ interface ChatroomProps {
 
 export default function Chatroom({ chatroomId }: ChatroomProps) {
   const { user } = useAuth();
-  
+
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showOnlineUsers, setShowOnlineUsers] = useState(false);
@@ -71,13 +71,13 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
     if (!newMessage.trim() || isSending) return;
 
     try {
-        await sendStandardMessageMutation.mutateAsync({
-          chatroomId,
-          data: {
-            content: newMessage.trim(),
-            message_type: 'text',
-          },
-        });
+      await sendStandardMessageMutation.mutateAsync({
+        chatroomId,
+        data: {
+          content: newMessage.trim(),
+          message_type: 'text',
+        },
+      });
       setNewMessage('');
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -89,19 +89,19 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
       // Check if user already reacted with this emoji
       const message = messages.find((m: any) => m.id === messageId);
       const userReaction = message?.reactions?.find((r: any) => r.user_id === user?.id && r.emoji === emoji);
-      
+
       if (userReaction) {
-          await removeStandardReactionMutation.mutateAsync({
-            chatroomId,
-            messageId,
-            data: { emoji },
-          });
+        await removeStandardReactionMutation.mutateAsync({
+          chatroomId,
+          messageId,
+          data: { emoji },
+        });
       } else {
-          await addStandardReactionMutation.mutateAsync({
-            chatroomId,
-            messageId,
-            data: { emoji },
-          });
+        await addStandardReactionMutation.mutateAsync({
+          chatroomId,
+          messageId,
+          data: { emoji },
+        });
       }
     } catch (error) {
       console.error('Failed to toggle reaction:', error);
@@ -112,7 +112,7 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
     const date = new Date(dateString);
     const now = new Date();
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
-    
+
     if (diffInHours < 1) {
       const diffInMinutes = Math.floor(diffInHours * 60);
       return `${diffInMinutes}m ago`;
@@ -157,7 +157,7 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
                 <ConnectionStatusBadge />
               </div>
               <div className="flex items-center gap-4 text-sm text-gray-500">
-                <button 
+                <button
                   onClick={() => setShowOnlineUsers(!showOnlineUsers)}
                   className="flex items-center gap-1 hover:text-blue-600 transition-colors"
                 >
@@ -165,7 +165,7 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
                 </button>
                 <span>💬 {chatroom.message_count} messages</span>
               </div>
-              
+
               {/* Online Users Panel */}
               {showOnlineUsers && (
                 <div className="mt-4 p-4 bg-gray-50 rounded-lg absolute z-20 shadow-lg border">
@@ -178,7 +178,7 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
 
         {/* Chat Interface */}
         <div className="bg-white flex-1 flex flex-col relative rounded-b-lg">
-          
+
           {/* Preview Mode Overlay */}
           {(chatroomData?.preview_mode) && (
             <div className="absolute inset-0 z-10 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-lg">
@@ -188,8 +188,8 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Join to Chat</h2>
                 <p className="text-gray-600 mb-6">
-                  {chatroom?.token_entry_fee && chatroom.token_entry_fee > 0 
-                    ? `This chatroom requires an entry fee of ${chatroom.token_entry_fee} tokens.` 
+                  {chatroom?.token_entry_fee && chatroom.token_entry_fee > 0
+                    ? `This chatroom requires an entry fee of ${chatroom.token_entry_fee} tokens.`
                     : "You need to join this chatroom to view messages and participate."}
                 </p>
                 <button
@@ -243,7 +243,7 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
                       )}
                     </div>
                     <p className="text-gray-900 whitespace-pre-wrap">{message.display_content}</p>
-                    
+
                     {/* Reactions */}
                     {message.reactions && message.reactions.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
@@ -300,7 +300,7 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
                 {isSending ? 'Sending...' : 'Send'}
               </button>
             </form>
-            
+
             {/* Typing Indicator - Real-time from WebSocket or local state */}
             <TypingIndicator contextId={String(chatroomId)} contextType="chatroom" className="mt-2" />
             {isTyping && (
@@ -318,10 +318,14 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
             <button
               key={emoji}
               onClick={() => {
-                // This would need to be implemented to react to the last message
-                console.log('React with:', emoji);
+                const lastMessage = messages[messages.length - 1];
+                if (lastMessage) {
+                  handleReaction(lastMessage.id, emoji);
+                }
               }}
-              className="text-lg hover:scale-110 transition-transform"
+              className="text-lg hover:scale-110 transition-transform disabled:opacity-50"
+              disabled={messages.length === 0}
+              title={messages.length > 0 ? `React to latest message with ${emoji}` : 'No messages to react to'}
             >
               {emoji}
             </button>

@@ -18,13 +18,13 @@ export function useE2EEncryption() {
         let keyPair = await Storage.getKeyPair(user.id);
 
         if (!keyPair) {
-          console.log('Generating new E2E key pair...');
+
           keyPair = await Crypto.generateKeyPair();
           await Storage.storeKeyPair(user.id, keyPair);
-          
+
           const publicKeyString = await Crypto.exportPublicKey(keyPair.publicKey);
           await securityApi.storePublicKey(publicKeyString);
-          console.log('E2E Public Key uploaded.');
+
         }
         setIsReady(true);
       } catch (error) {
@@ -52,7 +52,7 @@ export function useE2EEncryption() {
 
       // 3. Derive shared secret
       const sharedKey = await Crypto.deriveSharedKey(myKeys.privateKey, peerPublicKey);
-      
+
       // Cache it
       setSharedKeys(prev => ({ ...prev, [peerId]: sharedKey }));
       return sharedKey;
@@ -75,7 +75,7 @@ export function useE2EEncryption() {
   const regenerateKeys = useCallback(async () => {
     if (!user) return;
     try {
-      console.log('Regenerating E2E key pair...');
+
       const keyPair = await Crypto.generateKeyPair();
       await Storage.storeKeyPair(user.id, keyPair);
 
@@ -84,7 +84,7 @@ export function useE2EEncryption() {
 
       // Clear cache
       setSharedKeys({});
-      console.log('New E2E keys generated and uploaded.');
+
     } catch (error) {
       console.error('Failed to regenerate keys:', error);
       throw error;

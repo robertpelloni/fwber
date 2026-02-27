@@ -192,7 +192,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Dashboard
     Route::get('dashboard/stats', [\App\Http\Controllers\DashboardController::class, 'getStats']);
     Route::get('dashboard/activity', [\App\Http\Controllers\DashboardController::class, 'getActivity']);
-    Route::get('profile/completeness', [\App\Http\Controllers\DashboardController::class, 'getProfileCompleteness']);
+    Route::get('dashboard/completeness', [\App\Http\Controllers\DashboardController::class, 'getProfileCompleteness']);
 
     // WebSocket
     Route::get('websocket/token', [\App\Http\Controllers\WebSocketController::class, 'getToken']);

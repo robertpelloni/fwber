@@ -78,11 +78,11 @@ export function useWebSocketLogic(options: UseWebSocketOptions = {}) {
       logWebSocket.reconnectFailed(data.attempts);
     },
     handleMessage: (message: WebSocketMessage) => {
-      console.log('WebSocket message received:', message);
+      logWebSocket.messageReceived(message.type, 'unknown');
       setMessages(prev => [...prev.slice(-99), message]);
     },
     handlePresenceUpdate: (data: PresenceUpdate) => {
-      console.log('Presence update:', data);
+      logWebSocket.messageReceived('presence_update', data.user_id);
       setPresenceUpdates(prev => [...prev.slice(-49), data]);
 
       if (data.status) {
@@ -99,7 +99,7 @@ export function useWebSocketLogic(options: UseWebSocketOptions = {}) {
       }
     },
     handleNotification: (data: NotificationPayload) => {
-      console.log('Notification received:', data);
+      logWebSocket.messageReceived('notification', data.type || 'unknown');
       setNotifications(prev => [...prev.slice(-49), data]);
     },
     handleChatMessage: (data: ChatMessage) => {
@@ -149,7 +149,7 @@ export function useWebSocketLogic(options: UseWebSocketOptions = {}) {
       );
     },
     handleTypingIndicator: (data: TypingIndicator) => {
-      console.log('Typing indicator:', data);
+      logWebSocket.messageReceived('typing_indicator', data.from_user_id);
       setTypingIndicators(prev => {
         const filtered = prev.filter(item =>
           !(item.from_user_id === data.from_user_id && item.to_user_id === data.to_user_id)
@@ -163,9 +163,7 @@ export function useWebSocketLogic(options: UseWebSocketOptions = {}) {
   });
 
   useEffect(() => {
-    console.log('useWebSocketLogic effect triggered. Auth:', isAuthenticated, 'Token:', !!token, 'AutoConnect:', options.autoConnect);
     if (isAuthenticated && authToken && options.autoConnect !== false) {
-      console.log('Initializing WebSocket client...');
       const handlers = handlersRef.current;
 
       const wsClient = createWebSocketClient(wsUrl, token, {
@@ -220,11 +218,8 @@ export function useWebSocketLogic(options: UseWebSocketOptions = {}) {
   ]);
 
   const connect = useCallback(() => {
-    console.log('Manual connect called. Client exists:', !!client);
     if (client) {
       client.connect();
-    } else {
-      console.warn('Cannot connect: Client is null');
     }
   }, [client]);
 
