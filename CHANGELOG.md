@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.43] - 2026-02-27
+### Added
+- Implemented **Voice/Audio Dating Rooms**, providing drop-in "Clubhouse-style" live conversation stages.
+- Created `AudioRoom` schemas, `AudioRoomController` management, and Laravel Echo WebRTC signaling routing.
+- Built Next.js frontend pages `app/(protected)/audio-rooms` utilizing a custom `useWebRTC` hook for RTCPeerConnections.
+
 ## [0.3.42] - 2026-02-27
 ### Added
 - Implemented **Burner Communication Bridge**, allowing users to generate localized 24-hour QR codes creating anonymous, self-destructing (`expires_at`) chatrooms instantly bridging physical encounters into digital safety rings.

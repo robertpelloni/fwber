@@ -43,6 +43,7 @@ const navLinks = [
   { href: '/events', label: 'Events', icon: Calendar },
   { href: '/groups', label: 'Groups', icon: Users },
   { href: '/proximity-chatrooms', label: 'Local Chat', icon: Radio },
+  { href: '/audio-rooms', label: 'Audio Rooms', icon: Mic },
   { href: '/burner', label: 'Burner Bridge', icon: Zap },
   { href: '/bulletin-boards', label: 'Boards', icon: Layout },
   { href: '/deals', label: 'Deals', icon: Tag },

@@ -1,6 +1,6 @@
 # TODO — fwber Short-Term Task List
 
-> **Version:** 0.3.42  
+> **Version:** 0.3.43  
 > **Last Updated:** 2026-02-26  
 > **Priority Legend:** 🔴 Critical | 🟡 High | 🟢 Medium | ⚪ Low
 
@@ -49,7 +49,7 @@ All features are already correctly defaulted to `true` and use `env()` in `confi
 
 - [ ] **React Native Mobile App**: Wrap PWA in a native shell (Phase 6).
 - [ ] **Multi-Region Deployment**: Geo-DNS + edge caching (Phase 6).
-- [ ] **Voice/Audio Dating Rooms**: Clubhouse-style audio rooms (Phase 6).
+- [x] **Voice/Audio Dating Rooms**: Clubhouse-style audio rooms (Phase 6).
 - [ ] **ZK-Proximity Proofs**: Privacy-first location verification.
 - [x] **Burner Communication Bridge**: Ephemeral anonymous relay QR codes (Phase 6).
 - [ ] **Evolving AI Avatars**: Dynamic emotional avatar expressions.

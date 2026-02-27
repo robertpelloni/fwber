@@ -318,6 +318,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('burner-links', [\App\Http\Controllers\BurnerLinkController::class, 'store']);
     Route::post('burner-links/{token}/join', [\App\Http\Controllers\BurnerLinkController::class, 'join']);
     
+    // Audio Rooms
+    Route::prefix('audio-rooms')->group(function () {
+        Route::get('/', [\App\Http\Controllers\AudioRoomController::class, 'index']);
+        Route::post('/', [\App\Http\Controllers\AudioRoomController::class, 'store']);
+        Route::get('/{id}', [\App\Http\Controllers\AudioRoomController::class, 'show']);
+        Route::post('/{id}/join', [\App\Http\Controllers\AudioRoomController::class, 'join']);
+        Route::post('/{id}/leave', [\App\Http\Controllers\AudioRoomController::class, 'leave']);
+        Route::post('/{id}/signal', [\App\Http\Controllers\AudioRoomController::class, 'signal']);
+    });
+    
     Route::get('chatrooms/my', [\App\Http\Controllers\ChatroomController::class, 'myChatrooms']);
     Route::get('chatrooms/categories', [\App\Http\Controllers\ChatroomController::class, 'categories']);
     Route::get('chatrooms/popular', [\App\Http\Controllers\ChatroomController::class, 'popular']);
