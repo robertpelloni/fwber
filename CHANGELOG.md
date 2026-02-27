@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.39] - 2026-02-27
+### Changed
+- Ran `php artisan l5-swagger:generate` to output latest `api-docs.json`.
+- Verified and wired frontend Settings Page toggles (Ghost Mode/Location Fuzzing) to correctly `PATCH /api/profile`.
+- Validated `ConversationCoach.tsx` integration within `RealTimeChat.tsx` via `/wingman/message-feedback`.
+
 ## [0.3.38] - 2026-02-27
 
 ### Added

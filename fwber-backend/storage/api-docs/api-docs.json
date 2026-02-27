@@ -56,6 +56,29 @@
                 ]
             }
         },
+        "/analytics/events": {
+            "post": {
+                "tags": [
+                    "Analytics"
+                ],
+                "summary": "Store client clickstream events",
+                "description": "Store incoming clickstream events from the client",
+                "operationId": "534260420827b93e43be1ae20035b46f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {}
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Events recorded"
+                    }
+                }
+            }
+        },
         "/analytics/slow-requests": {
             "get": {
                 "tags": [
@@ -187,6 +210,241 @@
                 "responses": {
                     "200": {
                         "description": "Retention payload"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/friends": {
+            "get": {
+                "tags": [
+                    "Friends"
+                ],
+                "summary": "Get friends list",
+                "description": "Returns the list of authenticated user's friends.",
+                "operationId": "648e8394492ab2711bd963aa763da32c",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/User"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/friends/requests": {
+            "get": {
+                "tags": [
+                    "Friends"
+                ],
+                "summary": "Get pending friend requests",
+                "description": "Returns the list of pending friend requests for the authenticated user.",
+                "operationId": "9d089cd1f93fc7448b45a081c5fa9423",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Friend"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Friends"
+                ],
+                "summary": "Send a friend request",
+                "description": "Sends a friend request to another user.",
+                "operationId": "4c74cf402e8da685eaf12f301f3f68c1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "friend_id"
+                                ],
+                                "properties": {
+                                    "friend_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Friend request sent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Friend"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "409": {
+                        "description": "Friend request already sent or you are already friends"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/friends/requests/{userId}": {
+            "post": {
+                "tags": [
+                    "Friends"
+                ],
+                "summary": "Respond to a friend request",
+                "description": "Accept or decline a friend request from another user.",
+                "operationId": "d69e493986548cff15525f00544840a4",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "accepted",
+                                            "declined"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Friend request responded to successfully"
+                    },
+                    "404": {
+                        "description": "Friend request not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/friends/{friendId}": {
+            "delete": {
+                "tags": [
+                    "Friends"
+                ],
+                "summary": "Remove a friend",
+                "description": "Removes a friend from the authenticated user's friend list.",
+                "operationId": "c9b192a1911c5fcd2a4d926c4e8d2a0d",
+                "parameters": [
+                    {
+                        "name": "friendId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Friend removed successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/friends/search": {
+            "get": {
+                "tags": [
+                    "Friends"
+                ],
+                "summary": "Search for users",
+                "description": "Search for users by name or email.",
+                "operationId": "f385fdd687be248eabe0979905faa72f",
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/User"
+                                    }
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -2067,6 +2325,11 @@
                                             "chatrooms": true,
                                             "recommendations": false
                                         }
+                                    },
+                                    "moderation_driver": {
+                                        "description": "The active moderation driver (e.g. aws, google, mock)",
+                                        "type": "string",
+                                        "example": "google"
                                     }
                                 },
                                 "type": "object"
@@ -2087,6 +2350,9 @@
                                         },
                                         "features": {
                                             "type": "object"
+                                        },
+                                        "moderation_driver": {
+                                            "type": "string"
                                         },
                                         "updated": {
                                             "type": "array",
@@ -2984,6 +3250,98 @@
                 ]
             }
         },
+        "/api/user/export": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Request a GDPR data export",
+                "description": "Request a new data export.",
+                "operationId": "ad1348ebbafb80ed2d2a27f32df523f6",
+                "responses": {
+                    "202": {
+                        "description": "Export started",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/user/export/status": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get export status",
+                "description": "Check status and get latest export link.",
+                "operationId": "bf54b59c354a46910068ae806d81d98f",
+                "responses": {
+                    "200": {
+                        "description": "Export status",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "available": {
+                                            "type": "boolean"
+                                        },
+                                        "download_url": {
+                                            "type": "string",
+                                            "nullable": true
+                                        },
+                                        "generated_at": {
+                                            "type": "string",
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/user/export/{filename}": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Download export file",
+                "description": "Download the export file.",
+                "operationId": "9cfdd7c9624220b8214cb4520a7d9afa",
+                "responses": {
+                    "200": {
+                        "description": "File download"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/device-tokens": {
             "post": {
                 "tags": [
@@ -3273,6 +3631,13 @@
                                         "type": "number",
                                         "format": "float",
                                         "nullable": true
+                                    },
+                                    "shared_group_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -3482,7 +3847,7 @@
                 "tags": [
                     "Events"
                 ],
-                "summary": "Invite a user to an event",
+                "summary": "Invite a user or group to an event",
                 "operationId": "7718f59aed58c6465d6a75ef6fc64948",
                 "parameters": [
                     {
@@ -3501,8 +3866,14 @@
                             "schema": {
                                 "properties": {
                                     "user_id": {
+                                        "description": "Optional if group_id is provided",
                                         "type": "integer",
                                         "example": 1
+                                    },
+                                    "group_id": {
+                                        "description": "Optional if user_id is provided",
+                                        "type": "integer",
+                                        "example": 5
                                     }
                                 },
                                 "type": "object"
@@ -3512,11 +3883,26 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Invitation sent",
+                        "description": "Invitation(s) sent",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EventInvitation"
+                                    "oneOf": [
+                                        {
+                                            "$ref": "#/components/schemas/EventInvitation"
+                                        },
+                                        {
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string"
+                                                },
+                                                "count": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
                                 }
                             }
                         }
@@ -3754,6 +4140,246 @@
                 "responses": {
                     "200": {
                         "description": "Invitation sent"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/groups/{groupId}/matches": {
+            "get": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Get matching groups for a group (owner/admin)",
+                "description": "Get matching groups suggestions",
+                "operationId": "6c35c21a0f470ccfe4c4e96a296930ef",
+                "parameters": [
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "radius",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 50
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of matching groups"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/groups/{groupId}/matches/{targetGroupId}/connect": {
+            "post": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Request a match with another group",
+                "description": "Request a match with another group",
+                "operationId": "8a5cc44f23eb9e2e9962948f0a4687c5",
+                "parameters": [
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "targetGroupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Match requested"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "400": {
+                        "description": "Invalid request (e.g. already matched)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/groups/{groupId}/matches/requests": {
+            "get": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Get pending match requests",
+                "description": "Get pending match requests for a group (Incoming and Outgoing)",
+                "operationId": "b38de7b96c6ae3be52b7a342e3cd7606",
+                "parameters": [
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of requests"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/groups/{groupId}/matches/connected": {
+            "get": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Get connected groups",
+                "description": "Get connected groups (accepted matches)",
+                "operationId": "6cded1e53003f5dc99f362f45be0ea81",
+                "parameters": [
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of connected groups"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/groups/{groupId}/matches/requests/{matchId}/accept": {
+            "post": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Accept a match request",
+                "description": "Accept a match request",
+                "operationId": "3be07fe985ecb873c6ca65dd9a3f62c5",
+                "parameters": [
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "matchId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Match accepted"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/groups/{groupId}/matches/requests/{matchId}/reject": {
+            "post": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Reject a match request",
+                "description": "Reject a match request",
+                "operationId": "5b3d78fd677ef706a77a8f8a549ec669",
+                "parameters": [
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "matchId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Match rejected"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
                     }
                 },
                 "security": [
@@ -4656,6 +5282,42 @@
                 ]
             }
         },
+        "/groups/{groupId}/events": {
+            "get": {
+                "tags": [
+                    "Groups"
+                ],
+                "summary": "Get events for a group (shared and owned)",
+                "description": "Get events for a group",
+                "operationId": "a4224449bfe0712b71e0de89eb61ffb0",
+                "parameters": [
+                    {
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of events"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/health": {
             "get": {
                 "tags": [
@@ -5435,6 +6097,43 @@
                 ]
             }
         },
+        "/matches/{id}/insights/unlock": {
+            "post": {
+                "tags": [
+                    "Matches"
+                ],
+                "summary": "Unlock match insights",
+                "description": "Unlock compatibility insights",
+                "operationId": "54fef63d89dca59de886ec15c95881ce",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Match ID or Target User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Unlocked successfully"
+                    },
+                    "402": {
+                        "description": "Insufficient tokens"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/media/analyze": {
             "post": {
                 "tags": [
@@ -5516,99 +6215,6 @@
                     },
                     "422": {
                         "$ref": "#/components/schemas/ValidationError"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/mercure/cookie": {
-            "get": {
-                "tags": [
-                    "Mercure"
-                ],
-                "summary": "Get Mercure authorization cookie",
-                "description": "Set an authorization cookie for subscribing to Mercure SSE topics",
-                "operationId": "327f917a4e07331dfe360fa58fac5acb",
-                "responses": {
-                    "200": {
-                        "description": "Authorization cookie set",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string"
-                                        },
-                                        "topics": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "expires_in": {
-                                            "type": "integer",
-                                            "example": 3600
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/Unauthorized"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/mercure/status": {
-            "get": {
-                "tags": [
-                    "Mercure"
-                ],
-                "summary": "Get Mercure authorization status",
-                "description": "Check current Mercure authorization status and available topics",
-                "operationId": "86b0e48ced25aebcb00d3c951d341eec",
-                "responses": {
-                    "200": {
-                        "description": "Authorization status",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "authorized": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "user_id": {
-                                            "type": "integer"
-                                        },
-                                        "topics": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "mercure_url": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/Unauthorized"
                     }
                 },
                 "security": [
@@ -7077,6 +7683,58 @@
                 ]
             }
         },
+        "/profile/password": {
+            "put": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Update user password",
+                "operationId": "734f7ef40815da7e203ea9d79da15bd4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "current_password",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "current_password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "minLength": 8
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Password updated successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/profile/{userId}/view": {
             "post": {
                 "tags": [
@@ -7515,6 +8173,60 @@
                     },
                     "404": {
                         "$ref": "#/components/responses/NotFound"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/proximity/artifacts/{id}/claim": {
+            "post": {
+                "tags": [
+                    "Proximity Artifacts"
+                ],
+                "summary": "Claim a token drop",
+                "operationId": "417c4b1d30d35d5e03252ad34e814a9d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "lat",
+                                    "lng"
+                                ],
+                                "properties": {
+                                    "lat": {
+                                        "type": "number"
+                                    },
+                                    "lng": {
+                                        "type": "number"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Claim successful"
+                    },
+                    "400": {
+                        "description": "Claim failed"
                     }
                 },
                 "security": [
@@ -10375,6 +11087,66 @@
                 ]
             }
         },
+        "/vouch/generate-link": {
+            "post": {
+                "tags": [
+                    "Viral"
+                ],
+                "summary": "Generate a unique vouch link for the user",
+                "operationId": "405fcc83e561c40ec839870d57b92451",
+                "responses": {
+                    "200": {
+                        "description": "Vouch link generated"
+                    }
+                }
+            }
+        },
+        "/public/vouch": {
+            "post": {
+                "tags": [
+                    "Viral"
+                ],
+                "summary": "Submit a public vouch",
+                "operationId": "d36304df95e6053aa1c3ba7ff9111fa5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "referral_code": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "safe",
+                                            "fun",
+                                            "hot"
+                                        ]
+                                    },
+                                    "relationship_type": {
+                                        "type": "string"
+                                    },
+                                    "comment": {
+                                        "type": "string"
+                                    },
+                                    "voucher_name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Vouch recorded"
+                    }
+                }
+            }
+        },
         "/websocket/token": {
             "get": {
                 "tags": [
@@ -13025,6 +13797,10 @@
     },
     "tags": [
         {
+            "name": "Friends",
+            "description": "API Endpoints for managing friends"
+        },
+        {
             "name": "Configuration",
             "description": "System configuration and feature flags management"
         },
@@ -13055,6 +13831,10 @@
         {
             "name": "Dashboard",
             "description": "Dashboard"
+        },
+        {
+            "name": "User",
+            "description": "User"
         },
         {
             "name": "Notifications",
@@ -13095,10 +13875,6 @@
         {
             "name": "Media Analysis",
             "description": "Media Analysis"
-        },
-        {
-            "name": "Mercure",
-            "description": "Mercure"
         },
         {
             "name": "Messages",
@@ -13151,6 +13927,10 @@
         {
             "name": "Verification",
             "description": "Verification"
+        },
+        {
+            "name": "Viral",
+            "description": "Viral"
         },
         {
             "name": "WebSocket",
