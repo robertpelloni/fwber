@@ -2,7 +2,7 @@
 
 > **See [docs/UNIVERSAL_LLM_INSTRUCTIONS.md](docs/UNIVERSAL_LLM_INSTRUCTIONS.md) for the Master Protocol.**
 
-**Current Version:** 0.3.39  
+**Current Version:** 0.3.40  
 **Status:** See `PROJECT_STATUS.md` and `TODO.md`.
 
 ---

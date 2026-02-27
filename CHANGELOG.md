@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.40] - 2026-02-27
+### Changed
+- Verified the Admin Analytics Dashboard frontend (`app/analytics/page.tsx`) correctly fetches live Postgres/Redis metrics from `@/lib/api/admin.ts`.
+- Overhauled the unified Help Center (`app/help/page.tsx`).
+- Added 10 extensive markdown guides detailing the Tiered Privacy System (Blur to Clear), the AI Wingman tool suite (Cosmic Matches, Red/Green Flags), and the Local Private Vault encryption mechanisms.
+
 ## [0.3.39] - 2026-02-27
 ### Changed
 - Ran `php artisan l5-swagger:generate` to output latest `api-docs.json`.

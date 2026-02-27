@@ -1,6 +1,6 @@
 # TODO — fwber Short-Term Task List
 
-> **Version:** 0.3.37  
+> **Version:** 0.3.40  
 > **Last Updated:** 2026-02-26  
 > **Priority Legend:** 🔴 Critical | 🟡 High | 🟢 Medium | ⚪ Low
 
@@ -31,19 +31,19 @@ All features are already correctly defaulted to `true` and use `env()` in `confi
 | `PrivacySecurityService.php` | Mock endpoints | Real AWS Rekognition/Google Vision |
 | `AIMatchingService.php` | SQL keyword matching | Vector Embeddings (Phase 6) |
 
-## 🟢 Medium: UI Polish & Missing Representations
+## ~~🟢 Medium: UI Polish & Missing Representations~~ ✅ RESOLVED
 
-- [ ] **Tier Unlock Guide**: Verify animations render correctly on mobile viewports.
-- [ ] **Conversation Coach**: Verify real-time feedback displays correctly in all chat views.
-- [ ] **Notification Bell**: Ensure all notification types (gift, match, message, event) have distinct icons and correct deep links.
-- [ ] **Settings Page**: Audit all settings toggles to ensure they persist via the API and are reflected in the UI.
-- [ ] **Admin Dashboard**: Wire up the remaining admin analytics charts (if any are showing placeholder data).
+- [x] **Tier Unlock Guide**: Verify animations render correctly on mobile viewports.
+- [x] **Conversation Coach**: Verify real-time feedback displays correctly in all chat views.
+- [x] **Notification Bell**: Ensure all notification types (gift, match, message, event) have distinct icons and correct deep links.
+- [x] **Settings Page**: Audit all settings toggles to ensure they persist via the API and are reflected in the UI.
+- [x] **Admin Dashboard**: Wire up the remaining admin analytics charts (if any are showing placeholder data).
 
-## 🟢 Medium: Documentation Gaps
+## ~~🟢 Medium: Documentation Gaps~~ ✅ RESOLVED
 
-- [ ] **DEPLOY.md**: Create/update with latest Docker + Kubernetes + DreamHost deployment instructions.
-- [ ] **API Documentation**: Regenerate `api-docs.json` via `l5-swagger:generate` to include all new endpoints.
-- [ ] **User Manual / Help Center**: Audit `/help` page for completeness against all implemented features.
+- [x] **DEPLOY.md**: Create/update with latest Docker + Kubernetes + DreamHost deployment instructions.
+- [x] **API Documentation**: Regenerate `api-docs.json` via `l5-swagger:generate` to include all new endpoints.
+- [x] **User Manual / Help Center**: Audit `/help` page for completeness against all implemented features.
 
 ## ⚪ Low: Future Enhancements
 

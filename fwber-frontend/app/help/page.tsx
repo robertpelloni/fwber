@@ -12,7 +12,10 @@ import {
   MapPin,
   Sparkles,
   Search,
-  BookOpen
+  BookOpen,
+  Bot,
+  Eye,
+  Lock
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { useState } from 'react'
@@ -62,6 +65,40 @@ const HELP_CATEGORIES = [
       { title: 'Proximity Chatrooms', slug: 'chatrooms-guide' },
       { title: 'Creating & Joining Groups', slug: 'groups-guide' },
       { title: 'Achievements & Rewards', slug: 'achievements-guide' },
+    ]
+  },
+  {
+    id: 'ai-wingman',
+    title: 'AI Wingman & Tools',
+    description: 'Learn how to use AI to generate roasts, check vibes, and get conversation suggestions.',
+    icon: Bot,
+    articles: [
+      { title: 'Cosmic Matches & Fortune', slug: 'cosmic-fortune' },
+      { title: 'Roasts & Hypes', slug: 'roasts-hypes' },
+      { title: 'Conversation Coach', slug: 'conversation-coach' },
+      { title: 'Red & Green Flags', slug: 'vibe-check' },
+    ]
+  },
+  {
+    id: 'privacy-tiers',
+    title: 'Tiered Privacy System',
+    description: 'Understand the 5-tiered connection system (Blur to Clear) and how to manage face reveals.',
+    icon: Eye,
+    articles: [
+      { title: 'The 5 Privacy Tiers', slug: 'privacy-tiers-guide' },
+      { title: 'Sharing Unlocks', slug: 'sharing-unlocks' },
+      { title: 'Managing Face Reveals', slug: 'managing-reveals' },
+    ]
+  },
+  {
+    id: 'security-vault',
+    title: 'Security & Media Vault',
+    description: 'Protect your sensitive photos with on-device encryption and robust vault features.',
+    icon: Lock,
+    articles: [
+      { title: 'On-Device Encryption', slug: 'on-device-encryption' },
+      { title: 'The Local Vault', slug: 'local-vault' },
+      { title: 'Recovering Master Keys', slug: 'key-recovery' },
     ]
   }
 ]
