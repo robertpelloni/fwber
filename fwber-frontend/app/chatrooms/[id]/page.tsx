@@ -3,17 +3,17 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useChatroom, useChatroomMessages, useSendMessage, useAddReaction, useRemoveReaction, useJoinChatroom } from '@/lib/hooks/use-chatrooms';
-import { 
-  useProximityChatroom, 
-  useProximityChatroomMessages, 
-  useSendProximityMessage, 
-  useAddProximityReaction, 
+import {
+  useProximityChatroom,
+  useProximityChatroomMessages,
+  useSendProximityMessage,
+  useAddProximityReaction,
   useRemoveProximityReaction,
   useJoinProximityChatroom
 } from '@/lib/hooks/use-proximity-chatrooms';
 import { useAuth } from '@/lib/auth-context';
-import { 
-  ConnectionStatusBadge, 
+import {
+  ConnectionStatusBadge,
   PresenceIndicator,
   TypingIndicator,
   OnlineUsersList,
@@ -27,7 +27,7 @@ export default function ChatroomPage() {
   const { user } = useAuth();
   const chatroomId = parseInt(params.id as string);
   const isProximity = searchParams.get('type') === 'proximity';
-  
+
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showOnlineUsers, setShowOnlineUsers] = useState(false);
@@ -68,8 +68,8 @@ export default function ChatroomPage() {
 
   // Unified Data
   const chatroom = isProximity ? proximityChatroomData : standardChatroomData?.chatroom;
-  const messages = useMemo(() => 
-    (isProximity ? proximityMessagesData?.data : standardMessagesData?.data) || [], 
+  const messages = useMemo(() =>
+    (isProximity ? proximityMessagesData?.data : standardMessagesData?.data) || [],
     [isProximity, proximityMessagesData?.data, standardMessagesData?.data]
   );
   const isLoading = isProximity ? proximityChatroomLoading : standardChatroomLoading;
@@ -83,23 +83,23 @@ export default function ChatroomPage() {
       // We can check if we are already a member by looking at active_members or just try to join (idempotent usually)
       // For now, we'll try to join if we have location data to ensure presence is tracked
       if ((chatroom as any).is_within_proximity !== false) { // If true or undefined (implied)
-         joinProximityChatroomMutation.mutate({ 
-           id: chatroomId, 
-           data: { 
-             latitude: location.latitude, 
-             longitude: location.longitude 
-           } 
-         });
+        joinProximityChatroomMutation.mutate({
+          id: chatroomId,
+          data: {
+            latitude: location.latitude,
+            longitude: location.longitude
+          }
+        });
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isProximity, chatroomId, location?.latitude, location?.longitude]); // specific deps to avoid loops
-  
+
   // Get member IDs for presence tracking
   const memberIds = useMemo(() => {
     if (!chatroom) return [];
-    const members = isProximity 
-      ? (chatroom as any).active_members 
+    const members = isProximity
+      ? (chatroom as any).active_members
       : (chatroom as any).members;
     return members?.map((m: any) => String(m.id)) || [];
   }, [chatroom, isProximity]);
@@ -164,7 +164,7 @@ export default function ChatroomPage() {
       // Check if user already reacted with this emoji
       const message = messages.find((m: any) => m.id === messageId);
       const userReaction = message?.reactions?.find((r: any) => r.user_id === user?.id && r.emoji === emoji);
-      
+
       if (userReaction) {
         if (isProximity) {
           await removeProximityReactionMutation.mutateAsync({
@@ -203,7 +203,7 @@ export default function ChatroomPage() {
     const date = new Date(dateString);
     const now = new Date();
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
-    
+
     if (diffInHours < 1) {
       const diffInMinutes = Math.floor(diffInHours * 60);
       return `${diffInMinutes}m ago`;
@@ -262,7 +262,7 @@ export default function ChatroomPage() {
                 <p className="text-gray-600 mb-4">{chatroom.description}</p>
               )}
               <div className="flex items-center gap-4 text-sm text-gray-500">
-                <button 
+                <button
                   onClick={() => setShowOnlineUsers(!showOnlineUsers)}
                   className="flex items-center gap-1 hover:text-blue-600 transition-colors"
                 >
@@ -272,7 +272,7 @@ export default function ChatroomPage() {
                 {chatroom.city && <span>📍 {chatroom.city}</span>}
                 <span>🕒 Last active {formatTime(chatroom.last_activity_at)}</span>
               </div>
-              
+
               {/* Online Users Panel */}
               {showOnlineUsers && (
                 <div className="mt-4 p-4 bg-gray-50 rounded-lg">
@@ -293,7 +293,7 @@ export default function ChatroomPage() {
 
         {/* Chat Interface */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-[600px]">
-          
+
           {/* Preview Mode Overlay */}
           {(standardChatroomData?.preview_mode && !isProximity) && (
             <div className="absolute inset-0 z-10 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-lg">
@@ -303,8 +303,8 @@ export default function ChatroomPage() {
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Join to Chat</h2>
                 <p className="text-gray-600 mb-6">
-                  {chatroom?.token_entry_fee && chatroom.token_entry_fee > 0 
-                    ? `This chatroom requires an entry fee of ${chatroom.token_entry_fee} tokens.` 
+                  {chatroom?.token_entry_fee && chatroom.token_entry_fee > 0
+                    ? `This chatroom requires an entry fee of ${chatroom.token_entry_fee} tokens.`
                     : "You need to join this chatroom to view messages and participate."}
                 </p>
                 <button
@@ -358,7 +358,7 @@ export default function ChatroomPage() {
                       )}
                     </div>
                     <p className="text-gray-900 whitespace-pre-wrap">{message.display_content}</p>
-                    
+
                     {/* Reactions */}
                     {message.reactions && message.reactions.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
@@ -415,7 +415,7 @@ export default function ChatroomPage() {
                 {isSending ? 'Sending...' : 'Send'}
               </button>
             </form>
-            
+
             {/* Typing Indicator - Real-time from WebSocket or local state */}
             <TypingIndicator contextId={String(chatroomId)} contextType={isProximity ? "proximity_chatroom" : "chatroom"} className="mt-2" />
             {isTyping && (
@@ -433,10 +433,14 @@ export default function ChatroomPage() {
             <button
               key={emoji}
               onClick={() => {
-                // This would need to be implemented to react to the last message
-                console.log('React with:', emoji);
+                const lastMessage = messages[messages.length - 1];
+                if (lastMessage) {
+                  handleReaction(lastMessage.id, emoji);
+                }
               }}
-              className="text-lg hover:scale-110 transition-transform"
+              className="text-lg hover:scale-110 transition-transform disabled:opacity-50"
+              disabled={messages.length === 0}
+              title={messages.length > 0 ? `React to latest message with ${emoji}` : 'No messages to react to'}
             >
               {emoji}
             </button>

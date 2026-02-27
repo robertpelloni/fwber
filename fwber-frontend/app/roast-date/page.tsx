@@ -41,7 +41,7 @@ export default function RoastDatePage() {
 
       // apiClient.post returns an object with { data: T, status: number }
       // The actual JSON response from the server is in the `data` property.
-      setRoast(response.data.roast); 
+      setRoast(response.data.roast);
 
     } catch (error) {
       console.error(error);
@@ -73,8 +73,8 @@ export default function RoastDatePage() {
           text: roast,
           url: window.location.href,
         });
-      } catch (err) {
-        console.log("Share canceled");
+      } catch {
+        // User dismissed the share dialog
       }
     } else {
       handleCopy();
@@ -98,18 +98,18 @@ export default function RoastDatePage() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">Their Name</label>
-                <Input 
-                  placeholder="e.g. Brad" 
+                <Input
+                  placeholder="e.g. Brad"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="bg-white"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">What do they do?</label>
-                <Input 
-                  placeholder="e.g. DJ / Entrepreneur" 
+                <Input
+                  placeholder="e.g. DJ / Entrepreneur"
                   value={job}
                   onChange={(e) => setJob(e.target.value)}
                   className="bg-white"
@@ -118,8 +118,8 @@ export default function RoastDatePage() {
 
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">One Specific Trait / Flaw</label>
-                <Textarea 
-                  placeholder="e.g. Never stops talking about crypto, wears sunglasses indoors..." 
+                <Textarea
+                  placeholder="e.g. Never stops talking about crypto, wears sunglasses indoors..."
                   value={trait}
                   onChange={(e) => setTrait(e.target.value)}
                   className="bg-white resize-none"
@@ -127,7 +127,7 @@ export default function RoastDatePage() {
                 />
               </div>
 
-              <Button 
+              <Button
                 className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold py-6 text-lg shadow-md transition-transform active:scale-95"
                 onClick={handleGenerate}
                 disabled={isLoading}
@@ -142,7 +142,7 @@ export default function RoastDatePage() {
                   </>
                 )}
               </Button>
-              
+
               <p className="text-xs text-center text-gray-400 mt-4 flex items-center justify-center gap-1">
                 <AlertTriangle className="w-3 h-3" />
                 For entertainment only. Be nice-ish.
@@ -158,14 +158,14 @@ export default function RoastDatePage() {
               </div>
 
               <div className="flex gap-3">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="flex-1 border-orange-200 text-orange-700 hover:bg-orange-50"
                   onClick={() => setRoast(null)}
                 >
                   Try Again
                 </Button>
-                <Button 
+                <Button
                   className="flex-1 bg-gray-900 text-white hover:bg-gray-800"
                   onClick={handleShare}
                 >

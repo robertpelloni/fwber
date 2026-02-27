@@ -34,10 +34,10 @@ export default function TierDemoPage() {
   ]
 
   const handleTierChange = (newTier: RelationshipTier) => {
-    console.log('Tier change:', { from: currentTier, to: newTier })
+
     const currentIndex = tierOrder.indexOf(currentTier)
     const newIndex = tierOrder.indexOf(newTier)
-    
+
     if (newIndex > currentIndex) {
       setPreviousTier(currentTier)
       setCurrentTier(newTier)
@@ -66,7 +66,7 @@ export default function TierDemoPage() {
         {/* Controls */}
         <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6 mb-6">
           <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Controls</h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Tier selector */}
             <div>
@@ -78,11 +78,10 @@ export default function TierDemoPage() {
                   <button
                     key={tier}
                     onClick={() => handleTierChange(tier as RelationshipTier)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      currentTier === tier
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${currentTier === tier
                         ? 'bg-purple-600 text-white'
                         : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-                    }`}
+                      }`}
                   >
                     {label}
                   </button>
@@ -103,7 +102,6 @@ export default function TierDemoPage() {
                   value={messagesExchanged}
                   onChange={(e) => {
                     const val = Number(e.target.value)
-                    console.log('Messages changed:', val)
                     setMessagesExchanged(val)
                   }}
                   className="w-full"
@@ -121,7 +119,6 @@ export default function TierDemoPage() {
                   value={daysConnected}
                   onChange={(e) => {
                     const val = Number(e.target.value)
-                    console.log('Days changed:', val)
                     setDaysConnected(val)
                   }}
                   className="w-full"
@@ -134,7 +131,7 @@ export default function TierDemoPage() {
                   id="metInPerson"
                   checked={hasMetInPerson}
                   onChange={(e) => {
-                    console.log('Met in person:', e.target.checked)
+
                     setHasMetInPerson(e.target.checked)
                   }}
                   className="w-4 h-4"

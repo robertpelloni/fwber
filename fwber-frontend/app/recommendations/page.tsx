@@ -113,9 +113,9 @@ export default function RecommendationsPage() {
         content_id: contentId,
         rating,
       });
-      
+
       // Show success feedback
-      console.log('Feedback submitted successfully');
+      // Feedback submitted successfully — UI will update via React Query
     } catch (error) {
       console.error('Failed to submit feedback:', error);
     }
@@ -289,11 +289,10 @@ export default function RecommendationsPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === tab.id
+                className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${activeTab === tab.id
                     ? 'border-red-500 text-red-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                  }`}
                 title={tab.description}
               >
                 {tab.label}
@@ -313,7 +312,7 @@ export default function RecommendationsPage() {
             <>
               {getCurrentRecommendations().length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {getCurrentRecommendations().map((recommendation, index) => 
+                  {getCurrentRecommendations().map((recommendation, index) =>
                     renderRecommendationCard(recommendation, index)
                   )}
                 </div>

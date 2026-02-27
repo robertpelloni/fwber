@@ -23,11 +23,11 @@ export default function PublicProfilePage() {
   const searchParams = useSearchParams();
   const wingmanId = searchParams.get('wingman');
   const { token, user } = useAuth();
-  
+
   // Safely extract id - useParams returns string | string[] | undefined
   const id = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : null;
   const numericId = id ? parseInt(id, 10) : NaN;
-  
+
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +41,7 @@ export default function PublicProfilePage() {
       setIsLoading(false);
       return;
     }
-    
+
     try {
       setIsLoading(true);
       const data = await getPublicProfile(token, numericId);
@@ -59,7 +59,7 @@ export default function PublicProfilePage() {
         subject_id: Number(id),
         wingman_id: Number(wingmanId),
       });
-      console.log('Wingman assist recorded');
+      // Assist recorded successfully
     } catch (err) {
       console.error('Failed to record assist', err);
     }
@@ -80,17 +80,17 @@ export default function PublicProfilePage() {
 
   const handleAction = async (action: 'like' | 'pass') => {
     if (!token || !profile) return;
-    
+
     try {
       await performMatchAction(profile.id, action);
       setActionPerformed(true);
       if (action === 'like') {
-        alert('Liked! If they like you back, it\'s a match!');
+        showSuccess('Liked!', 'If they like you back, it\'s a match!');
       } else {
-        alert('Passed.');
+        showSuccess('Passed', 'You won\'t see this profile again.');
       }
     } catch (err) {
-      alert('Failed to perform action');
+      showError('Action Failed', 'Failed to perform action. Please try again.');
     }
   };
 
@@ -140,18 +140,18 @@ export default function PublicProfilePage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
             <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-                 <div className="flex justify-between items-end">
-                    <div>
-                        <h1 className="text-3xl font-bold flex items-center gap-2">
-                          {p.display_name}, {p.age}
-                          <PresenceIndicator userId={String(profile.id)} />
-                        </h1>
-                        <p className="text-gray-200 mt-1">
-                          {p.location?.city}, {p.location?.state}
-                        </p>
-                    </div>
-                    <TipButton recipientId={profile.id} recipientName={p.display_name || 'User'} />
-                 </div>
+              <div className="flex justify-between items-end">
+                <div>
+                  <h1 className="text-3xl font-bold flex items-center gap-2">
+                    {p.display_name}, {p.age}
+                    <PresenceIndicator userId={String(profile.id)} />
+                  </h1>
+                  <p className="text-gray-200 mt-1">
+                    {p.location?.city}, {p.location?.state}
+                  </p>
+                </div>
+                <TipButton recipientId={profile.id} recipientName={p.display_name || 'User'} />
+              </div>
             </div>
           </div>
 
@@ -159,36 +159,36 @@ export default function PublicProfilePage() {
           <div className="p-8">
 
             {(p.vouches && p.vouches.length > 0) && (
-                 <div className="flex gap-2 mb-6 flex-wrap">
-                    <VouchBadge type="safe" count={p.vouches.filter((v: any) => v.type === 'safe').length} />
-                    <VouchBadge type="fun" count={p.vouches.filter((v: any) => v.type === 'fun').length} />
-                    <VouchBadge type="hot" count={p.vouches.filter((v: any) => v.type === 'hot').length} />
-                 </div>
-            )}
-              <div>
-                <div className="flex justify-between items-center w-full">
-                  <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                      {p.display_name}, {p.age}
-                      <PresenceIndicator userId={String(profile.id)} />
-                    </h1>
-                    
-                    {/* Vouches Summary */}
-                    {(p.vouches && p.vouches.length > 0) && (
-                         <div className="flex gap-2 mt-2 flex-wrap">
-                            <VouchBadge type="safe" count={p.vouches.filter((v: any) => v.type === 'safe').length} />
-                            <VouchBadge type="fun" count={p.vouches.filter((v: any) => v.type === 'fun').length} />
-                            <VouchBadge type="hot" count={p.vouches.filter((v: any) => v.type === 'hot').length} />
-                         </div>
-                    )}
-
-                    <p className="text-gray-600 dark:text-gray-400 mt-1">
-                      {p.location?.city}, {p.location?.state}
-                    </p>
-                  </div>
-                  <TipButton recipientId={profile.id} recipientName={p.display_name || 'User'} />
-                </div>
+              <div className="flex gap-2 mb-6 flex-wrap">
+                <VouchBadge type="safe" count={p.vouches.filter((v: any) => v.type === 'safe').length} />
+                <VouchBadge type="fun" count={p.vouches.filter((v: any) => v.type === 'fun').length} />
+                <VouchBadge type="hot" count={p.vouches.filter((v: any) => v.type === 'hot').length} />
               </div>
+            )}
+            <div>
+              <div className="flex justify-between items-center w-full">
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    {p.display_name}, {p.age}
+                    <PresenceIndicator userId={String(profile.id)} />
+                  </h1>
+
+                  {/* Vouches Summary */}
+                  {(p.vouches && p.vouches.length > 0) && (
+                    <div className="flex gap-2 mt-2 flex-wrap">
+                      <VouchBadge type="safe" count={p.vouches.filter((v: any) => v.type === 'safe').length} />
+                      <VouchBadge type="fun" count={p.vouches.filter((v: any) => v.type === 'fun').length} />
+                      <VouchBadge type="hot" count={p.vouches.filter((v: any) => v.type === 'hot').length} />
+                    </div>
+                  )}
+
+                  <p className="text-gray-600 dark:text-gray-400 mt-1">
+                    {p.location?.city}, {p.location?.state}
+                  </p>
+                </div>
+                <TipButton recipientId={profile.id} recipientName={p.display_name || 'User'} />
+              </div>
+            </div>
 
             <div className="prose dark:prose-invert mb-8">
               <h3 className="text-lg font-semibold mb-2">About</h3>
@@ -197,20 +197,20 @@ export default function PublicProfilePage() {
 
             {/* Photo Gate */}
             <div className="mb-8">
-                <h3 className="text-lg font-semibold mb-4">Photos</h3>
-                <PhotoRevealGate
-                    photos={p.photos?.map(ph => ({
-                        id: String(ph.id),
-                        url: ph.url,
-                        isPrimary: ph.is_primary,
-                        type: 'real',
-                        isPrivate: ph.is_private,
-                        isUnlocked: ph.is_unlocked,
-                        unlockPrice: ph.unlock_price
-                    })) || []}
-                    currentTier={RelationshipTier.DISCOVERY}
-                    onTokenUnlock={handleTokenUnlock}
-                />
+              <h3 className="text-lg font-semibold mb-4">Photos</h3>
+              <PhotoRevealGate
+                photos={p.photos?.map(ph => ({
+                  id: String(ph.id),
+                  url: ph.url,
+                  isPrimary: ph.is_primary,
+                  type: 'real',
+                  isPrivate: ph.is_private,
+                  isUnlocked: ph.is_unlocked,
+                  unlockPrice: ph.unlock_price
+                })) || []}
+                currentTier={RelationshipTier.DISCOVERY}
+                onTokenUnlock={handleTokenUnlock}
+              />
             </div>
 
             {/* Actions */}
@@ -230,7 +230,7 @@ export default function PublicProfilePage() {
                     Like
                   </button>
                 </div>
-                
+
                 <button
                   onClick={() => setIsGiftModalOpen(true)}
                   className="flex items-center gap-2 px-6 py-2 bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 rounded-full font-medium hover:bg-pink-200 dark:hover:bg-pink-900/50 transition-colors"
