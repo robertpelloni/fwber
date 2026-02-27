@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { Bell, X, Check, MessageSquare, Heart, UserPlus, Eye, AlertCircle } from 'lucide-react';
+import { Bell, X, Check, MessageSquare, Heart, UserPlus, Eye, AlertCircle, Gift, Calendar } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { PresenceIndicator } from '@/components/realtime/PresenceComponents';
 
@@ -124,10 +124,9 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
       case 'view':
         return <Eye className="h-4 w-4 text-purple-500" />;
       case 'gift':
-        // Import Gift optionally or return a text-based/lucide equivalent? We can use Heart if Gift isn't imported, but assuming Gift is not imported let's just use Heart or a generic icon. Wait, I should import Gift from lucide-react. Actually I will do that in the outer layer.
-        return <span className="text-xl">🎁</span>;
+        return <Gift className="h-4 w-4 text-pink-400" />;
       case 'event':
-        return <span className="text-xl">📅</span>;
+        return <Calendar className="h-4 w-4 text-blue-400" />;
       case 'system':
         return <AlertCircle className="h-4 w-4 text-yellow-500" />;
       default:

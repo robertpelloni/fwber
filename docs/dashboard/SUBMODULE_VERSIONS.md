@@ -1,26 +1,40 @@
-# Submodule & Component Version Dashboard
+# Submodule & Component Versions Dashboard
 
-**Note:** `fwber` is primarily a monorepo. This dashboard tracks logical modules and their synchronization state.
+> **Last Updated:** 2026-02-27 by Claude (Antigravity)
+> **Core Version:** 0.3.38
 
-| Module | Location | Version | Status |
-|--------|----------|---------|--------|
-| **Core** | `/` | 0.3.33 | Active |
-| **Backend** | `fwber-backend/` | 0.3.33 | Active |
-| **Frontend** | `fwber-frontend/` | 0.3.33 | Active |
+## Architectural Scope: Pure Monorepo
 
-## Backend Services
-| Service | Driver | Implementation Status |
-|---------|--------|-----------------------|
-| Media Analysis | AWS Rekognition | ✅ Production Ready |
-| Realtime | Reverb (WebSocket) | ✅ Production Ready |
-| Search | Spatial SQL | ✅ Production Ready |
-| Caching | Redis | ✅ Implemented |
+The **fwber** project operates as a **Pure Monorepo**. There are no Git Submodules linked to this repository. All components (Frontend, Backend, Deployment scripts) are tracked within a single root `.git` tree.
 
-## Frontend Features
-| Feature | Path | Status |
-|---------|------|--------|
-| Achievements | `/achievements` | ✅ Complete |
-| Help Center | `/help` | ✅ Complete |
-| Security | `/settings/security` | ✅ Complete |
-| Admin System | `/admin/system` | ✅ Complete (Mock Data) |
-| Merchant Analytics | `/merchant/analytics` | ⚠️ UI Mock / Backend Ready |
+### Logical Components & Dependencies
+
+While there are no git submodules, the project is internally divided into two distinct environments powered by package managers:
+
+#### 1. Frontend (`/fwber-frontend`)
+*   **Framework:** Next.js 16 (React 19 RC)
+*   **State Management:** React Query, Zustand
+*   **Real-time:** Pusher-js (bridging legacy Mercure patterns)
+*   **Styling:** TailwindCSS, Shadcn UI, Framer Motion
+*   **Map/Geospatial:** Leaflet & React-Leaflet
+*   *(Run `npm list` in `/fwber-frontend` for exact live dependency versions)*
+
+#### 2. Backend (`/fwber-backend`)
+*   **Framework:** Laravel 12.x (PHP 8.3+)
+*   **Database:** PostgreSQL + PostGIS extension
+*   **Authentication:** Laravel Sanctum (Token-based)
+*   **Real-time Server:** Laravel Reverb / Pusher compatible layer
+*   **AI Integrations:** `openai-php/client`
+*   *(Run `composer show` in `/fwber-backend` for exact live vendor versions)*
+
+#### 3. Infrastructure (`/docker`, `/kubernetes`)
+*   **Containers:** Docker, Docker Compose
+*   **Orchestration:** Kubernetes Configs (Ingress, Services, StatefulSets)
+
+### Updating Dependencies
+
+To update the internal packages (not submodules):
+1. **Frontend:** `cd fwber-frontend && npm update`
+2. **Backend:** `cd fwber-backend && composer update`
+
+*This dashboard serves as the authoritative architectural mapping standard for all AI agents and CI/CD pipelines.*

@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.38] - 2026-02-27
+
+### Added
+- **Global Documentation Rewrite**: Completely rewrote `VISION.md`, outlining the transition to Rust microservices and ZK-Proximity proofs.
+- **Unified Deployment Guide**: Merged disparate deployment files into a single `DEPLOY.md` covering Docker, Kubernetes, Vercel, and DreamHost.
+- **Monorepo Architecture Map**: Added `SUBMODULE_VERSIONS.md` dashboard clarifying the pure monorepo structure.
+- **Notification Bell UX**: Added missing `Gift` and `Calendar` icons to `NotificationBell.tsx` and wired correct deep-links for `event` and `gift` notifications.
+
 ## [0.3.37] - 2026-02-26
 
 ### Added
