@@ -11,6 +11,7 @@ import { api } from '@/lib/api/client';
 import { PresenceIndicator } from '@/components/realtime/PresenceComponents';
 import TipButton from '@/components/tipping/TipButton';
 import PhotoRevealGate from '@/components/PhotoRevealGate';
+import { EvolvingAvatar } from '@/components/ui/EvolvingAvatar';
 import { RelationshipTier } from '@/lib/relationshipTiers';
 import { photoAPI } from '@/lib/api/photos';
 import GiftShopModal from '@/components/gifts/GiftShopModal';
@@ -117,13 +118,14 @@ export default function PublicProfilePage() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
         <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden">
           {/* Main Photo & Header */}
-          <div className="relative h-96 w-full bg-gray-200">
+          <div className="relative h-96 w-full bg-gray-200 flex justify-center items-center">
             {p.photos?.[0] ? (
-              <Image
+              <EvolvingAvatar
                 src={p.photos[0].url}
                 alt={p.display_name || 'User'}
-                fill
-                className="object-cover"
+                size="2xl"
+                emotion={p.current_emotion as any || 'neutral'}
+                className="w-64 h-64 border-4 shadow-xl mb-4"
               />
             ) : (
               <div className="flex items-center justify-center h-full text-4xl text-gray-400">

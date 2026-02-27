@@ -58,6 +58,8 @@ class UserProfile extends Model
         'avatar_prompt',
         'avatar_status',
         'preferences',
+        'current_emotion',
+        'emotion_updated_at',
         'love_language',
         'personality_type',
         'political_views',
@@ -108,6 +110,16 @@ class UserProfile extends Model
         static::saved(function ($profile) {
             // Dispatch job to update vector embedding
             \App\Jobs\ProcessProfileEmbedding::dispatch($profile);
+
+            // Dispatch out-of-band Rust microservice spatial index sync
+            // Only trigger if we actually hold coordinates.
+            if ($profile->location_lat && $profile->location_lng) {
+                \App\Jobs\SyncLocationToGeoScreener::dispatch(
+                    $profile->user_id,
+                    (float) $profile->location_lat,
+                    (float) $profile->location_lng
+                );
+            }
         });
     }
 }

@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.46] - 2026-02-27
+### Added
+- Implemented **Rust Geo-Screener** (Phase 6), a high-performance spatial indexing microservice utilizing Uber's `h3o` library via `actix-web`.
+- Decoupled SQL Haversine queries from `LocalPulse`, offloading dense proximity matches to O(1) grid traversal using the local Rust `8080` background proxy.
+- Set up automatic spatial index synchronization through the `SyncLocationToGeoScreener` dispatched Laravel job.
+
+## [0.3.45] - 2026-02-27
+### Added
+- Implemented **ZK-Proximity Proofs** (Facade), establishing a mathematically private location verification system without leaking raw user coordinates.
+- Scaffolded the `ZkProximityProof` Eloquent tracking schema and `ZKProximityService` inside the backend.
+- Created the interactive `/proximity/ZKProver.tsx` frontend SNARK simulation modal and injected it into `candidate` local matching cards inside the Local Pulse dashboard.
+
+## [0.3.44] - 2026-02-27
+### Added
+- Implemented **Evolving AI Avatars**, applying real-time dynamic CSS animations and visual overlays to match users' active emotional states.
+- Extended the `user_profiles` schema and `Conversation` payloads to natively persist a `current_emotion` property.
+- Replaced standard image objects with `EvolvingAvatar.tsx` wrappers across Profile views and RealTimeChat headers.
+
 ## [0.3.43] - 2026-02-27
 ### Added
 - Implemented **Voice/Audio Dating Rooms**, providing drop-in "Clubhouse-style" live conversation stages.

@@ -4,7 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useWebSocketChat, ChatMessage, OnlineUser, useWebSocket } from '@/lib/hooks/use-websocket';
 import { useAuth } from '@/lib/auth-context';
 import { MessageMetadata } from '@/components/MessageStatusIndicator';
-import { UserAvatar, PresenceIndicator, PresenceStatus } from '@/components/PresenceIndicator';
+import { PresenceIndicator, PresenceStatus } from '@/components/PresenceIndicator';
+import { EvolvingAvatar } from '@/components/ui/EvolvingAvatar';
 import { WingmanSuggestions } from '@/components/ai/WingmanSuggestions';
 import AudioRecorder from '@/components/AudioRecorder';
 import { api } from '@/lib/api/client';
@@ -25,6 +26,8 @@ import Image from 'next/image';
 interface RealTimeChatProps {
   recipientId: string;
   recipientName?: string;
+  recipientAvatar?: string;
+  recipientEmotion?: any;
   className?: string;
   onVideoCall?: () => void;
   onProfileView?: () => void;
@@ -111,6 +114,8 @@ function EncryptedMessageContent({ content, senderId, isOwnMessage }: { content:
 export default function RealTimeChat({
   recipientId,
   recipientName = 'User',
+  recipientAvatar,
+  recipientEmotion,
   className = '',
   onVideoCall,
   onProfileView,
@@ -300,11 +305,14 @@ export default function RealTimeChat({
       {/* Chat Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-700">
         <div className="flex items-center space-x-3 cursor-pointer" onClick={onProfileView}>
-          <UserAvatar
-            name={recipientName}
-            status={recipientStatus}
-            size="md"
-          />
+          <div className="relative">
+            <EvolvingAvatar
+              src={recipientAvatar || '/placeholder-avatar.png'}
+              alt={recipientName}
+              size="md"
+              emotion={recipientEmotion || 'neutral'}
+            />
+          </div>
           <div>
             <h3 className="text-white font-semibold flex items-center gap-2 hover:underline">
               {recipientName}
@@ -437,8 +445,8 @@ export default function RealTimeChat({
               >
                 <div
                   className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${isOwnMessage
-                      ? 'bg-red-600 text-white'
-                      : 'bg-gray-700 text-white'
+                    ? 'bg-red-600 text-white'
+                    : 'bg-gray-700 text-white'
                     }`}
                 >
                   {mediaUrl && (

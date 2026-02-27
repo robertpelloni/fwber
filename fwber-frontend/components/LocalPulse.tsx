@@ -5,10 +5,10 @@ import { useAuth } from '@/lib/auth-context';
 import { useLocalPulse, useCreateProximityArtifact, useFlagProximityArtifact } from '@/lib/hooks/use-proximity';
 import { useLocalPulseRealtime } from '@/lib/hooks/use-local-pulse-realtime';
 import { apiClient } from '@/lib/api/client';
-import { 
-  MapPin, 
-  MessageCircle, 
-  Users, 
+import {
+  MapPin,
+  MessageCircle,
+  Users,
   Heart,
   Clock,
   AlertCircle,
@@ -21,9 +21,12 @@ import {
   Camera,
   Tag,
   ShoppingBag,
+  ShieldCheck,
 } from 'lucide-react';
 import type { ProximityArtifact, MatchCandidate, ArtifactType } from '@/types/proximity';
 import ARView from './ar/ARView';
+import { ZKProver } from './proximity/ZKProver';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 interface LocationState {
   latitude: number | null;
@@ -46,12 +49,12 @@ const ArtifactTypeIcon = ({ type }: { type: ArtifactType }) => {
   }
 };
 
-const ArtifactCard = ({ 
-  artifact, 
+const ArtifactCard = ({
+  artifact,
   onFlag,
   onClaim
-}: { 
-  artifact: ProximityArtifact; 
+}: {
+  artifact: ProximityArtifact;
   onFlag: (id: number) => void;
   onClaim: (id: number) => void;
 }) => {
@@ -61,7 +64,7 @@ const ArtifactCard = ({
     const diff = expires.getTime() - now.getTime();
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(minutes / 60);
-    
+
     if (hours > 0) return `${hours}h remaining`;
     if (minutes > 0) return `${minutes}m remaining`;
     return 'Expiring soon';
@@ -85,15 +88,15 @@ const ArtifactCard = ({
         <div className="flex items-center space-x-2">
           <ArtifactTypeIcon type={artifact.type} />
           <span className="text-xs font-medium uppercase">{artifact.type.replace('_', ' ')}</span>
-          
+
           {artifact.type === 'token_drop' && amount && (
-             <span className="text-xs font-bold bg-yellow-200 px-2 py-0.5 rounded-full">{amount} FWB</span>
+            <span className="text-xs font-bold bg-yellow-200 px-2 py-0.5 rounded-full">{amount} FWB</span>
           )}
-          
+
           {isPromotion && artifact.meta?.discount && (
-             <span className="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
-               {artifact.meta.discount}% OFF
-             </span>
+            <span className="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
+              {artifact.meta.discount}% OFF
+            </span>
           )}
         </div>
         <button
@@ -123,21 +126,21 @@ const ArtifactCard = ({
       )}
 
       {artifact.type === 'token_drop' && !isClaimed && (
-         <div className="mb-3">
-            <button
-              onClick={() => onClaim(artifact.id)}
-              className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 rounded shadow-sm flex justify-center items-center gap-2"
-            >
-               <Coins className="w-4 h-4" />
-               Claim {amount} FWB
-            </button>
-         </div>
+        <div className="mb-3">
+          <button
+            onClick={() => onClaim(artifact.id)}
+            className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 rounded shadow-sm flex justify-center items-center gap-2"
+          >
+            <Coins className="w-4 h-4" />
+            Claim {amount} FWB
+          </button>
+        </div>
       )}
 
       {artifact.type === 'token_drop' && isClaimed && (
-         <div className="mb-3 text-center text-xs font-bold text-gray-500 bg-gray-100 py-2 rounded">
-            CLAIMED
-         </div>
+        <div className="mb-3 text-center text-xs font-bold text-gray-500 bg-gray-100 py-2 rounded">
+          CLAIMED
+        </div>
       )}
 
       <div className="flex items-center justify-between text-xs text-gray-600">
@@ -155,6 +158,8 @@ const ArtifactCard = ({
 };
 
 const CandidateCard = ({ candidate }: { candidate: MatchCandidate }) => {
+  const [showZkProver, setShowZkProver] = useState(false);
+
   const getCompatibilityBadges = (indicators: string[]) => {
     const badges: Record<string, { label: string; color: string }> = {
       shared_relationship_goals: { label: 'Shared Goals', color: 'bg-pink-100 text-pink-800' },
@@ -178,9 +183,18 @@ const CandidateCard = ({ candidate }: { candidate: MatchCandidate }) => {
             <span>{candidate.distance_miles.toFixed(1)} miles away</span>
           </div>
         </div>
-        <button aria-label="Like" className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors">
-          <Heart className="h-5 w-5" />
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setShowZkProver(true)}
+            title="Verify proximity"
+            className="bg-indigo-100 text-indigo-700 p-2 rounded-full hover:bg-indigo-200 transition-colors"
+          >
+            <ShieldCheck className="h-5 w-5" />
+          </button>
+          <button aria-label="Like" className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors">
+            <Heart className="h-5 w-5" />
+          </button>
+        </div>
       </div>
 
       {candidate.compatibility_indicators.length > 0 && (
@@ -201,6 +215,16 @@ const CandidateCard = ({ candidate }: { candidate: MatchCandidate }) => {
           Last seen {candidate.last_seen}
         </div>
       )}
+
+      <Dialog open={showZkProver} onOpenChange={setShowZkProver}>
+        <DialogContent className="sm:max-w-md bg-transparent border-none shadow-none p-0 flex justify-center">
+          <ZKProver
+            targetEntityType="user"
+            targetEntityId={candidate.user_id}
+            onProofVerified={() => setTimeout(() => setShowZkProver(false), 2000)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
@@ -287,7 +311,7 @@ export default function LocalPulse() {
 
   const handleFlagArtifact = async (id: number) => {
     if (!token) return;
-    
+
     try {
       await flagArtifact.mutateAsync({ id, token });
     } catch (err) {
@@ -383,7 +407,7 @@ export default function LocalPulse() {
       {showCreateForm && (
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
           <h3 className="text-lg font-semibold mb-4">Create Proximity Post</h3>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
@@ -392,11 +416,10 @@ export default function LocalPulse() {
                   <button
                     key={type}
                     onClick={() => setNewArtifact({ ...newArtifact, type })}
-                    className={`p-3 rounded-lg border-2 transition-colors flex flex-col items-center justify-center ${
-                      newArtifact.type === type
-                        ? 'border-blue-600 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                    className={`p-3 rounded-lg border-2 transition-colors flex flex-col items-center justify-center ${newArtifact.type === type
+                      ? 'border-blue-600 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                      }`}
                   >
                     <ArtifactTypeIcon type={type} />
                     <span className="text-xs block mt-1 capitalize text-center">{type.replace('_', ' ')}</span>
@@ -406,17 +429,17 @@ export default function LocalPulse() {
             </div>
 
             {newArtifact.type === 'token_drop' && (
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Amount (FWB)</label>
-                    <input
-                        type="number"
-                        min="1"
-                        value={dropAmount}
-                        onChange={(e) => setDropAmount(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="How many tokens to drop?"
-                    />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Amount (FWB)</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={dropAmount}
+                  onChange={(e) => setDropAmount(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="How many tokens to drop?"
+                />
+              </div>
             )}
 
             <div>

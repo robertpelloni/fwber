@@ -170,6 +170,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('users/{id}', [\App\Http\Controllers\ProfileController::class, 'showPublic']);
     Route::get('profile', [\App\Http\Controllers\ProfileController::class, 'show']);
     Route::put('profile', [\App\Http\Controllers\ProfileController::class, 'update']);
+    Route::patch('profile/emotion', [\App\Http\Controllers\AvatarEmotionController::class, 'update']);
     Route::put('profile/password', [\App\Http\Controllers\ProfileController::class, 'updatePassword']);
     Route::delete('profile', [\App\Http\Controllers\ProfileController::class, 'destroy']);
     Route::get('profile/completeness', [\App\Http\Controllers\ProfileController::class, 'completeness']);
@@ -317,6 +318,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Chatrooms
     Route::post('burner-links', [\App\Http\Controllers\BurnerLinkController::class, 'store']);
     Route::post('burner-links/{token}/join', [\App\Http\Controllers\BurnerLinkController::class, 'join']);
+    
+    // ZK-Proximity 
+    Route::post('proximity/zk-verify', [\App\Http\Controllers\ZKProximityController::class, 'verify']);
     
     // Audio Rooms
     Route::prefix('audio-rooms')->group(function () {

@@ -40,6 +40,7 @@ export interface Conversation {
     profile?: {
       display_name: string | null;
       age: number | null;
+      current_emotion?: string | null;
       photos?: Array<{
         id: number;
         url: string;
@@ -83,8 +84,8 @@ export async function getMessages(token: string, userId: number): Promise<Messag
  * Send a message to a user (supports text and media)
  */
 export async function sendMessage(
-  token: string, 
-  receiverId: number, 
+  token: string,
+  receiverId: number,
   content: string,
   media?: File | null,
   messageType?: 'text' | 'image' | 'video' | 'audio' | 'file'
@@ -92,7 +93,7 @@ export async function sendMessage(
   const formData = new FormData();
   formData.append('receiver_id', receiverId.toString());
   formData.append('content', content);
-  
+
   if (media) {
     formData.append('media', media);
   }
@@ -100,11 +101,11 @@ export async function sendMessage(
   if (messageType) {
     formData.append('message_type', messageType);
   } else if (media) {
-     // Auto-detect simple types if not provided
-     if (media.type.startsWith('image/')) formData.append('message_type', 'image');
-     else if (media.type.startsWith('video/')) formData.append('message_type', 'video');
-     else if (media.type.startsWith('audio/')) formData.append('message_type', 'audio');
-     else formData.append('message_type', 'file');
+    // Auto-detect simple types if not provided
+    if (media.type.startsWith('image/')) formData.append('message_type', 'image');
+    else if (media.type.startsWith('video/')) formData.append('message_type', 'video');
+    else if (media.type.startsWith('audio/')) formData.append('message_type', 'audio');
+    else formData.append('message_type', 'file');
   } else {
     formData.append('message_type', 'text');
   }
@@ -112,7 +113,7 @@ export async function sendMessage(
   const data = await api.post<any>('/messages', formData, {
     headers: { Authorization: `Bearer ${token}` }
   });
-  
+
   return data.message || data.data || data;
 }
 
@@ -120,7 +121,7 @@ export async function sendMessage(
  * Mark messages as read in a conversation
  */
 export async function markMessagesAsRead(
-  token: string, 
+  token: string,
   userId: number
 ): Promise<void> {
   await api.post(`/messages/mark-all-read/${userId}`, {}, {

@@ -12,6 +12,7 @@ use App\Events\ProximityArtifactEvent;
 use App\Services\ProximityArtifactService;
 use App\Services\ShadowThrottleService;
 use App\Services\GeoSpoofDetectionService;
+use App\Services\GeoScreenerClient;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 
@@ -19,7 +20,8 @@ class ProximityArtifactController extends Controller
 {
     public function __construct(
         private ShadowThrottleService $shadowThrottleService,
-        private GeoSpoofDetectionService $geoSpoofService
+        private GeoSpoofDetectionService $geoSpoofService,
+        private GeoScreenerClient $geoScreener
     ) {}
     /**
      * @OA\Get(
@@ -437,18 +439,27 @@ class ProximityArtifactController extends Controller
         int $radiusMeters,
         int $limit
     ): array {
-        // Convert radius from meters to approximate degrees
-        $radiusMiles = $radiusMeters / 1609.34;
-        $latDist = (1.1 * $radiusMiles) / 69.0;
-        $lonDist = (1.1 * $radiusMiles) / 69.1;
 
-        // Get nearby users with profiles
+        // Check Rust Geo-Screener First (O(1) Grid Hash Lookup vs SQL Haversine)
+        $h3CandidateIds = $this->geoScreener->getNearbyUsers($lat, $lng, $radiusMeters);
+        
         $query = \App\Models\User::query()
-            ->where('id', '!=', $user->id)
-            ->whereHas('profile', function ($q) use ($lat, $lng, $latDist, $lonDist) {
-                $q->whereBetween('location_latitude', [$lat - $latDist, $lat + $latDist])
-                  ->whereBetween('location_longitude', [$lng - $lonDist, $lng + $lonDist]);
-            });
+            ->where('id', '!=', $user->id);
+
+        if (!empty($h3CandidateIds)) {
+             // Fallback to array IN sweep (Instant Index Match)
+             $query->whereIn('id', $h3CandidateIds);
+        } else {
+             // Standard SQL Fallback Map
+             $radiusMiles = $radiusMeters / 1609.34;
+             $latDist = (1.1 * $radiusMiles) / 69.0;
+             $lonDist = (1.1 * $radiusMiles) / 69.1;
+     
+             $query->whereHas('profile', function ($q) use ($lat, $lng, $latDist, $lonDist) {
+                 $q->whereBetween('location_latitude', [$lat - $latDist, $lat + $latDist])
+                   ->whereBetween('location_longitude', [$lng - $lonDist, $lng + $lonDist]);
+             });
+        }
 
         // Gender preference filter
         if ($profile->preferences && isset($profile->preferences['gender_preferences'])) {

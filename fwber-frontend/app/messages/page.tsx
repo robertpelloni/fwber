@@ -30,7 +30,7 @@ export default function MessagesPage() {
   const [isVideoCallOpen, setIsVideoCallOpen] = useState(false)
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [incomingCall, setIncomingCall] = useState<{ callerId: string } | null>(null)
-  
+
   const loadConversations = useCallback(async () => {
     if (!token) return
 
@@ -55,15 +55,15 @@ export default function MessagesPage() {
   useEffect(() => {
     const lastSignal = videoSignals[videoSignals.length - 1];
     if (lastSignal && lastSignal.signal.type === 'offer') {
-       setIncomingCall({ callerId: lastSignal.from_user_id });
-       setIsVideoCallOpen(true);
+      setIncomingCall({ callerId: lastSignal.from_user_id });
+      setIsVideoCallOpen(true);
     }
   }, [videoSignals]);
 
   const handleBlock = async () => {
     const otherUser = selectedConversation?.other_user
     if (!token || !otherUser || !confirm('Are you sure you want to block this user? You will no longer see their messages or profile.')) return
-    
+
     try {
       await blockUser(token, otherUser.id)
       setConversations(prev => prev.filter(c => c.id !== selectedConversation!.id))
@@ -76,10 +76,10 @@ export default function MessagesPage() {
   const handleReport = async (reason: string, details: string) => {
     const otherUser = selectedConversation?.other_user
     if (!token || !otherUser) return
-    
+
     try {
       await reportUser(token, otherUser.id, reason, details)
-      
+
       if (confirm('Report submitted. Do you want to block this user as well?')) {
         try {
           await blockUser(token, otherUser.id)
@@ -205,9 +205,8 @@ export default function MessagesPage() {
                     <div
                       key={conversation.id}
                       onClick={() => setSelectedConversation(conversation)}
-                      className={`p-4 border-b cursor-pointer hover:bg-gray-50 ${
-                        selectedConversation?.id === conversation.id ? 'bg-blue-50 border-blue-200' : ''
-                      }`}
+                      className={`p-4 border-b cursor-pointer hover:bg-gray-50 ${selectedConversation?.id === conversation.id ? 'bg-blue-50 border-blue-200' : ''
+                        }`}
                     >
                       <div className="flex items-center space-x-3">
                         <div className="relative">
@@ -243,6 +242,8 @@ export default function MessagesPage() {
                   <RealTimeChat
                     recipientId={String(selectedConversation.other_user?.id)}
                     recipientName={selectedConversation.other_user?.profile?.display_name || 'User'}
+                    recipientAvatar={selectedConversation.other_user?.profile?.photos?.[0]?.url || '/placeholder-avatar.png'}
+                    recipientEmotion={selectedConversation.other_user?.profile?.current_emotion}
                     className="h-full"
                     onVideoCall={() => setIsVideoCallOpen(true)}
                     onProfileView={() => setIsProfileModalOpen(true)}
@@ -262,7 +263,7 @@ export default function MessagesPage() {
           )}
         </div>
       </div>
-      
+
       {selectedConversation && (
         <ReportModal
           isOpen={isReportModalOpen}
@@ -287,8 +288,8 @@ export default function MessagesPage() {
           recipientId={incomingCall ? incomingCall.callerId : String(selectedConversation!.other_user!.id)}
           isOpen={isVideoCallOpen}
           onClose={() => {
-              setIsVideoCallOpen(false);
-              setIncomingCall(null);
+            setIsVideoCallOpen(false);
+            setIncomingCall(null);
           }}
           isIncoming={!!incomingCall}
         />
