@@ -65,4 +65,14 @@ return [
         ],
     ],
 
+    'content_moderation' => [
+        'driver' => env('MODERATION_DRIVER', 'mock'),
+        'api_url' => env('CONTENT_MODERATION_API_URL', 'https://api.example.com/moderate/text'),
+    ],
+
+    'image_moderation' => [
+        'driver' => env('MODERATION_DRIVER', 'mock'),
+        'api_url' => env('IMAGE_MODERATION_API_URL', 'https://api.example.com/moderate/image'),
+    ],
+
 ];

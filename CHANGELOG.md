@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.41] - 2026-02-27
+### Changed
+- Configured dynamic `content_moderation` and `image_moderation` service container injections to un-mock `PrivacySecurityService.php` targeting native AWS Rekognition & Google Vision.
+- Verified `AIMatchingService.php` correctly leverages OpenAI `text-embedding-3-small` vectors generated asynchronously upon `UserProfile` persistence.
+
 ## [0.3.40] - 2026-02-27
 ### Changed
 - Verified the Admin Analytics Dashboard frontend (`app/analytics/page.tsx`) correctly fetches live Postgres/Redis metrics from `@/lib/api/admin.ts`.

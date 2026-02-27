@@ -1,6 +1,6 @@
 # TODO — fwber Short-Term Task List
 
-> **Version:** 0.3.40  
+> **Version:** 0.3.41  
 > **Last Updated:** 2026-02-26  
 > **Priority Legend:** 🔴 Critical | 🟡 High | 🟢 Medium | ⚪ Low
 
@@ -24,12 +24,12 @@ All previously commented-out routes and feature flags have been verified as alre
 
 All features are already correctly defaulted to `true` and use `env()` in `config/features.php`. No action required.
 
-## 🟡 High: Mock Implementations to Replace
+## ~~🟡 High: Mock Implementations to Replace~~ ✅ RESOLVED
 
 | Service | Current State | Target |
 |---------|--------------|--------|
-| `PrivacySecurityService.php` | Mock endpoints | Real AWS Rekognition/Google Vision |
-| `AIMatchingService.php` | SQL keyword matching | Vector Embeddings (Phase 6) |
+| `PrivacySecurityService.php` | ✅ `AwsRekognitionDriver` & `GoogleVisionDriver` | Real AWS Rekognition/Google Vision |
+| `AIMatchingService.php` | ✅ OpenAI `text-embedding-3-small` | Vector Embeddings (Phase 6) |
 
 ## ~~🟢 Medium: UI Polish & Missing Representations~~ ✅ RESOLVED
 
