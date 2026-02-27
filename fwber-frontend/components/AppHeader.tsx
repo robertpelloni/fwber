@@ -7,14 +7,14 @@ import { Logo } from '@/components/Logo'
 import { ConnectionStatusBadge } from './realtime/PresenceComponents'
 import { NotificationBell } from './NotificationBell'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { 
-  Menu, 
-  X, 
-  Home, 
-  Heart, 
-  MessageSquare, 
-  Users, 
-  MapPin, 
+import {
+  Menu,
+  X,
+  Home,
+  Heart,
+  MessageSquare,
+  Users,
+  MapPin,
   User,
   Settings,
   LogOut,
@@ -43,6 +43,7 @@ const navLinks = [
   { href: '/events', label: 'Events', icon: Calendar },
   { href: '/groups', label: 'Groups', icon: Users },
   { href: '/proximity-chatrooms', label: 'Local Chat', icon: Radio },
+  { href: '/burner', label: 'Burner Bridge', icon: Zap },
   { href: '/bulletin-boards', label: 'Boards', icon: Layout },
   { href: '/deals', label: 'Deals', icon: Tag },
   { href: '/bounties', label: 'Bounties', icon: Target },
@@ -107,9 +108,9 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
               {/* User Dropdown */}
               {userMenuOpen && (
                 <>
-                  <div 
-                    className="fixed inset-0 z-40" 
-                    onClick={() => setUserMenuOpen(false)} 
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setUserMenuOpen(false)}
                   />
                   <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
                     <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
@@ -127,7 +128,7 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                       <HelpCircle className="w-4 h-4" />
                       Help Center
                     </Link>
-                    
+
                     <Link
                       href="/profile"
                       onClick={() => setUserMenuOpen(false)}
@@ -172,7 +173,7 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                       <Zap className="w-4 h-4" />
                       Upgrade to Premium
                     </Link>
-                    
+
                     <Link
                       href="/settings"
                       onClick={() => setUserMenuOpen(false)}
@@ -181,7 +182,7 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                       <Settings className="w-4 h-4" />
                       Settings
                     </Link>
-                    
+
                     <div className="border-t border-gray-200 dark:border-gray-700 mt-1 pt-1">
                       <button
                         onClick={() => {

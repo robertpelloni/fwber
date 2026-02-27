@@ -27,6 +27,7 @@ class Chatroom extends Model
         'last_activity_at',
         'settings',
         'token_entry_fee',
+        'expires_at',
     ];
 
     protected $casts = [
@@ -35,6 +36,7 @@ class Chatroom extends Model
         'member_count' => 'integer',
         'message_count' => 'integer',
         'last_activity_at' => 'datetime',
+        'expires_at' => 'datetime',
         'settings' => 'array',
     ];
 

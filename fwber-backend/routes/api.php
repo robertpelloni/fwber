@@ -315,6 +315,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('messages/mark-all-read/{senderId}', [\App\Http\Controllers\MessageController::class, 'markAllAsRead']);
 
     // Chatrooms
+    Route::post('burner-links', [\App\Http\Controllers\BurnerLinkController::class, 'store']);
+    Route::post('burner-links/{token}/join', [\App\Http\Controllers\BurnerLinkController::class, 'join']);
+    
     Route::get('chatrooms/my', [\App\Http\Controllers\ChatroomController::class, 'myChatrooms']);
     Route::get('chatrooms/categories', [\App\Http\Controllers\ChatroomController::class, 'categories']);
     Route::get('chatrooms/popular', [\App\Http\Controllers\ChatroomController::class, 'popular']);
