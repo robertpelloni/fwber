@@ -1,20 +1,39 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { WebView } from 'react-native-webview';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+
+function WebViewContainer() {
+  const insets = useSafeAreaInsets();
+
+  return (
+    <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+      <WebView
+        source={{ uri: 'https://fwber.me' }}
+        style={styles.webview}
+        bounces={false}
+        showsVerticalScrollIndicator={false}
+      />
+      <StatusBar style="auto" />
+    </View>
+  );
+}
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaProvider>
+      <WebViewContainer />
+    </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: '#000', // Matches common fwber dark theme boundary
   },
+  webview: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  }
 });
