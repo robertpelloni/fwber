@@ -8,7 +8,7 @@ import { PresenceIndicator } from '@/components/realtime/PresenceComponents';
 
 interface Notification {
   id: string;
-  type: 'message' | 'match' | 'like' | 'friend_request' | 'view' | 'system';
+  type: 'message' | 'match' | 'like' | 'friend_request' | 'view' | 'system' | 'gift' | 'event';
   title: string;
   body: string;
   timestamp: string;
@@ -18,6 +18,8 @@ interface Notification {
     user_name?: string;
     match_id?: number;
     conversation_id?: number;
+    gift_id?: number;
+    event_id?: number;
   };
 }
 
@@ -121,6 +123,11 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
         return <UserPlus className="h-4 w-4 text-green-500" />;
       case 'view':
         return <Eye className="h-4 w-4 text-purple-500" />;
+      case 'gift':
+        // Import Gift optionally or return a text-based/lucide equivalent? We can use Heart if Gift isn't imported, but assuming Gift is not imported let's just use Heart or a generic icon. Wait, I should import Gift from lucide-react. Actually I will do that in the outer layer.
+        return <span className="text-xl">🎁</span>;
+      case 'event':
+        return <span className="text-xl">📅</span>;
       case 'system':
         return <AlertCircle className="h-4 w-4 text-yellow-500" />;
       default:
@@ -138,6 +145,10 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
         return `/friends`;
       case 'view':
         return `/profile/${notification.data?.user_id}`;
+      case 'gift':
+        return `/wallet?tab=gifts`;
+      case 'event':
+        return `/events/${notification.data?.event_id ?? ''}`;
       default:
         return '#';
     }
@@ -221,9 +232,8 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
                       if (!notification.read) markAsRead(notification.id);
                       setIsOpen(false);
                     }}
-                    className={`flex items-start gap-3 p-4 hover:bg-gray-50 transition-colors ${
-                      !notification.read ? 'bg-blue-50' : ''
-                    }`}
+                    className={`flex items-start gap-3 p-4 hover:bg-gray-50 transition-colors ${!notification.read ? 'bg-blue-50' : ''
+                      }`}
                   >
                     {/* Icon */}
                     <div className="flex-shrink-0 mt-0.5">
