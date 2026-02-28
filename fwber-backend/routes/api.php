@@ -460,6 +460,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('media/analyze', [\App\Http\Controllers\MediaAnalysisController::class, 'analyze']);
     });
 
+    // Scrapbook
+    Route::get('scrapbook/{matchId}', [\App\Http\Controllers\ScrapbookController::class, 'index']);
+    Route::post('scrapbook', [\App\Http\Controllers\ScrapbookController::class, 'store']);
+    Route::patch('scrapbook/{id}/pin', [\App\Http\Controllers\ScrapbookController::class, 'togglePin']);
+    Route::delete('scrapbook/{id}', [\App\Http\Controllers\ScrapbookController::class, 'destroy']);
+
     // Ice Breaker Cards
     Route::get('ice-breakers/questions', [\App\Http\Controllers\IceBreakerController::class, 'getQuestions']);
     Route::post('ice-breakers/answer', [\App\Http\Controllers\IceBreakerController::class, 'submitAnswer']);

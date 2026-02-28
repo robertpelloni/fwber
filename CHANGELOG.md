@@ -2,6 +2,14 @@ oProceedrocddPro# Changelog
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.4] - 2026-02-28
+### Added
+- **Scrapbook Mode**: Shared private memory board between matched users (`/scrapbook?match={id}`).
+- Backend: `ScrapbookEntry` model, migration, `ScrapbookController` (index, store, togglePin, destroy).
+- 4 API routes: `GET/POST /scrapbook`, `PATCH /scrapbook/{id}/pin`, `DELETE /scrapbook/{id}`.
+- Masonry grid frontend with color-coded entry cards, type badges (text/image/voice/link), pin/delete controls.
+- FAB button + modal form with type selector, 7-color accent picker, and emoji input.
+
 ## [1.0.3] - 2026-02-28
 ### Added
 - **AI Date Planner**: Personalized date itinerary generator using the existing AI Wingman backend (`/date-planner`).
