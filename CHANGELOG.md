@@ -1,6 +1,14 @@
-# Changelog
+oProceeddPro# Changelog
 
 All notable changes to this project will be documented in this file.
+
+## [1.0.1] - 2026-02-28
+### Added
+- **Conference Pulse Mode**: Professional networking overlay using the proximity engine (`/conference-pulse`).
+- Backend `conferencePulse()` endpoint at `GET /api/proximity-chatrooms/conference-pulse` with skill-based filtering.
+- Dark-themed frontend page with avatar-only professional cards, skill badges, and "Coffee Chat" CTAs.
+- `useConferencePulse` React Query hook for real-time conference member discovery.
+- Added "Conference" nav link to `AppHeader.tsx`.
 
 ## [1.0.0-RC1] - 2026-02-28
 ### 🎉 Release Candidate 1

@@ -253,7 +253,7 @@ export interface ProximityAnalytics {
  */
 export async function findNearby(filters: FindNearbyRequest): Promise<ProximityChatroomResponse> {
   const params = new URLSearchParams();
-  
+
   params.append('latitude', filters.latitude.toString());
   params.append('longitude', filters.longitude.toString());
   if (filters.radius_meters) params.append('radius_meters', filters.radius_meters.toString());
@@ -362,7 +362,7 @@ export async function getProximityChatroomMessages(
   } = {}
 ): Promise<MessageResponse> {
   const params = new URLSearchParams();
-  
+
   if (filters.type) params.append('type', filters.type);
   if (filters.user_id) params.append('user_id', filters.user_id.toString());
   if (filters.networking_only) params.append('networking_only', 'true');
@@ -479,5 +479,61 @@ export async function getSocialMessages(chatroomId: number): Promise<MessageResp
  */
 export async function getProximityMessageReplies(chatroomId: number, messageId: number): Promise<ProximityChatroomMessage[]> {
   const response = await apiClient.get<ProximityChatroomMessage[]>(`/proximity-chatrooms/${chatroomId}/messages/${messageId}/replies`);
+  return response.data;
+}
+
+// Conference Pulse types
+export interface ConferenceProfessional {
+  user_id: number;
+  name: string;
+  title: string | null;
+  company: string | null;
+  skills: string[];
+  bio: string | null;
+  distance_meters: number;
+  chatroom_id: number;
+  chatroom_name: string;
+}
+
+export interface ConferenceChatroom {
+  id: number;
+  name: string;
+  type: string;
+  event_name: string | null;
+  event_date: string | null;
+  active_members_count: number;
+  distance_meters: number;
+}
+
+export interface ConferencePulseResponse {
+  professionals: ConferenceProfessional[];
+  chatrooms: ConferenceChatroom[];
+  meta: {
+    center_lat: number;
+    center_lng: number;
+    radius_m: number;
+    professionals_count: number;
+    chatrooms_count: number;
+  };
+}
+
+export interface ConferencePulseRequest {
+  latitude: number;
+  longitude: number;
+  radius_meters?: number;
+  skill?: string;
+}
+
+/**
+ * Get Conference Pulse — nearby professionals at conferences/networking events
+ */
+export async function getConferencePulse(filters: ConferencePulseRequest): Promise<ConferencePulseResponse> {
+  const params = new URLSearchParams();
+  params.append('latitude', filters.latitude.toString());
+  params.append('longitude', filters.longitude.toString());
+  if (filters.radius_meters) params.append('radius_meters', filters.radius_meters.toString());
+  if (filters.skill) params.append('skill', filters.skill);
+
+  const response = await apiClient.get<ConferencePulseResponse>(`/proximity-chatrooms/conference-pulse?${params.toString()}`);
   return response.data;
 }

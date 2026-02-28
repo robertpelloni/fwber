@@ -538,4 +538,109 @@ class ProximityChatroomController extends Controller
     }
 
 
+    /**
+     * Conference Pulse — professional networking discovery.
+     * Returns nearby conference/networking chatrooms with avatar-only professional member cards.
+     * No photos are exposed — privacy-first professional networking.
+     */
+    public function conferencePulse(Request $request): JsonResponse
+    {
+        $request->validate([
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
+            'radius_meters' => 'nullable|integer|min:100|max:10000',
+            'skill' => 'nullable|string|max:100',
+        ]);
+
+        $latitude = $request->input('latitude');
+        $longitude = $request->input('longitude');
+        $radiusMeters = $request->input('radius_meters', 2000);
+        $skillFilter = $request->input('skill');
+
+        // Find conference/networking chatrooms nearby
+        $query = ProximityChatroom::active()->public()
+            ->withinRadius($latitude, $longitude, $radiusMeters)
+            ->whereIn('type', ['conference', 'networking', 'professional']);
+
+        $chatrooms = $query->with(['creator'])
+            ->withCount('activeMembers')
+            ->orderBy('distance')
+            ->limit(10)
+            ->get();
+
+        // Collect networking members across all nearby chatrooms
+        $professionals = collect();
+
+        foreach ($chatrooms as $chatroom) {
+            $membersQuery = $chatroom->networkingMembers()
+                ->wherePivot('is_visible', true);
+
+            $members = $membersQuery->get();
+
+            foreach ($members as $member) {
+                $professionalInfo = is_string($member->pivot->professional_info)
+                    ? json_decode($member->pivot->professional_info, true) ?? []
+                    : ($member->pivot->professional_info ?? []);
+
+                // Skill filter: skip if skill is requested but not matched
+                if ($skillFilter) {
+                    $skills = $professionalInfo['skills'] ?? [];
+                    $matchesSkill = collect($skills)->contains(function ($s) use ($skillFilter) {
+                        return str_contains(strtolower($s), strtolower($skillFilter));
+                    });
+                    if (!$matchesSkill) {
+                        continue;
+                    }
+                }
+
+                $distance = $this->locationService->calculateDistance(
+                    $latitude, $longitude,
+                    $member->pivot->latitude ?? $chatroom->latitude,
+                    $member->pivot->longitude ?? $chatroom->longitude
+                );
+
+                $professionals->push([
+                    'user_id' => $member->id,
+                    'name' => $member->name,
+                    'title' => $professionalInfo['title'] ?? null,
+                    'company' => $professionalInfo['company'] ?? null,
+                    'skills' => $professionalInfo['skills'] ?? [],
+                    'bio' => $professionalInfo['bio'] ?? null,
+                    'distance_meters' => round($distance),
+                    'chatroom_id' => $chatroom->id,
+                    'chatroom_name' => $chatroom->name,
+                    // Avatar-only: no photo URLs exposed
+                ]);
+            }
+        }
+
+        // Deduplicate by user_id, keep the closest entry
+        $professionals = $professionals
+            ->groupBy('user_id')
+            ->map(fn ($group) => $group->sortBy('distance_meters')->first())
+            ->sortBy('distance_meters')
+            ->values()
+            ->take(50);
+
+        return response()->json([
+            'professionals' => $professionals,
+            'chatrooms' => $chatrooms->map(fn ($c) => [
+                'id' => $c->id,
+                'name' => $c->name,
+                'type' => $c->type,
+                'event_name' => $c->event_name,
+                'event_date' => $c->event_date,
+                'active_members_count' => $c->active_members_count,
+                'distance_meters' => round($c->distance ?? 0),
+            ]),
+            'meta' => [
+                'center_lat' => $latitude,
+                'center_lng' => $longitude,
+                'radius_m' => $radiusMeters,
+                'professionals_count' => $professionals->count(),
+                'chatrooms_count' => $chatrooms->count(),
+            ],
+        ]);
+    }
+
 }

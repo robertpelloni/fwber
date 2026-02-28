@@ -365,6 +365,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Proximity Chatrooms
     Route::get('proximity-chatrooms/nearby', [\App\Http\Controllers\ProximityChatroomController::class, 'findNearby']);
+    Route::get('proximity-chatrooms/conference-pulse', [\App\Http\Controllers\ProximityChatroomController::class, 'conferencePulse']);
     Route::post('proximity-chatrooms', [\App\Http\Controllers\ProximityChatroomController::class, 'create']);
     Route::get('proximity-chatrooms/{id}', [\App\Http\Controllers\ProximityChatroomController::class, 'show']);
     Route::post('proximity-chatrooms/{id}/join', [\App\Http\Controllers\ProximityChatroomController::class, 'join']);

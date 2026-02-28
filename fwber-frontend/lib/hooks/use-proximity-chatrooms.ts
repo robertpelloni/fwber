@@ -22,6 +22,7 @@ import {
   getNetworkingMessages,
   getSocialMessages,
   getProximityMessageReplies,
+  getConferencePulse,
   type ProximityChatroom,
   type ProximityChatroomMessage,
   type ProximityChatroomMember,
@@ -32,6 +33,7 @@ import {
   type FindNearbyRequest,
   type UpdateLocationRequest,
   type NearbyNetworkingRequest,
+  type ConferencePulseRequest,
 } from '../api/proximity-chatrooms';
 
 // Query keys
@@ -159,7 +161,7 @@ export function useCreateProximityChatroom() {
     onSuccess: (newChatroom) => {
       // Invalidate nearby chatrooms
       queryClient.invalidateQueries({ queryKey: proximityChatroomKeys.all });
-      
+
       // Add the new chatroom to the cache
       queryClient.setQueryData(proximityChatroomKeys.detail(newChatroom.id), newChatroom);
     },
@@ -222,7 +224,7 @@ export function useSendProximityMessage() {
         proximityChatroomKeys.messages(chatroomId, {}),
         (oldData: any) => {
           if (!oldData) return oldData;
-          
+
           return {
             ...oldData,
             data: [newMessage, ...oldData.data],
@@ -230,7 +232,7 @@ export function useSendProximityMessage() {
           };
         }
       );
-      
+
       // Invalidate chatroom data to update message count
       queryClient.invalidateQueries({ queryKey: proximityChatroomKeys.detail(chatroomId) });
     },
@@ -249,7 +251,7 @@ export function useEditProximityMessage() {
         proximityChatroomKeys.messages(chatroomId, {}),
         (oldData: any) => {
           if (!oldData) return oldData;
-          
+
           return {
             ...oldData,
             data: oldData.data.map((msg: ProximityChatroomMessage) =>
@@ -274,7 +276,7 @@ export function useDeleteProximityMessage() {
         proximityChatroomKeys.messages(chatroomId, {}),
         (oldData: any) => {
           if (!oldData) return oldData;
-          
+
           return {
             ...oldData,
             data: oldData.data.map((msg: ProximityChatroomMessage) =>
@@ -338,5 +340,15 @@ export function useUnpinProximityMessage() {
       queryClient.invalidateQueries({ queryKey: proximityChatroomKeys.pinned(chatroomId) });
       queryClient.invalidateQueries({ queryKey: proximityChatroomKeys.messages(chatroomId, {}) });
     },
+  });
+}
+
+// Conference Pulse — professional networking discovery
+export function useConferencePulse(filters: ConferencePulseRequest) {
+  return useQuery({
+    queryKey: ['conference-pulse', filters] as const,
+    queryFn: () => getConferencePulse(filters),
+    enabled: !!filters.latitude && !!filters.longitude,
+    staleTime: 30 * 1000,
   });
 }
