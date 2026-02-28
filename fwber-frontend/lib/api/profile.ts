@@ -36,7 +36,7 @@ export interface UserProfile {
     travel_latitude?: number | null;
     travel_longitude?: number | null;
     travel_location_name?: string | null;
-    
+
     // New Optional Attributes
     love_language?: string;
     personality_type?: string;
@@ -61,7 +61,7 @@ export interface UserProfile {
     children?: string;
     religion?: string;
     political_views?: string;
-    
+
     preferences: {
       // Lifestyle preferences
       smoking?: string;
@@ -103,14 +103,16 @@ export interface UserProfile {
       unlock_price?: number;
     }>;
     vouches?: Array<{
-        type: 'safe' | 'fun' | 'hot';
-        relationship_type: string;
-        comment: string;
-        voucher_name: string;
-        created_at: string;
+      type: 'safe' | 'fun' | 'hot';
+      relationship_type: string;
+      comment: string;
+      voucher_name: string;
+      created_at: string;
     }>;
     profile_complete: boolean;
     completion_percentage: number;
+    current_emotion?: string;
+    is_federated?: boolean;
   };
 }
 
@@ -180,7 +182,7 @@ export interface ProfileUpdateData {
   religion?: string;
   political_views?: string;
   interests?: string[];
-  
+
   preferences?: {
     smoking?: string;
     drinking?: string;
@@ -272,7 +274,7 @@ export async function updateUserProfile(
 ): Promise<UserProfile> {
   // Map frontend fields to backend expected fields
   const payload: any = { ...updates };
-  
+
   if (updates.date_of_birth) {
     payload.birthdate = updates.date_of_birth;
     delete payload.date_of_birth;

@@ -58,7 +58,7 @@ export const EvolvingAvatar: React.FC<EvolvingAvatarProps> = ({
     return (
         <div className={cn("relative rounded-full inline-block transition-all duration-700 ease-in-out border-2", currentStyle.wrapper, className)}>
             <div className={cn("overflow-hidden rounded-full", dimensions)}>
-                <OptimizedImage
+                <Image
                     src={src}
                     alt={alt}
                     fill

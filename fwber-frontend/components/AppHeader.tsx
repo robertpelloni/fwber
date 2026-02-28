@@ -27,7 +27,8 @@ import {
   HelpCircle,
   Tag,
   Target,
-  Layout
+  Layout,
+  Mic
 } from 'lucide-react'
 
 interface AppHeaderProps {
