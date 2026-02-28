@@ -3,7 +3,7 @@
 > **See [docs/UNIVERSAL_LLM_INSTRUCTIONS.md](docs/UNIVERSAL_LLM_INSTRUCTIONS.md) for the Master Protocol.**
 > **See [AGENTS.md](AGENTS.md) for shared protocols (versioning, code standards, git workflow).**
 
-**Current Version:** 0.3.49  
+**Current Version:** 1.0.0-RC1  
 **Status:** See `PROJECT_STATUS.md` and `TODO.md`.
 
 ---

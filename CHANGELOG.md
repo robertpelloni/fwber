@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-RC1] - 2026-02-28
+### 🎉 Release Candidate 1
+- **All Phases Complete (1–7)**: Core Foundation, Enhanced UX, Social Dynamics, Advanced Features, Community & AI, Mobility & Infrastructure, and Federation.
+- **257 backend tests passing** (900 assertions) across the full Laravel test suite.
+- **Frontend build clean**: Next.js 16.1.1 production build compiles 94 static pages with zero errors.
+- **Neighborhood Social Forum** (v0.3.52): Threaded comments and Reddit-style voting on Local Pulse artifacts.
+- **Proactive AI Wingman Nudges** (v0.3.51): Real-time dating coaching via WebSocket push events.
+- **Value-Aligned Matching** (v0.3.50): Deep 12-point AI Compatibility Audit with glassmorphic UI.
+- **Multi-Region Edge Caching** (v0.3.49): `EdgeCacheResponse` middleware for CDN-ready public endpoints.
+- **Test stability**: Fixed `REDIS_CLIENT` configuration in `phpunit.xml` to enforce `predis` in test environments.
+
 ## [0.3.52] - 2026-02-28
 ### Added
 - Expanded **Local Pulse** into a hyper-local neighborhood forum (Phase 5).
