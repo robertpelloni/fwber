@@ -1,32 +1,33 @@
-# Project Status - v0.3.37
+# Project Status - v0.3.49
 
 **Date:** 2026-02-27
-**Current Phase:** Hardening & Merchant Integration
-**Version:** v0.3.37
+**Current Phase:** RC1 — All Phases Complete (1–7)
+**Version:** v0.3.49
 
 ## 🚨 Immediate Priorities (Next 24 Hours)
 
-1.  **Merchant Analytics Hardening**:
-    *   [x] Replace mock data in `MerchantAnalyticsService` with real calculations.
-    *   [x] Verify `kFactor` and `retention` logic.
-2.  **Documentation Synchronization**:
-    *   [x] `PROJECT_STATUS.md` updated to v0.3.34.
-    *   [x] `ROADMAP.md` updated.
-    *   [x] `AGENTS.md` detailed with versioning protocols.
+1.  **Stamp v1.0.0-RC1**: All `TODO.md` items are ✅. Frontend build and backend tests pass cleanly.
+2.  **QA Deep-Dive**: Optional — run Cypress E2E suite, stress test audio rooms.
 
 ## 🟢 Recent Accomplishments
 
-### ✅ Critical Updates (v0.3.34 - Feb 06)
-1.  **Merchant Analytics Integration**: Connected `/merchant/analytics` frontend to real backend endpoints.
-2.  **System Dashboard**: Implemented `/admin/system` with real health check data.
-3.  **Documentation**: Added `docs/dashboard/SUBMODULE_VERSIONS.md`.
+### ✅ Phase 5–7 Feature Sprint (v0.3.38 – v0.3.49, Feb 27)
+1.  **Voice/Audio Dating Rooms (v0.3.38)**: Clubhouse-style audio rooms with WebRTC peer connections and SFU topology.
+2.  **Burner Communication Bridge (v0.3.39)**: Ephemeral anonymous relay QR codes for out-of-band encrypted messaging.
+3.  **ZK Proximity Proofs (v0.3.44)**: Privacy-first location verification using zero-knowledge cryptographic proofs.
+4.  **Evolving AI Avatars (v0.3.45)**: Dynamic emotional avatar expressions (neutral, happy, flirty, mysterious, intense).
+5.  **Rust Geo-Screener (v0.3.46)**: H3 hexagonal spatial indexing microservice in Actix-Web for sub-ms proximity queries.
+6.  **Federated Servers / ActivityPub (v0.3.47)**: Self-hosted fwber nodes with WebFinger, NodeInfo, and Actor endpoints.
+7.  **React Native Mobile App (v0.3.48)**: Expo PWA wrapper with native Geolocation, BackHandler, and external link bridging.
+8.  **Multi-Region Edge Caching (v0.3.49)**: `EdgeCacheResponse` middleware with configurable `s-maxage` and `stale-while-revalidate`.
 
-### ✅ Critical Updates (v0.3.33 - Feb 06)
-1.  **Frontend Feature Completion**:
-    - **Achievements**: Full UI implementation at `/achievements`.
-    - **Help Center**: Documentation portal at `/help`.
-    - **Security Settings**: E2E encryption management.
-2.  **Refactoring**: Unified real-time logic into `useWebSocket`.
+### ✅ RC1 QA Cycle (v0.3.49, Feb 27)
+1.  **Frontend Build Fix**: Resolved 3 TypeScript errors (`current_emotion` type, `Mic` import, `OptimizedImage` ref).
+2.  **Backend Test Fix**: Resolved 7 pre-existing PHPUnit failures (Redis extension skip guards).
+3.  **Agent File Sync**: Synchronized all 5 agent instruction files from stale v0.3.41 to v0.3.49.
+4.  **Dashboard Update**: Rewrote `PROJECT_STRUCTURE_DASHBOARD.md` and `SUBMODULE_VERSIONS.md`.
+
+### ✅ Phase 4B–C (v0.3.31 – v0.3.37)
 
 
 ### ✅ Critical Fixes (Jan 06)
