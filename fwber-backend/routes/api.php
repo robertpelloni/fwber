@@ -299,6 +299,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('proximity/artifacts/{id}', [\App\Http\Controllers\ProximityArtifactController::class, 'show']);
     Route::post('proximity/artifacts/{id}/claim', [\App\Http\Controllers\ProximityArtifactController::class, 'claim']);
     Route::post('proximity/artifacts/{id}/flag', [\App\Http\Controllers\ProximityArtifactController::class, 'flag']);
+    Route::post('proximity/artifacts/{id}/comment', [\App\Http\Controllers\ProximityArtifactInteractionController::class, 'comment']);
+    Route::post('proximity/artifacts/{id}/vote', [\App\Http\Controllers\ProximityArtifactInteractionController::class, 'vote']);
     Route::delete('proximity/artifacts/{id}', [\App\Http\Controllers\ProximityArtifactController::class, 'destroy']);
     Route::get('proximity/local-pulse', [\App\Http\Controllers\ProximityArtifactController::class, 'localPulse']);
 

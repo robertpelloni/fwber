@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.52] - 2026-02-28
+### Added
+- Expanded **Local Pulse** into a hyper-local neighborhood forum (Phase 5).
+- Added `ProximityArtifactComment` and `ProximityArtifactVote` Eloquent models to allow threaded conversations and Reddit-style scoring on Pulse elements.
+- Implemented `ProximityArtifactInteractionController` to handle REST interactions (`POST /api/proximity/artifacts/{id}/comment` and `POST /api/proximity/artifacts/{id}/vote`).
+- Enhanced `LocalPulse.tsx` front-end by integrating interactive upvote/downvote buttons and inline comment threads powered by React Query mutations.
+
+## [0.3.51] - 2026-02-27
+### Added
+- Implemented **Proactive AI Wingman Nudges** (Phase 5).
+- Created `AnalyzeConversationNudge` background job to asynchronously analyze conversation flows using LLMs every 5 messages.
+- Dispatched `ConversationNudged` WebSocket events via Pusher/Reverb down private channels.
+- Added sliding Framer Motion-powered "Wingman Banner" to `RealTimeChat.tsx` to display real-time dating coaching dynamically.
+
+## [0.3.50] - 2026-02-27
+### Added
+- Implemented **Value-Aligned Matching & AI Compatibility Audit** (Phase 5).
+- Upgraded `AiWingmanService` to build deep 12-point personality matrices matching `User` models against one another.
+- Created premium JSON-LD gated endpoint `POST /api/wingman/compatibility-audit/{id}`.
+- Added animated glassmorphic Next.js interface at `/compatibility-audit/[id]` with visual feedback blocks for Alignment Areas, Friction Points, and Growth Potential.
+
 ## [0.3.49] - 2026-02-27
 ### Added
 - Implemented **Multi-Region & Edge Caching Architecture** (Phase 6).

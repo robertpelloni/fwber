@@ -133,4 +133,32 @@ export const proximityApi = {
     );
     return response.data;
   },
+
+  /**
+   * Add a comment to an artifact
+   */
+  commentArtifact: async (id: number, content: string, token: string): Promise<{ message: string; comment: any }> => {
+    const response = await axios.post(
+      `${API_BASE_URL}/proximity/artifacts/${id}/comment`,
+      { content },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  },
+
+  /**
+   * Vote on an artifact
+   */
+  voteArtifact: async (id: number, vote: number, token: string): Promise<{ message: string; votes_sum_vote: number; user_vote: number }> => {
+    const response = await axios.post(
+      `${API_BASE_URL}/proximity/artifacts/${id}/vote`,
+      { vote },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  },
 };

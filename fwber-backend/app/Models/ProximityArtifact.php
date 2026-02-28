@@ -78,4 +78,14 @@ class ProximityArtifact extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function comments()
+    {
+        return $this->hasMany(ProximityArtifactComment::class);
+    }
+
+    public function votes()
+    {
+        return $this->hasMany(ProximityArtifactVote::class);
+    }
 }

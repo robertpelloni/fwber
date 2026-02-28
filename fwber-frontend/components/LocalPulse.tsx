@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { useLocalPulse, useCreateProximityArtifact, useFlagProximityArtifact } from '@/lib/hooks/use-proximity';
+import { useLocalPulse, useCreateProximityArtifact, useFlagProximityArtifact, useVoteArtifact, useCommentArtifact } from '@/lib/hooks/use-proximity';
 import { useLocalPulseRealtime } from '@/lib/hooks/use-local-pulse-realtime';
 import { apiClient } from '@/lib/api/client';
 import {
@@ -22,6 +22,8 @@ import {
   Tag,
   ShoppingBag,
   ShieldCheck,
+  ChevronUp,
+  ChevronDown,
 } from 'lucide-react';
 import type { ProximityArtifact, MatchCandidate, ArtifactType } from '@/types/proximity';
 import ARView from './ar/ARView';
@@ -52,12 +54,19 @@ const ArtifactTypeIcon = ({ type }: { type: ArtifactType }) => {
 const ArtifactCard = ({
   artifact,
   onFlag,
-  onClaim
+  onClaim,
+  onVote,
+  onComment
 }: {
   artifact: ProximityArtifact;
   onFlag: (id: number) => void;
   onClaim: (id: number) => void;
+  onVote: (id: number, value: number) => void;
+  onComment: (id: number, content: string) => void;
 }) => {
+  const [showComments, setShowComments] = useState(false);
+  const [commentText, setCommentText] = useState('');
+
   const getTimeRemaining = (expiresAt: string) => {
     const now = new Date();
     const expires = new Date(expiresAt);
@@ -81,77 +90,146 @@ const ArtifactCard = ({
   const isClaimed = artifact.meta?.claimed;
   const amount = artifact.meta?.amount;
   const isPromotion = artifact.type === 'promotion';
+  const hasVoting = !isPromotion && artifact.type !== 'token_drop';
+  const score = artifact.votes_sum_vote ?? 0;
+  const userVote = artifact.user_vote ?? 0;
+
+  const handleCommentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+    onComment(artifact.id, commentText);
+    setCommentText('');
+    setShowComments(false);
+  };
 
   return (
-    <div className={`rounded-lg border p-4 ${typeColors[artifact.type]} ${isPromotion ? 'shadow-sm' : ''}`}>
-      <div className="flex items-start justify-between mb-2">
-        <div className="flex items-center space-x-2">
-          <ArtifactTypeIcon type={artifact.type} />
-          <span className="text-xs font-medium uppercase">{artifact.type.replace('_', ' ')}</span>
-
-          {artifact.type === 'token_drop' && amount && (
-            <span className="text-xs font-bold bg-yellow-200 px-2 py-0.5 rounded-full">{amount} FWB</span>
-          )}
-
-          {isPromotion && artifact.meta?.discount && (
-            <span className="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
-              {artifact.meta.discount}% OFF
-            </span>
-          )}
-        </div>
-        <button
-          onClick={() => onFlag(artifact.id)}
-          className="text-gray-400 hover:text-red-600 transition-colors"
-          title="Flag for review"
-        >
-          <Flag className="h-4 w-4" />
-        </button>
-      </div>
-
-      {isPromotion && artifact.meta?.merchant_name && (
-        <div className="text-xs font-semibold text-amber-800 mb-1">
-          {artifact.meta.merchant_name}
-        </div>
-      )}
-
-      <p className="text-sm mb-3 font-medium">{artifact.content}</p>
-
-      {isPromotion && artifact.meta?.promo_code && (
-        <div className="mb-3 bg-white/50 p-2 rounded border border-amber-200 border-dashed text-center">
-          <span className="text-xs text-amber-800 block mb-1">PROMO CODE</span>
-          <span className="font-mono font-bold text-lg tracking-wider select-all">
-            {artifact.meta.promo_code}
-          </span>
-        </div>
-      )}
-
-      {artifact.type === 'token_drop' && !isClaimed && (
-        <div className="mb-3">
+    <div className={`rounded-lg border p-4 flex gap-4 ${typeColors[artifact.type]} ${isPromotion ? 'shadow-sm' : ''}`}>
+      {/* Vote Component */}
+      {hasVoting && (
+        <div className="flex flex-col items-center justify-start space-y-1 w-8 flex-shrink-0">
           <button
-            onClick={() => onClaim(artifact.id)}
-            className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 rounded shadow-sm flex justify-center items-center gap-2"
+            onClick={() => onVote(artifact.id, userVote === 1 ? 0 : 1)}
+            className={`p-1 rounded hover:bg-black/5 transition-colors ${userVote === 1 ? 'text-orange-600' : 'text-gray-500'}`}
           >
-            <Coins className="w-4 h-4" />
-            Claim {amount} FWB
+            <ChevronUp className="w-6 h-6" />
+          </button>
+          <span className={`font-bold text-sm ${userVote === 1 ? 'text-orange-600' : userVote === -1 ? 'text-blue-600' : 'text-gray-700'}`}>
+            {score}
+          </span>
+          <button
+            onClick={() => onVote(artifact.id, userVote === -1 ? 0 : -1)}
+            className={`p-1 rounded hover:bg-black/5 transition-colors ${userVote === -1 ? 'text-blue-600' : 'text-gray-500'}`}
+          >
+            <ChevronDown className="w-6 h-6" />
           </button>
         </div>
       )}
 
-      {artifact.type === 'token_drop' && isClaimed && (
-        <div className="mb-3 text-center text-xs font-bold text-gray-500 bg-gray-100 py-2 rounded">
-          CLAIMED
-        </div>
-      )}
+      {/* Main Content */}
+      <div className="flex-1 min-w-0">
+        <div className="flex justify-between items-start mb-2">
+          <div className="flex items-center space-x-2">
+            <ArtifactTypeIcon type={artifact.type} />
+            <span className="text-xs font-medium uppercase">{artifact.type.replace('_', ' ')}</span>
 
-      <div className="flex items-center justify-between text-xs text-gray-600">
-        <div className="flex items-center space-x-1">
-          <MapPin className="h-3 w-3" />
-          <span>{Math.round(artifact.radius)}m radius</span>
+            {artifact.type === 'token_drop' && amount && (
+              <span className="text-xs font-bold bg-yellow-200 px-2 py-0.5 rounded-full">{amount} FWB</span>
+            )}
+
+            {isPromotion && artifact.meta?.discount && (
+              <span className="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
+                {artifact.meta.discount}% OFF
+              </span>
+            )}
+          </div>
+          <button
+            onClick={() => onFlag(artifact.id)}
+            className="text-gray-400 hover:text-red-600 transition-colors"
+            title="Flag for review"
+          >
+            <Flag className="h-4 w-4" />
+          </button>
         </div>
-        <div className="flex items-center space-x-1">
-          <Clock className="h-3 w-3" />
-          <span>{getTimeRemaining(artifact.expires_at)}</span>
+
+        {isPromotion && artifact.meta?.merchant_name && (
+          <div className="text-xs font-semibold text-amber-800 mb-1">
+            {artifact.meta.merchant_name}
+          </div>
+        )}
+
+        <p className="text-sm mb-3 font-medium">{artifact.content}</p>
+
+        {isPromotion && artifact.meta?.promo_code && (
+          <div className="mb-3 bg-white/50 p-2 rounded border border-amber-200 border-dashed text-center">
+            <span className="text-xs text-amber-800 block mb-1">PROMO CODE</span>
+            <span className="font-mono font-bold text-lg tracking-wider select-all">
+              {artifact.meta.promo_code}
+            </span>
+          </div>
+        )}
+
+        {artifact.type === 'token_drop' && !isClaimed && (
+          <div className="mb-3">
+            <button
+              onClick={() => onClaim(artifact.id)}
+              className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 rounded shadow-sm flex justify-center items-center gap-2"
+            >
+              <Coins className="w-4 h-4" />
+              Claim {amount} FWB
+            </button>
+          </div>
+        )}
+
+        {artifact.type === 'token_drop' && isClaimed && (
+          <div className="mb-3 text-center text-xs font-bold text-gray-500 bg-gray-100 py-2 rounded">
+            CLAIMED
+          </div>
+        )}
+
+        <div className="flex flex-wrap items-center justify-between gap-y-2 text-xs text-gray-600">
+          <div className="flex space-x-3">
+            {hasVoting && (
+              <button
+                onClick={() => setShowComments(!showComments)}
+                className="flex items-center space-x-1 hover:text-gray-900 transition-colors p-1 rounded hover:bg-black/5"
+              >
+                <MessageCircle className="h-3 w-3" />
+                <span className="font-medium">{artifact.comments_count ?? 0} Comments</span>
+              </button>
+            )}
+            <div className="flex items-center space-x-1 p-1">
+              <MapPin className="h-3 w-3" />
+              <span>{Math.round(artifact.radius)}m radius</span>
+            </div>
+          </div>
+          <div className="flex items-center space-x-1 p-1">
+            <Clock className="h-3 w-3" />
+            <span>{getTimeRemaining(artifact.expires_at)}</span>
+          </div>
         </div>
+
+        {/* Comment Entry Area */}
+        {showComments && hasVoting && (
+          <div className="mt-4 pt-3 border-t border-black/10">
+            <form onSubmit={handleCommentSubmit} className="flex gap-2">
+              <input
+                type="text"
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                placeholder="Add a comment..."
+                className="flex-1 px-3 py-1.5 text-sm bg-white border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                maxLength={500}
+              />
+              <button
+                type="submit"
+                disabled={!commentText.trim()}
+                className="bg-blue-600 text-white px-3 py-1.5 rounded text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              >
+                Post
+              </button>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -247,6 +325,8 @@ export default function LocalPulse() {
 
   const createArtifact = useCreateProximityArtifact();
   const flagArtifact = useFlagProximityArtifact();
+  const voteArtifact = useVoteArtifact();
+  const commentArtifact = useCommentArtifact();
 
   // Get user location
   useEffect(() => {
@@ -316,6 +396,24 @@ export default function LocalPulse() {
       await flagArtifact.mutateAsync({ id, token });
     } catch (err) {
       console.error('Failed to flag artifact:', err);
+    }
+  };
+
+  const handleVoteArtifact = async (id: number, value: number) => {
+    if (!token) return;
+    try {
+      await voteArtifact.mutateAsync({ id, vote: value, token });
+    } catch (err) {
+      console.error('Failed to vote:', err);
+    }
+  };
+
+  const handleCommentArtifact = async (id: number, content: string) => {
+    if (!token || !content.trim()) return;
+    try {
+      await commentArtifact.mutateAsync({ id, content, token });
+    } catch (err) {
+      console.error('Failed to comment:', err);
     }
   };
 
@@ -525,10 +623,12 @@ export default function LocalPulse() {
               <div className="space-y-3">
                 {localPulse.artifacts.map((artifact) => (
                   <ArtifactCard
-                    key={artifact.id}
+                    key={`artifact-${artifact.id}`}
                     artifact={artifact}
                     onFlag={handleFlagArtifact}
                     onClaim={handleClaimArtifact}
+                    onVote={handleVoteArtifact}
+                    onComment={handleCommentArtifact}
                   />
                 ))}
               </div>

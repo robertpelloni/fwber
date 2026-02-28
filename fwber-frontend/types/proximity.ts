@@ -23,6 +23,9 @@ export interface ProximityArtifact {
     promo_code?: string;
     is_sponsored?: boolean;
   };
+  comments_count?: number;
+  votes_sum_vote?: number;
+  user_vote?: number;
 }
 
 export interface MatchCandidate {

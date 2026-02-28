@@ -339,6 +339,11 @@ class ProximityArtifactController extends Controller
         $response = Cache::remember($cacheKey, 120, function () use ($user, $profile, $lat, $lng, $radius) {
             // Get proximity artifacts with shadow throttle filtering
             $artifacts = ProximityArtifact::query()
+                ->withCount('comments')
+                ->withSum('votes', 'vote')
+                ->with(['votes' => function($q) use ($user) {
+                    $q->where('user_id', $user->id);
+                }])
                 ->active()
                 ->withinBox($lat, $lng, $radius)
                 ->orderByDesc('created_at')
@@ -368,6 +373,9 @@ class ProximityArtifactController extends Controller
                         'created_at' => $a->created_at?->toIso8601String(),
                         'meta' => $a->meta,
                         'user_id' => $a->user_id,
+                        'comments_count' => $a->comments_count ?? 0,
+                        'votes_sum_vote' => (int) $a->votes_sum_vote ?? 0,
+                        'user_vote' => $a->votes->first()?->vote ?? 0,
                     ];
                 });
 
@@ -398,6 +406,9 @@ class ProximityArtifactController extends Controller
                             'is_sponsored' => true,
                         ],
                         'user_id' => null,
+                        'comments_count' => 0,
+                        'votes_sum_vote' => 0,
+                        'user_vote' => 0,
                     ];
                 });
 

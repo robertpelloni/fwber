@@ -90,3 +90,35 @@ export function useDeleteProximityArtifact() {
     },
   });
 }
+
+/**
+ * Hook to add a comment to an artifact
+ */
+export function useCommentArtifact() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, content, token }: { id: number; content: string; token: string }) =>
+      proximityApi.commentArtifact(id, content, token),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['local-pulse'] });
+      queryClient.invalidateQueries({ queryKey: ['proximity-artifacts'] });
+    },
+  });
+}
+
+/**
+ * Hook to vote on an artifact
+ */
+export function useVoteArtifact() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, vote, token }: { id: number; vote: number; token: string }) =>
+      proximityApi.voteArtifact(id, vote, token),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['local-pulse'] });
+      queryClient.invalidateQueries({ queryKey: ['proximity-artifacts'] });
+    },
+  });
+}
