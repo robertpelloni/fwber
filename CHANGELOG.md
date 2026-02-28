@@ -2,6 +2,14 @@ oProceedrocddPro# Changelog
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3] - 2026-02-28
+### Added
+- **AI Date Planner**: Personalized date itinerary generator using the existing AI Wingman backend (`/date-planner`).
+- Vertical timeline UI with color-coded step cards, venue/cost/duration metadata, and expandable conversation starters.
+- Geolocation auto-fill for location-aware AI suggestions.
+- `useDateIdeas` React Query hook and `date-planner.ts` API client.
+- Added "Date Planner" nav link with `CalendarHeart` icon to `AppHeader.tsx`.
+
 ## [1.0.2] - 2026-02-28
 ### Added
 - **Ice Breaker Cards**: Structured AMA-style question cards for first-contact gamification (`/ice-breakers`).
