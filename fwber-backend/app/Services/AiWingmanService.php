@@ -1087,4 +1087,82 @@ EOT;
             'narrative' => 'There\'s potential here — complete your profiles to see a more detailed analysis!',
         ];
     }
+
+    /**
+     * Analyze a conversation history to determine if a proactive "nudge" is needed.
+     * Returns null if the conversation is flowing well, or an array with a suggestion.
+     *
+     * @param User $user The user receiving the nudge
+     * @param User $match The other participant
+     * @param array $history Sequential array of last N messages
+     * @return array|null 
+     */
+    public function generateProactiveNudge(User $user, User $match, array $history): ?array
+    {
+        $prompt = $this->buildProactiveNudgePrompt($user, $match, $history);
+
+        try {
+            $response = $this->llmManager->driver()->chat([
+                ['role' => 'system', 'content' => 'You are an exceptionally perceptive dating coach and wingman. You monitor conversation histories to identify when a user should be nudged. Your goal is to keep things moving forward realistically. If the conversation is flowing well, do not intervene. Only suggest an action when there is a clear opportunity (e.g., they are hitting it off and should meet) or when the conversation is stalling.'],
+                ['role' => 'user', 'content' => $prompt]
+            ], ['temperature' => 0.5]);
+
+            return $this->parseProactiveNudge($response->content);
+        } catch (\Exception $e) {
+            Log::error("AiWingmanService: Failed to generate proactive nudge: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    protected function buildProactiveNudgePrompt(User $user, User $match, array $history): string
+    {
+        $conversation = "";
+        foreach ($history as $msg) {
+            $sender = ($msg['sender_id'] == $user->id) ? "Me" : "Target";
+            $content = $msg['content'] ?? '[Audio/Media]';
+            if (!empty($msg['transcription'])) {
+                $content = $msg['transcription'];
+            }
+            $conversation .= "{$sender}: {$content}\n";
+        }
+
+        return <<<EOT
+Here is the recent conversation history between "Me" and "Target":
+
+{$conversation}
+
+Analyze the flow based on the following rules:
+1. Is the conversation natural and engaging? -> NO NUDGE NEEDED.
+2. Are they consistently agreeing on shared interests and showing high mutual enthusiasm? -> SUGGESTION: Ask them on a date related to those interests.
+3. Has the conversation stalled on boring small talk (e.g., "how are you", "good, you?") for too long? -> SUGGESTION: Pivot the topic to a deeper interest (reference their profile).
+4. Is "Me" sending multiple back-to-back unanswered messages or coming on too strong? -> SUGGESTION: Back off and give them space.
+
+Output strict JSON:
+{
+    "needs_nudge": true or false,
+    "type": "ask_out" | "pivot_topic" | "back_off" | "warning",
+    "message": "The actual short, friendly advice you would give to 'Me' as a wingman. (Max 2 sentences)"
+}
+
+If "needs_nudge" is false, "type" and "message" can be null.
+EOT;
+    }
+
+    protected function parseProactiveNudge(string $content): ?array
+    {
+        $content = preg_replace('/^```json\s*|\s*```$/', '', trim($content));
+        $decoded = json_decode($content, true);
+
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            if (isset($decoded['needs_nudge']) && $decoded['needs_nudge'] === true) {
+                return [
+                    'type' => $decoded['type'] ?? 'general',
+                    'message' => $decoded['message'] ?? 'Why not ask them about their weekend plans?'
+                ];
+            }
+        }
+
+        // Return null if no nudge is needed or if parsing fails safely
+        return null;
+    }
 }

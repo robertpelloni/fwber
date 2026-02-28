@@ -15,11 +15,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   return usePusherLogic(options);
 }
 
-/**
- * Hook for WebSocket chat functionality
- */
 export function useWebSocketChat(recipientId?: string) {
-  const { sendChatMessage, sendTypingIndicator, chatMessages, typingIndicators, onlineUsers } = useWebSocket();
+  const { sendChatMessage, sendTypingIndicator, chatMessages, typingIndicators, onlineUsers, wingmanNudges } = useWebSocket();
 
   const [isTyping, setIsTyping] = useState(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -33,6 +30,11 @@ export function useWebSocketChat(recipientId?: string) {
   const recipientTyping = typingIndicators.filter((indicator: any) =>
     (indicator.from_user_id === recipientId || indicator.to_user_id === recipientId)
   );
+
+  // Filter nudges specifically involving this recipient
+  const currentNudges = wingmanNudges?.filter((nudge: any) =>
+    nudge.senderId === parseInt(recipientId || '0')
+  ) || [];
 
   const handleSendMessage = useCallback((content: string, type: string = 'text') => {
     if (recipientId) {
@@ -89,6 +91,7 @@ export function useWebSocketChat(recipientId?: string) {
     isTyping,
     chatMessages, // Add for ChatList component
     onlineUsers, // Add for OnlineUsers component
+    currentNudges, // Surface active wingman nudges to the UI
   };
 }
 

@@ -257,6 +257,11 @@ class MessageController extends Controller
             TranscribeAudioMessage::dispatch($message);
         }
 
+        // Proactive Wingman Nudge: Analyze the conversation flow every 5 messages
+        if ($tier->messages_exchanged > 0 && $tier->messages_exchanged % 5 === 0) {
+            \App\Jobs\AnalyzeConversationNudge::dispatch($receiverId, $senderId);
+        }
+
         return response()->json([
             'message' => $message,
             'tier_update' => [

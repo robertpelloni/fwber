@@ -51,6 +51,7 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [typingIndicators, setTypingIndicators] = useState<TypingIndicator[]>([]);
   const [videoSignals, setVideoSignals] = useState<VideoSignal[]>([]);
+  const [wingmanNudges, setWingmanNudges] = useState<any[]>([]);
 
   const echoRef = useRef<any>(null);
 
@@ -84,6 +85,9 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
     switch (data.type) {
       case 'chat_message':
         setChatMessages(prev => [...prev.slice(-99), data]);
+        break;
+      case 'wingman_nudge':
+        setWingmanNudges(prev => [...prev.slice(-9), data]);
         break;
       case 'presence_update':
         setPresenceUpdates(prev => [...prev.slice(-49), data]);
@@ -140,7 +144,8 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
         .listen('.ChatMessageSent', (e: any) => handleMessage({ ...e, type: 'chat_message' }))
         .listen('.NotificationSent', (e: any) => handleMessage({ ...e, type: 'notification' }))
         .listen('.TypingIndicator', (e: any) => handleMessage({ ...e, type: 'typing_indicator' }))
-        .listen('.VideoSignal', (e: any) => handleMessage({ ...e, type: 'video_signal' }));
+        .listen('.VideoSignal', (e: any) => handleMessage({ ...e, type: 'video_signal' }))
+        .listen('ConversationNudged', (e: any) => handleMessage({ ...e, type: 'wingman_nudge' }));
 
       // Subscribe to presence channel (if needed)
       // echo.join('online')
@@ -350,6 +355,7 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
     chatMessages,
     typingIndicators,
     videoSignals,
+    wingmanNudges,
     connect,
     disconnect,
     sendChatMessage,
@@ -373,6 +379,7 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
     chatMessages,
     typingIndicators,
     videoSignals,
+    wingmanNudges,
     connect,
     disconnect,
     sendChatMessage,

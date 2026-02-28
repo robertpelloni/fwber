@@ -22,6 +22,7 @@ import TipButton from '@/components/tipping/TipButton';
 import { ConversationCoach } from '@/components/chat/ConversationCoach';
 import { TierUnlockGuide } from '@/components/chat/TierUnlockGuide';
 import Image from 'next/image';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface RealTimeChatProps {
   recipientId: string;
@@ -145,7 +146,18 @@ export default function RealTimeChat({
     sendMessage,
     handleTypingChange,
     isTyping,
+    currentNudges,
   } = useWebSocketChat(recipientId);
+
+  const [activeNudge, setActiveNudge] = useState<any>(null);
+
+  // When a new nudge arrives, set it to active and show the banner
+  useEffect(() => {
+    if (currentNudges && currentNudges.length > 0) {
+      // Show the most recent one
+      setActiveNudge(currentNudges[currentNudges.length - 1]);
+    }
+  }, [currentNudges]);
 
   const { loadConversationHistory, connectionStatus } = useWebSocket();
 
@@ -419,6 +431,38 @@ export default function RealTimeChat({
 
       {/* Tier Unlock Guide Overlay */}
       <TierUnlockGuide matchId={recipientId} />
+
+      {/* Wingman Proactive Nudge Banner */}
+      <AnimatePresence>
+        {activeNudge && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, scale: 0.95, height: 0 }}
+            className="px-4 pt-2 -mb-2 z-10"
+          >
+            <div className="bg-gradient-to-r from-red-900/40 to-pink-900/40 border border-red-500/30 rounded-lg p-3 flex gap-3 items-start shadow-xl backdrop-blur-sm">
+              <div className="p-2 bg-red-500/20 rounded-full text-pink-400 shrink-0">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-red-400 font-semibold text-sm flex items-center justify-between">
+                  Wingman Suggestion
+                  <button
+                    onClick={() => setActiveNudge(null)}
+                    className="text-gray-400 hover:text-white transition-colors p-1"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </h4>
+                <p className="text-gray-200 text-sm mt-1 leading-snug">
+                  {activeNudge.nudge?.message || activeNudge.message || "Consider asking them out!"}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
