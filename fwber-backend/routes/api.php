@@ -460,6 +460,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('media/analyze', [\App\Http\Controllers\MediaAnalysisController::class, 'analyze']);
     });
 
+    // Ice Breaker Cards
+    Route::get('ice-breakers/questions', [\App\Http\Controllers\IceBreakerController::class, 'getQuestions']);
+    Route::post('ice-breakers/answer', [\App\Http\Controllers\IceBreakerController::class, 'submitAnswer']);
+    Route::get('ice-breakers/answers/{matchId}', [\App\Http\Controllers\IceBreakerController::class, 'getAnswers']);
+
     // AI Wingman
     Route::middleware('feature:ai_wingman')->group(function () {
         Route::get('wingman/ice-breakers/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'getIceBreakers']);

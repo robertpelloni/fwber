@@ -1,6 +1,15 @@
-oProceeddPro# Changelog
+oProceedrocddPro# Changelog
 
 All notable changes to this project will be documented in this file.
+
+## [1.0.2] - 2026-02-28
+### Added
+- **Ice Breaker Cards**: Structured AMA-style question cards for first-contact gamification (`/ice-breakers`).
+- Backend: `IceBreakerQuestion` + `IceBreakerAnswer` models, migration, seeder (30 curated questions across fun/deep/creative/spicy).
+- `IceBreakerController` with `getQuestions`, `submitAnswer`, `getAnswers` endpoints.
+- 3D flip-card frontend page with category-colored borders, progress dots, and mutual reveal mechanic.
+- React Query hooks: `useIceBreakerQuestions`, `useSubmitIceBreakerAnswer`, `useIceBreakerAnswers`.
+- Restored corrupted `AppHeader.tsx` with Conference Pulse nav link.
 
 ## [1.0.1] - 2026-02-28
 ### Added
