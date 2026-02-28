@@ -25,6 +25,20 @@ class AvatarGenerationTest extends TestCase
         // Mock config to ensure we use DALL-E for this test
         Config::set('avatar_generation.default_provider', 'dalle');
         Config::set('avatar_generation.providers.dalle.api_key', 'sk-test-key');
+
+        // Ensure tests work without PHP Redis extension
+        Config::set('cache.default', 'array');
+    }
+
+    /**
+     * Helper: skip if Redis extension not loaded (needed for service-level tests
+     * that resolve the full app container including Redis-backed rate limiters).
+     */
+    private function requireRedis(): void
+    {
+        if (!extension_loaded('redis')) {
+            $this->markTestSkipped('PHP Redis extension not installed.');
+        }
     }
 
     /**
@@ -62,6 +76,7 @@ class AvatarGenerationTest extends TestCase
      */
     public function test_service_generates_prompt_with_detailed_attributes()
     {
+        $this->requireRedis();
         $user = User::factory()->create();
         
         // Create a detailed profile
@@ -127,6 +142,7 @@ class AvatarGenerationTest extends TestCase
      */
     public function test_service_uses_request_options_over_profile_data()
     {
+        $this->requireRedis();
         $user = User::factory()->create();
         UserProfile::create([
             'user_id' => $user->id,
@@ -165,6 +181,7 @@ class AvatarGenerationTest extends TestCase
      */
     public function test_service_rejects_unsafe_generated_avatar()
     {
+        $this->requireRedis();
         Config::set('features.media_analysis', true);
         $user = User::factory()->create();
         UserProfile::create(['user_id' => $user->id, 'gender' => 'male']);

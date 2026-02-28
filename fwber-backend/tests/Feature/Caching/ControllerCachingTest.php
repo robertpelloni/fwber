@@ -13,6 +13,19 @@ class ControllerCachingTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // These tests validate Cache::tags() which requires Redis.
+        // Skip gracefully when the PHP Redis extension is not available.
+        if (!extension_loaded('redis')) {
+            $this->markTestSkipped('PHP Redis extension not installed — Cache::tags() tests require Redis.');
+        }
+
+        $this->withoutMiddleware(\App\Http\Middleware\CheckDailyBonus::class);
+    }
+
     public function test_recommendations_are_cached()
     {
         $this->withoutMiddleware(\App\Http\Middleware\TrackUserActivity::class);
