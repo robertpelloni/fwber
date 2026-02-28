@@ -334,5 +334,36 @@ class AiWingmanController extends Controller
 
         return response()->json(array_merge($result, ['share_id' => $shareId]));
     }
+
+    /**
+     * Generate a deep AI-powered "Compatibility Audit" for a matched user.
+     * Requires mutual match. Token-gated (5 FWB tokens).
+     *
+     * @param Request $request
+     * @param string $targetId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function compatibilityAudit(Request $request, string $targetId)
+    {
+        $user = Auth::user();
+        $target = User::findOrFail($targetId);
+
+        // Verify mutual match
+        $isMatched = \App\Models\UserMatch::where(function($q) use ($user, $targetId) {
+            $q->where('user1_id', $user->id)->where('user2_id', $targetId);
+        })->orWhere(function($q) use ($user, $targetId) {
+            $q->where('user1_id', $targetId)->where('user2_id', $user->id);
+        })->exists();
+
+        if (!$isMatched) {
+            return response()->json(['error' => 'You must be matched with this user to request a compatibility audit.'], 403);
+        }
+
+        $audit = $this->wingmanService->generateCompatibilityAudit($user, $target);
+
+        $shareId = $this->saveViralContent($user, 'compatibility_audit', $audit);
+
+        return response()->json(array_merge($audit, ['share_id' => $shareId]));
+    }
 }
 

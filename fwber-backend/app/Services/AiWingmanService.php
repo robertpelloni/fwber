@@ -942,5 +942,149 @@ EOT;
             'emoji' => '🟫'
         ];
     }
+
+    /**
+     * Generate a deep AI-powered "Compatibility Audit" for two matched users.
+     * Analyzes shared life goals, ethical frameworks, and long-term alignment.
+     *
+     * @param User $user
+     * @param User $target
+     * @return array Structured audit result
+     */
+    public function generateCompatibilityAudit(User $user, User $target): array
+    {
+        // Deterministic cache key — same pair always gets the same audit
+        $pairKey = min($user->id, $target->id) . ':' . max($user->id, $target->id);
+        $cacheKey = "wingman:compatibility_audit:{$pairKey}";
+
+        return Cache::remember($cacheKey, 86400, function () use ($user, $target) {
+            $userProfile = $user->profile;
+            $targetProfile = $target->profile;
+
+            if (!$userProfile || !$targetProfile) {
+                return $this->fallbackCompatibilityAudit();
+            }
+
+            $prompt = $this->buildCompatibilityAuditPrompt($user, $userProfile, $target, $targetProfile);
+
+            try {
+                $response = $this->llmManager->driver()->chat([
+                    ['role' => 'system', 'content' => 'You are a relationship psychologist and compatibility analyst. Your task is to provide a thoughtful, structured compatibility audit for two people based on their profiles. Be insightful, nuanced, and constructive. Focus on life goals, values, communication styles, and long-term potential — not just surface-level interests.'],
+                    ['role' => 'user', 'content' => $prompt]
+                ], ['temperature' => 0.7]);
+
+                return $this->parseCompatibilityAudit($response->content);
+            } catch (\Exception $e) {
+                Log::error("AiWingmanService: Failed to generate compatibility audit: " . $e->getMessage());
+                return $this->fallbackCompatibilityAudit();
+            }
+        });
+    }
+
+    protected function buildCompatibilityAuditPrompt(User $user, $userProfile, User $target, $targetProfile): string
+    {
+        $userBio = $userProfile->bio ?? 'No bio';
+        $userInterests = implode(', ', $userProfile->interests ?? []);
+        $userJob = $userProfile->occupation ?? 'Unknown';
+        $userAge = $userProfile->age ?? 'Unknown';
+        $userPersonality = $userProfile->personality_type ?? 'Unknown';
+        $userLoveLanguage = $userProfile->love_language ?? 'Unknown';
+        $userPolitics = $userProfile->political_views ?? 'Unknown';
+        $userReligion = $userProfile->religion ?? 'Unknown';
+        $userChildren = $userProfile->wants_children ?? 'Unknown';
+        $userDrinking = $userProfile->drinking ?? 'Unknown';
+        $userSmoking = $userProfile->smoking ?? 'Unknown';
+        $userSleep = $userProfile->sleep_schedule ?? 'Unknown';
+
+        $targetBio = $targetProfile->bio ?? 'No bio';
+        $targetInterests = implode(', ', $targetProfile->interests ?? []);
+        $targetJob = $targetProfile->occupation ?? 'Unknown';
+        $targetAge = $targetProfile->age ?? 'Unknown';
+        $targetPersonality = $targetProfile->personality_type ?? 'Unknown';
+        $targetLoveLanguage = $targetProfile->love_language ?? 'Unknown';
+        $targetPolitics = $targetProfile->political_views ?? 'Unknown';
+        $targetReligion = $targetProfile->religion ?? 'Unknown';
+        $targetChildren = $targetProfile->wants_children ?? 'Unknown';
+        $targetDrinking = $targetProfile->drinking ?? 'Unknown';
+        $targetSmoking = $targetProfile->smoking ?? 'Unknown';
+        $targetSleep = $targetProfile->sleep_schedule ?? 'Unknown';
+
+        return <<<EOT
+Perform a deep Compatibility Audit for these two people.
+
+PERSON A:
+- Age: {$userAge}, Job: {$userJob}
+- Bio: "{$userBio}"
+- Interests: {$userInterests}
+- Personality: {$userPersonality}, Love Language: {$userLoveLanguage}
+- Views: Politics: {$userPolitics}, Religion: {$userReligion}
+- Lifestyle: Children: {$userChildren}, Drinking: {$userDrinking}, Smoking: {$userSmoking}, Sleep: {$userSleep}
+
+PERSON B:
+- Age: {$targetAge}, Job: {$targetJob}
+- Bio: "{$targetBio}"
+- Interests: {$targetInterests}
+- Personality: {$targetPersonality}, Love Language: {$targetLoveLanguage}
+- Views: Politics: {$targetPolitics}, Religion: {$targetReligion}
+- Lifestyle: Children: {$targetChildren}, Drinking: {$targetDrinking}, Smoking: {$targetSmoking}, Sleep: {$targetSleep}
+
+Analyze their deep compatibility across: life goals, ethical/political alignment, communication style, lifestyle harmony, and long-term potential.
+
+Output strict JSON:
+{
+    "overall_score": 78,
+    "alignment_areas": [
+        {"area": "Shared Adventurous Spirit", "strength": 9, "detail": "Both value new experiences..."}
+    ],
+    "friction_points": [
+        {"area": "Sleep Schedule Mismatch", "severity": 6, "detail": "One is a night owl..."}
+    ],
+    "growth_potential": [
+        {"area": "Complementary Communication", "detail": "Their different styles could balance..."}
+    ],
+    "narrative": "A 2-3 sentence personalized summary of their compatibility."
 }
 
+- overall_score: 0-100 integer
+- alignment_areas: 3-5 items, strength 1-10
+- friction_points: 2-4 items, severity 1-10
+- growth_potential: 2-3 items describing how differences could complement
+- narrative: warm, constructive, specific to these two people
+EOT;
+    }
+
+    protected function parseCompatibilityAudit(string $content): array
+    {
+        $content = preg_replace('/^```json\s*|\s*```$/', '', trim($content));
+        $decoded = json_decode($content, true);
+
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            return [
+                'overall_score' => $decoded['overall_score'] ?? 50,
+                'alignment_areas' => $decoded['alignment_areas'] ?? [],
+                'friction_points' => $decoded['friction_points'] ?? [],
+                'growth_potential' => $decoded['growth_potential'] ?? [],
+                'narrative' => $decoded['narrative'] ?? 'Compatibility analysis complete.',
+            ];
+        }
+
+        return $this->fallbackCompatibilityAudit();
+    }
+
+    protected function fallbackCompatibilityAudit(): array
+    {
+        return [
+            'overall_score' => 50,
+            'alignment_areas' => [
+                ['area' => 'Shared Curiosity', 'strength' => 7, 'detail' => 'Both profiles show an openness to new experiences.']
+            ],
+            'friction_points' => [
+                ['area' => 'Insufficient Data', 'severity' => 3, 'detail' => 'Complete your profiles for a more accurate audit.']
+            ],
+            'growth_potential' => [
+                ['area' => 'Discovery Phase', 'detail' => 'Get to know each other to unlock deeper insights.']
+            ],
+            'narrative' => 'There\'s potential here — complete your profiles to see a more detailed analysis!',
+        ];
+    }
+}
