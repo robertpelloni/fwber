@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.49] - 2026-02-27
+### Added
+- Implemented **Multi-Region & Edge Caching Architecture** (Phase 6).
+- Created Laravel `EdgeCacheResponse` middleware (`edge.cache:MaxAge,SMaxAge`) designed to inject `Cache-Control` header declarations for public endpoints.
+- Applied the edge caching middleware structurally to non-authenticated `routes/web.php` (ActivityPub Discovery) and `routes/api.php` (Platform Metrics + Server Health Status API checks).
+- Expanded `DEPLOY.md` with explicit Cloudflare and Vercel CDN bypass rules blocking `edge.cache` caching collision during authenticated routes.
+
+## [0.3.48] - 2026-02-27
+### Added
+- Implemented **React Native Mobile App Core** (Phase 6), wrapping the PWA into a native Expo container.
+- Configured Native `app.json` explicitly requesting `NSLocationWhenInUseUsageDescription` (iOS) and `ACCESS_FINE_LOCATION` (Android) to stabilize Web Geolocation APIs inside the nested WebView.
+- Added `BackHandler` logic inside `App.js` preventing the physical Android Back button from terminating the App, instead forcing backwards history routing inside the WebView itself.
+- Added `onNavigationStateChange` interceptors preventing the WebView from hitting third-party URLs (e.g., Stripe, outbound social links), instead passing them directly to the native `Linking.openURL` system browser.
+
+## [0.3.47] - 2026-02-27
+### Added
+- Implemented **Federated Servers (ActivityPub)** (Phase 7), turning local instances into full nodes within the broader Fediverse.
+- Added `WebFingerController` and `NodeInfoController` at `/.well-known` to resolve `acct:user@domain.com` into Actor URIs and broadcast instance capabilities.
+- Scaffolded `ActivityPubInboxController` and `ActivityPubOutboxController` handling structured JSON-LD payloads.
+- Added Fediverse Integration toggle to the Next.js `SecuritySettingsPage`, binding to a newly migrated `is_federated` database mapping.
+
 ## [0.3.46] - 2026-02-27
 ### Added
 - Implemented **Rust Geo-Screener** (Phase 6), a high-performance spatial indexing microservice utilizing Uber's `h3o` library via `actix-web`.

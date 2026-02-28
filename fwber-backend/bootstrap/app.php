@@ -25,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'feature' => \App\Http\Middleware\FeatureEnabled::class,
             'rate_limit_advanced' => \App\Http\Middleware\AdvancedRateLimiting::class,
+            'edge.cache' => \App\Http\Middleware\EdgeCacheResponse::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

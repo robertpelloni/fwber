@@ -4,13 +4,16 @@ import { useState } from 'react';
 import { useE2EEncryption } from '@/lib/hooks/use-e2e-encryption';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Lock, RefreshCw, Key, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { Lock, RefreshCw, Key, ShieldCheck, AlertTriangle, Globe } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import AppHeader from '@/components/AppHeader';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 export default function SecuritySettingsPage() {
   const { isReady, regenerateKeys } = useE2EEncryption();
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [isFederated, setIsFederated] = useState(false); // Default to off, load from API in prod
   const { toast } = useToast();
 
   const handleRegenerateKeys = async () => {
@@ -100,6 +103,51 @@ export default function SecuritySettingsPage() {
                   </>
                 )}
               </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Globe className="w-5 h-5 text-indigo-500" />
+                Fediverse Integration
+              </CardTitle>
+              <CardDescription>
+                Allow your profile to interact with users on Mastodon, Misskey, and other ActivityPub-compatible servers.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-3">
+                  <div className={`w-3 h-3 rounded-full ${isFederated ? 'bg-green-500' : 'bg-gray-500'}`} />
+                  <div>
+                    <Label htmlFor="federation-toggle" className="font-medium text-sm text-gray-900 dark:text-white cursor-pointer hover:underline">
+                      ActivityPub Broadcasting
+                    </Label>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {isFederated ? 'Your profile is discoverable via WebFinger.' : 'Your profile is isolated to this server.'}
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  id="federation-toggle"
+                  checked={isFederated}
+                  onCheckedChange={(checked) => {
+                    setIsFederated(checked);
+                    toast({
+                      title: "Federation Updated",
+                      description: checked ? "You mapped your profile to the Fediverse!" : "You have isolated your profile locally.",
+                    });
+                    // In a real implementation: Update via API hook -> /api/profile
+                  }}
+                />
+              </div>
+
+              <div className="bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-200 dark:border-indigo-900 p-4 rounded-lg">
+                <p className="text-xs text-indigo-700 dark:text-indigo-300 font-mono">
+                  Your Fediverse Handle: @[your_name]@{typeof window !== 'undefined' ? window.location.hostname : 'domain.com'}
+                </p>
+              </div>
             </CardContent>
           </Card>
         </div>

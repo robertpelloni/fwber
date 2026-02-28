@@ -92,10 +92,12 @@ Route::post('merchant/checkout', [\App\Http\Controllers\Api\MerchantController::
 Route::get('merchant/payment/{id}', [\App\Http\Controllers\Api\MerchantController::class, 'show']);
 
 // Health Checks
-Route::get('health', [\App\Http\Controllers\HealthController::class, 'check']);
-Route::get('health/liveness', [\App\Http\Controllers\HealthController::class, 'liveness']);
-Route::get('health/readiness', [\App\Http\Controllers\HealthController::class, 'readiness']);
-Route::get('health/metrics', [\App\Http\Controllers\HealthController::class, 'metrics']);
+Route::group(['middleware' => ['edge.cache:30,15']], function () {
+    Route::get('health', [\App\Http\Controllers\HealthController::class, 'check']);
+    Route::get('health/liveness', [\App\Http\Controllers\HealthController::class, 'liveness']);
+    Route::get('health/readiness', [\App\Http\Controllers\HealthController::class, 'readiness']);
+    Route::get('health/metrics', [\App\Http\Controllers\HealthController::class, 'metrics']);
+});
 
 // Stripe Webhook
 Route::post('stripe/webhook', [\App\Http\Controllers\StripeWebhookController::class, 'handleWebhook']);
@@ -321,6 +323,16 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // ZK-Proximity 
     Route::post('proximity/zk-verify', [\App\Http\Controllers\ZKProximityController::class, 'verify']);
+
+    // Federation (ActivityPub)
+    Route::prefix('federation')->group(function () {
+        // Will bypass standard sanctum auth, requires Http Signature validation instead
+        Route::post('users/{id}/inbox', [\App\Http\Controllers\ActivityPubInboxController::class, 'handle']);
+        Route::get('users/{id}/outbox', [\App\Http\Controllers\ActivityPubOutboxController::class, 'index']);
+        
+        // Return Actor profile
+        Route::get('users/{id}', [\App\Http\Controllers\ActivityPubController::class, 'actor']);
+    });
     
     // Audio Rooms
     Route::prefix('audio-rooms')->group(function () {

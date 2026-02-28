@@ -1,7 +1,7 @@
 # DEPLOY.md — The fwber Operations Guide
 
 > **Last Updated:** 2026-02-27 by Claude (Antigravity)
-> **Version:** 0.3.38
+> **Version:** 0.3.49
 
 This document serves as the single source of truth for deploying the fwber monorepo across various environments.
 
@@ -93,3 +93,18 @@ Always run this checklist after a major version bump:
 3. [ ] Perform a test login.
 4. [ ] Upload a test photo (verifies S3/Disk permissions).
 5. [ ] Establish a test chat (verifies WebSocket persistence).
+
+---
+
+## 🌍 6. Multi-Region & CDN Edge Caching
+
+To scale globally, the fwber architecture relies on **Edge Caching** (via Vercel for the frontend, and Cloudflare for the backend API). 
+
+### Backend (Cloudflare)
+1. Ensure the domain is proxied (Orange Cloud) through Cloudflare.
+2. In Cloudflare **Caching rules**, create a rule bypassing cache entirely for any request containing the `Authorization` header, or routes matching `*/api/*` (excluding Health routes). 
+3. The Laravel app internally applies `EdgeCacheResponse` (alias: `edge.cache`) to globally safe endpoints like `/.well-known/webfinger` and `/api/health`. Cloudflare will automatically respect these `s-maxage` parameters and serve responses directly from the Edge.
+4. **Data Spillage Warning**: Never attach `edge.cache` to endpoints dealing with `auth:sanctum`.
+
+### Frontend (Vercel Edge)
+Vercel automatically distributes static assets globally. For dynamic routes, rely on `SWR` (Stale-While-Revalidate) caching provided by Next.js's native `fetch` extended cache parameters, keeping TTFB as low as possible across regions.

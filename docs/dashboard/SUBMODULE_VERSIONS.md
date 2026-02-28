@@ -1,7 +1,7 @@
 # Submodule & Component Versions Dashboard
 
-> **Last Updated:** 2026-02-27 by Claude (Antigravity)
-> **Core Version:** 0.3.38
+> **Last Updated:** 2026-02-27 by Gemini (Antigravity)
+> **Core Version:** 0.3.49
 
 ## Architectural Scope: Pure Monorepo
 
@@ -27,9 +27,21 @@ While there are no git submodules, the project is internally divided into two di
 *   **AI Integrations:** `openai-php/client`
 *   *(Run `composer show` in `/fwber-backend` for exact live vendor versions)*
 
-#### 3. Infrastructure (`/docker`, `/kubernetes`)
+#### 3. Geo-Screener Microservice (`/fwber-geo`)
+*   **Language:** Rust (2024 Edition)
+*   **Framework:** Actix-Web 4.x
+*   **Geospatial:** h3o (Uber H3 bindings)
+*   *(Run `cargo tree` in `/fwber-geo` for exact live dependency versions)*
+
+#### 4. Mobile Shell (`/mobile`)
+*   **Framework:** Expo SDK 55 (React Native 0.83)
+*   **Bridge:** react-native-webview 13.x, expo-location
+*   *(Run `npx expo config` in `/mobile` for exact live config)*
+
+#### 5. Infrastructure (`/docker`, `/kubernetes`)
 *   **Containers:** Docker, Docker Compose
 *   **Orchestration:** Kubernetes Configs (Ingress, Services, StatefulSets)
+*   **CDN/Edge:** Cloudflare (Backend API), Vercel Edge Network (Frontend)
 
 ### Updating Dependencies
 

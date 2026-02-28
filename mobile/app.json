@@ -13,7 +13,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.hyperfield.fwber"
+      "bundleIdentifier": "com.hyperfield.fwber",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "fwber needs access to your location to find nearby matches and venues."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -22,7 +25,11 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "com.hyperfield.fwber"
+      "package": "com.hyperfield.fwber",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
