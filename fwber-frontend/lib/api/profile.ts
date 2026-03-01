@@ -113,6 +113,7 @@ export interface UserProfile {
     completion_percentage: number;
     current_emotion?: string;
     is_federated?: boolean;
+    voice_intro_url?: string | null;
   };
 }
 
@@ -182,6 +183,7 @@ export interface ProfileUpdateData {
   religion?: string;
   political_views?: string;
   interests?: string[];
+  voice_intro?: File | null;
 
   preferences?: {
     smoking?: string;
@@ -280,14 +282,33 @@ export async function updateUserProfile(
     delete payload.date_of_birth;
   }
 
+  let body: BodyInit;
+  let headers: Record<string, string> = {
+    'Authorization': `Bearer ${token}`,
+    'Accept': 'application/json',
+  };
+
+  if (updates.voice_intro) {
+    const formData = new FormData();
+    Object.keys(payload).forEach(key => {
+      if (key === 'preferences' || key === 'location' || key === 'travel_location' || key === 'looking_for' || key === 'interests' || key === 'languages' || key === 'sti_status' || key === 'fetishes' || key === 'social_media') {
+        formData.append(key, JSON.stringify(payload[key]));
+      } else if (payload[key] !== undefined && payload[key] !== null) {
+        formData.append(key, payload[key]);
+      }
+    });
+    // Add spoof _method to handle PUT with multipart
+    formData.append('_method', 'PUT');
+    body = formData;
+  } else {
+    headers['Content-Type'] = 'application/json';
+    body = JSON.stringify(payload);
+  }
+
   const response = await fetch(`${API_BASE_URL}/profile`, {
-    method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-    body: JSON.stringify(payload),
+    method: updates.voice_intro ? 'POST' : 'PUT',
+    headers: headers,
+    body: body,
   });
 
   if (!response.ok) {

@@ -63,6 +63,7 @@ class UserProfileResource extends JsonResource
                 'fetishes' => $profile?->fetishes ?? [],
                 'sti_status' => $profile?->sti_status ?? [],
                 'is_incognito' => (bool) $profile?->is_incognito,
+                'voice_intro_url' => $profile?->voice_intro_url,
                 
                 // Physical Attributes
                 'height_cm' => $profile?->height_cm,

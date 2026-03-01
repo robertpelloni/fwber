@@ -460,6 +460,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('media/analyze', [\App\Http\Controllers\MediaAnalysisController::class, 'analyze']);
     });
 
+    // Safety: Emergency Contacts & Safe Walk
+    Route::get('safety/contacts', [\App\Http\Controllers\SafetyController::class, 'getContacts']);
+    Route::post('safety/contacts', [\App\Http\Controllers\SafetyController::class, 'addContact']);
+    Route::delete('safety/contacts/{id}', [\App\Http\Controllers\SafetyController::class, 'deleteContact']);
+    Route::post('safety/panic', [\App\Http\Controllers\SafetyController::class, 'triggerPanic']);
+    Route::post('safety/walk/start', [\App\Http\Controllers\SafetyController::class, 'startSafeWalk']);
+    Route::patch('safety/walk/{walkId}/location', [\App\Http\Controllers\SafetyController::class, 'updateLocation']);
+    Route::post('safety/walk/{walkId}/end', [\App\Http\Controllers\SafetyController::class, 'endSafeWalk']);
+    Route::get('safety/walk/active', [\App\Http\Controllers\SafetyController::class, 'getActiveWalk']);
+
     // Scrapbook
     Route::get('scrapbook/{matchId}', [\App\Http\Controllers\ScrapbookController::class, 'index']);
     Route::post('scrapbook', [\App\Http\Controllers\ScrapbookController::class, 'store']);

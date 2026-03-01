@@ -36,6 +36,8 @@ interface ProfileTabsProps {
     onProgress?: (fileIndex: number, progress: number, fileName: string) => void
   ) => Promise<void>;
   deletePhoto: (index: number) => void;
+  handleVoiceUpload?: (file: File) => void;
+  handleVoiceDelete?: () => void;
 }
 
 export default function ProfileTabs({
@@ -49,6 +51,8 @@ export default function ProfileTabs({
   photos,
   uploadPhotos,
   deletePhoto,
+  handleVoiceUpload,
+  handleVoiceDelete,
 }: ProfileTabsProps) {
   const [isEditMode, setIsEditMode] = useState(false);
 
@@ -83,7 +87,12 @@ export default function ProfileTabs({
             <BasicInformation formData={formData} handleInputChange={handleInputChange} handleLocationChange={handleLocationChange} />
           </TabsContent>
           <TabsContent value="bio">
-            <Bio formData={formData} handleInputChange={handleInputChange} />
+            <Bio
+              formData={formData}
+              handleInputChange={handleInputChange}
+              handleVoiceUpload={handleVoiceUpload}
+              handleVoiceDelete={handleVoiceDelete}
+            />
           </TabsContent>
           <TabsContent value="physical">
             <Physical formData={formData} handleInputChange={handleInputChange} />
@@ -136,16 +145,21 @@ export default function ProfileTabs({
         </Tabs>
       ) : (
         <div className="space-y-6">
-          <BasicInformation formData={formData} handleInputChange={() => {}} handleLocationChange={() => {}} />
-          <Bio formData={formData} handleInputChange={() => {}} />
-          <Physical formData={formData} handleInputChange={() => {}} />
-          <Intimate formData={formData} handleInputChange={() => {}} handleArrayChange={() => {}} />
-          <LookingFor formData={formData} handleLookingForChange={() => {}} />
-          <Location formData={formData} handleLocationChange={() => {}} />
-          <Lifestyle formData={formData} handlePreferenceChange={() => {}} />
-          <Dating formData={formData} handlePreferenceChange={() => {}} />
-          <Interests formData={formData} handleArrayPreferenceChange={() => {}} />
-          <Communication formData={formData} handlePreferenceChange={() => {}} />
+          <BasicInformation formData={formData} handleInputChange={() => { }} handleLocationChange={() => { }} />
+          <Bio
+            formData={formData}
+            handleInputChange={() => { }}
+            handleVoiceUpload={handleVoiceUpload}
+            handleVoiceDelete={handleVoiceDelete}
+          />
+          <Physical formData={formData} handleInputChange={() => { }} />
+          <Intimate formData={formData} handleInputChange={() => { }} handleArrayChange={() => { }} />
+          <LookingFor formData={formData} handleLookingForChange={() => { }} />
+          <Location formData={formData} handleLocationChange={() => { }} />
+          <Lifestyle formData={formData} handlePreferenceChange={() => { }} />
+          <Dating formData={formData} handlePreferenceChange={() => { }} />
+          <Interests formData={formData} handleArrayPreferenceChange={() => { }} />
+          <Communication formData={formData} handlePreferenceChange={() => { }} />
         </div>
       )}
     </div>

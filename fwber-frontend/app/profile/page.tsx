@@ -38,7 +38,7 @@ export default function ProfilePage() {
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
-  
+
   // Photo management
   const { photos, uploadPhotos, deletePhoto, setPrimaryPhoto } = usePhotos()
   const faceBlurEnabled = isFeatureEnabled('clientFaceBlur')
@@ -56,7 +56,7 @@ export default function ProfilePage() {
     }
     location: NonNullable<ProfileUpdateData['location']>
     looking_for: string[]
-    
+
     // New Optional Attributes
     love_language?: string
     personality_type?: string
@@ -82,6 +82,7 @@ export default function ProfilePage() {
     has_pets?: boolean | string
     languages?: string[]
     interests?: string[]
+    voice_intro?: File | null
   }
 
   // Form state
@@ -158,6 +159,7 @@ export default function ProfilePage() {
     has_pets: '',
     languages: [],
     interests: [],
+    voice_intro: null,
   })
 
   // Calculate completeness from current form data
@@ -165,8 +167,8 @@ export default function ProfilePage() {
     return calculateProfileCompleteness({
       displayName: formData.display_name,
       age: formData.date_of_birth ? Math.floor((Date.now() - new Date(formData.date_of_birth).getTime()) / 31536000000) : undefined,
-      location: formData.location.city && formData.location.state 
-        ? `${formData.location.city}, ${formData.location.state}` 
+      location: formData.location.city && formData.location.state
+        ? `${formData.location.city}, ${formData.location.state}`
         : undefined,
       bio: formData.bio,
       photos: photos.map(p => p.url),
@@ -257,7 +259,8 @@ export default function ProfilePage() {
           children: profileData.profile.children || '',
           religion: profileData.profile.religion || '',
           political_views: profileData.profile.political_views || '',
-          
+          voice_intro: null,
+
           preferences: {
             // Lifestyle preferences
             smoking: profileData.profile.preferences?.smoking || '',
@@ -302,7 +305,7 @@ export default function ProfilePage() {
   useEffect(() => {
     // Check for dev token as fallback
     const hasDevToken = typeof window !== 'undefined' && localStorage.getItem('fwber_token') === 'dev'
-    
+
     if (!authLoading && !isAuthenticated && !hasDevToken) {
       router.push('/login')
       return
@@ -324,7 +327,7 @@ export default function ProfilePage() {
 
       await updateUserProfile(effectiveToken, formData)
       setSuccess('Profile updated successfully!')
-      
+
       // Reload profile data
       await loadProfile()
     } catch (err) {
@@ -376,7 +379,7 @@ export default function ProfilePage() {
   const handleLookingForChange = (value: string, checked: boolean) => {
     setFormData(prev => ({
       ...prev,
-      looking_for: checked 
+      looking_for: checked
         ? [...prev.looking_for, value]
         : prev.looking_for.filter(item => item !== value)
     }))
@@ -401,7 +404,7 @@ export default function ProfilePage() {
       ...prev,
       preferences: {
         ...prev.preferences,
-        [key]: checked 
+        [key]: checked
           ? ([...(prev.preferences[key] as string[] | undefined ?? []), value])
           : ((prev.preferences[key] as string[] | undefined ?? []).filter((item: string) => item !== value))
       }
@@ -411,11 +414,26 @@ export default function ProfilePage() {
   const handleArrayChange = (field: string, value: string, checked: boolean) => {
     setFormData(prev => {
       const currentArray = (prev as Record<string, unknown>)[field] as string[] | undefined ?? [];
-      const updatedArray = checked 
+      const updatedArray = checked
         ? [...currentArray, value]
         : currentArray.filter((item: string) => item !== value);
       return { ...prev, [field]: updatedArray };
     });
+  }
+
+  const handleVoiceUpload = (file: File) => {
+    setFormData(prev => ({
+      ...prev,
+      voice_intro: file
+    }))
+  }
+
+  const handleVoiceDelete = () => {
+    setFormData(prev => ({
+      ...prev,
+      voice_intro: null,
+      voice_intro_url: null
+    }))
   }
 
   if (authLoading || isLoading) {
@@ -439,10 +457,10 @@ export default function ProfilePage() {
           <p className="mt-2 text-gray-600 dark:text-gray-300">
             Help others get to know you better. Complete your profile to find better matches.
           </p>
-          
+
           {/* Profile Completeness Bar */}
           <div className="mt-4">
-            <ProfileCompletenessBar 
+            <ProfileCompletenessBar
               percentage={currentCompleteness.percentage}
             />
           </div>
@@ -466,7 +484,7 @@ export default function ProfilePage() {
             <CardTitle>Profile Checklist</CardTitle>
           </CardHeader>
           <CardContent>
-            <ProfileCompletenessChecklist 
+            <ProfileCompletenessChecklist
               completeness={currentCompleteness}
               onFieldClick={(field: ProfileField) => {
                 // Scroll to the corresponding field
@@ -507,20 +525,20 @@ export default function ProfilePage() {
           <ProfileAnalysis />
           {/* <ProfileRoast /> Replaced by the new Viral Roast Page */}
           <Card className="bg-gradient-to-br from-orange-900 to-red-900 text-white border-orange-500/30 overflow-hidden relative">
-             <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/20 blur-3xl rounded-full -mr-16 -mt-16 pointer-events-none"></div>
-             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <span className="text-2xl">🔥</span> Roast My Profile
-                </CardTitle>
-             </CardHeader>
-             <CardContent>
-                <p className="text-orange-100/80 mb-4">
-                  Ready to get humbled? Let our AI roast your profile choices. Or switch to &quot;Hype Mode&quot; for an ego boost.
-                </p>
-                <a href="/roast" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-white text-orange-900 hover:bg-orange-100 h-10 px-4 py-2 w-full">
-                  Go to Roast Page
-                </a>
-             </CardContent>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/20 blur-3xl rounded-full -mr-16 -mt-16 pointer-events-none"></div>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <span className="text-2xl">🔥</span> Roast My Profile
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-orange-100/80 mb-4">
+                Ready to get humbled? Let our AI roast your profile choices. Or switch to &quot;Hype Mode&quot; for an ego boost.
+              </p>
+              <a href="/roast" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-white text-orange-900 hover:bg-orange-100 h-10 px-4 py-2 w-full">
+                Go to Roast Page
+              </a>
+            </CardContent>
           </Card>
           <VibeCheck />
           <DatingFortune />
@@ -544,6 +562,8 @@ export default function ProfilePage() {
               photos={photos}
               uploadPhotos={handlePhotoUpload}
               deletePhoto={handlePhotoRemove}
+              handleVoiceUpload={handleVoiceUpload}
+              handleVoiceDelete={handleVoiceDelete}
             />
             {/* Photo Upload Section */}
             <Card id="photos">
@@ -610,8 +630,8 @@ export default function ProfilePage() {
                       className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                       value={formData.date_of_birth ? formData.date_of_birth.split('-')[1] : ''}
                       onChange={(e) => {
-                         const [y, m, d] = formData.date_of_birth ? formData.date_of_birth.split('-') : [`${new Date().getFullYear() - 18}`, '01', '01'];
-                         handleInputChange('date_of_birth', `${y}-${e.target.value}-${d}`);
+                        const [y, m, d] = formData.date_of_birth ? formData.date_of_birth.split('-') : [`${new Date().getFullYear() - 18}`, '01', '01'];
+                        handleInputChange('date_of_birth', `${y}-${e.target.value}-${d}`);
                       }}
                     >
                       <option value="">Month</option>
@@ -628,7 +648,7 @@ export default function ProfilePage() {
                       }}
                     >
                       <option value="">Day</option>
-                      {Array.from({length: 31}, (_, i) => {
+                      {Array.from({ length: 31 }, (_, i) => {
                         const d = (i + 1).toString().padStart(2, '0');
                         return <option key={d} value={d}>{i + 1}</option>
                       })}
@@ -642,7 +662,7 @@ export default function ProfilePage() {
                       }}
                     >
                       <option value="">Year</option>
-                      {Array.from({length: 100}, (_, i) => {
+                      {Array.from({ length: 100 }, (_, i) => {
                         const year = new Date().getFullYear() - 18 - i;
                         return <option key={year} value={year}>{year}</option>
                       })}

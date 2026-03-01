@@ -72,6 +72,7 @@ class UserProfile extends Model
         'travel_longitude',
         'travel_location_name',
         'is_incognito',
+        'voice_intro_url',
     ];
 
     protected $casts = [

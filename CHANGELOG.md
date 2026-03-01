@@ -2,6 +2,14 @@ oProceedrocddPro# Changelog
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.5] - 2026-02-28
+### Added
+- **Panic Button & Safe Walk**: One-tap emergency alerts and live location-sharing during walks (`/safety`).
+- Backend: `EmergencyContact` and `SafeWalk` models, migrations, and `SafetyController` (7 endpoints).
+- Safety features: SOS panic trigger (notifies contacts), Safe Walk mode (destination tracking), and contact management.
+- Integrated original `blockUser` and `reportUser` functions into a merged `lib/api/safety.ts`.
+- Added "Safety" nav link with `Shield` icon to `AppHeader.tsx`.
+
 ## [1.0.4] - 2026-02-28
 ### Added
 - **Scrapbook Mode**: Shared private memory board between matched users (`/scrapbook?match={id}`).

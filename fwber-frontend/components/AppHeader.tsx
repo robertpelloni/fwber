@@ -30,7 +30,8 @@ import {
     Layout,
     Mic,
     Briefcase,
-    CalendarHeart
+    CalendarHeart,
+    Shield
 } from 'lucide-react'
 
 interface AppHeaderProps {
@@ -48,6 +49,7 @@ const navLinks = [
     { href: '/proximity-chatrooms', label: 'Local Chat', icon: Radio },
     { href: '/conference-pulse', label: 'Conference', icon: Briefcase },
     { href: '/date-planner', label: 'Date Planner', icon: CalendarHeart },
+    { href: '/safety', label: 'Safety', icon: Shield },
     { href: '/audio-rooms', label: 'Audio Rooms', icon: Mic },
     { href: '/burner', label: 'Burner Bridge', icon: Zap },
     { href: '/bulletin-boards', label: 'Boards', icon: Layout },

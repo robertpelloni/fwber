@@ -364,6 +364,16 @@ class ProfileController extends Controller
                         $validated['preferences']
                     );
                 }
+
+                // Handle Voice Intro File Upload
+                if ($request->hasFile('voice_intro')) {
+                    $result = \App\Services\MediaUploadService::store(
+                        $request->file('voice_intro'),
+                        $user->id,
+                        'audio'
+                    );
+                    $profile->voice_intro_url = $result['media_url'];
+                }
                 
                 $profile->save();
                 
@@ -388,7 +398,6 @@ class ProfileController extends Controller
                     'data' => new UserProfileResource($user),
                     'profile_complete' => $this->isProfileComplete($profile),
                 ]);
-
             } catch (\Exception $e) {
                 Log::error('Database error during profile update', ['error' => $e->getMessage()]);
                 // Return success even if save failed, to prevent UI blocking

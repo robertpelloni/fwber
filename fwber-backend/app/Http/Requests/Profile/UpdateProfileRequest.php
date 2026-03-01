@@ -4,6 +4,13 @@ namespace App\Http\Requests\Profile;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Backend tasks for voice_intro:
+ * - [x] Create migration for `voice_intro_url` in `user_profiles`
+ * - [x] Update `UserProfile` model and `UpdateProfileRequest`
+ * - [ ] Update `ProfileController` to handle audio file uploads
+ * - [ ] Update `UserProfileResource` for frontend exposure
+ */
 class UpdateProfileRequest extends FormRequest
 {
     public function authorize(): bool
@@ -108,6 +115,7 @@ class UpdateProfileRequest extends FormRequest
             'preferences.meeting_preference' => 'sometimes|nullable|string|in:public-places,coffee-dates,dinner-dates,outdoor-activities,virtual-first,flexible',
             'preferences.location_fuzzing' => 'sometimes|boolean',
             'email' => 'sometimes|nullable|email|max:255',
+            'voice_intro' => 'sometimes|nullable|file|mimes:mp3,wav,m4a,mpeg|max:5000',
         ];
     }
 }
