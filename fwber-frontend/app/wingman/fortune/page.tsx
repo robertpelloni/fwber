@@ -4,8 +4,8 @@ import { useState } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import AppHeader from '@/components/AppHeader'
 import { apiClient } from '@/lib/api/client'
-import { 
-  Sparkles, ArrowLeft, RefreshCw, Share2, 
+import {
+  Sparkles, ArrowLeft, RefreshCw, Share2,
   Moon, Star, Wand2
 } from 'lucide-react'
 import Link from 'next/link'
@@ -42,7 +42,7 @@ export default function FortunePage() {
     if (!fortune) return
 
     const shareText = `My Dating Fortune: "${fortune.fortune}" - Get yours at fwber!`
-    
+
     if (navigator.share) {
       try {
         await navigator.share({
@@ -62,11 +62,11 @@ export default function FortunePage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gradient-to-b from-indigo-950 via-purple-950 to-black">
         <AppHeader />
-        
+
         <main className="max-w-2xl mx-auto px-4 py-6">
           <div className="flex items-center gap-3 mb-8">
-            <Link 
-              href="/home" 
+            <Link
+              href="/wingman"
               className="p-2 -ml-2 hover:bg-purple-800/30 rounded-lg transition"
             >
               <ArrowLeft className="w-5 h-5 text-gray-400" />
@@ -84,11 +84,11 @@ export default function FortunePage() {
 
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 rounded-3xl blur-xl" />
-            
+
             <div className="relative bg-gradient-to-br from-indigo-900/80 via-purple-900/80 to-slate-900/80 rounded-3xl border border-indigo-500/30 overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 {[...Array(20)].map((_, i) => (
-                  <Star 
+                  <Star
                     key={i}
                     className="absolute text-yellow-300/20 animate-pulse"
                     style={{
@@ -116,7 +116,7 @@ export default function FortunePage() {
                       Ready to know your dating destiny?
                     </h2>
                     <p className="text-gray-400 max-w-md mx-auto">
-                      The AI spirits will reveal a personalized fortune about your love life. 
+                      The AI spirits will reveal a personalized fortune about your love life.
                       Are you prepared for the truth?
                     </p>
                   </div>

@@ -2,6 +2,33 @@ oProceedrocddPro# Changelog
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.9] - 2026-03-01
+### Added
+- **Audio Rooms Real-Time Engagement**: Fully functional "Clubhouse-style" mesh WebRTC networking.
+- Backend: `AudioRoomSignal`, `AudioRoomParticipantJoined`, and `AudioRoomParticipantLeft` broadcasting events via Laravel Echo.
+- Frontend: `useWebRTC` hook expanded to support dynamic multi-peer mesh connections.
+- UI: Real-time "Raise Hand" request feature and presence syncing across audience and speakers.
+
+## [1.0.8] - 2026-03-01
+### Added
+- **Wingman Arcade**: Created a centralized cyberpunk-themed hub (`/wingman`) for all AI-driven viral games.
+- Navigation integration across sub-features (Fortune, Cosmic Match, Roast, Vibe Check, Nemesis).
+- Added Arcade to global `AppHeader` navigation.
+
+## [1.0.7] - 2026-02-28
+### Added
+- **Relationship Accelerator**: Integrated Ice Breakers and Scrapbook into the core chat loop.
+- Proactive AI Wingman: Upgraded with specialized nudge categories (`ice_breaker`, `scrapbook`, `ask_out`, `back_off`).
+- Dynamic Chat Links: Direct navigation to shared experiences from the chat header and AI suggestions.
+- Backend: Enhanced `AiWingmanService` context analysis and `AnalyzeConversationNudge` background job.
+
+## [1.0.6] - 2026-02-28
+### Added
+- **Voice Profile Introductions**: 30-second audio snippets for personalizing user profiles.
+- `VoiceIntroRecorder` component for recording, previewing, and trimming audio.
+- Backend support: `voice_intro_url` field in `UserProfile`, media storage integration, and validation rules.
+- Profile integration: Audio playback in `Bio` component and upload management in `ProfilePage`.
+
 ## [1.0.5] - 2026-02-28
 ### Added
 - **Panic Button & Safe Walk**: One-tap emergency alerts and live location-sharing during walks (`/safety`).

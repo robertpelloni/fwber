@@ -4,8 +4,8 @@ import { useState } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import AppHeader from '@/components/AppHeader'
 import { apiClient } from '@/lib/api/client'
-import { 
-  Flame, ArrowLeft, RefreshCw, Share2, 
+import {
+  Flame, ArrowLeft, RefreshCw, Share2,
   Sparkles, Star, Heart
 } from 'lucide-react'
 import Link from 'next/link'
@@ -44,7 +44,7 @@ export default function RoastPage() {
 
     const emoji = mode === 'roast' ? '🔥' : '🚀'
     const shareText = `${emoji} My Profile ${mode === 'roast' ? 'Roast' : 'Hype'}: "${result.roast}" - Get yours at fwber!`
-    
+
     if (navigator.share) {
       try {
         await navigator.share({
@@ -66,11 +66,11 @@ export default function RoastPage() {
     <ProtectedRoute>
       <div className={`min-h-screen bg-gradient-to-b ${isRoast ? 'from-orange-950 via-red-950 to-black' : 'from-cyan-950 via-blue-950 to-black'}`}>
         <AppHeader />
-        
+
         <main className="max-w-2xl mx-auto px-4 py-6">
           <div className="flex items-center gap-3 mb-8">
-            <Link 
-              href="/home" 
+            <Link
+              href="/wingman"
               className="p-2 -ml-2 hover:bg-orange-800/30 rounded-lg transition"
             >
               <ArrowLeft className="w-5 h-5 text-gray-400" />
@@ -90,21 +90,19 @@ export default function RoastPage() {
             <div className="inline-flex rounded-xl bg-slate-800/50 p-1 border border-slate-700">
               <button
                 onClick={() => setMode('roast')}
-                className={`px-6 py-2 rounded-lg font-medium transition ${
-                  isRoast
+                className={`px-6 py-2 rounded-lg font-medium transition ${isRoast
                     ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white'
                     : 'text-gray-400 hover:text-white'
-                }`}
+                  }`}
               >
                 🔥 Roast Me
               </button>
               <button
                 onClick={() => setMode('hype')}
-                className={`px-6 py-2 rounded-lg font-medium transition ${
-                  !isRoast
+                className={`px-6 py-2 rounded-lg font-medium transition ${!isRoast
                     ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white'
                     : 'text-gray-400 hover:text-white'
-                }`}
+                  }`}
               >
                 🚀 Hype Me
               </button>
@@ -113,7 +111,7 @@ export default function RoastPage() {
 
           <div className="relative">
             <div className={`absolute inset-0 bg-gradient-to-r ${isRoast ? 'from-orange-500/20 via-red-500/20 to-orange-500/20' : 'from-cyan-500/20 via-blue-500/20 to-cyan-500/20'} rounded-3xl blur-xl`} />
-            
+
             <div className={`relative bg-gradient-to-br ${isRoast ? 'from-orange-900/80 via-red-900/80 to-slate-900/80 border-orange-500/30' : 'from-cyan-900/80 via-blue-900/80 to-slate-900/80 border-cyan-500/30'} rounded-3xl border overflow-hidden`}>
               <div className="relative p-8 text-center">
                 <div className="mb-6">
@@ -128,8 +126,8 @@ export default function RoastPage() {
                       {isRoast ? 'Ready to get roasted?' : 'Ready to get hyped?'}
                     </h2>
                     <p className="text-gray-400 max-w-md mx-auto">
-                      {isRoast 
-                        ? 'Our AI will analyze your profile and deliver a savage (but fun) roast. Can you handle it?' 
+                      {isRoast
+                        ? 'Our AI will analyze your profile and deliver a savage (but fun) roast. Can you handle it?'
                         : 'Our AI will analyze your profile and make you feel like the legend you are!'}
                     </p>
                   </div>

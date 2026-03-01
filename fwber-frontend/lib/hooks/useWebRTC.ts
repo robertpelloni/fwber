@@ -3,27 +3,32 @@ import { apiClient } from '../api/client';
 
 interface UseWebRTCProps {
     roomId: string;
-    userId: number; // The target peer to connect to
+    currentUserId: number;
+    echoInstance: any;
 }
 
-export function useWebRTC({ roomId, userId }: UseWebRTCProps) {
+export function useWebRTC({ roomId, currentUserId, echoInstance }: UseWebRTCProps) {
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-    const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
-    const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+    const [remoteStreams, setRemoteStreams] = useState<Record<number, MediaStream>>({});
 
-    const initializePeerConnection = useCallback(() => {
+    const peersRef = useRef<Map<number, RTCPeerConnection>>(new Map());
+    const localStreamRef = useRef<MediaStream | null>(null);
+
+    const getPeerConnection = useCallback((peerId: number) => {
+        if (peersRef.current.has(peerId)) {
+            return peersRef.current.get(peerId)!;
+        }
+
         const pc = new RTCPeerConnection({
             iceServers: [
                 { urls: 'stun:stun.l.google.com:19302' },
-                // STUN/TURN servers would go here in production
             ]
         });
 
         pc.onicecandidate = async (event) => {
             if (event.candidate) {
-                // Send ICE candidate to peer via Laravel Echo signaling route
                 await apiClient.post(`/audio-rooms/${roomId}/signal`, {
-                    target_user_id: userId,
+                    target_user_id: peerId,
                     type: 'ice-candidate',
                     payload: event.candidate
                 });
@@ -32,24 +37,53 @@ export function useWebRTC({ roomId, userId }: UseWebRTCProps) {
 
         pc.ontrack = (event) => {
             if (event.streams && event.streams[0]) {
-                setRemoteStream(event.streams[0]);
+                setRemoteStreams(prev => ({
+                    ...prev,
+                    [peerId]: event.streams[0]
+                }));
             }
         };
 
-        peerConnectionRef.current = pc;
+        pc.onconnectionstatechange = () => {
+            if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed' || pc.connectionState === 'closed') {
+                peersRef.current.delete(peerId);
+                setRemoteStreams(prev => {
+                    const updated = { ...prev };
+                    delete updated[peerId];
+                    return updated;
+                });
+            }
+        };
+
+        // Add local tracks if we have any
+        if (localStreamRef.current) {
+            localStreamRef.current.getTracks().forEach((track) => {
+                pc.addTrack(track, localStreamRef.current!);
+            });
+        }
+
+        peersRef.current.set(peerId, pc);
         return pc;
-    }, [roomId, userId]);
+    }, [roomId]);
 
     const startLocalAudio = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
             setLocalStream(stream);
+            localStreamRef.current = stream;
 
-            if (peerConnectionRef.current) {
+            // Add tracks to all existing peer connections
+            peersRef.current.forEach((pc) => {
                 stream.getTracks().forEach((track) => {
-                    peerConnectionRef.current?.addTrack(track, stream);
+                    // Check if sender already exists to avoid duplicates
+                    const senders = pc.getSenders();
+                    const hasTrack = senders.find(s => s.track === track);
+                    if (!hasTrack) {
+                        pc.addTrack(track, stream);
+                    }
                 });
-            }
+            });
+
             return stream;
         } catch (err) {
             console.error('Error accessing microphone', err);
@@ -58,75 +92,108 @@ export function useWebRTC({ roomId, userId }: UseWebRTCProps) {
     };
 
     const stopLocalAudio = () => {
-        if (localStream) {
-            localStream.getTracks().forEach(track => track.stop());
+        if (localStreamRef.current) {
+            localStreamRef.current.getTracks().forEach(track => track.stop());
             setLocalStream(null);
+            localStreamRef.current = null;
         }
     };
 
     const toggleMute = () => {
-        if (localStream) {
-            localStream.getAudioTracks().forEach(track => {
+        if (localStreamRef.current) {
+            localStreamRef.current.getAudioTracks().forEach(track => {
                 track.enabled = !track.enabled;
             });
         }
     };
 
-    const createOffer = async () => {
-        if (!peerConnectionRef.current) return;
+    const createOfferForPeer = useCallback(async (peerId: number) => {
+        const pc = getPeerConnection(peerId);
         try {
-            const offer = await peerConnectionRef.current.createOffer();
-            await peerConnectionRef.current.setLocalDescription(offer);
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
 
             await apiClient.post(`/audio-rooms/${roomId}/signal`, {
-                target_user_id: userId,
+                target_user_id: peerId,
                 type: 'offer',
                 payload: offer
             });
         } catch (err) {
-            console.error('Error creating offer', err);
+            console.error(`Error creating offer for peer ${peerId}`, err);
         }
-    };
+    }, [getPeerConnection, roomId]);
 
-    const handleReceiveSignal = async (signalData: { type: string, payload: any }) => {
-        if (!peerConnectionRef.current) return;
+    const handleReceiveSignal = useCallback(async (signalData: { sender_id: number, type: string, payload: any }) => {
+        const peerId = signalData.sender_id;
+        if (peerId === currentUserId) return; // Ignore own signals
+
+        const pc = getPeerConnection(peerId);
 
         try {
             if (signalData.type === 'offer') {
-                await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(signalData.payload));
-                const answer = await peerConnectionRef.current.createAnswer();
-                await peerConnectionRef.current.setLocalDescription(answer);
+                await pc.setRemoteDescription(new RTCSessionDescription(signalData.payload));
+                const answer = await pc.createAnswer();
+                await pc.setLocalDescription(answer);
 
                 await apiClient.post(`/audio-rooms/${roomId}/signal`, {
-                    target_user_id: userId,
+                    target_user_id: peerId,
                     type: 'answer',
                     payload: answer
                 });
             } else if (signalData.type === 'answer') {
-                await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(signalData.payload));
+                await pc.setRemoteDescription(new RTCSessionDescription(signalData.payload));
             } else if (signalData.type === 'ice-candidate') {
-                await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(signalData.payload));
+                if (pc.remoteDescription) {
+                    await pc.addIceCandidate(new RTCIceCandidate(signalData.payload));
+                }
             }
         } catch (err) {
-            console.error('Error handling signal', err);
+            console.error(`Error handling signal from peer ${peerId}`, err);
         }
-    };
+    }, [currentUserId, getPeerConnection, roomId]);
 
+    // Setup Echo listeners for signaling
     useEffect(() => {
-        initializePeerConnection();
+        if (!echoInstance || !currentUserId) return;
+
+        const channel = echoInstance.private(`users.${currentUserId}`);
+
+        const handleSignal = (e: any) => {
+            // e could be the event payload
+            if (e.room_id == roomId) {
+                handleReceiveSignal({
+                    sender_id: e.sender_id,
+                    type: e.type,
+                    payload: e.payload
+                });
+            }
+        };
+
+        channel.listen('.AudioRoomSignal', handleSignal);
+
         return () => {
-            peerConnectionRef.current?.close();
+            // Note: We don't necessarily leave the channel here if it's reused, 
+            // but we should ideally remove the listener if Echo supports it,
+            // or we just let it be if the component unmounts.
+            // For safety, stop all peer connections on unmount.
+        };
+    }, [echoInstance, currentUserId, roomId, handleReceiveSignal]);
+
+    // Cleanup peer connections on unmount
+    useEffect(() => {
+        return () => {
+            peersRef.current.forEach(pc => pc.close());
+            peersRef.current.clear();
             stopLocalAudio();
         };
-    }, [initializePeerConnection]);
+    }, []);
 
     return {
         localStream,
-        remoteStream,
+        remoteStreams,
         startLocalAudio,
         stopLocalAudio,
         toggleMute,
-        createOffer,
-        handleReceiveSignal
+        createOfferForPeer
     };
 }

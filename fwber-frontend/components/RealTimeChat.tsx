@@ -9,7 +9,7 @@ import { EvolvingAvatar } from '@/components/ui/EvolvingAvatar';
 import { WingmanSuggestions } from '@/components/ai/WingmanSuggestions';
 import AudioRecorder from '@/components/AudioRecorder';
 import { api } from '@/lib/api/client';
-import { Languages, Loader2, Sparkles, Gift as GiftIcon, Lock, Video, MoreVertical, Paperclip, X, ThumbsUp, Heart, Laugh } from 'lucide-react';
+import { Languages, Loader2, Sparkles, Gift as GiftIcon, Lock, Video, MoreVertical, Paperclip, X, ThumbsUp, Heart, Laugh, BookOpen, MessageSquareQuote } from 'lucide-react';
 import { useTranslation } from '@/lib/hooks/use-translation';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { MatchInsights } from '@/components/matches/MatchInsights';
@@ -23,6 +23,9 @@ import { ConversationCoach } from '@/components/chat/ConversationCoach';
 import { TierUnlockGuide } from '@/components/chat/TierUnlockGuide';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 interface RealTimeChatProps {
   recipientId: string;
@@ -138,6 +141,7 @@ export default function RealTimeChat({
   const { user } = useAuth();
   const { showSuccess, showError } = useToast();
   const { encrypt, isReady: isE2EReady } = useE2EEncryption();
+  const router = useRouter();
 
   const {
     messages,
@@ -364,6 +368,35 @@ export default function RealTimeChat({
 
           <TipButton recipientId={parseInt(recipientId)} recipientName={recipientName} compact />
 
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                className="p-2 hover:bg-gray-700 rounded-full text-gray-400 hover:text-purple-400 transition-colors"
+                title="Shared Experiences"
+              >
+                <BookOpen className="w-5 h-5" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-56 bg-gray-900 border-gray-700 text-white p-2">
+              <div className="space-y-1">
+                <button
+                  onClick={() => router.push(`/ice-breakers?match=${recipientId}`)}
+                  className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-800 rounded-md transition-colors text-sm"
+                >
+                  <Sparkles className="h-4 w-4 text-yellow-400" />
+                  <span>Play Ice Breakers</span>
+                </button>
+                <button
+                  onClick={() => router.push(`/scrapbook?match=${recipientId}`)}
+                  className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-800 rounded-md transition-colors text-sm"
+                >
+                  <MessageSquareQuote className="h-4 w-4 text-purple-400" />
+                  <span>Shared Scrapbook</span>
+                </button>
+              </div>
+            </PopoverContent>
+          </Popover>
+
           <Dialog>
             <DialogTrigger asChild>
               <button
@@ -458,6 +491,21 @@ export default function RealTimeChat({
                 <p className="text-gray-200 text-sm mt-1 leading-snug">
                   {activeNudge.nudge?.message || activeNudge.message || "Consider asking them out!"}
                 </p>
+                {activeNudge.nudge?.action_label && (
+                  <Button
+                    size="sm"
+                    className="mt-2 bg-red-600 hover:bg-red-700 text-xs h-7"
+                    onClick={() => {
+                      const type = activeNudge.nudge?.type;
+                      if (type === 'ice_breaker') router.push(`/ice-breakers?match=${recipientId}`);
+                      else if (type === 'scrapbook') router.push(`/scrapbook?match=${recipientId}`);
+                      else if (type === 'ask_out') setIsGiftModalOpen(true); // Placeholder for date planner
+                      setActiveNudge(null);
+                    }}
+                  >
+                    {activeNudge.nudge.action_label}
+                  </Button>
+                )}
               </div>
             </div>
           </motion.div>

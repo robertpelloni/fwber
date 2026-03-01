@@ -4,8 +4,8 @@ import { useState } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import AppHeader from '@/components/AppHeader'
 import { apiClient } from '@/lib/api/client'
-import { 
-  Star, ArrowLeft, RefreshCw, Share2, 
+import {
+  Star, ArrowLeft, RefreshCw, Share2,
   Heart, HeartCrack, Sparkles, Moon
 } from 'lucide-react'
 import Link from 'next/link'
@@ -65,7 +65,7 @@ export default function CosmicMatchPage() {
     if (!result) return
 
     const shareText = `My Cosmic Match: Best with ${result.best_match} ${getZodiacEmoji(result.best_match)}, Avoid ${result.worst_match} ${getZodiacEmoji(result.worst_match)} - Get yours at fwber!`
-    
+
     if (navigator.share) {
       try {
         await navigator.share({
@@ -85,11 +85,11 @@ export default function CosmicMatchPage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gradient-to-b from-violet-950 via-indigo-950 to-black">
         <AppHeader />
-        
+
         <main className="max-w-2xl mx-auto px-4 py-6">
           <div className="flex items-center gap-3 mb-8">
-            <Link 
-              href="/home" 
+            <Link
+              href="/wingman"
               className="p-2 -ml-2 hover:bg-purple-800/30 rounded-lg transition"
             >
               <ArrowLeft className="w-5 h-5 text-gray-400" />
@@ -107,11 +107,11 @@ export default function CosmicMatchPage() {
 
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-violet-500/20 via-indigo-500/20 to-purple-500/20 rounded-3xl blur-xl" />
-            
+
             <div className="relative bg-gradient-to-br from-violet-900/80 via-indigo-900/80 to-slate-900/80 rounded-3xl border border-violet-500/30 overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 {[...Array(30)].map((_, i) => (
-                  <div 
+                  <div
                     key={i}
                     className="absolute bg-white rounded-full animate-pulse"
                     style={{
@@ -140,7 +140,7 @@ export default function CosmicMatchPage() {
                       What do the stars say about your love life?
                     </h2>
                     <p className="text-gray-400 max-w-md mx-auto">
-                      Based on your profile, we&apos;ll reveal your most compatible 
+                      Based on your profile, we&apos;ll reveal your most compatible
                       and least compatible zodiac signs.
                     </p>
                   </div>
@@ -150,7 +150,7 @@ export default function CosmicMatchPage() {
                   <div className="space-y-4 py-4">
                     <div className="flex justify-center gap-2">
                       {['♈', '♉', '♊', '♋', '♌', '♍'].map((emoji, i) => (
-                        <span 
+                        <span
                           key={i}
                           className="text-2xl animate-bounce"
                           style={{ animationDelay: `${i * 0.1}s` }}

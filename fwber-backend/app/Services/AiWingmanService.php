@@ -1126,25 +1126,36 @@ EOT;
             $conversation .= "{$sender}: {$content}\n";
         }
 
+        $userInterests = implode(', ', $user->profile->interests ?? []);
+        $matchInterests = implode(', ', $match->profile->interests ?? []);
+
         return <<<EOT
 Here is the recent conversation history between "Me" and "Target":
 
 {$conversation}
 
-Analyze the flow based on the following rules:
-1. Is the conversation natural and engaging? -> NO NUDGE NEEDED.
-2. Are they consistently agreeing on shared interests and showing high mutual enthusiasm? -> SUGGESTION: Ask them on a date related to those interests.
-3. Has the conversation stalled on boring small talk (e.g., "how are you", "good, you?") for too long? -> SUGGESTION: Pivot the topic to a deeper interest (reference their profile).
-4. Is "Me" sending multiple back-to-back unanswered messages or coming on too strong? -> SUGGESTION: Back off and give them space.
+Context:
+- My Interests: {$userInterests}
+- Their Interests: {$matchInterests}
+
+Analyze the flow and determine if a proactive nudge is needed.
+Categories of nudges:
+1. **ice_breaker**: Use if the conversation is just starting, stalling on "hi/how are you", or if they share a specific interest not yet discussed.
+2. **scrapbook**: Use if they are reminiscing, sharing photos, or expressing a "moment" worth saving.
+3. **ask_out**: Use if there is high mutual enthusiasm and a clear opening to meet.
+4. **back_off**: Use if "Me" is being too pushy or double-triple messaging without response.
+
+Rules:
+- If the conversation is flowing perfectly, "needs_nudge" should be false.
+- Be cheeky, helpful, and concise.
 
 Output strict JSON:
 {
     "needs_nudge": true or false,
-    "type": "ask_out" | "pivot_topic" | "back_off" | "warning",
-    "message": "The actual short, friendly advice you would give to 'Me' as a wingman. (Max 2 sentences)"
+    "type": "ice_breaker" | "scrapbook" | "ask_out" | "back_off",
+    "message": "The advice text (max 2 sentences).",
+    "action_label": "Short label for a button (e.g., 'Play Ice Breakers', 'Add to Scrapbook', 'Plan Date')"
 }
-
-If "needs_nudge" is false, "type" and "message" can be null.
 EOT;
     }
 
@@ -1157,12 +1168,12 @@ EOT;
             if (isset($decoded['needs_nudge']) && $decoded['needs_nudge'] === true) {
                 return [
                     'type' => $decoded['type'] ?? 'general',
-                    'message' => $decoded['message'] ?? 'Why not ask them about their weekend plans?'
+                    'message' => $decoded['message'] ?? 'Time to make a move!',
+                    'action_label' => $decoded['action_label'] ?? 'View Suggestion'
                 ];
             }
         }
 
-        // Return null if no nudge is needed or if parsing fails safely
         return null;
     }
 }

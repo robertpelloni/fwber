@@ -4,8 +4,8 @@ import { useState } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import AppHeader from '@/components/AppHeader'
 import { apiClient } from '@/lib/api/client'
-import { 
-  Skull, ArrowLeft, RefreshCw, Share2, 
+import {
+  Skull, ArrowLeft, RefreshCw, Share2,
   Sparkles, AlertTriangle, Zap, Brain
 } from 'lucide-react'
 import Link from 'next/link'
@@ -45,7 +45,7 @@ export default function NemesisPage() {
     if (!result) return
 
     const shareText = `My Dating Nemesis: "${result.nemesis_type}" - ${result.clashing_traits.join(', ')}. Get yours at fwber!`
-    
+
     if (navigator.share) {
       try {
         await navigator.share({
@@ -65,11 +65,11 @@ export default function NemesisPage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gradient-to-b from-red-950 via-rose-950 to-black">
         <AppHeader />
-        
+
         <main className="max-w-2xl mx-auto px-4 py-6">
           <div className="flex items-center gap-3 mb-8">
-            <Link 
-              href="/home" 
+            <Link
+              href="/wingman"
               className="p-2 -ml-2 hover:bg-red-800/30 rounded-lg transition"
             >
               <ArrowLeft className="w-5 h-5 text-gray-400" />
@@ -87,7 +87,7 @@ export default function NemesisPage() {
 
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 via-rose-500/20 to-red-500/20 rounded-3xl blur-xl" />
-            
+
             <div className="relative bg-gradient-to-br from-red-900/80 via-rose-900/80 to-slate-900/80 rounded-3xl border border-red-500/30 overflow-hidden">
               <div className="relative p-8 text-center">
                 <div className="mb-6">
@@ -102,7 +102,7 @@ export default function NemesisPage() {
                       Who is your dating arch-nemesis?
                     </h2>
                     <p className="text-gray-400 max-w-md mx-auto">
-                      Using &quot;science&quot; and personality analysis, we&apos;ll identify the type of person 
+                      Using &quot;science&quot; and personality analysis, we&apos;ll identify the type of person
                       guaranteed to drive you absolutely crazy (in a bad way).
                     </p>
                   </div>
@@ -129,12 +129,12 @@ export default function NemesisPage() {
                         <span className="text-xl font-bold text-white">Your Nemesis:</span>
                       </div>
                       <h3 className="text-2xl font-bold text-red-300 mb-4">{result.nemesis_type}</h3>
-                      
+
                       <div className="mb-4">
                         <p className="text-sm text-gray-400 mb-2">Clashing Traits:</p>
                         <div className="flex flex-wrap gap-2 justify-center">
                           {result.clashing_traits.map((trait, index) => (
-                            <span 
+                            <span
                               key={index}
                               className="px-3 py-1 bg-red-500/20 text-red-300 rounded-full text-sm border border-red-500/30"
                             >

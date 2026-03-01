@@ -57,6 +57,7 @@ class AnalyzeConversationNudge implements ShouldQueue
                         'sender_id' => $msg->sender_id,
                         'content' => $msg->content,
                         'transcription' => $msg->transcription,
+                        'message_type' => $msg->message_type ?? 'text',
                     ];
                 })
                 ->toArray();

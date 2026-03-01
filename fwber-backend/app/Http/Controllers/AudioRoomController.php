@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Events\AudioRoomParticipantJoined;
+use App\Events\AudioRoomParticipantLeft;
+use App\Events\AudioRoomSignal;
 
 class AudioRoomController extends Controller
 {
@@ -86,8 +89,8 @@ class AudioRoomController extends Controller
 
         $participant->load('user');
 
-        // Optional: Broadcast event that user joined
-        // broadcast(new AudioRoomParticipantJoined($room, $participant))->toOthers();
+        // Broadcast event that user joined
+        broadcast(new AudioRoomParticipantJoined($room, $participant))->toOthers();
 
         return response()->json([
             'message' => 'Joined room successfully',
@@ -109,13 +112,13 @@ class AudioRoomController extends Controller
             ->where('user_id', $userId)
             ->delete();
 
-        // Optional: Broadcast event that user left
-        // broadcast(new AudioRoomParticipantLeft($room, $userId))->toOthers();
+        // Broadcast event that user left
+        broadcast(new AudioRoomParticipantLeft($room, $userId))->toOthers();
 
         // If host leaves, end the room
         if ($room->host_id === $userId) {
             $room->update(['status' => 'ended']);
-            // broadcast(new AudioRoomEnded($room))->toOthers();
+            // A separate room ended event could be fired here, but for now ParticipantLeft with host ID suffices.
         }
 
         return response()->json(['message' => 'Left room successfully']);
@@ -137,17 +140,13 @@ class AudioRoomController extends Controller
         $senderId = Auth::id();
         $targetId = $request->target_user_id;
 
-        // In a real implementation this fires a constrained event over Echo
-        // We broadcast to a private channel like: private-user.{targetId} or private-audio-room.{roomId}
-        //
-        // Example:
-        // broadcast(new WebRTCSignalReceived(
-        //     $room->id, 
-        //     $senderId, 
-        //     $targetId, 
-        //     $request->type, 
-        //     $request->payload
-        // ))->toOthers();
+        broadcast(new AudioRoomSignal(
+            $room->id, 
+            $senderId, 
+            $targetId, 
+            $request->type, 
+            $request->payload
+        ))->toOthers();
 
         return response()->json(['message' => 'Signal dispatched']);
     }

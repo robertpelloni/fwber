@@ -4,8 +4,8 @@ import { useState } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import AppHeader from '@/components/AppHeader'
 import { apiClient } from '@/lib/api/client'
-import { 
-  Sparkles, ArrowLeft, RefreshCw, Share2, 
+import {
+  Sparkles, ArrowLeft, RefreshCw, Share2,
   Flag, ThumbsUp, ThumbsDown, Zap
 } from 'lucide-react'
 import Link from 'next/link'
@@ -45,7 +45,7 @@ export default function VibeCheckPage() {
     const greenList = result.green_flags.slice(0, 2).join(', ')
     const redList = result.red_flags.slice(0, 2).join(', ')
     const shareText = `My Vibe Check: Green flags - ${greenList}. Red flags - ${redList}. Get yours at fwber!`
-    
+
     if (navigator.share) {
       try {
         await navigator.share({
@@ -65,11 +65,11 @@ export default function VibeCheckPage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gradient-to-b from-emerald-950 via-teal-950 to-black">
         <AppHeader />
-        
+
         <main className="max-w-2xl mx-auto px-4 py-6">
           <div className="flex items-center gap-3 mb-8">
-            <Link 
-              href="/home" 
+            <Link
+              href="/wingman"
               className="p-2 -ml-2 hover:bg-teal-800/30 rounded-lg transition"
             >
               <ArrowLeft className="w-5 h-5 text-gray-400" />
@@ -87,7 +87,7 @@ export default function VibeCheckPage() {
 
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-green-500/20 rounded-3xl blur-xl" />
-            
+
             <div className="relative bg-gradient-to-br from-emerald-900/80 via-teal-900/80 to-slate-900/80 rounded-3xl border border-emerald-500/30 overflow-hidden">
               <div className="relative p-8 text-center">
                 <div className="mb-6">
@@ -102,7 +102,7 @@ export default function VibeCheckPage() {
                       What are your dating red and green flags?
                     </h2>
                     <p className="text-gray-400 max-w-md mx-auto">
-                      Based on your profile, we&apos;ll analyze your personality 
+                      Based on your profile, we&apos;ll analyze your personality
                       to reveal your dating strengths and areas to work on.
                     </p>
                   </div>

@@ -31,7 +31,8 @@ import {
     Mic,
     Briefcase,
     CalendarHeart,
-    Shield
+    Shield,
+    Gamepad2
 } from 'lucide-react'
 
 interface AppHeaderProps {
@@ -56,6 +57,7 @@ const navLinks = [
     { href: '/deals', label: 'Deals', icon: Tag },
     { href: '/bounties', label: 'Bounties', icon: Target },
     { href: '/nearby', label: 'Nearby', icon: MapPin },
+    { href: '/wingman', label: 'Arcade', icon: Gamepad2 },
     { href: '/wallet', label: 'Wallet', icon: Wallet },
     { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
 ]

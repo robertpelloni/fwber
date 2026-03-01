@@ -4,11 +4,12 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Mic, MicOff, LogOut, Loader2, User as UserIcon } from 'lucide-react';
+import { Mic, MicOff, LogOut, Loader2, User as UserIcon, Hand } from 'lucide-react';
 import { apiClient } from '@/lib/api/client';
 import { useToast } from '@/components/ui/use-toast';
 import { useWebRTC } from '@/lib/hooks/useWebRTC';
 import { useAuth } from '@/lib/auth-context';
+import { usePusherLogic } from '@/lib/hooks/use-pusher-logic';
 
 interface RoomParticipant {
     id: number;
@@ -38,9 +39,13 @@ export default function ActiveAudioRoom() {
     const [isMuted, setIsMuted] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    const { startLocalAudio, stopLocalAudio, toggleMute } = useWebRTC({
+    // Get Echo instance
+    const { echo } = usePusherLogic({ autoConnect: true });
+
+    const { startLocalAudio, stopLocalAudio, toggleMute, createOfferForPeer, remoteStreams } = useWebRTC({
         roomId: id,
-        userId: 0 // Target peer ID would be set dynamically per-peer in a real scalable setup
+        currentUserId: user?.id || 0,
+        echoInstance: echo
     });
 
     useEffect(() => {
@@ -53,6 +58,16 @@ export default function ActiveAudioRoom() {
                 // Initialize local mic
                 await startLocalAudio();
 
+                // If we're a speaker, offer to other speakers
+                const me = resp.data.participants.find(p => p.user_id === user?.id);
+                if (me?.role === 'speaker' || resp.data.room.host_id === user?.id) {
+                    resp.data.participants.forEach(p => {
+                        if (p.user_id !== user?.id && (p.role === 'speaker' || p.user_id === resp.data.room.host_id)) {
+                            createOfferForPeer(p.user_id);
+                        }
+                    });
+                }
+
             } catch (error: any) {
                 toast({ variant: 'destructive', title: 'Cannot join room', description: error.response?.data?.message || 'Room might be ended.' });
                 router.push('/audio-rooms');
@@ -61,14 +76,104 @@ export default function ActiveAudioRoom() {
             }
         };
 
-        joinAndInit();
+        if (user?.id) {
+            joinAndInit();
+        }
 
         return () => {
             // Leave room when unmounting
             stopLocalAudio();
-            apiClient.post(`/audio-rooms/${id}/leave`).catch(() => { });
+            if (user?.id) {
+                apiClient.post(`/audio-rooms/${id}/leave`).catch(() => { });
+            }
         };
-    }, [id]);
+    }, [id, user?.id]);
+
+    useEffect(() => {
+        if (!echo || !room) return;
+
+        const channel = echo.join(`audio-rooms.${id}`);
+
+        channel.listen('.ParticipantJoined', (e: any) => {
+            setRoom(prev => {
+                if (!prev) return prev;
+                // Add participant if not exists
+                const exists = prev.participants.find(p => p.user_id === e.participant.user_id);
+                if (exists) return prev;
+                return { ...prev, participants: [...prev.participants, e.participant] };
+            });
+
+            // If the new participant is a speaker and we are a speaker, create an offer
+            const me = room.participants.find(p => p.user_id === user?.id) || (room.host_id === user?.id ? { role: 'speaker' } : null);
+            if (me?.role === 'speaker' && (e.participant.role === 'speaker' || e.participant.user_id === room.host_id)) {
+                // To avoid glare, higher ID sends offer
+                if ((user?.id || 0) > e.participant.user_id) {
+                    // Small delay to ensure they've set up their peer connection listener
+                    setTimeout(() => createOfferForPeer(e.participant.user_id), 1000);
+                }
+            }
+        });
+
+        channel.listen('.ParticipantLeft', (e: any) => {
+            setRoom(prev => {
+                if (!prev) return prev;
+                return { ...prev, participants: prev.participants.filter(p => p.user_id !== e.user_id) };
+            });
+            // If host left, maybe boot everyone or show message
+            if (e.user_id === room.host_id) {
+                toast({ title: 'Room Ended', description: 'The host has left the room.' });
+                router.push('/audio-rooms');
+            }
+        });
+
+        return () => {
+            echo.leave(`audio-rooms.${id}`);
+        };
+    }, [echo, room?.id, user?.id, createOfferForPeer]);
+
+    // Listen for private signals (like raise-hand)
+    useEffect(() => {
+        if (!echo || !user?.id) return;
+        const channel = echo.private(`users.${user.id}`);
+
+        channel.listen('.AudioRoomSignal', (e: any) => {
+            if (e.room_id == id && e.type === 'raise-hand') {
+                toast({
+                    title: 'Audience Request',
+                    description: 'A listener has raised their hand to speak!',
+                    duration: 4000
+                });
+            }
+        });
+
+    }, [echo, user?.id, id, toast]);
+
+    // Render remote audio streams
+    useEffect(() => {
+        // Attach streams to audio elements dynamically
+        Object.entries(remoteStreams).forEach(([peerId, stream]) => {
+            let audioEl = document.getElementById(`audio-peer-${peerId}`) as HTMLAudioElement;
+            if (!audioEl) {
+                audioEl = document.createElement('audio');
+                audioEl.id = `audio-peer-${peerId}`;
+                audioEl.autoplay = true;
+                // Hide it
+                audioEl.style.display = 'none';
+                document.body.appendChild(audioEl);
+            }
+            if (audioEl.srcObject !== stream) {
+                audioEl.srcObject = stream;
+            }
+        });
+
+        return () => {
+            // Cleanup audio elements
+            Object.keys(remoteStreams).forEach(peerId => {
+                const el = document.getElementById(`audio-peer-${peerId}`);
+                if (el) el.remove();
+            });
+        };
+    }, [remoteStreams]);
 
     const handleToggleMute = () => {
         toggleMute();
@@ -92,6 +197,7 @@ export default function ActiveAudioRoom() {
     const speakers = room.participants.filter(p => p.role === 'speaker' || p.user_id === room.host_id);
     const listeners = room.participants.filter(p => p.role === 'listener' && p.user_id !== room.host_id);
     const isHost = user?.id === room.host_id;
+    const me = room.participants.find(p => p.user_id === user?.id) || (isHost ? { role: 'speaker' } as any : null);
 
     return (
         <div className="container max-w-3xl mx-auto py-8 px-4 h-full flex flex-col">
@@ -150,14 +256,32 @@ export default function ActiveAudioRoom() {
 
                 {/* Bottom Controls */}
                 <div className="p-4 border-t bg-muted/20 flex justify-center gap-4">
-                    <Button
-                        size="lg"
-                        variant={isMuted ? "outline" : "default"}
-                        className={`rounded-full w-16 h-16 p-0 ${isMuted ? 'border-destructive text-destructive' : ''}`}
-                        onClick={handleToggleMute}
-                    >
-                        {isMuted ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
-                    </Button>
+                    {me?.role === 'speaker' || isHost ? (
+                        <Button
+                            size="lg"
+                            variant={isMuted ? "outline" : "default"}
+                            className={`rounded-full w-16 h-16 p-0 ${isMuted ? 'border-destructive text-destructive' : ''}`}
+                            onClick={handleToggleMute}
+                        >
+                            {isMuted ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
+                        </Button>
+                    ) : (
+                        <Button
+                            size="lg"
+                            variant="secondary"
+                            className="rounded-full w-16 h-16 p-0 hover:bg-primary/20 hover:text-primary transition"
+                            onClick={() => {
+                                toast({ title: 'Hand Raised', description: 'The host will see your request to speak.' });
+                                apiClient.post(`/audio-rooms/${id}/signal`, {
+                                    target_user_id: room.host_id,
+                                    type: 'raise-hand',
+                                    payload: {}
+                                }).catch(() => { });
+                            }}
+                        >
+                            <Hand className="w-6 h-6" />
+                        </Button>
+                    )}
                 </div>
             </Card>
         </div>
