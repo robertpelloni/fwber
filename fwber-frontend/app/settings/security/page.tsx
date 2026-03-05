@@ -3,18 +3,52 @@
 import { useState } from 'react';
 import { useE2EEncryption } from '@/lib/hooks/use-e2e-encryption';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Lock, RefreshCw, Key, ShieldCheck, AlertTriangle, Globe } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Lock, RefreshCw, Key, ShieldCheck, AlertTriangle, Globe, UserX } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import AppHeader from '@/components/AppHeader';
+import { useAuth } from '@/lib/auth-context';
+import { api } from '@/lib/api/client';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
 export default function SecuritySettingsPage() {
   const { isReady, regenerateKeys } = useE2EEncryption();
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [isFederated, setIsFederated] = useState(false); // Default to off, load from API in prod
+  const [decoyPassword, setDecoyPassword] = useState('');
+  const [isDecoyLoading, setIsDecoyLoading] = useState(false);
   const { toast } = useToast();
+
+  const handleCreateDecoy = async () => {
+    if (decoyPassword.length < 8) {
+      toast({ title: 'Error', description: 'Password must be at least 8 characters.', variant: 'destructive' });
+      return;
+    }
+    setIsDecoyLoading(true);
+    try {
+      await api.post('/settings/decoy-profile', { decoy_password: decoyPassword });
+      toast({ title: 'Success', description: 'Decoy Profile linked to this password.' });
+      setDecoyPassword('');
+    } catch (e) {
+      toast({ title: 'Error', description: 'Failed to create decoy profile.', variant: 'destructive' });
+    } finally {
+      setIsDecoyLoading(false);
+    }
+  };
+
+  const handleRemoveDecoy = async () => {
+    setIsDecoyLoading(true);
+    try {
+      await api.delete('/settings/decoy-profile');
+      toast({ title: 'Removed', description: 'Decoy Profile detached.' });
+    } catch (e) {
+      toast({ title: 'Error', description: 'Failed to remove', variant: 'destructive' });
+    } finally {
+      setIsDecoyLoading(false);
+    }
+  };
 
   const handleRegenerateKeys = async () => {
     if (!confirm('Are you sure? This will make previous encrypted messages unreadable on this device.')) {
@@ -149,6 +183,41 @@ export default function SecuritySettingsPage() {
                 </p>
               </div>
             </CardContent>
+          </Card>
+
+          <Card className="border-red-200 dark:border-red-900/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                <UserX className="w-5 h-5 text-red-500" />
+                Emergency Decoy Profile
+              </CardTitle>
+              <CardDescription>
+                If you are ever coerced into opening this app, you can log in with a secondary &quot;Decoy Password&quot;. This will seamlessly log you into a completely different, plausible profile instead of your real one.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="decoy">Set Decoy Password</Label>
+                <Input
+                  id="decoy"
+                  type="password"
+                  value={decoyPassword}
+                  onChange={e => setDecoyPassword(e.target.value)}
+                  placeholder="A password different from your main one"
+                />
+                <p className="text-xs text-gray-500">
+                  Use your normal login email, but enter this alternate password at the login screen.
+                </p>
+              </div>
+            </CardContent>
+            <CardFooter className="flex gap-2">
+              <Button variant="default" onClick={handleCreateDecoy} disabled={isDecoyLoading || !decoyPassword}>
+                {isDecoyLoading ? 'Saving...' : 'Set Decoy Password'}
+              </Button>
+              <Button variant="outline" onClick={handleRemoveDecoy} disabled={isDecoyLoading}>
+                Disable Decoy Mode
+              </Button>
+            </CardFooter>
           </Card>
         </div>
       </main>

@@ -2,6 +2,13 @@ oProceedrocddPro# Changelog
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2026-03-05
+### Added
+- **Decoy Profile Mode**: Added a "Decoy Password" feature to the Security Settings.
+- If a user is coerced into logging in, they can use their Decoy Password to seamlessly log into a completely separate, plausible dummy profile rather than revealing their actual account.
+- Backend: Handled securely in the `AuthController` login flow, checking `isDecoyAuth` and routing to the linked `decoy_user_id`.
+- Decoy Setup: Creates a secondary user account and dummy profile data transparently for plausible deniability.
+
 ## [1.0.9] - 2026-03-01
 ### Added
 - **Audio Rooms Real-Time Engagement**: Fully functional "Clubhouse-style" mesh WebRTC networking.

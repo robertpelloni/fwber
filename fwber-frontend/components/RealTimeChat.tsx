@@ -9,7 +9,7 @@ import { EvolvingAvatar } from '@/components/ui/EvolvingAvatar';
 import { WingmanSuggestions } from '@/components/ai/WingmanSuggestions';
 import AudioRecorder from '@/components/AudioRecorder';
 import { api } from '@/lib/api/client';
-import { Languages, Loader2, Sparkles, Gift as GiftIcon, Lock, Video, MoreVertical, Paperclip, X, ThumbsUp, Heart, Laugh, BookOpen, MessageSquareQuote } from 'lucide-react';
+import { Languages, Loader2, Sparkles, Gift as GiftIcon, Lock, Video, MoreVertical, Paperclip, X, ThumbsUp, Heart, Laugh, BookOpen, MessageSquareQuote, Star } from 'lucide-react';
 import { useTranslation } from '@/lib/hooks/use-translation';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { MatchInsights } from '@/components/matches/MatchInsights';
@@ -37,6 +37,7 @@ interface RealTimeChatProps {
   onProfileView?: () => void;
   onReport?: () => void;
   onBlock?: () => void;
+  onRateDate?: () => void;
 }
 
 function TranslateButton({ text, isOwnMessage }: { text: string, isOwnMessage: boolean }) {
@@ -124,7 +125,8 @@ export default function RealTimeChat({
   onVideoCall,
   onProfileView,
   onReport,
-  onBlock
+  onBlock,
+  onRateDate
 }: RealTimeChatProps) {
   const [message, setMessage] = useState('');
   const [isRecordingVoice, setIsRecordingVoice] = useState(false);
@@ -410,6 +412,16 @@ export default function RealTimeChat({
               <MatchInsights matchId={recipientId} />
             </DialogContent>
           </Dialog>
+
+          {onRateDate && (
+            <button
+              onClick={onRateDate}
+              className="p-2 hover:bg-gray-700 rounded-full text-gray-400 hover:text-green-400 transition-colors"
+              title="Rate Date Feedback"
+            >
+              <Star className="w-5 h-5" />
+            </button>
+          )}
 
           <div className="relative">
             <button

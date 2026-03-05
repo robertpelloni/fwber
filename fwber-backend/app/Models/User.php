@@ -31,10 +31,14 @@ class User extends Authenticatable
         'onboarding_completed_at',
         'last_daily_bonus_at',
         'role',
+        'decoy_password',
+        'decoy_user_id',
+        'is_decoy',
     ];
 
     protected $hidden = [
         'password',
+        'decoy_password',
         'remember_token',
         'two_factor_secret',
         'two_factor_recovery_codes',
@@ -52,6 +56,7 @@ class User extends Authenticatable
         'golden_tickets_remaining' => 'integer',
         'last_daily_bonus_at' => 'datetime',
         'onboarding_completed_at' => 'datetime',
+        'is_decoy' => 'boolean',
     ];
 
     protected $appends = [

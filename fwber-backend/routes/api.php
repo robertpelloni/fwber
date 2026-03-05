@@ -178,6 +178,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('profile/completeness', [\App\Http\Controllers\ProfileController::class, 'completeness']);
     Route::get('profile/export', [\App\Http\Controllers\ProfileController::class, 'export']);
 
+    // Security & Decoy Profile
+    Route::prefix('settings')->group(function () {
+        Route::post('decoy-profile', [\App\Http\Controllers\DecoyProfileController::class, 'setup']);
+        Route::delete('decoy-profile', [\App\Http\Controllers\DecoyProfileController::class, 'remove']);
+    });
+    Route::put('profile', [\App\Http\Controllers\ProfileController::class, 'update']);
+    Route::patch('profile/emotion', [\App\Http\Controllers\AvatarEmotionController::class, 'update']);
+    Route::put('profile/password', [\App\Http\Controllers\ProfileController::class, 'updatePassword']);
+    Route::delete('profile', [\App\Http\Controllers\ProfileController::class, 'destroy']);
+    Route::get('profile/completeness', [\App\Http\Controllers\ProfileController::class, 'completeness']);
+    Route::get('profile/export', [\App\Http\Controllers\ProfileController::class, 'export']);
+
     // GDPR Data Export
     Route::post('user/export', [\App\Http\Controllers\DataExportController::class, 'requestExport'])->middleware('throttle:1,1440'); // Once per day
     Route::get('user/export/status', [\App\Http\Controllers\DataExportController::class, 'checkStatus']);
@@ -310,6 +322,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('matches/{id}/insights', [\App\Http\Controllers\MatchInsightsController::class, 'show']);
     Route::post('matches/{id}/insights/unlock', [\App\Http\Controllers\MatchInsightsController::class, 'unlock']);
     Route::post('matches/action', [\App\Http\Controllers\MatchController::class, 'action'])->middleware('throttle:matching');
+    
+    // Post-Date Feedback
+    Route::post('matches/{matchId}/feedback', [\App\Http\Controllers\DateFeedbackController::class, 'store']);
+    Route::get('matches/{matchId}/feedback', [\App\Http\Controllers\DateFeedbackController::class, 'show']);
 
     // Direct Messages
     Route::get('messages/unread-count', [\App\Http\Controllers\MessageController::class, 'unreadCount']);

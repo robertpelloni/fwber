@@ -1,7 +1,7 @@
 # TODO — fwber Short-Term Task List
 
-> **Version:** 1.0.7
-> **Last Updated:** 2026-02-26  
+> **Version:** 1.1.0
+> **Last Updated:** 2026-03-05  
 > **Priority Legend:** 🔴 Critical | 🟡 High | 🟢 Medium | ⚪ Low
 
 ---

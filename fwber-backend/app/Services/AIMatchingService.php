@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\UserProfile;
+use App\Models\DateFeedback;
 use App\Models\MatchAction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
@@ -356,6 +357,10 @@ class AIMatchingService
         // Recency score (15%)
         $recencyScore = $this->calculateRecencyScore($candidate);
         $score += $recencyScore * 0.15;
+
+        // Post-Date Feedback Modifier (up to +/- 15 points based on historical ratings of similar profiles)
+        $feedbackModifier = $this->calculateDateFeedbackModifier($user, $candidateProfile);
+        $score += $feedbackModifier;
 
         return min(100, max(0, $score));
     }
@@ -752,6 +757,42 @@ class AIMatchingService
         }
 
         return $score;
+    }
+
+    private function calculateDateFeedbackModifier(User $user, UserProfile $candidateProfile): float
+    {
+        $modifier = 0;
+
+        // Fetch user's historical date feedback
+        $feedbacks = DateFeedback::where('reporting_user_id', $user->id)
+            ->with('subject.profile')
+            ->get();
+
+        if ($feedbacks->isEmpty() || !$candidateProfile->personality_type) {
+            return 0; // No historical data or nothing to compare against
+        }
+
+        foreach ($feedbacks as $feedback) {
+            $pastProfile = $feedback->subject?->profile;
+            if (!$pastProfile) continue;
+
+            // If safety concerns were flagged for a highly similar demographic/personality, apply a strong penalty.
+            // (Assuming personality type is the primary heuristic for 'similarity' here)
+            $isSimilar = $pastProfile->personality_type === $candidateProfile->personality_type;
+            
+            if ($isSimilar) {
+                if ($feedback->safety_concerns) {
+                    $modifier -= 15; // Strong penalty for safety patterns
+                } elseif ($feedback->rating <= 2) {
+                    $modifier -= 5;  // Negative feedback pattern
+                } elseif ($feedback->rating >= 4) {
+                    $modifier += 5;  // Positive feedback pattern
+                }
+            }
+        }
+
+        // Cap the modifier influence
+        return min(15, max(-20, $modifier));
     }
 
     private function calculateCommunicationScore(UserProfile $userProfile, UserProfile $candidateProfile): float

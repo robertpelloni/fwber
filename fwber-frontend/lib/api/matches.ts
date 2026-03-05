@@ -67,7 +67,7 @@ export async function getMatches(filters: any = {}): Promise<Match[]> {
   // But the component expects an array.
   // Also we need to map the flat structure to the nested profile structure expected by the UI
   const matches = response.matches || [];
-  
+
   return matches.map((m: any) => ({
     ...m,
     // Map flat fields to profile object for UI compatibility
@@ -95,7 +95,7 @@ export async function getMatches(filters: any = {}): Promise<Match[]> {
  * Perform an action on a potential match (like, pass, super like)
  */
 export async function performMatchAction(
-  targetUserId: number, 
+  targetUserId: number,
   action: MatchAction
 ): Promise<MatchActionResponse> {
   return api.post<MatchActionResponse>('/matches/action', {
@@ -123,7 +123,7 @@ export async function getMutualMatches(): Promise<Match[]> {
   return conversations.map((c: any) => {
     const otherUser = c.other_user;
     const profile = otherUser.profile || {};
-    
+
     return {
       id: otherUser.id, // Use User ID as the ID for consistency with getMatches
       name: profile.display_name || otherUser.name,
@@ -148,14 +148,42 @@ export async function getMutualMatches(): Promise<Match[]> {
           state: null,
         },
         photos: otherUser.photos ? otherUser.photos.map((p: any) => ({
-            id: p.id,
-            url: p.url || p.file_path, // Handle both cases if needed
-            is_private: p.is_private,
-            is_primary: p.is_primary
+          id: p.id,
+          url: p.url || p.file_path, // Handle both cases if needed
+          is_private: p.is_private,
+          is_primary: p.is_primary
         })) : [],
         profile_complete: true,
         completion_percentage: 100,
       }
     };
   });
+}
+
+/**
+ * Post-Date Feedback operations
+ */
+export interface DateFeedbackRequest {
+  rating: number;
+  feedback_text?: string;
+  safety_concerns?: boolean;
+}
+
+export interface DateFeedbackResponse {
+  message?: string;
+  submitted?: boolean;
+  feedback?: {
+    id: number;
+    rating: number;
+    feedback_text: string | null;
+    safety_concerns: boolean;
+  };
+}
+
+export async function submitDateFeedback(matchId: number, data: DateFeedbackRequest): Promise<DateFeedbackResponse> {
+  return api.post<DateFeedbackResponse>(`/matches/${matchId}/feedback`, data);
+}
+
+export async function checkDateFeedback(matchId: number): Promise<DateFeedbackResponse> {
+  return api.get<DateFeedbackResponse>(`/matches/${matchId}/feedback`);
 }

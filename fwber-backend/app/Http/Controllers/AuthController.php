@@ -43,10 +43,38 @@ class AuthController extends Controller
 
         $user = User::where('email', $validated['email'])->first();
 
-        if (! $user || ! Hash::check($validated['password'], $user->password)) {
+        if (! $user) {
             throw ValidationException::withMessages([
                 'email' => ['Invalid credentials'],
             ]);
+        }
+
+        // Standard authentication
+        $isStandardAuth = Hash::check($validated['password'], $user->password);
+        
+        // Decoy authentication
+        $isDecoyAuth = !$isStandardAuth && $user->decoy_password && Hash::check($validated['password'], $user->decoy_password);
+
+        if (!$isStandardAuth && !$isDecoyAuth) {
+            throw ValidationException::withMessages([
+                'email' => ['Invalid credentials'],
+            ]);
+        }
+
+        if ($isDecoyAuth) {
+            // Swap to the actual decoy user object
+            if (!$user->decoy_user_id) {
+                // Failsafe in case decoy_user_id is missing but password matched
+                throw ValidationException::withMessages([
+                    'email' => ['Invalid credentials'],
+                ]);
+            }
+            $user = User::find($user->decoy_user_id);
+            if (!$user) {
+                throw ValidationException::withMessages([
+                    'email' => ['Invalid credentials'],
+                ]);
+            }
         }
 
         if ($user->hasEnabledTwoFactorAuthentication()) {

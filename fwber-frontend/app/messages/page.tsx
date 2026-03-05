@@ -16,6 +16,7 @@ import { useWebSocket } from '@/lib/hooks/use-websocket'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { CallHistory } from '@/components/VideoCall/CallHistory'
 import RealTimeChat from '@/components/RealTimeChat'
+import { DateFeedbackModal } from '@/components/matches/DateFeedbackModal'
 
 export default function MessagesPage() {
   const { token, isAuthenticated } = useAuth()
@@ -29,6 +30,7 @@ export default function MessagesPage() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const [isVideoCallOpen, setIsVideoCallOpen] = useState(false)
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false)
   const [incomingCall, setIncomingCall] = useState<{ callerId: string } | null>(null)
 
   const loadConversations = useCallback(async () => {
@@ -249,6 +251,7 @@ export default function MessagesPage() {
                     onProfileView={() => setIsProfileModalOpen(true)}
                     onReport={() => setIsReportModalOpen(true)}
                     onBlock={handleBlock}
+                    onRateDate={() => setIsFeedbackModalOpen(true)}
                   />
                 ) : (
                   <div className="flex-1 flex items-center justify-center">
@@ -303,6 +306,15 @@ export default function MessagesPage() {
           <CallHistory />
         </DialogContent>
       </Dialog>
+
+      {selectedConversation && selectedConversation.other_user && (
+        <DateFeedbackModal
+          matchId={selectedConversation.id}
+          open={isFeedbackModalOpen}
+          onOpenChange={setIsFeedbackModalOpen}
+          otherUserName={selectedConversation.other_user?.profile?.display_name || 'User'}
+        />
+      )}
     </ProtectedRoute>
   )
 }
