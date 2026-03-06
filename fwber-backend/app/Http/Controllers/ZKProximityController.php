@@ -24,7 +24,11 @@ class ZKProximityController extends Controller
             'target_entity_type' => 'required|string|in:venue,user,event,chatroom',
             'target_entity_id' => 'required|integer',
             'proof_payload' => 'required|array',
+            'proof_payload.geohash' => 'required|string',
+            'proof_payload.signature' => 'required|string',
             'public_signals' => 'required|array',
+            'public_signals.timestamp' => 'required|integer',
+            'public_signals.target_entity_id' => 'required|integer',
             'proof_hash' => 'required|string',
         ]);
 
@@ -33,7 +37,8 @@ class ZKProximityController extends Controller
         // Pass circuit evaluation to the Service
         $isValid = $this->zkService->verifyProof(
             $request->proof_payload, 
-            $request->public_signals
+            $request->public_signals,
+            $request->target_entity_type
         );
 
         if (!$isValid) {

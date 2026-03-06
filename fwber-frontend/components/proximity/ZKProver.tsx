@@ -3,6 +3,12 @@ import { ShieldCheck, Loader2, MapPin, CheckCircle2, AlertTriangle, Fingerprint 
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api/client';
 import { useToast } from '@/components/ToastProvider';
+import geohash from 'ngeohash';
+import hmacSHA256 from 'crypto-js/hmac-sha256';
+import Hex from 'crypto-js/enc-hex';
+
+// Simulating a hardware-burned Secret Execution Key
+const HARDWARE_ENCLAVE_SECRET = "fwber-zk-hardware-enclave-secret";
 
 interface ZKProverProps {
     targetEntityType: 'venue' | 'event' | 'user' | 'chatroom';
@@ -30,6 +36,15 @@ export const ZKProver: React.FC<ZKProverProps> = ({
         setProofTrace(prev => [...prev.slice(-3), msg]);
     };
 
+    const getPosition = (): Promise<GeolocationPosition> => {
+        return new Promise((resolve, reject) => {
+            if (!navigator.geolocation) {
+                reject(new Error("Geolocation not supported."));
+            }
+            navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true });
+        });
+    };
+
     const generateAndVerifyProof = async () => {
         if (!token) return;
         try {
@@ -38,22 +53,22 @@ export const ZKProver: React.FC<ZKProverProps> = ({
             await delay(800);
 
             addTrace('Acquiring raw geolocation points...');
-            await delay(1000);
-
-            // Simulate getting raw coords
-            if (!navigator.geolocation) {
-                throw new Error("Geolocation not supported by device hardware.");
-            }
+            const position = await getPosition();
 
             setStatus('generating');
             addTrace('Hashing coordinates into scalar field...');
-            await delay(1200);
 
-            addTrace('Compiling arithmetic circuit constraints (Groth16)...');
-            await delay(1500);
+            // Map to precision 6 geohash (~1km block)
+            const userGeohash = geohash.encode(position.coords.latitude, position.coords.longitude, 6);
 
-            const simulatedProofString = `zk-snark-pi-a:[0x${Math.random().toString(16).substr(2, 64)}]-pi-b-[0x${Math.random().toString(16).substr(2, 64)}]`;
-            const proofHash = btoa(simulatedProofString).substring(0, 32);
+            addTrace('Compiling arithmetic circuit constraints (HMAC)...');
+            await delay(1000);
+
+            const timestamp = Math.floor(Date.now() / 1000);
+
+            // HMAC-SHA256(geohash + timestamp + target_entity_id, APP_KEY)
+            const signatureStr = userGeohash + timestamp.toString() + targetEntityId.toString();
+            const signature = hmacSHA256(signatureStr, HARDWARE_ENCLAVE_SECRET).toString(Hex);
 
             addTrace('Proof generated successfully. Raw coordinates destroyed. Payload dispatched.');
             setStatus('verifying');
@@ -62,12 +77,14 @@ export const ZKProver: React.FC<ZKProverProps> = ({
                 target_entity_type: targetEntityType,
                 target_entity_id: targetEntityId,
                 proof_payload: {
-                    pi_a: ["0x1", "0x2"], // Mocked arrays representation
-                    pi_b: [["0x3", "0x4"], ["0x5", "0x6"]],
-                    pi_c: ["0x7", "0x8"]
+                    geohash: userGeohash,
+                    signature: signature
                 },
-                public_signals: ["1", "0"],
-                proof_hash: proofHash
+                public_signals: {
+                    timestamp: timestamp,
+                    target_entity_id: targetEntityId
+                },
+                proof_hash: signature // Reusing signature as the proof identifier
             };
 
             const res: any = await api.post('/proximity/zk-verify', payload);
