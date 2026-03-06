@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Models\ProximityArtifact;
 
 class AvatarGenerationService
 {
@@ -51,13 +52,27 @@ class AvatarGenerationService
         $prompt = $this->buildPrompt($user, $options);
         $negativePrompt = $this->buildNegativePrompt();
 
+        $vibe = $this->analyzeUserVibe($user);
+
         try {
-            return match ($provider) {
+            $result = match ($provider) {
                 'dalle' => $this->generateWithDalle($prompt, $options),
                 'gemini' => $this->generateWithGemini($prompt, $negativePrompt, $options),
                 'replicate' => $this->generateWithReplicate($prompt, $negativePrompt, $options),
                 default => throw new \Exception("Unsupported provider: {$provider}"),
             };
+            
+            // Map the vibe to a clean string for metadata saving, removing the verbose prompt modifiers
+            $cleanVibe = null;
+            if ($vibe) {
+                 if (str_contains($vibe, 'energetic aura')) $cleanVibe = 'energetic';
+                 elseif (str_contains($vibe, 'relaxed aura')) $cleanVibe = 'relaxed';
+                 elseif (str_contains($vibe, 'intense aura')) $cleanVibe = 'edgy';
+            }
+
+            $result['vibe'] = $cleanVibe;
+            return $result;
+            
         } catch (\Exception $e) {
             Log::error("Avatar generation failed with provider {$provider}", [
                 'user_id' => $user->id,
@@ -436,12 +451,18 @@ class AvatarGenerationService
         $fitnessLevel = $get('fitness_level');
         if ($fitnessLevel) $parts[] = $fitnessLevel . ' build';
 
-        // Personality & Vibe (MBTI)
-        $mbti = $get('personality_type');
-        if ($mbti) {
-            $firstLetter = strtoupper(substr($mbti, 0, 1));
-            if ($firstLetter === 'E') $parts[] = 'energetic, friendly expression';
-            elseif ($firstLetter === 'I') $parts[] = 'calm, thoughtful expression';
+        // Calculate Vibe from Local Pulse Posts
+        $vibe = $this->analyzeUserVibe($user);
+        if ($vibe) {
+            $parts[] = $vibe;
+        } else {
+            // Personality & Vibe (MBTI) fallback
+            $mbti = $get('personality_type');
+            if ($mbti) {
+                $firstLetter = strtoupper(substr($mbti, 0, 1));
+                if ($firstLetter === 'E') $parts[] = 'energetic, friendly expression';
+                elseif ($firstLetter === 'I') $parts[] = 'calm, thoughtful expression';
+            }
         }
 
         // Background context from interests
@@ -480,5 +501,59 @@ class AvatarGenerationService
             'trans-female' => 'woman',
             default => 'person',
         };
+    }
+
+    private function analyzeUserVibe(User $user): ?string
+    {
+        // Get the user's last 5 textual posts in the Local Pulse
+        $recentPosts = ProximityArtifact::where('user_id', $user->id)
+            ->where('type', 'board_post')
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->pluck('content')
+            ->toArray();
+
+        if (empty($recentPosts)) {
+            return null; // No recent pulse data, fallback to MBTI
+        }
+
+        $combinedText = strtolower(implode(' ', $recentPosts));
+
+        // High Energy / Positive Keywords
+        $energeticScore = 0;
+        $energeticWords = ['party', 'drinks', 'fun', 'excited', 'amazing', 'love', 'wild', 'club', 'dancing', 'friends', 'concert', 'happy', 'weekend', 'tonight', 'epic'];
+        
+        // Relaxed / Cozy Keywords
+        $relaxedScore = 0;
+        $relaxedWords = ['movie', 'home', 'chill', 'tired', 'coffee', 'book', 'reading', 'rain', 'cozy', 'netflix', 'relaxing', 'quiet', 'sleep', 'morning', 'peaceful'];
+
+        // Dark / Edgy Keywords
+        $edgyScore = 0;
+        $edgyWords = ['bored', 'annoyed', 'sad', 'angry', 'hate', 'ugh', 'dark', 'midnight', 'alone', 'lost', 'done', 'broken', 'crazy', 'mad'];
+
+        foreach ($energeticWords as $word) {
+            if (str_contains($combinedText, $word)) $energeticScore++;
+        }
+        foreach ($relaxedWords as $word) {
+            if (str_contains($combinedText, $word)) $relaxedScore++;
+        }
+        foreach ($edgyWords as $word) {
+            if (str_contains($combinedText, $word)) $edgyScore++;
+        }
+
+        if ($energeticScore == 0 && $relaxedScore == 0 && $edgyScore == 0) {
+            return null; // Texts were neutral
+        }
+
+        // Determine the dominant vibe
+        $maxScore = max($energeticScore, $relaxedScore, $edgyScore);
+
+        if ($maxScore == $energeticScore) {
+            return 'energetic aura, vibrant warm lighting, confident and playful expression, lively mood';
+        } elseif ($maxScore == $relaxedScore) {
+            return 'relaxed aura, soft warm lighting, calm and thoughtful expression, cozy cozy mood';
+        } else {
+            return 'intense aura, dramatic cinematic lighting, serious and striking expression, moody and edgy';
+        }
     }
 }

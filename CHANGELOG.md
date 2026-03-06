@@ -2,6 +2,42 @@ oProceedrocddPro# Changelog
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.2] - 2026-03-06
+
+### Added
+- **Evolving AI Avatars (Vibe-Aware)**: Implemented dynamic avatar modifiers based on the user's recent Local Pulse text posts.
+  - Backend: `AvatarGenerationService` automatically analyzes the sentiment of the last 5 posts to inject mood/vibe descriptions into DALL-E prompts.
+  - Generates robust fallback configurations ensuring stable prompts if users lack sufficient textual posting history.
+  - Includes robust SQLite testing via `ProximityArtifactFactory`.
+  - Frontend: Interactive profile settings display instructing users on the dynamic lighting and expression linkages.
+  
+## [1.3.1] - 2026-03-05
+
+### Added
+- **AI Date Planner API**: Implemented the backend endpoint for the frontend's Date Planner feature. The `AIMatchingService` now uses OpenAI (`gpt-4o-mini`) to generate customized date itineraries based on matched users' profiles and an optional target location. Ensure users can only generate ideas for valid matches.
+- **Burner Communication Bridge**: Implemented the complete frontend interface for the privacy-first Burner Link feature. Users can now generate a scannable QR code & expiring link at `/burner`. Scanning a link directs a connecting user to `/burner/join/[token]` where an ephemeral 24-hour chatroom is automatically established between both parties.
+
+## [1.3.0] - 2026-03-05
+
+### Added
+- **Panic Button & Safe Walk UI**: Implemented the frontend interface for the new safety features.
+  - New `SafetyPage` (`/safety`) dashboard for managing Emergency Contacts and triggering Panic alerts.
+  - Global `SafeWalkTracker` component injected into the root layout for persistent background location tracking during an active Safe Walk.
+  - Integration with the pre-existing backend safety API endpoints (v1.0.5).
+
+## [1.2.0] - 2026-03-06
+### Added
+- **Chemistry Score Post-Date Feedback Loop**: Closed-loop learning system for AI-powered match improvement.
+  - Backend: `DateFeedback` model & migration with `match_id`, `reporting_user_id`, `subject_user_id`, `rating` (1-5), `feedback_text`, and `safety_concerns` fields.
+  - Backend: `DateFeedbackController` with `store` (submit) and `show` (check existing) actions.
+  - Backend: `AIMatchingService.calculateDateFeedbackModifier()` — adjusts compatibility scores ±15 points based on historical date ratings with similar personality types.
+  - Backend: `DateFeedbackTest.php` — 3 feature tests (10 assertions) covering submission, duplicate prevention, and retrieval.
+  - Frontend: `DateFeedbackModal` component with interactive star rating, private notes, and safety concern toggle.
+  - Frontend: API bindings `submitDateFeedback()` and `checkDateFeedback()` in `lib/api/matches.ts`.
+  - Frontend: "Rate Date" star button integrated into the `RealTimeChat` header for established matches.
+### Fixed
+- Fixed default import error for `api` in `app/settings/security/page.tsx` (changed to named import).
+
 ## [1.1.0] - 2026-03-05
 ### Added
 - **Decoy Profile Mode**: Added a "Decoy Password" feature to the Security Settings.
