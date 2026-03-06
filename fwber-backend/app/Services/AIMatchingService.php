@@ -915,4 +915,73 @@ class AIMatchingService
         
         Cache::tags(['ai_matches'])->flush();
     }
+
+    public function generateDateIdeas(User $user1, User $user2, ?string $location = null): array
+    {
+        $openaiKey = config('services.openai.api_key');
+        if (!$openaiKey) {
+            // Fallback mock ideas if OpenAI fails or is not configured
+            return [
+                'ideas' => [
+                    [
+                        'title' => 'Coffee & Walk',
+                        'description' => 'A casual meetup at a local cafe and a walk in the park.',
+                        'reason' => 'Low pressure setting to get to know each other.',
+                        'venue' => $location ?? 'Local Coffee Shop',
+                        'estimated_cost' => '$10-$20',
+                        'duration' => '1.5 hours',
+                        'conversation_starter' => 'What is a typical Sunday like for you?'
+                    ]
+                ]
+            ];
+        }
+
+        $prompt = "You are an expert dating concierge AI. Your task is to generate 3-5 highly creative, personalized date itineraries for two matched users based on their profiles. Return the response as a JSON object matching this schema: {\"ideas\": [{\"title\": \"string\", \"description\": \"string\", \"reason\": \"string (why this fits both profiles)\", \"venue\": \"string (optional location name based on provided location parameter)\", \"estimated_cost\": \"string (e.g., $$-$$$)\", \"duration\": \"string (e.g., 2 hours)\", \"conversation_starter\": \"string (a unique opening question related to the date/profiles)\"}]} \n\n"
+                . "User 1 Profile: " . json_encode($user1->profile?->toArray() ?? []) . "\n"
+                . "User 2 Profile: " . json_encode($user2->profile?->toArray() ?? []) . "\n";
+                
+        if ($location) {
+            $prompt .= "Target Location Context: " . $location . "\n";
+        }
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::withToken($openaiKey)
+                ->timeout(15) // Give AI time to think
+                ->post('https://api.openai.com/v1/chat/completions', [
+                    'model' => 'gpt-4o-mini',
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'You must always return valid JSON that perfectly matches the requested schema.'],
+                        ['role' => 'user', 'content' => $prompt]
+                    ],
+                    'response_format' => ['type' => 'json_object'],
+                    'temperature' => 0.7,
+                ]);
+
+            if ($response->successful()) {
+                $content = $response->json('choices.0.message.content');
+                if ($content) {
+                    $decoded = json_decode($content, true);
+                    if (json_last_error() === JSON_ERROR_NONE && isset($decoded['ideas'])) {
+                        return $decoded;
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('OpenAI Date Planner Failed: ' . $e->getMessage());
+        }
+
+        return [
+            'ideas' => [
+                [
+                    'title' => 'Casual Coffee Connection',
+                    'description' => 'A relaxed meetup at a nearby cafe.',
+                    'reason' => 'A great, low-pressure way to start a connection.',
+                    'venue' => $location ?? 'Local Cafe',
+                    'estimated_cost' => '$10-$20',
+                    'duration' => '1-2 hours',
+                    'conversation_starter' => 'What was the highlight of your week?'
+                ]
+            ]
+        ];
+    }
 }

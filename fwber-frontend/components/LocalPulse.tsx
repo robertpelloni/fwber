@@ -91,7 +91,7 @@ const ArtifactCard = ({
   const amount = artifact.meta?.amount;
   const isPromotion = artifact.type === 'promotion';
   const hasVoting = !isPromotion && artifact.type !== 'token_drop';
-  const score = artifact.votes_sum_vote ?? 0;
+  const score = artifact.votes_sum_value ?? 0;
   const userVote = artifact.user_vote ?? 0;
 
   const handleCommentSubmit = (e: React.FormEvent) => {

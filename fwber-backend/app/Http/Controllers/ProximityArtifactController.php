@@ -59,8 +59,15 @@ class ProximityArtifactController extends Controller
         
         $cacheKey = "proximity:feed:lat:{$gridLat}:lng:{$gridLng}:radius:{$radius}:type:{$type}";
 
-        $artifacts = Cache::remember($cacheKey, 60, function () use ($lat, $lng, $radius, $validated) {
-            $q = ProximityArtifact::query()->active()->withinBox($lat, $lng, $radius);
+        $artifacts = Cache::remember($cacheKey, 60, function () use ($lat, $lng, $radius, $validated, $user) {
+            $q = ProximityArtifact::query()
+                ->withCount('comments')
+                ->withSum('votes', 'value')
+                ->with(['votes' => function($query) use ($user) {
+                    $query->where('user_id', $user->id);
+                }])
+                ->active()
+                ->withinBox($lat, $lng, $radius);
             if (isset($validated['type'])) {
                 $q->type($validated['type']);
             }
@@ -78,6 +85,9 @@ class ProximityArtifactController extends Controller
                         'moderation_status' => $a->moderation_status,
                         'meta' => $a->meta,
                         'user_id' => $a->user_id,
+                        'comments_count' => $a->comments_count ?? 0,
+                        'votes_sum_value' => (int) $a->votes_sum_value ?? 0,
+                        'user_vote' => $a->votes->first()?->value ?? 0,
                     ];
                 });
         });
@@ -171,7 +181,15 @@ class ProximityArtifactController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $artifact = ProximityArtifact::active()->findOrFail($id);
+        $user = auth()->user();
+        $artifact = ProximityArtifact::active()
+            ->withCount('comments')
+            ->withSum('votes', 'value')
+            ->with(['votes' => function($query) use ($user) {
+                $query->where('user_id', $user->id);
+            }])
+            ->findOrFail($id);
+
         return response()->json(['artifact' => [
             'id' => $artifact->id,
             'type' => $artifact->type,
@@ -183,6 +201,9 @@ class ProximityArtifactController extends Controller
             'moderation_status' => $artifact->moderation_status,
             'meta' => $artifact->meta,
             'user_id' => $artifact->user_id,
+            'comments_count' => $artifact->comments_count ?? 0,
+            'votes_sum_value' => (int) $artifact->votes_sum_value ?? 0,
+            'user_vote' => $artifact->votes->first()?->value ?? 0,
         ]]);
     }
 
@@ -340,7 +361,7 @@ class ProximityArtifactController extends Controller
             // Get proximity artifacts with shadow throttle filtering
             $artifacts = ProximityArtifact::query()
                 ->withCount('comments')
-                ->withSum('votes', 'vote')
+                ->withSum('votes', 'value')
                 ->with(['votes' => function($q) use ($user) {
                     $q->where('user_id', $user->id);
                 }])
@@ -374,8 +395,8 @@ class ProximityArtifactController extends Controller
                         'meta' => $a->meta,
                         'user_id' => $a->user_id,
                         'comments_count' => $a->comments_count ?? 0,
-                        'votes_sum_vote' => (int) $a->votes_sum_vote ?? 0,
-                        'user_vote' => $a->votes->first()?->vote ?? 0,
+                        'votes_sum_value' => (int) $a->votes_sum_value ?? 0,
+                        'user_vote' => $a->votes->first()?->value ?? 0,
                     ];
                 });
 
@@ -407,7 +428,7 @@ class ProximityArtifactController extends Controller
                         ],
                         'user_id' => null,
                         'comments_count' => 0,
-                        'votes_sum_vote' => 0,
+                        'votes_sum_value' => 0,
                         'user_vote' => 0,
                     ];
                 });

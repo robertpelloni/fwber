@@ -7,19 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\ProximityArtifact;
 use App\Models\User;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+
 class ProximityArtifactVote extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids;
 
     protected $fillable = [
         'proximity_artifact_id',
         'user_id',
-        'vote',
+        'value',
     ];
 
     public function artifact()
     {
-        return $this->belongsTo(ProximityArtifact::class);
+        return $this->belongsTo(ProximityArtifact::class, 'proximity_artifact_id');
     }
 
     public function user()

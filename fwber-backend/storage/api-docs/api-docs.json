@@ -8349,6 +8349,106 @@
                 ]
             }
         },
+        "/api/proximity/artifacts/{id}/comment": {
+            "post": {
+                "tags": [
+                    "Proximity"
+                ],
+                "summary": "Add a comment to a proximity artifact",
+                "operationId": "dd55063355cb990404a9daf63c1d53bf",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "content"
+                                ],
+                                "properties": {
+                                    "content": {
+                                        "type": "string",
+                                        "maxLength": 500
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Comment created"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/proximity/artifacts/{id}/vote": {
+            "post": {
+                "tags": [
+                    "Proximity"
+                ],
+                "summary": "Vote on a proximity artifact",
+                "operationId": "766ea1857a78ccf06a1bf8ab7b6a36c9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "vote"
+                                ],
+                                "properties": {
+                                    "vote": {
+                                        "type": "integer",
+                                        "enum": [
+                                            1,
+                                            -1,
+                                            0
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Vote recorded"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/proximity-chatrooms/nearby": {
             "get": {
                 "tags": [
@@ -11830,6 +11930,52 @@
                     }
                 ]
             }
+        },
+        "/wingman/date-ideas/{match}": {
+            "get": {
+                "tags": [
+                    "Wingman"
+                ],
+                "summary": "Generate AI Date Ideas",
+                "description": "Generates personalized date ideas for a specific matched pair.",
+                "operationId": "0262f5f83c7255de1c2cd1863af5d0a5",
+                "parameters": [
+                    {
+                        "name": "match",
+                        "in": "path",
+                        "description": "The target User ID of the match",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "location",
+                        "in": "query",
+                        "description": "Optional location context",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "403": {
+                        "description": "Forbidden (Users not matched)"
+                    },
+                    "404": {
+                        "description": "Target user not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -13899,6 +14045,10 @@
         {
             "name": "Proximity Artifacts",
             "description": "Proximity Artifacts"
+        },
+        {
+            "name": "Proximity",
+            "description": "Proximity"
         },
         {
             "name": "Rate Limiting",

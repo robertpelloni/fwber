@@ -24,7 +24,7 @@ export interface ProximityArtifact {
     is_sponsored?: boolean;
   };
   comments_count?: number;
-  votes_sum_vote?: number;
+  votes_sum_value?: number;
   user_vote?: number;
 }
 

@@ -311,8 +311,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('proximity/artifacts/{id}', [\App\Http\Controllers\ProximityArtifactController::class, 'show']);
     Route::post('proximity/artifacts/{id}/claim', [\App\Http\Controllers\ProximityArtifactController::class, 'claim']);
     Route::post('proximity/artifacts/{id}/flag', [\App\Http\Controllers\ProximityArtifactController::class, 'flag']);
-    Route::post('proximity/artifacts/{id}/comment', [\App\Http\Controllers\ProximityArtifactInteractionController::class, 'comment']);
-    Route::post('proximity/artifacts/{id}/vote', [\App\Http\Controllers\ProximityArtifactInteractionController::class, 'vote']);
+    Route::get('proximity/artifacts/{artifact}/comments', [\App\Http\Controllers\API\ProximityArtifactCommentController::class, 'index']);
+    Route::post('proximity/artifacts/{artifact}/comments', [\App\Http\Controllers\API\ProximityArtifactCommentController::class, 'store']);
+    Route::delete('proximity/artifacts/comments/{comment}', [\App\Http\Controllers\API\ProximityArtifactCommentController::class, 'destroy']);
+    Route::post('proximity/artifacts/{artifact}/vote', [\App\Http\Controllers\API\ProximityArtifactVoteController::class, 'vote']);
     Route::delete('proximity/artifacts/{id}', [\App\Http\Controllers\ProximityArtifactController::class, 'destroy']);
     Route::get('proximity/local-pulse', [\App\Http\Controllers\ProximityArtifactController::class, 'localPulse']);
 
@@ -503,7 +505,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('wingman/replies/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'getReplySuggestions']);
         Route::post('wingman/message-feedback/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'analyzeDraft']);
         Route::get('wingman/profile-analysis', [\App\Http\Controllers\AiWingmanController::class, 'getProfileAnalysis']);
-        Route::get('wingman/date-ideas/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'getDateIdeas']);
+        Route::get('wingman/date-ideas/{match}', [\App\Http\Controllers\WingmanController::class, 'generateDateIdeas']);
         Route::post('wingman/roast', [\App\Http\Controllers\AiWingmanController::class, 'roastProfile']);
         Route::get('wingman/vibe-check', [\App\Http\Controllers\AiWingmanController::class, 'checkVibe']);
         Route::get('wingman/fortune', [\App\Http\Controllers\AiWingmanController::class, 'predictFortune']);

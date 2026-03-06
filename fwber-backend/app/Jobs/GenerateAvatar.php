@@ -57,6 +57,7 @@ class GenerateAvatar implements ShouldQueue
                     'provider' => $result['provider'],
                     'model' => $this->options['model'] ?? null,
                     'style' => $this->options['style'] ?? null,
+                    'vibe' => $result['vibe'] ?? null,
                 ];
                 $photo->save();
 

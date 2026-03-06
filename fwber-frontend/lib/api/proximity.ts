@@ -137,10 +137,10 @@ export const proximityApi = {
   /**
    * Add a comment to an artifact
    */
-  commentArtifact: async (id: number, content: string, token: string): Promise<{ message: string; comment: any }> => {
+  commentArtifact: async (id: number, content: string, parent_id?: string, token?: string): Promise<{ message: string; comment: any }> => {
     const response = await axios.post(
-      `${API_BASE_URL}/proximity/artifacts/${id}/comment`,
-      { content },
+      `${API_BASE_URL}/proximity/artifacts/${id}/comments`,
+      { content, parent_id },
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -149,12 +149,25 @@ export const proximityApi = {
   },
 
   /**
+   * Get comments for an artifact
+   */
+  getComments: async (id: number, token?: string): Promise<{ data: any[] }> => {
+    const response = await axios.get(
+      `${API_BASE_URL}/proximity/artifacts/${id}/comments`,
+      {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      }
+    );
+    return response.data;
+  },
+
+  /**
    * Vote on an artifact
    */
-  voteArtifact: async (id: number, vote: number, token: string): Promise<{ message: string; votes_sum_vote: number; user_vote: number }> => {
+  voteArtifact: async (id: number, value: number, token: string): Promise<{ message: string; vote: any }> => {
     const response = await axios.post(
       `${API_BASE_URL}/proximity/artifacts/${id}/vote`,
-      { vote },
+      { value },
       {
         headers: { Authorization: `Bearer ${token}` },
       }

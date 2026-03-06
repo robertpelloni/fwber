@@ -1,409 +1,326 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/auth-context';
+import { useState, useEffect } from 'react';
+import AppHeader from '@/components/AppHeader';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/components/ui/use-toast';
+import { ShieldCheck, Crosshair, Users, MapPin, Plus, Trash2, BellRing, Navigation } from 'lucide-react';
 import {
-    useEmergencyContacts,
-    useAddContact,
-    useDeleteContact,
-    useTriggerPanic,
-    useActiveWalk,
-    useStartSafeWalk,
-    useEndSafeWalk,
-} from '@/lib/hooks/use-safety';
-import {
-    ShieldAlert,
-    UserPlus,
-    Trash2,
-    Navigation,
-    MapPin,
-    Phone,
-    Mail,
-    Footprints,
-    X,
-    AlertTriangle,
-    CheckCircle,
-    Sparkles,
-} from 'lucide-react';
+    getContacts,
+    addContact,
+    deleteContact,
+    triggerPanic,
+    startSafeWalk,
+    EmergencyContact
+} from '@/lib/api/safety';
 
 export default function SafetyPage() {
-    const { isAuthenticated } = useAuth();
-    const router = useRouter();
+    const { toast } = useToast();
 
-    // State
-    const [showAddContact, setShowAddContact] = useState(false);
-    const [contactName, setContactName] = useState('');
-    const [contactPhone, setContactPhone] = useState('');
-    const [contactEmail, setContactEmail] = useState('');
-    const [panicTriggered, setPanicTriggered] = useState(false);
+    // Contacts State
+    const [contacts, setContacts] = useState<EmergencyContact[]>([]);
+    const [isLoadingContacts, setIsLoadingContacts] = useState(true);
+    const [newContactName, setNewContactName] = useState('');
+    const [newContactPhone, setNewContactPhone] = useState('');
+    const [isAddingContact, setIsAddingContact] = useState(false);
+
+    // Safe Walk State
     const [destination, setDestination] = useState('');
-    const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+    const [isStartingWalk, setIsStartingWalk] = useState(false);
 
-    // Hooks
-    const { data: contactsData } = useEmergencyContacts();
-    const addContact = useAddContact();
-    const deleteContact = useDeleteContact();
-    const panic = useTriggerPanic();
-    const { data: walkData } = useActiveWalk();
-    const startWalk = useStartSafeWalk();
-    const endWalk = useEndSafeWalk();
+    // Panic State
+    const [isPanicking, setIsPanicking] = useState(false);
 
-    const activeWalk = walkData?.walk;
-
-    // Get location
     useEffect(() => {
-        if (!navigator.geolocation) return;
-        navigator.geolocation.getCurrentPosition(
-            (pos) => setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-            () => { }
-        );
+        loadContacts();
     }, []);
 
-    const handlePanic = useCallback(() => {
-        panic.mutate(coords || undefined, {
-            onSuccess: () => setPanicTriggered(true),
-        });
-    }, [coords, panic]);
+    const loadContacts = async () => {
+        try {
+            const { contacts } = await getContacts();
+            setContacts(contacts);
+        } catch (e) {
+            toast({ title: 'Error', description: 'Failed to load emergency contacts.', variant: 'destructive' });
+        } finally {
+            setIsLoadingContacts(false);
+        }
+    };
 
-    const handleAddContact = () => {
-        if (!contactName.trim()) return;
-        addContact.mutate(
-            { name: contactName, phone: contactPhone || null, email: contactEmail || null, is_primary: false },
-            {
-                onSuccess: () => {
-                    setContactName(''); setContactPhone(''); setContactEmail('');
-                    setShowAddContact(false);
-                },
-            }
-        );
+    const handleAddContact = async () => {
+        if (!newContactName || !newContactPhone) {
+            toast({ title: 'Missing Info', description: 'Name and phone are required.', variant: 'destructive' });
+            return;
+        }
+
+        setIsAddingContact(true);
+        try {
+            await addContact({
+                name: newContactName,
+                phone: newContactPhone,
+                is_primary: contacts.length === 0 // First contact is primary
+            });
+            toast({ title: 'Success', description: 'Contact added successfully.' });
+            setNewContactName('');
+            setNewContactPhone('');
+            await loadContacts();
+        } catch (e) {
+            toast({ title: 'Error', description: 'Failed to add contact.', variant: 'destructive' });
+        } finally {
+            setIsAddingContact(false);
+        }
+    };
+
+    const handleDeleteContact = async (id: number) => {
+        try {
+            await deleteContact(id);
+            toast({ title: 'Contact Removed', description: 'Emergency contact removed.' });
+            setContacts(contacts.filter(c => c.id !== id));
+        } catch (e) {
+            toast({ title: 'Error', description: 'Failed to delete contact.', variant: 'destructive' });
+        }
     };
 
     const handleStartWalk = () => {
-        if (!coords) return;
-        startWalk.mutate({
-            destination: destination || undefined,
-            start_lat: coords.lat,
-            start_lng: coords.lng,
-        });
+        if (!destination) {
+            toast({ title: 'Destination Required', description: 'Please enter where you are walking to.', variant: 'destructive' });
+            return;
+        }
+
+        setIsStartingWalk(true);
+
+        if (!('geolocation' in navigator)) {
+            toast({ title: 'Unsupported', description: 'Geolocation is not supported by your browser.', variant: 'destructive' });
+            setIsStartingWalk(false);
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+                try {
+                    await startSafeWalk({
+                        destination,
+                        start_lat: pos.coords.latitude,
+                        start_lng: pos.coords.longitude
+                    });
+                    toast({ title: 'Safe Walk Started', description: 'Your location is now being securely tracked.' });
+                    setDestination('');
+                } catch (e) {
+                    toast({ title: 'Error', description: 'Failed to start safe walk.', variant: 'destructive' });
+                } finally {
+                    setIsStartingWalk(false);
+                }
+            },
+            (error) => {
+                setIsStartingWalk(false);
+                toast({ title: 'Location Error', description: 'Cannot start Safe Walk without location permissions.', variant: 'destructive' });
+            },
+            { enableHighAccuracy: true }
+        );
     };
 
-    if (!isAuthenticated) {
-        return (
-            <div className="sf-empty">
-                <ShieldAlert size={48} />
-                <h1>Safety Center</h1>
-                <p>Sign in to access safety features.</p>
-                <button onClick={() => router.push('/login')} className="sf-primary-btn">Log In</button>
-            </div>
-        );
-    }
+    const handlePanic = () => {
+        if (contacts.length === 0) {
+            toast({
+                title: 'No Contacts',
+                description: 'You must add at least one emergency contact before using the Panic Button.',
+                variant: 'destructive'
+            });
+            return;
+        }
+
+        setIsPanicking(true);
+
+        const executePanic = async (lat?: number, lng?: number) => {
+            try {
+                const res = await triggerPanic(lat, lng);
+                toast({
+                    title: 'PANIC TRIGGERED',
+                    description: `Alert sent to ${res.alerts_sent} contacts.`,
+                    variant: 'destructive'
+                });
+            } catch (e: any) {
+                toast({ title: 'System Failure', description: e.message || 'Panic alert failed to send!', variant: 'destructive' });
+            } finally {
+                setTimeout(() => setIsPanicking(false), 3000); // Cool down
+            }
+        };
+
+        if ('geolocation' in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => executePanic(pos.coords.latitude, pos.coords.longitude),
+                () => executePanic(undefined, undefined), // fire panic even without location
+                { timeout: 5000, maximumAge: 0 }
+            );
+        } else {
+            executePanic(undefined, undefined);
+        }
+    };
+
 
     return (
-        <>
-            <style jsx global>{`
-        .sf-page {
-          min-height: 100vh;
-          background: linear-gradient(160deg, #0a0a1a 0%, #1a0a0a 40%, #0f1628 100%);
-          color: #e0e0ff; padding: 2rem 1rem;
-          font-family: 'Inter', -apple-system, sans-serif;
-        }
-        .sf-container { max-width: 600px; margin: 0 auto; }
-        .sf-header { text-align: center; margin-bottom: 2rem; }
-        .sf-header h1 {
-          font-size: 2rem; font-weight: 700;
-          background: linear-gradient(to right, #ef4444, #f59e0b);
-          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-        .sf-header p { color: #7c7caa; font-size: 0.9rem; }
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 border-t-8 border-red-500">
+            <AppHeader />
 
-        /* PANIC BUTTON */
-        .sf-panic-zone {
-          text-align: center; margin-bottom: 2.5rem;
-        }
-        .sf-panic-btn {
-          width: 160px; height: 160px; border-radius: 50%;
-          background: radial-gradient(circle, #ef4444 0%, #991b1b 100%);
-          border: 4px solid rgba(239, 68, 68, 0.3);
-          color: white; font-size: 1.1rem; font-weight: 700;
-          cursor: pointer; display: flex; flex-direction: column;
-          align-items: center; justify-content: center; gap: 6px;
-          margin: 0 auto;
-          box-shadow: 0 0 40px rgba(239, 68, 68, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.2);
-          transition: transform 0.15s, box-shadow 0.2s;
-          animation: sf-pulse 2s infinite;
-        }
-        .sf-panic-btn:hover {
-          transform: scale(1.05);
-          box-shadow: 0 0 60px rgba(239, 68, 68, 0.5);
-        }
-        .sf-panic-btn:active { transform: scale(0.95); }
-        @keyframes sf-pulse {
-          0%, 100% { box-shadow: 0 0 40px rgba(239, 68, 68, 0.3); }
-          50% { box-shadow: 0 0 60px rgba(239, 68, 68, 0.5); }
-        }
-        .sf-panic-label {
-          font-size: 0.75rem; color: #7c7caa;
-          margin-top: 0.75rem; text-align: center;
-        }
+            <main className="max-w-3xl mx-auto px-4 py-8">
 
-        .sf-panic-result {
-          text-align: center; padding: 1.5rem;
-          background: rgba(239, 68, 68, 0.1);
-          border: 1px solid rgba(239, 68, 68, 0.3);
-          border-radius: 16px; margin-bottom: 2rem;
-        }
-        .sf-panic-result h3 { color: #ef4444; font-size: 1.1rem; margin-bottom: 0.5rem; }
-        .sf-panic-result p { color: #a0a0cc; font-size: 0.85rem; }
-
-        /* SECTIONS */
-        .sf-section {
-          background: rgba(20, 15, 35, 0.6);
-          border: 1px solid rgba(100, 100, 200, 0.12);
-          border-radius: 16px; padding: 1.25rem;
-          margin-bottom: 1.5rem;
-        }
-        .sf-section-header {
-          display: flex; justify-content: space-between;
-          align-items: center; margin-bottom: 1rem;
-        }
-        .sf-section-title {
-          font-size: 1rem; font-weight: 600; color: #e0e0ff;
-          display: flex; align-items: center; gap: 8px;
-        }
-        .sf-add-btn {
-          display: flex; align-items: center; gap: 4px;
-          padding: 6px 12px; border-radius: 8px;
-          background: rgba(99, 102, 241, 0.15);
-          border: 1px solid rgba(99, 102, 241, 0.3);
-          color: #818cf8; font-size: 0.8rem; font-weight: 500;
-          cursor: pointer;
-        }
-
-        /* CONTACTS */
-        .sf-contact {
-          display: flex; justify-content: space-between;
-          align-items: center; padding: 0.75rem;
-          background: rgba(10, 10, 25, 0.5);
-          border-radius: 10px; margin-bottom: 0.5rem;
-        }
-        .sf-contact-info h4 { font-size: 0.9rem; color: #e0e0ff; margin-bottom: 2px; }
-        .sf-contact-meta {
-          display: flex; gap: 0.75rem; font-size: 0.75rem; color: #7c7caa;
-        }
-        .sf-contact-meta span { display: flex; align-items: center; gap: 3px; }
-        .sf-del-btn {
-          background: none; border: none; color: #5a5a8a;
-          cursor: pointer; padding: 4px;
-        }
-        .sf-del-btn:hover { color: #ef4444; }
-
-        /* ADD FORM */
-        .sf-add-form {
-          padding: 1rem; background: rgba(10, 10, 25, 0.5);
-          border-radius: 12px; margin-bottom: 0.5rem;
-        }
-        .sf-input {
-          width: 100%; padding: 0.6rem 0.75rem;
-          background: rgba(20, 20, 40, 0.8);
-          border: 1px solid rgba(100, 100, 200, 0.2);
-          border-radius: 8px; color: #e0e0ff; font-size: 0.85rem;
-          margin-bottom: 0.5rem;
-        }
-        .sf-input::placeholder { color: #5a5a8a; }
-        .sf-input:focus { outline: none; border-color: rgba(99, 102, 241, 0.5); }
-        .sf-form-actions {
-          display: flex; gap: 0.5rem; margin-top: 0.5rem;
-        }
-        .sf-save-btn {
-          flex: 1; padding: 0.6rem;
-          background: linear-gradient(135deg, #6366f1, #818cf8);
-          color: white; border: none; border-radius: 8px;
-          font-size: 0.85rem; font-weight: 600; cursor: pointer;
-        }
-        .sf-cancel-btn {
-          padding: 0.6rem 1rem;
-          background: rgba(30, 30, 60, 0.6);
-          border: 1px solid rgba(100, 100, 200, 0.2);
-          border-radius: 8px; color: #7c7caa;
-          font-size: 0.85rem; cursor: pointer;
-        }
-
-        /* SAFE WALK */
-        .sf-walk-active {
-          text-align: center; padding: 1.5rem;
-          background: rgba(16, 185, 129, 0.08);
-          border: 1px solid rgba(16, 185, 129, 0.25);
-          border-radius: 16px;
-        }
-        .sf-walk-active h3 {
-          color: #34d399; font-size: 1rem; margin-bottom: 0.5rem;
-          display: flex; align-items: center; justify-content: center; gap: 6px;
-        }
-        .sf-walk-active p { color: #7c7caa; font-size: 0.85rem; margin-bottom: 1rem; }
-        .sf-end-walk-btn {
-          padding: 0.65rem 2rem;
-          background: linear-gradient(135deg, #10b981, #059669);
-          color: white; border: none; border-radius: 10px;
-          font-size: 0.9rem; font-weight: 600; cursor: pointer;
-        }
-        .sf-start-walk {
-          display: flex; gap: 0.5rem;
-        }
-        .sf-walk-input {
-          flex: 1; padding: 0.6rem 0.75rem;
-          background: rgba(10, 10, 25, 0.8);
-          border: 1px solid rgba(100, 100, 200, 0.2);
-          border-radius: 8px; color: #e0e0ff; font-size: 0.85rem;
-        }
-        .sf-walk-input::placeholder { color: #5a5a8a; }
-        .sf-walk-btn {
-          display: flex; align-items: center; gap: 6px;
-          padding: 0.6rem 1rem;
-          background: linear-gradient(135deg, #10b981, #059669);
-          color: white; border: none; border-radius: 8px;
-          font-size: 0.85rem; font-weight: 600; cursor: pointer;
-          white-space: nowrap;
-        }
-        .sf-walk-btn:disabled { opacity: 0.5; }
-
-        .sf-empty {
-          min-height: 100vh;
-          background: linear-gradient(160deg, #0a0a1a 0%, #1a0a0a 40%, #0f1628 100%);
-          display: flex; flex-direction: column;
-          align-items: center; justify-content: center;
-          gap: 1rem; text-align: center; padding: 2rem; color: #7c7caa;
-        }
-        .sf-empty h1 { font-size: 1.6rem; color: #e0e0ff; }
-        .sf-primary-btn {
-          padding: 0.75rem 2rem;
-          background: linear-gradient(135deg, #ef4444, #f59e0b);
-          color: white; border: none; border-radius: 12px;
-          font-size: 1rem; font-weight: 600; cursor: pointer;
-        }
-      `}</style>
-
-            <div className="sf-page">
-                <div className="sf-container">
-                    <div className="sf-header">
-                        <h1>🛡️ Safety Center</h1>
-                        <p>Your safety is our top priority</p>
+                <div className="text-center mb-8">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 mb-4">
+                        <ShieldCheck className="w-8 h-8" />
                     </div>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Safety Center</h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-2 max-w-lg mx-auto">
+                        Your safety is our absolute priority. Manage emergency contacts, start tracked walks, and trigger panic alerts.
+                    </p>
+                </div>
+
+                <div className="space-y-6">
 
                     {/* PANIC BUTTON */}
-                    <div className="sf-panic-zone">
-                        {panicTriggered && panic.data ? (
-                            <div className="sf-panic-result">
-                                <AlertTriangle size={32} style={{ color: '#ef4444', marginBottom: '0.5rem' }} />
-                                <h3>Panic Alert Sent</h3>
-                                <p>{panic.data.alerts_sent} emergency contact(s) notified</p>
-                                <p style={{ marginTop: '0.5rem', fontSize: '0.75rem' }}>
-                                    {panic.data.contacts_notified.join(', ')}
-                                </p>
-                            </div>
-                        ) : (
-                            <>
-                                <button className="sf-panic-btn" onClick={handlePanic} disabled={panic.isPending}>
-                                    <ShieldAlert size={36} />
-                                    {panic.isPending ? 'Sending...' : 'PANIC'}
-                                </button>
-                                <p className="sf-panic-label">
-                                    Tap to silently alert your emergency contacts with your location
-                                </p>
-                            </>
-                        )}
-                    </div>
+                    <Card className="border-red-500 shadow-red-500/10 shadow-xl overflow-hidden relative">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-red-500 rounded-bl-full opacity-10 filter blur-xl" />
+
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-red-600">
+                                <BellRing className="w-6 h-6" />
+                                Emergency Panic Button
+                            </CardTitle>
+                            <CardDescription>
+                                Pressing this instantly sends your live location and an emergency SOS message to all your trusted contacts.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="flex justify-center py-6">
+                            <Button
+                                size="lg"
+                                variant="destructive"
+                                className={`w-48 h-48 rounded-full shadow-2xl transition-all duration-300 ${isPanicking ? 'scale-95 bg-red-800' : 'hover:scale-105 bg-red-600 hover:bg-red-700'
+                                    }`}
+                                onClick={handlePanic}
+                                disabled={isPanicking}
+                            >
+                                <div className="flex flex-col items-center gap-2">
+                                    <Crosshair className={`w-12 h-12 ${isPanicking ? 'animate-spin text-red-400' : 'text-white'}`} />
+                                    <span className="font-black text-2xl tracking-widest text-white">
+                                        {isPanicking ? 'SENDING' : 'PANIC'}
+                                    </span>
+                                </div>
+                            </Button>
+                        </CardContent>
+                    </Card>
 
                     {/* SAFE WALK */}
-                    <div className="sf-section">
-                        <div className="sf-section-header">
-                            <span className="sf-section-title"><Footprints size={18} /> Safe Walk Home</span>
-                        </div>
-                        {activeWalk ? (
-                            <div className="sf-walk-active">
-                                <h3><Navigation size={16} /> Walk Active</h3>
-                                <p>
-                                    {activeWalk.destination ? `Heading to: ${activeWalk.destination}` : 'Sharing your location with contacts'}
-                                </p>
-                                <p style={{ fontSize: '0.75rem' }}>
-                                    Started {new Date(activeWalk.started_at || '').toLocaleTimeString()}
-                                </p>
-                                <button
-                                    className="sf-end-walk-btn"
-                                    onClick={() => endWalk.mutate(activeWalk.id)}
-                                    disabled={endWalk.isPending}
-                                >
-                                    <CheckCircle size={14} style={{ display: 'inline', marginRight: 4 }} />
-                                    {endWalk.isPending ? 'Ending...' : 'Arrived Safely'}
-                                </button>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
+                                <Navigation className="w-5 h-5" />
+                                Safe Walk Home
+                            </CardTitle>
+                            <CardDescription>
+                                Share your walking path securely. Your location is tracked in the background until you safely arrive and end the walk.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="destination">Where are you going?</Label>
+                                <div className="flex gap-3">
+                                    <div className="relative flex-1">
+                                        <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                                        <Input
+                                            id="destination"
+                                            placeholder="e.g. Home, Nearest Subway Station..."
+                                            value={destination}
+                                            onChange={(e) => setDestination(e.target.value)}
+                                            className="pl-9"
+                                        />
+                                    </div>
+                                    <Button
+                                        variant="outline"
+                                        className="border-orange-500 text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+                                        onClick={handleStartWalk}
+                                        disabled={isStartingWalk || !destination}
+                                    >
+                                        Start Walk
+                                    </Button>
+                                </div>
                             </div>
-                        ) : (
-                            <div className="sf-start-walk">
-                                <input
-                                    className="sf-walk-input"
-                                    placeholder="Where are you headed? (optional)"
-                                    value={destination}
-                                    onChange={(e) => setDestination(e.target.value)}
-                                />
-                                <button
-                                    className="sf-walk-btn"
-                                    onClick={handleStartWalk}
-                                    disabled={!coords || startWalk.isPending}
-                                >
-                                    <Footprints size={14} />
-                                    {startWalk.isPending ? 'Starting...' : 'Start Walk'}
-                                </button>
-                            </div>
-                        )}
-                    </div>
+                        </CardContent>
+                    </Card>
 
                     {/* EMERGENCY CONTACTS */}
-                    <div className="sf-section">
-                        <div className="sf-section-header">
-                            <span className="sf-section-title"><Phone size={18} /> Emergency Contacts</span>
-                            <button className="sf-add-btn" onClick={() => setShowAddContact(!showAddContact)}>
-                                {showAddContact ? <X size={14} /> : <UserPlus size={14} />}
-                                {showAddContact ? 'Cancel' : 'Add'}
-                            </button>
-                        </div>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Users className="w-5 h-5" />
+                                Trusted Emergency Contacts
+                            </CardTitle>
+                            <CardDescription>
+                                These contacts receive an SMS/Email instantly if you trigger the Panic Button. They DO NOT need a fwber account.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
 
-                        {showAddContact && (
-                            <div className="sf-add-form">
-                                <input className="sf-input" placeholder="Name *" value={contactName} onChange={(e) => setContactName(e.target.value)} />
-                                <input className="sf-input" placeholder="Phone" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} />
-                                <input className="sf-input" placeholder="Email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} />
-                                <div className="sf-form-actions">
-                                    <button className="sf-save-btn" onClick={handleAddContact} disabled={!contactName.trim()}>
-                                        Save Contact
-                                    </button>
-                                    <button className="sf-cancel-btn" onClick={() => setShowAddContact(false)}>Cancel</button>
+                            {/* Add New Contact Form */}
+                            <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg flex flex-col sm:flex-row gap-3 items-end border border-gray-200 dark:border-gray-700">
+                                <div className="space-y-1 w-full flex-1">
+                                    <Label className="text-xs">Contact Name</Label>
+                                    <Input
+                                        placeholder="e.g. Mom"
+                                        value={newContactName}
+                                        onChange={(e) => setNewContactName(e.target.value)}
+                                    />
                                 </div>
+                                <div className="space-y-1 w-full flex-1">
+                                    <Label className="text-xs">Phone Number</Label>
+                                    <Input
+                                        placeholder="+1 555-0100"
+                                        type="tel"
+                                        value={newContactPhone}
+                                        onChange={(e) => setNewContactPhone(e.target.value)}
+                                    />
+                                </div>
+                                <Button onClick={handleAddContact} disabled={isAddingContact} className="w-full sm:w-auto">
+                                    <Plus className="w-4 h-4 mr-2" />
+                                    Add
+                                </Button>
                             </div>
-                        )}
 
-                        {contactsData?.contacts && contactsData.contacts.length > 0 ? (
-                            contactsData.contacts.map((c) => (
-                                <div key={c.id} className="sf-contact">
-                                    <div className="sf-contact-info">
-                                        <h4>{c.name} {c.is_primary && '⭐'}</h4>
-                                        <div className="sf-contact-meta">
-                                            {c.phone && <span><Phone size={10} /> {c.phone}</span>}
-                                            {c.email && <span><Mail size={10} /> {c.email}</span>}
-                                        </div>
+                            {/* Contacts List */}
+                            <div className="space-y-3">
+                                {isLoadingContacts ? (
+                                    <p className="text-center text-sm text-gray-500 py-4">Loading contacts...</p>
+                                ) : contacts.length === 0 ? (
+                                    <div className="text-center p-6 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-lg">
+                                        <p className="text-gray-500 dark:text-gray-400">No emergency contacts set up yet. Please add one for your safety.</p>
                                     </div>
-                                    <button className="sf-del-btn" onClick={() => deleteContact.mutate(c.id)}>
-                                        <Trash2 size={14} />
-                                    </button>
-                                </div>
-                            ))
-                        ) : !showAddContact ? (
-                            <p style={{ color: '#5a5a8a', fontSize: '0.85rem', textAlign: 'center', padding: '1rem' }}>
-                                No emergency contacts yet. Add one to enable panic alerts.
-                            </p>
-                        ) : null}
-                    </div>
+                                ) : (
+                                    contacts.map(contact => (
+                                        <div key={contact.id} className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900">
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    <p className="font-medium text-gray-900 dark:text-white">{contact.name}</p>
+                                                    {contact.is_primary && (
+                                                        <span className="bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                                                            Primary
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <p className="text-sm text-gray-500 font-mono">{contact.phone}</p>
+                                            </div>
+                                            <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20" onClick={() => handleDeleteContact(contact.id)}>
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+
+                        </CardContent>
+                    </Card>
+
                 </div>
-            </div>
-        </>
+            </main>
+        </div>
     );
 }

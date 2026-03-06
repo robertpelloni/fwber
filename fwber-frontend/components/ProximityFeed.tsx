@@ -5,15 +5,17 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { proximityApi } from '@/lib/api/proximity';
 import type { ProximityArtifact, ProximityChatroom } from '@/types/proximity';
-import { MapPin, Send, AlertTriangle, Trash2, Clock, User, MessageSquare, LogOut } from 'lucide-react';
+import { MapPin, Send, AlertTriangle, Trash2, Clock, User, MessageSquare, LogOut, ChevronDown, ChevronUp } from 'lucide-react';
 import SexQuote from './SexQuote';
+import ArtifactVoting from './proximity/ArtifactVoting';
+import ArtifactComments from './proximity/ArtifactComments';
 
 export default function ProximityFeed() {
   const router = useRouter();
   const { token: authToken, user } = useAuth();
   // Allow mock token for testing or fallback to stored token
   const token = authToken || (typeof window !== 'undefined' ? (localStorage.getItem('fwber_token') || localStorage.getItem('mock_auth_token')) : null);
-  
+
   const [artifacts, setArtifacts] = useState<ProximityArtifact[]>([]);
   const [chatrooms, setChatrooms] = useState<ProximityChatroom[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,6 +23,7 @@ export default function ProximityFeed() {
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [newArtifactContent, setNewArtifactContent] = useState('');
   const [isPosting, setIsPosting] = useState(false);
+  const [expandedCommentsId, setExpandedCommentsId] = useState<number | null>(null);
 
   // Get user location
   useEffect(() => {
@@ -55,7 +58,7 @@ export default function ProximityFeed() {
 
     try {
       setIsLoading(true);
-      
+
       const [artifactsRes, chatroomsRes] = await Promise.allSettled([
         proximityApi.getArtifactsFeed(location.lat, location.lng, 5000, undefined, token),
         proximityApi.findNearbyChatrooms(location.lat, location.lng, 5000, token)
@@ -136,6 +139,10 @@ export default function ProximityFeed() {
     }
   };
 
+  const toggleComments = (id: number) => {
+    setExpandedCommentsId(prev => prev === id ? null : id);
+  };
+
   const handleLeaveRoom = async (e: React.MouseEvent, roomId: number) => {
     e.stopPropagation(); // Prevent navigation
     if (!token || !confirm("Are you sure you want to leave this chatroom?")) return;
@@ -143,7 +150,7 @@ export default function ProximityFeed() {
     try {
       await proximityApi.leaveChatroom(roomId, token);
       // Optimistically update UI
-      setChatrooms(prev => prev.map(room => 
+      setChatrooms(prev => prev.map(room =>
         room.id === roomId ? { ...room, is_member: false } : room
       ));
     } catch (err) {
@@ -220,15 +227,14 @@ export default function ProximityFeed() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => router.push(`/proximity-chatrooms/${room.id}`)}
-                    className={`flex-1 text-white text-sm font-medium py-2 px-4 rounded transition-colors flex items-center justify-center gap-2 ${
-                      room.is_member 
-                        ? 'bg-green-600 hover:bg-green-700' 
-                        : 'bg-purple-600 hover:bg-purple-700'
-                    }`}
+                    className={`flex-1 text-white text-sm font-medium py-2 px-4 rounded transition-colors flex items-center justify-center gap-2 ${room.is_member
+                      ? 'bg-green-600 hover:bg-green-700'
+                      : 'bg-purple-600 hover:bg-purple-700'
+                      }`}
                   >
                     {room.is_member ? 'Enter Room' : 'Join Room'}
                   </button>
-                  
+
                   {room.is_member && (
                     <button
                       onClick={(e) => handleLeaveRoom(e, room.id)}
@@ -254,74 +260,107 @@ export default function ProximityFeed() {
           </div>
         ) : (
           artifacts.map((artifact) => (
-            <div key={artifact.id} className={`bg-white shadow rounded-lg p-4 ${artifact.type === 'promotion' ? 'border border-amber-300 bg-amber-50/30' : ''}`}>
-              <div className="flex justify-between items-start mb-2">
-                <div className="flex items-center gap-2">
-                  <div className={`p-1 rounded-full ${artifact.type === 'promotion' ? 'bg-amber-100 text-amber-600' : 'bg-gray-100'}`}>
-                    {artifact.type === 'promotion' ? (
-                       <div className="h-4 w-4 flex items-center justify-center font-bold">P</div>
-                    ) : (
-                       <User className="h-4 w-4 text-gray-600" />
-                    )}
-                  </div>
-                  <div className="flex flex-col leading-tight">
-                    <span className="font-medium text-sm">
-                      {artifact.type === 'promotion' 
-                        ? (artifact.meta?.merchant_name || "Merchant Promotion") 
-                        : `User #${artifact.user_id}`
-                      }
-                    </span>
-                    {artifact.type === 'promotion' && (
-                       <span className="text-[10px] text-amber-600 font-bold uppercase tracking-wider">Sponsored</span>
-                    )}
-                  </div>
-                  {!artifact.type?.includes('promotion') && (
-                    <span className="text-xs text-gray-400 flex items-center gap-1 ml-1">
-                      <Clock className="h-3 w-3" />
-                      {new Date(artifact.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  {user?.id === artifact.user_id ? (
-                    <button
-                      onClick={() => handleDelete(artifact.id)}
-                      className="text-gray-400 hover:text-red-600"
-                      title="Delete"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleFlag(artifact.id)}
-                      className="text-gray-400 hover:text-yellow-600"
-                      title="Report"
-                    >
-                      <AlertTriangle className="h-4 w-4" />
-                    </button>
-                  )}
-                </div>
-              </div>
-              
-              {/* Promotion Content */}
-              {artifact.type === 'promotion' && artifact.meta && (
-                <div className="mb-2 p-2 bg-amber-100/50 rounded border border-amber-200">
-                  {artifact.meta.title && <h4 className="font-bold text-gray-900 leading-tight mb-1">{artifact.meta.title}</h4>}
-                  <div className="flex justify-between items-center">
-                    {artifact.meta.discount && <span className="text-green-700 font-bold bg-green-100 px-2 py-0.5 rounded text-xs">-{artifact.meta.discount}% OFF</span>}
-                    {artifact.meta.promo_code && <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-600 border border-gray-200">CODE: {artifact.meta.promo_code}</span>}
-                  </div>
-                </div>
+            <div key={artifact.id} className={`bg-white shadow rounded-lg p-4 flex gap-3 ${artifact.type === 'promotion' ? 'border border-amber-300 bg-amber-50/30' : ''}`}>
+
+              {/* Left Column: Voting (Hidden for Promotions currently though backend supports it) */}
+              {!artifact.type?.includes('promotion') && (
+                <ArtifactVoting
+                  artifactId={artifact.id}
+                  initialScore={artifact.votes_sum_value || 0}
+                  initialUserVote={artifact.user_vote || 0}
+                />
               )}
 
-              <p className="text-gray-800 mb-3 whitespace-pre-wrap">{artifact.content}</p>
-              
-              <div className="text-xs text-gray-500 flex items-center gap-4">
-                <span className="flex items-center gap-1">
-                  <MapPin className="h-3 w-3" />
-                  {location ? `${Math.round(getDistanceFromLatLonInM(location.lat, location.lng, artifact.lat, artifact.lng))}m away` : 'Nearby'}
-                </span>
-                <span>Expires {new Date(artifact.expires_at).toLocaleDateString()}</span>
+              {/* Right Column: Content */}
+              <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-start mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className={`p-1 rounded-full ${artifact.type === 'promotion' ? 'bg-amber-100 text-amber-600' : 'bg-gray-100'}`}>
+                      {artifact.type === 'promotion' ? (
+                        <div className="h-4 w-4 flex items-center justify-center font-bold">P</div>
+                      ) : (
+                        <User className="h-4 w-4 text-gray-600" />
+                      )}
+                    </div>
+                    <div className="flex flex-col leading-tight">
+                      <span className="font-medium text-sm">
+                        {artifact.type === 'promotion'
+                          ? (artifact.meta?.merchant_name || "Merchant Promotion")
+                          : `User #${artifact.user_id}`
+                        }
+                      </span>
+                      {artifact.type === 'promotion' && (
+                        <span className="text-[10px] text-amber-600 font-bold uppercase tracking-wider">Sponsored</span>
+                      )}
+                    </div>
+                    {!artifact.type?.includes('promotion') && (
+                      <span className="text-xs text-gray-400 flex items-center gap-1 ml-1">
+                        <Clock className="h-3 w-3" />
+                        {new Date(artifact.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    {user?.id === artifact.user_id ? (
+                      <button
+                        onClick={() => handleDelete(artifact.id)}
+                        className="text-gray-400 hover:text-red-600"
+                        title="Delete"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleFlag(artifact.id)}
+                        className="text-gray-400 hover:text-yellow-600"
+                        title="Report"
+                      >
+                        <AlertTriangle className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Promotion Content */}
+                {artifact.type === 'promotion' && artifact.meta && (
+                  <div className="mb-2 p-2 bg-amber-100/50 rounded border border-amber-200">
+                    {artifact.meta.title && <h4 className="font-bold text-gray-900 leading-tight mb-1">{artifact.meta.title}</h4>}
+                    <div className="flex justify-between items-center">
+                      {artifact.meta.discount && <span className="text-green-700 font-bold bg-green-100 px-2 py-0.5 rounded text-xs">-{artifact.meta.discount}% OFF</span>}
+                      {artifact.meta.promo_code && <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-600 border border-gray-200">CODE: {artifact.meta.promo_code}</span>}
+                    </div>
+                  </div>
+                )}
+
+                <p className="text-gray-800 mb-3 whitespace-pre-wrap">{artifact.content}</p>
+
+                <div className="flex flex-wrap items-center justify-between mt-3 pt-3 border-t border-gray-50 text-xs text-gray-500">
+                  <div className="flex gap-4">
+                    <span className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-full">
+                      <MapPin className="h-3 w-3" />
+                      {location ? `${Math.round(getDistanceFromLatLonInM(location.lat, location.lng, artifact.lat, artifact.lng))}m away` : 'Nearby'}
+                    </span>
+                    <button
+                      onClick={() => toggleComments(artifact.id)}
+                      className="flex items-center gap-1 hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded-full transition-colors"
+                    >
+                      <MessageSquare className="h-3 w-3" />
+                      {artifact.comments_count || 0} {artifact.comments_count === 1 ? 'Comment' : 'Comments'}
+                    </button>
+                    {!artifact.type?.includes('promotion') && (
+                      <span className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-full">
+                        <Clock className="h-3 w-3" />
+                        Expires {new Date(artifact.expires_at).toLocaleDateString()}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Comments Section */}
+                <ArtifactComments
+                  artifactId={artifact.id}
+                  isOpen={expandedCommentsId === artifact.id}
+                />
               </div>
             </div>
           ))
