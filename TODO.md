@@ -38,10 +38,10 @@
 
 ## ⚪ Low: Technical Debt
 
-- [ ] Clean up duplicate `node_modules` entries in `.gitignore`
-- [ ] Remove stale references to Mercure (migrated to Reverb)
+- [x] Clean up `.gitignore` (133→78 lines, removed 10 duplicate `node_modules` entries)
+- [x] Review feature flags in `config/features.php` — disabled 6 unverified features
+- [ ] Remove stale references to Mercure (8 frontend files — cosmetic, not breaking)
 - [ ] Audit 78 controllers — identify unused ones
-- [ ] Review feature flags in `config/features.php` — disable unverified features
 
 ---
 
