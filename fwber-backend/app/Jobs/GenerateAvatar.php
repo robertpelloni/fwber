@@ -37,7 +37,12 @@ class GenerateAvatar implements ShouldQueue
     public function handle(AvatarGenerationService $avatarService): void
     {
         try {
-            $result = $avatarService->generateAvatar($this->user, $this->options);
+            // Branch: photo-based (img2img) vs traits-based generation
+            if (!empty($this->options['from_photo']) && !empty($this->options['photo_path'])) {
+                $result = $avatarService->generateFromImage($this->user, $this->options['photo_path'], $this->options);
+            } else {
+                $result = $avatarService->generateAvatar($this->user, $this->options);
+            }
 
             if ($result['success']) {
                 // Extract relative path from URL

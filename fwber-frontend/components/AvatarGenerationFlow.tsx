@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
-import { Loader2, Sparkles, RefreshCw, Check, X, Settings, Image as ImageIcon, Lock, Share2, Users } from 'lucide-react';
+import { Loader2, Sparkles, RefreshCw, Check, X, Settings, Image as ImageIcon, Lock, Share2, Users, Camera, Wand2 } from 'lucide-react';
 import Image from 'next/image';
 import axios from 'axios';
 import { useWebSocket } from '@/lib/hooks/use-websocket';
@@ -22,6 +22,16 @@ interface PhysicalProfile {
   hair_color?: string;
   eye_color?: string;
   height_cm?: number;
+  skin_tone?: string;
+  facial_hair?: string;
+  breast_size?: string;
+  fitness_level?: string;
+}
+
+interface UserPhoto {
+  id: number;
+  filename: string;
+  path: string;
 }
 
 interface ProviderConfig {
@@ -30,15 +40,21 @@ interface ProviderConfig {
   api_token?: string;
 }
 
+type GenerationMode = 'traits' | 'photo';
+
 export default function AvatarGenerationFlow({ 
   userId, 
   currentAvatarUrl,
   onComplete 
 }: AvatarGenerationProps) {
   const [view, setView] = useState<'generate' | 'gallery'>('generate');
+  const [mode, setMode] = useState<GenerationMode>('traits');
   const [step, setStep] = useState<'profile' | 'style' | 'generating' | 'preview' | 'complete'>('profile');
   const [profile, setProfile] = useState<PhysicalProfile>({});
+  const [profileLoaded, setProfileLoaded] = useState(false);
   const [style, setStyle] = useState<string>('realistic');
+  const [sexyBoost, setSexyBoost] = useState(true); // On by default — this is a physical dating app
+  const [selectedPhotoId, setSelectedPhotoId] = useState<number | null>(null);
   const [generatedAvatar, setGeneratedAvatar] = useState<string | null>(null);
   const [generatedPhotoId, setGeneratedPhotoId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -55,29 +71,58 @@ export default function AvatarGenerationFlow({
   const { messages, clearMessages } = useWebSocket();
 
   const styleOptions = [
-    { id: 'realistic', name: 'Realistic' },
-    { id: 'anime', name: 'Anime' },
-    { id: 'fantasy', name: 'Fantasy' },
-    { id: 'sci-fi', name: 'Sci-Fi' },
-    { id: 'cartoon', name: 'Cartoon' },
-    { id: 'pixel-art', name: 'Pixel Art' },
-    { id: 'neon', name: 'Neon Cyberpunk', premium: true },
-    { id: 'oil-painting', name: 'Oil Painting', premium: true },
+    { id: 'realistic', name: 'Realistic', desc: 'Professional model look' },
+    { id: 'glamour', name: 'Glamour', desc: 'Red carpet ready' },
+    { id: 'fantasy', name: 'Fantasy', desc: 'Mythical & magical' },
+    { id: 'anime', name: 'Anime', desc: 'Japanese art style' },
+    { id: 'neon', name: 'Neon Cyberpunk', desc: 'Futuristic vibes', premium: true },
+    { id: 'oil-painting', name: 'Oil Painting', desc: 'Classic masterpiece', premium: true },
   ];
 
-  const isStyleLocked = (option: any) => {
+  const isStyleLocked = (option: typeof styleOptions[number]) => {
     if (!option.premium) return false;
     return (user?.referrals_count || 0) < 1;
   };
 
   const queryClient = useQueryClient();
 
-  // Listen for avatar generation completion
+  // Auto-load physical traits from user profile
+  const traitsQuery = useQuery({
+    queryKey: ['avatar-physical-traits'],
+    queryFn: async () => {
+      const token = localStorage.getItem('fwber_token');
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/avatar/physical-traits`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return res.data;
+    },
+  });
+
+  // Auto-populate profile when traits load
+  useEffect(() => {
+    if (traitsQuery.data?.traits && !profileLoaded) {
+      const traits = traitsQuery.data.traits;
+      const loaded: PhysicalProfile = {};
+      if (traits.age) loaded.age = traits.age;
+      if (traits.gender) loaded.gender = traits.gender;
+      if (traits.ethnicity) loaded.ethnicity = traits.ethnicity;
+      if (traits.body_type) loaded.body_type = traits.body_type;
+      if (traits.hair_color) loaded.hair_color = traits.hair_color;
+      if (traits.eye_color) loaded.eye_color = traits.eye_color;
+      if (traits.height_cm) loaded.height_cm = traits.height_cm;
+      if (traits.skin_tone) loaded.skin_tone = traits.skin_tone;
+      if (traits.facial_hair) loaded.facial_hair = traits.facial_hair;
+      if (traits.breast_size) loaded.breast_size = traits.breast_size;
+      if (traits.fitness_level) loaded.fitness_level = traits.fitness_level;
+      
+      setProfile(loaded);
+      setProfileLoaded(true);
+    }
+  }, [traitsQuery.data, profileLoaded]);
+
+  // Listen for avatar generation completion via WebSocket
   useEffect(() => {
     if (step === 'generating') {
-        // Check for avatar_generated message
-        // The message structure from Reverb might vary, but we expect type='avatar_generated'
-        // or a notification with that type.
         const avatarMsg = messages.find((m: any) =>
             m.type === 'avatar_generated' || 
             (m.type === 'notification' && (m.data?.type === 'avatar_generated' || m.data?.notification?.type === 'avatar_generated'))
@@ -122,12 +167,14 @@ export default function AvatarGenerationFlow({
     fetchProviders();
   }, []);
 
+  // Traits-based generation
   const generateMutation = useMutation({
     mutationFn: async (profileData: PhysicalProfile) => {
       const token = localStorage.getItem('fwber_token');
-      const payload: any = { 
+      const payload: Record<string, unknown> = { 
         ...profileData, 
         style,
+        sexy_boost: sexyBoost,
         provider: selectedProvider 
       };
       
@@ -142,16 +189,13 @@ export default function AvatarGenerationFlow({
       return response.data;
     },
     onSuccess: (data) => {
-      // If the backend returns a URL immediately (e.g. cached or fast), use it.
-      // Otherwise, if it returns status='processing', we wait for WebSocket.
       if (data.avatar_url) {
           setGeneratedAvatar(data.avatar_url);
           setGeneratedPhotoId(data.photo_id);
           setStep('preview');
           setError(null);
       } else {
-          // Stay in 'generating' step and wait for WebSocket
-          console.log('Avatar generation started, waiting for completion...');
+          console.log('Avatar generation started, waiting for WebSocket...');
       }
     },
     onError: (err: any) => {
@@ -160,18 +204,43 @@ export default function AvatarGenerationFlow({
     },
   });
 
+  // Photo-based generation (img2img)
+  const generateFromPhotoMutation = useMutation({
+    mutationFn: async (photoId: number) => {
+      const token = localStorage.getItem('fwber_token');
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/avatar/generate-from-photo`,
+        { 
+          photo_id: photoId,
+          style,
+          sexy_boost: sexyBoost,
+          provider: selectedProvider,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      return response.data;
+    },
+    onSuccess: (data) => {
+      if (data.avatar_url) {
+          setGeneratedAvatar(data.avatar_url);
+          setStep('preview');
+          setError(null);
+      }
+    },
+    onError: (err: any) => {
+      setError(err.response?.data?.message || 'Failed to generate avatar from photo');
+      setStep('style');
+    },
+  });
+
   const acceptMutation = useMutation({
     mutationFn: async () => {
       const token = localStorage.getItem('fwber_token');
-      // Update profile with new avatar URL
       await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/physical-profile`,
         { ...profile, avatar_url: generatedAvatar },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
-      // If we have a photo ID, we might want to mark it as primary or something, 
-      // but updating the profile avatar_url is usually enough.
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
@@ -193,7 +262,12 @@ export default function AvatarGenerationFlow({
     clearMessages();
     setStep('generating');
     setError(null);
-    generateMutation.mutate(profile);
+
+    if (mode === 'photo' && selectedPhotoId) {
+      generateFromPhotoMutation.mutate(selectedPhotoId);
+    } else {
+      generateMutation.mutate(profile);
+    }
   };
 
   const handleProfileSubmit = () => {
@@ -203,7 +277,11 @@ export default function AvatarGenerationFlow({
   const handleRegenerate = () => {
     clearMessages();
     setStep('generating');
-    generateMutation.mutate(profile);
+    if (mode === 'photo' && selectedPhotoId) {
+      generateFromPhotoMutation.mutate(selectedPhotoId);
+    } else {
+      generateMutation.mutate(profile);
+    }
   };
 
   const handleAccept = () => {
@@ -219,6 +297,8 @@ export default function AvatarGenerationFlow({
     return profile.age && profile.gender && profile.ethnicity && 
            profile.body_type && profile.hair_color && profile.eye_color;
   };
+
+  const userPhotos: UserPhoto[] = traitsQuery.data?.photos || [];
 
   return (
     <div className="max-w-2xl mx-auto p-6">
@@ -297,7 +377,7 @@ export default function AvatarGenerationFlow({
       {/* Progress Indicator */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-2">
-          <StepIndicator active={step === 'profile'} completed={step !== 'profile'} label="Profile" />
+          <StepIndicator active={step === 'profile'} completed={step !== 'profile'} label="Source" />
           <div className="flex-1 h-0.5 bg-gray-200 mx-2">
             <div className={`h-full bg-purple-600 transition-all duration-300 ${
               step !== 'profile' ? 'w-full' : 'w-0'
@@ -330,156 +410,310 @@ export default function AvatarGenerationFlow({
         </div>
       )}
 
-      {/* Step 1: Physical Profile Input */}
+      {/* Step 1: Source Selection — Traits or Photo */}
       {step === 'profile' && (
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Create Your Avatar</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Create Your Sexy Avatar</h2>
             <p className="text-gray-600">
-              Describe your physical characteristics to generate a personalized AI avatar.
+              Generate an attractive, stylized version of yourself from your physical traits or an uploaded photo.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Age</label>
-              <input
-                type="number"
-                min="18"
-                max="100"
-                value={profile.age || ''}
-                onChange={(e) => setProfile({ ...profile, age: parseInt(e.target.value) })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder="25"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
-              <select
-                aria-label="Select gender"
-                value={profile.gender || ''}
-                onChange={(e) => setProfile({ ...profile, gender: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              >
-                <option value="">Select gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="non-binary">Non-binary</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Ethnicity</label>
-              <select
-                aria-label="Select ethnicity"
-                value={profile.ethnicity || ''}
-                onChange={(e) => setProfile({ ...profile, ethnicity: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              >
-                <option value="">Select ethnicity</option>
-                <option value="asian">Asian</option>
-                <option value="black">Black</option>
-                <option value="hispanic">Hispanic/Latino</option>
-                <option value="white">White</option>
-                <option value="middle_eastern">Middle Eastern</option>
-                <option value="mixed">Mixed</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Body Type</label>
-              <select
-                aria-label="Select body type"
-                value={profile.body_type || ''}
-                onChange={(e) => setProfile({ ...profile, body_type: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              >
-                <option value="">Select body type</option>
-                <option value="slim">Slim</option>
-                <option value="athletic">Athletic</option>
-                <option value="average">Average</option>
-                <option value="curvy">Curvy</option>
-                <option value="heavyset">Heavyset</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Hair Color</label>
-              <select
-                aria-label="Select hair color"
-                value={profile.hair_color || ''}
-                onChange={(e) => setProfile({ ...profile, hair_color: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              >
-                <option value="">Select hair color</option>
-                <option value="black">Black</option>
-                <option value="brown">Brown</option>
-                <option value="blonde">Blonde</option>
-                <option value="red">Red</option>
-                <option value="gray">Gray</option>
-                <option value="bald">Bald</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Eye Color</label>
-              <select
-                aria-label="Select eye color"
-                value={profile.eye_color || ''}
-                onChange={(e) => setProfile({ ...profile, eye_color: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              >
-                <option value="">Select eye color</option>
-                <option value="brown">Brown</option>
-                <option value="blue">Blue</option>
-                <option value="green">Green</option>
-                <option value="hazel">Hazel</option>
-                <option value="gray">Gray</option>
-                <option value="amber">Amber</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Height (cm)</label>
-              <input
-                type="number"
-                min="140"
-                max="220"
-                value={profile.height_cm || ''}
-                onChange={(e) => setProfile({ ...profile, height_cm: parseInt(e.target.value) })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder="170"
-              />
-            </div>
+          {/* Mode Toggle */}
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              onClick={() => setMode('traits')}
+              className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
+                mode === 'traits' 
+                  ? 'border-purple-600 bg-purple-50 shadow-md' 
+                  : 'border-gray-200 hover:border-purple-300'
+              }`}
+            >
+              <Wand2 className={`w-8 h-8 ${mode === 'traits' ? 'text-purple-600' : 'text-gray-400'}`} />
+              <span className="font-semibold text-sm">From Physical Traits</span>
+              <span className="text-xs text-gray-500">Auto-filled from your profile</span>
+            </button>
+            <button
+              onClick={() => setMode('photo')}
+              className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
+                mode === 'photo' 
+                  ? 'border-purple-600 bg-purple-50 shadow-md' 
+                  : 'border-gray-200 hover:border-purple-300'
+              }`}
+            >
+              <Camera className={`w-8 h-8 ${mode === 'photo' ? 'text-purple-600' : 'text-gray-400'}`} />
+              <span className="font-semibold text-sm">From My Photo</span>
+              <span className="text-xs text-gray-500">AI transforms your pic</span>
+            </button>
           </div>
+
+          {/* Traits Mode */}
+          {mode === 'traits' && (
+            <>
+              {profileLoaded && (
+                <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                  <Check className="w-4 h-4 text-green-600" />
+                  <span className="text-sm text-green-700 font-medium">Traits loaded from your profile</span>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Age</label>
+                  <input
+                    type="number"
+                    min="18"
+                    max="100"
+                    value={profile.age || ''}
+                    onChange={(e) => setProfile({ ...profile, age: parseInt(e.target.value) })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    placeholder="25"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                  <select
+                    aria-label="Select gender"
+                    value={profile.gender || ''}
+                    onChange={(e) => setProfile({ ...profile, gender: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  >
+                    <option value="">Select gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="non-binary">Non-binary</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Ethnicity</label>
+                  <select
+                    aria-label="Select ethnicity"
+                    value={profile.ethnicity || ''}
+                    onChange={(e) => setProfile({ ...profile, ethnicity: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  >
+                    <option value="">Select ethnicity</option>
+                    <option value="asian">Asian</option>
+                    <option value="black">Black</option>
+                    <option value="hispanic">Hispanic/Latino</option>
+                    <option value="white">White</option>
+                    <option value="middle_eastern">Middle Eastern</option>
+                    <option value="mixed">Mixed</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Body Type</label>
+                  <select
+                    aria-label="Select body type"
+                    value={profile.body_type || ''}
+                    onChange={(e) => setProfile({ ...profile, body_type: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  >
+                    <option value="">Select body type</option>
+                    <option value="slim">Slim</option>
+                    <option value="athletic">Athletic</option>
+                    <option value="average">Average</option>
+                    <option value="curvy">Curvy</option>
+                    <option value="heavyset">Heavyset</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Hair Color</label>
+                  <select
+                    aria-label="Select hair color"
+                    value={profile.hair_color || ''}
+                    onChange={(e) => setProfile({ ...profile, hair_color: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  >
+                    <option value="">Select hair color</option>
+                    <option value="black">Black</option>
+                    <option value="brown">Brown</option>
+                    <option value="blonde">Blonde</option>
+                    <option value="red">Red</option>
+                    <option value="gray">Gray</option>
+                    <option value="bald">Bald</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Eye Color</label>
+                  <select
+                    aria-label="Select eye color"
+                    value={profile.eye_color || ''}
+                    onChange={(e) => setProfile({ ...profile, eye_color: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  >
+                    <option value="">Select eye color</option>
+                    <option value="brown">Brown</option>
+                    <option value="blue">Blue</option>
+                    <option value="green">Green</option>
+                    <option value="hazel">Hazel</option>
+                    <option value="gray">Gray</option>
+                    <option value="amber">Amber</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Height (cm)</label>
+                  <input
+                    type="number"
+                    min="140"
+                    max="220"
+                    value={profile.height_cm || ''}
+                    onChange={(e) => setProfile({ ...profile, height_cm: parseInt(e.target.value) })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    placeholder="170"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Fitness Level</label>
+                  <select
+                    aria-label="Select fitness level"
+                    value={profile.fitness_level || ''}
+                    onChange={(e) => setProfile({ ...profile, fitness_level: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  >
+                    <option value="">Select fitness level</option>
+                    <option value="lean">Lean</option>
+                    <option value="fit">Fit</option>
+                    <option value="toned">Toned</option>
+                    <option value="muscular">Muscular</option>
+                    <option value="average">Average</option>
+                  </select>
+                </div>
+
+                {profile.gender && ['female', 'non-binary'].includes(profile.gender) && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Breast Size</label>
+                    <select
+                      aria-label="Select breast size"
+                      value={profile.breast_size || ''}
+                      onChange={(e) => setProfile({ ...profile, breast_size: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    >
+                      <option value="">Select size</option>
+                      <option value="small">Small</option>
+                      <option value="medium">Medium</option>
+                      <option value="large">Large</option>
+                    </select>
+                  </div>
+                )}
+
+                {profile.gender && ['male'].includes(profile.gender) && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Facial Hair</label>
+                    <select
+                      aria-label="Select facial hair"
+                      value={profile.facial_hair || ''}
+                      onChange={(e) => setProfile({ ...profile, facial_hair: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    >
+                      <option value="">Select style</option>
+                      <option value="none">Clean shaven</option>
+                      <option value="stubble">Stubble</option>
+                      <option value="beard">Full beard</option>
+                      <option value="goatee">Goatee</option>
+                      <option value="mustache">Mustache</option>
+                    </select>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Photo Mode */}
+          {mode === 'photo' && (
+            <div>
+              {userPhotos.length === 0 ? (
+                <div className="text-center py-8 bg-gray-50 rounded-lg">
+                  <Camera className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                  <p className="text-gray-500 mb-2">No photos uploaded yet</p>
+                  <p className="text-sm text-gray-400">Upload photos to your profile first, then come back here.</p>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-sm text-gray-600 mb-3">Select a photo to transform into a sexy avatar:</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    {userPhotos.map((photo) => (
+                      <button
+                        key={photo.id}
+                        onClick={() => setSelectedPhotoId(photo.id)}
+                        className={`relative aspect-square rounded-lg overflow-hidden border-3 transition-all ${
+                          selectedPhotoId === photo.id
+                            ? 'border-purple-600 ring-2 ring-purple-300 shadow-lg scale-105'
+                            : 'border-transparent hover:border-purple-300'
+                        }`}
+                      >
+                        <Image
+                          src={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}/storage/${photo.path || photo.filename}`}
+                          alt="Your photo"
+                          fill
+                          className="object-cover"
+                        />
+                        {selectedPhotoId === photo.id && (
+                          <div className="absolute inset-0 bg-purple-600/20 flex items-center justify-center">
+                            <Check className="w-8 h-8 text-white drop-shadow-lg" />
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           <button
             onClick={handleProfileSubmit}
-            disabled={!isProfileComplete()}
-            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-medium"
+            disabled={mode === 'traits' ? !isProfileComplete() : !selectedPhotoId}
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed transition-all font-medium shadow-lg hover:shadow-xl"
           >
             <Sparkles className="w-5 h-5" />
             Continue to Style Selection
           </button>
-
-          <p className="text-xs text-gray-500 text-center">
-            Your avatar will be AI-generated based on your description. No photos required.
-          </p>
         </div>
       )}
 
-      {/* Step 2: Style Selection */}
+      {/* Step 2: Style Selection + Sexy Boost */}
       {step === 'style' && (
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose an Avatar Style</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Your Look</h2>
             <p className="text-gray-600">
-              Select an artistic style for your generated avatar.
+              Select a style and boost level for your avatar.
             </p>
+          </div>
+
+          {/* Sexy Boost Toggle */}
+          <div className="bg-gradient-to-r from-pink-50 to-purple-50 border border-pink-200 rounded-xl p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-pink-500" />
+                  Sexy Boost
+                </h3>
+                <p className="text-sm text-gray-600 mt-1">Maximize attractiveness — model-quality features, alluring gaze, perfect lighting</p>
+              </div>
+              <button
+                onClick={() => setSexyBoost(!sexyBoost)}
+                className={`relative inline-flex h-7 w-14 items-center rounded-full transition-colors ${
+                  sexyBoost ? 'bg-gradient-to-r from-pink-500 to-purple-500' : 'bg-gray-300'
+                }`}
+              >
+                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform ${
+                  sexyBoost ? 'translate-x-8' : 'translate-x-1'
+                }`} />
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -513,6 +747,7 @@ export default function AvatarGenerationFlow({
                     <span className="text-gray-500 text-sm">{option.name}</span>
                   </div>
                   <p className="text-center font-medium capitalize">{option.name}</p>
+                  <p className="text-center text-xs text-gray-500">{option.desc}</p>
                 </div>
               );
             })}
@@ -610,9 +845,9 @@ export default function AvatarGenerationFlow({
             </button>
             <button
               onClick={handleGenerate}
-              className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all font-medium shadow-lg"
             >
-              Continue
+              {sexyBoost ? '🔥 Generate Sexy Avatar' : 'Generate Avatar'}
             </button>
           </div>
         </div>
@@ -622,9 +857,14 @@ export default function AvatarGenerationFlow({
       {step === 'generating' && (
         <div className="text-center py-12">
           <Loader2 className="w-16 h-16 text-purple-600 animate-spin mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">Generating Your Avatar</h3>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            {mode === 'photo' ? 'Transforming Your Photo...' : 'Generating Your Avatar...'}
+          </h3>
           <p className="text-gray-600">
-            Our AI is creating a unique avatar based on your profile...
+            {sexyBoost 
+              ? 'Our AI is creating a stunning, head-turning version of you...'
+              : 'Our AI is creating a unique avatar based on your profile...'
+            }
           </p>
           <div className="mt-8 flex justify-center gap-2">
             <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" />
@@ -634,7 +874,7 @@ export default function AvatarGenerationFlow({
         </div>
       )}
 
-      {/* Step 3: Preview & Accept/Reject */}
+      {/* Step 4: Preview & Accept/Reject */}
       {step === 'preview' && generatedAvatar && (
         <div className="space-y-6">
           <div className="text-center">
@@ -672,7 +912,7 @@ export default function AvatarGenerationFlow({
           <div className="grid grid-cols-2 gap-4">
             <button
               onClick={handleRegenerate}
-              disabled={generateMutation.isPending}
+              disabled={generateMutation.isPending || generateFromPhotoMutation.isPending}
               className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:border-purple-600 hover:text-purple-600 disabled:opacity-50 transition-colors font-medium"
             >
               <RefreshCw className="w-5 h-5" />
@@ -682,7 +922,7 @@ export default function AvatarGenerationFlow({
             <button
               onClick={handleAccept}
               disabled={acceptMutation.isPending}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors font-medium"
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 transition-all font-medium"
             >
               <Check className="w-5 h-5" />
               {acceptMutation.isPending ? 'Saving...' : 'Accept Avatar'}
@@ -693,12 +933,12 @@ export default function AvatarGenerationFlow({
             onClick={handleReject}
             className="w-full text-sm text-gray-500 hover:text-gray-700 transition-colors"
           >
-            Start over with different profile
+            Start over with different source
           </button>
         </div>
       )}
 
-      {/* Step 4: Complete */}
+      {/* Step 5: Complete */}
       {step === 'complete' && (
         <div className="text-center py-12">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -737,7 +977,7 @@ function StepIndicator({ active, completed, label }: { active: boolean; complete
           <Check className="w-5 h-5 text-white" />
         ) : (
           <span className={`text-sm font-semibold ${active ? 'text-purple-600' : 'text-gray-400'}`}>
-            {label === 'Profile' ? '1' : label === 'Style' ? '2' : label === 'Generate' ? '3' : '4'}
+            {label === 'Source' ? '1' : label === 'Style' ? '2' : label === 'Generate' ? '3' : '4'}
           </span>
         )}
       </div>

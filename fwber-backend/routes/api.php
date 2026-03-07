@@ -452,6 +452,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // AI Avatar Generation
     Route::get('avatar/providers', [\App\Http\Controllers\AvatarController::class, 'providers']);
     Route::post('avatar/generate', [\App\Http\Controllers\AvatarController::class, 'generate']);
+    Route::post('avatar/generate-from-photo', [\App\Http\Controllers\AvatarController::class, 'generateFromPhoto']);
+    Route::get('avatar/physical-traits', [\App\Http\Controllers\AvatarController::class, 'physicalTraits']);
 
     // AI Content Generation (rate limited)
     Route::middleware('throttle:content_generation')->group(function () {

@@ -50,7 +50,7 @@ class AvatarGenerationService
     {
         $provider = $options['provider'] ?? $this->config['default_provider'];
         $prompt = $this->buildPrompt($user, $options);
-        $negativePrompt = $this->buildNegativePrompt();
+        $negativePrompt = $this->buildNegativePrompt($options);
 
         $vibe = $this->analyzeUserVibe($user);
 
@@ -91,7 +91,7 @@ class AvatarGenerationService
         // Only Replicate supported for now
         $provider = 'replicate';
         $prompt = $this->buildPrompt($user, $options);
-        $negativePrompt = $this->buildNegativePrompt();
+        $negativePrompt = $this->buildNegativePrompt($options);
 
         try {
             return $this->generateWithReplicateImg2Img($imagePath, $prompt, $negativePrompt, $options);
@@ -472,15 +472,32 @@ class AvatarGenerationService
             $parts[] = $mainInterest . ' background theme';
         }
 
+        // Sexy boost — emphasize physical attractiveness
+        if (!empty($options['sexy_boost'])) {
+            $parts[] = 'strikingly attractive, magnetic presence, alluring gaze, flawless skin, model-quality features, sultry confidence';
+            $parts[] = 'fashion photography, dramatic lighting, editorial quality, glamorous';
+        } else {
+            $parts[] = 'attractive, confident expression';
+        }
+
         // Quality modifiers
-        $parts[] = 'high quality, detailed, professional photography, attractive, confident expression, natural lighting';
+        $parts[] = 'high quality, detailed, professional photography, natural lighting';
 
         return implode(', ', array_filter($parts));
     }
 
-    private function buildNegativePrompt(): string
+    private function buildNegativePrompt(array $options = []): string
     {
-        return 'nsfw, nude, naked, explicit, low quality, blurry, pixelated, deformed, disfigured, mutation, extra limbs, extra fingers, watermark, text, signature, cartoon, anime, drawing, child, minor, young, inappropriate, sexual';
+        $base = 'low quality, blurry, pixelated, deformed, disfigured, mutation, extra limbs, extra fingers, watermark, text, signature, child, minor, young';
+
+        // Sexy boost allows more suggestive (but not explicit) outputs
+        if (!empty($options['sexy_boost'])) {
+            $base .= ', nude, naked, explicit, pornographic';
+        } else {
+            $base .= ', nsfw, nude, naked, explicit, sexual, inappropriate';
+        }
+
+        return $base;
     }
 
     private function getAgeGroup(int $age): string
