@@ -40,7 +40,7 @@
 
 - [x] Clean up `.gitignore` (133→78 lines, removed 10 duplicate `node_modules` entries)
 - [x] Review feature flags in `config/features.php` — disabled 6 unverified features
-- [ ] Remove stale references to Mercure (8 frontend files — cosmetic, not breaking)
+- [x] Rename stale Mercure references to Reverb (8 files — coordinated backend + frontend)
 - [x] Audit controllers — 89 total, 8 unused: `ConfigController`, `GroupPostController`, `PhotoRevealController`, `PhotoUnlockController`, `ProximityArtifactInteractionController`, `PushSubscriptionController`, `Schemas`, `TelemetryReportController`
 
 ---
