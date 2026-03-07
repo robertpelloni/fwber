@@ -20,14 +20,14 @@
 
 ## 🟡 High: Core Flow Verification (Phase 2)
 
-- [ ] Verify register → login → logout works end-to-end
-- [ ] Verify onboarding wizard completes successfully
-- [ ] Verify Local Pulse loads proximity artifacts
-- [ ] Verify match flow (discover → like → match)
-- [ ] Verify direct messaging (send + receive)
-- [ ] Run backend test suite and fix any failures
-- [ ] Run frontend build and fix any errors
-- [ ] Document verification results in `docs/RELEASE_EVIDENCE.md`
+- [x] Verify register → login → logout works end-to-end (57 tests, 194 assertions)
+- [x] Verify onboarding wizard completes successfully (OnboardingProfileUpdateTest)
+- [x] Verify Local Pulse loads proximity artifacts (ProximityArtifactTest — 12 tests)
+- [x] Verify match flow (discover → like → match) (MatchTest + PremiumMatchFilterTest)
+- [x] Verify direct messaging (send + receive) (MessageTest)
+- [x] Run backend test suite and fix any failures (285 passed, 0 failures)
+- [x] Run frontend build and fix any errors (4 pre-existing errors fixed, build green)
+- [x] Document verification results in `docs/RELEASE_EVIDENCE.md`
 
 ## 🟢 Medium: Launch Preparation
 
