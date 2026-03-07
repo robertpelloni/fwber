@@ -1,7 +1,7 @@
 # DEPLOY.md — The fwber Operations Guide
 
-> **Last Updated:** 2026-02-27 by Claude (Antigravity)
-> **Version:** 0.3.49
+> **Last Updated:** 2026-03-07
+> **Version:** 0.5.0-beta
 
 This document serves as the single source of truth for deploying the fwber monorepo across various environments.
 

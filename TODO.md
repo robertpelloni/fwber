@@ -31,10 +31,10 @@
 
 ## 🟢 Medium: Launch Preparation
 
-- [ ] Execute content strategy from `docs/marketing/CONTENT_STRATEGY.md`
-- [ ] Prepare Detroit metro beta launch materials
-- [ ] Set up basic analytics (signups, DAU, matches/day)
-- [ ] Review and test production deployment script
+- [ ] Execute content strategy from `docs/marketing/CONTENT_STRATEGY.md` (647 lines ready)
+- [ ] Prepare Detroit metro beta launch materials (flyers, stickers, coasters)
+- [ ] Set up basic analytics (signups, DAU, matches/day) — `AnalyticsController` exists
+- [x] Review production deployment setup — `deploy.sh`, `docker-compose.yml`, `DEPLOY.md`, K8s manifests all solid
 
 ## ⚪ Low: Technical Debt
 
