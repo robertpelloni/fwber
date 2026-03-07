@@ -1,29 +1,28 @@
 # FWBER GEMINI INSTRUCTIONS
 
 > **See [docs/UNIVERSAL_LLM_INSTRUCTIONS.md](docs/UNIVERSAL_LLM_INSTRUCTIONS.md) for the Master Protocol.**
-> **See [AGENTS.md](AGENTS.md) for shared protocols (versioning, code standards, git workflow).**
+> **See [AGENTS.md](AGENTS.md) for shared protocols and Stabilization Mode policy.**
 
-**Current Version:** 1.0.0-RC1  
-**Status:** See `PROJECT_STATUS.md` and `TODO.md`.
+**Current Version:** 0.5.0-beta  
+**Status:** Stabilization & Launch Consolidation
 
 ---
 
-## 🧠 Gemini-Specific Role: Speed & Performance
+## 🧠 Gemini-Specific Role: Consolidation & Launch Support
 
 ### Strengths to Leverage
 - **Speed**: Use parallel tool calls for maximum throughput.
-- **Large Context**: Perform full-repo scans to identify patterns, dead code, and inconsistencies.
-- **Scripting**: Write automation scripts for repo maintenance, dashboard generation, and deployment.
+- **Large Context**: Perform full-repo scans for contradictions, dead code, and drift.
+- **Scripting**: Write CI checks, maintenance scripts, and deployment tooling.
 - **Performance Analysis**: Profile build times, bundle sizes, and database queries.
 
-### Workflow
-1. Read `TODO.md` and `ROADMAP.md` — pick the highest-impact item.
-2. Implement rapidly using parallel execution.
+### Stabilization Workflow
+1. Read `TODO.md` — pick the highest-impact consolidation item.
+2. Execute using parallel tool calls for efficiency.
 3. Run `npm run build` and `php artisan test` to verify.
-4. Update `CHANGELOG.md`, bump `VERSION`, commit, and push.
-5. Proceed to the next item without pausing.
+4. Update `CHANGELOG.md` if a real change was made.
 
-### Special Responsibilities
-- Maintain `docs/dashboard/PROJECT_STRUCTURE_DASHBOARD.md`.
-- Run `docs/dashboard/SUBMODULE_VERSIONS.md` updates.
-- Generate API documentation via `l5-swagger:generate` when endpoints change.
+### Rules
+- **Do NOT** introduce new features unless tagged `critical-bug` or `security`.
+- **Do NOT** bump the version unless a real release occurs.
+- **FOCUS**: Docs cleanup, CI improvements, consistency checks, performance.

@@ -38,7 +38,7 @@ export default function ArtifactComments({ artifactId, isOpen }: ArtifactComment
         if (isOpen && artifactId) {
             loadComments();
         }
-    }, [isOpen, artifactId]);
+    }, [isOpen, artifactId, loadComments]);
 
     const loadComments = async () => {
         setIsLoading(true);

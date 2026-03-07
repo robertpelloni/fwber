@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -48,37 +48,34 @@ export default function ActiveAudioRoom() {
         echoInstance: echo
     });
 
-    useEffect(() => {
-        const joinAndInit = async () => {
-            try {
-                // Join room via API
-                const resp = await apiClient.post<{ room: RoomDetails, participants: RoomParticipant[] }>(`/audio-rooms/${id}/join`);
-                setRoom(resp.data.room);
+    const fetchRoomDetails = useCallback(async () => {
+        if (!user?.id) return;
 
-                // Initialize local mic
-                await startLocalAudio();
+        try {
+            // Join room via API
+            const resp = await apiClient.post<{ room: RoomDetails, participants: RoomParticipant[] }>(`/audio-rooms/${id}/join`);
+            setRoom(resp.data.room);
 
-                // If we're a speaker, offer to other speakers
-                const me = resp.data.participants.find(p => p.user_id === user?.id);
-                if (me?.role === 'speaker' || resp.data.room.host_id === user?.id) {
-                    resp.data.participants.forEach(p => {
-                        if (p.user_id !== user?.id && (p.role === 'speaker' || p.user_id === resp.data.room.host_id)) {
-                            createOfferForPeer(p.user_id);
-                        }
-                    });
-                }
-
-            } catch (error: any) {
-                toast({ variant: 'destructive', title: 'Cannot join room', description: error.response?.data?.message || 'Room might be ended.' });
-                router.push('/audio-rooms');
-            } finally {
-                setLoading(false);
+            // If we're a speaker, offer to other speakers
+            const me = resp.data.participants.find(p => p.user_id === user?.id);
+            if (me?.role === 'speaker' || resp.data.room.host_id === user?.id) {
+                resp.data.participants.forEach(p => {
+                    if (p.user_id !== user?.id && (p.role === 'speaker' || p.user_id === resp.data.room.host_id)) {
+                        createOfferForPeer(p.user_id);
+                    }
+                });
             }
-        };
 
-        if (user?.id) {
-            joinAndInit();
+        } catch (error: any) {
+            toast({ variant: 'destructive', title: 'Cannot join room', description: error.response?.data?.message || 'Room might be ended.' });
+            router.push('/audio-rooms');
+        } finally {
+            setLoading(false);
         }
+    }, [id, user?.id, createOfferForPeer, toast, router]);
+
+    useEffect(() => {
+        fetchRoomDetails();
 
         return () => {
             // Leave room when unmounting
@@ -87,7 +84,12 @@ export default function ActiveAudioRoom() {
                 apiClient.post(`/audio-rooms/${id}/leave`).catch(() => { });
             }
         };
-    }, [id, user?.id]);
+    }, [fetchRoomDetails, id, stopLocalAudio, user?.id]);
+
+    useEffect(() => {
+        if (!room) return;
+        startLocalAudio();
+    }, [room, startLocalAudio]);
 
     useEffect(() => {
         if (!echo || !room) return;

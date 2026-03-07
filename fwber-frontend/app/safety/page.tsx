@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import AppHeader from '@/components/AppHeader';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -34,11 +34,7 @@ export default function SafetyPage() {
     // Panic State
     const [isPanicking, setIsPanicking] = useState(false);
 
-    useEffect(() => {
-        loadContacts();
-    }, []);
-
-    const loadContacts = async () => {
+    const loadContacts = useCallback(async () => {
         try {
             const { contacts } = await getContacts();
             setContacts(contacts);
@@ -47,7 +43,11 @@ export default function SafetyPage() {
         } finally {
             setIsLoadingContacts(false);
         }
-    };
+    }, [toast]);
+
+    useEffect(() => {
+        loadContacts();
+    }, [loadContacts]);
 
     const handleAddContact = async () => {
         if (!newContactName || !newContactPhone) {

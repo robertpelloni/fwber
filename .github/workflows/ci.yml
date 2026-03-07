@@ -7,6 +7,78 @@ on:
     branches: [ main ]
 
 jobs:
+  consistency-checks:
+    name: Source of Truth Checks
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Version consistency check
+      run: |
+        VERSION=$(cat VERSION | tr -d '[:space:]')
+        echo "VERSION file says: $VERSION"
+
+        # Check agent files reference the correct version
+        for file in AGENTS.md CLAUDE.md GEMINI.md GPT.md copilot-instructions.md; do
+          if [ -f "$file" ]; then
+            if grep -q "**Current Version:**" "$file"; then
+              FILE_VERSION=$(grep "**Current Version:**" "$file" | head -1 | sed 's/.*\*\*Current Version:\*\* *//' | sed 's/ *$//' | tr -d '[:space:]')
+              if [ "$FILE_VERSION" != "$VERSION" ]; then
+                echo "❌ Version mismatch in $file: found '$FILE_VERSION', expected '$VERSION'"
+                exit 1
+              else
+                echo "✅ $file version matches"
+              fi
+            fi
+          fi
+        done
+
+    - name: License check
+      run: |
+        if [ ! -f LICENSE ]; then
+          echo "❌ LICENSE file is missing"
+          exit 1
+        fi
+        if ! grep -q "MIT License" LICENSE; then
+          echo "❌ LICENSE is not MIT"
+          exit 1
+        fi
+        if [ -f COPYING ]; then
+          echo "❌ COPYING file should not exist (legacy AGPL artifact)"
+          exit 1
+        fi
+        echo "✅ License is MIT, no AGPL artifacts"
+
+    - name: Secret scanning check
+      run: |
+        # Check that .encryption_key is in .gitignore
+        if ! grep -q ".encryption_key" .gitignore; then
+          echo "❌ .encryption_key is not in .gitignore"
+          exit 1
+        fi
+        # Check that no .env files are tracked (except .env.example)
+        TRACKED_ENV=$(git ls-files '*.env' '.env.*' | grep -v '.example' | grep -v '.testing' || true)
+        if [ -n "$TRACKED_ENV" ]; then
+          echo "❌ Environment files are tracked in git: $TRACKED_ENV"
+          exit 1
+        fi
+        echo "✅ No secrets or env files tracked"
+
+    - name: Documentation hygiene check
+      run: |
+        # Fail if new SESSION_HANDOFF files appear in root
+        HANDOFFS=$(find . -maxdepth 1 -name "SESSION_HANDOFF_*.md" | wc -l)
+        if [ "$HANDOFFS" -gt 0 ]; then
+          echo "❌ Found $HANDOFFS SESSION_HANDOFF files in root (should be archived)"
+          exit 1
+        fi
+        UPDATES=$(find . -maxdepth 1 -name "RECENT_UPDATES_*.md" | wc -l)
+        if [ "$UPDATES" -gt 0 ]; then
+          echo "❌ Found $UPDATES RECENT_UPDATES files in root (should be archived)"
+          exit 1
+        fi
+        echo "✅ No stale handoff/update files in root"
+
   backend-test:
     runs-on: ubuntu-latest
     defaults:
@@ -14,13 +86,13 @@ jobs:
         working-directory: ./fwber-backend
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.2'
-        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, dom, filter, gd, iconv, json, mbstring, pdo
+        php-version: '8.4'
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, dom, filter, gd, json, pdo
         coverage: xdebug
 
     - name: Copy .env
@@ -46,17 +118,17 @@ jobs:
         DB_DATABASE: database/database.sqlite
       run: php artisan test
 
-  frontend-test:
+  frontend-build:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./fwber-frontend
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Use Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: '20.x'
         cache: 'npm'
@@ -67,7 +139,7 @@ jobs:
 
     - name: Lint
       run: npm run lint
-      continue-on-error: true # Don't fail build on lint errors for now
+      continue-on-error: true
 
     - name: Build
       env:

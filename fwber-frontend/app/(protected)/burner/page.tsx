@@ -52,10 +52,14 @@ export default function BurnerGeneratorPage() {
 
     useEffect(() => {
         generateLink();
+
+        const currentPollingRef = pollingRef.current;
         return () => {
-            if (pollingRef.current) clearInterval(pollingRef.current);
+            if (currentPollingRef) {
+                clearInterval(currentPollingRef);
+            }
         };
-    }, []);
+    }, [generateLink]);
 
     const copyLink = () => {
         if (burnerData) {

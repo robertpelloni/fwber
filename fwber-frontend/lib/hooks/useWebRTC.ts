@@ -181,12 +181,13 @@ export function useWebRTC({ roomId, currentUserId, echoInstance }: UseWebRTCProp
 
     // Cleanup peer connections on unmount
     useEffect(() => {
+        const currentPeersRef = peersRef.current;
         return () => {
-            peersRef.current.forEach(pc => pc.close());
-            peersRef.current.clear();
-            stopLocalAudio();
+            localStream?.getTracks().forEach(track => track.stop());
+            // Close all peer connections
+            currentPeersRef.forEach(peer => peer.close());
         };
-    }, []);
+    }, [localStream]);
 
     return {
         localStream,
@@ -197,3 +198,4 @@ export function useWebRTC({ roomId, currentUserId, echoInstance }: UseWebRTCProp
         createOfferForPeer
     };
 }
+

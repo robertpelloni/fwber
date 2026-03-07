@@ -120,7 +120,7 @@ export default function RootLayout({
                   <PerformanceMonitor />
                   {/* Version badge — reads from VERSION file at build time via next.config.js */}
                   <div className="fixed bottom-1 right-1 text-[10px] text-muted-foreground opacity-50 pointer-events-none z-50">
-                    v{process.env.NEXT_PUBLIC_PROJECT_VERSION || '0.3.37'}
+                    v{process.env.NEXT_PUBLIC_PROJECT_VERSION || '0.5.0-beta'}
                   </div>
                 </ToastProvider>
               </SolanaProvider>

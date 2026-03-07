@@ -105,7 +105,7 @@ export default function AudioRoomsLobby() {
                         <div className="p-8 text-center text-muted-foreground animate-pulse">Scanning frequencies...</div>
                     ) : rooms.length === 0 ? (
                         <Card className="p-8 text-center bg-muted/30 border-dashed">
-                            <p className="text-muted-foreground">It's quiet. Too quiet. Be the first to host a room!</p>
+                            <p className="text-muted-foreground">It&apos;s quiet. Too quiet. Be the first to host a room!</p>
                         </Card>
                     ) : (
                         rooms.map(room => (

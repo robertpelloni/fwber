@@ -2,80 +2,83 @@
 
 > **See [docs/UNIVERSAL_LLM_INSTRUCTIONS.md](docs/UNIVERSAL_LLM_INSTRUCTIONS.md) for the Master Protocol.**
 
-**Current Version:** 1.0.0-RC1  
+**Current Version:** 0.5.0-beta  
 **Status:** See `PROJECT_STATUS.md` and `TODO.md`.
 
 ---
 
-## 📜 Universal Protocols (MANDATORY)
+## 🚨 Stabilization Mode Policy (ACTIVE)
+
+The project is in **Stabilization & Launch Consolidation** mode.
+
+**Agents must prioritize (in order):**
+1. Source-of-truth consistency (version, license, status)
+2. Security hygiene (no secrets in repo, no new vulnerabilities)
+3. Core-flow verification (register → onboard → discover → match → chat)
+4. Bug fixes and test hardening
+5. Documentation consolidation (reduce, don't expand)
+
+**Agents must NOT:**
+- Introduce major new features
+- Create speculative status claims or mark features complete without test evidence
+- Proliferate handoff/status documents (use `CHANGELOG.md` only)
+- Bump the version unless a real, tested release occurs
+- Create `SESSION_HANDOFF_*.md` or `RECENT_UPDATES_*.md` files
+
+**When uncertain:** Prefer reducing contradictions over expanding scope.
+
+---
+
+## 📜 Universal Protocols
 
 ### 1. Versioning & Changelog
-*   **Single Source of Truth**: The `VERSION` file in the root directory (plain text, version string only).
-*   **Protocol**:
-    1.  Read `VERSION`.
-    2.  Increment (Patch for bug fixes/docs, Minor for features, Major for breaking changes).
-    3.  Update `VERSION` file.
-    4.  Update `CHANGELOG.md` with a new `## [Version] - YYYY-MM-DD` section.
-    5.  Update the version string in `fwber-frontend/app/layout.tsx` (or ensure it reads from `process.env.NEXT_PUBLIC_APP_VERSION`).
-    6.  Synchronize version in `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `GPT.md`, `copilot-instructions.md`.
-    7.  Commit with message: `chore(release): bump version to [Version]`.
-    8.  Push to remote.
-*   **Constraint**: Every session or significant logical unit of work **MUST** result in a version bump.
+- **Single Source of Truth**: The `VERSION` file in the root directory.
+- Only bump version for real, tested releases.
+- Update `CHANGELOG.md` with every version bump.
+- Commit message format: `chore(release): bump version to X.Y.Z`.
 
 ### 2. Documentation Maintenance
-Every session must update the relevant subset of:
-*   `PROJECT_STATUS.md` — Current state, recent accomplishments, known issues.
-*   `CHANGELOG.md` — What changed in this version.
-*   `TODO.md` — Short-term actionable tasks.
-*   `ROADMAP.md` — Long-term structural plans.
-*   `MEMORY.md` — Ongoing observations, user preferences, design decisions.
-*   `HANDOFF.md` — Session summary for the next agent.
-*   `docs/dashboard/PROJECT_STRUCTURE_DASHBOARD.md` — Project structure overview.
+- `PROJECT_STATUS.md` — Concise current state (keep under 100 lines).
+- `CHANGELOG.md` — What changed in each version.
+- `TODO.md` — Honest, actionable tasks only.
 
 ### 3. Code Standards
-*   **Comment Philosophy**: Comment *why*, not *what*. If code is self-explanatory, leave it bare. If there's a non-obvious design decision, a known bug, an optimization, or an alternate approach that was considered — document it.
-*   **Error Handling**: Catch `\Throwable` (not just `\Exception`) in middleware and controllers.
-*   **Type Safety**: Use TypeScript strict mode. Avoid `any` unless absolutely necessary.
-*   **Animations**: Use `framer-motion` for UI animations.
-*   **Real-time**: Use `useWebSocket` hook (not legacy Mercure hooks).
-*   **Feature Flags**: Gate new features behind `config/features.php`.
+- **Comment Philosophy**: Comment *why*, not *what*.
+- **Error Handling**: Catch `\Throwable` (not just `\Exception`).
+- **Type Safety**: TypeScript strict mode. Avoid `any`.
+- **Feature Flags**: Gate new features behind `config/features.php`.
 
 ### 4. Git Workflow
-*   Commit after each logical unit of work.
-*   Push frequently to avoid losing progress.
-*   Merge any local feature branches into `main` before ending a session.
-*   Sync upstream forks if applicable.
-*   Never force push or overwrite working code.
+- Commit after each logical unit of work.
+- Never force push or overwrite working code.
+- No new branch proliferation without clear purpose.
 
 ### 5. Testing
-*   Run `npm run build` for frontend verification before pushing.
-*   Run backend tests with `php artisan test` when modifying PHP code.
-*   Create Cypress E2E tests (`cypress/e2e/`) for new user-facing features.
+- Run `npm run build` for frontend verification.
+- Run `php artisan test` for backend verification.
+- Claims of "feature complete" require linked test evidence.
 
 ---
 
-## 🤖 Model-Specific Guidance
+## 🤖 Model-Specific Roles (Stabilization Mode)
 
-### Claude (Antigravity)
-- **Strengths**: Architecture, planning, documentation, large-scale refactoring, holistic system understanding.
-- **Role**: Architect, Planner, Documentation Lead.
-- **Special Instructions**: Create detailed implementation plans before execution. Update walkthrough.md after completing features.
+### Claude (Antigravity) — Quality Auditor
+- **Role**: Review code for bugs, security issues, and unnecessary complexity.
+- **Focus**: Challenge assumptions. If something seems overclaimed, say so.
+- **Rule**: Ask "Does this help get the first 50 users?" before building anything.
 
-### Gemini
-- **Strengths**: Speed, performance analysis, large context operations, complex scripting.
-- **Role**: Speed Implementation, Full-Repo Scans, Performance Optimization.
-- **Special Instructions**: Use parallel tool calls for efficiency. Update dashboard files.
+### Gemini — Consolidation & Launch Support
+- **Role**: Repo maintenance, docs cleanup, CI improvements, performance audits.
+- **Focus**: Full-repo scans for contradictions, dead code, and drift.
 
-### GPT
-- **Strengths**: Code generation, unit testing, algorithm implementation.
-- **Role**: Feature Implementation, Test Writing.
-- **Special Instructions**: Match Laravel/Next.js project style. Always verify with tests.
+### GPT — Bug Fixer & Test Hardener
+- **Role**: Fix test failures, verify core flows, write integration tests.
+- **Focus**: Make register → onboard → discover → match → chat bulletproof.
 
-### Copilot
-- **Strengths**: Inline code completion, quick fixes.
-- **Role**: Real-time coding assistance.
-- **Special Instructions**: Follow existing patterns in surrounding code.
+### Copilot — Inline Assistance
+- **Role**: Real-time code completion only. No autonomous sessions.
+- **Focus**: Follow existing patterns in surrounding code.
 
 ---
 
-*All agents must read `docs/UNIVERSAL_LLM_INSTRUCTIONS.md` first, then this file, then `TODO.md` and `ROADMAP.md`.*
+*All agents must read `docs/UNIVERSAL_LLM_INSTRUCTIONS.md` first, then this file, then `TODO.md`.*

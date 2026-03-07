@@ -215,7 +215,7 @@ export default function WingmanArcadePage() {
                         <div className="flex-grow">
                             <h4 className="text-xl font-bold text-white mb-2">How it works</h4>
                             <p className="text-gray-400 leading-relaxed">
-                                The Arcade games use our proprietary <strong>Roast & Hype Engine</strong> to analyze your profile attributes against local dating trends and cosmic alignments. None of your data is shared during these games—it's all performed within your private session.
+                                The Arcade games use our proprietary <strong>Roast & Hype Engine</strong> to analyze your profile attributes against local dating trends and cosmic alignments. None of your data is shared during these games—it&apos;s all performed within your private session.
                             </p>
                         </div>
                         <Link

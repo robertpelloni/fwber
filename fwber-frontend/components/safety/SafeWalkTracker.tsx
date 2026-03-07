@@ -71,7 +71,7 @@ export default function SafeWalkTracker() {
                 watchIdRef.current = null;
             }
         };
-    }, [activeWalk?.id, activeWalk?.status, toast]);
+    }, [activeWalk, toast]);
 
     const handleEndWalk = async () => {
         if (!activeWalk) return;

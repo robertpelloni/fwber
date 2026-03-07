@@ -1,7 +1,7 @@
 # Submodule & Component Versions Dashboard
 
-> **Last Updated:** 2026-02-27 by Gemini (Antigravity)
-> **Core Version:** 0.3.49
+> **Last Updated:** 2026-03-06 by Gemini (Antigravity)
+> **Core Version:** 1.3.2
 
 ## Architectural Scope: Pure Monorepo
 

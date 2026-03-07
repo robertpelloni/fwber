@@ -277,7 +277,7 @@ export default function PhysicalProfilePage() {
                                 Combine your physical traits into a descriptive prompt.
                             </p>
                             <p className="text-xs text-purple-400 mt-1 font-medium flex items-center gap-1">
-                                <Sparkles className="w-3 h-3" /> Vibe-Aware: Your avatar's lighting, expression, and aura will be dynamically influenced by the vibe of your recent posts on the Local Pulse.
+                                <Sparkles className="w-3 h-3" /> Vibe-Aware: Your avatar&apos;s lighting, expression, and aura will be dynamically influenced by the vibe of your recent posts on the Local Pulse.
                             </p>
                         </div>
 

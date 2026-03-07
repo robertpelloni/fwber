@@ -22,7 +22,7 @@ export default function TermsPage() {
         <p>fwber utilizes a virtual token economy (FWB Tokens) for unlocking premium features, entering chatrooms, and sending gifts. FWB tokens have no real-world cash value outside the platform unless explicitly redeemed through our authorized Merchant Analytics program. All token purchases are final and non-refundable.</p>
 
         <h2 className="text-xl font-semibold mt-6 mb-2">4. Privacy and Cryptographic Features</h2>
-        <p>While we provide advanced privacy tools like Ghost Mode, Location Fuzzing, and End-to-End Encrypted chatrooms, these tools are provided "as is". You understand that interacting with users in proximity feeds carries inherent physical risks. Always meet in public venues for first encounters.</p>
+        <p>While we provide advanced privacy tools like Ghost Mode, Location Fuzzing, and End-to-End Encrypted chatrooms, these tools are provided &quot;as is&quot;. You understand that interacting with users in proximity feeds carries inherent physical risks. Always meet in public venues for first encounters.</p>
 
         <h2 className="text-xl font-semibold mt-6 mb-2">5. Disclaimer of Warranties</h2>
         <p>The materials on fwber&apos;s website are provided on an &apos;as is&apos; basis. fwber makes no warranties, expressed or implied, regarding the conduct of its members or the accuracy of their profiles.</p>

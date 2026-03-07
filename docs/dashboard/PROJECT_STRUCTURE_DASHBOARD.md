@@ -1,7 +1,7 @@
 # Project Structure Dashboard
 
-**Last Updated:** February 27, 2026
-**Version:** v0.3.49
+**Last Updated:** 2026-03-06
+**Version:** v1.3.2
 **Maintainer:** Gemini (Antigravity)
 
 ## OVERVIEW
@@ -13,14 +13,14 @@
 ### 📂 Root (`/`)
 | Path | Description | Version |
 |------|-------------|---------|
-| `fwber-backend/` | Laravel 12 API & Application Logic | 0.3.49 |
-| `fwber-frontend/` | Next.js 16 Web Application (PWA) | 0.3.49 |
+| `fwber-backend/` | Laravel 12 API & Application Logic | 1.3.2 |
+| `fwber-frontend/` | Next.js 16 Web Application (PWA) | 1.3.2 |
 | `fwber-geo/` | Rust Geo-Screener Microservice (Actix-Web + H3) | 0.1.0 |
 | `mobile/` | React Native / Expo Mobile Shell | 0.1.0 |
 | `docker/` | Docker Compose & Container Configurations | - |
 | `kubernetes/` | K8s Deployment Manifests | - |
 | `docs/` | Project Documentation & Knowledge Base | - |
-| `VERSION` | Current Project Version | 0.3.49 |
+| `VERSION` | Current Project Version | 1.3.2 |
 
 ### 🐘 Backend (`fwber-backend/`)
 **Stack:** Laravel 12, PHP 8.3+, PostgreSQL + PostGIS, Redis, Pusher/Reverb

@@ -1,10 +1,10 @@
 # FWBER COPILOT INSTRUCTIONS
 
 > **See [docs/UNIVERSAL_LLM_INSTRUCTIONS.md](docs/UNIVERSAL_LLM_INSTRUCTIONS.md) for the Master Protocol.**
-> **See [AGENTS.md](AGENTS.md) for shared protocols (versioning, code standards, git workflow).**
+> **See [AGENTS.md](AGENTS.md) for shared protocols and Stabilization Mode policy.**
 
-**Current Version:** 1.0.0-RC1  
-**Status:** See `PROJECT_STATUS.md` and `TODO.md`.
+**Current Version:** 0.5.0-beta  
+**Status:** Stabilization & Launch Consolidation
 
 ---
 
@@ -17,3 +17,4 @@
 - Use `framer-motion` for animations.
 - Gate new features behind `config/features.php` flags.
 - Comment non-obvious design decisions.
+- **Do NOT** suggest new features — focus on bug fixes and code quality.
