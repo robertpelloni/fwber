@@ -10,7 +10,7 @@ import NotificationPermissionHandler from '@/components/NotificationPermissionHa
 import SentryInitializer from '@/components/SentryInitializer'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import FeedbackModal from '@/components/FeedbackModal'
-// import { MercureProvider } from '@/lib/contexts/MercureContext'
+// Legacy: Mercure provider removed, migrated to Reverb WebSocket
 import { SolanaProvider } from '@/components/SolanaProvider'
 import NotificationListener from '@/components/realtime/NotificationListener'
 import PWAInstallPrompt from '@/components/PWAInstallPrompt'

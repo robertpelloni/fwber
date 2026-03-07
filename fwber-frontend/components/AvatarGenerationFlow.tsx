@@ -76,7 +76,7 @@ export default function AvatarGenerationFlow({
   useEffect(() => {
     if (step === 'generating') {
         // Check for avatar_generated message
-        // The message structure from Mercure might vary, but we expect type='avatar_generated'
+        // The message structure from Reverb might vary, but we expect type='avatar_generated'
         // or a notification with that type.
         const avatarMsg = messages.find((m: any) =>
             m.type === 'avatar_generated' || 

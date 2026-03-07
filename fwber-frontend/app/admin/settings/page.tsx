@@ -305,21 +305,21 @@ export default function AdminSettingsPage() {
               System Health
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Mercure Status */}
+              {/* Reverb Status */}
               <div className="bg-white rounded-lg border border-gray-200 p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    {health?.services.mercure === 'up' ? (
+                    {health?.services.reverb === 'up' ? (
                       <Wifi className="h-5 w-5 text-green-600" />
                     ) : (
                       <WifiOff className="h-5 w-5 text-gray-400" />
                     )}
-                    <span className="font-medium text-gray-900">Mercure Hub</span>
+                    <span className="font-medium text-gray-900">Reverb Hub</span>
                   </div>
-                  <HealthStatusBadge status={health?.services.mercure ?? 'unknown'} />
+                  <HealthStatusBadge status={health?.services.reverb ?? 'unknown'} />
                 </div>
                 <p className="text-sm text-gray-500 truncate">
-                  {health?.details.mercure_url || 'Not configured'}
+                  {health?.details.reverb_url || 'Not configured'}
                 </p>
               </div>
 

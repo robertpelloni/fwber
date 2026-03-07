@@ -55,7 +55,7 @@ export function useUpdateFeatureFlags() {
 }
 
 /**
- * Hook to fetch system health including Mercure status
+ * Hook to fetch system health including Reverb status
  */
 export function useSystemHealth(options: ConfigQueryOptions = {}) {
   return useQuery<SystemHealth>({

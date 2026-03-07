@@ -232,19 +232,19 @@ export default function AnalyticsPage() {
 
             {/* Mercure */}
             <div className={`rounded-lg p-4 text-center ${
-              systemHealth.services?.mercure === 'up' ? 'bg-green-50' : 
-              systemHealth.services?.mercure === 'down' ? 'bg-red-50' : 'bg-gray-50'
+              systemHealth.services?.reverb === 'up' ? 'bg-green-50' : 
+              systemHealth.services?.reverb === 'down' ? 'bg-red-50' : 'bg-gray-50'
             }`}>
               <p className={`text-sm ${
-                systemHealth.services?.mercure === 'up' ? 'text-green-600' : 
-                systemHealth.services?.mercure === 'down' ? 'text-red-600' : 'text-gray-600'
-              }`}>Mercure Hub</p>
+                systemHealth.services?.reverb === 'up' ? 'text-green-600' : 
+                systemHealth.services?.reverb === 'down' ? 'text-red-600' : 'text-gray-600'
+              }`}>Reverb Hub</p>
               <p className={`mt-2 text-2xl font-semibold ${
-                systemHealth.services?.mercure === 'up' ? 'text-green-900' : 
-                systemHealth.services?.mercure === 'down' ? 'text-red-900' : 'text-gray-900'
+                systemHealth.services?.reverb === 'up' ? 'text-green-900' : 
+                systemHealth.services?.reverb === 'down' ? 'text-red-900' : 'text-gray-900'
               }`}>
-                {systemHealth.services?.mercure === 'up' ? '✓ Connected' : 
-                 systemHealth.services?.mercure === 'down' ? '✕ Down' : '— N/A'}
+                {systemHealth.services?.reverb === 'up' ? '✓ Connected' : 
+                 systemHealth.services?.reverb === 'down' ? '✕ Down' : '— N/A'}
               </p>
               <p className="mt-1 text-xs text-gray-500">Real-time events</p>
             </div>
@@ -274,7 +274,7 @@ export default function AnalyticsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-semibold text-gray-900">🔌 Live System Signals</h2>
-            <p className="text-sm text-gray-500">Real-time Mercure + infra health</p>
+            <p className="text-sm text-gray-500">Real-time Reverb + infra health</p>
           </div>
           {realtimeQuery.isFetching && <span className="text-xs text-gray-500">Refreshing…</span>}
         </div>
@@ -285,7 +285,7 @@ export default function AnalyticsPage() {
               <p className="mt-2 text-3xl font-semibold text-blue-900">
                 {formatNumber(realtimeMetrics.active_connections)}
               </p>
-              <p className="text-xs text-blue-500">Mercure/WebSocket sessions</p>
+              <p className="text-xs text-blue-500">Reverb/WebSocket sessions</p>
             </div>
             <div className="rounded-lg bg-green-50 p-4 text-center">
               <p className="text-sm text-green-600">Messages / Minute</p>
@@ -304,7 +304,7 @@ export default function AnalyticsPage() {
           </div>
         ) : (
           <p className="mt-4 text-sm text-gray-500">
-                Realtime metrics unavailable. Check Mercure/API health.
+                Realtime metrics unavailable. Check Reverb/API health.
           </p>
         )}
       </div>

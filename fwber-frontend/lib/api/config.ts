@@ -41,11 +41,11 @@ export interface SystemHealth {
   services: {
     database: 'up' | 'down';
     cache: 'up' | 'down';
-    mercure: 'up' | 'down';
+    reverb: 'up' | 'down';
     queue: 'up' | 'down' | 'unknown';
   };
   details: {
-    mercure_url: string | null;
+    reverb_url: string | null;
     cache_driver: string;
     queue_driver: string;
   };
@@ -84,7 +84,7 @@ export function updateFeatureFlags(
 }
 
 /**
- * Get system health status including Mercure
+ * Get system health status including Reverb
  */
 export function getSystemHealth(): Promise<SystemHealth> {
   return api.get<SystemHealth>('/config/health');

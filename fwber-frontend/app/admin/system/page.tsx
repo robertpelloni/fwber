@@ -229,7 +229,7 @@ export default function SystemDashboardPage() {
                   </ul>
                   <h3>Refactoring</h3>
                   <ul>
-                    <li>Unified Real-time logic (removed legacy Mercure hooks).</li>
+                    <li>Unified Real-time logic (removed legacy Mercure hooks, migrated to Reverb).</li>
                     <li>Standardized API client usage.</li>
                     <li>Comprehensive linting & type fixes.</li>
                   </ul>

@@ -149,12 +149,12 @@ class ConfigController extends Controller
     }
 
     /**
-     * Get Mercure/WebSocket connection health status.
+     * Get Reverb/WebSocket connection health status.
      *
      * @OA\Get(
      *     path="/api/config/health",
      *     summary="Get system health",
-     *     description="Returns health status of various system components including Mercure.",
+     *     description="Returns health status of various system components including Reverb.",
      *     operationId="getSystemHealth",
      *     tags={"Configuration"},
      *     security={{"bearerAuth":{}}},
@@ -163,7 +163,7 @@ class ConfigController extends Controller
      *         description="Health status retrieved",
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(property="mercure", type="object",
+     *             @OA\Property(property="reverb", type="object",
      *                 @OA\Property(property="configured", type="boolean"),
      *                 @OA\Property(property="public_url", type="string"),
      *                 @OA\Property(property="status", type="string", example="healthy")
@@ -184,8 +184,8 @@ class ConfigController extends Controller
      */
     public function getHealth(): JsonResponse
     {
-        $mercureUrl = config('services.mercure.public_url');
-        $mercureConfigured = !empty($mercureUrl);
+        $reverbUrl = config('reverb.servers.reverb.host', config('services.mercure.public_url'));
+        $reverbConfigured = !empty($reverbUrl);
 
         // Check Database connectivity
         $dbStatus = 'down';
@@ -212,14 +212,14 @@ class ConfigController extends Controller
         $queueStatus = 'unknown';
         $queueDriver = config('queue.default');
 
-        // Mercure status
-        $mercureStatus = $mercureConfigured ? 'up' : 'down';
+        // Reverb (real-time) status
+        $reverbStatus = $reverbConfigured ? 'up' : 'down';
 
         // Calculate overall status
         $overallStatus = 'healthy';
         if ($dbStatus === 'down') {
             $overallStatus = 'unhealthy';
-        } elseif ($cacheStatus === 'down' || $mercureStatus === 'down') {
+        } elseif ($cacheStatus === 'down' || $reverbStatus === 'down') {
             $overallStatus = 'degraded';
         }
 
@@ -228,11 +228,11 @@ class ConfigController extends Controller
             'services' => [
                 'database' => $dbStatus,
                 'cache' => $cacheStatus,
-                'mercure' => $mercureStatus,
+                'reverb' => $reverbStatus,
                 'queue' => $queueStatus,
             ],
             'details' => [
-                'mercure_url' => $mercureUrl ?: null,
+                'reverb_url' => $reverbUrl ?: null,
                 'cache_driver' => config('cache.default'),
                 'queue_driver' => $queueDriver,
             ],

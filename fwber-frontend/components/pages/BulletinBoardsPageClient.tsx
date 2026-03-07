@@ -44,7 +44,7 @@ export default function BulletinBoardsPageClient() {
   
   // Set up real-time updates
   const { connectionStatus } = useWebSocket();
-  const mercureConnected = connectionStatus.connected;
+  const reverbConnected = connectionStatus.connected;
 
   // Get user's current location
   useEffect(() => {
@@ -138,9 +138,9 @@ export default function BulletinBoardsPageClient() {
               📍 Local Bulletin Boards
             </h1>
             <div className="flex items-center space-x-2">
-              <div className={`w-2 h-2 rounded-full ${mercureConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+              <div className={`w-2 h-2 rounded-full ${reverbConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
               <span className="text-sm text-gray-600">
-                {mercureConnected ? 'Real-time' : 'Connecting...'}
+                {reverbConnected ? 'Real-time' : 'Connecting...'}
               </span>
             </div>
           </div>
