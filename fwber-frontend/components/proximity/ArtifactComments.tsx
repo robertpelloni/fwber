@@ -34,12 +34,6 @@ export default function ArtifactComments({ artifactId, isOpen }: ArtifactComment
     const [newComment, setNewComment] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    useEffect(() => {
-        if (isOpen && artifactId) {
-            loadComments();
-        }
-    }, [isOpen, artifactId, loadComments]);
-
     const loadComments = async () => {
         setIsLoading(true);
         try {
@@ -52,6 +46,13 @@ export default function ArtifactComments({ artifactId, isOpen }: ArtifactComment
             setIsLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (isOpen && artifactId) {
+            loadComments();
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen, artifactId]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
