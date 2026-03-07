@@ -1,6 +1,39 @@
-oProceedrocddPro# Changelog
+# Changelog
 
 All notable changes to this project will be documented in this file.
+
+## [0.5.0-beta] - 2026-03-07 — Credibility Sprint
+
+> **Version Reset**: Previous entries below used inflated version numbers (0.3.x → 1.3.x)
+> without release evidence. Version was reset to `0.5.0-beta` to reflect actual maturity.
+
+### Phase 1: Truth Layer
+- Resolved license contradiction (AGPL `COPYING` → MIT `LICENSE`)
+- Unified version to `0.5.0-beta` across 7 files
+- Created `SECURITY.md` vulnerability reporting policy
+- Archived 33 stale files, rewrote `PROJECT_STATUS.md`, `README.md`, `TODO.md`
+- Rewrote all 5 agent instruction files with Stabilization Mode
+- Added CI `consistency-checks` job (version sync, license, secret scanning, doc hygiene)
+
+### Phase 2: Core Flow Verification
+- 285 backend tests passed (993 assertions)
+- 57 targeted core flow tests verified (auth, onboarding, match, messaging)
+- Frontend build clean after fixing 4 pre-existing TypeScript errors
+- Created `docs/RELEASE_EVIDENCE.md`
+
+### Phase 3: Technical Debt & Launch Prep
+- Hardened feature flags — disabled 6 unverified features by default
+- Cleaned `.gitignore` (133→78 lines, removed 10 duplicate `node_modules`)
+- Audited 89 controllers — identified 8 unused
+- Renamed stale Mercure references to Reverb (8-file coordinated backend + frontend)
+- Reviewed production deployment setup (`deploy.sh`, `docker-compose.yml`, `DEPLOY.md`, K8s)
+- Updated `DEPLOY.md` version to `0.5.0-beta`
+
+### Test Hardening
+- Added `CoreDatingFlowTest.php` — 19 E2E tests covering full dating loop
+- Total backend tests: 304 passed (1019 assertions)
+
+---
 
 ## [1.3.2] - 2026-03-06
 
