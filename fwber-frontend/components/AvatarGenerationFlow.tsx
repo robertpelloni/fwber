@@ -26,12 +26,37 @@ interface PhysicalProfile {
   facial_hair?: string;
   breast_size?: string;
   fitness_level?: string;
+  tattoos?: string[];
+  piercings?: string[];
+  clothing_style?: string;
+  occupation?: string;
+  personality_type?: string;
+  love_language?: string;
+  relationship_style?: string;
+  interests?: string[];
 }
 
 interface UserPhoto {
   id: number;
   filename: string;
-  path: string;
+  file_path: string;
+}
+
+interface AvatarTraitsResponse {
+  traits: PhysicalProfile;
+  has_photos: boolean;
+  photos: UserPhoto[];
+}
+
+interface AvatarGalleryPhoto {
+  id: number;
+  url?: string;
+  thumbnail_url?: string;
+  file_path?: string;
+  metadata?: {
+    source?: string;
+    provider?: string;
+  };
 }
 
 interface ProviderConfig {
@@ -89,7 +114,7 @@ export default function AvatarGenerationFlow({
   // Auto-load physical traits from user profile
   const traitsQuery = useQuery({
     queryKey: ['avatar-physical-traits'],
-    queryFn: async () => {
+    queryFn: async (): Promise<AvatarTraitsResponse> => {
       const token = localStorage.getItem('fwber_token');
       const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/avatar/physical-traits`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -114,6 +139,14 @@ export default function AvatarGenerationFlow({
       if (traits.facial_hair) loaded.facial_hair = traits.facial_hair;
       if (traits.breast_size) loaded.breast_size = traits.breast_size;
       if (traits.fitness_level) loaded.fitness_level = traits.fitness_level;
+      if (traits.tattoos) loaded.tattoos = traits.tattoos;
+      if (traits.piercings) loaded.piercings = traits.piercings;
+      if (traits.clothing_style) loaded.clothing_style = traits.clothing_style;
+      if (traits.occupation) loaded.occupation = traits.occupation;
+      if (traits.personality_type) loaded.personality_type = traits.personality_type;
+      if (traits.love_language) loaded.love_language = traits.love_language;
+      if (traits.relationship_style) loaded.relationship_style = traits.relationship_style;
+      if (traits.interests) loaded.interests = traits.interests;
       
       setProfile(loaded);
       setProfileLoaded(true);
@@ -142,12 +175,13 @@ export default function AvatarGenerationFlow({
 
   const galleryQuery = useQuery({
     queryKey: ['avatar-gallery'],
-    queryFn: async () => {
+    queryFn: async (): Promise<AvatarGalleryPhoto[]> => {
         const token = localStorage.getItem('fwber_token');
         const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/photos`, {
              headers: { Authorization: `Bearer ${token}` }
         });
-        return res.data.filter((p: any) => p.metadata?.source === 'ai');
+        const photos: AvatarGalleryPhoto[] = res.data?.data || [];
+        return photos.filter((photo) => photo.metadata?.source === 'ai');
     },
     enabled: view === 'gallery'
   });
@@ -237,13 +271,23 @@ export default function AvatarGenerationFlow({
     mutationFn: async () => {
       const token = localStorage.getItem('fwber_token');
       await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/physical-profile`,
-        { ...profile, avatar_url: generatedAvatar },
+        `${process.env.NEXT_PUBLIC_API_URL}/profile`,
+        { avatar_url: generatedAvatar },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
+      if (generatedPhotoId) {
+        await axios.put(
+          `${process.env.NEXT_PUBLIC_API_URL}/photos/${generatedPhotoId}`,
+          { is_primary: true },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
+      queryClient.invalidateQueries({ queryKey: ['user-profile'] });
+      queryClient.invalidateQueries({ queryKey: ['avatar-gallery'] });
       setStep('complete');
       if (onComplete && generatedAvatar) {
         onComplete(generatedAvatar);
@@ -344,7 +388,7 @@ export default function AvatarGenerationFlow({
                         </button>
                     </div>
                 ) : (
-                    galleryQuery.data?.map((photo: any) => (
+                    galleryQuery.data?.map((photo) => (
                         <div key={photo.id} className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden">
                             <Image 
                                 src={photo.url || photo.thumbnail_url} 
@@ -356,6 +400,7 @@ export default function AvatarGenerationFlow({
                                 <button 
                                     onClick={() => {
                                         setGeneratedAvatar(photo.url);
+                                    setGeneratedPhotoId(photo.id);
                                         setStep('preview');
                                         setView('generate');
                                     }}
@@ -416,8 +461,12 @@ export default function AvatarGenerationFlow({
           <div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Create Your Sexy Avatar</h2>
             <p className="text-gray-600">
-              Generate an attractive, stylized version of yourself from your physical traits or an uploaded photo.
+              Generate an attractive, stylized version of yourself from your saved physical traits or an uploaded photo.
             </p>
+          </div>
+
+          <div className="rounded-xl border border-purple-100 bg-purple-50 px-4 py-3 text-sm text-purple-900">
+            We reuse the detailed physical and private matching traits you&apos;ve already saved in your profile to make avatars more accurate, while uploaded photos can anchor likeness for stronger identity matching.
           </div>
 
           {/* Mode Toggle */}
@@ -654,7 +703,7 @@ export default function AvatarGenerationFlow({
                         }`}
                       >
                         <Image
-                          src={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}/storage/${photo.path || photo.filename}`}
+                          src={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}/storage/${photo.file_path || photo.filename}`}
                           alt="Your photo"
                           fill
                           className="object-cover"

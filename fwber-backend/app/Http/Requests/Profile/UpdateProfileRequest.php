@@ -22,6 +22,7 @@ class UpdateProfileRequest extends FormRequest
     {
         return [
             'display_name' => 'sometimes|nullable|string|max:50',
+            'avatar_url' => 'sometimes|nullable|string|max:2048',
             'bio' => 'sometimes|nullable|string|max:500',
             'birthdate' => 'sometimes|nullable|date|before_or_equal:' . now()->subYears(18)->toDateString() . '|after:1900-01-01',
             'gender' => 'sometimes|nullable|string|in:male,female,non-binary,mtf,ftm,other,prefer-not-to-say',
@@ -31,7 +32,7 @@ class UpdateProfileRequest extends FormRequest
             
             // Physical
             'height_cm' => 'sometimes|nullable|integer|min:50|max:300',
-            'body_type' => 'sometimes|nullable|string|in:slim,athletic,average,curvy,plus-size,muscular',
+            'body_type' => 'sometimes|nullable|string|in:slim,athletic,average,curvy,plus-size,plus_size,muscular,heavyset,dad_bod',
             'ethnicity' => 'sometimes|nullable|string',
             'breast_size' => 'sometimes|nullable|string',
             'tattoos' => 'sometimes|nullable|string',
@@ -104,7 +105,15 @@ class UpdateProfileRequest extends FormRequest
             'preferences.education' => 'sometimes|nullable|string|in:high-school,some-college,associates,bachelors,masters,phd,other',
             'preferences.age_range_min' => 'sometimes|nullable|integer|min:18|max:99|lte:preferences.age_range_max',
             'preferences.age_range_max' => 'sometimes|nullable|integer|min:18|max:99|gte:preferences.age_range_min',
-            'preferences.body_type' => 'sometimes|nullable|string|in:slim,athletic,average,curvy,plus-size,muscular',
+            'preferences.body_type' => 'sometimes|nullable|string|in:slim,athletic,average,curvy,plus-size,plus_size,muscular,heavyset,dad_bod',
+            'preferences.min_height' => 'sometimes|nullable|integer|min:50|max:300|lte:preferences.max_height',
+            'preferences.max_height' => 'sometimes|nullable|integer|min:50|max:300|gte:preferences.min_height',
+            'preferences.preferred_breast_sizes' => 'sometimes|nullable|array',
+            'preferences.preferred_breast_sizes.*' => 'string',
+            'preferences.min_penis_length' => 'sometimes|nullable|numeric|min:0|max:50|lte:preferences.max_penis_length',
+            'preferences.max_penis_length' => 'sometimes|nullable|numeric|min:0|max:50|gte:preferences.min_penis_length',
+            'preferences.min_penis_girth' => 'sometimes|nullable|numeric|min:0|max:50|lte:preferences.max_penis_girth',
+            'preferences.max_penis_girth' => 'sometimes|nullable|numeric|min:0|max:50|gte:preferences.min_penis_girth',
             'preferences.religion' => 'sometimes|nullable|string|in:christian,catholic,jewish,muslim,hindu,buddhist,agnostic,atheist,spiritual,other',
             'preferences.politics' => 'sometimes|nullable|string|in:liberal,moderate,conservative,apolitical,other',
             'preferences.hobbies' => 'sometimes|nullable|array',

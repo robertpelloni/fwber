@@ -4,6 +4,7 @@
 
 @layer base {
   :root {
+    --app-sidebar-width: 18rem;
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -187,6 +188,17 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  @media (min-width: 1024px) {
+    body.app-shell-sidebar {
+      padding-left: var(--app-sidebar-width);
+    }
+
+    .app-header-with-sidebar {
+      margin-left: calc(var(--app-sidebar-width) * -1);
+      width: calc(100% + var(--app-sidebar-width));
+    }
   }
   
   /* Optimize images */

@@ -109,6 +109,7 @@ class PhotoController extends Controller
                         'id' => $photo->id,
                         'filename' => $photo->filename,
                         'original_filename' => $photo->original_filename,
+                        'file_path' => $photo->file_path,
                         'url' => $photo->url,
                         'thumbnail_url' => $photo->thumbnail_url,
                         'mime_type' => $photo->mime_type,
@@ -119,6 +120,7 @@ class PhotoController extends Controller
                         'is_private' => $photo->is_private,
                         'unlock_price' => $photo->unlock_price ?? 0, // Default to 0 if missing
                         'sort_order' => $photo->sort_order ?? 0, // Default to 0 if missing
+                        'metadata' => $photo->metadata,
                         'created_at' => $photo->created_at,
                         'updated_at' => $photo->updated_at,
                     ];

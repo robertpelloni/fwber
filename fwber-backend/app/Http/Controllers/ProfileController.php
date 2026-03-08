@@ -381,6 +381,10 @@ class ProfileController extends Controller
                 if (isset($validated['email'])) {
                     $user->email = $validated['email'];
                 }
+
+                if (array_key_exists('avatar_url', $validated)) {
+                    $user->avatar_url = $validated['avatar_url'];
+                }
                 
                 $user->save();
                 

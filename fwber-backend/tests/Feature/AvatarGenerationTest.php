@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Jobs\GenerateAvatar;
+use App\Models\Photo;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Services\AvatarGenerationService;
@@ -93,6 +94,9 @@ class AvatarGenerationTest extends TestCase
             'piercings' => ['nose ring'],
             'clothing_style' => 'cyberpunk',
             'fitness_level' => 'muscular',
+            'skin_tone' => 'olive',
+            'love_language' => 'physical_touch',
+            'relationship_style' => 'monogamous',
             'personality_type' => 'ENTP', // Extrovert -> energetic
             'interests' => ['Gaming', 'Coding'],
         ]);
@@ -128,13 +132,200 @@ class AvatarGenerationTest extends TestCase
                    str_contains($prompt, 'purple hair') &&
                    str_contains($prompt, 'green eyes') &&
                    str_contains($prompt, 'athletic body type') &&
-                   str_contains($prompt, 'visible tattoos') &&
-                   str_contains($prompt, 'piercings') &&
+                   str_contains($prompt, 'olive skin tone') &&
+                   str_contains($prompt, 'arm sleeve tattoos') &&
+                   str_contains($prompt, 'nose ring piercings') &&
                    str_contains($prompt, 'wearing cyberpunk style clothing') &&
                    str_contains($prompt, 'muscular build') &&
+                   str_contains($prompt, 'magnetic, affectionate energy') &&
+                   str_contains($prompt, 'monogamous romantic energy') &&
                    str_contains($prompt, 'energetic, friendly expression') &&
                    str_contains($prompt, 'Gaming background theme');
         });
+    }
+
+    public function test_service_adds_identity_anchor_for_photo_based_generation()
+    {
+        $this->requireRedis();
+
+        $user = User::factory()->create();
+
+        UserProfile::create([
+            'user_id' => $user->id,
+            'gender' => 'female',
+            'ethnicity' => 'Latina',
+            'hair_color' => 'black',
+        ]);
+
+        Http::fake([
+            'api.openai.com/*' => Http::response([
+                'data' => [
+                    ['url' => 'https://example.com/avatar-photo-anchor.png']
+                ]
+            ], 200),
+            '*' => Http::response('ok', 200),
+        ]);
+
+        $service = app(AvatarGenerationService::class);
+        $service->generateAvatar($user, [
+            'from_photo' => true,
+            'style' => 'editorial portrait',
+            'sexy_boost' => true,
+        ]);
+
+        Http::assertSent(function ($request) {
+            if ($request->url() !== 'https://api.openai.com/v1/images/generations') {
+                return false;
+            }
+
+            $data = $request->data();
+            $prompt = $data['prompt'];
+
+            return str_contains($prompt, 'same person as the reference photo')
+                && str_contains($prompt, 'preserve recognizable facial structure')
+                && str_contains($prompt, 'tasteful sexy styling');
+        });
+    }
+
+    public function test_generate_from_photo_dispatches_job_with_reference_photo_metadata()
+    {
+        Queue::fake();
+
+        $user = User::factory()->create();
+        $photo = Photo::create([
+            'user_id' => $user->id,
+            'filename' => 'source.jpg',
+            'original_filename' => 'source.jpg',
+            'file_path' => 'photos/source.jpg',
+            'mime_type' => 'image/jpeg',
+            'is_primary' => false,
+            'is_private' => false,
+            'sort_order' => 1,
+        ]);
+
+        $response = $this->actingAs($user)
+            ->postJson('/api/avatar/generate-from-photo', [
+                'photo_id' => $photo->id,
+                'style' => 'glamour',
+                'provider' => 'replicate',
+                'model' => 'custom-model',
+                'lora_scale' => 0.7,
+                'sexy_boost' => true,
+            ]);
+
+        $response->assertOk()
+            ->assertJson([
+                'success' => true,
+                'status' => 'processing',
+            ]);
+
+        Queue::assertPushed(GenerateAvatar::class, function ($job) use ($user, $photo) {
+            return $job->user->id === $user->id
+                && $job->options['from_photo'] === true
+                && $job->options['source_photo_id'] === $photo->id
+                && $job->options['photo_path'] === $photo->file_path
+                && $job->options['provider'] === 'replicate'
+                && $job->options['model'] === 'custom-model';
+        });
+    }
+
+    public function test_physical_traits_endpoint_returns_extended_profile_traits()
+    {
+        $user = User::factory()->create();
+
+        UserProfile::create([
+            'user_id' => $user->id,
+            'birthdate' => '1994-01-01',
+            'gender' => 'female',
+            'ethnicity' => 'Asian',
+            'body_type' => 'athletic',
+            'hair_color' => 'black',
+            'eye_color' => 'brown',
+            'height_cm' => 168,
+            'skin_tone' => 'golden',
+            'facial_hair' => 'none',
+            'breast_size' => 'medium',
+            'fitness_level' => 'fit',
+            'tattoos' => ['floral shoulder'],
+            'piercings' => ['ear'],
+            'clothing_style' => 'streetwear',
+            'occupation' => 'designer',
+            'personality_type' => 'ENFP',
+            'love_language' => 'quality_time',
+            'relationship_style' => 'monogamous',
+            'interests' => ['art', 'travel'],
+        ]);
+
+        Photo::create([
+            'user_id' => $user->id,
+            'filename' => 'ref.jpg',
+            'original_filename' => 'ref.jpg',
+            'file_path' => 'photos/ref.jpg',
+            'mime_type' => 'image/jpeg',
+            'is_primary' => false,
+            'is_private' => false,
+            'sort_order' => 1,
+        ]);
+
+        $response = $this->actingAs($user)->getJson('/api/avatar/physical-traits');
+
+        $response->assertOk()
+            ->assertJsonPath('traits.clothing_style', 'streetwear')
+            ->assertJsonPath('traits.occupation', 'designer')
+            ->assertJsonPath('traits.personality_type', 'ENFP')
+            ->assertJsonPath('traits.love_language', 'quality_time')
+            ->assertJsonPath('traits.relationship_style', 'monogamous')
+            ->assertJsonPath('traits.interests.0', 'art')
+            ->assertJsonPath('traits.tattoos.0', 'floral shoulder')
+            ->assertJsonPath('photos.0.file_path', 'photos/ref.jpg');
+    }
+
+    public function test_photos_index_includes_file_path_and_metadata_for_ai_gallery(): void
+    {
+        $user = User::factory()->create();
+
+        Photo::create([
+            'user_id' => $user->id,
+            'filename' => 'ai-avatar.png',
+            'original_filename' => 'ai-avatar.png',
+            'file_path' => 'avatars/ai-avatar.png',
+            'mime_type' => 'image/png',
+            'is_primary' => false,
+            'is_private' => false,
+            'sort_order' => 0,
+            'metadata' => [
+                'source' => 'ai',
+                'provider' => 'dalle',
+            ],
+        ]);
+
+        $response = $this->actingAs($user)->getJson('/api/photos');
+
+        $response->assertOk()
+            ->assertJsonPath('data.0.file_path', 'avatars/ai-avatar.png')
+            ->assertJsonPath('data.0.metadata.source', 'ai')
+            ->assertJsonPath('data.0.metadata.provider', 'dalle');
+    }
+
+    public function test_profile_update_can_persist_avatar_url(): void
+    {
+        $user = User::factory()->create();
+        UserProfile::create([
+            'user_id' => $user->id,
+            'display_name' => 'Avatar Tester',
+        ]);
+
+        $response = $this->actingAs($user)->putJson('/api/profile', [
+            'avatar_url' => '/storage/avatars/accepted-avatar.png',
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('success', true);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'avatar_url' => '/storage/avatars/accepted-avatar.png',
+        ]);
     }
 
     /**
