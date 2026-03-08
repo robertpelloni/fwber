@@ -28,6 +28,14 @@ All notable changes to this project will be documented in this file.
 - Renamed stale Mercure references to Reverb (8-file coordinated backend + frontend)
 - Reviewed production deployment setup (`deploy.sh`, `docker-compose.yml`, `DEPLOY.md`, K8s)
 - Updated `DEPLOY.md` version to `0.5.0-beta`
+- Synced `fwber-frontend/package-lock.json` with `package.json` after CI `npm ci` drift surfaced missing lockfile entries for transitive frontend dependencies, restoring the deploy pipeline's install path
+- Replaced simulated admin analytics with real database-backed metrics for top events, moderation counts, realtime activity, and matches/day
+- Updated `/analytics` UI to surface real `matches_today` data
+- Verified analytics via targeted backend tests (`php artisan test --filter=Analytics`) and a successful frontend production build
+- Enriched AI avatar generation to use more real profile attributes, stronger photo-based identity anchoring, and richer generation metadata
+- Aligned avatar photo handling on `file_path` across backend + frontend flows and expanded avatar coverage via targeted backend tests (`php artisan test --filter=AvatarGeneration`) plus a clean frontend production build
+- Expanded onboarding and profile editing to collect more detailed private physical and intimate matching preferences with explicit privacy copy and respectful wording
+- Verified the new private-preference flow with targeted backend profile tests and a clean frontend production build
 
 ### Test Hardening
 - Added `CoreDatingFlowTest.php` — 19 E2E tests covering full dating loop
