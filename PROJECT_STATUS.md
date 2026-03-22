@@ -13,7 +13,8 @@ fwber is a privacy-first proximity dating platform. The core dating loop (regist
 ### What Works (Core Loop)
 - ✅ User registration and authentication (Sanctum)
 - ✅ Onboarding wizard with profile creation
-- ✅ AI avatar generation
+- ✅ AI avatar generation (Trait-based & Photo-based)
+- ✅ Platform analytics (signups, DAU, retention, slow request analysis)
 - ✅ Local Pulse proximity feed (artifacts + candidates)
 - ✅ Match discovery and authorization
 - ✅ Direct messaging (text + audio)

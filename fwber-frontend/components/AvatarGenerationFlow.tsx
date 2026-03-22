@@ -391,7 +391,7 @@ export default function AvatarGenerationFlow({
                     galleryQuery.data?.map((photo) => (
                         <div key={photo.id} className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden">
                             <Image 
-                                src={photo.url || photo.thumbnail_url} 
+                                src={photo.url || photo.thumbnail_url || ''} 
                                 alt="AI Avatar" 
                                 fill 
                                 className="object-cover"
@@ -399,7 +399,7 @@ export default function AvatarGenerationFlow({
                             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
                                 <button 
                                     onClick={() => {
-                                        setGeneratedAvatar(photo.url);
+                                        setGeneratedAvatar(photo.url || photo.thumbnail_url || null);
                                     setGeneratedPhotoId(photo.id);
                                         setStep('preview');
                                         setView('generate');

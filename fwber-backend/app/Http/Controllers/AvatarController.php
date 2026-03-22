@@ -63,12 +63,12 @@ class AvatarController extends Controller
             ->firstOrFail();
 
         try {
-            $options = $request->only(['style', 'sexy_boost', 'provider']);
+            $options = $request->only(['style', 'sexy_boost', 'provider', 'model', 'lora_scale']);
             $options['source_photo_id'] = $photo->id;
             
             \App\Jobs\GenerateAvatar::dispatch($user, array_merge($options, [
                 'from_photo' => true,
-                'photo_path' => $photo->path ?? $photo->filename,
+                'photo_path' => $photo->file_path ?? $photo->filename,
             ]));
 
             return response()->json([
@@ -105,9 +105,17 @@ class AvatarController extends Controller
                 'facial_hair' => $profile?->facial_hair,
                 'breast_size' => $profile?->breast_size,
                 'fitness_level' => $profile?->fitness_level,
+                'clothing_style' => $profile?->clothing_style,
+                'occupation' => $profile?->occupation,
+                'personality_type' => $profile?->personality_type,
+                'love_language' => $profile?->love_language,
+                'relationship_style' => $profile?->relationship_style,
+                'interests' => $profile?->interests,
+                'tattoos' => $profile?->tattoos,
+                'piercings' => $profile?->piercings,
             ],
             'has_photos' => $user->photos()->count() > 0,
-            'photos' => $user->photos()->select('id', 'filename', 'path')->limit(6)->get(),
+            'photos' => $user->photos()->select('id', 'filename', 'file_path as path', 'file_path')->limit(6)->get(),
         ]);
     }
 }
