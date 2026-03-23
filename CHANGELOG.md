@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.9-beta] - 2026-03-23 — Voice-Only Confessional Mode
+
+### Features
+- **Confessional Mode**: 
+    - Implemented a new privacy feature where users can hide their photos and bio, forcing matches to be based solely on a 15-second voice introduction.
+    - Added `is_confessional_mode` to the `user_profiles` database table and model.
+    - Updated `UserProfileResource` and `MatchResource` to dynamically mask personal data and inject the `voice_intro_url` when the mode is active.
+    - Built a custom "Voice Only" UI state for the `SwipeableCard.tsx` discovery feed, complete with an integrated audio player.
+    - Wired up the toggle in the Security & Privacy settings page.
+
 ## [0.5.8-beta] - 2026-03-23 — Full Feature Verification
 
 ### Milestones

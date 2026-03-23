@@ -1,7 +1,7 @@
-# Project Status — fwber v0.5.8-beta
+# Project Status — fwber v0.5.9-beta
 
 **Date:** 2026-03-23  
-**Version:** 0.5.8-beta  
+**Version:** 0.5.9-beta  
 **Status:** Beta — Stabilization & Launch Consolidation
 
 ---
@@ -34,6 +34,7 @@ fwber is a privacy-first proximity dating platform. The codebase is currently in
 - ✅ Detroit Launch Content (Seed content for Midtown, Corktown, Downtown populated)
 - ✅ Real-time WebSocket (Reverb broadcasting hardened)
 - ✅ Face blur (Client-side `@vladmandic/face-api` Webpack module resolution verified)
+- ✅ Voice-Only "Confessional" Mode (UI toggle, API masking, Audio discovery card)
 
 ### Experimental / Aspirational (Not Verified)
 - 🔬 Multi-region deployment (Geo-DNS)

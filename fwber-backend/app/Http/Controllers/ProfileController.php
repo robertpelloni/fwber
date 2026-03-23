@@ -314,6 +314,8 @@ class ProfileController extends Controller
                     'fetishes',
                     'sti_status',
                     'is_incognito',
+                    'is_confessional_mode',
+                    'is_federated',
                     'subscription_price',
                 ])));
                 

@@ -31,9 +31,33 @@ class UserProfileResource extends JsonResource
             // Profile relationship failed to load
         }
 
+        $isOwner = auth()->id() === $this->id;
+        $isConfessional = (bool) $profile?->is_confessional_mode;
+
+        // If in Confessional Mode and not the owner, we strip almost everything
+        if ($isConfessional && !$isOwner) {
+            return [
+                'id' => $this->id,
+                'is_confessional' => true,
+                'profile' => [
+                    'display_name' => 'Voice Only Profile',
+                    'age' => $profile?->birthdate ? Carbon::parse($profile->birthdate)->age : null,
+                    'gender' => $profile?->gender,
+                    'voice_intro_url' => $profile?->voice_intro_url,
+                    'location' => [
+                        'city' => $this->extractCityFromLocation($profile),
+                        'state' => $this->extractStateFromLocation($profile),
+                    ],
+                    'photos' => [], // Hidden in confessional discovery
+                    'is_confessional_mode' => true,
+                ],
+            ];
+        }
+
         return [
             'id' => $this->id,
             'email' => $this->email,
+            'is_confessional' => $isConfessional,
             'email_verified' => (bool) $this->email_verified_at,
             'created_at' => $this->created_at?->toISOString(),
             'last_online' => $this->updated_at?->toISOString(),

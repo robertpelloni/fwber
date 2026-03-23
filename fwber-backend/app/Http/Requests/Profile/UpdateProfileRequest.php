@@ -89,6 +89,8 @@ class UpdateProfileRequest extends FormRequest
             // Travel Mode
             'is_travel_mode' => 'sometimes|boolean',
             'is_incognito' => 'sometimes|boolean',
+            'is_confessional_mode' => 'sometimes|boolean',
+            'is_federated' => 'sometimes|boolean',
             'subscription_price' => 'sometimes|integer|min:0',
             'travel_location' => 'sometimes|nullable|array',
             'travel_location.latitude' => 'sometimes|numeric|between:-90,90',

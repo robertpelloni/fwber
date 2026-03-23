@@ -72,6 +72,8 @@ class UserProfile extends Model
         'travel_longitude',
         'travel_location_name',
         'is_incognito',
+        'is_confessional_mode',
+        'is_federated',
         'voice_intro_url',
     ];
 
@@ -83,6 +85,8 @@ class UserProfile extends Model
         'travel_latitude' => 'float',
         'travel_longitude' => 'float',
         'is_incognito' => 'boolean',
+        'is_confessional_mode' => 'boolean',
+        'is_federated' => 'boolean',
         'has_children' => 'boolean',
         'wants_children' => 'boolean',
         'has_pets' => 'boolean',
