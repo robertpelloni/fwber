@@ -1,6 +1,6 @@
 # TODO — fwber Credibility Sprint
 
-> **Version:** 0.5.6-beta  
+> **Version:** 0.5.7-beta  
 > **Last Updated:** 2026-03-07  
 > **Mode:** Stabilization & Launch Consolidation
 
@@ -9,7 +9,7 @@
 ## 🔴 Critical: Credibility Hardening (Phase 1)
 
 - [x] Unify license (MIT) and remove AGPL artifact
-- [x] Enforce `VERSION` as canonical source (0.5.6-beta)
+- [x] Enforce `VERSION` as canonical source (0.5.7-beta)
 - [x] Sync version across all agent instruction files
 - [x] Publish `SECURITY.md`
 - [x] Archive 33 stale handoff/status/update files

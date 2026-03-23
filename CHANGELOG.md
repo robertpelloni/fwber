@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.7-beta] - 2026-03-23 — Technical Debt & Detroit Seeding
+
+### Features
+- **Detroit Seed Content**: 
+    - Created `DetroitSeedContentSeeder.php` to populate the Local Pulse with authentic neighborhood posts across Midtown, Corktown, Downtown, Eastern Market, and West Village.
+    - Implemented idempotent seeding with tiny coordinate variance for realistic distribution.
+
+### Maintenance
+- **Controller Audit**: 
+    - Excised 7 unused/dead controllers to reduce codebase surface area: `ConfigController`, `GroupPostController`, `PhotoRevealController`, `PhotoUnlockController`, `ProximityArtifactInteractionController`, `PushSubscriptionController`, and `TelemetryReportController`.
+- **Backend Stability**:
+    - Fixed database constraint violations in seeding by aligning `moderation_status` with migration values (`clean` vs `approved`).
+
 ## [0.5.6-beta] - 2026-03-23 — Web3 Wallet Hardening
 
 ### Features
