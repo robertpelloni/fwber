@@ -28,6 +28,20 @@ export const ZKProver: React.FC<ZKProverProps> = ({
 
     const [status, setStatus] = useState<'idle' | 'locating' | 'generating' | 'verifying' | 'success' | 'error'>('idle');
     const [proofTrace, setProofTrace] = useState<string[]>([]);
+    const [zkParams, setZkParams] = useState<{ secret: string, precision: number } | null>(null);
+
+    // Fetch ZK parameters on mount
+    useEffect(() => {
+        const fetchParams = async () => {
+            try {
+                const res: any = await api.get('/proximity/zk-params');
+                setZkParams(res);
+            } catch (err) {
+                console.error("Failed to load ZK parameters", err);
+            }
+        };
+        fetchParams();
+    }, []);
 
     // Deterministic mock SNARK delay
     const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -46,7 +60,7 @@ export const ZKProver: React.FC<ZKProverProps> = ({
     };
 
     const generateAndVerifyProof = async () => {
-        if (!token) return;
+        if (!token || !zkParams) return;
         try {
             setStatus('locating');
             addTrace('Accessing protected hardware enclave...');
@@ -58,8 +72,8 @@ export const ZKProver: React.FC<ZKProverProps> = ({
             setStatus('generating');
             addTrace('Hashing coordinates into scalar field...');
 
-            // Map to precision 6 geohash (~1km block)
-            const userGeohash = geohash.encode(position.coords.latitude, position.coords.longitude, 6);
+            // Map to precision defined by server
+            const userGeohash = geohash.encode(position.coords.latitude, position.coords.longitude, zkParams.precision);
 
             addTrace('Compiling arithmetic circuit constraints (HMAC)...');
             await delay(1000);
@@ -68,7 +82,7 @@ export const ZKProver: React.FC<ZKProverProps> = ({
 
             // HMAC-SHA256(geohash + timestamp + target_entity_id, APP_KEY)
             const signatureStr = userGeohash + timestamp.toString() + targetEntityId.toString();
-            const signature = hmacSHA256(signatureStr, HARDWARE_ENCLAVE_SECRET).toString(Hex);
+            const signature = hmacSHA256(signatureStr, zkParams.secret).toString(Hex);
 
             addTrace('Proof generated successfully. Raw coordinates destroyed. Payload dispatched.');
             setStatus('verifying');

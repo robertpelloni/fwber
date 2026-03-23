@@ -44,12 +44,10 @@ return [
         'model' => env('ANTHROPIC_MODEL', 'claude-3-5-sonnet-20241022'),
     ],
 
-    'mercure' => [
-        'public_url' => env('MERCURE_PUBLIC_URL', 'https://demo.mercure.rocks/.well-known/mercure'),
-        'internal_url' => env('MERCURE_INTERNAL_URL', 'https://demo.mercure.rocks/.well-known/mercure'),
-        'publisher_key' => env('MERCURE_PUBLISHER_JWT_KEY', '!ChangeThisMercureHubJWTSecretKey!'),
-        'subscriber_key' => env('MERCURE_SUBSCRIBER_JWT_KEY', '!ChangeThisMercureHubJWTSecretKey!'),
-        'cookie_domain' => env('MERCURE_COOKIE_DOMAIN'),
+    'geo_screener' => [
+        'enabled' => env('GEO_SCREENER_ENABLED', false),
+        'url' => env('GEO_SCREENER_URL', 'http://127.0.0.1:8081'),
+        'timeout' => env('GEO_SCREENER_TIMEOUT', 2),
     ],
 
     'solana' => [

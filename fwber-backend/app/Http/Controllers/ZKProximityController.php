@@ -16,6 +16,17 @@ class ZKProximityController extends Controller
     }
 
     /**
+     * Get the parameters for ZK proof generation (Mock hardware enclave keys).
+     */
+    public function params()
+    {
+        return response()->json([
+            'secret' => env('ZK_SECRET', 'fwber-zk-hardware-enclave-secret'),
+            'precision' => 6
+        ]);
+    }
+
+    /**
      * Verify a zero-knowledge proximity proof from the client.
      */
     public function verify(Request $request)

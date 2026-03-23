@@ -20,11 +20,10 @@ class ZKProximityService
             return false;
         }
 
-        // 2. Validate Proof Signature (HMAC)
-        // The frontend generates: HMAC-SHA256(geohash + timestamp + target_entity_id, APP_KEY)
+        // HMAC-SHA256(geohash + timestamp + target_entity_id, APP_KEY)
         $expectedSignature = hash_hmac('sha256', 
             $proofPayload['geohash'] . $timestamp . $publicSignals['target_entity_id'], 
-            'fwber-zk-hardware-enclave-secret'
+            env('ZK_SECRET', 'fwber-zk-hardware-enclave-secret')
         );
 
         if (!hash_equals($expectedSignature, $proofPayload['signature'])) {

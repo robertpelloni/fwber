@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.4-beta] - 2026-03-23 — ZK-Proximity Hardening
+
+### Security
+- **ZK-Proximity Proofs Hardened**: 
+    - Moved the "Hardware Enclave" secret to the backend environment variables (`ZK_SECRET`).
+    - Implemented `GET /api/proximity/zk-params` to securely provide circuit parameters to the frontend.
+    - Updated `ZKProver.tsx` to dynamically fetch parameters instead of using a hardcoded secret.
+    - Updated `ZKProximityService` to leverage the new configuration-driven secret verification.
+
+## [0.5.3-beta] - 2026-03-23 — Geo-Screener Hardening & Configuration
+
+### Architecture
+- **Geo-Screener Integration Hardened**: 
+    - Updated `GeoScreenerClient.php` to default to port `8081` (avoiding conflict with Bun dev server).
+    - Refactored client to use `config('services.geo_screener')` instead of direct `env()` calls.
+    - Updated `config/services.php` to include full `geo_screener` mapping.
+    - Added comprehensive `GeoScreenerTest.php` to verify the microservice communication layer.
+- **Config Cleanup**: Removed stale `mercure` configuration from `config/services.php`.
+
+### Documentation
+- Updated `.env.example` to include all missing `GEO_SCREENER_*` and `FEATURE_*` variables.
+
 ## [0.5.2-beta] - 2026-03-23 — Bounty Hardening & Real Rewards
 
 ### Features

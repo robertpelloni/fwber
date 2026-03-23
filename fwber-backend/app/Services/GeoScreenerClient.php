@@ -12,8 +12,7 @@ class GeoScreenerClient
 
     public function __construct()
     {
-        // Default to the Rust microservice port
-        $this->baseUrl = env('GEO_SCREENER_URL', 'http://127.0.0.1:8080');
+        $this->baseUrl = config('services.geo_screener.url', 'http://127.0.0.1:8081');
         $this->timeout = config('services.geo_screener.timeout', 2);
     }
 
@@ -22,7 +21,7 @@ class GeoScreenerClient
      */
     public function isEnabled(): bool
     {
-        return env('GEO_SCREENER_ENABLED', false);
+        return config('services.geo_screener.enabled', false);
     }
 
     /**

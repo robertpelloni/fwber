@@ -357,6 +357,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('burner-links/{token}/join', [\App\Http\Controllers\BurnerLinkController::class, 'join']);
     
     // ZK-Proximity 
+    Route::get('proximity/zk-params', [\App\Http\Controllers\ZKProximityController::class, 'params']);
     Route::post('proximity/zk-verify', [\App\Http\Controllers\ZKProximityController::class, 'verify']);
 
     // Audio Rooms
