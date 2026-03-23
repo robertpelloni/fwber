@@ -111,11 +111,11 @@ export default function HomePage() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
               <Link
-                href="/register"
-                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-10 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
+                href="/rate-my-pussy"
+                className="w-full sm:w-auto bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-black py-4 px-10 rounded-full text-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center animate-bounce hover:animate-none"
               >
-                <Heart className="w-5 h-5 mr-2 fill-current" />
-                Create Anonymous Account
+                <Heart className="w-6 h-6 mr-2 fill-current" />
+                Rate My Cat
               </Link>
               <Link
                 href="/roast"
@@ -125,10 +125,10 @@ export default function HomePage() {
                 Roast My Profile
               </Link>
               <Link
-                href="/login"
-                className="w-full sm:w-auto bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-bold py-4 px-10 rounded-full text-lg border-2 border-gray-200 dark:border-gray-700 hover:border-blue-600 dark:hover:border-blue-500 transition-all duration-200"
+                href="/register"
+                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-10 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
               >
-                Member Login
+                Create Anonymous Account
               </Link>
             </div>
 

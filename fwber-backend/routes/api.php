@@ -245,6 +245,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('video/history', [\App\Http\Controllers\VideoChatController::class, 'history']);
     });
 
+    // Rate My Pussy (Viral Cat Rating)
+    Route::get('cats', [\App\Http\Controllers\CatPhotoController::class, 'index'])->withoutMiddleware(['auth:sanctum']);
+    Route::post('cats', [\App\Http\Controllers\CatPhotoController::class, 'store']);
+    Route::post('cats/{id}/rate', [\App\Http\Controllers\CatPhotoController::class, 'rate']);
+
     // Analytics
     Route::get('analytics', [\App\Http\Controllers\AnalyticsController::class, 'index']);
     Route::get('analytics/realtime', [\App\Http\Controllers\AnalyticsController::class, 'realtime']);

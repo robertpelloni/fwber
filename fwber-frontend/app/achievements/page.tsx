@@ -32,6 +32,24 @@ const CATEGORY_ICONS: Record<string, any> = {
 function AchievementCard({ achievement }: { achievement: Achievement }) {
   const Icon = CATEGORY_ICONS[achievement.category] || Trophy
 
+  const handleShare = async () => {
+    const shareText = `🏆 I just unlocked the "${achievement.name}" achievement on fwber! ${achievement.description} #fwber #dating`
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Achievement Unlocked!',
+          text: shareText,
+          url: window.location.origin
+        })
+      } catch (err) {
+        console.error('Error sharing:', err)
+      }
+    } else {
+      await navigator.clipboard.writeText(shareText)
+      alert('Achievement details copied to clipboard!')
+    }
+  }
+
   return (
     <Card className={`relative overflow-hidden transition-all duration-300 ${achievement.is_unlocked ? 'border-primary/50 bg-primary/5' : 'opacity-70 grayscale'}`}>
       <CardHeader className="flex flex-row items-center gap-4 pb-2">
@@ -39,8 +57,20 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
           {achievement.is_hidden ? <Lock className="w-6 h-6" /> : <Icon className="w-6 h-6" />}
         </div>
         <div className="flex-1">
-          <CardTitle className="text-lg">
+          <CardTitle className="text-lg flex items-center justify-between">
             {achievement.is_hidden ? 'Secret Achievement' : achievement.name}
+            {achievement.is_unlocked && (
+              <button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleShare();
+                }}
+                className="p-1.5 hover:bg-primary/10 rounded-full transition-colors text-primary"
+                title="Share Achievement"
+              >
+                <Share2 className="w-4 h-4" />
+              </button>
+            )}
           </CardTitle>
           <CardDescription>
             {achievement.is_hidden ? 'Keep playing to discover this achievement.' : achievement.description}

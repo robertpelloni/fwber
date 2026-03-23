@@ -43,6 +43,27 @@ export function TierUnlockGuide({ matchId }: TierUnlockGuideProps) {
     // Highlighting the next big unlock
     const highlightUnlock = nextTierInfo.unlocks[0];
 
+    const handleShareMilestone = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        const shareText = `💘 Just reached a new connection milestone on fwber! We just unlocked ${highlightUnlock}. #fwber #dating`
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'Relationship Milestone!',
+                    text: shareText,
+                    url: window.location.origin
+                })
+            } catch (err) {
+                console.error('Error sharing:', err)
+            }
+        } else {
+            await navigator.clipboard.writeText(shareText)
+            alert('Milestone details copied to clipboard!')
+        }
+    }
+
+    const isReadyToUnlock = msgsNeeded === 0 && daysNeeded === 0;
+
     return (
         <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-b border-gray-700 w-full">
             <div
@@ -54,7 +75,18 @@ export function TierUnlockGuide({ matchId }: TierUnlockGuideProps) {
                         <span>{nextTierInfo.icon}</span>
                     </div>
                     <div className="truncate">
-                        <div className="text-[10px] text-gray-400 font-bold tracking-wide uppercase">Next: {nextTierInfo.name}</div>
+                        <div className="text-[10px] text-gray-400 font-bold tracking-wide uppercase flex items-center gap-2">
+                            Next: {nextTierInfo.name}
+                            {isReadyToUnlock && (
+                                <button 
+                                    onClick={handleShareMilestone}
+                                    className="p-1 hover:bg-white/10 rounded-full transition-colors text-pink-400"
+                                    title="Share Milestone"
+                                >
+                                    <Share2 className="w-3 h-3" />
+                                </button>
+                            )}
+                        </div>
                         <div className="text-sm text-white font-medium flex items-center gap-1 truncate">
                             <Sparkles className="w-3 h-3 text-yellow-400 shrink-0" />
                             <span className="text-gray-300 ml-1 truncate">{highlightUnlock}</span>

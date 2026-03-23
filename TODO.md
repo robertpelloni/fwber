@@ -31,6 +31,7 @@
 
 ## 🟢 Medium: Launch Preparation
 
+- [x] Launch "Rate My Pussy" cat-rating viral campaign (`/rate-my-pussy`)
 - [ ] Execute content strategy from `docs/marketing/CONTENT_STRATEGY.md` (647 lines ready)
 - [ ] Prepare Detroit metro beta launch materials (flyers, stickers, coasters)
 - [x] Integrate AI Avatar Generation flow (Physical Traits & Photo Uploads) — verified & hardened

@@ -12,7 +12,7 @@ const PhotoUpload = dynamic(() => import('@/components/PhotoUpload'), {
   ssr: false,
   loading: () => <div className="h-64 bg-muted animate-pulse rounded-lg" />
 })
-import { Camera, ShieldCheck, Star } from 'lucide-react'
+import { Camera, ShieldCheck, Star, Share2 } from 'lucide-react'
 import { ProfileCompletenessBar, ProfileCompletenessChecklist, calculateProfileCompleteness, type ProfileField } from '@/lib/profileCompleteness'
 import PhysicalProfileEditor from '@/components/PhysicalProfileEditor'
 import { isFeatureEnabled } from '@/lib/featureFlags'
@@ -467,13 +467,34 @@ export default function ProfilePage() {
 
           {/* Celebration Message at 100% */}
           {currentCompleteness.percentage === 100 && (
-            <div className="mt-4 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-4 border border-green-200 dark:border-green-800">
+            <div className="mt-4 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-4 border border-green-200 dark:border-green-800 flex items-center justify-between gap-4">
               <div className="flex items-center space-x-2">
                 <Star className="w-5 h-5 text-yellow-500 fill-current" />
                 <span className="text-green-800 dark:text-green-200 font-semibold">
                   🎉 Amazing! Your profile is 100% complete!
                 </span>
               </div>
+              <button
+                onClick={async () => {
+                  const shareText = `💎 My dating profile is officially 100% complete on fwber! Come find me in Detroit's private-first adult network. #fwber #dating #detroit`
+                  if (navigator.share) {
+                    try {
+                      await navigator.share({
+                        title: 'Profile 100% Complete!',
+                        text: shareText,
+                        url: window.location.origin
+                      })
+                    } catch (err) { console.error(err) }
+                  } else {
+                    await navigator.clipboard.writeText(shareText)
+                    alert('Profile link copied!')
+                  }
+                }}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-black rounded-full transition shadow-md whitespace-nowrap"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+                Share Status
+              </button>
             </div>
           )}
         </div>

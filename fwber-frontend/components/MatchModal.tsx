@@ -3,30 +3,36 @@
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Share2 } from 'lucide-react'
 
 interface MatchModalProps {
-  isOpen: boolean
-  onClose: () => void
-  matchedUser: {
-    name: string
-    photoUrl: string
-  }
-  currentUser: {
-    photoUrl: string
-  }
+// ... existing interface ...
 }
 
 export default function MatchModal({ isOpen, onClose, matchedUser, currentUser }: MatchModalProps) {
   const router = useRouter()
   const [isVisible, setIsVisible] = useState(false)
 
-  useEffect(() => {
-    if (isOpen) {
-      setIsVisible(true)
+  const handleShare = async () => {
+    const shareText = `💕 It's a match! I just matched with ${matchedUser.name} on fwber. Detroit's privacy-first dating is real! #fwber #dating #detroit`
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "It's a Match!",
+          text: shareText,
+          url: window.location.origin
+        })
+      } catch (err) {
+        console.error('Error sharing:', err)
+      }
     } else {
-      const timer = setTimeout(() => setIsVisible(false), 300)
-      return () => clearTimeout(timer)
+      await navigator.clipboard.writeText(shareText)
+      alert('Match link copied to clipboard!')
     }
+  }
+
+  useEffect(() => {
+// ... existing useEffect ...
   }, [isOpen])
 
   if (!isVisible && !isOpen) return null
@@ -94,6 +100,14 @@ export default function MatchModal({ isOpen, onClose, matchedUser, currentUser }
                 className="w-full bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
               >
                 Send a Message
+              </button>
+
+              <button
+                onClick={handleShare}
+                className="w-full bg-white dark:bg-gray-800 text-pink-600 dark:text-pink-400 font-bold py-3 px-6 rounded-full border-2 border-pink-100 dark:border-pink-900/30 shadow-sm hover:bg-pink-50 dark:hover:bg-pink-900/10 flex items-center justify-center gap-2 transition-all"
+              >
+                <Share2 className="w-5 h-5" />
+                Share This Match
               </button>
               
               <button

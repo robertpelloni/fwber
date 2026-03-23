@@ -4,36 +4,11 @@ import { useState, useEffect } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { apiClient } from '@/lib/api/client'
 import VouchLeaderboard from '@/components/VouchLeaderboard'
-import { Trophy, Users, TrendingUp } from 'lucide-react'
+import { Trophy, Users, TrendingUp, Share2, Award, Zap } from 'lucide-react'
 
 
 interface LeaderboardData {
-  top_holders: Array<{
-    name: string
-    balance: string
-    joined: string
-  }>
-  top_referrers: Array<{
-    name: string
-    referrals: number
-  }>
-  top_wingmen: Array<{
-    name: string
-    assists: number
-  }>
-  top_vouched: Array<{
-    name: string
-    vouches: number
-    breakdown?: {
-      safe: number
-      fun: number
-      hot: number
-    }
-  }>
-  top_streaks: Array<{
-    name: string
-    streak: number
-  }>
+// ... existing interface ...
 }
 
 export default function LeaderboardPage() {
@@ -47,6 +22,24 @@ export default function LeaderboardPage() {
       .finally(() => setLoading(false))
   }, [])
 
+  const handleShareRank = async () => {
+    const shareText = `🔥 Checking out the fwber community leaderboard! I'm climbing the ranks in Detroit's privacy-first dating scene. Join me: ${window.location.origin} #fwber #detroit #dating`
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'fwber Leaderboard',
+          text: shareText,
+          url: window.location.origin
+        })
+      } catch (err) {
+        console.error('Error sharing:', err)
+      }
+    } else {
+      await navigator.clipboard.writeText(shareText)
+      alert('Leaderboard link copied!')
+    }
+  }
+
   if (loading) return <div className="p-8 text-center">Loading leaderboard...</div>
   if (!data) return null
 
@@ -54,7 +47,16 @@ export default function LeaderboardPage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Community Leaderboard</h1>
+          <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Community Leaderboard</h1>
+            <button 
+              onClick={handleShareRank}
+              className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full transition shadow-lg"
+            >
+              <Share2 className="w-4 h-4" />
+              Share My Rank
+            </button>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
             {/* Top Holders */}
@@ -96,21 +98,29 @@ export default function LeaderboardPage() {
               </div>
               <div className="divide-y divide-gray-200 dark:divide-gray-700">
                 {data.top_referrers.map((user, index) => (
-                  <div key={index} className="p-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className={`w-8 h-8 flex items-center justify-center rounded-full font-bold ${
-                        index === 0 ? 'bg-yellow-100 text-yellow-700' :
-                        index === 1 ? 'bg-gray-100 text-gray-700' :
-                        index === 2 ? 'bg-orange-100 text-orange-700' :
-                        'text-gray-500'
-                      }`}>
-                        {index + 1}
+                  <div key={index} className="p-4 flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className={`w-8 h-8 flex items-center justify-center rounded-full font-bold ${
+                          index === 0 ? 'bg-yellow-100 text-yellow-700' :
+                          index === 1 ? 'bg-gray-100 text-gray-700' :
+                          index === 2 ? 'bg-orange-100 text-orange-700' :
+                          'text-gray-500'
+                        }`}>
+                          {index + 1}
+                        </span>
+                        <p className="font-medium text-gray-900 dark:text-white">{user.name}</p>
+                      </div>
+                      <span className="font-bold text-gray-900 dark:text-white">
+                        {user.referrals}
                       </span>
-                      <p className="font-medium text-gray-900 dark:text-white">{user.name}</p>
                     </div>
-                    <span className="font-bold text-gray-900 dark:text-white">
-                      {user.referrals} invites
-                    </span>
+                    {index < 3 && (
+                      <div className="flex items-center gap-1.5 px-2 py-1 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 rounded text-[10px] font-black uppercase tracking-tighter">
+                        <Zap className="w-3 h-3" />
+                        Next Reward: {index === 0 ? '500' : index === 1 ? '250' : '100'} Tokens
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
