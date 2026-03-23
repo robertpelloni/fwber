@@ -138,17 +138,23 @@ class RelationshipTierController extends Controller
             
             $tierValue = $tierMap[$tier->current_tier] ?? 0;
             
+            $user1 = User::find($match->user1_id);
+            $user2 = User::find($match->user2_id);
+
             if ($tierValue > 0) {
-                // Unlock for both users
-                $user1 = User::find($match->user1_id);
-                $user2 = User::find($match->user2_id);
-                
+                // Unlock Achievements
                 if ($user1) {
                     $this->achievementService->checkAndUnlock($user1, 'relationship_tier', $tierValue);
                 }
                 if ($user2) {
                     $this->achievementService->checkAndUnlock($user2, 'relationship_tier', $tierValue);
                 }
+            }
+
+            // Send Notifications
+            if ($user1 && $user2) {
+                $user1->notify(new \App\Notifications\RelationshipTierUpgradedNotification($tier, $user2));
+                $user2->notify(new \App\Notifications\RelationshipTierUpgradedNotification($tier, $user1));
             }
         }
 

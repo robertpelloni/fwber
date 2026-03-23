@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRelationshipTier } from '@/lib/hooks/useRelationshipTier';
 import { getTierProgress, getTierInfo, RelationshipTier } from '@/lib/relationshipTiers';
-import { ChevronDown, ChevronUp, Lock, Unlock, Sparkles } from 'lucide-react';
+import { ChevronDown, ChevronUp, Lock, Unlock, Sparkles, Share2 } from 'lucide-react';
+import { apiClient } from '@/lib/api/client';
 
 interface TierUnlockGuideProps {
     matchId: string;
@@ -64,6 +65,18 @@ export function TierUnlockGuide({ matchId }: TierUnlockGuideProps) {
 
     const isReadyToUnlock = msgsNeeded === 0 && daysNeeded === 0;
 
+    const handleVerifyMeeting = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!confirm("Did you actually meet this person in the real world? This cannot be undone.")) return;
+        
+        try {
+            await apiClient.put(`/matches/${matchId}/tier`, { mark_met_in_person: true });
+            window.location.reload(); 
+        } catch (err) {
+            console.error("Verification failed", err);
+        }
+    };
+
     return (
         <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-b border-gray-700 w-full">
             <div
@@ -78,13 +91,15 @@ export function TierUnlockGuide({ matchId }: TierUnlockGuideProps) {
                         <div className="text-[10px] text-gray-400 font-bold tracking-wide uppercase flex items-center gap-2">
                             Next: {nextTierInfo.name}
                             {isReadyToUnlock && (
-                                <button 
+                                <motion.button 
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
                                     onClick={handleShareMilestone}
                                     className="p-1 hover:bg-white/10 rounded-full transition-colors text-pink-400"
                                     title="Share Milestone"
                                 >
                                     <Share2 className="w-3 h-3" />
-                                </button>
+                                </motion.button>
                             )}
                         </div>
                         <div className="text-sm text-white font-medium flex items-center gap-1 truncate">
@@ -95,6 +110,14 @@ export function TierUnlockGuide({ matchId }: TierUnlockGuideProps) {
                 </div>
 
                 <div className="flex items-center gap-3">
+                    {currentTier === 'established' && (
+                        <button
+                            onClick={handleVerifyMeeting}
+                            className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-[10px] font-black rounded-full transition uppercase tracking-tighter shadow-lg shadow-green-500/20 whitespace-nowrap"
+                        >
+                            Verify Meeting
+                        </button>
+                    )}
                     <div className="hidden sm:block text-right">
                         <div className="text-xs text-gray-400 flex items-center justify-end gap-1">
                             <Lock className="w-3 h-3" />

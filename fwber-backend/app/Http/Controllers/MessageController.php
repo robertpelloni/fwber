@@ -252,6 +252,13 @@ class MessageController extends Controller
         $tier->incrementMessages();
         $tierUpgraded = $tier->current_tier !== $previousTier;
 
+        if ($tierUpgraded) {
+            $user = Auth::user();
+            $otherUser = $match->getOtherUser($user->id);
+            $user->notify(new \App\Notifications\RelationshipTierUpgradedNotification($tier, $otherUser));
+            $otherUser->notify(new \App\Notifications\RelationshipTierUpgradedNotification($tier, $user));
+        }
+
         // Dispatch audio transcription job if applicable
         if ($message->message_type === 'audio') {
             TranscribeAudioMessage::dispatch($message);

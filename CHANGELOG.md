@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.5-beta] - 2026-03-23 — Relationship Tier Hardening
+
+### Features
+- **Relationship Tiers Wired**: 
+    - Implemented `RelationshipTierUpgradedNotification.php` to inform users when a connection levels up.
+    - Updated `MessageController` and `RelationshipTierController` to trigger real-time notifications upon tier upgrades.
+    - **Frontend Verification**: Added a "Verify Meeting" button to the `TierUnlockGuide.tsx` component, allowing users to manually confirm real-world encounters to reach the `verified` tier.
+    - Enhanced the `TierUnlockGuide` with entry animations for social sharing milestones.
+
 ## [0.5.4-beta] - 2026-03-23 — ZK-Proximity Hardening
 
 ### Security

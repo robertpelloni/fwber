@@ -1,7 +1,7 @@
-# Project Status — fwber v0.5.4-beta
+# Project Status — fwber v0.5.5-beta
 
 **Date:** 2026-03-23  
-**Version:** 0.5.4-beta  
+**Version:** 0.5.5-beta  
 **Status:** Beta — Stabilization & Launch Consolidation
 
 ---
@@ -30,6 +30,7 @@ fwber is a privacy-first proximity dating platform. The codebase is currently in
 - ✅ AI Wingman features (Roast, Coach, Vibe check verified via mocks)
 - ✅ Matchmaker Bounties (Escrow and automatic reward transfer verified)
 - ✅ ZK Proximity Proofs (Hardware enclave mock + server verification hardened)
+- ✅ Relationship Tiers (Progressive reveal + real-time notifications hardened)
 
 ### What Exists But Needs Verification
 - ⚠️ Real-time WebSocket (Reverb) — basic broadcasting verified, needs high-concurrency production test
