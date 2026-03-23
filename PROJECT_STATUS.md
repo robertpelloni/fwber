@@ -25,12 +25,12 @@ fwber is a privacy-first proximity dating platform. The core dating loop (regist
 - ✅ ActivityPub federation (Inbox/Outbox/Actor endpoints verified)
 - ✅ Rust geo-screener (H3 spatial indexing verified)
 - ✅ React Native mobile wrapper (Expo/WebView shell verified)
+- ✅ Video chat (WebRTC signaling and calls verified)
+- ✅ Solana token integration (Wallet login + SPL transfers verified)
+- ✅ AI Wingman features (Roast, Coach, Vibe check verified via mocks)
 
 ### What Exists But Needs Verification
-- ⚠️ Video chat (WebRTC) — needs E2E testing
-- ⚠️ AI Wingman features (roast, vibe check, etc.) — need real API keys
-- ⚠️ Solana token integration — needs live wallet testing
-- ⚠️ Real-time WebSocket (Reverb) — needs production environment
+- ⚠️ Real-time WebSocket (Reverb) — basic broadcasting verified, needs high-concurrency production test
 - ⚠️ Face blur — needs browser compatibility testing
 
 ### Experimental / Aspirational (Not Verified)
