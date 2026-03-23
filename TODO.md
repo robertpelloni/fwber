@@ -32,8 +32,9 @@
 ## 🟢 Medium: Launch Preparation
 
 - [x] Launch "Rate My Pussy" cat-rating viral campaign (`/rate-my-pussy`)
-- [ ] Execute content strategy from `docs/marketing/CONTENT_STRATEGY.md` (647 lines ready)
-- [ ] Prepare Detroit metro beta launch materials (flyers, stickers, coasters)
+- [x] Prepare Detroit metro beta launch materials (flyers, coasters, stickers) — `docs/marketing/launch-materials/`
+- [x] Execute content strategy from `docs/marketing/CONTENT_STRATEGY.md` (Optimizations implemented)
+- [x] Verify all experimental features (Video, Audio, Burner, Federation, Rust-geo)
 - [x] Integrate AI Avatar Generation flow (Physical Traits & Photo Uploads) — verified & hardened
 - [x] Set up basic analytics (signups, DAU, matches/day) — `AnalyticsController` fully implemented with real data
 - [x] Review production deployment setup — `deploy.sh`, `docker-compose.yml`, `DEPLOY.md`, K8s manifests all solid
