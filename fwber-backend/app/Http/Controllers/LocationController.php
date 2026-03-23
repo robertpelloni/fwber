@@ -6,13 +6,14 @@ use App\Http\Requests\UpdateLocationRequest;
 use App\Http\Requests\GetNearbyUsersRequest;
 use App\Http\Requests\UpdateLocationPrivacyRequest;
 use App\Models\UserLocation;
+use App\Domain\Core\EventSourcing\EventStore;
+use App\Events\Location\UserLocationUpdated;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 /**
  * Location Controller - Real-time Location Tracking API
-
  * 
  * AI Model: Claude 4.5 - Multi-AI Orchestration
  * Phase: Location-Based Social Features Implementation
@@ -22,6 +23,10 @@ use Illuminate\Support\Facades\Log;
  */
 class LocationController extends Controller
 {
+    public function __construct(
+        private readonly EventStore $eventStore
+    ) {}
+
     /**
      * Update user's current location
     *
@@ -57,7 +62,25 @@ class LocationController extends Controller
                 return response()->json(['message' => 'Unauthenticated'], 401);
             }
 
-            // Get or create user location
+            // --- EVENT SOURCING INTEGRATION ---
+            // Append immutable event log
+            $currentVersion = $this->eventStore->getCurrentVersion((string)$user->id, 'UserLocation');
+            $event = new UserLocationUpdated(
+                (string)$user->id,
+                (float)$request->input('latitude'),
+                (float)$request->input('longitude'),
+                null // Location name resolution would go here
+            );
+            
+            $this->eventStore->append(
+                $event, 
+                'UserLocation', 
+                $currentVersion + 1,
+                ['ip' => $request->ip(), 'user_agent' => $request->userAgent()]
+            );
+            // ----------------------------------
+
+            // Get or create user location (Projection Update)
             $location = UserLocation::where('user_id', $user->id)->first();
             
             if (!$location) {

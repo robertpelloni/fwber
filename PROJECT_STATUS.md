@@ -1,14 +1,26 @@
+<<<<<<< Updated upstream
 # Project Status — fwber v0.5.9-beta
 
 **Date:** 2026-03-23  
 **Version:** 0.5.9-beta  
 **Status:** Beta — Stabilization & Launch Consolidation
+=======
+# Project Status — fwber v0.6.1-beta
+
+**Date:** 2026-03-23  
+**Version:** 0.6.1-beta  
+**Status:** Beta — Stabilization & Architectural Evolution
+>>>>>>> Stashed changes
 
 ---
 
 ## Current State
 
+<<<<<<< Updated upstream
 fwber is a privacy-first proximity dating platform. The codebase is currently in **Phase 3: Launch Consolidation**. 
+=======
+fwber is a privacy-first proximity dating platform. The codebase has successfully cleared **Phase 3: Launch Consolidation** and has entered the next phase of architectural evolution and feature expansion.
+>>>>>>> Stashed changes
 
 ### What Works (Core Loop)
 - ✅ User registration and authentication (Sanctum)
@@ -35,6 +47,11 @@ fwber is a privacy-first proximity dating platform. The codebase is currently in
 - ✅ Real-time WebSocket (Reverb broadcasting hardened)
 - ✅ Face blur (Client-side `@vladmandic/face-api` Webpack module resolution verified)
 - ✅ Voice-Only "Confessional" Mode (UI toggle, API masking, Audio discovery card)
+<<<<<<< Updated upstream
+=======
+- ✅ B2B Merchant "Local Vibe" API & Dashboard
+- ✅ Core Event Sourcing Infrastructure (Location tracking migrated)
+>>>>>>> Stashed changes
 
 ### Experimental / Aspirational (Not Verified)
 - 🔬 Multi-region deployment (Geo-DNS)

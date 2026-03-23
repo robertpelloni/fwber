@@ -7,7 +7,8 @@ import { getMerchantProfile, getPromotions, MerchantProfile, Promotion } from '@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { PlusCircle, Tag } from 'lucide-react'
+import { PlusCircle, Tag, Radio } from 'lucide-react'
+import NeighborhoodVibe from '@/components/merchant/NeighborhoodVibe'
 
 export default function MerchantDashboard() {
   const { token } = useAuth()
@@ -28,7 +29,7 @@ export default function MerchantDashboard() {
       } catch (error) {
         console.error(error)
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
     loadData()
@@ -39,22 +40,31 @@ export default function MerchantDashboard() {
   }
 
   return (
-    <div className="space-y-6 px-4 sm:px-0">
+    <div className="space-y-6 px-4 sm:px-0 pb-20">
         {/* Welcome Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Dashboard</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white uppercase italic tracking-tighter">Merchant Portal</h1>
                 <p className="text-gray-500 dark:text-gray-400">
-                    Welcome back, {profile?.business_name}
+                    {profile?.business_name} — B2B Local Intelligence
                 </p>
             </div>
-            <Link href="/merchant/promotions/new">
-                <Button className="bg-amber-500 hover:bg-amber-600 text-white">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Create Promotion
+            <div className="flex gap-2">
+                <Button variant="outline" className="border-amber-500 text-amber-600 hover:bg-amber-50">
+                    <Radio className="mr-2 h-4 w-4 animate-pulse" />
+                    Vibe Broadcast
                 </Button>
-            </Link>
+                <Link href="/merchant/promotions/new">
+                    <Button className="bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/20">
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        New Promotion
+                    </Button>
+                </Link>
+            </div>
         </div>
+
+        {/* Real-time Intel */}
+        {token && <NeighborhoodVibe token={token} />}
 
         {/* Stats Grid */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
