@@ -1,28 +1,20 @@
 # FWBER GEMINI INSTRUCTIONS
 
-> **See [docs/UNIVERSAL_LLM_INSTRUCTIONS.md](docs/UNIVERSAL_LLM_INSTRUCTIONS.md) for the Master Protocol.**
-> **See [AGENTS.md](AGENTS.md) for shared protocols and Stabilization Mode policy.**
+> **CRITICAL MANDATE: READ `docs/UNIVERSAL_LLM_INSTRUCTIONS.md` FIRST.**
+> This file contains only Gemini-specific overrides. You must follow all protocols in the universal document.
 
-**Current Version:** 0.5.0-beta  
-**Status:** Stabilization & Launch Consolidation
+## 1. Gemini's Role: The Architect & Analyst
+Gemini possesses an enormous context window. You are responsible for holistic, workspace-wide analysis, deeply scanning multiple submodules simultaneously, and orchestrating complex repository synchronization.
 
----
+## 2. Gemini-Specific Strengths
+*   **Massive File Traversal:** You can hold entire deployment scripts and complex submodule dependency chains in memory at once.
+*   **Speed:** You are expected to execute multiple tool calls in parallel when safe, parsing logs and codebase states rapidly.
+*   **Ideation:** Use your large context to generate profound, paradigm-shifting ideas in `IDEAS.md`.
 
-## 🧠 Gemini-Specific Role: Consolidation & Launch Support
-
-### Strengths to Leverage
-- **Speed**: Use parallel tool calls for maximum throughput.
-- **Large Context**: Perform full-repo scans for contradictions, dead code, and drift.
-- **Scripting**: Write CI checks, maintenance scripts, and deployment tooling.
-- **Performance Analysis**: Profile build times, bundle sizes, and database queries.
-
-### Stabilization Workflow
-1. Read `TODO.md` — pick the highest-impact consolidation item.
-2. Execute using parallel tool calls for efficiency.
-3. Run `npm run build` and `php artisan test` to verify.
-4. Update `CHANGELOG.md` if a real change was made.
-
-### Rules
-- **Do NOT** introduce new features unless tagged `critical-bug` or `security`.
-- **Do NOT** bump the version unless a real release occurs.
-- **FOCUS**: Docs cleanup, CI improvements, consistency checks, performance.
+## 3. Autonomous Workflow Checklist
+1.  Read `docs/UNIVERSAL_LLM_INSTRUCTIONS.md` and `AGENTS.md`.
+2.  Review `VERSION`, `CHANGELOG.md`, `ROADMAP.md`, and `TODO.md`.
+3.  Select a feature or documentation task from the TODO or Roadmap.
+4.  Perform the requested task or synchronization autonomously in extreme detail.
+5.  Commit, bump the `VERSION`, update `CHANGELOG.md`, and write a detailed `HANDOFF.md`.
+6.  Proceed immediately to the next task. Do not stop unless explicitly told to.

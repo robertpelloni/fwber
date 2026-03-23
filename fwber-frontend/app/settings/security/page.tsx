@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useE2EEncryption } from '@/lib/hooks/use-e2e-encryption';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -9,17 +9,25 @@ import { useToast } from '@/components/ui/use-toast';
 import AppHeader from '@/components/AppHeader';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api/client';
+import { updateUserProfile } from '@/lib/api/profile';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 
 export default function SecuritySettingsPage() {
   const { isReady, regenerateKeys } = useE2EEncryption();
+  const { token, user } = useAuth();
   const [isRegenerating, setIsRegenerating] = useState(false);
-  const [isFederated, setIsFederated] = useState(false); // Default to off, load from API in prod
+  const [isFederated, setIsFederated] = useState(false);
   const [decoyPassword, setDecoyPassword] = useState('');
   const [isDecoyLoading, setIsDecoyLoading] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (user?.profile?.is_federated !== undefined) {
+      setIsFederated(user.profile.is_federated);
+    }
+  }, [user]);
 
   const handleCreateDecoy = async () => {
     if (decoyPassword.length < 8) {
@@ -70,6 +78,25 @@ export default function SecuritySettingsPage() {
       });
     } finally {
       setIsRegenerating(false);
+    }
+  };
+
+  const handleFederationToggle = async (checked: boolean) => {
+    setIsFederated(checked);
+    if (!token) return;
+    try {
+      await updateUserProfile(token, { is_federated: checked });
+      toast({
+        title: "Federation Updated",
+        description: checked ? "You mapped your profile to the Fediverse!" : "You have isolated your profile locally.",
+      });
+    } catch (error) {
+      setIsFederated(!checked); // revert on failure
+      toast({
+        title: "Error",
+        description: "Failed to update federation settings.",
+        variant: "destructive",
+      });
     }
   };
 

@@ -1,28 +1,21 @@
 # FWBER GPT INSTRUCTIONS
 
-> **See [docs/UNIVERSAL_LLM_INSTRUCTIONS.md](docs/UNIVERSAL_LLM_INSTRUCTIONS.md) for the Master Protocol.**
-> **See [AGENTS.md](AGENTS.md) for shared protocols and Stabilization Mode policy.**
+> **CRITICAL MANDATE: READ `docs/UNIVERSAL_LLM_INSTRUCTIONS.md` FIRST.**
+> This file contains only GPT-specific overrides. You must follow all protocols in the universal document.
 
-**Current Version:** 0.5.0-beta  
-**Status:** Stabilization & Launch Consolidation
+## 1. GPT's Role: Feature Implementor & Bug Fixer
+You are the primary engine for churning through the `TODO.md`. You write clean, idiomatic Laravel PHP and Next.js TypeScript rapidly and accurately.
 
----
+## 2. GPT-Specific Strengths
+*   **Code Generation:** Fast, accurate implementation of standard MVC, REST, and React patterns.
+*   **Testing:** Create comprehensive PHPUnit feature tests and Cypress E2E tests for every feature you build.
+*   **Algorithm Implementation:** Implement complex matching or geospatial logic as defined in the roadmap.
 
-## 🧠 GPT-Specific Role: Bug Fixer & Test Hardener
-
-### Strengths to Leverage
-- **Code Generation**: Write clean, idiomatic Laravel PHP and Next.js TypeScript.
-- **Testing**: Create comprehensive PHPUnit feature tests and Cypress E2E tests.
-- **Algorithm Implementation**: Implement fixes for specific bugs and regressions.
-
-### Stabilization Workflow
-1. Read `TODO.md` — pick a bug fix or test verification task.
-2. Write the fix, matching existing project conventions.
-3. Write or update tests to verify the fix.
-4. Run `npm run build` (frontend) and `php artisan test` (backend).
-5. Update `CHANGELOG.md` if a real change was made.
-
-### Rules
-- **Do NOT** implement new features. Fix bugs and harden tests only.
-- **Do NOT** expand the feature surface area.
-- **PRIORITY**: Make the core dating flow bulletproof (register → onboard → discover → match → chat).
+## 3. Autonomous Workflow Checklist
+1.  Read `docs/UNIVERSAL_LLM_INSTRUCTIONS.md` and `AGENTS.md`.
+2.  Review `VERSION`, `CHANGELOG.md`, `ROADMAP.md`, and `TODO.md`.
+3.  Pick the highest priority uncompleted task.
+4.  Write the fix/feature, matching existing project conventions. Ensure 100% UI coverage.
+5.  Write or update tests to verify the fix.
+6.  Commit, bump the `VERSION`, update `CHANGELOG.md`, and write a detailed `HANDOFF.md`.
+7.  Proceed immediately to the next task. Do not stop unless explicitly told to.

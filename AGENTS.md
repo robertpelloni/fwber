@@ -2,30 +2,26 @@
 
 > **See [docs/UNIVERSAL_LLM_INSTRUCTIONS.md](docs/UNIVERSAL_LLM_INSTRUCTIONS.md) for the Master Protocol.**
 
-**Current Version:** 0.5.0-beta  
+**Current Version:** 0.5.1-beta  
 **Status:** See `PROJECT_STATUS.md` and `TODO.md`.
 
 ---
 
-## 🚨 Stabilization Mode Policy (ACTIVE)
+## 🚨 Autonomous Execution Policy (ACTIVE)
 
-The project is in **Stabilization & Launch Consolidation** mode.
+When instructed to "proceed" or "keep going", you are authorized and expected to operate in a continuous, autonomous loop:
 
-**Agents must prioritize (in order):**
-1. Source-of-truth consistency (version, license, status)
-2. Security hygiene (no secrets in repo, no new vulnerabilities)
-3. Core-flow verification (register → onboard → discover → match → chat)
-4. Bug fixes and test hardening
-5. Documentation consolidation (reduce, don't expand)
+1. **Analyze:** Deeply review `ROADMAP.md`, `TODO.md`, and `PROJECT_STATUS.md` to find missing or incomplete features.
+2. **Implement:** Write robust, well-commented code. Ensure full UI representation (tooltips, labels, config).
+3. **Verify:** Test your code. Fix any bugs.
+4. **Version Bump:** Update the `VERSION` file and `CHANGELOG.md` for *every* completed feature build.
+5. **Git Sync:** `git add .`, `git commit -m "feat: [description] (vX.Y.Z)"`, and `git push`.
+6. **Loop:** Do not stop. Automatically pick the next feature and proceed.
 
 **Agents must NOT:**
-- Introduce major new features
-- Create speculative status claims or mark features complete without test evidence
-- Proliferate handoff/status documents (use `CHANGELOG.md` only)
-- Bump the version unless a real, tested release occurs
-- Create `SESSION_HANDOFF_*.md` or `RECENT_UPDATES_*.md` files
-
-**When uncertain:** Prefer reducing contradictions over expanding scope.
+- Stop or pause for confirmation unless fundamentally blocked or specifically asked to stop.
+- Implement half-features. If you build a backend API, you MUST build the frontend UI to consume it.
+- Leave uncommented code if it requires explanation.
 
 ---
 
@@ -33,47 +29,34 @@ The project is in **Stabilization & Launch Consolidation** mode.
 
 ### 1. Versioning & Changelog
 - **Single Source of Truth**: The `VERSION` file in the root directory.
-- Only bump version for real, tested releases.
 - Update `CHANGELOG.md` with every version bump.
-- Commit message format: `chore(release): bump version to X.Y.Z`.
 
 ### 2. Documentation Maintenance
-- `PROJECT_STATUS.md` — Concise current state (keep under 100 lines).
+- `PROJECT_STATUS.md` — Concise current state.
 - `CHANGELOG.md` — What changed in each version.
 - `TODO.md` — Honest, actionable tasks only.
+- `HANDOFF.md` — Extreme detail of findings, actions, and next steps for the next AI agent.
 
 ### 3. Code Standards
-- **Comment Philosophy**: Comment *why*, not *what*.
+- **Comment Philosophy**: Comment *why*, not *what*. Explain side-effects, optimizations, and non-working methods you tried.
 - **Error Handling**: Catch `\Throwable` (not just `\Exception`).
 - **Type Safety**: TypeScript strict mode. Avoid `any`.
-- **Feature Flags**: Gate new features behind `config/features.php`.
-
-### 4. Git Workflow
-- Commit after each logical unit of work.
-- Never force push or overwrite working code.
-- No new branch proliferation without clear purpose.
-
-### 5. Testing
-- Run `npm run build` for frontend verification.
-- Run `php artisan test` for backend verification.
-- Claims of "feature complete" require linked test evidence.
 
 ---
 
-## 🤖 Model-Specific Roles (Stabilization Mode)
+## 🤖 Model-Specific Roles
 
-### Claude (Antigravity) — Quality Auditor
-- **Role**: Review code for bugs, security issues, and unnecessary complexity.
-- **Focus**: Challenge assumptions. If something seems overclaimed, say so.
-- **Rule**: Ask "Does this help get the first 50 users?" before building anything.
+### Claude (Antigravity) — Architecture & Refactoring Lead
+- **Role**: Review code for bugs, architectural flaws, and complexity. Lead deep refactoring efforts (e.g., Event Sourcing migration).
+- **Focus**: See `CLAUDE.md`.
 
-### Gemini — Consolidation & Launch Support
-- **Role**: Repo maintenance, docs cleanup, CI improvements, performance audits.
-- **Focus**: Full-repo scans for contradictions, dead code, and drift.
+### Gemini — Consolidation & Ecosystem Lead
+- **Role**: Repo maintenance, cross-submodule synchronization, docs cleanup, CI improvements, performance audits.
+- **Focus**: See `GEMINI.md`.
 
-### GPT — Bug Fixer & Test Hardener
-- **Role**: Fix test failures, verify core flows, write integration tests.
-- **Focus**: Make register → onboard → discover → match → chat bulletproof.
+### GPT — Feature Implementation & Bug Fixer
+- **Role**: Fix test failures, verify core flows, write integration tests, build out missing UI.
+- **Focus**: See `GPT.md`.
 
 ### Copilot — Inline Assistance
 - **Role**: Real-time code completion only. No autonomous sessions.

@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.1-beta] - 2026-03-23 — Deep Federation & Project Overhaul
+
+### Architecture & Documentation
+- **Universal LLM Protocols**: Completely rewrote AI agent instructions (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `GPT.md`) to route through a single source of truth (`docs/UNIVERSAL_LLM_INSTRUCTIONS.md`).
+- **Autonomous Execution**: Implemented infinite-loop protocol for AI agents to autonomously find, implement, verify, and commit missing features.
+- **Submodule Dashboard**: Created `docs/SUBMODULE_DASHBOARD.md` to map out the monorepo architecture (`fwber-backend`, `fwber-frontend`, `fwber-geo`, `mobile`).
+- **Ideation Lab**: Created `IDEAS.md` for deep technical refactors (Event Sourcing) and product pivots (B2B API, Hardware Tokens).
+- **Persistent Memory**: Created `MEMORY.md` to track architectural quirks and design preferences.
+
+### Features
+- **UI Wired**: Hooked up the ActivityPub Federation toggle in the Security Settings page (`app/settings/security/page.tsx`) to actually persist the `is_federated` state to the database via `updateUserProfile`.
+
 ## [0.5.0-beta] - 2026-03-07 — Credibility Sprint
 
 > **Version Reset**: Previous entries below used inflated version numbers (0.3.x → 1.3.x)

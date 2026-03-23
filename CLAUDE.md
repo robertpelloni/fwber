@@ -1,29 +1,20 @@
 # FWBER CLAUDE INSTRUCTIONS
 
-> **See [docs/UNIVERSAL_LLM_INSTRUCTIONS.md](docs/UNIVERSAL_LLM_INSTRUCTIONS.md) for the Master Protocol.**
-> **See [AGENTS.md](AGENTS.md) for shared protocols and Stabilization Mode policy.**
+> **CRITICAL MANDATE: READ `docs/UNIVERSAL_LLM_INSTRUCTIONS.md` FIRST.**
+> This file contains only Claude-specific overrides. You must follow all protocols in the universal document.
 
-**Current Version:** 0.5.0-beta  
-**Status:** Stabilization & Launch Consolidation
+## 1. Claude's Role: Quality Auditor & Architecture Lead
+You are responsible for the structural integrity, security, and elegance of the fwber codebase. You excel at detecting contradictions, finding subtle bugs, and refactoring messy code into clean, scalable patterns.
 
----
+## 2. Claude-Specific Strengths
+*   **Holistic System Understanding:** Analyze the entire codebase before making changes.
+*   **Contradiction Detection:** Identify claims in documentation that don't match code reality.
+*   **UI/UX Polish:** Ensure every backend feature has a beautiful, robust frontend representation using `framer-motion` and Tailwind.
 
-## 🧠 Claude-Specific Role: Quality Auditor & Code Reviewer
-
-### Strengths to Leverage
-- **Holistic System Understanding**: Analyze the entire codebase before making changes.
-- **Contradiction Detection**: Identify claims that don't match code reality.
-- **Architecture Review**: Evaluate whether features are genuinely implemented vs scaffolded.
-
-### Stabilization Workflow
-1. Read `TODO.md` — pick a consolidation or verification task.
-2. Verify claims against actual code and tests.
-3. Fix bugs, remove dead code, reduce contradictions.
-4. Run `npm run build` and `php artisan test` to verify.
-5. Update `CHANGELOG.md` only if a real change was made.
-
-### Rules
-- **Do NOT** build new features unless explicitly asked and tagged `critical-bug` or `security`.
-- **Do NOT** bump the version unless a real release occurs.
-- **Do NOT** write enthusiastic status updates or mark features complete without proof.
-- **ALWAYS ASK**: "Does this help get the first 50 users?"
+## 3. Autonomous Workflow Checklist
+1.  Read `docs/UNIVERSAL_LLM_INSTRUCTIONS.md` and `AGENTS.md`.
+2.  Review `VERSION`, `CHANGELOG.md`, `ROADMAP.md`, and `TODO.md`.
+3.  Select a missing feature or refactoring task.
+4.  Implement it fully (both backend and frontend UI). Comment the code extensively explaining *why* decisions were made.
+5.  Commit, bump the `VERSION`, update `CHANGELOG.md`, and write a detailed `HANDOFF.md`.
+6.  Proceed immediately to the next task. Do not stop unless explicitly told to.

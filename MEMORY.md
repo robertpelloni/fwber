@@ -1,72 +1,22 @@
-# MEMORY.md — Ongoing Observations & Design Preferences
+# MEMORY.md — Codebase Observations & Quirks
 
-> **Last Updated:** 2026-03-07 by Gemini (Antigravity)  
-> **Purpose:** Persistent memory file for AI agents to document codebase observations, user preferences, and design decisions.
+> *This file serves as a persistent memory bank for all AI agents working on fwber. Update this file whenever you encounter a strange architectural quirk, a persistent bug, or a strict design preference.*
 
----
+## Architectural Observations
 
-## 🚨 Operational Mode: Launch Consolidation (Effective 2026-03-07)
+1.  **WebSockets vs HTTP:** The application uses Laravel Reverb for real-time WebSockets, but it relies on an external Rust service (`fwber-geo`) for spatial indexing via HTTP POST/GET requests. This split was intentional for performance, but requires ensuring both services are running locally (`php artisan serve` + `cargo run`).
+2.  **Face Blurring:** Client-side face blurring (`@vladmandic/face-api`) is heavily utilized to maintain the "Anti-Catfish" guarantee. The models are statically served from `public/models`. **Do not attempt to move this logic to the backend.**
+3.  **Strict Typing:** The frontend enforces strict TypeScript. If you see a type error (e.g., `Type 'undefined' is not assignable to type 'string'`), do not bypass it with `any` or `// @ts-ignore`. Fix the underlying data flow or provide proper fallbacks.
+4.  **Database:** We use PostgreSQL with PostGIS in production, but SQLite for local testing. Avoid database-specific syntax (like MySQL's `TIMESTAMPDIFF`) in queries if possible, or provide fallback logic for SQLite (e.g., `julianday('now') - julianday(date_of_birth)`).
 
-**Status:** FEATURE FREEZE ACTIVE  
-**Priority:** Credibility → Security → User Acquisition → Stability  
-**Forbidden:** New features without user request, version drift, secret commits.
+## Design Preferences
 
-**Agent Rules:**
-1. **VERSION File is Canonical:** All docs must match `VERSION` file.
-2. **Security First:** Flag any potential secrets immediately.
-3. **No Sycophancy:** Validate claims with test coverage links.
-4. **Marketing > Engineering:** Prioritize tasks that drive user acquisition.
-5. **Doc Hygiene:** No new session handoff files. Log in `CHANGELOG.md` only.
+1.  **Aesthetic:** "Neon-Professional" / "Cyber-Noir". Deep dark modes, subtle glowing accents, glassmorphism (`backdrop-blur-md`).
+2.  **UI Updates:** Prefer optimistic UI updates over loading spinners where possible. Use `framer-motion` for smooth transitions.
+3.  **Alerts:** Never use native browser `alert()` or `confirm()`. Always use the custom Toast system or custom Modals.
 
----
+## Known Quirks
 
-## 🧠 User Preferences (Robert Pelloni)
-
-### Communication Style
-- Prefers **extreme autonomy** — agents should proceed without asking for confirmation unless truly destructive.
-- Values **enthusiasm and momentum** — "Keep going! Don't ever stop! Don't ever quit!"
-- Wants **all model instruction files** to reference `docs/UNIVERSAL_LLM_INSTRUCTIONS.md`.
-
-### Code & Architecture Preferences
-- **Monorepo monolith** (Laravel 12 backend + Next.js 16 frontend).
-- **Dark mode / "Cyber-Noir" aesthetic** — gradients, glassmorphism, neon accents.
-- **framer-motion** for animations.
-- **Feature flags** in `config/features.php`.
-- **Privacy-first** — fuzzy location, ghost mode, AI avatars by default, E2E encryption.
-
----
-
-## 🏗️ Codebase Observations
-
-### Backend (Laravel 12)
-- **78 controllers**, **53 services**, **200+ test files**.
-- `config/features.php` has 12+ feature flags, most disabled by default.
-- Real-time via Laravel Reverb (WebSocket broadcasting).
-
-### Frontend (Next.js 16)
-- **100+ pages**, **150+ components**.
-- Uses `useWebSocket` hook for real-time.
-- PWA-enabled with `sw-push.js` service worker.
-- `layout.tsx` reads version from `process.env.NEXT_PUBLIC_PROJECT_VERSION`.
-
-### Infrastructure
-- **Docker**: dev and prod compose files.
-- **Kubernetes**: Full manifest suite ready.
-- **CI/CD**: GitHub Actions (backend tests + frontend build).
-- **Hosting**: DreamHost Shared (current).
-
----
-
-## 📐 Design Decisions
-
-| Decision | Rationale |
-|----------|-----------|
-| AI Avatars by default | Anti-catfish — reveal after connection established |
-| 5-tier relationship reveal | Gradual trust-building prevents harassment |
-| Proximity-first discovery | "Local Pulse" prioritizes nearby connections |
-| Monorepo over microservices | Easier to deploy and maintain for small team |
-| Feature flags | Gate experimental features; disable unverified ones |
-
----
-
-*This file is maintained by all AI agents. Add observations as you discover them.*
+1.  **Duplicate Routes:** Be careful when modifying `routes/api.php`. Previous refactors accidentally created duplicate route blocks (e.g., for Federation). Always check the entire file after making changes.
+2.  **Middleware:** The `api` middleware group in `bootstrap/app.php` can sometimes apply `auth:sanctum` unexpectedly if routes aren't explicitly placed or excluded using `->withoutMiddleware(['auth:sanctum'])`.
+3.  **Test Environment:** The local test suite (`php artisan test`) may skip tests requiring Redis (like `ControllerCachingTest`) if the PHP Redis extension is not installed. This is expected behavior in local dev, but Redis is mandatory in production.

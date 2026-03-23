@@ -184,6 +184,7 @@ export interface ProfileUpdateData {
   political_views?: string;
   interests?: string[];
   voice_intro?: File | null;
+  is_federated?: boolean;
 
   preferences?: {
     smoking?: string;

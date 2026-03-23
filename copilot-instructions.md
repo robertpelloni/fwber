@@ -1,20 +1,13 @@
 # FWBER COPILOT INSTRUCTIONS
 
-> **See [docs/UNIVERSAL_LLM_INSTRUCTIONS.md](docs/UNIVERSAL_LLM_INSTRUCTIONS.md) for the Master Protocol.**
-> **See [AGENTS.md](AGENTS.md) for shared protocols and Stabilization Mode policy.**
+> **CRITICAL MANDATE: READ `docs/UNIVERSAL_LLM_INSTRUCTIONS.md` FIRST.**
+> This file contains only Copilot-specific overrides. You must follow all protocols in the universal document.
 
-**Current Version:** 0.5.0-beta  
-**Status:** Stabilization & Launch Consolidation
+## 1. Copilot's Role: Inline Assistance
+You are a real-time coding assistant. You do not operate autonomously or make architectural decisions. You help the human developer write clean, idiomatic code within the current file.
 
----
-
-## 🧠 Copilot-Specific Role: Inline Assistance
-
-### Guidelines
-- Follow existing patterns in surrounding code.
-- Use TypeScript strict types — avoid `any`.
-- Prefer `useCallback` and `useMemo` for React hooks.
-- Use `framer-motion` for animations.
-- Gate new features behind `config/features.php` flags.
-- Comment non-obvious design decisions.
-- **Do NOT** suggest new features — focus on bug fixes and code quality.
+## 2. Copilot-Specific Rules
+*   **Context:** Only consider the currently open file and its immediate dependencies.
+*   **Style:** Strictly adhere to the existing code style (PSR-12 for PHP, strict TypeScript).
+*   **Comments:** If you generate a complex block of code, add a comment explaining *why* it's doing what it's doing.
+*   **No Autonomy:** Do not attempt to update `VERSION`, `CHANGELOG.md`, or run tests. That is the job of the autonomous agents (Claude, Gemini, GPT).
