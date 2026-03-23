@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.1-beta] - 2026-03-23 — Unified Event Sourcing Architecture
+
+### Architecture
+- **Event Sourcing Foundation**: 
+    - Implemented a massive paradigm shift away from pure CRUD toward an immutable, append-only Event Sourcing architecture.
+    - Created the `domain_events` database migration.
+    - Scaffolded the `DomainEvent` abstract class and `EventStore` core service.
+    - **Location Tracking Migrated**: Successfully refactored `LocationController@update` to append a `UserLocationUpdated` event to the `EventStore` before updating the read projection, ensuring perfect geospatial audit trails.
+
+## [0.6.0-beta] - 2026-03-23 — B2B Local Vibe API
+
+### Features
+- **Merchant Local Pulse API**: 
+    - Created `LocalPulseAnalyticsService` which leverages OpenAI to analyze aggregated local artifacts and generate a real-time neighborhood "Vibe", Sentiment Score, and Trending Keywords.
+    - Implemented `MerchantPulseController` exposing the `GET /api/merchant/pulse/vibe` endpoint, secured behind a new `role:merchant` middleware.
+- **Merchant Dashboard**: 
+    - Built the `NeighborhoodVibe.tsx` component, providing merchants with a sleek, live dashboard of the current local atmosphere.
+    - Scaffolded the `broadcast` endpoint for upcoming "Vibe-Matched" promotional blasts.
+
 ## [0.5.9-beta] - 2026-03-23 — Voice-Only Confessional Mode
 
 ### Features
