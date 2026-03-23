@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.6-beta] - 2026-03-23 — Web3 Wallet Hardening
+
+### Features
+- **On-Chain Settlement**: 
+    - Added an "On-Chain" toggle to the `SendTokenModal.tsx` allowing users to settle tips directly on the Solana blockchain via `@solana/web3.js`.
+    - Integrated recipient wallet address lookups into the transfer flow.
+    - Updated `TokenController.php` to handle external transaction verification and logging, ensuring on-chain transfers are correctly represented in user history without double-deduction.
+    - Enhanced push notifications to indicate on-chain settlement status.
+
 ## [0.5.5-beta] - 2026-03-23 — Relationship Tier Hardening
 
 ### Features

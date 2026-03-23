@@ -142,46 +142,67 @@ class TokenController extends Controller
 
         $amount = $request->amount;
         $message = $request->message;
+        $onChain = $request->boolean('on_chain', false);
+        $signature = $request->signature;
 
         if ($sender->id === $recipient->id) {
              return response()->json(['error' => 'Cannot send tokens to yourself'], 400);
         }
 
-        if ($sender->token_balance < $amount) {
+        if (!$onChain && $sender->token_balance < $amount) {
             return response()->json(['error' => 'Insufficient balance'], 400);
         }
 
         try {
-            \DB::transaction(function () use ($sender, $recipient, $amount, $message) {
-                $deducted = User::where('id', $sender->id)
-                    ->where('token_balance', '>=', $amount)
-                    ->decrement('token_balance', $amount);
+            \DB::transaction(function () use ($sender, $recipient, $amount, $message, $onChain, $signature) {
+                if ($onChain) {
+                    // Just log the transaction as it was settled on-chain
+                    $sender->tokenTransactions()->create([
+                        'amount' => -$amount,
+                        'type' => 'on_chain_transfer',
+                        'description' => "On-chain transfer to {$recipient->name}",
+                        'metadata' => ['recipient_id' => $recipient->id, 'message' => $message, 'signature' => $signature],
+                    ]);
 
-                if (!$deducted) {
-                    throw new \Exception('Insufficient balance');
+                    $recipient->tokenTransactions()->create([
+                        'amount' => $amount,
+                        'type' => 'on_chain_received',
+                        'description' => "On-chain received from {$sender->name}",
+                        'metadata' => ['sender_id' => $sender->id, 'message' => $message, 'signature' => $signature],
+                    ]);
+                } else {
+                    $deducted = User::where('id', $sender->id)
+                        ->where('token_balance', '>=', $amount)
+                        ->decrement('token_balance', $amount);
+
+                    if (!$deducted) {
+                        throw new \Exception('Insufficient balance');
+                    }
+
+                    $recipient->increment('token_balance', $amount);
+
+                    $sender->tokenTransactions()->create([
+                        'amount' => -$amount,
+                        'type' => 'tip_sent',
+                        'description' => "Sent to {$recipient->name}",
+                        'metadata' => ['recipient_id' => $recipient->id, 'message' => $message],
+                    ]);
+
+                    $recipient->tokenTransactions()->create([
+                        'amount' => $amount,
+                        'type' => 'tip_received',
+                        'description' => "Received from {$sender->name}",
+                        'metadata' => ['sender_id' => $sender->id, 'message' => $message],
+                    ]);
                 }
-
-                $recipient->increment('token_balance', $amount);
-
-                $sender->tokenTransactions()->create([
-                    'amount' => -$amount,
-                    'type' => 'tip_sent',
-                    'description' => "Sent to {$recipient->name}",
-                    'metadata' => ['recipient_id' => $recipient->id, 'message' => $message],
-                ]);
-
-                $recipient->tokenTransactions()->create([
-                    'amount' => $amount,
-                    'type' => 'tip_received',
-                    'description' => "Received from {$sender->name}",
-                    'metadata' => ['sender_id' => $sender->id, 'message' => $message],
-                ]);
             });
 
             // Send Push Notification
             $body = $message
                 ? "{$sender->name} sent {$amount} FWB: \"{$message}\""
                 : "{$sender->name} sent you {$amount} FWB.";
+
+            if ($onChain) $body = "🌐 On-Chain: " . $body;
 
             $this->pushService->send(
                 $recipient,
@@ -197,7 +218,7 @@ class TokenController extends Controller
             return response()->json(['error' => $e->getMessage()], 400);
         }
 
-        return response()->json(['message' => 'Tip sent successfully', 'new_balance' => $sender->fresh()->token_balance]);
+        return response()->json(['message' => 'Transfer successful', 'new_balance' => $sender->fresh()->token_balance]);
     }
 
     public function balance(Request $request)
