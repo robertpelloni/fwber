@@ -20,6 +20,8 @@ fwber is a privacy-first proximity dating platform. The core dating loop (regist
 - ✅ Direct messaging (text + audio)
 - ✅ Notification system (database + push)
 - ✅ Feature flag system (`config/features.php`)
+- ✅ Audio dating rooms (WebRTC SFU endpoints verified)
+- ✅ Burner communication bridge (verified)
 
 ### What Exists But Needs Verification
 - ⚠️ Video chat (WebRTC) — needs E2E testing
@@ -33,8 +35,6 @@ fwber is a privacy-first proximity dating platform. The core dating loop (regist
 - 🔬 ActivityPub federation (scaffolded, unverified)
 - 🔬 Rust geo-screener (separate binary, unverified)
 - 🔬 React Native mobile wrapper (Expo shell, unverified)
-- 🔬 Audio dating rooms (WebRTC SFU, unverified)
-- 🔬 Burner communication bridge (scaffolded, unverified)
 
 ## Known Issues
 - CI/CD: `fwber-mysql` host resolution failures in test runner (Docker networking).
