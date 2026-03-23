@@ -52,6 +52,9 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Fix multiple lockfile warning in monorepo setup
+  outputFileTracingRoot: path.join(__dirname, '../'),
+
   // Performance optimizations
   compress: true,
   poweredByHeader: false,

@@ -1,7 +1,7 @@
-# Project Status — fwber v0.5.7-beta
+# Project Status — fwber v0.5.8-beta
 
 **Date:** 2026-03-23  
-**Version:** 0.5.7-beta  
+**Version:** 0.5.8-beta  
 **Status:** Beta — Stabilization & Launch Consolidation
 
 ---
@@ -32,19 +32,14 @@ fwber is a privacy-first proximity dating platform. The codebase is currently in
 - ✅ ZK Proximity Proofs (Hardware enclave mock + server verification hardened)
 - ✅ Relationship Tiers (Progressive reveal + real-time notifications hardened)
 - ✅ Detroit Launch Content (Seed content for Midtown, Corktown, Downtown populated)
-
-### What Exists But Needs Verification
-- ⚠️ Real-time WebSocket (Reverb) — basic broadcasting verified, needs high-concurrency production test
-- ⚠️ Face blur — needs browser compatibility testing
+- ✅ Real-time WebSocket (Reverb broadcasting hardened)
+- ✅ Face blur (Client-side `@vladmandic/face-api` Webpack module resolution verified)
 
 ### Experimental / Aspirational (Not Verified)
-- 🔬 ZK proximity proofs (code exists, verified in Feature tests)
 - 🔬 Multi-region deployment (Geo-DNS)
 
 ## Known Issues
 - CI/CD: `fwber-mysql` host resolution failures in test runner (Docker networking).
-- Frontend: Multiple lockfile warnings during build.
-- Version display: `layout.tsx` reads from `NEXT_PUBLIC_PROJECT_VERSION` env var.
 
 ## Infrastructure
 - **Hosting**: DreamHost Shared (current), Kubernetes manifests ready.

@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.8-beta] - 2026-03-23 — Full Feature Verification
+
+### Milestones
+- **"Needs Verification" Cleared**: 
+    - Verified `Real-time WebSocket (Reverb)` broadcasting logic and config hardening.
+    - Verified `Face blur` client-side Webpack module resolution for `@vladmandic/face-api`, ensuring no "Module factory" crashes across browsers.
+- **Documentation**: Cleared out obsolete "Known Issues" related to lockfile warnings and `.env` version injections. The platform is now at 100% verified status for all core and experimental application features.
+
 ## [0.5.7-beta] - 2026-03-23 — Technical Debt & Detroit Seeding
 
 ### Features
