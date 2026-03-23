@@ -144,7 +144,7 @@ async fn main() -> std::io::Result<()> {
     });
 
     println!("🚀 Starting Rust Geo-Screener (Uber H3 Indexing)");
-    println!("📡 Listening on 127.0.0.1:8080");
+    println!("📡 Listening on 127.0.0.1:8081");
 
     HttpServer::new(move || {
         App::new()
@@ -152,7 +152,7 @@ async fn main() -> std::io::Result<()> {
             .route("/index", web::post().to(index_location))
             .route("/nearby", web::get().to(get_nearby))
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind(("127.0.0.1", 8081))?
     .run()
     .await
 }

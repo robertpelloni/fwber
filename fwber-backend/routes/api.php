@@ -41,6 +41,16 @@ use App\Http\Controllers\EventController;
 |
 */
 
+// Federation (ActivityPub)
+Route::prefix('federation')->group(function () {
+    // Will bypass standard sanctum auth, requires Http Signature validation instead
+    Route::post('users/{id}/inbox', [\App\Http\Controllers\ActivityPubInboxController::class, 'handle']);
+    Route::get('users/{id}/outbox', [\App\Http\Controllers\ActivityPubOutboxController::class, 'index']);
+    
+    // Return Actor profile
+    Route::get('users/{id}', [\App\Http\Controllers\ActivityPubController::class, 'actor']);
+});
+
 Route::post('auth/register', [\App\Http\Controllers\AuthController::class, 'register'])->middleware('throttle:auth');
 Route::post('auth/login', [\App\Http\Controllers\AuthController::class, 'login'])->middleware('throttle:auth');
 Route::get('auth/login', function () {
@@ -344,16 +354,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // ZK-Proximity 
     Route::post('proximity/zk-verify', [\App\Http\Controllers\ZKProximityController::class, 'verify']);
 
-    // Federation (ActivityPub)
-    Route::prefix('federation')->group(function () {
-        // Will bypass standard sanctum auth, requires Http Signature validation instead
-        Route::post('users/{id}/inbox', [\App\Http\Controllers\ActivityPubInboxController::class, 'handle']);
-        Route::get('users/{id}/outbox', [\App\Http\Controllers\ActivityPubOutboxController::class, 'index']);
-        
-        // Return Actor profile
-        Route::get('users/{id}', [\App\Http\Controllers\ActivityPubController::class, 'actor']);
-    });
-    
     // Audio Rooms
     Route::prefix('audio-rooms')->group(function () {
         Route::get('/', [\App\Http\Controllers\AudioRoomController::class, 'index']);
