@@ -82,7 +82,48 @@ class ActivityPubTest extends TestCase
         $response = $this->postJson("/api/federation/users/{$user->id}/inbox", $payload);
 
         $response->assertStatus(202)
-            ->assertJson(['status' => 'received']);
+            ->assertJson(['status' => 'follow_processed']);
+
+        $this->assertDatabaseHas('followers', [
+            'user_id' => $user->id,
+            'actor_uri' => 'https://remote.test/users/remote-user'
+        ]);
+    }
+
+    public function test_inbox_handles_unfollow()
+    {
+        $user = User::factory()->create();
+        UserProfile::factory()->create([
+            'user_id' => $user->id,
+            'is_federated' => true
+        ]);
+
+        \App\Models\Follower::create([
+            'user_id' => $user->id,
+            'actor_uri' => 'https://remote.test/users/remote-user',
+            'status' => 'accepted'
+        ]);
+
+        $payload = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'type' => 'Undo',
+            'actor' => 'https://remote.test/users/remote-user',
+            'object' => [
+                'type' => 'Follow',
+                'actor' => 'https://remote.test/users/remote-user',
+                'object' => url("/api/federation/users/{$user->id}")
+            ]
+        ];
+
+        $response = $this->postJson("/api/federation/users/{$user->id}/inbox", $payload);
+
+        $response->assertStatus(202)
+            ->assertJson(['status' => 'unfollow_processed']);
+
+        $this->assertDatabaseMissing('followers', [
+            'user_id' => $user->id,
+            'actor_uri' => 'https://remote.test/users/remote-user'
+        ]);
     }
 
     public function test_outbox_returns_ordered_collection()

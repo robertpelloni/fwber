@@ -24,18 +24,65 @@ class ActivityPubInboxController extends Controller
             return response()->json(['error' => 'Inbox not found'], 404);
         }
 
-        $payload = $request->json()->all();
+        $activity = $request->json()->all();
+        $type = $activity['type'] ?? 'Unknown';
 
-        // Standard ActivityPub routing
-        $type = $payload['type'] ?? 'Unknown';
+        Log::info("ActivityPub: Received {$type} for user {$user->id}", $activity);
 
-        Log::info("ActivityPub INBOX received type: {$type} for User {$user->id}");
+        switch ($type) {
+            case 'Follow':
+                return $this->handleFollow($user, $activity);
+            
+            case 'Undo':
+                if (isset($activity['object']['type']) && $activity['object']['type'] === 'Follow') {
+                    return $this->handleUnfollow($user, $activity);
+                }
+                break;
 
-        // In a full implementation, we would dispatch Jobs based on type:
-        // - Follow -> Create localized Follower record
-        // - Undo -> Remove Follower record
-        // - Create (Note) -> Save foreign post to local timeline
+            case 'Create':
+                // Handle incoming posts from followed users
+                break;
+        }
 
-        return response()->json(['status' => 'received'], 202); // 202 Accepted
+        return response()->json(['status' => 'received'], 202);
+    }
+
+    /**
+     * Process an incoming Follow activity.
+     */
+    protected function handleFollow(User $user, array $activity)
+    {
+        $actorUri = $activity['actor'] ?? null;
+        if (!$actorUri) return response()->json(['error' => 'No actor provided'], 400);
+
+        $parsed = parse_url($actorUri);
+        $domain = $parsed['host'] ?? null;
+        $pathParts = explode('/', trim($parsed['path'] ?? '', '/'));
+        $username = end($pathParts);
+
+        \App\Models\Follower::updateOrCreate(
+            ['user_id' => $user->id, 'actor_uri' => $actorUri],
+            [
+                'username' => $username,
+                'domain' => $domain,
+                'status' => 'accepted'
+            ]
+        );
+
+        return response()->json(['status' => 'follow_processed'], 202);
+    }
+
+    /**
+     * Process an incoming Undo Follow activity.
+     */
+    protected function handleUnfollow(User $user, array $activity)
+    {
+        $actorUri = $activity['actor'] ?? null;
+        
+        \App\Models\Follower::where('user_id', $user->id)
+            ->where('actor_uri', $actorUri)
+            ->delete();
+
+        return response()->json(['status' => 'unfollow_processed'], 202);
     }
 }

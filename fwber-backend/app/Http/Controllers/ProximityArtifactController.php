@@ -21,7 +21,8 @@ class ProximityArtifactController extends Controller
     public function __construct(
         private ShadowThrottleService $shadowThrottleService,
         private GeoSpoofDetectionService $geoSpoofService,
-        private GeoScreenerClient $geoScreener
+        private GeoScreenerClient $geoScreener,
+        private \App\Services\ActivityPubService $apService
     ) {}
     /**
      * @OA\Get(
@@ -152,6 +153,24 @@ class ProximityArtifactController extends Controller
                 'artifact_id' => $artifact->id,
                 'error' => $e->getMessage(),
             ]);
+        }
+
+        // ActivityPub Federation: Broadcast public board posts to followers
+        if ($artifact->type === 'board_post') {
+            try {
+                $this->apService->broadcastToFollowers($user, [
+                    'type' => 'Create',
+                    'actor' => url("/api/federation/users/{$user->id}"),
+                    'object' => [
+                        'type' => 'Note',
+                        'content' => $artifact->content,
+                        'attributedTo' => url("/api/federation/users/{$user->id}"),
+                        'to' => ['https://www.w3.org/ns/activitystreams#Public']
+                    ]
+                ]);
+            } catch (\Throwable $e) {
+                \Log::error("ActivityPub: Broadcast failed for artifact {$artifact->id}: " . $e->getMessage());
+            }
         }
 
         return response()->json(['artifact' => [

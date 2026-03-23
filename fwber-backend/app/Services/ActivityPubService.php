@@ -8,6 +8,22 @@ use Illuminate\Support\Facades\Log;
 class ActivityPubService
 {
     /**
+     * Broadcast an activity to all accepted followers.
+     */
+    public function broadcastToFollowers(User $user, array $activity)
+    {
+        $followers = \App\Models\Follower::where('user_id', $user->id)
+            ->where('status', 'accepted')
+            ->get();
+
+        foreach ($followers as $follower) {
+            // TODO: Dispatch delivery job
+            // \App\Jobs\SendActivityPubActivity::dispatch($follower->actor_uri, $activity);
+            Log::info("ActivityPub: Queued delivery for follower {$follower->actor_uri}");
+        }
+    }
+
+    /**
      * Generate an ActivityPub Actor (Person) representation of a user.
      * Maps local user profile fields into standard fediverse schema.
      */

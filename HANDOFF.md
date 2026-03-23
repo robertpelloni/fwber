@@ -8,6 +8,10 @@
 This cycle focused on methodically verifying every core site function and ensuring deployment stability for DreamHost and Vercel. All backend tests are green, and the frontend build is verified.
 
 ## Accomplishments
+- **Deep Federation (ActivityPub Hardening)**:
+    - Implemented `Follower` model and database migration for cross-server relationships.
+    - Upgraded `ActivityPubInboxController` to process real `Follow` and `Undo` activities.
+    - Added automated broadcasting: Public "Local Pulse" board posts are now automatically pushed to federated followers via the `ActivityPubService`.
 - **Full Verification**: 322 backend tests passed (1042 assertions). 100% of core and experimental features are verified green.
 - **Experimental Features Verified**:
     - **Burner Communication Bridge**: Verified 24-hour self-destructing links.
