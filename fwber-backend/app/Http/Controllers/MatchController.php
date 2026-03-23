@@ -15,17 +15,23 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use App\Services\PushNotificationService;
 use App\Services\MatchMakerService;
+use App\Services\EmailNotificationService;
 use Carbon\Carbon;
 
 class MatchController extends Controller
 {
     private AIMatchingService $matchingService;
     private MatchMakerService $matchMakerService;
+    private EmailNotificationService $emailService;
 
-    public function __construct(AIMatchingService $matchingService, MatchMakerService $matchMakerService)
-    {
+    public function __construct(
+        AIMatchingService $matchingService, 
+        MatchMakerService $matchMakerService,
+        EmailNotificationService $emailService
+    ) {
         $this->matchingService = $matchingService;
         $this->matchMakerService = $matchMakerService;
+        $this->emailService = $emailService;
     }
     /**
      * @OA\Get(
@@ -560,6 +566,7 @@ class MatchController extends Controller
 
     private function recordMatchAction(int $userId, int $targetUserId, string $action): void
     {
+        Log::info("MatchController: Recording action {$action} from {$userId} to {$targetUserId}");
         DB::table('match_actions')->insert([
             'user_id' => $userId,
             'target_user_id' => $targetUserId,
@@ -571,11 +578,14 @@ class MatchController extends Controller
 
     private function checkForMatch(int $userId, int $targetUserId): bool
     {
+        Log::info("MatchController: Checking for mutual match between {$userId} and {$targetUserId}");
         $mutualLike = DB::table('match_actions')
             ->where('user_id', $targetUserId)
             ->where('target_user_id', $userId)
             ->where('action', 'like')
             ->exists();
+
+        Log::info("MatchController: Mutual like found? " . ($mutualLike ? 'YES' : 'NO'));
 
         if ($mutualLike) {
             $user1 = min($userId, $targetUserId);
@@ -604,8 +614,13 @@ class MatchController extends Controller
                 $userB = User::find($user2);
                 
                 if ($userA && $userB) {
-                    $emailService->sendNewMatchNotification($userA, $userB);
-                    $emailService->sendNewMatchNotification($userB, $userA);
+                    // Use the injected email service
+                    try {
+                        $this->emailService->sendNewMatchNotification($userA, $userB);
+                        $this->emailService->sendNewMatchNotification($userB, $userA);
+                    } catch (\Throwable $e) {
+                        Log::error("Match email failed: " . $e->getMessage());
+                    }
 
                     // Send push notifications to both users
                     $pushService = app(PushNotificationService::class);

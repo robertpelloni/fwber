@@ -30,10 +30,7 @@ class MatchMakerController extends Controller
 
         $user = $request->user();
         
-        // Basic check if user has enough tokens (though we might deduct later, it's good to check)
-        // Assuming user has a 'tokens' relationship or attribute. 
-        // If not strictly enforced here, the service handles the logic.
-        if ($user->tokens < $request->token_reward) {
+        if ($user->token_balance < $request->token_reward) {
              return response()->json(['message' => 'Insufficient tokens'], 402);
         }
 

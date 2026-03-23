@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.2-beta] - 2026-03-23 — Bounty Hardening & Real Rewards
+
+### Features
+- **Matchmaker Bounties Hardened**: 
+    - Implemented **Token Escrow**: Tokens are now deducted from the bounty creator's balance immediately upon creation.
+    - Implemented **Automatic Rewards**: When a match occurs through a suggested candidate, the escrowed bounty is automatically transferred to the wingman's wallet.
+    - Marked bounty status as `fulfilled` upon successful match.
+- **Verification Suite**: Created `MatchBountyTest.php` to verify the end-to-end escrow and reward lifecycle.
+
+### Fixes
+- **Backend Stability**: Fixed a type-error in `MatchMakerController` where it was checking a relationship instead of the user's `token_balance`.
+- **Match Notifications**: Fixed a missing service injection (`EmailNotificationService`) in the `MatchController`.
+
 ## [0.5.1-beta] - 2026-03-23 — Deep Federation & Project Overhaul
 
 ### Architecture & Documentation

@@ -1,14 +1,14 @@
-# Project Status — fwber v0.5.1-beta
+# Project Status — fwber v0.5.2-beta
 
-**Date:** 2026-03-07  
-**Version:** 0.5.1-beta  
+**Date:** 2026-03-23  
+**Version:** 0.5.2-beta  
 **Status:** Beta — Stabilization & Launch Consolidation
 
 ---
 
 ## Current State
 
-fwber is a privacy-first proximity dating platform. The core dating loop (register → onboard → discover → match → chat) is implemented across a Laravel 12 backend and Next.js 16 frontend.
+fwber is a privacy-first proximity dating platform. The codebase is currently in **Phase 3: Launch Consolidation**. 
 
 ### What Works (Core Loop)
 - ✅ User registration and authentication (Sanctum)
@@ -28,6 +28,7 @@ fwber is a privacy-first proximity dating platform. The core dating loop (regist
 - ✅ Video chat (WebRTC signaling and calls verified)
 - ✅ Solana token integration (Wallet login + SPL transfers verified)
 - ✅ AI Wingman features (Roast, Coach, Vibe check verified via mocks)
+- ✅ Matchmaker Bounties (Escrow and automatic reward transfer verified)
 
 ### What Exists But Needs Verification
 - ⚠️ Real-time WebSocket (Reverb) — basic broadcasting verified, needs high-concurrency production test
