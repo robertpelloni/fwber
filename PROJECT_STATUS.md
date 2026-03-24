@@ -1,7 +1,7 @@
-# Project Status — fwber v0.6.4-beta
+# Project Status — fwber v0.6.5-beta
 
-**Date:** 2026-03-23  
-**Version:** 0.6.4-beta  
+**Date:** 2026-03-24  
+**Version:** 0.6.5-beta  
 **Status:** Beta — Stabilization & Architectural Evolution
 
 ---
@@ -39,6 +39,7 @@ fwber is a privacy-first proximity dating platform. The codebase has successfull
 - ✅ Core Event Sourcing Infrastructure (Location tracking migrated)
 
 ### Experimental / Aspirational (Not Verified)
+- 🔬 "Anti-App" Hardware Token API (BLE bridge simulation scaffolded)
 - 🔬 Multi-region deployment (Geo-DNS)
 - 🔬 Conflict-free Replicated Data Types (CRDTs) for offline chat
 

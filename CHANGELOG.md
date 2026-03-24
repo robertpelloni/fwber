@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.5-beta] - 2026-03-24 — "Anti-App" Hardware Token API
+
+### Features
+- **Hardware Token Integration**: 
+    - Scaffolded the backend infrastructure to support physical, Bluetooth Low Energy (BLE) proximity tokens.
+    - Created the `HardwareToken` model and `hardware_tokens` table.
+    - Built `HardwareTokenController` with endpoints for registration (`/register`), status checking (`/status`), and physical proximity pinging (`/ping`).
+    - Implemented high-compatibility triggers: When a token pings another token owned by a highly compatible user (>85% AI score), a silent data push is dispatched to the target's phone, which can relay a "glow/vibrate" command back to their physical token.
+- **Hardware Settings UI**: 
+    - Created a sleek new `app/settings/hardware/page.tsx` for users to easily pair their physical tokens using a 6-character code, complete with live battery and sync status displays.
+
 ## [0.6.4-beta] - 2026-03-23 — Event Sourcing: User Profiles
 
 ### Architecture

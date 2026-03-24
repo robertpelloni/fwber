@@ -609,3 +609,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('achievements', [\App\Http\Controllers\AchievementController::class, 'index']);
 });
 
+
+         / /   H a r d w a r e   T o k e n   A P I 
+         R o u t e : : m i d d l e w a r e ( ' a u t h : s a n c t u m ' ) - > p r e f i x ( ' h a r d w a r e - t o k e n s ' ) - > g r o u p ( f u n c t i o n   ( )   { 
+                 R o u t e : : p o s t ( ' r e g i s t e r ' ,   [ \ A p p \ H t t p \ C o n t r o l l e r s \ H a r d w a r e T o k e n C o n t r o l l e r : : c l a s s ,   ' r e g i s t e r ' ] ) ; 
+                 R o u t e : : p o s t ( ' p i n g ' ,   [ \ A p p \ H t t p \ C o n t r o l l e r s \ H a r d w a r e T o k e n C o n t r o l l e r : : c l a s s ,   ' p i n g ' ] ) ; 
+                 R o u t e : : g e t ( ' s t a t u s ' ,   [ \ A p p \ H t t p \ C o n t r o l l e r s \ H a r d w a r e T o k e n C o n t r o l l e r : : c l a s s ,   ' s t a t u s ' ] ) ; 
+         } ) ;  
+ 
