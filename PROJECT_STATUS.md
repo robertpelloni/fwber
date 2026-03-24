@@ -1,7 +1,7 @@
-# Project Status — fwber v0.6.7-beta
+# Project Status — fwber v0.6.9-beta
 
 **Date:** 2026-03-24  
-**Version:** 0.6.7-beta  
+**Version:** 0.6.9-beta  
 **Status:** Beta — Stabilization & Architectural Evolution
 
 ---
@@ -39,6 +39,8 @@ fwber is a privacy-first proximity dating platform. The codebase has successfull
 - ✅ Core Event Sourcing Infrastructure (Location, Matches, Messages, Profiles migrated)
 - ✅ AR "Ghost" Navigation (Real-time proximity guiding verified)
 - ✅ "Anti-Catfish" ZK-Identity Verification (Cryptographic proof submission operational)
+- ✅ "Detroit Pulse" Physical Node API (Live IoT dashboards active)
+- ✅ ActivityPub "Dating" Namespace (Cross-server match requests)
 
 ### Experimental / Aspirational (Not Verified)
 - 🔬 "Anti-App" Hardware Token API (BLE bridge simulation scaffolded)

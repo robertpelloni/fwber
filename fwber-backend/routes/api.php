@@ -122,6 +122,9 @@ Route::post('public/roast', [\App\Http\Controllers\AiWingmanController::class, '
 // Public Matchmaker Bounty
 Route::get('matchmaker/bounty/{slug}', [\App\Http\Controllers\MatchMakerController::class, 'showBounty']);
 
+// Physical Pulse (IoT Nodes)
+Route::get('public/pulse/node/{uuid}', [\App\Http\Controllers\PhysicalPulseController::class, 'node']);
+
 // Venue Partner Auth
 Route::prefix('venue')->group(function () {
     Route::post('register', [\App\Http\Controllers\VenueAuthController::class, 'register']);
@@ -354,6 +357,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('proximity/zk-params', [\App\Http\Controllers\ZKProximityController::class, 'params']);
     Route::post('proximity/zk-verify', [\App\Http\Controllers\ZKProximityController::class, 'verify']);
 
+    // Identity Verification (ZK)
+    Route::prefix('identity')->group(function () {
+        Route::post('verify-zk', [\App\Http\Controllers\IdentityController::class, 'verify']);
+        Route::get('status', [\App\Http\Controllers\IdentityController::class, 'status']);
+    });
+
     // Audio Rooms
     Route::prefix('audio-rooms')->group(function () {
         Route::get('/', [\App\Http\Controllers\AudioRoomController::class, 'index']);
@@ -514,7 +523,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('wingman/cosmic-match', [\App\Http\Controllers\AiWingmanController::class, 'getCosmicMatch']);
         Route::get('wingman/nemesis', [\App\Http\Controllers\AiWingmanController::class, 'findNemesis']);
         Route::post('wingman/quirk-check', [\App\Http\Controllers\AiWingmanController::class, 'checkQuirk']);
-        Route::post('wingman/compatibility-audit/{targetId}', [\App\Http\Controllers\AiWingmanController::class, 'compatibilityAudit']);
+        // Route::post('wingman/compatibility-audit/{targetId}', [\App\Http\Controllers\AiWingmanController::class, 'compatibilityAudit']);
     });
 
 
@@ -618,10 +627,3 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('status', [\App\Http\Controllers\HardwareTokenController::class, 'status']);
     });
 });
-
-         / /   Z K - I d e n t i t y   V e r i f i c a t i o n   A P I 
-         R o u t e : : m i d d l e w a r e ( ' a u t h : s a n c t u m ' ) - > p r e f i x ( ' i d e n t i t y ' ) - > g r o u p ( f u n c t i o n   ( )   { 
-                 R o u t e : : p o s t ( ' v e r i f y - z k ' ,   [ \ A p p \ H t t p \ C o n t r o l l e r s \ I d e n t i t y C o n t r o l l e r : : c l a s s ,   ' v e r i f y ' ] ) ; 
-                 R o u t e : : g e t ( ' s t a t u s ' ,   [ \ A p p \ H t t p \ C o n t r o l l e r s \ I d e n t i t y C o n t r o l l e r : : c l a s s ,   ' s t a t u s ' ] ) ; 
-         } ) ;  
- 

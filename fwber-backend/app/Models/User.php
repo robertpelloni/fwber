@@ -17,6 +17,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'actor_uri',
+        'is_remote',
         'password',
         'tier',
         'tier_expires_at',

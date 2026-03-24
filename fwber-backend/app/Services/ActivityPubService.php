@@ -38,11 +38,18 @@ class ActivityPubService
         
         $publicKeyId = "{$actorUri}#main-key";
         
-        // Return standard Person JSON-LD
+        // Return standard Person JSON-LD with custom 'fwber' dating extensions
         return [
             '@context' => [
                 'https://www.w3.org/ns/activitystreams',
-                'https://w3id.org/security/v1'
+                'https://w3id.org/security/v1',
+                [
+                    'fwber' => 'https://schema.fwber.app/ns#',
+                    'gender' => 'fwber:gender',
+                    'orientation' => 'fwber:orientation',
+                    'relationshipStatus' => 'fwber:relationshipStatus',
+                    'isVerified' => 'fwber:isVerified'
+                ]
             ],
             'id' => $actorUri,
             'type' => 'Person',
@@ -56,6 +63,11 @@ class ActivityPubService
                 'mediaType' => 'image/jpeg',
                 'url' => $user->photos()->where('is_primary', true)->first()?->url ?? asset('images/default-avatar.png')
             ],
+            // Dating Specific Metadata (fwber namespace)
+            'gender' => $profile->gender,
+            'orientation' => $profile->sexual_orientation,
+            'relationshipStatus' => $profile->relationship_type,
+            'isVerified' => (bool) $profile->is_id_verified,
             // Endpoints
             'inbox' => $inboxUri,
             'outbox' => $outboxUri,

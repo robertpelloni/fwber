@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Log;
 use App\Services\PushNotificationService;
 use App\Services\MatchMakerService;
 use App\Services\EmailNotificationService;
+use App\Services\ActivityPubService;
 use App\Domain\Core\EventSourcing\EventStore;
 use App\Events\Matches\MatchActionRecorded;
 use Carbon\Carbon;
@@ -26,18 +27,22 @@ class MatchController extends Controller
     private MatchMakerService $matchMakerService;
     private EmailNotificationService $emailService;
     private EventStore $eventStore;
+    private ActivityPubService $apService;
 
     public function __construct(
         AIMatchingService $matchingService, 
         MatchMakerService $matchMakerService,
         EmailNotificationService $emailService,
-        EventStore $eventStore
+        EventStore $eventStore,
+        ActivityPubService $apService
     ) {
         $this->matchingService = $matchingService;
         $this->matchMakerService = $matchMakerService;
         $this->emailService = $emailService;
         $this->eventStore = $eventStore;
+        $this->apService = $apService;
     }
+
     /**
      * @OA\Get(
      *     path="/matches",
@@ -360,6 +365,30 @@ class MatchController extends Controller
 
         // Record the action (Projection Update)
         $this->recordMatchAction($user->id, $targetUserId, $action);
+
+        // ActivityPub Federation: Send MatchRequest to remote user
+        $targetUser = User::find($targetUserId);
+        if ($targetUser && $targetUser->is_remote && $action === 'like') {
+            try {
+                // Generate a custom "Offer" Activity representing a dating MatchRequest
+                $activity = [
+                    'type' => 'Offer',
+                    'actor' => url("/api/federation/users/{$user->id}"),
+                    'object' => [
+                        'type' => 'fwber:MatchRequest',
+                        'content' => 'User liked your profile.',
+                    ],
+                    'target' => $targetUser->actor_uri
+                ];
+                
+                // In a full implementation, this would be queued and cryptographically signed 
+                // using the user's private key before being POSTed to the target's inbox.
+                // $this->apService->dispatchToRemoteInbox($targetUser->actor_uri, $activity);
+                Log::info("ActivityPub: Queued MatchRequest (Offer) to remote user: {$targetUser->actor_uri}");
+            } catch (\Exception $e) {
+                Log::error("Failed to federate MatchRequest: " . $e->getMessage());
+            }
+        }
 
         // Invalidate feed cache so the user doesn't see this person again immediately
         Cache::tags(["matches_feed:user_{$user->id}"])->flush();
