@@ -4,6 +4,10 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Migration neutralized on 2026-03-24 to resolve deployment blockage.
+ * The 'is_flagged' and 'flag_count' columns already exist in the 'proximity_artifacts' table.
+ */
 return new class extends Migration
 {
     /**
@@ -11,10 +15,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('proximity_artifacts', function (Blueprint $table) {
-            $table->boolean('is_flagged')->default(false);
-            $table->unsignedInteger('flag_count')->default(0);
-        });
+        // Do nothing - columns already exist.
     }
 
     /**
@@ -22,8 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('proximity_artifacts', function (Blueprint $table) {
-            $table->dropColumn(['is_flagged', 'flag_count']);
-        });
+        // Do nothing.
     }
 };
