@@ -13,6 +13,11 @@ class DiagnosticsController extends Controller
      */
     public function logs(Request $request)
     {
+        // Force OPcache reset to pick up \env() fix
+        if (function_exists('opcache_reset')) {
+            opcache_reset();
+        }
+
         $secret = $request->header('X-Diagnostics-Secret');
         
         if ($secret !== 'fwber_debug_2026_!@#') {
