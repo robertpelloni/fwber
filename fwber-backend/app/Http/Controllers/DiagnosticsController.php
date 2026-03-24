@@ -26,6 +26,13 @@ class DiagnosticsController extends Controller
 
         $logPath = storage_path('logs/laravel.log');
         
+        // Return some debug info first
+        $info = "PHP: " . PHP_VERSION . "\n";
+        $info .= "File: " . __FILE__ . "\n";
+        $info .= "Base Path: " . base_path() . "\n";
+        $info .= "Log Path: " . $logPath . "\n";
+        $info .= "----------------------------------\n\n";
+
         if (!File::exists($logPath)) {
             return response()->json(['message' => 'Log file not found'], 404);
         }
@@ -38,7 +45,7 @@ class DiagnosticsController extends Controller
         $reader = new \SplFileObject($logPath, 'r');
         $lines = new \LimitIterator($reader, max(0, $totalLines - 100), $totalLines);
         
-        $output = "";
+        $output = $info;
         foreach ($lines as $line) {
             $output .= $line;
         }
