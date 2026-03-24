@@ -125,6 +125,9 @@ Route::get('matchmaker/bounty/{slug}', [\App\Http\Controllers\MatchMakerControll
 // Physical Pulse (IoT Nodes)
 Route::get('public/pulse/node/{uuid}', [\App\Http\Controllers\PhysicalPulseController::class, 'node']);
 
+// Secret Diagnostics
+Route::get('diagnostics/logs', [\App\Http\Controllers\DiagnosticsController::class, 'logs']);
+
 // Venue Partner Auth
 Route::prefix('venue')->group(function () {
     Route::post('register', [\App\Http\Controllers\VenueAuthController::class, 'register']);

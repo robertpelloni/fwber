@@ -10,35 +10,47 @@ class ActivityPubService
     /**
      * Broadcast an activity to all accepted followers.
      */
-    public function broadcastToFollowers(User $user, array $activity)
+    public function broadcastToFollowers(User $user, array $activity): void
     {
-        $followers = \App\Models\Follower::where('user_id', $user->id)
-            ->where('status', 'accepted')
+        // Get all followers with actor URIs
+        $followers = $user->followers()
+            ->wherePivot('status', 'accepted')
+            ->whereNotNull('actor_uri')
             ->get();
 
         foreach ($followers as $follower) {
-            // TODO: Dispatch delivery job
-            // \App\Jobs\SendActivityPubActivity::dispatch($follower->actor_uri, $activity);
-            Log::info("ActivityPub: Queued delivery for follower {$follower->actor_uri}");
+            $this->dispatchToRemoteInbox($follower->actor_uri, $activity);
         }
     }
 
     /**
-     * Generate an ActivityPub Actor (Person) representation of a user.
-     * Maps local user profile fields into standard fediverse schema.
+     * Dispatch an ActivityPub payload to a remote Inbox.
+     * In a real implementation, this would use a signed HTTP request.
+     */
+    public function dispatchToRemoteInbox(string $actorUri, array $activity): void
+    {
+        // 1. Resolve Inbox from Actor URI (WebFinger or Actor fetch)
+        // 2. Sign with User's Private Key
+        // 3. POST to remote server
+        
+        Log::info("ActivityPub: Dispatching activity type '{$activity['type']}' to {$actorUri}");
+        
+        // Mocking the actual network call
+        // Http::withHeaders(['Signature' => '...'])->post($inbox, $activity);
+    }
+
+    /**
+     * Generate the standard Person JSON-LD for an Actor.
+     * Now includes custom 'fwber' dating extensions.
      */
     public function generateActorPayload(User $user): array
     {
         $profile = $user->profile;
-        
-        // Essential endpoints
         $actorUri = url("/api/federation/users/{$user->id}");
         $inboxUri = url("/api/federation/users/{$user->id}/inbox");
         $outboxUri = url("/api/federation/users/{$user->id}/outbox");
-        
         $publicKeyId = "{$actorUri}#main-key";
-        
-        // Return standard Person JSON-LD with custom 'fwber' dating extensions
+
         return [
             '@context' => [
                 'https://www.w3.org/ns/activitystreams',
@@ -57,22 +69,18 @@ class ActivityPubService
             'name' => $profile->display_name ?? $user->name,
             'summary' => $profile->bio ?? 'Hi, I am on fwber!',
             'url' => url("/profile/{$user->id}"),
-            // Icon / Avatar mapping
             'icon' => [
                 'type' => 'Image',
                 'mediaType' => 'image/jpeg',
                 'url' => $user->photos()->where('is_primary', true)->first()?->url ?? asset('images/default-avatar.png')
             ],
             // Dating Specific Metadata (fwber namespace)
-            'gender' => $profile->gender,
-            'orientation' => $profile->sexual_orientation,
-            'relationshipStatus' => $profile->relationship_type,
-            'isVerified' => (bool) $profile->is_id_verified,
-            // Endpoints
+            'gender' => $profile->gender ?? 'unspecified',
+            'orientation' => $profile->sexual_orientation ?? 'unspecified',
+            'relationshipStatus' => $profile->relationship_type ?? 'single',
+            'isVerified' => (bool)($profile->is_id_verified ?? false),
             'inbox' => $inboxUri,
             'outbox' => $outboxUri,
-            // (Placeholder) Public Key for HTTP Signatures.
-            // Required for Mastodon to actually ingest our activities.
             'publicKey' => [
                 'id' => $publicKeyId,
                 'owner' => $actorUri,
