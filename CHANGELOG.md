@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.4-beta] - 2026-03-23 — Event Sourcing: User Profiles
+
+### Architecture
+- **User Profiles Migrated**: 
+    - Extended the Event Sourcing architecture to track user identity lifecycle.
+    - Created `UserProfileCreated` and `UserProfileUpdated` domain events.
+    - Refactored `ProfileController@update` to inject the `EventStore`. 
+    - Implemented change-detection logic to only append relevant property updates to the event log, providing a high-fidelity audit trail of all bio, preference, and privacy settings changes.
+
 ## [0.6.3-beta] - 2026-03-23 — Event Sourcing: Messaging
 
 ### Architecture

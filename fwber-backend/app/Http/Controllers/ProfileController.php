@@ -7,6 +7,9 @@ use App\Http\Requests\Profile\UpdatePasswordRequest;
 use App\Http\Resources\UserProfileResource;
 use App\Models\User;
 use App\Models\UserProfile;
+use App\Domain\Core\EventSourcing\EventStore;
+use App\Events\Profile\UserProfileUpdated;
+use App\Events\Profile\UserProfileCreated;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -24,6 +27,10 @@ use Carbon\Carbon;
  */
 class ProfileController extends Controller
 {
+    public function __construct(
+        private readonly EventStore $eventStore
+    ) {}
+
     /**
      * @OA\Get(
      *     path="/users/{id}",
@@ -262,12 +269,42 @@ class ProfileController extends Controller
             // Get or create profile with error handling
             try {
                 $profile = $user->profile;
-                if (!$profile) {
+                $isNewProfile = !$profile;
+
+                if ($isNewProfile) {
                     $profile = new UserProfile();
                     $profile->user_id = $user->id;
                 }
                 
-                // Update profile fields
+                // --- EVENT SOURCING INTEGRATION ---
+                $currentVersion = $this->eventStore->getCurrentVersion((string)$user->id, 'UserProfile');
+                
+                if ($isNewProfile) {
+                    $event = new UserProfileCreated((string)$user->id, $validated);
+                } else {
+                    // Calculate actual changes for the update event
+                    $changes = [];
+                    foreach ($validated as $key => $value) {
+                        if ($key === 'location' || $key === 'travel_location' || $key === 'preferences') {
+                            $changes[$key] = $value; // Always include complex nested fields for now
+                            continue;
+                        }
+                        if ($profile->getAttribute($key) != $value) {
+                            $changes[$key] = $value;
+                        }
+                    }
+                    $event = new UserProfileUpdated((string)$user->id, $changes);
+                }
+
+                $this->eventStore->append(
+                    $event,
+                    'UserProfile',
+                    $currentVersion + 1,
+                    ['ip' => $request->ip(), 'user_agent' => $request->userAgent()]
+                );
+                // ----------------------------------
+
+                // Update profile fields (Projection Update)
                 $profile->fill(array_intersect_key($validated, array_flip([
                     'display_name',
                     'bio',
