@@ -193,12 +193,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('decoy-profile', [\App\Http\Controllers\DecoyProfileController::class, 'setup']);
         Route::delete('decoy-profile', [\App\Http\Controllers\DecoyProfileController::class, 'remove']);
     });
-    Route::put('profile', [\App\Http\Controllers\ProfileController::class, 'update']);
-    Route::patch('profile/emotion', [\App\Http\Controllers\AvatarEmotionController::class, 'update']);
-    Route::put('profile/password', [\App\Http\Controllers\ProfileController::class, 'updatePassword']);
-    Route::delete('profile', [\App\Http\Controllers\ProfileController::class, 'destroy']);
-    Route::get('profile/completeness', [\App\Http\Controllers\ProfileController::class, 'completeness']);
-    Route::get('profile/export', [\App\Http\Controllers\ProfileController::class, 'export']);
 
     // GDPR Data Export
     Route::post('user/export', [\App\Http\Controllers\DataExportController::class, 'requestExport'])->middleware('throttle:1,1440'); // Once per day
@@ -558,11 +552,14 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Location routes (Phase 5A - Location-Based Social Features)
-    Route::get("/location", [LocationController::class, "show"]);
-    Route::post("/location", [LocationController::class, "update"]);
-    Route::put("/location/privacy", [LocationController::class, "updatePrivacy"]);
-    Route::delete("/location", [LocationController::class, "clear"]);
-    Route::get("/location/nearby", [LocationController::class, "nearby"]);
+    Route::prefix('location')->group(function () {
+        Route::get('aura/{matchId}', [LocationController::class, 'aura']);
+        Route::get('/', [LocationController::class, 'show']);
+        Route::post('/', [LocationController::class, 'update']);
+        Route::put('/privacy', [LocationController::class, 'updatePrivacy']);
+        Route::delete('/', [LocationController::class, 'clear']);
+        Route::get('/nearby', [LocationController::class, 'nearby']);
+    });
 
     // Verification
     Route::post('verification/verify', [\App\Http\Controllers\VerificationController::class, 'verify'])->middleware('throttle:verification');
@@ -607,13 +604,24 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Achievements
     Route::get('achievements', [\App\Http\Controllers\AchievementController::class, 'index']);
+
+    // Merchant Pulse API
+    Route::middleware(['role:merchant'])->prefix('merchant/pulse')->group(function () {
+        Route::get('vibe', [\App\Http\Controllers\MerchantPulseController::class, 'getVibe']);
+        Route::post('broadcast', [\App\Http\Controllers\MerchantPulseController::class, 'broadcast']);
+    });
+
+    // Hardware Token API
+    Route::prefix('hardware-tokens')->group(function () {
+        Route::post('register', [\App\Http\Controllers\HardwareTokenController::class, 'register']);
+        Route::post('ping', [\App\Http\Controllers\HardwareTokenController::class, 'ping']);
+        Route::get('status', [\App\Http\Controllers\HardwareTokenController::class, 'status']);
+    });
 });
 
-
-         / /   H a r d w a r e   T o k e n   A P I 
-         R o u t e : : m i d d l e w a r e ( ' a u t h : s a n c t u m ' ) - > p r e f i x ( ' h a r d w a r e - t o k e n s ' ) - > g r o u p ( f u n c t i o n   ( )   { 
-                 R o u t e : : p o s t ( ' r e g i s t e r ' ,   [ \ A p p \ H t t p \ C o n t r o l l e r s \ H a r d w a r e T o k e n C o n t r o l l e r : : c l a s s ,   ' r e g i s t e r ' ] ) ; 
-                 R o u t e : : p o s t ( ' p i n g ' ,   [ \ A p p \ H t t p \ C o n t r o l l e r s \ H a r d w a r e T o k e n C o n t r o l l e r : : c l a s s ,   ' p i n g ' ] ) ; 
-                 R o u t e : : g e t ( ' s t a t u s ' ,   [ \ A p p \ H t t p \ C o n t r o l l e r s \ H a r d w a r e T o k e n C o n t r o l l e r : : c l a s s ,   ' s t a t u s ' ] ) ; 
+         / /   Z K - I d e n t i t y   V e r i f i c a t i o n   A P I 
+         R o u t e : : m i d d l e w a r e ( ' a u t h : s a n c t u m ' ) - > p r e f i x ( ' i d e n t i t y ' ) - > g r o u p ( f u n c t i o n   ( )   { 
+                 R o u t e : : p o s t ( ' v e r i f y - z k ' ,   [ \ A p p \ H t t p \ C o n t r o l l e r s \ I d e n t i t y C o n t r o l l e r : : c l a s s ,   ' v e r i f y ' ] ) ; 
+                 R o u t e : : g e t ( ' s t a t u s ' ,   [ \ A p p \ H t t p \ C o n t r o l l e r s \ I d e n t i t y C o n t r o l l e r : : c l a s s ,   ' s t a t u s ' ] ) ; 
          } ) ;  
  

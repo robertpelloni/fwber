@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.7-beta] - 2026-03-24 — "Anti-Catfish" ZK-Identity Verification
+
+### Features
+- **ZK-Identity Protocol**: 
+    - Implemented a Zero-Knowledge Identity Verification system, allowing users to prove their authenticity without revealing private documents.
+    - Created `ZkIdentityVerificationService` to verify cryptographic proofs tied to user email hashes and trusted issuers.
+    - Built `IdentityController` with endpoints for proof submission (`/verify-zk`) and status checking (`/status`).
+    - Added `is_id_verified`, `zk_id_issuer`, and `id_verified_at` to the `user_profiles` schema.
+- **Verification UI**: 
+    - Created a new `app/settings/identity/page.tsx` dashboard where users can generate and submit ZK-proofs using their device's secure enclave (simulated). Verified users receive a green "Verified Identity" badge.
+
+## [0.6.6-beta] - 2026-03-23 — AR "Ghost" Navigation
+
+### Features
+- **Match AR Navigation**: 
+    - Implemented a specialized AR "Ghost" navigation system to help matched users physically locate each other in crowded venues.
+    - Created `GET /api/location/aura/{matchId}` in `LocationController` with strict match-relationship verification.
+    - Built `MatchARView.tsx` frontend component featuring agrayscale camera feed, scoping grid, pulsing "aura" marker, and a dynamic HUD compass for directional guidance.
+    - Integrated a "Locate Match" trigger button directly into the `RealTimeChat.tsx` header.
+
 ## [0.6.5-beta] - 2026-03-24 — "Anti-App" Hardware Token API
 
 ### Features

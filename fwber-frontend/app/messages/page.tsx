@@ -17,6 +17,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { CallHistory } from '@/components/VideoCall/CallHistory'
 import RealTimeChat from '@/components/RealTimeChat'
 import { DateFeedbackModal } from '@/components/matches/DateFeedbackModal'
+import MatchARView from '@/components/ar/MatchARView'
 
 export default function MessagesPage() {
   const { token, isAuthenticated } = useAuth()
@@ -31,6 +32,7 @@ export default function MessagesPage() {
   const [isVideoCallOpen, setIsVideoCallOpen] = useState(false)
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false)
+  const [isAROpen, setIsAROpen] = useState(false)
   const [incomingCall, setIncomingCall] = useState<{ callerId: string } | null>(null)
 
   const loadConversations = useCallback(async () => {
@@ -249,6 +251,7 @@ export default function MessagesPage() {
                     className="h-full"
                     onVideoCall={() => setIsVideoCallOpen(true)}
                     onProfileView={() => setIsProfileModalOpen(true)}
+                    onLocate={() => setIsAROpen(true)}
                     onReport={() => setIsReportModalOpen(true)}
                     onBlock={handleBlock}
                     onRateDate={() => setIsFeedbackModalOpen(true)}
@@ -266,6 +269,15 @@ export default function MessagesPage() {
           )}
         </div>
       </div>
+
+      {isAROpen && selectedConversation && token && (
+          <MatchARView 
+            matchId={selectedConversation.id}
+            matchName={selectedConversation.other_user?.profile?.display_name || 'Match'}
+            token={token}
+            onClose={() => setIsAROpen(false)}
+          />
+      )}
 
       {selectedConversation && (
         <ReportModal

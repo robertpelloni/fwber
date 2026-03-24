@@ -9,7 +9,7 @@ import { EvolvingAvatar } from '@/components/ui/EvolvingAvatar';
 import { WingmanSuggestions } from '@/components/ai/WingmanSuggestions';
 import AudioRecorder from '@/components/AudioRecorder';
 import { api } from '@/lib/api/client';
-import { Languages, Loader2, Sparkles, Gift as GiftIcon, Lock, Video, MoreVertical, Paperclip, X, ThumbsUp, Heart, Laugh, BookOpen, MessageSquareQuote, Star } from 'lucide-react';
+import { Languages, Loader2, Sparkles, Gift as GiftIcon, Lock, Video, MoreVertical, Paperclip, X, ThumbsUp, Heart, Laugh, BookOpen, MessageSquareQuote, Star, Zap } from 'lucide-react';
 import { useTranslation } from '@/lib/hooks/use-translation';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { MatchInsights } from '@/components/matches/MatchInsights';
@@ -349,6 +349,14 @@ export default function RealTimeChat({
         </div>
         <div className="flex items-center space-x-2">
           <DatePlanner matchId={recipientId} matchName={recipientName} />
+
+          <button
+            onClick={onLocate}
+            className="p-2 hover:bg-gray-700 rounded-full text-gray-400 hover:text-purple-400 transition-colors"
+            title="Locate Match (AR)"
+          >
+            <Zap className="w-5 h-5" />
+          </button>
 
           {onVideoCall && (
             <button

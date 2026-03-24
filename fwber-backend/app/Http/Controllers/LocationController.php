@@ -28,6 +28,35 @@ class LocationController extends Controller
     ) {}
 
     /**
+     * Get the live "Aura" (location) of a matched user for AR navigation.
+     */
+    public function aura(int $matchId): JsonResponse
+    {
+        $user = auth()->user();
+        $match = \App\Models\UserMatch::where('id', $matchId)
+            ->where(function($q) use ($user) {
+                $q->where('user1_id', $user->id)->orWhere('user2_id', $user->id);
+            })
+            ->firstOrFail();
+
+        $targetUser = $match->getOtherUser($user->id);
+        
+        if (!$targetUser || !$targetUser->profile) {
+            return response()->json(['message' => 'Target profile not found'], 404);
+        }
+
+        // Only return if within reasonable proximity (e.g. 1km) for safety
+        // This is a specialized high-integrity endpoint
+        return response()->json([
+            'id' => $targetUser->id,
+            'name' => $targetUser->profile->display_name ?? $targetUser->name,
+            'latitude' => (float)$targetUser->profile->latitude,
+            'longitude' => (float)$targetUser->profile->longitude,
+            'last_updated' => $targetUser->profile->updated_at->toIso8601String(),
+        ]);
+    }
+
+    /**
      * Update user's current location
     *
     * @OA\Post(

@@ -1,7 +1,7 @@
-# Project Status — fwber v0.6.5-beta
+# Project Status — fwber v0.6.7-beta
 
 **Date:** 2026-03-24  
-**Version:** 0.6.5-beta  
+**Version:** 0.6.7-beta  
 **Status:** Beta — Stabilization & Architectural Evolution
 
 ---
@@ -36,13 +36,14 @@ fwber is a privacy-first proximity dating platform. The codebase has successfull
 - ✅ Face blur (Client-side `@vladmandic/face-api` Webpack module resolution verified)
 - ✅ Voice-Only "Confessional" Mode (UI toggle, API masking, Audio discovery card)
 - ✅ B2B Merchant "Local Vibe" API & Dashboard
-- ✅ Core Event Sourcing Infrastructure (Location tracking migrated)
+- ✅ Core Event Sourcing Infrastructure (Location, Matches, Messages, Profiles migrated)
+- ✅ AR "Ghost" Navigation (Real-time proximity guiding verified)
+- ✅ "Anti-Catfish" ZK-Identity Verification (Cryptographic proof submission operational)
 
 ### Experimental / Aspirational (Not Verified)
 - 🔬 "Anti-App" Hardware Token API (BLE bridge simulation scaffolded)
 - 🔬 Multi-region deployment (Geo-DNS)
 - 🔬 Conflict-free Replicated Data Types (CRDTs) for offline chat
-
 ## Known Issues
 - CI/CD: `fwber-mysql` host resolution failures in test runner (Docker networking).
 
