@@ -25,9 +25,14 @@ class DiagnosticsController extends Controller
         }
 
         $logPath = storage_path('logs/laravel.log');
+
+        if ($request->has('clear')) {
+            File::put($logPath, "Log cleared at " . now()->toIso8601String() . "\n");
+        }
         
         // Return some debug info first
-        $info = "PHP: " . PHP_VERSION . "\n";
+        $info = "TIME: " . now()->toIso8601String() . "\n";
+        $info .= "PHP: " . PHP_VERSION . "\n";
         $info .= "File: " . __FILE__ . "\n";
         $info .= "Base Path: " . base_path() . "\n";
         $info .= "Log Path: " . $logPath . "\n";
