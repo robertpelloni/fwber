@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Log;
 use App\Services\PushNotificationService;
 use App\Services\MatchMakerService;
 use App\Services\EmailNotificationService;
+use App\Domain\Core\EventSourcing\EventStore;
+use App\Events\Matches\MatchActionRecorded;
 use Carbon\Carbon;
 
 class MatchController extends Controller
@@ -23,15 +25,18 @@ class MatchController extends Controller
     private AIMatchingService $matchingService;
     private MatchMakerService $matchMakerService;
     private EmailNotificationService $emailService;
+    private EventStore $eventStore;
 
     public function __construct(
         AIMatchingService $matchingService, 
         MatchMakerService $matchMakerService,
-        EmailNotificationService $emailService
+        EmailNotificationService $emailService,
+        EventStore $eventStore
     ) {
         $this->matchingService = $matchingService;
         $this->matchMakerService = $matchMakerService;
         $this->emailService = $emailService;
+        $this->eventStore = $eventStore;
     }
     /**
      * @OA\Get(
@@ -336,7 +341,24 @@ class MatchController extends Controller
             return response()->json(['message' => 'User not accessible'], 400);
         }
 
-        // Record the action
+        // --- EVENT SOURCING INTEGRATION ---
+        $currentVersion = $this->eventStore->getCurrentVersion((string)$user->id, 'MatchAction');
+        $event = new MatchActionRecorded(
+            (string)$user->id,
+            (int)$targetUserId,
+            (string)$action,
+            (float)($user->profile->latitude ?? 0),
+            (float)($user->profile->longitude ?? 0)
+        );
+        $this->eventStore->append(
+            $event,
+            'MatchAction',
+            $currentVersion + 1,
+            ['ip' => $request->ip(), 'user_agent' => $request->userAgent()]
+        );
+        // ----------------------------------
+
+        // Record the action (Projection Update)
         $this->recordMatchAction($user->id, $targetUserId, $action);
 
         // Invalidate feed cache so the user doesn't see this person again immediately

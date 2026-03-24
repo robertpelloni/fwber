@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.3-beta] - 2026-03-23 — Event Sourcing: Messaging
+
+### Architecture
+- **Messaging Migrated**: 
+    - Completed the third major milestone of the Event Sourcing refactor.
+    - Created the `MessageSent` domain event to capture immutable records of all user communications.
+    - Refactored `MessageController@store` to inject the `EventStore` and append events within the existing database transaction. This guarantees that every message ever sent on the platform is preserved in the append-only event log, regardless of future changes to the relational `messages` table.
+
+## [0.6.2-beta] - 2026-03-23 — Event Sourcing: Match Actions
+
+### Architecture
+- **Match Actions Migrated**: 
+    - Continued the transition to Event Sourcing by migrating the "Swipe" logic.
+    - Created the `MatchActionRecorded` domain event.
+    - Refactored `MatchController@action` to append events to the `EventStore` before updating the relational match state. This ensures a permanent, immutable record of all user interactions (likes, passes, super-likes).
+
 ## [0.6.1-beta] - 2026-03-23 — Unified Event Sourcing Architecture
 
 ### Architecture

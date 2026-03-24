@@ -1,6 +1,6 @@
 # TODO — fwber Credibility Sprint
 
-> **Version:** 0.6.1-beta  
+> **Version:** 0.6.3-beta  
 > **Last Updated:** 2026-03-23  
 > **Mode:** Stabilization & Architectural Evolution
 

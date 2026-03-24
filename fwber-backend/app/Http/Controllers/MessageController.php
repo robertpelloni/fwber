@@ -9,12 +9,18 @@ use App\Models\RelationshipTier;
 use App\Models\User;
 use App\Models\UserMatch;
 use App\Jobs\TranscribeAudioMessage;
+use App\Domain\Core\EventSourcing\EventStore;
+use App\Events\Messaging\MessageSent;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
 class MessageController extends Controller
 {
+    public function __construct(
+        private readonly EventStore $eventStore
+    ) {}
+
     /**
      * @OA\Post(
      *     path="/messages",
@@ -215,7 +221,7 @@ class MessageController extends Controller
         }
 
         // Wrap message + match update + tier creation in transaction for atomicity
-        [$message, $tier] = \DB::transaction(function () use ($senderId, $receiverId, $validated, $resolvedType, $mediaUrl, $mediaType, $duration, $thumbnailUrl, $match) {
+        [$message, $tier] = \DB::transaction(function () use ($senderId, $receiverId, $validated, $resolvedType, $mediaUrl, $mediaType, $duration, $thumbnailUrl, $match, $request) {
             // Create the message
             $message = Message::create([
                 'sender_id' => $senderId,
@@ -229,6 +235,24 @@ class MessageController extends Controller
                 'is_encrypted' => $validated['is_encrypted'] ?? false,
                 'sent_at' => now(),
             ]);
+
+            // --- EVENT SOURCING INTEGRATION ---
+            $currentVersion = $this->eventStore->getCurrentVersion((string)$match->id, 'Chatroom');
+            $event = new MessageSent(
+                (string)$match->id, // Aggregate is the chat context
+                (int)$senderId,
+                (int)$receiverId,
+                (string)($validated['content'] ?? ''),
+                (string)$resolvedType,
+                json_encode(['message_id' => $message->id])
+            );
+            $this->eventStore->append(
+                $event,
+                'Chatroom',
+                $currentVersion + 1,
+                ['ip' => $request->ip(), 'user_agent' => $request->userAgent()]
+            );
+            // ----------------------------------
 
             // Update match last_message_at
             $match->last_message_at = now();
