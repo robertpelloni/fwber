@@ -320,25 +320,26 @@ class AvatarGenerationService
 
         $contents = $response->body();
         $filename = 'avatars/' . Str::uuid() . '.png';
-        Storage::disk('public')->put($filename, $contents);
+        $disk = config('filesystems.default', 'public');
+        Storage::disk($disk)->put($filename, $contents);
 
         // Analyze the image for safety
         if (config('features.media_analysis')) {
             try {
                 $analysis = $this->mediaAnalysis->analyze($filename, 'image');
                 if (!$analysis->safe) {
-                    Storage::disk('public')->delete($filename);
+                    Storage::disk($disk)->delete($filename);
                     throw new \Exception("Generated avatar was flagged as unsafe: " . implode(', ', $analysis->moderationLabels));
                 }
             } catch (\Exception $e) {
-                if (Storage::disk('public')->exists($filename)) {
-                    Storage::disk('public')->delete($filename);
+                if (Storage::disk($disk)->exists($filename)) {
+                    Storage::disk($disk)->delete($filename);
                 }
                 throw $e;
             }
         }
 
-        return Storage::url($filename);
+        return Storage::disk($disk)->url($filename);
     }
 
     private function saveImageFromBase64(string $base64, string $provider): string

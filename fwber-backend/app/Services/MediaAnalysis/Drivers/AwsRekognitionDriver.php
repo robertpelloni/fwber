@@ -46,12 +46,12 @@ class AwsRekognitionDriver implements MediaAnalysisInterface
 
         try {
             // Get image bytes
-            // Assuming $url is the path relative to public disk as used in PhotoController
-            if (!Storage::disk('public')->exists($url)) {
-                throw new Exception("File not found: $url");
+            $disk = config('filesystems.default', 'public');
+            if (!Storage::disk($disk)->exists($url)) {
+                throw new Exception("File not found on disk [{$disk}]: $url");
             }
             
-            $imageBytes = Storage::disk('public')->get($url);
+            $imageBytes = Storage::disk($disk)->get($url);
 
             // 1. Detect Moderation Labels (Safety)
             $moderationResult = $this->client->detectModerationLabels([
@@ -109,15 +109,16 @@ class AwsRekognitionDriver implements MediaAnalysisInterface
         }
 
         try {
-            if (!Storage::disk('public')->exists($sourcePath)) {
-                throw new Exception("Source file not found: $sourcePath");
+            $disk = config('filesystems.default', 'public');
+            if (!Storage::disk($disk)->exists($sourcePath)) {
+                throw new Exception("Source file not found on disk [{$disk}]: $sourcePath");
             }
-            if (!Storage::disk('public')->exists($targetPath)) {
-                throw new Exception("Target file not found: $targetPath");
+            if (!Storage::disk($disk)->exists($targetPath)) {
+                throw new Exception("Target file not found on disk [{$disk}]: $targetPath");
             }
 
-            $sourceBytes = Storage::disk('public')->get($sourcePath);
-            $targetBytes = Storage::disk('public')->get($targetPath);
+            $sourceBytes = Storage::disk($disk)->get($sourcePath);
+            $targetBytes = Storage::disk($disk)->get($targetPath);
 
             $result = $this->client->compareFaces([
                 'SourceImage' => ['Bytes' => $sourceBytes],

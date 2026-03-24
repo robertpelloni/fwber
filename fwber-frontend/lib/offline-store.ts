@@ -1,62 +1,78 @@
-const DB_NAME = 'fwber_offline_store';
-const DB_VERSION = 2; // Increment version
-const STORE_MESSAGES = 'offline_messages';
-const STORE_LOCATIONS = 'offline_locations';
-const STORE_CHAT_MESSAGES = 'offline_chat_messages';
+'use client';
 
-function openDB(): Promise<IDBDatabase> {
-  if (typeof window === 'undefined' || !window.indexedDB) {
-    return Promise.reject(new Error('IndexedDB not supported'));
-  }
+const DB_NAME = 'fwber_offline_v1';
+const STORE_NAME = 'pending_messages';
 
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-    request.onerror = () => reject(request.error);
-    request.onsuccess = () => resolve(request.result);
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains(STORE_MESSAGES)) {
-        db.createObjectStore(STORE_MESSAGES, { keyPath: 'id', autoIncrement: true });
-      }
-      if (!db.objectStoreNames.contains(STORE_LOCATIONS)) {
-        db.createObjectStore(STORE_LOCATIONS, { keyPath: 'id', autoIncrement: true });
-      }
-      if (!db.objectStoreNames.contains(STORE_CHAT_MESSAGES)) {
-        db.createObjectStore(STORE_CHAT_MESSAGES, { keyPath: 'id', autoIncrement: true });
-      }
-    };
-  });
+export interface OfflineMessage {
+    id?: number;
+    uuid: string;
+    chatroom_id?: string;
+    recipient_id: string;
+    content: string;
+    type: string;
+    is_encrypted: boolean;
+    created_at: string;
+    retry_count: number;
 }
 
-export async function storeOfflineMessage(message: any): Promise<void> {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE_MESSAGES, 'readwrite');
-    const store = transaction.objectStore(STORE_MESSAGES);
-    const request = store.add(message);
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
-  });
+export async function openDB(): Promise<IDBDatabase> {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, 1);
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+        request.onupgradeneeded = (event) => {
+            const db = (event.target as IDBOpenDBRequest).result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                const store = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                store.createIndex('uuid', 'uuid', { unique: true });
+                store.createIndex('chatroom_id', 'chatroom_id', { unique: false });
+            }
+        };
+    });
 }
 
-export async function storeOfflineChatMessage(message: any): Promise<void> {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE_CHAT_MESSAGES, 'readwrite');
-    const store = transaction.objectStore(STORE_CHAT_MESSAGES);
-    const request = store.add(message);
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
-  });
+export async function storeOfflineMessage(message: Omit<OfflineMessage, 'id' | 'retry_count'>): Promise<number> {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(STORE_NAME, 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.add({ ...message, retry_count: 0 });
+        request.onsuccess = () => resolve(request.result as number);
+        request.onerror = () => reject(request.error);
+    });
 }
 
-export async function storeOfflineLocation(location: any): Promise<void> {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE_LOCATIONS, 'readwrite');
-    const store = transaction.objectStore(STORE_LOCATIONS);
-    const request = store.add(location);
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
-  });
+export async function getPendingMessages(): Promise<OfflineMessage[]> {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(STORE_NAME, 'readonly');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.getAll();
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+export async function removePendingMessage(id: number): Promise<void> {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(STORE_NAME, 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.delete(id);
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+    });
+}
+
+export async function incrementRetryCount(id: number): Promise<void> {
+    const db = await openDB();
+    const transaction = db.transaction(STORE_NAME, 'readwrite');
+    const store = transaction.objectStore(STORE_NAME);
+    const message = await new Promise<OfflineMessage>((resolve) => {
+        store.get(id).onsuccess = (e) => resolve((e.target as IDBRequest).result);
+    });
+    if (message) {
+        message.retry_count += 1;
+        store.put(message);
+    }
 }

@@ -11,6 +11,7 @@ class Message extends Model
     use HasFactory;
 
     protected $fillable = [
+        'uuid',
         'sender_id',
         'receiver_id',
         'content',
@@ -29,6 +30,7 @@ class Message extends Model
     ];
 
     protected $casts = [
+        'uuid' => 'string',
         'sent_at' => 'datetime',
         'read_at' => 'datetime',
         'is_read' => 'boolean',

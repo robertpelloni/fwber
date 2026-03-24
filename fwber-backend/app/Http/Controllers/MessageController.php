@@ -466,4 +466,68 @@ class MessageController extends Controller
 
         return response()->json(['unread_count' => $count]);
     }
+
+    /**
+     * Sync an offline message sent while disconnected.
+     */
+    public function sync(Request $request): JsonResponse
+    {
+        $senderId = Auth::id();
+        $validated = $request->validate([
+            'uuid' => 'required|uuid',
+            'recipient_id' => 'required|exists:users,id',
+            'content' => 'required|string',
+            'message_type' => 'required|string',
+            'is_encrypted' => 'required|boolean',
+            'created_at' => 'required|date',
+        ]);
+
+        $receiverId = $validated['recipient_id'];
+
+        // Idempotency: Check if this message UUID already exists
+        $existing = Message::where('uuid', $validated['uuid'])->first();
+        if ($existing) {
+            return response()->json(['message' => 'Message already synced', 'id' => $existing->id]);
+        }
+
+        // Verify relationship
+        $match = UserMatch::where(function ($query) use ($senderId, $receiverId) {
+            $query->where('user1_id', $senderId)->where('user2_id', $receiverId)
+                  ->orWhere('user1_id', $receiverId)->where('user2_id', $senderId);
+        })->where('is_active', true)->first();
+
+        if (!$match) {
+            return response()->json(['message' => 'Cannot sync message without mutual match'], 403);
+        }
+
+        $message = Message::create([
+            'uuid' => $validated['uuid'],
+            'sender_id' => $senderId,
+            'receiver_id' => $receiverId,
+            'content' => $validated['content'],
+            'message_type' => $validated['message_type'],
+            'is_encrypted' => $validated['is_encrypted'],
+            'sent_at' => $validated['created_at'],
+        ]);
+
+        // --- EVENT SOURCING INTEGRATION ---
+        $currentVersion = $this->eventStore->getCurrentVersion((string)$match->id, 'Chatroom');
+        $event = new MessageSent(
+            (string)$match->id,
+            (int)$senderId,
+            (int)$receiverId,
+            (string)$validated['content'],
+            (string)$validated['message_type'],
+            json_encode(['message_id' => $message->id, 'is_sync' => true])
+        );
+        $this->eventStore->append($event, 'Chatroom', $currentVersion + 1, ['ip' => $request->ip()]);
+        // ----------------------------------
+
+        $match->update(['last_message_at' => now()]);
+
+        return response()->json([
+            'message' => 'Offline message synced successfully',
+            'id' => $message->id,
+        ], 201);
+    }
 }

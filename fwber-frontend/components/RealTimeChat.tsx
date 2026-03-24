@@ -18,6 +18,9 @@ import { storeOfflineChatMessage } from '@/lib/offline-store';
 import { useToast } from '@/components/ToastProvider';
 import GiftShopModal from '@/components/gifts/GiftShopModal';
 import { useE2EEncryption } from '@/lib/hooks/use-e2e-encryption';
+import { useChatSync } from '@/lib/hooks/use-chat-sync';
+import { storeOfflineMessage } from '@/lib/offline-store';
+import { v4 as uuidv4 } from 'uuid';
 import TipButton from '@/components/tipping/TipButton';
 import { ConversationCoach } from '@/components/chat/ConversationCoach';
 import { TierUnlockGuide } from '@/components/chat/TierUnlockGuide';
@@ -206,14 +209,46 @@ export default function RealTimeChat({
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if ((message.trim() || selectedFile) && recipientId) {
+    if ((message.trim() || selectedFile) && recipientId && user) {
       setIsSending(true);
+      
+      const messageUuid = uuidv4();
+      const messageContent = message.trim();
+      
+      // Handle offline queuing for text-only messages
+      if (!isConnected || !navigator.onLine) {
+          if (selectedFile) {
+              showError('Offline', 'File uploads require an active connection.');
+              setIsSending(false);
+              return;
+          }
+
+          try {
+              await storeOfflineMessage({
+                  uuid: messageUuid,
+                  recipient_id: recipientId,
+                  content: messageContent,
+                  type: 'text',
+                  is_encrypted: isE2EReady,
+                  created_at: new Date().toISOString()
+              });
+              
+              setMessage('');
+              showSuccess('Saved Offline', 'Message will be synced when you reconnect.');
+              setIsSending(false);
+              return;
+          } catch (err) {
+              console.error('Failed to store offline message', err);
+          }
+      }
+
       try {
         if (selectedFile) {
           // Handle file upload via API
           const formData = new FormData();
+          formData.append('uuid', messageUuid);
           formData.append('receiver_id', recipientId);
-          formData.append('content', message.trim());
+          formData.append('content', messageContent);
           formData.append('media', selectedFile);
 
           // Auto-detect type
