@@ -40,8 +40,10 @@ export default function IdentityVerificationPage() {
     
     // In a real app, this would use an SDK from a provider like WorldID or a government ZK-pass
     // Here we simulate the generation of a proof tied to the user's email hash.
-    const userHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(user.email))
-        .then(hash => Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join(''));
+    const data = new TextEncoder().encode(user.email);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data as any);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const userHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     
     const mockProof = `zk_proof_alpha_valid_sig_${userHash.substring(0, 8)}_auth_9921`;
 

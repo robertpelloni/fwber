@@ -8,7 +8,11 @@ import { Trophy, Users, TrendingUp, Share2, Award, Zap } from 'lucide-react'
 
 
 interface LeaderboardData {
-// ... existing interface ...
+  top_holders: Array<{ name: string; balance: string; joined: string }>;
+  top_referrers: Array<{ name: string; referrals: number }>;
+  top_wingmen: Array<{ name: string; assists: number }>;
+  top_vouched: Array<{ name: string; vouches: number; breakdown?: { safe: number; fun: number; hot: number } }>;
+  top_streaks: Array<{ name: string; streak: number }>;
 }
 
 export default function LeaderboardPage() {

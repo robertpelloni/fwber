@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Heart, X, Star, Mic2, Play, Pause } from 'lucide-react'
+import { Heart, X, Star, Mic2, Play, Pause, MapPin } from 'lucide-react'
 
 interface SwipeableCardProps {
   user: {
@@ -12,6 +12,7 @@ interface SwipeableCardProps {
     name: string
     age?: number
     bio?: string
+    gender?: string
     distance?: number
     compatibility_score?: number
     photos?: string[]
@@ -26,7 +27,10 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
   const [isDragging, setIsDragging] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const cardRef = useRef<HTMLDivElement | null>(null)
   const [startPos, setStartPos] = useState({ x: 0, y: 0 })
+  const [currentPos, setCurrentPos] = useState({ x: 0, y: 0 })
+  const [rotation, setRotation] = useState(0)
 
   const toggleAudio = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -40,6 +44,11 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
   };
 
   const handleStart = useCallback((clientX: number, clientY: number) => {
+    setIsDragging(true)
+    setStartPos({ x: clientX, y: clientY })
+    setCurrentPos({ x: clientX, y: clientY })
+  }, [])
+
   const handleMove = useCallback((clientX: number, clientY: number) => {
     if (!isDragging) return
 
@@ -292,20 +301,20 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
       
       {/* Swipe indicators */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/2 left-4 transform -translate-y-1/2 opacity-0 transition-opacity duration-200">
-          <div className="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold">
+        <div className={`absolute top-1/2 left-4 transform -translate-y-1/2 transition-opacity duration-200 ${isDragging && currentPos.x - startPos.x < -50 ? 'opacity-100' : 'opacity-0'}`}>
+          <div className="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold shadow-xl border-2 border-white/20">
             PASS
           </div>
         </div>
         
-        <div className="absolute top-1/2 right-4 transform -translate-y-1/2 opacity-0 transition-opacity duration-200">
-          <div className="bg-green-500 text-white px-4 py-2 rounded-lg font-semibold">
+        <div className={`absolute top-1/2 right-4 transform -translate-y-1/2 transition-opacity duration-200 ${isDragging && currentPos.x - startPos.x > 50 ? 'opacity-100' : 'opacity-0'}`}>
+          <div className="bg-green-500 text-white px-4 py-2 rounded-lg font-semibold shadow-xl border-2 border-white/20">
             LIKE
           </div>
         </div>
         
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 opacity-0 transition-opacity duration-200">
-          <div className="bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold">
+        <div className={`absolute top-4 left-1/2 transform -translate-x-1/2 transition-opacity duration-200 ${isDragging && currentPos.y - startPos.y < -50 ? 'opacity-100' : 'opacity-0'}`}>
+          <div className="bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold shadow-xl border-2 border-white/20">
             SUPER LIKE
           </div>
         </div>

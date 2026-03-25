@@ -51,7 +51,7 @@ export default function SendTokenModal({ isOpen, onClose, onSuccess }: SendToken
         if (!internalWallet?.mint_address) throw new Error('Mint address not found');
 
         // 1. Get recipient wallet address from API
-        const res = await apiClient.get(`/users/${selectedRecipient}/wallet`);
+        const res = await apiClient.get(`/users/${selectedRecipient}/wallet`) as any;
         const recipientWallet = res.data.wallet_address;
         if (!recipientWallet) throw new Error('Recipient has no wallet linked');
 

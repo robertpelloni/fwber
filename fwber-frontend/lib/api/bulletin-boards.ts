@@ -1,5 +1,6 @@
 import { useAuth } from '../auth-context';
 import { storeOfflineMessage } from '../offline-store';
+import { v4 as uuidv4 } from 'uuid';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -160,13 +161,16 @@ export class BulletinBoardAPI {
       if (typeof navigator !== 'undefined' && !navigator.onLine) {
         console.log('Offline, storing message for sync');
         await storeOfflineMessage({
+          uuid: uuidv4(),
           boardId,
           content,
+          type: 'text',
+          is_encrypted: false,
           lat: location.lat,
           lng: location.lng,
           is_anonymous: options.is_anonymous,
           token: this.token, // Store token to replay request
-          createdAt: Date.now()
+          created_at: new Date().toISOString()
         });
         
         // Register sync

@@ -7,12 +7,17 @@ export interface OfflineMessage {
     id?: number;
     uuid: string;
     chatroom_id?: string;
-    recipient_id: string;
+    boardId?: number | string;
+    recipient_id?: string;
     content: string;
     type: string;
     is_encrypted: boolean;
+    is_anonymous?: boolean;
+    token?: string;
     created_at: string;
     retry_count: number;
+    lat?: number;
+    lng?: number;
 }
 
 export async function openDB(): Promise<IDBDatabase> {
@@ -41,6 +46,9 @@ export async function storeOfflineMessage(message: Omit<OfflineMessage, 'id' | '
         request.onerror = () => reject(request.error);
     });
 }
+
+// Alias for build compatibility
+export const storeOfflineChatMessage = storeOfflineMessage;
 
 export async function getPendingMessages(): Promise<OfflineMessage[]> {
     const db = await openDB();

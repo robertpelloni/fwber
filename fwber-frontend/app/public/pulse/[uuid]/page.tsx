@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { api } from '@/lib/api/client';
-import { Activity, MessageSquare, TrendingUp, Zap, Users, Shield } from 'lucide-react';
+import { Activity, MessageSquare, TrendingUp, Zap, Users, Shield, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface VibeData {

@@ -132,6 +132,7 @@ export interface ProfileUpdateData {
     state?: string;
   };
   is_travel_mode?: boolean;
+  is_confessional_mode?: boolean;
   travel_location?: {
     latitude?: number;
     longitude?: number;

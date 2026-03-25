@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useCallback } from 'react';
-import { getPendingMessages, removePendingMessage, incrementRetryCount } from './offline-store';
+import { getPendingMessages, removePendingMessage, incrementRetryCount } from '@/lib/offline-store';
 import { api } from '@/lib/api/client';
 import { useToast } from '@/components/ui/use-toast';
 

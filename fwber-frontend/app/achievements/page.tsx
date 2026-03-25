@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Trophy, Lock, Star, Zap, Users, Shield, Award } from 'lucide-react'
+import { Trophy, Lock, Star, Zap, Users, Shield, Award, Share2 } from 'lucide-react'
 import AppHeader from '@/components/AppHeader'
 import { apiClient } from '@/lib/api/client'
 import { useAuth } from '@/lib/auth-context'

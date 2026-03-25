@@ -5,8 +5,17 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Share2 } from 'lucide-react'
 
+interface MatchUser {
+  id: number
+  name: string
+  photoUrl: string
+}
+
 interface MatchModalProps {
-// ... existing interface ...
+  isOpen: boolean
+  onClose: () => void
+  matchedUser: MatchUser
+  currentUser?: MatchUser
 }
 
 export default function MatchModal({ isOpen, onClose, matchedUser, currentUser }: MatchModalProps) {
@@ -67,7 +76,7 @@ export default function MatchModal({ isOpen, onClose, matchedUser, currentUser }
               {/* Current User Photo */}
               <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white shadow-lg overflow-hidden transform -rotate-6">
                 <Image
-                  src={currentUser.photoUrl || '/placeholder-user.jpg'}
+                  src={currentUser?.photoUrl || '/placeholder-user.jpg'}
                   alt="You"
                   fill
                   sizes="(max-width: 640px) 96px, 128px"

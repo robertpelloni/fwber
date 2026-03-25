@@ -5,6 +5,7 @@ import { storeOfflineChatMessage } from '@/lib/offline-store';
 import { useE2EEncryption } from '@/lib/hooks/use-e2e-encryption';
 import { initEcho } from '@/lib/echo';
 import { logWebSocket } from '@/lib/logger';
+import { v4 as uuidv4 } from 'uuid';
 
 // Import shared types from centralized location
 import type {
@@ -190,13 +191,13 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
 
   // API wrappers for sending data
   const sendChatMessage = useCallback(async (recipientId: string, content: string, type: string = 'text') => {
+    let isEncrypted = false;
     try {
       if (!navigator.onLine) {
         throw new Error('Offline');
       }
 
       let finalContent = content;
-      let isEncrypted = false;
 
       if (type === 'text' && isE2EReadyRef.current) {
         try {
@@ -219,10 +220,12 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
       if (!navigator.onLine || (err as any)?.message === 'Offline' || (err as any)?.code === 'ERR_NETWORK') {
         try {
           await storeOfflineChatMessage({
+            uuid: uuidv4(),
             recipient_id: recipientId,
-            message: { type, content },
-            token: token,
-            timestamp: new Date().toISOString()
+            content: content,
+            type: type,
+            is_encrypted: isEncrypted,
+            created_at: new Date().toISOString()
           });
 
           // Register background sync

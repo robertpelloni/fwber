@@ -38,6 +38,7 @@ interface RealTimeChatProps {
   className?: string;
   onVideoCall?: () => void;
   onProfileView?: () => void;
+  onLocate?: () => void;
   onReport?: () => void;
   onBlock?: () => void;
   onRateDate?: () => void;
@@ -127,6 +128,7 @@ export default function RealTimeChat({
   className = '',
   onVideoCall,
   onProfileView,
+  onLocate,
   onReport,
   onBlock,
   onRateDate
@@ -315,14 +317,12 @@ export default function RealTimeChat({
           const token = localStorage.getItem('fwber_token');
           if (token) {
             await storeOfflineChatMessage({
+              uuid: uuidv4(),
               recipient_id: recipientId,
-              message: {
-                type: 'audio',
-                media: audioFile,
-                media_duration: duration
-              },
-              token: token,
-              timestamp: new Date().toISOString()
+              content: '[Voice Message]',
+              type: 'audio',
+              is_encrypted: isE2EReady,
+              created_at: new Date().toISOString()
             });
 
             // Register background sync
