@@ -19,14 +19,12 @@ return [
 
     'allowed_methods' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 
-    'allowed_origins' => env('CORS_ALLOWED_ORIGINS') 
-        ? explode(',', env('CORS_ALLOWED_ORIGINS'))
-        : ['*'],
+    'allowed_origins' => ['*'],
 
     'allowed_origins_patterns' => [],
 
     // Restrict allowed headers for security
-    'allowed_headers' => ['Content-Type', 'X-Requested-With', 'Authorization', 'X-XSRF-TOKEN', 'X-Socket-ID', 'X-Pusher-Socket-ID'],
+    'allowed_headers' => ['Content-Type', 'X-Requested-With', 'Authorization', 'X-XSRF-TOKEN', 'X-Socket-ID', 'X-Pusher-Socket-ID', 'X-Diagnostics-Secret'],
 
     'exposed_headers' => [],
 
