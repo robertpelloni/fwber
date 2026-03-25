@@ -51,7 +51,7 @@ export function useAnalytics() {
         const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
         const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl.slice(0, -4) : rawBaseUrl;
 
-        fetch(`${baseUrl}/api/analytics/events`, {
+        fetch(`${baseUrl}/analytics/events`, {
             method: 'POST',
             headers,
             body: JSON.stringify(payloadData),
