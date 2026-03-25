@@ -239,7 +239,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: '/api/:path*', // This is now handled by Apache/Nginx outside Next.js
+        destination: 'https://api.fwber.me/api/:path*',
       },
       {
         source: '/.well-known/webfinger',
