@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.99.1] - 2026-03-24 — Version Unification (Gold Pre-release)
+
+### Architecture
+- **Version Standardization**: Unified all platform version numbers across root, backend, frontend, mobile, and documentation to `0.99.1`.
+- **Version Manifest**: Created `VERSION.md` to track and document all canonical version locations for future releases.
+
 ## [0.6.7-beta] - 2026-03-24 — "Anti-Catfish" ZK-Identity Verification
 
 ### Features

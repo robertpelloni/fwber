@@ -8,7 +8,7 @@
 
 Privacy-first proximity dating platform. Open source. Work in progress.
 
-**Status:** Beta (v0.5.0) — functional but seeking early testers in Detroit metro.  
+**Status:** Beta (v0.99.1) — functional but seeking early testers in Detroit metro.  
 **Stack:** Laravel 12 (PHP 8.4) + Next.js 16 (React 18) + MySQL  
 **License:** MIT
 

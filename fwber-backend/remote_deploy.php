@@ -6,7 +6,7 @@ $descriptorspec = array(
 );
 
 $password = "Temppass.0!";
-$cmd = 'ssh -o StrictHostKeyChecking=no fwber@pdx1-shared-a1-33.dreamhost.com "tail -n 50 ~/fwber/fwber-backend/storage/logs/laravel.log"';
+$cmd = 'ssh -o StrictHostKeyChecking=no fwber@pdx1-shared-a1-33.dreamhost.com "cd ~/fwber.me/fwber-backend && git checkout . && git pull origin main && ./deploy.sh --env=production --force"';
 
 $process = proc_open($cmd, $descriptorspec, $pipes);
 

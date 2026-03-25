@@ -1,7 +1,7 @@
-# Project Status — fwber v0.6.9-beta
+# Project Status — fwber v0.99.1
 
 **Date:** 2026-03-24  
-**Version:** 0.6.9-beta  
+**Version:** 0.99.1  
 **Status:** Beta — Stabilization & Architectural Evolution
 
 ---
