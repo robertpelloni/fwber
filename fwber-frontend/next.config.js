@@ -237,6 +237,10 @@ const nextConfig = {
 
   async rewrites() {
     return [
+      {
+        source: '/api/:path*',
+        destination: 'https://api.fwber.me/api/:path*',
+      },
     ];
   },
   
