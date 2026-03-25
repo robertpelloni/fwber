@@ -50,7 +50,13 @@ class WarmCache extends Command
             ->get();
 
         $cacheKey = config('optimization.cache_version') . ':groups:index:public';
-        Cache::tags(['groups'])->put($cacheKey, $groups, 600);
+        
+        // Driver safety check: only use tags if supported (e.g. redis, memcached)
+        if (config('cache.default') === 'redis' || config('cache.default') === 'memcached') {
+            Cache::tags(['groups'])->put($cacheKey, $groups, 600);
+        } else {
+            Cache::put($cacheKey, $groups, 600);
+        }
 
         $duration = round((microtime(true) - $start) * 1000, 2);
         $this->info("Groups cache warmed in {$duration}ms. Count: {$groups->count()}");
@@ -67,7 +73,7 @@ class WarmCache extends Command
         $cacheKey = config('optimization.cache_version') . ':events:index:' . md5(json_encode([
             'lat' => null,
             'lon' => null,
-            'radius' => null, // Controller uses $request->radius which is null if not present
+            'radius' => null, 
             'status' => null,
             'page' => 1,
         ]));
@@ -78,7 +84,11 @@ class WarmCache extends Command
             ->withCount('attendees')
             ->paginate(20);
 
-        Cache::tags(['events'])->put($cacheKey, $events, 300);
+        if (config('cache.default') === 'redis' || config('cache.default') === 'memcached') {
+            Cache::tags(['events'])->put($cacheKey, $events, 300);
+        } else {
+            Cache::put($cacheKey, $events, 300);
+        }
 
         $duration = round((microtime(true) - $start) * 1000, 2);
         $this->info("Events cache warmed in {$duration}ms. Count: {$events->count()}");
