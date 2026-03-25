@@ -93,9 +93,10 @@ class LocationController extends Controller
 
             // --- EVENT SOURCING INTEGRATION ---
             // Append immutable event log
-            $currentVersion = $this->eventStore->getCurrentVersion((string)$user->id, 'UserLocation');
+            $aggregateId = (string) $user->id;
+            $currentVersion = $this->eventStore->getCurrentVersion($aggregateId, 'UserLocation');
             $event = new UserLocationUpdated(
-                (string)$user->id,
+                $aggregateId,
                 (float)$request->input('latitude'),
                 (float)$request->input('longitude'),
                 null // Location name resolution would go here
@@ -155,7 +156,7 @@ class LocationController extends Controller
 
             return response()->json([
                 'message' => 'Error updating location',
-                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+                'error' => $e->getMessage() . ' IN ' . $e->getFile() . ':' . $e->getLine(),
             ], 500);
         }
     }
