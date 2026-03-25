@@ -13,10 +13,12 @@ import type {
   PaginatedResponse,
 } from './types';
 
-// Ensure BASE_URL always ends with /api to prevent 404s on shared hosting
+// Ensure BASE_URL doesn't double-prefix /api
 const getBaseUrl = () => {
   const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-  return url.endsWith('/api') ? url : `${url}/api`;
+  // If the URL already contains /api, don't add it again
+  if (url.includes('/api')) return url;
+  return url.endsWith('/') ? `${url}api` : `${url}/api`;
 };
 
 const BASE_URL = getBaseUrl();
