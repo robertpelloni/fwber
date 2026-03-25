@@ -14,13 +14,9 @@ class UpdateLocationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
-            'accuracy' => 'sometimes|numeric|min:0|max:1000',
-            'heading' => 'sometimes|numeric|between:0,360',
-            'speed' => 'sometimes|numeric|min:0|max:100',
-            'altitude' => 'sometimes|numeric|min:-1000|max:50000',
-            'privacy_level' => 'sometimes|in:public,friends,private',
+            'latitude' => 'required',
+            'longitude' => 'required',
+            'accuracy' => 'sometimes',
         ];
     }
 }
