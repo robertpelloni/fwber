@@ -78,7 +78,13 @@ class AnalyticsController extends Controller
         $ipAddress = $request->ip();
         $userAgent = $request->userAgent();
 
-        foreach ($request->input('events') as $event) {
+        $events = $request->input('events', []);
+        
+        if (empty($events)) {
+            return response()->json(['status' => 'success', 'message' => 'No events to process']);
+        }
+
+        foreach ($events as $event) {
             $this->analyticsService->recordEvent(
                 $sessionId,
                 $event['event_name'],
