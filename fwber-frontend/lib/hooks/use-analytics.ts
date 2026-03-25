@@ -49,7 +49,8 @@ export function useAnalytics() {
         }
 
         const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-        const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl.slice(0, -4) : rawBaseUrl;
+        // Ensure we have the /api prefix exactly once
+        const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl.replace(/\/$/, '')}/api`;
 
         fetch(`${baseUrl}/analytics/events`, {
             method: 'POST',
