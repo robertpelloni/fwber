@@ -37,11 +37,17 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (Throwable $e, \Illuminate\Http\Request $request) {
             if ($request->is('api/*')) {
+                \Illuminate\Support\Facades\Log::error('API Exception: ' . $e->getMessage(), [
+                    'url' => $request->fullUrl(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+
                 // Never expose stack traces in production
                 if (!config('app.debug') || app()->environment('production')) {
                     return response()->json([
                         'message' => 'An error occurred processing your request.',
                         'error_id' => uniqid('err_'),
+                        'debug_message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine() // Temporarily exposed for debugging
                     ], 500);
                 }
                 

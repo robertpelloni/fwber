@@ -1,110 +1,91 @@
 # DEPLOY.md — The fwber Operations Guide
 
-> **Last Updated:** 2026-03-07
-> **Version:** 0.5.0-beta
+> **Last Updated:** 2026-03-25
+> **Version:** 0.99.1
 
-This document serves as the single source of truth for deploying the fwber monorepo across various environments.
-
----
-
-## 🏗️ 1. Local Development (Docker Compose)
-
-The fastest way to spin up the entire stack locally is via Docker Compose.
-
-1. **Prerequisites**: Docker Desktop installed.
-2. **Setup Env**:
-   ```bash
-   cp fwber-backend/.env.example fwber-backend/.env
-   cp fwber-frontend/.env.example fwber-frontend/.env.local
-   ```
-3. **Boot the Cluster**:
-   ```bash
-   docker-compose -f docker-compose.dev.yml up -d
-   ```
-4. **Initialize DB**:
-   ```bash
-   docker-compose exec app php artisan migrate --seed
-   ```
-5. **Access**: Frontend at `http://localhost:3000`, Backend API at `http://localhost:8000`.
+This document serves as the single source of truth for deploying the fwber distributed architecture.
 
 ---
 
-## 🚀 2. Production: Vercel (Frontend)
+## 🚀 1. Production: Vercel (Frontend)
 
-The Next.js 16 frontend is optimized for deployment on Vercel.
+The Next.js 16.1 frontend is optimized for deployment on Vercel Edge Network.
 
 1. **Dashboard Setup**: Import the GitHub repository into Vercel.
-2. **Root Directory**: In Vercel Project Settings > General, set the Root Directory to `fwber-frontend`.
+2. **Root Directory**: Set the Root Directory to `fwber-frontend`.
 3. **Environment Variables**: Add the following to Vercel:
-   * `NEXT_PUBLIC_API_URL=https://api.fwber.com/api`
-   * `NEXT_PUBLIC_WEBSOCKET_HOST=api.fwber.com`
-   * `NEXT_PUBLIC_WEBSOCKET_PORT=443`
-4. **Build Optimization**: Set the Ignored Build Step to prevent backend commits from triggering frontend builds:
-   `git diff --quiet HEAD^ HEAD ./`
+   * `NEXT_PUBLIC_API_URL=https://api.fwber.me` (CRITICAL: Do not include `/api` at the end)
+   * `NEXT_PUBLIC_WS_URL=wss://ws.fwber.me`
+4. **Build Settings**: 
+   * Build Command: `npm run build`
+   * Output Directory: `.next`
+5. **DNS**: Point your main domain (`www.fwber.me`) to Vercel via A Record (`76.76.21.21`) or CNAME.
 
 ---
 
-## 🐘 3. Production: DreamHost (Backend API)
+## 🐘 2. Production: DreamHost (Backend API)
 
-DreamHost provides sturdy shared/VPS hosting, but requires specific configuration to handle Laravel 12 and the queue workers.
+DreamHost hosts the Laravel 12 API, Database, and WebSockets.
 
 1. **PHP Version**: Ensure the domain is set to use PHP 8.3+.
-2. **Document Root**: Point the domain's web directory to `/path/to/fwber/fwber-backend/public`.
-3. **Queue Worker**: On shared hosting, you must use a CRON job to process the queue if `supervisor` is unavailable:
-   `* * * * * cd /path/to/fwber/fwber-backend && php artisan schedule:run >> /dev/null 2>&1`
-4. **Environment Tweaks (`fwber-backend/.env`)**:
+2. **Document Root**: Point the `api.fwber.me` subdomain's web directory to `/home/user/fwber/fwber-backend/public`.
+3. **Database**: MySQL 8+ hosted internally on DreamHost (`mysql.fwber.me`).
+4. **Environment (`.env`)**:
    ```ini
    APP_ENV=production
    APP_DEBUG=false
+   APP_URL=https://api.fwber.me
    
-   # Shared Hosting Optimization - Avoids file locking issues
    CACHE_STORE=database
    QUEUE_CONNECTION=database
    SESSION_DRIVER=database
+   BROADCAST_DRIVER=reverb
    
-   # Security
-   CORS_ALLOWED_ORIGINS="https://fwber.vercel.app,https://fwber.com"
+   CORS_ALLOWED_ORIGINS="https://www.fwber.me,https://fwber.me"
+   ```
+5. **Deployment Command**:
+   ```bash
+   cd ~/fwber/fwber-backend && git pull origin main && php artisan config:clear && php artisan config:cache && php artisan migrate --force
    ```
 
 ---
 
-## ⚓ 4. Production: Kubernetes (Enterprise Scale)
+## 📡 3. Production: WebSockets (Laravel Reverb)
 
-For high-density scaling, use the provided Helm charts or K8s manifests in the `/kubernetes` directory.
+The "Pulse" real-time engine requires a dedicated proxy setup on DreamHost.
 
-1. **Cluster Requirements**: NGINX Ingress Controller, Cert-Manager, and an external managed database (e.g., AWS RDS PostgreSQL with PostGIS enabled).
-2. **Secrets**:
-   ```bash
-   kubectl create secret generic fwber-secrets --from-env-file=k8s.env
+1. **Subdomain**: Create `ws.fwber.me` as a Fully Hosted domain in DreamHost.
+2. **DNS**: Point `ws.fwber.me` to the DreamHost server IP (NOT Vercel).
+3. **The Proxy Bridge**: Place this `.htaccess` in the `ws.fwber.me` root directory:
+   ```apache
+   RewriteEngine On
+   RewriteCond %{HTTP:Upgrade} =websocket [NC]
+   RewriteRule ^(.*) http://127.0.0.1:8080/$1 [P,L]
+   RewriteCond %{HTTP:Upgrade} !=websocket [NC]
+   RewriteRule ^(.*) http://127.0.0.1:8080/$1 [P,L]
    ```
-3. **Deploy**:
+4. **Start the Engine**: Run the daemon in the background:
    ```bash
-   kubectl apply -f kubernetes/
+   nohup php artisan reverb:start --host=0.0.0.0 --port=8080 > reverb.log 2>&1 &
    ```
-4. **Real-time Scaling**: The `laravel-echo-server` or `reverb` pods require sticky sessions in the Ingress configuration to maintain WebSocket connections reliably.
+
+---
+
+## 🦀 4. Production: Rust Geo-Screener (Optional)
+
+For high-density scaling, run the `fwber-geo` microservice.
+
+1. Compile: `cd fwber-geo && cargo build --release`
+2. Run: `nohup ./target/release/fwber-geo > geo.log 2>&1 &`
+3. Update backend `.env` to point to the Rust service URL.
 
 ---
 
 ## 🩺 5. Post-Deployment Verification
 
 Always run this checklist after a major version bump:
-1. [ ] Check the `VERSION` file in production matches `CHANGELOG.md`.
-2. [ ] Ping `/api/system` (or `/admin/system` via browser) to ensure DB and Cache paths are green.
-3. [ ] Perform a test login.
-4. [ ] Upload a test photo (verifies S3/Disk permissions).
-5. [ ] Establish a test chat (verifies WebSocket persistence).
-
----
-
-## 🌍 6. Multi-Region & CDN Edge Caching
-
-To scale globally, the fwber architecture relies on **Edge Caching** (via Vercel for the frontend, and Cloudflare for the backend API). 
-
-### Backend (Cloudflare)
-1. Ensure the domain is proxied (Orange Cloud) through Cloudflare.
-2. In Cloudflare **Caching rules**, create a rule bypassing cache entirely for any request containing the `Authorization` header, or routes matching `*/api/*` (excluding Health routes). 
-3. The Laravel app internally applies `EdgeCacheResponse` (alias: `edge.cache`) to globally safe endpoints like `/.well-known/webfinger` and `/api/health`. Cloudflare will automatically respect these `s-maxage` parameters and serve responses directly from the Edge.
-4. **Data Spillage Warning**: Never attach `edge.cache` to endpoints dealing with `auth:sanctum`.
-
-### Frontend (Vercel Edge)
-Vercel automatically distributes static assets globally. For dynamic routes, rely on `SWR` (Stale-While-Revalidate) caching provided by Next.js's native `fetch` extended cache parameters, keeping TTFB as low as possible across regions.
+1. [ ] Check `https://api.fwber.me/api/health` reports the correct version.
+2. [ ] Verify Vercel build is Green.
+3. [ ] Perform a test ZK-Identity verification (checks cryptography and DB).
+4. [ ] Upload a test photo (verifies AWS S3 credentials).
+5. [ ] Establish a test chat (verifies Reverb WebSocket persistence).

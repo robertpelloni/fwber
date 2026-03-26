@@ -347,9 +347,10 @@ class MatchController extends Controller
         }
 
         // --- EVENT SOURCING INTEGRATION ---
-        $currentVersion = $this->eventStore->getCurrentVersion((string)$user->id, 'MatchAction');
+        $aggregateId = (string) $user->id;
+        $currentVersion = $this->eventStore->getCurrentVersion($aggregateId, 'MatchAction');
         $event = new MatchActionRecorded(
-            (string)$user->id,
+            $aggregateId,
             (int)$targetUserId,
             (string)$action,
             (float)($user->profile->latitude ?? 0),

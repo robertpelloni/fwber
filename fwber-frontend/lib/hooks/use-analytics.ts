@@ -48,11 +48,10 @@ export function useAnalytics() {
             headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-        // Ensure we have the /api prefix exactly once
-        const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl.replace(/\/$/, '')}/api`;
+        const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.fwber.me';
+        const baseUrl = rawBaseUrl.replace(/\/api$/, '').replace(/\/$/, '');
 
-        fetch(`${baseUrl}/analytics/events`, {
+        fetch(`${baseUrl}/api/analytics/events`, {
             method: 'POST',
             headers,
             body: JSON.stringify(payloadData),

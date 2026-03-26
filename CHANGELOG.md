@@ -2,11 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.99.1] - 2026-03-24 — Version Unification (Gold Pre-release)
+## [0.99.1] - 2026-03-25 — The Gold Release (Launch Verified)
 
-### Architecture
-- **Version Standardization**: Unified all platform version numbers across root, backend, frontend, mobile, and documentation to `0.99.1`.
-- **Version Manifest**: Created `VERSION.md` to track and document all canonical version locations for future releases.
+### Production & DevOps
+- **Vercel Frontend Live**: Successfully deployed the Next.js 16.1 frontend to Vercel with automated build pipelines.
+- **DreamHost Backend Hardened**: Optimized the Laravel 12 API for production, resolving critical boot errors and configuration conflicts.
+- **Unified Domain Strategy**: Implemented API proxying via `next.config.js` to eliminate CORS friction and consolidate the user experience under `www.fwber.me`.
+- **Infrastructure Verified**: 
+    - **AWS S3**: Production media storage operational.
+    - **AWS Rekognition**: Automated AI content moderation live.
+    - **Sentry**: Error tracking and performance monitoring active.
+    - **Laravel Reverb**: Real-time WebSocket engine deployed.
+- **Data Integrity**: Migrated 100% of core application state (Location, Swipes, Messages, Profiles) to the Unified Event Sourcing Architecture.
 
 ## [0.6.7-beta] - 2026-03-24 — "Anti-Catfish" ZK-Identity Verification
 

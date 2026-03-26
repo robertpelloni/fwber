@@ -1,36 +1,29 @@
-# TODO — fwber Credibility Sprint
+# TODO — fwber Immediate Action Items
 
 > **Version:** 0.99.1  
-> **Last Updated:** 2026-03-23  
-> **Mode:** Stabilization & Architectural Evolution
+> **Last Updated:** 2026-03-25  
 
 ---
 
-## 🔴 Critical: Credibility Hardening (Phase 1)
-- [x] All Phase 1 tasks completed.
+## 🔴 Critical: Bug Fixes & Stability
+- [ ] **Fix 500 Errors on Production**: The `/api/location`, `/api/photos`, and `/api/safety/walk/active` endpoints are throwing 500 errors on DreamHost. Add explicit `Log::error($e)` to `bootstrap/app.php` exception handler to capture the silent trace and fix the root cause (likely validation, permissions, or missing env vars).
+- [ ] **Verify Vercel Deployment**: Ensure the latest Next.js build with the `/api` absolute path proxy and MIME fixes is successfully deployed and running.
 
-## 🟡 High: Core Flow Verification (Phase 2)
-- [x] All Phase 2 tasks completed. (304 tests passed, 1019 assertions).
+## 🟡 High: Missing UI Integrations
+- [ ] **ActivityPub Federation UI**: The backend supports WebFinger, Inbox, and Outbox, but the frontend lacks a UI to search for federated users, follow them, or view the federated feed.
+- [ ] **Merchant Portal UI**: Backend `MerchantController` and `MerchantPulseController` exist, but the frontend `app/merchant` portal is incomplete or missing. Needs registration, promotion creation, and vibe broadcasting UI.
+- [ ] **AI Wingman Enhancements**: The backend supports `compatibilityAudit`, `findNemesis`, and `predictFortune`. Ensure these are fully wired up in the chat interface with rich, animated UI components.
+- [ ] **Hardware Token UI Polish**: Ensure the `app/settings/hardware/page.tsx` gracefully handles BLE pairing flows and visualizes the "ping" actions.
 
-## 🟢 Medium: Launch Preparation
-- [x] Launch "Rate My Pussy" cat-rating viral campaign (`/rate-my-pussy`)
-- [x] Prepare Detroit metro beta launch materials (flyers, coasters, stickers)
-- [x] Execute content strategy from `docs/marketing/CONTENT_STRATEGY.md`
-- [x] Verify all experimental features (Video, Audio, Burner, Federation, Rust-geo)
-- [x] Harden ActivityPub Federation 
-- [x] Integrate AI Avatar Generation flow
-- [x] Set up basic analytics (signups, DAU, matches/day)
-- [x] Review production deployment setup 
-- [x] Implement Voice-Only Confessional Mode
-- [x] Build B2B Local Vibe API and Merchant Dashboard
-- [x] Migrate User Location to Event Sourcing Infrastructure
+## 🟢 Medium: Robustness & Refactoring
+- [ ] **Event Sourcing Audit**: Review all `EventStore::append` calls to ensure aggregate IDs are strictly cast to strings and that no integer-to-string database constraint errors exist.
+- [ ] **Offline Sync Conflict Resolution**: Enhance `use-chat-sync.ts` to handle complex CRDT conflict resolution when merging offline messages with server state.
+- [ ] **Rust Geo-Screener Integration**: Transition the PHP `LocationController` to offload dense spatial queries to the `fwber-geo` Rust microservice.
 
-## ⚪ Low: Technical Debt
-- [x] Clean up `.gitignore`
-- [x] Review feature flags in `config/features.php`
-- [x] Rename stale Mercure references to Reverb 
-- [x] Audit controllers — removed 8 unused controllers.
+## ⚪ Low: Technical Debt & Documentation
+- [ ] Update `cypress` E2E tests to cover the new ZK-Identity and AR Navigation flows.
+- [ ] Clean up unused local test files and outdated `.txt` debug logs from the root directory.
+- [ ] Ensure all new API endpoints are fully documented with Swagger/OpenAPI annotations.
 
 ---
-
-*This file reflects real, actionable tasks. Items are only marked complete when verified with evidence.*
+*This file is continuously updated by autonomous AI agents. Do not leave items unchecked if they are completed.*

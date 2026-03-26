@@ -237,9 +237,10 @@ class MessageController extends Controller
             ]);
 
             // --- EVENT SOURCING INTEGRATION ---
-            $currentVersion = $this->eventStore->getCurrentVersion((string)$match->id, 'Chatroom');
+            $aggregateId = (string) $match->id;
+            $currentVersion = $this->eventStore->getCurrentVersion($aggregateId, 'Chatroom');
             $event = new MessageSent(
-                (string)$match->id, // Aggregate is the chat context
+                $aggregateId, // Aggregate is the chat context
                 (int)$senderId,
                 (int)$receiverId,
                 (string)($validated['content'] ?? ''),
