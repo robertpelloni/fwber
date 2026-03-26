@@ -821,7 +821,7 @@ export default function ProfilePage() {
                   <label key={option} className="flex items-center cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={formData.looking_for.includes(option)}
+                      checked={Array.isArray(formData.looking_for) ? formData.looking_for.includes(option) : false}
                       onChange={(e) => handleLookingForChange(option, e.target.checked)}
                       className="h-5 w-5 rounded border-2 border-gray-400 text-blue-600 accent-blue-600 cursor-pointer"
                     />
@@ -1150,7 +1150,7 @@ export default function ProfilePage() {
                       <label key={hobby} className="flex items-center">
                         <input
                           type="checkbox"
-                          checked={formData.preferences.hobbies.includes(hobby)}
+                          checked={Array.isArray(formData.preferences.hobbies) ? formData.preferences.hobbies.includes(hobby) : false}
                           onChange={(e) => handleArrayPreferenceChange('hobbies', hobby, e.target.checked)}
                           className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                         />
@@ -1169,7 +1169,7 @@ export default function ProfilePage() {
                       <label key={genre} className="flex items-center">
                         <input
                           type="checkbox"
-                          checked={formData.preferences.music.includes(genre)}
+                          checked={Array.isArray(formData.preferences.music) ? formData.preferences.music.includes(genre) : false}
                           onChange={(e) => handleArrayPreferenceChange('music', genre, e.target.checked)}
                           className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                         />
@@ -1188,7 +1188,7 @@ export default function ProfilePage() {
                       <label key={sport} className="flex items-center">
                         <input
                           type="checkbox"
-                          checked={formData.preferences.sports.includes(sport)}
+                          checked={Array.isArray(formData.preferences.sports) ? formData.preferences.sports.includes(sport) : false}
                           onChange={(e) => handleArrayPreferenceChange('sports', sport, e.target.checked)}
                           className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                         />
