@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateLocationPrivacyRequest;
 use App\Models\UserLocation;
 use App\Domain\Core\EventSourcing\EventStore;
 use App\Events\Location\UserLocationUpdated;
+use App\Services\GeoScreenerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -24,7 +25,8 @@ use Illuminate\Support\Facades\Log;
 class LocationController extends Controller
 {
     public function __construct(
-        private readonly EventStore $eventStore
+        private readonly EventStore $eventStore,
+        private readonly GeoScreenerService $geoScreener
     ) {}
 
     /**
@@ -125,6 +127,14 @@ class LocationController extends Controller
             $location->is_active = true;
             $location->save();
 
+            // --- RUST GEO-SCREENER INTEGRATION ---
+            $this->geoScreener->indexLocation(
+                $user->id,
+                (float)$location->latitude,
+                (float)$location->longitude
+            );
+            // -------------------------------------
+
             Log::info('Location updated', [
                 'user_id' => $user->id,
                 'latitude' => $location->latitude,
@@ -194,11 +204,21 @@ class LocationController extends Controller
             $radius = $validated['radius'] ?? 1000; // Default 1km
             $limit = $validated['limit'] ?? 20; // Default 20 users
 
-            // Get nearby users based on privacy settings
-            $nearbyUsers = UserLocation::active()
+            // --- RUST GEO-SCREENER OFFloading ---
+            $candidateIds = $this->geoScreener->getNearbyUserIds($latitude, $longitude, $radius);
+            // -------------------------------------
 
+            // Get nearby users based on privacy settings
+            $query = UserLocation::active()
                 ->with(['user.profile'])
-                ->where('user_id', '!=', $user->id) // Exclude current user
+                ->where('user_id', '!=', $user->id); // Exclude current user
+
+            if ($candidateIds !== null) {
+                // If we have candidate IDs from Rust, filter by them
+                $query->whereIn('user_id', $candidateIds);
+            }
+
+            $nearbyUsers = $query
                 // Incognito Mode Logic
                 ->whereHas('user', function ($userQuery) use ($user) {
                     $userQuery->where(function ($q) use ($user) {

@@ -316,6 +316,16 @@ class AiWingmanController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
+    public function findNemesis(Request $request)
+    {
+        $user = Auth::user();
+        $result = $this->wingmanService->findNemesis($user);
+
+        $shareId = $this->saveViralContent($user, 'nemesis', $result);
+
+        return response()->json(array_merge($result, ['share_id' => $shareId]));
+    }
+
     /**
      * Analyze a user quirk for "Red Flags".
      *
