@@ -36,6 +36,19 @@ return Application::configure(basePath: dirname(__DIR__))
         \Sentry\Laravel\Integration::handles($exceptions);
 
         $exceptions->render(function (Throwable $e, \Illuminate\Http\Request $request) {
+            if ($e instanceof \Illuminate\Auth\AuthenticationException) {
+                return response()->json(['message' => 'Unauthenticated.'], 401);
+            }
+            if ($e instanceof \Illuminate\Validation\ValidationException) {
+                return response()->json([
+                    'message' => $e->getMessage(),
+                    'errors' => $e->errors()
+                ], 422);
+            }
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
+                return response()->json(['message' => $e->getMessage()], $e->getStatusCode());
+            }
+
             if ($request->is('api/*')) {
                 \Illuminate\Support\Facades\Log::error('API Exception: ' . $e->getMessage(), [
                     'url' => $request->fullUrl(),
@@ -47,7 +60,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     return response()->json([
                         'message' => 'An error occurred processing your request.',
                         'error_id' => uniqid('err_'),
-                        'debug_message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine() // Temporarily exposed for debugging
+                        'debug_message' => app()->environment('production') ? 'Hidden in production' : $e->getMessage()
                     ], 500);
                 }
                 
