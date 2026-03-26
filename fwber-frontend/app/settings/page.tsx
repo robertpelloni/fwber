@@ -24,6 +24,7 @@ import {
   Plane,
   Ghost,
   Download,
+  Globe,
 } from 'lucide-react';
 
 interface SettingsLinkProps {
@@ -370,6 +371,13 @@ export default function SettingsPage() {
                 icon={<Shield className="w-5 h-5" />}
                 title="Blocked Users"
                 description="Manage blocked users and privacy settings"
+              />
+              <SettingsLink
+                href="/settings/federation"
+                icon={<Globe className="w-5 h-5" />}
+                title="Global Federation"
+                description="Connect with Mastodon, Threads and the Fediverse"
+                badge="Beta"
               />
               <SettingsButton
                 onClick={exportStatus === 'ready' ? handleDownloadExport : handleExportData}

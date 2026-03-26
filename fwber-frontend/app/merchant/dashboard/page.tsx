@@ -50,12 +50,13 @@ export default function MerchantDashboard() {
                 </p>
             </div>
             <div className="flex gap-2">
-                <Button variant="outline" className="border-amber-500 text-amber-600 hover:bg-amber-50">
-                    <Radio className="mr-2 h-4 w-4 animate-pulse" />
-                    Vibe Broadcast
-                </Button>
-                <Link href="/merchant/promotions/new">
-                    <Button className="bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/20">
+                <Link href="/merchant/vibe">
+                    <Button variant="outline" className="border-amber-500 text-amber-600 hover:bg-amber-50">
+                        <Radio className="mr-2 h-4 w-4 animate-pulse" />
+                        Vibe Broadcast
+                    </Button>
+                </Link>
+                <Link href="/merchant/promotions/new">                    <Button className="bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/20">
                         <PlusCircle className="mr-2 h-4 w-4" />
                         New Promotion
                     </Button>
