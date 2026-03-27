@@ -40,11 +40,45 @@ class ActivityPubInboxController extends Controller
                 break;
 
             case 'Create':
-                // Handle incoming posts from followed users
-                break;
+                return $this->handleCreate($user, $activity);
         }
 
         return response()->json(['status' => 'received'], 202);
+    }
+
+    /**
+     * Process an incoming Create activity (Note/Post).
+     */
+    protected function handleCreate(User $user, array $activity)
+    {
+        $object = $activity['object'] ?? null;
+        if (!$object || ($object['type'] ?? '') !== 'Note') {
+            return response()->json(['status' => 'ignored_type'], 202);
+        }
+
+        // Only store if we are actually following this person (or they are a follower? usually following)
+        // For simplicity in this demo, we store it if it's sent to us.
+        
+        $actorUri = $activity['actor'] ?? null;
+        $parsed = parse_url($actorUri);
+        $domain = $parsed['host'] ?? null;
+        $pathParts = explode('/', trim($parsed['path'] ?? '', '/'));
+        $username = end($pathParts);
+
+        \App\Models\FederatedPost::updateOrCreate(
+            ['guid' => $object['id']],
+            [
+                'actor_uri' => $actorUri,
+                'actor_username' => $username,
+                'actor_domain' => $domain,
+                'content' => $object['content'] ?? '',
+                'url' => $object['url'] ?? null,
+                'published_at' => isset($object['published']) ? \Carbon\Carbon::parse($object['published']) : now(),
+                'metadata' => $object
+            ]
+        );
+
+        return response()->json(['status' => 'post_stored'], 202);
     }
 
     /**

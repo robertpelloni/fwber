@@ -476,7 +476,7 @@ export default function PhotoManagementPage() {
     
     const handleDragEnter = (e: DragEvent) => {
       // Only handle file drags, ignore photo reordering drags
-      if (e.dataTransfer?.types.includes('Files') && !e.dataTransfer?.types.includes('application/json')) {
+      if (e.dataTransfer?.types && Array.from(e.dataTransfer.types).includes('Files') && !Array.from(e.dataTransfer.types).includes('application/json')) {
         dragCounter++
         if (dragCounter === 1) {
           e.preventDefault()
@@ -487,14 +487,14 @@ export default function PhotoManagementPage() {
     }
     
     const handleDragOver = (e: DragEvent) => {
-      if (e.dataTransfer?.types.includes('Files') && !e.dataTransfer?.types.includes('application/json')) {
+      if (e.dataTransfer?.types && Array.from(e.dataTransfer.types).includes('Files') && !Array.from(e.dataTransfer.types).includes('application/json')) {
         e.preventDefault()
         e.stopPropagation()
       }
     }
     
     const handleDragLeave = (e: DragEvent) => {
-      if (e.dataTransfer?.types.includes('Files') && !e.dataTransfer?.types.includes('application/json')) {
+      if (e.dataTransfer?.types && Array.from(e.dataTransfer.types).includes('Files') && !Array.from(e.dataTransfer.types).includes('application/json')) {
         dragCounter--
         if (dragCounter === 0) {
           setIsPageDragActive(false)
@@ -503,7 +503,7 @@ export default function PhotoManagementPage() {
     }
     
     const handleDrop = (e: DragEvent) => {
-      if (e.dataTransfer?.types.includes('Files') && !e.dataTransfer?.types.includes('application/json')) {
+      if (e.dataTransfer?.types && Array.from(e.dataTransfer.types).includes('Files') && !Array.from(e.dataTransfer.types).includes('application/json')) {
         e.preventDefault()
         e.stopPropagation()
         dragCounter = 0
