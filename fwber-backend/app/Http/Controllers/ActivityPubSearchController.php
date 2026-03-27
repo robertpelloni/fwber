@@ -124,4 +124,30 @@ class ActivityPubSearchController extends Controller
             return response()->json(['error' => 'Failed to process follow request'], 500);
         }
     }
+
+    /**
+     * Get list of external actors the user is following.
+     */
+    public function getFollowing()
+    {
+        $user = auth()->user();
+        $following = \App\Models\Following::where('user_id', $user->id)->get();
+
+        return response()->json([
+            'following' => $following
+        ]);
+    }
+
+    /**
+     * Get list of external actors following the user.
+     */
+    public function getFollowers()
+    {
+        $user = auth()->user();
+        $followers = \App\Models\Follower::where('user_id', $user->id)->get();
+
+        return response()->json([
+            'followers' => $followers
+        ]);
+    }
 }
