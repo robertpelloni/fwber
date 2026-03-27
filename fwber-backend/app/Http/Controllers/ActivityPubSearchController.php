@@ -94,7 +94,23 @@ class ActivityPubSearchController extends Controller
         }
 
         try {
-            // Log the follow intent (In a real system, this would queue an ActivityPub 'Follow' activity)
+            // Parse actor ID to get username and domain for local record
+            $parsed = parse_url($actorId);
+            $domain = $parsed['host'] ?? null;
+            $pathParts = explode('/', trim($parsed['path'] ?? '', '/'));
+            $username = end($pathParts);
+
+            // 1. Store the follow record locally
+            \App\Models\Following::updateOrCreate(
+                ['user_id' => $user->id, 'actor_uri' => $actorId],
+                [
+                    'username' => $username,
+                    'domain' => $domain,
+                    'status' => 'pending'
+                ]
+            );
+
+            // 2. Log the follow intent (In a real system, this would queue an ActivityPub 'Follow' activity)
             Log::info("User {$user->id} requested to follow federated actor: {$actorId}");
 
             // TODO: Sign and dispatch 'Follow' activity to remote inbox
