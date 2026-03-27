@@ -27,7 +27,30 @@ export default function FederationSettingsPage() {
     const [handle, setHandle] = useState('');
     const [isSearching, setIsSearching] = useState(false);
     const [results, setResults] = useState<RemoteActor[]>([]);
-    const [following, setFollowing] = useState<string[]>([]);
+    const [following, setFollowing] = useState<any[]>([]);
+    const [followers, setFollowers] = useState<any[]>([]);
+    const [activeTab, setActiveTab] = useState<'search' | 'following' | 'followers'>('search');
+
+    useEffect(() => {
+        fetchConnections();
+    }, [token]);
+
+    const fetchConnections = async () => {
+        if (!token) return;
+        try {
+            const followingsRes = await api.get('/federation/following', {
+                headers: { Authorization: `Bearer ${token}` }
+            }) as any;
+            setFollowing(followingsRes.data.following || []);
+
+            const followersRes = await api.get('/federation/followers', {
+                headers: { Authorization: `Bearer ${token}` }
+            }) as any;
+            setFollowers(followersRes.data.followers || []);
+        } catch (error) {
+            console.error('Failed to fetch connections:', error);
+        }
+    };
 
     const handleFollow = async (actorId: string) => {
         if (!token) return;
@@ -35,11 +58,11 @@ export default function FederationSettingsPage() {
             await api.post('/federation/follow', { actor_id: actorId }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setFollowing([...following, actorId]);
             toast({
                 title: "Follow Request Sent",
                 description: "You are now following this federated actor.",
             });
+            fetchConnections();
         } catch (error) {
             toast({
                 variant: "destructive",
@@ -62,12 +85,12 @@ export default function FederationSettingsPage() {
 
         try {
             setIsSearching(true);
-            // In a real implementation, this hits our local WebFinger proxy
             const response = await api.get(`/federation/search?q=${encodeURIComponent(handle)}`, {
                 headers: { Authorization: `Bearer ${token}` }
             }) as any;
             
             setResults(response.data.actors);
+            setActiveTab('search');
         } catch (error) {
             console.error('Federated search failed:', error);
             toast({
@@ -81,9 +104,9 @@ export default function FederationSettingsPage() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto space-y-8 pb-24">
+        <div className="max-w-4xl mx-auto space-y-8 pb-24 px-4">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                     <Link href="/settings">
                         <Button variant="ghost" size="icon" className="rounded-full">
@@ -99,61 +122,139 @@ export default function FederationSettingsPage() {
                         </p>
                     </div>
                 </div>
-                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">BETA</Badge>
+                <div className="flex items-center gap-2">
+                    <Link href="/settings/federation/feed">
+                        <Button variant="outline" size="sm" className="border-blue-200 text-blue-600 hover:bg-blue-50">
+                            <MessageSquare className="w-4 h-4 mr-2" /> View Global Feed
+                        </Button>
+                    </Link>
+                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 self-start sm:self-auto">BETA</Badge>
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {/* Search Column */}
-                <div className="md:col-span-2 space-y-6">
-                    <Card className="border-blue-100 dark:border-blue-900/30">
-                        <CardHeader>
-                            <CardTitle className="text-lg flex items-center gap-2">
-                                <Search className="w-4 h-4" /> Discover External Actors
-                            </CardTitle>
-                            <CardDescription>Search for users on Mastodon, Threads, or other fwber nodes.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <form onSubmit={handleSearch} className="flex gap-2">
-                                <Input 
-                                    placeholder="@username@mastodon.social"
-                                    value={handle}
-                                    onChange={(e) => setHandle(e.target.value)}
-                                    className="bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800"
-                                />
-                                <Button type="submit" disabled={isSearching} className="bg-blue-600 hover:bg-blue-700">
-                                    {isSearching ? '...' : 'Search'}
-                                </Button>
-                            </form>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Main Column */}
+                <div className="lg:col-span-2 space-y-6">
+                    <div className="flex border-b border-zinc-200 dark:border-zinc-800">
+                        <button 
+                            onClick={() => setActiveTab('search')}
+                            className={`pb-2 px-4 text-sm font-bold uppercase tracking-widest transition-colors ${activeTab === 'search' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-zinc-400 hover:text-zinc-600'}`}
+                        >
+                            Search
+                        </button>
+                        <button 
+                            onClick={() => setActiveTab('following')}
+                            className={`pb-2 px-4 text-sm font-bold uppercase tracking-widest transition-colors ${activeTab === 'following' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-zinc-400 hover:text-zinc-600'}`}
+                        >
+                            Following ({following.length})
+                        </button>
+                        <button 
+                            onClick={() => setActiveTab('followers')}
+                            className={`pb-2 px-4 text-sm font-bold uppercase tracking-widest transition-colors ${activeTab === 'followers' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-zinc-400 hover:text-zinc-600'}`}
+                        >
+                            Followers ({followers.length})
+                        </button>
+                    </div>
 
-                            {results.length > 0 && (
-                                <div className="mt-8 space-y-4">
-                                    {results.map((actor) => (
-                                        <div key={actor.id} className="p-4 border rounded-xl flex items-center justify-between bg-white dark:bg-zinc-900 shadow-sm">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden border border-zinc-200 dark:border-zinc-700">
-                                                    {actor.icon && <img src={actor.icon.url} alt="" className="w-full h-full object-cover" />}
+                    {activeTab === 'search' && (
+                        <Card className="border-blue-100 dark:border-blue-900/30">
+                            <CardHeader>
+                                <CardTitle className="text-lg flex items-center gap-2">
+                                    <Search className="w-4 h-4" /> Discover External Actors
+                                </CardTitle>
+                                <CardDescription>Search for users on Mastodon, Threads, or other fwber nodes.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <form onSubmit={handleSearch} className="flex gap-2">
+                                    <Input 
+                                        placeholder="@username@mastodon.social"
+                                        value={handle}
+                                        onChange={(e) => setHandle(e.target.value)}
+                                        className="bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800"
+                                    />
+                                    <Button type="submit" disabled={isSearching} className="bg-blue-600 hover:bg-blue-700 text-white">
+                                        {isSearching ? '...' : 'Search'}
+                                    </Button>
+                                </form>
+
+                                {results.length > 0 && (
+                                    <div className="mt-8 space-y-4">
+                                        {results.map((actor) => {
+                                            const isFollowing = following.some(f => f.actor_uri === actor.id);
+                                            return (
+                                                <div key={actor.id} className="p-4 border rounded-xl flex items-center justify-between bg-white dark:bg-zinc-900 shadow-sm transition-all hover:shadow-md">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden border border-zinc-200 dark:border-zinc-700">
+                                                            {actor.icon && <img src={actor.icon.url} alt="" className="w-full h-full object-cover" />}
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-bold text-sm">@{actor.preferredUsername}@{actor.server}</p>
+                                                            <p className="text-xs text-zinc-500">{actor.name || 'External Actor'}</p>
+                                                        </div>
+                                                    </div>
+                                                    <Button 
+                                                        size="sm" 
+                                                        variant={isFollowing ? "secondary" : "outline"}
+                                                        className={isFollowing ? "" : "border-blue-200 text-blue-600 hover:bg-blue-50"}
+                                                        onClick={() => handleFollow(actor.id)}
+                                                        disabled={isFollowing}
+                                                    >
+                                                        <UserPlus className="w-4 h-4 mr-2" /> 
+                                                        {isFollowing ? 'Following' : 'Follow'}
+                                                    </Button>
                                                 </div>
-                                                <div>
-                                                    <p className="font-bold text-sm">@{actor.preferredUsername}@{actor.server}</p>
-                                                    <p className="text-xs text-zinc-500">{actor.name || 'External Actor'}</p>
-                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {activeTab === 'following' && (
+                        <div className="space-y-4">
+                            {following.length === 0 ? (
+                                <p className="text-center py-12 text-zinc-500 italic">You aren't following anyone yet.</p>
+                            ) : (
+                                following.map((f) => (
+                                    <div key={f.id} className="p-4 border rounded-xl flex items-center justify-between bg-white dark:bg-zinc-900 shadow-sm">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                                                {f.username?.[0].toUpperCase()}
                                             </div>
-                                            <Button 
-                                                size="sm" 
-                                                variant={following.includes(actor.id) ? "secondary" : "outline"}
-                                                className={following.includes(actor.id) ? "" : "border-blue-200 text-blue-600 hover:bg-blue-50"}
-                                                onClick={() => handleFollow(actor.id)}
-                                                disabled={following.includes(actor.id)}
-                                            >
-                                                <UserPlus className="w-4 h-4 mr-2" /> 
-                                                {following.includes(actor.id) ? 'Following' : 'Follow'}
-                                            </Button>
+                                            <div>
+                                                <p className="font-bold text-sm">@{f.username}@{f.domain}</p>
+                                                <p className="text-[10px] text-zinc-400 uppercase tracking-widest font-bold">Status: {f.status}</p>
+                                            </div>
                                         </div>
-                                    ))}
-                                </div>
+                                        <Badge variant="secondary">{f.status}</Badge>
+                                    </div>
+                                ))
                             )}
-                        </CardContent>
-                    </Card>
+                        </div>
+                    )}
+
+                    {activeTab === 'followers' && (
+                        <div className="space-y-4">
+                            {followers.length === 0 ? (
+                                <p className="text-center py-12 text-zinc-500 italic">No one is following you yet.</p>
+                            ) : (
+                                followers.map((f) => (
+                                    <div key={f.id} className="p-4 border rounded-xl flex items-center justify-between bg-white dark:bg-zinc-900 shadow-sm">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold">
+                                                {f.username?.[0].toUpperCase()}
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-sm">@{f.username}@{f.domain}</p>
+                                                <p className="text-[10px] text-zinc-400 uppercase tracking-widest font-bold">Remote Follower</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    )}
 
                     <Card className="bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800">
                         <CardHeader>
