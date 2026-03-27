@@ -69,6 +69,9 @@ class ActivityPubInboxController extends Controller
             ]
         );
 
+        // Notify the user
+        $user->notify(new \App\Notifications\FederatedFollowNotification($username, $domain));
+
         return response()->json(['status' => 'follow_processed'], 202);
     }
 
