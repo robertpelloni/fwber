@@ -67,6 +67,7 @@ const navLinks: NavItem[] = [
     { href: '/bounties', label: 'Bounties', icon: Target },
     { href: '/nearby', label: 'Nearby', icon: MapPin },
     { href: '/wingman', label: 'Arcade', icon: Gamepad2 },
+    { href: '/merchant/dashboard', label: 'Merchant Hub', icon: Briefcase },
     { href: '/wallet', label: 'Wallet', icon: Wallet },
     { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
 ]
@@ -297,6 +298,11 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
 
                         <nav className="space-y-1" aria-label="Primary navigation">
                             {navLinks.map((link) => {
+                                // Skip Merchant Hub if user is not a merchant
+                                if (link.href === '/merchant/dashboard' && user?.role !== 'merchant') {
+                                    return null
+                                }
+
                                 const active = isActivePath(pathname, link.href)
 
                                 return (
