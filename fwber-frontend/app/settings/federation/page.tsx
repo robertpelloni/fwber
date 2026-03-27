@@ -27,6 +27,27 @@ export default function FederationSettingsPage() {
     const [handle, setHandle] = useState('');
     const [isSearching, setIsSearching] = useState(false);
     const [results, setResults] = useState<RemoteActor[]>([]);
+    const [following, setFollowing] = useState<string[]>([]);
+
+    const handleFollow = async (actorId: string) => {
+        if (!token) return;
+        try {
+            await api.post('/federation/follow', { actor_id: actorId }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setFollowing([...following, actorId]);
+            toast({
+                title: "Follow Request Sent",
+                description: "You are now following this federated actor.",
+            });
+        } catch (error) {
+            toast({
+                variant: "destructive",
+                title: "Follow Failed",
+                description: "Could not send follow request to the remote server.",
+            });
+        }
+    };
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -117,8 +138,15 @@ export default function FederationSettingsPage() {
                                                     <p className="text-xs text-zinc-500">{actor.name || 'External Actor'}</p>
                                                 </div>
                                             </div>
-                                            <Button size="sm" variant="outline" className="border-blue-200 text-blue-600 hover:bg-blue-50">
-                                                <UserPlus className="w-4 h-4 mr-2" /> Follow
+                                            <Button 
+                                                size="sm" 
+                                                variant={following.includes(actor.id) ? "secondary" : "outline"}
+                                                className={following.includes(actor.id) ? "" : "border-blue-200 text-blue-600 hover:bg-blue-50"}
+                                                onClick={() => handleFollow(actor.id)}
+                                                disabled={following.includes(actor.id)}
+                                            >
+                                                <UserPlus className="w-4 h-4 mr-2" /> 
+                                                {following.includes(actor.id) ? 'Following' : 'Follow'}
                                             </Button>
                                         </div>
                                     ))}

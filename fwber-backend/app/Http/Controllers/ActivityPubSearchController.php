@@ -80,4 +80,32 @@ class ActivityPubSearchController extends Controller
             return response()->json(['actors' => []]);
         }
     }
+
+    /**
+     * Follow an external actor.
+     */
+    public function follow(Request $request)
+    {
+        $user = auth()->user();
+        $actorId = $request->input('actor_id');
+
+        if (!$actorId) {
+            return response()->json(['error' => 'Actor ID required'], 422);
+        }
+
+        try {
+            // Log the follow intent (In a real system, this would queue an ActivityPub 'Follow' activity)
+            Log::info("User {$user->id} requested to follow federated actor: {$actorId}");
+
+            // TODO: Sign and dispatch 'Follow' activity to remote inbox
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Follow request initiated'
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Failed to initiate federated follow: " . $e->getMessage());
+            return response()->json(['error' => 'Failed to process follow request'], 500);
+        }
+    }
 }

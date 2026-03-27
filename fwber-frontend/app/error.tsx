@@ -25,15 +25,21 @@ export default function Error({
     // Sentry.captureException(error)
   }, [error])
 
-  // Determine error type and messaging
-  const isNetworkError = error.message?.includes('fetch') ||
-                         error.message?.includes('network') ||
-                         error.message?.includes('Failed to fetch')
+  // Safely extract message as string
+  const errorMessage = typeof error?.message === 'string' 
+    ? error.message 
+    : JSON.stringify(error?.message || error || '');
 
-  const isAuthError = error.message?.includes('401') ||
-                      error.message?.includes('403') ||
-                      error.message?.includes('Unauthorized') ||
-                      error.message?.includes('authentication')
+  // Determine error type and messaging
+  const isNetworkError = errorMessage.includes('fetch') ||
+                         errorMessage.includes('network') ||
+                         errorMessage.includes('Failed to fetch')
+
+  const isAuthError = errorMessage.includes('401') ||
+                      errorMessage.includes('403') ||
+                      errorMessage.includes('Unauthorized') ||
+                      errorMessage.includes('authentication') ||
+                      errorMessage.includes('Unauthenticated')
 
   const getErrorTitle = () => {
     if (isNetworkError) return 'Connection Problem'
