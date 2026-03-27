@@ -109,6 +109,25 @@ export async function getKeyPair(userId: number): Promise<CryptoKeyPair | null> 
   });
 }
 
+export async function getKeyPairMetadata(userId: number): Promise<{ createdAt: number } | null> {
+  const db = await openDatabase();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(STORE_KEYS, 'readonly');
+    const store = transaction.objectStore(STORE_KEYS);
+    const request = store.get(userId);
+
+    request.onerror = () => reject(new Error('Failed to retrieve key pair metadata'));
+    request.onsuccess = () => {
+      const result = request.result as KeyPairStorage;
+      if (!result) {
+        resolve(null);
+        return;
+      }
+      resolve({ createdAt: result.createdAt });
+    };
+  });
+}
+
 export async function clearKeys(): Promise<void> {
   const db = await openDatabase();
   return new Promise((resolve, reject) => {

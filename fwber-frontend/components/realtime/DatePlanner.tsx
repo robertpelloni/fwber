@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useAiWingman, DateIdea } from '@/lib/hooks/use-ai-wingman';
@@ -8,14 +8,26 @@ import { useToast } from '@/components/ToastProvider';
 interface DatePlannerProps {
   matchId: string;
   matchName: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  hideTrigger?: boolean;
 }
 
-export function DatePlanner({ matchId, matchName }: DatePlannerProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function DatePlanner({ matchId, matchName, open, onOpenChange, hideTrigger = false }: DatePlannerProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isOpen = open !== undefined ? open : internalOpen;
+  
   const { getDateIdeas } = useAiWingman();
   const [ideas, setIdeas] = useState<DateIdea[]>([]);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const toast = useToast();
+
+  const handleOpenChange = (val: boolean) => {
+    setInternalOpen(val);
+    if (onOpenChange) {
+      onOpenChange(val);
+    }
+  };
 
   const handleGenerate = () => {
     getDateIdeas.mutate(
@@ -28,21 +40,23 @@ export function DatePlanner({ matchId, matchName }: DatePlannerProps) {
     );
   };
 
-  const copyToClipboard = (text: string, index: number) => {
-    navigator.clipboard.writeText(text);
-    setCopiedIndex(index);
-    setTimeout(() => setCopiedIndex(null), 2000);
-    toast.showSuccess('Date idea copied!');
-  };
+  // Auto-generate if opened and no ideas exist
+  useEffect(() => {
+    if (isOpen && ideas.length === 0 && !getDateIdeas.isPending) {
+      handleGenerate();
+    }
+  }, [isOpen]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
-          <Calendar className="w-4 h-4" />
-          Plan Date
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      {!hideTrigger && (
+        <DialogTrigger asChild>
+          <Button variant="outline" size="sm" className="gap-2">
+            <Calendar className="w-4 h-4" />
+            Plan Date
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">

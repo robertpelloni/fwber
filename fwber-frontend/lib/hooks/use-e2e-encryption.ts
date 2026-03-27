@@ -16,15 +16,22 @@ export function useE2EEncryption() {
     const initKeys = async () => {
       try {
         let keyPair = await Storage.getKeyPair(user.id);
+        let metadata = await Storage.getKeyPairMetadata(user.id);
+        
+        const KEY_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+        const needsRotation = metadata && (Date.now() - metadata.createdAt > KEY_MAX_AGE_MS);
 
-        if (!keyPair) {
-
+        if (!keyPair || needsRotation) {
+          console.log(needsRotation ? 'E2E keys expired. Rotating...' : 'Generating initial E2E keys...');
           keyPair = await Crypto.generateKeyPair();
           await Storage.storeKeyPair(user.id, keyPair);
 
           const publicKeyString = await Crypto.exportPublicKey(keyPair.publicKey);
           await securityApi.storePublicKey(publicKeyString);
-
+          
+          if (needsRotation) {
+            setSharedKeys({}); // Clear cached shared keys on rotation
+          }
         }
         setIsReady(true);
       } catch (error) {

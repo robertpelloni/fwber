@@ -138,6 +138,7 @@ export default function RealTimeChat({
   const [isConnected, setIsConnected] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [isGiftModalOpen, setIsGiftModalOpen] = useState(false);
+  const [isDatePlannerOpen, setIsDatePlannerOpen] = useState(false);
   const [showSafetyMenu, setShowSafetyMenu] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSending, setIsSending] = useState(false);
@@ -167,6 +168,12 @@ export default function RealTimeChat({
     if (currentNudges && currentNudges.length > 0) {
       // Show the most recent one
       setActiveNudge(currentNudges[currentNudges.length - 1]);
+      
+      // Auto-dismiss after 15 seconds
+      const timer = setTimeout(() => {
+        setActiveNudge(null);
+      }, 15000);
+      return () => clearTimeout(timer);
     }
   }, [currentNudges]);
 
@@ -383,7 +390,12 @@ export default function RealTimeChat({
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <DatePlanner matchId={recipientId} matchName={recipientName} />
+          <DatePlanner 
+            matchId={recipientId} 
+            matchName={recipientName} 
+            open={isDatePlannerOpen}
+            onOpenChange={setIsDatePlannerOpen}
+          />
 
           <button
             onClick={onLocate}
@@ -554,7 +566,7 @@ export default function RealTimeChat({
                       const type = activeNudge.nudge?.type;
                       if (type === 'ice_breaker') router.push(`/ice-breakers?match=${recipientId}`);
                       else if (type === 'scrapbook') router.push(`/scrapbook?match=${recipientId}`);
-                      else if (type === 'ask_out') setIsGiftModalOpen(true); // Placeholder for date planner
+                      else if (type === 'ask_out') setIsDatePlannerOpen(true);
                       setActiveNudge(null);
                     }}
                   >

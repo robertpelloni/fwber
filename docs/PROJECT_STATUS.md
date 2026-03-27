@@ -36,10 +36,15 @@
 
 ## 🚧 Active Development (Phase 5B)
 
-- **[IN PROGRESS]** **ActivityPub Inbox/Outbox UI**: Developing the feed for federated interactions.
-- **[IN PROGRESS]** **Merchant Onboarding**: Refining the business registration flow.
-- **[TODO]** **AI Wingman Proactive Nudges**: Wiring the "Smart Suggestion" engine into active chats.
-- **[TODO]** **E2E Encryption Key Rotation**: Automating key lifecycle management in the UI.
+- **[DONE]** **ActivityPub Inbox/Outbox UI**: Developing the feed for federated interactions.
+- **[DONE]** **Merchant Onboarding**: Refining the business registration flow.
+- **[DONE]** **AI Wingman Proactive Nudges**: Wiring the "Smart Suggestion" engine into active chats.
+- **[DONE]** **E2E Encryption Key Rotation**: Automating key lifecycle management in the UI.
+
+### Phase 6: Ecosystem Polish & Scale (Upcoming)
+- **[TODO]** Finalize multi-region load balancing
+- **[TODO]** Comprehensive user sentiment and engagement analysis
+- **[TODO]** Advanced AI match probability tuning
 
 ---
 
