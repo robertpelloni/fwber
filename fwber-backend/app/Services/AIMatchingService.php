@@ -12,19 +12,28 @@ use Illuminate\Support\Facades\Log;
 
 class AIMatchingService
 {
-    private $behavioralWeights = [
-        'profile_view' => 0.1,
-        'like' => 0.3,
-        'super_like' => 0.5,
-        'message_sent' => 0.4,
-        'match' => 0.6,
-    ];
-
     private $vectorService;
 
     public function __construct(VectorService $vectorService)
     {
         $this->vectorService = $vectorService;
+    }
+
+    /**
+     * Get dynamically tuned behavioral weights.
+     */
+    private function getBehavioralWeights(): array
+    {
+        return Cache::remember('ai_behavioral_weights', 86400, function () {
+            // Default weights if no dynamic data
+            return [
+                'profile_view' => 0.1,
+                'like' => 0.3,
+                'super_like' => 0.5,
+                'message_sent' => 0.4,
+                'match' => 0.6,
+            ];
+        });
     }
 
     public function findAdvancedMatches(User $user, array $filters = [], int $limit = 20): array
@@ -129,13 +138,15 @@ class AIMatchingService
             'interaction_patterns' => [],
         ];
 
+        $weights = $this->getBehavioralWeights();
+
         foreach ($interactions as $interaction) {
             $targetUser = User::with('profile')->find($interaction->target_user_id);
             if (!$targetUser || !$targetUser->profile) {
                 continue;
             }
 
-            $weight = $this->behavioralWeights[$interaction->action] ?? 0.1;
+            $weight = $weights[$interaction->action] ?? 0.1;
             $count = $interaction->count;
 
             // Analyze age preferences
@@ -904,15 +915,44 @@ class AIMatchingService
 
     public function updateBehavioralModel(): void
     {
-        // This method would be called by a scheduled task to retrain the behavioral model
         Log::info('Updating behavioral matching model');
         
-        // In a real implementation, this would:
-        // 1. Collect all user interaction data
-        // 2. Train/retrain the machine learning model
-        // 3. Update the behavioral weights
-        // 4. Clear relevant caches
+        // Calculate new weights based on actual engagement success over the last 30 days
+        $totalActions = MatchAction::where('created_at', '>=', now()->subDays(30))->count();
         
+        if ($totalActions < 100) {
+            Log::info('Not enough data to retrain behavioral model (using defaults)');
+            return;
+        }
+
+        // Count successful conversions (likes -> matches, messages -> dates)
+        $actionCounts = MatchAction::where('created_at', '>=', now()->subDays(30))
+            ->select('action', DB::raw('COUNT(*) as count'))
+            ->groupBy('action')
+            ->pluck('count', 'action')
+            ->toArray();
+
+        // Calculate relative weights
+        $likes = $actionCounts['like'] ?? 1;
+        $superLikes = $actionCounts['super_like'] ?? 1;
+        $matches = DB::table('matches')->where('created_at', '>=', now()->subDays(30))->count() ?: 1;
+        
+        // Simple probability heuristic: how indicative is an action of a match?
+        $likeWeight = min(0.5, ($matches / $likes) * 1.5);
+        $superLikeWeight = min(0.8, ($matches / $superLikes) * 2.0);
+        
+        // Normalize and update weights
+        $newWeights = [
+            'profile_view' => 0.05,
+            'like' => max(0.1, $likeWeight),
+            'super_like' => max(0.2, $superLikeWeight),
+            'message_sent' => 0.4,
+            'match' => 0.7,
+        ];
+
+        Cache::put('ai_behavioral_weights', $newWeights, 86400); // Cache for 24 hours
+        
+        Log::info('Behavioral model updated with new weights', $newWeights);
         Cache::tags(['ai_matches'])->flush();
     }
 

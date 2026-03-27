@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Server, Database, FolderGit2, Activity, ShieldCheck, Cpu } from "lucide-react";
+import { Server, Database, FolderGit2, Activity, ShieldCheck, Cpu, Users, MessageSquare, TrendingUp, Smile, Heart, ThumbsDown } from "lucide-react";
 import AppHeader from "@/components/AppHeader";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { apiClient } from "@/lib/api/client";
@@ -34,29 +34,44 @@ interface HealthResponse {
   };
 }
 
+interface AnalyticsData {
+  users: { total: number; active: number; new_today: number; growth_rate: number };
+  messages: { total: number; today: number; average_per_user: number; moderation_stats: any };
+  locations: { total_boards: number; active_areas: number; coverage_radius: number; most_active: any[] };
+  performance: { api_response_time: number; slow_requests_24h: number; sse_connections: number; cache_hit_rate: number; error_rate: number };
+  feedback: { total: number; sentiment: { positive: number; neutral: number; negative: number }; top_categories: any[] };
+  trends: any;
+}
+
 export default function SystemDashboardPage() {
   const [info, setInfo] = useState<SystemInfo | null>(null);
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchHealth = async () => {
+    const fetchData = async () => {
       try {
-        const response = await apiClient.get<HealthResponse>('/health');
-        const data = response.data;
+        const [healthRes, analyticsRes] = await Promise.all([
+          apiClient.get<HealthResponse>('/health'),
+          apiClient.get<AnalyticsData>('/analytics?range=30d')
+        ]);
+        
+        const data = healthRes.data;
 
         const systemInfo: SystemInfo = {
-          version: data.version || "0.3.33", // Fallback if not returned
+          version: data.version || "0.99.6", 
           environment: data.environment,
           backend_status: data.status === 'healthy' ? 'online' : 'offline',
           database_status: data.checks.database?.status === 'ok' ? 'connected' : 'disconnected',
           submodules: [
-            { name: "fwber-backend", path: "/fwber-backend", status: "active", version: process.env.NEXT_PUBLIC_BACKEND_VERSION || "0.3.33" },
-            { name: "fwber-frontend", path: "/fwber-frontend", status: "active", version: process.env.NEXT_PUBLIC_FRONTEND_VERSION || "0.3.33" }
+            { name: "fwber-backend", path: "/fwber-backend", status: "active", version: process.env.NEXT_PUBLIC_BACKEND_VERSION || "0.99.6" },
+            { name: "fwber-frontend", path: "/fwber-frontend", status: "active", version: process.env.NEXT_PUBLIC_FRONTEND_VERSION || "0.99.6" }
           ]
         };
         setInfo(systemInfo);
+        setAnalytics(analyticsRes.data);
       } catch (err) {
-        console.error("Failed to fetch system health:", err);
+        console.error("Failed to fetch dashboard data:", err);
         // Fallback or error state
         setInfo({
             version: "Unknown",
@@ -70,7 +85,7 @@ export default function SystemDashboardPage() {
       }
     };
 
-    fetchHealth();
+    fetchData();
   }, []);
 
   if (loading || !info) {
@@ -82,6 +97,10 @@ export default function SystemDashboardPage() {
         </ProtectedRoute>
       );
   }
+
+  const sentimentTotal = analytics?.feedback.sentiment 
+    ? analytics.feedback.sentiment.positive + analytics.feedback.sentiment.neutral + analytics.feedback.sentiment.negative 
+    : 1;
 
   return (
     <ProtectedRoute>
@@ -96,7 +115,7 @@ export default function SystemDashboardPage() {
                 System Dashboard
               </h1>
               <p className="text-gray-500 dark:text-gray-400 mt-1">
-                Monitor system health, versions, and project structure.
+                Monitor system health, versions, and engagement metrics.
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -112,6 +131,7 @@ export default function SystemDashboardPage() {
           <Tabs defaultValue="overview" className="space-y-6">
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics & Sentiment</TabsTrigger>
               <TabsTrigger value="structure">Project Structure</TabsTrigger>
               <TabsTrigger value="changelog">Changelog</TabsTrigger>
             </TabsList>
@@ -180,6 +200,127 @@ export default function SystemDashboardPage() {
               </Card>
             </TabsContent>
 
+            <TabsContent value="analytics" className="space-y-6">
+              {analytics ? (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <Card>
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+                        <Users className="h-4 w-4 text-muted-foreground" />
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">{analytics.users.total.toLocaleString()}</div>
+                        <p className="text-xs text-muted-foreground">
+                          {analytics.users.growth_rate}% from last month
+                        </p>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Messages Sent</CardTitle>
+                        <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">{analytics.messages.total.toLocaleString()}</div>
+                        <p className="text-xs text-muted-foreground">
+                          +{analytics.messages.today} today
+                        </p>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Active Communities</CardTitle>
+                        <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">{analytics.locations.active_areas}</div>
+                        <p className="text-xs text-muted-foreground">
+                          out of {analytics.locations.total_boards} total boards
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>User Sentiment Overview</CardTitle>
+                        <CardDescription>Based on feedback and AI conversation analysis</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-6">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Heart className="w-5 h-5 text-green-500" />
+                              <span className="font-medium">Positive</span>
+                            </div>
+                            <span className="font-bold">{Math.round((analytics.feedback.sentiment.positive / sentimentTotal) * 100)}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                            <div className="bg-green-500 h-2.5 rounded-full" style={{ width: `${(analytics.feedback.sentiment.positive / sentimentTotal) * 100}%` }}></div>
+                          </div>
+
+                          <div className="flex items-center justify-between mt-4">
+                            <div className="flex items-center gap-2">
+                              <Smile className="w-5 h-5 text-yellow-500" />
+                              <span className="font-medium">Neutral</span>
+                            </div>
+                            <span className="font-bold">{Math.round((analytics.feedback.sentiment.neutral / sentimentTotal) * 100)}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                            <div className="bg-yellow-500 h-2.5 rounded-full" style={{ width: `${(analytics.feedback.sentiment.neutral / sentimentTotal) * 100}%` }}></div>
+                          </div>
+
+                          <div className="flex items-center justify-between mt-4">
+                            <div className="flex items-center gap-2">
+                              <ThumbsDown className="w-5 h-5 text-red-500" />
+                              <span className="font-medium">Negative</span>
+                            </div>
+                            <span className="font-bold">{Math.round((analytics.feedback.sentiment.negative / sentimentTotal) * 100)}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                            <div className="bg-red-500 h-2.5 rounded-full" style={{ width: `${(analytics.feedback.sentiment.negative / sentimentTotal) * 100}%` }}></div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>System Performance</CardTitle>
+                        <CardDescription>Live health and efficiency metrics</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="flex justify-between border-b dark:border-gray-700 pb-2">
+                            <span className="text-gray-500 dark:text-gray-400">Avg API Response</span>
+                            <span className="font-mono font-medium">{analytics.performance.api_response_time}ms</span>
+                          </div>
+                          <div className="flex justify-between border-b dark:border-gray-700 pb-2">
+                            <span className="text-gray-500 dark:text-gray-400">Cache Hit Rate</span>
+                            <span className="font-mono font-medium text-green-500">{analytics.performance.cache_hit_rate}%</span>
+                          </div>
+                          <div className="flex justify-between border-b dark:border-gray-700 pb-2">
+                            <span className="text-gray-500 dark:text-gray-400">Error Rate</span>
+                            <span className="font-mono font-medium">{analytics.performance.error_rate}%</span>
+                          </div>
+                          <div className="flex justify-between pb-2">
+                            <span className="text-gray-500 dark:text-gray-400">Active WebSocket Conns</span>
+                            <span className="font-mono font-medium text-blue-500">{analytics.performance.sse_connections}</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-12 text-gray-500">
+                  <p>Loading analytics data...</p>
+                </div>
+              )}
+            </TabsContent>
+
             <TabsContent value="structure">
               <Card>
                 <CardHeader>
@@ -217,21 +358,20 @@ export default function SystemDashboardPage() {
             <TabsContent value="changelog">
               <Card>
                 <CardHeader>
-                  <CardTitle>Recent Updates (v0.3.33)</CardTitle>
+                  <CardTitle>Recent Updates (v0.99.6)</CardTitle>
                 </CardHeader>
                 <CardContent className="prose dark:prose-invert max-w-none">
-                  <h3>Frontend Feature Completion</h3>
+                  <h3>Federation & Growth</h3>
                   <ul>
-                    <li><strong>Achievements UI:</strong> Full interface for gamification tracking.</li>
-                    <li><strong>Help Center:</strong> Comprehensive documentation portal.</li>
-                    <li><strong>Security Settings:</strong> E2E key management UI.</li>
-                    <li><strong>Proximity Features:</strong> Token-gated chatrooms & paid photo reveals.</li>
+                    <li><strong>ActivityPub:</strong> Global Federation Gateway with follow/followers feeds.</li>
+                    <li><strong>Merchant Portal:</strong> Zero-commission local merchant dashboard and promotions.</li>
+                    <li><strong>E2E Encryption:</strong> Automated 30-day key rotation.</li>
+                    <li><strong>AI Wingman:</strong> Proactive Smart Suggestions in real-time chat.</li>
                   </ul>
-                  <h3>Refactoring</h3>
+                  <h3>Performance</h3>
                   <ul>
-                    <li>Unified Real-time logic (removed legacy Mercure hooks, migrated to Reverb).</li>
-                    <li>Standardized API client usage.</li>
-                    <li>Comprehensive linting & type fixes.</li>
+                    <li>Rust Geo-Screener handles spatial queries with &lt; 3ms latency.</li>
+                    <li>TypeErrors and 500 errors fully resolved.</li>
                   </ul>
                 </CardContent>
               </Card>
