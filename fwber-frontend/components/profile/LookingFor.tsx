@@ -19,7 +19,7 @@ export default function LookingFor({ formData, handleLookingForChange }: Looking
             <label key={option} className="flex items-center cursor-pointer">
               <input
                 type="checkbox"
-                checked={formData.looking_for.includes(option)}
+                checked={Array.isArray(formData.looking_for) ? formData.looking_for.includes(option) : false}
                 onChange={(e) => handleLookingForChange(option, e.target.checked)}
                 className="h-5 w-5 rounded border-2 border-gray-400 text-blue-600 accent-blue-600 cursor-pointer"
               />

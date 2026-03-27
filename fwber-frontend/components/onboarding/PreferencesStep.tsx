@@ -57,7 +57,7 @@ export function PreferencesStep<T extends OnboardingFormData>({ formData, setFor
                   type="checkbox"
                   id={`looking_${opt}`}
                   className="h-5 w-5 rounded border-2 border-gray-400 text-blue-600 focus:ring-blue-500 accent-blue-600 cursor-pointer"
-                  checked={formData.looking_for.includes(val)}
+                  checked={Array.isArray(formData.looking_for) ? formData.looking_for.includes(val) : false}
                   onChange={e => handleLookingForChange(val, e.target.checked)}
                 />
                 <span className="text-sm select-none">{opt}</span>

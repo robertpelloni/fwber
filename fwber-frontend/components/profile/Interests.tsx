@@ -23,7 +23,7 @@ export default function Interests({ formData, handleArrayPreferenceChange }: Int
               <label key={hobby} className="flex items-center">
                 <input
                   type="checkbox"
-                  checked={formData.preferences.hobbies.includes(hobby)}
+                  checked={Array.isArray(formData.preferences?.hobbies) ? formData.preferences.hobbies.includes(hobby) : false}
                   onChange={(e) => handleArrayPreferenceChange('hobbies', hobby, e.target.checked)}
                   className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                 />
@@ -42,7 +42,7 @@ export default function Interests({ formData, handleArrayPreferenceChange }: Int
               <label key={genre} className="flex items-center">
                 <input
                   type="checkbox"
-                  checked={formData.preferences.music.includes(genre)}
+                  checked={Array.isArray(formData.preferences?.music) ? formData.preferences.music.includes(genre) : false}
                   onChange={(e) => handleArrayPreferenceChange('music', genre, e.target.checked)}
                   className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                 />
@@ -61,7 +61,7 @@ export default function Interests({ formData, handleArrayPreferenceChange }: Int
               <label key={sport} className="flex items-center">
                 <input
                   type="checkbox"
-                  checked={formData.preferences.sports.includes(sport)}
+                  checked={Array.isArray(formData.preferences?.sports) ? formData.preferences.sports.includes(sport) : false}
                   onChange={(e) => handleArrayPreferenceChange('sports', sport, e.target.checked)}
                   className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                 />
