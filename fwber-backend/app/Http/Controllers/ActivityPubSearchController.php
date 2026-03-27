@@ -150,4 +150,18 @@ class ActivityPubSearchController extends Controller
             'followers' => $followers
         ]);
     }
+
+    /**
+     * Get recent federated posts.
+     */
+    public function getPosts()
+    {
+        $posts = \App\Models\FederatedPost::orderBy('published_at', 'desc')
+            ->limit(50)
+            ->get();
+
+        return response()->json([
+            'posts' => $posts
+        ]);
+    }
 }
