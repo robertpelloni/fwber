@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api/client';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
-import { Globe, Search, UserPlus, Shield, Info, ArrowLeft, Share2 } from 'lucide-react';
+import { Globe, Search, UserPlus, Shield, Info, ArrowLeft, Share2, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 
 interface RemoteActor {
