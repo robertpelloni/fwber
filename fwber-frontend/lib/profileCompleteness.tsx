@@ -149,8 +149,8 @@ export function ProfileCompletenessChecklist({
   className = '' 
 }: ProfileCompletenessChecklistProps) {
   const allFields = [
-    ...completeness.missingFields,
-    ...DEFAULT_PROFILE_FIELDS.filter(f => completeness.completedFields.includes(f.key))
+    ...(Array.isArray(completeness.missingFields) ? completeness.missingFields : []),
+    ...DEFAULT_PROFILE_FIELDS.filter(f => Array.isArray(completeness.completedFields) && completeness.completedFields.includes(f.key))
   ].sort((a, b) => {
     // Required first, then by weight
     if (a.required && !b.required) return -1;
@@ -176,7 +176,7 @@ export function ProfileCompletenessChecklist({
 
       <div className="space-y-2">
         {allFields.map(field => {
-          const isComplete = completeness.completedFields.includes(field.key);
+          const isComplete = Array.isArray(completeness.completedFields) && completeness.completedFields.includes(field.key);
           return (
             <button
               key={field.key}

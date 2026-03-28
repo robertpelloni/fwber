@@ -96,7 +96,7 @@ export default function EnhancedProfileEditor() {
   };
 
   const handleArrayToggle = (field: 'looking_for' | 'interests' | 'languages' | 'interested_in' | 'fetishes', value: string) => {
-    const current = (profile[field] as string[]) || [];
+    const current = Array.isArray(profile[field]) ? (profile[field] as string[]) : [];
     const updated = current.includes(value)
       ? current.filter(item => item !== value)
       : [...current, value];

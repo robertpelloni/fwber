@@ -42,7 +42,9 @@ class PhotoAPI {
   private baseUrl: string
 
   constructor() {
-    this.baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+    this.baseUrl = typeof window !== 'undefined' 
+      ? '/api' 
+      : (process.env.NEXT_PUBLIC_API_URL || 'https://api.fwber.me').replace(/\/$/, '') + '/api'
   }
 
   private async request<T>(

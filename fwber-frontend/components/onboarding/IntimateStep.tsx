@@ -31,7 +31,7 @@ export default function IntimateStep({ formData, setFormData }: IntimateStepProp
 
   const handleArrayToggle = (field: 'sti_status' | 'fetishes', value: string) => {
     setFormData((prev: Record<string, unknown>) => {
-      const current = (prev[field] as string[]) || [];
+      const current = Array.isArray(prev[field]) ? (prev[field] as string[]) : [];
       const updated = current.includes(value)
         ? current.filter((v: string) => v !== value)
         : [...current, value];
