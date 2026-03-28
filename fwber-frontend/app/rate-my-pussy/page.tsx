@@ -92,7 +92,7 @@ export default function RateMyPussyPage() {
             RATE MY PUSSY
           </h1>
           <p className="text-xl text-gray-400 font-medium">
-            The world's most provocative cat rating site.
+            The world&apos;s most provocative cat rating site.
           </p>
         </header>
 
@@ -123,7 +123,7 @@ export default function RateMyPussyPage() {
             </h2>
             <form onSubmit={handleUpload} className="space-y-6">
               <div>
-                <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-widest">Cat's Name</label>
+                <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-widest">Cat&apos;s Name</label>
                 <input
                   type="text"
                   value={newCatName}
@@ -170,10 +170,11 @@ export default function RateMyPussyPage() {
                 } rounded-3xl blur opacity-25 group-hover:opacity-75 transition duration-500`} />
                 <div className="relative bg-zinc-950 rounded-3xl border border-zinc-800 overflow-hidden">
                   <div className="aspect-square relative">
-                    <img
+                    <Image
                       src={cat.image_url}
                       alt={cat.cat_name}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
                     />
                     <div className="absolute top-4 left-4 bg-black/80 backdrop-blur px-4 py-1 rounded-full text-sm font-black border border-white/10">
                       #{i + 1}
@@ -213,10 +214,11 @@ export default function RateMyPussyPage() {
             {otherCats.map((cat) => (
               <div key={cat.id} className="bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800 group">
                 <div className="aspect-square relative overflow-hidden">
-                  <img
+                  <Image
                     src={cat.image_url}
                     alt={cat.cat_name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                    fill
+                    className="object-cover group-hover:scale-110 transition duration-500"
                   />
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                     <button 
@@ -246,7 +248,7 @@ export default function RateMyPussyPage() {
           <div className="relative z-10">
             <h2 className="text-4xl font-black mb-4">Looking for humans instead?</h2>
             <p className="text-gray-400 mb-8 max-w-lg mx-auto text-lg leading-relaxed">
-              fwber is Detroit's privacy-first, open-source proximity dating app.
+              fwber is Detroit&apos;s privacy-first, open-source proximity dating app.
               Find real connections, keep your data.
             </p>
             <Link

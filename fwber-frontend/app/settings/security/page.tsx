@@ -144,7 +144,7 @@ export default function SecuritySettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-purple-600 dark:text-purple-400">
                 <Mic2 className="w-5 h-5" />
-                Voice-Only "Confessional" Mode
+                Voice-Only &quot;Confessional&quot; Mode
               </CardTitle>
               <CardDescription>
                 Disable photos and bios entirely. Force matches to be made based on the sound of your voice and the depth of your 15-second intro.

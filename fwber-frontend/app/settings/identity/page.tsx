@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api/client';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,7 @@ export default function IdentityVerificationPage() {
   const [loading, setLoading] = useState(true);
   const [isVerifying, setIsVerifying] = useState(false);
 
-  const fetchStatus = async () => {
+  const fetchStatus = useCallback(async () => {
     try {
       setLoading(true);
       const res = await api.get('/identity/status', {
@@ -28,11 +28,11 @@ export default function IdentityVerificationPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     if (token) fetchStatus();
-  }, [token]);
+  }, [token, fetchStatus]);
 
   const handleSimulateZKProof = async () => {
     if (!user) return;
@@ -122,7 +122,7 @@ export default function IdentityVerificationPage() {
             
             <CardFooter className="bg-green-500/10 border-t border-green-500/20 p-4">
                 <p className="text-xs text-green-700 dark:text-green-300">
-                    You can now access premium "Verified-Only" pulse feeds and messaging tiers.
+                    You can now access premium &quot;Verified-Only&quot; pulse feeds and messaging tiers.
                 </p>
             </CardFooter>
           </Card>
@@ -143,7 +143,7 @@ export default function IdentityVerificationPage() {
                         <div className="p-4 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex flex-col gap-2">
                             <Fingerprint className="w-6 h-6 text-purple-500" />
                             <h4 className="font-bold text-sm uppercase">Biometric Link</h4>
-                            <p className="text-xs text-zinc-500">Connect your device's secure enclave to generate a unique identity key.</p>
+                            <p className="text-xs text-zinc-500">Connect your device&apos;s secure enclave to generate a unique identity key.</p>
                         </div>
                         <div className="p-4 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex flex-col gap-2">
                             <Lock className="w-6 h-6 text-blue-500" />

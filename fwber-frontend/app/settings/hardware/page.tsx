@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api/client';
 import { Button } from '@/components/ui/button';
@@ -27,7 +27,7 @@ export default function HardwareTokenPage() {
   const [isPairing, setIsPairing] = useState(false);
   const [pairingCode, setPairingCode] = useState('');
 
-  const fetchStatus = async () => {
+  const fetchStatus = useCallback(async () => {
     try {
       setLoading(true);
       const res = await api.get('/hardware-tokens/status', {
@@ -42,11 +42,11 @@ export default function HardwareTokenPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     if (token) fetchStatus();
-  }, [token]);
+  }, [token, fetchStatus]);
 
   const handlePair = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,7 +85,7 @@ export default function HardwareTokenPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-black italic tracking-tighter text-zinc-900 dark:text-white uppercase flex items-center gap-3">
             <Bluetooth className="w-8 h-8 text-blue-500" />
-            "Anti-App" Token
+            &quot;Anti-App&quot; Token
           </h1>
           <p className="text-zinc-500 mt-2">
             Pair your physical fwber bracelet or keychain. Leave your phone in your pocket. The token will glow and vibrate when a highly compatible match is within 50 feet.

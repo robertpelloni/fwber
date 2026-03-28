@@ -6,7 +6,7 @@ import AppHeader from '@/components/AppHeader'
 import { apiClient } from '@/lib/api/client'
 import {
   Skull, ArrowLeft, RefreshCw, Share2,
-  Zap, AlertTriangle, Brain, Ghost
+  Zap, AlertTriangle, Brain, Ghost, Globe
 } from 'lucide-react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -191,7 +191,7 @@ export default function ScientificNemesisPage() {
                             <Skull className="w-3 h-3" /> The Disaster Scenario
                           </h3>
                           <p className="text-sm text-zinc-300 leading-relaxed italic">
-                            "{result.why_it_would_fail}"
+                            &quot;{result.why_it_would_fail}&quot;
                           </p>
                         </div>
 

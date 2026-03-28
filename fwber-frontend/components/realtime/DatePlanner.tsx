@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useAiWingman, DateIdea } from '@/lib/hooks/use-ai-wingman';
@@ -29,7 +29,7 @@ export function DatePlanner({ matchId, matchName, open, onOpenChange, hideTrigge
     }
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = useCallback(() => {
     getDateIdeas.mutate(
       { matchId },
       {
@@ -38,6 +38,13 @@ export function DatePlanner({ matchId, matchName, open, onOpenChange, hideTrigge
         },
       }
     );
+  }, [matchId, getDateIdeas]);
+
+  const copyToClipboard = (text: string, index: number) => {
+    navigator.clipboard.writeText(text);
+    setCopiedIndex(index);
+    setTimeout(() => setCopiedIndex(null), 2000);
+    toast.showSuccess('Date idea copied!');
   };
 
   // Auto-generate if opened and no ideas exist
@@ -45,7 +52,7 @@ export function DatePlanner({ matchId, matchName, open, onOpenChange, hideTrigge
     if (isOpen && ideas.length === 0 && !getDateIdeas.isPending) {
       handleGenerate();
     }
-  }, [isOpen]);
+  }, [isOpen, ideas.length, getDateIdeas.isPending, handleGenerate]);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>

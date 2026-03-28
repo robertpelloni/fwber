@@ -99,7 +99,7 @@ export default function NeighborhoodVibe({ token }: { token: string }) {
                         <div className="flex items-start gap-3">
                             <Info className="w-4 h-4 text-zinc-400 mt-0.5" />
                             <p className="text-sm text-zinc-600 dark:text-zinc-400 italic">
-                                "{analysis.summary}"
+                                &quot;{analysis.summary}&quot;
                             </p>
                         </div>
                     </div>
