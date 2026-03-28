@@ -31,16 +31,15 @@ export default function Error({
     : JSON.stringify(error?.message || error || '');
 
   // Determine error type and messaging
-  const isNetworkError = errorMessage.includes('fetch') ||
+  const isNetworkError = errorMessage && (errorMessage.includes('fetch') ||
                          errorMessage.includes('network') ||
-                         errorMessage.includes('Failed to fetch')
+                         errorMessage.includes('Failed to fetch'))
 
-  const isAuthError = errorMessage.includes('401') ||
+  const isAuthError = errorMessage && (errorMessage.includes('401') ||
                       errorMessage.includes('403') ||
                       errorMessage.includes('Unauthorized') ||
                       errorMessage.includes('authentication') ||
-                      errorMessage.includes('Unauthenticated')
-
+                      errorMessage.includes('Unauthenticated'))
   const getErrorTitle = () => {
     if (isNetworkError) return 'Connection Problem'
     if (isAuthError) return 'Authentication Error'

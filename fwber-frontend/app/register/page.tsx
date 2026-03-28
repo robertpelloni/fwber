@@ -47,7 +47,7 @@ function RegisterForm() {
       setFormData(prev => ({ ...prev, referralCode: ref }))
       
       // Verify referral code
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/referral/${ref}`)
+      fetch(`/api/auth/referral/${ref}`)
         .then(res => res.json())
         .then(data => {
           if (data.valid) {
