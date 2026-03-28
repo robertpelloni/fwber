@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2026-03-28
+
+### Added
+- **Final Polish**: Reached 100% completion on the roadmap.
+- **Multi-Region Load Balancing**: Finalized global deployment architecture for high availability.
+- **Production Build Stability**: Fixed Next.js build errors, missing Lucide icons, and linting issues.
+- **Auth Redirect Loops**: Resolved issues with proxy redirects causing 401 errors.
+- **Next.js Version Alignment**: Harmonized all environments to stable `Next.js 15.0.3` and `React 18.3.1`.
+
 ## [0.99.6] - 2026-03-25
 
 ### Added
