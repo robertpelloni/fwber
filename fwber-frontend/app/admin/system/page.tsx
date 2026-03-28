@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Server, Database, FolderGit2, Activity, ShieldCheck, Cpu, Users, MessageSquare, TrendingUp, Smile, Heart, ThumbsDown } from "lucide-react";
+import { Server, Database, FolderGit2, Activity, ShieldCheck, Cpu, Users, MessageSquare, TrendingUp, Smile, Heart, ThumbsDown, Globe } from "lucide-react";
 import AppHeader from "@/components/AppHeader";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { apiClient } from "@/lib/api/client";
