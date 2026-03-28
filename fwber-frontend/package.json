@@ -82,7 +82,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
-    "@next/bundle-analyzer": "^16.0.6",
+    "@next/bundle-analyzer": "15.0.3",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@types/bs58": "^4.0.4",
     "@types/crypto-js": "^4.2.2",
