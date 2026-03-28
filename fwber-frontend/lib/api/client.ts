@@ -245,6 +245,15 @@ async function request<T>(
 
         // Don't retry client errors (except 429 rate limit) or auth errors
         if ((apiError.isClientError && !apiError.isRateLimitError) || apiError.isAuthError) {
+          // If auth error in browser, clear storage and redirect
+          if (apiError.isAuthError && typeof window !== 'undefined') {
+            localStorage.removeItem('fwber_token');
+            localStorage.removeItem('fwber_user');
+            // Check if we are already on login page to avoid redirect loops
+            if (!window.location.pathname.includes('/login')) {
+              window.location.href = '/login?reason=session_expired';
+            }
+          }
           throw apiError;
         }
 
