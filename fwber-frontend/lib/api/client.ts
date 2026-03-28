@@ -13,15 +13,9 @@ import type {
   PaginatedResponse,
 } from './types';
 
-// Ensure BASE_URL hits the Next.js proxy in browser, and absolute URL on server
+// Ensure BASE_URL hits the Next.js proxy
 const getBaseUrl = () => {
-  if (typeof window !== 'undefined') {
-    // In the browser, ALWAYS use the local Next.js proxy to bypass CORS
-    return '/api';
-  }
-  // On the server (SSR), we need the absolute URL to hit DreamHost directly
-  const url = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
-  return url.replace(/\/$/, '') + '/api';
+  return '/api';
 };
 
 const BASE_URL = getBaseUrl();
