@@ -2,8 +2,8 @@
 
 namespace App\Services\IpIntelligence\Drivers;
 
-use App\Services\IpIntelligence\IpIntelligenceInterface;
 use App\Services\IpIntelligence\DTOs\IpLocation;
+use App\Services\IpIntelligence\IpIntelligenceInterface;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -22,7 +22,8 @@ class IpInfoDriver implements IpIntelligenceInterface
             $response = Http::get("https://ipinfo.io/{$ipAddress}?token={$this->token}");
 
             if ($response->failed()) {
-                Log::warning("IpInfo API failed for IP {$ipAddress}: " . $response->body());
+                Log::warning("IpInfo API failed for IP {$ipAddress}: ".$response->body());
+
                 return null;
             }
 
@@ -51,7 +52,8 @@ class IpInfoDriver implements IpIntelligenceInterface
             );
 
         } catch (\Exception $e) {
-            Log::error("IpInfo Driver Error: " . $e->getMessage());
+            Log::error('IpInfo Driver Error: '.$e->getMessage());
+
             return null;
         }
     }

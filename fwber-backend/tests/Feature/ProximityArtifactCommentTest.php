@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
-use App\Models\UserProfile;
 use App\Models\ProximityArtifact;
 use App\Models\ProximityArtifactComment;
+use App\Models\User;
+use App\Models\UserProfile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -14,19 +14,20 @@ class ProximityArtifactCommentTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private ProximityArtifact $artifact;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->user = User::factory()->create();
         UserProfile::factory()->create(['user_id' => $this->user->id]);
 
         $this->artifact = ProximityArtifact::factory()->create([
             'user_id' => User::factory()->create()->id,
             'type' => 'board_post',
-            'content' => 'Test post'
+            'content' => 'Test post',
         ]);
     }
 
@@ -44,7 +45,7 @@ class ProximityArtifactCommentTest extends TestCase
             'proximity_artifact_id' => $this->artifact->id,
             'user_id' => $this->user->id,
             'content' => 'This is a test comment',
-            'parent_id' => null
+            'parent_id' => null,
         ]);
     }
 
@@ -54,14 +55,14 @@ class ProximityArtifactCommentTest extends TestCase
         $parentComment = ProximityArtifactComment::create([
             'proximity_artifact_id' => $this->artifact->id,
             'user_id' => User::factory()->create()->id,
-            'content' => 'Parent comment'
+            'content' => 'Parent comment',
         ]);
 
         $response = $this->actingAs($this->user)->postJson(
             "/api/proximity/artifacts/{$this->artifact->id}/comments",
             [
                 'content' => 'This is a reply',
-                'parent_id' => $parentComment->id
+                'parent_id' => $parentComment->id,
             ]
         );
 
@@ -71,7 +72,7 @@ class ProximityArtifactCommentTest extends TestCase
             'proximity_artifact_id' => $this->artifact->id,
             'user_id' => $this->user->id,
             'content' => 'This is a reply',
-            'parent_id' => $parentComment->id
+            'parent_id' => $parentComment->id,
         ]);
     }
 
@@ -82,14 +83,14 @@ class ProximityArtifactCommentTest extends TestCase
             'proximity_artifact_id' => $this->artifact->id,
             'user_id' => $this->user->id,
             'content' => 'Comment 1',
-            'created_at' => now()->subMinutes(1)
+            'created_at' => now()->subMinutes(1),
         ]);
-        
+
         $comment2 = ProximityArtifactComment::factory()->create([
             'proximity_artifact_id' => $this->artifact->id,
             'user_id' => $this->user->id,
             'content' => 'Comment 2',
-            'created_at' => now()
+            'created_at' => now(),
         ]);
 
         // Create 1 reply
@@ -97,7 +98,7 @@ class ProximityArtifactCommentTest extends TestCase
             'proximity_artifact_id' => $this->artifact->id,
             'user_id' => $this->user->id,
             'content' => 'Reply to comment 2',
-            'parent_id' => $comment2->id
+            'parent_id' => $comment2->id,
         ]);
 
         $response = $this->actingAs($this->user)->getJson(
@@ -120,7 +121,7 @@ class ProximityArtifactCommentTest extends TestCase
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['content']);
-            
+
         $responseTooLong = $this->actingAs($this->user)->postJson(
             "/api/proximity/artifacts/{$this->artifact->id}/comments",
             ['content' => str_repeat('a', 1001)]
@@ -135,7 +136,7 @@ class ProximityArtifactCommentTest extends TestCase
         $comment = ProximityArtifactComment::create([
             'proximity_artifact_id' => $this->artifact->id,
             'user_id' => $this->user->id,
-            'content' => 'My comment'
+            'content' => 'My comment',
         ]);
 
         $response = $this->actingAs($this->user)->deleteJson(
@@ -146,7 +147,7 @@ class ProximityArtifactCommentTest extends TestCase
             ->assertJson(['message' => 'Comment deleted']);
 
         $this->assertSoftDeleted('proximity_artifact_comments', [
-            'id' => $comment->id
+            'id' => $comment->id,
         ]);
     }
 
@@ -156,7 +157,7 @@ class ProximityArtifactCommentTest extends TestCase
         $comment = ProximityArtifactComment::create([
             'proximity_artifact_id' => $this->artifact->id,
             'user_id' => $otherUser->id,
-            'content' => 'Other users comment'
+            'content' => 'Other users comment',
         ]);
 
         $response = $this->actingAs($this->user)->deleteJson(
@@ -167,7 +168,7 @@ class ProximityArtifactCommentTest extends TestCase
             ->assertJson(['message' => 'Unauthorized']);
 
         $this->assertDatabaseHas('proximity_artifact_comments', [
-            'id' => $comment->id
+            'id' => $comment->id,
         ]);
     }
 }

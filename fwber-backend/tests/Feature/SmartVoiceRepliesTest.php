@@ -2,34 +2,36 @@
 
 namespace Tests\Feature;
 
+use App\DTOs\LlmResponse;
+use App\Models\Message;
 use App\Models\User;
 use App\Models\UserMatch;
-use App\Models\Message;
 use App\Services\Ai\Llm\LlmManager;
 use App\Services\Ai\Llm\LlmProviderInterface;
-use App\DTOs\LlmResponse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use Mockery;
+use Tests\TestCase;
 
 class SmartVoiceRepliesTest extends TestCase
 {
     use RefreshDatabase;
 
     protected $user;
+
     protected $match;
+
     protected $matchUser;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Enable the feature
         config(['features.ai_wingman' => true]);
-        
+
         $this->user = User::factory()->create();
         $this->matchUser = User::factory()->create();
-        
+
         $this->match = UserMatch::create([
             'user1_id' => $this->user->id,
             'user2_id' => $this->matchUser->id,
@@ -53,8 +55,9 @@ class SmartVoiceRepliesTest extends TestCase
         // Mock Driver
         $mockDriver = Mockery::mock(LlmProviderInterface::class);
         $mockDriver->shouldReceive('chat')
-            ->withArgs(function($messages, $options) {
+            ->withArgs(function ($messages, $options) {
                 $prompt = $messages[1]['content'];
+
                 return str_contains($prompt, 'Match: Hey, do you want to grab coffee?');
             })
             ->once()
@@ -88,8 +91,9 @@ class SmartVoiceRepliesTest extends TestCase
         // Mock Driver
         $mockDriver = Mockery::mock(LlmProviderInterface::class);
         $mockDriver->shouldReceive('chat')
-            ->withArgs(function($messages, $options) {
+            ->withArgs(function ($messages, $options) {
                 $prompt = $messages[1]['content'];
+
                 return str_contains($prompt, 'Match: [Audio Message]');
             })
             ->once()

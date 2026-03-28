@@ -26,10 +26,10 @@ class DataExportCompletedNotification extends Notification implements ShouldQueu
     public function toMail($notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->subject('Your Data Export is Ready')
-                    ->line('Your requested data export has been completed and is ready for download.')
-                    ->action('Download Data Export', $this->downloadUrl)
-                    ->line('This link will expire in 7 days for your security.');
+            ->subject('Your Data Export is Ready')
+            ->line('Your requested data export has been completed and is ready for download.')
+            ->action('Download Data Export', $this->downloadUrl)
+            ->line('This link will expire in 7 days for your security.');
     }
 
     public function toArray($notifiable): array
@@ -37,7 +37,7 @@ class DataExportCompletedNotification extends Notification implements ShouldQueu
         return [
             'type' => 'data_export_completed',
             'download_url' => $this->downloadUrl,
-            'message' => 'Your data export is ready to download.'
+            'message' => 'Your data export is ready to download.',
         ];
     }
 }

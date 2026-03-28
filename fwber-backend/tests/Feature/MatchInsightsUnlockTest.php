@@ -2,15 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\CheckDailyBonus;
+use App\Models\ContentUnlock;
 use App\Models\User;
 use App\Models\UserMatch;
 use App\Models\UserProfile;
-use App\Models\ContentUnlock;
 use App\Services\TokenDistributionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use Mockery\MockInterface;
-use App\Http\Middleware\CheckDailyBonus;
+use Tests\TestCase;
 
 class MatchInsightsUnlockTest extends TestCase
 {
@@ -43,8 +43,8 @@ class MatchInsightsUnlockTest extends TestCase
             ->assertJson([
                 'data' => [
                     'is_locked' => true,
-                    'cost' => 10
-                ]
+                    'cost' => 10,
+                ],
             ]);
     }
 
@@ -65,9 +65,9 @@ class MatchInsightsUnlockTest extends TestCase
         $this->mock(TokenDistributionService::class, function (MockInterface $mock) use ($user) {
             $mock->shouldReceive('spendTokens')
                 ->once()
-                ->with(\Mockery::on(function($u) use ($user) {
+                ->with(\Mockery::on(function ($u) use ($user) {
                     return $u->id === $user->id;
-                }), 10, "Unlocked Match Insight");
+                }), 10, 'Unlocked Match Insight');
         });
 
         $response = $this->actingAs($user)->postJson("/api/matches/{$match->id}/insights/unlock");
@@ -78,7 +78,7 @@ class MatchInsightsUnlockTest extends TestCase
         $this->assertDatabaseHas('content_unlocks', [
             'user_id' => $user->id,
             'content_type' => 'match_insight',
-            'content_id' => $target->id
+            'content_id' => $target->id,
         ]);
     }
 
@@ -99,7 +99,7 @@ class MatchInsightsUnlockTest extends TestCase
         $this->mock(TokenDistributionService::class, function (MockInterface $mock) {
             $mock->shouldReceive('spendTokens')
                 ->once()
-                ->andThrow(new \Exception("Insufficient tokens"));
+                ->andThrow(new \Exception('Insufficient tokens'));
         });
 
         $response = $this->actingAs($user)->postJson("/api/matches/{$match->id}/insights/unlock");
@@ -109,7 +109,7 @@ class MatchInsightsUnlockTest extends TestCase
         $this->assertDatabaseMissing('content_unlocks', [
             'user_id' => $user->id,
             'content_type' => 'match_insight',
-            'content_id' => $target->id
+            'content_id' => $target->id,
         ]);
     }
 
@@ -131,7 +131,7 @@ class MatchInsightsUnlockTest extends TestCase
             'user_id' => $user->id,
             'content_type' => 'match_insight',
             'content_id' => $target->id,
-            'cost' => 10
+            'cost' => 10,
         ]);
 
         $response = $this->actingAs($user)->getJson("/api/matches/{$match->id}/insights");

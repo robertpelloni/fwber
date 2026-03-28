@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\Venue;
 use App\Models\User;
+use App\Models\Venue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
@@ -15,7 +15,7 @@ class VenueControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Register trig functions for SQLite
         if (DB::connection()->getDriverName() === 'sqlite') {
             $db = DB::connection()->getPdo();
@@ -31,7 +31,7 @@ class VenueControllerTest extends TestCase
     public function test_can_list_nearby_venues()
     {
         $user = User::factory()->create();
-        
+
         // Venue nearby (New York)
         $nearbyVenue = Venue::factory()->create([
             'name' => 'Nearby Bar',

@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasTwoFactorAuthentication;
+use App\Models\Traits\SafelyHydratesAttributes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use NotificationChannels\WebPush\HasPushSubscriptions;
-use App\Models\Traits\HasTwoFactorAuthentication;
-use App\Models\Traits\SafelyHydratesAttributes;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasPushSubscriptions, HasTwoFactorAuthentication, SafelyHydratesAttributes;
+    use HasApiTokens, HasFactory, HasPushSubscriptions, HasTwoFactorAuthentication, Notifiable, SafelyHydratesAttributes;
 
     protected $fillable = [
         'name',
@@ -137,8 +137,8 @@ class User extends Authenticatable
     public function attendingEvents()
     {
         return $this->belongsToMany(Event::class, 'event_attendees')
-                    ->withPivot('status')
-                    ->withTimestamps();
+            ->withPivot('status')
+            ->withTimestamps();
     }
 
     public function createdGroups()
@@ -149,8 +149,8 @@ class User extends Authenticatable
     public function groups()
     {
         return $this->belongsToMany(Group::class, 'group_members')
-                    ->withPivot('role', 'joined_at')
-                    ->withTimestamps();
+            ->withPivot('role', 'joined_at')
+            ->withTimestamps();
     }
 
     public function notificationPreferences()

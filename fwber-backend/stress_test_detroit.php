@@ -16,21 +16,21 @@ $totalTime = 0;
 for ($i = 0; $i < $totalRequests; $i++) {
     $lat = 42.3314 + (mt_rand(-100, 100) / 10000);
     $lng = -83.0458 + (mt_rand(-100, 100) / 10000);
-    
+
     $start = microtime(true);
-    
+
     $ch = curl_init("$baseUrl/location");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
         'latitude' => $lat,
         'longitude' => $lng,
-        'accuracy' => 10
+        'accuracy' => 10,
     ]));
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Content-Type: application/json',
-        'Authorization: Bearer ' . $token,
-        'Accept: application/json'
+        'Authorization: Bearer '.$token,
+        'Accept: application/json',
     ]);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Bypass for local resolution issues
 
@@ -46,7 +46,7 @@ for ($i = 0; $i < $totalRequests; $i++) {
         $failCount++;
         echo "❌ Request $i: {$httpCode} - Response: $response\n";
     }
-    
+
     curl_close($ch);
 }
 
@@ -54,6 +54,5 @@ $avg = $totalTime / $totalRequests;
 echo "\n--- RESULTS ---\n";
 echo "Success: $successCount\n";
 echo "Failures: $failCount\n";
-echo "Avg Latency: " . round($avg, 4) . "s\n";
-echo "Total Time: " . round($totalTime, 2) . "s\n";
-
+echo 'Avg Latency: '.round($avg, 4)."s\n";
+echo 'Total Time: '.round($totalTime, 2)."s\n";

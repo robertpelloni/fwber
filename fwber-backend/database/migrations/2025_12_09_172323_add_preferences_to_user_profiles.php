@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user_profiles', function (Blueprint $table) {
-            if (!Schema::hasColumn('user_profiles', 'preferences')) {
+            if (! Schema::hasColumn('user_profiles', 'preferences')) {
                 $table->json('preferences')->nullable()->after('interests');
             }
         });

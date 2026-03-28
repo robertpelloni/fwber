@@ -2,10 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Models\ProximityArtifact;
 use App\Models\Notification;
-use Illuminate\Support\Facades\Artisan;
+use App\Models\ProximityArtifact;
+use Illuminate\Console\Command;
 
 class PruneSystemData extends Command
 {
@@ -41,8 +40,8 @@ class PruneSystemData extends Command
         // 3. Prune Telescope entries (if installed) older than 48 hours
         // We check if the command exists in the list of commands or if the class exists
         if (class_exists(\Laravel\Telescope\Telescope::class)) {
-             $this->info('Pruning Telescope entries...');
-             $this->call('telescope:prune', ['--hours' => 48]);
+            $this->info('Pruning Telescope entries...');
+            $this->call('telescope:prune', ['--hours' => 48]);
         } else {
             $this->info('Telescope not installed, skipping prune.');
         }

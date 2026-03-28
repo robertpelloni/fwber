@@ -2,13 +2,12 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\SlowRequest;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
+use Tests\TestCase;
 
 class SlowRequestTest extends TestCase
 {
@@ -23,6 +22,7 @@ class SlowRequestTest extends TestCase
         // Define a slow route
         Route::get('/test-slow-route', function () {
             usleep(10000); // 10ms
+
             return 'ok';
         })->middleware(\App\Http\Middleware\ApmMiddleware::class);
 
@@ -46,7 +46,7 @@ class SlowRequestTest extends TestCase
     public function test_analytics_endpoint_returns_slow_requests(): void
     {
         $user = User::factory()->create();
-        
+
         // Create some slow requests
         SlowRequest::create([
             'user_id' => $user->id,
@@ -71,14 +71,14 @@ class SlowRequestTest extends TestCase
                     'db_query_count',
                     'memory_usage_kb',
                     'created_at',
-                ]
+                ],
             ]);
     }
 
     public function test_analytics_stats_endpoint_returns_metrics(): void
     {
         $user = User::factory()->create();
-        
+
         // Create some slow requests
         SlowRequest::create([
             'user_id' => $user->id,
@@ -104,14 +104,14 @@ class SlowRequestTest extends TestCase
                     'max_duration',
                     'avg_queries',
                     'avg_memory',
-                ]
+                ],
             ]);
     }
 
     public function test_analytics_analysis_endpoint_returns_insights(): void
     {
         $user = User::factory()->create();
-        
+
         // Create 5 slow requests with high DB query count (N+1 simulation)
         for ($i = 0; $i < 5; $i++) {
             SlowRequest::create([
@@ -133,7 +133,7 @@ class SlowRequestTest extends TestCase
             ->assertJsonFragment([
                 'endpoint' => 'api.n-plus-one',
             ]);
-            
+
         $data = $response->json();
         $this->assertNotEmpty($data);
         $this->assertStringContainsString('High database query count', $data[0]['issues'][0]);
@@ -142,7 +142,7 @@ class SlowRequestTest extends TestCase
     public function test_analytics_analysis_endpoint_returns_insights_with_slow_queries(): void
     {
         $user = User::factory()->create();
-        
+
         // Create 5 slow requests with high DB query count (N+1 simulation)
         for ($i = 0; $i < 5; $i++) {
             SlowRequest::create([
@@ -156,8 +156,8 @@ class SlowRequestTest extends TestCase
                 'db_query_count' => 100, // High query count
                 'memory_usage_kb' => 2048,
                 'slowest_queries' => [
-                    ['sql' => 'SELECT * FROM users', 'time' => 100, 'connection' => 'mysql']
-                ]
+                    ['sql' => 'SELECT * FROM users', 'time' => 100, 'connection' => 'mysql'],
+                ],
             ]);
         }
 
@@ -167,7 +167,7 @@ class SlowRequestTest extends TestCase
             ->assertJsonFragment([
                 'endpoint' => 'api.n-plus-one',
             ]);
-            
+
         $data = $response->json();
         $this->assertNotEmpty($data);
         $this->assertArrayHasKey('sample_slow_queries', $data[0]);

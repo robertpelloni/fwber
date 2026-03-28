@@ -3,20 +3,21 @@
 namespace App\Notifications;
 
 use App\Models\User;
+use App\Notifications\Traits\ChecksNotificationPreferences;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use NotificationChannels\WebPush\WebPushMessage;
 use NotificationChannels\WebPush\WebPushChannel;
-use App\Notifications\Traits\ChecksNotificationPreferences;
+use NotificationChannels\WebPush\WebPushMessage;
 
 class NewMessageNotification extends Notification implements ShouldQueue
 {
-    use Queueable, ChecksNotificationPreferences;
+    use ChecksNotificationPreferences, Queueable;
 
     public $sender;
+
     public $messageContent;
+
     public $chatroomId;
 
     /**
@@ -46,10 +47,10 @@ class NewMessageNotification extends Notification implements ShouldQueue
     public function toWebPush($notifiable, $notification)
     {
         return (new WebPushMessage)
-            ->title('New Message from ' . $this->sender->name)
+            ->title('New Message from '.$this->sender->name)
             ->body($this->messageContent)
             ->action('Reply', 'reply_message')
-            ->data(['url' => '/chatrooms/' . $this->chatroomId]);
+            ->data(['url' => '/chatrooms/'.$this->chatroomId]);
     }
 
     /**

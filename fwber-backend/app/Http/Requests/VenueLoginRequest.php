@@ -10,6 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @OA\Schema(
  *   schema="VenueLoginRequest",
  *   required={"email", "password"},
+ *
  *   @OA\Property(property="email", type="string", format="email", description="Venue email"),
  *   @OA\Property(property="password", type="string", format="password", description="Password")
  * )

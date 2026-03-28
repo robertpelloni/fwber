@@ -52,7 +52,7 @@ class UserMatch extends Model
         if ($this->user1_id === $currentUserId) {
             return $this->user2;
         }
-        
+
         if ($this->user2_id === $currentUserId) {
             return $this->user1;
         }

@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\GeoSpoofDetection;
 use App\Models\User;
 use App\Services\IpIntelligence\IpIntelligenceInterface;
-use Illuminate\Support\Facades\Cache;
 
 class GeoSpoofDetectionService
 {
@@ -15,12 +14,6 @@ class GeoSpoofDetectionService
 
     /**
      * Detect potential geolocation spoofing.
-     *
-     * @param int $userId
-     * @param float $latitude
-     * @param float $longitude
-     * @param string $ipAddress
-     * @return GeoSpoofDetection|null
      */
     public function detectSpoof(int $userId, float $latitude, float $longitude, string $ipAddress): ?GeoSpoofDetection
     {
@@ -57,7 +50,7 @@ class GeoSpoofDetectionService
         // Check for impossible velocity (teleportation)
         $lastDetection = GeoSpoofDetection::where('user_id', $userId)->orderBy('id', 'desc')->first();
         $velocityKmh = null;
-        if (!$lastDetection) {
+        if (! $lastDetection) {
             // Attempt raw DB fallback in case Eloquent query misses within transactional test context
             $raw = \DB::table('geo_spoof_detections')->where('user_id', $userId)->orderBy('id', 'desc')->first();
             if ($raw) {
@@ -171,7 +164,7 @@ class GeoSpoofDetectionService
             ->orderBy('detected_at', 'desc')
             ->first();
 
-        if (!$lastDetection) {
+        if (! $lastDetection) {
             return null;
         }
         // Use seconds for higher precision and avoid truncation issues

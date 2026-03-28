@@ -7,9 +7,9 @@ use App\Http\Requests\Api\RespondToFriendRequest;
 use App\Http\Requests\Api\SendFriendRequest;
 use App\Models\Friend;
 use App\Models\User;
+use App\Services\PushNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Services\PushNotificationService;
 use OpenApi\Attributes as OA;
 
 /**
@@ -34,9 +34,11 @@ class FriendController extends Controller
      *     summary="Get friends list",
      *     description="Returns the list of authenticated user's friends.",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
+     *
      *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/User"))
      *     )
      * )
@@ -65,9 +67,11 @@ class FriendController extends Controller
      *     summary="Get pending friend requests",
      *     description="Returns the list of pending friend requests for the authenticated user.",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
+     *
      *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Friend"))
      *     )
      * )
@@ -87,18 +91,24 @@ class FriendController extends Controller
      *     summary="Send a friend request",
      *     description="Sends a friend request to another user.",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"friend_id"},
+     *
      *             @OA\Property(property="friend_id", type="integer", example=1)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Friend request sent successfully",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/Friend")
      *     ),
+     *
      *     @OA\Response(
      *         response=400,
      *         description="Bad request"
@@ -132,7 +142,7 @@ class FriendController extends Controller
         $friendRequest = Friend::create([
             'user_id' => $user->id,
             'friend_id' => $friendId,
-            'status' => 'pending'
+            'status' => 'pending',
         ]);
 
         // Send Push Notification
@@ -141,7 +151,7 @@ class FriendController extends Controller
             [
                 'title' => 'New Friend Request',
                 'body' => "{$user->name} wants to be friends!",
-                'url' => '/friends'
+                'url' => '/friends',
             ],
             'social'
         );
@@ -156,19 +166,25 @@ class FriendController extends Controller
      *     summary="Respond to a friend request",
      *     description="Accept or decline a friend request from another user.",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="userId",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"status"},
+     *
      *             @OA\Property(property="status", type="string", enum={"accepted", "declined"})
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Friend request responded to successfully"
@@ -184,7 +200,7 @@ class FriendController extends Controller
         $user = Auth::user();
         $friendRequest = Friend::where('user_id', $userId)->where('friend_id', $user->id)->where('status', 'pending')->first();
 
-        if (!$friendRequest) {
+        if (! $friendRequest) {
             return response()->json(['message' => 'Friend request not found.'], 404);
         }
 
@@ -203,7 +219,7 @@ class FriendController extends Controller
                 [
                     'title' => 'Friend Request Accepted',
                     'body' => "{$user->name} accepted your friend request!",
-                    'url' => '/friends'
+                    'url' => '/friends',
                 ],
                 'social'
             );
@@ -211,6 +227,7 @@ class FriendController extends Controller
             return response()->json($friendRequest);
         } else {
             $friendRequest->delete();
+
             return response()->json(['message' => 'Friend request declined.']);
         }
     }
@@ -222,12 +239,15 @@ class FriendController extends Controller
      *     summary="Remove a friend",
      *     description="Removes a friend from the authenticated user's friend list.",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="friendId",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Friend removed successfully"
@@ -260,15 +280,19 @@ class FriendController extends Controller
      *     summary="Search for users",
      *     description="Search for users by name or email.",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="query",
      *         in="query",
      *         required=true,
+     *
      *         @OA\Schema(type="string")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
+     *
      *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/User"))
      *     )
      * )
@@ -276,9 +300,9 @@ class FriendController extends Controller
     public function search(Request $request)
     {
         $query = $request->input('query') ?? $request->input('q');
-        
-        if (!$query || strlen($query) < 2) {
-             return response()->json(['message' => 'The query field is required and must be at least 2 characters.'], 422);
+
+        if (! $query || strlen($query) < 2) {
+            return response()->json(['message' => 'The query field is required and must be at least 2 characters.'], 422);
         }
 
         $user = Auth::user();

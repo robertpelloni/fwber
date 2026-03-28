@@ -21,7 +21,7 @@ class LocationControllerTest extends TestCase
             'latitude' => 40.7128,
             'longitude' => -74.0060,
             'accuracy' => 10,
-            'privacy_level' => 'public'
+            'privacy_level' => 'public',
         ]);
 
         $response->assertStatus(200);
@@ -29,7 +29,7 @@ class LocationControllerTest extends TestCase
             'user_id' => $user->id,
             'latitude' => 40.7128,
             'longitude' => -74.0060,
-            'privacy_level' => 'public'
+            'privacy_level' => 'public',
         ]);
     }
 
@@ -43,7 +43,7 @@ class LocationControllerTest extends TestCase
             'longitude' => -74.0060,
             'privacy_level' => 'public',
             'last_updated' => now(),
-            'is_active' => true
+            'is_active' => true,
         ]);
 
         $response = $this->actingAs($user)->getJson('/api/location');
@@ -51,7 +51,7 @@ class LocationControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonFragment([
             'latitude' => '40.71280000',
-            'longitude' => '-74.00600000'
+            'longitude' => '-74.00600000',
         ]);
     }
 
@@ -65,17 +65,17 @@ class LocationControllerTest extends TestCase
             'longitude' => -74.0060,
             'privacy_level' => 'public',
             'last_updated' => now(),
-            'is_active' => true
+            'is_active' => true,
         ]);
 
         $response = $this->actingAs($user)->putJson('/api/location/privacy', [
-            'privacy_level' => 'private'
+            'privacy_level' => 'private',
         ]);
 
         $response->assertStatus(200);
         $this->assertDatabaseHas('user_locations', [
             'user_id' => $user->id,
-            'privacy_level' => 'private'
+            'privacy_level' => 'private',
         ]);
     }
 
@@ -89,7 +89,7 @@ class LocationControllerTest extends TestCase
             'longitude' => -74.0060,
             'privacy_level' => 'public',
             'last_updated' => now(),
-            'is_active' => true
+            'is_active' => true,
         ]);
 
         $response = $this->actingAs($user)->deleteJson('/api/location');
@@ -97,7 +97,7 @@ class LocationControllerTest extends TestCase
         $response->assertStatus(200);
         $this->assertDatabaseHas('user_locations', [
             'user_id' => $user->id,
-            'is_active' => false
+            'is_active' => false,
         ]);
     }
 
@@ -111,7 +111,7 @@ class LocationControllerTest extends TestCase
             'longitude' => -74.0060,
             'privacy_level' => 'public',
             'last_updated' => now(),
-            'is_active' => true
+            'is_active' => true,
         ]);
 
         $nearbyUser = User::factory()->create();
@@ -122,7 +122,7 @@ class LocationControllerTest extends TestCase
             'longitude' => -74.0060,
             'privacy_level' => 'public',
             'last_updated' => now(),
-            'is_active' => true
+            'is_active' => true,
         ]);
 
         $farUser = User::factory()->create();
@@ -133,7 +133,7 @@ class LocationControllerTest extends TestCase
             'longitude' => -74.0060,
             'privacy_level' => 'public',
             'last_updated' => now(),
-            'is_active' => true
+            'is_active' => true,
         ]);
 
         $response = $this->actingAs($user)->getJson('/api/location/nearby?latitude=40.7128&longitude=-74.0060&radius=1000');

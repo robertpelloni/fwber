@@ -18,10 +18,10 @@ class OpenAiLlmDriver implements LlmProviderInterface
     public function chat(array $messages, array $config = []): LlmResponse
     {
         $mergedConfig = array_merge($this->defaultConfig, $config);
-        
+
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Authorization' => 'Bearer '.$this->apiKey,
                 'Content-Type' => 'application/json',
             ])->post('https://api.openai.com/v1/chat/completions', [
                 'model' => $mergedConfig['model'] ?? $this->model,
@@ -33,7 +33,7 @@ class OpenAiLlmDriver implements LlmProviderInterface
             if ($response->successful()) {
                 $data = $response->json();
                 $content = $data['choices'][0]['message']['content'] ?? '';
-                
+
                 return new LlmResponse(
                     content: $content,
                     provider: 'openai',
@@ -44,12 +44,12 @@ class OpenAiLlmDriver implements LlmProviderInterface
                     ]
                 );
             }
-            
+
             Log::error('OpenAI API error', [
                 'status' => $response->status(),
                 'body' => $response->body(),
             ]);
-            
+
         } catch (\Exception $e) {
             Log::error('OpenAI chat request failed', ['error' => $e->getMessage()]);
         }
@@ -61,7 +61,7 @@ class OpenAiLlmDriver implements LlmProviderInterface
     {
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Authorization' => 'Bearer '.$this->apiKey,
                 'Content-Type' => 'application/json',
             ])->post('https://api.openai.com/v1/moderations', [
                 'input' => $content,
@@ -71,14 +71,14 @@ class OpenAiLlmDriver implements LlmProviderInterface
             if ($response->successful()) {
                 $data = $response->json();
                 $result = $data['results'][0] ?? [];
-                
+
                 return [
                     'flagged' => $result['flagged'] ?? false,
                     'categories' => $result['category_scores'] ?? [],
                     'score' => max($result['category_scores'] ?? [0]),
                 ];
             }
-            
+
             Log::error('OpenAI moderation error', [
                 'status' => $response->status(),
                 'body' => $response->body(),

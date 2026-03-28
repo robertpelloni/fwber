@@ -12,16 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user_profiles', function (Blueprint $table) {
-            if (!Schema::hasColumn('user_profiles', 'penis_length_cm')) {
+            if (! Schema::hasColumn('user_profiles', 'penis_length_cm')) {
                 $table->decimal('penis_length_cm', 5, 2)->nullable();
             }
-            if (!Schema::hasColumn('user_profiles', 'penis_girth_cm')) {
+            if (! Schema::hasColumn('user_profiles', 'penis_girth_cm')) {
                 $table->decimal('penis_girth_cm', 5, 2)->nullable();
             }
-            if (!Schema::hasColumn('user_profiles', 'sti_status')) {
+            if (! Schema::hasColumn('user_profiles', 'sti_status')) {
                 $table->json('sti_status')->nullable();
             }
-            if (!Schema::hasColumn('user_profiles', 'fetishes')) {
+            if (! Schema::hasColumn('user_profiles', 'fetishes')) {
                 $table->json('fetishes')->nullable();
             }
         });

@@ -18,7 +18,7 @@ class AvatarEmotionController extends Controller
         ]);
 
         $profile = Auth::user()->profile;
-        if (!$profile) {
+        if (! $profile) {
             return response()->json(['message' => 'Profile not found'], 404);
         }
 
@@ -29,7 +29,7 @@ class AvatarEmotionController extends Controller
         return response()->json([
             'message' => 'Avatar emotion updated successfully',
             'current_emotion' => $profile->current_emotion,
-            'emotion_updated_at' => $profile->emotion_updated_at
+            'emotion_updated_at' => $profile->emotion_updated_at,
         ]);
     }
 }

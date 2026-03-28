@@ -5,9 +5,13 @@ namespace App\Services\MediaAnalysis;
 class MediaAnalysisResult
 {
     public bool $safe;
+
     public array $labels;
+
     public array $moderationLabels;
+
     public float $confidence;
+
     public array $metadata;
 
     public function __construct(

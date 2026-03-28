@@ -21,7 +21,7 @@ return new class extends Migration
             });
         } catch (\Exception $e) {
             // Ignore duplicate column error if race condition occurs
-            if (!str_contains($e->getMessage(), 'Duplicate column name')) {
+            if (! str_contains($e->getMessage(), 'Duplicate column name')) {
                 throw $e;
             }
         }

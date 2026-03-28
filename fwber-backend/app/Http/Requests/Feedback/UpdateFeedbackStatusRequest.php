@@ -22,7 +22,7 @@ class UpdateFeedbackStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => 'required|in:new,reviewed,resolved,dismissed'
+            'status' => 'required|in:new,reviewed,resolved,dismissed',
         ];
     }
 }

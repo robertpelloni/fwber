@@ -6,15 +6,15 @@ use App\Models\RelationshipTier;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Notifications\Notification;
 
 class RelationshipTierUpgradedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
     protected $tier;
+
     protected $otherUser;
 
     /**
@@ -44,7 +44,7 @@ class RelationshipTierUpgradedNotification extends Notification implements Shoul
     public function toArray(object $notifiable): array
     {
         $tierInfo = $this->tier->getTierInfo();
-        
+
         return [
             'type' => 'tier_upgraded',
             'match_id' => $this->tier->match_id,

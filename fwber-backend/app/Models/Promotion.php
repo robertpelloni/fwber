@@ -45,7 +45,8 @@ class Promotion extends Model
         // Approximate: 1 deg lat ~ 111,000 m; 1 deg lng ~ 111,000 m * cos(lat)
         $latOffset = $radiusMeters / 111000.0;
         $lngOffset = $radiusMeters / (111000.0 * max(0.1, cos(deg2rad($lat))));
+
         return $query->whereBetween('lat', [$lat - $latOffset, $lat + $latOffset])
-                     ->whereBetween('lng', [$lng - $lngOffset, $lng + $lngOffset]);
+            ->whereBetween('lng', [$lng - $lngOffset, $lng + $lngOffset]);
     }
 }

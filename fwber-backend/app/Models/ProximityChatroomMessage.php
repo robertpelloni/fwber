@@ -99,7 +99,7 @@ class ProximityChatroomMessage extends Model
      */
     public function isReply(): bool
     {
-        return !is_null($this->parent_id);
+        return ! is_null($this->parent_id);
     }
 
     /**
@@ -140,7 +140,8 @@ class ProximityChatroomMessage extends Model
     public function getPreviewAttribute(): string
     {
         $content = $this->display_content;
-        return strlen($content) > 100 ? substr($content, 0, 100) . '...' : $content;
+
+        return strlen($content) > 100 ? substr($content, 0, 100).'...' : $content;
     }
 
     /**

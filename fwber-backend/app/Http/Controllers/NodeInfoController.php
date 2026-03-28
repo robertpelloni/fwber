@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
 
 class NodeInfoController extends Controller
@@ -17,9 +16,9 @@ class NodeInfoController extends Controller
             'links' => [
                 [
                     'rel' => 'http://nodeinfo.diaspora.software/ns/schema/2.0',
-                    'href' => url('/nodeinfo/2.0')
-                ]
-            ]
+                    'href' => url('/nodeinfo/2.0'),
+                ],
+            ],
         ]);
     }
 
@@ -43,28 +42,28 @@ class NodeInfoController extends Controller
             'version' => '2.0',
             'software' => [
                 'name' => 'fwber',
-                'version' => config('app.version', '0.3.47')
+                'version' => config('app.version', '0.3.47'),
             ],
             'protocols' => [
-                'activitypub'
+                'activitypub',
             ],
             'services' => [
                 'inbound' => [],
-                'outbound' => []
+                'outbound' => [],
             ],
             'openRegistrations' => true,
             'usage' => [
                 'users' => [
                     'total' => $federatedCount, // Only expose count of opted-in users to Fediverse
                     'activeHalfyear' => $activeHalfYear,
-                    'activeMonth' => $activeMonth
+                    'activeMonth' => $activeMonth,
                 ],
-                'localPosts' => 0 // Might track Local Pulse artifacts shared globally later
+                'localPosts' => 0, // Might track Local Pulse artifacts shared globally later
             ],
             'metadata' => [
                 'theme' => 'dark_glassmorphism',
-                'focus' => 'proximity_dating'
-            ]
+                'focus' => 'proximity_dating',
+            ],
         ])->header('Content-Type', 'application/json; profile="http://nodeinfo.diaspora.software/ns/schema/2.0#"');
     }
 }

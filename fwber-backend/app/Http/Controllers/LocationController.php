@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UpdateLocationRequest;
-use App\Http\Requests\GetNearbyUsersRequest;
-use App\Http\Requests\UpdateLocationPrivacyRequest;
-use App\Models\UserLocation;
 use App\Domain\Core\EventSourcing\EventStore;
 use App\Events\Location\UserLocationUpdated;
+use App\Http\Requests\GetNearbyUsersRequest;
+use App\Http\Requests\UpdateLocationPrivacyRequest;
+use App\Http\Requests\UpdateLocationRequest;
+use App\Models\UserLocation;
 use App\Services\GeoScreenerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,11 +15,11 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * Location Controller - Real-time Location Tracking API
- * 
+ *
  * AI Model: Claude 4.5 - Multi-AI Orchestration
  * Phase: Location-Based Social Features Implementation
  * Purpose: Handle location tracking and proximity-based discovery
- * 
+ *
  * Created: 2025-01-19
  */
 class LocationController extends Controller
@@ -36,14 +36,14 @@ class LocationController extends Controller
     {
         $user = auth()->user();
         $match = \App\Models\UserMatch::where('id', $matchId)
-            ->where(function($q) use ($user) {
+            ->where(function ($q) use ($user) {
                 $q->where('user1_id', $user->id)->orWhere('user2_id', $user->id);
             })
             ->firstOrFail();
 
         $targetUser = $match->getOtherUser($user->id);
-        
-        if (!$targetUser || !$targetUser->profile) {
+
+        if (! $targetUser || ! $targetUser->profile) {
             return response()->json(['message' => 'Target profile not found'], 404);
         }
 
@@ -52,44 +52,48 @@ class LocationController extends Controller
         return response()->json([
             'id' => $targetUser->id,
             'name' => $targetUser->profile->display_name ?? $targetUser->name,
-            'latitude' => (float)$targetUser->profile->latitude,
-            'longitude' => (float)$targetUser->profile->longitude,
+            'latitude' => (float) $targetUser->profile->latitude,
+            'longitude' => (float) $targetUser->profile->longitude,
             'last_updated' => $targetUser->profile->updated_at->toIso8601String(),
         ]);
     }
 
     /**
      * Update user's current location
-    *
-    * @OA\Post(
-    *   path="/location",
-    *   tags={"Location"},
-    *   summary="Update current location",
-    *   description="Updates the authenticated user's current location and privacy level.",
-    *   security={{"bearerAuth":{}}},
-    *   @OA\RequestBody(required=true,
-    *     @OA\JsonContent(
-    *       required={"latitude","longitude"},
-    *       @OA\Property(property="latitude", type="number", format="float", example=37.7749),
-    *       @OA\Property(property="longitude", type="number", format="float", example=-122.4194),
-    *       @OA\Property(property="accuracy", type="number", example=12.5),
-    *       @OA\Property(property="heading", type="number", example=140),
-    *       @OA\Property(property="speed", type="number", example=1.2),
-    *       @OA\Property(property="altitude", type="number", example=20),
-    *       @OA\Property(property="privacy_level", type="string", enum={"public","friends","private"})
-    *     )
-    *   ),
-    *   @OA\Response(response=200, description="Updated"),
-    *   @OA\Response(response=422, ref="#/components/responses/ValidationError"),
-    *   @OA\Response(response=401, description="Unauthenticated")
-    * )
+     *
+     * @OA\Post(
+     *   path="/location",
+     *   tags={"Location"},
+     *   summary="Update current location",
+     *   description="Updates the authenticated user's current location and privacy level.",
+     *   security={{"bearerAuth":{}}},
+     *
+     *   @OA\RequestBody(required=true,
+     *
+     *     @OA\JsonContent(
+     *       required={"latitude","longitude"},
+     *
+     *       @OA\Property(property="latitude", type="number", format="float", example=37.7749),
+     *       @OA\Property(property="longitude", type="number", format="float", example=-122.4194),
+     *       @OA\Property(property="accuracy", type="number", example=12.5),
+     *       @OA\Property(property="heading", type="number", example=140),
+     *       @OA\Property(property="speed", type="number", example=1.2),
+     *       @OA\Property(property="altitude", type="number", example=20),
+     *       @OA\Property(property="privacy_level", type="string", enum={"public","friends","private"})
+     *     )
+     *   ),
+     *
+     *   @OA\Response(response=200, description="Updated"),
+     *   @OA\Response(response=422, ref="#/components/responses/ValidationError"),
+     *   @OA\Response(response=401, description="Unauthenticated")
+     * )
      */
     public function update(UpdateLocationRequest $request): JsonResponse
     {
         try {
             $user = auth()->user();
-            
-            if (!$user) {
+
+            if (! $user) {
                 return response()->json(['message' => 'Unauthenticated'], 401);
             }
 
@@ -99,14 +103,14 @@ class LocationController extends Controller
             $currentVersion = $this->eventStore->getCurrentVersion($aggregateId, 'UserLocation');
             $event = new UserLocationUpdated(
                 $aggregateId,
-                (float)$request->input('latitude'),
-                (float)$request->input('longitude'),
+                (float) $request->input('latitude'),
+                (float) $request->input('longitude'),
                 null // Location name resolution would go here
             );
-            
+
             $this->eventStore->append(
-                $event, 
-                'UserLocation', 
+                $event,
+                'UserLocation',
                 $currentVersion + 1,
                 ['ip' => $request->ip(), 'user_agent' => $request->userAgent()]
             );
@@ -114,15 +118,15 @@ class LocationController extends Controller
 
             // Get or create user location (Projection Update)
             $location = UserLocation::where('user_id', $user->id)->first();
-            
-            if (!$location) {
-                $location = new UserLocation();
+
+            if (! $location) {
+                $location = new UserLocation;
                 $location->user_id = $user->id;
             }
 
             // Update location data
             $location->fill($request->validated());
-            
+
             $location->last_updated = now();
             $location->is_active = true;
             $location->save();
@@ -130,8 +134,8 @@ class LocationController extends Controller
             // --- RUST GEO-SCREENER INTEGRATION ---
             $this->geoScreener->indexLocation(
                 $user->id,
-                (float)$location->latitude,
-                (float)$location->longitude
+                (float) $location->latitude,
+                (float) $location->longitude
             );
             // -------------------------------------
 
@@ -166,35 +170,37 @@ class LocationController extends Controller
 
             return response()->json([
                 'message' => 'Error updating location',
-                'error' => $e->getMessage() . ' IN ' . $e->getFile() . ':' . $e->getLine(),
+                'error' => $e->getMessage().' IN '.$e->getFile().':'.$e->getLine(),
             ], 500);
         }
     }
 
     /**
      * Get nearby users within radius
-        *
-        * @OA\Get(
-        *   path="/location/nearby",
-        *   tags={"Location"},
-        *   summary="Find nearby users",
-        *   description="Finds nearby users within a radius considering privacy settings.",
-        *   security={{"bearerAuth":{}}},
-        *   @OA\Parameter(name="latitude", in="query", required=true, @OA\Schema(type="number", format="float")),
-        *   @OA\Parameter(name="longitude", in="query", required=true, @OA\Schema(type="number", format="float")),
-        *   @OA\Parameter(name="radius", in="query", required=false, @OA\Schema(type="integer", minimum=100, maximum=10000)),
-        *   @OA\Parameter(name="limit", in="query", required=false, @OA\Schema(type="integer", minimum=1, maximum=100)),
-        *   @OA\Response(response=200, description="Nearby users list"),
-        *   @OA\Response(response=422, ref="#/components/responses/ValidationError"),
-        *   @OA\Response(response=401, description="Unauthenticated")
-        * )
+     *
+     * @OA\Get(
+     *   path="/location/nearby",
+     *   tags={"Location"},
+     *   summary="Find nearby users",
+     *   description="Finds nearby users within a radius considering privacy settings.",
+     *   security={{"bearerAuth":{}}},
+     *
+     *   @OA\Parameter(name="latitude", in="query", required=true, @OA\Schema(type="number", format="float")),
+     *   @OA\Parameter(name="longitude", in="query", required=true, @OA\Schema(type="number", format="float")),
+     *   @OA\Parameter(name="radius", in="query", required=false, @OA\Schema(type="integer", minimum=100, maximum=10000)),
+     *   @OA\Parameter(name="limit", in="query", required=false, @OA\Schema(type="integer", minimum=1, maximum=100)),
+     *
+     *   @OA\Response(response=200, description="Nearby users list"),
+     *   @OA\Response(response=422, ref="#/components/responses/ValidationError"),
+     *   @OA\Response(response=401, description="Unauthenticated")
+     * )
      */
     public function nearby(GetNearbyUsersRequest $request): JsonResponse
     {
         try {
             $user = auth()->user();
-            
-            if (!$user) {
+
+            if (! $user) {
                 return response()->json(['message' => 'Unauthenticated'], 401);
             }
 
@@ -227,15 +233,15 @@ class LocationController extends Controller
                             $p->where('is_incognito', false);
                         })
                         // Case 2: Incognito but Liked Me
-                        ->orWhere(function ($q) use ($user) {
-                            $q->whereHas('profile', function ($p) {
-                                $p->where('is_incognito', true);
-                            })
-                            ->whereHas('matchActions', function ($ma) use ($user) {
-                                $ma->where('target_user_id', $user->id)
-                                   ->whereIn('action', ['like', 'super_like']);
+                            ->orWhere(function ($q) use ($user) {
+                                $q->whereHas('profile', function ($p) {
+                                    $p->where('is_incognito', true);
+                                })
+                                    ->whereHas('matchActions', function ($ma) use ($user) {
+                                        $ma->where('target_user_id', $user->id)
+                                            ->whereIn('action', ['like', 'super_like']);
+                                    });
                             });
-                        });
                     });
                 })
                 ->where(function ($query) use ($user) {
@@ -249,9 +255,9 @@ class LocationController extends Controller
                                         $q->whereHas('matchesAsUser1', function ($mq) use ($user) {
                                             $mq->where('user2_id', $user->id);
                                         })
-                                        ->orWhereHas('matchesAsUser2', function ($mq) use ($user) {
-                                            $mq->where('user1_id', $user->id);
-                                        });
+                                            ->orWhereHas('matchesAsUser2', function ($mq) use ($user) {
+                                                $mq->where('user1_id', $user->id);
+                                            });
                                     });
                                 });
                         });
@@ -308,36 +314,40 @@ class LocationController extends Controller
 
     /**
      * Update location privacy settings
-        *
-        * @OA\Put(
-        *   path="/location/privacy",
-        *   tags={"Location"},
-        *   summary="Update location privacy",
-        *   security={{"bearerAuth":{}}},
-        *   @OA\RequestBody(required=true,
-        *     @OA\JsonContent(
-        *       required={"privacy_level"},
-        *       @OA\Property(property="privacy_level", type="string", enum={"public","friends","private"})
-        *     )
-        *   ),
-        *   @OA\Response(response=200, description="Updated"),
-        *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
-        *   @OA\Response(response=422, ref="#/components/responses/ValidationError"),
-        *   @OA\Response(response=401, description="Unauthenticated")
-        * )
+     *
+     * @OA\Put(
+     *   path="/location/privacy",
+     *   tags={"Location"},
+     *   summary="Update location privacy",
+     *   security={{"bearerAuth":{}}},
+     *
+     *   @OA\RequestBody(required=true,
+     *
+     *     @OA\JsonContent(
+     *       required={"privacy_level"},
+     *
+     *       @OA\Property(property="privacy_level", type="string", enum={"public","friends","private"})
+     *     )
+     *   ),
+     *
+     *   @OA\Response(response=200, description="Updated"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *   @OA\Response(response=422, ref="#/components/responses/ValidationError"),
+     *   @OA\Response(response=401, description="Unauthenticated")
+     * )
      */
     public function updatePrivacy(UpdateLocationPrivacyRequest $request): JsonResponse
     {
         try {
             $user = auth()->user();
-            
-            if (!$user) {
+
+            if (! $user) {
                 return response()->json(['message' => 'Unauthenticated'], 401);
             }
 
             $location = UserLocation::where('user_id', $user->id)->first();
-            
-            if (!$location) {
+
+            if (! $location) {
                 return response()->json([
                     'message' => 'No location data found. Please update your location first.',
                 ], 404);
@@ -345,7 +355,6 @@ class LocationController extends Controller
 
             $location->privacy_level = $request->privacy_level;
             $location->save();
-
 
             Log::info('Location privacy updated', [
                 'user_id' => $user->id,
@@ -376,29 +385,30 @@ class LocationController extends Controller
 
     /**
      * Clear location history (set inactive)
-        *
-        * @OA\Delete(
-        *   path="/location",
-        *   tags={"Location"},
-        *   summary="Clear current location",
-        *   security={{"bearerAuth":{}}},
-        *   @OA\Response(response=200, description="Cleared"),
-        *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
-        *   @OA\Response(response=401, description="Unauthenticated")
-        * )
+     *
+     * @OA\Delete(
+     *   path="/location",
+     *   tags={"Location"},
+     *   summary="Clear current location",
+     *   security={{"bearerAuth":{}}},
+     *
+     *   @OA\Response(response=200, description="Cleared"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *   @OA\Response(response=401, description="Unauthenticated")
+     * )
      */
     public function clear(Request $request): JsonResponse
     {
         try {
             $user = auth()->user();
-            
-            if (!$user) {
+
+            if (! $user) {
                 return response()->json(['message' => 'Unauthenticated'], 401);
             }
 
             $location = UserLocation::where('user_id', $user->id)->first();
-            
-            if (!$location) {
+
+            if (! $location) {
                 return response()->json([
                     'message' => 'No location data found.',
                 ], 404);
@@ -431,29 +441,30 @@ class LocationController extends Controller
 
     /**
      * Get current user's location
-        *
-        * @OA\Get(
-        *   path="/location",
-        *   tags={"Location"},
-        *   summary="Get current user's location",
-        *   security={{"bearerAuth":{}}},
-        *   @OA\Response(response=200, description="Location"),
-        *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
-        *   @OA\Response(response=401, description="Unauthenticated")
-        * )
+     *
+     * @OA\Get(
+     *   path="/location",
+     *   tags={"Location"},
+     *   summary="Get current user's location",
+     *   security={{"bearerAuth":{}}},
+     *
+     *   @OA\Response(response=200, description="Location"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *   @OA\Response(response=401, description="Unauthenticated")
+     * )
      */
     public function show(Request $request): JsonResponse
     {
         try {
             $user = auth()->user();
-            
-            if (!$user) {
+
+            if (! $user) {
                 return response()->json(['message' => 'Unauthenticated'], 401);
             }
 
             $location = UserLocation::where('user_id', $user->id)->first();
-            
-            if (!$location) {
+
+            if (! $location) {
                 return response()->json([
                     'message' => 'No location data found. Please update your location.',
                 ], 404);

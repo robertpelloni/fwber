@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Config;
 use App\Models\SlowRequest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Route;
+use Tests\TestCase;
 
 class ApmMiddlewareTest extends TestCase
 {
@@ -24,6 +24,7 @@ class ApmMiddlewareTest extends TestCase
         // Define a slow route
         Route::get('/test-slow-route', function () {
             usleep(1100000); // Sleep for 1.1 seconds
+
             return 'slow response';
         })->middleware(\App\Http\Middleware\ApmMiddleware::class);
 

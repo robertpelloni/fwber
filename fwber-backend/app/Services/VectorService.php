@@ -3,13 +3,14 @@
 namespace App\Services;
 
 use App\Models\UserProfile;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redis;
 use OpenAI\Laravel\Facades\OpenAI;
 
 class VectorService
 {
     const INDEX_NAME = 'user:profile:idx';
+
     const PREFIX = 'user:profile:';
 
     /**
@@ -25,10 +26,10 @@ class VectorService
             Redis::command('FT.INFO', [self::INDEX_NAME]);
         } catch (\Exception $e) {
             // Index likely doesn't exist, create it
-            Log::info("Creating RediSearch index: " . self::INDEX_NAME);
-            
+            Log::info('Creating RediSearch index: '.self::INDEX_NAME);
+
             // Create index on Hash with prefix 'user:profile:'
-            // Fields: 
+            // Fields:
             // - embedding: VECTOR (FLAT, 1536 dims, FLOAT32)
             // - gender: TAG
             // - age: NUMERIC
@@ -39,7 +40,7 @@ class VectorService
                 'SCHEMA',
                 'embedding', 'VECTOR', 'FLAT', '6', 'TYPE', 'FLOAT32', 'DIM', '1536', 'DISTANCE_METRIC', 'COSINE',
                 'gender', 'TAG',
-                'age', 'NUMERIC'
+                'age', 'NUMERIC',
             ]);
         }
     }
@@ -58,10 +59,11 @@ class VectorService
 
         if (empty($embedding)) {
             Log::error("Failed to generate embedding for profile {$profile->id}");
+
             return;
         }
 
-        $key = self::PREFIX . $profile->user_id;
+        $key = self::PREFIX.$profile->user_id;
 
         // Pack the float array into a binary string for Redis
         $packed = pack('f*', ...$embedding);
@@ -71,9 +73,9 @@ class VectorService
             'embedding' => $packed,
             'gender' => $profile->gender ?? 'unknown',
             'age' => $profile->age ?? 0,
-            'user_id' => $profile->user_id
+            'user_id' => $profile->user_id,
         ]);
-        
+
         Log::info("Stored embedding for user {$profile->user_id}");
     }
 
@@ -93,24 +95,25 @@ class VectorService
 
         // Add filters to query if needed (e.g., @gender:{male} @age:[18 30])
         // For now, simple KNN
-        
+
         try {
             $result = Redis::command('FT.SEARCH', [
                 self::INDEX_NAME,
                 $query,
                 'PARAMS', '2', 'blob', $packed,
                 'SORTBY', 'score',
-                'DIALECT', '2'
+                'DIALECT', '2',
             ]);
 
             // Parse result
             // Result format: [count, key1, [field1, val1, ...], key2, ...]
             // Or with DIALECT 2? Need to check exact format return by phpredis
-            
+
             return $this->parseSearchResults($result);
 
         } catch (\Exception $e) {
-            Log::error("Vector search failed: " . $e->getMessage());
+            Log::error('Vector search failed: '.$e->getMessage());
+
             return [];
         }
     }
@@ -125,11 +128,12 @@ class VectorService
 
             return $response->embeddings[0]->embedding;
         } catch (\Exception $e) {
-            Log::error("OpenAI Embedding failed: " . $e->getMessage());
+            Log::error('OpenAI Embedding failed: '.$e->getMessage());
             // In dev/mock mode, return a random vector?
-            if (config('app.env') === 'local' && !config('openai.api_key')) {
+            if (config('app.env') === 'local' && ! config('openai.api_key')) {
                 return array_fill(0, 1536, 0.1);
             }
+
             return [];
         }
     }
@@ -138,15 +142,21 @@ class VectorService
     {
         // Combine bio, preferences, and key traits into a text blob
         $parts = [];
-        if ($profile->bio) $parts[] = "Bio: {$profile->bio}";
+        if ($profile->bio) {
+            $parts[] = "Bio: {$profile->bio}";
+        }
         if ($profile->preferences) {
             $prefs = is_array($profile->preferences) ? json_encode($profile->preferences) : $profile->preferences;
             $parts[] = "Preferences: {$prefs}";
         }
-        if ($profile->political_views) $parts[] = "Politics: {$profile->political_views}";
-        if ($profile->religion) $parts[] = "Religion: {$profile->religion}";
-        
-        return implode(". ", $parts);
+        if ($profile->political_views) {
+            $parts[] = "Politics: {$profile->political_views}";
+        }
+        if ($profile->religion) {
+            $parts[] = "Religion: {$profile->religion}";
+        }
+
+        return implode('. ', $parts);
     }
 
     private function parseSearchResults(array $result): array
@@ -158,18 +168,18 @@ class VectorService
         // Loop through pairs (key, fields) or (key, score, fields) depending on flags
         // With standard FT.SEARCH and no WITHSCORES, it might be key, fields...
         // But we asked for score in query "AS score"
-        
+
         // Let's assume standard behavior for now and refine via debugging if needed
         for ($i = 0; $i < count($result); $i += 2) {
             $key = $result[$i];
-            $fields = $result[$i+1]; // Array of field/values
-            
+            $fields = $result[$i + 1]; // Array of field/values
+
             // Extract user_id from key or fields
             $userId = str_replace(self::PREFIX, '', $key);
-            
+
             // Extract score if present in fields
             // ...
-            
+
             $hits[] = [
                 'user_id' => $userId,
                 // 'score' => ...

@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Loader2, Globe, Users, MessageSquare, Repeat, Heart } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
+import Image from 'next/image'
 
 interface FederatedPost {
   id: number
@@ -78,9 +79,9 @@ export default function GlobalFeedPage() {
             {posts.map((post) => (
               <Card key={post.id} className="overflow-hidden hover:shadow-md transition-shadow">
                 <CardHeader className="flex flex-row items-center gap-4 pb-3">
-                  <div className="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
+                  <div className="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden relative">
                     {post.author_avatar ? (
-                      <img src={post.author_avatar} alt="" className="w-full h-full object-cover" />
+                      <Image src={post.author_avatar} alt="" fill sizes="40px" className="object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-blue-100 text-blue-600 font-bold uppercase">
                         {(post.author_name || post.actor_id).charAt(0)}

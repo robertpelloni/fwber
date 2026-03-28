@@ -14,11 +14,12 @@ class FeatureEnabled
      */
     public function handle(Request $request, Closure $next, string $feature)
     {
-        $enabled = (bool) config('features.' . $feature, false);
-        if (!$enabled) {
+        $enabled = (bool) config('features.'.$feature, false);
+        if (! $enabled) {
             // Return 404 to avoid feature discovery when disabled
             return response()->json(['error' => 'Not Found'], 404);
         }
+
         return $next($request);
     }
 }

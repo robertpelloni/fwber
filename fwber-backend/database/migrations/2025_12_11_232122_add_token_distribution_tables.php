@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('referrer_id')->nullable()->after('referral_code');
             $table->string('wallet_address')->nullable()->after('referrer_id');
             $table->decimal('token_balance', 16, 4)->default(0)->after('wallet_address');
-            
+
             $table->foreign('referrer_id')->references('id')->on('users')->onDelete('set null');
         });
 
@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->json('metadata')->nullable(); // For storing related user_id, etc.
             $table->timestamps();
-            
+
             $table->index('type');
         });
     }
@@ -39,7 +39,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('token_transactions');
-        
+
         Schema::table('users', function (Blueprint $table) {
             $table->dropForeign(['referrer_id']);
             $table->dropColumn(['referral_code', 'referrer_id', 'wallet_address', 'token_balance']);

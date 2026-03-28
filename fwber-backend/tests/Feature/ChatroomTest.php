@@ -6,9 +6,7 @@ use App\Models\Chatroom;
 use App\Models\User;
 use App\Services\ContentModerationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
-use Mockery;
 
 class ChatroomTest extends TestCase
 {
@@ -17,7 +15,7 @@ class ChatroomTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Mock ContentModerationService
         $this->mock(ContentModerationService::class, function ($mock) {
             $mock->shouldReceive('checkContent')->andReturn(true);
@@ -69,7 +67,7 @@ class ChatroomTest extends TestCase
                         'id',
                         'name',
                         'type',
-                    ]
+                    ],
                 ],
                 'current_page',
                 'total',

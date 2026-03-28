@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api/client';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { Globe, Search, UserPlus, Shield, Info, ArrowLeft, Share2, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface RemoteActor {
     id: string;
@@ -31,11 +32,7 @@ export default function FederationSettingsPage() {
     const [followers, setFollowers] = useState<any[]>([]);
     const [activeTab, setActiveTab] = useState<'search' | 'following' | 'followers'>('search');
 
-    useEffect(() => {
-        fetchConnections();
-    }, [token]);
-
-    const fetchConnections = async () => {
+    const fetchConnections = useCallback(async () => {
         if (!token) return;
         try {
             const followingsRes = await api.get('/federation/following', {
@@ -50,7 +47,11 @@ export default function FederationSettingsPage() {
         } catch (error) {
             console.error('Failed to fetch connections:', error);
         }
-    };
+    }, [token]);
+
+    useEffect(() => {
+        fetchConnections();
+    }, [fetchConnections]);
 
     const handleFollow = async (actorId: string) => {
         if (!token) return;
@@ -184,8 +185,8 @@ export default function FederationSettingsPage() {
                                             return (
                                                 <div key={actor.id} className="p-4 border rounded-xl flex items-center justify-between bg-white dark:bg-zinc-900 shadow-sm transition-all hover:shadow-md">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden border border-zinc-200 dark:border-zinc-700">
-                                                            {actor.icon && <img src={actor.icon.url} alt="" className="w-full h-full object-cover" />}
+                                                        <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden border border-zinc-200 dark:border-zinc-700 relative">
+                                                            {actor.icon && <Image src={actor.icon.url} alt="" fill sizes="40px" className="object-cover" />}
                                                         </div>
                                                         <div>
                                                             <p className="font-bold text-sm">@{actor.preferredUsername}@{actor.server}</p>
@@ -214,7 +215,7 @@ export default function FederationSettingsPage() {
                     {activeTab === 'following' && (
                         <div className="space-y-4">
                             {following.length === 0 ? (
-                                <p className="text-center py-12 text-zinc-500 italic">You aren't following anyone yet.</p>
+                                <p className="text-center py-12 text-zinc-500 italic">You aren&apos;t following anyone yet.</p>
                             ) : (
                                 following.map((f) => (
                                     <div key={f.id} className="p-4 border rounded-xl flex items-center justify-between bg-white dark:bg-zinc-900 shadow-sm">

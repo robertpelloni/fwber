@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\MerchantPayment;
-use App\Models\MerchantProfile;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 

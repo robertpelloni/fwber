@@ -3,16 +3,15 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Models\UserProfile;
-use App\Models\Photo;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class PrivacySecurityService
 {
     private $contentModerationApi;
+
     private $imageModerationApi;
 
     public function __construct()
@@ -24,8 +23,8 @@ class PrivacySecurityService
 
     public function moderateContent(string $content, string $type = 'text'): array
     {
-        $cacheKey = 'moderation_' . md5($content . $type);
-        
+        $cacheKey = 'moderation_'.md5($content.$type);
+
         return Cache::remember($cacheKey, 3600, function () use ($content, $type) {
             // Use configured moderation driver
             $driver = config('services.content_moderation.driver', 'mock');
@@ -47,7 +46,7 @@ class PrivacySecurityService
         if ($type === 'text') {
             return $this->moderateTextRegex($content);
         }
-        
+
         // Image content moderation
         if ($type === 'image') {
             return $this->moderateImageBasic($content);
@@ -60,11 +59,11 @@ class PrivacySecurityService
     {
         // Use the AwsRekognitionDriver directly via the container or new instance
         // Assuming content is a file path/URL
-        
+
         try {
             /** @var \App\Services\MediaAnalysis\Drivers\AwsRekognitionDriver $driver */
             $driver = app(\App\Services\MediaAnalysis\Drivers\AwsRekognitionDriver::class);
-            
+
             // Rekognition driver expects a file path relative to public disk
             $result = $driver->analyze($contentUrl, $type);
 
@@ -72,10 +71,11 @@ class PrivacySecurityService
                 'is_safe' => $result->isSafe,
                 'confidence' => $result->confidence,
                 'flags' => $result->unsafeLabels,
-                'action' => $result->isSafe ? 'approve' : 'reject'
+                'action' => $result->isSafe ? 'approve' : 'reject',
             ];
         } catch (\Exception $e) {
-            Log::error("PrivacySecurityService: AWS Moderation failed: " . $e->getMessage());
+            Log::error('PrivacySecurityService: AWS Moderation failed: '.$e->getMessage());
+
             // Fallback to strict mock if service fails to avoid letting unsafe content through
             return ['is_safe' => false, 'confidence' => 0.0, 'flags' => ['moderation_service_error'], 'action' => 'reject'];
         }
@@ -86,13 +86,13 @@ class PrivacySecurityService
         try {
             /** @var \App\Services\MediaAnalysis\Drivers\GoogleVisionDriver $driver */
             $driver = app(\App\Services\MediaAnalysis\Drivers\GoogleVisionDriver::class);
-            
+
             // Google driver expects a file path (local or url depending on setup)
             // For now, assume it handles what AWS driver handled (path relative to storage or absolute)
             // But GoogleVisionDriver uses file_get_contents($url) so it needs a reachable path.
             // If $contentUrl is a relative storage path, we might need to resolve it.
             // AWS driver used Storage::disk('public')->get(), Google driver currently does file_get_contents.
-            
+
             // Let's ensure consistency. If it's a relative path in storage, resolve full path.
             if (Storage::disk('public')->exists($contentUrl)) {
                 $fullPath = Storage::disk('public')->path($contentUrl);
@@ -106,10 +106,11 @@ class PrivacySecurityService
                 'is_safe' => $result->safe,
                 'confidence' => $result->confidence,
                 'flags' => $result->moderationLabels, // Using moderationLabels which maps to warnings/unsafe reasons
-                'action' => $result->safe ? 'approve' : 'reject'
+                'action' => $result->safe ? 'approve' : 'reject',
             ];
         } catch (\Exception $e) {
-            Log::error("PrivacySecurityService: Google Moderation failed: " . $e->getMessage());
+            Log::error('PrivacySecurityService: Google Moderation failed: '.$e->getMessage());
+
             return ['is_safe' => false, 'confidence' => 0.0, 'flags' => ['moderation_service_error'], 'action' => 'reject'];
         }
     }
@@ -122,7 +123,7 @@ class PrivacySecurityService
         // Check for explicit content keywords
         $explicitKeywords = [
             'unsolicited', 'explicit', 'inappropriate', 'harassment',
-            'spam', 'scam', 'fake', 'bot', 'seller', 'escort'
+            'spam', 'scam', 'fake', 'bot', 'seller', 'escort',
         ];
 
         $textLower = strtolower($text);
@@ -184,7 +185,7 @@ class PrivacySecurityService
             // Check file type
             $mimeType = Storage::mimeType($imagePath);
             $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-            if (!in_array($mimeType, $allowedTypes)) {
+            if (! in_array($mimeType, $allowedTypes)) {
                 $flags[] = 'invalid_file_type';
                 $confidence -= 0.5;
             }
@@ -195,13 +196,13 @@ class PrivacySecurityService
                 if ($imageInfo) {
                     $width = $imageInfo[0];
                     $height = $imageInfo[1];
-                    
+
                     // Check for extremely small images (potential spam)
                     if ($width < 100 || $height < 100) {
                         $flags[] = 'image_too_small';
                         $confidence -= 0.2;
                     }
-                    
+
                     // Check for extremely large images (potential abuse)
                     if ($width > 4000 || $height > 4000) {
                         $flags[] = 'image_too_large';
@@ -251,8 +252,8 @@ class PrivacySecurityService
     public function validatePhotoAccess(string $accessToken, int $requestingUserId): ?array
     {
         $accessData = Cache::get("photo_access:{$accessToken}");
-        
-        if (!$accessData) {
+
+        if (! $accessData) {
             return null; // Token expired or invalid
         }
 
@@ -262,6 +263,7 @@ class PrivacySecurityService
 
         if (now()->isAfter($accessData['expires_at'])) {
             Cache::forget("photo_access:{$accessToken}");
+
             return null; // Expired
         }
 
@@ -284,9 +286,10 @@ class PrivacySecurityService
 
         // Basic validation
         $imageModeration = $this->moderateImage($verificationImagePath);
-        
-        if (!$imageModeration['is_safe']) {
+
+        if (! $imageModeration['is_safe']) {
             $result['message'] = 'Image failed moderation';
+
             return $result;
         }
 
@@ -371,7 +374,7 @@ class PrivacySecurityService
 
         $limit = $limits[$action] ?? 50;
         $key = "rate_limit:{$userId}:{$action}";
-        
+
         $current = Cache::get($key, 0);
         if ($current >= $limit) {
             return false; // Rate limit exceeded
@@ -388,7 +391,8 @@ class PrivacySecurityService
         $key = config('app.encryption_key');
         $iv = random_bytes(16);
         $encrypted = openssl_encrypt($data, 'AES-256-CBC', $key, 0, $iv);
-        return base64_encode($iv . $encrypted);
+
+        return base64_encode($iv.$encrypted);
     }
 
     public function decryptSensitiveData(string $encryptedData): string
@@ -397,13 +401,14 @@ class PrivacySecurityService
         $data = base64_decode($encryptedData);
         $iv = substr($data, 0, 16);
         $encrypted = substr($data, 16);
+
         return openssl_decrypt($encrypted, 'AES-256-CBC', $key, 0, $iv);
     }
 
     public function anonymizeUserData(int $userId): void
     {
         $user = User::find($userId);
-        if (!$user) {
+        if (! $user) {
             return;
         }
 
@@ -438,7 +443,7 @@ class PrivacySecurityService
     public function generatePrivacyReport(int $userId): array
     {
         $user = User::with('profile')->find($userId);
-        if (!$user) {
+        if (! $user) {
             return [];
         }
 
@@ -454,11 +459,11 @@ class PrivacySecurityService
         $profile = $user->profile;
         if ($profile) {
             $dataPoints = [
-                'display_name' => !empty($profile->display_name),
-                'bio' => !empty($profile->bio),
-                'location' => !empty($profile->location_description),
+                'display_name' => ! empty($profile->display_name),
+                'bio' => ! empty($profile->bio),
+                'location' => ! empty($profile->location_description),
                 'photos' => $profile->photos()->count() > 0,
-                'preferences' => !empty($profile->preferences),
+                'preferences' => ! empty($profile->preferences),
             ];
 
             $report['data_points'] = $dataPoints;

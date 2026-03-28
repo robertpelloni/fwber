@@ -4,7 +4,6 @@ namespace App\Events;
 
 use App\Models\AudioRoom;
 use App\Models\AudioRoomParticipant;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -16,6 +15,7 @@ class AudioRoomParticipantJoined implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $room;
+
     public $participant;
 
     /**
@@ -35,7 +35,7 @@ class AudioRoomParticipantJoined implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PresenceChannel('audio-rooms.' . $this->room->id),
+            new PresenceChannel('audio-rooms.'.$this->room->id),
         ];
     }
 

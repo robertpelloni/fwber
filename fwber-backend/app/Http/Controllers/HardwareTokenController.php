@@ -41,7 +41,7 @@ class HardwareTokenController extends Controller
 
         return response()->json([
             'message' => 'Hardware token paired successfully',
-            'token' => $token
+            'token' => $token,
         ]);
     }
 
@@ -56,13 +56,13 @@ class HardwareTokenController extends Controller
         ]);
 
         $detectorUser = Auth::user();
-        
+
         // Find the user who owns the detected token
         $detectedToken = HardwareToken::where('token_uuid', $request->detected_token_uuid)
             ->where('is_active', true)
             ->first();
 
-        if (!$detectedToken) {
+        if (! $detectedToken) {
             return response()->json(['message' => 'Token not recognized'], 404);
         }
 
@@ -93,16 +93,16 @@ class HardwareTokenController extends Controller
             $this->pushService->sendPushNotification($detectorUser->id, 'High Compatibility Nearby! 🚨', 'Someone you have an 85%+ match with is within 50 feet. Look around!');
 
             Log::info("Hardware Token Match Triggered: User {$detectorUser->id} detected User {$targetUser->id} (Score: {$score})");
-            
+
             return response()->json([
                 'message' => 'High compatibility detected. Hardware trigger dispatched.',
-                'match_score' => $score
+                'match_score' => $score,
             ]);
         }
 
         return response()->json([
             'message' => 'Token ping recorded. Score below threshold.',
-            'match_score' => $score
+            'match_score' => $score,
         ]);
     }
 
@@ -115,7 +115,7 @@ class HardwareTokenController extends Controller
             ->where('is_active', true)
             ->first();
 
-        if (!$token) {
+        if (! $token) {
             return response()->json(['message' => 'No active token found'], 404);
         }
 

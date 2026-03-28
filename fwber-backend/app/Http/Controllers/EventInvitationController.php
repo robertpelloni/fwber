@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Event\RespondEventInvitationRequest;
+use App\Http\Requests\Event\StoreEventInvitationRequest;
 use App\Models\Event;
-use App\Models\EventInvitation;
 use App\Models\EventAttendee;
+use App\Models\EventInvitation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Http\Requests\Event\StoreEventInvitationRequest;
-use App\Http\Requests\Event\RespondEventInvitationRequest;
 
 class EventInvitationController extends Controller
 {
@@ -20,9 +20,11 @@ class EventInvitationController extends Controller
      *     summary="Get my event invitations",
      *     tags={"Events"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="List of invitations",
+     *
      *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/EventInvitation"))
      *     )
      * )
@@ -44,22 +46,30 @@ class EventInvitationController extends Controller
      *     summary="Invite a user or group to an event",
      *     tags={"Events"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="user_id", type="integer", example=1, description="Optional if group_id is provided"),
      *             @OA\Property(property="group_id", type="integer", example=5, description="Optional if user_id is provided")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Invitation(s) sent",
+     *
      *         @OA\JsonContent(
      *             oneOf={
+     *
      *                 @OA\Schema(ref="#/components/schemas/EventInvitation"),
      *                 @OA\Schema(
      *                     type="object",
+     *
      *                     @OA\Property(property="message", type="string"),
      *                     @OA\Property(property="count", type="integer")
      *                 )
@@ -107,6 +117,7 @@ class EventInvitationController extends Controller
                         $existingInvitation->invitee->notify(new \App\Notifications\EventInvitationReceived($existingInvitation));
                         $count++;
                     }
+
                     continue;
                 }
 
@@ -124,7 +135,7 @@ class EventInvitationController extends Controller
 
             return response()->json([
                 'message' => "Invitations sent to {$count} group members.",
-                'count' => $count
+                'count' => $count,
             ], 201);
         }
 
@@ -151,6 +162,7 @@ class EventInvitationController extends Controller
             // If declined previously, we might want to allow re-inviting, or just update status
             // For now, let's just update the existing one to pending
             $existingInvitation->update(['status' => 'pending', 'inviter_id' => $inviterId]);
+
             return response()->json($existingInvitation);
         }
 
@@ -173,13 +185,18 @@ class EventInvitationController extends Controller
      *     summary="Respond to an invitation",
      *     tags={"Events"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="status", type="string", enum={"accepted", "declined"})
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Response recorded"
@@ -208,6 +225,6 @@ class EventInvitationController extends Controller
             }
         });
 
-        return response()->json(['message' => 'Invitation ' . $request->status]);
+        return response()->json(['message' => 'Invitation '.$request->status]);
     }
 }

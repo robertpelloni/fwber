@@ -2,10 +2,9 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
 class HealthCheckTest extends TestCase
@@ -19,7 +18,7 @@ class HealthCheckTest extends TestCase
         // Mock dependencies to ensure they don't fail the test if the environment isn't perfect
         // But ideally we want integration tests to actually check them.
         // For this test, we'll assume the test environment is set up correctly (sqlite/array cache)
-        
+
         $response = $this->getJson('/api/health');
 
         $response->assertStatus(200)
@@ -28,7 +27,7 @@ class HealthCheckTest extends TestCase
                 'checks' => [
                     'database' => ['status' => 'ok'],
                     'cache' => ['status' => 'ok'],
-                ]
+                ],
             ]);
     }
 

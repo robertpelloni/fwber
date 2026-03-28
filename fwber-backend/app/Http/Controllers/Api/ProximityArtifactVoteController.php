@@ -5,8 +5,8 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\ProximityArtifact;
 use App\Models\ProximityArtifactVote;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ProximityArtifactVoteController extends Controller
 {
@@ -27,7 +27,7 @@ class ProximityArtifactVoteController extends Controller
             ProximityArtifactVote::where('proximity_artifact_id', $artifact->id)
                 ->where('user_id', $user->id)
                 ->delete();
-                
+
             return response()->json(['message' => 'Vote removed']);
         }
 
@@ -44,7 +44,7 @@ class ProximityArtifactVoteController extends Controller
 
         return response()->json([
             'message' => 'Vote recorded',
-            'vote' => $vote
+            'vote' => $vote,
         ]);
     }
 }

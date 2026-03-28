@@ -1,15 +1,12 @@
 <?php
 
-require __DIR__ . '/vendor/autoload.php';
-$app = require_once __DIR__ . '/bootstrap/app.php';
+require __DIR__.'/vendor/autoload.php';
+$app = require_once __DIR__.'/bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Http;
-use App\Services\MediaAnalysis\Drivers\AwsRekognitionDriver;
-use App\Services\AvatarGenerationService;
 use Aws\Rekognition\RekognitionClient;
+use Illuminate\Support\Facades\Http;
 
 echo "=== fwber PRODUCTION AI & STORAGE VERIFICATION (FORCE NO-SSL) ===\n\n";
 
@@ -17,7 +14,7 @@ echo "=== fwber PRODUCTION AI & STORAGE VERIFICATION (FORCE NO-SSL) ===\n\n";
 echo "[1/3] Testing AWS S3 Connectivity...\n";
 try {
     $bucket = config('filesystems.disks.s3.bucket');
-    
+
     // We create a custom client for the test to skip SSL
     $s3Client = new \Aws\S3\S3Client([
         'region' => config('filesystems.disks.s3.region'),
@@ -26,22 +23,22 @@ try {
             'key' => config('filesystems.disks.s3.key'),
             'secret' => config('filesystems.disks.s3.secret'),
         ],
-        'http'    => [
-            'verify' => false
-        ]
+        'http' => [
+            'verify' => false,
+        ],
     ]);
-    
-    $testFile = 'prod_verify_' . time() . '.txt';
+
+    $testFile = 'prod_verify_'.time().'.txt';
     $s3Client->putObject([
         'Bucket' => $bucket,
-        'Key'    => $testFile,
-        'Body'   => 'fwber_verification_active'
+        'Key' => $testFile,
+        'Body' => 'fwber_verification_active',
     ]);
-    
+
     echo "✅ S3: Success (File uploaded to $bucket)\n";
     $s3Client->deleteObject(['Bucket' => $bucket, 'Key' => $testFile]);
 } catch (\Exception $e) {
-    echo "❌ S3 ERROR: " . $e->getMessage() . "\n";
+    echo '❌ S3 ERROR: '.$e->getMessage()."\n";
 }
 
 echo "\n";
@@ -56,15 +53,15 @@ try {
             'key' => config('services.aws.key'),
             'secret' => config('services.aws.secret'),
         ],
-        'http'    => [
-            'verify' => false
-        ]
+        'http' => [
+            'verify' => false,
+        ],
     ]);
 
     $rekClient->listCollections(['MaxResults' => 1]);
     echo "✅ Rekognition: Success (API Responsive)\n";
 } catch (\Exception $e) {
-    echo "✅ Rekognition: Success (API responded: " . $e->getMessage() . ")\n";
+    echo '✅ Rekognition: Success (API responded: '.$e->getMessage().")\n";
 }
 
 echo "\n";
@@ -78,7 +75,7 @@ try {
     } else {
         echo "Attempting to generate small test image (1024x1024)...\n";
         $response = Http::withoutVerifying()->withHeaders([
-            'Authorization' => 'Bearer ' . $apiKey,
+            'Authorization' => 'Bearer '.$apiKey,
         ])->post('https://api.openai.com/v1/images/generations', [
             'model' => 'dall-e-3',
             'prompt' => 'A small glowing purple icon of a futuristic heart on a black background, minimalist style.',
@@ -88,28 +85,28 @@ try {
 
         if ($response->successful()) {
             $url = $response->json('data.0.url');
-            echo "✅ OpenAI: Success (Image generated! URL: " . substr($url, 0, 50) . "...)\n";
-            
+            echo '✅ OpenAI: Success (Image generated! URL: '.substr($url, 0, 50)."...)\n";
+
             echo "Testing S3-to-AI Bridge (Saving generated image to S3)...\n";
             $contents = file_get_contents($url, false, stream_context_create([
-                "ssl" => ["verify_peer" => false, "verify_peer_name" => false]
+                'ssl' => ['verify_peer' => false, 'verify_peer_name' => false],
             ]));
-            
-            $filename = 'verification/test_avatar_' . time() . '.png';
-            
+
+            $filename = 'verification/test_avatar_'.time().'.png';
+
             $s3Client->putObject([
                 'Bucket' => $bucket,
-                'Key'    => $filename,
-                'Body'   => $contents
+                'Key' => $filename,
+                'Body' => $contents,
             ]);
-            
+
             echo "✅ AI Bridge: Success (Avatar saved to S3)\n";
         } else {
-            echo "❌ OpenAI ERROR: " . $response->body() . "\n";
+            echo '❌ OpenAI ERROR: '.$response->body()."\n";
         }
     }
 } catch (\Exception $e) {
-    echo "❌ AI ERROR: " . $e->getMessage() . "\n";
+    echo '❌ AI ERROR: '.$e->getMessage()."\n";
 }
 
 echo "\n=== VERIFICATION COMPLETE ===\n";

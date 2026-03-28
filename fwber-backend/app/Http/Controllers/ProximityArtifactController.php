@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ProximityArtifactEvent;
 use App\Http\Requests\LocalPulseRequest;
+use App\Http\Requests\Proximity\ClaimProximityArtifactRequest;
 use App\Http\Requests\ProximityFeedRequest;
 use App\Http\Requests\StoreProximityArtifactRequest;
-use App\Http\Requests\Proximity\ClaimProximityArtifactRequest;
-use App\Models\ProximityArtifact;
 use App\Models\Promotion;
-use App\Events\ProximityArtifactEvent;
+use App\Models\ProximityArtifact;
+use App\Services\GeoScreenerClient;
+use App\Services\GeoSpoofDetectionService;
 use App\Services\ProximityArtifactService;
 use App\Services\ShadowThrottleService;
-use App\Services\GeoSpoofDetectionService;
-use App\Services\GeoScreenerClient;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 
@@ -24,24 +24,30 @@ class ProximityArtifactController extends Controller
         private GeoScreenerClient $geoScreener,
         private \App\Services\ActivityPubService $apService
     ) {}
+
     /**
      * @OA\Get(
      *   path="/proximity/feed",
      *   tags={"Proximity Artifacts"},
      *   summary="Get proximity artifacts feed",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="lat", in="query", required=true, @OA\Schema(type="number")),
      *   @OA\Parameter(name="lng", in="query", required=true, @OA\Schema(type="number")),
      *   @OA\Parameter(name="radius", in="query", @OA\Schema(type="integer", minimum=100, maximum=10000)),
      *   @OA\Parameter(name="type", in="query", @OA\Schema(type="string", enum={"chat", "board_post", "announce"})),
+     *
      *   @OA\Response(
      *     response=200,
      *     description="Proximity artifacts",
+     *
      *     @OA\JsonContent(
+     *
      *       @OA\Property(property="artifacts", type="array", @OA\Items(ref="#/components/schemas/ProximityArtifact"))
      *     )
      *   ),
-    *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     *
+     *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function index(ProximityFeedRequest $request): JsonResponse
@@ -49,22 +55,22 @@ class ProximityArtifactController extends Controller
         $user = auth()->user();
         $validated = $request->validated();
 
-        $lat = (float)$validated['lat'];
-        $lng = (float)$validated['lng'];
-        $radius = (int)($validated['radius'] ?? 1000);
+        $lat = (float) $validated['lat'];
+        $lng = (float) $validated['lng'];
+        $radius = (int) ($validated['radius'] ?? 1000);
         $type = $validated['type'] ?? 'all';
 
         // Round coordinates to ~110m precision for caching grid
         $gridLat = round($lat, 3);
         $gridLng = round($lng, 3);
-        
+
         $cacheKey = "proximity:feed:lat:{$gridLat}:lng:{$gridLng}:radius:{$radius}:type:{$type}";
 
         $artifacts = Cache::remember($cacheKey, 60, function () use ($lat, $lng, $radius, $validated, $user) {
             $q = ProximityArtifact::query()
                 ->withCount('comments')
                 ->withSum('votes', 'value')
-                ->with(['votes' => function($query) use ($user) {
+                ->with(['votes' => function ($query) use ($user) {
                     $query->where('user_id', $user->id);
                 }])
                 ->active()
@@ -102,10 +108,13 @@ class ProximityArtifactController extends Controller
      *   tags={"Proximity Artifacts"},
      *   summary="Create proximity artifact",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\RequestBody(
      *     required=true,
+     *
      *     @OA\JsonContent(
      *       required={"type", "content", "lat", "lng"},
+     *
      *       @OA\Property(property="type", type="string", enum={"chat", "board_post", "announce"}),
      *       @OA\Property(property="content", type="string"),
      *       @OA\Property(property="lat", type="number"),
@@ -113,8 +122,9 @@ class ProximityArtifactController extends Controller
      *       @OA\Property(property="radius", type="integer", minimum=100, maximum=10000)
      *     )
      *   ),
-    *   @OA\Response(response=201, description="Artifact created"),
-    *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     *
+     *   @OA\Response(response=201, description="Artifact created"),
+     *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function store(StoreProximityArtifactRequest $request, ProximityArtifactService $service): JsonResponse
@@ -124,9 +134,9 @@ class ProximityArtifactController extends Controller
 
         // Detect potential geo-spoofing
         $ipAddress = $request->ip();
-        $lat = (float)$validated['lat'];
-        $lng = (float)$validated['lng'];
-        
+        $lat = (float) $validated['lat'];
+        $lng = (float) $validated['lng'];
+
         $this->geoSpoofService->detectSpoof($user->id, $lat, $lng, $ipAddress);
 
         try {
@@ -135,7 +145,7 @@ class ProximityArtifactController extends Controller
                 'content' => $validated['content'],
                 'location_lat' => $lat,
                 'location_lng' => $lng,
-                'visibility_radius_m' => (int)($validated['radius'] ?? 1000),
+                'visibility_radius_m' => (int) ($validated['radius'] ?? 1000),
                 'amount' => $validated['amount'] ?? 0,
             ]);
         } catch (\Throwable $e) {
@@ -165,11 +175,11 @@ class ProximityArtifactController extends Controller
                         'type' => 'Note',
                         'content' => $artifact->content,
                         'attributedTo' => url("/api/federation/users/{$user->id}"),
-                        'to' => ['https://www.w3.org/ns/activitystreams#Public']
-                    ]
+                        'to' => ['https://www.w3.org/ns/activitystreams#Public'],
+                    ],
                 ]);
             } catch (\Throwable $e) {
-                \Log::error("ActivityPub: Broadcast failed for artifact {$artifact->id}: " . $e->getMessage());
+                \Log::error("ActivityPub: Broadcast failed for artifact {$artifact->id}: ".$e->getMessage());
             }
         }
 
@@ -193,9 +203,11 @@ class ProximityArtifactController extends Controller
      *   tags={"Proximity Artifacts"},
      *   summary="Get single artifact",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *
      *   @OA\Response(response=200, description="Artifact details"),
-    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function show(int $id): JsonResponse
@@ -204,7 +216,7 @@ class ProximityArtifactController extends Controller
         $artifact = ProximityArtifact::active()
             ->withCount('comments')
             ->withSum('votes', 'value')
-            ->with(['votes' => function($query) use ($user) {
+            ->with(['votes' => function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             }])
             ->findOrFail($id);
@@ -232,8 +244,11 @@ class ProximityArtifactController extends Controller
      *   tags={"Proximity Artifacts"},
      *   summary="Claim a token drop",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *
      *   @OA\RequestBody(required=true, @OA\JsonContent(required={"lat","lng"}, @OA\Property(property="lat", type="number"), @OA\Property(property="lng", type="number"))),
+     *
      *   @OA\Response(response=200, description="Claim successful"),
      *   @OA\Response(response=400, description="Claim failed")
      * )
@@ -245,11 +260,12 @@ class ProximityArtifactController extends Controller
         $artifact = ProximityArtifact::active()->findOrFail($id);
 
         try {
-            $amount = $service->claimArtifact($artifact, $user, (float)$request->lat, (float)$request->lng);
+            $amount = $service->claimArtifact($artifact, $user, (float) $request->lat, (float) $request->lng);
+
             return response()->json([
                 'message' => "Claimed {$amount} tokens!",
                 'amount' => $amount,
-                'new_balance' => $user->fresh()->token_balance
+                'new_balance' => $user->fresh()->token_balance,
             ]);
         } catch (\Throwable $e) {
             return response()->json(['error' => $e->getMessage()], 400);
@@ -262,9 +278,11 @@ class ProximityArtifactController extends Controller
      *   tags={"Proximity Artifacts"},
      *   summary="Flag artifact for moderation",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-    *   @OA\Response(response=200, description="Flag recorded", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
-    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     *
+     *   @OA\Response(response=200, description="Flag recorded", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function flag(int $id, Request $request, ProximityArtifactService $service): JsonResponse
@@ -295,10 +313,12 @@ class ProximityArtifactController extends Controller
      *   tags={"Proximity Artifacts"},
      *   summary="Remove artifact (owner only)",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-    *   @OA\Response(response=200, description="Artifact removed", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     *
+     *   @OA\Response(response=200, description="Artifact removed", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function destroy(int $id): JsonResponse
@@ -330,44 +350,46 @@ class ProximityArtifactController extends Controller
     /**
      * Local Pulse - Merged feed of proximity artifacts + nearby match candidates
      * This combines the draw of hyperlocal ephemeral content with mutual-match discovery
-     * 
+     *
      * @OA\Get(
      *   path="/proximity/local-pulse",
      *   tags={"Proximity Artifacts"},
      *   summary="Local Pulse: ephemeral content + nearby matches",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="lat", in="query", required=true, @OA\Schema(type="number")),
      *   @OA\Parameter(name="lng", in="query", required=true, @OA\Schema(type="number")),
      *   @OA\Parameter(name="radius", in="query", @OA\Schema(type="integer", minimum=100, maximum=10000)),
+     *
      *   @OA\Response(
      *     response=200,
      *     description="Local pulse feed",
+     *
      *     @OA\JsonContent(
+     *
      *       @OA\Property(property="artifacts", type="array", @OA\Items(type="object")),
      *       @OA\Property(property="candidates", type="array", @OA\Items(type="object")),
      *       @OA\Property(property="meta", type="object")
      *     )
      *   ),
-    *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     *
+     *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
-     * 
-     * @param LocalPulseRequest $request
-     * @return JsonResponse
      */
     public function localPulse(LocalPulseRequest $request): JsonResponse
     {
         $user = auth()->user();
         $profile = $user->profile;
 
-        if (!$profile) {
+        if (! $profile) {
             return response()->json(['error' => 'Profile required'], 422);
         }
 
         $validated = $request->validated();
 
-        $lat = (float)$validated['lat'];
-        $lng = (float)$validated['lng'];
-        $radius = (int)($validated['radius'] ?? 1000);
+        $lat = (float) $validated['lat'];
+        $lng = (float) $validated['lng'];
+        $radius = (int) ($validated['radius'] ?? 1000);
 
         // Round coordinates to ~110m precision for caching grid
         $gridLat = round($lat, 3);
@@ -381,7 +403,7 @@ class ProximityArtifactController extends Controller
             $artifacts = ProximityArtifact::query()
                 ->withCount('comments')
                 ->withSum('votes', 'value')
-                ->with(['votes' => function($q) use ($user) {
+                ->with(['votes' => function ($q) use ($user) {
                     $q->where('user_id', $user->id);
                 }])
                 ->active()
@@ -392,11 +414,11 @@ class ProximityArtifactController extends Controller
                 ->filter(function (ProximityArtifact $a) {
                     // Apply shadow throttle probabilistic filtering
                     $visibility = $this->shadowThrottleService->getVisibilityMultiplier($a->user_id);
-                    
+
                     if ($visibility >= 1.0) {
                         return true; // Always show if not throttled
                     }
-                    
+
                     // Probabilistic inclusion based on visibility multiplier
                     return (mt_rand() / mt_getrandmax()) < $visibility;
                 })
@@ -493,23 +515,23 @@ class ProximityArtifactController extends Controller
 
         // Check Rust Geo-Screener First (O(1) Grid Hash Lookup vs SQL Haversine)
         $h3CandidateIds = $this->geoScreener->getNearbyUsers($lat, $lng, $radiusMeters);
-        
+
         $query = \App\Models\User::query()
             ->where('id', '!=', $user->id);
 
-        if (!empty($h3CandidateIds)) {
-             // Fallback to array IN sweep (Instant Index Match)
-             $query->whereIn('id', $h3CandidateIds);
+        if (! empty($h3CandidateIds)) {
+            // Fallback to array IN sweep (Instant Index Match)
+            $query->whereIn('id', $h3CandidateIds);
         } else {
-             // Standard SQL Fallback Map
-             $radiusMiles = $radiusMeters / 1609.34;
-             $latDist = (1.1 * $radiusMiles) / 69.0;
-             $lonDist = (1.1 * $radiusMiles) / 69.1;
-     
-             $query->whereHas('profile', function ($q) use ($lat, $lng, $latDist, $lonDist) {
-                 $q->whereBetween('location_latitude', [$lat - $latDist, $lat + $latDist])
-                   ->whereBetween('location_longitude', [$lng - $lonDist, $lng + $lonDist]);
-             });
+            // Standard SQL Fallback Map
+            $radiusMiles = $radiusMeters / 1609.34;
+            $latDist = (1.1 * $radiusMiles) / 69.0;
+            $lonDist = (1.1 * $radiusMiles) / 69.1;
+
+            $query->whereHas('profile', function ($q) use ($lat, $lng, $latDist, $lonDist) {
+                $q->whereBetween('location_latitude', [$lat - $latDist, $lat + $latDist])
+                    ->whereBetween('location_longitude', [$lng - $lonDist, $lng + $lonDist]);
+            });
         }
 
         // Gender preference filter
@@ -523,12 +545,12 @@ class ProximityArtifactController extends Controller
         // Age filter from preferences
         $ageMin = $profile->preferences['age_range']['min'] ?? 18;
         $ageMax = $profile->preferences['age_range']['max'] ?? 100;
-        
+
         $query->whereHas('profile', function ($q) use ($ageMin, $ageMax) {
             // Support both SQLite (testing) and MySQL (production)
             $sql = \Illuminate\Support\Facades\DB::connection()->getDriverName() === 'sqlite'
                 ? "(julianday('now') - julianday(date_of_birth)) / 365.25 BETWEEN ? AND ?"
-                : "TIMESTAMPDIFF(YEAR, date_of_birth, NOW()) BETWEEN ? AND ?";
+                : 'TIMESTAMPDIFF(YEAR, date_of_birth, NOW()) BETWEEN ? AND ?';
 
             $q->whereRaw($sql, [$ageMin, $ageMax]);
         });
@@ -538,8 +560,8 @@ class ProximityArtifactController extends Controller
             ->where('user_id', $user->id)
             ->pluck('target_user_id')
             ->toArray();
-        
-        if (!empty($excludedIds)) {
+
+        if (! empty($excludedIds)) {
             $query->whereNotIn('id', $excludedIds);
         }
 
@@ -547,11 +569,11 @@ class ProximityArtifactController extends Controller
             ->filter(function (\App\Models\User $candidate) {
                 // Filter out shadow throttled users probabilistically
                 $visibility = $this->shadowThrottleService->getVisibilityMultiplier($candidate->id);
-                
+
                 if ($visibility >= 1.0) {
                     return true;
                 }
-                
+
                 return (mt_rand() / mt_getrandmax()) < $visibility;
             })
             ->take($limit);
@@ -559,10 +581,10 @@ class ProximityArtifactController extends Controller
         // Return lightweight previews (no full profiles, just teasers)
         return $candidates->map(function (\App\Models\User $candidate) use ($profile) {
             $candidateProfile = $candidate->profile;
-            
+
             // Calculate simplified compatibility (just mutual wants indicators)
             $compatibilityIndicators = $this->getCompatibilityIndicators($profile, $candidateProfile);
-            
+
             return [
                 'user_id' => $candidate->id,
                 'age' => $candidateProfile->date_of_birth?->diffInYears(now()),
@@ -579,7 +601,7 @@ class ProximityArtifactController extends Controller
      */
     private function calculateDistance(\App\Models\UserProfile $profile1, \App\Models\UserProfile $profile2): float
     {
-        if (!$profile1->location_latitude || !$profile2->location_latitude) {
+        if (! $profile1->location_latitude || ! $profile2->location_latitude) {
             return 0;
         }
 
@@ -589,7 +611,7 @@ class ProximityArtifactController extends Controller
         $lon2 = $profile2->location_longitude;
 
         $theta = $lon1 - $lon2;
-        $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) + 
+        $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +
                 cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
         $dist = acos($dist);
         $dist = rad2deg($dist);
@@ -616,7 +638,7 @@ class ProximityArtifactController extends Controller
                     array_keys(array_filter($userPrefs['relationship_type'] ?? [])),
                     array_keys(array_filter($candidatePrefs['relationship_type'] ?? []))
                 );
-                if (!empty($commonTypes)) {
+                if (! empty($commonTypes)) {
                     $indicators[] = 'shared_relationship_goals';
                 }
             }

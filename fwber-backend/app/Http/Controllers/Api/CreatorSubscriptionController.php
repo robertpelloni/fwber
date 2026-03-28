@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\CreatorSubscription;
 use App\Models\User;
 use App\Services\TokenDistributionService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class CreatorSubscriptionController extends Controller
@@ -32,7 +32,7 @@ class CreatorSubscriptionController extends Controller
         }
 
         $price = $creator->profile->subscription_price;
-        if (!$price || $price <= 0) {
+        if (! $price || $price <= 0) {
             return response()->json(['error' => 'This user has not enabled subscriptions'], 400);
         }
 
@@ -82,7 +82,7 @@ class CreatorSubscriptionController extends Controller
             ->first();
 
         return response()->json([
-            'is_subscribed' => (bool)$subscription,
+            'is_subscribed' => (bool) $subscription,
             'expires_at' => $subscription?->expires_at,
         ]);
     }

@@ -16,17 +16,19 @@ class MerchantAnalyticsTest extends TestCase
     use RefreshDatabase;
 
     private MerchantAnalyticsService $service;
+
     private User $merchantUser;
+
     private MerchantProfile $merchantProfile;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new MerchantAnalyticsService();
-        
+        $this->service = new MerchantAnalyticsService;
+
         $this->merchantUser = User::factory()->create();
         $this->merchantProfile = MerchantProfile::factory()->create([
-            'user_id' => $this->merchantUser->id
+            'user_id' => $this->merchantUser->id,
         ]);
     }
 
@@ -37,7 +39,7 @@ class MerchantAnalyticsTest extends TestCase
             'merchant_id' => $this->merchantUser->id,
             'amount' => 100,
             'status' => 'paid',
-            'created_at' => Carbon::now()
+            'created_at' => Carbon::now(),
         ]);
 
         $kpis = $this->service->getKPIs($this->merchantProfile, '7d');
@@ -52,7 +54,7 @@ class MerchantAnalyticsTest extends TestCase
     public function test_it_returns_retention_data()
     {
         $retention = $this->service->getRetention($this->merchantProfile, '7d');
-        
+
         $this->assertIsArray($retention);
         $this->assertCount(4, $retention);
         $this->assertEquals('Day 1', $retention[0]['label']);
@@ -63,7 +65,7 @@ class MerchantAnalyticsTest extends TestCase
         Promotion::factory()->create([
             'merchant_id' => $this->merchantProfile->id,
             'title' => 'Test Promo',
-            'created_at' => Carbon::now()
+            'created_at' => Carbon::now(),
         ]);
 
         $performance = $this->service->getPromotionsPerformance($this->merchantProfile, '7d');

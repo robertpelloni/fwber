@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\User\StoreBlockRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\User\StoreBlockRequest;
 
 class BlockController extends Controller
 {
@@ -15,13 +14,17 @@ class BlockController extends Controller
      *   tags={"Safety"},
      *   summary="Block a user",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\RequestBody(
      *     required=true,
+     *
      *     @OA\JsonContent(
      *       required={"user_id"},
+     *
      *       @OA\Property(property="user_id", type="integer")
      *     )
      *   ),
+     *
      *   @OA\Response(response=200, description="User blocked"),
      *   @OA\Response(response=422, description="Cannot block yourself")
      * )
@@ -35,7 +38,7 @@ class BlockController extends Controller
             return response()->json(['message' => 'Cannot block yourself'], 422);
         }
 
-        if (!$blocker->blockedUsers()->where('blocked_id', $blockedId)->exists()) {
+        if (! $blocker->blockedUsers()->where('blocked_id', $blockedId)->exists()) {
             $blocker->blockedUsers()->attach($blockedId);
         }
 
@@ -48,7 +51,9 @@ class BlockController extends Controller
      *   tags={"Safety"},
      *   summary="Unblock a user",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+     *
      *   @OA\Response(response=200, description="User unblocked")
      * )
      */
@@ -66,12 +71,14 @@ class BlockController extends Controller
      *   tags={"Safety"},
      *   summary="List blocked users",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Response(response=200, description="List of blocked users")
      * )
      */
     public function index()
     {
         $blocked = Auth::user()->blockedUsers()->get(['users.id', 'users.name']);
+
         return response()->json(['data' => $blocked]);
     }
 }

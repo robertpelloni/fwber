@@ -19,14 +19,14 @@ class MediaAnalysisServiceProvider extends ServiceProvider
             $driver = config('media_analysis.driver', 'mock');
 
             if ($driver === 'aws') {
-                return new AwsRekognitionDriver();
+                return new AwsRekognitionDriver;
             }
 
             if ($driver === 'openai') {
-                return new OpenAIVisionDriver();
+                return new OpenAIVisionDriver;
             }
 
-            return new MockMediaAnalysisDriver();
+            return new MockMediaAnalysisDriver;
         });
     }
 

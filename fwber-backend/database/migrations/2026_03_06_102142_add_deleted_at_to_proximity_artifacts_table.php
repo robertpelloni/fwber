@@ -15,7 +15,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('proximity_artifacts', function (Blueprint $table) {
-            if (!Schema::hasColumn('proximity_artifacts', 'deleted_at')) {
+            if (! Schema::hasColumn('proximity_artifacts', 'deleted_at')) {
                 $table->softDeletes();
             }
         });

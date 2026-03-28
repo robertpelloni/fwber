@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Add index for faster lookup by slug
             $table->index('slug');
             // Add index for finding active bounties

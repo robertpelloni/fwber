@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use App\Models\User;
 
 class TokenTest extends TestCase
 {
@@ -27,7 +27,7 @@ class TokenTest extends TestCase
         $response = $this->actingAs($sender)
             ->postJson('/api/wallet/transfer', [
                 'amount' => 50,
-                'recipient_id' => $recipient->id
+                'recipient_id' => $recipient->id,
             ]);
 
         $response->assertStatus(200);
@@ -44,7 +44,7 @@ class TokenTest extends TestCase
         $response = $this->actingAs($sender)
             ->postJson('/api/wallet/transfer', [
                 'amount' => 50,
-                'recipient_id' => $recipient->id
+                'recipient_id' => $recipient->id,
             ]);
 
         $response->assertStatus(400);
@@ -57,7 +57,7 @@ class TokenTest extends TestCase
         $response = $this->actingAs($sender)
             ->postJson('/api/wallet/transfer', [
                 'amount' => 50,
-                'recipient_id' => $sender->id
+                'recipient_id' => $sender->id,
             ]);
 
         $response->assertStatus(400);
@@ -83,7 +83,7 @@ class TokenTest extends TestCase
         $response = $this->actingAs($user)
             ->postJson('/api/wallet/withdraw', [
                 'amount' => 50,
-                'destination_address' => $validSolanaAddress
+                'destination_address' => $validSolanaAddress,
             ]);
 
         $response->assertStatus(200)

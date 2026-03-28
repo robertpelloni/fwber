@@ -2,14 +2,12 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-use App\Models\User;
-use App\Models\Match;
-use App\Models\VideoCall;
-use Illuminate\Support\Facades\Event;
 use App\Events\VideoSignal;
+use App\Models\User;
+use App\Models\VideoCall;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
+use Tests\TestCase;
 
 class VideoChatTest extends TestCase
 {
@@ -24,16 +22,16 @@ class VideoChatTest extends TestCase
         \App\Models\MatchAction::create([
             'user_id' => $user1->id,
             'target_user_id' => $user2->id,
-            'action' => 'like'
+            'action' => 'like',
         ]);
         \App\Models\MatchAction::create([
             'user_id' => $user2->id,
             'target_user_id' => $user1->id,
-            'action' => 'like'
+            'action' => 'like',
         ]);
 
         $response = $this->actingAs($user1)->postJson('/api/video/initiate', [
-            'recipient_id' => $user2->id
+            'recipient_id' => $user2->id,
         ]);
 
         $response->assertStatus(200)
@@ -42,7 +40,7 @@ class VideoChatTest extends TestCase
         $this->assertDatabaseHas('video_calls', [
             'caller_id' => $user1->id,
             'receiver_id' => $user2->id,
-            'status' => 'initiated'
+            'status' => 'initiated',
         ]);
     }
 
@@ -56,20 +54,20 @@ class VideoChatTest extends TestCase
         $call = VideoCall::create([
             'caller_id' => $user1->id,
             'receiver_id' => $user2->id,
-            'status' => 'initiated'
+            'status' => 'initiated',
         ]);
 
         $response = $this->actingAs($user1)->postJson('/api/video/signal', [
             'recipient_id' => $user2->id,
             'signal' => ['type' => 'offer', 'sdp' => 'v=0...'],
-            'call_id' => $call->id
+            'call_id' => $call->id,
         ]);
 
         $response->assertStatus(200);
 
         Event::assertDispatched(VideoSignal::class, function ($event) use ($user1, $user2, $call) {
-            return $event->from_user_id === $user1->id && 
-                   $event->to_user_id === $user2->id && 
+            return $event->from_user_id === $user1->id &&
+                   $event->to_user_id === $user2->id &&
                    $event->call_id === $call->id;
         });
     }
@@ -82,18 +80,18 @@ class VideoChatTest extends TestCase
         $call = VideoCall::create([
             'caller_id' => $user1->id,
             'receiver_id' => $user2->id,
-            'status' => 'initiated'
+            'status' => 'initiated',
         ]);
 
         $response = $this->actingAs($user2)->putJson("/api/video/{$call->id}/status", [
-            'status' => 'connected'
+            'status' => 'connected',
         ]);
 
         $response->assertStatus(200);
 
         $this->assertDatabaseHas('video_calls', [
             'id' => $call->id,
-            'status' => 'connected'
+            'status' => 'connected',
         ]);
     }
 
@@ -105,7 +103,7 @@ class VideoChatTest extends TestCase
         VideoCall::create([
             'caller_id' => $user->id,
             'receiver_id' => $other->id,
-            'status' => 'ended'
+            'status' => 'ended',
         ]);
 
         $response = $this->actingAs($user)->getJson('/api/video/history');

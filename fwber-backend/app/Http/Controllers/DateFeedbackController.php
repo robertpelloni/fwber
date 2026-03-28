@@ -26,7 +26,7 @@ class DateFeedbackController extends Controller
         $match = UserMatch::where('id', $matchId)
             ->where(function ($query) use ($user) {
                 $query->where('user1_id', $user->id)
-                      ->orWhere('user2_id', $user->id);
+                    ->orWhere('user2_id', $user->id);
             })->firstOrFail();
 
         // 2. Identify the other user
@@ -74,7 +74,7 @@ class DateFeedbackController extends Controller
             ->where('reporting_user_id', $user->id)
             ->first();
 
-        if (!$feedback) {
+        if (! $feedback) {
             return response()->json(['submitted' => false], 404);
         }
 

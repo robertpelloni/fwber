@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class ProfileViewController extends Controller
 {
@@ -16,17 +16,22 @@ class ProfileViewController extends Controller
      *     summary="Record a profile view",
      *     description="Track when a user views another user's profile (with 24-hour deduplication). Anonymous views are tracked by IP address. Returns one of three possible messages: 'Profile view recorded' (new view), 'View already recorded' (duplicate within 24h), or 'Cannot view own profile' (self-view blocked).",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="userId",
      *         in="path",
      *         description="ID of the user whose profile is being viewed",
      *         required=true,
+     *
      *         @OA\Schema(type="integer", example=42)
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Operation completed (see message field for details)",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Profile view recorded")
      *         )
      *     )
@@ -44,7 +49,7 @@ class ProfileViewController extends Controller
         }
 
         // Check cache first for existing view to avoid DB hit
-        $cacheKey = "profile_view:{$userId}:" . ($viewerUserId ? "user:{$viewerUserId}" : "ip:{$viewerIp}");
+        $cacheKey = "profile_view:{$userId}:".($viewerUserId ? "user:{$viewerUserId}" : "ip:{$viewerIp}");
 
         if (Cache::has($cacheKey)) {
             return response()->json(['message' => 'View already recorded']);
@@ -66,6 +71,7 @@ class ProfileViewController extends Controller
         if ($existingView) {
             // Re-populate cache
             Cache::put($cacheKey, true, 86400); // 24 hours
+
             return response()->json(['message' => 'View already recorded']);
         }
 
@@ -95,20 +101,26 @@ class ProfileViewController extends Controller
      *     summary="Get profile viewers",
      *     description="Retrieve list of authenticated users who have viewed the profile (last 50 views, excludes anonymous views)",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="userId",
      *         in="path",
      *         description="ID of the user whose profile views to retrieve",
      *         required=true,
+     *
      *         @OA\Schema(type="integer", example=42)
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Profile viewers retrieved successfully",
+     *
      *         @OA\JsonContent(
      *             type="array",
+     *
      *             @OA\Items(
      *                 type="object",
+     *
      *                 @OA\Property(property="id", type="integer", example=123),
      *                 @OA\Property(
      *                     property="viewer",
@@ -123,16 +135,21 @@ class ProfileViewController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=403,
      *         description="Unauthorized to view other user's profile views",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="error", type="string", example="Unauthorized")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthenticated",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
      *     )
      * )
@@ -171,6 +188,7 @@ class ProfileViewController extends Controller
                     ];
                 }
             }
+
             return $viewsWithUsers;
         });
     }
@@ -182,17 +200,22 @@ class ProfileViewController extends Controller
      *     summary="Get profile view statistics",
      *     description="Retrieve aggregated profile view analytics including total, daily, weekly, and monthly views plus unique viewer count",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="userId",
      *         in="path",
      *         description="ID of the user whose view statistics to retrieve",
      *         required=true,
+     *
      *         @OA\Schema(type="integer", example=42)
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="View statistics retrieved successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="total_views", type="integer", example=156),
      *             @OA\Property(property="today_views", type="integer", example=12),
      *             @OA\Property(property="week_views", type="integer", example=45),
@@ -200,16 +223,21 @@ class ProfileViewController extends Controller
      *             @OA\Property(property="unique_viewers", type="integer", example=72)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=403,
      *         description="Unauthorized to view other user's statistics",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="error", type="string", example="Unauthorized")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthenticated",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
      *     )
      * )

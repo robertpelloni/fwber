@@ -4,19 +4,21 @@ namespace App\Notifications;
 
 use App\Models\Gift;
 use App\Models\User;
+use App\Notifications\Traits\ChecksNotificationPreferences;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
-use NotificationChannels\WebPush\WebPushMessage;
 use NotificationChannels\WebPush\WebPushChannel;
-use App\Notifications\Traits\ChecksNotificationPreferences;
+use NotificationChannels\WebPush\WebPushMessage;
 
 class GiftReceivedNotification extends Notification implements ShouldQueue
 {
-    use Queueable, ChecksNotificationPreferences;
+    use ChecksNotificationPreferences, Queueable;
 
     public $sender;
+
     public $gift;
+
     public $message;
 
     /**
@@ -53,7 +55,7 @@ class GiftReceivedNotification extends Notification implements ShouldQueue
         }
 
         return (new WebPushMessage)
-            ->title('New Gift from ' . $this->sender->name)
+            ->title('New Gift from '.$this->sender->name)
             ->body($body)
             ->action('View Gifts', 'view_gifts')
             ->data(['url' => '/profile']); // Or wherever gifts are viewed

@@ -18,7 +18,7 @@ class ScrapbookController extends Controller
         $userId = Auth::id();
 
         // Verify they are matched
-        if (!$this->isMatched($userId, $matchId)) {
+        if (! $this->isMatched($userId, $matchId)) {
             return response()->json(['error' => 'You are not matched with this user.'], 403);
         }
 
@@ -28,6 +28,7 @@ class ScrapbookController extends Controller
             ->get()
             ->map(function ($entry) use ($userId) {
                 $entry->is_mine = $entry->user_id === $userId;
+
                 return $entry;
             });
 
@@ -62,7 +63,7 @@ class ScrapbookController extends Controller
             return response()->json(['error' => 'Cannot create scrapbook with yourself.'], 422);
         }
 
-        if (!$this->isMatched($userId, $matchId)) {
+        if (! $this->isMatched($userId, $matchId)) {
             return response()->json(['error' => 'You are not matched with this user.'], 403);
         }
 
@@ -95,7 +96,7 @@ class ScrapbookController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $entry->is_pinned = !$entry->is_pinned;
+        $entry->is_pinned = ! $entry->is_pinned;
         $entry->save();
 
         return response()->json(['entry' => $entry]);

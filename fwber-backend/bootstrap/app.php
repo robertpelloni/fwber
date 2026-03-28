@@ -19,7 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
         $middleware->append(\App\Http\Middleware\ApmMiddleware::class);
         // $middleware->append(\App\Http\Middleware\InjectLoggingContext::class);
-        
+
         $middleware->api(append: [
             \App\Http\Middleware\TrackUserActivity::class,
             \App\Http\Middleware\CheckDailyBonus::class,
@@ -42,7 +42,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($e instanceof \Illuminate\Validation\ValidationException) {
                 return response()->json([
                     'message' => $e->getMessage(),
-                    'errors' => $e->errors()
+                    'errors' => $e->errors(),
                 ], 422);
             }
             if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface) {
@@ -50,20 +50,20 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             if ($request->is('api/*')) {
-                \Illuminate\Support\Facades\Log::error('API Exception: ' . $e->getMessage(), [
+                \Illuminate\Support\Facades\Log::error('API Exception: '.$e->getMessage(), [
                     'url' => $request->fullUrl(),
-                    'trace' => $e->getTraceAsString()
+                    'trace' => $e->getTraceAsString(),
                 ]);
 
                 // Never expose stack traces in production
-                if (!config('app.debug') || app()->environment('production')) {
+                if (! config('app.debug') || app()->environment('production')) {
                     return response()->json([
                         'message' => 'An error occurred processing your request.',
                         'error_id' => uniqid('err_'),
-                        'debug_message' => app()->environment('production') ? 'Hidden in production' : $e->getMessage()
+                        'debug_message' => app()->environment('production') ? 'Hidden in production' : $e->getMessage(),
                     ], 500);
                 }
-                
+
                 // Allow default Laravel renderer in development
             }
         });

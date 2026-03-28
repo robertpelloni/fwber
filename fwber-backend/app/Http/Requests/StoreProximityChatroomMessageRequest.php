@@ -10,6 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @OA\Schema(
  *   schema="StoreProximityChatroomMessageRequest",
  *   required={"content"},
+ *
  *   @OA\Property(property="content", type="string", maxLength=2000),
  *   @OA\Property(property="message_type", type="string", enum={"text", "image", "file", "announcement"}),
  *   @OA\Property(property="parent_id", type="integer", nullable=true),

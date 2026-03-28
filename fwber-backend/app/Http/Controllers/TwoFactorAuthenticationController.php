@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use PragmaRX\Google2FA\Google2FA;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Auth\ConfirmTwoFactorRequest;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use PragmaRX\Google2FA\Google2FA;
 
 class TwoFactorAuthenticationController extends Controller
 {
@@ -17,13 +16,13 @@ class TwoFactorAuthenticationController extends Controller
     {
         $user = $request->user();
 
-        $google2fa = new Google2FA();
+        $google2fa = new Google2FA;
         $secret = $google2fa->generateSecretKey();
 
         $user->forceFill([
             'two_factor_secret' => encrypt($secret),
             'two_factor_recovery_codes' => encrypt(json_encode(collect(range(1, 8))->map(function () {
-                return \Illuminate\Support\Str::random(10) . '-' . \Illuminate\Support\Str::random(10);
+                return \Illuminate\Support\Str::random(10).'-'.\Illuminate\Support\Str::random(10);
             })->all())),
         ])->save();
 
@@ -63,7 +62,7 @@ class TwoFactorAuthenticationController extends Controller
             return response()->json(['message' => '2FA is not enabled.'], 400);
         }
 
-        $google2fa = new Google2FA();
+        $google2fa = new Google2FA;
         $valid = $google2fa->verifyKey(decrypt($user->two_factor_secret), $request->code);
 
         if (! $valid) {

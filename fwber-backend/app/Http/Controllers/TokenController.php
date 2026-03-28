@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\TokenTransaction;
-use Illuminate\Support\Facades\Process;
-use App\Http\Requests\Token\WithdrawTokenRequest;
-use App\Http\Requests\Token\TransferTokenRequest;
 use App\Http\Requests\Token\GetBalanceRequest;
+use App\Http\Requests\Token\TransferTokenRequest;
 use App\Http\Requests\Token\UpdateWalletAddressRequest;
+use App\Http\Requests\Token\WithdrawTokenRequest;
+use App\Models\User;
+use Illuminate\Support\Facades\Process;
 
 class TokenController extends Controller
 {
@@ -23,7 +21,7 @@ class TokenController extends Controller
             ->where('token_balance', '>=', $amount)
             ->decrement('token_balance', $amount);
 
-        if (!$updated) {
+        if (! $updated) {
             return response()->json(['error' => 'Insufficient balance'], 400);
         }
 
@@ -38,12 +36,13 @@ class TokenController extends Controller
                 'SOLANA_MINT_ADDRESS' => config('services.solana.mint_address'),
                 'SOLANA_RPC_URL' => config('services.solana.rpc_url'),
             ])
-            ->run(['node', $scriptPath, $request->destination_address, (string)$amount]);
+            ->run(['node', $scriptPath, $request->destination_address, (string) $amount]);
 
         if ($process->failed()) {
             // Rollback
             $user->increment('token_balance', $amount);
-            \Log::error('Solana Withdrawal Failed: ' . $process->errorOutput());
+            \Log::error('Solana Withdrawal Failed: '.$process->errorOutput());
+
             return response()->json(['error' => 'Transfer failed. Please try again.'], 500);
         }
 
@@ -59,14 +58,14 @@ class TokenController extends Controller
             'metadata' => [
                 'signature' => $signature,
                 'destination' => $request->destination_address,
-                'chain' => 'solana'
+                'chain' => 'solana',
             ],
         ]);
 
         return response()->json([
             'message' => 'Withdrawal successful',
             'signature' => $signature,
-            'new_balance' => $user->token_balance
+            'new_balance' => $user->token_balance,
         ]);
     }
 
@@ -77,7 +76,7 @@ class TokenController extends Controller
         $amount = $request->amount;
 
         if ($sender->id === $recipient->id) {
-             return response()->json(['error' => 'Cannot tip yourself'], 400);
+            return response()->json(['error' => 'Cannot tip yourself'], 400);
         }
 
         // Check balance atomically inside transaction? Or before?
@@ -92,24 +91,24 @@ class TokenController extends Controller
                     ->where('token_balance', '>=', $amount)
                     ->decrement('token_balance', $amount);
 
-                if (!$deducted) {
+                if (! $deducted) {
                     throw new \Exception('Insufficient balance');
                 }
 
                 $recipient->increment('token_balance', $amount);
 
                 $sender->tokenTransactions()->create([
-                'amount' => -$amount,
-                'type' => 'tip_sent',
-                'description' => "Tip to {$recipient->name}",
-                'metadata' => ['recipient_id' => $recipient->id],
-            ]);
+                    'amount' => -$amount,
+                    'type' => 'tip_sent',
+                    'description' => "Tip to {$recipient->name}",
+                    'metadata' => ['recipient_id' => $recipient->id],
+                ]);
 
-            $recipient->tokenTransactions()->create([
-                'amount' => $amount,
-                'type' => 'tip_received',
-                'description' => "Tip from {$sender->name}",
-                'metadata' => ['sender_id' => $sender->id],
+                $recipient->tokenTransactions()->create([
+                    'amount' => $amount,
+                    'type' => 'tip_received',
+                    'description' => "Tip from {$sender->name}",
+                    'metadata' => ['sender_id' => $sender->id],
                 ]);
             });
         } catch (\Exception $e) {
@@ -122,7 +121,7 @@ class TokenController extends Controller
     public function balance(GetBalanceRequest $request)
     {
         $user = $request->user();
-        
+
         return response()->json([
             'balance' => $user->token_balance,
             'referral_code' => $user->referral_code,
@@ -150,7 +149,7 @@ class TokenController extends Controller
             ->get(['id', 'name', 'token_balance', 'created_at'])
             ->map(function ($user) {
                 return [
-                    'name' => substr($user->name, 0, 3) . '***', // Privacy
+                    'name' => substr($user->name, 0, 3).'***', // Privacy
                     'balance' => $user->token_balance,
                     'joined' => $user->created_at->diffForHumans(),
                 ];
@@ -162,7 +161,7 @@ class TokenController extends Controller
             ->get(['id', 'name', 'referrals_count'])
             ->map(function ($user) {
                 return [
-                    'name' => substr($user->name, 0, 3) . '***',
+                    'name' => substr($user->name, 0, 3).'***',
                     'referrals' => $user->referrals_count,
                 ];
             });
@@ -176,7 +175,7 @@ class TokenController extends Controller
             ->get()
             ->map(function ($assist) {
                 return [
-                    'name' => substr($assist->matchmaker->name, 0, 3) . '***',
+                    'name' => substr($assist->matchmaker->name, 0, 3).'***',
                     'assists' => $assist->assists_count,
                 ];
             });
@@ -187,7 +186,7 @@ class TokenController extends Controller
             ->get(['id', 'name'])
             ->map(function ($user) {
                 return [
-                    'name' => substr($user->name, 0, 3) . '***',
+                    'name' => substr($user->name, 0, 3).'***',
                     'vouches' => $user->vouches_count,
                 ];
             });

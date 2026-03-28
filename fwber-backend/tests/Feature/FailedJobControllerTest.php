@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
-use App\Models\User;
 
 class FailedJobControllerTest extends TestCase
 {
@@ -15,7 +15,7 @@ class FailedJobControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create admin user
         $this->admin = User::factory()->create();
     }
@@ -38,19 +38,19 @@ class FailedJobControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonStructure([
                 'data' => [
-                    '*' => ['uuid', 'connection', 'queue', 'payload', 'exception', 'failed_at']
+                    '*' => ['uuid', 'connection', 'queue', 'payload', 'exception', 'failed_at'],
                 ],
                 'current_page',
-                'total'
+                'total',
             ]);
-            
+
         $this->assertEquals(1, $response->json('total'));
     }
 
     public function test_admin_can_retry_failed_job()
     {
         $uuid = 'test-uuid-retry';
-        
+
         DB::table('failed_jobs')->insert([
             'uuid' => $uuid,
             'connection' => 'database',
@@ -74,7 +74,7 @@ class FailedJobControllerTest extends TestCase
     public function test_admin_can_delete_failed_job()
     {
         $uuid = 'test-uuid-delete';
-        
+
         DB::table('failed_jobs')->insert([
             'uuid' => $uuid,
             'connection' => 'database',

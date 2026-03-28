@@ -4,11 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\Event;
 use App\Models\EventInvitation;
-use App\Models\User;
 use App\Models\Group;
 use App\Models\GroupMember;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class EventInvitationTest extends TestCase
@@ -48,7 +47,7 @@ class EventInvitationTest extends TestCase
 
         $inviter = User::factory()->create();
         $event = Event::factory()->create(['created_by_user_id' => $inviter->id]);
-        
+
         $group = Group::factory()->create();
         $user1 = User::factory()->create();
         $user2 = User::factory()->create();
@@ -141,7 +140,7 @@ class EventInvitationTest extends TestCase
             ]);
 
         $response->assertStatus(200);
-        
+
         $this->assertDatabaseHas('event_invitations', [
             'id' => $invitation->id,
             'status' => 'accepted',
@@ -173,7 +172,7 @@ class EventInvitationTest extends TestCase
             ]);
 
         $response->assertStatus(200);
-        
+
         $this->assertDatabaseHas('event_invitations', [
             'id' => $invitation->id,
             'status' => 'declined',

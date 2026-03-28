@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Social\StoreVouchRequest;
 use App\Models\User;
 use App\Models\Vouch;
 use App\Notifications\PushMessage;
 use App\Services\AchievementService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use App\Http\Requests\Social\StoreVouchRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 
 class VouchController extends Controller
@@ -25,6 +25,7 @@ class VouchController extends Controller
      *     path="/vouch/generate-link",
      *     tags={"Viral"},
      *     summary="Generate a unique vouch link for the user",
+     *
      *     @OA\Response(response=200, description="Vouch link generated")
      * )
      */
@@ -33,19 +34,19 @@ class VouchController extends Controller
         $user = $request->user();
         // Generate a signed URL that expires in 7 days
         // This ensures the link is tied to this specific user and adds a layer of trust
-        // We use 'vouch.create' as the named route on the frontend (conceptually), 
+        // We use 'vouch.create' as the named route on the frontend (conceptually),
         // but here we just return the URL string.
-        
+
         // Actually, for a simple public link, we can just use the referral code or ID.
         // But a signed URL is safer if we want to prevent enumeration.
         // Let's stick to referral_code for simplicity and shareability as established in other viral features.
         // However, the instructions mentioned "generateLink".
-        
-        $url = config('app.frontend_url') . '/vouch/' . $user->referral_code;
+
+        $url = config('app.frontend_url').'/vouch/'.$user->referral_code;
 
         return response()->json([
             'url' => $url,
-            'referral_code' => $user->referral_code
+            'referral_code' => $user->referral_code,
         ]);
     }
 
@@ -54,9 +55,12 @@ class VouchController extends Controller
      *     path="/public/vouch",
      *     tags={"Viral"},
      *     summary="Submit a public vouch",
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="referral_code", type="string"),
      *             @OA\Property(property="type", type="string", enum={"safe", "fun", "hot"}),
      *             @OA\Property(property="relationship_type", type="string"),
@@ -64,6 +68,7 @@ class VouchController extends Controller
      *             @OA\Property(property="voucher_name", type="string")
      *         )
      *     ),
+     *
      *     @OA\Response(response=200, description="Vouch recorded")
      * )
      */
@@ -101,7 +106,7 @@ class VouchController extends Controller
         }
 
         try {
-            $emoji = match($request->type) {
+            $emoji = match ($request->type) {
                 'safe' => '🛡️',
                 'fun' => '🎉',
                 'hot' => '🔥',
@@ -112,8 +117,8 @@ class VouchController extends Controller
             $user->notify(new PushMessage(
                 "New Vouch! $emoji",
                 "$voucher vouched for you as {$request->type}!",
-                "/profile",
-                "social"
+                '/profile',
+                'social'
             ));
         } catch (\Exception $e) {
             // Ignore notification failures

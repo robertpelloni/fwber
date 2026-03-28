@@ -5,6 +5,7 @@ namespace App\Helpers;
 class GeohashHelper
 {
     private static $base32 = '0123456789bcdefghjkmnpqrstuvwxyz';
+
     private static $bits = [16, 8, 4, 2, 1];
 
     public static function encode($latitude, $longitude, $precision = 12)
@@ -35,7 +36,7 @@ class GeohashHelper
                 }
             }
 
-            $is_even = !$is_even;
+            $is_even = ! $is_even;
             if ($bit < 4) {
                 $bit++;
             } else {

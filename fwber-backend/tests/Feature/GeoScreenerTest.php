@@ -2,11 +2,9 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Services\GeoScreenerClient;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
-use App\Services\GeoScreenerClient;
-use App\Models\User;
 
 class GeoScreenerTest extends TestCase
 {
@@ -23,11 +21,11 @@ class GeoScreenerTest extends TestCase
     {
         config([
             'services.geo_screener.enabled' => true,
-            'services.geo_screener.url' => 'http://mock-geo:8081'
+            'services.geo_screener.url' => 'http://mock-geo:8081',
         ]);
 
         Http::fake([
-            'http://mock-geo:8081/index' => Http::response(['status' => 'indexed'], 200)
+            'http://mock-geo:8081/index' => Http::response(['status' => 'indexed'], 200),
         ]);
 
         $client = app(GeoScreenerClient::class);
@@ -47,11 +45,11 @@ class GeoScreenerTest extends TestCase
     {
         config([
             'services.geo_screener.enabled' => true,
-            'services.geo_screener.url' => 'http://mock-geo:8081'
+            'services.geo_screener.url' => 'http://mock-geo:8081',
         ]);
 
         Http::fake([
-            'http://mock-geo:8081/nearby*' => Http::response(['users' => [1, 2, 3]], 200)
+            'http://mock-geo:8081/nearby*' => Http::response(['users' => [1, 2, 3]], 200),
         ]);
 
         $client = app(GeoScreenerClient::class);

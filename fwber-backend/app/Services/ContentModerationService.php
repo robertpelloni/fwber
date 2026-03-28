@@ -2,13 +2,14 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
 use App\Services\Ai\Llm\LlmManager;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class ContentModerationService
 {
     private LlmManager $llmManager;
+
     private array $moderationConfig;
 
     public function __construct(LlmManager $llmManager)
@@ -33,25 +34,25 @@ class ContentModerationService
      */
     public function moderateContent(string $content, array $context = []): array
     {
-        $cacheKey = 'moderation_' . md5($content);
-        
+        $cacheKey = 'moderation_'.md5($content);
+
         // Check cache first
         if ($cached = Cache::get($cacheKey)) {
             return $cached;
         }
 
         $results = [];
-        
+
         // OpenAI moderation
         if (in_array('openai', $this->moderationConfig['providers'])) {
             $results['openai'] = $this->moderateWithOpenAI($content);
         }
-        
+
         // Gemini moderation
         if (in_array('gemini', $this->moderationConfig['providers'])) {
             $results['gemini'] = $this->moderateWithGemini($content, $context);
         }
-        
+
         // If no providers available, return safe-by-default heuristic
         if (empty($results)) {
             $finalResult = [
@@ -68,10 +69,10 @@ class ContentModerationService
             // Combine results
             $finalResult = $this->combineModerationResults($results, $content);
         }
-        
+
         // Cache result
         Cache::put($cacheKey, $finalResult, $this->moderationConfig['cache_ttl']);
-        
+
         return $finalResult;
     }
 
@@ -82,7 +83,7 @@ class ContentModerationService
     {
         try {
             $result = $this->llmManager->driver('openai')->moderate($content);
-            
+
             if (isset($result['error'])) {
                 return ['flagged' => false, 'error' => $result['error']];
             }
@@ -91,7 +92,7 @@ class ContentModerationService
                 'flagged' => $result['flagged'],
                 'categories' => $result['categories'],
                 'confidence' => $result['score'],
-                'provider' => 'openai'
+                'provider' => 'openai',
             ];
         } catch (\Exception $e) {
             Log::error('OpenAI moderation failed', ['error' => $e->getMessage()]);
@@ -106,10 +107,10 @@ class ContentModerationService
     private function moderateWithGemini(string $content, array $context = []): array
     {
         try {
-            // Note: Context is currently ignored in driver implementation for simplicity, 
+            // Note: Context is currently ignored in driver implementation for simplicity,
             // but could be appended to content if needed.
             $result = $this->llmManager->driver('gemini')->moderate($content);
-            
+
             if (isset($result['error'])) {
                 return ['flagged' => false, 'error' => $result['error']];
             }
@@ -118,7 +119,7 @@ class ContentModerationService
                 'flagged' => $result['flagged'],
                 'categories' => $result['categories'],
                 'confidence' => $result['score'],
-                'provider' => 'gemini'
+                'provider' => 'gemini',
             ];
         } catch (\Exception $e) {
             Log::error('Gemini moderation failed', ['error' => $e->getMessage()]);
@@ -142,24 +143,24 @@ class ContentModerationService
             if ($result['flagged'] ?? false) {
                 $flagged = true;
             }
-            
+
             if (isset($result['categories'])) {
                 foreach ($result['categories'] as $category => $score) {
-                    if (!isset($categories[$category])) {
+                    if (! isset($categories[$category])) {
                         $categories[$category] = 0;
                     }
                     $categories[$category] = max($categories[$category], $score);
                 }
             }
-            
+
             if (isset($result['reason'])) {
                 $reasons[] = $result['reason'];
             }
-            
+
             if (isset($result['confidence'])) {
                 $confidence = max($confidence, $result['confidence']);
             }
-            
+
             $providers[] = $provider;
         }
 
@@ -191,8 +192,9 @@ class ContentModerationService
         if (empty($categories)) {
             return 0.0;
         }
-        
+
         $scores = array_values($categories);
+
         return array_sum($scores) / count($scores);
     }
 
@@ -201,12 +203,12 @@ class ContentModerationService
      */
     private function determineAction(bool $flagged, array $categories): string
     {
-        if (!$flagged) {
+        if (! $flagged) {
             return 'approve';
         }
 
         $maxScore = max($categories);
-        
+
         if ($maxScore >= 0.9) {
             return 'reject'; // High confidence - reject
         } elseif ($maxScore >= 0.7) {

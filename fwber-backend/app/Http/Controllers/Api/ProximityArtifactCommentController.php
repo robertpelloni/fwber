@@ -5,9 +5,8 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\ProximityArtifact;
 use App\Models\ProximityArtifactComment;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Http\Request;
 
 class ProximityArtifactCommentController extends Controller
 {
@@ -39,7 +38,7 @@ class ProximityArtifactCommentController extends Controller
         ]);
 
         // Ensure parent comment belongs to the same artifact if provided
-        if (!empty($validated['parent_id'])) {
+        if (! empty($validated['parent_id'])) {
             $parent = ProximityArtifactComment::findOrFail($validated['parent_id']);
             if ($parent->proximity_artifact_id !== $artifact->id) {
                 return response()->json(['message' => 'Invalid parent comment.'], 422);
@@ -57,7 +56,7 @@ class ProximityArtifactCommentController extends Controller
 
         return response()->json([
             'message' => 'Comment posted',
-            'comment' => $comment
+            'comment' => $comment,
         ], 201);
     }
 

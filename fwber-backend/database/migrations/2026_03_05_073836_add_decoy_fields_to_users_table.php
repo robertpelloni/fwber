@@ -17,9 +17,9 @@ return new class extends Migration
             $table->boolean('is_decoy')->default(false)->after('decoy_user_id');
 
             $table->foreign('decoy_user_id')
-                  ->references('id')
-                  ->on('users')
-                  ->onDelete('set null');
+                ->references('id')
+                ->on('users')
+                ->onDelete('set null');
         });
     }
 

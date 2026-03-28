@@ -27,11 +27,11 @@ return new class extends Migration
     {
         Schema::table('groups', function (Blueprint $table) {
             $table->dropColumn([
-                'tags', 
-                'category', 
-                'matching_enabled', 
-                'location_lat', 
-                'location_lon'
+                'tags',
+                'category',
+                'matching_enabled',
+                'location_lat',
+                'location_lon',
             ]);
         });
     }

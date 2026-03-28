@@ -6,8 +6,8 @@ use App\Models\User;
 use App\Models\UserProfile;
 use App\Services\AiWingmanService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use Mockery;
+use Tests\TestCase;
 
 class AiProfileRoasterTest extends TestCase
 {
@@ -40,7 +40,7 @@ class AiProfileRoasterTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'roast' => 'Look at you, a coding hiker. How original. Do you debug trails too?'
+                'roast' => 'Look at you, a coding hiker. How original. Do you debug trails too?',
             ]);
     }
 
@@ -68,7 +68,7 @@ class AiProfileRoasterTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'roast' => 'You are the absolute best! Coding genius and mountain conqueror!'
+                'roast' => 'You are the absolute best! Coding genius and mountain conqueror!',
             ]);
     }
 
@@ -91,7 +91,7 @@ class AiProfileRoasterTest extends TestCase
                 ->once()
                 ->andReturn([
                     'green_flags' => ['Passionate', 'Active'],
-                    'red_flags' => ['Might talk about code too much']
+                    'red_flags' => ['Might talk about code too much'],
                 ]);
         });
 
@@ -100,7 +100,7 @@ class AiProfileRoasterTest extends TestCase
         $response->assertStatus(200)
             ->assertJson([
                 'green_flags' => ['Passionate', 'Active'],
-                'red_flags' => ['Might talk about code too much']
+                'red_flags' => ['Might talk about code too much'],
             ]);
     }
 }

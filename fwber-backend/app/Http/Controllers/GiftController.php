@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Gift\SendGiftRequest;
 use App\Models\Gift;
 use App\Models\User;
 use App\Models\UserGift;
 use App\Notifications\GiftReceivedNotification;
 use App\Services\TokenDistributionService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Http\Requests\Gift\SendGiftRequest;
 
 class GiftController extends Controller
 {
@@ -46,7 +45,7 @@ class GiftController extends Controller
             return response()->json(['error' => 'You cannot send gifts to yourself.'], 400);
         }
 
-        if (!$gift->is_active) {
+        if (! $gift->is_active) {
             return response()->json(['error' => 'This gift is no longer available.'], 400);
         }
 
@@ -68,7 +67,7 @@ class GiftController extends Controller
                     'amount' => $gift->cost,
                     'type' => 'gift_received',
                     'description' => "Received gift '{$gift->name}' from {$sender->name}",
-                    'metadata' => ['sender_id' => $sender->id, 'gift_id' => $gift->id]
+                    'metadata' => ['sender_id' => $sender->id, 'gift_id' => $gift->id],
                 ]);
 
                 // Create UserGift record

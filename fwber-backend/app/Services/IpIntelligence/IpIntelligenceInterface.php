@@ -8,9 +8,6 @@ interface IpIntelligenceInterface
 {
     /**
      * Get geolocation and intelligence data for an IP address.
-     *
-     * @param string $ipAddress
-     * @return IpLocation|null
      */
     public function analyze(string $ipAddress): ?IpLocation;
 }

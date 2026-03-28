@@ -42,7 +42,7 @@ class E2EKeyManagementTest extends TestCase
     {
         $user = User::factory()->create();
         $publicKey = 'my-secret-key';
-        
+
         UserPublicKey::create([
             'user_id' => $user->id,
             'public_key' => Crypt::encryptString($publicKey),

@@ -7,14 +7,15 @@ use App\Services\Ai\Llm\LlmProviderInterface;
 use App\Services\ContentModerationService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Log;
 use Mockery;
 use Tests\TestCase;
 
 class ContentModerationServiceTest extends TestCase
 {
     protected $llmManager;
+
     protected $driver;
+
     protected $service;
 
     protected function setUp(): void
@@ -23,7 +24,7 @@ class ContentModerationServiceTest extends TestCase
 
         $this->llmManager = Mockery::mock(LlmManager::class);
         $this->driver = Mockery::mock(LlmProviderInterface::class);
-        
+
         // Default config
         Config::set('moderation', [
             'enabled' => true,
@@ -49,8 +50,8 @@ class ContentModerationServiceTest extends TestCase
 
     public function test_moderate_content_safe()
     {
-        $content = "This is safe content.";
-        
+        $content = 'This is safe content.';
+
         $this->llmManager->shouldReceive('driver')
             ->with('openai')
             ->andReturn($this->driver);
@@ -60,7 +61,7 @@ class ContentModerationServiceTest extends TestCase
             ->andReturn([
                 'flagged' => false,
                 'categories' => ['hate' => 0.01],
-                'score' => 0.01
+                'score' => 0.01,
             ]);
 
         Cache::shouldReceive('get')
@@ -78,8 +79,8 @@ class ContentModerationServiceTest extends TestCase
 
     public function test_moderate_content_unsafe()
     {
-        $content = "This is unsafe content.";
-        
+        $content = 'This is unsafe content.';
+
         $this->llmManager->shouldReceive('driver')
             ->with('openai')
             ->andReturn($this->driver);
@@ -89,7 +90,7 @@ class ContentModerationServiceTest extends TestCase
             ->andReturn([
                 'flagged' => true,
                 'categories' => ['hate' => 0.95],
-                'score' => 0.95
+                'score' => 0.95,
             ]);
 
         Cache::shouldReceive('get')
@@ -107,10 +108,10 @@ class ContentModerationServiceTest extends TestCase
 
     public function test_moderate_content_cached()
     {
-        $content = "Cached content.";
+        $content = 'Cached content.';
         $cachedResult = [
             'flagged' => false,
-            'action' => 'approve'
+            'action' => 'approve',
         ];
 
         Cache::shouldReceive('get')
@@ -127,11 +128,11 @@ class ContentModerationServiceTest extends TestCase
     public function test_moderate_content_multiple_providers()
     {
         Config::set('moderation.providers', ['openai', 'gemini']);
-        
+
         // Re-instantiate service to pick up new config
         $this->service = new ContentModerationService($this->llmManager);
 
-        $content = "Content checked by both.";
+        $content = 'Content checked by both.';
 
         $openaiDriver = Mockery::mock(LlmProviderInterface::class);
         $geminiDriver = Mockery::mock(LlmProviderInterface::class);
@@ -149,7 +150,7 @@ class ContentModerationServiceTest extends TestCase
             ->andReturn([
                 'flagged' => false,
                 'categories' => ['hate' => 0.1],
-                'score' => 0.1
+                'score' => 0.1,
             ]);
 
         $geminiDriver->shouldReceive('moderate')
@@ -157,7 +158,7 @@ class ContentModerationServiceTest extends TestCase
             ->andReturn([
                 'flagged' => true,
                 'categories' => ['hate' => 0.9],
-                'score' => 0.9
+                'score' => 0.9,
             ]);
 
         Cache::shouldReceive('get')->andReturn(null);

@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ReviewFlagRequest;
 use App\Http\Requests\ReviewSpoofRequest;
-use App\Models\ModerationAction;
-use App\Models\ShadowThrottle;
 use App\Models\GeoSpoofDetection;
+use App\Models\ModerationAction;
 use App\Models\ProximityArtifact;
+use App\Models\ShadowThrottle;
 use App\Models\User;
 use App\Services\ShadowThrottleService;
 use Illuminate\Http\Request;
@@ -27,14 +27,15 @@ class ModerationController extends Controller
      *   tags={"Moderation"},
      *   summary="Moderation dashboard overview",
      *   security={{"bearerAuth":{}}},
-    *   @OA\Response(response=200, description="Dashboard stats and recent actions"),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
+     *
+     *   @OA\Response(response=200, description="Dashboard stats and recent actions"),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function dashboard(Request $request)
     {
         // Check if user is moderator
-        if (!$request->user()->is_moderator) {
+        if (! $request->user()->is_moderator) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -64,13 +65,14 @@ class ModerationController extends Controller
      *   tags={"Moderation"},
      *   summary="Flagged content queue",
      *   security={{"bearerAuth":{}}},
-    *   @OA\Response(response=200, description="Paginated flagged content"),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
+     *
+     *   @OA\Response(response=200, description="Paginated flagged content"),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function flaggedContent(Request $request)
     {
-        if (!$request->user()->is_moderator) {
+        if (! $request->user()->is_moderator) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -103,22 +105,26 @@ class ModerationController extends Controller
      *   tags={"Moderation"},
      *   summary="Review flagged content",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="artifactId", in="path", required=true, @OA\Schema(type="integer")),
+     *
      *   @OA\RequestBody(required=true, @OA\JsonContent(
      *     required={"action","reason"},
+     *
      *     @OA\Property(property="action", type="string", enum={"approve","remove","throttle_user","ban_user"}),
      *     @OA\Property(property="reason", type="string", maxLength=500),
      *     @OA\Property(property="throttle_severity", type="integer", minimum=1, maximum=5),
      *     @OA\Property(property="throttle_duration_hours", type="integer", minimum=1)
      *   )),
-    *   @OA\Response(response=200, description="Action completed"),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-    *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     *
+     *   @OA\Response(response=200, description="Action completed"),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function reviewFlag(ReviewFlagRequest $request, int $artifactId)
     {
-        if (!$request->user()->is_moderator) {
+        if (! $request->user()->is_moderator) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -147,7 +153,7 @@ class ModerationController extends Controller
 
                 case 'remove':
                     $artifact->delete();
-                    
+
                     ModerationAction::create([
                         'moderator_id' => $request->user()->id,
                         'target_artifact_id' => $artifact->id,
@@ -160,7 +166,7 @@ class ModerationController extends Controller
                 case 'throttle_user':
                     $severity = $validated['throttle_severity'] ?? 2;
                     $duration = $validated['throttle_duration_hours'] ?? 24;
-                    
+
                     $this->shadowThrottleService->applyThrottle(
                         $artifact->user_id,
                         'flagged_content',
@@ -169,9 +175,9 @@ class ModerationController extends Controller
                         $request->user()->id,
                         $validated['reason']
                     );
-                    
+
                     $artifact->delete();
-                    
+
                     ModerationAction::create([
                         'moderator_id' => $request->user()->id,
                         'target_artifact_id' => $artifact->id,
@@ -193,9 +199,9 @@ class ModerationController extends Controller
                         5,
                         null,
                         $request->user()->id,
-                        "Banned: " . $validated['reason']
+                        'Banned: '.$validated['reason']
                     );
-                    
+
                     ModerationAction::create([
                         'moderator_id' => $request->user()->id,
                         'target_user_id' => $artifact->user_id,
@@ -217,13 +223,14 @@ class ModerationController extends Controller
      *   tags={"Moderation"},
      *   summary="Geo-spoof detections",
      *   security={{"bearerAuth":{}}},
-    *   @OA\Response(response=200, description="Paginated detections"),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
+     *
+     *   @OA\Response(response=200, description="Paginated detections"),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function spoofDetections(Request $request)
     {
-        if (!$request->user()->is_moderator) {
+        if (! $request->user()->is_moderator) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -245,21 +252,25 @@ class ModerationController extends Controller
      *   tags={"Moderation"},
      *   summary="Review geo-spoof detection",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="detectionId", in="path", required=true, @OA\Schema(type="integer")),
+     *
      *   @OA\RequestBody(required=true, @OA\JsonContent(
      *     required={"action","reason"},
+     *
      *     @OA\Property(property="action", type="string", enum={"confirm","dismiss"}),
      *     @OA\Property(property="reason", type="string", maxLength=500),
      *     @OA\Property(property="apply_throttle", type="boolean")
      *   )),
-    *   @OA\Response(response=200, description="Review completed"),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-    *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     *
+     *   @OA\Response(response=200, description="Review completed"),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function reviewSpoof(ReviewSpoofRequest $request, int $detectionId)
     {
-        if (!$request->user()->is_moderator) {
+        if (! $request->user()->is_moderator) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -272,14 +283,14 @@ class ModerationController extends Controller
                 $detection->update(['is_confirmed_spoof' => true]);
 
                 if (($validated['apply_throttle'] ?? false) === true) {
-                    $severity = (int)($validated['throttle_severity'] ?? 4);
+                    $severity = (int) ($validated['throttle_severity'] ?? 4);
                     $this->shadowThrottleService->applyThrottle(
                         $detection->user_id,
                         'geo_spoof',
                         $severity,
                         72,
                         $request->user()->id,
-                        "Geo-spoofing confirmed: " . $validated['reason']
+                        'Geo-spoofing confirmed: '.$validated['reason']
                     );
                 }
 
@@ -319,13 +330,14 @@ class ModerationController extends Controller
      *   tags={"Moderation"},
      *   summary="Active shadow throttles",
      *   security={{"bearerAuth":{}}},
-    *   @OA\Response(response=200, description="Paginated throttles"),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
+     *
+     *   @OA\Response(response=200, description="Paginated throttles"),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function activeThrottles(Request $request)
     {
-        if (!$request->user()->is_moderator) {
+        if (! $request->user()->is_moderator) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -346,14 +358,16 @@ class ModerationController extends Controller
      *   tags={"Moderation"},
      *   summary="Remove shadow throttle",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="throttleId", in="path", required=true, @OA\Schema(type="integer")),
-    *   @OA\Response(response=200, description="Throttle removed"),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
+     *
+     *   @OA\Response(response=200, description="Throttle removed"),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function removeThrottle(Request $request, int $throttleId)
     {
-        if (!$request->user()->is_moderator) {
+        if (! $request->user()->is_moderator) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -379,13 +393,14 @@ class ModerationController extends Controller
      *   tags={"Moderation"},
      *   summary="Moderation action history",
      *   security={{"bearerAuth":{}}},
-    *   @OA\Response(response=200, description="Paginated actions"),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
+     *
+     *   @OA\Response(response=200, description="Paginated actions"),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function actionHistory(Request $request)
     {
-        if (!$request->user()->is_moderator) {
+        if (! $request->user()->is_moderator) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -404,14 +419,16 @@ class ModerationController extends Controller
      *   tags={"Moderation"},
      *   summary="User moderation profile",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
-    *   @OA\Response(response=200, description="User moderation profile"),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
+     *
+     *   @OA\Response(response=200, description="User moderation profile"),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function userProfile(Request $request, int $userId)
     {
-        if (!$request->user()->is_moderator) {
+        if (! $request->user()->is_moderator) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 

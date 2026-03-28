@@ -18,10 +18,10 @@ class TierAchievementTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Enable the feature flag
         Config::set('features.face_reveal', true);
-        
+
         // Seed achievements
         $this->seed(AchievementSeeder::class);
     }
@@ -30,7 +30,7 @@ class TierAchievementTest extends TestCase
     {
         $user1 = User::factory()->create();
         $user2 = User::factory()->create();
-        
+
         $match = UserMatch::create([
             'user1_id' => $user1->id,
             'user2_id' => $user2->id,
@@ -69,7 +69,7 @@ class TierAchievementTest extends TestCase
     {
         $user1 = User::factory()->create();
         $user2 = User::factory()->create();
-        
+
         $match = UserMatch::create([
             'user1_id' => $user1->id,
             'user2_id' => $user2->id,
@@ -103,7 +103,7 @@ class TierAchievementTest extends TestCase
     {
         $user1 = User::factory()->create();
         $user2 = User::factory()->create();
-        
+
         $match = UserMatch::create([
             'user1_id' => $user1->id,
             'user2_id' => $user2->id,

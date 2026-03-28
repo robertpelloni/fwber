@@ -2,16 +2,14 @@
 
 namespace Tests\Unit\Services;
 
-use Tests\TestCase;
-use App\Services\ContentGenerationService;
+use App\DTOs\LlmResponse;
+use App\Models\User;
 use App\Services\Ai\Llm\LlmManager;
 use App\Services\Ai\Llm\LlmProviderInterface;
-use App\Models\User;
-use Mockery;
+use App\Services\ContentGenerationService;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Cache;
-
-use App\DTOs\LlmResponse;
+use Mockery;
+use Tests\TestCase;
 
 class ContentGenerationServiceTest extends TestCase
 {
@@ -34,7 +32,7 @@ class ContentGenerationServiceTest extends TestCase
         $user->shouldReceive('getAttribute')->with('created_at')->andReturn(now());
         // Handle isset checks (?? operator)
         $user->shouldReceive('offsetExists')->andReturn(true);
-        
+
         // Mock BulletinMessage alias to avoid DB calls
         $mockMessage = Mockery::mock('alias:App\Models\BulletinMessage');
         $mockMessage->shouldReceive('where->get')->andReturn(collect([]));
@@ -63,7 +61,7 @@ class ContentGenerationServiceTest extends TestCase
         Config::set('content_generation.cache_ttl', 3600); // Add this line
 
         $service = new ContentGenerationService($mockLlmManager);
-        
+
         $result = $service->generateProfileContent($user);
 
         $this->assertIsArray($result);
@@ -71,4 +69,3 @@ class ContentGenerationServiceTest extends TestCase
         $this->assertEquals('Generated profile bio', $result['suggestions'][0]['content']);
     }
 }
-

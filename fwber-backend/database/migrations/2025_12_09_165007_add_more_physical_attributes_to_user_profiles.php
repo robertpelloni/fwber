@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user_profiles', function (Blueprint $table) {
-            if (!Schema::hasColumn('user_profiles', 'breast_size')) {
+            if (! Schema::hasColumn('user_profiles', 'breast_size')) {
                 $table->string('breast_size')->nullable();
             }
-            if (!Schema::hasColumn('user_profiles', 'tattoos')) {
+            if (! Schema::hasColumn('user_profiles', 'tattoos')) {
                 $table->string('tattoos')->nullable(); // None, Some, Many, Full Sleeve, etc.
             }
-            if (!Schema::hasColumn('user_profiles', 'piercings')) {
+            if (! Schema::hasColumn('user_profiles', 'piercings')) {
                 $table->string('piercings')->nullable(); // None, Ears, Face, Body, etc.
             }
         });

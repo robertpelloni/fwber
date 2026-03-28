@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use Tests\TestCase;
-use App\Models\User;
 
 class LogViewerTest extends TestCase
 {
@@ -14,9 +14,9 @@ class LogViewerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create a dummy log file
-        if (!File::exists(storage_path('logs'))) {
+        if (! File::exists(storage_path('logs'))) {
             File::makeDirectory(storage_path('logs'));
         }
         File::put(storage_path('logs/test.log'), "Line 1\nLine 2\nLine 3");
@@ -39,7 +39,7 @@ class LogViewerTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonStructure([
-                '*' => ['name', 'size', 'updated_at']
+                '*' => ['name', 'size', 'updated_at'],
             ]);
     }
 
@@ -52,7 +52,7 @@ class LogViewerTest extends TestCase
         $response->assertStatus(200)
             ->assertJson([
                 'filename' => 'test.log',
-                'content' => "Line 1\nLine 2\nLine 3"
+                'content' => "Line 1\nLine 2\nLine 3",
             ]);
     }
 

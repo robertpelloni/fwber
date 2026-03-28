@@ -4,21 +4,14 @@ namespace App\Services;
 
 use App\Models\ShadowThrottle;
 use App\Models\User;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class ShadowThrottleService
 {
     /**
      * Apply shadow throttle to a user.
      *
-     * @param int $userId
-     * @param string $reason
-     * @param int $severity (1-5)
-     * @param int|null $durationHours
-     * @param int|null $createdBy Moderator user ID
-     * @param string|null $notes
-     * @return ShadowThrottle
+     * @param  int  $severity  (1-5)
+     * @param  int|null  $createdBy  Moderator user ID
      */
     public function applyThrottle(
         int $userId,
@@ -30,8 +23,8 @@ class ShadowThrottleService
     ): ShadowThrottle {
         // Calculate visibility reduction based on severity
         $visibilityReduction = $this->calculateVisibilityReduction($severity);
-        
-        $expiresAt = $durationHours 
+
+        $expiresAt = $durationHours
             ? now()->addHours($durationHours)
             : null; // Null = permanent until manually removed
 
@@ -57,7 +50,7 @@ class ShadowThrottleService
      */
     private function calculateVisibilityReduction(int $severity): float
     {
-        return match($severity) {
+        return match ($severity) {
             1 => 0.70,
             2 => 0.50,
             3 => 0.30,
@@ -86,7 +79,7 @@ class ShadowThrottleService
     public function getVisibilityMultiplier(int $userId): float
     {
         $throttle = $this->getActiveThrottle($userId);
-        
+
         return $throttle ? (float) $throttle->visibility_reduction : 1.0;
     }
 

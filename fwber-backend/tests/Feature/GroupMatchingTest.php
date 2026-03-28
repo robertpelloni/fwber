@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\Group;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -27,7 +27,7 @@ class GroupMatchingTest extends TestCase
         ]);
 
         $response->assertStatus(201);
-        
+
         $this->assertDatabaseHas('groups', [
             'name' => 'Hiking Group',
             'category' => 'hobbies',
@@ -47,7 +47,7 @@ class GroupMatchingTest extends TestCase
             'created_by_user_id' => $user->id,
             'creator_id' => $user->id,
         ]);
-        
+
         // manually create member entry for creator (usually handled by service)
         $group->members()->create([
             'user_id' => $user->id,
@@ -77,7 +77,7 @@ class GroupMatchingTest extends TestCase
     public function test_find_group_matches()
     {
         $user = User::factory()->create();
-        
+
         // Target Group (NYC)
         $groupA = Group::factory()->create([
             'name' => 'NYC Hikers',
@@ -138,7 +138,7 @@ class GroupMatchingTest extends TestCase
     public function test_can_request_group_match()
     {
         $user = User::factory()->create();
-        
+
         // Source Group (User is Owner)
         $groupA = Group::factory()->create([
             'name' => 'Group A',
@@ -169,7 +169,7 @@ class GroupMatchingTest extends TestCase
         $response = $this->actingAs($user)->postJson("/api/groups/{$groupA->id}/matches/{$groupB->id}/connect");
 
         $response->assertStatus(201)
-                 ->assertJsonPath('match.status', 'pending');
+            ->assertJsonPath('match.status', 'pending');
 
         $this->assertDatabaseHas('group_matches', [
             'group_id_1' => $groupA->id,

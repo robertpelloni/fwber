@@ -32,9 +32,9 @@ class PhotoUploadAnalysisTest extends TestCase
         // In MockMediaAnalysisDriver, crc32($url) % 6 determines the scenario.
         // We need to find a filename that maps to a safe scenario (0, 1, 2, 4, 5).
         // Scenario 3 is "explicit" (unsafe).
-        
-        $safeName = 'safe_image.jpg'; 
-        
+
+        $safeName = 'safe_image.jpg';
+
         $file = UploadedFile::fake()->image($safeName);
 
         $response = $this->actingAs($user)->postJson('/api/photos', [
@@ -45,7 +45,7 @@ class PhotoUploadAnalysisTest extends TestCase
         // If it fails with 422, it might be because it hit the "unsafe" hash by bad luck
         // or validation error.
         if ($response->status() === 422 && isset($response->json()['message']) && str_contains($response->json()['message'], 'unsafe')) {
-             $this->markTestSkipped('Hash collision with unsafe scenario - retry test');
+            $this->markTestSkipped('Hash collision with unsafe scenario - retry test');
         }
 
         $response->assertStatus(201);
@@ -69,7 +69,7 @@ class PhotoUploadAnalysisTest extends TestCase
                 moderationLabels: ['Explicit Content'],
                 confidence: 0.99
             ));
-            
+
         $this->app->instance(MediaAnalysisInterface::class, $mockService);
 
         $file = UploadedFile::fake()->image('test.jpg');
@@ -81,7 +81,7 @@ class PhotoUploadAnalysisTest extends TestCase
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['photo']);
-            
+
         // Assert file was deleted (not in database)
         $this->assertDatabaseMissing('photos', [
             'user_id' => $user->id,

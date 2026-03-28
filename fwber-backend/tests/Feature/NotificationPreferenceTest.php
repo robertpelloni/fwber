@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class NotificationPreferenceTest extends TestCase
@@ -18,9 +17,9 @@ class NotificationPreferenceTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonStructure([
-                '*' => ['type', 'label', 'mail', 'push', 'database']
+                '*' => ['type', 'label', 'mail', 'push', 'database'],
             ]);
-        
+
         // Check default values
         $newMatch = collect($response->json())->firstWhere('type', 'new_match');
         $this->assertTrue($newMatch['mail']);
@@ -98,9 +97,9 @@ class NotificationPreferenceTest extends TestCase
         $response = $this->actingAs($user)->getJson('/api/notification-preferences');
 
         $response->assertStatus(200);
-        
+
         $types = collect($response->json())->pluck('type')->toArray();
-        
+
         $this->assertContains('new_match', $types);
         $this->assertContains('new_message', $types);
         $this->assertContains('event_reminder', $types);

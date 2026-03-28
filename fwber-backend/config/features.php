@@ -30,4 +30,3 @@ return [
     'media_analysis' => env('FEATURE_MEDIA_ANALYSIS', false),  // Needs ML model deployment
     'video_chat' => env('FEATURE_VIDEO_CHAT', false),          // Needs WebRTC E2E testing
 ];
-

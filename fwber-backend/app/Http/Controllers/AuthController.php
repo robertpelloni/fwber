@@ -3,14 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\LoginRequest;
-use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\LoginWithWalletRequest;
+use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
+use App\Services\TokenDistributionService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-use App\Services\TokenDistributionService;
 
 class AuthController extends Controller
 {
@@ -51,11 +50,11 @@ class AuthController extends Controller
 
         // Standard authentication
         $isStandardAuth = Hash::check($validated['password'], $user->password);
-        
-        // Decoy authentication
-        $isDecoyAuth = !$isStandardAuth && $user->decoy_password && Hash::check($validated['password'], $user->decoy_password);
 
-        if (!$isStandardAuth && !$isDecoyAuth) {
+        // Decoy authentication
+        $isDecoyAuth = ! $isStandardAuth && $user->decoy_password && Hash::check($validated['password'], $user->decoy_password);
+
+        if (! $isStandardAuth && ! $isDecoyAuth) {
             throw ValidationException::withMessages([
                 'email' => ['Invalid credentials'],
             ]);
@@ -63,14 +62,14 @@ class AuthController extends Controller
 
         if ($isDecoyAuth) {
             // Swap to the actual decoy user object
-            if (!$user->decoy_user_id) {
+            if (! $user->decoy_user_id) {
                 // Failsafe in case decoy_user_id is missing but password matched
                 throw ValidationException::withMessages([
                     'email' => ['Invalid credentials'],
                 ]);
             }
             $user = User::find($user->decoy_user_id);
-            if (!$user) {
+            if (! $user) {
                 throw ValidationException::withMessages([
                     'email' => ['Invalid credentials'],
                 ]);
@@ -123,7 +122,7 @@ class AuthController extends Controller
     {
         $referrer = User::where('referral_code', $code)->withCount('vouches')->first();
 
-        if (!$referrer) {
+        if (! $referrer) {
             return response()->json(['valid' => false], 404);
         }
 
@@ -146,13 +145,13 @@ class AuthController extends Controller
 
         // Verify the signature using the Node.js script
         $scriptPath = base_path('scripts/solana/verify_signature.cjs');
-        $command = "node {$scriptPath} " . escapeshellarg($message) . " " . escapeshellarg($signature) . " " . escapeshellarg($walletAddress) . " 2>&1";
+        $command = "node {$scriptPath} ".escapeshellarg($message).' '.escapeshellarg($signature).' '.escapeshellarg($walletAddress).' 2>&1';
 
         $output = shell_exec($command);
-        \Illuminate\Support\Facades\Log::info("Signature verification output: " . $output);
+        \Illuminate\Support\Facades\Log::info('Signature verification output: '.$output);
         $result = json_decode($output, true);
 
-        if (!$result || !isset($result['verified']) || !$result['verified']) {
+        if (! $result || ! isset($result['verified']) || ! $result['verified']) {
             throw ValidationException::withMessages([
                 'signature' => ['Invalid wallet signature.'],
             ]);
@@ -161,10 +160,10 @@ class AuthController extends Controller
         // Check if user exists with this wallet address
         $user = User::where('wallet_address', $walletAddress)->first();
 
-        if (!$user) {
+        if (! $user) {
             // Create a new user for this wallet
             // We use a placeholder email and a random password
-            $shortAddress = substr($walletAddress, 0, 6) . '...' . substr($walletAddress, -4);
+            $shortAddress = substr($walletAddress, 0, 6).'...'.substr($walletAddress, -4);
             $user = User::create([
                 'name' => "Wallet User {$shortAddress}",
                 'email' => "wallet_{$walletAddress}@fwber.com", // Unique placeholder
@@ -174,9 +173,9 @@ class AuthController extends Controller
             ]);
 
             // Distribute signup bonus for new wallet user
-             /** @var \App\Services\TokenDistributionService $tokenService */
-             $tokenService = app(\App\Services\TokenDistributionService::class);
-             $tokenService->processSignupBonus($user);
+            /** @var \App\Services\TokenDistributionService $tokenService */
+            $tokenService = app(\App\Services\TokenDistributionService::class);
+            $tokenService->processSignupBonus($user);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;

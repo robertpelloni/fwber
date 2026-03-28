@@ -3,9 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\Photo;
+use App\Models\PhotoReveal;
 use App\Models\User;
 use App\Models\UserMatch;
-use App\Models\PhotoReveal;
 use App\Services\PhotoEncryptionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
@@ -18,10 +18,10 @@ class PhotoRevealControllerTest extends TestCase
     public function test_photo_reveal_controller_decryption_logic()
     {
         Storage::fake('public');
-        
+
         $user = User::factory()->create();
         $matchUser = User::factory()->create();
-        
+
         // Create a match
         $match = UserMatch::create([
             'user1_id' => $user->id,
@@ -32,10 +32,10 @@ class PhotoRevealControllerTest extends TestCase
         // Create an encrypted photo
         $content = 'This is a secret photo content';
         $path = 'photos/secret.jpg';
-        
-        $encryptionService = new PhotoEncryptionService();
+
+        $encryptionService = new PhotoEncryptionService;
         $encryptionService->encryptAndStore($content, $path, 'public');
-        
+
         $photo = Photo::create([
             'user_id' => $user->id,
             'filename' => 'secret.jpg',
@@ -64,28 +64,32 @@ class PhotoRevealControllerTest extends TestCase
         ]);
 
         // Instantiate controller
-        $mediaAnalysisMock = new class implements \App\Services\MediaAnalysis\MediaAnalysisInterface {
-            public function analyze(string $url, string $type): \App\Services\MediaAnalysis\MediaAnalysisResult {
+        $mediaAnalysisMock = new class implements \App\Services\MediaAnalysis\MediaAnalysisInterface
+        {
+            public function analyze(string $url, string $type): \App\Services\MediaAnalysis\MediaAnalysisResult
+            {
                 return new \App\Services\MediaAnalysis\MediaAnalysisResult(true, []);
             }
-            public function compareFaces(string $sourcePath, string $targetPath): float {
+
+            public function compareFaces(string $sourcePath, string $targetPath): float
+            {
                 return 1.0;
             }
         };
         $controller = new \App\Http\Controllers\PhotoController($mediaAnalysisMock);
-        
+
         // Mock Request
         $request = \Illuminate\Http\Request::create('/dummy', 'GET');
-        
+
         // Authenticate as matchUser
         $this->actingAs($matchUser);
 
         // Call method
         $response = $controller->original($request, $photo->id);
-        
+
         // Assert response is a StreamedResponse
         if ($response instanceof \Illuminate\Http\JsonResponse) {
-            $this->fail('Expected StreamedResponse, got JsonResponse: ' . json_encode($response->getData()));
+            $this->fail('Expected StreamedResponse, got JsonResponse: '.json_encode($response->getData()));
         }
         $this->assertInstanceOf(\Symfony\Component\HttpFoundation\StreamedResponse::class, $response);
     }

@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\RelationshipTier;
 use App\Models\User;
 use App\Models\UserMatch;
-use App\Models\RelationshipTier;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -15,16 +15,18 @@ class DirectMessageTest extends TestCase
     use RefreshDatabase;
 
     protected $sender;
+
     protected $receiver;
+
     protected $match;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->sender = User::factory()->create();
         $this->receiver = User::factory()->create();
-        
+
         // Create an active match
         $this->match = UserMatch::create([
             'user1_id' => $this->sender->id,
@@ -32,7 +34,7 @@ class DirectMessageTest extends TestCase
             'is_active' => true,
             // 'matched_at' => now(), // Removed as column doesn't exist
         ]);
-        
+
         // Create initial relationship tier
         RelationshipTier::create([
             'match_id' => $this->match->id,
@@ -61,7 +63,7 @@ class DirectMessageTest extends TestCase
     public function test_can_send_audio_message()
     {
         Storage::fake('public');
-        
+
         $file = UploadedFile::fake()->create('voice.mp3', 100, 'audio/mpeg');
 
         $response = $this->actingAs($this->sender)->postJson('/api/messages', [
@@ -72,14 +74,14 @@ class DirectMessageTest extends TestCase
         ]);
 
         $response->assertStatus(201);
-        
+
         $this->assertDatabaseHas('messages', [
             'sender_id' => $this->sender->id,
             'receiver_id' => $this->receiver->id,
             'message_type' => 'audio',
             'media_duration' => 15,
         ]);
-        
+
         // Verify file storage
         // Note: The controller stores it in messages/{senderId}/{hash}.mp3
         // We can't easily predict the hash, but we can check if the directory exists
@@ -91,7 +93,7 @@ class DirectMessageTest extends TestCase
     public function test_audio_message_validation_duration()
     {
         Storage::fake('public');
-        
+
         $file = UploadedFile::fake()->create('voice.mp3', 100, 'audio/mpeg');
 
         // Test too long

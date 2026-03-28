@@ -2,23 +2,24 @@
 
 namespace App\Notifications;
 
+use App\Notifications\Traits\ChecksNotificationPreferences;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\BroadcastMessage;
-use NotificationChannels\WebPush\WebPushMessage;
-use NotificationChannels\WebPush\WebPushChannel;
-use App\Notifications\Traits\ChecksNotificationPreferences;
-
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
+use NotificationChannels\WebPush\WebPushMessage;
 
 class PushMessage extends Notification implements ShouldQueue
 {
-    use Queueable, ChecksNotificationPreferences;
+    use ChecksNotificationPreferences, Queueable;
 
     public $title;
+
     public $body;
+
     public $url;
+
     public $type;
 
     /**
@@ -41,12 +42,12 @@ class PushMessage extends Notification implements ShouldQueue
     {
         // Use preference based on type
         $channels = $this->getChannels($notifiable, $this->type);
-        
+
         // Ensure broadcast is included for real-time updates
-        if (!in_array('broadcast', $channels)) {
-             $channels[] = 'broadcast';
+        if (! in_array('broadcast', $channels)) {
+            $channels[] = 'broadcast';
         }
-        
+
         return $channels;
     }
 

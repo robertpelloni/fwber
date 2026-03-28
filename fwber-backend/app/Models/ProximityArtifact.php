@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Prunable;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProximityArtifact extends Model
 {
-    use HasFactory, SoftDeletes, Prunable;
+    use HasFactory, Prunable, SoftDeletes;
 
     protected $fillable = [
         'user_id', 'type', 'content', 'location_lat', 'location_lng',
@@ -38,7 +38,7 @@ class ProximityArtifact extends Model
     public function scopeActive(Builder $q): Builder
     {
         return $q->where('moderation_status', '!=', 'removed')
-                 ->where('expires_at', '>', now());
+            ->where('expires_at', '>', now());
     }
 
     public function scopeType(Builder $q, string $type): Builder
@@ -51,26 +51,28 @@ class ProximityArtifact extends Model
         // Approximate: 1 deg lat ~ 111,000 m; 1 deg lng ~ 111,000 m * cos(lat)
         $latOffset = $radiusMeters / 111000.0;
         $lngOffset = $radiusMeters / (111000.0 * max(0.1, cos(deg2rad($lat))));
+
         return $q->whereBetween('location_lat', [$lat - $latOffset, $lat + $latOffset])
-                 ->whereBetween('location_lng', [$lng - $lngOffset, $lng + $lngOffset]);
+            ->whereBetween('location_lng', [$lng - $lngOffset, $lng + $lngOffset]);
     }
 
     public function getFuzzedLatitudeAttribute(): float
     {
-        return $this->fuzzCoord((float)$this->location_lat, 0.0008);
+        return $this->fuzzCoord((float) $this->location_lat, 0.0008);
     }
 
     public function getFuzzedLongitudeAttribute(): float
     {
-        return $this->fuzzCoord((float)$this->location_lng, 0.0008);
+        return $this->fuzzCoord((float) $this->location_lng, 0.0008);
     }
 
     private function fuzzCoord(float $value, float $delta): float
     {
         // Deterministic small jitter based on id for stability across requests
-        $seed = crc32((string)($this->id ?? 0));
+        $seed = crc32((string) ($this->id ?? 0));
         mt_srand($seed);
         $offset = (mt_rand() / mt_getrandmax()) * (2 * $delta) - $delta;
+
         return round($value + $offset, 7);
     }
 

@@ -6,7 +6,6 @@ use App\Models\ProximityArtifact;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class CatPhotoController extends Controller
 {
@@ -92,13 +91,13 @@ class CatPhotoController extends Controller
         // Recalculate average in artifact meta
         $meta = $artifact->meta;
         $allVotes = $artifact->votes()->count();
-        
+
         // This is a simplification, ideally we'd store individual ratings
         // but for a viral feature we'll just track score in meta for now
         $meta['rating_count'] = ($meta['rating_count'] ?? 0) + 1;
         $meta['total_score'] = ($meta['total_score'] ?? 0) + $request->rating;
         $meta['average_rating'] = round($meta['total_score'] / $meta['rating_count'], 1);
-        
+
         $artifact->update(['meta' => $meta]);
 
         return response()->json([

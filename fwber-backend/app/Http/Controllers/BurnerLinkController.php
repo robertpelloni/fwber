@@ -17,9 +17,9 @@ class BurnerLinkController extends Controller
     public function store(Request $request)
     {
         $user = auth()->user();
-        
+
         $token = bin2hex(random_bytes(32));
-        
+
         $burnerLink = \App\Models\BurnerLink::create([
             'creator_id' => $user->id,
             'token' => $token,
@@ -29,7 +29,7 @@ class BurnerLinkController extends Controller
         return response()->json([
             'token' => $burnerLink->token,
             'expires_at' => $burnerLink->expires_at,
-            'url' => url("/burner/join/{$burnerLink->token}")
+            'url' => url("/burner/join/{$burnerLink->token}"),
         ], 201);
     }
 
@@ -42,7 +42,7 @@ class BurnerLinkController extends Controller
 
         $burnerLink = \App\Models\BurnerLink::with('chatroom')->where('token', $token)->first();
 
-        if (!$burnerLink) {
+        if (! $burnerLink) {
             return response()->json(['message' => 'Invalid or expired burner link.'], 404);
         }
 
@@ -55,9 +55,10 @@ class BurnerLinkController extends Controller
             if ($burnerLink->chatroom_id && $burnerLink->chatroom && $burnerLink->chatroom->hasMember($user)) {
                 return response()->json([
                     'message' => 'You are already in this chatroom.',
-                    'chatroom_id' => $burnerLink->chatroom_id
+                    'chatroom_id' => $burnerLink->chatroom_id,
                 ]);
             }
+
             return response()->json(['message' => 'This burner link has already been used.'], 403);
         }
 
@@ -80,7 +81,7 @@ class BurnerLinkController extends Controller
 
         // Add both members
         $creator = \App\Models\User::find($burnerLink->creator_id);
-        
+
         // Wrap in transaction for safety
         \Illuminate\Support\Facades\DB::transaction(function () use ($chatroom, $creator, $user, $burnerLink) {
             $chatroom->addMember($creator);
@@ -90,12 +91,12 @@ class BurnerLinkController extends Controller
             \App\Models\ChatroomMessage::create([
                 'chatroom_id' => $chatroom->id,
                 'user_id' => $creator->id,
-                'content' => "Burner connection established. This chat self-destructs in 24 hours.",
+                'content' => 'Burner connection established. This chat self-destructs in 24 hours.',
                 'type' => 'system',
                 'is_edited' => false,
                 'is_deleted' => false,
             ]);
-            
+
             $chatroom->update(['message_count' => 1, 'last_activity_at' => now()]);
 
             // Mark link as used
@@ -108,7 +109,7 @@ class BurnerLinkController extends Controller
 
         return response()->json([
             'message' => 'Burner connection established successfully.',
-            'chatroom_id' => $chatroom->id
+            'chatroom_id' => $chatroom->id,
         ]);
     }
 }

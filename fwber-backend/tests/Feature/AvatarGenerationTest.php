@@ -6,13 +6,13 @@ use App\Jobs\GenerateAvatar;
 use App\Models\Photo;
 use App\Models\User;
 use App\Models\UserProfile;
+use App\Notifications\AvatarGeneratedNotification;
 use App\Services\AvatarGenerationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Notification;
-use App\Notifications\AvatarGeneratedNotification;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class AvatarGenerationTest extends TestCase
@@ -22,7 +22,7 @@ class AvatarGenerationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Mock config to ensure we use DALL-E for this test
         Config::set('avatar_generation.default_provider', 'dalle');
         Config::set('avatar_generation.providers.dalle.api_key', 'sk-test-key');
@@ -37,7 +37,7 @@ class AvatarGenerationTest extends TestCase
      */
     private function requireRedis(): void
     {
-        if (!extension_loaded('redis')) {
+        if (! extension_loaded('redis')) {
             $this->markTestSkipped('PHP Redis extension not installed.');
         }
     }
@@ -49,7 +49,7 @@ class AvatarGenerationTest extends TestCase
     {
         Queue::fake();
         $user = User::factory()->create();
-        
+
         $this->actingAs($user)
             ->postJson('/api/physical-profile/avatar/request', ['style' => 'anime'])
             ->assertStatus(422)
@@ -63,7 +63,7 @@ class AvatarGenerationTest extends TestCase
         $response->assertStatus(200)
             ->assertJson([
                 'success' => true,
-                'status' => 'processing'
+                'status' => 'processing',
             ]);
 
         Queue::assertPushed(GenerateAvatar::class, function ($job) use ($user) {
@@ -79,7 +79,7 @@ class AvatarGenerationTest extends TestCase
     {
         $this->requireRedis();
         $user = User::factory()->create();
-        
+
         // Create a detailed profile
         UserProfile::create([
             'user_id' => $user->id,
@@ -104,8 +104,8 @@ class AvatarGenerationTest extends TestCase
         Http::fake([
             'api.openai.com/*' => Http::response([
                 'data' => [
-                    ['url' => 'https://example.com/avatar.png']
-                ]
+                    ['url' => 'https://example.com/avatar.png'],
+                ],
             ], 200),
             '*' => Http::response('ok', 200),
         ]);
@@ -160,8 +160,8 @@ class AvatarGenerationTest extends TestCase
         Http::fake([
             'api.openai.com/*' => Http::response([
                 'data' => [
-                    ['url' => 'https://example.com/avatar-photo-anchor.png']
-                ]
+                    ['url' => 'https://example.com/avatar-photo-anchor.png'],
+                ],
             ], 200),
             '*' => Http::response('ok', 200),
         ]);
@@ -344,8 +344,8 @@ class AvatarGenerationTest extends TestCase
         Http::fake([
             'api.openai.com/*' => Http::response([
                 'data' => [
-                    ['url' => 'https://example.com/avatar.png']
-                ]
+                    ['url' => 'https://example.com/avatar.png'],
+                ],
             ], 200),
             '*' => Http::response('ok', 200),
         ]);
@@ -361,9 +361,10 @@ class AvatarGenerationTest extends TestCase
                 return false;
             }
             $prompt = $request->data()['prompt'];
-            return str_contains($prompt, 'woman') && 
+
+            return str_contains($prompt, 'woman') &&
                    str_contains($prompt, 'pink hair') &&
-                   !str_contains($prompt, 'brown hair');
+                   ! str_contains($prompt, 'brown hair');
         });
     }
 
@@ -380,8 +381,8 @@ class AvatarGenerationTest extends TestCase
         Http::fake([
             'api.openai.com/*' => Http::response([
                 'data' => [
-                    ['url' => 'https://example.com/unsafe-avatar.png']
-                ]
+                    ['url' => 'https://example.com/unsafe-avatar.png'],
+                ],
             ], 200),
             'https://example.com/unsafe-avatar.png' => Http::response('unsafe-image-content', 200),
         ]);
@@ -397,7 +398,7 @@ class AvatarGenerationTest extends TestCase
                 0.9,
                 ['source' => 'mock']
             ));
-        
+
         $this->app->instance(\App\Services\MediaAnalysis\MediaAnalysisInterface::class, $mockAnalysis);
 
         $service = app(AvatarGenerationService::class);
@@ -419,8 +420,8 @@ class AvatarGenerationTest extends TestCase
                 'providers' => [
                     'dalle',
                     'gemini',
-                    'replicate'
-                ]
+                    'replicate',
+                ],
             ]);
     }
 
@@ -440,12 +441,12 @@ class AvatarGenerationTest extends TestCase
                 'id' => 'pred_123',
                 'status' => 'starting',
             ], 201),
-            
+
             // 2. Polling Status (Succeeded)
             'api.replicate.com/v1/predictions/pred_123' => Http::response([
                 'id' => 'pred_123',
                 'status' => 'succeeded',
-                'output' => ['https://replicate.com/output.png']
+                'output' => ['https://replicate.com/output.png'],
             ], 200),
 
             // 3. Download Image
@@ -459,16 +460,18 @@ class AvatarGenerationTest extends TestCase
             'lora_scale' => 0.8,
             'style' => 'cyberpunk',
         ]);
-        
+
         $job->handle(app(AvatarGenerationService::class));
 
         // Verify Replicate Request contained custom options
         Http::assertSent(function ($request) {
             if ($request->url() === 'https://api.replicate.com/v1/predictions') {
                 $data = $request->data();
+
                 return $data['version'] === 'custom-model-v1' &&
                        $data['input']['lora_scale'] === 0.8;
             }
+
             return true;
         });
 

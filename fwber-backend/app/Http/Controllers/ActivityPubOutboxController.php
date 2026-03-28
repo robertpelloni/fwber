@@ -2,24 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
 
 class ActivityPubOutboxController extends Controller
 {
     /**
      * Lists activities published by this user.
-     * 
-     * @param int $id The local user ID
+     *
+     * @param  int  $id  The local user ID
      */
     public function index($id)
     {
         $user = User::where('id', $id)
-            ->whereHas('profile', function($q) {
+            ->whereHas('profile', function ($q) {
                 $q->where('is_federated', true);
             })->first();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['error' => 'Outbox not found'], 404);
         }
 
@@ -30,7 +29,7 @@ class ActivityPubOutboxController extends Controller
             'type' => 'OrderedCollection',
             'totalItems' => 0, // Placeholder
             'first' => url("/api/federation/users/{$user->id}/outbox?page=true"),
-            'last' => url("/api/federation/users/{$user->id}/outbox?min_id=0&page=true")
+            'last' => url("/api/federation/users/{$user->id}/outbox?min_id=0&page=true"),
         ])->header('Content-Type', 'application/activity+json');
     }
 }

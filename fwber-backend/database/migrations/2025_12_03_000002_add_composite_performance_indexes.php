@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -17,12 +17,12 @@ return new class extends Migration
             return;
         }
 
-        $addIndex = function($table, $columns, $name) {
+        $addIndex = function ($table, $columns, $name) {
             if (Schema::hasTable($table)) {
                 // Check if index exists using raw SQL for MySQL to avoid duplicate key errors
                 $exists = count(DB::select("SHOW INDEX FROM `{$table}` WHERE Key_name = ?", [$name])) > 0;
-                
-                if (!$exists) {
+
+                if (! $exists) {
                     try {
                         Schema::table($table, function (Blueprint $table) use ($columns, $name) {
                             $table->index($columns, $name);
@@ -66,13 +66,14 @@ return new class extends Migration
             return;
         }
 
-        $dropIndex = function($table, $name) {
+        $dropIndex = function ($table, $name) {
             if (Schema::hasTable($table)) {
                 try {
                     Schema::table($table, function (Blueprint $table) use ($name) {
                         $table->dropIndex($name);
                     });
-                } catch (\Exception $e) {}
+                } catch (\Exception $e) {
+                }
             }
         };
 

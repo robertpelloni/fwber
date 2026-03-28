@@ -17,7 +17,7 @@ class VouchLeaderboardTest extends TestCase
         // Create users
         $user1 = User::factory()->create(['name' => 'Alice']);
         $user2 = User::factory()->create(['name' => 'Bob']);
-        
+
         // Create vouches for user1 (Total 3: 2 Safe, 1 Fun)
         Vouch::factory()->create(['to_user_id' => $user1->id, 'type' => 'safe']);
         Vouch::factory()->create(['to_user_id' => $user1->id, 'type' => 'safe']);
@@ -33,21 +33,21 @@ class VouchLeaderboardTest extends TestCase
             ->getJson('/api/leaderboard');
 
         $response->assertStatus(200);
-        
+
         $data = $response->json();
-        
+
         $this->assertArrayHasKey('top_vouched', $data);
         $topVouched = $data['top_vouched'];
-        
+
         // Check order (User 1 should be first)
         $this->assertEquals('Ali***', $topVouched[0]['name']);
         $this->assertEquals(3, $topVouched[0]['vouches']);
-        
+
         // Check breakdown for User 1
         $this->assertEquals(2, $topVouched[0]['breakdown']['safe']);
         $this->assertEquals(1, $topVouched[0]['breakdown']['fun']);
         $this->assertEquals(0, $topVouched[0]['breakdown']['hot']);
-        
+
         // Check User 2
         $this->assertEquals('Bob***', $topVouched[1]['name']);
         $this->assertEquals(1, $topVouched[1]['vouches']);

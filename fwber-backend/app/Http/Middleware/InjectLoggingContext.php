@@ -4,14 +4,13 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
-use Illuminate\Support\Facades\Log;
-
 /**
  * Injects structured logging context into each request.
- * 
+ *
  * Adds X-Request-ID header to responses for distributed tracing.
  */
 class InjectLoggingContext

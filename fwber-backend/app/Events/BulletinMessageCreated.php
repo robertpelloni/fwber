@@ -2,12 +2,9 @@
 
 namespace App\Events;
 
-use App\Models\BulletinBoard;
 use App\Models\BulletinMessage;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -17,6 +14,7 @@ class BulletinMessageCreated implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $message;
+
     public $boardId;
 
     /**
@@ -36,7 +34,7 @@ class BulletinMessageCreated implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new Channel('bulletin-board.' . $this->boardId),
+            new Channel('bulletin-board.'.$this->boardId),
             new Channel('bulletin-boards.public'),
         ];
     }

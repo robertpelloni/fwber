@@ -10,6 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @OA\Schema(
  *   schema="StoreProximityArtifactRequest",
  *   required={"type", "content", "lat", "lng"},
+ *
  *   @OA\Property(property="type", type="string", enum={"chat", "board_post", "announce"}, description="Artifact type"),
  *   @OA\Property(property="content", type="string", maxLength=500, description="Artifact content"),
  *   @OA\Property(property="lat", type="number", format="float", minimum=-90, maximum=90, description="Latitude"),

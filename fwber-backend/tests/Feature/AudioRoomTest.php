@@ -2,12 +2,11 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\AudioRoom;
 use App\Models\AudioRoomParticipant;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class AudioRoomTest extends TestCase
 {
@@ -24,13 +23,13 @@ class AudioRoomTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJsonStructure([
-                'id', 'name', 'topic', 'host_id'
+                'id', 'name', 'topic', 'host_id',
             ]);
 
         $this->assertDatabaseHas('audio_rooms', [
             'name' => 'Late Night Chats',
             'topic' => 'Just vibing',
-            'host_id' => $user->id
+            'host_id' => $user->id,
         ]);
 
         $roomId = $response->json('id');
@@ -38,14 +37,14 @@ class AudioRoomTest extends TestCase
         $this->assertDatabaseHas('audio_room_participants', [
             'audio_room_id' => $roomId,
             'user_id' => $user->id,
-            'role' => 'speaker'
+            'role' => 'speaker',
         ]);
     }
 
     public function test_user_can_list_active_audio_rooms()
     {
         $user = User::factory()->create();
-        
+
         // Active room
         AudioRoom::create([
             'host_id' => $user->id,
@@ -66,7 +65,7 @@ class AudioRoomTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonCount(1); // Only the active room should be listed
-            
+
         $this->assertEquals('Active Room', $response->json('0.name'));
     }
 
@@ -86,13 +85,13 @@ class AudioRoomTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonStructure([
-                'participant' => ['id', 'user_id', 'role']
+                'participant' => ['id', 'user_id', 'role'],
             ]);
 
         $this->assertDatabaseHas('audio_room_participants', [
             'audio_room_id' => $room->id,
             'user_id' => $joiner->id,
-            'role' => 'listener'
+            'role' => 'listener',
         ]);
     }
 
@@ -111,7 +110,7 @@ class AudioRoomTest extends TestCase
         AudioRoomParticipant::create([
             'audio_room_id' => $room->id,
             'user_id' => $joiner->id,
-            'role' => 'listener'
+            'role' => 'listener',
         ]);
 
         $response = $this->actingAs($joiner)->postJson("/api/audio-rooms/{$room->id}/leave");
@@ -120,7 +119,7 @@ class AudioRoomTest extends TestCase
 
         $this->assertDatabaseMissing('audio_room_participants', [
             'audio_room_id' => $room->id,
-            'user_id' => $joiner->id
+            'user_id' => $joiner->id,
         ]);
     }
 
@@ -139,7 +138,7 @@ class AudioRoomTest extends TestCase
         $response = $this->actingAs($joiner)->postJson("/api/audio-rooms/{$room->id}/signal", [
             'target_user_id' => $host->id,
             'type' => 'offer',
-            'payload' => 'sdp_data_here'
+            'payload' => 'sdp_data_here',
         ]);
 
         $response->assertStatus(200);

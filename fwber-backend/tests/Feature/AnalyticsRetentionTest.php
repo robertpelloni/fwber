@@ -2,11 +2,10 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\DailyActiveUser;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Carbon\Carbon;
+use Tests\TestCase;
 
 class AnalyticsRetentionTest extends TestCase
 {
@@ -41,9 +40,9 @@ class AnalyticsRetentionTest extends TestCase
         $response = $this->getJson('/api/analytics/retention');
 
         $response->assertStatus(200);
-        
+
         $data = $response->json();
-        
+
         // Find the cohort for Month -2
         $cohortKey = $monthMinus2->format('Y-m');
         $cohort = collect($data)->firstWhere('month', $cohortKey);
@@ -53,12 +52,12 @@ class AnalyticsRetentionTest extends TestCase
 
         // Check Month 1 retention (Month -1) -> 50% (1/2)
         $month1 = collect($cohort['retention'])->firstWhere('month_offset', 1);
-        $this->assertNotNull($month1, "Month 1 retention not found");
+        $this->assertNotNull($month1, 'Month 1 retention not found');
         $this->assertEquals(50, $month1['percentage']);
 
         // Check Month 2 retention (Month 0) -> 100% (2/2)
         $month2 = collect($cohort['retention'])->firstWhere('month_offset', 2);
-        $this->assertNotNull($month2, "Month 2 retention not found");
+        $this->assertNotNull($month2, 'Month 2 retention not found');
         $this->assertEquals(100, $month2['percentage']);
     }
 }

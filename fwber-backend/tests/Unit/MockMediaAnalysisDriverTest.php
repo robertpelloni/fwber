@@ -13,7 +13,7 @@ class MockMediaAnalysisDriverTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->driver = new MockMediaAnalysisDriver();
+        $this->driver = new MockMediaAnalysisDriver;
     }
 
     public function test_analyze_image_returns_mock_data()
@@ -45,11 +45,11 @@ class MockMediaAnalysisDriverTest extends TestCase
         $this->assertArrayHasKey('transcription', $result->metadata);
         $this->assertArrayHasKey('sentiment', $result->metadata);
     }
-    
+
     public function test_unsafe_image_detection()
     {
         $result = $this->driver->analyze('http://example.com/unsafe_image.jpg', 'image');
-        
+
         $this->assertFalse($result->safe);
         $this->assertContains('Explicit', $result->labels);
     }

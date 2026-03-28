@@ -21,7 +21,7 @@ class StoreClientEventsRequest extends FormRequest
     {
         return [
             'events' => 'required|array|min:1|max:50',
-            'events.*.name' => 'required|string|in:' . implode(',', self::ALLOWED_CLIENT_EVENTS),
+            'events.*.name' => 'required|string|in:'.implode(',', self::ALLOWED_CLIENT_EVENTS),
             'events.*.payload' => 'required|array',
             'events.*.ts' => 'nullable|date',
         ];

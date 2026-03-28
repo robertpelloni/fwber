@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\Device\StoreDeviceTokenRequest;
 use App\Models\DeviceToken;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\Device\StoreDeviceTokenRequest;
 
 class DeviceTokenController extends Controller
 {
@@ -15,14 +14,18 @@ class DeviceTokenController extends Controller
      *   tags={"Notifications"},
      *   summary="Register a device token for push notifications",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\RequestBody(
      *     required=true,
+     *
      *     @OA\JsonContent(
      *       required={"token", "platform"},
+     *
      *       @OA\Property(property="token", type="string"),
      *       @OA\Property(property="platform", type="string", enum={"ios", "android", "web"})
      *     )
      *   ),
+     *
      *   @OA\Response(response=200, description="Token registered")
      * )
      */
@@ -48,7 +51,9 @@ class DeviceTokenController extends Controller
      *   tags={"Notifications"},
      *   summary="Remove a device token",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="token", in="path", required=true, @OA\Schema(type="string")),
+     *
      *   @OA\Response(response=200, description="Token removed")
      * )
      */

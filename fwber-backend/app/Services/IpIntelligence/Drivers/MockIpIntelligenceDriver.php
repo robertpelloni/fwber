@@ -2,8 +2,8 @@
 
 namespace App\Services\IpIntelligence\Drivers;
 
-use App\Services\IpIntelligence\IpIntelligenceInterface;
 use App\Services\IpIntelligence\DTOs\IpLocation;
+use App\Services\IpIntelligence\IpIntelligenceInterface;
 
 class MockIpIntelligenceDriver implements IpIntelligenceInterface
 {

@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\Validator;
 class TelemetryService
 {
     private bool $enabled;
+
     private array $schemas;
+
     private bool $storeEvents;
 
     public function __construct()
@@ -21,14 +23,14 @@ class TelemetryService
             'schemas' => [],
             'store_events' => true,
         ]);
-        $this->enabled = (bool)($config['enabled'] ?? true);
-        $this->schemas = (array)($config['schemas'] ?? []);
-        $this->storeEvents = (bool)($config['store_events'] ?? true);
+        $this->enabled = (bool) ($config['enabled'] ?? true);
+        $this->schemas = (array) ($config['schemas'] ?? []);
+        $this->storeEvents = (bool) ($config['store_events'] ?? true);
     }
 
     public function emit(string $event, array $payload): bool
     {
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             return false;
         }
 
@@ -39,6 +41,7 @@ class TelemetryService
                     'event' => $event,
                     'errors' => $validator->errors()->toArray(),
                 ]);
+
                 return false;
             }
         }
@@ -52,6 +55,7 @@ class TelemetryService
 
         $this->aggregate($event, $payload);
         $this->persist($event, $payload);
+
         return true;
     }
 

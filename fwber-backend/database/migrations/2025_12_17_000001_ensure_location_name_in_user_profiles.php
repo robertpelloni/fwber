@@ -14,17 +14,17 @@ return new class extends Migration
     {
         Schema::table('user_profiles', function (Blueprint $table) {
             // Ensure latitude exists
-            if (!Schema::hasColumn('user_profiles', 'latitude')) {
+            if (! Schema::hasColumn('user_profiles', 'latitude')) {
                 $table->decimal('latitude', 10, 8)->nullable();
             }
 
             // Ensure longitude exists
-            if (!Schema::hasColumn('user_profiles', 'longitude')) {
+            if (! Schema::hasColumn('user_profiles', 'longitude')) {
                 $table->decimal('longitude', 11, 8)->nullable();
             }
 
             // Ensure location_name exists
-            if (!Schema::hasColumn('user_profiles', 'location_name')) {
+            if (! Schema::hasColumn('user_profiles', 'location_name')) {
                 if (Schema::hasColumn('user_profiles', 'longitude')) {
                     $table->string('location_name')->nullable()->after('longitude');
                 } else {

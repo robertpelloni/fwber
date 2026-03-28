@@ -24,12 +24,12 @@ class UpdateProfileRequest extends FormRequest
             'display_name' => 'sometimes|nullable|string|max:50',
             'avatar_url' => 'sometimes|nullable|string|max:2048',
             'bio' => 'sometimes|nullable|string|max:500',
-            'birthdate' => 'sometimes|nullable|date|before_or_equal:' . now()->subYears(18)->toDateString() . '|after:1900-01-01',
+            'birthdate' => 'sometimes|nullable|date|before_or_equal:'.now()->subYears(18)->toDateString().'|after:1900-01-01',
             'gender' => 'sometimes|nullable|string|in:male,female,non-binary,mtf,ftm,other,prefer-not-to-say',
             'pronouns' => 'sometimes|nullable|string|in:he/him,she/her,they/them,he/they,she/they,other,prefer-not-to-say',
             'sexual_orientation' => 'sometimes|nullable|string|in:straight,gay,lesbian,bisexual,pansexual,asexual,demisexual,queer,questioning,other,prefer-not-to-say',
             'relationship_style' => 'sometimes|nullable|string|in:monogamous,non-monogamous,polyamorous,open,swinger,other,prefer-not-to-say',
-            
+
             // Physical
             'height_cm' => 'sometimes|nullable|integer|min:50|max:300',
             'body_type' => 'sometimes|nullable|string|in:slim,athletic,average,curvy,plus-size,plus_size,muscular,heavyset,dad_bod',
@@ -44,13 +44,13 @@ class UpdateProfileRequest extends FormRequest
             'dominant_hand' => 'sometimes|nullable|string',
             'fitness_level' => 'sometimes|nullable|string',
             'clothing_style' => 'sometimes|nullable|string',
-            
+
             // Intimate
             'penis_length_cm' => 'sometimes|nullable|numeric|min:0|max:50',
             'penis_girth_cm' => 'sometimes|nullable|numeric|min:0|max:50',
             'fetishes' => 'sometimes|nullable|array',
             'sti_status' => 'sometimes|nullable|array',
-            
+
             // Lifestyle
             'occupation' => 'sometimes|nullable|string|max:100',
             'education' => 'sometimes|nullable|string',
@@ -66,7 +66,7 @@ class UpdateProfileRequest extends FormRequest
             'has_pets' => 'sometimes|nullable|boolean',
             'languages' => 'sometimes|nullable|array',
             'interests' => 'sometimes|nullable|array',
-            
+
             // Social & Personality
             'love_language' => 'sometimes|nullable|string|in:words_of_affirmation,acts_of_service,receiving_gifts,quality_time,physical_touch',
             'personality_type' => 'sometimes|nullable|string|size:4', // MBTI
@@ -74,11 +74,11 @@ class UpdateProfileRequest extends FormRequest
             'religion' => 'sometimes|nullable|string',
             'sleep_schedule' => 'sometimes|nullable|string',
             'social_media' => 'sometimes|nullable|array',
-            
+
             'looking_for' => 'sometimes|nullable|array',
-            "looking_for.*" => 'string|in:friendship,friends,dating,relationship,casual,marriage,networking',
+            'looking_for.*' => 'string|in:friendship,friends,dating,relationship,casual,marriage,networking',
             'interested_in' => 'sometimes|nullable|array',
-            
+
             'location' => 'sometimes|nullable|array',
             'location.latitude' => 'sometimes|numeric|between:-90,90',
             'location.longitude' => 'sometimes|numeric|between:-180,180',

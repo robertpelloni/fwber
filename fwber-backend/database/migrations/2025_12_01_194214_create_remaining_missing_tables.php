@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('match_actions')) {
+        if (! Schema::hasTable('match_actions')) {
             Schema::create('match_actions', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
@@ -22,7 +22,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('device_tokens')) {
+        if (! Schema::hasTable('device_tokens')) {
             Schema::create('device_tokens', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
@@ -32,7 +32,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('group_moderation_events')) {
+        if (! Schema::hasTable('group_moderation_events')) {
             Schema::create('group_moderation_events', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('group_id')->constrained('groups')->onDelete('cascade');
@@ -46,7 +46,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('user_locations')) {
+        if (! Schema::hasTable('user_locations')) {
             Schema::create('user_locations', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
@@ -63,7 +63,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('user_physical_profiles')) {
+        if (! Schema::hasTable('user_physical_profiles')) {
             Schema::create('user_physical_profiles', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained('users')->onDelete('cascade');

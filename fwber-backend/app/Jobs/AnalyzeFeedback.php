@@ -31,16 +31,16 @@ class AnalyzeFeedback implements ShouldQueue
     {
         $feedback = Feedback::find($this->feedbackId);
 
-        if (!$feedback) {
+        if (! $feedback) {
             return;
         }
 
         try {
             $prompt = $this->buildPrompt($feedback);
-            
+
             $response = $llmManager->driver()->chat([
                 ['role' => 'system', 'content' => 'You are a product manager assistant. Analyze the user feedback and categorize it.'],
-                ['role' => 'user', 'content' => $prompt]
+                ['role' => 'user', 'content' => $prompt],
             ], ['temperature' => 0.3]);
 
             $analysis = $this->parseResponse($response->content);
@@ -54,7 +54,7 @@ class AnalyzeFeedback implements ShouldQueue
             ]);
 
         } catch (\Exception $e) {
-            Log::error("AnalyzeFeedback Job Failed: " . $e->getMessage());
+            Log::error('AnalyzeFeedback Job Failed: '.$e->getMessage());
         }
     }
 
@@ -87,7 +87,7 @@ EOT;
         return [
             'category' => 'general',
             'sentiment' => 'neutral',
-            'summary' => 'Could not parse analysis.'
+            'summary' => 'Could not parse analysis.',
         ];
     }
 }

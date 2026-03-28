@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\MatchBounty;
-use App\Models\MatchAssist;
-use App\Services\TokenDistributionService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use App\Http\Requests\Bounty\StoreBountyRequest;
 use App\Http\Requests\Bounty\SuggestCandidateRequest;
+use App\Models\MatchAssist;
+use App\Models\MatchBounty;
+use App\Services\TokenDistributionService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class MatchBountyController extends Controller
 {
@@ -78,7 +78,7 @@ class MatchBountyController extends Controller
                 $this->tokenDistributionService->spendTokens(
                     $user,
                     $tokenReward,
-                    "Escrow for Match Bounty creation"
+                    'Escrow for Match Bounty creation'
                 );
 
                 $slug = Str::random(8);
@@ -97,11 +97,12 @@ class MatchBountyController extends Controller
 
                 return response()->json([
                     'message' => 'Bounty created successfully',
-                    'bounty' => $bounty
+                    'bounty' => $bounty,
                 ], 201);
             });
         } catch (\Exception $e) {
-            Log::error("Failed to create match bounty: " . $e->getMessage());
+            Log::error('Failed to create match bounty: '.$e->getMessage());
+
             return response()->json(['message' => 'Failed to create bounty.'], 500);
         }
     }
@@ -114,7 +115,7 @@ class MatchBountyController extends Controller
         $bounty = MatchBounty::with(['user:id,name,avatar_url'])->where('slug', $slug)->firstOrFail();
 
         return response()->json([
-            'bounty' => $bounty
+            'bounty' => $bounty,
         ]);
     }
 
@@ -124,7 +125,7 @@ class MatchBountyController extends Controller
     public function suggest(SuggestCandidateRequest $request, $slug)
     {
         $bounty = MatchBounty::where('slug', $slug)->firstOrFail();
-        
+
         if ($bounty->status !== 'active') {
             return response()->json(['message' => 'This bounty is no longer active.'], 400);
         }
@@ -140,7 +141,7 @@ class MatchBountyController extends Controller
         if ($candidateId == $bounty->user_id) {
             return response()->json(['message' => 'You cannot suggest the bounty creator to themselves.'], 400);
         }
-        
+
         // Prevent matchmaker from suggesting themselves to the bounty creator?
         // Actually, maybe that's allowed? "I'm the match!"
         // For now, let's allow it unless specific logic forbids.
@@ -152,7 +153,7 @@ class MatchBountyController extends Controller
             ->first();
 
         if ($existing) {
-             return response()->json(['message' => 'You have already suggested this candidate.'], 409);
+            return response()->json(['message' => 'You have already suggested this candidate.'], 409);
         }
 
         $assist = MatchAssist::create([
@@ -164,12 +165,12 @@ class MatchBountyController extends Controller
         ]);
 
         // In a real implementation, we would likely link the MatchAssist to the MatchBounty
-        // so we know which suggestion claimed the reward. 
+        // so we know which suggestion claimed the reward.
         // For this step, we'll assume the MatchAssist creation is enough to trigger the notification flow later.
 
         return response()->json([
             'message' => 'Candidate suggested successfully!',
-            'assist' => $assist
+            'assist' => $assist,
         ], 201);
     }
 }

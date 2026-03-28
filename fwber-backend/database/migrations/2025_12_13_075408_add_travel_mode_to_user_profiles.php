@@ -29,7 +29,7 @@ return new class extends Migration
                 'is_travel_mode',
                 'travel_latitude',
                 'travel_longitude',
-                'travel_location_name'
+                'travel_location_name',
             ]);
         });
     }

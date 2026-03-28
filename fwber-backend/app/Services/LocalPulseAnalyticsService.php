@@ -43,14 +43,15 @@ class LocalPulseAnalyticsService
 
             try {
                 $analysis = $this->analyzeCorpusWithAi($corpus);
-                
+
                 return array_merge($analysis, [
                     'activity_score' => $recentPosts->count() * 2, // Simple count-based score
                     'post_count' => $recentPosts->count(),
                     'last_updated' => now()->toISOString(),
                 ]);
             } catch (\Throwable $e) {
-                Log::error("Vibe analysis AI failure: " . $e->getMessage());
+                Log::error('Vibe analysis AI failure: '.$e->getMessage());
+
                 return [
                     'vibe' => 'Active',
                     'sentiment' => 0.6,
@@ -77,7 +78,7 @@ class LocalPulseAnalyticsService
 
         $response = $this->llmManager->driver('openai')->chat([
             ['role' => 'system', 'content' => 'You are an expert neighborhood sentiment analyst.'],
-            ['role' => 'user', 'content' => $prompt]
+            ['role' => 'user', 'content' => $prompt],
         ]);
 
         return json_decode($response, true) ?? [];

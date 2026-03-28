@@ -2,10 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
-use App\Models\UserProfile;
-use App\Models\Venue;
 use App\Helpers\GeohashHelper;
+use App\Models\User;
+use App\Models\Venue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
@@ -17,7 +16,7 @@ class ZKProximityFeatureTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Mock the hardware secret key config used by the service
         config(['app.key' => 'fwber-zk-hardware-enclave-secret']);
     }
@@ -38,7 +37,7 @@ class ZKProximityFeatureTest extends TestCase
         $timestamp = time();
 
         // Generate HMAC signature mimicking frontend
-        $signatureStr = $geohash . $timestamp . $venue->id;
+        $signatureStr = $geohash.$timestamp.$venue->id;
         $signature = hash_hmac('sha256', $signatureStr, 'fwber-zk-hardware-enclave-secret');
 
         $payload = [
@@ -58,10 +57,10 @@ class ZKProximityFeatureTest extends TestCase
         $response = $this->postJson('/api/proximity/zk-verify', $payload);
 
         $response->assertStatus(200)
-                 ->assertJson([
-                     'message' => 'Proximity Cryptographically Verified',
-                     'verified' => true,
-                 ]);
+            ->assertJson([
+                'message' => 'Proximity Cryptographically Verified',
+                'verified' => true,
+            ]);
 
         $this->assertDatabaseHas('zk_proximity_proofs', [
             'user_id' => $user->id,
@@ -98,10 +97,10 @@ class ZKProximityFeatureTest extends TestCase
         $response = $this->postJson('/api/proximity/zk-verify', $payload);
 
         $response->assertStatus(422)
-                 ->assertJson([
-                     'verified' => false,
-                 ]);
-                 
+            ->assertJson([
+                'verified' => false,
+            ]);
+
         $this->assertDatabaseMissing('zk_proximity_proofs', [
             'user_id' => $user->id,
         ]);
@@ -114,13 +113,13 @@ class ZKProximityFeatureTest extends TestCase
 
         // Target venue is in New York
         $venue = Venue::factory()->create(['latitude' => 40.7128, 'longitude' => -74.0060]);
-        
+
         // User claims to be in London
         $londonGeohash = GeohashHelper::encode(51.5074, -0.1278, 6);
         $timestamp = time();
 
         // Sign the malicious geohash correctly (simulating a spoofed client)
-        $signatureStr = $londonGeohash . $timestamp . $venue->id;
+        $signatureStr = $londonGeohash.$timestamp.$venue->id;
         $signature = hash_hmac('sha256', $signatureStr, 'fwber-zk-hardware-enclave-secret');
 
         $payload = [
@@ -140,9 +139,9 @@ class ZKProximityFeatureTest extends TestCase
         $response = $this->postJson('/api/proximity/zk-verify', $payload);
 
         $response->assertStatus(422)
-                 ->assertJson([
-                     'verified' => false,
-                 ]);
+            ->assertJson([
+                'verified' => false,
+            ]);
     }
 
     public function test_zk_proof_rejected_with_stale_timestamp_replay()
@@ -152,11 +151,11 @@ class ZKProximityFeatureTest extends TestCase
 
         $venue = Venue::factory()->create(['latitude' => 40.7128, 'longitude' => -74.0060]);
         $geohash = GeohashHelper::encode($venue->latitude, $venue->longitude, 6);
-        
+
         // Timestamp from 1 hour ago
         $timestamp = time() - 3600;
 
-        $signatureStr = $geohash . $timestamp . $venue->id;
+        $signatureStr = $geohash.$timestamp.$venue->id;
         $signature = hash_hmac('sha256', $signatureStr, 'fwber-zk-hardware-enclave-secret');
 
         $payload = [
@@ -176,8 +175,8 @@ class ZKProximityFeatureTest extends TestCase
         $response = $this->postJson('/api/proximity/zk-verify', $payload);
 
         $response->assertStatus(422)
-                 ->assertJson([
-                     'verified' => false,
-                 ]);
+            ->assertJson([
+                'verified' => false,
+            ]);
     }
 }

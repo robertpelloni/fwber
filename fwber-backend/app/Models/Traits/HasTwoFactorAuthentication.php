@@ -25,14 +25,14 @@ trait HasTwoFactorAuthentication
     {
         $this->forceFill([
             'two_factor_recovery_codes' => encrypt(json_encode(collect(range(1, 8))->map(function () {
-                return \Illuminate\Support\Str::random(10) . '-' . \Illuminate\Support\Str::random(10);
+                return \Illuminate\Support\Str::random(10).'-'.\Illuminate\Support\Str::random(10);
             })->all())),
         ])->save();
     }
 
     public function twoFactorQrCodeSvg(): string
     {
-        $google2fa = new Google2FA();
+        $google2fa = new Google2FA;
 
         return $google2fa->getQRCodeInline(
             config('app.name'),
@@ -43,7 +43,7 @@ trait HasTwoFactorAuthentication
 
     public function twoFactorQrCodeUrl(): string
     {
-        $google2fa = new Google2FA();
+        $google2fa = new Google2FA;
 
         return $google2fa->getQRCodeUrl(
             config('app.name'),

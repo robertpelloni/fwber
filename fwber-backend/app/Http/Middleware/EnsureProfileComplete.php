@@ -17,7 +17,7 @@ class EnsureProfileComplete
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'message' => 'Unauthenticated',
             ], 401);
@@ -25,8 +25,8 @@ class EnsureProfileComplete
 
         // Check if profile exists
         $profile = $user->profile;
-        
-        if (!$profile) {
+
+        if (! $profile) {
             return response()->json([
                 'message' => 'Profile not found. Please complete your profile to continue.',
                 'required_fields' => [
@@ -57,17 +57,17 @@ class EnsureProfileComplete
         }
 
         // Check for location (either description or coordinates)
-        $hasLocation = !empty($profile->location_description) || 
-                      (!empty($profile->location_latitude) && !empty($profile->location_longitude));
-        
-        if (!$hasLocation) {
+        $hasLocation = ! empty($profile->location_description) ||
+                      (! empty($profile->location_latitude) && ! empty($profile->location_longitude));
+
+        if (! $hasLocation) {
             $missingFields[] = [
                 'field' => 'location',
                 'label' => 'Location',
             ];
         }
 
-        if (!empty($missingFields)) {
+        if (! empty($missingFields)) {
             return response()->json([
                 'message' => 'Please complete your profile before accessing this feature.',
                 'missing_fields' => $missingFields,

@@ -2,19 +2,18 @@
 
 namespace App\Services;
 
+use App\Events\GroupMemberBanned;
+use App\Events\GroupMemberKicked;
+use App\Events\GroupMemberMuted;
+use App\Events\GroupMemberUnbanned;
+use App\Events\GroupMemberUnmuted;
+use App\Events\GroupOwnershipTransferred;
+use App\Events\GroupRoleChanged;
 use App\Models\Group;
 use App\Models\GroupMember;
 use App\Models\GroupModerationEvent;
-use App\Events\GroupRoleChanged;
-use App\Events\GroupOwnershipTransferred;
-use App\Events\GroupMemberBanned;
-use App\Events\GroupMemberUnbanned;
-use App\Events\GroupMemberMuted;
-use App\Events\GroupMemberUnmuted;
-use App\Events\GroupMemberKicked;
-use Illuminate\Support\Facades\DB;
-use App\Services\TokenDistributionService;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class GroupService
 {
@@ -142,7 +141,7 @@ class GroupService
         if ($group->chatroom_id) {
             $chatroom = \App\Models\Chatroom::find($group->chatroom_id);
             $user = \App\Models\User::find($userId);
-            if ($chatroom && $user && !$chatroom->hasMember($user)) {
+            if ($chatroom && $user && ! $chatroom->hasMember($user)) {
                 $chatroom->addMember($user, 'member');
             }
         }
@@ -152,7 +151,7 @@ class GroupService
     {
         $member = $group->activeMembers()->where('user_id', $userId)->first();
 
-        if (!$member) {
+        if (! $member) {
             throw new \Exception('Not a member', 400);
         }
 
@@ -178,12 +177,12 @@ class GroupService
     public function setMemberRole(Group $group, int $actorId, int $memberUserId, string $newRole): void
     {
         $actor = $group->activeMembers()->where('user_id', $actorId)->first();
-        if (!$actor) {
+        if (! $actor) {
             throw new \Exception('Unauthorized', 403);
         }
 
         $target = $group->activeMembers()->where('user_id', $memberUserId)->first();
-        if (!$target) {
+        if (! $target) {
             throw new \Exception('Member not found or inactive', 404);
         }
 
@@ -197,6 +196,7 @@ class GroupService
                 return;
             }
             $this->updateRole($group, $actorId, $target, $newRole);
+
             return;
         }
 
@@ -206,6 +206,7 @@ class GroupService
                     return;
                 }
                 $this->updateRole($group, $actorId, $target, $newRole);
+
                 return;
             }
             throw new \Exception('Admins cannot assign admin role', 403);
@@ -219,7 +220,7 @@ class GroupService
         $target->role = $newRole;
         $target->role_changed_at = now();
         $target->save();
-        
+
         GroupModerationEvent::create([
             'group_id' => $group->id,
             'actor_user_id' => $actorId,
@@ -229,19 +230,19 @@ class GroupService
             'metadata' => ['new_role' => $newRole],
             'occurred_at' => now(),
         ]);
-        
+
         event(new GroupRoleChanged($group->id, $actorId, $target->user_id, $newRole));
     }
 
     public function transferOwnership(Group $group, int $actorId, int $newOwnerUserId): void
     {
         $actor = $group->activeMembers()->where('user_id', $actorId)->first();
-        if (!$actor || !$actor->isOwner()) {
+        if (! $actor || ! $actor->isOwner()) {
             throw new \Exception('Only owner can transfer ownership', 403);
         }
 
         $target = $group->activeMembers()->where('user_id', $newOwnerUserId)->first();
-        if (!$target) {
+        if (! $target) {
             throw new \Exception('Target user is not an active member', 400);
         }
 
@@ -267,19 +268,19 @@ class GroupService
             'metadata' => ['from' => $actorId, 'to' => $target->user_id],
             'occurred_at' => now(),
         ]);
-        
+
         event(new GroupOwnershipTransferred($group->id, $actorId, $target->user_id));
     }
 
     public function banMember(Group $group, int $actorId, int $memberUserId, ?string $reason): void
     {
         $actor = $group->activeMembers()->where('user_id', $actorId)->first();
-        if (!$actor || !$actor->isAdmin()) {
+        if (! $actor || ! $actor->isAdmin()) {
             throw new \Exception('Unauthorized', 403);
         }
 
         $target = $group->members()->where('user_id', $memberUserId)->orderByDesc('id')->first();
-        if (!$target) {
+        if (! $target) {
             throw new \Exception('Member not found', 404);
         }
         if ($target->isOwner()) {
@@ -289,7 +290,7 @@ class GroupService
         if ($target->is_banned) {
             return;
         }
-        
+
         $target->is_banned = true;
         $target->is_active = false;
         $target->left_at = now();
@@ -307,26 +308,26 @@ class GroupService
             'metadata' => null,
             'occurred_at' => now(),
         ]);
-        
+
         event(new GroupMemberBanned($group->id, $actorId, $memberUserId, $reason));
     }
 
     public function unbanMember(Group $group, int $actorId, int $memberUserId): void
     {
         $actor = $group->activeMembers()->where('user_id', $actorId)->first();
-        if (!$actor || !$actor->isAdmin()) {
+        if (! $actor || ! $actor->isAdmin()) {
             throw new \Exception('Unauthorized', 403);
         }
 
         $target = $group->members()->where('user_id', $memberUserId)->orderByDesc('id')->first();
-        if (!$target) {
+        if (! $target) {
             throw new \Exception('Member not found', 404);
         }
 
-        if (!$target->is_banned) {
+        if (! $target->is_banned) {
             return;
         }
-        
+
         $target->is_banned = false;
         $target->banned_reason = null;
         $target->banned_at = null;
@@ -342,19 +343,19 @@ class GroupService
             'metadata' => null,
             'occurred_at' => now(),
         ]);
-        
+
         event(new GroupMemberUnbanned($group->id, $actorId, $memberUserId));
     }
 
     public function muteMember(Group $group, int $actorId, int $memberUserId, ?int $durationMinutes, ?string $untilStr, ?string $reason): string
     {
         $actor = $group->activeMembers()->where('user_id', $actorId)->first();
-        if (!$actor || !$actor->isAdmin()) {
+        if (! $actor || ! $actor->isAdmin()) {
             throw new \Exception('Unauthorized', 403);
         }
 
         $target = $group->activeMembers()->where('user_id', $memberUserId)->first();
-        if (!$target) {
+        if (! $target) {
             throw new \Exception('Member not found or inactive', 404);
         }
         if ($target->isOwner()) {
@@ -362,13 +363,13 @@ class GroupService
         }
 
         $until = null;
-        if (!empty($untilStr)) {
+        if (! empty($untilStr)) {
             $until = \Carbon\Carbon::parse($untilStr);
-        } elseif (!empty($durationMinutes)) {
+        } elseif (! empty($durationMinutes)) {
             $until = now()->addMinutes($durationMinutes);
         }
 
-        if (!$until) {
+        if (! $until) {
             $until = now()->addHour(); // default 1 hour
         }
 
@@ -376,7 +377,7 @@ class GroupService
         if ($target->is_muted && $target->muted_until && $until && $target->muted_until >= $until && (($target->mute_reason ?? null) === ($reason ?? null))) {
             return $target->muted_until->toIso8601String();
         }
-        
+
         $target->is_muted = true;
         $target->muted_until = $until;
         $target->mute_reason = $reason ?? null;
@@ -392,28 +393,28 @@ class GroupService
             'metadata' => ['muted_until' => $until->toIso8601String()],
             'occurred_at' => now(),
         ]);
-        
+
         event(new GroupMemberMuted($group->id, $actorId, $memberUserId, $until->toIso8601String(), $reason ?? null));
-        
+
         return $until->toIso8601String();
     }
 
     public function unmuteMember(Group $group, int $actorId, int $memberUserId): void
     {
         $actor = $group->activeMembers()->where('user_id', $actorId)->first();
-        if (!$actor || !$actor->isAdmin()) {
+        if (! $actor || ! $actor->isAdmin()) {
             throw new \Exception('Unauthorized', 403);
         }
 
         $target = $group->members()->where('user_id', $memberUserId)->orderByDesc('id')->first();
-        if (!$target) {
+        if (! $target) {
             throw new \Exception('Member not found', 404);
         }
 
-        if (!$target->is_muted) {
+        if (! $target->is_muted) {
             return;
         }
-        
+
         $target->is_muted = false;
         $target->muted_until = null;
         $target->mute_reason = null;
@@ -429,19 +430,19 @@ class GroupService
             'metadata' => null,
             'occurred_at' => now(),
         ]);
-        
+
         event(new GroupMemberUnmuted($group->id, $actorId, $memberUserId));
     }
 
     public function kickMember(Group $group, int $actorId, int $memberUserId): void
     {
         $actor = $group->activeMembers()->where('user_id', $actorId)->first();
-        if (!$actor || !$actor->isAdmin()) {
+        if (! $actor || ! $actor->isAdmin()) {
             throw new \Exception('Unauthorized', 403);
         }
 
         $target = $group->activeMembers()->where('user_id', $memberUserId)->first();
-        if (!$target) {
+        if (! $target) {
             throw new \Exception('Member not found or inactive', 404);
         }
         if ($target->isOwner()) {
@@ -461,7 +462,7 @@ class GroupService
             'metadata' => null,
             'occurred_at' => now(),
         ]);
-        
+
         event(new GroupMemberKicked($group->id, $actorId, $memberUserId));
     }
 }

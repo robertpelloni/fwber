@@ -15,10 +15,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('proximity_artifacts', function (Blueprint $table) {
-            if (!Schema::hasColumn('proximity_artifacts', 'is_flagged')) {
+            if (! Schema::hasColumn('proximity_artifacts', 'is_flagged')) {
                 $table->boolean('is_flagged')->default(false);
             }
-            if (!Schema::hasColumn('proximity_artifacts', 'flag_count')) {
+            if (! Schema::hasColumn('proximity_artifacts', 'flag_count')) {
                 $table->integer('flag_count')->default(0);
             }
         });

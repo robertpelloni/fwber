@@ -16,7 +16,7 @@ class AuthenticateApi
 
         // Support standard session-based auth for tests using actingAs() where no bearer token is supplied.
         // If a user is already authenticated AND no Authorization header is present, bypass token check.
-        if (auth()->check() && !str_starts_with($header, 'Bearer ')) {
+        if (auth()->check() && ! str_starts_with($header, 'Bearer ')) {
             return $next($request);
         }
 
@@ -24,8 +24,9 @@ class AuthenticateApi
             SecurityLog::authFailed([
                 'reason' => 'Missing Bearer header',
                 'ip' => $request->ip(),
-                'user_agent' => $request->userAgent()
+                'user_agent' => $request->userAgent(),
             ]);
+
             return $this->unauthorized();
         }
 
@@ -35,8 +36,9 @@ class AuthenticateApi
             SecurityLog::authFailed([
                 'reason' => 'Empty token',
                 'ip' => $request->ip(),
-                'user_agent' => $request->userAgent()
+                'user_agent' => $request->userAgent(),
             ]);
+
             return $this->unauthorized();
         }
 
@@ -62,8 +64,9 @@ class AuthenticateApi
                 SecurityLog::authSuccess([
                     'type' => 'dev_bypass',
                     'user_id' => $user->id,
-                    'ip' => $request->ip()
+                    'ip' => $request->ip(),
                 ]);
+
                 return $next($request);
             }
         }
@@ -76,8 +79,9 @@ class AuthenticateApi
                 'reason' => 'Invalid token',
                 'ip' => $request->ip(),
                 'user_agent' => $request->userAgent(),
-                'token_prefix' => substr($plainToken, 0, 8) . '...'
+                'token_prefix' => substr($plainToken, 0, 8).'...',
             ]);
+
             return $this->unauthorized();
         }
 
@@ -87,8 +91,9 @@ class AuthenticateApi
             SecurityLog::tokenExpired([
                 'user_id' => $apiToken->user->id,
                 'ip' => $request->ip(),
-                'token_created_at' => $apiToken->created_at->toIso8601String()
+                'token_created_at' => $apiToken->created_at->toIso8601String(),
             ]);
+
             return response()->json(['message' => 'Token expired. Please login again.'], 401);
         }
 
@@ -99,7 +104,7 @@ class AuthenticateApi
         SecurityLog::authSuccess([
             'user_id' => $apiToken->user->id,
             'ip' => $request->ip(),
-            'user_agent' => $request->userAgent()
+            'user_agent' => $request->userAgent(),
         ]);
 
         return $next($request);

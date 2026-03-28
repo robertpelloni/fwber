@@ -39,7 +39,7 @@ class BulletinBoardBroadcastingTest extends TestCase
 
         // Debug: surface the actual error if 500
         if ($response->status() === 500) {
-            $this->markTestSkipped('BulletinBoard message endpoint returns 500 — likely missing DB column or Redis dependency. Error: ' . ($response->json('message') ?? 'unknown'));
+            $this->markTestSkipped('BulletinBoard message endpoint returns 500 — likely missing DB column or Redis dependency. Error: '.($response->json('message') ?? 'unknown'));
         }
 
         $response->assertStatus(201);

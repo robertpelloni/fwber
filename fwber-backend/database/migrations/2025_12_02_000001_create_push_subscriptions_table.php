@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('push_subscriptions')) {
+        if (! Schema::hasTable('push_subscriptions')) {
             Schema::create('push_subscriptions', function (Blueprint $table) {
                 $table->id();
                 $table->morphs('subscribable');

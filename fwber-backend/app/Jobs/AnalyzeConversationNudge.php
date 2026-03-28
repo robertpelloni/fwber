@@ -2,10 +2,10 @@
 
 namespace App\Jobs;
 
-use App\Models\User;
-use App\Models\Message;
-use App\Services\AiWingmanService;
 use App\Events\ConversationNudged;
+use App\Models\Message;
+use App\Models\User;
+use App\Services\AiWingmanService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -18,6 +18,7 @@ class AnalyzeConversationNudge implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $receiverId;
+
     public int $senderId;
 
     /**
@@ -38,21 +39,21 @@ class AnalyzeConversationNudge implements ShouldQueue
             $user = User::find($this->receiverId);
             $match = User::find($this->senderId);
 
-            if (!$user || !$match) {
+            if (! $user || ! $match) {
                 return;
             }
 
             // Fetch recent history (last 15 messages)
-            $messages = Message::where(function($q) use ($user, $match) {
-                    $q->where('sender_id', $user->id)->where('receiver_id', $match->id);
-                })
-                ->orWhere(function($q) use ($user, $match) {
+            $messages = Message::where(function ($q) use ($user, $match) {
+                $q->where('sender_id', $user->id)->where('receiver_id', $match->id);
+            })
+                ->orWhere(function ($q) use ($user, $match) {
                     $q->where('sender_id', $match->id)->where('receiver_id', $user->id);
                 })
                 ->orderBy('created_at', 'asc') // Oldest first for context narrative
                 ->take(15)
                 ->get()
-                ->map(function($msg) {
+                ->map(function ($msg) {
                     return [
                         'sender_id' => $msg->sender_id,
                         'content' => $msg->content,
@@ -74,7 +75,7 @@ class AnalyzeConversationNudge implements ShouldQueue
             }
 
         } catch (\Exception $e) {
-            Log::error("AnalyzeConversationNudge Job Failed: " . $e->getMessage());
+            Log::error('AnalyzeConversationNudge Job Failed: '.$e->getMessage());
         }
     }
 }

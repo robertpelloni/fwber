@@ -12,6 +12,7 @@ class PerformanceAlertNotification extends Notification implements ShouldQueue
     use Queueable;
 
     protected array $slowEndpoints;
+
     protected string $period;
 
     /**

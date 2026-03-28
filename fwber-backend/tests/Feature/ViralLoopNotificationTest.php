@@ -4,8 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Models\ViralContent;
-use App\Services\TokenDistributionService;
 use App\Notifications\PushMessage;
+use App\Services\TokenDistributionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
@@ -19,7 +19,7 @@ class ViralLoopNotificationTest extends TestCase
         Notification::fake();
 
         $user = User::factory()->create(['referral_code' => 'TESTTOKEN']);
-        $service = new TokenDistributionService();
+        $service = new TokenDistributionService;
 
         $service->awardTokens($user, 100, 'test_bonus', 'Test Bonus');
 

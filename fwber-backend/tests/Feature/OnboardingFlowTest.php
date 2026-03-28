@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use App\Models\UserProfile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -17,19 +16,19 @@ class OnboardingFlowTest extends TestCase
     {
         config(['app.avatar_mode' => 'upload']);
         Storage::fake('public');
-        
+
         $user = User::factory()->create();
-        
+
         $file = UploadedFile::fake()->image('photo.jpg');
         $response = $this->actingAs($user)->postJson('/api/photos', [
             'photo' => $file,
-            'is_private' => false
+            'is_private' => false,
         ]);
-        
+
         $response->assertStatus(201);
-        
+
         $listResponse = $this->actingAs($user)->getJson('/api/photos');
-        
+
         $listResponse->assertStatus(200);
         $listResponse->assertJsonCount(1, 'data');
         // The controller might use UUIDs or hash names, so just check the extension and existence

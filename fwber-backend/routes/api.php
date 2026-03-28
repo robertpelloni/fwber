@@ -1,34 +1,14 @@
 <?php
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\AnalyticsController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\BulletinBoardController;
-use App\Http\Controllers\ChatroomController;
-use App\Http\Controllers\ChatroomMessageController;
-use App\Http\Controllers\ContentGenerationController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\LocationController;
-use App\Http\Controllers\MatchController;
-use App\Http\Controllers\PhotoController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ProfileViewController;
-use App\Http\Controllers\ProximityChatroomController;
-use App\Http\Controllers\ProximityChatroomMessageController;
-use App\Http\Controllers\RateLimitController;
-use App\Http\Controllers\RecommendationController;
-use App\Http\Controllers\HealthController;
-use App\Http\Controllers\RelationshipTierController;
-use App\Http\Controllers\UserPhysicalProfileController;
 use App\Http\Controllers\BlockController;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\WebSocketController;
-use App\Http\Controllers\ProximityArtifactController;
-use App\Http\Controllers\ModerationController;
+use App\Http\Controllers\BulletinBoardController;
 use App\Http\Controllers\DeviceTokenController;
-use App\Http\Controllers\FriendController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\FriendController;
+use App\Http\Controllers\LocationController;
+use App\Http\Controllers\ReportController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,7 +31,7 @@ Route::prefix('federation')->group(function () {
     // Will bypass standard sanctum auth, requires Http Signature validation instead
     Route::post('users/{id}/inbox', [\App\Http\Controllers\ActivityPubInboxController::class, 'handle']);
     Route::get('users/{id}/outbox', [\App\Http\Controllers\ActivityPubOutboxController::class, 'index']);
-    
+
     // Return Actor profile
     Route::get('users/{id}', [\App\Http\Controllers\ActivityPubController::class, 'actor']);
 });
@@ -72,7 +52,7 @@ Route::post('telemetry/client-events', [\App\Http\Controllers\TelemetryControlle
 Route::post('analytics/events', [\App\Http\Controllers\AnalyticsController::class, 'store']);
 
 // Public Debug Route (No Auth)
-if (!app()->isProduction()) {
+if (! app()->isProduction()) {
     Route::get('debug/public', function () {
         return response()->json([
             'status' => 'ok',
@@ -85,6 +65,7 @@ if (!app()->isProduction()) {
     Route::get('debug/user', function (Request $request) {
         try {
             $user = $request->user();
+
             return response()->json([
                 'user' => $user,
                 'profile' => $user->profile,
@@ -96,7 +77,7 @@ if (!app()->isProduction()) {
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ], 500);
         }
     })->middleware('auth:sanctum');
@@ -236,7 +217,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('websocket/connections', [\App\Http\Controllers\WebSocketController::class, 'getUserConnections']);
     Route::get('websocket/status', [\App\Http\Controllers\WebSocketController::class, 'status']);
     Route::post('websocket/broadcast', [\App\Http\Controllers\WebSocketController::class, 'broadcast']);
-    
+
     // Pusher Auth
     Route::post('broadcasting/auth', function (Request $request) {
         return Broadcast::auth($request);
@@ -264,7 +245,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('analytics/slow-requests/analysis', [\App\Http\Controllers\AnalyticsController::class, 'analyzeSlowRequests']);
     Route::get('analytics/boosts', [\App\Http\Controllers\AnalyticsController::class, 'boosts']);
     Route::get('analytics/retention', [\App\Http\Controllers\AnalyticsController::class, 'retention']);
-    
+
     // Logs (Admin)
     Route::get('admin/logs', [\App\Http\Controllers\LogController::class, 'index']);
     Route::get('admin/logs/{filename}', [\App\Http\Controllers\LogController::class, 'show']);
@@ -344,7 +325,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('matches/{id}/insights', [\App\Http\Controllers\MatchInsightsController::class, 'show']);
     Route::post('matches/{id}/insights/unlock', [\App\Http\Controllers\MatchInsightsController::class, 'unlock']);
     Route::post('matches/action', [\App\Http\Controllers\MatchController::class, 'action'])->middleware('throttle:matching');
-    
+
     // Post-Date Feedback
     Route::post('matches/{matchId}/feedback', [\App\Http\Controllers\DateFeedbackController::class, 'store']);
     Route::get('matches/{matchId}/feedback', [\App\Http\Controllers\DateFeedbackController::class, 'show']);
@@ -360,8 +341,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Chatrooms
     Route::post('burner-links', [\App\Http\Controllers\BurnerLinkController::class, 'store']);
     Route::post('burner-links/{token}/join', [\App\Http\Controllers\BurnerLinkController::class, 'join']);
-    
-    // ZK-Proximity 
+
+    // ZK-Proximity
     Route::get('proximity/zk-params', [\App\Http\Controllers\ZKProximityController::class, 'params']);
     Route::post('proximity/zk-verify', [\App\Http\Controllers\ZKProximityController::class, 'verify']);
 
@@ -380,7 +361,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/{id}/leave', [\App\Http\Controllers\AudioRoomController::class, 'leave']);
         Route::post('/{id}/signal', [\App\Http\Controllers\AudioRoomController::class, 'signal']);
     });
-    
+
     Route::get('chatrooms/my', [\App\Http\Controllers\ChatroomController::class, 'myChatrooms']);
     Route::get('chatrooms/categories', [\App\Http\Controllers\ChatroomController::class, 'categories']);
     Route::get('chatrooms/popular', [\App\Http\Controllers\ChatroomController::class, 'popular']);
@@ -534,7 +515,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('wingman/compatibility-audit/{targetId}', [\App\Http\Controllers\AiWingmanController::class, 'compatibilityAudit']);
     });
 
-
     // Bulletin Board
     Route::get('bulletin-boards', [BulletinBoardController::class, 'index']);
     Route::post('bulletin-boards', [BulletinBoardController::class, 'createOrFind']);
@@ -554,7 +534,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('bounties', [\App\Http\Controllers\API\MatchBountyController::class, 'store']);
     Route::get('bounties/{slug}', [\App\Http\Controllers\API\MatchBountyController::class, 'show']);
     Route::get('bounties/{slug}/suggest', function ($slug) {
-         return response()->json(['message' => 'Use POST to suggest']);
+        return response()->json(['message' => 'Use POST to suggest']);
     });
     Route::post('bounties/{slug}/suggest', [\App\Http\Controllers\API\MatchBountyController::class, 'suggest']);
 
@@ -614,7 +594,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Matchmaker Bounty
     Route::post('matchmaker/bounty', [\App\Http\Controllers\MatchMakerController::class, 'createBounty']);
     Route::post('matchmaker/bounty/{slug}/suggest', [\App\Http\Controllers\MatchMakerController::class, 'suggest']);
-    
+
     // Share Unlock
     Route::post('share-unlock', [\App\Http\Controllers\ShareUnlockController::class, 'store']);
     Route::get('share-unlock/{targetProfileId}', [\App\Http\Controllers\ShareUnlockController::class, 'check']);

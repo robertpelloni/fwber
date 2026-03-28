@@ -2,8 +2,8 @@
 
 namespace App\Services\IpIntelligence\Drivers;
 
-use App\Services\IpIntelligence\IpIntelligenceInterface;
 use App\Services\IpIntelligence\DTOs\IpLocation;
+use App\Services\IpIntelligence\IpIntelligenceInterface;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -18,10 +18,10 @@ class IpApiDriver implements IpIntelligenceInterface
         try {
             // Using ip-api.com (free tier)
             $response = Http::timeout(5)->get("http://ip-api.com/json/{$ipAddress}?fields=status,message,country,city,lat,lon,isp,proxy,hosting");
-            
+
             if ($response->successful() && $response->json('status') === 'success') {
                 $data = $response->json();
-                
+
                 return new IpLocation(
                     latitude: (float) $data['lat'],
                     longitude: (float) $data['lon'],
@@ -35,7 +35,7 @@ class IpApiDriver implements IpIntelligenceInterface
                 );
             }
         } catch (\Exception $e) {
-            Log::warning("IP geolocation failed for {$ipAddress}: " . $e->getMessage());
+            Log::warning("IP geolocation failed for {$ipAddress}: ".$e->getMessage());
         }
 
         return null;

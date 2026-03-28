@@ -22,7 +22,7 @@ class BoostControllerTest extends TestCase
     public function test_can_purchase_standard_boost()
     {
         $user = User::factory()->create();
-        
+
         $mockGateway = Mockery::mock(PaymentGatewayInterface::class);
         $mockGateway->shouldReceive('charge')
             ->once()
@@ -34,7 +34,7 @@ class BoostControllerTest extends TestCase
         $response = $this->actingAs($user)
             ->postJson('/api/boosts/purchase', [
                 'type' => 'standard',
-                'payment_method_id' => 'tok_visa'
+                'payment_method_id' => 'tok_visa',
             ]);
 
         $response->assertStatus(200)
@@ -59,7 +59,7 @@ class BoostControllerTest extends TestCase
     public function test_can_purchase_super_boost()
     {
         $user = User::factory()->create();
-        
+
         $mockGateway = Mockery::mock(PaymentGatewayInterface::class);
         $mockGateway->shouldReceive('charge')
             ->once()
@@ -71,7 +71,7 @@ class BoostControllerTest extends TestCase
         $response = $this->actingAs($user)
             ->postJson('/api/boosts/purchase', [
                 'type' => 'super',
-                'payment_method_id' => 'tok_visa'
+                'payment_method_id' => 'tok_visa',
             ]);
 
         $response->assertStatus(200)
@@ -104,7 +104,7 @@ class BoostControllerTest extends TestCase
     public function test_handles_payment_failure()
     {
         $user = User::factory()->create();
-        
+
         $mockGateway = Mockery::mock(PaymentGatewayInterface::class);
         $mockGateway->shouldReceive('charge')
             ->once()
@@ -192,7 +192,7 @@ class BoostControllerTest extends TestCase
         $response = $this->actingAs($user)
             ->postJson('/api/boosts/purchase', [
                 'type' => 'standard',
-                'payment_method' => 'token'
+                'payment_method' => 'token',
             ]);
 
         $response->assertStatus(200)
@@ -216,7 +216,7 @@ class BoostControllerTest extends TestCase
         $response = $this->actingAs($user)
             ->postJson('/api/boosts/purchase', [
                 'type' => 'standard',
-                'payment_method' => 'token'
+                'payment_method' => 'token',
             ]);
 
         $response->assertStatus(400)

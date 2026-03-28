@@ -2,12 +2,12 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\DailyActiveUser;
+use App\Services\StreakService;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use App\Models\DailyActiveUser;
-use App\Services\StreakService;
 use Symfony\Component\HttpFoundation\Response;
 
 class TrackUserActivity
@@ -27,7 +27,7 @@ class TrackUserActivity
                 $today = now()->toDateString();
                 $cacheKey = "user_active:{$user->id}:{$today}";
 
-                if (!Cache::has($cacheKey)) {
+                if (! Cache::has($cacheKey)) {
                     // Record DAU
                     try {
                         DailyActiveUser::firstOrCreate([
@@ -51,7 +51,7 @@ class TrackUserActivity
             }
         } catch (\Throwable $e) {
             // Fail silently to prevent blocking the request
-            \Illuminate\Support\Facades\Log::error('TrackUserActivity error: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('TrackUserActivity error: '.$e->getMessage());
         }
 
         return $next($request);

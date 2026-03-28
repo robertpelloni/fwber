@@ -2,11 +2,10 @@
 
 namespace Tests\Feature;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
-use Carbon\Carbon;
 
 class StreakTest extends TestCase
 {
@@ -21,7 +20,7 @@ class StreakTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(['current_streak' => 1]);
-        
+
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
             'current_streak' => 1,
@@ -40,7 +39,7 @@ class StreakTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(['current_streak' => 2]);
-        
+
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
             'current_streak' => 2,
@@ -59,7 +58,7 @@ class StreakTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(['current_streak' => 1]);
-        
+
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
             'current_streak' => 1,
@@ -78,7 +77,7 @@ class StreakTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(['current_streak' => 5]);
-        
+
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
             'current_streak' => 5,

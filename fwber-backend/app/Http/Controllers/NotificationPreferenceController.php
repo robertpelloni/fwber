@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Requests\Notification\UpdateNotificationPreferenceRequest;
+use Illuminate\Http\Request;
 
 class NotificationPreferenceController extends Controller
 {
@@ -23,12 +23,16 @@ class NotificationPreferenceController extends Controller
      *     summary="Get user notification preferences",
      *     tags={"Notifications"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="List of preferences",
+     *
      *         @OA\JsonContent(
      *             type="array",
+     *
      *             @OA\Items(
+     *
      *                 @OA\Property(property="type", type="string"),
      *                 @OA\Property(property="label", type="string"),
      *                 @OA\Property(property="mail", type="boolean"),
@@ -65,24 +69,32 @@ class NotificationPreferenceController extends Controller
      *     summary="Update notification preference",
      *     tags={"Notifications"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="type",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="string")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="mail", type="boolean"),
      *             @OA\Property(property="push", type="boolean"),
      *             @OA\Property(property="database", type="boolean")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Preference updated",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="type", type="string"),
      *             @OA\Property(property="mail", type="boolean"),
      *             @OA\Property(property="push", type="boolean"),
@@ -93,7 +105,7 @@ class NotificationPreferenceController extends Controller
      */
     public function update(UpdateNotificationPreferenceRequest $request, $type)
     {
-        if (!array_key_exists($type, self::TYPES)) {
+        if (! array_key_exists($type, self::TYPES)) {
             return response()->json(['message' => 'Invalid notification type'], 400);
         }
 

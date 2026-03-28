@@ -46,18 +46,18 @@ class Event extends Model
     {
         return $this->hasMany(EventAttendee::class);
     }
-    
+
     public function attendingUsers()
     {
         return $this->belongsToMany(User::class, 'event_attendees')
-                    ->withPivot('status')
-                    ->withTimestamps();
+            ->withPivot('status')
+            ->withTimestamps();
     }
 
     public function groups()
     {
         return $this->belongsToMany(Group::class, 'event_groups')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
     public function chatroom()

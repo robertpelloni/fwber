@@ -10,6 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @OA\Schema(
  *   schema="FlagProximityArtifactRequest",
  *   required={"reason"},
+ *
  *   @OA\Property(property="reason", type="string", maxLength=500, description="Reason for flagging")
  * )
  */

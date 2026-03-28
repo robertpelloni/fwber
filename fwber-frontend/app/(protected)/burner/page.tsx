@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import QRCode from 'react-qr-code';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,7 +21,7 @@ export default function BurnerGeneratorPage() {
     const { toast } = useToast();
     const pollingRef = useRef<NodeJS.Timeout | null>(null);
 
-    const generateLink = async () => {
+    const generateLink = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
@@ -39,7 +39,7 @@ export default function BurnerGeneratorPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [toast]);
 
     const startPolling = (token: string) => {
         if (pollingRef.current) clearInterval(pollingRef.current);

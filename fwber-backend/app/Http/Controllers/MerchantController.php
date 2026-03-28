@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Merchant\BrowseDealsRequest;
+use App\Http\Requests\Merchant\RegisterMerchantRequest;
+use App\Http\Requests\Merchant\StorePromotionRequest;
+use App\Http\Requests\Merchant\TrackPromotionRequest;
+use App\Http\Requests\Merchant\UpdateMerchantProfileRequest;
 use App\Models\MerchantProfile;
 use App\Models\Promotion;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
-use App\Http\Requests\Merchant\RegisterMerchantRequest;
-use App\Http\Requests\Merchant\UpdateMerchantProfileRequest;
-use App\Http\Requests\Merchant\StorePromotionRequest;
-use App\Http\Requests\Merchant\BrowseDealsRequest;
-use App\Http\Requests\Merchant\TrackPromotionRequest;
 
 class MerchantController extends Controller
 {
@@ -59,7 +57,7 @@ class MerchantController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user->merchantProfile) {
+        if (! $user->merchantProfile) {
             return response()->json(['message' => 'Merchant profile not found.'], 404);
         }
 
@@ -74,7 +72,7 @@ class MerchantController extends Controller
         $user = Auth::user();
         $profile = $user->merchantProfile;
 
-        if (!$profile) {
+        if (! $profile) {
             return response()->json(['message' => 'Merchant profile not found.'], 404);
         }
 
@@ -96,7 +94,7 @@ class MerchantController extends Controller
         $user = Auth::user();
         $profile = $user->merchantProfile;
 
-        if (!$profile) {
+        if (! $profile) {
             return response()->json(['message' => 'Merchant profile not found.'], 403);
         }
 
@@ -104,7 +102,7 @@ class MerchantController extends Controller
         if ($profile->verification_status !== 'verified') {
             return response()->json([
                 'message' => 'Merchant verification required. Please ensure your business details are complete and contact support.',
-                'status' => $profile->verification_status
+                'status' => $profile->verification_status,
             ], 403);
         }
 
@@ -126,7 +124,7 @@ class MerchantController extends Controller
         $user = Auth::user();
         $profile = $user->merchantProfile;
 
-        if (!$profile) {
+        if (! $profile) {
             return response()->json(['message' => 'Merchant profile not found.'], 404);
         }
 

@@ -79,7 +79,7 @@ class ViralContentTest extends TestCase
         $user->refresh();
 
         $this->assertEquals(5, $content->views);
-        $this->assertTrue((bool)$content->reward_claimed);
+        $this->assertTrue((bool) $content->reward_claimed);
         $this->assertEquals('gold', $user->tier);
         $this->assertTrue($user->tier_expires_at->isFuture());
     }

@@ -9,9 +9,6 @@ class JsonFormatterTap
 {
     /**
      * Customize the given logger instance.
-     *
-     * @param  \Monolog\Logger  $logger
-     * @return void
      */
     public function __invoke(Logger $logger): void
     {

@@ -2,18 +2,19 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
-use App\Models\User;
 use App\Models\BulletinBoard;
 use App\Models\BulletinMessage;
+use App\Models\User;
 use App\Services\Ai\Llm\LlmManager;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class ContentGenerationService
 {
     private LlmManager $llmManager;
+
     private array $generationConfig;
 
     public function __construct(LlmManager $llmManager)
@@ -39,19 +40,19 @@ class ContentGenerationService
      */
     public function generateProfileContent(User $user, array $preferences = []): array
     {
-        $cacheKey = "profile_content_{$user->id}_" . md5(serialize($preferences));
-        
+        $cacheKey = "profile_content_{$user->id}_".md5(serialize($preferences));
+
         if ($cached = Cache::get($cacheKey)) {
             return $cached;
         }
 
         $userProfile = $this->buildUserProfile($user);
         $context = $this->buildProfileContext($preferences);
-        
+
         $content = $this->generateWithMultiAI($userProfile, $context, 'profile');
-        
+
         Cache::put($cacheKey, $content, $this->generationConfig['cache_ttl']);
-        
+
         return $content;
     }
 
@@ -63,9 +64,9 @@ class ContentGenerationService
         $boardContext = $this->buildBoardContext($board);
         $userContext = $this->buildUserContext($user);
         $locationContext = $this->buildLocationContext($board, $user);
-        
+
         $combinedContext = array_merge($boardContext, $userContext, $locationContext, $context);
-        
+
         return $this->generateWithMultiAI($combinedContext, $context, 'post_suggestions');
     }
 
@@ -76,9 +77,9 @@ class ContentGenerationService
     {
         $userContext = $this->buildUserContext($user);
         $conversationContext = $this->buildConversationContext($context);
-        
+
         $combinedContext = array_merge($userContext, $conversationContext);
-        
+
         return $this->generateWithMultiAI($combinedContext, $context, 'conversation_starters');
     }
 
@@ -105,7 +106,7 @@ class ContentGenerationService
                 $res = $this->generateWithClaude($context, $additionalContext, $type);
             }
 
-            if (!empty($res['content'])) {
+            if (! empty($res['content'])) {
                 $results[$provider] = $res;
                 // Stop after first successful provider to minimize external calls (important for tests and caching semantics)
                 break;
@@ -123,10 +124,10 @@ class ContentGenerationService
     {
         try {
             $prompt = $this->buildOpenAIPrompt($context, $additionalContext, $type);
-            
+
             $messages = [
                 ['role' => 'system', 'content' => $this->getSystemPrompt($type)],
-                ['role' => 'user', 'content' => $prompt]
+                ['role' => 'user', 'content' => $prompt],
             ];
 
             $response = $this->llmManager->driver('openai')->chat($messages, [
@@ -154,9 +155,9 @@ class ContentGenerationService
     {
         try {
             $prompt = $this->buildGeminiPrompt($context, $additionalContext, $type);
-            
+
             $messages = [
-                ['role' => 'user', 'content' => $prompt]
+                ['role' => 'user', 'content' => $prompt],
             ];
 
             $response = $this->llmManager->driver('gemini')->chat($messages, [
@@ -184,10 +185,10 @@ class ContentGenerationService
     {
         try {
             $prompt = $this->buildOpenAIPrompt($context, $additionalContext, $type);
-            
+
             $messages = [
                 ['role' => 'system', 'content' => $this->getSystemPrompt($type)],
-                ['role' => 'user', 'content' => $prompt]
+                ['role' => 'user', 'content' => $prompt],
             ];
 
             $response = $this->llmManager->driver('claude')->chat($messages, [
@@ -319,8 +320,8 @@ class ContentGenerationService
      */
     private function combineGenerationResults(array $results, string $type, array $sourceContext = []): array
     {
-        $validResults = array_filter($results, fn($r) => !empty($r['content']) && !isset($r['error']));
-        
+        $validResults = array_filter($results, fn ($r) => ! empty($r['content']) && ! isset($r['error']));
+
         if (empty($validResults)) {
             // Fallback baseline suggestion to ensure graceful behavior when external providers are unavailable
             $baselineContent = $this->buildBaselineSuggestion($sourceContext, $type);
@@ -357,9 +358,10 @@ class ContentGenerationService
         }
 
         // Sort by confidence and safety score
-        usort($suggestions, function($a, $b) {
+        usort($suggestions, function ($a, $b) {
             $scoreA = ($a['confidence'] + $a['safety_score']) / 2;
             $scoreB = ($b['confidence'] + $b['safety_score']) / 2;
+
             return $scoreB <=> $scoreA;
         });
 
@@ -412,7 +414,7 @@ class ContentGenerationService
         // Use existing ContentModerationService in non-testing environments
         $moderationService = app(ContentModerationService::class);
         $moderationResult = $moderationService->moderateContent($content);
-        
+
         if ($moderationResult['flagged']) {
             return 0.0;
         }
@@ -420,6 +422,7 @@ class ContentGenerationService
         if (empty($categories)) {
             return 1.0; // No issues detected
         }
+
         return 1.0 - max($categories);
     }
 
@@ -434,7 +437,7 @@ class ContentGenerationService
             'conversation_starters' => 'You are a conversation expert. Create interesting, personalized conversation starters that help users connect meaningfully.',
             'content_optimization' => 'You are a content optimization expert. Improve existing content for better engagement, clarity, and impact.',
         ];
-        
+
         return $prompts[$type] ?? 'You are a helpful content generation assistant.';
     }
 
@@ -444,18 +447,18 @@ class ContentGenerationService
     private function buildOpenAIPrompt(array $context, array $additionalContext, string $type): string
     {
         $basePrompt = "Generate content based on the following context:\n\n";
-        $basePrompt .= "Context: " . json_encode($context) . "\n";
-        $basePrompt .= "Additional Context: " . json_encode($additionalContext) . "\n\n";
-        
+        $basePrompt .= 'Context: '.json_encode($context)."\n";
+        $basePrompt .= 'Additional Context: '.json_encode($additionalContext)."\n\n";
+
         switch ($type) {
             case 'profile':
-                return $basePrompt . "Create an engaging dating profile bio that highlights the user's personality and interests. Make it authentic and appealing.";
+                return $basePrompt."Create an engaging dating profile bio that highlights the user's personality and interests. Make it authentic and appealing.";
             case 'post_suggestions':
-                return $basePrompt . "Generate 5 engaging bulletin board post suggestions that are relevant to the location and community. Make them conversational and interactive.";
+                return $basePrompt.'Generate 5 engaging bulletin board post suggestions that are relevant to the location and community. Make them conversational and interactive.';
             case 'conversation_starters':
-                return $basePrompt . "Create 3 personalized conversation starters that would work well in this context. Make them interesting and easy to respond to.";
+                return $basePrompt.'Create 3 personalized conversation starters that would work well in this context. Make them interesting and easy to respond to.';
             default:
-                return $basePrompt . "Generate relevant, engaging content for this context.";
+                return $basePrompt.'Generate relevant, engaging content for this context.';
         }
     }
 
@@ -465,18 +468,18 @@ class ContentGenerationService
     private function buildGeminiPrompt(array $context, array $additionalContext, string $type): string
     {
         $basePrompt = "Analyze this context and generate appropriate content:\n\n";
-        $basePrompt .= "Context: " . json_encode($context) . "\n";
-        $basePrompt .= "Additional Context: " . json_encode($additionalContext) . "\n\n";
-        
+        $basePrompt .= 'Context: '.json_encode($context)."\n";
+        $basePrompt .= 'Additional Context: '.json_encode($additionalContext)."\n\n";
+
         switch ($type) {
             case 'profile':
-                return $basePrompt . "Write an attractive and authentic dating profile bio that showcases the user's personality and interests.";
+                return $basePrompt."Write an attractive and authentic dating profile bio that showcases the user's personality and interests.";
             case 'post_suggestions':
-                return $basePrompt . "Suggest 5 engaging bulletin board posts that would be relevant and interesting for this location and community.";
+                return $basePrompt.'Suggest 5 engaging bulletin board posts that would be relevant and interesting for this location and community.';
             case 'conversation_starters':
-                return $basePrompt . "Create 3 conversation starters that would work well in this social context.";
+                return $basePrompt.'Create 3 conversation starters that would work well in this social context.';
             default:
-                return $basePrompt . "Generate appropriate content for this context.";
+                return $basePrompt.'Generate appropriate content for this context.';
         }
     }
 
@@ -488,8 +491,9 @@ class ContentGenerationService
         switch ($type) {
             case 'profile':
                 $interests = $context['interests'] ?? [];
-                $interestsStr = empty($interests) ? '' : ' I enjoy ' . implode(', ', $interests) . '.';
-                return 'Friendly, genuine, and curious about the world.' . $interestsStr . ' Open to great conversations and new connections.';
+                $interestsStr = empty($interests) ? '' : ' I enjoy '.implode(', ', $interests).'.';
+
+                return 'Friendly, genuine, and curious about the world.'.$interestsStr.' Open to great conversations and new connections.';
             case 'post_suggestions':
                 return 'Anyone up for a casual meetup this week? Share your ideas below!';
             case 'conversation_starters':
@@ -507,7 +511,7 @@ class ContentGenerationService
         // Analyze user's content and behavior to determine personality traits
         $messages = BulletinMessage::where('user_id', $user->id)->get();
         $content = $messages->pluck('content')->join(' ');
-        
+
         // Basic personality analysis based on content
         $traits = [
             'extroversion' => $this->analyzeExtroversion($content),
@@ -516,7 +520,7 @@ class ContentGenerationService
             'agreeableness' => $this->analyzeAgreeableness($content),
             'neuroticism' => $this->analyzeNeuroticism($content),
         ];
-        
+
         return $traits;
     }
 
@@ -527,7 +531,7 @@ class ContentGenerationService
     {
         $messages = BulletinMessage::where('user_id', $user->id)->get();
         $content = $messages->pluck('content')->join(' ');
-        
+
         return [
             'formality' => $this->analyzeFormality($content),
             'humor_usage' => $this->analyzeHumorUsage($content),
@@ -545,17 +549,17 @@ class ContentGenerationService
         $sentences = preg_split('/[.!?]+/', $content);
         $words = str_word_count($content);
         $syllables = $this->countSyllables($content);
-        
+
         if (count($sentences) == 0 || $words == 0) {
             return 0.0;
         }
-        
+
         $avgWordsPerSentence = $words / count($sentences);
         $avgSyllablesPerWord = $syllables / $words;
-        
+
         // Flesch Reading Ease Score
         $score = 206.835 - (1.015 * $avgWordsPerSentence) - (84.6 * $avgSyllablesPerWord);
-        
+
         return max(0.0, min(1.0, $score / 100));
     }
 
@@ -566,11 +570,11 @@ class ContentGenerationService
     {
         $words = str_word_count($text, 1);
         $syllables = 0;
-        
+
         foreach ($words as $word) {
             $syllables += $this->countWordSyllables($word);
         }
-        
+
         return $syllables;
     }
 
@@ -583,7 +587,7 @@ class ContentGenerationService
         $syllables = 0;
         $vowels = 'aeiouy';
         $prevChar = '';
-        
+
         for ($i = 0; $i < strlen($word); $i++) {
             $char = $word[$i];
             if (strpos($vowels, $char) !== false && strpos($vowels, $prevChar) === false) {
@@ -591,12 +595,12 @@ class ContentGenerationService
             }
             $prevChar = $char;
         }
-        
+
         // Handle silent 'e'
         if (substr($word, -1) === 'e' && $syllables > 1) {
             $syllables--;
         }
-        
+
         return max(1, $syllables);
     }
 
@@ -606,152 +610,179 @@ class ContentGenerationService
     private function calculateDistance(float $lat1, float $lon1, float $lat2, float $lon2): float
     {
         $earthRadius = 6371000; // meters
-        
+
         $dLat = deg2rad($lat2 - $lat1);
         $dLon = deg2rad($lon2 - $lon1);
-        
-        $a = sin($dLat/2) * sin($dLat/2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon/2) * sin($dLon/2);
-        $c = 2 * atan2(sqrt($a), sqrt(1-$a));
-        
+
+        $a = sin($dLat / 2) * sin($dLat / 2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon / 2) * sin($dLon / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
         return $earthRadius * $c;
     }
 
     // Personality analysis methods (simplified implementations)
-    private function analyzeExtroversion(string $content): float { 
+    private function analyzeExtroversion(string $content): float
+    {
         $extroversionWords = ['party', 'social', 'friends', 'group', 'together', 'fun', 'excited'];
         $score = 0;
         foreach ($extroversionWords as $word) {
             $score += substr_count(strtolower($content), $word);
         }
+
         return min(1.0, $score / 10);
     }
-    
-    private function analyzeOpenness(string $content): float { 
+
+    private function analyzeOpenness(string $content): float
+    {
         $opennessWords = ['creative', 'art', 'music', 'travel', 'new', 'different', 'explore'];
         $score = 0;
         foreach ($opennessWords as $word) {
             $score += substr_count(strtolower($content), $word);
         }
+
         return min(1.0, $score / 10);
     }
-    
-    private function analyzeConscientiousness(string $content): float { 
+
+    private function analyzeConscientiousness(string $content): float
+    {
         $conscientiousnessWords = ['plan', 'organize', 'goal', 'work', 'study', 'responsible'];
         $score = 0;
         foreach ($conscientiousnessWords as $word) {
             $score += substr_count(strtolower($content), $word);
         }
+
         return min(1.0, $score / 10);
     }
-    
-    private function analyzeAgreeableness(string $content): float { 
+
+    private function analyzeAgreeableness(string $content): float
+    {
         $agreeablenessWords = ['help', 'kind', 'nice', 'support', 'care', 'love', 'compassion'];
         $score = 0;
         foreach ($agreeablenessWords as $word) {
             $score += substr_count(strtolower($content), $word);
         }
+
         return min(1.0, $score / 10);
     }
-    
-    private function analyzeNeuroticism(string $content): float { 
+
+    private function analyzeNeuroticism(string $content): float
+    {
         $neuroticismWords = ['worry', 'anxious', 'stress', 'nervous', 'upset', 'sad'];
         $score = 0;
         foreach ($neuroticismWords as $word) {
             $score += substr_count(strtolower($content), $word);
         }
+
         return min(1.0, $score / 10);
     }
-    
-    private function analyzeFormality(string $content): float { 
+
+    private function analyzeFormality(string $content): float
+    {
         $formalWords = ['please', 'thank you', 'sincerely', 'regards', 'respectfully'];
         $informalWords = ['hey', 'yo', 'lol', 'omg', 'btw', 'tbh'];
-        
+
         $formalCount = 0;
         $informalCount = 0;
-        
+
         foreach ($formalWords as $word) {
             $formalCount += substr_count(strtolower($content), $word);
         }
-        
+
         foreach ($informalWords as $word) {
             $informalCount += substr_count(strtolower($content), $word);
         }
-        
+
         $total = $formalCount + $informalCount;
+
         return $total > 0 ? $formalCount / $total : 0.5;
     }
-    
-    private function analyzeHumorUsage(string $content): float { 
+
+    private function analyzeHumorUsage(string $content): float
+    {
         $humorIndicators = ['lol', 'haha', 'funny', 'joke', 'laugh', '😄', '😂', '🤣'];
         $score = 0;
         foreach ($humorIndicators as $indicator) {
             $score += substr_count(strtolower($content), $indicator);
         }
+
         return min(1.0, $score / 5);
     }
-    
-    private function analyzeEmojiUsage(string $content): float { 
+
+    private function analyzeEmojiUsage(string $content): float
+    {
         $emojiCount = preg_match_all('/[\x{1F600}-\x{1F64F}]|[\x{1F300}-\x{1F5FF}]|[\x{1F680}-\x{1F6FF}]|[\x{1F1E0}-\x{1F1FF}]|[\x{2600}-\x{26FF}]|[\x{2700}-\x{27BF}]/u', $content);
         $wordCount = str_word_count($content);
+
         return $wordCount > 0 ? min(1.0, $emojiCount / $wordCount) : 0;
     }
-    
-    private function analyzeSentenceLength(string $content): float { 
+
+    private function analyzeSentenceLength(string $content): float
+    {
         $sentences = preg_split('/[.!?]+/', $content);
         $words = str_word_count($content);
         $sentenceCount = count(array_filter($sentences));
-        
-        if ($sentenceCount == 0) return 0.5;
-        
+
+        if ($sentenceCount == 0) {
+            return 0.5;
+        }
+
         $avgWordsPerSentence = $words / $sentenceCount;
+
         return min(1.0, $avgWordsPerSentence / 20); // Normalize to 20 words per sentence
     }
-    
-    private function analyzeVocabularyComplexity(string $content): float { 
+
+    private function analyzeVocabularyComplexity(string $content): float
+    {
         $words = str_word_count($content, 1);
         $complexWords = 0;
-        
+
         foreach ($words as $word) {
             if (strlen($word) > 6) { // Words longer than 6 characters
                 $complexWords++;
             }
         }
-        
+
         $totalWords = count($words);
+
         return $totalWords > 0 ? min(1.0, $complexWords / $totalWords) : 0;
     }
-    
-    private function calculateActivityLevel(User $user): float { 
+
+    private function calculateActivityLevel(User $user): float
+    {
         $messageCount = BulletinMessage::where('user_id', $user->id)->count();
         $daysSinceJoined = $user->created_at->diffInDays(now());
-        
+
         return $daysSinceJoined > 0 ? min(1.0, $messageCount / $daysSinceJoined) : 0;
     }
-    
-    private function analyzeEngagementPatterns(User $user): array { 
+
+    private function analyzeEngagementPatterns(User $user): array
+    {
         $messages = BulletinMessage::where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
             ->limit(100)
             ->get();
 
         return [
-            'peak_hours' => $messages->groupBy(fn($m) => $m->created_at->format('H'))->map->count()->toArray(),
+            'peak_hours' => $messages->groupBy(fn ($m) => $m->created_at->format('H'))->map->count()->toArray(),
             'content_types' => $messages->groupBy('type')->map->count()->toArray(),
             'interaction_style' => $messages->count() > 50 ? 'highly_active' : 'observational',
         ];
     }
-    
-    private function getRecentBoardActivity(BulletinBoard $board): array { 
+
+    private function getRecentBoardActivity(BulletinBoard $board): array
+    {
         $count = BulletinMessage::where('bulletin_board_id', $board->id)
             ->where('created_at', '>=', now()->subDays(7))
             ->count();
+
         return [
             'messages_last_7_days' => $count,
             'unique_contributors' => BulletinMessage::where('bulletin_board_id', $board->id)->distinct('user_id')->count(),
         ];
     }
-    
-    private function getPopularBoardTopics(BulletinBoard $board): array { 
+
+    private function getPopularBoardTopics(BulletinBoard $board): array
+    {
         // Analyze recent messages to extract common keywords
         $content = BulletinMessage::where('bulletin_board_id', $board->id)
             ->where('created_at', '>=', now()->subDays(30))
@@ -760,15 +791,16 @@ class ContentGenerationService
 
         $words = str_word_count(strtolower($content), 1);
         $stopWords = ['the', 'and', 'for', 'you', 'this', 'that', 'with'];
-        $filtered = array_filter($words, fn($w) => strlen($w) > 3 && !in_array($w, $stopWords));
-        
+        $filtered = array_filter($words, fn ($w) => strlen($w) > 3 && ! in_array($w, $stopWords));
+
         $counts = array_count_values($filtered);
         arsort($counts);
-        
+
         return array_slice($counts, 0, 10, true);
     }
-    
-    private function getBoardUserDemographics(BulletinBoard $board): array { 
+
+    private function getBoardUserDemographics(BulletinBoard $board): array
+    {
         $userIds = BulletinMessage::where('bulletin_board_id', $board->id)->distinct('user_id')->pluck('user_id');
         $users = User::whereIn('id', $userIds)->get();
 

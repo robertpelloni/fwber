@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use App\Models\Message;
+use App\Models\User;
 use Carbon\Carbon;
 
 class AutoReplyService implements AutoReplyServiceInterface
@@ -11,14 +11,14 @@ class AutoReplyService implements AutoReplyServiceInterface
     public function shouldReply(int $userId, string $incomingMessage): bool
     {
         $user = User::find($userId);
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
         // Simple logic: Reply if user hasn't been seen in 15 minutes
         // and the message is a greeting (very basic heuristic)
         $isOffline = $user->last_seen_at && $user->last_seen_at->diffInMinutes(Carbon::now()) > 15;
-        
+
         $isGreeting = preg_match('/^(hi|hello|hey|sup|yo)\b/i', trim($incomingMessage));
 
         return $isOffline && $isGreeting;

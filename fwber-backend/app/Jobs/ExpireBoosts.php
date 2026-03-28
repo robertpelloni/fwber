@@ -3,13 +3,13 @@
 namespace App\Jobs;
 
 use App\Models\Boost;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
 
 class ExpireBoosts implements ShouldQueue
 {
@@ -55,6 +55,7 @@ class ExpireBoosts implements ShouldQueue
 
         if ($count === 0) {
             Log::info('ExpireBoosts: No boosts to expire');
+
             return;
         }
 
@@ -62,7 +63,7 @@ class ExpireBoosts implements ShouldQueue
         foreach ($expiredBoosts as $boost) {
             $boost->status = 'expired';
             $boost->save();
-            
+
             Log::info("ExpireBoosts: Expired boost {$boost->id} for user {$boost->user_id}");
         }
 
@@ -74,6 +75,6 @@ class ExpireBoosts implements ShouldQueue
      */
     public function failed(\Throwable $exception): void
     {
-        Log::error('ExpireBoosts job failed: ' . $exception->getMessage());
+        Log::error('ExpireBoosts job failed: '.$exception->getMessage());
     }
 }

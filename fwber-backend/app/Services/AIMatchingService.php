@@ -2,12 +2,12 @@
 
 namespace App\Services;
 
-use App\Models\User;
-use App\Models\UserProfile;
 use App\Models\DateFeedback;
 use App\Models\MatchAction;
-use Illuminate\Support\Facades\DB;
+use App\Models\User;
+use App\Models\UserProfile;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class AIMatchingService
@@ -41,17 +41,17 @@ class AIMatchingService
         // Include filters in cache key
         $filterHash = md5(serialize($filters));
         $cacheKey = "ai_matches_v2_{$user->id}_{$filterHash}";
-        
+
         return Cache::remember($cacheKey, 300, function () use ($user, $filters, $limit) {
             $userProfile = $user->profile;
-            if (!$userProfile) {
+            if (! $userProfile) {
                 return [];
             }
 
             // 1. Generate embedding for current user query (or use their profile embedding)
             // For now, we use the user's own profile as the query vector
-            // We need to re-generate it or fetch it. 
-            // Better to assume we have it in Redis? 
+            // We need to re-generate it or fetch it.
+            // Better to assume we have it in Redis?
             // Let's generate it on the fly for the query to be sure
             $queryText = $this->vectorService->formatProfileForEmbedding($userProfile);
             $queryVector = $this->vectorService->generateEmbedding($queryText);
@@ -76,15 +76,18 @@ class AIMatchingService
 
             $scoredCandidates = $candidates->map(function ($candidate) use ($user, $userProfile, $behavioralPrefs) {
                 // Filter out if missing profile
-                if (!$candidate->profile) return null;
+                if (! $candidate->profile) {
+                    return null;
+                }
 
-                // Application Level Filtering (Distance, Age, etc) happens here effectively 
+                // Application Level Filtering (Distance, Age, etc) happens here effectively
                 // because we check compatibility which includes these factors.
                 // However, we should explicitly check hard filters if strict.
                 // For now, let's rely on the score.
 
                 $score = $this->calculateAdvancedScore($user, $userProfile, $candidate, $behavioralPrefs);
                 $candidate->ai_score = $score;
+
                 return $candidate;
             })->filter()->values();
 
@@ -99,28 +102,31 @@ class AIMatchingService
 
     public function fallbackToHeuristicMatching(User $user, array $filters = [], int $limit = 20): array
     {
-         $userProfile = $user->profile;
-         if (!$userProfile) {
-             return [];
-         }
+        $userProfile = $user->profile;
+        if (! $userProfile) {
+            return [];
+        }
 
-         $candidates = $this->getCandidates($user, $userProfile, $filters);
-         
-         $behavioralPrefs = $this->analyzeUserBehavior($user);
+        $candidates = $this->getCandidates($user, $userProfile, $filters);
 
-         $scoredCandidates = $candidates->map(function ($candidate) use ($user, $userProfile, $behavioralPrefs) {
-             if (!$candidate->profile) return null;
+        $behavioralPrefs = $this->analyzeUserBehavior($user);
 
-             $score = $this->calculateAdvancedScore($user, $userProfile, $candidate, $behavioralPrefs);
-             $candidate->ai_score = $score;
-             return $candidate;
-         })->filter()->values();
+        $scoredCandidates = $candidates->map(function ($candidate) use ($user, $userProfile, $behavioralPrefs) {
+            if (! $candidate->profile) {
+                return null;
+            }
 
-         return $scoredCandidates
-             ->sortByDesc('ai_score')
-             ->take($limit)
-             ->values()
-             ->all();
+            $score = $this->calculateAdvancedScore($user, $userProfile, $candidate, $behavioralPrefs);
+            $candidate->ai_score = $score;
+
+            return $candidate;
+        })->filter()->values();
+
+        return $scoredCandidates
+            ->sortByDesc('ai_score')
+            ->take($limit)
+            ->values()
+            ->all();
     }
 
     private function analyzeUserBehavior(User $user): array
@@ -142,7 +148,7 @@ class AIMatchingService
 
         foreach ($interactions as $interaction) {
             $targetUser = User::with('profile')->find($interaction->target_user_id);
-            if (!$targetUser || !$targetUser->profile) {
+            if (! $targetUser || ! $targetUser->profile) {
                 continue;
             }
 
@@ -152,21 +158,21 @@ class AIMatchingService
             // Analyze age preferences
             if ($targetUser->profile->birthdate) {
                 $age = $targetUser->profile->birthdate->diffInYears(now());
-                $behavioralPrefs['preferred_ages'][$age] = 
+                $behavioralPrefs['preferred_ages'][$age] =
                     ($behavioralPrefs['preferred_ages'][$age] ?? 0) + ($weight * $count);
             }
 
             // Analyze location preferences
             if ($targetUser->profile->location_name) {
                 $location = $targetUser->profile->location_name;
-                $behavioralPrefs['preferred_locations'][$location] = 
+                $behavioralPrefs['preferred_locations'][$location] =
                     ($behavioralPrefs['preferred_locations'][$location] ?? 0) + ($weight * $count);
             }
 
             // Analyze gender preferences
             if ($targetUser->profile->gender) {
                 $gender = $targetUser->profile->gender;
-                $behavioralPrefs['preferred_genders'][$gender] = 
+                $behavioralPrefs['preferred_genders'][$gender] =
                     ($behavioralPrefs['preferred_genders'][$gender] ?? 0) + ($weight * $count);
             }
         }
@@ -188,30 +194,30 @@ class AIMatchingService
         // Basic distance filter
         if ($myLat && $myLon) {
             $maxDistance = $filters['max_distance'] ?? 50; // Default 50 miles
-            
+
             // Calculate bounding box
             $latDist = (1.1 * $maxDistance) / 49.1;
             $lonDist = (1.1 * $maxDistance) / 69.1;
-            
+
             $minLat = $myLat - $latDist;
             $maxLat = $myLat + $latDist;
             $minLon = $myLon - $lonDist;
             $maxLon = $myLon + $lonDist;
 
             $query->whereHas('profile', function ($q) use ($minLat, $maxLat, $minLon, $maxLon) {
-                $q->where(function($sub) use ($minLat, $maxLat, $minLon, $maxLon) {
+                $q->where(function ($sub) use ($minLat, $maxLat, $minLon, $maxLon) {
                     // Match users at their real location (if not in travel mode)
-                    $sub->where(function($w) use ($minLat, $maxLat, $minLon, $maxLon) {
+                    $sub->where(function ($w) use ($minLat, $maxLat, $minLon, $maxLon) {
                         $w->where('is_travel_mode', false)
-                          ->whereBetween('latitude', [$minLat, $maxLat])
-                          ->whereBetween('longitude', [$minLon, $maxLon]);
+                            ->whereBetween('latitude', [$minLat, $maxLat])
+                            ->whereBetween('longitude', [$minLon, $maxLon]);
                     })
                     // Or match users who are virtually traveling to my area
-                    ->orWhere(function($w) use ($minLat, $maxLat, $minLon, $maxLon) {
-                        $w->where('is_travel_mode', true)
-                          ->whereBetween('travel_latitude', [$minLat, $maxLat])
-                          ->whereBetween('travel_longitude', [$minLon, $maxLon]);
-                    });
+                        ->orWhere(function ($w) use ($minLat, $maxLat, $minLon, $maxLon) {
+                            $w->where('is_travel_mode', true)
+                                ->whereBetween('travel_latitude', [$minLat, $maxLat])
+                                ->whereBetween('travel_longitude', [$minLon, $maxLon]);
+                        });
                 });
             });
         }
@@ -220,12 +226,12 @@ class AIMatchingService
         if (isset($filters['age_min']) || isset($filters['age_max'])) {
             $ageMin = (int) ($filters['age_min'] ?? 18);
             $ageMax = (int) ($filters['age_max'] ?? 100);
-            
+
             $query->whereHas('profile', function ($q) use ($ageMin, $ageMax) {
                 // SQLite-compatible age calculation
                 $q->whereRaw("(julianday('now') - julianday(birthdate)) / 365.25 BETWEEN ? AND ?", [
                     $ageMin,
-                    $ageMax
+                    $ageMax,
                 ]);
             });
         }
@@ -233,75 +239,75 @@ class AIMatchingService
         // Advanced Filters
         $query->whereHas('profile', function ($q) use ($filters) {
             // Smoking
-            if (!empty($filters['smoking'])) {
+            if (! empty($filters['smoking'])) {
                 $q->where('smoking_status', $filters['smoking']);
             }
 
             // Drinking
-            if (!empty($filters['drinking'])) {
+            if (! empty($filters['drinking'])) {
                 $q->where('drinking_status', $filters['drinking']);
             }
 
             // Body Type
-            if (!empty($filters['body_type'])) {
+            if (! empty($filters['body_type'])) {
                 $q->where('body_type', $filters['body_type']);
             }
 
             // Height Min
-            if (!empty($filters['height_min'])) {
-                $q->where('height_cm', '>=', (int)$filters['height_min']);
+            if (! empty($filters['height_min'])) {
+                $q->where('height_cm', '>=', (int) $filters['height_min']);
             }
 
             // Has Bio
-            if (!empty($filters['has_bio']) && $filters['has_bio']) {
+            if (! empty($filters['has_bio']) && $filters['has_bio']) {
                 $q->whereNotNull('bio')->where('bio', '!=', '');
             }
 
             // -- Premium Filters --
 
             // Cannabis
-            if (!empty($filters['cannabis'])) {
+            if (! empty($filters['cannabis'])) {
                 $q->where('cannabis_status', $filters['cannabis']);
             }
 
             // Diet
-            if (!empty($filters['diet'])) {
+            if (! empty($filters['diet'])) {
                 $q->where('dietary_preferences', $filters['diet']);
             }
 
             // Politics
-            if (!empty($filters['politics'])) {
+            if (! empty($filters['politics'])) {
                 $q->where('political_views', $filters['politics']);
             }
 
             // Religion
-            if (!empty($filters['religion'])) {
+            if (! empty($filters['religion'])) {
                 $q->where('religion', $filters['religion']);
             }
 
             // Zodiac
-            if (!empty($filters['zodiac'])) {
+            if (! empty($filters['zodiac'])) {
                 $q->where('zodiac_sign', $filters['zodiac']);
             }
 
             // Has Pets (Frontend sends 'yes'/'no', DB is boolean)
-            if (!empty($filters['has_pets'])) {
+            if (! empty($filters['has_pets'])) {
                 $q->where('has_pets', $filters['has_pets'] === 'yes');
             }
 
             // Has Children
-            if (!empty($filters['has_children'])) {
+            if (! empty($filters['has_children'])) {
                 $q->where('has_children', $filters['has_children'] === 'yes');
             }
 
             // Wants Children
-            if (!empty($filters['wants_children'])) {
+            if (! empty($filters['wants_children'])) {
                 $q->where('wants_children', $filters['wants_children'] === 'yes');
             }
         });
 
         // Verified Only
-        if (!empty($filters['verified_only']) && $filters['verified_only']) {
+        if (! empty($filters['verified_only']) && $filters['verified_only']) {
             $query->whereNotNull('email_verified_at');
         }
 
@@ -319,7 +325,7 @@ class AIMatchingService
                     // OR if they are incognito but have liked me
                     ->orWhere(function ($incognito) use ($likerIds) {
                         $incognito->where('is_incognito', true)
-                                  ->whereIn('user_id', $likerIds);
+                            ->whereIn('user_id', $likerIds);
                     });
             });
         });
@@ -328,8 +334,8 @@ class AIMatchingService
         $excludedIds = MatchAction::where('user_id', $user->id)
             ->pluck('target_user_id')
             ->toArray();
-        
-        if (!empty($excludedIds)) {
+
+        if (! empty($excludedIds)) {
             $query->whereNotIn('id', $excludedIds);
         }
 
@@ -341,7 +347,7 @@ class AIMatchingService
         $score = 0;
         $candidateProfile = $candidate->profile;
 
-        if (!$candidateProfile) {
+        if (! $candidateProfile) {
             return 0;
         }
 
@@ -381,7 +387,7 @@ class AIMatchingService
         $userProfile = $user->profile;
         $candidateProfile = $candidate->profile;
 
-        if (!$userProfile || !$candidateProfile) {
+        if (! $userProfile || ! $candidateProfile) {
             return [];
         }
 
@@ -419,13 +425,13 @@ class AIMatchingService
                 'sexual' => round($this->calculateSexualScore($userProfile, $candidateProfile)),
                 'lifestyle' => round($this->calculateLifestyleScore($userProfile, $candidateProfile)),
                 'personality' => round($this->calculatePersonalityScore($userProfile, $candidateProfile)),
-            ]
+            ],
         ];
     }
 
     private function calculateRecencyScore(User $candidate): float
     {
-        if (!$candidate->last_seen_at) {
+        if (! $candidate->last_seen_at) {
             return 0;
         }
 
@@ -479,7 +485,7 @@ class AIMatchingService
         // Body Type
         $bodyTypes = ['Tiny', 'Slim', 'Average', 'Muscular', 'Curvy', 'Thick', 'BBW'];
         foreach ($bodyTypes as $type) {
-            $preference = $userPrefs['want_body_' . strtolower($type)] ?? 0;
+            $preference = $userPrefs['want_body_'.strtolower($type)] ?? 0;
             if ($preference) {
                 $maxScore += 20;
                 if (($candidatePrefs['body_type'] ?? '') === strtolower($type)) {
@@ -491,7 +497,7 @@ class AIMatchingService
         // Ethnicity
         $ethnicities = ['White', 'Asian', 'Latino', 'Indian', 'Black', 'Other'];
         foreach ($ethnicities as $ethnicity) {
-            $preference = $userPrefs['want_ethnicity_' . strtolower($ethnicity)] ?? 0;
+            $preference = $userPrefs['want_ethnicity_'.strtolower($ethnicity)] ?? 0;
             if ($preference) {
                 $maxScore += 15;
                 if (($candidatePrefs['ethnicity'] ?? '') === strtolower($ethnicity)) {
@@ -519,7 +525,7 @@ class AIMatchingService
         // Height
         if (isset($userPrefs['min_height']) && isset($userPrefs['max_height']) && $candidateProfile->height_cm) {
             $maxScore += 15;
-            if ($candidateProfile->height_cm >= $userPrefs['min_height'] && 
+            if ($candidateProfile->height_cm >= $userPrefs['min_height'] &&
                 $candidateProfile->height_cm <= $userPrefs['max_height']) {
                 $score += 15;
             }
@@ -555,7 +561,7 @@ class AIMatchingService
         if ($candidateProfile->penis_length_cm) {
             $minLen = $userPrefs['min_penis_length'] ?? 0;
             $maxLen = $userPrefs['max_penis_length'] ?? 100;
-            
+
             if ($minLen > 0 || $maxLen < 100) {
                 $total++;
                 if ($candidateProfile->penis_length_cm >= $minLen && $candidateProfile->penis_length_cm <= $maxLen) {
@@ -567,7 +573,7 @@ class AIMatchingService
         if ($candidateProfile->penis_girth_cm) {
             $minGirth = $userPrefs['min_penis_girth'] ?? 0;
             $maxGirth = $userPrefs['max_penis_girth'] ?? 100;
-            
+
             if ($minGirth > 0 || $maxGirth < 100) {
                 $total++;
                 if ($candidateProfile->penis_girth_cm >= $minGirth && $candidateProfile->penis_girth_cm <= $maxGirth) {
@@ -578,13 +584,13 @@ class AIMatchingService
 
         $sexualActs = [
             'safe_sex', 'bareback', 'oral_give', 'oral_receive',
-            'anal_top', 'anal_bottom', 'roleplay', 'dom', 'sub', 
-            'kink_spanking', 'kink_bondage'
+            'anal_top', 'anal_bottom', 'roleplay', 'dom', 'sub',
+            'kink_spanking', 'kink_bondage',
         ];
 
         foreach ($sexualActs as $act) {
-            $iWant = $userPrefs['want_' . $act] ?? 0;
-            $theyWant = $candidatePrefs['want_' . $act] ?? 0;
+            $iWant = $userPrefs['want_'.$act] ?? 0;
+            $theyWant = $candidatePrefs['want_'.$act] ?? 0;
 
             if ($iWant || $theyWant) {
                 $total++;
@@ -600,7 +606,7 @@ class AIMatchingService
         $kinkMatches = 0;
         $kinks = ['dom', 'sub', 'spanking', 'bondage', 'roleplay'];
         foreach ($kinks as $kink) {
-            if (($userPrefs['want_' . $kink] ?? 0) && ($candidatePrefs['want_' . $kink] ?? 0)) {
+            if (($userPrefs['want_'.$kink] ?? 0) && ($candidatePrefs['want_'.$kink] ?? 0)) {
                 $kinkMatches++;
             }
         }
@@ -617,13 +623,19 @@ class AIMatchingService
         $candidatePrefs = $candidateProfile->preferences ?? [];
 
         // Smoking
-        if (($userPrefs['smoke'] ?? 0) && ($candidatePrefs['no_smoke'] ?? 0)) $penalties += 20;
-        
+        if (($userPrefs['smoke'] ?? 0) && ($candidatePrefs['no_smoke'] ?? 0)) {
+            $penalties += 20;
+        }
+
         // Drinking
-        if (($userPrefs['heavy_drink'] ?? 0) && ($candidatePrefs['no_heavy_drink'] ?? 0)) $penalties += 15;
+        if (($userPrefs['heavy_drink'] ?? 0) && ($candidatePrefs['no_heavy_drink'] ?? 0)) {
+            $penalties += 15;
+        }
 
         // Drugs
-        if (($userPrefs['drugs'] ?? 0) && ($candidatePrefs['no_drugs'] ?? 0)) $penalties += 25;
+        if (($userPrefs['drugs'] ?? 0) && ($candidatePrefs['no_drugs'] ?? 0)) {
+            $penalties += 25;
+        }
 
         // Children Compatibility
         if (isset($userPrefs['wants_children']) && isset($candidateProfile->wants_children)) {
@@ -631,14 +643,14 @@ class AIMatchingService
                 $penalties += 15;
             }
         }
-        
+
         // Dealbreaker: Has Kids
         if (($userPrefs['no_kids'] ?? false) && $candidateProfile->has_children) {
             $penalties += 50;
         }
 
         // Pets Compatibility
-        if (($userPrefs['must_love_pets'] ?? false) && !$candidateProfile->has_pets) {
+        if (($userPrefs['must_love_pets'] ?? false) && ! $candidateProfile->has_pets) {
             $penalties += 10;
         }
 
@@ -779,18 +791,20 @@ class AIMatchingService
             ->with('subject.profile')
             ->get();
 
-        if ($feedbacks->isEmpty() || !$candidateProfile->personality_type) {
+        if ($feedbacks->isEmpty() || ! $candidateProfile->personality_type) {
             return 0; // No historical data or nothing to compare against
         }
 
         foreach ($feedbacks as $feedback) {
             $pastProfile = $feedback->subject?->profile;
-            if (!$pastProfile) continue;
+            if (! $pastProfile) {
+                continue;
+            }
 
             // If safety concerns were flagged for a highly similar demographic/personality, apply a strong penalty.
             // (Assuming personality type is the primary heuristic for 'similarity' here)
             $isSimilar = $pastProfile->personality_type === $candidateProfile->personality_type;
-            
+
             if ($isSimilar) {
                 if ($feedback->safety_concerns) {
                     $modifier -= 15; // Strong penalty for safety patterns
@@ -814,14 +828,14 @@ class AIMatchingService
         if ($userProfile->bio && $candidateProfile->bio) {
             $userBio = strtolower($userProfile->bio);
             $candidateBio = strtolower($candidateProfile->bio);
-            
+
             // Simple keyword matching (in a real implementation, use NLP)
             $userWords = array_unique(str_word_count($userBio, 1));
             $candidateWords = array_unique(str_word_count($candidateBio, 1));
-            
+
             $commonWords = array_intersect($userWords, $candidateWords);
             $totalWords = count($userWords) + count($candidateWords);
-            
+
             if ($totalWords > 0) {
                 $similarity = (count($commonWords) * 2) / $totalWords;
                 $score += $similarity * 50;
@@ -831,7 +845,7 @@ class AIMatchingService
         // Bio length compatibility
         $userBioLength = strlen($userProfile->bio ?? '');
         $candidateBioLength = strlen($candidateProfile->bio ?? '');
-        
+
         if ($userBioLength > 0 && $candidateBioLength > 0) {
             $lengthDiff = abs($userBioLength - $candidateBioLength);
             $maxLength = max($userBioLength, $candidateBioLength);
@@ -857,16 +871,16 @@ class AIMatchingService
     {
         $lat1 = $profile1->is_travel_mode ? $profile1->travel_latitude : $profile1->latitude;
         $lon1 = $profile1->is_travel_mode ? $profile1->travel_longitude : $profile1->longitude;
-        
+
         $lat2 = $profile2->is_travel_mode ? $profile2->travel_latitude : $profile2->latitude;
         $lon2 = $profile2->is_travel_mode ? $profile2->travel_longitude : $profile2->longitude;
 
-        if (!$lat1 || !$lat2) {
+        if (! $lat1 || ! $lat2) {
             return 0;
         }
 
         $theta = $lon1 - $lon2;
-        $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) + 
+        $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +
                 cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
         $dist = acos($dist);
         $dist = rad2deg($dist);
@@ -877,16 +891,16 @@ class AIMatchingService
 
     private function checkGenderCompatibility(UserProfile $userProfile, UserProfile $candidateProfile): bool
     {
-        if (!$userProfile->preferences || !$candidateProfile->preferences) {
+        if (! $userProfile->preferences || ! $candidateProfile->preferences) {
             return true;
         }
 
         $userGenderPrefs = $userProfile->preferences['gender_preferences'] ?? [];
         $candidateGenderPrefs = $candidateProfile->preferences['gender_preferences'] ?? [];
 
-        $userWantsCandidate = isset($userGenderPrefs[$candidateProfile->gender]) && 
+        $userWantsCandidate = isset($userGenderPrefs[$candidateProfile->gender]) &&
                              $userGenderPrefs[$candidateProfile->gender];
-        $candidateWantsUser = isset($candidateGenderPrefs[$userProfile->gender]) && 
+        $candidateWantsUser = isset($candidateGenderPrefs[$userProfile->gender]) &&
                              $candidateGenderPrefs[$userProfile->gender];
 
         return $userWantsCandidate && $candidateWantsUser;
@@ -896,12 +910,12 @@ class AIMatchingService
     {
         $score = 0;
 
-        if (!$userProfile->preferences || !$candidateProfile->preferences) {
+        if (! $userProfile->preferences || ! $candidateProfile->preferences) {
             return 25; // Default score
         }
 
         $preferenceKeys = ['relationship_style', 'sexual_orientation', 'sti_status'];
-        
+
         foreach ($preferenceKeys as $key) {
             if (isset($userProfile->preferences[$key]) && isset($candidateProfile->preferences[$key])) {
                 if ($userProfile->preferences[$key] === $candidateProfile->preferences[$key]) {
@@ -916,12 +930,13 @@ class AIMatchingService
     public function updateBehavioralModel(): void
     {
         Log::info('Updating behavioral matching model');
-        
+
         // Calculate new weights based on actual engagement success over the last 30 days
         $totalActions = MatchAction::where('created_at', '>=', now()->subDays(30))->count();
-        
+
         if ($totalActions < 100) {
             Log::info('Not enough data to retrain behavioral model (using defaults)');
+
             return;
         }
 
@@ -936,11 +951,11 @@ class AIMatchingService
         $likes = $actionCounts['like'] ?? 1;
         $superLikes = $actionCounts['super_like'] ?? 1;
         $matches = DB::table('matches')->where('created_at', '>=', now()->subDays(30))->count() ?: 1;
-        
+
         // Simple probability heuristic: how indicative is an action of a match?
         $likeWeight = min(0.5, ($matches / $likes) * 1.5);
         $superLikeWeight = min(0.8, ($matches / $superLikes) * 2.0);
-        
+
         // Normalize and update weights
         $newWeights = [
             'profile_view' => 0.05,
@@ -951,7 +966,7 @@ class AIMatchingService
         ];
 
         Cache::put('ai_behavioral_weights', $newWeights, 86400); // Cache for 24 hours
-        
+
         Log::info('Behavioral model updated with new weights', $newWeights);
         Cache::tags(['ai_matches'])->flush();
     }
@@ -959,7 +974,7 @@ class AIMatchingService
     public function generateDateIdeas(User $user1, User $user2, ?string $location = null): array
     {
         $openaiKey = config('services.openai.api_key');
-        if (!$openaiKey) {
+        if (! $openaiKey) {
             // Fallback mock ideas if OpenAI fails or is not configured
             return [
                 'ideas' => [
@@ -970,18 +985,18 @@ class AIMatchingService
                         'venue' => $location ?? 'Local Coffee Shop',
                         'estimated_cost' => '$10-$20',
                         'duration' => '1.5 hours',
-                        'conversation_starter' => 'What is a typical Sunday like for you?'
-                    ]
-                ]
+                        'conversation_starter' => 'What is a typical Sunday like for you?',
+                    ],
+                ],
             ];
         }
 
         $prompt = "You are an expert dating concierge AI. Your task is to generate 3-5 highly creative, personalized date itineraries for two matched users based on their profiles. Return the response as a JSON object matching this schema: {\"ideas\": [{\"title\": \"string\", \"description\": \"string\", \"reason\": \"string (why this fits both profiles)\", \"venue\": \"string (optional location name based on provided location parameter)\", \"estimated_cost\": \"string (e.g., $$-$$$)\", \"duration\": \"string (e.g., 2 hours)\", \"conversation_starter\": \"string (a unique opening question related to the date/profiles)\"}]} \n\n"
-                . "User 1 Profile: " . json_encode($user1->profile?->toArray() ?? []) . "\n"
-                . "User 2 Profile: " . json_encode($user2->profile?->toArray() ?? []) . "\n";
-                
+                .'User 1 Profile: '.json_encode($user1->profile?->toArray() ?? [])."\n"
+                .'User 2 Profile: '.json_encode($user2->profile?->toArray() ?? [])."\n";
+
         if ($location) {
-            $prompt .= "Target Location Context: " . $location . "\n";
+            $prompt .= 'Target Location Context: '.$location."\n";
         }
 
         try {
@@ -991,7 +1006,7 @@ class AIMatchingService
                     'model' => 'gpt-4o-mini',
                     'messages' => [
                         ['role' => 'system', 'content' => 'You must always return valid JSON that perfectly matches the requested schema.'],
-                        ['role' => 'user', 'content' => $prompt]
+                        ['role' => 'user', 'content' => $prompt],
                     ],
                     'response_format' => ['type' => 'json_object'],
                     'temperature' => 0.7,
@@ -1007,7 +1022,7 @@ class AIMatchingService
                 }
             }
         } catch (\Exception $e) {
-            Log::error('OpenAI Date Planner Failed: ' . $e->getMessage());
+            Log::error('OpenAI Date Planner Failed: '.$e->getMessage());
         }
 
         return [
@@ -1019,9 +1034,9 @@ class AIMatchingService
                     'venue' => $location ?? 'Local Cafe',
                     'estimated_cost' => '$10-$20',
                     'duration' => '1-2 hours',
-                    'conversation_starter' => 'What was the highlight of your week?'
-                ]
-            ]
+                    'conversation_starter' => 'What was the highlight of your week?',
+                ],
+            ],
         ];
     }
 }

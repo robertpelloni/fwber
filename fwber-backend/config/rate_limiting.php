@@ -8,13 +8,13 @@ return [
     */
 
     'enabled' => env('FEATURE_RATE_LIMITS', true),
-    
+
     'redis_prefix' => 'rate_limit',
-    
+
     'cleanup_interval' => 3600, // 1 hour
-    
+
     'default_capacity' => 60,
-    
+
     'default_refill_rate' => 1, // tokens per second
 
     'actions' => [

@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\Event;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class EventControllerTest extends TestCase
@@ -60,18 +59,18 @@ class EventControllerTest extends TestCase
         // Ensure price is 0 for free RSVP test
         $event = Event::factory()->create([
             'created_by_user_id' => $creator->id,
-            'price' => 0
+            'price' => 0,
         ]);
 
         $response = $this->actingAs($attendee)
             ->postJson("/api/events/{$event->id}/rsvp", ['status' => 'attending']);
 
         $response->assertStatus(200);
-        
+
         $this->assertDatabaseHas('event_attendees', [
             'event_id' => $event->id,
             'user_id' => $attendee->id,
-            'status' => 'attending'
+            'status' => 'attending',
         ]);
     }
 }

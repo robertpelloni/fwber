@@ -5,9 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProximityChatroom extends Model
 {
@@ -73,10 +72,10 @@ class ProximityChatroom extends Model
     {
         return $this->belongsToMany(User::class, 'proximity_chatroom_members')
             ->withPivot([
-                'role', 'is_muted', 'is_banned', 'latitude', 'longitude', 
+                'role', 'is_muted', 'is_banned', 'latitude', 'longitude',
                 'distance_meters', 'joined_at', 'last_seen_at', 'last_location_update',
                 'preferences', 'professional_info', 'interests', 'is_visible',
-                'is_networking', 'is_social'
+                'is_networking', 'is_social',
             ])
             ->withTimestamps();
     }
@@ -178,7 +177,7 @@ class ProximityChatroom extends Model
         if (isset($attributes['professional_info']) && is_array($attributes['professional_info'])) {
             $attributes['professional_info'] = json_encode($attributes['professional_info']);
         }
-        
+
         if (isset($attributes['interests']) && is_array($attributes['interests'])) {
             $attributes['interests'] = json_encode($attributes['interests']);
         }
@@ -207,7 +206,7 @@ class ProximityChatroom extends Model
     public function updateMemberLocation(User $user, float $latitude, float $longitude): void
     {
         $distance = $this->calculateDistance($latitude, $longitude);
-        
+
         $this->members()->updateExistingPivot($user->id, [
             'latitude' => $latitude,
             'longitude' => $longitude,
@@ -222,18 +221,18 @@ class ProximityChatroom extends Model
     public function calculateDistance(float $latitude, float $longitude): int
     {
         $earthRadius = 6371000; // Earth's radius in meters
-        
+
         $lat1 = deg2rad($this->latitude);
         $lon1 = deg2rad($this->longitude);
         $lat2 = deg2rad($latitude);
         $lon2 = deg2rad($longitude);
-        
+
         $dlat = $lat2 - $lat1;
         $dlon = $lon2 - $lon1;
-        
-        $a = sin($dlat/2) * sin($dlat/2) + cos($lat1) * cos($lat2) * sin($dlon/2) * sin($dlon/2);
-        $c = 2 * atan2(sqrt($a), sqrt(1-$a));
-        
+
+        $a = sin($dlat / 2) * sin($dlat / 2) + cos($lat1) * cos($lat2) * sin($dlon / 2) * sin($dlon / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
         return round($earthRadius * $c);
     }
 
@@ -244,15 +243,15 @@ class ProximityChatroom extends Model
     {
         $earthRadius = 6371000; // Earth's radius in meters
         $haversine = "({$earthRadius} * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude))))";
-        
+
         return static::select('*')
             ->selectRaw("{$haversine} AS distance", [
-                $latitude, $longitude, $latitude
+                $latitude, $longitude, $latitude,
             ])
             ->where('is_active', true)
             ->where('is_public', true)
             ->whereRaw("{$haversine} <= ?", [
-                $latitude, $longitude, $latitude, $radiusMeters
+                $latitude, $longitude, $latitude, $radiusMeters,
             ])
             ->orderBy('distance')
             ->get();
@@ -264,6 +263,7 @@ class ProximityChatroom extends Model
     public function isWithinProximity(float $latitude, float $longitude): bool
     {
         $distance = $this->calculateDistance($latitude, $longitude);
+
         return $distance <= $this->radius_meters;
     }
 
@@ -297,6 +297,7 @@ class ProximityChatroom extends Model
         ];
 
         $prefix = $prefixes[$this->type] ?? '📍';
+
         return "{$prefix} {$this->name}";
     }
 
@@ -316,7 +317,7 @@ class ProximityChatroom extends Model
         return $query->where('is_active', true)
             ->where(function ($q) {
                 $q->whereNull('expires_at')
-                  ->orWhere('expires_at', '>', now());
+                    ->orWhere('expires_at', '>', now());
             });
     }
 
@@ -359,14 +360,14 @@ class ProximityChatroom extends Model
     {
         $earthRadius = 6371000;
         $haversine = "({$earthRadius} * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude))))";
-        
+
         return $query->select('*')
-        ->selectRaw("{$haversine} AS distance", [
-            $latitude, $longitude, $latitude
-        ])
-        ->whereRaw("{$haversine} <= ?", [
-            $latitude, $longitude, $latitude, $radiusMeters
-        ])
-        ->orderBy('distance');
+            ->selectRaw("{$haversine} AS distance", [
+                $latitude, $longitude, $latitude,
+            ])
+            ->whereRaw("{$haversine} <= ?", [
+                $latitude, $longitude, $latitude, $radiusMeters,
+            ])
+            ->orderBy('distance');
     }
 }

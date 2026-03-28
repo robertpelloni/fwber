@@ -10,9 +10,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AnalyzeSlowRequests implements ShouldQueue
 {
@@ -23,7 +22,7 @@ class AnalyzeSlowRequests implements ShouldQueue
      */
     public function handle(): void
     {
-        if (!config('apm.enabled', false)) {
+        if (! config('apm.enabled', false)) {
             return;
         }
 
@@ -67,9 +66,9 @@ class AnalyzeSlowRequests implements ShouldQueue
         // Notify Admins
         // In a real app, you might have a specific Admin model or role.
         // Here we'll notify the first admin user or a configured email.
-        
+
         $admin = User::where('email', $adminEmail)->first();
-        
+
         if ($admin) {
             $admin->notify(new PerformanceAlertNotification($formattedEndpoints));
         } else {

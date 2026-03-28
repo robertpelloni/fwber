@@ -2,9 +2,7 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -15,8 +13,11 @@ class TypingIndicator implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $from_user_id;
+
     public $to_user_id;
+
     public $chatroom_id;
+
     public $is_typing;
 
     /**
@@ -38,11 +39,11 @@ class TypingIndicator implements ShouldBroadcast
     public function broadcastOn(): array
     {
         if ($this->chatroom_id) {
-            return [new PrivateChannel('chatroom.' . $this->chatroom_id)];
+            return [new PrivateChannel('chatroom.'.$this->chatroom_id)];
         }
-        
+
         if ($this->to_user_id) {
-            return [new PrivateChannel('users.' . $this->to_user_id)];
+            return [new PrivateChannel('users.'.$this->to_user_id)];
         }
 
         return [];

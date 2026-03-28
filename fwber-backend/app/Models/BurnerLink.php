@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class BurnerLink extends Model
 {
@@ -52,6 +51,6 @@ class BurnerLink extends Model
      */
     public function isUsed(): bool
     {
-        return !is_null($this->used_at);
+        return ! is_null($this->used_at);
     }
 }

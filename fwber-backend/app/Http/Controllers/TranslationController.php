@@ -18,20 +18,24 @@ class TranslationController extends Controller
 
     /**
      * Translate a message
-     * 
+     *
      * @OA\Post(
      *   path="/messages/translate",
      *   tags={"Messages"},
      *   summary="Translate text",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\RequestBody(
      *     required=true,
+     *
      *     @OA\JsonContent(
      *       required={"text", "target_language"},
+     *
      *       @OA\Property(property="text", type="string"),
      *       @OA\Property(property="target_language", type="string", example="es")
      *     )
      *   ),
+     *
      *   @OA\Response(response=200, description="Translated text"),
      *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
      * )
@@ -55,7 +59,7 @@ class TranslationController extends Controller
         return response()->json([
             'original' => $request->input('text'),
             'translated' => $translated,
-            'target_language' => $request->input('target_language')
+            'target_language' => $request->input('target_language'),
         ]);
     }
 }

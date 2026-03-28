@@ -17,7 +17,7 @@ class AchievementController extends Controller
     public function index(Request $request)
     {
         return response()->json([
-            'achievements' => $this->achievementService->getProgress($request->user())
+            'achievements' => $this->achievementService->getProgress($request->user()),
         ]);
     }
 }

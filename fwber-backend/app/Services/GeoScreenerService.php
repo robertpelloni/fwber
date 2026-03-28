@@ -2,14 +2,16 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Config;
 
 class GeoScreenerService
 {
     protected bool $enabled;
+
     protected string $baseUrl;
+
     protected int $timeout;
 
     public function __construct()
@@ -24,7 +26,9 @@ class GeoScreenerService
      */
     public function indexLocation(int $userId, float $lat, float $lng): bool
     {
-        if (!$this->enabled) return false;
+        if (! $this->enabled) {
+            return false;
+        }
 
         try {
             $response = Http::timeout($this->timeout)
@@ -36,19 +40,22 @@ class GeoScreenerService
 
             return $response->successful();
         } catch (\Exception $e) {
-            Log::warning("GeoScreener: Failed to index location for user {$userId}: " . $e->getMessage());
+            Log::warning("GeoScreener: Failed to index location for user {$userId}: ".$e->getMessage());
+
             return false;
         }
     }
 
     /**
      * Get nearby user IDs from the Rust H3 spatial index.
-     * 
+     *
      * @return array|null List of user IDs or null if service failed/disabled
      */
     public function getNearbyUserIds(float $lat, float $lng, float $radiusMeters): ?array
     {
-        if (!$this->enabled) return null;
+        if (! $this->enabled) {
+            return null;
+        }
 
         try {
             $response = Http::timeout($this->timeout)
@@ -64,7 +71,8 @@ class GeoScreenerService
 
             return null;
         } catch (\Exception $e) {
-            Log::error("GeoScreener: Failed to fetch nearby users: " . $e->getMessage());
+            Log::error('GeoScreener: Failed to fetch nearby users: '.$e->getMessage());
+
             return null;
         }
     }

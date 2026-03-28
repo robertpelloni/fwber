@@ -18,10 +18,10 @@ class PaymentServiceProvider extends ServiceProvider
             $driver = config('services.payment.driver', 'mock');
 
             if ($driver === 'stripe') {
-                return new StripePaymentGateway();
+                return new StripePaymentGateway;
             }
 
-            return new MockPaymentGateway();
+            return new MockPaymentGateway;
         });
     }
 

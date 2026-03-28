@@ -10,8 +10,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class TranscribeAudioMessage implements ShouldQueue
 {
@@ -30,7 +30,7 @@ class TranscribeAudioMessage implements ShouldQueue
      */
     public function handle(AudioTranscriptionService $transcriptionService, ContentModerationService $moderationService): void
     {
-        if ($this->message->message_type !== 'audio' || !$this->message->media_url) {
+        if ($this->message->message_type !== 'audio' || ! $this->message->media_url) {
             return;
         }
 
@@ -38,14 +38,15 @@ class TranscribeAudioMessage implements ShouldQueue
             // Parse the URL to get the path relative to storage root
             // media_url is like /storage/messages/1/abc.mp3
             $urlPath = parse_url($this->message->media_url, PHP_URL_PATH);
-            
+
             // Remove leading /storage/ to get path relative to public disk
             $relativePath = preg_replace('/^\/?storage\//', '', $urlPath);
-            
+
             $fullPath = Storage::disk('public')->path($relativePath);
 
-            if (!file_exists($fullPath)) {
+            if (! file_exists($fullPath)) {
                 Log::warning("Audio file not found for transcription job: {$fullPath}");
+
                 return;
             }
 
@@ -56,7 +57,7 @@ class TranscribeAudioMessage implements ShouldQueue
 
                 // Moderate the content
                 $moderationResult = $moderationService->moderate($text);
-                
+
                 if ($moderationResult['flagged']) {
                     $updateData['is_flagged'] = true;
                     $updateData['flagged_reason'] = implode(', ', $moderationResult['categories']);
@@ -65,7 +66,7 @@ class TranscribeAudioMessage implements ShouldQueue
                 $this->message->update($updateData);
             }
         } catch (\Exception $e) {
-            Log::error("TranscribeAudioMessage job failed: " . $e->getMessage());
+            Log::error('TranscribeAudioMessage job failed: '.$e->getMessage());
         }
     }
 }

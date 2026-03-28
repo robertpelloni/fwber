@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\Payment;
+use App\Models\Subscription;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use App\Models\User;
-use App\Models\Subscription;
-use App\Models\Payment;
 
 class SubscriptionControllerTest extends TestCase
 {
@@ -61,7 +61,7 @@ class SubscriptionControllerTest extends TestCase
             'quantity' => 1,
         ]);
 
-        $response = $this->actingAs($user)->getJson('/api/subscriptions/' . $subscription->id);
+        $response = $this->actingAs($user)->getJson('/api/subscriptions/'.$subscription->id);
 
         $response->assertStatus(200)
             ->assertJsonFragment(['stripe_id' => 'sub_single']);

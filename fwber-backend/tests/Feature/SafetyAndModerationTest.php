@@ -8,7 +8,6 @@ use App\Models\Report;
 use App\Models\ShadowThrottle;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class SafetyAndModerationTest extends TestCase
@@ -41,7 +40,7 @@ class SafetyAndModerationTest extends TestCase
     public function test_can_create_shadow_throttle(): void
     {
         $user = User::factory()->create();
-        
+
         $throttle = ShadowThrottle::create([
             'user_id' => $user->id,
             'reason' => 'spam',

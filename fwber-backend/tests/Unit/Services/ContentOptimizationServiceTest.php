@@ -15,8 +15,11 @@ use Tests\TestCase;
 class ContentOptimizationServiceTest extends TestCase
 {
     protected $llmManager;
+
     protected $driver;
+
     protected $moderationService;
+
     protected $service;
 
     protected function setUp(): void
@@ -26,7 +29,7 @@ class ContentOptimizationServiceTest extends TestCase
         $this->llmManager = Mockery::mock(LlmManager::class);
         $this->driver = Mockery::mock(LlmProviderInterface::class);
         $this->moderationService = Mockery::mock(ContentModerationService::class);
-        
+
         // Bind the mock moderation service to the container
         $this->app->instance(ContentModerationService::class, $this->moderationService);
 
@@ -54,9 +57,9 @@ class ContentOptimizationServiceTest extends TestCase
 
     public function test_optimize_content_success()
     {
-        $content = "Original content.";
+        $content = 'Original content.';
         $context = ['interests' => ['tech']];
-        
+
         $this->llmManager->shouldReceive('driver')
             ->with('openai')
             ->andReturn($this->driver);
@@ -67,14 +70,14 @@ class ContentOptimizationServiceTest extends TestCase
             ->with(Mockery::on(function ($messages) {
                 return str_contains($messages[0]['content'], 'engagement');
             }))
-            ->andReturn(new LlmResponse("Engaging content!", 'openai'));
+            ->andReturn(new LlmResponse('Engaging content!', 'openai'));
 
         // Clarity
         $this->driver->shouldReceive('chat')
             ->with(Mockery::on(function ($messages) {
                 return str_contains($messages[0]['content'], 'clarity');
             }))
-            ->andReturn(new LlmResponse("Clear content.", 'openai'));
+            ->andReturn(new LlmResponse('Clear content.', 'openai'));
 
         // Safety
         $this->moderationService->shouldReceive('moderateContent')
@@ -86,7 +89,7 @@ class ContentOptimizationServiceTest extends TestCase
             ->with(Mockery::on(function ($messages) {
                 return str_contains($messages[0]['content'], 'relevance');
             }))
-            ->andReturn(new LlmResponse("Relevant content.", 'openai'));
+            ->andReturn(new LlmResponse('Relevant content.', 'openai'));
 
         Cache::shouldReceive('get')->andReturn(null);
         Cache::shouldReceive('put');
@@ -100,7 +103,7 @@ class ContentOptimizationServiceTest extends TestCase
 
     public function test_optimize_content_safety_flagged()
     {
-        $content = "Unsafe content.";
+        $content = 'Unsafe content.';
         $context = [];
 
         $this->llmManager->shouldReceive('driver')
@@ -112,14 +115,14 @@ class ContentOptimizationServiceTest extends TestCase
             ->with(Mockery::on(function ($messages) {
                 return str_contains($messages[0]['content'], 'engagement');
             }))
-            ->andReturn(new LlmResponse("Engaging content!", 'openai'));
+            ->andReturn(new LlmResponse('Engaging content!', 'openai'));
 
         // Clarity
         $this->driver->shouldReceive('chat')
             ->with(Mockery::on(function ($messages) {
                 return str_contains($messages[0]['content'], 'clarity');
             }))
-            ->andReturn(new LlmResponse("Clear content.", 'openai'));
+            ->andReturn(new LlmResponse('Clear content.', 'openai'));
 
         // Safety - Flagged first, then optimized
         $this->moderationService->shouldReceive('moderateContent')
@@ -130,10 +133,10 @@ class ContentOptimizationServiceTest extends TestCase
             ->with(Mockery::on(function ($messages) {
                 return str_contains($messages[0]['content'], 'safety');
             }))
-            ->andReturn(new LlmResponse("Safe content.", 'openai'));
+            ->andReturn(new LlmResponse('Safe content.', 'openai'));
 
         $this->moderationService->shouldReceive('moderateContent')
-            ->with("Safe content.")
+            ->with('Safe content.')
             ->andReturn(['flagged' => false]);
 
         // Relevance
@@ -141,7 +144,7 @@ class ContentOptimizationServiceTest extends TestCase
             ->with(Mockery::on(function ($messages) {
                 return str_contains($messages[0]['content'], 'relevance');
             }))
-            ->andReturn(new LlmResponse("Relevant content.", 'openai'));
+            ->andReturn(new LlmResponse('Relevant content.', 'openai'));
 
         Cache::shouldReceive('get')->andReturn(null);
         Cache::shouldReceive('put');
@@ -153,7 +156,7 @@ class ContentOptimizationServiceTest extends TestCase
 
     public function test_optimize_content_cached()
     {
-        $content = "Cached content.";
+        $content = 'Cached content.';
         $cachedResult = ['optimized' => 'Cached result'];
 
         Cache::shouldReceive('get')

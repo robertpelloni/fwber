@@ -131,7 +131,8 @@ export default function ActiveAudioRoom() {
         return () => {
             echo.leave(`audio-rooms.${id}`);
         };
-    }, [echo, room?.id, user?.id, createOfferForPeer]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [echo, room?.id, user?.id, createOfferForPeer, id, router, toast]);
 
     // Listen for private signals (like raise-hand)
     useEffect(() => {

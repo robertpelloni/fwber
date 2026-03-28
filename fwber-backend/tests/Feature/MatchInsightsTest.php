@@ -7,7 +7,6 @@ use App\Models\UserProfile;
 use App\Services\AiWingmanService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Mockery;
 
 class MatchInsightsTest extends TestCase
 {
@@ -22,7 +21,7 @@ class MatchInsightsTest extends TestCase
             'interests' => ['hiking', 'coding'],
             'birthdate' => now()->subYears(25),
         ]);
-        
+
         $match = User::factory()->create();
         UserProfile::factory()->create([
             'user_id' => $match->id,
@@ -36,8 +35,8 @@ class MatchInsightsTest extends TestCase
         // Mock AiWingmanService
         // We need to partial mock if we want other methods to work, but here we only call generateMatchExplanation
         // However, the controller also injects AIMatchingService. We can let that run real code as it's just logic.
-        
-        $this->mock(AiWingmanService::class, function ($mock) use ($user, $match) {
+
+        $this->mock(AiWingmanService::class, function ($mock) {
             $mock->shouldReceive('generateMatchExplanation')
                 ->andReturn('You are a perfect match because you both like coding.');
         });
@@ -47,7 +46,7 @@ class MatchInsightsTest extends TestCase
             'user_id' => $user->id,
             'content_type' => 'match_insight',
             'content_id' => $match->id,
-            'cost' => 10
+            'cost' => 10,
         ]);
 
         $response = $this->getJson("/api/matches/{$match->id}/insights");
@@ -59,8 +58,8 @@ class MatchInsightsTest extends TestCase
                 'data' => [
                     'total_score',
                     'breakdown',
-                    'ai_explanation'
-                ]
+                    'ai_explanation',
+                ],
             ]);
     }
 }

@@ -2,19 +2,19 @@
 
 namespace App\Models;
 
+use App\Models\Traits\SafelyHydratesAttributes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
-use App\Models\Traits\SafelyHydratesAttributes;
 
 /**
  * Photo Model - User Photo Management
- * 
+ *
  * AI Model: Claude 4.5 - Multi-AI Orchestration
  * Phase: 4A - Laravel Photo Upload System
  * Purpose: Model for user photo storage and management
- * 
+ *
  * Created: 2025-01-19
  * Multi-AI: Serena analysis + Chroma knowledge + Sequential thinking
  */
@@ -86,6 +86,7 @@ class Photo extends Model
     public function getThumbnailUrlAttribute(): string
     {
         $path = $this->thumbnail_path ?: $this->file_path;
+
         return Storage::disk('public')->url($path);
     }
 
@@ -96,21 +97,21 @@ class Photo extends Model
     {
         try {
             $user = auth()->user();
-            
-            if (!$user) {
+
+            if (! $user) {
                 return false;
             }
-            
+
             // Owner always has access
             if ($this->user_id === $user->id) {
                 return true;
             }
-            
+
             // Public photos are always unlocked
-            if (!$this->is_private) {
+            if (! $this->is_private) {
                 return true;
             }
-            
+
             // Check if unlocked via tokens
             return \App\Models\PhotoUnlock::where('user_id', $user->id)
                 ->where('photo_id', $this->id)
@@ -162,7 +163,7 @@ class Photo extends Model
         static::where('user_id', $this->user_id)
             ->where('id', '!=', $this->id)
             ->update(['is_primary' => false]);
-        
+
         // Set this photo as primary
         $this->update(['is_primary' => true]);
     }
@@ -173,15 +174,15 @@ class Photo extends Model
     public function deleteFile(): bool
     {
         $deleted = true;
-        
+
         if ($this->file_path && Storage::disk('public')->exists($this->file_path)) {
             $deleted = Storage::disk('public')->delete($this->file_path) && $deleted;
         }
-        
+
         if ($this->thumbnail_path && Storage::disk('public')->exists($this->thumbnail_path)) {
             $deleted = Storage::disk('public')->delete($this->thumbnail_path) && $deleted;
         }
-        
+
         return $deleted;
     }
 

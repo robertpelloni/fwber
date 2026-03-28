@@ -19,7 +19,7 @@ class AudioModerationTest extends TestCase
     public function test_audio_message_is_transcribed_and_moderated()
     {
         Storage::fake('public');
-        
+
         // Create users
         $sender = User::factory()->create();
         $receiver = User::factory()->create();
@@ -69,7 +69,7 @@ class AudioModerationTest extends TestCase
     public function test_audio_message_is_not_flagged_if_safe()
     {
         Storage::fake('public');
-        
+
         // Create users
         $sender = User::factory()->create();
         $receiver = User::factory()->create();

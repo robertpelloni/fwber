@@ -58,7 +58,7 @@ class Message extends Model
     {
         return $query->where(function ($q) use ($userId1, $userId2) {
             $q->where('sender_id', $userId1)->where('receiver_id', $userId2)
-              ->orWhere('sender_id', $userId2)->where('receiver_id', $userId1);
+                ->orWhere('sender_id', $userId2)->where('receiver_id', $userId1);
         });
     }
 

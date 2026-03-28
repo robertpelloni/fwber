@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Carbon\Carbon;
 
 class RelationshipTier extends Model
 {
@@ -77,14 +77,14 @@ class RelationshipTier extends Model
     {
         $this->messages_exchanged++;
         $this->last_message_at = now();
-        
+
         $newTier = $this->calculateTier();
         $previousTier = $this->current_tier;
-        
+
         if ($newTier !== $previousTier) {
             $this->current_tier = $newTier;
         }
-        
+
         $this->save();
     }
 
@@ -105,7 +105,7 @@ class RelationshipTier extends Model
     public function confirmMeetingForUser(int $userId): void
     {
         // Ensure match is loaded
-        if (!$this->relationLoaded('match')) {
+        if (! $this->relationLoaded('match')) {
             $this->load('match');
         }
 
@@ -133,32 +133,32 @@ class RelationshipTier extends Model
                 'name' => 'Discovery',
                 'icon' => '🔍',
                 'color' => 'gray',
-                'unlocks' => ['AI-generated photos', 'Basic profile info']
+                'unlocks' => ['AI-generated photos', 'Basic profile info'],
             ],
             'matched' => [
                 'name' => 'Matched',
                 'icon' => '💫',
                 'color' => 'blue',
-                'unlocks' => ['Direct messaging', '1-2 blurred real photos']
+                'unlocks' => ['Direct messaging', '1-2 blurred real photos'],
             ],
             'connected' => [
                 'name' => 'Connected',
                 'icon' => '💬',
                 'color' => 'purple',
-                'unlocks' => ['3-5 real photos', 'Video chat', 'Voice messages']
+                'unlocks' => ['3-5 real photos', 'Video chat', 'Voice messages'],
             ],
             'established' => [
                 'name' => 'Established',
                 'icon' => '❤️',
                 'color' => 'pink',
-                'unlocks' => ['Full photo gallery', 'Contact sharing']
+                'unlocks' => ['Full photo gallery', 'Contact sharing'],
             ],
             'verified' => [
                 'name' => 'Verified',
                 'icon' => '✅',
                 'color' => 'green',
-                'unlocks' => ['Complete access', 'Private content']
-            ]
+                'unlocks' => ['Complete access', 'Private content'],
+            ],
         ];
 
         return $tiers[$this->current_tier] ?? $tiers['discovery'];
@@ -172,17 +172,17 @@ class RelationshipTier extends Model
         switch ($this->current_tier) {
             case 'discovery':
                 return ['real' => 0, 'ai' => 999, 'blurred' => 0];
-            
+
             case 'matched':
                 return ['real' => 0, 'ai' => 999, 'blurred' => min(2, $totalRealPhotos)];
-            
+
             case 'connected':
                 return ['real' => min(5, $totalRealPhotos), 'ai' => 999, 'blurred' => 0];
-            
+
             case 'established':
             case 'verified':
                 return ['real' => $totalRealPhotos, 'ai' => 999, 'blurred' => 0];
-            
+
             default:
                 return ['real' => 0, 'ai' => 999, 'blurred' => 0];
         }

@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Message;
-use App\Services\AiWingmanService;
-use Illuminate\Http\Request;
 use App\Http\Requests\Wingman\AnalyzeDraftRequest;
 use App\Http\Requests\Wingman\AnalyzeQuirkRequest;
 use App\Http\Requests\Wingman\RoastPublicRequest;
-use Illuminate\Support\Facades\Auth;
-
+use App\Models\Message;
+use App\Models\User;
 use App\Models\ViralContent;
+use App\Services\AiWingmanService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AiWingmanController extends Controller
 {
@@ -29,14 +28,13 @@ class AiWingmanController extends Controller
             'type' => $type,
             'content' => $content,
         ]);
+
         return $viral->id;
     }
 
     /**
      * Get ice breaker suggestions for a specific match.
      *
-     * @param Request $request
-     * @param string $matchId
      * @return \Illuminate\Http\JsonResponse
      */
     public function getIceBreakers(Request $request, string $matchId)
@@ -45,13 +43,13 @@ class AiWingmanController extends Controller
         $match = User::findOrFail($matchId);
 
         // Check if they are matched
-        $isMatched = \App\Models\UserMatch::where(function($q) use ($user, $matchId) {
+        $isMatched = \App\Models\UserMatch::where(function ($q) use ($user, $matchId) {
             $q->where('user1_id', $user->id)->where('user2_id', $matchId);
-        })->orWhere(function($q) use ($user, $matchId) {
+        })->orWhere(function ($q) use ($user, $matchId) {
             $q->where('user1_id', $matchId)->where('user2_id', $user->id);
         })->exists();
 
-        if (!$isMatched) {
+        if (! $isMatched) {
             return response()->json(['error' => 'You are not matched with this user.'], 403);
         }
 
@@ -63,8 +61,6 @@ class AiWingmanController extends Controller
     /**
      * Get reply suggestions for an ongoing conversation.
      *
-     * @param Request $request
-     * @param string $matchId
      * @return \Illuminate\Http\JsonResponse
      */
     public function getReplySuggestions(Request $request, string $matchId)
@@ -73,27 +69,27 @@ class AiWingmanController extends Controller
         $match = User::findOrFail($matchId);
 
         // Check if they are matched
-        $isMatched = \App\Models\UserMatch::where(function($q) use ($user, $matchId) {
+        $isMatched = \App\Models\UserMatch::where(function ($q) use ($user, $matchId) {
             $q->where('user1_id', $user->id)->where('user2_id', $matchId);
-        })->orWhere(function($q) use ($user, $matchId) {
+        })->orWhere(function ($q) use ($user, $matchId) {
             $q->where('user1_id', $matchId)->where('user2_id', $user->id);
         })->exists();
 
-        if (!$isMatched) {
+        if (! $isMatched) {
             return response()->json(['error' => 'You are not matched with this user.'], 403);
         }
 
         // Fetch last 10 messages
-        $messages = Message::where(function($q) use ($user, $matchId) {
-                $q->where('sender_id', $user->id)->where('receiver_id', $matchId);
-            })
-            ->orWhere(function($q) use ($user, $matchId) {
+        $messages = Message::where(function ($q) use ($user, $matchId) {
+            $q->where('sender_id', $user->id)->where('receiver_id', $matchId);
+        })
+            ->orWhere(function ($q) use ($user, $matchId) {
                 $q->where('sender_id', $matchId)->where('receiver_id', $user->id);
             })
             ->orderBy('created_at', 'asc') // Oldest first for context
             ->take(10)
             ->get()
-            ->map(function($msg) {
+            ->map(function ($msg) {
                 return [
                     'sender_id' => $msg->sender_id,
                     'content' => $msg->content,
@@ -116,8 +112,7 @@ class AiWingmanController extends Controller
     /**
      * Analyze a draft message and provide feedback.
      *
-     * @param Request $request
-     * @param string $matchId
+     * @param  Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function analyzeDraft(AnalyzeDraftRequest $request, string $matchId)
@@ -126,27 +121,27 @@ class AiWingmanController extends Controller
         $match = User::findOrFail($matchId);
 
         // Check if they are matched
-        $isMatched = \App\Models\UserMatch::where(function($q) use ($user, $matchId) {
+        $isMatched = \App\Models\UserMatch::where(function ($q) use ($user, $matchId) {
             $q->where('user1_id', $user->id)->where('user2_id', $matchId);
-        })->orWhere(function($q) use ($user, $matchId) {
+        })->orWhere(function ($q) use ($user, $matchId) {
             $q->where('user1_id', $matchId)->where('user2_id', $user->id);
         })->exists();
 
-        if (!$isMatched) {
+        if (! $isMatched) {
             return response()->json(['error' => 'You are not matched with this user.'], 403);
         }
 
         // Fetch last 10 messages for context
-        $messages = Message::where(function($q) use ($user, $matchId) {
-                $q->where('sender_id', $user->id)->where('receiver_id', $matchId);
-            })
-            ->orWhere(function($q) use ($user, $matchId) {
+        $messages = Message::where(function ($q) use ($user, $matchId) {
+            $q->where('sender_id', $user->id)->where('receiver_id', $matchId);
+        })
+            ->orWhere(function ($q) use ($user, $matchId) {
                 $q->where('sender_id', $matchId)->where('receiver_id', $user->id);
             })
             ->orderBy('created_at', 'asc')
             ->take(10)
             ->get()
-            ->map(function($msg) {
+            ->map(function ($msg) {
                 return [
                     'sender_id' => $msg->sender_id,
                     'content' => $msg->content,
@@ -164,7 +159,6 @@ class AiWingmanController extends Controller
     /**
      * Analyze the authenticated user's profile.
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function getProfileAnalysis(Request $request)
@@ -178,8 +172,6 @@ class AiWingmanController extends Controller
     /**
      * Get date ideas for a specific match.
      *
-     * @param Request $request
-     * @param string $matchId
      * @return \Illuminate\Http\JsonResponse
      */
     public function getDateIdeas(Request $request, string $matchId)
@@ -188,13 +180,13 @@ class AiWingmanController extends Controller
         $match = User::findOrFail($matchId);
 
         // Check if they are matched
-        $isMatched = \App\Models\UserMatch::where(function($q) use ($user, $matchId) {
+        $isMatched = \App\Models\UserMatch::where(function ($q) use ($user, $matchId) {
             $q->where('user1_id', $user->id)->where('user2_id', $matchId);
-        })->orWhere(function($q) use ($user, $matchId) {
+        })->orWhere(function ($q) use ($user, $matchId) {
             $q->where('user1_id', $matchId)->where('user2_id', $user->id);
         })->exists();
 
-        if (!$isMatched) {
+        if (! $isMatched) {
             return response()->json(['error' => 'You are not matched with this user.'], 403);
         }
 
@@ -208,13 +200,13 @@ class AiWingmanController extends Controller
      * Generate a roast or hype for an unauthenticated user (Public "Tease").
      * Rate limited by IP.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function roastPublic(RoastPublicRequest $request)
     {
         $mode = $request->input('mode', 'roast');
-        
+
         $result = $this->wingmanService->roastGeneric(
             $request->input('name'),
             $request->input('job'),
@@ -230,14 +222,13 @@ class AiWingmanController extends Controller
         return response()->json([
             'roast' => $result,
             'is_preview' => true,
-            'cta' => 'Sign up to save this roast and share it with friends!'
+            'cta' => 'Sign up to save this roast and share it with friends!',
         ]);
     }
 
     /**
      * Generate a roast or hype of the authenticated user's profile.
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function roastProfile(Request $request)
@@ -245,7 +236,7 @@ class AiWingmanController extends Controller
         $user = Auth::user();
         $mode = $request->input('mode', 'roast');
 
-        if (!in_array($mode, ['roast', 'hype'])) {
+        if (! in_array($mode, ['roast', 'hype'])) {
             $mode = 'roast';
         }
 
@@ -255,14 +246,13 @@ class AiWingmanController extends Controller
 
         return response()->json([
             'roast' => $result,
-            'share_id' => $shareId
+            'share_id' => $shareId,
         ]);
     }
 
     /**
      * Generate "Red Flags" and "Green Flags" for the authenticated user's profile.
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function checkVibe(Request $request)
@@ -278,7 +268,6 @@ class AiWingmanController extends Controller
     /**
      * Generate a humorous "Dating Fortune" for the authenticated user.
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function predictFortune(Request $request)
@@ -290,14 +279,13 @@ class AiWingmanController extends Controller
 
         return response()->json([
             'fortune' => $result,
-            'share_id' => $shareId
+            'share_id' => $shareId,
         ]);
     }
 
     /**
      * Generate a "Cosmic Match" prediction for the authenticated user.
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function getCosmicMatch(Request $request)
@@ -313,7 +301,6 @@ class AiWingmanController extends Controller
     /**
      * Generate a "Scientific Nemesis" profile for the authenticated user.
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function findNemesis(Request $request)
@@ -329,14 +316,14 @@ class AiWingmanController extends Controller
     /**
      * Analyze a user quirk for "Red Flags".
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function checkQuirk(AnalyzeQuirkRequest $request)
     {
         $user = Auth::user();
         $quirk = $request->input('quirk');
-        
+
         $result = $this->wingmanService->analyzeQuirk($quirk);
 
         // Save for sharing
@@ -349,8 +336,6 @@ class AiWingmanController extends Controller
      * Generate a deep AI-powered "Compatibility Audit" for a matched user.
      * Requires mutual match. Token-gated (5 FWB tokens).
      *
-     * @param Request $request
-     * @param string $targetId
      * @return \Illuminate\Http\JsonResponse
      */
     public function compatibilityAudit(Request $request, string $targetId)
@@ -359,13 +344,13 @@ class AiWingmanController extends Controller
         $target = User::findOrFail($targetId);
 
         // Verify mutual match
-        $isMatched = \App\Models\UserMatch::where(function($q) use ($user, $targetId) {
+        $isMatched = \App\Models\UserMatch::where(function ($q) use ($user, $targetId) {
             $q->where('user1_id', $user->id)->where('user2_id', $targetId);
-        })->orWhere(function($q) use ($user, $targetId) {
+        })->orWhere(function ($q) use ($user, $targetId) {
             $q->where('user1_id', $targetId)->where('user2_id', $user->id);
         })->exists();
 
-        if (!$isMatched) {
+        if (! $isMatched) {
             return response()->json(['error' => 'You must be matched with this user to request a compatibility audit.'], 403);
         }
 
@@ -376,4 +361,3 @@ class AiWingmanController extends Controller
         return response()->json(array_merge($audit, ['share_id' => $shareId]));
     }
 }
-

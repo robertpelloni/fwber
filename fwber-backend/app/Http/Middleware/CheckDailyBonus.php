@@ -2,10 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\TokenDistributionService;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Services\TokenDistributionService;
 
 class CheckDailyBonus
 {
@@ -27,7 +27,7 @@ class CheckDailyBonus
                     $lastBonus = null;
                 }
 
-                if (!$lastBonus || $lastBonus->lt($now->startOfDay())) {
+                if (! $lastBonus || $lastBonus->lt($now->startOfDay())) {
 
                     // Award 10 Tokens
                     try {
@@ -38,13 +38,13 @@ class CheckDailyBonus
                         $user->save();
                     } catch (\Throwable $e) {
                         // Ignore if token service fails or save fails (missing column)
-                        \Illuminate\Support\Facades\Log::error('CheckDailyBonus error: ' . $e->getMessage());
+                        \Illuminate\Support\Facades\Log::error('CheckDailyBonus error: '.$e->getMessage());
                     }
                 }
             }
         } catch (\Throwable $e) {
             // Fail silently
-            \Illuminate\Support\Facades\Log::error('CheckDailyBonus fatal error: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('CheckDailyBonus fatal error: '.$e->getMessage());
         }
 
         return $next($request);

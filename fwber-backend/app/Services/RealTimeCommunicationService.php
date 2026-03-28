@@ -2,18 +2,20 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use App\Models\Message;
+use App\Models\User;
 use App\Models\UserMatch;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 
 class RealTimeCommunicationService
 {
     private $redis;
+
     private $presencePrefix = 'user:presence:';
+
     private $typingPrefix = 'user:typing:';
+
     private $messagePrefix = 'message:';
 
     public function __construct()
@@ -24,7 +26,7 @@ class RealTimeCommunicationService
     public function setUserOnline(int $userId): void
     {
         $this->redis->setex(
-            $this->presencePrefix . $userId,
+            $this->presencePrefix.$userId,
             300, // 5 minutes TTL
             json_encode([
                 'user_id' => $userId,
@@ -39,13 +41,14 @@ class RealTimeCommunicationService
 
     public function setUserOffline(int $userId): void
     {
-        $this->redis->del($this->presencePrefix . $userId);
+        $this->redis->del($this->presencePrefix.$userId);
         $this->publishPresenceUpdate($userId, 'offline');
     }
 
     public function getUserPresence(int $userId): ?array
     {
-        $presence = $this->redis->get($this->presencePrefix . $userId);
+        $presence = $this->redis->get($this->presencePrefix.$userId);
+
         return $presence ? json_decode($presence, true) : null;
     }
 
@@ -53,7 +56,7 @@ class RealTimeCommunicationService
     {
         if ($isTyping) {
             $this->redis->setex(
-                $this->typingPrefix . $userId . ':' . $targetUserId,
+                $this->typingPrefix.$userId.':'.$targetUserId,
                 10, // 10 seconds TTL
                 json_encode([
                     'user_id' => $userId,
@@ -63,7 +66,7 @@ class RealTimeCommunicationService
                 ])
             );
         } else {
-            $this->redis->del($this->typingPrefix . $userId . ':' . $targetUserId);
+            $this->redis->del($this->typingPrefix.$userId.':'.$targetUserId);
         }
 
         $this->publishTypingUpdate($userId, $targetUserId, $isTyping);
@@ -71,14 +74,15 @@ class RealTimeCommunicationService
 
     public function getTypingStatus(int $userId, int $targetUserId): ?array
     {
-        $typing = $this->redis->get($this->typingPrefix . $targetUserId . ':' . $userId);
+        $typing = $this->redis->get($this->typingPrefix.$targetUserId.':'.$userId);
+
         return $typing ? json_decode($typing, true) : null;
     }
 
     public function sendMessage(int $senderId, int $receiverId, string $content, ?string $messageType = 'text'): array
     {
         // Validate that users can communicate
-        if (!$this->canUsersCommunicate($senderId, $receiverId)) {
+        if (! $this->canUsersCommunicate($senderId, $receiverId)) {
             throw new \Exception('Users cannot communicate');
         }
 
@@ -118,7 +122,7 @@ class RealTimeCommunicationService
             ->where('receiver_id', $userId)
             ->first();
 
-        if ($message && !$message->is_read) {
+        if ($message && ! $message->is_read) {
             $message->update(['is_read' => true, 'read_at' => now()]);
             $this->publishMessageRead($message);
         }
@@ -128,11 +132,11 @@ class RealTimeCommunicationService
     {
         $messages = Message::where(function ($query) use ($userId1, $userId2) {
             $query->where('sender_id', $userId1)->where('receiver_id', $userId2)
-                  ->orWhere('sender_id', $userId2)->where('receiver_id', $userId1);
+                ->orWhere('sender_id', $userId2)->where('receiver_id', $userId1);
         })
-        ->orderBy('sent_at', 'desc')
-        ->limit($limit)
-        ->get();
+            ->orderBy('sent_at', 'desc')
+            ->limit($limit)
+            ->get();
 
         return $messages->map(function ($message) {
             return [
@@ -187,7 +191,7 @@ class RealTimeCommunicationService
         return UserMatch::where('is_active', true)
             ->where(function ($query) use ($userId1, $userId2) {
                 $query->where('user1_id', $userId1)->where('user2_id', $userId2)
-                      ->orWhere('user1_id', $userId2)->where('user2_id', $userId1);
+                    ->orWhere('user1_id', $userId2)->where('user2_id', $userId1);
             })
             ->exists();
     }
@@ -238,7 +242,7 @@ class RealTimeCommunicationService
         UserMatch::where('is_active', true)
             ->where(function ($query) use ($userId1, $userId2) {
                 $query->where('user1_id', $userId1)->where('user2_id', $userId2)
-                      ->orWhere('user1_id', $userId2)->where('user2_id', $userId1);
+                    ->orWhere('user1_id', $userId2)->where('user2_id', $userId1);
             })
             ->update(['last_message_at' => now()]);
     }
@@ -246,9 +250,9 @@ class RealTimeCommunicationService
     private function sendPushNotification(int $receiverId, Message $message): void
     {
         $presence = $this->getUserPresence($receiverId);
-        
+
         // Only send push notification if user is offline
-        if (!$presence || $presence['status'] !== 'online') {
+        if (! $presence || $presence['status'] !== 'online') {
             // In a real implementation, this would integrate with FCM, APNS, or similar
             Log::info("Push notification for user {$receiverId}: New message from {$message->sender_id}");
         }
@@ -256,12 +260,12 @@ class RealTimeCommunicationService
 
     public function initiateVideoCall(int $userId, int $targetUserId): array
     {
-        if (!$this->canUsersCommunicate($userId, $targetUserId)) {
+        if (! $this->canUsersCommunicate($userId, $targetUserId)) {
             throw new \Exception('Users cannot initiate video call');
         }
 
         $callId = uniqid('call_');
-        
+
         // Store call information
         $this->redis->setex(
             "call:{$callId}",
@@ -295,7 +299,7 @@ class RealTimeCommunicationService
     public function acceptVideoCall(string $callId, int $userId): array
     {
         $callData = $this->redis->get("call:{$callId}");
-        if (!$callData) {
+        if (! $callData) {
             throw new \Exception('Call not found');
         }
 
@@ -307,7 +311,7 @@ class RealTimeCommunicationService
         // Update call status
         $call['status'] = 'accepted';
         $call['accepted_at'] = now()->toISOString();
-        
+
         $this->redis->setex(
             "call:{$callId}",
             3600,
@@ -326,24 +330,22 @@ class RealTimeCommunicationService
         return $call;
     }
 
-
-
     public function endVideoCall(string $callId, int $userId): void
     {
         $callData = $this->redis->get("call:{$callId}");
-        if (!$callData) {
+        if (! $callData) {
             return;
         }
 
         $call = json_decode($callData, true);
-        if (!in_array($userId, [$call['initiator_id'], $call['target_id']])) {
+        if (! in_array($userId, [$call['initiator_id'], $call['target_id']])) {
             throw new \Exception('Unauthorized to end this call');
         }
 
         // Update call status
         $call['status'] = 'ended';
         $call['ended_at'] = now()->toISOString();
-        
+
         $this->redis->setex(
             "call:{$callId}",
             3600,
@@ -366,12 +368,12 @@ class RealTimeCommunicationService
     public function sendSignal(string $callId, int $senderId, array $signalData): void
     {
         $callData = $this->redis->get("call:{$callId}");
-        if (!$callData) {
+        if (! $callData) {
             throw new \Exception('Call not found');
         }
 
         $call = json_decode($callData, true);
-        if (!in_array($senderId, [$call['initiator_id'], $call['target_id']])) {
+        if (! in_array($senderId, [$call['initiator_id'], $call['target_id']])) {
             throw new \Exception('Unauthorized to signal in this call');
         }
 

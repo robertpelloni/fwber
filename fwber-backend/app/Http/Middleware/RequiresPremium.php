@@ -2,10 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use Carbon\Carbon;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Carbon\Carbon;
 
 class RequiresPremium
 {
@@ -18,15 +18,15 @@ class RequiresPremium
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
-        $isPremium = $user->tier === 'gold' && 
-                     $user->tier_expires_at && 
+        $isPremium = $user->tier === 'gold' &&
+                     $user->tier_expires_at &&
                      Carbon::parse($user->tier_expires_at)->isFuture();
 
-        if (!$isPremium) {
+        if (! $isPremium) {
             return response()->json(['message' => 'Premium subscription required.'], 403);
         }
 

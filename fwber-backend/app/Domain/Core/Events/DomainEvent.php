@@ -7,14 +7,16 @@ use Illuminate\Support\Str;
 abstract class DomainEvent
 {
     public readonly string $eventId;
+
     public readonly string $aggregateUuid;
+
     public readonly \DateTimeImmutable $occurredAt;
 
     public function __construct(string $aggregateUuid)
     {
         $this->eventId = Str::uuid()->toString();
         $this->aggregateUuid = $aggregateUuid;
-        $this->occurredAt = new \DateTimeImmutable();
+        $this->occurredAt = new \DateTimeImmutable;
     }
 
     /**

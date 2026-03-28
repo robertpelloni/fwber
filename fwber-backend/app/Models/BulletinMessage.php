@@ -86,7 +86,7 @@ class BulletinMessage extends Model
         if ($this->is_anonymous) {
             return 'Anonymous';
         }
-        
+
         return $this->user->name ?? 'Unknown User';
     }
 
@@ -98,7 +98,7 @@ class BulletinMessage extends Model
         if ($this->is_anonymous) {
             return null;
         }
-        
+
         return $this->user->avatar_url ?? null;
     }
 
@@ -109,7 +109,7 @@ class BulletinMessage extends Model
     {
         return $query->where(function ($q) {
             $q->whereNull('expires_at')
-              ->orWhere('expires_at', '>', now());
+                ->orWhere('expires_at', '>', now());
         });
     }
 

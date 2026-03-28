@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use App\Models\Venue;
 use App\Models\VenueCheckin;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -29,7 +29,7 @@ class VenueCheckinControllerTest extends TestCase
             ]);
 
         $response->assertStatus(201);
-        
+
         $this->assertDatabaseHas('venue_checkins', [
             'user_id' => $user->id,
             'venue_id' => $venue->id,
@@ -84,7 +84,7 @@ class VenueCheckinControllerTest extends TestCase
             'venue_id' => $venue1->id,
             'user_id' => $user->id,
         ]);
-        
+
         $checkin1 = VenueCheckin::where('venue_id', $venue1->id)->first();
         $this->assertNotNull($checkin1->checked_out_at);
     }
@@ -119,7 +119,7 @@ class VenueCheckinControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($user)
-            ->getJson("/api/user/checkin");
+            ->getJson('/api/user/checkin');
 
         $response->assertStatus(200)
             ->assertJsonFragment(['venue_id' => $venue->id]);

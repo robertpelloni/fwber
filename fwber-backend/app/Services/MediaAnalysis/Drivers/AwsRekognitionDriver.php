@@ -5,9 +5,9 @@ namespace App\Services\MediaAnalysis\Drivers;
 use App\Services\MediaAnalysis\MediaAnalysisInterface;
 use App\Services\MediaAnalysis\MediaAnalysisResult;
 use Aws\Rekognition\RekognitionClient;
+use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Exception;
 
 class AwsRekognitionDriver implements MediaAnalysisInterface
 {
@@ -26,15 +26,16 @@ class AwsRekognitionDriver implements MediaAnalysisInterface
                 'credentials' => [
                     'key' => $key,
                     'secret' => $secret,
-                ]
+                ],
             ]);
         }
     }
 
     public function analyze(string $url, string $type): MediaAnalysisResult
     {
-        if (!$this->client) {
+        if (! $this->client) {
             Log::warning('AWS Rekognition credentials not configured. Falling back to safe result.');
+
             return new MediaAnalysisResult(
                 true,
                 ['aws_not_configured'],
@@ -47,25 +48,25 @@ class AwsRekognitionDriver implements MediaAnalysisInterface
         try {
             // Get image bytes
             $disk = config('filesystems.default', 'public');
-            if (!Storage::disk($disk)->exists($url)) {
+            if (! Storage::disk($disk)->exists($url)) {
                 throw new Exception("File not found on disk [{$disk}]: $url");
             }
-            
+
             $imageBytes = Storage::disk($disk)->get($url);
 
             // 1. Detect Moderation Labels (Safety)
             $moderationResult = $this->client->detectModerationLabels([
                 'Image' => ['Bytes' => $imageBytes],
-                'MinConfidence' => 60
+                'MinConfidence' => 60,
             ]);
-            
+
             $moderationLabels = $moderationResult['ModerationLabels'] ?? [];
             $unsafeLabels = [];
-            
+
             foreach ($moderationLabels as $label) {
-                $unsafeLabels[] = $label['Name'] . ' (' . round($label['Confidence']) . '%)';
+                $unsafeLabels[] = $label['Name'].' ('.round($label['Confidence']).'%)';
             }
-            
+
             $isSafe = empty($unsafeLabels);
 
             // 2. Detect Content Labels (Tags)
@@ -74,9 +75,9 @@ class AwsRekognitionDriver implements MediaAnalysisInterface
                 $labelResult = $this->client->detectLabels([
                     'Image' => ['Bytes' => $imageBytes],
                     'MaxLabels' => 15,
-                    'MinConfidence' => 70
+                    'MinConfidence' => 70,
                 ]);
-                
+
                 foreach ($labelResult['Labels'] as $label) {
                     $contentLabels[] = $label['Name'];
                 }
@@ -93,9 +94,9 @@ class AwsRekognitionDriver implements MediaAnalysisInterface
         } catch (Exception $e) {
             Log::error('AWS Rekognition Analysis Failed', [
                 'error' => $e->getMessage(),
-                'file' => $url
+                'file' => $url,
             ]);
-            
+
             // Rethrow so the upload fails rather than allowing potentially unsafe content silently
             throw $e;
         }
@@ -103,17 +104,17 @@ class AwsRekognitionDriver implements MediaAnalysisInterface
 
     public function compareFaces(string $sourcePath, string $targetPath): float
     {
-        if (!$this->client) {
+        if (! $this->client) {
             Log::error('AWS Rekognition credentials not configured.');
             throw new Exception('AWS Rekognition credentials not configured.');
         }
 
         try {
             $disk = config('filesystems.default', 'public');
-            if (!Storage::disk($disk)->exists($sourcePath)) {
+            if (! Storage::disk($disk)->exists($sourcePath)) {
                 throw new Exception("Source file not found on disk [{$disk}]: $sourcePath");
             }
-            if (!Storage::disk($disk)->exists($targetPath)) {
+            if (! Storage::disk($disk)->exists($targetPath)) {
                 throw new Exception("Target file not found on disk [{$disk}]: $targetPath");
             }
 
@@ -123,11 +124,11 @@ class AwsRekognitionDriver implements MediaAnalysisInterface
             $result = $this->client->compareFaces([
                 'SourceImage' => ['Bytes' => $sourceBytes],
                 'TargetImage' => ['Bytes' => $targetBytes],
-                'SimilarityThreshold' => 70
+                'SimilarityThreshold' => 70,
             ]);
 
             $faceMatches = $result['FaceMatches'] ?? [];
-            
+
             if (empty($faceMatches)) {
                 return 0.0;
             }
@@ -146,7 +147,7 @@ class AwsRekognitionDriver implements MediaAnalysisInterface
             Log::error('AWS Rekognition Compare Faces Failed', [
                 'error' => $e->getMessage(),
                 'source' => $sourcePath,
-                'target' => $targetPath
+                'target' => $targetPath,
             ]);
             throw $e;
         }

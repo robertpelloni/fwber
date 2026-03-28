@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use App\Models\User;
 use App\Models\UserProfile;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class ActivityPubTest extends TestCase
 {
@@ -16,7 +16,7 @@ class ActivityPubTest extends TestCase
         $user = User::factory()->create(['name' => 'alice']);
         UserProfile::factory()->create([
             'user_id' => $user->id,
-            'is_federated' => true
+            'is_federated' => true,
         ]);
 
         $domain = parse_url(config('app.url'), PHP_URL_HOST);
@@ -35,7 +35,7 @@ class ActivityPubTest extends TestCase
         $user = User::factory()->create(['name' => 'bob']);
         UserProfile::factory()->create([
             'user_id' => $user->id,
-            'is_federated' => false
+            'is_federated' => false,
         ]);
 
         $domain = parse_url(config('app.url'), PHP_URL_HOST);
@@ -52,7 +52,7 @@ class ActivityPubTest extends TestCase
         UserProfile::factory()->create([
             'user_id' => $user->id,
             'is_federated' => true,
-            'bio' => 'Charlie bio'
+            'bio' => 'Charlie bio',
         ]);
 
         $response = $this->getJson("/api/federation/users/{$user->id}");
@@ -68,7 +68,7 @@ class ActivityPubTest extends TestCase
         $user = User::factory()->create();
         UserProfile::factory()->create([
             'user_id' => $user->id,
-            'is_federated' => true
+            'is_federated' => true,
         ]);
 
         $payload = [
@@ -76,7 +76,7 @@ class ActivityPubTest extends TestCase
             'id' => 'https://remote.test/activity/1',
             'type' => 'Follow',
             'actor' => 'https://remote.test/users/remote-user',
-            'object' => url("/api/federation/users/{$user->id}")
+            'object' => url("/api/federation/users/{$user->id}"),
         ];
 
         $response = $this->postJson("/api/federation/users/{$user->id}/inbox", $payload);
@@ -86,7 +86,7 @@ class ActivityPubTest extends TestCase
 
         $this->assertDatabaseHas('followers', [
             'user_id' => $user->id,
-            'actor_uri' => 'https://remote.test/users/remote-user'
+            'actor_uri' => 'https://remote.test/users/remote-user',
         ]);
     }
 
@@ -95,13 +95,13 @@ class ActivityPubTest extends TestCase
         $user = User::factory()->create();
         UserProfile::factory()->create([
             'user_id' => $user->id,
-            'is_federated' => true
+            'is_federated' => true,
         ]);
 
         \App\Models\Follower::create([
             'user_id' => $user->id,
             'actor_uri' => 'https://remote.test/users/remote-user',
-            'status' => 'accepted'
+            'status' => 'accepted',
         ]);
 
         $payload = [
@@ -111,8 +111,8 @@ class ActivityPubTest extends TestCase
             'object' => [
                 'type' => 'Follow',
                 'actor' => 'https://remote.test/users/remote-user',
-                'object' => url("/api/federation/users/{$user->id}")
-            ]
+                'object' => url("/api/federation/users/{$user->id}"),
+            ],
         ];
 
         $response = $this->postJson("/api/federation/users/{$user->id}/inbox", $payload);
@@ -122,7 +122,7 @@ class ActivityPubTest extends TestCase
 
         $this->assertDatabaseMissing('followers', [
             'user_id' => $user->id,
-            'actor_uri' => 'https://remote.test/users/remote-user'
+            'actor_uri' => 'https://remote.test/users/remote-user',
         ]);
     }
 
@@ -131,7 +131,7 @@ class ActivityPubTest extends TestCase
         $user = User::factory()->create();
         UserProfile::factory()->create([
             'user_id' => $user->id,
-            'is_federated' => true
+            'is_federated' => true,
         ]);
 
         $response = $this->getJson("/api/federation/users/{$user->id}/outbox");

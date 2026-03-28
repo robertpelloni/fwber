@@ -25,7 +25,7 @@ class RoastPublicRequest extends FormRequest
             'name' => 'required|string|max:50',
             'job' => 'required|string|max:50',
             'trait' => 'required|string|max:100', // e.g., "always late", "obsessed with gym"
-            'mode' => 'in:roast,hype'
+            'mode' => 'in:roast,hype',
         ];
     }
 }

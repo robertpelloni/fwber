@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Payment\StorePaymentRequest;
 use App\Models\PaymentRequest;
 use App\Models\User;
 use App\Services\PushNotificationService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use App\Http\Requests\Payment\StorePaymentRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PaymentRequestController extends Controller
@@ -70,7 +70,7 @@ class PaymentRequestController extends Controller
             [
                 'title' => 'New Payment Request',
                 'body' => "{$user->name} requested {$request->amount} FWB: \"{$request->note}\"",
-                'url' => '/wallet?tab=requests'
+                'url' => '/wallet?tab=requests',
             ],
             'transaction'
         );
@@ -109,7 +109,7 @@ class PaymentRequestController extends Controller
                     ->where('token_balance', '>=', $amount)
                     ->decrement('token_balance', $amount);
 
-                if (!$deducted) {
+                if (! $deducted) {
                     throw new \Exception('Insufficient balance');
                 }
 
@@ -143,7 +143,7 @@ class PaymentRequestController extends Controller
                 [
                     'title' => 'Payment Received!',
                     'body' => "{$payer->name} paid your request of {$amount} FWB.",
-                    'url' => '/wallet'
+                    'url' => '/wallet',
                 ],
                 'transaction'
             );
@@ -175,7 +175,7 @@ class PaymentRequestController extends Controller
         $status = ($user->id === $paymentRequest->payer_id) ? 'declined' : 'cancelled';
 
         $paymentRequest->update([
-            'status' => $status
+            'status' => $status,
         ]);
 
         // Notify other party if declined
@@ -185,7 +185,7 @@ class PaymentRequestController extends Controller
                 [
                     'title' => 'Request Declined',
                     'body' => "{$user->name} declined your payment request.",
-                    'url' => '/wallet'
+                    'url' => '/wallet',
                 ],
                 'transaction'
             );

@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 
 class FailedJobController extends Controller
 {
@@ -27,7 +26,7 @@ class FailedJobController extends Controller
     {
         $job = DB::table('failed_jobs')->where('uuid', $uuid)->first();
 
-        if (!$job) {
+        if (! $job) {
             return response()->json(['message' => 'Job not found'], 404);
         }
 
@@ -43,7 +42,7 @@ class FailedJobController extends Controller
     {
         $job = DB::table('failed_jobs')->where('uuid', $uuid)->first();
 
-        if (!$job) {
+        if (! $job) {
             return response()->json(['message' => 'Job not found'], 404);
         }
 
@@ -61,7 +60,7 @@ class FailedJobController extends Controller
 
         return response()->json(['message' => 'All failed jobs queued for retry']);
     }
-    
+
     /**
      * Delete all failed jobs.
      */

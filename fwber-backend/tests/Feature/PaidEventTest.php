@@ -21,7 +21,7 @@ class PaidEventTest extends TestCase
 
         $response = $this->actingAs($user)
             ->postJson("/api/events/{$event->id}/rsvp", [
-                'status' => 'attending'
+                'status' => 'attending',
             ]);
 
         $response->assertStatus(200);
@@ -41,11 +41,11 @@ class PaidEventTest extends TestCase
         $response = $this->actingAs($user)
             ->postJson("/api/events/{$event->id}/rsvp", [
                 'status' => 'attending',
-                'payment_method' => 'token'
+                'payment_method' => 'token',
             ]);
 
         $response->assertStatus(200);
-        
+
         $this->assertEquals(100, $user->fresh()->token_balance); // 200 - (10 * 10)
         $this->assertDatabaseHas('event_attendees', [
             'event_id' => $event->id,
@@ -64,7 +64,7 @@ class PaidEventTest extends TestCase
         $response = $this->actingAs($user)
             ->postJson("/api/events/{$event->id}/rsvp", [
                 'status' => 'attending',
-                'payment_method' => 'token'
+                'payment_method' => 'token',
             ]);
 
         $response->assertStatus(400)
@@ -88,7 +88,7 @@ class PaidEventTest extends TestCase
             ->postJson("/api/events/{$event->id}/rsvp", [
                 'status' => 'attending',
                 'payment_method' => 'stripe',
-                'payment_method_id' => 'tok_visa'
+                'payment_method_id' => 'tok_visa',
             ]);
 
         $response->assertStatus(200);
@@ -110,7 +110,7 @@ class PaidEventTest extends TestCase
         $this->actingAs($user)
             ->postJson("/api/events/{$event->id}/rsvp", [
                 'status' => 'attending',
-                'payment_method' => 'token'
+                'payment_method' => 'token',
             ]);
 
         $this->assertEquals(100, $user->fresh()->token_balance);
@@ -118,14 +118,14 @@ class PaidEventTest extends TestCase
         // Change to maybe
         $this->actingAs($user)
             ->postJson("/api/events/{$event->id}/rsvp", [
-                'status' => 'maybe'
+                'status' => 'maybe',
             ]);
 
         // Change back to attending (Should not charge)
         $response = $this->actingAs($user)
             ->postJson("/api/events/{$event->id}/rsvp", [
                 'status' => 'attending',
-                'payment_method' => 'token'
+                'payment_method' => 'token',
             ]);
 
         $response->assertStatus(200);

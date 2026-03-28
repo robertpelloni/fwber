@@ -10,6 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @OA\Schema(
  *   schema="LocalPulseRequest",
  *   required={"lat", "lng"},
+ *
  *   @OA\Property(property="lat", type="number", format="float", minimum=-90, maximum=90, description="Latitude"),
  *   @OA\Property(property="lng", type="number", format="float", minimum=-180, maximum=180, description="Longitude"),
  *   @OA\Property(property="radius", type="integer", minimum=100, maximum=10000, description="Search radius in meters")

@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use PragmaRX\Google2FA\Google2FA;
-use App\Models\User;
 use App\Http\Requests\Auth\TwoFactorChallengeRequest;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use PragmaRX\Google2FA\Google2FA;
 
 class TwoFactorChallengeController extends Controller
 {
@@ -29,10 +28,10 @@ class TwoFactorChallengeController extends Controller
         // Ideally, we should pass a temporary token from the login step to this step.
         // For simplicity in this implementation, we will require password again OR assume the client
         // sends the credentials again with the code.
-        
+
         // Let's require password again for security, or use a signed "challenge" token.
         // Using a signed challenge token is better.
-        
+
         // However, to keep it simple and stateless:
         // The client sends email + password + code.
 
@@ -43,7 +42,7 @@ class TwoFactorChallengeController extends Controller
         }
 
         if ($request->code) {
-            $google2fa = new Google2FA();
+            $google2fa = new Google2FA;
             $valid = $google2fa->verifyKey(decrypt($user->two_factor_secret), $request->code);
 
             if (! $valid) {

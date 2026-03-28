@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Services;
 
+use App\Models\ProximityArtifact;
 use App\Models\User;
 use App\Models\UserProfile;
-use App\Models\ProximityArtifact;
 use App\Services\AvatarGenerationService;
 use App\Services\MediaAnalysis\MediaAnalysisInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -20,10 +20,10 @@ class AvatarGenerationVibeTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $mediaAnalysisMock = Mockery::mock(MediaAnalysisInterface::class);
         $this->app->instance(MediaAnalysisInterface::class, $mediaAnalysisMock);
-        
+
         $this->service = app(AvatarGenerationService::class);
     }
 
@@ -110,26 +110,26 @@ class AvatarGenerationVibeTest extends TestCase
         ProximityArtifact::factory()->create(['user_id' => $user->id, 'type' => 'board_post', 'content' => 'Having fun at the club tonight!']);
 
         // Force 'testing' environment and mock the HTTP request to OpenAI
-        app()->detectEnvironment(fn() => 'testing');
+        app()->detectEnvironment(fn () => 'testing');
         config(['avatar_generation.providers.dalle.api_key' => 'fake-key']);
         config(['features.media_analysis' => true]);
 
         $mediaAnalysisMock = app(MediaAnalysisInterface::class);
         $resultObj = new \App\Services\MediaAnalysis\MediaAnalysisResult(true);
         $mediaAnalysisMock->shouldReceive('analyze')->once()->andReturn($resultObj);
-        
+
         \Illuminate\Support\Facades\Http::fake([
             'api.openai.com/v1/images/generations' => \Illuminate\Support\Facades\Http::response([
                 'data' => [
-                    ['url' => 'https://example.com/fake-image.png']
-                ]
+                    ['url' => 'https://example.com/fake-image.png'],
+                ],
             ], 200),
-            'example.com/*' => \Illuminate\Support\Facades\Http::response('fake-image-data', 200)
+            'example.com/*' => \Illuminate\Support\Facades\Http::response('fake-image-data', 200),
         ]);
 
         $result = $this->service->generateAvatar($user, ['provider' => 'dalle']);
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             dump($result);
         }
 

@@ -22,7 +22,7 @@ class StoreBlockRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'required|exists:users,id'
+            'user_id' => 'required|exists:users,id',
         ];
     }
 }

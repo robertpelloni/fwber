@@ -75,6 +75,7 @@ class Group extends Model
     public function getMemberRole($userId)
     {
         $member = $this->members()->where('user_id', $userId)->first();
+
         return $member ? $member->role : null;
     }
 

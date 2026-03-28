@@ -2,13 +2,14 @@
 
 namespace App\Services\Ai;
 
+use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Exception;
 
 class AudioTranscriptionService
 {
     protected string $apiKey;
+
     protected string $baseUrl = 'https://api.openai.com/v1';
 
     public function __construct()
@@ -18,8 +19,9 @@ class AudioTranscriptionService
 
     public function transcribe(string $filePath): ?string
     {
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             Log::error("Audio file not found for transcription: {$filePath}");
+
             return null;
         }
 
@@ -41,6 +43,7 @@ class AudioTranscriptionService
             return null;
         } catch (Exception $e) {
             Log::error('Audio transcription exception', ['error' => $e->getMessage()]);
+
             return null;
         }
     }

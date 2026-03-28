@@ -41,7 +41,7 @@ class GiftTest extends TestCase
         ]);
 
         $response->assertStatus(200);
-        
+
         $this->assertDatabaseHas('users', [
             'id' => $sender->id,
             'token_balance' => 90,
@@ -67,7 +67,7 @@ class GiftTest extends TestCase
         ]);
 
         $response->assertStatus(400);
-        
+
         $this->assertDatabaseHas('users', [
             'id' => $sender->id,
             'token_balance' => 5,

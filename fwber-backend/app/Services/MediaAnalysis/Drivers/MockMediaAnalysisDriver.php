@@ -45,10 +45,10 @@ class MockMediaAnalysisDriver implements MediaAnalysisInterface
             4 => ['labels' => ['City', 'Building', 'Architecture', 'Street'], 'mod' => []],
             5 => ['labels' => ['Beach', 'Ocean', 'Sand', 'Summer'], 'mod' => ['Swimwear']], // Borderline
         ];
-        
+
         $scenarioIndex = $hash % count($scenarios);
         $scenario = $scenarios[$scenarioIndex];
-        
+
         // Simulate confidence variation
         $confidence = 0.85 + (($hash % 15) / 100); // 0.85 to 0.99
 
@@ -58,11 +58,11 @@ class MockMediaAnalysisDriver implements MediaAnalysisInterface
             moderationLabels: $scenario['mod'],
             confidence: $confidence,
             metadata: [
-                'width' => 1024, 
+                'width' => 1024,
                 'height' => 768,
                 'mock' => true,
                 'scenario_id' => $scenarioIndex,
-                'source' => 'mock_driver'
+                'source' => 'mock_driver',
             ]
         );
     }

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('proof_hash'); // Store the ZK payload hash
             $table->boolean('is_verified')->default(false);
             $table->timestamps();
-            
+
             // Index for fast spatial/entity lookups
             $table->index(['target_entity_type', 'target_entity_id']);
         });

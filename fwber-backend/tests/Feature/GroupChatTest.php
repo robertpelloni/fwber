@@ -2,11 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\Chatroom;
 use App\Models\Group;
 use App\Models\User;
-use App\Models\Chatroom;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class GroupChatTest extends TestCase
@@ -25,10 +24,10 @@ class GroupChatTest extends TestCase
         ]);
 
         $response->assertStatus(201);
-        
+
         $group = Group::first();
         $this->assertNotNull($group->chatroom_id);
-        
+
         $chatroom = Chatroom::find($group->chatroom_id);
         $this->assertNotNull($chatroom);
         $this->assertEquals('Test Group', $chatroom->name);
@@ -40,7 +39,7 @@ class GroupChatTest extends TestCase
     {
         $creator = User::factory()->create();
         $user = User::factory()->create();
-        
+
         $this->actingAs($creator);
         $groupResponse = $this->postJson('/api/groups', [
             'name' => 'Test Group',
@@ -51,9 +50,9 @@ class GroupChatTest extends TestCase
 
         $this->actingAs($user);
         $response = $this->postJson("/api/groups/{$groupId}/join");
-        
+
         $response->assertStatus(200);
-        
+
         $chatroom = Chatroom::find($group->chatroom_id);
         $this->assertTrue($chatroom->hasMember($user));
     }
@@ -62,7 +61,7 @@ class GroupChatTest extends TestCase
     {
         $creator = User::factory()->create();
         $user = User::factory()->create();
-        
+
         $this->actingAs($creator);
         $groupResponse = $this->postJson('/api/groups', [
             'name' => 'Test Group',
@@ -73,13 +72,13 @@ class GroupChatTest extends TestCase
 
         $this->actingAs($user);
         $this->postJson("/api/groups/{$groupId}/join");
-        
+
         $chatroom = Chatroom::find($group->chatroom_id);
         $this->assertTrue($chatroom->hasMember($user));
 
         $response = $this->postJson("/api/groups/{$groupId}/leave");
         $response->assertStatus(200);
-        
+
         $this->assertFalse($chatroom->hasMember($user));
     }
 }

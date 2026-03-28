@@ -3,10 +3,9 @@
 namespace App\Http\Middleware;
 
 use App\Facades\SecurityLog;
+use App\Services\AdvancedRateLimitingService;
 use Closure;
 use Illuminate\Http\Request;
-use App\Services\AdvancedRateLimitingService;
-use Illuminate\Support\Facades\Log;
 
 class AdvancedRateLimiting
 {
@@ -34,10 +33,10 @@ class AdvancedRateLimiting
         // Check rate limit
         $rateLimitResult = $this->rateLimitingService->checkRateLimit($userId, $action, $context);
 
-        if (!$rateLimitResult['allowed']) {
+        if (! $rateLimitResult['allowed']) {
             // Check for suspicious activity
             $suspiciousActivity = $this->rateLimitingService->detectSuspiciousActivity($userId);
-            
+
             if ($suspiciousActivity['suspicious']) {
                 SecurityLog::suspiciousActivity([
                     'user_id' => $userId,
@@ -47,10 +46,10 @@ class AdvancedRateLimiting
                     'user_agent' => $request->userAgent(),
                 ]);
             } else {
-                 SecurityLog::rateLimitExceeded([
+                SecurityLog::rateLimitExceeded([
                     'user_id' => $userId,
                     'action' => $action,
-                    'limit' => $rateLimitResult['limit'] ?? 'unknown', 
+                    'limit' => $rateLimitResult['limit'] ?? 'unknown',
                     'ip' => $request->ip(),
                 ]);
             }
@@ -66,7 +65,7 @@ class AdvancedRateLimiting
 
         // Add rate limit headers to response
         $response = $next($request);
-        
+
         $response->headers->set('X-RateLimit-Remaining', $rateLimitResult['remaining_tokens']);
         $response->headers->set('X-RateLimit-Reset', $rateLimitResult['reset_time']);
         $response->headers->set('X-RateLimit-Action', $action);

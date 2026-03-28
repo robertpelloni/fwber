@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 class GeoScreenerClient
 {
     protected $baseUrl;
+
     protected $timeout;
 
     public function __construct()
@@ -29,7 +30,7 @@ class GeoScreenerClient
      */
     public function indexLocation(int $userId, float $lat, float $lng): bool
     {
-        if (!$this->isEnabled()) {
+        if (! $this->isEnabled()) {
             return false;
         }
 
@@ -43,7 +44,8 @@ class GeoScreenerClient
 
             return $response->successful();
         } catch (\Exception $e) {
-            Log::error("GeoScreener Index Error: " . $e->getMessage());
+            Log::error('GeoScreener Index Error: '.$e->getMessage());
+
             return false;
         }
     }
@@ -53,7 +55,7 @@ class GeoScreenerClient
      */
     public function getNearbyUsers(float $lat, float $lng, float $radiusMeters = 1000): array
     {
-        if (!$this->isEnabled()) {
+        if (! $this->isEnabled()) {
             return [];
         }
 
@@ -67,12 +69,14 @@ class GeoScreenerClient
 
             if ($response->successful()) {
                 $data = $response->json();
+
                 return $data['users'] ?? [];
             }
-            
+
             return [];
         } catch (\Exception $e) {
-            Log::warning("GeoScreener Nearby Error: " . $e->getMessage());
+            Log::warning('GeoScreener Nearby Error: '.$e->getMessage());
+
             return [];
         }
     }

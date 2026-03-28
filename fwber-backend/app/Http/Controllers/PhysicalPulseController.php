@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\PhysicalNode;
 use App\Services\LocalPulseAnalyticsService;
-use Illuminate\Http\Request;
 
 class PhysicalPulseController extends Controller
 {

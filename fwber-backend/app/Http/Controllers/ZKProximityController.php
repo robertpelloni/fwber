@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Services\ZKProximityService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ZKProximityController extends Controller
@@ -22,7 +22,7 @@ class ZKProximityController extends Controller
     {
         return response()->json([
             'secret' => env('ZK_SECRET', 'fwber-zk-hardware-enclave-secret'),
-            'precision' => 6
+            'precision' => 6,
         ]);
     }
 
@@ -47,30 +47,30 @@ class ZKProximityController extends Controller
 
         // Pass circuit evaluation to the Service
         $isValid = $this->zkService->verifyProof(
-            $request->proof_payload, 
+            $request->proof_payload,
             $request->public_signals,
             $request->target_entity_type
         );
 
-        if (!$isValid) {
+        if (! $isValid) {
             return response()->json([
                 'message' => 'Zero-Knowledge Proximity Proof failed verification.',
-                'verified' => false
+                'verified' => false,
             ], 422);
         }
 
-        // Record the mathematical presence 
+        // Record the mathematical presence
         $proofRecord = $this->zkService->recordVerifiedPresence(
-            $userId, 
-            $request->target_entity_type, 
-            $request->target_entity_id, 
+            $userId,
+            $request->target_entity_type,
+            $request->target_entity_id,
             $request->proof_hash
         );
 
         return response()->json([
             'message' => 'Proximity Cryptographically Verified',
             'verified' => true,
-            'record_id' => $proofRecord->id
+            'record_id' => $proofRecord->id,
         ], 200);
     }
 }

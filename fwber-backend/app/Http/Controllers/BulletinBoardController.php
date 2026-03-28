@@ -7,8 +7,8 @@ use App\Events\BulletinMessageCreated;
 use App\Models\BulletinBoard;
 use App\Models\BulletinMessage;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -21,11 +21,15 @@ class BulletinBoardController extends Controller
      *   path="/bulletin-boards",
      *   tags={"Bulletin Boards"},
      *   summary="List nearby bulletin boards",
+     *
      *   @OA\Parameter(name="lat", in="query", required=true, @OA\Schema(type="number", format="float", minimum=-90, maximum=90)),
      *   @OA\Parameter(name="lng", in="query", required=true, @OA\Schema(type="number", format="float", minimum=-180, maximum=180)),
      *   @OA\Parameter(name="radius", in="query", required=false, @OA\Schema(type="integer", minimum=100, maximum=50000), description="Meters (default 5000)"),
+     *
      *   @OA\Response(response=200, description="Nearby boards",
+     *
      *     @OA\JsonContent(type="object",
+     *
      *       @OA\Property(property="boards", type="array", @OA\Items(type="object")),
      *       @OA\Property(property="user_location", type="object",
      *         @OA\Property(property="lat", type="number"),
@@ -34,6 +38,7 @@ class BulletinBoardController extends Controller
      *       @OA\Property(property="search_radius", type="integer")
      *     )
      *   ),
+     *
      *   @OA\Response(response=400, description="Validation error")
      * )
      */
@@ -76,17 +81,22 @@ class BulletinBoardController extends Controller
      *   path="/bulletin-boards/{id}",
      *   tags={"Bulletin Boards"},
      *   summary="Get bulletin board by ID",
+     *
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="lat", in="query", required=false, @OA\Schema(type="number")),
      *   @OA\Parameter(name="lng", in="query", required=false, @OA\Schema(type="number")),
+     *
      *   @OA\Response(response=200, description="Board and messages",
+     *
      *     @OA\JsonContent(type="object",
+     *
      *       @OA\Property(property="board", type="object"),
      *       @OA\Property(property="messages", type="array", @OA\Items(type="object"))
      *     )
      *   ),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     *
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function show(Request $request, int $id): JsonResponse
@@ -98,10 +108,10 @@ class BulletinBoardController extends Controller
         if ($request->has('lat') && $request->has('lng')) {
             $lat = $request->input('lat');
             $lng = $request->input('lng');
-            
-            if (!$board->containsPoint($lat, $lng)) {
+
+            if (! $board->containsPoint($lat, $lng)) {
                 return response()->json([
-                    'error' => 'You are not within the bulletin board area'
+                    'error' => 'You are not within the bulletin board area',
                 ], 403);
             }
         }
@@ -119,18 +129,24 @@ class BulletinBoardController extends Controller
      *   path="/bulletin-boards",
      *   tags={"Bulletin Boards"},
      *   summary="Create or find a board for a location",
+     *
      *   @OA\RequestBody(required=true, @OA\JsonContent(
      *     required={"lat","lng"},
+     *
      *     @OA\Property(property="lat", type="number", format="float"),
      *     @OA\Property(property="lng", type="number", format="float"),
      *     @OA\Property(property="radius", type="integer", minimum=100, maximum=5000)
      *   )),
+     *
      *   @OA\Response(response=200, description="Found/created",
+     *
      *     @OA\JsonContent(type="object",
+     *
      *       @OA\Property(property="board", type="object"),
      *       @OA\Property(property="created", type="boolean")
      *     )
      *   ),
+     *
      *   @OA\Response(response=400, description="Validation error")
      * )
      */
@@ -161,13 +177,13 @@ class BulletinBoardController extends Controller
                 'center_lng' => $lng,
                 'radius_meters' => $radius,
                 'name' => "Board at {$geohash}",
-                'description' => "Local bulletin board for this area",
+                'description' => 'Local bulletin board for this area',
                 'is_active' => true,
             ]
         );
-        
+
         // Update MySQL spatial location if it's null
-        if (!$board->location && DB::connection()->getDriverName() !== 'sqlite') {
+        if (! $board->location && DB::connection()->getDriverName() !== 'sqlite') {
             DB::statement(
                 'UPDATE bulletin_boards SET location = POINT(?, ?) WHERE id = ?',
                 [$lng, $lat, $board->id]
@@ -187,23 +203,30 @@ class BulletinBoardController extends Controller
      *   path="/bulletin-boards/{boardId}/messages",
      *   tags={"Bulletin Boards"},
      *   summary="Post a message",
-    *   security={{"bearerAuth":{}}},
+     *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="boardId", in="path", required=true, @OA\Schema(type="integer")),
+     *
      *   @OA\RequestBody(required=true, @OA\JsonContent(
      *     required={"content","lat","lng"},
+     *
      *     @OA\Property(property="content", type="string", maxLength=1000),
      *     @OA\Property(property="is_anonymous", type="boolean"),
      *     @OA\Property(property="expires_in_hours", type="integer", minimum=1, maximum=168),
      *     @OA\Property(property="lat", type="number"),
      *     @OA\Property(property="lng", type="number")
      *   )),
+     *
      *   @OA\Response(response=201, description="Created",
+     *
      *     @OA\JsonContent(type="object",
+     *
      *       @OA\Property(property="message", type="object"),
      *       @OA\Property(property="board", type="object")
      *     )
      *   ),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
      *   @OA\Response(response=400, description="Validation error"),
      *   @OA\Response(response=401, description="Unauthenticated")
      * )
@@ -228,10 +251,10 @@ class BulletinBoardController extends Controller
         // Check if user is within board radius
         $lat = $request->input('lat');
         $lng = $request->input('lng');
-        
-        if (!$board->containsPoint($lat, $lng)) {
+
+        if (! $board->containsPoint($lat, $lng)) {
             return response()->json([
-                'error' => 'You are not within the bulletin board area'
+                'error' => 'You are not within the bulletin board area',
             ], 403);
         }
 
@@ -241,11 +264,11 @@ class BulletinBoardController extends Controller
             'user_id' => $user->id,
             'content' => $request->input('content'),
             'is_anonymous' => $request->input('is_anonymous', false),
-            'expires_at' => $request->has('expires_in_hours') 
+            'expires_at' => $request->has('expires_in_hours')
                 ? now()->addHours($request->input('expires_in_hours'))
                 : now()->addDays(7), // Default 7 days
         ]);
-        
+
         // Set MySQL spatial location for the message
         if (DB::connection()->getDriverName() !== 'sqlite') {
             DB::statement(
@@ -270,22 +293,27 @@ class BulletinBoardController extends Controller
      *   path="/bulletin-boards/{boardId}/messages",
      *   tags={"Bulletin Boards"},
      *   summary="List messages for a board",
+     *
      *   @OA\Parameter(name="boardId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="per_page", in="query", required=false, @OA\Schema(type="integer", minimum=1, maximum=100)),
      *   @OA\Parameter(name="since", in="query", required=false, @OA\Schema(type="string", format="date-time")),
+     *
      *   @OA\Response(response=200, description="Messages",
+     *
      *     @OA\JsonContent(type="object",
+     *
      *       @OA\Property(property="messages", type="object"),
      *       @OA\Property(property="board", type="object")
      *     )
      *   ),
-    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     *
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function getMessages(Request $request, int $boardId): JsonResponse
     {
         $board = BulletinBoard::findOrFail($boardId);
-        
+
         $perPage = min($request->input('per_page', 20), 100);
         $since = $request->input('since'); // For SSE resume
 
@@ -307,8 +335,6 @@ class BulletinBoardController extends Controller
         ]);
     }
 
-
-
     /**
      * Generate geohash for a location
      */
@@ -317,15 +343,15 @@ class BulletinBoardController extends Controller
         // Simple geohash implementation
         // In production, use a proper geohash library
         $base32 = '0123456789bcdefghjkmnpqrstuvwxyz';
-        
+
         $latRange = [-90.0, 90.0];
         $lngRange = [-180.0, 180.0];
-        
+
         $geohash = '';
         $isEven = true;
         $bit = 0;
         $ch = 0;
-        
+
         while (strlen($geohash) < $precision) {
             if ($isEven) {
                 $mid = ($lngRange[0] + $lngRange[1]) / 2;
@@ -344,9 +370,9 @@ class BulletinBoardController extends Controller
                     $latRange[1] = $mid;
                 }
             }
-            
-            $isEven = !$isEven;
-            
+
+            $isEven = ! $isEven;
+
             if ($bit < 4) {
                 $bit++;
             } else {
@@ -355,7 +381,7 @@ class BulletinBoardController extends Controller
                 $ch = 0;
             }
         }
-        
+
         return $geohash;
     }
 
@@ -372,7 +398,7 @@ class BulletinBoardController extends Controller
             \Log::error('Failed to publish message to Pusher', [
                 'board_id' => $board->id,
                 'message_id' => $message->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
         }
     }

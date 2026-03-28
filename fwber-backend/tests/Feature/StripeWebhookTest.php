@@ -2,14 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\Subscription;
-use App\Models\Payment;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-use Stripe\Webhook;
 use Mockery;
+use Stripe\Webhook;
+use Tests\TestCase;
 
 class StripeWebhookTest extends TestCase
 {
@@ -24,7 +22,7 @@ class StripeWebhookTest extends TestCase
     public function test_payment_intent_succeeded_creates_payment_and_grants_premium()
     {
         $user = User::factory()->create();
-        
+
         $payload = [
             'id' => 'evt_test_123',
             'type' => 'payment_intent.succeeded',
@@ -35,8 +33,8 @@ class StripeWebhookTest extends TestCase
                     'currency' => 'usd',
                     'metadata' => ['user_id' => $user->id],
                     'description' => 'Premium Subscription',
-                ]
-            ]
+                ],
+            ],
         ];
 
         $this->mockWebhookEvent($payload);
@@ -54,13 +52,13 @@ class StripeWebhookTest extends TestCase
 
         $user->refresh();
         $this->assertEquals('gold', $user->tier);
-        $this->assertTrue((bool)$user->unlimited_swipes);
+        $this->assertTrue((bool) $user->unlimited_swipes);
     }
 
     public function test_subscription_created_creates_subscription()
     {
         $user = User::factory()->create();
-        
+
         $payload = [
             'id' => 'evt_test_sub_123',
             'type' => 'customer.subscription.created',
@@ -74,14 +72,14 @@ class StripeWebhookTest extends TestCase
                         'data' => [
                             [
                                 'price' => ['id' => 'price_test_123'],
-                                'quantity' => 1
-                            ]
-                        ]
+                                'quantity' => 1,
+                            ],
+                        ],
                     ],
                     'current_period_end' => now()->addMonth()->timestamp,
                     'trial_end' => null,
-                ]
-            ]
+                ],
+            ],
         ];
 
         $this->mockWebhookEvent($payload);
@@ -95,7 +93,7 @@ class StripeWebhookTest extends TestCase
             'stripe_id' => 'sub_test_123',
             'stripe_status' => 'active',
         ]);
-        
+
         $user->refresh();
         $this->assertEquals('gold', $user->tier);
     }
@@ -112,7 +110,7 @@ class StripeWebhookTest extends TestCase
             'quantity' => 1,
             'ends_at' => now()->addMonth(),
         ]);
-        
+
         $payload = [
             'id' => 'evt_test_update_123',
             'type' => 'customer.subscription.updated',
@@ -125,14 +123,14 @@ class StripeWebhookTest extends TestCase
                         'data' => [
                             [
                                 'price' => ['id' => 'price_test'],
-                                'quantity' => 1
-                            ]
-                        ]
+                                'quantity' => 1,
+                            ],
+                        ],
                     ],
                     'current_period_end' => now()->addMonth()->timestamp,
                     'trial_end' => null,
-                ]
-            ]
+                ],
+            ],
         ];
 
         $this->mockWebhookEvent($payload);
@@ -162,7 +160,7 @@ class StripeWebhookTest extends TestCase
             'quantity' => 1,
             'ends_at' => now()->addMonth(),
         ]);
-        
+
         $payload = [
             'id' => 'evt_test_delete_123',
             'type' => 'customer.subscription.deleted',
@@ -171,8 +169,8 @@ class StripeWebhookTest extends TestCase
                     'id' => 'sub_test_delete',
                     'status' => 'canceled',
                     'metadata' => ['user_id' => $user->id],
-                ]
-            ]
+                ],
+            ],
         ];
 
         $this->mockWebhookEvent($payload);
@@ -193,8 +191,8 @@ class StripeWebhookTest extends TestCase
     private function mockWebhookEvent($payload)
     {
         $event = json_decode(json_encode($payload));
-        
-        Mockery::mock('alias:' . Webhook::class)
+
+        Mockery::mock('alias:'.Webhook::class)
             ->shouldReceive('constructEvent')
             ->andReturn($event);
     }

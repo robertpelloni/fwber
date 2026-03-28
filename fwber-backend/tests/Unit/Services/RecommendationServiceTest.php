@@ -2,24 +2,26 @@
 
 namespace Tests\Unit\Services;
 
-use Tests\TestCase;
-use App\Services\RecommendationService;
-use App\Services\Ai\Llm\LlmManager;
-use App\Services\Ai\Llm\LlmProviderInterface;
-use App\DTOs\LlmResponse;
+use App\Models\TelemetryEvent;
 use App\Models\User;
 use App\Models\UserProfile;
-use App\Models\TelemetryEvent;
+use App\Services\Ai\Llm\LlmManager;
+use App\Services\Ai\Llm\LlmProviderInterface;
+use App\Services\RecommendationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
+use Tests\TestCase;
 
 class RecommendationServiceTest extends TestCase
 {
     use RefreshDatabase;
 
     private $llmManager;
+
     private $openaiDriver;
+
     private $geminiDriver;
+
     private $service;
 
     protected function setUp(): void
@@ -42,7 +44,7 @@ class RecommendationServiceTest extends TestCase
         $this->service = new RecommendationService($this->llmManager);
     }
 
-    public function testFindSimilarUsers()
+    public function test_find_similar_users()
     {
         // Create target user
         $user = User::factory()->create();
@@ -76,7 +78,7 @@ class RecommendationServiceTest extends TestCase
                 'content_id' => 1,
                 'content_type' => 'bulletin_message',
                 'title' => 'Coding Workshop',
-                'description' => 'Learn Laravel'
+                'description' => 'Learn Laravel',
             ],
             'recorded_at' => now(),
         ]);
@@ -88,7 +90,7 @@ class RecommendationServiceTest extends TestCase
 
         $profile = [
             'id' => $user->id,
-            'interests' => ['coding', 'music', 'hiking']
+            'interests' => ['coding', 'music', 'hiking'],
         ];
 
         $result = $method->invoke($this->service, $profile);
@@ -99,7 +101,7 @@ class RecommendationServiceTest extends TestCase
         $this->assertEquals('Coding Workshop', $result[0]['liked_content'][0]['title']);
     }
 
-    public function testCalculateContentScore()
+    public function test_calculate_content_score()
     {
         $reflection = new \ReflectionClass($this->service);
         $method = $reflection->getMethod('calculateContentScore');
@@ -107,12 +109,12 @@ class RecommendationServiceTest extends TestCase
 
         $content = [
             'title' => 'Laravel Workshop',
-            'description' => 'Learn PHP and Coding'
+            'description' => 'Learn PHP and Coding',
         ];
 
         $profile = [
             'interests' => ['coding', 'php'],
-            'location' => ['name' => 'New York']
+            'location' => ['name' => 'New York'],
         ];
 
         $score = $method->invoke($this->service, $content, $profile);
@@ -121,7 +123,7 @@ class RecommendationServiceTest extends TestCase
         $this->assertEquals(0.7, $score);
     }
 
-    public function testCalculateCollaborativeScore()
+    public function test_calculate_collaborative_score()
     {
         $reflection = new \ReflectionClass($this->service);
         $method = $reflection->getMethod('calculateCollaborativeScore');
@@ -136,7 +138,7 @@ class RecommendationServiceTest extends TestCase
         $this->assertEqualsWithDelta(1.0, $score, 0.01);
     }
 
-    public function testGetTrendingTopics()
+    public function test_get_trending_topics()
     {
         // Create messages with recurring keywords
         $user = User::factory()->create();

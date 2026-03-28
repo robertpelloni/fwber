@@ -252,7 +252,7 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
         }
       }
     }
-  }, [token, user?.id]);
+  }, [user?.id]);
 
   const sendTypingIndicator = useCallback(async (recipientId: string, isTyping: boolean, chatroomId?: string) => {
     try {

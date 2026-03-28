@@ -6,8 +6,8 @@ use App\Models\User;
 use App\Models\UserMatch;
 use App\Services\AiWingmanService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use Mockery;
+use Tests\TestCase;
 
 class AiConversationCoachTest extends TestCase
 {
@@ -28,10 +28,10 @@ class AiConversationCoachTest extends TestCase
 
         $this->actingAs($user);
 
-        $draft = "Hey u up?";
+        $draft = 'Hey u up?';
 
         // Mock AiWingmanService
-        $this->mock(AiWingmanService::class, function ($mock) use ($user, $match, $draft) {
+        $this->mock(AiWingmanService::class, function ($mock) use ($draft) {
             $mock->shouldReceive('analyzeDraftMessage')
                 ->with(Mockery::type(User::class), Mockery::type(User::class), $draft, Mockery::type('array'))
                 ->once()
@@ -39,7 +39,7 @@ class AiConversationCoachTest extends TestCase
                     'score' => 40,
                     'tone' => 'Lazy',
                     'feedback' => 'This is a bit cliché and low effort.',
-                    'suggestion' => 'Hey! How was your day?'
+                    'suggestion' => 'Hey! How was your day?',
                 ]);
         });
 
@@ -52,7 +52,7 @@ class AiConversationCoachTest extends TestCase
                 'score' => 40,
                 'tone' => 'Lazy',
                 'feedback' => 'This is a bit cliché and low effort.',
-                'suggestion' => 'Hey! How was your day?'
+                'suggestion' => 'Hey! How was your day?',
             ]);
     }
 

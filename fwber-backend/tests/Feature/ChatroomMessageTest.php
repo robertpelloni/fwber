@@ -8,9 +8,7 @@ use App\Models\User;
 use App\Services\ContentModerationService;
 use App\Services\TelemetryService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
-use Mockery;
 
 class ChatroomMessageTest extends TestCase
 {
@@ -24,7 +22,7 @@ class ChatroomMessageTest extends TestCase
         \Illuminate\Support\Facades\RateLimiter::for('messaging', function ($request) {
             return \Illuminate\Cache\RateLimiting\Limit::perMinute(60);
         });
-        
+
         // Mock ContentModerationService
         $this->mock(ContentModerationService::class, function ($mock) {
             $mock->shouldReceive('moderateContent')->andReturn(['flagged' => false]);
@@ -84,7 +82,7 @@ class ChatroomMessageTest extends TestCase
                         'id',
                         'content',
                         'user',
-                    ]
+                    ],
                 ],
                 'current_page',
                 'total',

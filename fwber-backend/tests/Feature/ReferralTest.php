@@ -14,7 +14,7 @@ class ReferralTest extends TestCase
     {
         $referrer = User::factory()->create([
             'referral_code' => 'TESTCODE',
-            'golden_tickets_remaining' => 3
+            'golden_tickets_remaining' => 3,
         ]);
 
         $referee1 = User::factory()->create(['referrer_id' => $referrer->id]);

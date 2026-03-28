@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\UserMatch as MatchModel;
 use App\Models\User;
+use App\Models\UserMatch as MatchModel;
 use App\Models\UserProfile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -23,27 +23,27 @@ class DatePlannerTest extends TestCase
     {
         $user1 = User::factory()->create();
         $user2 = User::factory()->create();
-        
+
         // No match record exists
 
         $response = $this->actingAs($user1)->getJson("/api/wingman/date-ideas/{$user2->id}");
-        
+
         $response->assertStatus(403)
-                 ->assertJson(['message' => 'You are not matched with this user.']);
+            ->assertJson(['message' => 'You are not matched with this user.']);
     }
 
     public function test_generates_ideas_for_matched_users()
     {
         $user1 = User::factory()->create();
         UserProfile::factory()->create(['user_id' => $user1->id, 'bio' => 'Likes coffee and dogs']);
-        
+
         $user2 = User::factory()->create();
         UserProfile::factory()->create(['user_id' => $user2->id, 'bio' => 'Enjoys long walks and lattes']);
 
         MatchModel::create([
             'user1_id' => $user1->id,
             'user2_id' => $user2->id,
-            'status' => 'accepted'
+            'status' => 'accepted',
         ]);
 
         // Mock OpenAI HTTP response
@@ -61,33 +61,33 @@ class DatePlannerTest extends TestCase
                                         'venue' => 'Central Bark',
                                         'estimated_cost' => '$15',
                                         'duration' => '2 hours',
-                                        'conversation_starter' => 'What is your favorite dog breed?'
-                                    ]
-                                ]
-                            ])
-                        ]
-                    ]
-                ]
-            ], 200)
+                                        'conversation_starter' => 'What is your favorite dog breed?',
+                                    ],
+                                ],
+                            ]),
+                        ],
+                    ],
+                ],
+            ], 200),
         ]);
 
         $response = $this->actingAs($user1)->getJson("/api/wingman/date-ideas/{$user2->id}?location=Downtown");
 
         $response->assertStatus(200)
-                 ->assertJsonStructure([
-                     'ideas' => [
-                         '*' => [
-                             'title',
-                             'description',
-                             'reason',
-                             'venue',
-                             'estimated_cost',
-                             'duration',
-                             'conversation_starter'
-                         ]
-                     ]
-                 ]);
-                 
+            ->assertJsonStructure([
+                'ideas' => [
+                    '*' => [
+                        'title',
+                        'description',
+                        'reason',
+                        'venue',
+                        'estimated_cost',
+                        'duration',
+                        'conversation_starter',
+                    ],
+                ],
+            ]);
+
         $this->assertEquals('Dog Park & Cafe', $response->json('ideas.0.title'));
     }
 }

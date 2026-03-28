@@ -2,16 +2,16 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Carbon\Carbon;
 
 /**
  * User Profile API Resource
- * 
+ *
  * Transforms User + UserProfile data for API responses
  * Used by ProfileController for Next.js frontend
- * 
+ *
  * Created: 2025-10-18 (Multi-AI Implementation)
  */
 class UserProfileResource extends JsonResource
@@ -35,7 +35,7 @@ class UserProfileResource extends JsonResource
         $isConfessional = (bool) $profile?->is_confessional_mode;
 
         // If in Confessional Mode and not the owner, we strip almost everything
-        if ($isConfessional && !$isOwner) {
+        if ($isConfessional && ! $isOwner) {
             return [
                 'id' => $this->id,
                 'is_confessional' => true,
@@ -61,7 +61,7 @@ class UserProfileResource extends JsonResource
             'email_verified' => (bool) $this->email_verified_at,
             'created_at' => $this->created_at?->toISOString(),
             'last_online' => $this->updated_at?->toISOString(),
-            
+
             // Profile data
             'profile' => [
                 'display_name' => $profile?->display_name,
@@ -88,7 +88,7 @@ class UserProfileResource extends JsonResource
                 'sti_status' => $profile?->sti_status ?? [],
                 'is_incognito' => (bool) $profile?->is_incognito,
                 'voice_intro_url' => $profile?->voice_intro_url,
-                
+
                 // Physical Attributes
                 'height_cm' => $profile?->height_cm,
                 'body_type' => $profile?->body_type,
@@ -132,7 +132,7 @@ class UserProfileResource extends JsonResource
                 'religion' => $profile?->religion,
                 'sleep_schedule' => $profile?->sleep_schedule,
                 'social_media' => $profile?->social_media ?? [],
-                
+
                 // Location (with privacy controls)
                 'location' => [
                     'latitude' => $profile?->latitude,
@@ -142,10 +142,10 @@ class UserProfileResource extends JsonResource
                     'state' => $this->extractStateFromLocation($profile),
                     'max_distance' => data_get($profile?->preferences, 'max_distance', 25),
                 ],
-                
+
                 // Preferences
                 'preferences' => $profile?->preferences ?? [],
-                
+
                 // Photos
                 'photos' => $this->when($this->relationLoaded('photos'), function () {
                     return $this->photos->map(function ($photo) {
@@ -159,7 +159,7 @@ class UserProfileResource extends JsonResource
                         ];
                     });
                 }),
-                
+
                 // Completion status
                 'profile_complete' => $this->isProfileComplete($profile),
                 'completion_percentage' => $this->getCompletionPercentage($profile),
@@ -177,17 +177,17 @@ class UserProfileResource extends JsonResource
             ],
         ];
     }
-    
+
     /**
      * Check if profile is complete
      */
     private function isProfileComplete($profile): bool
     {
         try {
-            if (!$profile) {
+            if (! $profile) {
                 return false;
             }
-            
+
             $requiredFields = [
                 'display_name',
                 'gender',
@@ -218,17 +218,17 @@ class UserProfileResource extends JsonResource
             return false;
         }
     }
-    
+
     /**
      * Calculate profile completion percentage
      */
     private function getCompletionPercentage($profile): int
     {
         try {
-            if (!$profile) {
+            if (! $profile) {
                 return 0;
             }
-            
+
             $allFields = [
                 'display_name',
                 'bio',
@@ -242,44 +242,45 @@ class UserProfileResource extends JsonResource
                 'longitude',
                 'preferences',
             ];
-            
+
             $completed = 0;
             foreach ($allFields as $field) {
-                if (!empty($profile->$field)) {
+                if (! empty($profile->$field)) {
                     $completed++;
                 }
             }
-            
+
             return round(($completed / count($allFields)) * 100);
         } catch (\Exception $e) {
             return 0;
         }
     }
-    
+
     /**
      * Extract city from location description
      */
     private function extractCityFromLocation($profile): ?string
     {
-        if (!$profile?->location_name) {
+        if (! $profile?->location_name) {
             return null;
         }
-        
+
         $parts = explode(',', $profile->location_name);
+
         return trim($parts[0]) ?: null;
     }
-    
+
     /**
      * Extract state from location description
      */
     private function extractStateFromLocation($profile): ?string
     {
-        if (!$profile?->location_name) {
+        if (! $profile?->location_name) {
             return null;
         }
-        
+
         $parts = explode(',', $profile->location_name);
+
         return isset($parts[1]) ? trim($parts[1]) : null;
     }
 }
-

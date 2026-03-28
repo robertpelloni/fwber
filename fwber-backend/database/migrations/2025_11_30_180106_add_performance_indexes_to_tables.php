@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -14,14 +14,14 @@ return new class extends Migration
     {
         $indexExists = function ($table, $indexName) {
             try {
-                return collect(DB::select("SHOW INDEXES FROM " . $table . " WHERE Key_name = ?", [$indexName]))->count() > 0;
+                return collect(DB::select('SHOW INDEXES FROM '.$table.' WHERE Key_name = ?', [$indexName]))->count() > 0;
             } catch (\Exception $e) {
                 return false;
             }
         };
 
         // Optimize User Profiles for Geospatial and Demographic queries
-        
+
         if (! $indexExists('user_profiles', 'profiles_geo_index')) {
             if (Schema::hasColumn('user_profiles', 'latitude') && Schema::hasColumn('user_profiles', 'longitude')) {
                 Schema::table('user_profiles', function (Blueprint $table) {

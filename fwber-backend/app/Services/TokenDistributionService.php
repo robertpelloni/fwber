@@ -2,18 +2,21 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use App\Models\TokenTransaction;
+use App\Models\User;
 use App\Notifications\PushMessage;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class TokenDistributionService
 {
     const SIGNUP_BONUS_BASE = 100;
+
     const REFERRAL_BONUS = 50;
+
     const MATCHMAKER_BONUS = 50;
+
     const EARLY_ADOPTER_MULTIPLIER_DECAY = 0.0001; // Decay factor per user
 
     public function generateReferralCode(): string
@@ -34,7 +37,7 @@ class TokenDistributionService
             $userCount = User::count();
             $multiplier = 1 / (1 + ($userCount * self::EARLY_ADOPTER_MULTIPLIER_DECAY));
             $amount = self::SIGNUP_BONUS_BASE * $multiplier;
-            
+
             // Round to 2 decimal places
             $amount = round($amount, 2);
 
@@ -52,7 +55,7 @@ class TokenDistributionService
                     // Check for Golden Ticket
                     if ($referrer->golden_tickets_remaining > 0) {
                         $referrer->decrement('golden_tickets_remaining');
-                        
+
                         // Grant 3 Days of Premium (Gold Tier)
                         $user->tier = 'gold';
                         $user->tier_expires_at = now()->addDays(3);
@@ -68,11 +71,11 @@ class TokenDistributionService
                         $referralCount = $referrer->referrals()->count();
                         $achievementService->checkAndUnlock($referrer, 'referrals_count', $referralCount);
                     } catch (\Exception $e) {
-                        Log::error("Achievement check failed: " . $e->getMessage());
+                        Log::error('Achievement check failed: '.$e->getMessage());
                     }
-                    
+
                     // Award Referee (Double-sided airdrop: both get 50)
-                    $this->awardTokens($user, self::REFERRAL_BONUS, 'referral_accepted_bonus', "Bonus for using referral code");
+                    $this->awardTokens($user, self::REFERRAL_BONUS, 'referral_accepted_bonus', 'Bonus for using referral code');
                 }
             }
         });
@@ -92,21 +95,21 @@ class TokenDistributionService
 
         try {
             $user->notify(new PushMessage(
-                "💰 Tokens Received!",
+                '💰 Tokens Received!',
                 "You received {$amount} tokens: {$description}",
-                "/wallet",
-                "wallet"
+                '/wallet',
+                'wallet'
             ));
         } catch (\Exception $e) {
             // Fail silently if notification service is down or configured incorrectly
-            Log::error("Notification failed in awardTokens: " . $e->getMessage());
+            Log::error('Notification failed in awardTokens: '.$e->getMessage());
         }
     }
 
     public function spendTokens(User $user, float $amount, string $description): void
     {
         if ($user->token_balance < $amount) {
-            throw new \Exception("Insufficient token balance.");
+            throw new \Exception('Insufficient token balance.');
         }
 
         DB::transaction(function () use ($user, $amount, $description) {
@@ -115,8 +118,8 @@ class TokenDistributionService
                 ->where('token_balance', '>=', $amount)
                 ->decrement('token_balance', $amount);
 
-            if (!$updated) {
-                throw new \Exception("Insufficient token balance (race condition detected).");
+            if (! $updated) {
+                throw new \Exception('Insufficient token balance (race condition detected).');
             }
 
             // Refresh model instance to keep in sync
@@ -134,7 +137,7 @@ class TokenDistributionService
     public function transferTokens(User $sender, User $recipient, float $amount, string $type, string $description, array $metadata = []): void
     {
         if ($sender->token_balance < $amount) {
-            throw new \Exception("Insufficient tokens");
+            throw new \Exception('Insufficient tokens');
         }
 
         DB::transaction(function () use ($sender, $recipient, $amount, $type, $description, $metadata) {
@@ -143,8 +146,8 @@ class TokenDistributionService
                 ->where('token_balance', '>=', $amount)
                 ->decrement('token_balance', $amount);
 
-            if (!$deducted) {
-                throw new \Exception("Insufficient tokens");
+            if (! $deducted) {
+                throw new \Exception('Insufficient tokens');
             }
 
             // 2. Credit Recipient
@@ -156,16 +159,16 @@ class TokenDistributionService
                 'amount' => -$amount,
                 'type' => $type,
                 'description' => $description,
-                'metadata' => $metadata
+                'metadata' => $metadata,
             ]);
 
             // 4. Log Recipient Transaction
             TokenTransaction::create([
                 'user_id' => $recipient->id,
                 'amount' => $amount,
-                'type' => $type . '_revenue', // e.g., event_ticket_revenue
-                'description' => "Revenue: " . $description,
-                'metadata' => array_merge($metadata, ['sender_id' => $sender->id])
+                'type' => $type.'_revenue', // e.g., event_ticket_revenue
+                'description' => 'Revenue: '.$description,
+                'metadata' => array_merge($metadata, ['sender_id' => $sender->id]),
             ]);
         });
     }

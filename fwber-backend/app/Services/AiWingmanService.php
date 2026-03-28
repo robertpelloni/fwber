@@ -20,8 +20,8 @@ class AiWingmanService
     /**
      * Generate ice breaker suggestions for a match.
      *
-     * @param User $user The user asking for suggestions
-     * @param User $match The matched user
+     * @param  User  $user  The user asking for suggestions
+     * @param  User  $match  The matched user
      * @return array List of suggested ice breakers
      */
     public function generateIceBreakers(User $user, User $match): array
@@ -32,8 +32,8 @@ class AiWingmanService
             $userProfile = $user->profile;
             $matchProfile = $match->profile;
 
-            if (!$userProfile || !$matchProfile) {
-                return ["Hi! How's it going?", "Hey! I saw we matched."];
+            if (! $userProfile || ! $matchProfile) {
+                return ["Hi! How's it going?", 'Hey! I saw we matched.'];
             }
 
             $prompt = $this->buildIceBreakerPrompt($user, $match);
@@ -41,13 +41,14 @@ class AiWingmanService
             try {
                 $response = $this->llmManager->driver()->chat([
                     ['role' => 'system', 'content' => 'You are a helpful dating coach and wingman. Your goal is to help users start conversations that are engaging, respectful, and relevant to their shared interests.'],
-                    ['role' => 'user', 'content' => $prompt]
+                    ['role' => 'user', 'content' => $prompt],
                 ], ['temperature' => 0.7]);
 
                 return $this->parseSuggestions($response->content);
             } catch (\Exception $e) {
-                Log::error("AiWingmanService: Failed to generate ice breakers: " . $e->getMessage());
-                return ["Hi! How's it going?", "Hey! I saw we matched."];
+                Log::error('AiWingmanService: Failed to generate ice breakers: '.$e->getMessage());
+
+                return ["Hi! How's it going?", 'Hey! I saw we matched.'];
             }
         });
     }
@@ -55,9 +56,9 @@ class AiWingmanService
     /**
      * Generate reply suggestions based on conversation history.
      *
-     * @param User $user The user asking for suggestions
-     * @param User $match The matched user
-     * @param array $history Array of message objects/arrays ['sender_id' => ..., 'content' => ...]
+     * @param  User  $user  The user asking for suggestions
+     * @param  User  $match  The matched user
+     * @param  array  $history  Array of message objects/arrays ['sender_id' => ..., 'content' => ...]
      * @return array List of suggested replies
      */
     public function generateReplySuggestions(User $user, User $match, array $history): array
@@ -67,20 +68,20 @@ class AiWingmanService
         try {
             $response = $this->llmManager->driver()->chat([
                 ['role' => 'system', 'content' => 'You are a helpful dating coach and wingman. Your goal is to help users keep conversations going. Suggestions should be casual, friendly, and encourage a response.'],
-                ['role' => 'user', 'content' => $prompt]
+                ['role' => 'user', 'content' => $prompt],
             ], ['temperature' => 0.7]);
 
             return $this->parseSuggestions($response->content);
         } catch (\Exception $e) {
-            Log::error("AiWingmanService: Failed to generate replies: " . $e->getMessage());
-            return ["That sounds interesting!", "Tell me more about that."];
+            Log::error('AiWingmanService: Failed to generate replies: '.$e->getMessage());
+
+            return ['That sounds interesting!', 'Tell me more about that.'];
         }
     }
 
     /**
      * Analyze a user's profile and provide feedback.
      *
-     * @param User $user
      * @return array Structured feedback
      */
     public function analyzeProfile(User $user): array
@@ -91,23 +92,24 @@ class AiWingmanService
 
         return Cache::remember($cacheKey, 86400, function () use ($user, $profile) {
             $photos = $user->photos;
-            
+
             $prompt = $this->buildProfileAnalysisPrompt($user, $profile, $photos);
 
             try {
                 $response = $this->llmManager->driver()->chat([
                     ['role' => 'system', 'content' => 'You are an expert dating profile consultant. Your goal is to help users optimize their profiles to attract better matches. Be honest but constructive.'],
-                    ['role' => 'user', 'content' => $prompt]
+                    ['role' => 'user', 'content' => $prompt],
                 ], ['temperature' => 0.7]);
 
                 return $this->parseAnalysis($response->content);
             } catch (\Exception $e) {
-                Log::error("AiWingmanService: Failed to analyze profile: " . $e->getMessage());
+                Log::error('AiWingmanService: Failed to analyze profile: '.$e->getMessage());
+
                 return [
                     'score' => 0,
                     'strengths' => [],
                     'weaknesses' => ['Service unavailable'],
-                    'tips' => ['Please try again later.']
+                    'tips' => ['Please try again later.'],
                 ];
             }
         });
@@ -116,9 +118,6 @@ class AiWingmanService
     /**
      * Suggest date ideas based on user profiles and location.
      *
-     * @param User $user
-     * @param User $match
-     * @param string|null $location
      * @return array List of date ideas
      */
     public function suggestDateIdeas(User $user, User $match, ?string $location = null): array
@@ -140,18 +139,19 @@ class AiWingmanService
             try {
                 $response = $this->llmManager->driver()->chat([
                     ['role' => 'system', 'content' => 'You are a creative dating concierge. Your goal is to suggest unique and personalized date ideas based on the interests of two people.'],
-                    ['role' => 'user', 'content' => $prompt]
+                    ['role' => 'user', 'content' => $prompt],
                 ], ['temperature' => 0.8]);
 
                 return $this->parseDateIdeas($response->content);
             } catch (\Exception $e) {
-                Log::error("AiWingmanService: Failed to suggest date ideas: " . $e->getMessage());
+                Log::error('AiWingmanService: Failed to suggest date ideas: '.$e->getMessage());
+
                 return [
                     [
                         'title' => 'Coffee Date',
                         'description' => 'Grab a coffee and get to know each other.',
-                        'reason' => 'Classic and low pressure.'
-                    ]
+                        'reason' => 'Classic and low pressure.',
+                    ],
                 ];
             }
         });
@@ -159,10 +159,6 @@ class AiWingmanService
 
     /**
      * Generate a personalized explanation of why two users are a good match.
-     *
-     * @param User $user
-     * @param User $match
-     * @return string
      */
     public function generateMatchExplanation(User $user, User $match): string
     {
@@ -174,13 +170,14 @@ class AiWingmanService
             try {
                 $response = $this->llmManager->driver()->chat([
                     ['role' => 'system', 'content' => 'You are an insightful relationship expert. Your goal is to explain to a user why they matched with someone else, highlighting shared interests and complementary traits.'],
-                    ['role' => 'user', 'content' => $prompt]
+                    ['role' => 'user', 'content' => $prompt],
                 ], ['temperature' => 0.7]);
 
                 return $response->content;
             } catch (\Exception $e) {
-                Log::error("AiWingmanService: Failed to generate match explanation: " . $e->getMessage());
-                return "You both have shared interests and compatible preferences!";
+                Log::error('AiWingmanService: Failed to generate match explanation: '.$e->getMessage());
+
+                return 'You both have shared interests and compatible preferences!';
             }
         });
     }
@@ -208,15 +205,15 @@ EOT;
 
     protected function buildReplyPrompt(User $user, User $match, array $history): string
     {
-        $conversation = "";
+        $conversation = '';
         foreach ($history as $msg) {
-            $sender = ($msg['sender_id'] == $user->id) ? "Me" : "Match";
-            
+            $sender = ($msg['sender_id'] == $user->id) ? 'Me' : 'Match';
+
             $content = $msg['content'];
-            if (!empty($msg['transcription'])) {
+            if (! empty($msg['transcription'])) {
                 $content = $msg['transcription'];
             } elseif (($msg['message_type'] ?? '') === 'audio') {
-                $content = "[Audio Message]";
+                $content = '[Audio Message]';
             }
 
             $conversation .= "{$sender}: {$content}\n";
@@ -242,7 +239,7 @@ EOT;
         $interests = implode(', ', $profile->interests ?? []);
         $photoCount = $photos->count();
         $hasVerified = $profile->is_verified ? 'Yes' : 'No';
-        
+
         // Basic stats
         $stats = "Photos: {$photoCount}, Verified: {$hasVerified}";
 
@@ -270,8 +267,8 @@ EOT;
     {
         $userInterests = implode(', ', $user->profile->interests ?? []);
         $matchInterests = implode(', ', $match->profile->interests ?? []);
-        
-        $venueContext = "";
+
+        $venueContext = '';
         if (count($venues) > 0) {
             $venueContext = "Here are some local venues you can recommend if they fit:\n";
             foreach ($venues as $venue) {
@@ -302,7 +299,7 @@ EOT;
         // Attempt to parse JSON from the response
         // LLMs might wrap JSON in markdown code blocks
         $content = preg_replace('/^```json\s*|\s*```$/', '', trim($content));
-        
+
         $decoded = json_decode($content, true);
 
         if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
@@ -311,12 +308,12 @@ EOT;
 
         // Fallback: split by newlines if not JSON
         $lines = explode("\n", $content);
-        $suggestions = array_filter($lines, function($line) {
-            return !empty(trim($line));
+        $suggestions = array_filter($lines, function ($line) {
+            return ! empty(trim($line));
         });
-        
+
         // Clean up numbering (e.g., "1. ")
-        return array_map(function($line) {
+        return array_map(function ($line) {
             return preg_replace('/^\d+\.\s*/', '', trim($line));
         }, array_values($suggestions));
     }
@@ -335,7 +332,7 @@ EOT;
             'score' => 50,
             'strengths' => ['Could not parse analysis.'],
             'weaknesses' => [],
-            'tips' => ['Please try again.']
+            'tips' => ['Please try again.'],
         ];
     }
 
@@ -352,19 +349,13 @@ EOT;
             [
                 'title' => 'Coffee & Walk',
                 'description' => 'Grab a coffee and take a walk in a nearby park.',
-                'reason' => 'Simple, low pressure, and allows for conversation.'
-            ]
+                'reason' => 'Simple, low pressure, and allows for conversation.',
+            ],
         ];
     }
 
     /**
      * Analyze a draft message and provide feedback.
-     *
-     * @param User $user
-     * @param User $match
-     * @param string $draft
-     * @param array $history
-     * @return array
      */
     public function analyzeDraftMessage(User $user, User $match, string $draft, array $history): array
     {
@@ -373,33 +364,34 @@ EOT;
         try {
             $response = $this->llmManager->driver()->chat([
                 ['role' => 'system', 'content' => 'You are a communication coach. Your goal is to help users send better messages in a dating context. Analyze the tone, clarity, and potential impact of the draft message.'],
-                ['role' => 'user', 'content' => $prompt]
+                ['role' => 'user', 'content' => $prompt],
             ], ['temperature' => 0.7]);
 
             return $this->parseDraftAnalysis($response->content);
         } catch (\Exception $e) {
-            Log::error("AiWingmanService: Failed to analyze draft: " . $e->getMessage());
+            Log::error('AiWingmanService: Failed to analyze draft: '.$e->getMessage());
+
             return [
                 'score' => 50,
                 'tone' => 'Neutral',
                 'feedback' => 'Unable to analyze message at this time.',
-                'suggestion' => null
+                'suggestion' => null,
             ];
         }
     }
 
     protected function buildDraftAnalysisPrompt(User $user, User $match, string $draft, array $history): string
     {
-        $conversation = "";
+        $conversation = '';
         // Take last 5 messages for context
         $recentHistory = array_slice($history, -5);
         foreach ($recentHistory as $msg) {
-            $sender = ($msg['sender_id'] == $user->id) ? "Me" : "Match";
+            $sender = ($msg['sender_id'] == $user->id) ? 'Me' : 'Match';
             $content = $msg['content'];
-            if (!empty($msg['transcription'])) {
+            if (! empty($msg['transcription'])) {
                 $content = $msg['transcription'];
             } elseif (($msg['message_type'] ?? '') === 'audio') {
-                $content = "[Audio Message]";
+                $content = '[Audio Message]';
             }
             $conversation .= "{$sender}: {$content}\n";
         }
@@ -436,7 +428,7 @@ EOT;
                 'score' => $decoded['score'] ?? 50,
                 'tone' => $decoded['tone'] ?? 'Unknown',
                 'feedback' => $decoded['feedback'] ?? 'No feedback provided.',
-                'suggestion' => $decoded['suggestion'] ?? null
+                'suggestion' => $decoded['suggestion'] ?? null,
             ];
         }
 
@@ -444,23 +436,19 @@ EOT;
             'score' => 50,
             'tone' => 'Unknown',
             'feedback' => 'Could not parse analysis.',
-            'suggestion' => null
+            'suggestion' => null,
         ];
     }
 
     /**
      * Generate a humorous "roast" or enthusiastic "hype" for a generic input (public/guest mode).
      *
-     * @param string $name
-     * @param string $job
-     * @param string $trait
-     * @param string $mode 'roast' or 'hype'
-     * @return string
+     * @param  string  $mode  'roast' or 'hype'
      */
     public function roastGeneric(string $name, string $job, string $trait, string $mode = 'roast'): string
     {
         // Simple cache key based on inputs to prevent spamming the exact same request
-        $cacheKey = "wingman:generic:{$mode}:" . md5($name . $job . $trait);
+        $cacheKey = "wingman:generic:{$mode}:".md5($name.$job.$trait);
 
         return Cache::remember($cacheKey, 3600, function () use ($name, $job, $trait, $mode) {
             $prompt = $this->buildGenericRoastPrompt($name, $job, $trait, $mode);
@@ -472,12 +460,13 @@ EOT;
             try {
                 $response = $this->llmManager->driver()->chat([
                     ['role' => 'system', 'content' => $systemPrompt],
-                    ['role' => 'user', 'content' => $prompt]
+                    ['role' => 'user', 'content' => $prompt],
                 ], ['temperature' => 0.9]);
 
                 return $response->content;
             } catch (\Exception $e) {
-                Log::error("AiWingmanService: Failed to generate generic {$mode}: " . $e->getMessage());
+                Log::error("AiWingmanService: Failed to generate generic {$mode}: ".$e->getMessage());
+
                 return "You broke the roast machine! That's how un-roastable you are. (Try again later)";
             }
         });
@@ -503,9 +492,7 @@ EOT;
     /**
      * Generate a humorous "roast" or enthusiastic "hype" of the user's profile.
      *
-     * @param User $user
-     * @param string $mode 'roast' or 'hype'
-     * @return string
+     * @param  string  $mode  'roast' or 'hype'
      */
     public function roastProfile(User $user, string $mode = 'roast'): string
     {
@@ -523,12 +510,13 @@ EOT;
             try {
                 $response = $this->llmManager->driver()->chat([
                     ['role' => 'system', 'content' => $systemPrompt],
-                    ['role' => 'user', 'content' => $prompt]
+                    ['role' => 'user', 'content' => $prompt],
                 ], ['temperature' => 0.9]);
 
                 return $response->content;
             } catch (\Exception $e) {
-                Log::error("AiWingmanService: Failed to generate {$mode}: " . $e->getMessage());
+                Log::error("AiWingmanService: Failed to generate {$mode}: ".$e->getMessage());
+
                 return $mode === 'hype'
                     ? "You're amazing! (My hype circuits are overloaded right now, try again later!)"
                     : "Your profile is so perfect I can't even find anything to roast! (Or maybe my servers are just busy...)";
@@ -538,9 +526,6 @@ EOT;
 
     /**
      * Generate "Red Flags" and "Green Flags" for a user's profile.
-     *
-     * @param User $user
-     * @return array
      */
     public function checkVibe(User $user): array
     {
@@ -554,15 +539,16 @@ EOT;
             try {
                 $response = $this->llmManager->driver()->chat([
                     ['role' => 'system', 'content' => 'You are a "Vibe Checker". Your job is to analyze dating profiles and identify "Green Flags" (positive traits) and "Red Flags" (potential warning signs or humorous observations). Be witty, observant, and keep it lighthearted.'],
-                    ['role' => 'user', 'content' => $prompt]
+                    ['role' => 'user', 'content' => $prompt],
                 ], ['temperature' => 0.8]);
 
                 return $this->parseVibeCheck($response->content);
             } catch (\Exception $e) {
-                Log::error("AiWingmanService: Failed to check vibe: " . $e->getMessage());
+                Log::error('AiWingmanService: Failed to check vibe: '.$e->getMessage());
+
                 return [
                     'green_flags' => ['Mystery', 'Unpredictable'],
-                    'red_flags' => ['Service unavailable', 'Too hot to handle']
+                    'red_flags' => ['Service unavailable', 'Too hot to handle'],
                 ];
             }
         });
@@ -570,9 +556,6 @@ EOT;
 
     /**
      * Generate a humorous "Dating Fortune" for the user.
-     *
-     * @param User $user
-     * @return string
      */
     public function predictFortune(User $user): string
     {
@@ -586,22 +569,20 @@ EOT;
             try {
                 $response = $this->llmManager->driver()->chat([
                     ['role' => 'system', 'content' => 'You are a mystical "Dating Oracle". Your job is to predict the user\'s romantic future in a humorous, fortune-cookie style. Be specific, slightly absurd, but encouraging.'],
-                    ['role' => 'user', 'content' => $prompt]
+                    ['role' => 'user', 'content' => $prompt],
                 ], ['temperature' => 0.9]);
 
                 return $response->content;
             } catch (\Exception $e) {
-                Log::error("AiWingmanService: Failed to predict fortune: " . $e->getMessage());
-                return "In the near future, you will encounter a server error that leads to a beautiful connection with customer support.";
+                Log::error('AiWingmanService: Failed to predict fortune: '.$e->getMessage());
+
+                return 'In the near future, you will encounter a server error that leads to a beautiful connection with customer support.';
             }
         });
     }
 
     /**
      * Generate a "Cosmic Match" prediction for the user.
-     *
-     * @param User $user
-     * @return array
      */
     public function predictCosmicMatch(User $user): array
     {
@@ -615,17 +596,18 @@ EOT;
             try {
                 $response = $this->llmManager->driver()->chat([
                     ['role' => 'system', 'content' => 'You are an expert astrologer and dating coach. Your job is to analyze profiles and determine the best and worst zodiac matches based on personality traits inferred from the bio and interests.'],
-                    ['role' => 'user', 'content' => $prompt]
+                    ['role' => 'user', 'content' => $prompt],
                 ], ['temperature' => 0.8]);
 
                 return $this->parseCosmicMatch($response->content);
             } catch (\Exception $e) {
-                Log::error("AiWingmanService: Failed to predict cosmic match: " . $e->getMessage());
+                Log::error('AiWingmanService: Failed to predict cosmic match: '.$e->getMessage());
+
                 return [
                     'best_match' => 'Unknown',
                     'best_reason' => 'The stars are cloudy today.',
                     'worst_match' => 'Unknown',
-                    'worst_reason' => 'Try again later.'
+                    'worst_reason' => 'Try again later.',
                 ];
             }
         });
@@ -638,7 +620,7 @@ EOT;
 
         $userInterests = implode(', ', $userProfile->interests ?? []);
         $matchInterests = implode(', ', $matchProfile->interests ?? []);
-        
+
         $userBio = $userProfile->bio ?? '';
         $matchBio = $matchProfile->bio ?? '';
 
@@ -666,9 +648,9 @@ EOT;
         $interests = implode(', ', $profile->interests ?? []);
         $job = $profile->occupation ?? 'Unemployed';
         $age = $profile->age ?? 'Unknown age';
-        
+
         $instruction = $mode === 'hype'
-            ? "Write a hype intro for this person. Make them sound irresistible. Focus on their best qualities and spin their flaws into features."
+            ? 'Write a hype intro for this person. Make them sound irresistible. Focus on their best qualities and spin their flaws into features.'
             : "Roast this dating profile. Be funny, witty, and slightly mean, but don't cross the line into harassment. Make fun of their clichés.";
 
         return <<<EOT
@@ -765,7 +747,7 @@ EOT;
                 'best_match' => $decoded['best_match'] ?? 'Leo',
                 'best_reason' => $decoded['best_reason'] ?? 'Because you need some drama.',
                 'worst_match' => $decoded['worst_match'] ?? 'Scorpio',
-                'worst_reason' => $decoded['worst_reason'] ?? 'Too intense for you.'
+                'worst_reason' => $decoded['worst_reason'] ?? 'Too intense for you.',
             ];
         }
 
@@ -773,7 +755,7 @@ EOT;
             'best_match' => 'Libra',
             'best_reason' => 'Balance is key.',
             'worst_match' => 'Gemini',
-            'worst_reason' => 'Two faces are too many.'
+            'worst_reason' => 'Two faces are too many.',
         ];
     }
 
@@ -785,21 +767,18 @@ EOT;
         if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
             return [
                 'green_flags' => $decoded['green_flags'] ?? [],
-                'red_flags' => $decoded['red_flags'] ?? []
+                'red_flags' => $decoded['red_flags'] ?? [],
             ];
         }
 
         return [
             'green_flags' => ['Good vibes only'],
-            'red_flags' => ['AI confusion']
+            'red_flags' => ['AI confusion'],
         ];
     }
 
     /**
      * Generate a "Scientific Nemesis" profile for the user.
-     *
-     * @param User $user
-     * @return array
      */
     public function findNemesis(User $user): array
     {
@@ -813,17 +792,18 @@ EOT;
             try {
                 $response = $this->llmManager->driver()->chat([
                     ['role' => 'system', 'content' => 'You are a "Scientific Matchmaker" gone rogue. Your job is to use psychological principles (Big Five, Myers-Briggs, etc.) to identify the absolute worst possible romantic match for a user. Be specific, analytical, but humorous.'],
-                    ['role' => 'user', 'content' => $prompt]
+                    ['role' => 'user', 'content' => $prompt],
                 ], ['temperature' => 0.8]);
 
                 return $this->parseNemesis($response->content);
             } catch (\Exception $e) {
-                Log::error("AiWingmanService: Failed to find nemesis: " . $e->getMessage());
+                Log::error('AiWingmanService: Failed to find nemesis: '.$e->getMessage());
+
                 return [
                     'nemesis_type' => 'The Void',
                     'clashing_traits' => ['Everything'],
                     'why_it_would_fail' => 'Matter and anti-matter do not mix.',
-                    'scientific_explanation' => 'Total protonic reversal.'
+                    'scientific_explanation' => 'Total protonic reversal.',
                 ];
             }
         });
@@ -867,21 +847,18 @@ EOT;
                 'nemesis_type' => $decoded['nemesis_type'] ?? 'The Unknown',
                 'clashing_traits' => $decoded['clashing_traits'] ?? ['Mystery', 'Silence', 'Void'],
                 'why_it_would_fail' => $decoded['why_it_would_fail'] ?? 'You would simply cease to exist.',
-                'scientific_explanation' => $decoded['scientific_explanation'] ?? 'Data insufficient for meaningful analysis.'
+                'scientific_explanation' => $decoded['scientific_explanation'] ?? 'Data insufficient for meaningful analysis.',
             ];
         }
     }
 
     /**
      * Analyze a specific user quirk and classify it as Green, Beige, or Red flag.
-     *
-     * @param string $quirk
-     * @return array
      */
     public function analyzeQuirk(string $quirk): array
     {
         // Simple cache key based on quirk hash to prevent re-processing identical inputs immediately
-        $cacheKey = "wingman:quirk_check:" . md5(strtolower(trim($quirk)));
+        $cacheKey = 'wingman:quirk_check:'.md5(strtolower(trim($quirk)));
 
         return Cache::remember($cacheKey, 86400, function () use ($quirk) {
             $prompt = $this->buildQuirkAnalysisPrompt($quirk);
@@ -889,16 +866,17 @@ EOT;
             try {
                 $response = $this->llmManager->driver()->chat([
                     ['role' => 'system', 'content' => 'You are a witty "Red Flag Checker". Your job is to analyze user-submitted quirks or habits and classify them as a "Green Flag" (Good), "Beige Flag" (Weird/Neutral), or "Red Flag" (Bad). Provide a short, roasting, or complimentary reason.'],
-                    ['role' => 'user', 'content' => $prompt]
+                    ['role' => 'user', 'content' => $prompt],
                 ], ['temperature' => 0.8]);
 
                 return $this->parseQuirkAnalysis($response->content);
             } catch (\Exception $e) {
-                Log::error("AiWingmanService: Failed to analyze quirk: " . $e->getMessage());
+                Log::error('AiWingmanService: Failed to analyze quirk: '.$e->getMessage());
+
                 return [
                     'flag_type' => 'Beige Flag',
                     'reason' => 'My servers are confused by this behavior.',
-                    'emoji' => '🟫'
+                    'emoji' => '🟫',
                 ];
             }
         });
@@ -932,14 +910,14 @@ EOT;
             return [
                 'flag_type' => $decoded['flag_type'] ?? 'Beige Flag',
                 'reason' => $decoded['reason'] ?? 'Indeterminate vibe.',
-                'emoji' => $decoded['emoji'] ?? '🟫'
+                'emoji' => $decoded['emoji'] ?? '🟫',
             ];
         }
 
         return [
             'flag_type' => 'Beige Flag',
             'reason' => 'Analysis failed, assuming it\'s just weird.',
-            'emoji' => '🟫'
+            'emoji' => '🟫',
         ];
     }
 
@@ -947,21 +925,19 @@ EOT;
      * Generate a deep AI-powered "Compatibility Audit" for two matched users.
      * Analyzes shared life goals, ethical frameworks, and long-term alignment.
      *
-     * @param User $user
-     * @param User $target
      * @return array Structured audit result
      */
     public function generateCompatibilityAudit(User $user, User $target): array
     {
         // Deterministic cache key — same pair always gets the same audit
-        $pairKey = min($user->id, $target->id) . ':' . max($user->id, $target->id);
+        $pairKey = min($user->id, $target->id).':'.max($user->id, $target->id);
         $cacheKey = "wingman:compatibility_audit:{$pairKey}";
 
         return Cache::remember($cacheKey, 86400, function () use ($user, $target) {
             $userProfile = $user->profile;
             $targetProfile = $target->profile;
 
-            if (!$userProfile || !$targetProfile) {
+            if (! $userProfile || ! $targetProfile) {
                 return $this->fallbackCompatibilityAudit();
             }
 
@@ -970,12 +946,13 @@ EOT;
             try {
                 $response = $this->llmManager->driver()->chat([
                     ['role' => 'system', 'content' => 'You are a relationship psychologist and compatibility analyst. Your task is to provide a thoughtful, structured compatibility audit for two people based on their profiles. Be insightful, nuanced, and constructive. Focus on life goals, values, communication styles, and long-term potential — not just surface-level interests.'],
-                    ['role' => 'user', 'content' => $prompt]
+                    ['role' => 'user', 'content' => $prompt],
                 ], ['temperature' => 0.7]);
 
                 return $this->parseCompatibilityAudit($response->content);
             } catch (\Exception $e) {
-                Log::error("AiWingmanService: Failed to generate compatibility audit: " . $e->getMessage());
+                Log::error('AiWingmanService: Failed to generate compatibility audit: '.$e->getMessage());
+
                 return $this->fallbackCompatibilityAudit();
             }
         });
@@ -1076,13 +1053,13 @@ EOT;
         return [
             'overall_score' => 50,
             'alignment_areas' => [
-                ['area' => 'Shared Curiosity', 'strength' => 7, 'detail' => 'Both profiles show an openness to new experiences.']
+                ['area' => 'Shared Curiosity', 'strength' => 7, 'detail' => 'Both profiles show an openness to new experiences.'],
             ],
             'friction_points' => [
-                ['area' => 'Insufficient Data', 'severity' => 3, 'detail' => 'Complete your profiles for a more accurate audit.']
+                ['area' => 'Insufficient Data', 'severity' => 3, 'detail' => 'Complete your profiles for a more accurate audit.'],
             ],
             'growth_potential' => [
-                ['area' => 'Discovery Phase', 'detail' => 'Get to know each other to unlock deeper insights.']
+                ['area' => 'Discovery Phase', 'detail' => 'Get to know each other to unlock deeper insights.'],
             ],
             'narrative' => 'There\'s potential here — complete your profiles to see a more detailed analysis!',
         ];
@@ -1092,10 +1069,9 @@ EOT;
      * Analyze a conversation history to determine if a proactive "nudge" is needed.
      * Returns null if the conversation is flowing well, or an array with a suggestion.
      *
-     * @param User $user The user receiving the nudge
-     * @param User $match The other participant
-     * @param array $history Sequential array of last N messages
-     * @return array|null 
+     * @param  User  $user  The user receiving the nudge
+     * @param  User  $match  The other participant
+     * @param  array  $history  Sequential array of last N messages
      */
     public function generateProactiveNudge(User $user, User $match, array $history): ?array
     {
@@ -1104,23 +1080,24 @@ EOT;
         try {
             $response = $this->llmManager->driver()->chat([
                 ['role' => 'system', 'content' => 'You are an exceptionally perceptive dating coach and wingman. You monitor conversation histories to identify when a user should be nudged. Your goal is to keep things moving forward realistically. If the conversation is flowing well, do not intervene. Only suggest an action when there is a clear opportunity (e.g., they are hitting it off and should meet) or when the conversation is stalling.'],
-                ['role' => 'user', 'content' => $prompt]
+                ['role' => 'user', 'content' => $prompt],
             ], ['temperature' => 0.5]);
 
             return $this->parseProactiveNudge($response->content);
         } catch (\Exception $e) {
-            Log::error("AiWingmanService: Failed to generate proactive nudge: " . $e->getMessage());
+            Log::error('AiWingmanService: Failed to generate proactive nudge: '.$e->getMessage());
+
             return null;
         }
     }
 
     protected function buildProactiveNudgePrompt(User $user, User $match, array $history): string
     {
-        $conversation = "";
+        $conversation = '';
         foreach ($history as $msg) {
-            $sender = ($msg['sender_id'] == $user->id) ? "Me" : "Target";
+            $sender = ($msg['sender_id'] == $user->id) ? 'Me' : 'Target';
             $content = $msg['content'] ?? '[Audio/Media]';
-            if (!empty($msg['transcription'])) {
+            if (! empty($msg['transcription'])) {
                 $content = $msg['transcription'];
             }
             $conversation .= "{$sender}: {$content}\n";
@@ -1169,7 +1146,7 @@ EOT;
                 return [
                     'type' => $decoded['type'] ?? 'general',
                     'message' => $decoded['message'] ?? 'Time to make a move!',
-                    'action_label' => $decoded['action_label'] ?? 'View Suggestion'
+                    'action_label' => $decoded['action_label'] ?? 'View Suggestion',
                 ];
             }
         }

@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Feedback\StoreFeedbackRequest;
+use App\Http\Requests\Feedback\UpdateFeedbackStatusRequest;
 use App\Models\Feedback;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
-use App\Http\Requests\Feedback\UpdateFeedbackStatusRequest;
-use App\Http\Requests\Feedback\StoreFeedbackRequest;
 
 class FeedbackController extends Controller
 {
     /**
      * Get all feedback (Admin only)
-     * 
+     *
      * @OA\Get(
      *   path="/feedback",
      *   tags={"Feedback"},
      *   summary="List all feedback",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Response(response=200, description="List of feedback")
      * )
      */
@@ -33,20 +33,25 @@ class FeedbackController extends Controller
 
     /**
      * Update feedback status (Admin only)
-     * 
+     *
      * @OA\Put(
      *   path="/feedback/{id}",
      *   tags={"Feedback"},
      *   summary="Update feedback status",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *
      *   @OA\RequestBody(
      *     required=true,
+     *
      *     @OA\JsonContent(
      *       required={"status"},
+     *
      *       @OA\Property(property="status", type="string", enum={"new", "reviewed", "resolved", "dismissed"})
      *     )
      *   ),
+     *
      *   @OA\Response(response=200, description="Feedback updated")
      * )
      */
@@ -60,22 +65,26 @@ class FeedbackController extends Controller
 
     /**
      * Submit feedback
-     * 
+     *
      * @OA\Post(
      *   path="/feedback",
      *   tags={"Feedback"},
      *   summary="Submit user feedback",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\RequestBody(
      *     required=true,
+     *
      *     @OA\JsonContent(
      *       required={"message", "category"},
+     *
      *       @OA\Property(property="category", type="string", enum={"bug", "feature", "general", "safety"}),
      *       @OA\Property(property="message", type="string"),
      *       @OA\Property(property="page_url", type="string"),
      *       @OA\Property(property="metadata", type="object")
      *     )
      *   ),
+     *
      *   @OA\Response(response=201, description="Feedback submitted"),
      *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
      * )
@@ -99,11 +108,12 @@ class FeedbackController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Thank you for your feedback!',
-                'data' => $feedback
+                'data' => $feedback,
             ], 201);
 
         } catch (\Exception $e) {
             Log::error('Error saving feedback', ['error' => $e->getMessage()]);
+
             return response()->json(['message' => 'Internal server error'], 500);
         }
     }

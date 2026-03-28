@@ -2,17 +2,18 @@
 
 namespace App\Services;
 
+use App\Models\ProximityArtifact;
 use App\Models\User;
 use App\Services\MediaAnalysis\MediaAnalysisInterface;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use App\Models\ProximityArtifact;
 
 class AvatarGenerationService
 {
     private array $config;
+
     private MediaAnalysisInterface $mediaAnalysis;
 
     public function __construct(MediaAnalysisInterface $mediaAnalysis)
@@ -61,18 +62,23 @@ class AvatarGenerationService
                 'replicate' => $this->generateWithReplicate($prompt, $negativePrompt, $options),
                 default => throw new \Exception("Unsupported provider: {$provider}"),
             };
-            
+
             // Map the vibe to a clean string for metadata saving, removing the verbose prompt modifiers
             $cleanVibe = null;
             if ($vibe) {
-                 if (str_contains($vibe, 'energetic aura')) $cleanVibe = 'energetic';
-                 elseif (str_contains($vibe, 'relaxed aura')) $cleanVibe = 'relaxed';
-                 elseif (str_contains($vibe, 'intense aura')) $cleanVibe = 'edgy';
+                if (str_contains($vibe, 'energetic aura')) {
+                    $cleanVibe = 'energetic';
+                } elseif (str_contains($vibe, 'relaxed aura')) {
+                    $cleanVibe = 'relaxed';
+                } elseif (str_contains($vibe, 'intense aura')) {
+                    $cleanVibe = 'edgy';
+                }
             }
 
             $result['vibe'] = $cleanVibe;
+
             return $result;
-            
+
         } catch (\Exception $e) {
             Log::error("Avatar generation failed with provider {$provider}", [
                 'user_id' => $user->id,
@@ -96,10 +102,11 @@ class AvatarGenerationService
         try {
             return $this->generateWithReplicateImg2Img($imagePath, $prompt, $negativePrompt, $options);
         } catch (\Exception $e) {
-            Log::error("Avatar img2img generation failed", [
+            Log::error('Avatar img2img generation failed', [
                 'user_id' => $user->id,
                 'error' => $e->getMessage(),
             ]);
+
             return ['success' => false, 'error' => $e->getMessage()];
         }
     }
@@ -107,9 +114,9 @@ class AvatarGenerationService
     private function generateWithDalle(string $prompt, array $options): array
     {
         $apiKey = $this->config['providers']['dalle']['api_key'];
-        
+
         if (empty($apiKey)) {
-             if (app()->environment('testing')) {
+            if (app()->environment('testing')) {
                 return [
                     'success' => true,
                     'image_url' => 'https://example.com/fake-avatar.png',
@@ -120,7 +127,7 @@ class AvatarGenerationService
         }
 
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $apiKey,
+            'Authorization' => 'Bearer '.$apiKey,
             'Content-Type' => 'application/json',
         ])->post('https://api.openai.com/v1/images/generations', [
             'model' => $this->config['providers']['dalle']['model'],
@@ -133,6 +140,7 @@ class AvatarGenerationService
 
         if ($response->successful()) {
             $url = $response->json('data.0.url');
+
             return [
                 'success' => true,
                 'image_url' => $this->saveImageFromUrl($url, 'dalle'),
@@ -140,15 +148,15 @@ class AvatarGenerationService
             ];
         }
 
-        throw new \Exception('OpenAI API error: ' . $response->body());
+        throw new \Exception('OpenAI API error: '.$response->body());
     }
 
     private function generateWithGemini(string $prompt, string $negativePrompt, array $options): array
     {
         $apiKey = $this->config['providers']['gemini']['api_key'];
-        
+
         if (empty($apiKey)) {
-             if (app()->environment('testing')) {
+            if (app()->environment('testing')) {
                 return [
                     'success' => true,
                     'image_url' => 'https://example.com/fake-avatar.png',
@@ -180,15 +188,15 @@ class AvatarGenerationService
             }
         }
 
-        throw new \Exception('Gemini API error: ' . $response->body());
+        throw new \Exception('Gemini API error: '.$response->body());
     }
 
     private function generateWithReplicate(string $prompt, string $negativePrompt, array $options): array
     {
         $apiToken = $this->config['providers']['replicate']['api_token'];
-        
+
         if (empty($apiToken)) {
-             if (app()->environment('testing')) {
+            if (app()->environment('testing')) {
                 return [
                     'success' => true,
                     'image_url' => 'https://example.com/fake-avatar.png',
@@ -214,7 +222,7 @@ class AvatarGenerationService
         }
 
         $response = Http::withHeaders([
-            'Authorization' => 'Token ' . $apiToken,
+            'Authorization' => 'Token '.$apiToken,
             'Content-Type' => 'application/json',
         ])->post('https://api.replicate.com/v1/predictions', [
             'version' => $version,
@@ -224,20 +232,20 @@ class AvatarGenerationService
         if ($response->successful()) {
             $prediction = $response->json();
             $predictionId = $prediction['id'];
-            
+
             // Poll for completion
             return $this->pollReplicatePrediction($predictionId, $apiToken);
         }
 
-        throw new \Exception('Replicate API error: ' . $response->body());
+        throw new \Exception('Replicate API error: '.$response->body());
     }
 
     private function generateWithReplicateImg2Img(string $imagePath, string $prompt, string $negativePrompt, array $options): array
     {
         $apiToken = $this->config['providers']['replicate']['api_token'];
-        
+
         if (empty($apiToken)) {
-             if (app()->environment('testing')) {
+            if (app()->environment('testing')) {
                 return [
                     'success' => true,
                     'image_url' => 'https://example.com/fake-avatar.png',
@@ -248,7 +256,7 @@ class AvatarGenerationService
         }
 
         // Read image and convert to data URI
-        if (!Storage::disk('public')->exists($imagePath)) {
+        if (! Storage::disk('public')->exists($imagePath)) {
             throw new \Exception('Source image not found');
         }
         $imageContent = Storage::disk('public')->get($imagePath);
@@ -257,7 +265,7 @@ class AvatarGenerationService
         $dataUri = "data:$mime;base64,$base64";
 
         $response = Http::withHeaders([
-            'Authorization' => 'Token ' . $apiToken,
+            'Authorization' => 'Token '.$apiToken,
             'Content-Type' => 'application/json',
         ])->post('https://api.replicate.com/v1/predictions', [
             'version' => '27b93a2413e7f36cd83da926f3656280b2931564ff050bf9575f1fdf9bcd7478', // SD model
@@ -273,10 +281,11 @@ class AvatarGenerationService
 
         if ($response->successful()) {
             $prediction = $response->json();
+
             return $this->pollReplicatePrediction($prediction['id'], $apiToken);
         }
 
-        throw new \Exception('Replicate API error: ' . $response->body());
+        throw new \Exception('Replicate API error: '.$response->body());
     }
 
     private function pollReplicatePrediction(string $id, string $token): array
@@ -287,13 +296,14 @@ class AvatarGenerationService
         while ($attempt < $maxAttempts) {
             sleep(2);
             $response = Http::withHeaders([
-                'Authorization' => 'Token ' . $token,
+                'Authorization' => 'Token '.$token,
             ])->get("https://api.replicate.com/v1/predictions/{$id}");
 
             if ($response->successful()) {
                 $status = $response->json('status');
                 if ($status === 'succeeded') {
                     $url = $response->json('output.0');
+
                     return [
                         'success' => true,
                         'image_url' => $this->saveImageFromUrl($url, 'replicate'),
@@ -301,7 +311,7 @@ class AvatarGenerationService
                     ];
                 }
                 if ($status === 'failed') {
-                    throw new \Exception('Replicate generation failed: ' . $response->json('error'));
+                    throw new \Exception('Replicate generation failed: '.$response->json('error'));
                 }
             }
             $attempt++;
@@ -313,13 +323,13 @@ class AvatarGenerationService
     private function saveImageFromUrl(string $url, string $provider): string
     {
         $response = Http::get($url);
-        
-        if (!$response->successful()) {
+
+        if (! $response->successful()) {
             throw new \Exception("Failed to download image from {$url}");
         }
 
         $contents = $response->body();
-        $filename = 'avatars/' . Str::uuid() . '.png';
+        $filename = 'avatars/'.Str::uuid().'.png';
         $disk = config('filesystems.default', 'public');
         Storage::disk($disk)->put($filename, $contents);
 
@@ -327,9 +337,9 @@ class AvatarGenerationService
         if (config('features.media_analysis')) {
             try {
                 $analysis = $this->mediaAnalysis->analyze($filename, 'image');
-                if (!$analysis->safe) {
+                if (! $analysis->safe) {
                     Storage::disk($disk)->delete($filename);
-                    throw new \Exception("Generated avatar was flagged as unsafe: " . implode(', ', $analysis->moderationLabels));
+                    throw new \Exception('Generated avatar was flagged as unsafe: '.implode(', ', $analysis->moderationLabels));
                 }
             } catch (\Exception $e) {
                 if (Storage::disk($disk)->exists($filename)) {
@@ -345,16 +355,16 @@ class AvatarGenerationService
     private function saveImageFromBase64(string $base64, string $provider): string
     {
         $contents = base64_decode($base64);
-        $filename = 'avatars/' . Str::uuid() . '.png';
+        $filename = 'avatars/'.Str::uuid().'.png';
         Storage::disk('public')->put($filename, $contents);
 
         // Analyze the image for safety
         if (config('features.media_analysis')) {
             try {
                 $analysis = $this->mediaAnalysis->analyze($filename, 'image');
-                if (!$analysis->safe) {
+                if (! $analysis->safe) {
                     Storage::disk('public')->delete($filename);
-                    throw new \Exception("Generated avatar was flagged as unsafe: " . implode(', ', $analysis->moderationLabels));
+                    throw new \Exception('Generated avatar was flagged as unsafe: '.implode(', ', $analysis->moderationLabels));
                 }
             } catch (\Exception $e) {
                 if (Storage::disk('public')->exists($filename)) {
@@ -371,25 +381,25 @@ class AvatarGenerationService
     {
         $profile = $user->profile;
         $parts = [];
-        
+
         // Helper to get attribute from options or profile
-        $get = fn($key) => $options[$key] ?? $profile?->{$key} ?? null;
+        $get = fn ($key) => $options[$key] ?? $profile?->{$key} ?? null;
 
         // Base style
         $parts[] = $options['style'] ?? $this->config['default_style'];
 
         // Age
         $age = $options['age'] ?? null;
-        if (!$age && $profile?->birthdate) {
+        if (! $age && $profile?->birthdate) {
             $age = $profile->birthdate->age;
         }
-        
+
         if ($age) {
-            $parts[] = $this->getAgeGroup((int)$age) . ' person';
+            $parts[] = $this->getAgeGroup((int) $age).' person';
         } else {
             $parts[] = 'person';
         }
-        
+
         // Gender
         $gender = $get('gender');
         if ($gender) {
@@ -398,59 +408,76 @@ class AvatarGenerationService
 
         // Physical attributes
         $ethnicity = $get('ethnicity');
-        if ($ethnicity) $parts[] = $ethnicity;
+        if ($ethnicity) {
+            $parts[] = $ethnicity;
+        }
 
         $bodyType = $get('body_type');
-        if ($bodyType) $parts[] = $bodyType . ' body type';
+        if ($bodyType) {
+            $parts[] = $bodyType.' body type';
+        }
 
         $height = $get('height_cm');
         if ($height) {
-            if ($height > 185) $parts[] = 'tall';
-            elseif ($height < 160) $parts[] = 'short';
+            if ($height > 185) {
+                $parts[] = 'tall';
+            } elseif ($height < 160) {
+                $parts[] = 'short';
+            }
         }
 
         // Breast size (only for relevant genders)
         $breastSize = $get('breast_size');
         if ($breastSize && in_array(strtolower($gender ?? ''), ['female', 'trans-female', 'non-binary'])) {
-             $parts[] = $breastSize . ' bust';
+            $parts[] = $breastSize.' bust';
         }
 
         $hairColor = $get('hair_color');
-        if ($hairColor) $parts[] = $hairColor . ' hair';
+        if ($hairColor) {
+            $parts[] = $hairColor.' hair';
+        }
 
         $eyeColor = $get('eye_color');
-        if ($eyeColor) $parts[] = $eyeColor . ' eyes';
+        if ($eyeColor) {
+            $parts[] = $eyeColor.' eyes';
+        }
 
         $skinTone = $get('skin_tone');
-        if ($skinTone) $parts[] = $skinTone . ' skin tone';
+        if ($skinTone) {
+            $parts[] = $skinTone.' skin tone';
+        }
 
         $facialHair = $get('facial_hair');
-        if ($facialHair && $facialHair !== 'none') $parts[] = $facialHair;
+        if ($facialHair && $facialHair !== 'none') {
+            $parts[] = $facialHair;
+        }
 
         // Distinctive features
         $tattoos = $get('tattoos');
-        if (!empty($tattoos) && is_array($tattoos)) {
-             $parts[] = 'visible tattoos';
+        if (! empty($tattoos) && is_array($tattoos)) {
+            $parts[] = 'visible tattoos';
         }
 
         $piercings = $get('piercings');
-        if (!empty($piercings) && is_array($piercings)) {
-             $parts[] = 'piercings';
+        if (! empty($piercings) && is_array($piercings)) {
+            $parts[] = 'piercings';
         }
 
         // Style & Vibe
         $clothingStyle = $get('clothing_style');
         $occupation = $get('occupation');
-        
+
         if ($clothingStyle) {
-            $parts[] = 'wearing ' . $clothingStyle . ' style clothing';
+            $parts[] = 'wearing '.$clothingStyle.' style clothing';
         } elseif ($occupation) {
             // Fallback to occupation-based style if no specific style set
-            $parts[] = 'dressed as a ' . $occupation;
+            $parts[] = 'dressed as a '.$occupation;
         }
 
         $fitnessLevel = $get('fitness_level');
-        if ($fitnessLevel) $parts[] = $fitnessLevel . ' build';
+        if ($fitnessLevel) {
+            $parts[] = $fitnessLevel.' build';
+        }
 
         // Calculate Vibe from Local Pulse Posts
         $vibe = $this->analyzeUserVibe($user);
@@ -461,20 +488,23 @@ class AvatarGenerationService
             $mbti = $get('personality_type');
             if ($mbti) {
                 $firstLetter = strtoupper(substr($mbti, 0, 1));
-                if ($firstLetter === 'E') $parts[] = 'energetic, friendly expression';
-                elseif ($firstLetter === 'I') $parts[] = 'calm, thoughtful expression';
+                if ($firstLetter === 'E') {
+                    $parts[] = 'energetic, friendly expression';
+                } elseif ($firstLetter === 'I') {
+                    $parts[] = 'calm, thoughtful expression';
+                }
             }
         }
 
         // Background context from interests
         $interests = $get('interests');
-        if (!empty($interests) && is_array($interests)) {
+        if (! empty($interests) && is_array($interests)) {
             $mainInterest = $interests[0];
-            $parts[] = $mainInterest . ' background theme';
+            $parts[] = $mainInterest.' background theme';
         }
 
         // Sexy boost — emphasize physical attractiveness
-        if (!empty($options['sexy_boost'])) {
+        if (! empty($options['sexy_boost'])) {
             $parts[] = 'strikingly attractive, magnetic presence, alluring gaze, flawless skin, model-quality features, sultry confidence';
             $parts[] = 'fashion photography, dramatic lighting, editorial quality, glamorous';
         } else {
@@ -492,7 +522,7 @@ class AvatarGenerationService
         $base = 'low quality, blurry, pixelated, deformed, disfigured, mutation, extra limbs, extra fingers, watermark, text, signature, child, minor, young';
 
         // Sexy boost allows more suggestive (but not explicit) outputs
-        if (!empty($options['sexy_boost'])) {
+        if (! empty($options['sexy_boost'])) {
             $base .= ', nude, naked, explicit, pornographic';
         } else {
             $base .= ', nsfw, nude, naked, explicit, sexual, inappropriate';
@@ -503,9 +533,16 @@ class AvatarGenerationService
 
     private function getAgeGroup(int $age): string
     {
-        if ($age >= 18 && $age <= 25) return 'young adult';
-        if ($age >= 26 && $age <= 35) return 'adult';
-        if ($age >= 36 && $age <= 50) return 'middle-aged';
+        if ($age >= 18 && $age <= 25) {
+            return 'young adult';
+        }
+        if ($age >= 26 && $age <= 35) {
+            return 'adult';
+        }
+        if ($age >= 36 && $age <= 50) {
+            return 'middle-aged';
+        }
+
         return 'mature adult';
     }
 
@@ -540,7 +577,7 @@ class AvatarGenerationService
         // High Energy / Positive Keywords
         $energeticScore = 0;
         $energeticWords = ['party', 'drinks', 'fun', 'excited', 'amazing', 'love', 'wild', 'club', 'dancing', 'friends', 'concert', 'happy', 'weekend', 'tonight', 'epic'];
-        
+
         // Relaxed / Cozy Keywords
         $relaxedScore = 0;
         $relaxedWords = ['movie', 'home', 'chill', 'tired', 'coffee', 'book', 'reading', 'rain', 'cozy', 'netflix', 'relaxing', 'quiet', 'sleep', 'morning', 'peaceful'];
@@ -550,13 +587,19 @@ class AvatarGenerationService
         $edgyWords = ['bored', 'annoyed', 'sad', 'angry', 'hate', 'ugh', 'dark', 'midnight', 'alone', 'lost', 'done', 'broken', 'crazy', 'mad'];
 
         foreach ($energeticWords as $word) {
-            if (str_contains($combinedText, $word)) $energeticScore++;
+            if (str_contains($combinedText, $word)) {
+                $energeticScore++;
+            }
         }
         foreach ($relaxedWords as $word) {
-            if (str_contains($combinedText, $word)) $relaxedScore++;
+            if (str_contains($combinedText, $word)) {
+                $relaxedScore++;
+            }
         }
         foreach ($edgyWords as $word) {
-            if (str_contains($combinedText, $word)) $edgyScore++;
+            if (str_contains($combinedText, $word)) {
+                $edgyScore++;
+            }
         }
 
         if ($energeticScore == 0 && $relaxedScore == 0 && $edgyScore == 0) {

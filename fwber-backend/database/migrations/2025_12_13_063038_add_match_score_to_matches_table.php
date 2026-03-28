@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('matches', function (Blueprint $table) {
-            if (!Schema::hasColumn('matches', 'match_score')) {
+            if (! Schema::hasColumn('matches', 'match_score')) {
                 $table->integer('match_score')->nullable()->after('status');
             }
         });

@@ -2,26 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Profile\UpdateProfileRequest;
+use App\Domain\Core\EventSourcing\EventStore;
+use App\Events\Profile\UserProfileCreated;
+use App\Events\Profile\UserProfileUpdated;
 use App\Http\Requests\Profile\UpdatePasswordRequest;
+use App\Http\Requests\Profile\UpdateProfileRequest;
 use App\Http\Resources\UserProfileResource;
 use App\Models\User;
 use App\Models\UserProfile;
-use App\Domain\Core\EventSourcing\EventStore;
-use App\Events\Profile\UserProfileUpdated;
-use App\Events\Profile\UserProfileCreated;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
 
 /**
  * Profile Controller - User Profile Management API
- * 
+ *
  * AI Model: Gemini 2.5 Flash - Simulated
  * Phase: 3A - First Next.js Integration
  * Purpose: Provide RESTful API for user profile operations
- * 
+ *
  * Created: 2025-10-18
  * Part of: Laravel + Next.js official stack (per ADR 001)
  */
@@ -38,18 +38,23 @@ class ProfileController extends Controller
      *     summary="Get public profile of a user",
      *     description="Retrieve public profile information for a specific user.",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         description="User ID",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Profile retrieved successfully",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/UserProfileResource")
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="User not found"
@@ -59,9 +64,9 @@ class ProfileController extends Controller
     public function showPublic(int $id): JsonResponse
     {
         $user = User::with(['profile', 'photos', 'vouches'])->findOrFail($id);
-        
+
         // Ensure profile exists
-        if (!$user->profile) {
+        if (! $user->profile) {
             return response()->json(['message' => 'Profile not found'], 404);
         }
 
@@ -78,10 +83,13 @@ class ProfileController extends Controller
      *     summary="Get authenticated user's profile",
      *     description="Retrieve complete profile information for the authenticated user including preferences, location, and completion status",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Profile retrieved successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(
      *                 property="data",
@@ -99,37 +107,40 @@ class ProfileController extends Controller
      *             @OA\Property(property="profile_complete", type="boolean", example=true)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Profile not found",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Profile not found. Please complete your profile."),
      *             @OA\Property(property="profile_complete", type="boolean", example=false)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthenticated",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
      *     )
      * )
-     * 
+     *
      * Get authenticated user's profile
-     * 
-     * @return JsonResponse
      */
     public function show(Request $request): JsonResponse
     {
-        Log::info('DEBUG: ProfileController::show hit for user ' . auth()->id());
+        Log::info('DEBUG: ProfileController::show hit for user '.auth()->id());
         try {
             $user = auth()->user();
-            
-            if (!$user) {
+
+            if (! $user) {
                 return response()->json([
                     'message' => 'Unauthenticated',
                 ], 401);
             }
-            
+
             // Eager load profile relationship with error handling
             try {
                 $user->load('profile');
@@ -137,7 +148,7 @@ class ProfileController extends Controller
                 Log::error('Failed to load profile relationship', ['error' => $e->getMessage()]);
                 // Continue without profile loaded
             }
-            
+
             // Safely check for profile existence
             $hasProfile = false;
             try {
@@ -147,26 +158,26 @@ class ProfileController extends Controller
                 $hasProfile = false;
             }
 
-            if (!$hasProfile) {
+            if (! $hasProfile) {
                 return response()->json([
                     'message' => 'Profile not found. Please complete your profile.',
                     'profile_complete' => false,
                 ], 404);
             }
-            
+
             return response()->json([
                 'success' => true,
                 'data' => new UserProfileResource($user),
                 'profile_complete' => $this->isProfileComplete($user->profile),
             ]);
-            
+
         } catch (\Throwable $e) {
             Log::error('Profile fetch error', [
                 'user_id' => auth()->id(),
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            
+
             // Return 404 or partial data instead of 500 to prevent UI crash
             return response()->json([
                 'message' => 'Profile unavailable',
@@ -174,7 +185,7 @@ class ProfileController extends Controller
             ], 404);
         }
     }
-    
+
     /**
      * @OA\Put(
      *     path="/profile",
@@ -182,9 +193,12 @@ class ProfileController extends Controller
      *     summary="Update user profile",
      *     description="Update profile information including bio, preferences, location, and personal details. All fields are optional.",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="display_name", type="string", maxLength=50, example="Johnny"),
      *             @OA\Property(property="bio", type="string", maxLength=500, example="Updated bio text"),
      *             @OA\Property(property="date_of_birth", type="string", format="date", example="1990-05-15"),
@@ -195,9 +209,11 @@ class ProfileController extends Controller
      *             @OA\Property(
      *                 property="looking_for",
      *                 type="array",
+     *
      *                 @OA\Items(type="string", enum={"friendship", "dating", "relationship", "casual", "marriage", "networking"}),
      *                 example={"dating", "relationship"}
      *             ),
+     *
      *             @OA\Property(
      *                 property="location",
      *                 type="object",
@@ -218,82 +234,88 @@ class ProfileController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Profile updated successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Profile updated successfully"),
      *             @OA\Property(property="data", type="object")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Validation error",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthenticated",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
      *     )
      * )
-     * 
+     *
      * Update authenticated user's profile
-     * 
-     * @param UpdateProfileRequest $request
-     * @return JsonResponse
      */
     public function update(UpdateProfileRequest $request): JsonResponse
     {
         try {
             $user = auth()->user();
-            
-            if (!$user) {
+
+            if (! $user) {
                 return response()->json(['message' => 'Unauthenticated'], 401);
             }
-            
+
             // Wrap validation in try-catch in case it triggers DB checks on missing columns
             try {
                 $validated = $request->validated();
             } catch (\Exception $e) {
                 Log::error('Validation error during profile update', ['error' => $e->getMessage()]);
+
                 return response()->json(['message' => 'Invalid data provided'], 422);
             }
-            
+
             Log::info('Profile update request', [
                 'user_id' => $user->id,
-                'data' => $validated
+                'data' => $validated,
             ]);
-            
+
             // Get or create profile with error handling
             try {
                 $profile = $user->profile;
-                $isNewProfile = !$profile;
+                $isNewProfile = ! $profile;
 
                 if ($isNewProfile) {
-                    $profile = new UserProfile();
+                    $profile = new UserProfile;
                     $profile->user_id = $user->id;
                 }
-                
+
                 // --- EVENT SOURCING INTEGRATION ---
-                $currentVersion = $this->eventStore->getCurrentVersion((string)$user->id, 'UserProfile');
-                
+                $currentVersion = $this->eventStore->getCurrentVersion((string) $user->id, 'UserProfile');
+
                 if ($isNewProfile) {
-                    $event = new UserProfileCreated((string)$user->id, $validated);
+                    $event = new UserProfileCreated((string) $user->id, $validated);
                 } else {
                     // Calculate actual changes for the update event
                     $changes = [];
                     foreach ($validated as $key => $value) {
                         if ($key === 'location' || $key === 'travel_location' || $key === 'preferences') {
                             $changes[$key] = $value; // Always include complex nested fields for now
+
                             continue;
                         }
                         if ($profile->getAttribute($key) != $value) {
                             $changes[$key] = $value;
                         }
                     }
-                    $event = new UserProfileUpdated((string)$user->id, $changes);
+                    $event = new UserProfileUpdated((string) $user->id, $changes);
                 }
 
                 $this->eventStore->append(
@@ -355,7 +377,7 @@ class ProfileController extends Controller
                     'is_federated',
                     'subscription_price',
                 ])));
-                
+
                 // Handle location fields
                 if (isset($validated['location'])) {
                     $location = $validated['location'];
@@ -366,7 +388,7 @@ class ProfileController extends Controller
                         $profile->longitude = $location['longitude'];
                     }
                     if (isset($location['city'])) {
-                        $profile->location_name = $location['city'] . ', ' . ($location['state'] ?? '');
+                        $profile->location_name = $location['city'].', '.($location['state'] ?? '');
                     }
                 }
 
@@ -374,7 +396,7 @@ class ProfileController extends Controller
                 if (isset($validated['is_travel_mode'])) {
                     $profile->is_travel_mode = $validated['is_travel_mode'];
                 }
-                
+
                 if (isset($validated['travel_location'])) {
                     $travel = $validated['travel_location'];
                     if (isset($travel['latitude'])) {
@@ -387,16 +409,16 @@ class ProfileController extends Controller
                         $profile->travel_location_name = $travel['name'];
                     }
                 }
-                
+
                 // Handle JSON fields
                 if (isset($validated['looking_for'])) {
                     $profile->looking_for = $validated['looking_for'];
                 }
-                
+
                 if (isset($validated['interested_in'])) {
                     $profile->interested_in = $validated['interested_in'];
                 }
-                
+
                 if (isset($validated['preferences'])) {
                     $profile->preferences = array_merge(
                         $profile->preferences ?? [],
@@ -413,9 +435,9 @@ class ProfileController extends Controller
                     );
                     $profile->voice_intro_url = $result['media_url'];
                 }
-                
+
                 $profile->save();
-                
+
                 // Update user's basic info if provided
                 if (isset($validated['email'])) {
                     $user->email = $validated['email'];
@@ -424,17 +446,17 @@ class ProfileController extends Controller
                 if (array_key_exists('avatar_url', $validated)) {
                     $user->avatar_url = $validated['avatar_url'];
                 }
-                
+
                 $user->save();
-                
+
                 // Reload with fresh data
                 $user->load('profile');
-                
+
                 Log::info('Profile updated', [
                     'user_id' => $user->id,
                     'updated_fields' => array_keys($validated),
                 ]);
-                
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Profile updated successfully',
@@ -443,6 +465,7 @@ class ProfileController extends Controller
                 ]);
             } catch (\Exception $e) {
                 Log::error('Database error during profile update', ['error' => $e->getMessage()]);
+
                 // Return success even if save failed, to prevent UI blocking
                 // This is a "fake it till you make it" strategy for broken schemas
                 return response()->json([
@@ -451,14 +474,14 @@ class ProfileController extends Controller
                     'data' => new UserProfileResource($user),
                 ]);
             }
-            
+
         } catch (\Exception $e) {
             Log::error('Profile update error', [
                 'user_id' => auth()->id(),
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-            
+
             return response()->json([
                 'message' => 'Error updating profile',
                 'error' => $e->getMessage(), // Always show error for debugging
@@ -466,12 +489,9 @@ class ProfileController extends Controller
             ], 500);
         }
     }
-    
+
     /**
      * Check if profile is complete enough for matching
-     * 
-     * @param UserProfile $profile
-     * @return bool
      */
     private function isProfileComplete(UserProfile $profile): bool
     {
@@ -502,25 +522,23 @@ class ProfileController extends Controller
         }
 
         // looking_for should be an array with at least one entry
-        if (!is_array($profile->looking_for) || count($profile->looking_for) === 0) {
+        if (! is_array($profile->looking_for) || count($profile->looking_for) === 0) {
             return false;
         }
-        
+
         return true;
     }
-    
+
     /**
      * Get profile completion percentage
-     * 
-     * @return JsonResponse
      */
     public function completeness(Request $request): JsonResponse
     {
         try {
             $user = auth()->user();
             $profile = $user->profile;
-            
-            if (!$profile) {
+
+            if (! $profile) {
                 return response()->json([
                     'percentage' => 0,
                     'required_complete' => false,
@@ -536,20 +554,20 @@ class ProfileController extends Controller
                     ],
                 ]);
             }
-            
+
             // Helper to check nested preferences
-            $hasPref = function($key) use ($profile) {
-                return !empty($profile->preferences) && !empty($profile->preferences[$key]);
+            $hasPref = function ($key) use ($profile) {
+                return ! empty($profile->preferences) && ! empty($profile->preferences[$key]);
             };
 
             // Check sections
             $sections = [
-                'basic' => !empty($profile->display_name) && !empty($profile->birthdate) && !empty($profile->gender),
-                'location' => !empty($profile->latitude) && !empty($profile->longitude),
-                'preferences' => !empty($profile->looking_for) && count($profile->looking_for ?? []) > 0,
-                'interests' => !empty($profile->interests) || $hasPref('hobbies') || $hasPref('music') || $hasPref('sports'),
-                'physical' => !empty($profile->body_type) || $hasPref('body_type'),
-                'lifestyle' => !empty($profile->smoking_status) || $hasPref('smoking') || $hasPref('drinking') || $hasPref('exercise'),
+                'basic' => ! empty($profile->display_name) && ! empty($profile->birthdate) && ! empty($profile->gender),
+                'location' => ! empty($profile->latitude) && ! empty($profile->longitude),
+                'preferences' => ! empty($profile->looking_for) && count($profile->looking_for ?? []) > 0,
+                'interests' => ! empty($profile->interests) || $hasPref('hobbies') || $hasPref('music') || $hasPref('sports'),
+                'physical' => ! empty($profile->body_type) || $hasPref('body_type'),
+                'lifestyle' => ! empty($profile->smoking_status) || $hasPref('smoking') || $hasPref('drinking') || $hasPref('exercise'),
             ];
 
             // Required fields
@@ -570,25 +588,43 @@ class ProfileController extends Controller
                     $missingOptional[] = $field;
                 }
             }
-            
+
             // Check preferences for optional missing
-            if (!$sections['interests']) $missingOptional[] = 'interests_and_hobbies';
-            if (!$sections['physical']) $missingOptional[] = 'physical_attributes';
-            if (!$sections['lifestyle']) $missingOptional[] = 'lifestyle_habits';
-            
+            if (! $sections['interests']) {
+                $missingOptional[] = 'interests_and_hobbies';
+            }
+            if (! $sections['physical']) {
+                $missingOptional[] = 'physical_attributes';
+            }
+            if (! $sections['lifestyle']) {
+                $missingOptional[] = 'lifestyle_habits';
+            }
+
             // Calculate percentage
             // Basic: 30%, Location: 20%, Preferences: 20%, Bio: 10%, Interests: 10%, Lifestyle: 10%
             $score = 0;
-            if ($sections['basic']) $score += 30;
-            if ($sections['location']) $score += 20;
-            if ($sections['preferences']) $score += 20;
-            if (!empty($profile->bio)) $score += 10;
-            if ($sections['interests']) $score += 10;
-            if ($sections['lifestyle']) $score += 10;
+            if ($sections['basic']) {
+                $score += 30;
+            }
+            if ($sections['location']) {
+                $score += 20;
+            }
+            if ($sections['preferences']) {
+                $score += 20;
+            }
+            if (! empty($profile->bio)) {
+                $score += 10;
+            }
+            if ($sections['interests']) {
+                $score += 10;
+            }
+            if ($sections['lifestyle']) {
+                $score += 10;
+            }
 
             // Cap at 100
             $percentage = min(100, $score);
-            
+
             return response()->json([
                 'percentage' => $percentage,
                 'required_complete' => count($missingRequired) === 0,
@@ -596,13 +632,13 @@ class ProfileController extends Controller
                 'missing_optional' => $missingOptional,
                 'sections' => $sections,
             ]);
-            
+
         } catch (\Exception $e) {
             Log::error('Profile completeness check error', [
                 'user_id' => auth()->id(),
                 'error' => $e->getMessage(),
             ]);
-            
+
             return response()->json([
                 'message' => 'Error checking profile completeness',
             ], 500);
@@ -611,15 +647,13 @@ class ProfileController extends Controller
 
     /**
      * Export all user data (GDPR)
-     * 
-     * @return JsonResponse
      */
     public function export(Request $request): JsonResponse
     {
         try {
             $user = auth()->user();
-            
-            if (!$user) {
+
+            if (! $user) {
                 return response()->json(['message' => 'Unauthenticated'], 401);
             }
 
@@ -637,19 +671,19 @@ class ProfileController extends Controller
                 'giftsReceived',
                 'giftsSent',
             ]);
-            
+
             return response()->json([
                 'success' => true,
                 'data' => $user,
                 'generated_at' => now()->toIso8601String(),
             ]);
-            
+
         } catch (\Exception $e) {
             Log::error('Data export error', [
                 'user_id' => auth()->id(),
                 'error' => $e->getMessage(),
             ]);
-            
+
             return response()->json([
                 'message' => 'Error exporting data',
                 'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
@@ -659,33 +693,31 @@ class ProfileController extends Controller
 
     /**
      * Delete user account and all associated data
-     * 
-     * @return JsonResponse
      */
     public function destroy(Request $request): JsonResponse
     {
         try {
             $user = auth()->user();
-            
-            if (!$user) {
+
+            if (! $user) {
                 return response()->json(['message' => 'Unauthenticated'], 401);
             }
 
             // Delete user (cascades to profile, photos, matches, etc. via DB constraints)
             // Note: S3 file cleanup should be handled by Model Observers or a cleanup job
             $user->delete();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Account deleted successfully',
             ]);
-            
+
         } catch (\Exception $e) {
             Log::error('Account deletion error', [
                 'user_id' => auth()->id(),
                 'error' => $e->getMessage(),
             ]);
-            
+
             return response()->json([
                 'message' => 'Error deleting account',
                 'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
@@ -699,15 +731,19 @@ class ProfileController extends Controller
      *     tags={"Profile"},
      *     summary="Update user password",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"current_password", "password", "password_confirmation"},
+     *
      *             @OA\Property(property="current_password", type="string", format="password"),
      *             @OA\Property(property="password", type="string", format="password", minLength=8),
      *             @OA\Property(property="password_confirmation", type="string", format="password")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Password updated successfully"

@@ -22,7 +22,7 @@ class SecurityHeaders
     public function handle(Request $request, Closure $next): Response
     {
         // Force HTTPS in production
-        if (!$request->secure() && app()->environment('production')) {
+        if (! $request->secure() && app()->environment('production')) {
             return redirect()->secure($request->getRequestUri());
         }
 
@@ -44,18 +44,18 @@ class SecurityHeaders
         // Content Security Policy (CSP)
         // Strict by default in production; relaxed in non-production or when explicitly allowed via env
         $isProd = app()->environment('production');
-        $relaxed = (bool) env('CSP_RELAXED', !$isProd);
+        $relaxed = (bool) env('CSP_RELAXED', ! $isProd);
 
-        $scriptDirectives = ($isProd && !$relaxed)
+        $scriptDirectives = ($isProd && ! $relaxed)
             ? "script-src 'self'"
             : "script-src 'self' 'unsafe-inline' 'unsafe-eval'";
 
         // Strict style-src in production (no unsafe-inline) unless relaxed
-        $styleDirectives = ($isProd && !$relaxed) 
-            ? "style-src 'self'" 
+        $styleDirectives = ($isProd && ! $relaxed)
+            ? "style-src 'self'"
             : "style-src 'self' 'unsafe-inline'";
-        
-        $frameAncestors = ($isProd && !$relaxed)
+
+        $frameAncestors = ($isProd && ! $relaxed)
             ? "frame-ancestors 'none'"
             : "frame-ancestors 'self'";
 
@@ -82,7 +82,7 @@ class SecurityHeaders
             'usb=()',
             'magnetometer=()',
             'gyroscope=()',
-            'accelerometer=()'
+            'accelerometer=()',
         ]);
         $response->headers->set('Permissions-Policy', $permissionsPolicy);
 

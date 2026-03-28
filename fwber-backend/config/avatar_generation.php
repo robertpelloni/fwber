@@ -3,7 +3,7 @@
 return [
     'enabled' => env('AVATAR_GENERATION_ENABLED', true),
     'default_provider' => env('AVATAR_GENERATION_PROVIDER', 'dalle'),
-    
+
     'providers' => [
         'dalle' => [
             'api_key' => env('OPENAI_API_KEY'),
@@ -20,6 +20,6 @@ return [
             'model' => 'stability-ai/stable-diffusion:27b93a2413e7f36cd83da926f3656280b2931564ff050bf9575f1fdf9bcd7478',
         ],
     ],
-    
+
     'default_style' => 'realistic portrait, professional headshot',
 ];

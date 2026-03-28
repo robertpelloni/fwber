@@ -2,25 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EditChatroomMessageRequest;
+use App\Http\Requests\ReactToChatroomMessageRequest;
+use App\Http\Requests\StoreChatroomMessageRequest;
 use App\Models\Chatroom;
 use App\Models\ChatroomMessage;
-use App\Models\ChatroomMessageReaction;
 use App\Notifications\NewMessageNotification;
 use App\Services\ContentModerationService;
 use App\Services\TelemetryService;
-use App\Http\Requests\EditChatroomMessageRequest;
-use App\Http\Requests\StoreChatroomMessageRequest;
-use App\Http\Requests\ReactToChatroomMessageRequest;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 
 class ChatroomMessageController extends Controller
 {
     protected $contentModeration;
+
     protected $telemetry;
 
     public function __construct(ContentModerationService $contentModeration, TelemetryService $telemetry)
@@ -37,21 +36,23 @@ class ChatroomMessageController extends Controller
      *   tags={"Chatrooms"},
      *   summary="List chatroom messages",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="type", in="query", required=false, @OA\Schema(type="string")),
      *   @OA\Parameter(name="user_id", in="query", required=false, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="pinned", in="query", required=false, @OA\Schema(type="boolean")),
      *   @OA\Parameter(name="announcements", in="query", required=false, @OA\Schema(type="boolean")),
-    *   @OA\Response(response=200, description="Paginated messages", @OA\JsonContent(ref="#/components/schemas/PaginatedChatMessages")),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     *
+     *   @OA\Response(response=200, description="Paginated messages", @OA\JsonContent(ref="#/components/schemas/PaginatedChatMessages")),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function index(Request $request, int $chatroomId): JsonResponse
     {
         $chatroom = Chatroom::findOrFail($chatroomId);
 
-        if (!$chatroom->hasMember(Auth::user())) {
+        if (! $chatroom->hasMember(Auth::user())) {
             return response()->json(['message' => 'You are not a member of this chatroom'], 403);
         }
 
@@ -92,25 +93,29 @@ class ChatroomMessageController extends Controller
      *   tags={"Chatrooms"},
      *   summary="Send message",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
+     *
      *   @OA\RequestBody(required=true, @OA\JsonContent(
      *     required={"content"},
+     *
      *     @OA\Property(property="content", type="string", maxLength=2000),
      *     @OA\Property(property="type", type="string", enum={"text","image","file","announcement"}),
      *     @OA\Property(property="parent_id", type="integer", nullable=true),
      *     @OA\Property(property="metadata", type="object")
      *   )),
-    *   @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/ChatMessage")),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-    *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
-    *   @OA\Response(response=422, ref="#/components/responses/ModerationError")
+     *
+     *   @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/ChatMessage")),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *   @OA\Response(response=422, ref="#/components/responses/ModerationError")
      * )
      */
     public function store(StoreChatroomMessageRequest $request, int $chatroomId): JsonResponse
     {
         $chatroom = Chatroom::findOrFail($chatroomId);
 
-        if (!$chatroom->hasMember(Auth::user())) {
+        if (! $chatroom->hasMember(Auth::user())) {
             return response()->json(['message' => 'You are not a member of this chatroom'], 403);
         }
 
@@ -186,7 +191,7 @@ class ChatroomMessageController extends Controller
             'user_id' => Auth::id(),
             'message_id' => $message->id,
             'type' => $message->type,
-            'is_reply' => !is_null($request->parent_id),
+            'is_reply' => ! is_null($request->parent_id),
             'content_length' => strlen($request->content),
         ]);
 
@@ -195,7 +200,7 @@ class ChatroomMessageController extends Controller
             $recipients = $chatroom->activeMembers()
                 ->where('users.id', '!=', Auth::id())
                 ->get();
-            
+
             if ($recipients->isNotEmpty()) {
                 Notification::send($recipients, new NewMessageNotification($message));
             }
@@ -203,7 +208,7 @@ class ChatroomMessageController extends Controller
             Log::error('Failed to send push notifications for new message', [
                 'chatroom_id' => $chatroomId,
                 'message_id' => $message->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
             // Don't fail the request if notifications fail
         }
@@ -219,18 +224,20 @@ class ChatroomMessageController extends Controller
      *   tags={"Chatrooms"},
      *   summary="Get message",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
-    *   @OA\Response(response=200, description="Message", @OA\JsonContent(ref="#/components/schemas/ChatMessage")),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     *
+     *   @OA\Response(response=200, description="Message", @OA\JsonContent(ref="#/components/schemas/ChatMessage")),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function show(int $chatroomId, int $messageId): JsonResponse
     {
         $chatroom = Chatroom::findOrFail($chatroomId);
 
-        if (!$chatroom->hasMember(Auth::user())) {
+        if (! $chatroom->hasMember(Auth::user())) {
             return response()->json(['message' => 'You are not a member of this chatroom'], 403);
         }
 
@@ -249,30 +256,34 @@ class ChatroomMessageController extends Controller
      *   tags={"Chatrooms"},
      *   summary="Edit message",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+     *
      *   @OA\RequestBody(required=true, @OA\JsonContent(
      *     required={"content"},
+     *
      *     @OA\Property(property="content", type="string", maxLength=2000)
      *   )),
-    *   @OA\Response(response=200, description="Updated", @OA\JsonContent(ref="#/components/schemas/ChatMessage")),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-    *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
-    *   @OA\Response(response=422, ref="#/components/responses/ModerationError")
+     *
+     *   @OA\Response(response=200, description="Updated", @OA\JsonContent(ref="#/components/schemas/ChatMessage")),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *   @OA\Response(response=422, ref="#/components/responses/ModerationError")
      * )
      */
     public function update(EditChatroomMessageRequest $request, int $chatroomId, int $messageId): JsonResponse
     {
         $chatroom = Chatroom::findOrFail($chatroomId);
 
-        if (!$chatroom->hasMember(Auth::user())) {
+        if (! $chatroom->hasMember(Auth::user())) {
             return response()->json(['message' => 'You are not a member of this chatroom'], 403);
         }
 
         $message = $chatroom->messages()->findOrFail($messageId);
 
         // Check if user can edit this message
-        if ($message->user_id !== Auth::id() && !$chatroom->hasModerator(Auth::user())) {
+        if ($message->user_id !== Auth::id() && ! $chatroom->hasModerator(Auth::user())) {
             return response()->json(['message' => 'You can only edit your own messages'], 403);
         }
 
@@ -312,25 +323,27 @@ class ChatroomMessageController extends Controller
      *   tags={"Chatrooms"},
      *   summary="Delete message",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
-    *   @OA\Response(response=200, description="Deleted", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     *
+     *   @OA\Response(response=200, description="Deleted", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function destroy(int $chatroomId, int $messageId): JsonResponse
     {
         $chatroom = Chatroom::findOrFail($chatroomId);
 
-        if (!$chatroom->hasMember(Auth::user())) {
+        if (! $chatroom->hasMember(Auth::user())) {
             return response()->json(['message' => 'You are not a member of this chatroom'], 403);
         }
 
         $message = $chatroom->messages()->findOrFail($messageId);
 
         // Check if user can delete this message
-        if ($message->user_id !== Auth::id() && !$chatroom->hasModerator(Auth::user())) {
+        if ($message->user_id !== Auth::id() && ! $chatroom->hasModerator(Auth::user())) {
             return response()->json(['message' => 'You can only delete your own messages'], 403);
         }
 
@@ -353,23 +366,27 @@ class ChatroomMessageController extends Controller
      *   tags={"Chatrooms"},
      *   summary="Add reaction",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+     *
      *   @OA\RequestBody(required=true, @OA\JsonContent(
      *     required={"emoji"},
+     *
      *     @OA\Property(property="emoji", type="string", maxLength=10)
      *   )),
-    *   @OA\Response(response=200, description="Added", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-    *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
-    *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     *
+     *   @OA\Response(response=200, description="Added", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function addReaction(ReactToChatroomMessageRequest $request, int $chatroomId, int $messageId): JsonResponse
     {
         $chatroom = Chatroom::findOrFail($chatroomId);
 
-        if (!$chatroom->hasMember(Auth::user())) {
+        if (! $chatroom->hasMember(Auth::user())) {
             return response()->json(['message' => 'You are not a member of this chatroom'], 403);
         }
 
@@ -390,23 +407,27 @@ class ChatroomMessageController extends Controller
      *   tags={"Chatrooms"},
      *   summary="Remove reaction",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+     *
      *   @OA\RequestBody(required=true, @OA\JsonContent(
      *     required={"emoji"},
+     *
      *     @OA\Property(property="emoji", type="string", maxLength=10)
      *   )),
-    *   @OA\Response(response=200, description="Removed", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-    *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
-    *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     *
+     *   @OA\Response(response=200, description="Removed", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function removeReaction(ReactToChatroomMessageRequest $request, int $chatroomId, int $messageId): JsonResponse
     {
         $chatroom = Chatroom::findOrFail($chatroomId);
 
-        if (!$chatroom->hasMember(Auth::user())) {
+        if (! $chatroom->hasMember(Auth::user())) {
             return response()->json(['message' => 'You are not a member of this chatroom'], 403);
         }
 
@@ -427,18 +448,20 @@ class ChatroomMessageController extends Controller
      *   tags={"Chatrooms"},
      *   summary="Pin message",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
-    *   @OA\Response(response=200, description="Pinned", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     *
+     *   @OA\Response(response=200, description="Pinned", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function pin(int $chatroomId, int $messageId): JsonResponse
     {
         $chatroom = Chatroom::findOrFail($chatroomId);
 
-        if (!$chatroom->hasModerator(Auth::user())) {
+        if (! $chatroom->hasModerator(Auth::user())) {
             return response()->json(['message' => 'You do not have permission to pin messages'], 403);
         }
 
@@ -456,18 +479,20 @@ class ChatroomMessageController extends Controller
      *   tags={"Chatrooms"},
      *   summary="Unpin message",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
-    *   @OA\Response(response=200, description="Unpinned", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     *
+     *   @OA\Response(response=200, description="Unpinned", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function unpin(int $chatroomId, int $messageId): JsonResponse
     {
         $chatroom = Chatroom::findOrFail($chatroomId);
 
-        if (!$chatroom->hasModerator(Auth::user())) {
+        if (! $chatroom->hasModerator(Auth::user())) {
             return response()->json(['message' => 'You do not have permission to unpin messages'], 403);
         }
 
@@ -485,17 +510,19 @@ class ChatroomMessageController extends Controller
      *   tags={"Chatrooms"},
      *   summary="Pinned messages",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
-    *   @OA\Response(response=200, description="List", @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ChatMessage"))),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     *
+     *   @OA\Response(response=200, description="List", @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ChatMessage"))),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function pinned(int $chatroomId): JsonResponse
     {
         $chatroom = Chatroom::findOrFail($chatroomId);
 
-        if (!$chatroom->hasMember(Auth::user())) {
+        if (! $chatroom->hasMember(Auth::user())) {
             return response()->json(['message' => 'You are not a member of this chatroom'], 403);
         }
 
@@ -516,18 +543,20 @@ class ChatroomMessageController extends Controller
      *   tags={"Chatrooms"},
      *   summary="Message replies",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="chatroomId", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
-    *   @OA\Response(response=200, description="List", @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ChatMessage"))),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     *
+     *   @OA\Response(response=200, description="List", @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ChatMessage"))),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function replies(int $chatroomId, int $messageId): JsonResponse
     {
         $chatroom = Chatroom::findOrFail($chatroomId);
 
-        if (!$chatroom->hasMember(Auth::user())) {
+        if (! $chatroom->hasMember(Auth::user())) {
             return response()->json(['message' => 'You are not a member of this chatroom'], 403);
         }
 

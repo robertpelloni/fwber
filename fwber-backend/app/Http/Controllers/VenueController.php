@@ -4,11 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\VenueSearchRequest;
 use App\Models\Venue;
-use App\Models\VenueCheckin;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class VenueController extends Controller
 {
@@ -19,11 +15,15 @@ class VenueController extends Controller
      *   path="/venues",
      *   tags={"Venues"},
      *   summary="List nearby venues",
+     *
      *   @OA\Parameter(name="lat", in="query", required=true, @OA\Schema(type="number", format="float")),
      *   @OA\Parameter(name="lng", in="query", required=true, @OA\Schema(type="number", format="float")),
      *   @OA\Parameter(name="radius", in="query", required=false, @OA\Schema(type="integer", minimum=100, maximum=50000)),
+     *
      *   @OA\Response(response=200, description="Nearby venues",
+     *
      *     @OA\JsonContent(type="object",
+     *
      *       @OA\Property(property="venues", type="array", @OA\Items(type="object")),
      *       @OA\Property(property="user_location", type="object")
      *     )
@@ -69,14 +69,16 @@ class VenueController extends Controller
      *   path="/venues/{id}",
      *   tags={"Venues"},
      *   summary="Get venue details",
+     *
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *
      *   @OA\Response(response=200, description="Venue details")
      * )
      */
     public function show(int $id): JsonResponse
     {
         $venue = Venue::findOrFail($id);
-        
+
         // Get active checkins with user profiles (limited info)
         $activeCheckins = $venue->checkins()
             ->with(['user.profile'])

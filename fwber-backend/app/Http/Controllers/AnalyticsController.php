@@ -2,31 +2,32 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Services\AnalyticsService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Redis;
-use App\Models\User;
+use App\Http\Requests\Analytics\StoreAnalyticsEventRequest;
 use App\Models\BulletinBoard;
 use App\Models\BulletinMessage;
 use App\Models\SlowRequest;
+use App\Models\User;
+use App\Services\AnalyticsService;
 use App\Services\ContentModerationService;
-use App\Http\Requests\Analytics\StoreAnalyticsEventRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 
 class AnalyticsController extends Controller
 {
     protected ContentModerationService $moderationService;
+
     protected \App\Services\WebSocketService $webSocketService;
+
     protected AnalyticsService $analyticsService;
 
     public function __construct(
         ContentModerationService $moderationService,
         \App\Services\WebSocketService $webSocketService,
         AnalyticsService $analyticsService
-    )
-    {
+    ) {
         $this->moderationService = $moderationService;
         $this->webSocketService = $webSocketService;
         $this->analyticsService = $analyticsService;
@@ -40,7 +41,9 @@ class AnalyticsController extends Controller
      *   tags={"Analytics"},
      *   summary="Platform analytics overview",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="range", in="query", required=false, description="Time range (1d, 7d, 30d, 90d)", @OA\Schema(type="string", enum={"1d","7d","30d","90d"})),
+     *
      *   @OA\Response(response=200, description="Analytics payload")
      * )
      */
@@ -48,7 +51,7 @@ class AnalyticsController extends Controller
     {
         $timeRange = $request->input('range', '7d');
         $cacheKey = "analytics_{$timeRange}";
-        
+
         // Cache analytics for 5 minutes
         $analytics = Cache::remember($cacheKey, 300, function () use ($timeRange) {
             return $this->generateAnalyticsData($timeRange);
@@ -64,10 +67,13 @@ class AnalyticsController extends Controller
      *   path="/analytics/events",
      *   tags={"Analytics"},
      *   summary="Store client clickstream events",
+     *
      *   @OA\RequestBody(
      *     required=true,
+     *
      *     @OA\JsonContent()
      *   ),
+     *
      *   @OA\Response(response=200, description="Events recorded")
      * )
      */
@@ -79,7 +85,7 @@ class AnalyticsController extends Controller
         $userAgent = $request->userAgent();
 
         $events = $request->input('events', []);
-        
+
         if (empty($events)) {
             return response()->json(['status' => 'success', 'message' => 'No events to process']);
         }
@@ -105,7 +111,7 @@ class AnalyticsController extends Controller
     private function generateAnalyticsData(string $timeRange): array
     {
         $dateRange = $this->getDateRange($timeRange);
-        
+
         return [
             'users' => $this->getUserAnalytics($dateRange),
             'messages' => $this->getMessageAnalytics($dateRange),
@@ -123,11 +129,11 @@ class AnalyticsController extends Controller
     {
         $feedbackQuery = \App\Models\Feedback::whereBetween('created_at', [
             $dateRange['start'],
-            $dateRange['end']
+            $dateRange['end'],
         ]);
 
         $total = (clone $feedbackQuery)->count();
-        
+
         // Sentiment breakdown
         $sentiment = (clone $feedbackQuery)
             ->select('sentiment', DB::raw('count(*) as count'))
@@ -145,7 +151,7 @@ class AnalyticsController extends Controller
             ->map(function ($item) {
                 return [
                     'category' => $item->category,
-                    'count' => $item->count
+                    'count' => $item->count,
                 ];
             });
 
@@ -156,7 +162,7 @@ class AnalyticsController extends Controller
                 'neutral' => $sentiment['neutral'] ?? 0,
                 'negative' => $sentiment['negative'] ?? 0,
             ],
-            'top_categories' => $categories
+            'top_categories' => $categories,
         ];
     }
 
@@ -168,19 +174,19 @@ class AnalyticsController extends Controller
         $totalUsers = User::count();
         $activeUsers = User::where('last_active_at', '>=', $dateRange['start'])->count();
         $newToday = User::whereDate('created_at', today())->count();
-        
+
         // Calculate growth rate
         $previousPeriod = User::whereBetween('created_at', [
             $dateRange['start']->subDays($dateRange['days']),
-            $dateRange['start']
+            $dateRange['start'],
         ])->count();
-        
+
         $currentPeriod = User::whereBetween('created_at', [
             $dateRange['start'],
-            $dateRange['end']
+            $dateRange['end'],
         ])->count();
-        
-        $growthRate = $previousPeriod > 0 
+
+        $growthRate = $previousPeriod > 0
             ? round((($currentPeriod - $previousPeriod) / $previousPeriod) * 100, 1)
             : 0;
 
@@ -200,7 +206,7 @@ class AnalyticsController extends Controller
         $totalMessages = BulletinMessage::count();
         $todayMessages = BulletinMessage::whereDate('created_at', today())->count();
         $averagePerUser = $totalMessages > 0 ? round($totalMessages / User::count(), 1) : 0;
-        
+
         // Moderation stats
         $moderationStats = $this->getModerationStats($dateRange);
 
@@ -220,7 +226,7 @@ class AnalyticsController extends Controller
         $totalBoards = BulletinBoard::count();
         $activeAreas = BulletinBoard::where('is_active', true)->count();
         $coverageRadius = BulletinBoard::avg('radius_meters') ?? 1000;
-        
+
         // Most active areas
         $mostActive = BulletinBoard::withCount(['messages', 'activeUsers'])
             ->where('is_active', true)
@@ -251,12 +257,13 @@ class AnalyticsController extends Controller
         // Get real data from SlowRequest model
         $avgResponseTime = SlowRequest::where('created_at', '>=', now()->subDay())->avg('duration_ms') ?? 0;
         $slowRequestCount = SlowRequest::where('created_at', '>=', now()->subDay())->count();
-        
+
         // Real SSE Connections
         $sseConnections = 0;
         try {
             $sseConnections = count($this->webSocketService->getOnlineUsers());
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
 
         // Real Cache Hit Rate (Redis)
         $cacheHitRate = 0;
@@ -268,7 +275,8 @@ class AnalyticsController extends Controller
             if ($total > 0) {
                 $cacheHitRate = round(($hits / $total) * 100, 1);
             }
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
 
         // Real Error Rate
         $errorRate = 0;
@@ -276,12 +284,13 @@ class AnalyticsController extends Controller
             $today = now()->format('Y-m-d');
             $requests = Redis::get("apm:requests:{$today}") ?? 0;
             $errors = Redis::get("apm:errors:{$today}") ?? 0;
-            
+
             if ($requests > 0) {
                 $errorRate = round(($errors / $requests) * 100, 2);
             }
-        } catch (\Exception $e) {}
-        
+        } catch (\Exception $e) {
+        }
+
         return [
             'api_response_time' => round($avgResponseTime, 2), // Average of slow requests (biased, but useful)
             'slow_requests_24h' => $slowRequestCount,
@@ -299,6 +308,7 @@ class AnalyticsController extends Controller
      *   tags={"Analytics"},
      *   summary="List slow requests",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Response(response=200, description="List of slow requests")
      * )
      */
@@ -320,6 +330,7 @@ class AnalyticsController extends Controller
      *   tags={"Analytics"},
      *   summary="Aggregated slow request statistics",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Response(response=200, description="Aggregated stats")
      * )
      */
@@ -351,6 +362,7 @@ class AnalyticsController extends Controller
      *   tags={"Analytics"},
      *   summary="Analyze slow requests for optimization opportunities",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Response(response=200, description="Analysis insights")
      * )
      */
@@ -373,34 +385,34 @@ class AnalyticsController extends Controller
 
         foreach ($stats as $stat) {
             $issues = [];
-            
+
             // Check for N+1 queries
             if ($stat->avg_queries > 50) {
-                $issues[] = "High database query count (" . round($stat->avg_queries) . "). Potential N+1 query problem.";
+                $issues[] = 'High database query count ('.round($stat->avg_queries).'). Potential N+1 query problem.';
             }
 
             // Check for memory leaks or heavy processing
             if ($stat->avg_memory > 50000) { // 50MB
-                $issues[] = "High memory usage (" . round($stat->avg_memory / 1024, 1) . "MB). Check for large collections or memory leaks.";
+                $issues[] = 'High memory usage ('.round($stat->avg_memory / 1024, 1).'MB). Check for large collections or memory leaks.';
             }
 
             // Check for slow processing despite low DB usage
             if ($stat->avg_duration > 1000 && $stat->avg_queries < 10) {
-                $issues[] = "Slow response time (" . round($stat->avg_duration) . "ms) with low DB usage. Potential CPU bottleneck or external API latency.";
+                $issues[] = 'Slow response time ('.round($stat->avg_duration).'ms) with low DB usage. Potential CPU bottleneck or external API latency.';
             }
 
             // Always include if it's very slow (> 2s) even if no specific pattern matched above
             if (empty($issues) && $stat->avg_duration > 2000) {
-                $issues[] = "Very slow response time (" . round($stat->avg_duration) . "ms). Needs investigation.";
+                $issues[] = 'Very slow response time ('.round($stat->avg_duration).'ms). Needs investigation.';
             }
 
-            if (!empty($issues)) {
+            if (! empty($issues)) {
                 // Fetch a sample request to get the slowest queries
-                $sample = SlowRequest::where(function($query) use ($stat) {
-                        $query->where('route_name', $stat->endpoint)
-                              ->orWhere('action', $stat->endpoint)
-                              ->orWhere('url', $stat->endpoint);
-                    })
+                $sample = SlowRequest::where(function ($query) use ($stat) {
+                    $query->where('route_name', $stat->endpoint)
+                        ->orWhere('action', $stat->endpoint)
+                        ->orWhere('url', $stat->endpoint);
+                })
                     ->where('method', $stat->method)
                     ->whereNotNull('slowest_queries')
                     ->latest()
@@ -419,7 +431,7 @@ class AnalyticsController extends Controller
         }
 
         // Sort by impact score
-        usort($insights, fn($a, $b) => $b['impact_score'] <=> $a['impact_score']);
+        usort($insights, fn ($a, $b) => $b['impact_score'] <=> $a['impact_score']);
 
         return response()->json(array_values($insights));
     }
@@ -432,7 +444,7 @@ class AnalyticsController extends Controller
         // Hourly activity for the last 24 hours (Optimized)
         $start24h = now()->subHours(24);
         $driver = DB::connection()->getDriverName();
-        
+
         if ($driver === 'sqlite') {
             $msgHourSql = 'strftime("%Y-%m-%d %H", created_at)';
             $userHourSql = 'strftime("%Y-%m-%d %H", last_active_at)';
@@ -445,7 +457,7 @@ class AnalyticsController extends Controller
             ->where('created_at', '>=', $start24h)
             ->groupBy('hour_key')
             ->pluck('count', 'hour_key');
-            
+
         $usersByHour = User::selectRaw("$userHourSql as hour_key, COUNT(*) as count")
             ->where('last_active_at', '>=', $start24h)
             ->groupBy('hour_key')
@@ -455,7 +467,7 @@ class AnalyticsController extends Controller
         for ($i = 0; $i < 24; $i++) {
             $hour = now()->subHours(23 - $i);
             $key = $hour->format('Y-m-d H');
-            
+
             $hourlyActivity[] = [
                 'hour' => $hour->hour,
                 'messages' => $messagesByHour[$key] ?? 0,
@@ -469,7 +481,7 @@ class AnalyticsController extends Controller
             ->where('created_at', '>=', $dateRange['start'])
             ->groupBy('date_key')
             ->pluck('count', 'date_key');
-            
+
         $usersByDay = User::selectRaw('DATE(last_active_at) as date_key, COUNT(*) as count')
             ->where('last_active_at', '>=', $dateRange['start'])
             ->groupBy('date_key')
@@ -480,7 +492,7 @@ class AnalyticsController extends Controller
         for ($i = 0; $i < $days; $i++) {
             $date = now()->subDays($days - 1 - $i);
             $key = $date->format('Y-m-d');
-            
+
             $dailyActivity[] = [
                 'date' => $key,
                 'messages' => $messagesByDay[$key] ?? 0,
@@ -525,7 +537,7 @@ class AnalyticsController extends Controller
     private function getDateRange(string $timeRange): array
     {
         $end = now();
-        
+
         switch ($timeRange) {
             case '1d':
                 $start = $end->copy()->subDay();
@@ -563,6 +575,7 @@ class AnalyticsController extends Controller
      *   tags={"Analytics"},
      *   summary="Real-time metrics",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Response(response=200, description="Realtime metrics payload")
      * )
      */
@@ -590,6 +603,7 @@ class AnalyticsController extends Controller
      *   tags={"Analytics"},
      *   summary="Moderation insights",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Response(response=200, description="Moderation insights payload")
      * )
      */
@@ -620,6 +634,7 @@ class AnalyticsController extends Controller
      *   tags={"Analytics"},
      *   summary="Boost analytics",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Response(response=200, description="Boost analytics payload")
      * )
      */
@@ -634,7 +649,7 @@ class AnalyticsController extends Controller
             $totalRevenue = \App\Models\Payment::where('status', 'succeeded')
                 ->where('description', 'like', '%Boost%')
                 ->sum('amount');
-            
+
             $todayRevenue = \App\Models\Payment::where('status', 'succeeded')
                 ->where('description', 'like', '%Boost%')
                 ->whereDate('created_at', today())
@@ -668,6 +683,7 @@ class AnalyticsController extends Controller
      *   tags={"Analytics"},
      *   summary="User retention cohorts",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Response(response=200, description="Retention payload")
      * )
      */
@@ -687,7 +703,7 @@ class AnalyticsController extends Controller
         for ($i = 11; $i >= 0; $i--) {
             $month = now()->subMonths($i)->startOfMonth();
             $nextMonth = $month->copy()->addMonth();
-            
+
             // Users registered in this month
             $cohortUsers = User::whereBetween('created_at', [$month, $nextMonth])->pluck('id');
             $cohortSize = $cohortUsers->count();
@@ -700,7 +716,7 @@ class AnalyticsController extends Controller
             // Check retention for subsequent months
             for ($j = 0; $j <= 11 - $i; $j++) {
                 $checkMonth = $month->copy()->addMonths($j);
-                
+
                 // Count how many of $cohortUsers were active in $checkMonth
                 // Using DailyActiveUser table
                 $activeCount = \App\Models\DailyActiveUser::whereIn('user_id', $cohortUsers)
@@ -709,7 +725,7 @@ class AnalyticsController extends Controller
                     ->count();
 
                 $percentage = $cohortSize > 0 ? round(($activeCount / $cohortSize) * 100, 1) : 0;
-                
+
                 $retentionData[] = [
                     'month_offset' => $j,
                     'percentage' => $percentage,

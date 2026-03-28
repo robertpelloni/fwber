@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
 use App\Services\ActivityPubService;
 
@@ -14,11 +13,11 @@ class ActivityPubController extends Controller
     public function actor($id, ActivityPubService $service)
     {
         $user = User::where('id', $id)
-                    ->whereHas('profile', function($q) {
-                        $q->where('is_federated', true);
-                    })->first();
+            ->whereHas('profile', function ($q) {
+                $q->where('is_federated', true);
+            })->first();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['error' => 'Actor not found'], 404);
         }
 

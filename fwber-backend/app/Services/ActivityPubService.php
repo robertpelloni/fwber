@@ -32,9 +32,9 @@ class ActivityPubService
         // 1. Resolve Inbox from Actor URI (WebFinger or Actor fetch)
         // 2. Sign with User's Private Key
         // 3. POST to remote server
-        
+
         Log::info("ActivityPub: Dispatching activity type '{$activity['type']}' to {$actorUri}");
-        
+
         // Mocking the actual network call
         // Http::withHeaders(['Signature' => '...'])->post($inbox, $activity);
     }
@@ -60,8 +60,8 @@ class ActivityPubService
                     'gender' => 'fwber:gender',
                     'orientation' => 'fwber:orientation',
                     'relationshipStatus' => 'fwber:relationshipStatus',
-                    'isVerified' => 'fwber:isVerified'
-                ]
+                    'isVerified' => 'fwber:isVerified',
+                ],
             ],
             'id' => $actorUri,
             'type' => 'Person',
@@ -72,20 +72,20 @@ class ActivityPubService
             'icon' => [
                 'type' => 'Image',
                 'mediaType' => 'image/jpeg',
-                'url' => $user->photos()->where('is_primary', true)->first()?->url ?? asset('images/default-avatar.png')
+                'url' => $user->photos()->where('is_primary', true)->first()?->url ?? asset('images/default-avatar.png'),
             ],
             // Dating Specific Metadata (fwber namespace)
             'gender' => $profile->gender ?? 'unspecified',
             'orientation' => $profile->sexual_orientation ?? 'unspecified',
             'relationshipStatus' => $profile->relationship_type ?? 'single',
-            'isVerified' => (bool)($profile->is_id_verified ?? false),
+            'isVerified' => (bool) ($profile->is_id_verified ?? false),
             'inbox' => $inboxUri,
             'outbox' => $outboxUri,
             'publicKey' => [
                 'id' => $publicKeyId,
                 'owner' => $actorUri,
-                'publicKeyPem' => "-----BEGIN PUBLIC KEY-----\nMockPublicKeyForIteration0347\n-----END PUBLIC KEY-----"
-            ]
+                'publicKeyPem' => "-----BEGIN PUBLIC KEY-----\nMockPublicKeyForIteration0347\n-----END PUBLIC KEY-----",
+            ],
         ];
     }
 }

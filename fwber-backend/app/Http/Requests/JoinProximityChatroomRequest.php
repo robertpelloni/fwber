@@ -10,6 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @OA\Schema(
  *   schema="JoinProximityChatroomRequest",
  *   required={"latitude", "longitude"},
+ *
  *   @OA\Property(property="latitude", type="number", format="float", minimum=-90, maximum=90),
  *   @OA\Property(property="longitude", type="number", format="float", minimum=-180, maximum=180),
  *   @OA\Property(property="is_networking", type="boolean"),

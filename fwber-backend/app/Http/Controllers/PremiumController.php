@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User;
 use App\Models\Payment;
+use App\Models\User;
 use App\Services\Payment\PaymentGatewayInterface;
 use App\Services\TokenDistributionService;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PremiumController extends Controller
 {
     protected $paymentGateway;
+
     protected $tokenService;
 
     public function __construct(PaymentGatewayInterface $paymentGateway, TokenDistributionService $tokenService)
@@ -24,18 +25,18 @@ class PremiumController extends Controller
     public function getWhoLikesYou(Request $request)
     {
         $user = $request->user();
-        
+
         // Get users who liked the current user
         $likerIds = DB::table('match_actions')
             ->where('target_user_id', $user->id)
             ->where('action', 'like')
             ->pluck('user_id');
-            
+
         $likers = User::with(['profile', 'photos'])->whereIn('id', $likerIds)->get();
 
         // Check premium status
-        $isPremium = $user->tier === 'gold' && 
-                     $user->tier_expires_at && 
+        $isPremium = $user->tier === 'gold' &&
+                     $user->tier_expires_at &&
                      Carbon::parse($user->tier_expires_at)->isFuture();
 
         if ($isPremium) {
@@ -77,7 +78,7 @@ class PremiumController extends Controller
 
         $result = $this->paymentGateway->createPaymentIntent($amount, $currency, [
             'user_id' => $user->id,
-            'description' => 'Premium Subscription'
+            'description' => 'Premium Subscription',
         ]);
 
         if ($result->success) {
@@ -96,7 +97,7 @@ class PremiumController extends Controller
             $tokenCost = 200; // 200 tokens for 1 month premium
 
             try {
-                $this->tokenService->spendTokens($user, $tokenCost, "Purchased Premium Subscription (1 Month)");
+                $this->tokenService->spendTokens($user, $tokenCost, 'Purchased Premium Subscription (1 Month)');
 
                 // Grant premium
                 $user->tier = 'gold';
@@ -108,7 +109,7 @@ class PremiumController extends Controller
                 \App\Models\Subscription::create([
                     'user_id' => $user->id,
                     'name' => 'gold',
-                    'stripe_id' => 'token_' . uniqid(),
+                    'stripe_id' => 'token_'.uniqid(),
                     'stripe_status' => 'active',
                     'stripe_price' => 'token_price_premium_monthly',
                     'quantity' => 1,
@@ -118,7 +119,7 @@ class PremiumController extends Controller
                 return response()->json([
                     'message' => 'Premium purchased successfully',
                     'tier' => $user->tier,
-                    'expires_at' => $user->tier_expires_at
+                    'expires_at' => $user->tier_expires_at,
                 ]);
 
             } catch (\Exception $e) {
@@ -128,7 +129,7 @@ class PremiumController extends Controller
 
         $amount = 19.99; // Price for premium
         $currency = 'USD';
-        
+
         try {
             if ($request->has('payment_intent_id')) {
                 $result = $this->paymentGateway->verifyPayment($request->input('payment_intent_id'));
@@ -162,7 +163,7 @@ class PremiumController extends Controller
                     \App\Models\Subscription::create([
                         'user_id' => $user->id,
                         'name' => 'gold',
-                        'stripe_id' => $result->transactionId ?? 'manual_' . uniqid(),
+                        'stripe_id' => $result->transactionId ?? 'manual_'.uniqid(),
                         'stripe_status' => 'active',
                         'stripe_price' => 'price_premium_monthly',
                         'quantity' => 1,
@@ -173,10 +174,10 @@ class PremiumController extends Controller
                 return response()->json([
                     'message' => 'Premium purchased successfully',
                     'tier' => $user->tier,
-                    'expires_at' => $user->tier_expires_at
+                    'expires_at' => $user->tier_expires_at,
                 ]);
             } else {
-                 Payment::create([
+                Payment::create([
                     'user_id' => $user->id,
                     'amount' => $amount,
                     'currency' => $currency,
@@ -187,26 +188,26 @@ class PremiumController extends Controller
                     'metadata' => ['error' => $result->message],
                 ]);
 
-                return response()->json(['error' => 'Payment failed: ' . $result->message], 400);
+                return response()->json(['error' => 'Payment failed: '.$result->message], 400);
             }
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Payment error: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Payment error: '.$e->getMessage()], 500);
         }
     }
 
     public function getPremiumStatus(Request $request)
     {
         $user = $request->user();
-        
-        $isPremium = $user->tier === 'gold' && 
-                     $user->tier_expires_at && 
+
+        $isPremium = $user->tier === 'gold' &&
+                     $user->tier_expires_at &&
                      Carbon::parse($user->tier_expires_at)->isFuture();
 
         return response()->json([
             'is_premium' => $isPremium,
             'tier' => $user->tier,
             'expires_at' => $user->tier_expires_at,
-            'unlimited_swipes' => $user->unlimited_swipes
+            'unlimited_swipes' => $user->unlimited_swipes,
         ]);
     }
 }

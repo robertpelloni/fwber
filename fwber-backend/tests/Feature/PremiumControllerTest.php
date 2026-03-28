@@ -16,7 +16,7 @@ class PremiumControllerTest extends TestCase
     public function test_can_purchase_premium_with_stripe()
     {
         $user = User::factory()->create();
-        
+
         $mockGateway = Mockery::mock(PaymentGatewayInterface::class);
         $mockGateway->shouldReceive('charge')
             ->once()
@@ -27,7 +27,7 @@ class PremiumControllerTest extends TestCase
 
         $response = $this->actingAs($user)
             ->postJson('/api/premium/purchase', [
-                'payment_method_id' => 'tok_visa'
+                'payment_method_id' => 'tok_visa',
             ]);
 
         $response->assertStatus(200)
@@ -50,7 +50,7 @@ class PremiumControllerTest extends TestCase
 
         $response = $this->actingAs($user)
             ->postJson('/api/premium/purchase', [
-                'payment_method' => 'token'
+                'payment_method' => 'token',
             ]);
 
         $response->assertStatus(200)
@@ -74,7 +74,7 @@ class PremiumControllerTest extends TestCase
 
         $response = $this->actingAs($user)
             ->postJson('/api/premium/purchase', [
-                'payment_method' => 'token'
+                'payment_method' => 'token',
             ]);
 
         $response->assertStatus(400)

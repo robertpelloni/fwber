@@ -5,9 +5,9 @@ namespace App\Services;
 use App\Models\MatchAssist;
 use App\Models\MatchBounty;
 use App\Models\User;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class MatchMakerService
 {
@@ -73,7 +73,7 @@ class MatchMakerService
     public function suggestCandidate(MatchBounty $bounty, User $matchmaker, User $candidate): MatchAssist
     {
         if ($candidate->id === $bounty->user_id) {
-             throw new \Exception("Cannot suggest the bounty creator to themselves.");
+            throw new \Exception('Cannot suggest the bounty creator to themselves.');
         }
 
         // Check if this pair was already suggested for this bounty
@@ -122,8 +122,8 @@ class MatchMakerService
 
         // Check for assists in both directions
         $allAssists = MatchAssist::where(function ($q) use ($user1Id, $user2Id) {
-                $q->where('subject_id', $user1Id)->where('target_id', $user2Id);
-            })
+            $q->where('subject_id', $user1Id)->where('target_id', $user2Id);
+        })
             ->orWhere(function ($q) use ($user1Id, $user2Id) {
                 $q->where('subject_id', $user2Id)->where('target_id', $user1Id);
             })
@@ -131,7 +131,7 @@ class MatchMakerService
             ->with('bounty')
             ->get();
 
-        Log::info("ActivityPub: Found " . $allAssists->count() . " assists for match");
+        Log::info('ActivityPub: Found '.$allAssists->count().' assists for match');
 
         foreach ($allAssists as $assist) {
             $this->rewardWingman($assist);
@@ -144,7 +144,7 @@ class MatchMakerService
             $assist->update(['status' => 'matched']);
 
             $wingman = $assist->matchmaker;
-            
+
             // Determine reward amount: Actual bounty reward or default bonus
             $rewardAmount = self::MATCHMAKER_BONUS;
             $memo = "Wingman Bonus: You successfully matched User {$assist->subject_id} and User {$assist->target_id}!";
@@ -156,7 +156,7 @@ class MatchMakerService
                 // Mark bounty as fulfilled
                 $assist->bounty->update(['status' => 'fulfilled']);
             }
-            
+
             Log::info("Matchmaker Reward: User {$wingman->id} claimed {$rewardAmount} FWB for assist {$assist->id}");
 
             $this->tokenService->awardTokens(

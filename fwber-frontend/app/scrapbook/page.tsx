@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useScrapbook, useAddScrapbookEntry, useTogglePin, useDeleteEntry } from '@/lib/hooks/use-scrapbook';
 import { Pin, Trash2, Plus, X, BookHeart, Image, Mic, Link2, Type, Sparkles } from 'lucide-react';
+import NextImage from 'next/image';
 import type { ScrapbookEntry, CreateScrapbookEntry } from '@/lib/api/scrapbook';
 
 const NOTE_COLORS = ['#a855f7', '#ec4899', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#6366f1'];
@@ -55,8 +56,8 @@ function EntryCard({
 
             {/* Content */}
             {entry.type === 'image' && entry.media_url && (
-                <div className="sb-media">
-                    <img src={entry.media_url} alt="Scrapbook" loading="lazy" />
+                <div className="sb-media" style={{ position: 'relative', width: '100%', minHeight: '200px' }}>
+                    <NextImage src={entry.media_url} alt="Scrapbook" fill style={{ objectFit: 'cover' }} />
                 </div>
             )}
             <p className="sb-content">{entry.content}</p>

@@ -10,6 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @OA\Schema(
  *   schema="MessageReactionRequest",
  *   required={"emoji"},
+ *
  *   @OA\Property(property="emoji", type="string", maxLength=10, description="Emoji character for reaction")
  * )
  */

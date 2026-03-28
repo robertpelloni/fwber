@@ -24,8 +24,8 @@ class OnboardingProfileUpdateTest extends TestCase
                 'latitude' => 40.7128,
                 'longitude' => -74.0060,
                 'city' => 'New York',
-                'state' => 'NY'
-            ]
+                'state' => 'NY',
+            ],
         ];
 
         $response = $this->actingAs($user)->putJson('/api/profile', $payload);
@@ -50,7 +50,7 @@ class OnboardingProfileUpdateTest extends TestCase
             'preferences' => [
                 'age_range_min' => 21,
                 'age_range_max' => 45,
-            ]
+            ],
         ];
 
         $response = $this->actingAs($user)->putJson('/api/profile', $payload);
@@ -65,10 +65,10 @@ class OnboardingProfileUpdateTest extends TestCase
             $this->assertTrue(in_array('dating', $profile->looking_for));
             $this->assertTrue(in_array('friends', $profile->looking_for) || in_array('friendship', $profile->looking_for));
         } else {
-            dump('looking_for is not an array: ' . var_export($profile->looking_for, true));
+            dump('looking_for is not an array: '.var_export($profile->looking_for, true));
             $this->fail('looking_for is not an array');
         }
-        
+
         $this->assertEquals(21, $profile->preferences['age_range_min']);
         $this->assertEquals(45, $profile->preferences['age_range_max']);
     }

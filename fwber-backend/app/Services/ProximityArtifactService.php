@@ -38,10 +38,10 @@ class ProximityArtifactService
         if ($data['type'] === 'token_drop') {
             $amount = $data['amount'] ?? 0;
             if ($amount <= 0) {
-                throw new \InvalidArgumentException("Amount must be positive for token drops");
+                throw new \InvalidArgumentException('Amount must be positive for token drops');
             }
 
-            $this->tokenService->spendTokens($user, $amount, "Created Token Drop");
+            $this->tokenService->spendTokens($user, $amount, 'Created Token Drop');
             $meta['amount'] = $amount;
             $meta['claimed'] = false;
         }
@@ -80,30 +80,30 @@ class ProximityArtifactService
     public function claimArtifact(ProximityArtifact $artifact, User $claimer, float $lat, float $lng): float
     {
         if ($artifact->type !== 'token_drop') {
-            throw new \InvalidArgumentException("Not a token drop");
+            throw new \InvalidArgumentException('Not a token drop');
         }
 
         $meta = $artifact->meta;
         if (($meta['claimed'] ?? false)) {
-            throw new \RuntimeException("Already claimed");
+            throw new \RuntimeException('Already claimed');
         }
 
         // Check distance (50 meters)
         $dist = $this->calculateDistance($lat, $lng, $artifact->location_lat, $artifact->location_lng);
         if ($dist > 50) {
-             throw new \RuntimeException("Too far away to claim (Distance: " . round($dist) . "m)");
+            throw new \RuntimeException('Too far away to claim (Distance: '.round($dist).'m)');
         }
 
         $amount = $meta['amount'] ?? 0;
 
-        DB::transaction(function() use ($artifact, $claimer, $amount, $meta) {
-             $this->tokenService->awardTokens($claimer, $amount, 'token_drop_claim', "Claimed Drop {$artifact->id}");
+        DB::transaction(function () use ($artifact, $claimer, $amount, $meta) {
+            $this->tokenService->awardTokens($claimer, $amount, 'token_drop_claim', "Claimed Drop {$artifact->id}");
 
-             $meta['claimed'] = true;
-             $meta['claimed_by'] = $claimer->id;
-             $meta['claimed_at'] = now()->toIso8601String();
-             $artifact->meta = $meta;
-             $artifact->save();
+            $meta['claimed'] = true;
+            $meta['claimed_by'] = $claimer->id;
+            $meta['claimed_at'] = now()->toIso8601String();
+            $artifact->meta = $meta;
+            $artifact->save();
         });
 
         return $amount;
@@ -132,7 +132,7 @@ class ProximityArtifactService
 
     private function assertType(string $type): void
     {
-        if (!isset(self::TYPE_EXPIRY[$type])) {
+        if (! isset(self::TYPE_EXPIRY[$type])) {
             throw new \InvalidArgumentException("Unsupported artifact type: {$type}");
         }
     }
@@ -173,6 +173,7 @@ class ProximityArtifactService
         if (strlen($clean) < 1 || strlen($clean) > 500) {
             throw new \RuntimeException('Content length invalid');
         }
+
         return $clean;
     }
 }

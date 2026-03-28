@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,7 +32,7 @@ export default function MerchantAnalyticsPage() {
     const [data, setData] = useState<AnalyticsData | null>(null);
     const [loading, setLoading] = useState(true);
 
-    const fetchAnalytics = async () => {
+    const fetchAnalytics = useCallback(async () => {
         if (!token) return;
         try {
             setLoading(true);
@@ -45,11 +45,11 @@ export default function MerchantAnalyticsPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [token]);
 
     useEffect(() => {
         fetchAnalytics();
-    }, [token]);
+    }, [fetchAnalytics]);
 
     return (
         <div className="max-w-6xl mx-auto space-y-8 pb-24">

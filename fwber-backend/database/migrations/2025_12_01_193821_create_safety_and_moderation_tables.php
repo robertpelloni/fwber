@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('shadow_throttles')) {
+        if (! Schema::hasTable('shadow_throttles')) {
             Schema::create('shadow_throttles', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -26,14 +26,14 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('moderation_actions')) {
+        if (! Schema::hasTable('moderation_actions')) {
             Schema::create('moderation_actions', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('moderator_id')->constrained('users');
                 $table->foreignId('target_user_id')->nullable()->constrained('users');
                 // target_artifact_id will be added in a later migration or nullable here if artifacts table exists
                 // Since ProximityArtifact might not exist yet, we'll make it nullable and add constraint later or just use bigInteger
-                $table->unsignedBigInteger('target_artifact_id')->nullable(); 
+                $table->unsignedBigInteger('target_artifact_id')->nullable();
                 $table->string('action_type'); // ban, suspend, warn, delete_content
                 $table->string('reason');
                 $table->json('metadata')->nullable();
@@ -41,7 +41,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('reports')) {
+        if (! Schema::hasTable('reports')) {
             Schema::create('reports', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('reporter_id')->constrained('users');
@@ -56,7 +56,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('blocks')) {
+        if (! Schema::hasTable('blocks')) {
             Schema::create('blocks', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('blocker_id')->constrained('users')->onDelete('cascade');
@@ -67,7 +67,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('proximity_artifacts')) {
+        if (! Schema::hasTable('proximity_artifacts')) {
             Schema::create('proximity_artifacts', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
@@ -86,7 +86,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('telemetry_events')) {
+        if (! Schema::hasTable('telemetry_events')) {
             Schema::create('telemetry_events', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
@@ -97,7 +97,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('relationship_tiers')) {
+        if (! Schema::hasTable('relationship_tiers')) {
             Schema::create('relationship_tiers', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('match_id')->constrained('matches')->onDelete('cascade');
@@ -112,7 +112,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('friends')) {
+        if (! Schema::hasTable('friends')) {
             Schema::create('friends', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained('users')->onDelete('cascade');

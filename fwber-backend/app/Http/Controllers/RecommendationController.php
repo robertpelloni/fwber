@@ -2,17 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
-use App\Services\RecommendationService;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
-use OpenApi\Attributes as OA;
-
-use App\Models\Boost;
 use App\Models\BulletinBoard;
 use App\Models\TelemetryEvent;
+use App\Services\RecommendationService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class RecommendationController extends Controller
 {
@@ -30,7 +26,7 @@ class RecommendationController extends Controller
     {
         try {
             $user = $request->user();
-            if (!$user) {
+            if (! $user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
 
@@ -38,7 +34,7 @@ class RecommendationController extends Controller
             $validator = Validator::make($request->all(), [
                 'limit' => 'integer|min:1|max:50',
                 'types' => 'array',
-                "types.*" => 'string|in:content,collaborative,ai,location',
+                'types.*' => 'string|in:content,collaborative,ai,location',
                 'context' => 'array',
                 'context.latitude' => 'numeric|between:-90,90',
                 'context.longitude' => 'numeric|between:-180,180',
@@ -48,7 +44,7 @@ class RecommendationController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'error' => 'Validation failed',
-                    'details' => $validator->errors()
+                    'details' => $validator->errors(),
                 ], 422);
             }
 
@@ -66,7 +62,7 @@ class RecommendationController extends Controller
                 'payload' => [
                     'count' => count($recommendations),
                     'types' => $types,
-                    'context' => $context
+                    'context' => $context,
                 ],
                 'created_at' => now(),
             ]);
@@ -76,14 +72,14 @@ class RecommendationController extends Controller
                 'meta' => [
                     'total' => count($recommendations),
                     'limit' => $limit,
-                    'types' => $types
-                ]
+                    'types' => $types,
+                ],
             ]);
 
         } catch (\Exception $e) {
             Log::error('Recommendation generation failed', [
                 'user_id' => $request->user()?->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return response()->json(['error' => 'Internal server error'], 500);
@@ -139,6 +135,7 @@ class RecommendationController extends Controller
     {
         // Add admin check if needed
         $timeframe = $request->input('timeframe', '7d');
+
         return response()->json($this->getRecommendationAnalytics($timeframe));
     }
 
@@ -147,7 +144,7 @@ class RecommendationController extends Controller
      */
     private function getTrendingContent(string $timeframe, int $limit): array
     {
-        $hours = match($timeframe) {
+        $hours = match ($timeframe) {
             '24h' => 24,
             '7d' => 168,
             '30d' => 720,
@@ -156,14 +153,14 @@ class RecommendationController extends Controller
 
         // Query Bulletin Boards with most activity in the timeframe
         $trendingBoards = BulletinBoard::where('is_active', true)
-            ->withCount(['messages' => function($query) use ($hours) {
+            ->withCount(['messages' => function ($query) use ($hours) {
                 $query->where('created_at', '>=', now()->subHours($hours));
             }])
             ->orderBy('messages_count', 'desc')
             ->limit($limit)
             ->get();
 
-        return $trendingBoards->map(function($board) {
+        return $trendingBoards->map(function ($board) {
             return [
                 'id' => $board->id,
                 'type' => 'bulletin_board',
@@ -215,7 +212,7 @@ class RecommendationController extends Controller
      */
     private function getRecommendationAnalytics(string $timeframe): array
     {
-        $days = match($timeframe) {
+        $days = match ($timeframe) {
             '24h' => 1,
             '7d' => 7,
             '30d' => 30,

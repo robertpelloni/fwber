@@ -2,13 +2,11 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\BurnerLink;
-use App\Models\Chatroom;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
+use Tests\TestCase;
 
 class BurnerLinkTest extends TestCase
 {
@@ -19,19 +17,19 @@ class BurnerLinkTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->postJson('/api/burner-links', [
-            'expires_in_hours' => 24
+            'expires_in_hours' => 24,
         ]);
 
         $response->assertStatus(201)
             ->assertJsonStructure([
                 'token',
                 'expires_at',
-                'url'
+                'url',
             ]);
 
         $this->assertDatabaseHas('burner_links', [
             'creator_id' => $user->id,
-            'used_at' => null
+            'used_at' => null,
         ]);
     }
 
@@ -44,7 +42,7 @@ class BurnerLinkTest extends TestCase
             'creator_id' => $creator->id,
             'token' => Str::random(32),
             'expires_at' => now()->addHours(24),
-            'used_at' => null
+            'used_at' => null,
         ]);
 
         $response = $this->actingAs($joiner)->postJson("/api/burner-links/{$burnerLink->token}/join");
@@ -52,7 +50,7 @@ class BurnerLinkTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonStructure([
                 'message',
-                'chatroom_id'
+                'chatroom_id',
             ]);
 
         $this->assertDatabaseHas('burner_links', [
@@ -64,12 +62,12 @@ class BurnerLinkTest extends TestCase
 
         $this->assertDatabaseHas('chatroom_members', [
             'chatroom_id' => $chatroomId,
-            'user_id' => $creator->id
+            'user_id' => $creator->id,
         ]);
 
         $this->assertDatabaseHas('chatroom_members', [
             'chatroom_id' => $chatroomId,
-            'user_id' => $joiner->id
+            'user_id' => $joiner->id,
         ]);
     }
 
@@ -81,7 +79,7 @@ class BurnerLinkTest extends TestCase
             'creator_id' => $creator->id,
             'token' => Str::random(32),
             'expires_at' => now()->addHours(24),
-            'used_at' => null
+            'used_at' => null,
         ]);
 
         $response = $this->actingAs($creator)->postJson("/api/burner-links/{$burnerLink->token}/join");
@@ -99,7 +97,7 @@ class BurnerLinkTest extends TestCase
             'creator_id' => $creator->id,
             'token' => Str::random(32),
             'expires_at' => now()->subHour(),
-            'used_at' => null
+            'used_at' => null,
         ]);
 
         $response = $this->actingAs($joiner)->postJson("/api/burner-links/{$burnerLink->token}/join");
@@ -118,7 +116,7 @@ class BurnerLinkTest extends TestCase
             'creator_id' => $creator->id,
             'token' => Str::random(32),
             'expires_at' => now()->addHours(24),
-            'used_at' => now()
+            'used_at' => now(),
         ]);
 
         $response = $this->actingAs($joiner2)->postJson("/api/burner-links/{$burnerLink->token}/join");

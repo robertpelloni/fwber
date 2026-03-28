@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Services\AdvancedRateLimitingService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
 class RateLimitController extends Controller
@@ -18,17 +18,21 @@ class RateLimitController extends Controller
 
     /**
      * Get rate limit status for user
-     * 
+     *
      * @OA\Get(
      *     path="/rate-limits/status/{action}",
      *     tags={"Rate Limiting"},
      *     summary="Get rate limit status",
      *     description="Check current rate limit status for a specific action",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(name="action", in="path", required=false, @OA\Schema(type="string", default="api_call")),
-    *     @OA\Response(response=200, description="Rate limit status",
-    *         @OA\JsonContent(ref="#/components/schemas/RateLimitStatusResponse")
-    *     ),
+     *
+     *     @OA\Response(response=200, description="Rate limit status",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/RateLimitStatusResponse")
+     *     ),
+     *
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
      * )
      */
@@ -46,16 +50,19 @@ class RateLimitController extends Controller
 
     /**
      * Get rate limit status for all actions
-     * 
+     *
      * @OA\Get(
      *     path="/rate-limits/all-status",
      *     tags={"Rate Limiting"},
      *     summary="Get all rate limit statuses",
      *     description="Check rate limit status for all tracked actions",
      *     security={{"bearerAuth":{}}},
-    *     @OA\Response(response=200, description="All rate limit statuses",
-    *         @OA\JsonContent(ref="#/components/schemas/AllRateLimitStatusesResponse")
-    *     ),
+     *
+     *     @OA\Response(response=200, description="All rate limit statuses",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/AllRateLimitStatusesResponse")
+     *     ),
+     *
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
      * )
      */
@@ -63,7 +70,7 @@ class RateLimitController extends Controller
     {
         $userId = $request->user()->id;
         $actions = ['content_generation', 'bulletin_post', 'location_update', 'photo_upload', 'api_call'];
-        
+
         $statuses = [];
         foreach ($actions as $action) {
             $statuses[$action] = $this->rateLimitingService->getRateLimitStatus($userId, $action);
@@ -78,17 +85,19 @@ class RateLimitController extends Controller
 
     /**
      * Reset rate limit for user (admin only)
-     * 
+     *
      * @OA\Post(
      *     path="/rate-limits/reset/{action}",
      *     tags={"Rate Limiting"},
      *     summary="Reset rate limit",
      *     description="Reset rate limit for a specific action (admin only)",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(name="action", in="path", required=true, @OA\Schema(type="string")),
+     *
      *     @OA\Response(response=200, description="Rate limit reset"),
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
-    *     @OA\Response(response=403, ref="#/components/responses/Forbidden")
+     *     @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function reset(Request $request, string $action): JsonResponse
@@ -106,17 +115,19 @@ class RateLimitController extends Controller
 
     /**
      * Get rate limit statistics (admin only)
-     * 
+     *
      * @OA\Get(
      *     path="/rate-limits/stats/{timeframe}",
      *     tags={"Rate Limiting"},
      *     summary="Get rate limit statistics",
      *     description="Retrieve rate limiting statistics for a timeframe (admin only)",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(name="timeframe", in="path", required=false, @OA\Schema(type="string", default="1h", example="1h")),
+     *
      *     @OA\Response(response=200, description="Rate limit statistics"),
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
-    *     @OA\Response(response=403, ref="#/components/responses/Forbidden")
+     *     @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function getStats(Request $request, string $timeframe = '1h'): JsonResponse
@@ -132,20 +143,24 @@ class RateLimitController extends Controller
 
     /**
      * Check for suspicious activity
-     * 
+     *
      * @OA\Get(
      *     path="/rate-limits/suspicious-activity",
      *     tags={"Rate Limiting"},
      *     summary="Check suspicious activity",
      *     description="Detect suspicious rate limit patterns for the authenticated user",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(response=200, description="Suspicious activity check",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="user_id", type="integer"),
      *             @OA\Property(property="suspicious_activity", type="object"),
      *             @OA\Property(property="timestamp", type="string", format="date-time")
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
      * )
      */
@@ -163,22 +178,26 @@ class RateLimitController extends Controller
 
     /**
      * Clean up expired rate limit entries (admin only)
-     * 
+     *
      * @OA\Post(
      *     path="/rate-limits/cleanup",
      *     tags={"Rate Limiting"},
      *     summary="Clean up expired entries",
      *     description="Remove expired rate limit entries from storage (admin only)",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(response=200, description="Cleanup completed",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean"),
      *             @OA\Property(property="cleaned_entries", type="integer"),
      *             @OA\Property(property="message", type="string")
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
-    *     @OA\Response(response=403, ref="#/components/responses/Forbidden")
+     *     @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function cleanup(Request $request): JsonResponse

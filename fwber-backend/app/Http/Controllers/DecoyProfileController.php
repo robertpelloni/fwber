@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\UserProfile;
 use App\Models\UserLocation;
+use App\Models\UserProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -27,18 +27,18 @@ class DecoyProfileController extends Controller
             $mainUser->update([
                 'decoy_password' => Hash::make($request->decoy_password),
             ]);
-            
+
             return response()->json([
                 'message' => 'Decoy password updated successfully.',
             ]);
         }
 
         // 1. Create the decoy user
-        $fakeName = 'User' . rand(1000, 9999);
-        $fakeEmail = 'user_' . Str::random(10) . '@example.com';
-        
+        $fakeName = 'User'.rand(1000, 9999);
+        $fakeEmail = 'user_'.Str::random(10).'@example.com';
+
         $decoyUser = clone $mainUser; // Quick way to copy some attributes, but safer to explicitly set them
-        
+
         $decoyUser = User::create([
             'name' => $fakeName,
             'email' => $fakeEmail,
@@ -84,7 +84,7 @@ class DecoyProfileController extends Controller
     public function remove(Request $request)
     {
         $mainUser = $request->user();
-        
+
         if ($mainUser->decoy_user_id) {
             // Optional: Hard delete the decoy user and its relationships to clean up
             $decoyUser = User::find($mainUser->decoy_user_id);

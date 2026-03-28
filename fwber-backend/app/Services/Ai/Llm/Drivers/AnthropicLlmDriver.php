@@ -18,12 +18,12 @@ class AnthropicLlmDriver implements LlmProviderInterface
     public function chat(array $messages, array $config = []): LlmResponse
     {
         $mergedConfig = array_merge($this->defaultConfig, $config);
-        
+
         try {
             // Extract system message if present
             $system = null;
             $filteredMessages = [];
-            
+
             foreach ($messages as $msg) {
                 if ($msg['role'] === 'system') {
                     $system = $msg['content'];
@@ -52,7 +52,7 @@ class AnthropicLlmDriver implements LlmProviderInterface
             if ($response->successful()) {
                 $data = $response->json();
                 $content = $data['content'][0]['text'] ?? '';
-                
+
                 return new LlmResponse(
                     content: $content,
                     provider: 'claude',
@@ -63,12 +63,12 @@ class AnthropicLlmDriver implements LlmProviderInterface
                     ]
                 );
             }
-            
+
             Log::error('Claude API error', [
                 'status' => $response->status(),
                 'body' => $response->body(),
             ]);
-            
+
         } catch (\Exception $e) {
             Log::error('Claude chat request failed', ['error' => $e->getMessage()]);
         }
@@ -78,18 +78,18 @@ class AnthropicLlmDriver implements LlmProviderInterface
 
     public function moderate(string $content): array
     {
-        $prompt = "Analyze the following content for moderation. Respond with JSON only.\n\n" .
-               "Content: \"$content\"\n\n" .
-               "Check for: hate speech, harassment, violence, sexual content, spam, inappropriate language.\n" .
-               "Respond with JSON: {\"flagged\": boolean, \"categories\": {\"hate\": 0.0-1.0, \"harassment\": 0.0-1.0, \"violence\": 0.0-1.0, \"sexual\": 0.0-1.0, \"spam\": 0.0-1.0}, \"reason\": \"explanation\"}";
+        $prompt = "Analyze the following content for moderation. Respond with JSON only.\n\n".
+               "Content: \"$content\"\n\n".
+               "Check for: hate speech, harassment, violence, sexual content, spam, inappropriate language.\n".
+               'Respond with JSON: {"flagged": boolean, "categories": {"hate": 0.0-1.0, "harassment": 0.0-1.0, "violence": 0.0-1.0, "sexual": 0.0-1.0, "spam": 0.0-1.0}, "reason": "explanation"}';
 
         $response = $this->chat([['role' => 'user', 'content' => $prompt]], [
             'temperature' => 0.1,
             'max_tokens' => 1000,
         ]);
 
-        if (!empty($response->metadata['error'])) {
-             return ['flagged' => false, 'categories' => [], 'score' => 0.0, 'error' => $response->metadata['error']];
+        if (! empty($response->metadata['error'])) {
+            return ['flagged' => false, 'categories' => [], 'score' => 0.0, 'error' => $response->metadata['error']];
         }
 
         // Parse JSON from response

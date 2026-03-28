@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\Security\StoreE2EKeyRequest;
 use App\Models\User;
+use App\Models\UserPublicKey;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
-use App\Models\UserPublicKey;
-use App\Http\Requests\Security\StoreE2EKeyRequest;
 
 class E2EKeyManagementController extends Controller
 {
@@ -17,20 +16,24 @@ class E2EKeyManagementController extends Controller
      *   tags={"E2E Encryption"},
      *   summary="Upload public key",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\RequestBody(
      *     required=true,
+     *
      *     @OA\JsonContent(
      *       required={"public_key"},
+     *
      *       @OA\Property(property="public_key", type="string")
      *     )
      *   ),
+     *
      *   @OA\Response(response=200, description="Key uploaded")
      * )
      */
     public function store(StoreE2EKeyRequest $request)
     {
         $user = Auth::user();
-        
+
         UserPublicKey::updateOrCreate(
             ['user_id' => $user->id],
             [
@@ -50,7 +53,9 @@ class E2EKeyManagementController extends Controller
      *   tags={"E2E Encryption"},
      *   summary="Get user's public key",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+     *
      *   @OA\Response(response=200, description="Public key retrieved"),
      *   @OA\Response(response=404, description="User or key not found")
      * )
@@ -59,7 +64,7 @@ class E2EKeyManagementController extends Controller
     {
         $key = UserPublicKey::where('user_id', $userId)->first();
 
-        if (!$key) {
+        if (! $key) {
             return response()->json(['error' => 'Public key not found for this user'], 404);
         }
 
@@ -76,7 +81,7 @@ class E2EKeyManagementController extends Controller
         $user = Auth::user();
         $key = UserPublicKey::where('user_id', $user->id)->first();
 
-        if (!$key) {
+        if (! $key) {
             return response()->json(['error' => 'Public key not found'], 404);
         }
 

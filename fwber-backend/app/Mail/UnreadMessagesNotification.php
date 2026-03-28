@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -30,7 +29,7 @@ class UnreadMessagesNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "You have {$this->unreadCount} unread message" . ($this->unreadCount > 1 ? 's' : ''),
+            subject: "You have {$this->unreadCount} unread message".($this->unreadCount > 1 ? 's' : ''),
         );
     }
 

@@ -31,12 +31,12 @@ class AchievementService
         foreach ($achievements as $achievement) {
             DB::transaction(function () use ($user, $achievement, &$unlocked) {
                 $user->achievements()->attach($achievement->id, ['unlocked_at' => now()]);
-                
+
                 if ($achievement->reward_tokens > 0) {
                     $this->tokenService->awardTokens(
-                        $user, 
-                        $achievement->reward_tokens, 
-                        'achievement_unlocked', 
+                        $user,
+                        $achievement->reward_tokens,
+                        'achievement_unlocked',
                         "Unlocked achievement: {$achievement->name}"
                     );
                 }
@@ -55,7 +55,7 @@ class AchievementService
 
         return $allAchievements->map(function ($achievement) use ($userAchievements) {
             $isUnlocked = $userAchievements->has($achievement->id);
-            
+
             return [
                 'id' => $achievement->id,
                 'name' => $achievement->name,
@@ -65,7 +65,7 @@ class AchievementService
                 'reward_tokens' => $achievement->reward_tokens,
                 'is_unlocked' => $isUnlocked,
                 'unlocked_at' => $isUnlocked ? $userAchievements[$achievement->id]->pivot->unlocked_at : null,
-                'is_hidden' => $achievement->is_hidden && !$isUnlocked,
+                'is_hidden' => $achievement->is_hidden && ! $isUnlocked,
             ];
         });
     }

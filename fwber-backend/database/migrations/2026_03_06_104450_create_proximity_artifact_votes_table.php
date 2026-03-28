@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->tinyInteger('value'); // 1 = upvote, -1 = downvote
             $table->timestamps();
-            
+
             // A user can only have one active vote per artifact
             $table->unique(['proximity_artifact_id', 'user_id']);
         });

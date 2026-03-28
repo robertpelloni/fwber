@@ -12,28 +12,28 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user_profiles', function (Blueprint $table) {
-            if (!Schema::hasColumn('user_profiles', 'height_cm')) {
+            if (! Schema::hasColumn('user_profiles', 'height_cm')) {
                 $table->integer('height_cm')->nullable();
             }
-            if (!Schema::hasColumn('user_profiles', 'body_type')) {
+            if (! Schema::hasColumn('user_profiles', 'body_type')) {
                 $table->string('body_type')->nullable();
             }
-            if (!Schema::hasColumn('user_profiles', 'ethnicity')) {
+            if (! Schema::hasColumn('user_profiles', 'ethnicity')) {
                 $table->string('ethnicity')->nullable();
             }
-            if (!Schema::hasColumn('user_profiles', 'occupation')) {
+            if (! Schema::hasColumn('user_profiles', 'occupation')) {
                 $table->string('occupation')->nullable();
             }
-            if (!Schema::hasColumn('user_profiles', 'education')) {
+            if (! Schema::hasColumn('user_profiles', 'education')) {
                 $table->string('education')->nullable();
             }
-            if (!Schema::hasColumn('user_profiles', 'relationship_status')) {
+            if (! Schema::hasColumn('user_profiles', 'relationship_status')) {
                 $table->string('relationship_status')->nullable();
             }
-            if (!Schema::hasColumn('user_profiles', 'looking_for')) {
+            if (! Schema::hasColumn('user_profiles', 'looking_for')) {
                 $table->json('looking_for')->nullable();
             }
-            if (!Schema::hasColumn('user_profiles', 'interested_in')) {
+            if (! Schema::hasColumn('user_profiles', 'interested_in')) {
                 $table->json('interested_in')->nullable();
             }
         });

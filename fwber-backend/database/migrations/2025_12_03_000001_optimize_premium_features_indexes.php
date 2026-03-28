@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -12,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $addIndex = function($table, $columns, $name) {
+        $addIndex = function ($table, $columns, $name) {
             if (Schema::hasTable($table)) {
                 try {
                     // Attempt to add index, will fail if exists
@@ -67,13 +66,14 @@ return new class extends Migration
      */
     public function down(): void
     {
-        $dropIndex = function($table, $name) {
+        $dropIndex = function ($table, $name) {
             if (Schema::hasTable($table)) {
                 try {
                     Schema::table($table, function (Blueprint $table) use ($name) {
                         $table->dropIndex($name);
                     });
-                } catch (\Exception $e) {}
+                } catch (\Exception $e) {
+                }
             }
         };
 

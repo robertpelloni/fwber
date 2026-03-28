@@ -8,7 +8,6 @@ use App\Models\UserProfile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class VerificationTest extends TestCase
@@ -45,8 +44,8 @@ class VerificationTest extends TestCase
             'user_id' => $user->id,
             'filename' => 'profile.jpg',
             'original_filename' => 'profile.jpg',
-            'file_path' => 'photos/' . $user->id . '/profile.jpg',
-            'thumbnail_path' => 'photos/' . $user->id . '/thumbnails/thumb_profile.jpg',
+            'file_path' => 'photos/'.$user->id.'/profile.jpg',
+            'thumbnail_path' => 'photos/'.$user->id.'/thumbnails/thumb_profile.jpg',
             'mime_type' => 'image/jpeg',
             'file_size' => 1024,
             'width' => 800,
@@ -56,7 +55,7 @@ class VerificationTest extends TestCase
         ]);
 
         // Mock storage for the primary photo
-        Storage::disk('public')->put('photos/' . $user->id . '/profile.jpg', 'dummy content');
+        Storage::disk('public')->put('photos/'.$user->id.'/profile.jpg', 'dummy content');
 
         // Upload a selfie
         $file = UploadedFile::fake()->image('selfie.jpg');
@@ -87,8 +86,8 @@ class VerificationTest extends TestCase
             'user_id' => $user->id,
             'filename' => 'mismatch_profile.jpg',
             'original_filename' => 'mismatch_profile.jpg',
-            'file_path' => 'photos/' . $user->id . '/mismatch_profile.jpg',
-            'thumbnail_path' => 'photos/' . $user->id . '/thumbnails/thumb_mismatch_profile.jpg',
+            'file_path' => 'photos/'.$user->id.'/mismatch_profile.jpg',
+            'thumbnail_path' => 'photos/'.$user->id.'/thumbnails/thumb_mismatch_profile.jpg',
             'mime_type' => 'image/jpeg',
             'file_size' => 1024,
             'width' => 800,
@@ -97,7 +96,7 @@ class VerificationTest extends TestCase
             'sort_order' => 0,
         ]);
 
-        Storage::disk('public')->put('photos/' . $user->id . '/mismatch_profile.jpg', 'dummy content');
+        Storage::disk('public')->put('photos/'.$user->id.'/mismatch_profile.jpg', 'dummy content');
 
         // Upload a selfie
         $file = UploadedFile::fake()->image('selfie.jpg');

@@ -10,6 +10,7 @@ class FederatedFollowNotification extends Notification
     use Queueable;
 
     protected $username;
+
     protected $domain;
 
     public function __construct($username, $domain)

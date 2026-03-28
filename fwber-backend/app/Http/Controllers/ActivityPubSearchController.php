@@ -10,14 +10,14 @@ class ActivityPubSearchController extends Controller
 {
     /**
      * Search for an external actor using WebFinger.
-     * 
+     *
      * Expected format: @user@domain.com or user@domain.com
      */
     public function search(Request $request)
     {
         $handle = $request->query('q');
-        
-        if (!$handle || !str_contains($handle, '@')) {
+
+        if (! $handle || ! str_contains($handle, '@')) {
             return response()->json(['error' => 'Invalid handle format'], 422);
         }
 
@@ -30,8 +30,9 @@ class ActivityPubSearchController extends Controller
             $webfingerUrl = "https://{$domain}/.well-known/webfinger?resource=acct:{$cleanHandle}";
             $webfingerResponse = Http::timeout(5)->get($webfingerUrl);
 
-            if (!$webfingerResponse->successful()) {
+            if (! $webfingerResponse->successful()) {
                 Log::warning("WebFinger lookup failed for {$handle}", ['url' => $webfingerUrl]);
+
                 return response()->json(['actors' => []]);
             }
 
@@ -45,7 +46,7 @@ class ActivityPubSearchController extends Controller
                 }
             }
 
-            if (!$actorUrl) {
+            if (! $actorUrl) {
                 return response()->json(['actors' => []]);
             }
 
@@ -54,7 +55,7 @@ class ActivityPubSearchController extends Controller
                 ->withHeaders(['Accept' => 'application/activity+json'])
                 ->get($actorUrl);
 
-            if (!$actorResponse->successful()) {
+            if (! $actorResponse->successful()) {
                 return response()->json(['actors' => []]);
             }
 
@@ -70,13 +71,14 @@ class ActivityPubSearchController extends Controller
                         'name' => $actor['name'] ?? $username,
                         'summary' => strip_tags($actor['summary'] ?? ''),
                         'icon' => isset($actor['icon']['url']) ? ['url' => $actor['icon']['url']] : null,
-                        'server' => $domain
-                    ]
-                ]
+                        'server' => $domain,
+                    ],
+                ],
             ]);
 
         } catch (\Exception $e) {
-            Log::error("Federated search exception for {$handle}: " . $e->getMessage());
+            Log::error("Federated search exception for {$handle}: ".$e->getMessage());
+
             return response()->json(['actors' => []]);
         }
     }
@@ -89,7 +91,7 @@ class ActivityPubSearchController extends Controller
         $user = auth()->user();
         $actorId = $request->input('actor_id');
 
-        if (!$actorId) {
+        if (! $actorId) {
             return response()->json(['error' => 'Actor ID required'], 422);
         }
 
@@ -106,7 +108,7 @@ class ActivityPubSearchController extends Controller
                 [
                     'username' => $username,
                     'domain' => $domain,
-                    'status' => 'pending'
+                    'status' => 'pending',
                 ]
             );
 
@@ -114,13 +116,14 @@ class ActivityPubSearchController extends Controller
             Log::info("User {$user->id} requested to follow federated actor: {$actorId}");
 
             // TODO: Sign and dispatch 'Follow' activity to remote inbox
-            
+
             return response()->json([
                 'success' => true,
-                'message' => 'Follow request initiated'
+                'message' => 'Follow request initiated',
             ]);
         } catch (\Exception $e) {
-            Log::error("Failed to initiate federated follow: " . $e->getMessage());
+            Log::error('Failed to initiate federated follow: '.$e->getMessage());
+
             return response()->json(['error' => 'Failed to process follow request'], 500);
         }
     }
@@ -134,7 +137,7 @@ class ActivityPubSearchController extends Controller
         $following = \App\Models\Following::where('user_id', $user->id)->get();
 
         return response()->json([
-            'following' => $following
+            'following' => $following,
         ]);
     }
 
@@ -147,7 +150,7 @@ class ActivityPubSearchController extends Controller
         $followers = \App\Models\Follower::where('user_id', $user->id)->get();
 
         return response()->json([
-            'followers' => $followers
+            'followers' => $followers,
         ]);
     }
 
@@ -161,7 +164,7 @@ class ActivityPubSearchController extends Controller
             ->get();
 
         return response()->json([
-            'posts' => $posts
+            'posts' => $posts,
         ]);
     }
 }

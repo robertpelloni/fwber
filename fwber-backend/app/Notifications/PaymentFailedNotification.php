@@ -2,19 +2,19 @@
 
 namespace App\Notifications;
 
+use App\Notifications\Traits\ChecksNotificationPreferences;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\WebPush\WebPushMessage;
-use NotificationChannels\WebPush\WebPushChannel;
-use App\Notifications\Traits\ChecksNotificationPreferences;
 
 class PaymentFailedNotification extends Notification implements ShouldQueue
 {
-    use Queueable, ChecksNotificationPreferences;
+    use ChecksNotificationPreferences, Queueable;
 
     public $amount;
+
     public $currency;
 
     /**
@@ -41,11 +41,11 @@ class PaymentFailedNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $formattedAmount = number_format($this->amount, 2) . ' ' . strtoupper($this->currency);
+        $formattedAmount = number_format($this->amount, 2).' '.strtoupper($this->currency);
 
         return (new MailMessage)
             ->subject('Payment Failed')
-            ->line('We were unable to process your payment of ' . $formattedAmount . '.')
+            ->line('We were unable to process your payment of '.$formattedAmount.'.')
             ->line('Please update your payment method to avoid service interruption.')
             ->action('Update Payment Method', url('/settings/billing'))
             ->line('Thank you for using our application!');
@@ -56,7 +56,7 @@ class PaymentFailedNotification extends Notification implements ShouldQueue
      */
     public function toWebPush($notifiable, $notification)
     {
-        $formattedAmount = number_format($this->amount, 2) . ' ' . strtoupper($this->currency);
+        $formattedAmount = number_format($this->amount, 2).' '.strtoupper($this->currency);
 
         return (new WebPushMessage)
             ->title('Payment Failed')
@@ -75,7 +75,7 @@ class PaymentFailedNotification extends Notification implements ShouldQueue
         return [
             'amount' => $this->amount,
             'currency' => $this->currency,
-            'message' => 'Payment of ' . number_format($this->amount, 2) . ' ' . strtoupper($this->currency) . ' failed.',
+            'message' => 'Payment of '.number_format($this->amount, 2).' '.strtoupper($this->currency).' failed.',
         ];
     }
 }

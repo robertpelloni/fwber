@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Core\EventSourcing\EventStore;
+use App\Events\Messaging\MessageSent;
 use App\Http\Requests\Message\StoreMessageRequest;
+use App\Jobs\TranscribeAudioMessage;
 use App\Models\Block;
 use App\Models\Message;
 use App\Models\RelationshipTier;
 use App\Models\User;
 use App\Models\UserMatch;
-use App\Jobs\TranscribeAudioMessage;
-use App\Domain\Core\EventSourcing\EventStore;
-use App\Events\Messaging\MessageSent;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class MessageController extends Controller
@@ -28,12 +28,16 @@ class MessageController extends Controller
      *     summary="Send a message",
      *     description="Send a text message or media (image/video/audio/file) to a matched user. Either content or media is required. Enforces relationship tier limits and blocks.",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
+     *
      *             @OA\Schema(
      *                 required={"receiver_id"},
+     *
      *                 @OA\Property(property="receiver_id", type="integer", description="ID of message recipient", example=42),
      *                 @OA\Property(property="content", type="string", maxLength=5000, description="Text message content", example="Hey, how are you?"),
      *                 @OA\Property(property="message_type", type="string", enum={"text", "image", "video", "audio", "file"}, example="text"),
@@ -42,10 +46,13 @@ class MessageController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Message sent successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="id", type="integer", example=123),
      *             @OA\Property(property="sender_id", type="integer", example=1),
      *             @OA\Property(property="receiver_id", type="integer", example=42),
@@ -55,32 +62,42 @@ class MessageController extends Controller
      *             @OA\Property(property="created_at", type="string", format="date-time")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=403,
      *         description="Messaging blocked or not allowed",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="error", type="string", example="Messaging blocked between users")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="No active match found",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="error", type="string", example="No active match found")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Validation error",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthenticated",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
      *     )
      * )
-     * 
+     *
      * Send a message to a matched user
      */
     public function store(StoreMessageRequest $request): JsonResponse
@@ -98,20 +115,20 @@ class MessageController extends Controller
         // Find the match between these users (eager load relationshipTier to avoid N+1)
         $match = UserMatch::where(function ($query) use ($senderId, $receiverId) {
             $query->where('user1_id', $senderId)->where('user2_id', $receiverId)
-                  ->orWhere('user1_id', $receiverId)->where('user2_id', $senderId);
+                ->orWhere('user1_id', $receiverId)->where('user2_id', $senderId);
         })->where('is_active', true)->with('relationshipTier')->first();
 
-        if (!$match) {
+        if (! $match) {
             return response()->json(['error' => 'No active match found'], 404);
         }
 
         // At least one of content or media is required
-        if (!$request->hasFile('media') && (!isset($validated['content']) || trim((string)$validated['content']) === '')) {
+        if (! $request->hasFile('media') && (! isset($validated['content']) || trim((string) $validated['content']) === '')) {
             return response()->json([
                 'message' => 'The given data was invalid.',
                 'errors' => [
-                    'content' => ['Either content or media is required']
-                ]
+                    'content' => ['Either content or media is required'],
+                ],
             ], 422);
         }
 
@@ -127,7 +144,7 @@ class MessageController extends Controller
             $mediaType = $file->getMimeType();
 
             // Infer message type from MIME when not explicitly set
-            if (!isset($validated['message_type'])) {
+            if (! isset($validated['message_type'])) {
                 if (str_starts_with($mediaType, 'image/')) {
                     $resolvedType = 'image';
                 } elseif (str_starts_with($mediaType, 'audio/')) {
@@ -149,8 +166,8 @@ class MessageController extends Controller
                     return response()->json([
                         'message' => 'The given data was invalid.',
                         'errors' => [
-                            'message_type' => ['message_type does not match uploaded media']
-                        ]
+                            'message_type' => ['message_type does not match uploaded media'],
+                        ],
                     ], 422);
                 }
             }
@@ -161,7 +178,7 @@ class MessageController extends Controller
                 'image' => 5120,   // 5 MB
                 'audio' => 3072,   // 3 MB
                 'video' => 15360,  // 15 MB
-                'file'  => 2048,   // 2 MB
+                'file' => 2048,   // 2 MB
             ];
 
             // Validate size by resolved type
@@ -170,43 +187,43 @@ class MessageController extends Controller
                 return response()->json([
                     'message' => 'The given data was invalid.',
                     'errors' => [
-                        'media' => ["{$resolvedType} exceeds maximum size of {$cap} KB"]
-                    ]
+                        'media' => ["{$resolvedType} exceeds maximum size of {$cap} KB"],
+                    ],
                 ], 422);
             }
 
             // Validate allowed MIME for images specifically to block disguised executables
             if ($resolvedType === 'image') {
                 $allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-                if (!in_array($mediaType, $allowed, true)) {
+                if (! in_array($mediaType, $allowed, true)) {
                     return response()->json([
                         'message' => 'The given data was invalid.',
                         'errors' => [
-                            'media' => ['Unsupported image type']
-                        ]
+                            'media' => ['Unsupported image type'],
+                        ],
                     ], 422);
                 }
             }
 
             // Clamp duration for audio/video
             if ($resolvedType === 'audio') {
-                $duration = (int)($duration ?? 1);
+                $duration = (int) ($duration ?? 1);
                 if ($duration < 1 || $duration > 120) {
                     return response()->json([
                         'message' => 'The given data was invalid.',
                         'errors' => [
-                            'media_duration' => ['Audio duration must be between 1 and 120 seconds']
-                        ]
+                            'media_duration' => ['Audio duration must be between 1 and 120 seconds'],
+                        ],
                     ], 422);
                 }
             } elseif ($resolvedType === 'video') {
-                $duration = (int)($duration ?? 1);
+                $duration = (int) ($duration ?? 1);
                 if ($duration < 1 || $duration > 60) {
                     return response()->json([
                         'message' => 'The given data was invalid.',
                         'errors' => [
-                            'media_duration' => ['Video duration must be between 1 and 60 seconds']
-                        ]
+                            'media_duration' => ['Video duration must be between 1 and 60 seconds'],
+                        ],
                     ], 422);
                 }
             } else {
@@ -241,10 +258,10 @@ class MessageController extends Controller
             $currentVersion = $this->eventStore->getCurrentVersion($aggregateId, 'Chatroom');
             $event = new MessageSent(
                 $aggregateId, // Aggregate is the chat context
-                (int)$senderId,
-                (int)$receiverId,
-                (string)($validated['content'] ?? ''),
-                (string)$resolvedType,
+                (int) $senderId,
+                (int) $receiverId,
+                (string) ($validated['content'] ?? ''),
+                (string) $resolvedType,
                 json_encode(['message_id' => $message->id])
             );
             $this->eventStore->append(
@@ -261,8 +278,8 @@ class MessageController extends Controller
 
             // Increment tier message count
             $tier = $match->relationshipTier;
-            
-            if (!$tier) {
+
+            if (! $tier) {
                 $tier = RelationshipTier::create([
                     'match_id' => $match->id,
                     'current_tier' => 'matched',
@@ -301,33 +318,38 @@ class MessageController extends Controller
                 'previous_tier' => $previousTier,
                 'tier_upgraded' => $tierUpgraded,
                 'messages_exchanged' => $tier->messages_exchanged,
-            ]
+            ],
         ], 201);
     }
 
     /**
      * Get conversation with a matched user
-        *
-        * @OA\Get(
-        *   path="/messages/{userId}",
-        *   tags={"Messages"},
-        *   summary="Get conversation with a matched user",
-        *   description="Returns paginated messages and other user's presence info.",
-        *   security={{"bearerAuth":{}}},
-        *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
-        *   @OA\Response(
-        *     response=200,
-        *     description="Conversation",
-        *     @OA\JsonContent(type="object",
-        *       @OA\Property(property="messages", type="array", @OA\Items(ref="#/components/schemas/DirectMessage")),
-        *       @OA\Property(property="pagination", type="object"),
-        *       @OA\Property(property="other_user", ref="#/components/schemas/User")
-        *     )
-        *   ),
-        *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-        *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
-        *   @OA\Response(response=401, ref="#/components/responses/Unauthorized")
-        * )
+     *
+     * @OA\Get(
+     *   path="/messages/{userId}",
+     *   tags={"Messages"},
+     *   summary="Get conversation with a matched user",
+     *   description="Returns paginated messages and other user's presence info.",
+     *   security={{"bearerAuth":{}}},
+     *
+     *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+     *
+     *   @OA\Response(
+     *     response=200,
+     *     description="Conversation",
+     *
+     *     @OA\JsonContent(type="object",
+     *
+     *       @OA\Property(property="messages", type="array", @OA\Items(ref="#/components/schemas/DirectMessage")),
+     *       @OA\Property(property="pagination", type="object"),
+     *       @OA\Property(property="other_user", ref="#/components/schemas/User")
+     *     )
+     *   ),
+     *
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *   @OA\Response(response=401, ref="#/components/responses/Unauthorized")
+     * )
      */
     public function index(Request $request, int $userId): JsonResponse
     {
@@ -341,10 +363,10 @@ class MessageController extends Controller
         // Verify match exists
         $match = UserMatch::where(function ($query) use ($currentUserId, $userId) {
             $query->where('user1_id', $currentUserId)->where('user2_id', $userId)
-                  ->orWhere('user1_id', $userId)->where('user2_id', $currentUserId);
+                ->orWhere('user1_id', $userId)->where('user2_id', $currentUserId);
         })->where('is_active', true)->first();
 
-        if (!$match) {
+        if (! $match) {
             return response()->json(['error' => 'No active match found'], 404);
         }
 
@@ -373,18 +395,20 @@ class MessageController extends Controller
 
     /**
      * Mark message as read
-        *
-        * @OA\Post(
-        *   path="/messages/{messageId}/read",
-        *   tags={"Messages"},
-        *   summary="Mark a message as read",
-        *   security={{"bearerAuth":{}}},
-        *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
-        *   @OA\Response(response=200, description="Marked read"),
-        *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-        *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
-        *   @OA\Response(response=401, description="Unauthenticated")
-        * )
+     *
+     * @OA\Post(
+     *   path="/messages/{messageId}/read",
+     *   tags={"Messages"},
+     *   summary="Mark a message as read",
+     *   security={{"bearerAuth":{}}},
+     *
+     *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+     *
+     *   @OA\Response(response=200, description="Marked read"),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *   @OA\Response(response=401, description="Unauthenticated")
+     * )
      */
     public function markAsRead(int $messageId): JsonResponse
     {
@@ -397,7 +421,7 @@ class MessageController extends Controller
         }
 
         // Idempotent: do not overwrite existing timestamp
-        if (!$message->is_read) {
+        if (! $message->is_read) {
             $message->is_read = true;
             $message->read_at = now();
             $message->save();
@@ -422,7 +446,9 @@ class MessageController extends Controller
      *   tags={"Messages"},
      *   summary="Mark all messages from a sender as read",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="senderId", in="path", required=true, @OA\Schema(type="integer")),
+     *
      *   @OA\Response(response=200, description="Marked all read"),
      *   @OA\Response(response=401, description="Unauthenticated")
      * )
@@ -430,7 +456,7 @@ class MessageController extends Controller
     public function markAllAsRead(int $senderId): JsonResponse
     {
         $currentUserId = Auth::id();
-        
+
         Message::where('sender_id', $senderId)
             ->where('receiver_id', $currentUserId)
             ->where('is_read', false)
@@ -441,26 +467,30 @@ class MessageController extends Controller
 
     /**
      * Get unread message count
-        *
-        * @OA\Get(
-        *   path="/messages/unread-count",
-        *   tags={"Messages"},
-        *   summary="Get count of unread messages",
-        *   security={{"bearerAuth":{}}},
-        *   @OA\Response(
-        *     response=200,
-        *     description="Unread count",
-        *     @OA\JsonContent(type="object",
-        *       @OA\Property(property="unread_count", type="integer", example=3)
-        *     )
-        *   ),
-        *   @OA\Response(response=401, description="Unauthenticated")
-        * )
+     *
+     * @OA\Get(
+     *   path="/messages/unread-count",
+     *   tags={"Messages"},
+     *   summary="Get count of unread messages",
+     *   security={{"bearerAuth":{}}},
+     *
+     *   @OA\Response(
+     *     response=200,
+     *     description="Unread count",
+     *
+     *     @OA\JsonContent(type="object",
+     *
+     *       @OA\Property(property="unread_count", type="integer", example=3)
+     *     )
+     *   ),
+     *
+     *   @OA\Response(response=401, description="Unauthenticated")
+     * )
      */
     public function unreadCount(): JsonResponse
     {
         $userId = Auth::id();
-        
+
         $count = Message::where('receiver_id', $userId)
             ->unread()
             ->count();
@@ -494,10 +524,10 @@ class MessageController extends Controller
         // Verify relationship
         $match = UserMatch::where(function ($query) use ($senderId, $receiverId) {
             $query->where('user1_id', $senderId)->where('user2_id', $receiverId)
-                  ->orWhere('user1_id', $receiverId)->where('user2_id', $senderId);
+                ->orWhere('user1_id', $receiverId)->where('user2_id', $senderId);
         })->where('is_active', true)->first();
 
-        if (!$match) {
+        if (! $match) {
             return response()->json(['message' => 'Cannot sync message without mutual match'], 403);
         }
 
@@ -512,13 +542,13 @@ class MessageController extends Controller
         ]);
 
         // --- EVENT SOURCING INTEGRATION ---
-        $currentVersion = $this->eventStore->getCurrentVersion((string)$match->id, 'Chatroom');
+        $currentVersion = $this->eventStore->getCurrentVersion((string) $match->id, 'Chatroom');
         $event = new MessageSent(
-            (string)$match->id,
-            (int)$senderId,
-            (int)$receiverId,
-            (string)$validated['content'],
-            (string)$validated['message_type'],
+            (string) $match->id,
+            (int) $senderId,
+            (int) $receiverId,
+            (string) $validated['content'],
+            (string) $validated['message_type'],
             json_encode(['message_id' => $message->id, 'is_sync' => true])
         );
         $this->eventStore->append($event, 'Chatroom', $currentVersion + 1, ['ip' => $request->ip()]);

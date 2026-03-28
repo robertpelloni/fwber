@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\GeoSpoofDetection;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class GeoSpoofDetectionTest extends TestCase
@@ -15,7 +14,7 @@ class GeoSpoofDetectionTest extends TestCase
     public function test_can_create_geo_spoof_detection()
     {
         $user = User::factory()->create();
-        
+
         $detection = GeoSpoofDetection::factory()->create([
             'user_id' => $user->id,
             'suspicion_score' => 85,

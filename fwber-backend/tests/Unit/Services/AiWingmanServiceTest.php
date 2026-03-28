@@ -2,14 +2,14 @@
 
 namespace Tests\Unit\Services;
 
-use Tests\TestCase;
-use App\Services\AiWingmanService;
-use App\Services\Ai\Llm\LlmManager;
-use App\Services\Ai\Llm\LlmProviderInterface;
+use App\DTOs\LlmResponse;
 use App\Models\User;
 use App\Models\UserProfile;
+use App\Services\Ai\Llm\LlmManager;
+use App\Services\Ai\Llm\LlmProviderInterface;
+use App\Services\AiWingmanService;
 use Mockery;
-use App\DTOs\LlmResponse;
+use Tests\TestCase;
 
 class AiWingmanServiceTest extends TestCase
 {
@@ -25,7 +25,7 @@ class AiWingmanServiceTest extends TestCase
         $userProfile = Mockery::mock(UserProfile::class);
         $userProfile->shouldReceive('getAttribute')->with('interests')->andReturn(['coding', 'gaming']);
         $userProfile->shouldReceive('offsetExists')->andReturn(true);
-        
+
         $user = Mockery::mock(User::class);
         $user->shouldReceive('getAttribute')->with('profile')->andReturn($userProfile);
         $user->shouldReceive('getAttribute')->with('id')->andReturn(1);
@@ -43,9 +43,9 @@ class AiWingmanServiceTest extends TestCase
 
         // Mock LLM Response
         $jsonResponse = json_encode([
-            "Hey! I see you like gaming too. What are you playing lately?",
-            "I noticed you love hiking. Any favorite trails?",
-            "Hi! Your bio caught my eye."
+            'Hey! I see you like gaming too. What are you playing lately?',
+            'I noticed you love hiking. Any favorite trails?',
+            'Hi! Your bio caught my eye.',
         ]);
 
         $responseObj = new LlmResponse(
@@ -66,7 +66,7 @@ class AiWingmanServiceTest extends TestCase
         $suggestions = $service->generateIceBreakers($user, $match);
 
         $this->assertCount(3, $suggestions);
-        $this->assertEquals("Hey! I see you like gaming too. What are you playing lately?", $suggestions[0]);
+        $this->assertEquals('Hey! I see you like gaming too. What are you playing lately?', $suggestions[0]);
     }
 
     public function test_generate_reply_suggestions_returns_suggestions()
@@ -80,14 +80,14 @@ class AiWingmanServiceTest extends TestCase
 
         $history = [
             ['sender_id' => 1, 'content' => 'Hi!'],
-            ['sender_id' => 2, 'content' => 'Hello! How are you?']
+            ['sender_id' => 2, 'content' => 'Hello! How are you?'],
         ];
 
         // Mock LLM Response
         $jsonResponse = json_encode([
             "I'm doing great, thanks! How about you?",
-            "Pretty good! Just finished work.",
-            "Can't complain. What are you up to?"
+            'Pretty good! Just finished work.',
+            "Can't complain. What are you up to?",
         ]);
 
         $responseObj = new LlmResponse(
@@ -118,7 +118,7 @@ class AiWingmanServiceTest extends TestCase
         $user->shouldReceive('getAttribute')->with('profile')->andReturn(null);
         $user->shouldReceive('getAttribute')->with('id')->andReturn(1);
         $user->shouldReceive('offsetExists')->with('profile')->andReturn(true);
-        
+
         $match = Mockery::mock(User::class);
         $match->shouldReceive('getAttribute')->with('profile')->andReturn(null);
         $match->shouldReceive('getAttribute')->with('id')->andReturn(2);
@@ -133,10 +133,10 @@ class AiWingmanServiceTest extends TestCase
             ->andReturn($mockDriver);
 
         $service = new AiWingmanService($mockLlmManager);
-        
+
         // Should return fallback suggestions
         $suggestions = $service->generateIceBreakers($user, $match);
-        
+
         $this->assertNotEmpty($suggestions);
         $this->assertEquals("Hi! How's it going?", $suggestions[0]);
     }

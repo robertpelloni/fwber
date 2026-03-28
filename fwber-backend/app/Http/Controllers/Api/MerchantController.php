@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Merchant\CreatePaymentRequest;
 use App\Models\MerchantPayment;
 use App\Models\User;
-use App\Models\TokenTransaction;
 use App\Services\TokenDistributionService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use App\Http\Requests\Merchant\CreatePaymentRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -30,7 +29,7 @@ class MerchantController extends Controller
     {
         $user = $request->user();
 
-        $secret = 'sk_' . Str::random(32);
+        $secret = 'sk_'.Str::random(32);
 
         $user->merchant_secret = $secret;
         $user->merchant_name = $request->input('merchant_name', $user->merchant_name ?? $user->name);
@@ -45,12 +44,12 @@ class MerchantController extends Controller
     public function createPayment(CreatePaymentRequest $request): JsonResponse
     {
         $secret = $request->header('X-Merchant-Secret');
-        if (!$secret) {
+        if (! $secret) {
             return response()->json(['error' => 'Missing X-Merchant-Secret header'], 401);
         }
 
         $merchant = User::where('merchant_secret', $secret)->first();
-        if (!$merchant) {
+        if (! $merchant) {
             return response()->json(['error' => 'Invalid merchant secret'], 401);
         }
 
@@ -105,7 +104,7 @@ class MerchantController extends Controller
         }
 
         if ($user->id === $payment->merchant_id) {
-             return response()->json(['error' => 'Cannot pay yourself'], 400);
+            return response()->json(['error' => 'Cannot pay yourself'], 400);
         }
 
         try {

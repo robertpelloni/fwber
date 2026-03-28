@@ -18,6 +18,7 @@ class GenerateAvatar implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public User $user;
+
     public array $options;
 
     /**
@@ -38,7 +39,7 @@ class GenerateAvatar implements ShouldQueue
     {
         try {
             // Branch: photo-based (img2img) vs traits-based generation
-            if (!empty($this->options['from_photo']) && !empty($this->options['photo_path'])) {
+            if (! empty($this->options['from_photo']) && ! empty($this->options['photo_path'])) {
                 $result = $avatarService->generateFromImage($this->user, $this->options['photo_path'], $this->options);
             } else {
                 $result = $avatarService->generateAvatar($this->user, $this->options);
@@ -46,10 +47,10 @@ class GenerateAvatar implements ShouldQueue
 
             if ($result['success']) {
                 // Extract relative path from URL
-                $path = 'avatars/' . basename($result['image_url']);
+                $path = 'avatars/'.basename($result['image_url']);
 
                 // Save to photos table
-                $photo = new Photo();
+                $photo = new Photo;
                 $photo->user_id = $this->user->id;
                 $photo->file_path = $path;
                 $photo->filename = basename($path);

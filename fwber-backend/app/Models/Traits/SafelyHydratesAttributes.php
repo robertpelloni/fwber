@@ -18,7 +18,8 @@ trait SafelyHydratesAttributes
             return parent::getAttribute($key);
         } catch (\Throwable $e) {
             // Log the error but don't crash the app
-            Log::error("SafelyHydratesAttributes: Error accessing attribute '$key' on " . static::class . ": " . $e->getMessage());
+            Log::error("SafelyHydratesAttributes: Error accessing attribute '$key' on ".static::class.': '.$e->getMessage());
+
             return null;
         }
     }
@@ -33,8 +34,8 @@ trait SafelyHydratesAttributes
         try {
             return parent::toArray();
         } catch (\Throwable $e) {
-            Log::error("SafelyHydratesAttributes: Error converting " . static::class . " to array: " . $e->getMessage());
-            
+            Log::error('SafelyHydratesAttributes: Error converting '.static::class.' to array: '.$e->getMessage());
+
             // Return a safe subset or empty array
             return [
                 'id' => $this->id ?? null,

@@ -36,12 +36,13 @@ class ShadowThrottle extends Model
     public function setReasonAttribute(string $value): void
     {
         $allowed = ['spam', 'flagged_content', 'geo_spoof', 'rapid_posting', 'manual'];
-        if (!in_array($value, $allowed, true)) {
+        if (! in_array($value, $allowed, true)) {
             // Preserve original in notes
             $original = trim($value);
             $notes = (string) ($this->attributes['notes'] ?? '');
-            $this->attributes['notes'] = trim($notes !== '' ? ($notes . ' | reason: ' . $original) : ('reason: ' . $original));
+            $this->attributes['notes'] = trim($notes !== '' ? ($notes.' | reason: '.$original) : ('reason: '.$original));
             $this->attributes['reason'] = 'manual';
+
             return;
         }
 
@@ -70,7 +71,7 @@ class ShadowThrottle extends Model
     public function isActive(): bool
     {
         $now = now();
-        
+
         if ($now->lessThan($this->started_at)) {
             return false;
         }

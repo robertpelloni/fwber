@@ -14,7 +14,7 @@ return [
     'photo_unlock_cost' => 50,
     'boost_cost' => 100,
     'super_like_cost' => 10,
-    
+
     // Rewards (in tokens)
     'signup_bonus' => 100,
     'referral_bonus' => 50,

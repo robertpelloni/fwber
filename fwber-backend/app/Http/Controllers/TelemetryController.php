@@ -13,7 +13,7 @@ class TelemetryController extends Controller
         $validated = $request->validated();
 
         $user = $request->user();
-        $userId = $user ? (int)$user->id : null;
+        $userId = $user ? (int) $user->id : null;
 
         $processed = 0;
         $failed = 0;

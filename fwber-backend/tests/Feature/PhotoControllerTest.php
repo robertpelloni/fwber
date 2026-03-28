@@ -23,15 +23,15 @@ class PhotoControllerTest extends TestCase
 
         $response = $this->actingAs($user)->postJson('/api/photos', [
             'photo' => $file,
-            'is_private' => false
+            'is_private' => false,
         ]);
 
         $response->assertStatus(201);
         $this->assertDatabaseHas('photos', [
             'user_id' => $user->id,
-            'original_filename' => 'photo.jpg'
+            'original_filename' => 'photo.jpg',
         ]);
-        
+
         // Verify file storage
         $photo = Photo::first();
         Storage::disk('public')->assertExists($photo->file_path);
@@ -72,13 +72,13 @@ class PhotoControllerTest extends TestCase
         $photo = Photo::factory()->create(['user_id' => $user->id, 'is_private' => false]);
 
         $response = $this->actingAs($user)->putJson("/api/photos/{$photo->id}", [
-            'is_private' => true
+            'is_private' => true,
         ]);
 
         $response->assertStatus(200);
         $this->assertDatabaseHas('photos', [
             'id' => $photo->id,
-            'is_private' => true
+            'is_private' => true,
         ]);
     }
 }

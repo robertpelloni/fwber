@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Events\VideoSignal;
-use Illuminate\Support\Facades\Auth;
-use App\Models\VideoCall;
 use App\Http\Requests\VideoChat\InitiateVideoChatRequest;
-use App\Http\Requests\VideoChat\UpdateVideoCallStatusRequest;
 use App\Http\Requests\VideoChat\SignalVideoChatRequest;
+use App\Http\Requests\VideoChat\UpdateVideoCallStatusRequest;
+use App\Models\VideoCall;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class VideoChatController extends Controller
 {
@@ -80,7 +80,7 @@ class VideoChatController extends Controller
     public function history(Request $request)
     {
         $userId = Auth::id();
-        
+
         $calls = VideoCall::with(['caller:id,name,avatar_url', 'receiver:id,name,avatar_url'])
             ->where('caller_id', $userId)
             ->orWhere('receiver_id', $userId)

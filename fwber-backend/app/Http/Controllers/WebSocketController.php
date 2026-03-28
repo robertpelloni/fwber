@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 use App\Services\WebSocketService;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Log;
 use App\Support\LogContext;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use OpenApi\Attributes as OA;
 
 class WebSocketController extends Controller
@@ -20,19 +20,23 @@ class WebSocketController extends Controller
     }
 
     /**     * Get Mercure JWT token
-     * 
+     *
      * @OA\Get(
      *     path="/websocket/token",
      *     tags={"WebSocket"},
      *     summary="Get Mercure JWT token",
      *     description="Get a JWT token for Mercure subscription",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(response=200, description="Token generated",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="token", type="string"),
      *             @OA\Property(property="hub_url", type="string")
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
      * )
      */
@@ -40,7 +44,7 @@ class WebSocketController extends Controller
     {
         try {
             $user = $request->user();
-            if (!$user) {
+            if (! $user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
 
@@ -63,15 +67,18 @@ class WebSocketController extends Controller
     }
 
     /**     * Handle WebSocket connection
-     * 
+     *
      * @OA\Post(
      *     path="/websocket/connect",
      *     tags={"WebSocket"},
      *     summary="Connect to WebSocket",
      *     description="Establish a WebSocket connection for real-time communication",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="connection_data", type="object",
      *                 @OA\Property(property="user_agent", type="string", example="Mozilla/5.0..."),
      *                 @OA\Property(property="ip_address", type="string", example="192.168.1.1"),
@@ -79,9 +86,12 @@ class WebSocketController extends Controller
      *             )
      *         )
      *     ),
-    *     @OA\Response(response=200, description="Connection established",
-    *         @OA\JsonContent(ref="#/components/schemas/WebSocketConnectionEstablished")
-    *     ),
+     *
+     *     @OA\Response(response=200, description="Connection established",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/WebSocketConnectionEstablished")
+     *     ),
+     *
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
      *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
@@ -90,7 +100,7 @@ class WebSocketController extends Controller
     {
         try {
             $user = $request->user();
-            if (!$user) {
+            if (! $user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
 
@@ -104,7 +114,7 @@ class WebSocketController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'error' => 'Validation failed',
-                    'details' => $validator->errors()
+                    'details' => $validator->errors(),
                 ], 422);
             }
 
@@ -130,20 +140,24 @@ class WebSocketController extends Controller
 
     /**
      * Handle WebSocket disconnection
-     * 
+     *
      * @OA\Post(
      *     path="/websocket/disconnect",
      *     tags={"WebSocket"},
      *     summary="Disconnect from WebSocket",
      *     description="Close an active WebSocket connection",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"connection_id"},
+     *
      *             @OA\Property(property="connection_id", type="string", example="conn_abc123")
      *         )
      *     ),
+     *
      *     @OA\Response(response=200, description="Disconnected successfully"),
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
      *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
@@ -153,7 +167,7 @@ class WebSocketController extends Controller
     {
         try {
             $user = $request->user();
-            if (!$user) {
+            if (! $user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
 
@@ -164,7 +178,7 @@ class WebSocketController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'error' => 'Validation failed',
-                    'details' => $validator->errors()
+                    'details' => $validator->errors(),
                 ], 422);
             }
 
@@ -190,17 +204,20 @@ class WebSocketController extends Controller
 
     /**
      * Send message to user
-     * 
+     *
      * @OA\Post(
      *     path="/websocket/message",
      *     tags={"WebSocket"},
      *     summary="Send WebSocket message",
      *     description="Send a real-time message to another user",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"recipient_id", "message"},
+     *
      *             @OA\Property(property="recipient_id", type="string", example="user_123"),
      *             @OA\Property(property="message", type="object",
      *                 required={"type", "content"},
@@ -209,9 +226,12 @@ class WebSocketController extends Controller
      *             )
      *         )
      *     ),
-    *     @OA\Response(response=200, description="Message sent successfully",
-    *         @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")
-    *     ),
+     *
+     *     @OA\Response(response=200, description="Message sent successfully",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")
+     *     ),
+     *
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
      *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
@@ -220,7 +240,7 @@ class WebSocketController extends Controller
     {
         try {
             $user = $request->user();
-            if (!$user) {
+            if (! $user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
 
@@ -234,7 +254,7 @@ class WebSocketController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'error' => 'Validation failed',
-                    'details' => $validator->errors()
+                    'details' => $validator->errors(),
                 ], 422);
             }
 
@@ -255,7 +275,7 @@ class WebSocketController extends Controller
                 eventType: 'message_failed',
                 extra: [
                     'receiver_id' => $request->input('receiver_id'),
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]
             ));
 
@@ -265,24 +285,30 @@ class WebSocketController extends Controller
 
     /**
      * Send typing indicator
-     * 
+     *
      * @OA\Post(
      *     path="/websocket/typing",
      *     tags={"WebSocket"},
      *     summary="Send typing indicator",
      *     description="Notify another user that you are typing",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"recipient_id", "is_typing"},
+     *
      *             @OA\Property(property="recipient_id", type="string", example="user_123"),
      *             @OA\Property(property="is_typing", type="boolean", example=true)
      *         )
      *     ),
-    *     @OA\Response(response=200, description="Typing indicator sent",
-    *         @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")
-    *     ),
+     *
+     *     @OA\Response(response=200, description="Typing indicator sent",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")
+     *     ),
+     *
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
      *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
@@ -291,7 +317,7 @@ class WebSocketController extends Controller
     {
         try {
             $user = $request->user();
-            if (!$user) {
+            if (! $user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
 
@@ -304,7 +330,7 @@ class WebSocketController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'error' => 'Validation failed',
-                    'details' => $validator->errors()
+                    'details' => $validator->errors(),
                 ], 422);
             }
 
@@ -327,7 +353,7 @@ class WebSocketController extends Controller
                 extra: [
                     'receiver_id' => $request->input('receiver_id'),
                     'chatroom_id' => $request->input('chatroom_id'),
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]
             ));
 
@@ -337,24 +363,30 @@ class WebSocketController extends Controller
 
     /**
      * Update presence status
-     * 
+     *
      * @OA\Post(
      *     path="/websocket/presence",
      *     tags={"WebSocket"},
      *     summary="Update presence status",
      *     description="Update your online/away/busy/offline status",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"status"},
+     *
      *             @OA\Property(property="status", type="string", enum={"online", "away", "busy", "offline"}, example="online"),
      *             @OA\Property(property="metadata", type="object")
      *         )
      *     ),
-    *     @OA\Response(response=200, description="Presence updated successfully",
-    *         @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")
-    *     ),
+     *
+     *     @OA\Response(response=200, description="Presence updated successfully",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")
+     *     ),
+     *
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
      *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
@@ -363,7 +395,7 @@ class WebSocketController extends Controller
     {
         try {
             $user = $request->user();
-            if (!$user) {
+            if (! $user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
 
@@ -375,7 +407,7 @@ class WebSocketController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'error' => 'Validation failed',
-                    'details' => $validator->errors()
+                    'details' => $validator->errors(),
                 ], 422);
             }
 
@@ -396,7 +428,7 @@ class WebSocketController extends Controller
                 eventType: 'presence_update_failed',
                 extra: [
                     'status' => $request->input('status'),
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]
             ));
 
@@ -406,17 +438,20 @@ class WebSocketController extends Controller
 
     /**
      * Send notification
-     * 
+     *
      * @OA\Post(
      *     path="/websocket/notification",
      *     tags={"WebSocket"},
      *     summary="Send real-time notification",
      *     description="Send a push notification to another user via WebSocket",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"recipient_id", "notification"},
+     *
      *             @OA\Property(property="recipient_id", type="string", example="user_123"),
      *             @OA\Property(property="notification", type="object",
      *                 required={"title", "body"},
@@ -427,9 +462,12 @@ class WebSocketController extends Controller
      *             )
      *         )
      *     ),
-    *     @OA\Response(response=200, description="Notification sent successfully",
-    *         @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")
-    *     ),
+     *
+     *     @OA\Response(response=200, description="Notification sent successfully",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")
+     *     ),
+     *
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
      *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
@@ -438,7 +476,7 @@ class WebSocketController extends Controller
     {
         try {
             $user = $request->user();
-            if (!$user) {
+            if (! $user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
 
@@ -454,7 +492,7 @@ class WebSocketController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'error' => 'Validation failed',
-                    'details' => $validator->errors()
+                    'details' => $validator->errors(),
                 ], 422);
             }
 
@@ -475,7 +513,7 @@ class WebSocketController extends Controller
                 eventType: 'notification_failed',
                 extra: [
                     'receiver_id' => $request->input('user_id'),
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]
             ));
 
@@ -485,20 +523,24 @@ class WebSocketController extends Controller
 
     /**
      * Get online users
-     * 
+     *
      * @OA\Get(
      *     path="/websocket/online-users",
      *     tags={"WebSocket"},
      *     summary="Get online users",
      *     description="Returns a list of all currently online users",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(response=200, description="List of online users",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="online_users", type="array", @OA\Items(type="string")),
      *             @OA\Property(property="total", type="integer"),
      *             @OA\Property(property="timestamp", type="string", format="date-time")
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
      * )
      */
@@ -506,7 +548,7 @@ class WebSocketController extends Controller
     {
         try {
             $user = $request->user();
-            if (!$user) {
+            if (! $user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
 
@@ -531,20 +573,24 @@ class WebSocketController extends Controller
 
     /**
      * Get user connections
-     * 
+     *
      * @OA\Get(
      *     path="/websocket/connections",
      *     tags={"WebSocket"},
      *     summary="Get user connections",
      *     description="Returns a list of the authenticated user's active WebSocket connections",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(response=200, description="User connections",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="connections", type="array", @OA\Items(type="object")),
      *             @OA\Property(property="total", type="integer"),
      *             @OA\Property(property="timestamp", type="string", format="date-time")
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
      * )
      */
@@ -552,7 +598,7 @@ class WebSocketController extends Controller
     {
         try {
             $user = $request->user();
-            if (!$user) {
+            if (! $user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
 
@@ -570,7 +616,7 @@ class WebSocketController extends Controller
                 eventType: 'get_user_connections_failed',
                 extra: [
                     'target_user_id' => $userId,
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]
             ));
 
@@ -580,17 +626,20 @@ class WebSocketController extends Controller
 
     /**
      * Broadcast message to multiple users
-     * 
+     *
      * @OA\Post(
      *     path="/websocket/broadcast",
      *     tags={"WebSocket"},
      *     summary="Broadcast message",
      *     description="Send a message to multiple users (Admin only)",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"user_ids", "message"},
+     *
      *             @OA\Property(property="user_ids", type="array", @OA\Items(type="string")),
      *             @OA\Property(property="message", type="object",
      *                 required={"type", "content"},
@@ -599,12 +648,16 @@ class WebSocketController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(response=200, description="Broadcast sent",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string"),
      *             @OA\Property(property="recipients", type="integer")
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized"),
      *     @OA\Response(response=403, ref="#/components/responses/Forbidden"),
      *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
@@ -614,13 +667,13 @@ class WebSocketController extends Controller
     {
         try {
             $user = $request->user();
-            if (!$user || !$user->is_admin) {
+            if (! $user || ! $user->is_admin) {
                 return response()->json(['error' => 'Unauthorized'], 403);
             }
 
             $validator = Validator::make($request->all(), [
                 'user_ids' => 'required|array',
-                "user_ids.*" => 'string',
+                'user_ids.*' => 'string',
                 'message' => 'required|array',
                 'message.type' => 'required|string',
                 'message.content' => 'required|string',
@@ -629,7 +682,7 @@ class WebSocketController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'error' => 'Validation failed',
-                    'details' => $validator->errors()
+                    'details' => $validator->errors(),
                 ], 422);
             }
 
@@ -641,7 +694,7 @@ class WebSocketController extends Controller
             if ($success) {
                 return response()->json([
                     'message' => 'Broadcast sent successfully',
-                    'recipients' => count($userIds)
+                    'recipients' => count($userIds),
                 ]);
             } else {
                 return response()->json(['error' => 'Failed to broadcast message'], 500);
@@ -653,7 +706,7 @@ class WebSocketController extends Controller
                 eventType: 'broadcast_failed',
                 extra: [
                     'recipients_count' => count($request->input('user_ids', [])),
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]
             ));
 
@@ -663,21 +716,25 @@ class WebSocketController extends Controller
 
     /**
      * Get WebSocket status
-     * 
+     *
      * @OA\Get(
      *     path="/websocket/status",
      *     tags={"WebSocket"},
      *     summary="Get WebSocket status",
      *     description="Returns the current status of the WebSocket server and the user's connection",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(response=200, description="WebSocket status",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="websocket_enabled", type="boolean"),
      *             @OA\Property(property="user_connections", type="integer"),
      *             @OA\Property(property="total_online_users", type="integer"),
      *             @OA\Property(property="timestamp", type="string", format="date-time")
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, ref="#/components/responses/Unauthorized")
      * )
      */
@@ -685,7 +742,7 @@ class WebSocketController extends Controller
     {
         try {
             $user = $request->user();
-            if (!$user) {
+            if (! $user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
 

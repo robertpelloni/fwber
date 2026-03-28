@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\MatchMakerService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use App\Http\Requests\MatchMaker\StoreBountyRequest;
 use App\Http\Requests\MatchMaker\SuggestCandidateRequest;
-
 use App\Models\User;
+use App\Services\MatchMakerService;
+use Illuminate\Support\Facades\Log;
 
 class MatchMakerController extends Controller
 {
@@ -29,21 +27,22 @@ class MatchMakerController extends Controller
     {
 
         $user = $request->user();
-        
+
         if ($user->token_balance < $request->token_reward) {
-             return response()->json(['message' => 'Insufficient tokens'], 402);
+            return response()->json(['message' => 'Insufficient tokens'], 402);
         }
 
         try {
             $bounty = $this->matchMakerService->createBounty($user, $request->token_reward);
-            
+
             return response()->json([
                 'message' => 'Bounty created successfully',
                 'bounty' => $bounty,
-                'share_url' => config('app.url') . '/bounty/' . $bounty->slug // Or frontend URL
+                'share_url' => config('app.url').'/bounty/'.$bounty->slug, // Or frontend URL
             ], 201);
         } catch (\Exception $e) {
-            Log::error('Failed to create bounty: ' . $e->getMessage());
+            Log::error('Failed to create bounty: '.$e->getMessage());
+
             return response()->json(['message' => 'Failed to create bounty'], 500);
         }
     }
@@ -59,26 +58,27 @@ class MatchMakerController extends Controller
     {
 
         $matchmaker = $request->user();
-        
+
         try {
             $bounty = $this->matchMakerService->getBountyBySlug($slug);
-            
-            if (!$bounty) {
+
+            if (! $bounty) {
                 return response()->json(['message' => 'Bounty not found or inactive'], 404);
             }
 
             $candidate = User::findOrFail($request->candidate_id);
 
             $assist = $this->matchMakerService->suggestCandidate($bounty, $matchmaker, $candidate);
-            
+
             return response()->json([
                 'message' => 'Candidate suggested successfully!',
-                'assist' => $assist
+                'assist' => $assist,
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Failed to suggest candidate: ' . $e->getMessage());
-            return response()->json(['message' => 'Failed to suggest candidate: ' . $e->getMessage()], 500);
+            Log::error('Failed to suggest candidate: '.$e->getMessage());
+
+            return response()->json(['message' => 'Failed to suggest candidate: '.$e->getMessage()], 500);
         }
     }
 
@@ -89,8 +89,8 @@ class MatchMakerController extends Controller
     {
         try {
             $bounty = $this->matchMakerService->getBountyBySlug($slug);
-            
-            if (!$bounty) {
+
+            if (! $bounty) {
                 return response()->json(['message' => 'Bounty not found'], 404);
             }
 
@@ -98,10 +98,11 @@ class MatchMakerController extends Controller
             $bounty->load(['user.profile', 'user.photos']);
 
             return response()->json([
-                'bounty' => $bounty
+                'bounty' => $bounty,
             ]);
         } catch (\Exception $e) {
-             Log::error('Failed to fetch bounty: ' . $e->getMessage());
+            Log::error('Failed to fetch bounty: '.$e->getMessage());
+
             return response()->json(['message' => 'Error fetching bounty'], 500);
         }
     }

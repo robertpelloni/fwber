@@ -25,6 +25,7 @@ class NotificationController extends Controller
             ->get()
             ->map(function ($notification) {
                 $data = $notification->data;
+
                 return [
                     'id' => $notification->id,
                     'type' => $notification->type,
@@ -55,7 +56,7 @@ class NotificationController extends Controller
         $user = Auth::user();
         $notification = $user->notifications()->where('id', $id)->first();
 
-        if (!$notification) {
+        if (! $notification) {
             return response()->json(['message' => 'Notification not found'], 404);
         }
 

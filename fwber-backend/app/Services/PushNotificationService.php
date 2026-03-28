@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Models\Notification;
 use App\Notifications\PushMessage;
 use Illuminate\Support\Facades\Log;
 
@@ -19,7 +18,7 @@ class PushNotificationService
                 $type
             ));
         } catch (\Exception $e) {
-            Log::error("Failed to send push notification to user {$user->id}: " . $e->getMessage());
+            Log::error("Failed to send push notification to user {$user->id}: ".$e->getMessage());
         }
     }
 }

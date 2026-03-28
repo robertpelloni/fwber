@@ -7,14 +7,14 @@ use App\Models\Boost;
 use App\Models\Payment;
 use App\Services\Payment\PaymentGatewayInterface;
 use App\Services\TokenDistributionService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
 class BoostController extends Controller
 {
     protected $paymentGateway;
+
     protected $tokenService;
 
     public function __construct(PaymentGatewayInterface $paymentGateway, TokenDistributionService $tokenService)
@@ -31,18 +31,24 @@ class BoostController extends Controller
      *     summary="Purchase a profile boost",
      *     tags={"Boosts"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"type"},
+     *
      *             @OA\Property(property="type", type="string", enum={"standard", "super"})
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Boost purchased successfully",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/Boost")
      *     ),
+     *
      *     @OA\Response(response=400, description="User already has an active boost")
      * )
      */
@@ -66,7 +72,7 @@ class BoostController extends Controller
             $tokenCost = $type === 'super' ? 100 : 50;
 
             try {
-                $this->tokenService->spendTokens($user, $tokenCost, "Purchased " . ucfirst($type) . " Boost");
+                $this->tokenService->spendTokens($user, $tokenCost, 'Purchased '.ucfirst($type).' Boost');
 
                 $duration = $type === 'super' ? 120 : 30; // minutes
                 $now = now();
@@ -103,7 +109,7 @@ class BoostController extends Controller
                         'payment_gateway' => config('services.payment.driver', 'mock'),
                         'transaction_id' => $result->transactionId,
                         'status' => 'succeeded',
-                        'description' => ucfirst($type) . ' Boost',
+                        'description' => ucfirst($type).' Boost',
                         'metadata' => $result->data,
                     ]);
 
@@ -121,21 +127,21 @@ class BoostController extends Controller
 
                 return response()->json($boost);
             } else {
-                 Payment::create([
+                Payment::create([
                     'user_id' => $user->id,
                     'amount' => $amount,
                     'currency' => $currency,
                     'payment_gateway' => config('services.payment.driver', 'mock'),
                     'transaction_id' => null,
                     'status' => 'failed',
-                    'description' => ucfirst($type) . ' Boost Failed',
+                    'description' => ucfirst($type).' Boost Failed',
                     'metadata' => ['error' => $result->message],
                 ]);
 
-                return response()->json(['error' => 'Payment failed: ' . $result->message], 400);
+                return response()->json(['error' => 'Payment failed: '.$result->message], 400);
             }
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Payment error: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Payment error: '.$e->getMessage()], 500);
         }
     }
 
@@ -147,11 +153,14 @@ class BoostController extends Controller
      *     summary="Get user's active boost",
      *     tags={"Boosts"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Active boost details",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/Boost")
      *     ),
+     *
      *     @OA\Response(response=404, description="No active boost found")
      * )
      */
@@ -161,7 +170,7 @@ class BoostController extends Controller
             ->active()
             ->first();
 
-        if (!$boost) {
+        if (! $boost) {
             return response()->json(['data' => null, 'message' => 'No active boost'], 200);
         }
 
@@ -176,9 +185,11 @@ class BoostController extends Controller
      *     summary="Get user's boost history",
      *     tags={"Boosts"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="List of past boosts",
+     *
      *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Boost"))
      *     )
      * )

@@ -18,7 +18,7 @@ class MerchantPulseController extends Controller
     public function getVibe(Request $request)
     {
         $merchant = Auth::user()->merchantProfile;
-        if (!$merchant) {
+        if (! $merchant) {
             return response()->json(['error' => 'Merchant profile required'], 403);
         }
 
@@ -27,11 +27,11 @@ class MerchantPulseController extends Controller
         $lng = $request->get('lng', $merchant->longitude);
         $radius = $request->get('radius', 2000);
 
-        if (!$lat || !$lng) {
+        if (! $lat || ! $lng) {
             return response()->json(['error' => 'Location coordinates required'], 422);
         }
 
-        $analysis = $this->vibeService->getNeighborhoodVibe((float)$lat, (float)$lng, (int)$radius);
+        $analysis = $this->vibeService->getNeighborhoodVibe((float) $lat, (float) $lng, (int) $radius);
 
         return response()->json([
             'business_name' => $merchant->business_name,
@@ -53,14 +53,14 @@ class MerchantPulseController extends Controller
         ]);
 
         $merchant = Auth::user()->merchantProfile;
-        
+
         // Logic to create a 'promotion' type ProximityArtifact
         // In a real implementation, this would also check the current vibe
         // against the 'vibe_target' before fulfilling the broadcast.
 
         return response()->json([
             'message' => 'Vibe-targeted promotion queued for broadcast.',
-            'status' => 'pending_vibe_match'
+            'status' => 'pending_vibe_match',
         ]);
     }
 }

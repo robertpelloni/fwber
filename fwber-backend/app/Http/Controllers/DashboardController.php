@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -15,10 +15,13 @@ class DashboardController extends Controller
      *     summary="Get dashboard statistics",
      *     description="Retrieve comprehensive statistics for the authenticated user including matches, conversations, profile views, and engagement metrics",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Dashboard statistics retrieved successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="total_matches", type="integer", example=15),
      *             @OA\Property(property="pending_matches", type="integer", example=3),
      *             @OA\Property(property="accepted_matches", type="integer", example=12),
@@ -31,9 +34,11 @@ class DashboardController extends Controller
      *             @OA\Property(property="last_login", type="string", format="date-time", example="2025-01-15T10:30:00Z")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthenticated",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
      *     )
      * )
@@ -50,7 +55,7 @@ class DashboardController extends Controller
         $matchStats = DB::table('matches')
             ->where(function ($query) use ($userId) {
                 $query->where('user1_id', $userId)
-                      ->orWhere('user2_id', $userId);
+                    ->orWhere('user2_id', $userId);
             })
             ->selectRaw('
                 COUNT(*) as total_matches,
@@ -91,8 +96,8 @@ class DashboardController extends Controller
             ->where('receiver_id', $userId)
             ->count();
 
-        $responseRate = $receivedMessages > 0 
-            ? round(($sentMessages / $receivedMessages) * 100) 
+        $responseRate = $receivedMessages > 0
+            ? round(($sentMessages / $receivedMessages) * 100)
             : 0;
 
         // Days active
@@ -121,20 +126,26 @@ class DashboardController extends Controller
      *     summary="Get recent activity feed",
      *     description="Retrieve a unified activity feed showing recent matches, messages, and profile views",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="limit",
      *         in="query",
      *         description="Maximum number of activity items to return",
      *         required=false,
+     *
      *         @OA\Schema(type="integer", default=10, minimum=1, maximum=50)
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Activity feed retrieved successfully",
+     *
      *         @OA\JsonContent(
      *             type="array",
+     *
      *             @OA\Items(
      *                 type="object",
+     *
      *                 @OA\Property(property="type", type="string", enum={"match", "message", "view"}, example="match"),
      *                 @OA\Property(
      *                     property="user",
@@ -148,9 +159,11 @@ class DashboardController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthenticated",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
      *     )
      * )
@@ -167,7 +180,7 @@ class DashboardController extends Controller
         $matches = DB::table('matches')
             ->where(function ($query) use ($userId) {
                 $query->where('user1_id', $userId)
-                      ->orWhere('user2_id', $userId);
+                    ->orWhere('user2_id', $userId);
             })
             ->where('status', 'accepted')
             ->orderBy('created_at', 'desc')
@@ -256,24 +269,31 @@ class DashboardController extends Controller
      *     summary="Get profile completeness",
      *     description="Calculate profile completion percentage and identify missing required/optional fields for the authenticated user",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Profile completeness calculated successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="percentage", type="integer", minimum=0, maximum=100, example=85),
      *             @OA\Property(property="required_complete", type="boolean", example=true),
      *             @OA\Property(
      *                 property="missing_required",
      *                 type="array",
+     *
      *                 @OA\Items(type="string"),
      *                 example={"city"}
      *             ),
+     *
      *             @OA\Property(
      *                 property="missing_optional",
      *                 type="array",
+     *
      *                 @OA\Items(type="string"),
      *                 example={"bio", "interests", "height_cm"}
      *             ),
+     *
      *             @OA\Property(
      *                 property="sections",
      *                 type="object",
@@ -286,9 +306,11 @@ class DashboardController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthenticated",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
      *     )
      * )
@@ -296,11 +318,11 @@ class DashboardController extends Controller
     public function getProfileCompleteness(Request $request)
     {
         $user = $request->user();
-        
+
         // Required fields
         $requiredFields = [
-            'name', 'email', 'age', 'gender', 'interested_in', 
-            'city', 'country', 'looking_for'
+            'name', 'email', 'age', 'gender', 'interested_in',
+            'city', 'country', 'looking_for',
         ];
 
         // Optional fields
@@ -308,7 +330,7 @@ class DashboardController extends Controller
             'bio', 'interests', 'occupation', 'education', 'height_cm',
             'body_type', 'ethnicity', 'hair_color', 'eye_color',
             'smoking', 'drinking', 'exercise', 'relationship_status',
-            'has_children', 'wants_children', 'avatar_url'
+            'has_children', 'wants_children', 'avatar_url',
         ];
 
         $missingRequired = [];
@@ -341,12 +363,12 @@ class DashboardController extends Controller
 
         // Section completeness
         $sections = [
-            'basic' => !empty($user->name) && !empty($user->age) && !empty($user->gender),
-            'location' => !empty($user->city) && !empty($user->country),
-            'preferences' => !empty($user->interested_in) && !empty($user->looking_for),
-            'interests' => !empty($user->interests) && is_array($user->interests) && count($user->interests) > 0,
-            'physical' => !empty($user->height_cm) || !empty($user->body_type) || !empty($user->ethnicity),
-            'lifestyle' => !empty($user->smoking) || !empty($user->drinking) || !empty($user->exercise),
+            'basic' => ! empty($user->name) && ! empty($user->age) && ! empty($user->gender),
+            'location' => ! empty($user->city) && ! empty($user->country),
+            'preferences' => ! empty($user->interested_in) && ! empty($user->looking_for),
+            'interests' => ! empty($user->interests) && is_array($user->interests) && count($user->interests) > 0,
+            'physical' => ! empty($user->height_cm) || ! empty($user->body_type) || ! empty($user->ethnicity),
+            'lifestyle' => ! empty($user->smoking) || ! empty($user->drinking) || ! empty($user->exercise),
         ];
 
         return response()->json([

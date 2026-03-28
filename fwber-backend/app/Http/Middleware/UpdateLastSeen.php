@@ -19,7 +19,7 @@ class UpdateLastSeen
         if (Auth::check()) {
             $user = Auth::user();
 
-            $shouldUpdate = !$user->last_seen_at
+            $shouldUpdate = ! $user->last_seen_at
                 || now()->diffInSeconds($user->last_seen_at) >= 60;
 
             if ($shouldUpdate) {

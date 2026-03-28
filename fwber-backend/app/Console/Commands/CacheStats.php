@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Facades\Cache;
 
 class CacheStats extends Command
 {
@@ -28,21 +27,22 @@ class CacheStats extends Command
     public function handle()
     {
         if (config('cache.default') !== 'redis') {
-            $this->error('Cache driver is not set to Redis. Current driver: ' . config('cache.default'));
+            $this->error('Cache driver is not set to Redis. Current driver: '.config('cache.default'));
+
             return 1;
         }
 
         try {
             $info = Redis::info();
-            
+
             $this->info('Redis Cache Statistics');
             $this->line('----------------------');
-            
+
             $this->table(
                 ['Metric', 'Value'],
                 [
                     ['Version', $info['redis_version'] ?? 'N/A'],
-                    ['Uptime', ($info['uptime_in_days'] ?? 0) . ' days'],
+                    ['Uptime', ($info['uptime_in_days'] ?? 0).' days'],
                     ['Used Memory', $info['used_memory_human'] ?? 'N/A'],
                     ['Peak Memory', $info['used_memory_peak_human'] ?? 'N/A'],
                     ['Connected Clients', $info['connected_clients'] ?? 'N/A'],
@@ -63,7 +63,7 @@ class CacheStats extends Command
                 [
                     ['Keyspace Hits', number_format($hits)],
                     ['Keyspace Misses', number_format($misses)],
-                    ['Hit Ratio', $ratio . '%'],
+                    ['Hit Ratio', $ratio.'%'],
                     ['Total Commands', number_format($info['total_commands_processed'] ?? 0)],
                 ]
             );
@@ -71,13 +71,14 @@ class CacheStats extends Command
             $this->newLine();
             $this->info('Key Distribution (DB Size)');
             $this->line('--------------------------');
-            
+
             // Get DB size safely
             $dbSize = Redis::dbSize();
-            $this->line("Total Keys: " . number_format($dbSize));
+            $this->line('Total Keys: '.number_format($dbSize));
 
         } catch (\Exception $e) {
-            $this->error('Failed to connect to Redis: ' . $e->getMessage());
+            $this->error('Failed to connect to Redis: '.$e->getMessage());
+
             return 1;
         }
 

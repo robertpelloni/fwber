@@ -4,15 +4,14 @@ namespace App\Jobs;
 
 use App\Models\Event;
 use App\Models\EventAttendee;
-use App\Models\User;
 use App\Notifications\EventReminderNotification;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
 
 class SendEventReminders implements ShouldQueue
 {
@@ -60,6 +59,7 @@ class SendEventReminders implements ShouldQueue
 
         if ($count === 0) {
             Log::info('SendEventReminders: No events require reminders');
+
             return;
         }
 
@@ -76,7 +76,7 @@ class SendEventReminders implements ShouldQueue
                         $attendee->user->notify(new EventReminderNotification($event));
                         Log::info("SendEventReminders: Sent reminder to user {$attendee->user_id} for event {$event->id} '{$event->title}'");
                     } catch (\Exception $e) {
-                        Log::error("SendEventReminders: Failed to send reminder to user {$attendee->user_id} for event {$event->id}: " . $e->getMessage());
+                        Log::error("SendEventReminders: Failed to send reminder to user {$attendee->user_id} for event {$event->id}: ".$e->getMessage());
                     }
                 }
             }
@@ -96,6 +96,6 @@ class SendEventReminders implements ShouldQueue
      */
     public function failed(\Throwable $exception): void
     {
-        Log::error('SendEventReminders job failed: ' . $exception->getMessage());
+        Log::error('SendEventReminders job failed: '.$exception->getMessage());
     }
 }

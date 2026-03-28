@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\Group;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class GroupControllerTest extends TestCase
@@ -44,7 +43,7 @@ class GroupControllerTest extends TestCase
         $this->assertDatabaseHas('groups', ['name' => 'Test Group']);
         $this->assertDatabaseHas('group_members', [
             'user_id' => $user->id,
-            'role' => 'owner'
+            'role' => 'owner',
         ]);
     }
 
@@ -58,11 +57,11 @@ class GroupControllerTest extends TestCase
             ->postJson("/api/groups/{$group->id}/join");
 
         $response->assertStatus(200);
-        
+
         $this->assertDatabaseHas('group_members', [
             'group_id' => $group->id,
             'user_id' => $joiner->id,
-            'role' => 'member'
+            'role' => 'member',
         ]);
     }
 
@@ -71,7 +70,7 @@ class GroupControllerTest extends TestCase
         $creator = User::factory()->create();
         $leaver = User::factory()->create();
         $group = Group::factory()->create(['created_by_user_id' => $creator->id]);
-        
+
         // Manually add member
         \App\Models\GroupMember::create([
             'group_id' => $group->id,
@@ -84,7 +83,7 @@ class GroupControllerTest extends TestCase
             ->postJson("/api/groups/{$group->id}/leave");
 
         $response->assertStatus(200);
-        
+
         $this->assertDatabaseHas('group_members', [
             'group_id' => $group->id,
             'user_id' => $leaver->id,

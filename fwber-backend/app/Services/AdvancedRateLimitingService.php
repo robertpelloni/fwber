@@ -2,13 +2,14 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redis;
 
 class AdvancedRateLimitingService
 {
     private array $config;
+
     private array $actionConfigs;
 
     public function __construct()
@@ -24,23 +25,24 @@ class AdvancedRateLimitingService
     {
         $config = $this->getActionConfig($action);
         $key = $this->buildKey($userId, $action);
-        
+
         $bucket = $this->getTokenBucket($key, $config);
         $cost = $this->calculateCost($action, $context);
-        
+
         if ($bucket['tokens'] < $cost) {
             $this->logRateLimit($userId, $action, $context);
+
             return [
                 'allowed' => false,
                 'retry_after' => $this->calculateRetryAfter($bucket, $config, $cost),
                 'remaining_tokens' => $bucket['tokens'],
                 'reset_time' => $bucket['reset_time'],
-                'reason' => 'Rate limit exceeded'
+                'reason' => 'Rate limit exceeded',
             ];
         }
 
         $this->consumeTokens($key, $bucket, $cost, $config);
-        
+
         return [
             'allowed' => true,
             'remaining_tokens' => $bucket['tokens'] - $cost,
@@ -72,6 +74,7 @@ class AdvancedRateLimitingService
     public function resetRateLimit(string $userId, string $action): bool
     {
         $key = $this->buildKey($userId, $action);
+
         return Redis::del($key) > 0;
     }
 
@@ -80,9 +83,9 @@ class AdvancedRateLimitingService
      */
     public function getRateLimitStats(string $timeframe = '1h'): array
     {
-        $pattern = $this->config['redis_prefix'] . ':*';
+        $pattern = $this->config['redis_prefix'].':*';
         $keys = Redis::keys($pattern);
-        
+
         $stats = [
             'total_keys' => count($keys),
             'timeframe' => $timeframe,
@@ -90,7 +93,7 @@ class AdvancedRateLimitingService
         ];
 
         foreach ($this->actionConfigs as $action => $config) {
-            $actionKeys = array_filter($keys, fn($key) => str_contains($key, ":{$action}:"));
+            $actionKeys = array_filter($keys, fn ($key) => str_contains($key, ":{$action}:"));
             $stats['actions'][$action] = [
                 'active_buckets' => count($actionKeys),
                 'config' => $config,
@@ -105,7 +108,7 @@ class AdvancedRateLimitingService
      */
     public function cleanupExpiredEntries(): int
     {
-        $pattern = $this->config['redis_prefix'] . ':*';
+        $pattern = $this->config['redis_prefix'].':*';
         $keys = Redis::keys($pattern);
         $cleaned = 0;
 
@@ -135,10 +138,10 @@ class AdvancedRateLimitingService
         // Calculate tokens to add based on time passed
         $timePassed = max(0, $now - $lastRefill);
         $tokensToAdd = $timePassed * $config['refill_rate'];
-        
+
         // Cap tokens at capacity
         $newTokens = min($config['capacity'], $tokens + $tokensToAdd);
-        
+
         // Calculate reset time
         $resetTime = $now + (($config['capacity'] - $newTokens) / $config['refill_rate']);
 
@@ -155,7 +158,7 @@ class AdvancedRateLimitingService
     private function consumeTokens(string $key, array $bucket, int $cost, array $config): void
     {
         $newTokens = max(0, $bucket['tokens'] - $cost);
-        
+
         Redis::hmset($key, [
             'tokens' => $newTokens,
             'last_refill' => $bucket['last_refill'],
@@ -197,6 +200,7 @@ class AdvancedRateLimitingService
     private function calculateRetryAfter(array $bucket, array $config, int $cost): int
     {
         $tokensNeeded = $cost - $bucket['tokens'];
+
         return (int) ceil($tokensNeeded / $config['refill_rate']);
     }
 
@@ -239,9 +243,9 @@ class AdvancedRateLimitingService
      */
     public function detectSuspiciousActivity(string $userId): array
     {
-        $pattern = $this->config['redis_prefix'] . ":{$userId}:*";
+        $pattern = $this->config['redis_prefix'].":{$userId}:*";
         $keys = Redis::keys($pattern);
-        
+
         $suspicious = false;
         $reasons = [];
 
@@ -264,7 +268,7 @@ class AdvancedRateLimitingService
         $recentHits = Cache::get("rate_limit_hits:{$userId}", []);
         $recentHits[] = now()->timestamp;
         $recentHits = array_slice($recentHits, -10); // Keep last 10 hits
-        
+
         if (count($recentHits) >= 10) {
             $timeSpan = $recentHits[9] - $recentHits[0];
             if ($timeSpan < 60) { // 10 hits in less than 1 minute

@@ -2,14 +2,14 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class SecurityMonitoringService
 {
     private array $config;
+
     private array $alertThresholds;
 
     public function __construct()
@@ -47,10 +47,10 @@ class SecurityMonitoringService
 
         // Log to structured logging system
         Log::channel('security')->info('Security Event', $logEntry);
-        
+
         // Store in database for analysis
         $this->storeSecurityEvent($logEntry);
-        
+
         // Check for suspicious patterns
         $this->analyzeSecurityPatterns($logEntry);
     }
@@ -86,7 +86,7 @@ class SecurityMonitoringService
 
         $userId = $logEntry['user_id'];
         $timeWindow = now()->subMinutes(5);
-        
+
         $failedLogins = DB::table('security_events')
             ->where('event', 'auth_failed')
             ->where('user_id', $userId)
@@ -109,7 +109,7 @@ class SecurityMonitoringService
         $latitude = $logEntry['context']['latitude'] ?? null;
         $longitude = $logEntry['context']['longitude'] ?? null;
 
-        if (!$latitude || !$longitude) {
+        if (! $latitude || ! $longitude) {
             return false;
         }
 
@@ -119,7 +119,7 @@ class SecurityMonitoringService
             ->orderBy('created_at', 'desc')
             ->first();
 
-        if (!$lastLocation) {
+        if (! $lastLocation) {
             return false;
         }
 
@@ -133,6 +133,7 @@ class SecurityMonitoringService
 
         // If distance is more than 1000km in less than 1 hour, it's suspicious
         $timeDiff = now()->diffInHours($lastLocation->created_at);
+
         return $distance > 1000 && $timeDiff < 1;
     }
 
@@ -147,7 +148,7 @@ class SecurityMonitoringService
 
         $userId = $logEntry['user_id'];
         $timeWindow = now()->subMinutes(5);
-        
+
         $apiCalls = DB::table('security_events')
             ->where('event', 'api_call')
             ->where('user_id', $userId)
@@ -167,6 +168,7 @@ class SecurityMonitoringService
         }
 
         $severity = $logEntry['severity'] ?? 'info';
+
         return $severity === 'high' || $severity === 'critical';
     }
 
@@ -180,6 +182,7 @@ class SecurityMonitoringService
         }
 
         $context = $logEntry['context'];
+
         return $context['suspicious'] ?? false;
     }
 
@@ -199,10 +202,10 @@ class SecurityMonitoringService
 
         // Log alert
         Log::channel('security')->warning("Security Alert: {$pattern}", $alert);
-        
+
         // Store alert in database
         $this->storeSecurityAlert($alert);
-        
+
         // Send notifications
         $this->sendSecurityNotifications($alert);
     }
@@ -263,11 +266,11 @@ class SecurityMonitoringService
     private function sendSecurityNotifications(array $alert): void
     {
         $channels = $this->config['alert_channels'];
-        
+
         if ($channels['email'] ?? false) {
             $this->sendEmailAlert($alert);
         }
-        
+
         if ($channels['slack'] ?? false) {
             $this->sendSlackAlert($alert);
         }
@@ -279,9 +282,9 @@ class SecurityMonitoringService
     private function sendEmailAlert(array $alert): void
     {
         $recipients = config('security_monitoring.email_recipients', []);
-        
+
         foreach ($recipients as $email) {
-            Mail::raw("Security Alert: {$alert['pattern']}\n\n" . json_encode($alert, JSON_PRETTY_PRINT), function ($message) use ($email, $alert) {
+            Mail::raw("Security Alert: {$alert['pattern']}\n\n".json_encode($alert, JSON_PRETTY_PRINT), function ($message) use ($email, $alert) {
                 $message->to($email)
                     ->subject("Security Alert: {$alert['pattern']}")
                     ->priority(1);
@@ -295,8 +298,8 @@ class SecurityMonitoringService
     private function sendSlackAlert(array $alert): void
     {
         $webhookUrl = config('security_monitoring.slack_webhook_url');
-        
-        if (!$webhookUrl) {
+
+        if (! $webhookUrl) {
             return;
         }
 
@@ -356,13 +359,13 @@ class SecurityMonitoringService
     private function calculateDistance(float $lat1, float $lon1, float $lat2, float $lon2): float
     {
         $earthRadius = 6371000; // meters
-        
+
         $dLat = deg2rad($lat2 - $lat1);
         $dLon = deg2rad($lon2 - $lon1);
-        
-        $a = sin($dLat/2) * sin($dLat/2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon/2) * sin($dLon/2);
-        $c = 2 * atan2(sqrt($a), sqrt(1-$a));
-        
+
+        $a = sin($dLat / 2) * sin($dLat / 2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon / 2) * sin($dLon / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
         return $earthRadius * $c / 1000; // Convert to kilometers
     }
 
@@ -372,7 +375,7 @@ class SecurityMonitoringService
     public function getSecurityStats(string $timeframe = '24h'): array
     {
         $timeWindow = $this->getTimeWindow($timeframe);
-        
+
         $stats = [
             'timeframe' => $timeframe,
             'total_events' => DB::table('security_events')
@@ -417,6 +420,7 @@ class SecurityMonitoringService
         ];
 
         $hours = $timeframes[$timeframe] ?? 24;
+
         return now()->subHours($hours);
     }
 

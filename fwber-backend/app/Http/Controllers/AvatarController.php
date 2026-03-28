@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\GenerateAvatarRequest;
-use App\Services\AvatarGenerationService;
 use App\Models\Photo;
+use App\Services\AvatarGenerationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,14 +20,14 @@ class AvatarController extends Controller
     public function providers()
     {
         return response()->json([
-            'providers' => $this->avatarService->getProviders()
+            'providers' => $this->avatarService->getProviders(),
         ]);
     }
 
     public function generate(GenerateAvatarRequest $request)
     {
         $user = Auth::user();
-        
+
         try {
             // Dispatch job for async generation
             \App\Jobs\GenerateAvatar::dispatch($user, $request->all());
@@ -65,7 +65,7 @@ class AvatarController extends Controller
         try {
             $options = $request->only(['style', 'sexy_boost', 'provider', 'model', 'lora_scale']);
             $options['source_photo_id'] = $photo->id;
-            
+
             \App\Jobs\GenerateAvatar::dispatch($user, array_merge($options, [
                 'from_photo' => true,
                 'photo_path' => $photo->file_path ?? $photo->filename,

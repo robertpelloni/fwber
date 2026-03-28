@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         // Fix missing photo_unlocks table
-        if (!Schema::hasTable('photo_unlocks')) {
+        if (! Schema::hasTable('photo_unlocks')) {
             Schema::create('photo_unlocks', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -26,15 +26,15 @@ return new class extends Migration
         }
 
         // Fix missing unlock_price column
-        if (Schema::hasTable('photos') && !Schema::hasColumn('photos', 'unlock_price')) {
+        if (Schema::hasTable('photos') && ! Schema::hasColumn('photos', 'unlock_price')) {
             Schema::table('photos', function (Blueprint $table) {
                 $table->decimal('unlock_price', 8, 2)->nullable()->after('is_private');
             });
         }
-        
+
         // Fix missing content_unlocks table (from 2025_12_23_174829)
-        if (!Schema::hasTable('content_unlocks')) {
-             Schema::create('content_unlocks', function (Blueprint $table) {
+        if (! Schema::hasTable('content_unlocks')) {
+            Schema::create('content_unlocks', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->onDelete('cascade');
                 $table->string('content_type'); // 'match_insight', 'profile_reveal', etc

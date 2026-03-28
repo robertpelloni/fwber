@@ -2,13 +2,14 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
 use App\Services\Ai\Llm\LlmManager;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class ContentOptimizationService
 {
     private LlmManager $llmManager;
+
     private array $optimizationConfig;
 
     public function __construct(LlmManager $llmManager)
@@ -32,31 +33,31 @@ class ContentOptimizationService
      */
     public function optimizeContent(string $content, array $context = []): array
     {
-        $cacheKey = 'optimization_' . md5($content . serialize($context));
-        
+        $cacheKey = 'optimization_'.md5($content.serialize($context));
+
         if ($cached = Cache::get($cacheKey)) {
             return $cached;
         }
 
         $optimizations = [];
-        
+
         // Engagement optimization
         $optimizations['engagement'] = $this->optimizeForEngagement($content, $context);
-        
+
         // Clarity optimization
         $optimizations['clarity'] = $this->optimizeForClarity($content, $context);
-        
+
         // Safety optimization
         $optimizations['safety'] = $this->optimizeForSafety($content, $context);
-        
+
         // Relevance optimization
         $optimizations['relevance'] = $this->optimizeForRelevance($content, $context);
-        
+
         // Combine optimizations
         $result = $this->combineOptimizations($optimizations, $content);
-        
+
         Cache::put($cacheKey, $result, $this->optimizationConfig['cache_ttl']);
-        
+
         return $result;
     }
 
@@ -66,20 +67,20 @@ class ContentOptimizationService
     private function optimizeForEngagement(string $content, array $context): array
     {
         try {
-            $prompt = "Optimize this content for maximum engagement:\n\n" .
-                     "Content: \"$content\"\n" .
-                     "Context: " . json_encode($context) . "\n\n" .
-                     "Make it more engaging, interesting, and likely to get responses. " .
-                     "Keep the original meaning but make it more compelling.";
-            
+            $prompt = "Optimize this content for maximum engagement:\n\n".
+                     "Content: \"$content\"\n".
+                     'Context: '.json_encode($context)."\n\n".
+                     'Make it more engaging, interesting, and likely to get responses. '.
+                     'Keep the original meaning but make it more compelling.';
+
             $response = $this->llmManager->driver('openai')->chat([
                 ['role' => 'system', 'content' => 'You are an expert content optimizer specializing in social media engagement.'],
-                ['role' => 'user', 'content' => $prompt]
+                ['role' => 'user', 'content' => $prompt],
             ]);
 
             if (isset($response->content)) {
                 $optimizedContent = $response->content;
-                
+
                 return [
                     'original' => $content,
                     'optimized' => $optimizedContent,
@@ -100,20 +101,20 @@ class ContentOptimizationService
     private function optimizeForClarity(string $content, array $context): array
     {
         try {
-            $prompt = "Improve the clarity and readability of this content:\n\n" .
-                     "Content: \"$content\"\n" .
-                     "Context: " . json_encode($context) . "\n\n" .
-                     "Make it clearer, more concise, and easier to understand. " .
-                     "Fix any grammar or structure issues.";
-            
+            $prompt = "Improve the clarity and readability of this content:\n\n".
+                     "Content: \"$content\"\n".
+                     'Context: '.json_encode($context)."\n\n".
+                     'Make it clearer, more concise, and easier to understand. '.
+                     'Fix any grammar or structure issues.';
+
             $response = $this->llmManager->driver('openai')->chat([
                 ['role' => 'system', 'content' => 'You are an expert editor specializing in clear, concise communication.'],
-                ['role' => 'user', 'content' => $prompt]
+                ['role' => 'user', 'content' => $prompt],
             ]);
 
             if (isset($response->content)) {
                 $optimizedContent = $response->content;
-                
+
                 return [
                     'original' => $content,
                     'optimized' => $optimizedContent,
@@ -135,28 +136,28 @@ class ContentOptimizationService
     {
         $moderationService = app(ContentModerationService::class);
         $moderationResult = $moderationService->moderateContent($content);
-        
-        if (!$moderationResult['flagged']) {
+
+        if (! $moderationResult['flagged']) {
             return ['status' => 'safe', 'content' => $content];
         }
-        
+
         try {
-            $prompt = "Make this content safer and more appropriate while keeping the original intent:\n\n" .
-                     "Content: \"$content\"\n" .
-                     "Issues: " . json_encode($moderationResult['categories']) . "\n\n" .
-                     "Rewrite to be safe and appropriate for a social platform.";
-            
+            $prompt = "Make this content safer and more appropriate while keeping the original intent:\n\n".
+                     "Content: \"$content\"\n".
+                     'Issues: '.json_encode($moderationResult['categories'])."\n\n".
+                     'Rewrite to be safe and appropriate for a social platform.';
+
             $response = $this->llmManager->driver('openai')->chat([
                 ['role' => 'system', 'content' => 'You are a content safety expert. Make content appropriate while preserving intent.'],
-                ['role' => 'user', 'content' => $prompt]
+                ['role' => 'user', 'content' => $prompt],
             ]);
 
             if (isset($response->content)) {
                 $optimizedContent = $response->content;
-                
+
                 // Re-check safety
                 $newModerationResult = $moderationService->moderateContent($optimizedContent);
-                
+
                 return [
                     'original' => $content,
                     'optimized' => $optimizedContent,
@@ -177,19 +178,19 @@ class ContentOptimizationService
     private function optimizeForRelevance(string $content, array $context): array
     {
         try {
-            $prompt = "Make this content more relevant to the context and audience:\n\n" .
-                     "Content: \"$content\"\n" .
-                     "Context: " . json_encode($context) . "\n\n" .
-                     "Adjust the content to be more relevant to the location, community, and current trends.";
-            
+            $prompt = "Make this content more relevant to the context and audience:\n\n".
+                     "Content: \"$content\"\n".
+                     'Context: '.json_encode($context)."\n\n".
+                     'Adjust the content to be more relevant to the location, community, and current trends.';
+
             $response = $this->llmManager->driver('openai')->chat([
                 ['role' => 'system', 'content' => 'You are a content relevance expert. Make content more contextually relevant.'],
-                ['role' => 'user', 'content' => $prompt]
+                ['role' => 'user', 'content' => $prompt],
             ]);
 
             if (isset($response->content)) {
                 $optimizedContent = $response->content;
-                
+
                 return [
                     'original' => $content,
                     'optimized' => $optimizedContent,
@@ -215,11 +216,11 @@ class ContentOptimizationService
         $validOptimizations = 0;
 
         foreach ($optimizations as $type => $optimization) {
-            if (isset($optimization['optimized']) && !isset($optimization['error'])) {
+            if (isset($optimization['optimized']) && ! isset($optimization['error'])) {
                 $finalOptimization = $optimization['optimized'];
                 $allImprovements[$type] = $optimization['improvements'] ?? [];
-                
-                $scoreKey = $type . '_score';
+
+                $scoreKey = $type.'_score';
                 if (isset($optimization[$scoreKey])) {
                     $totalScore += $optimization[$scoreKey];
                     $validOptimizations++;
@@ -260,34 +261,34 @@ class ContentOptimizationService
     private function analyzeImprovements(string $original, string $optimized): array
     {
         $improvements = [];
-        
+
         // Length improvement
         $originalLength = strlen($original);
         $optimizedLength = strlen($optimized);
         $improvements['length_change'] = $optimizedLength - $originalLength;
-        
+
         // Word count improvement
         $originalWords = str_word_count($original);
         $optimizedWords = str_word_count($optimized);
         $improvements['word_count_change'] = $optimizedWords - $originalWords;
-        
+
         // Readability improvement
         $originalReadability = $this->calculateReadabilityScore($original);
         $optimizedReadability = $this->calculateReadabilityScore($optimized);
         $improvements['readability_improvement'] = $optimizedReadability - $originalReadability;
-        
+
         // Engagement indicators
         $engagementIndicators = ['?', '!', '😊', '😄', '👍', '❤️'];
         $originalEngagement = 0;
         $optimizedEngagement = 0;
-        
+
         foreach ($engagementIndicators as $indicator) {
             $originalEngagement += substr_count($original, $indicator);
             $optimizedEngagement += substr_count($optimized, $indicator);
         }
-        
+
         $improvements['engagement_indicators_change'] = $optimizedEngagement - $originalEngagement;
-        
+
         return $improvements;
     }
 
@@ -297,22 +298,22 @@ class ContentOptimizationService
     private function analyzeClarityImprovements(string $original, string $optimized): array
     {
         $improvements = [];
-        
+
         // Sentence count
         $originalSentences = preg_split('/[.!?]+/', $original);
         $optimizedSentences = preg_split('/[.!?]+/', $optimized);
         $improvements['sentence_count_change'] = count($optimizedSentences) - count($originalSentences);
-        
+
         // Average sentence length
         $originalAvgLength = $this->calculateAverageSentenceLength($original);
         $optimizedAvgLength = $this->calculateAverageSentenceLength($optimized);
         $improvements['sentence_length_change'] = $optimizedAvgLength - $originalAvgLength;
-        
+
         // Complex word usage
         $originalComplexWords = $this->countComplexWords($original);
         $optimizedComplexWords = $this->countComplexWords($optimized);
         $improvements['complex_words_change'] = $optimizedComplexWords - $originalComplexWords;
-        
+
         return $improvements;
     }
 
@@ -322,20 +323,20 @@ class ContentOptimizationService
     private function analyzeSafetyImprovements(array $original, array $optimized): array
     {
         $improvements = [];
-        
+
         $originalFlagged = $original['flagged'] ?? false;
         $optimizedFlagged = $optimized['flagged'] ?? false;
-        
-        $improvements['flagged_status_change'] = $originalFlagged && !$optimizedFlagged ? 'improved' : 'no_change';
-        
+
+        $improvements['flagged_status_change'] = $originalFlagged && ! $optimizedFlagged ? 'improved' : 'no_change';
+
         if (isset($original['categories']) && isset($optimized['categories'])) {
             foreach ($original['categories'] as $category => $score) {
                 $originalScore = $score;
                 $optimizedScore = $optimized['categories'][$category] ?? 0;
-                $improvements[$category . '_score_change'] = $optimizedScore - $originalScore;
+                $improvements[$category.'_score_change'] = $optimizedScore - $originalScore;
             }
         }
-        
+
         return $improvements;
     }
 
@@ -345,21 +346,21 @@ class ContentOptimizationService
     private function analyzeRelevanceImprovements(string $original, string $optimized, array $context): array
     {
         $improvements = [];
-        
+
         // Context keyword usage
         $contextKeywords = $this->extractContextKeywords($context);
         $originalRelevance = $this->calculateKeywordRelevance($original, $contextKeywords);
         $optimizedRelevance = $this->calculateKeywordRelevance($optimized, $contextKeywords);
-        
+
         $improvements['context_relevance_change'] = $optimizedRelevance - $originalRelevance;
-        
+
         // Location relevance
         if (isset($context['location'])) {
             $originalLocationRelevance = $this->calculateLocationRelevance($original, $context['location']);
             $optimizedLocationRelevance = $this->calculateLocationRelevance($optimized, $context['location']);
             $improvements['location_relevance_change'] = $optimizedLocationRelevance - $originalLocationRelevance;
         }
-        
+
         return $improvements;
     }
 
@@ -369,23 +370,23 @@ class ContentOptimizationService
     private function calculateEngagementScore(string $content): float
     {
         $score = 0;
-        
+
         // Question marks (encourage responses)
         $score += substr_count($content, '?') * 0.1;
-        
+
         // Exclamation marks (show enthusiasm)
         $score += substr_count($content, '!') * 0.05;
-        
+
         // Emojis (add personality)
         $emojiCount = preg_match_all('/[\x{1F600}-\x{1F64F}]|[\x{1F300}-\x{1F5FF}]|[\x{1F680}-\x{1F6FF}]|[\x{1F1E0}-\x{1F1FF}]|[\x{2600}-\x{26FF}]|[\x{2700}-\x{27BF}]/u', $content);
         $score += $emojiCount * 0.05;
-        
+
         // Call-to-action words
         $ctaWords = ['join', 'come', 'let\'s', 'share', 'tell', 'show', 'meet'];
         foreach ($ctaWords as $word) {
             $score += substr_count(strtolower($content), $word) * 0.1;
         }
-        
+
         return min(1.0, $score);
     }
 
@@ -397,7 +398,7 @@ class ContentOptimizationService
         $readabilityScore = $this->calculateReadabilityScore($content);
         $sentenceLengthScore = $this->calculateSentenceLengthScore($content);
         $vocabularyScore = $this->calculateVocabularyScore($content);
-        
+
         return ($readabilityScore + $sentenceLengthScore + $vocabularyScore) / 3;
     }
 
@@ -409,13 +410,14 @@ class ContentOptimizationService
         if ($moderationResult['flagged']) {
             return 0.0;
         }
-        
+
         $categories = $moderationResult['categories'] ?? [];
         if (empty($categories)) {
             return 1.0;
         }
-        
+
         $maxScore = max($categories);
+
         return 1.0 - $maxScore;
     }
 
@@ -425,21 +427,21 @@ class ContentOptimizationService
     private function calculateRelevanceScore(string $content, array $context): float
     {
         $score = 0;
-        
+
         // Context keyword relevance
         $contextKeywords = $this->extractContextKeywords($context);
         $score += $this->calculateKeywordRelevance($content, $contextKeywords) * 0.5;
-        
+
         // Location relevance
         if (isset($context['location'])) {
             $score += $this->calculateLocationRelevance($content, $context['location']) * 0.3;
         }
-        
+
         // Time relevance
         if (isset($context['time'])) {
             $score += $this->calculateTimeRelevance($content, $context['time']) * 0.2;
         }
-        
+
         return min(1.0, $score);
     }
 
@@ -451,17 +453,17 @@ class ContentOptimizationService
         $sentences = preg_split('/[.!?]+/', $content);
         $words = str_word_count($content);
         $syllables = $this->countSyllables($content);
-        
+
         if (count($sentences) == 0 || $words == 0) {
             return 0.0;
         }
-        
+
         $avgWordsPerSentence = $words / count($sentences);
         $avgSyllablesPerWord = $syllables / $words;
-        
+
         // Flesch Reading Ease Score
         $score = 206.835 - (1.015 * $avgWordsPerSentence) - (84.6 * $avgSyllablesPerWord);
-        
+
         return max(0.0, min(1.0, $score / 100));
     }
 
@@ -473,11 +475,13 @@ class ContentOptimizationService
         $sentences = preg_split('/[.!?]+/', $content);
         $words = str_word_count($content);
         $sentenceCount = count(array_filter($sentences));
-        
-        if ($sentenceCount == 0) return 0.5;
-        
+
+        if ($sentenceCount == 0) {
+            return 0.5;
+        }
+
         $avgWordsPerSentence = $words / $sentenceCount;
-        
+
         // Optimal range is 15-20 words per sentence
         if ($avgWordsPerSentence >= 15 && $avgWordsPerSentence <= 20) {
             return 1.0;
@@ -495,12 +499,14 @@ class ContentOptimizationService
     {
         $words = str_word_count($content, 1);
         $totalWords = count($words);
-        
-        if ($totalWords == 0) return 0.0;
-        
+
+        if ($totalWords == 0) {
+            return 0.0;
+        }
+
         $uniqueWords = count(array_unique($words));
         $vocabularyDiversity = $uniqueWords / $totalWords;
-        
+
         return min(1.0, $vocabularyDiversity * 2);
     }
 
@@ -512,7 +518,7 @@ class ContentOptimizationService
         $sentences = preg_split('/[.!?]+/', $content);
         $words = str_word_count($content);
         $sentenceCount = count(array_filter($sentences));
-        
+
         return $sentenceCount > 0 ? $words / $sentenceCount : 0;
     }
 
@@ -523,13 +529,13 @@ class ContentOptimizationService
     {
         $words = str_word_count($content, 1);
         $complexWords = 0;
-        
+
         foreach ($words as $word) {
             if (strlen($word) > 6) {
                 $complexWords++;
             }
         }
-        
+
         return $complexWords;
     }
 
@@ -540,11 +546,11 @@ class ContentOptimizationService
     {
         $words = str_word_count($text, 1);
         $syllables = 0;
-        
+
         foreach ($words as $word) {
             $syllables += $this->countWordSyllables($word);
         }
-        
+
         return $syllables;
     }
 
@@ -557,7 +563,7 @@ class ContentOptimizationService
         $syllables = 0;
         $vowels = 'aeiouy';
         $prevChar = '';
-        
+
         for ($i = 0; $i < strlen($word); $i++) {
             $char = $word[$i];
             if (strpos($vowels, $char) !== false && strpos($vowels, $prevChar) === false) {
@@ -565,12 +571,12 @@ class ContentOptimizationService
             }
             $prevChar = $char;
         }
-        
+
         // Handle silent 'e'
         if (substr($word, -1) === 'e' && $syllables > 1) {
             $syllables--;
         }
-        
+
         return max(1, $syllables);
     }
 
@@ -580,19 +586,19 @@ class ContentOptimizationService
     private function extractContextKeywords(array $context): array
     {
         $keywords = [];
-        
+
         if (isset($context['interests'])) {
             $keywords = array_merge($keywords, $context['interests']);
         }
-        
+
         if (isset($context['topics'])) {
             $keywords = array_merge($keywords, $context['topics']);
         }
-        
+
         if (isset($context['location']['name'])) {
             $keywords[] = $context['location']['name'];
         }
-        
+
         return array_unique($keywords);
     }
 
@@ -601,17 +607,19 @@ class ContentOptimizationService
      */
     private function calculateKeywordRelevance(string $content, array $keywords): float
     {
-        if (empty($keywords)) return 0.5;
-        
+        if (empty($keywords)) {
+            return 0.5;
+        }
+
         $matches = 0;
         $contentLower = strtolower($content);
-        
+
         foreach ($keywords as $keyword) {
             if (strpos($contentLower, strtolower($keyword)) !== false) {
                 $matches++;
             }
         }
-        
+
         return $matches / count($keywords);
     }
 
@@ -621,19 +629,19 @@ class ContentOptimizationService
     private function calculateLocationRelevance(string $content, array $location): float
     {
         $locationKeywords = [];
-        
+
         if (isset($location['name'])) {
             $locationKeywords[] = $location['name'];
         }
-        
+
         if (isset($location['city'])) {
             $locationKeywords[] = $location['city'];
         }
-        
+
         if (isset($location['neighborhood'])) {
             $locationKeywords[] = $location['neighborhood'];
         }
-        
+
         return $this->calculateKeywordRelevance($content, $locationKeywords);
     }
 
@@ -643,9 +651,9 @@ class ContentOptimizationService
     private function calculateTimeRelevance(string $content, string $time): float
     {
         $timeKeywords = [];
-        
+
         $hour = (int) date('H', strtotime($time));
-        
+
         if ($hour >= 6 && $hour < 12) {
             $timeKeywords = ['morning', 'breakfast', 'coffee', 'start', 'early'];
         } elseif ($hour >= 12 && $hour < 18) {
@@ -655,7 +663,7 @@ class ContentOptimizationService
         } else {
             $timeKeywords = ['night', 'late', 'nightlife', 'party', 'stars'];
         }
-        
+
         return $this->calculateKeywordRelevance($content, $timeKeywords);
     }
 }

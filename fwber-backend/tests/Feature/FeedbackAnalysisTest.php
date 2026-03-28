@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\DTOs\LlmResponse;
 use App\Jobs\AnalyzeFeedback;
 use App\Models\Feedback;
 use App\Models\User;
 use App\Services\Ai\Llm\LlmManager;
 use App\Services\Ai\Llm\LlmProviderInterface;
-use App\DTOs\LlmResponse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Mockery;
@@ -51,7 +51,7 @@ class FeedbackAnalysisTest extends TestCase
                     'category' => 'bug',
                     'sentiment' => 'negative',
                     'summary' => 'Login button issue on mobile.',
-                    'tags' => ['mobile', 'auth']
+                    'tags' => ['mobile', 'auth'],
                 ]),
                 provider: 'mock'
             ));
@@ -67,7 +67,7 @@ class FeedbackAnalysisTest extends TestCase
         $this->assertEquals('bug', $feedback->category);
         $this->assertEquals('negative', $feedback->sentiment);
         $this->assertEquals('Login button issue on mobile.', $feedback->ai_analysis);
-        $this->assertTrue((bool)$feedback->is_analyzed);
+        $this->assertTrue((bool) $feedback->is_analyzed);
         $this->assertEquals(['ai_tags' => ['mobile', 'auth']], $feedback->metadata);
     }
 }

@@ -2,12 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
-use App\Models\Vouch;
 use App\Models\Achievement;
+use App\Models\User;
 use App\Models\ViralContent;
+use App\Models\Vouch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class ViralGamificationTest extends TestCase
@@ -36,7 +35,7 @@ class ViralGamificationTest extends TestCase
         // Verify not unlocked yet
         $this->assertDatabaseMissing('user_achievements', [
             'user_id' => $user->id,
-            'achievement_id' => Achievement::where('name', 'Icon')->first()->id
+            'achievement_id' => Achievement::where('name', 'Icon')->first()->id,
         ]);
 
         // Add 50th vouch via API
@@ -50,7 +49,7 @@ class ViralGamificationTest extends TestCase
         // Verify unlocked
         $this->assertDatabaseHas('user_achievements', [
             'user_id' => $user->id,
-            'achievement_id' => Achievement::where('name', 'Icon')->first()->id
+            'achievement_id' => Achievement::where('name', 'Icon')->first()->id,
         ]);
 
         // Check tokens awarded (500)
@@ -73,7 +72,7 @@ class ViralGamificationTest extends TestCase
 
         $this->assertDatabaseHas('user_achievements', [
             'user_id' => $user->id,
-            'achievement_id' => Achievement::where('name', 'Viral Star')->first()->id
+            'achievement_id' => Achievement::where('name', 'Viral Star')->first()->id,
         ]);
     }
 
@@ -102,8 +101,8 @@ class ViralGamificationTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonStructure([
             'top_vouched' => [
-                '*' => ['name', 'vouches']
-            ]
+                '*' => ['name', 'vouches'],
+            ],
         ]);
 
         $topVouched = $response->json('top_vouched');

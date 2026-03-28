@@ -11,9 +11,9 @@ class MockPaymentGateway implements PaymentGatewayInterface
         // Simulate a successful intent creation
         return new PaymentResult(
             success: true,
-            transactionId: 'pi_mock_' . Str::random(24),
+            transactionId: 'pi_mock_'.Str::random(24),
             data: [
-                'client_secret' => 'pi_mock_secret_' . Str::random(24),
+                'client_secret' => 'pi_mock_secret_'.Str::random(24),
                 'amount' => $amount,
                 'currency' => $currency,
             ]
@@ -32,7 +32,7 @@ class MockPaymentGateway implements PaymentGatewayInterface
 
         return new PaymentResult(
             success: true,
-            transactionId: 'ch_mock_' . Str::random(24),
+            transactionId: 'ch_mock_'.Str::random(24),
             message: 'Payment successful',
             data: [
                 'amount' => $amount,
@@ -46,7 +46,7 @@ class MockPaymentGateway implements PaymentGatewayInterface
     {
         return new PaymentResult(
             success: true,
-            transactionId: 're_mock_' . Str::random(24),
+            transactionId: 're_mock_'.Str::random(24),
             message: 'Refund successful'
         );
     }

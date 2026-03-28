@@ -10,6 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @OA\Schema(
  *   schema="UpdateProximityChatroomMessageRequest",
  *   required={"content"},
+ *
  *   @OA\Property(property="content", type="string", maxLength=2000),
  *   @OA\Property(property="is_networking", type="boolean"),
  *   @OA\Property(property="is_social", type="boolean")

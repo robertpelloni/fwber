@@ -17,17 +17,19 @@ class ZKProximityService
         $timestamp = $publicSignals['timestamp'] ?? 0;
         if (abs(time() - $timestamp) > 300) {
             Log::warning('ZK proof rejected: Stale timestamp', ['timestamp' => $timestamp]);
+
             return false;
         }
 
         // HMAC-SHA256(geohash + timestamp + target_entity_id, APP_KEY)
-        $expectedSignature = hash_hmac('sha256', 
-            $proofPayload['geohash'] . $timestamp . $publicSignals['target_entity_id'], 
+        $expectedSignature = hash_hmac('sha256',
+            $proofPayload['geohash'].$timestamp.$publicSignals['target_entity_id'],
             env('ZK_SECRET', 'fwber-zk-hardware-enclave-secret')
         );
 
-        if (!hash_equals($expectedSignature, $proofPayload['signature'])) {
+        if (! hash_equals($expectedSignature, $proofPayload['signature'])) {
             Log::warning('ZK proof rejected: Invalid signature');
+
             return false;
         }
 
@@ -51,8 +53,9 @@ class ZKProximityService
             }
         }
 
-        if (!$targetLat || !$targetLon) {
+        if (! $targetLat || ! $targetLon) {
             Log::warning('ZK proof rejected: Target entity location unknown');
+
             return false;
         }
 
@@ -62,14 +65,16 @@ class ZKProximityService
 
         // Allow adjacent cells - for simplicity we just check exact match or very close prefix
         if ($targetGeohash !== $userGeohash && substr($targetGeohash, 0, 5) !== substr($userGeohash, 0, 5)) {
-             Log::warning('ZK proof rejected: Proximity constraint violation', [
-                 'target' => $targetGeohash, 
-                 'user' => $userGeohash
-             ]);
-             return false;
+            Log::warning('ZK proof rejected: Proximity constraint violation', [
+                'target' => $targetGeohash,
+                'user' => $userGeohash,
+            ]);
+
+            return false;
         }
 
         Log::info('ZK Proximity Proof successfully validated.');
+
         return true;
     }
 
@@ -83,7 +88,7 @@ class ZKProximityService
             'target_entity_type' => $entityType,
             'target_entity_id' => $entityId,
             'proof_hash' => $proofHash,
-            'is_verified' => true
+            'is_verified' => true,
         ]);
     }
 }

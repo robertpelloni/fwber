@@ -2,15 +2,13 @@
 
 namespace Tests\Unit;
 
-use Tests\TestCase;
 use App\Services\MediaAnalysis\Drivers\GoogleVisionDriver;
-use Google\Cloud\Vision\V1\ImageAnnotatorClient;
 use Google\Cloud\Vision\V1\AnnotateImageResponse;
-use Google\Cloud\Vision\V1\SafeSearchAnnotation;
-use Google\Cloud\Vision\V1\EntityAnnotation;
+use Google\Cloud\Vision\V1\ImageAnnotatorClient;
 use Google\Cloud\Vision\V1\Likelihood;
+use Google\Cloud\Vision\V1\SafeSearchAnnotation;
 use Mockery;
-use Illuminate\Support\Facades\Storage;
+use Tests\TestCase;
 
 class GoogleVisionDriverTest extends TestCase
 {
@@ -39,14 +37,16 @@ class GoogleVisionDriverTest extends TestCase
         // Create dummy file
         $path = storage_path('app/public/test.jpg');
         // Ensure directory exists
-        if (!is_dir(dirname($path))) mkdir(dirname($path), 0777, true);
+        if (! is_dir(dirname($path))) {
+            mkdir(dirname($path), 0777, true);
+        }
         file_put_contents($path, 'dummy content');
 
         $result = $driver->analyze($path, 'image');
 
         $this->assertTrue($result->safe);
         $this->assertEquals(1.0, $result->confidence);
-        
+
         // Cleanup
         @unlink($path);
     }
@@ -76,7 +76,9 @@ class GoogleVisionDriverTest extends TestCase
         // Create dummy file
         $path = storage_path('app/public/test_unsafe.jpg');
         // Ensure directory exists
-        if (!is_dir(dirname($path))) mkdir(dirname($path), 0777, true);
+        if (! is_dir(dirname($path))) {
+            mkdir(dirname($path), 0777, true);
+        }
         file_put_contents($path, 'dummy content');
 
         $result = $driver->analyze($path, 'image');

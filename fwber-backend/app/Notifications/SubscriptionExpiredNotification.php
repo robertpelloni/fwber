@@ -3,17 +3,16 @@
 namespace App\Notifications;
 
 use App\Models\Subscription;
+use App\Notifications\Traits\ChecksNotificationPreferences;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\WebPush\WebPushMessage;
-use NotificationChannels\WebPush\WebPushChannel;
-use App\Notifications\Traits\ChecksNotificationPreferences;
 
 class SubscriptionExpiredNotification extends Notification implements ShouldQueue
 {
-    use Queueable, ChecksNotificationPreferences;
+    use ChecksNotificationPreferences, Queueable;
 
     public $subscription;
 

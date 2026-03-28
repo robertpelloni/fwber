@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\AudioRoomParticipantJoined;
+use App\Events\AudioRoomParticipantLeft;
+use App\Events\AudioRoomSignal;
 use App\Models\AudioRoom;
 use App\Models\AudioRoomParticipant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use App\Events\AudioRoomParticipantJoined;
-use App\Events\AudioRoomParticipantLeft;
-use App\Events\AudioRoomSignal;
 
 class AudioRoomController extends Controller
 {
@@ -63,14 +62,14 @@ class AudioRoomController extends Controller
 
         return response()->json($room, 201);
     }
-    
+
     /**
      * Get specific room details.
      */
     public function show($id)
     {
         $room = AudioRoom::with(['host', 'participants.user'])->findOrFail($id);
-        
+
         return response()->json($room);
     }
 
@@ -96,7 +95,7 @@ class AudioRoomController extends Controller
             'message' => 'Joined room successfully',
             'room' => $room->load(['host']),
             'participant' => $participant,
-            'participants' => $room->participants()->with('user')->get()
+            'participants' => $room->participants()->with('user')->get(),
         ]);
     }
 
@@ -141,10 +140,10 @@ class AudioRoomController extends Controller
         $targetId = $request->target_user_id;
 
         broadcast(new AudioRoomSignal(
-            $room->id, 
-            $senderId, 
-            $targetId, 
-            $request->type, 
+            $room->id,
+            $senderId,
+            $targetId,
+            $request->type,
             $request->payload
         ))->toOthers();
 

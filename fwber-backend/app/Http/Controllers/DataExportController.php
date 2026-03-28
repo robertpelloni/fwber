@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Jobs\ExportUserData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class DataExportController extends Controller
 {
@@ -18,10 +18,13 @@ class DataExportController extends Controller
      *     summary="Request a GDPR data export",
      *     tags={"User"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Response(
      *         response=202,
      *         description="Export started",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string")
      *         )
      *     )
@@ -32,11 +35,11 @@ class DataExportController extends Controller
         $user = Auth::user();
 
         // Rate limiting check could go here
-        
+
         ExportUserData::dispatch($user);
 
         return response()->json([
-            'message' => 'Data export started. This process may take a few minutes.'
+            'message' => 'Data export started. This process may take a few minutes.',
         ], 202);
     }
 
@@ -48,10 +51,13 @@ class DataExportController extends Controller
      *     summary="Get export status",
      *     tags={"User"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Export status",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="available", type="boolean"),
      *             @OA\Property(property="download_url", type="string", nullable=true),
      *             @OA\Property(property="generated_at", type="string", nullable=true)
@@ -63,7 +69,7 @@ class DataExportController extends Controller
     {
         $userId = Auth::id();
         $directory = "exports/{$userId}";
-        
+
         // Find latest zip file
         $files = Storage::files($directory);
         $latestFile = null;
@@ -83,14 +89,14 @@ class DataExportController extends Controller
             return response()->json([
                 'available' => true,
                 'download_url' => route('api.user.export.download', ['filename' => basename($latestFile)]),
-                'generated_at' => date('c', $latestTime)
+                'generated_at' => date('c', $latestTime),
             ]);
         }
 
         return response()->json([
             'available' => false,
             'download_url' => null,
-            'generated_at' => null
+            'generated_at' => null,
         ]);
     }
 
@@ -102,6 +108,7 @@ class DataExportController extends Controller
      *     summary="Download export file",
      *     tags={"User"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="File download"
@@ -113,7 +120,7 @@ class DataExportController extends Controller
         $userId = Auth::id();
         $path = "exports/{$userId}/{$filename}";
 
-        if (!Storage::exists($path)) {
+        if (! Storage::exists($path)) {
             abort(404);
         }
 

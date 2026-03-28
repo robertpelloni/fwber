@@ -34,7 +34,7 @@ class E2EKeyManagementService
     {
         $record = UserPublicKey::where('user_id', $userId)->first();
 
-        if (!$record) {
+        if (! $record) {
             return null;
         }
 

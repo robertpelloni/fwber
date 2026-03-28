@@ -4,8 +4,8 @@ namespace App\Services;
 
 use App\Mail\NewMatchNotification;
 use App\Mail\UnreadMessagesNotification;
-use App\Models\User;
 use App\Models\Message;
+use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 
@@ -20,12 +20,12 @@ class EmailNotificationService
      */
     public function sendNewMatchNotification(User $recipient, User $match): void
     {
-        if (!$this->flags->isEnabled('email_notifications')) {
+        if (! $this->flags->isEnabled('email_notifications')) {
             return;
         }
 
         $matchProfile = $match->profile;
-        if (!$matchProfile) {
+        if (! $matchProfile) {
             return;
         }
 
@@ -44,12 +44,12 @@ class EmailNotificationService
      */
     public function sendUnreadMessagesNotification(User $recipient): void
     {
-        if (!$this->flags->isEnabled('email_notifications')) {
+        if (! $this->flags->isEnabled('email_notifications')) {
             return;
         }
 
         $cacheKey = "email_unread_notification_sent:{$recipient->id}";
-        
+
         // Debounce: don't send if we sent one recently
         if (Cache::has($cacheKey)) {
             return;
@@ -71,7 +71,7 @@ class EmailNotificationService
             ->map(function ($messages) {
                 $sender = $messages->first()->sender;
                 $latestMessage = $messages->first();
-                
+
                 return [
                     'name' => $sender->name,
                     'message_preview' => \Illuminate\Support\Str::limit($latestMessage->content, 60),
@@ -97,7 +97,7 @@ class EmailNotificationService
      */
     public function sendBatchUnreadNotifications(): int
     {
-        if (!$this->flags->isEnabled('email_notifications')) {
+        if (! $this->flags->isEnabled('email_notifications')) {
             return 0;
         }
 

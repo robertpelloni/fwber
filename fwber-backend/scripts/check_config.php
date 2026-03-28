@@ -1,8 +1,8 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
-$app = require_once __DIR__ . '/../bootstrap/app.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
@@ -65,9 +65,9 @@ foreach ($checks as $category => $vars) {
     echo "[$category]\n";
     foreach ($vars as $key => $description) {
         $value = env($key);
-        $status = $value ? "✅ Set" : "❌ Missing";
-        $masked = $value ? substr($value, 0, 4) . '...' : 'N/A';
-        
+        $status = $value ? '✅ Set' : '❌ Missing';
+        $masked = $value ? substr($value, 0, 4).'...' : 'N/A';
+
         // Don't mask non-secrets
         if (in_array($key, ['APP_URL', 'DB_CONNECTION', 'DB_HOST', 'DB_DATABASE', 'REDIS_HOST', 'MAIL_MAILER', 'AWS_DEFAULT_REGION', 'AWS_BUCKET', 'MERCURE_PUBLIC_URL'])) {
             $masked = $value ?: 'N/A';

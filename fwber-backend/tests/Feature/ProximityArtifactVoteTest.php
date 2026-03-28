@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\ProximityArtifact;
 use App\Models\User;
 use App\Models\UserProfile;
-use App\Models\ProximityArtifact;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -13,19 +13,20 @@ class ProximityArtifactVoteTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private ProximityArtifact $artifact;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->user = User::factory()->create();
         UserProfile::factory()->create(['user_id' => $this->user->id]);
 
         $this->artifact = ProximityArtifact::factory()->create([
             'user_id' => User::factory()->create()->id,
             'type' => 'board_post',
-            'content' => 'Test post'
+            'content' => 'Test post',
         ]);
     }
 
@@ -38,13 +39,13 @@ class ProximityArtifactVoteTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'message' => 'Vote recorded'
+                'message' => 'Vote recorded',
             ]);
 
         $this->assertDatabaseHas('proximity_artifact_votes', [
             'proximity_artifact_id' => $this->artifact->id,
             'user_id' => $this->user->id,
-            'value' => 1
+            'value' => 1,
         ]);
     }
 
@@ -60,7 +61,7 @@ class ProximityArtifactVoteTest extends TestCase
         $this->assertDatabaseHas('proximity_artifact_votes', [
             'proximity_artifact_id' => $this->artifact->id,
             'user_id' => $this->user->id,
-            'value' => -1
+            'value' => -1,
         ]);
     }
 
@@ -82,7 +83,7 @@ class ProximityArtifactVoteTest extends TestCase
 
         $this->assertDatabaseMissing('proximity_artifact_votes', [
             'proximity_artifact_id' => $this->artifact->id,
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
         ]);
     }
 

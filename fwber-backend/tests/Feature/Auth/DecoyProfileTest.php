@@ -3,7 +3,6 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
-use App\Models\UserProfile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -21,16 +20,16 @@ class DecoyProfileTest extends TestCase
         ]);
 
         $response->assertStatus(200)
-                 ->assertJson([
-                     'message' => 'Decoy profile created and linked successfully.',
-                 ]);
+            ->assertJson([
+                'message' => 'Decoy profile created and linked successfully.',
+            ]);
 
         $user->refresh();
         $this->assertNotNull($user->decoy_user_id);
         $this->assertTrue(Hash::check('secret_decoy_password', $user->decoy_password));
 
         $decoyUser = User::find($user->decoy_user_id);
-        $this->assertTrue((bool)$decoyUser->is_decoy);
+        $this->assertTrue((bool) $decoyUser->is_decoy);
         $this->assertDatabaseHas('user_profiles', [
             'user_id' => $decoyUser->id,
         ]);
@@ -46,7 +45,7 @@ class DecoyProfileTest extends TestCase
         $this->actingAs($user)->postJson('/api/settings/decoy-profile', [
             'decoy_password' => 'secret_decoy_password',
         ]);
-        
+
         $user->refresh();
         $decoyUserId = $user->decoy_user_id;
 
@@ -88,7 +87,7 @@ class DecoyProfileTest extends TestCase
         $user->refresh();
         $this->assertNull($user->decoy_user_id);
         $this->assertNull($user->decoy_password);
-        
+
         // Decoy user should be deleted
         $this->assertNull(User::find($decoyUserId));
     }

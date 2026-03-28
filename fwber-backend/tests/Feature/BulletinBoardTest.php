@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\BulletinBoard;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
@@ -15,7 +14,7 @@ class BulletinBoardTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Register trig functions for SQLite if needed for other calculations
         if (DB::connection()->getDriverName() === 'sqlite') {
             $db = DB::connection()->getPdo();
@@ -56,7 +55,7 @@ class BulletinBoardTest extends TestCase
         $nearbyLng = -74.0060;
 
         $distance = $board->distanceFrom($nearbyLat, $nearbyLng);
-        
+
         // Allow some margin of error for float calculation
         $this->assertTrue($distance > 100 && $distance < 120);
         $this->assertTrue($board->containsPoint($nearbyLat, $nearbyLng));

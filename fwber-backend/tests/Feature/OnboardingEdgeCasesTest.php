@@ -9,7 +9,7 @@ use Tests\TestCase;
 
 class OnboardingEdgeCasesTest extends TestCase
 {
-    use RefreshDatabase; 
+    use RefreshDatabase;
 
     public function test_update_with_empty_location_object()
     {
@@ -20,7 +20,7 @@ class OnboardingEdgeCasesTest extends TestCase
             'display_name' => 'Test User',
             'birthdate' => '1990-01-01',
             'gender' => 'male',
-            'location' => [] // Empty object
+            'location' => [], // Empty object
         ];
 
         $response = $this->actingAs($user)->putJson('/api/profile', $payload);
@@ -40,22 +40,22 @@ class OnboardingEdgeCasesTest extends TestCase
             'location' => [
                 'city' => 'New York',
                 // Missing latitude/longitude/state
-            ]
+            ],
         ];
 
         $response = $this->actingAs($user)->putJson('/api/profile', $payload);
 
         $response->assertStatus(200);
-        
+
         $response->assertJson([
             'data' => [
                 'profile' => [
                     'location' => [
                         'city' => 'New York',
-                        'state' => null
-                    ]
-                ]
-            ]
+                        'state' => null,
+                    ],
+                ],
+            ],
         ]);
     }
 
@@ -71,7 +71,7 @@ class OnboardingEdgeCasesTest extends TestCase
             'location' => [
                 'latitude' => 0,
                 'longitude' => 0,
-            ]
+            ],
         ];
 
         $response = $this->actingAs($user)->putJson('/api/profile', $payload);
@@ -91,7 +91,7 @@ class OnboardingEdgeCasesTest extends TestCase
             'location' => [
                 'city' => '',
                 'state' => '',
-            ]
+            ],
         ];
 
         $response = $this->actingAs($user)->putJson('/api/profile', $payload);

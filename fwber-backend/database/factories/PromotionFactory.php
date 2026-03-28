@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\Promotion;
 use App\Models\MerchantProfile;
+use App\Models\Promotion;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

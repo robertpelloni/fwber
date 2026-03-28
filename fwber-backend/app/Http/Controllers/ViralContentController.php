@@ -19,7 +19,7 @@ class ViralContentController extends Controller
     /**
      * Retrieve viral content by its UUID.
      *
-     * @param string $id
+     * @param  string  $id
      * @return \Illuminate\Http\JsonResponse
      */
     public function show($id, Request $request)
@@ -29,14 +29,14 @@ class ViralContentController extends Controller
         // Increment views if not the owner and not in preview mode
         $viewerId = auth('sanctum')->id();
         $isPreview = $request->query('preview') === 'true';
-        
+
         // Simple view counting (can be improved with IP tracking to prevent spam)
-        if (!$isPreview && (!$viewerId || $viewerId !== $content->user_id)) {
+        if (! $isPreview && (! $viewerId || $viewerId !== $content->user_id)) {
             $content->increment('views');
-            
+
             // Check for reward (5 views)
             // Reload to get updated views count
-            if ($content->fresh()->views >= 5 && !$content->reward_claimed) {
+            if ($content->fresh()->views >= 5 && ! $content->reward_claimed) {
                 $owner = $content->user;
                 if ($owner) {
                     // Grant 24 hours of Gold
@@ -44,12 +44,12 @@ class ViralContentController extends Controller
                     if ($currentExpiry->isPast()) {
                         $currentExpiry = now();
                     }
-                    
+
                     $owner->update([
                         'tier' => 'gold',
                         'tier_expires_at' => $currentExpiry->addHours(24),
                     ]);
-                    
+
                     $content->update(['reward_claimed' => true]);
 
                     try {
@@ -60,10 +60,10 @@ class ViralContentController extends Controller
 
                     try {
                         $owner->notify(new PushMessage(
-                            "Viral Gold Unlocked! 🏆",
+                            'Viral Gold Unlocked! 🏆',
                             "Your content is taking off! You've earned 24h of Gold status.",
-                            "/profile",
-                            "reward"
+                            '/profile',
+                            'reward'
                         ));
                     } catch (\Exception $e) {
                         // Ignore

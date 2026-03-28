@@ -2,35 +2,39 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Core\EventSourcing\EventStore;
+use App\Events\Matches\MatchActionRecorded;
 use App\Http\Requests\MatchActionRequest;
 use App\Http\Requests\MatchFilterRequest;
 use App\Http\Resources\MatchResource;
 use App\Models\User;
 use App\Models\UserProfile;
+use App\Services\ActivityPubService;
 use App\Services\AIMatchingService;
+use App\Services\EmailNotificationService;
+use App\Services\MatchMakerService;
+use App\Services\PushNotificationService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Services\PushNotificationService;
-use App\Services\MatchMakerService;
-use App\Services\EmailNotificationService;
-use App\Services\ActivityPubService;
-use App\Domain\Core\EventSourcing\EventStore;
-use App\Events\Matches\MatchActionRecorded;
-use Carbon\Carbon;
 
 class MatchController extends Controller
 {
     private AIMatchingService $matchingService;
+
     private MatchMakerService $matchMakerService;
+
     private EmailNotificationService $emailService;
+
     private EventStore $eventStore;
+
     private ActivityPubService $apService;
 
     public function __construct(
-        AIMatchingService $matchingService, 
+        AIMatchingService $matchingService,
         MatchMakerService $matchMakerService,
         EmailNotificationService $emailService,
         EventStore $eventStore,
@@ -50,64 +54,83 @@ class MatchController extends Controller
      *     summary="Get potential matches",
      *     description="Retrieve a feed of potential matches based on user preferences, location, and filters. Results are cached for 60 seconds per user.",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="age_min",
      *         in="query",
      *         description="Minimum age filter",
      *         required=false,
+     *
      *         @OA\Schema(type="integer", minimum=18, maximum=100, example=25)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="age_max",
      *         in="query",
      *         description="Maximum age filter",
      *         required=false,
+     *
      *         @OA\Schema(type="integer", minimum=18, maximum=100, example=40)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="max_distance",
      *         in="query",
      *         description="Maximum distance in miles",
      *         required=false,
+     *
      *         @OA\Schema(type="integer", minimum=1, maximum=500, default=50, example=25)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="smoking",
      *         in="query",
      *         description="Filter by smoking preference",
      *         required=false,
+     *
      *         @OA\Schema(type="string", enum={"non-smoker", "occasional", "regular", "social", "trying-to-quit"})
      *     ),
+     *
      *     @OA\Parameter(
      *         name="drinking",
      *         in="query",
      *         description="Filter by drinking preference",
      *         required=false,
+     *
      *         @OA\Schema(type="string", enum={"non-drinker", "occasional", "regular", "social", "sober"})
      *     ),
+     *
      *     @OA\Parameter(
      *         name="body_type",
      *         in="query",
      *         description="Filter by body type",
      *         required=false,
+     *
      *         @OA\Schema(type="string", enum={"slim", "athletic", "average", "curvy", "plus-size", "muscular"})
      *     ),
+     *
      *     @OA\Parameter(
      *         name="height_min",
      *         in="query",
      *         description="Minimum height in centimeters",
      *         required=false,
+     *
      *         @OA\Schema(type="integer", minimum=120, maximum=250)
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Matches retrieved successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="matches",
      *                 type="array",
+     *
      *                 @OA\Items(
      *                     type="object",
+     *
      *                     @OA\Property(property="id", type="integer", example=42),
      *                     @OA\Property(property="name", type="string", example="Jane Smith"),
      *                     @OA\Property(property="age", type="integer", example=28),
@@ -120,16 +143,21 @@ class MatchController extends Controller
      *             @OA\Property(property="total", type="integer", example=15)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=400,
      *         description="Profile not complete",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Profile not found. Please complete your profile first.")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthenticated",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
      *     )
      * )
@@ -138,8 +166,8 @@ class MatchController extends Controller
     {
         $user = auth()->user();
         $profile = $user->profile;
-        
-        if (!$profile) {
+
+        if (! $profile) {
             return response()->json([
                 'message' => 'Profile not found. Please complete your profile first.',
             ], 400);
@@ -147,8 +175,8 @@ class MatchController extends Controller
 
         // Cache feed for 60 seconds per user with filter params
         // Cache feed for 5 minutes per user with filter params
-        $cacheKey = "feed:user_{$user->id}:" . md5($request->getQueryString() ?? '');
-        
+        $cacheKey = "feed:user_{$user->id}:".md5($request->getQueryString() ?? '');
+
         $matches = Cache::tags(["matches_feed:user_{$user->id}"])->remember($cacheKey, 300, function () use ($user, $profile, $request) {
             $filters = [
                 'age_min' => $request->get('age_min'),
@@ -172,18 +200,18 @@ class MatchController extends Controller
             ];
 
             $candidates = $this->matchingService->findAdvancedMatches($user, $filters);
-            
+
             // Convert array back to collection and map attributes for resource
             return collect($candidates)->map(function ($candidate) use ($profile) {
                 // Map ai_score to compatibility_score for the resource
                 $candidate->setAttribute('compatibility_score', $candidate->ai_score);
-                
+
                 // Calculate distance for display (service uses it for scoring but doesn't return it)
                 $candidate->setAttribute(
                     'distance',
                     $this->calculateDistance($profile, $candidate->profile)
                 );
-                
+
                 return $candidate;
             });
         });
@@ -192,12 +220,12 @@ class MatchController extends Controller
         app(\App\Services\TelemetryService::class)->emit('feed.viewed', [
             'user_id' => $user->id,
             'count' => $matches->count(),
-            'filters_applied' => !empty($request->query()),
+            'filters_applied' => ! empty($request->query()),
         ]);
 
         return response()->json([
-            "matches" => MatchResource::collection($matches)->toArray(request()),
-            "total" => $matches->count(),
+            'matches' => MatchResource::collection($matches)->toArray(request()),
+            'total' => $matches->count(),
         ]);
     }
 
@@ -208,10 +236,13 @@ class MatchController extends Controller
      *     summary="Get established matches",
      *     description="Retrieve a list of users the authenticated user has matched with.",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Matches retrieved successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
      *         )
      *     )
@@ -220,7 +251,7 @@ class MatchController extends Controller
     public function establishedMatches(Request $request): JsonResponse
     {
         $user = auth()->user();
-        
+
         $cacheKey = "matches:established:user_{$user->id}";
 
         $conversations = Cache::tags(["matches_list:user_{$user->id}"])->remember($cacheKey, 60, function () use ($user) {
@@ -278,38 +309,51 @@ class MatchController extends Controller
      *     summary="Perform match action",
      *     description="Like, pass, or super like a potential match. Returns whether action resulted in a mutual match.",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"action", "target_user_id"},
+     *
      *             @OA\Property(property="action", type="string", enum={"like", "pass", "super_like"}, example="like"),
      *             @OA\Property(property="target_user_id", type="integer", example=42)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Action recorded successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="action", type="string", example="like"),
      *             @OA\Property(property="is_match", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="It's a match!")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=400,
      *         description="Invalid action or user not accessible",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Cannot perform action on yourself")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthenticated",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Validation error",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
      *     )
      * )
@@ -326,7 +370,7 @@ class MatchController extends Controller
         }
 
         // Check swipe limit for free users
-        if (!$user->unlimited_swipes) {
+        if (! $user->unlimited_swipes) {
             $todaySwipes = DB::table('match_actions')
                 ->where('user_id', $user->id)
                 ->where('created_at', '>=', Carbon::today())
@@ -336,13 +380,13 @@ class MatchController extends Controller
             if ($todaySwipes >= 50) {
                 return response()->json([
                     'message' => 'Daily swipe limit reached. Upgrade to Premium for unlimited swipes.',
-                    'limit_reached' => true
+                    'limit_reached' => true,
                 ], 403);
             }
         }
 
         // Check if target user is accessible
-        if (!$this->isUserAccessible($user, $targetUserId)) {
+        if (! $this->isUserAccessible($user, $targetUserId)) {
             return response()->json(['message' => 'User not accessible'], 400);
         }
 
@@ -351,10 +395,10 @@ class MatchController extends Controller
         $currentVersion = $this->eventStore->getCurrentVersion($aggregateId, 'MatchAction');
         $event = new MatchActionRecorded(
             $aggregateId,
-            (int)$targetUserId,
-            (string)$action,
-            (float)($user->profile->latitude ?? 0),
-            (float)($user->profile->longitude ?? 0)
+            (int) $targetUserId,
+            (string) $action,
+            (float) ($user->profile->latitude ?? 0),
+            (float) ($user->profile->longitude ?? 0)
         );
         $this->eventStore->append(
             $event,
@@ -379,15 +423,15 @@ class MatchController extends Controller
                         'type' => 'fwber:MatchRequest',
                         'content' => 'User liked your profile.',
                     ],
-                    'target' => $targetUser->actor_uri
+                    'target' => $targetUser->actor_uri,
                 ];
-                
-                // In a full implementation, this would be queued and cryptographically signed 
+
+                // In a full implementation, this would be queued and cryptographically signed
                 // using the user's private key before being POSTed to the target's inbox.
                 // $this->apService->dispatchToRemoteInbox($targetUser->actor_uri, $activity);
                 Log::info("ActivityPub: Queued MatchRequest (Offer) to remote user: {$targetUser->actor_uri}");
             } catch (\Exception $e) {
-                Log::error("Failed to federate MatchRequest: " . $e->getMessage());
+                Log::error('Failed to federate MatchRequest: '.$e->getMessage());
             }
         }
 
@@ -417,13 +461,13 @@ class MatchController extends Controller
             $query->whereHas('profile', function ($q) use ($profile, $maxDistance) {
                 $latDist = (1.1 * $maxDistance) / 49.1;
                 $lonDist = (1.1 * $maxDistance) / 69.1;
-                
+
                 $q->whereBetween('location_latitude', [
                     $profile->location_latitude - $latDist,
-                    $profile->location_latitude + $latDist
+                    $profile->location_latitude + $latDist,
                 ])->whereBetween('location_longitude', [
                     $profile->location_longitude - $lonDist,
-                    $profile->location_longitude + $lonDist
+                    $profile->location_longitude + $lonDist,
                 ]);
             });
         }
@@ -439,12 +483,12 @@ class MatchController extends Controller
         // Age filter (request params override preferences)
         $ageMin = (int) $request->get('age_min', $profile->preferences['age_range']['min'] ?? 18);
         $ageMax = (int) $request->get('age_max', $profile->preferences['age_range']['max'] ?? 100);
-        
+
         $query->whereHas('profile', function ($q) use ($ageMin, $ageMax) {
             // SQLite-compatible age calculation
             $q->whereRaw("(julianday('now') - julianday(date_of_birth)) / 365.25 BETWEEN ? AND ?", [
                 $ageMin,
-                $ageMax
+                $ageMax,
             ]);
         });
 
@@ -467,15 +511,15 @@ class MatchController extends Controller
             ->where('user_id', $user->id)
             ->pluck('target_user_id')
             ->toArray();
-        
-        if (!empty($excludedIds)) {
+
+        if (! empty($excludedIds)) {
             $query->whereNotIn('id', $excludedIds);
         }
 
         $matches = $query->limit(20)->get();
 
         // Calculate compatibility scores and sort
-        return $matches->map(function (User $candidate) use ($user, $profile) {
+        return $matches->map(function (User $candidate) use ($profile) {
             $candidate->setAttribute(
                 'compatibility_score',
                 $this->calculateCompatibilityScore($profile, $candidate->profile)
@@ -484,6 +528,7 @@ class MatchController extends Controller
                 'distance',
                 $this->calculateDistance($profile, $candidate->profile)
             );
+
             return $candidate;
         })->sortByDesc('compatibility_score')->values();
     }
@@ -526,12 +571,12 @@ class MatchController extends Controller
 
     private function calculateFreshnessBoost(User $candidate): int
     {
-        if (!$candidate->last_seen_at) {
+        if (! $candidate->last_seen_at) {
             return 0;
         }
 
         $hoursSinceActive = now()->diffInHours($candidate->last_seen_at);
-        
+
         if ($hoursSinceActive < 1) {
             return 5; // Very recent activity
         } elseif ($hoursSinceActive < 24) {
@@ -539,7 +584,7 @@ class MatchController extends Controller
         } elseif ($hoursSinceActive < 168) {
             return 1; // Active this week
         }
-        
+
         return 0;
     }
 
@@ -549,6 +594,7 @@ class MatchController extends Controller
         $count = ProximityArtifact::where('user_id', $candidate->id)
             ->where('created_at', '>=', now()->subDay())
             ->count();
+
         // Each 10 artifacts -> 1 point penalty, capped at 5
         return (int) min(5, floor($count / 10));
     }
@@ -557,16 +603,16 @@ class MatchController extends Controller
     {
         $lat1 = $profile1->is_travel_mode ? $profile1->travel_latitude : $profile1->latitude;
         $lon1 = $profile1->is_travel_mode ? $profile1->travel_longitude : $profile1->longitude;
-        
+
         $lat2 = $profile2->is_travel_mode ? $profile2->travel_latitude : $profile2->latitude;
         $lon2 = $profile2->is_travel_mode ? $profile2->travel_longitude : $profile2->longitude;
 
-        if (!$lat1 || !$lat2) {
+        if (! $lat1 || ! $lat2) {
             return 0;
         }
 
         $theta = $lon1 - $lon2;
-        $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) + 
+        $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +
                 cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
         $dist = acos($dist);
         $dist = rad2deg($dist);
@@ -577,7 +623,7 @@ class MatchController extends Controller
 
     private function checkGenderCompatibility(UserProfile $userProfile, UserProfile $candidateProfile): bool
     {
-        if (!$userProfile->preferences || !$candidateProfile->preferences) {
+        if (! $userProfile->preferences || ! $candidateProfile->preferences) {
             return true; // Default to compatible if no preferences set
         }
 
@@ -585,11 +631,11 @@ class MatchController extends Controller
         $candidateGenderPrefs = $candidateProfile->preferences['gender_preferences'] ?? [];
 
         // Check if user wants candidate's gender
-        $userWantsCandidate = isset($userGenderPrefs[$candidateProfile->gender]) && 
+        $userWantsCandidate = isset($userGenderPrefs[$candidateProfile->gender]) &&
                              $userGenderPrefs[$candidateProfile->gender];
 
         // Check if candidate wants user's gender
-        $candidateWantsUser = isset($candidateGenderPrefs[$userProfile->gender]) && 
+        $candidateWantsUser = isset($candidateGenderPrefs[$userProfile->gender]) &&
                              $candidateGenderPrefs[$userProfile->gender];
 
         return $userWantsCandidate && $candidateWantsUser;
@@ -599,15 +645,15 @@ class MatchController extends Controller
     {
         $userProfile = $user->profile;
         $targetUser = User::with('profile')->find($targetUserId);
-        
-        if (!$userProfile || !$targetUser || !$targetUser->profile) {
+
+        if (! $userProfile || ! $targetUser || ! $targetUser->profile) {
             return false;
         }
 
         // Check distance
         $distance = $this->calculateDistance($userProfile, $targetUser->profile);
         $maxDistance = $userProfile->preferences['max_distance'] ?? 50;
-        
+
         if ($distance > $maxDistance) {
             return false;
         }
@@ -637,7 +683,7 @@ class MatchController extends Controller
             ->where('action', 'like')
             ->exists();
 
-        Log::info("MatchController: Mutual like found? " . ($mutualLike ? 'YES' : 'NO'));
+        Log::info('MatchController: Mutual like found? '.($mutualLike ? 'YES' : 'NO'));
 
         if ($mutualLike) {
             $user1 = min($userId, $targetUserId);
@@ -649,7 +695,7 @@ class MatchController extends Controller
                 ->where('user2_id', $user2)
                 ->exists();
 
-            if (!$existing) {
+            if (! $existing) {
                 DB::table('matches')->insert([
                     'user1_id' => $user1,
                     'user2_id' => $user2,
@@ -664,14 +710,14 @@ class MatchController extends Controller
                 // Send notifications to both users
                 $userA = User::find($user1);
                 $userB = User::find($user2);
-                
+
                 if ($userA && $userB) {
                     // Use the injected email service
                     try {
                         $this->emailService->sendNewMatchNotification($userA, $userB);
                         $this->emailService->sendNewMatchNotification($userB, $userA);
                     } catch (\Throwable $e) {
-                        Log::error("Match email failed: " . $e->getMessage());
+                        Log::error('Match email failed: '.$e->getMessage());
                     }
 
                     // Send push notifications to both users
@@ -716,7 +762,7 @@ class MatchController extends Controller
             ->where('name', $pairName)
             ->first();
 
-        if (!$existing) {
+        if (! $existing) {
             // Wrap chatroom creation + member adds + system message in transaction for atomicity
             \DB::transaction(function () use ($pairName, $user1, $user2) {
                 $chatroom = \App\Models\Chatroom::create([

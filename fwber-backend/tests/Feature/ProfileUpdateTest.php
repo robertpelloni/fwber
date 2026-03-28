@@ -29,7 +29,7 @@ class ProfileUpdateTest extends TestCase
         ]);
 
         $response->assertStatus(200);
-        
+
         $this->assertDatabaseHas('user_profiles', [
             'user_id' => $user->id,
             'is_travel_mode' => true,
@@ -55,7 +55,7 @@ class ProfileUpdateTest extends TestCase
         ]);
 
         $response->assertStatus(200);
-        
+
         $this->assertDatabaseHas('user_profiles', [
             'user_id' => $user->id,
             'is_travel_mode' => false,
@@ -67,7 +67,7 @@ class ProfileUpdateTest extends TestCase
     public function test_basic_profile_update_with_birthdate()
     {
         $user = User::factory()->create();
-        
+
         $response = $this->actingAs($user)->putJson('/api/profile', [
             'display_name' => 'Updated Name',
             'birthdate' => '1995-05-05',
@@ -77,19 +77,19 @@ class ProfileUpdateTest extends TestCase
                 'latitude' => 40.7128,
                 'longitude' => -74.0060,
                 'city' => 'New York',
-                'state' => 'NY'
-            ]
+                'state' => 'NY',
+            ],
         ]);
 
         $response->dump();
-        
+
         $response->assertStatus(200);
     }
 
     public function test_onboarding_profile_update()
     {
         $user = User::factory()->create();
-        
+
         // Mimic the payload from frontend
         $payload = [
             'display_name' => 'New User',
@@ -99,13 +99,13 @@ class ProfileUpdateTest extends TestCase
                 'city' => 'San Francisco',
                 'state' => 'CA',
                 // latitude and longitude might be missing if user didn't use geolocation
-            ]
+            ],
         ];
 
         $response = $this->actingAs($user)->putJson('/api/profile', $payload);
 
         $response->assertStatus(200);
-        
+
         $this->assertDatabaseHas('user_profiles', [
             'user_id' => $user->id,
             'display_name' => 'New User',
@@ -116,13 +116,13 @@ class ProfileUpdateTest extends TestCase
     public function test_preferences_age_range_validation()
     {
         $user = User::factory()->create();
-        
+
         // Test valid range
         $response = $this->actingAs($user)->putJson('/api/profile', [
             'preferences' => [
                 'age_range_min' => 25,
                 'age_range_max' => 35,
-            ]
+            ],
         ]);
         $response->assertStatus(200);
 
@@ -131,7 +131,7 @@ class ProfileUpdateTest extends TestCase
             'preferences' => [
                 'age_range_min' => 40,
                 'age_range_max' => 30,
-            ]
+            ],
         ]);
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['preferences.age_range_min', 'preferences.age_range_max']);

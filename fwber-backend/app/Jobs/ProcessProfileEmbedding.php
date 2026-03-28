@@ -31,7 +31,7 @@ class ProcessProfileEmbedding implements ShouldQueue
     {
         // Ensure index exists (idempotent)
         $vectorService->initializeIndex();
-        
+
         // Generate and store embedding
         $vectorService->storeProfile($this->profile);
     }

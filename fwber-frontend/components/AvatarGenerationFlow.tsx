@@ -228,8 +228,6 @@ export default function AvatarGenerationFlow({
           setGeneratedPhotoId(data.photo_id);
           setStep('preview');
           setError(null);
-      } else {
-          console.log('Avatar generation started, waiting for WebSocket...');
       }
     },
     onError: (err: any) => {

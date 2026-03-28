@@ -2,29 +2,30 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class PhotoEncryptionService
 {
     /**
      * Encrypt content and store it to the specified disk and path.
      *
-     * @param string $content Raw file content
-     * @param string $path Storage path
-     * @param string $disk Storage disk name
-     * @return bool
+     * @param  string  $content  Raw file content
+     * @param  string  $path  Storage path
+     * @param  string  $disk  Storage disk name
      */
     public function encryptAndStore(string $content, string $path, string $disk = 'local'): bool
     {
         try {
             // Encrypt the content using Laravel's encryption (AES-256-CBC by default)
             $encrypted = Crypt::encrypt($content);
+
             return Storage::disk($disk)->put($path, $encrypted);
         } catch (\Exception $e) {
-            Log::error("Encryption failed for path {$path}: " . $e->getMessage());
+            Log::error("Encryption failed for path {$path}: ".$e->getMessage());
+
             return false;
         }
     }
@@ -32,24 +33,25 @@ class PhotoEncryptionService
     /**
      * Retrieve encrypted content from storage and decrypt it.
      *
-     * @param string $path Storage path
-     * @param string $disk Storage disk name
+     * @param  string  $path  Storage path
+     * @param  string  $disk  Storage disk name
      * @return string Decrypted content
+     *
      * @throws FileNotFoundException
      * @throws \Illuminate\Contracts\Encryption\DecryptException
      */
     public function decryptAndRetrieve(string $path, string $disk = 'local'): string
     {
-        if (!Storage::disk($disk)->exists($path)) {
+        if (! Storage::disk($disk)->exists($path)) {
             throw new FileNotFoundException("File not found at path: {$path}");
         }
 
         $encryptedContent = Storage::disk($disk)->get($path);
-        
+
         try {
             return Crypt::decrypt($encryptedContent);
         } catch (\Exception $e) {
-            Log::error("Decryption failed for path {$path}: " . $e->getMessage());
+            Log::error("Decryption failed for path {$path}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -63,12 +65,12 @@ class PhotoEncryptionService
     public function decryptStream(string $path, string $disk = 'local')
     {
         $content = $this->decryptAndRetrieve($path, $disk);
-        
+
         // Create a temporary stream
         $stream = fopen('php://memory', 'r+');
         fwrite($stream, $content);
         rewind($stream);
-        
+
         return $stream;
     }
 }

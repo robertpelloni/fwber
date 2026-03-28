@@ -13,38 +13,38 @@ return new class extends Migration
     {
         Schema::table('user_profiles', function (Blueprint $table) {
             // Basic Info
-            if (!Schema::hasColumn('user_profiles', 'display_name')) {
+            if (! Schema::hasColumn('user_profiles', 'display_name')) {
                 $table->string('display_name')->nullable();
             }
-            if (!Schema::hasColumn('user_profiles', 'bio')) {
+            if (! Schema::hasColumn('user_profiles', 'bio')) {
                 $table->text('bio')->nullable();
             }
-            if (!Schema::hasColumn('user_profiles', 'birthdate')) {
+            if (! Schema::hasColumn('user_profiles', 'birthdate')) {
                 $table->date('birthdate')->nullable();
             }
-            if (!Schema::hasColumn('user_profiles', 'gender')) {
+            if (! Schema::hasColumn('user_profiles', 'gender')) {
                 $table->string('gender')->nullable();
             }
 
             // Location
-            if (!Schema::hasColumn('user_profiles', 'latitude')) {
+            if (! Schema::hasColumn('user_profiles', 'latitude')) {
                 $table->decimal('latitude', 10, 8)->nullable();
             }
-            if (!Schema::hasColumn('user_profiles', 'longitude')) {
+            if (! Schema::hasColumn('user_profiles', 'longitude')) {
                 $table->decimal('longitude', 11, 8)->nullable();
             }
-            if (!Schema::hasColumn('user_profiles', 'location_name')) {
+            if (! Schema::hasColumn('user_profiles', 'location_name')) {
                 $table->string('location_name')->nullable();
             }
 
             // Preferences & JSON fields
-            if (!Schema::hasColumn('user_profiles', 'looking_for')) {
+            if (! Schema::hasColumn('user_profiles', 'looking_for')) {
                 $table->json('looking_for')->nullable();
             }
-            if (!Schema::hasColumn('user_profiles', 'preferences')) {
+            if (! Schema::hasColumn('user_profiles', 'preferences')) {
                 $table->json('preferences')->nullable();
             }
-            if (!Schema::hasColumn('user_profiles', 'interested_in')) {
+            if (! Schema::hasColumn('user_profiles', 'interested_in')) {
                 $table->json('interested_in')->nullable();
             }
         });

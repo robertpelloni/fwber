@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Prunable;
+use Illuminate\Notifications\DatabaseNotification;
 
 class Notification extends DatabaseNotification
 {

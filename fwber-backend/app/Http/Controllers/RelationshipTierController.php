@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Api\UpdateRelationshipTierRequest;
+use App\Models\Photo;
+use App\Models\RelationshipTier;
 use App\Models\User;
 use App\Models\UserMatch;
-use App\Models\RelationshipTier;
-use App\Models\Photo;
 use App\Services\AchievementService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -49,16 +49,18 @@ class RelationshipTierController extends Controller
 
     /**
      * Get tier progress for a specific match
-     * 
+     *
      * @OA\Get(
      *   path="/matches/{matchId}/tier",
      *   tags={"Relationship Tiers"},
      *   summary="Get match tier progress",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="matchId", in="path", required=true, @OA\Schema(type="integer")),
+     *
      *   @OA\Response(response=200, description="Tier progress"),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-    *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function show(int $matchId): JsonResponse
@@ -70,9 +72,9 @@ class RelationshipTierController extends Controller
         $tier->updateDaysConnected();
 
         $userId = Auth::id();
-        $userConfirmed = ($tier->user1_confirmed_meeting_at && $match->user1_id === $userId) || 
+        $userConfirmed = ($tier->user1_confirmed_meeting_at && $match->user1_id === $userId) ||
                          ($tier->user2_confirmed_meeting_at && $match->user2_id === $userId);
-        $otherConfirmed = ($tier->user1_confirmed_meeting_at && $match->user1_id !== $userId) || 
+        $otherConfirmed = ($tier->user1_confirmed_meeting_at && $match->user1_id !== $userId) ||
                           ($tier->user2_confirmed_meeting_at && $match->user2_id !== $userId);
 
         return response()->json([
@@ -91,21 +93,26 @@ class RelationshipTierController extends Controller
 
     /**
      * Update tier metrics
-     * 
+     *
      * @OA\Put(
      *   path="/matches/{matchId}/tier",
      *   tags={"Relationship Tiers"},
      *   summary="Update tier metrics",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="matchId", in="path", required=true, @OA\Schema(type="integer")),
+     *
      *   @OA\RequestBody(
+     *
      *     @OA\JsonContent(
+     *
      *       @OA\Property(property="increment_messages", type="boolean"),
      *       @OA\Property(property="mark_met_in_person", type="boolean")
      *     )
      *   ),
+     *
      *   @OA\Response(response=200, description="Tier updated"),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function update(UpdateRelationshipTierRequest $request, int $matchId): JsonResponse
@@ -135,9 +142,9 @@ class RelationshipTierController extends Controller
                 'established' => 4,
                 'verified' => 5,
             ];
-            
+
             $tierValue = $tierMap[$tier->current_tier] ?? 0;
-            
+
             $user1 = User::find($match->user1_id);
             $user2 = User::find($match->user2_id);
 
@@ -159,9 +166,9 @@ class RelationshipTierController extends Controller
         }
 
         $userId = Auth::id();
-        $userConfirmed = ($tier->user1_confirmed_meeting_at && $match->user1_id === $userId) || 
+        $userConfirmed = ($tier->user1_confirmed_meeting_at && $match->user1_id === $userId) ||
                          ($tier->user2_confirmed_meeting_at && $match->user2_id === $userId);
-        $otherConfirmed = ($tier->user1_confirmed_meeting_at && $match->user1_id !== $userId) || 
+        $otherConfirmed = ($tier->user1_confirmed_meeting_at && $match->user1_id !== $userId) ||
                           ($tier->user2_confirmed_meeting_at && $match->user2_id !== $userId);
 
         return response()->json([
@@ -180,23 +187,28 @@ class RelationshipTierController extends Controller
 
     /**
      * Get photos for a match based on current tier
-     * 
+     *
      * @OA\Get(
      *   path="/matches/{matchId}/tier/photos",
      *   tags={"Relationship Tiers"},
      *   summary="Get tier-based photos (progressive unlock)",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="matchId", in="path", required=true, @OA\Schema(type="integer")),
+     *
      *   @OA\Response(
      *     response=200,
      *     description="Photos visible at current tier",
+     *
      *     @OA\JsonContent(
+     *
      *       @OA\Property(property="ai_photos", type="array", @OA\Items(type="object")),
      *       @OA\Property(property="real_photos", type="object"),
      *       @OA\Property(property="unlock_requirements", type="object")
      *     )
      *   ),
-    *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
+     *
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function getPhotos(int $matchId): JsonResponse
@@ -207,7 +219,7 @@ class RelationshipTierController extends Controller
         // Get the other user's photos
         $userId = Auth::id();
         $otherUser = $match->getOtherUser($userId);
-        
+
         $aiPhotos = Photo::where('user_id', $otherUser->id)
             ->where('photo_type', 'ai')
             ->orderBy('sort_order')
@@ -223,28 +235,28 @@ class RelationshipTierController extends Controller
         return response()->json([
             'match_id' => $matchId,
             'current_tier' => $tier->current_tier,
-            'ai_photos' => $aiPhotos->map(fn($photo) => [
+            'ai_photos' => $aiPhotos->map(fn ($photo) => [
                 'id' => $photo->id,
-                'url' => asset('storage/' . $photo->file_path),
-                'thumbnail_url' => $photo->thumbnail_path ? asset('storage/' . $photo->thumbnail_path) : null,
+                'url' => asset('storage/'.$photo->file_path),
+                'thumbnail_url' => $photo->thumbnail_path ? asset('storage/'.$photo->thumbnail_path) : null,
                 'type' => 'ai',
                 'is_primary' => $photo->is_primary,
             ]),
             'real_photos' => [
-                'visible' => $realPhotos->take($photoCounts['real'])->map(fn($photo) => [
+                'visible' => $realPhotos->take($photoCounts['real'])->map(fn ($photo) => [
                     'id' => $photo->id,
-                    'url' => asset('storage/' . $photo->file_path),
-                    'thumbnail_url' => $photo->thumbnail_path ? asset('storage/' . $photo->thumbnail_path) : null,
+                    'url' => asset('storage/'.$photo->file_path),
+                    'thumbnail_url' => $photo->thumbnail_path ? asset('storage/'.$photo->thumbnail_path) : null,
                     'type' => 'real',
                     'is_primary' => $photo->is_primary,
                     'blurred' => false,
                 ]),
                 'blurred' => $realPhotos->skip($photoCounts['real'])
                     ->take($photoCounts['blurred'])
-                    ->map(fn($photo) => [
+                    ->map(fn ($photo) => [
                         'id' => $photo->id,
-                        'url' => asset('storage/' . $photo->file_path),
-                        'thumbnail_url' => $photo->thumbnail_path ? asset('storage/' . $photo->thumbnail_path) : null,
+                        'url' => asset('storage/'.$photo->file_path),
+                        'thumbnail_url' => $photo->thumbnail_path ? asset('storage/'.$photo->thumbnail_path) : null,
                         'type' => 'real',
                         'is_primary' => $photo->is_primary,
                         'blurred' => true,
@@ -268,7 +280,7 @@ class RelationshipTierController extends Controller
                     'requirements' => [
                         ['description' => 'Exchange at least 10 messages', 'met' => $tier->messages_exchanged >= 10],
                         ['description' => 'Stay connected for 1+ days', 'met' => $tier->days_connected >= 1],
-                    ]
+                    ],
                 ];
 
             case 'connected':
@@ -277,7 +289,7 @@ class RelationshipTierController extends Controller
                     'requirements' => [
                         ['description' => 'Exchange at least 50 messages', 'met' => $tier->messages_exchanged >= 50],
                         ['description' => 'Stay connected for 7+ days', 'met' => $tier->days_connected >= 7],
-                    ]
+                    ],
                 ];
 
             case 'established':
@@ -286,13 +298,13 @@ class RelationshipTierController extends Controller
                     'requirements' => [
                         ['description' => 'Meet in person', 'met' => $tier->has_met_in_person],
                         ['description' => 'Both confirm meeting', 'met' => $tier->has_met_in_person],
-                    ]
+                    ],
                 ];
 
             case 'verified':
                 return [
                     'next_tier' => null,
-                    'requirements' => []
+                    'requirements' => [],
                 ];
 
             default:

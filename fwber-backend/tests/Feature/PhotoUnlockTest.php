@@ -67,7 +67,7 @@ class PhotoUnlockTest extends TestCase
             ->postJson("/api/photos/{$photo->id}/unlock");
 
         $response->assertStatus(402);
-        
+
         $this->assertDatabaseMissing('photo_unlocks', [
             'user_id' => $unlocker->id,
             'photo_id' => $photo->id,

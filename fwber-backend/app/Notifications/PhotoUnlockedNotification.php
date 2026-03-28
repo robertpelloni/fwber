@@ -2,11 +2,10 @@
 
 namespace App\Notifications;
 
-use App\Models\User;
 use App\Models\Photo;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class PhotoUnlockedNotification extends Notification implements ShouldQueue
@@ -14,6 +13,7 @@ class PhotoUnlockedNotification extends Notification implements ShouldQueue
     use Queueable;
 
     protected $unlocker;
+
     protected $photo;
 
     /**

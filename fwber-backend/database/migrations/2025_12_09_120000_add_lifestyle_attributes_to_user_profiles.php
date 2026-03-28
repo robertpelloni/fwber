@@ -43,7 +43,7 @@ return new class extends Migration
                 'wants_children',
                 'has_pets',
                 'languages',
-                'interests'
+                'interests',
             ]);
         });
     }

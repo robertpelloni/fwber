@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\ProximityChatroom;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
@@ -29,7 +28,7 @@ class ProximityChatroomTest extends TestCase
     public function test_can_create_proximity_chatroom()
     {
         $user = User::factory()->create();
-        
+
         $chatroom = ProximityChatroom::factory()->create([
             'created_by' => $user->id,
             'name' => 'Test Area',
@@ -72,7 +71,7 @@ class ProximityChatroomTest extends TestCase
 
         // Point within 1000m (approx)
         // 0.001 degree lat is approx 111m
-        $nearbyLat = 40.7128 + 0.001; 
+        $nearbyLat = 40.7128 + 0.001;
         $nearbyLng = -74.0060;
 
         $this->assertTrue($chatroom->isWithinProximity($nearbyLat, $nearbyLng));

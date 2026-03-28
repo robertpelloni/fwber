@@ -5,14 +5,14 @@ namespace App\Jobs;
 use App\Models\Subscription;
 use App\Models\User;
 use App\Notifications\SubscriptionExpiredNotification;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class CleanupExpiredSubscriptions implements ShouldQueue
 {
@@ -60,14 +60,16 @@ class CleanupExpiredSubscriptions implements ShouldQueue
 
         if ($count === 0) {
             Log::info('CleanupExpiredSubscriptions: No expired subscriptions to process');
+
             return;
         }
 
         foreach ($expiredSubscriptions as $subscription) {
             $user = $subscription->user;
-            
-            if (!$user) {
+
+            if (! $user) {
                 Log::warning("CleanupExpiredSubscriptions: User not found for subscription {$subscription->id}");
+
                 continue;
             }
 
@@ -91,7 +93,7 @@ class CleanupExpiredSubscriptions implements ShouldQueue
                 try {
                     $user->notify(new SubscriptionExpiredNotification($subscription));
                 } catch (\Exception $e) {
-                    Log::error("CleanupExpiredSubscriptions: Failed to notify user {$user->id}: " . $e->getMessage());
+                    Log::error("CleanupExpiredSubscriptions: Failed to notify user {$user->id}: ".$e->getMessage());
                 }
             }
         }
@@ -104,6 +106,6 @@ class CleanupExpiredSubscriptions implements ShouldQueue
      */
     public function failed(\Throwable $exception): void
     {
-        Log::error('CleanupExpiredSubscriptions job failed: ' . $exception->getMessage());
+        Log::error('CleanupExpiredSubscriptions job failed: '.$exception->getMessage());
     }
 }

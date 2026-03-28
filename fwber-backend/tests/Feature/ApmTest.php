@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\SlowRequest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
-use App\Models\SlowRequest;
 
 class ApmTest extends TestCase
 {
@@ -15,7 +15,7 @@ class ApmTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Enable APM and set threshold to 100ms for testing
         Config::set('apm.enabled', true);
         Config::set('apm.slow_request_threshold', 100);
@@ -26,6 +26,7 @@ class ApmTest extends TestCase
         // Define a slow route
         Route::get('test/slow', function () {
             usleep(200000); // 200ms
+
             return 'slow';
         })->middleware(\App\Http\Middleware\ApmMiddleware::class);
 
@@ -39,7 +40,7 @@ class ApmTest extends TestCase
             'url' => 'http://localhost:8000/test/slow',
             'method' => 'GET',
         ]);
-        
+
         // Verify duration is recorded
         $log = SlowRequest::where('url', 'http://localhost:8000/test/slow')->first();
         $this->assertNotNull($log);

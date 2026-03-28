@@ -23,7 +23,7 @@ class IdentityController extends Controller
         ]);
 
         $user = Auth::user();
-        
+
         $success = $this->idService->verifyProof($user, $request->only(['proof', 'issuer']));
 
         if ($success) {
@@ -48,7 +48,7 @@ class IdentityController extends Controller
         $profile = Auth::user()->profile;
 
         return response()->json([
-            'is_id_verified' => (bool)$profile->is_id_verified,
+            'is_id_verified' => (bool) $profile->is_id_verified,
             'issuer' => $profile->zk_id_issuer,
             'verified_at' => $profile->id_verified_at,
         ]);

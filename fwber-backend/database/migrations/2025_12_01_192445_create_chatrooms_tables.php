@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('chatrooms')) {
+        if (! Schema::hasTable('chatrooms')) {
             Schema::create('chatrooms', function (Blueprint $table) {
                 $table->id();
                 $table->string('name', 100);
@@ -31,7 +31,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('chatroom_members')) {
+        if (! Schema::hasTable('chatroom_members')) {
             Schema::create('chatroom_members', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('chatroom_id')->constrained()->onDelete('cascade');
@@ -48,7 +48,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('chatroom_messages')) {
+        if (! Schema::hasTable('chatroom_messages')) {
             Schema::create('chatroom_messages', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('chatroom_id')->constrained()->onDelete('cascade');
@@ -69,7 +69,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('chatroom_message_reactions')) {
+        if (! Schema::hasTable('chatroom_message_reactions')) {
             Schema::create('chatroom_message_reactions', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('chatroom_message_id')->constrained()->onDelete('cascade');
@@ -79,7 +79,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('chatroom_message_mentions')) {
+        if (! Schema::hasTable('chatroom_message_mentions')) {
             Schema::create('chatroom_message_mentions', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('chatroom_message_id')->constrained()->onDelete('cascade');

@@ -16,11 +16,14 @@ class SubscriptionController extends Controller
      *     summary="Get user's subscriptions",
      *     tags={"Subscriptions"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="List of user's subscriptions",
+     *
      *         @OA\JsonContent(
      *             type="array",
+     *
      *             @OA\Items(ref="#/components/schemas/Subscription")
      *         )
      *     )
@@ -29,9 +32,9 @@ class SubscriptionController extends Controller
     public function index(Request $request)
     {
         $userId = Auth::id();
-        
+
         // Cache for 5 minutes with user-specific tagged caching
-        $cacheKey = config('optimization.cache_version') . ":subscriptions:user:{$userId}";
+        $cacheKey = config('optimization.cache_version').":subscriptions:user:{$userId}";
         $subscriptions = Cache::tags(['subscriptions', "user:{$userId}"])
             ->remember($cacheKey, 300, function () use ($userId) {
                 return Subscription::where('user_id', $userId)
@@ -48,11 +51,14 @@ class SubscriptionController extends Controller
      *     summary="Get user's payment history",
      *     tags={"Subscriptions"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Paginated list of payments",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Payment")),
      *             @OA\Property(property="current_page", type="integer"),
      *             @OA\Property(property="per_page", type="integer"),
@@ -65,9 +71,9 @@ class SubscriptionController extends Controller
     {
         $userId = Auth::id();
         $page = $request->input('page', 1);
-        
+
         // Cache for 10 minutes with user-specific and page-specific tagged caching
-        $cacheKey = config('optimization.cache_version') . ":payments:history:user:{$userId}:page:{$page}";
+        $cacheKey = config('optimization.cache_version').":payments:history:user:{$userId}:page:{$page}";
         $payments = Cache::tags(['subscriptions', "user:{$userId}"])
             ->remember($cacheKey, 600, function () use ($userId) {
                 return Payment::where('user_id', $userId)
@@ -84,14 +90,18 @@ class SubscriptionController extends Controller
      *     summary="Cancel active subscription",
      *     tags={"Subscriptions"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Subscription canceled successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string"),
      *             @OA\Property(property="ends_at", type="string", format="date-time")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=400,
      *         description="No active subscription found"
@@ -101,12 +111,12 @@ class SubscriptionController extends Controller
     public function cancel(Request $request)
     {
         $user = $request->user();
-        
+
         $subscription = Subscription::where('user_id', $user->id)
             ->where('stripe_status', 'active')
             ->first();
 
-        if (!$subscription) {
+        if (! $subscription) {
             return response()->json(['message' => 'No active subscription found.'], 400);
         }
 
@@ -115,7 +125,7 @@ class SubscriptionController extends Controller
             $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
             $stripe->subscriptions->cancel($subscription->stripe_id, []);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Stripe cancellation failed: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Stripe cancellation failed: '.$e->getMessage()], 500);
         }
 
         $subscription->stripe_status = 'canceled';
@@ -126,8 +136,8 @@ class SubscriptionController extends Controller
         Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
 
         return response()->json([
-            'message' => 'Subscription canceled successfully. You will retain access until ' . $subscription->ends_at->format('Y-m-d'),
-            'ends_at' => $subscription->ends_at
+            'message' => 'Subscription canceled successfully. You will retain access until '.$subscription->ends_at->format('Y-m-d'),
+            'ends_at' => $subscription->ends_at,
         ]);
     }
 
@@ -155,6 +165,7 @@ class SubscriptionController extends Controller
     public function show($id)
     {
         $subscription = Subscription::where('user_id', Auth::id())->findOrFail($id);
+
         return response()->json($subscription);
     }
 

@@ -8,7 +8,6 @@ use App\Models\Chatroom;
 use App\Models\Event;
 use App\Models\EventAttendee;
 use App\Models\Payment;
-use App\Models\TokenTransaction;
 use App\Services\Payment\PaymentGatewayInterface;
 use App\Services\TokenDistributionService;
 use Illuminate\Http\Request;
@@ -19,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 class EventController extends Controller
 {
     protected $paymentGateway;
+
     protected $tokenService;
 
     public function __construct(PaymentGatewayInterface $paymentGateway, TokenDistributionService $tokenService)
@@ -26,45 +26,57 @@ class EventController extends Controller
         $this->paymentGateway = $paymentGateway;
         $this->tokenService = $tokenService;
     }
+
     /**
      * @OA\Get(
      *     path="/api/events",
      *     summary="List nearby events",
      *     tags={"Events"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="latitude",
      *         in="query",
      *         description="User's latitude for geospatial search",
      *         required=false,
+     *
      *         @OA\Schema(type="number", format="float")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="longitude",
      *         in="query",
      *         description="User's longitude for geospatial search",
      *         required=false,
+     *
      *         @OA\Schema(type="number", format="float")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="radius",
      *         in="query",
      *         description="Search radius in kilometers (default: 10)",
      *         required=false,
+     *
      *         @OA\Schema(type="number", format="float", default=10)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="status",
      *         in="query",
      *         description="Filter by event status",
      *         required=false,
+     *
      *         @OA\Schema(type="string", enum={"upcoming", "ongoing", "completed", "cancelled"})
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="List of events with attendee counts",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Event")),
      *             @OA\Property(property="current_page", type="integer"),
      *             @OA\Property(property="per_page", type="integer"),
@@ -76,7 +88,7 @@ class EventController extends Controller
     public function index(Request $request)
     {
         // Generate cache key based on query parameters
-        $cacheKey = config('optimization.cache_version') . ':events:index:' . md5(json_encode([
+        $cacheKey = config('optimization.cache_version').':events:index:'.md5(json_encode([
             'lat' => $request->latitude,
             'lon' => $request->longitude,
             'radius' => $request->radius,
@@ -99,9 +111,9 @@ class EventController extends Controller
                     // Simple box approximation for testing
                     $latRange = $radius / 111;
                     $lonRange = $radius / (111 * cos(deg2rad($lat)));
-                    
+
                     $query->whereBetween('latitude', [$lat - $latRange, $lat + $latRange])
-                          ->whereBetween('longitude', [$lon - $lonRange, $lon + $lonRange]);
+                        ->whereBetween('longitude', [$lon - $lonRange, $lon + $lonRange]);
                 } else {
                     $query->select('*')
                         ->selectRaw(
@@ -139,10 +151,13 @@ class EventController extends Controller
      *     summary="Create a new event",
      *     tags={"Events"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"title", "description", "location_name", "latitude", "longitude", "starts_at", "ends_at"},
+     *
      *             @OA\Property(property="title", type="string", maxLength=255),
      *             @OA\Property(property="description", type="string"),
      *             @OA\Property(property="location_name", type="string"),
@@ -155,11 +170,14 @@ class EventController extends Controller
      *             @OA\Property(property="shared_group_ids", type="array", @OA\Items(type="integer"), nullable=true)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Event created successfully",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/Event")
      *     ),
+     *
      *     @OA\Response(response=422, description="Validation error")
      * )
      */
@@ -176,7 +194,7 @@ class EventController extends Controller
         // Create a dedicated chatroom for this event
         $chatroom = Chatroom::create([
             'name' => $event->title,
-            'description' => 'Official discussion for event: ' . $event->title,
+            'description' => 'Official discussion for event: '.$event->title,
             'type' => 'event',
             'category' => 'event',
             'created_by' => Auth::id(),
@@ -193,10 +211,10 @@ class EventController extends Controller
 
         // Attach shared groups if provided
         if ($request->has('shared_group_ids')) {
-             $groupIds = $request->input('shared_group_ids');
-             // Validate user is admin of these groups or they are connected?
-             // For now, simple attachment
-             $event->groups()->attach($groupIds);
+            $groupIds = $request->input('shared_group_ids');
+            // Validate user is admin of these groups or they are connected?
+            // For now, simple attachment
+            $event->groups()->attach($groupIds);
         }
 
         // Invalidate events cache
@@ -211,17 +229,22 @@ class EventController extends Controller
      *     summary="Get event details",
      *     tags={"Events"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Event details with creator and attendees",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/Event")
      *     ),
+     *
      *     @OA\Response(response=404, description="Event not found")
      * )
      */
@@ -230,7 +253,7 @@ class EventController extends Controller
         $event = Event::with(['creator', 'attendees.user', 'groups', 'chatroom'])
             ->withCount('attendees')
             ->findOrFail($id);
-            
+
         return response()->json($event);
     }
 
@@ -240,11 +263,14 @@ class EventController extends Controller
      *     summary="Get user's created and attending events",
      *     tags={"Events"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="List of user's events",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Event"))
      *         )
      *     )
@@ -253,12 +279,12 @@ class EventController extends Controller
     public function myEvents(Request $request)
     {
         $user = Auth::user();
-        
+
         // Events created by user OR events user is attending
         $events = Event::where('created_by_user_id', $user->id)
             ->orWhereHas('attendees', function ($query) use ($user) {
                 $query->where('user_id', $user->id)
-                      ->where('status', 'attending');
+                    ->where('status', 'attending');
             })
             ->withCount('attendees')
             ->orderBy('starts_at', 'desc')
@@ -273,27 +299,36 @@ class EventController extends Controller
      *     summary="RSVP to an event",
      *     tags={"Events"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"status"},
+     *
      *             @OA\Property(property="status", type="string", enum={"attending", "maybe", "declined"})
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="RSVP updated successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string"),
      *             @OA\Property(property="rsvp", type="object")
      *         )
      *     ),
+     *
      *     @OA\Response(response=400, description="Event is full"),
      *     @OA\Response(response=404, description="Event not found")
      * )
@@ -312,46 +347,46 @@ class EventController extends Controller
                 ->where('user_id', $user->id)
                 ->where('status', 'attending')
                 ->isNotEmpty();
-                
-            if (!$isAlreadyAttending && $currentAttendees >= $event->max_attendees) {
+
+            if (! $isAlreadyAttending && $currentAttendees >= $event->max_attendees) {
                 return response()->json(['message' => 'Event is full'], 400);
             }
         }
 
         $existingAttendee = $event->attendees->where('user_id', $user->id)->first();
         $alreadyPaid = $existingAttendee && $existingAttendee->paid;
-        
+
         $paymentData = [];
 
         // Handle Payment Logic if switching to attending and not paid
         $hasPrice = $event->price > 0 || $event->token_cost > 0;
 
-        if ($request->status === 'attending' && $hasPrice && !$alreadyPaid) {
+        if ($request->status === 'attending' && $hasPrice && ! $alreadyPaid) {
             $paymentMethod = $request->input('payment_method');
-            
+
             // If no payment method provided for a paid event, return error
-            if (!$paymentMethod) {
-                 return response()->json(['error' => 'Payment method required for paid events'], 400);
+            if (! $paymentMethod) {
+                return response()->json(['error' => 'Payment method required for paid events'], 400);
             }
 
             $transactionId = null;
 
             if ($paymentMethod === 'token') {
                 $tokenCost = $event->token_cost ?? ($event->price * 10);
-                
+
                 if ($tokenCost > 0) {
                     try {
                         // P2P Payment: Deduct from Attendee, Credit Organizer
                         $this->tokenService->transferTokens(
-                            $user, 
-                            $event->creator, 
-                            $tokenCost, 
-                            'event_ticket', 
+                            $user,
+                            $event->creator,
+                            $tokenCost,
+                            'event_ticket',
                             "Ticket for event: {$event->title}",
                             ['event_id' => $event->id]
                         );
 
-                        $transactionId = 'token_' . uniqid();
+                        $transactionId = 'token_'.uniqid();
                     } catch (\Exception $e) {
                         return response()->json(['error' => $e->getMessage()], 400);
                     }
@@ -359,20 +394,20 @@ class EventController extends Controller
             } else {
                 // Stripe (Only checks fiat price)
                 if ($event->price <= 0) {
-                     return response()->json(['error' => 'This event has no fiat price.'], 400);
+                    return response()->json(['error' => 'This event has no fiat price.'], 400);
                 }
                 $paymentMethodId = $request->input('payment_method_id');
-                if (!$paymentMethodId) {
-                        return response()->json(['error' => 'Payment method ID required for paid events'], 400);
+                if (! $paymentMethodId) {
+                    return response()->json(['error' => 'Payment method ID required for paid events'], 400);
                 }
 
                 try {
                     $result = $this->paymentGateway->charge($event->price, 'USD', $paymentMethodId);
-                    if (!$result->success) {
-                        return response()->json(['error' => 'Payment failed: ' . $result->message], 400);
+                    if (! $result->success) {
+                        return response()->json(['error' => 'Payment failed: '.$result->message], 400);
                     }
                     $transactionId = $result->transactionId;
-                    
+
                     // Log Payment
                     Payment::create([
                         'user_id' => $user->id,
@@ -385,7 +420,7 @@ class EventController extends Controller
                         'metadata' => $result->data,
                     ]);
                 } catch (\Exception $e) {
-                    return response()->json(['error' => 'Payment error: ' . $e->getMessage()], 500);
+                    return response()->json(['error' => 'Payment error: '.$e->getMessage()], 500);
                 }
             }
 
@@ -404,7 +439,7 @@ class EventController extends Controller
         // Add user to the event chatroom if they are attending
         if ($event->chatroom_id && $request->status === 'attending') {
             $chatroom = Chatroom::find($event->chatroom_id);
-            if ($chatroom && !$chatroom->hasMember($user)) {
+            if ($chatroom && ! $chatroom->hasMember($user)) {
                 $chatroom->addMember($user, 'member');
             }
         }
@@ -414,7 +449,7 @@ class EventController extends Controller
         if ($event->chatroom_id && $request->status === 'declined') {
             $chatroom = Chatroom::find($event->chatroom_id);
             if ($chatroom && $chatroom->hasMember($user)) {
-                 $chatroom->removeMember($user);
+                $chatroom->removeMember($user);
             }
         }
 

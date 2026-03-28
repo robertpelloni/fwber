@@ -25,16 +25,16 @@ class DetroitSeedContentSeeder extends Seeder
         ];
 
         $posts = [
-            ['Midtown', "Grabbing a pour-over at Anthology. The vibe is perfect for a first date. Anyone nearby?"],
-            ['Midtown', "Checking out the new exhibit at the DIA. Truly stunning. #DetroitArts"],
-            ['Corktown', "Slows BBQ is packed tonight! Who wants to grab a drink while we wait for a table?"],
-            ['Corktown', "Is it just me or is Michigan Ave getting more beautiful every day?"],
-            ['Downtown', "The Belt is glowing tonight. Perfect spot for a neon-noir photo op."],
-            ['Downtown', "Just finished a walk along the Riverfront. Detroit, I love you."],
-            ['Eastern Market', "Found the best vintage leather jacket at the Saturday market! ✨"],
-            ['Eastern Market', "Flowers, food, and community. Nothing beats a morning here."],
+            ['Midtown', 'Grabbing a pour-over at Anthology. The vibe is perfect for a first date. Anyone nearby?'],
+            ['Midtown', 'Checking out the new exhibit at the DIA. Truly stunning. #DetroitArts'],
+            ['Corktown', 'Slows BBQ is packed tonight! Who wants to grab a drink while we wait for a table?'],
+            ['Corktown', 'Is it just me or is Michigan Ave getting more beautiful every day?'],
+            ['Downtown', 'The Belt is glowing tonight. Perfect spot for a neon-noir photo op.'],
+            ['Downtown', 'Just finished a walk along the Riverfront. Detroit, I love you.'],
+            ['Eastern Market', 'Found the best vintage leather jacket at the Saturday market! ✨'],
+            ['Eastern Market', 'Flowers, food, and community. Nothing beats a morning here.'],
             ['West Village', "Sister Pie cookies are dangerous. I've had three already. Help."],
-            ['West Village', "Does anyone know if the tennis courts at Belle Isle are open today?"],
+            ['West Village', 'Does anyone know if the tennis courts at Belle Isle are open today?'],
         ];
 
         foreach ($posts as $index => $postData) {
@@ -44,9 +44,9 @@ class DetroitSeedContentSeeder extends Seeder
 
             // Create or find a seed user for each post
             $user = User::updateOrCreate(
-                ['email' => "seed" . ($index + 1) . "@fwber.test"],
+                ['email' => 'seed'.($index + 1).'@fwber.test'],
                 [
-                    'name' => "SeedUser_" . ($index + 1),
+                    'name' => 'SeedUser_'.($index + 1),
                     'password' => Hash::make('password'),
                     'token_balance' => 100,
                 ]
@@ -55,10 +55,10 @@ class DetroitSeedContentSeeder extends Seeder
             UserProfile::updateOrCreate(
                 ['user_id' => $user->id],
                 [
-                    'bio' => "Detroit local. Love " . $neighborhood . ".",
+                    'bio' => 'Detroit local. Love '.$neighborhood.'.',
                     'latitude' => $coords['lat'] + (rand(-100, 100) / 100000), // Tiny variance
                     'longitude' => $coords['lng'] + (rand(-100, 100) / 100000),
-                    'location_name' => $neighborhood . ", Detroit",
+                    'location_name' => $neighborhood.', Detroit',
                     'is_verified' => true,
                 ]
             );

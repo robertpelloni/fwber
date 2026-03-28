@@ -6,7 +6,6 @@ use App\Models\Event;
 use App\Models\Group;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 
 class WarmCache extends Command
 {
@@ -40,17 +39,17 @@ class WarmCache extends Command
     protected function warmGroups()
     {
         $this->info('Warming groups cache...');
-        
+
         $start = microtime(true);
-        
+
         // Replicate GroupController::index logic for public groups
         $groups = Group::where('privacy', 'public')
             ->orWhere('visibility', 'visible')
             ->withCount('members')
             ->get();
 
-        $cacheKey = config('optimization.cache_version') . ':groups:index:public';
-        
+        $cacheKey = config('optimization.cache_version').':groups:index:public';
+
         // Driver safety check: only use tags if supported (e.g. redis, memcached)
         if (config('cache.default') === 'redis' || config('cache.default') === 'memcached') {
             Cache::tags(['groups'])->put($cacheKey, $groups, 600);
@@ -70,10 +69,10 @@ class WarmCache extends Command
 
         // Replicate EventController::index logic for default view (no geo, page 1)
         // Key generation must match controller exactly
-        $cacheKey = config('optimization.cache_version') . ':events:index:' . md5(json_encode([
+        $cacheKey = config('optimization.cache_version').':events:index:'.md5(json_encode([
             'lat' => null,
             'lon' => null,
-            'radius' => null, 
+            'radius' => null,
             'status' => null,
             'page' => 1,
         ]));

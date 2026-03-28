@@ -2,13 +2,12 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Log;
-use App\Models\User;
 use App\Events\ChatMessageSent;
 use App\Events\NotificationSent;
-use App\Events\TypingIndicator;
-use App\Events\VideoSignal;
 use App\Events\PresenceUpdate;
+use App\Events\TypingIndicator;
+use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class WebSocketService
 {
@@ -68,6 +67,7 @@ class WebSocketService
             // For now, we can reuse handleChatMessage or similar if appropriate
             // Or create a generic BroadcastMessage event
         }
+
         return true;
     }
 
@@ -86,7 +86,7 @@ class WebSocketService
         } catch (\Exception $e) {
             Log::error('Failed to send presence update', [
                 'user_id' => $userId,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return false;
@@ -100,12 +100,13 @@ class WebSocketService
     {
         try {
             broadcast(new NotificationSent($userId, $notification));
+
             return true;
 
         } catch (\Exception $e) {
             Log::error('Failed to send notification', [
                 'user_id' => $userId,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return false;
@@ -119,13 +120,14 @@ class WebSocketService
     {
         try {
             broadcast(new ChatMessageSent($userId, $recipientId, $message));
+
             return true;
 
         } catch (\Exception $e) {
             Log::error('Failed to handle chat message', [
                 'user_id' => $userId,
                 'recipient_id' => $recipientId,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return false;
@@ -139,6 +141,7 @@ class WebSocketService
     {
         try {
             broadcast(new TypingIndicator($userId, $recipientId, $chatroomId, $isTyping));
+
             return true;
 
         } catch (\Exception $e) {
@@ -146,7 +149,7 @@ class WebSocketService
                 'user_id' => $userId,
                 'recipient_id' => $recipientId,
                 'chatroom_id' => $chatroomId,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return false;

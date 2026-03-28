@@ -68,7 +68,7 @@ class StripePaymentGateway implements PaymentGatewayInterface
                     'metadata' => $metadata,
                     'automatic_payment_methods' => [
                         'enabled' => true,
-                        'allow_redirects' => 'never'
+                        'allow_redirects' => 'never',
                     ],
                 ]);
 
@@ -88,7 +88,7 @@ class StripePaymentGateway implements PaymentGatewayInterface
         try {
             // Try as PaymentIntent first
             $refund = $this->stripe->refunds->create(['payment_intent' => $transactionId]);
-            
+
             return new PaymentResult(
                 success: true,
                 transactionId: $refund->id
@@ -97,6 +97,7 @@ class StripePaymentGateway implements PaymentGatewayInterface
             // Fallback for Charge ID
             try {
                 $refund = $this->stripe->refunds->create(['charge' => $transactionId]);
+
                 return new PaymentResult(
                     success: true,
                     transactionId: $refund->id
@@ -111,7 +112,7 @@ class StripePaymentGateway implements PaymentGatewayInterface
     {
         try {
             $intent = $this->stripe->paymentIntents->retrieve($paymentId);
-            
+
             if ($intent->status === 'succeeded') {
                 return new PaymentResult(
                     success: true,
@@ -119,10 +120,10 @@ class StripePaymentGateway implements PaymentGatewayInterface
                     data: $intent->toArray()
                 );
             }
-            
+
             return new PaymentResult(
-                success: false, 
-                message: 'Payment not succeeded. Status: ' . $intent->status,
+                success: false,
+                message: 'Payment not succeeded. Status: '.$intent->status,
                 data: $intent->toArray()
             );
         } catch (Exception $e) {

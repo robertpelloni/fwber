@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class SentryContext
@@ -30,7 +29,7 @@ class SentryContext
                 $scope->setTag('environment', config('app.env'));
                 $scope->setTag('http_method', $request->method());
                 $scope->setTag('route', $request->route()?->getName() ?? 'unknown');
-                
+
                 // Add request metadata
                 $scope->setContext('request', [
                     'url' => $request->fullUrl(),

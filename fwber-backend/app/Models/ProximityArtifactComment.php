@@ -2,17 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\ProximityArtifact;
-use App\Models\User;
-
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class ProximityArtifactComment extends Model
 {
-    use HasFactory, SoftDeletes, HasUuids;
+    use HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
         'proximity_artifact_id',
@@ -30,7 +27,7 @@ class ProximityArtifactComment extends Model
     {
         return $this->belongsTo(User::class);
     }
-    
+
     public function parent()
     {
         return $this->belongsTo(self::class, 'parent_id');

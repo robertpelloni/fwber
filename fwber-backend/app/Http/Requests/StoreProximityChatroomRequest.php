@@ -10,6 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @OA\Schema(
  *   schema="StoreProximityChatroomRequest",
  *   required={"name", "type", "latitude", "longitude"},
+ *
  *   @OA\Property(property="name", type="string", maxLength=100),
  *   @OA\Property(property="description", type="string", maxLength=500),
  *   @OA\Property(property="type", type="string", enum={"conference", "event", "venue", "area", "temporary"}),

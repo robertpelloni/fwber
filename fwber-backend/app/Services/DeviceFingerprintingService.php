@@ -3,13 +3,13 @@
 namespace App\Services;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 
 class DeviceFingerprintingService
 {
     private array $config;
+
     private array $suspiciousPatterns;
 
     public function __construct()
@@ -57,11 +57,11 @@ class DeviceFingerprintingService
 
         // Add IP-based components (hashed for privacy)
         $ip = $request->ip();
-        $components['ip_hash'] = hash('sha256', $ip . config('app.key'));
+        $components['ip_hash'] = hash('sha256', $ip.config('app.key'));
 
         // Create fingerprint
         $fingerprint = hash('sha256', implode('|', $components));
-        
+
         return $fingerprint;
     }
 
@@ -122,7 +122,7 @@ class DeviceFingerprintingService
     {
         $key = $this->buildKey($fingerprint);
         $associatedUsers = Redis::smembers($key);
-        
+
         if (count($associatedUsers) > $this->config['max_users_per_device']) {
             return [
                 'suspicious' => true,
@@ -152,7 +152,7 @@ class DeviceFingerprintingService
     {
         $blockKey = $this->buildBlockKey($fingerprint);
         Redis::setex($blockKey, $this->config['device_block_duration'], $reason);
-        
+
         Log::warning('Device blocked', [
             'fingerprint' => $fingerprint,
             'reason' => $reason,
@@ -167,7 +167,7 @@ class DeviceFingerprintingService
     {
         $blockKey = $this->buildBlockKey($fingerprint);
         $blockReason = Redis::get($blockKey);
-        
+
         if ($blockReason) {
             return [
                 'blocked' => true,
@@ -184,9 +184,9 @@ class DeviceFingerprintingService
      */
     public function getDeviceStats(): array
     {
-        $pattern = $this->config['redis_prefix'] . ':*';
+        $pattern = $this->config['redis_prefix'].':*';
         $keys = Redis::keys($pattern);
-        
+
         $stats = [
             'total_devices' => count($keys),
             'blocked_devices' => 0,
@@ -215,7 +215,7 @@ class DeviceFingerprintingService
      */
     public function cleanupExpiredDevices(): int
     {
-        $pattern = $this->config['redis_prefix'] . ':*';
+        $pattern = $this->config['redis_prefix'].':*';
         $keys = Redis::keys($pattern);
         $cleaned = 0;
 
@@ -240,7 +240,7 @@ class DeviceFingerprintingService
         $key = $this->buildKey($fingerprint);
         $associatedUsers = Redis::smembers($key);
         $requestCount = $this->checkRequestFrequency($fingerprint);
-        
+
         return [
             'fingerprint' => $fingerprint,
             'associated_users' => $associatedUsers,
@@ -259,10 +259,10 @@ class DeviceFingerprintingService
         $key = $this->buildRequestKey($fingerprint);
         $currentMinute = now()->format('Y-m-d H:i');
         $minuteKey = "{$key}:{$currentMinute}";
-        
+
         $count = Redis::incr($minuteKey);
         Redis::expire($minuteKey, 60); // Expire after 1 minute
-        
+
         return $count;
     }
 
@@ -296,16 +296,16 @@ class DeviceFingerprintingService
     public function generateSecureFingerprint(Request $request): string
     {
         $baseFingerprint = $this->generateFingerprint($request);
-        
+
         // Add additional security components
         $securityComponents = [
-            'ip_hash' => hash('sha256', $request->ip() . config('app.key')),
+            'ip_hash' => hash('sha256', $request->ip().config('app.key')),
             'timestamp' => now()->format('Y-m-d H:i'),
             'session_id' => $request->session()->getId(),
         ];
 
-        $secureFingerprint = hash('sha256', $baseFingerprint . implode('|', $securityComponents));
-        
+        $secureFingerprint = hash('sha256', $baseFingerprint.implode('|', $securityComponents));
+
         return $secureFingerprint;
     }
 
@@ -315,13 +315,14 @@ class DeviceFingerprintingService
     public function validateFingerprint(string $fingerprint): bool
     {
         // Check if fingerprint is valid format (64 character hex string)
-        if (!preg_match('/^[a-f0-9]{64}$/', $fingerprint)) {
+        if (! preg_match('/^[a-f0-9]{64}$/', $fingerprint)) {
             return false;
         }
 
         // Check if fingerprint is not in blocklist
         $blockKey = $this->buildBlockKey($fingerprint);
-        return !Redis::exists($blockKey);
+
+        return ! Redis::exists($blockKey);
     }
 
     /**

@@ -37,7 +37,6 @@ export default function NotificationPermissionHandler() {
                 '/notifications/subscribe',
                 subscription.toJSON()
             );
-            console.log('Push notification subscription active');
         } catch (error) {
             console.error('Failed to sync subscription with backend:', error);
         }

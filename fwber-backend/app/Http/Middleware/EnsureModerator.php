@@ -13,7 +13,7 @@ class EnsureModerator
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$request->user() || !$request->user()->is_moderator) {
+        if (! $request->user() || ! $request->user()->is_moderator) {
             return response()->json(['error' => 'Unauthorized. Moderator access required.'], 403);
         }
 

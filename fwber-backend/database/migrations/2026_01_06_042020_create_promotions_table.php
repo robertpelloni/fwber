@@ -18,12 +18,12 @@ return new class extends Migration
             $table->text('description');
             $table->string('promo_code')->nullable();
             $table->string('discount_value'); // e.g., "20% OFF", "BOGO"
-            
+
             // Geolocation for "AR" discovery
             $table->decimal('lat', 10, 8)->index();
             $table->decimal('lng', 11, 8)->index();
             $table->integer('radius')->default(100); // meters
-            
+
             $table->integer('token_cost')->default(0); // Cost to claim/view
             $table->dateTime('starts_at');
             $table->dateTime('expires_at');

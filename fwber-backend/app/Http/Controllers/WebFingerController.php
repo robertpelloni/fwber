@@ -2,31 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 
 class WebFingerController extends Controller
 {
     /**
      * Resolves acct:username@domain.com into an ActivityPub Actor URI
-     * 
+     *
      * @see https://www.rfc-editor.org/rfc/rfc7033
      */
     public function handle(Request $request)
     {
         $resource = $request->query('resource');
 
-        if (!$resource || !str_starts_with($resource, 'acct:')) {
+        if (! $resource || ! str_starts_with($resource, 'acct:')) {
             return response()->json(['error' => 'Invalid resource string'], 400);
         }
 
         // Extract: acct:username@domain.test -> username
         $identifier = str_replace('acct:', '', $resource);
         $parts = explode('@', $identifier);
-        
+
         if (count($parts) !== 2) {
-             return response()->json(['error' => 'Malformed account string'], 400);
+            return response()->json(['error' => 'Malformed account string'], 400);
         }
 
         $username = $parts[0];
@@ -39,11 +38,11 @@ class WebFingerController extends Controller
 
         // Find user by name (or custom handle if we add it)
         $user = User::where('name', $username)
-                    ->whereHas('profile', function($q) {
-                        $q->where('is_federated', true); // Must opt-in
-                    })->first();
+            ->whereHas('profile', function ($q) {
+                $q->where('is_federated', true); // Must opt-in
+            })->first();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['error' => 'User not found or not federated'], 404);
         }
 
@@ -53,20 +52,20 @@ class WebFingerController extends Controller
             'subject' => $resource,
             'aliases' => [
                 $actorUri,
-                url("/profile/{$user->id}")
+                url("/profile/{$user->id}"),
             ],
             'links' => [
                 [
                     'rel' => 'self',
                     'type' => 'application/activity+json',
-                    'href' => $actorUri
+                    'href' => $actorUri,
                 ],
                 [
                     'rel' => 'http://webfinger.net/rel/profile-page',
                     'type' => 'text/html',
-                    'href' => url("/profile/{$user->id}")
-                ]
-            ]
+                    'href' => url("/profile/{$user->id}"),
+                ],
+            ],
         ])->header('Content-Type', 'application/jrd+json');
     }
 }

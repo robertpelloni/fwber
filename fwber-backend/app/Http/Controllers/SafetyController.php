@@ -49,6 +49,7 @@ class SafetyController extends Controller
     {
         $contact = EmergencyContact::where('user_id', Auth::id())->findOrFail($id);
         $contact->delete();
+
         return response()->json(['message' => 'Contact removed.']);
     }
 

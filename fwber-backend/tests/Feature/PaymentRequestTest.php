@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
+use App\Http\Middleware\CheckDailyBonus;
 use App\Models\PaymentRequest;
+use App\Models\User;
 use App\Services\PushNotificationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use Mockery\MockInterface;
-use App\Http\Middleware\CheckDailyBonus;
+use Tests\TestCase;
 
 class PaymentRequestTest extends TestCase
 {

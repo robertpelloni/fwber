@@ -2,9 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\RelationshipTier;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Console\Command;
 
 class UpdateRelationshipTierDays extends Command
 {
@@ -32,21 +31,21 @@ class UpdateRelationshipTierDays extends Command
             ->chunk(100, function ($tiers) use (&$updated, &$upgraded) {
                 foreach ($tiers as $tier) {
                     $previousTier = $tier->current_tier;
-                    
+
                     // Update days connected
                     $tier->updateDaysConnected();
-                    
+
                     // Recalculate tier based on current metrics
                     $calculatedTier = $tier->calculateTier();
-                    
+
                     if ($calculatedTier !== $tier->current_tier) {
                         $tier->current_tier = $calculatedTier;
                         $tier->save();
                         $upgraded++;
-                        
+
                         $this->info("Match #{$tier->match_id}: Upgraded from {$previousTier} to {$calculatedTier}");
                     }
-                    
+
                     $updated++;
                 }
             });

@@ -13,20 +13,20 @@ class WalletLoginTest extends TestCase
     public function test_login_with_valid_signature_creates_user()
     {
         // 1. Generate a valid signature using the helper script
-        $message = "Login Test " . time();
+        $message = 'Login Test '.time();
         $scriptPath = base_path('scripts/solana/sign_message.cjs');
-        $command = "node {$scriptPath} " . escapeshellarg($message);
+        $command = "node {$scriptPath} ".escapeshellarg($message);
 
         $output = shell_exec($command);
-        
-        if (!$output) {
+
+        if (! $output) {
             $this->markTestSkipped('Node.js script failed or returned no output. Ensure node is installed and script exists.');
         }
 
         $data = json_decode($output, true);
 
-        if (!$data) {
-             $this->markTestSkipped('Failed to decode JSON from node script: ' . $output);
+        if (! $data) {
+            $this->markTestSkipped('Failed to decode JSON from node script: '.$output);
         }
 
         $walletAddress = $data['wallet_address'];

@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
@@ -33,11 +31,11 @@ return new class extends Migration
                 'is_hidden' => false,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]
+            ],
         ];
 
         foreach ($achievements as $achievement) {
-            if (!DB::table('achievements')->where('name', $achievement['name'])->exists()) {
+            if (! DB::table('achievements')->where('name', $achievement['name'])->exists()) {
                 DB::table('achievements')->insert($achievement);
             }
         }

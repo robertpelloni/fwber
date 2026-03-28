@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ContentUnlock;
 use App\Models\User;
 use App\Models\UserMatch;
-use App\Models\ContentUnlock;
 use App\Services\AIMatchingService;
 use App\Services\AiWingmanService;
 use App\Services\TokenDistributionService;
@@ -15,15 +15,16 @@ use OpenApi\Attributes as OA;
 class MatchInsightsController extends Controller
 {
     protected AIMatchingService $matchingService;
+
     protected AiWingmanService $wingmanService;
+
     protected TokenDistributionService $tokenService;
 
     public function __construct(
         AIMatchingService $matchingService,
         AiWingmanService $wingmanService,
         TokenDistributionService $tokenService
-    )
-    {
+    ) {
         $this->matchingService = $matchingService;
         $this->wingmanService = $wingmanService;
         $this->tokenService = $tokenService;
@@ -31,13 +32,15 @@ class MatchInsightsController extends Controller
 
     /**
      * Get compatibility insights for a match
-     * 
+     *
      * @OA\Get(
      *   path="/matches/{id}/insights",
      *   tags={"Matches"},
      *   summary="Get match compatibility insights",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string"), description="Match ID or Target User ID"),
+     *
      *   @OA\Response(response=200, description="Compatibility breakdown"),
      *   @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
@@ -45,10 +48,10 @@ class MatchInsightsController extends Controller
     public function show(Request $request, string $id): JsonResponse
     {
         $user = auth()->user();
-        
+
         $targetUser = $this->resolveTargetUser($user, $id);
 
-        if (!$targetUser) {
+        if (! $targetUser) {
             return response()->json(['message' => 'User or Match not found'], 404);
         }
 
@@ -60,16 +63,16 @@ class MatchInsightsController extends Controller
 
         // Calculate score (always free)
         $insights = $this->matchingService->getCompatibilityBreakdown($user, $targetUser);
-        
-        if (!$isUnlocked) {
-             return response()->json([
+
+        if (! $isUnlocked) {
+            return response()->json([
                 'success' => true,
                 'data' => [
                     'total_score' => $insights['total_score'],
                     'is_locked' => true,
                     'cost' => 10,
-                    'preview_message' => 'Unlock detailed compatibility analysis and AI insights for 10 tokens.'
-                ]
+                    'preview_message' => 'Unlock detailed compatibility analysis and AI insights for 10 tokens.',
+                ],
             ]);
         }
 
@@ -80,7 +83,7 @@ class MatchInsightsController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $insights
+            'data' => $insights,
         ]);
     }
 
@@ -92,7 +95,9 @@ class MatchInsightsController extends Controller
      *   tags={"Matches"},
      *   summary="Unlock match insights",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string"), description="Match ID or Target User ID"),
+     *
      *   @OA\Response(response=200, description="Unlocked successfully"),
      *   @OA\Response(response=402, description="Insufficient tokens"),
      *   @OA\Response(response=404, ref="#/components/responses/NotFound")
@@ -104,7 +109,7 @@ class MatchInsightsController extends Controller
 
         $targetUser = $this->resolveTargetUser($user, $id);
 
-        if (!$targetUser) {
+        if (! $targetUser) {
             return response()->json(['message' => 'User or Match not found'], 404);
         }
 
@@ -120,7 +125,7 @@ class MatchInsightsController extends Controller
 
         // Deduct tokens (10 tokens)
         try {
-            $this->tokenService->spendTokens($user, 10, "Unlocked Match Insight");
+            $this->tokenService->spendTokens($user, 10, 'Unlocked Match Insight');
         } catch (\Exception $e) {
             return response()->json(['error' => 'Insufficient tokens'], 402);
         }
@@ -130,7 +135,7 @@ class MatchInsightsController extends Controller
             'user_id' => $user->id,
             'content_type' => 'match_insight',
             'content_id' => $targetUser->id,
-            'cost' => 10
+            'cost' => 10,
         ]);
 
         return response()->json(['message' => 'Unlocked successfully', 'balance' => $user->token_balance]);
@@ -148,6 +153,7 @@ class MatchInsightsController extends Controller
             }
 
             $targetUserId = ($match->user1_id === $user->id) ? $match->user2_id : $match->user1_id;
+
             return User::with('profile')->find($targetUserId);
         }
 

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Response;
 
 class LogController extends Controller
 {
@@ -16,8 +15,8 @@ class LogController extends Controller
     public function index()
     {
         $logPath = storage_path('logs');
-        $files = File::glob($logPath . '/*.log');
-        
+        $files = File::glob($logPath.'/*.log');
+
         $logs = collect($files)->map(function ($file) {
             return [
                 'name' => basename($file),
@@ -37,9 +36,9 @@ class LogController extends Controller
      */
     public function show($filename, Request $request)
     {
-        $path = storage_path('logs/' . $filename);
+        $path = storage_path('logs/'.$filename);
 
-        if (!File::exists($path)) {
+        if (! File::exists($path)) {
             return response()->json(['message' => 'Log file not found.'], 404);
         }
 
@@ -54,22 +53,32 @@ class LogController extends Controller
 
     /**
      * Slightly modified version of http://www.geekality.net/2011/05/28/php-tail-tackling-large-files/
+     *
      * @author Torleif Berger, Lorenzo Stanco
+     *
      * @link http://stackoverflow.com/a/15025877/995958
+     *
      * @license MIT
      */
     private function tailCustom($filepath, $lines = 1, $adaptive = true)
     {
-        $f = @fopen($filepath, "rb");
-        if ($f === false) return false;
+        $f = @fopen($filepath, 'rb');
+        if ($f === false) {
+            return false;
+        }
 
         // Sets buffer size, according to the number of lines to retrieve.
         // This gives a performance boost when reading a few lines from the file.
-        if (!$adaptive) $buffer = 4096;
-        else $buffer = ($lines < 2 ? 64 : ($lines < 10 ? 512 : 4096));
+        if (! $adaptive) {
+            $buffer = 4096;
+        } else {
+            $buffer = ($lines < 2 ? 64 : ($lines < 10 ? 512 : 4096));
+        }
 
         fseek($f, -1, SEEK_END);
-        if (fread($f, 1) != "\n") $lines -= 1;
+        if (fread($f, 1) != "\n") {
+            $lines -= 1;
+        }
 
         $output = '';
         $chunk = '';
@@ -81,7 +90,7 @@ class LogController extends Controller
         while (ftell($f) > 0 && $lines >= 0) {
             $seek = min(ftell($f), $buffer);
             fseek($f, -$seek, SEEK_CUR);
-            $output = ($chunk = fread($f, $seek)) . $output;
+            $output = ($chunk = fread($f, $seek)).$output;
             fseek($f, -mb_strlen($chunk, '8bit'), SEEK_CUR);
             $lines -= substr_count($chunk, "\n");
         }
@@ -91,6 +100,7 @@ class LogController extends Controller
         }
 
         fclose($f);
+
         return trim($output);
     }
 }

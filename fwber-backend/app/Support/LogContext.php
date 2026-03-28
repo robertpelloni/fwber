@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 
 /**
  * Provides structured context for logging with request IDs, user context, and correlation tracking.
- * 
+ *
  * Usage:
  *   Log::info('User action', LogContext::make());
  *   Log::error('Payment failed', LogContext::make(['payment_id' => $id]));
@@ -17,8 +17,7 @@ class LogContext
     /**
      * Generate structured context array for logging.
      *
-     * @param array $extra Additional context to merge
-     * @return array
+     * @param  array  $extra  Additional context to merge
      */
     public static function make(array $extra = []): array
     {
@@ -54,10 +53,9 @@ class LogContext
     /**
      * Create context for WebSocket operations.
      *
-     * @param string|null $connectionId WebSocket connection ID
-     * @param string|null $eventType WebSocket event type
-     * @param array $extra Additional context
-     * @return array
+     * @param  string|null  $connectionId  WebSocket connection ID
+     * @param  string|null  $eventType  WebSocket event type
+     * @param  array  $extra  Additional context
      */
     public static function fromWebSocket(?string $connectionId = null, ?string $eventType = null, array $extra = []): array
     {
@@ -71,10 +69,9 @@ class LogContext
     /**
      * Create context for webhook operations.
      *
-     * @param string $webhookId External webhook ID (e.g., Stripe event ID)
-     * @param string $eventType Webhook event type
-     * @param array $extra Additional context
-     * @return array
+     * @param  string  $webhookId  External webhook ID (e.g., Stripe event ID)
+     * @param  string  $eventType  Webhook event type
+     * @param  array  $extra  Additional context
      */
     public static function fromWebhook(string $webhookId, string $eventType, array $extra = []): array
     {
@@ -88,10 +85,9 @@ class LogContext
     /**
      * Create context for payment operations.
      *
-     * @param string|null $transactionId Payment gateway transaction ID
-     * @param string|null $gateway Payment gateway name
-     * @param array $extra Additional context
-     * @return array
+     * @param  string|null  $transactionId  Payment gateway transaction ID
+     * @param  string|null  $gateway  Payment gateway name
+     * @param  array  $extra  Additional context
      */
     public static function fromPayment(?string $transactionId = null, ?string $gateway = null, array $extra = []): array
     {
@@ -104,8 +100,6 @@ class LogContext
 
     /**
      * Get or generate request ID for distributed tracing.
-     *
-     * @return string
      */
     protected static function getRequestId(): string
     {
@@ -117,13 +111,14 @@ class LogContext
         // Check for forwarded request ID from load balancer/proxy
         if ($requestId = request()->header('X-Request-ID')) {
             request()->attributes->set('request_id', $requestId);
+
             return $requestId;
         }
 
         // Generate new request ID
         $requestId = Str::uuid()->toString();
         request()->attributes->set('request_id', $requestId);
-        
+
         return $requestId;
     }
 }

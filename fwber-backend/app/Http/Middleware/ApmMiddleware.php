@@ -2,13 +2,13 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\SlowRequest;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Symfony\Component\HttpFoundation\Response;
-use App\Models\SlowRequest;
 
 class ApmMiddleware
 {
@@ -28,15 +28,15 @@ class ApmMiddleware
             // Fail silently if Redis is down or extension is missing
         }
 
-        if (!config('apm.enabled', false)) {
+        if (! config('apm.enabled', false)) {
             return $next($request);
         }
 
         $startTime = microtime(true);
-        
+
         $queryCount = 0;
         $slowQueries = [];
-        
+
         // Use DB::listen instead of enableQueryLog to save memory
         // This is safer for production as it doesn't store the full query log in memory
         DB::listen(function ($query) use (&$queryCount, &$slowQueries) {
@@ -82,13 +82,13 @@ class ApmMiddleware
                     'duration_ms' => $duration,
                     'db_query_count' => $queryCount,
                     'memory_usage_kb' => $memoryUsage,
-                    'slowest_queries' => !empty($slowQueries) ? $slowQueries : null,
+                    'slowest_queries' => ! empty($slowQueries) ? $slowQueries : null,
                     'ip' => $request->ip(),
                     'user_agent' => $request->userAgent(),
                     'payload' => $request->isMethod('GET') ? null : $request->except(['password', 'password_confirmation']),
                 ]);
             } catch (\Exception $e) {
-                Log::error('Failed to log slow request: ' . $e->getMessage());
+                Log::error('Failed to log slow request: '.$e->getMessage());
             }
 
             Log::warning('Slow Request Detected', [

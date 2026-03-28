@@ -10,11 +10,11 @@ Artisan::command('inspire', function () {
 
 Artisan::command('schema:fix-missing', function () {
     $this->info('Checking for missing tables...');
-    
+
     $schema = \Illuminate\Support\Facades\Schema::connection(null);
-    
+
     // Fix missing photo_unlocks table
-    if (!$schema->hasTable('photo_unlocks')) {
+    if (! $schema->hasTable('photo_unlocks')) {
         $this->info('Creating photo_unlocks table...');
         $schema->create('photo_unlocks', function (\Illuminate\Database\Schema\Blueprint $table) {
             $table->id();
@@ -32,7 +32,7 @@ Artisan::command('schema:fix-missing', function () {
     }
 
     // Fix missing unlock_price column
-    if ($schema->hasTable('photos') && !$schema->hasColumn('photos', 'unlock_price')) {
+    if ($schema->hasTable('photos') && ! $schema->hasColumn('photos', 'unlock_price')) {
         $this->info('Adding unlock_price to photos table...');
         $schema->table('photos', function (\Illuminate\Database\Schema\Blueprint $table) {
             $table->decimal('unlock_price', 8, 2)->nullable()->after('is_private');
@@ -41,11 +41,11 @@ Artisan::command('schema:fix-missing', function () {
     } else {
         $this->info('unlock_price column already exists.');
     }
-    
+
     // Fix missing content_unlocks table
-    if (!$schema->hasTable('content_unlocks')) {
+    if (! $schema->hasTable('content_unlocks')) {
         $this->info('Creating content_unlocks table...');
-            $schema->create('content_unlocks', function (\Illuminate\Database\Schema\Blueprint $table) {
+        $schema->create('content_unlocks', function (\Illuminate\Database\Schema\Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('content_type');
@@ -68,9 +68,9 @@ Schedule::command('model:prune')->daily();
 Schedule::command('sanctum:prune-expired --hours=24')->daily();
 
 // Background jobs for premium features
+use App\Jobs\CleanupExpiredSubscriptions;
 use App\Jobs\ExpireBoosts;
 use App\Jobs\SendEventReminders;
-use App\Jobs\CleanupExpiredSubscriptions;
 
 // Expire boosts every 15 minutes
 Schedule::job(new ExpireBoosts)->everyFifteenMinutes()
@@ -89,6 +89,7 @@ Schedule::job(new CleanupExpiredSubscriptions)->dailyAt('02:00')
 
 // Analyze slow requests for performance alerts every hour
 use App\Jobs\AnalyzeSlowRequests;
+
 Schedule::job(new AnalyzeSlowRequests)->hourly()
     ->name('analyze-slow-requests')
     ->withoutOverlapping();

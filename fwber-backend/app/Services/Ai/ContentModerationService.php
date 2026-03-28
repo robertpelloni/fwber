@@ -2,13 +2,14 @@
 
 namespace App\Services\Ai;
 
+use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Exception;
 
 class ContentModerationService
 {
     protected string $apiKey;
+
     protected string $baseUrl = 'https://api.openai.com/v1';
 
     public function __construct()
@@ -19,7 +20,6 @@ class ContentModerationService
     /**
      * Moderate the given text content.
      *
-     * @param string $text
      * @return array{flagged: bool, categories: array}
      */
     public function moderate(string $text): array
@@ -36,8 +36,8 @@ class ContentModerationService
 
             if ($response->successful()) {
                 $result = $response->json('results.0');
-                
-                if (!$result) {
+
+                if (! $result) {
                     return ['flagged' => false, 'categories' => []];
                 }
 
@@ -65,6 +65,7 @@ class ContentModerationService
             return ['flagged' => false, 'categories' => []];
         } catch (Exception $e) {
             Log::error('Content moderation exception', ['error' => $e->getMessage()]);
+
             return ['flagged' => false, 'categories' => []];
         }
     }

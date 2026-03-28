@@ -3,21 +3,22 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\TokenTransaction;
-use App\Http\Requests\Token\WithdrawTokenRequest;
+use App\Http\Requests\Token\ConfirmTopUpRequest;
 use App\Http\Requests\Token\DepositTokenRequest;
+use App\Http\Requests\Token\InitiateTopUpRequest;
 use App\Http\Requests\Token\TransferTokenRequest;
 use App\Http\Requests\Token\UpdateWalletAddressRequest;
-use App\Http\Requests\Token\InitiateTopUpRequest;
-use App\Http\Requests\Token\ConfirmTopUpRequest;
-use Illuminate\Support\Facades\Process;
+use App\Http\Requests\Token\WithdrawTokenRequest;
+use App\Models\TokenTransaction;
+use App\Models\User;
 use App\Services\PushNotificationService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Process;
 
 class TokenController extends Controller
 {
     protected $pushService;
+
     protected $paymentGateway;
 
     public function __construct(PushNotificationService $pushService, \App\Services\Payment\PaymentGatewayInterface $paymentGateway)
@@ -36,7 +37,7 @@ class TokenController extends Controller
             ->where('token_balance', '>=', $amount)
             ->decrement('token_balance', $amount);
 
-        if (!$updated) {
+        if (! $updated) {
             return response()->json(['error' => 'Insufficient balance'], 400);
         }
 
@@ -51,12 +52,13 @@ class TokenController extends Controller
                 'SOLANA_MINT_ADDRESS' => config('services.solana.mint_address'),
                 'SOLANA_RPC_URL' => config('services.solana.rpc_url'),
             ])
-            ->run(['node', $scriptPath, $request->destination_address, (string)$amount]);
+            ->run(['node', $scriptPath, $request->destination_address, (string) $amount]);
 
         if ($process->failed()) {
             // Rollback
             $user->increment('token_balance', $amount);
-            \Log::error('Solana Withdrawal Failed: ' . $process->errorOutput());
+            \Log::error('Solana Withdrawal Failed: '.$process->errorOutput());
+
             return response()->json(['error' => 'Transfer failed. Please try again.'], 500);
         }
 
@@ -72,14 +74,14 @@ class TokenController extends Controller
             'metadata' => [
                 'signature' => $signature,
                 'destination' => $request->destination_address,
-                'chain' => 'solana'
+                'chain' => 'solana',
             ],
         ]);
 
         return response()->json([
             'message' => 'Withdrawal successful',
             'signature' => $signature,
-            'new_balance' => $user->token_balance
+            'new_balance' => $user->token_balance,
         ]);
     }
 
@@ -88,12 +90,12 @@ class TokenController extends Controller
         // Check for duplicate signature
         $exists = TokenTransaction::whereJsonContains('metadata->signature', $request->signature)->exists();
         // Fallback for SQLite which sometimes struggles with JSON path in whereJsonContains depending on version
-        if (!$exists) {
-             $exists = TokenTransaction::where('metadata', 'like', '%"'.$request->signature.'"%')->exists();
+        if (! $exists) {
+            $exists = TokenTransaction::where('metadata', 'like', '%"'.$request->signature.'"%')->exists();
         }
 
         if ($exists) {
-             return response()->json(['error' => 'Transaction already processed'], 400);
+            return response()->json(['error' => 'Transaction already processed'], 400);
         }
 
         $user = $request->user();
@@ -107,11 +109,12 @@ class TokenController extends Controller
                 'SOLANA_MINT_ADDRESS' => config('services.solana.mint_address'),
                 'SOLANA_RPC_URL' => config('services.solana.rpc_url'),
             ])
-            ->run(['node', $scriptPath, $request->signature, (string)$request->amount]);
+            ->run(['node', $scriptPath, $request->signature, (string) $request->amount]);
 
         if ($process->failed()) {
-             \Log::error('Deposit Verification Failed: ' . $process->errorOutput());
-             return response()->json(['error' => 'Verification failed or transaction not found'], 400);
+            \Log::error('Deposit Verification Failed: '.$process->errorOutput());
+
+            return response()->json(['error' => 'Verification failed or transaction not found'], 400);
         }
 
         // Credit User
@@ -123,8 +126,8 @@ class TokenController extends Controller
             'description' => 'Deposit from Solana',
             'metadata' => [
                 'signature' => $request->signature,
-                'chain' => 'solana'
-            ]
+                'chain' => 'solana',
+            ],
         ]);
 
         return response()->json(['message' => 'Deposit successful', 'new_balance' => $user->fresh()->token_balance]);
@@ -146,10 +149,10 @@ class TokenController extends Controller
         $signature = $request->signature;
 
         if ($sender->id === $recipient->id) {
-             return response()->json(['error' => 'Cannot send tokens to yourself'], 400);
+            return response()->json(['error' => 'Cannot send tokens to yourself'], 400);
         }
 
-        if (!$onChain && $sender->token_balance < $amount) {
+        if (! $onChain && $sender->token_balance < $amount) {
             return response()->json(['error' => 'Insufficient balance'], 400);
         }
 
@@ -175,7 +178,7 @@ class TokenController extends Controller
                         ->where('token_balance', '>=', $amount)
                         ->decrement('token_balance', $amount);
 
-                    if (!$deducted) {
+                    if (! $deducted) {
                         throw new \Exception('Insufficient balance');
                     }
 
@@ -202,14 +205,16 @@ class TokenController extends Controller
                 ? "{$sender->name} sent {$amount} FWB: \"{$message}\""
                 : "{$sender->name} sent you {$amount} FWB.";
 
-            if ($onChain) $body = "🌐 On-Chain: " . $body;
+            if ($onChain) {
+                $body = '🌐 On-Chain: '.$body;
+            }
 
             $this->pushService->send(
                 $recipient,
                 [
                     'title' => '💰 Payment Received!',
                     'body' => $body,
-                    'url' => '/wallet'
+                    'url' => '/wallet',
                 ],
                 'transaction'
             );
@@ -224,16 +229,18 @@ class TokenController extends Controller
     public function balance(Request $request)
     {
         $user = $request->user();
-        
-        $treasury = \Cache::rememberForever('treasury_address', function() {
-             $script = base_path('scripts/solana/get_server_pubkey.cjs');
-             if (!file_exists($script)) return null;
 
-             $process = Process::path(base_path())
+        $treasury = \Cache::rememberForever('treasury_address', function () {
+            $script = base_path('scripts/solana/get_server_pubkey.cjs');
+            if (! file_exists($script)) {
+                return null;
+            }
+
+            $process = Process::path(base_path())
                 ->env(['SOLANA_SERVER_SECRET_KEY' => config('services.solana.server_secret_key')])
                 ->run(['node', $script]);
 
-             return trim($process->output());
+            return trim($process->output());
         });
 
         return response()->json([
@@ -267,7 +274,7 @@ class TokenController extends Controller
                 ->get(['id', 'name', 'token_balance', 'created_at'])
                 ->map(function ($user) {
                     return [
-                        'name' => substr($user->name, 0, 3) . '***', // Privacy
+                        'name' => substr($user->name, 0, 3).'***', // Privacy
                         'balance' => $user->token_balance,
                         'joined' => $user->created_at->diffForHumans(),
                     ];
@@ -279,7 +286,7 @@ class TokenController extends Controller
                 ->get(['id', 'name', 'referrals_count'])
                 ->map(function ($user) {
                     return [
-                        'name' => substr($user->name, 0, 3) . '***',
+                        'name' => substr($user->name, 0, 3).'***',
                         'referrals' => $user->referrals_count,
                     ];
                 });
@@ -293,35 +300,35 @@ class TokenController extends Controller
                 ->get()
                 ->map(function ($assist) {
                     return [
-                        'name' => substr($assist->matchmaker->name, 0, 3) . '***',
+                        'name' => substr($assist->matchmaker->name, 0, 3).'***',
                         'assists' => $assist->assists_count,
                     ];
                 });
 
             $topVouched = User::withCount([
-                    'vouches',
-                    'vouches as safe_count' => function ($query) {
-                        $query->where('type', 'safe');
-                    },
-                    'vouches as fun_count' => function ($query) {
-                        $query->where('type', 'fun');
-                    },
-                    'vouches as hot_count' => function ($query) {
-                        $query->where('type', 'hot');
-                    }
-                ])
+                'vouches',
+                'vouches as safe_count' => function ($query) {
+                    $query->where('type', 'safe');
+                },
+                'vouches as fun_count' => function ($query) {
+                    $query->where('type', 'fun');
+                },
+                'vouches as hot_count' => function ($query) {
+                    $query->where('type', 'hot');
+                },
+            ])
                 ->orderByDesc('vouches_count')
                 ->take(10)
                 ->get(['id', 'name'])
                 ->map(function ($user) {
                     return [
-                        'name' => substr($user->name, 0, 3) . '***',
+                        'name' => substr($user->name, 0, 3).'***',
                         'vouches' => $user->vouches_count,
                         'breakdown' => [
                             'safe' => $user->safe_count,
                             'fun' => $user->fun_count,
                             'hot' => $user->hot_count,
-                        ]
+                        ],
                     ];
                 });
 
@@ -331,7 +338,7 @@ class TokenController extends Controller
                 ->get(['id', 'name', 'current_streak'])
                 ->map(function ($user) {
                     return [
-                        'name' => substr($user->name, 0, 3) . '***',
+                        'name' => substr($user->name, 0, 3).'***',
                         'streak' => $user->current_streak,
                     ];
                 });
@@ -351,7 +358,7 @@ class TokenController extends Controller
         $user = $request->user();
         $amountUsd = $request->amount_usd;
         $currency = 'USD';
-        
+
         // Exchange Rate: $1 USD = 10 FWB
         $fwbAmount = $amountUsd * 10;
 
@@ -359,14 +366,14 @@ class TokenController extends Controller
             'user_id' => $user->id,
             'description' => "Purchase {$fwbAmount} FWB",
             'type' => 'token_topup',
-            'fwb_amount' => $fwbAmount
+            'fwb_amount' => $fwbAmount,
         ]);
 
         if ($result->success) {
             return response()->json([
                 'client_secret' => $result->data['client_secret'],
                 'amount_usd' => $amountUsd,
-                'fwb_amount' => $fwbAmount
+                'fwb_amount' => $fwbAmount,
             ]);
         }
 
@@ -376,7 +383,7 @@ class TokenController extends Controller
     public function confirmTopUp(ConfirmTopUpRequest $request)
     {
         $user = $request->user();
-        
+
         try {
             $result = $this->paymentGateway->verifyPayment($request->payment_intent_id);
 
@@ -384,25 +391,25 @@ class TokenController extends Controller
                 // Check if already processed to be idempotent
                 $existingTx = TokenTransaction::whereJsonContains('metadata->payment_intent_id', $request->payment_intent_id)->exists();
                 if ($existingTx) {
-                     return response()->json(['message' => 'Transaction already processed']);
+                    return response()->json(['message' => 'Transaction already processed']);
                 }
 
                 // metadata from Stripe intent
-                $metadata = $result->data['metadata'] ?? []; 
-                $fwbAmount = isset($metadata['fwb_amount']) ? (int)$metadata['fwb_amount'] : 0;
-                
+                $metadata = $result->data['metadata'] ?? [];
+                $fwbAmount = isset($metadata['fwb_amount']) ? (int) $metadata['fwb_amount'] : 0;
+
                 // Fallback if metadata missing (shouldn't happen if initiated correctly)
                 if ($fwbAmount <= 0) {
-                     // Default calculation based on amount charged
-                     $chargedAmount = $result->data['amount'] ?? 0; // usually in cents if from stripe object, but our result object normalizes it?
-                     // Let's rely on what we get. Our StripePaymentGateway returns amount in float from intent? 
-                     // Actually let's assume standard $1 = 10 FWB
-                     $fwbAmount = ($result->data['amount'] ?? 0) * 10;
+                    // Default calculation based on amount charged
+                    $chargedAmount = $result->data['amount'] ?? 0; // usually in cents if from stripe object, but our result object normalizes it?
+                    // Let's rely on what we get. Our StripePaymentGateway returns amount in float from intent?
+                    // Actually let's assume standard $1 = 10 FWB
+                    $fwbAmount = ($result->data['amount'] ?? 0) * 10;
                 }
 
                 \DB::transaction(function () use ($user, $result, $fwbAmount, $request) {
-                     // Log Payment
-                     \App\Models\Payment::create([
+                    // Log Payment
+                    \App\Models\Payment::create([
                         'user_id' => $user->id,
                         'amount' => $result->data['amount'],
                         'currency' => $result->data['currency'],
@@ -424,22 +431,22 @@ class TokenController extends Controller
                         'metadata' => [
                             'payment_intent_id' => $request->payment_intent_id,
                             'gateway' => 'stripe',
-                            'cost_usd' => $result->data['amount']
-                        ]
+                            'cost_usd' => $result->data['amount'],
+                        ],
                     ]);
                 });
 
                 return response()->json([
                     'message' => 'Top-up successful',
                     'new_balance' => $user->fresh()->token_balance,
-                    'fwb_added' => $fwbAmount
+                    'fwb_added' => $fwbAmount,
                 ]);
             }
 
-            return response()->json(['error' => 'Payment verification failed: ' . $result->message], 400);
+            return response()->json(['error' => 'Payment verification failed: '.$result->message], 400);
 
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error verifying payment: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Error verifying payment: '.$e->getMessage()], 500);
         }
     }
 }

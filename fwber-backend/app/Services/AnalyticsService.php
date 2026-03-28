@@ -10,14 +10,7 @@ class AnalyticsService
 {
     /**
      * Record a new clickstream event.
-     * 
-     * @param string $sessionId
-     * @param string $eventName
-     * @param array $payload
-     * @param int|null $userId
-     * @param string|null $url
-     * @param string|null $ipAddress
-     * @param string|null $userAgent
+     *
      * @return bool
      */
     public function recordEvent(
@@ -43,7 +36,7 @@ class AnalyticsService
             Log::error('Failed to record clickstream event', [
                 'error' => $e->getMessage(),
                 'event' => $eventName,
-                'session' => $sessionId
+                'session' => $sessionId,
             ]);
             // Do not throw to avoid breaking the main requests
         }

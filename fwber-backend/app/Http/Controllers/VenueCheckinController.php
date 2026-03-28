@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreVenueCheckinRequest;
 use App\Models\Venue;
 use App\Models\VenueCheckin;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class VenueCheckinController extends Controller
@@ -16,7 +15,7 @@ class VenueCheckinController extends Controller
     public function store(StoreVenueCheckinRequest $request, $venueId)
     {
         $venue = Venue::findOrFail($venueId);
-        
+
         // Verify distance (must be within 500m)
         $distance = $this->calculateDistance(
             $request->latitude,
@@ -28,7 +27,7 @@ class VenueCheckinController extends Controller
         if ($distance > 0.5) { // 0.5 km = 500m
             return response()->json([
                 'message' => 'You are too far from the venue to check in.',
-                'distance_km' => round($distance, 3)
+                'distance_km' => round($distance, 3),
             ], 403);
         }
 
@@ -88,7 +87,7 @@ class VenueCheckinController extends Controller
     public function destroy($venueId)
     {
         $user = Auth::user();
-        
+
         VenueCheckin::where('user_id', $user->id)
             ->where('venue_id', $venueId)
             ->whereNull('checked_out_at')
@@ -96,7 +95,7 @@ class VenueCheckinController extends Controller
 
         return response()->json(['message' => 'Checked out successfully']);
     }
-    
+
     /**
      * Get current check-in status for the user.
      */
@@ -107,7 +106,7 @@ class VenueCheckinController extends Controller
             ->whereNull('checked_out_at')
             ->latest()
             ->first();
-            
+
         return response()->json($checkin);
     }
 }

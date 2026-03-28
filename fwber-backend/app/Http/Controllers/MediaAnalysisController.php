@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 
 /**
  * Media Analysis Controller
- * 
+ *
  * Handles requests for analyzing media content (images, video, audio)
  * for safety, moderation, and content labeling.
  */
@@ -24,24 +24,30 @@ class MediaAnalysisController extends Controller
 
     /**
      * Analyze media content
-     * 
+     *
      * @OA\Post(
      *   path="/media/analyze",
      *   tags={"Media Analysis"},
      *   summary="Analyze media for safety",
      *   security={{"bearerAuth":{}}},
+     *
      *   @OA\RequestBody(
      *     required=true,
+     *
      *     @OA\JsonContent(
      *       required={"url", "type"},
+     *
      *       @OA\Property(property="url", type="string", format="uri", example="https://example.com/image.jpg"),
      *       @OA\Property(property="type", type="string", enum={"image", "video", "audio"}, example="image")
      *     )
      *   ),
+     *
      *   @OA\Response(
-     *     response=200, 
+     *     response=200,
      *     description="Analysis result",
+     *
      *     @OA\JsonContent(
+     *
      *       @OA\Property(property="success", type="boolean", example=true),
      *       @OA\Property(property="data", type="object",
      *         @OA\Property(property="safe", type="boolean"),
@@ -51,6 +57,7 @@ class MediaAnalysisController extends Controller
      *       )
      *     )
      *   ),
+     *
      *   @OA\Response(response=422, ref="#/components/schemas/ValidationError")
      * )
      */
