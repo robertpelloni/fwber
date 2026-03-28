@@ -24,8 +24,8 @@ export function useAnalytics() {
         // Use current session ID or generate a temporary one if not ready
         const sid = sessionIdRef.current || sessionStorage.getItem('fwber_analytics_session_id') || crypto.randomUUID();
 
-        // Safety check: ensure backend token exists
-        const token = localStorage.getItem('auth_token');
+        // Use the same token key as AuthContext
+        const token = localStorage.getItem('fwber_token');
 
         const payloadData = {
             session_id: sid,
@@ -48,10 +48,8 @@ export function useAnalytics() {
             headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.fwber.me';
-        const baseUrl = rawBaseUrl.replace(/\/api$/, '').replace(/\/$/, '');
-
-        fetch(`${baseUrl}/api/analytics/events`, {
+        // Always go through the Next.js proxy in the browser
+        fetch('/api/analytics/events', {
             method: 'POST',
             headers,
             body: JSON.stringify(payloadData),
