@@ -7,7 +7,7 @@ import { apiClient } from '@/lib/api/client'
 import { useAuth } from '@/lib/auth-context'
 import { 
   Eye, ArrowLeft, TrendingUp, Users, Calendar, Clock,
-  ChevronRight, User, MapPin
+  ChevronRight, User, MapPin, Globe
 } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
