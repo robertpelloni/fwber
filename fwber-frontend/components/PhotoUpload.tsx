@@ -380,7 +380,7 @@ export default function PhotoUpload({
     const handleDragEnter = (e: DragEvent) => {
       e.preventDefault()
       e.stopPropagation()
-      if (e.dataTransfer?.types.includes('Files')) {
+      if (e.dataTransfer?.types && Array.from(e.dataTransfer.types).includes('Files')) {
         setDragActive(true)
       }
     }

@@ -141,7 +141,7 @@ export function OnlineUsersList({
     if (!context?.onlineUsers) return [];
 
     let users = context.onlineUsers;
-    if (userIds) {
+    if (userIds && Array.isArray(userIds)) {
       users = users.filter((u: OnlineUser) => userIds.includes(u.user_id));
     }
     return users.filter((u: OnlineUser) => u.status !== 'offline');

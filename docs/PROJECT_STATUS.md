@@ -1,8 +1,8 @@
 # Project Status - fwber
 
-**Current Version:** 1.0.0 "Launch"  
+**Current Version:** 1.0.1 "Launch Patch"  
 **Status:** 🟢 STABLE / DEPLOYED  
-**Last Updated:** March 27, 2026
+**Last Updated:** March 28, 2026
 
 ---
 
@@ -10,10 +10,10 @@
 
 | Environment | Version | Status | URL |
 | :--- | :--- | :--- | :--- |
-| **Production (Web)** | 1.0.0 | 🟢 Active | https://www.fwber.me |
-| **Production (API)** | 1.0.0 | 🟢 Healthy | https://api.fwber.me |
-| **Real-time (WS)** | 1.0.0 | 🟢 Connected | wss://ws.fwber.me |
-| **Geo-Screener** | 1.0.0 | 🟢 Online | Internal (Rust) |
+| **Production (Web)** | 1.0.1 | 🟢 Active | https://www.fwber.me |
+| **Production (API)** | 1.0.1 | 🟢 Healthy | https://api.fwber.me |
+| **Real-time (WS)** | 1.0.1 | 🟢 Connected | wss://ws.fwber.me |
+| **Geo-Screener** | 1.0.1 | 🟢 Online | Internal (Rust) |
 
 ---
 
