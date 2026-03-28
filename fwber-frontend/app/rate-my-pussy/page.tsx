@@ -35,7 +35,7 @@ export default function RateMyPussyPage() {
   async function fetchCats() {
     try {
       const response = await apiClient.get<Cat[]>('/cats')
-      setCats(response.data)
+      setCats(Array.isArray(response.data) ? response.data : [])
     } catch (err) {
       console.error('Failed to fetch cats:', err)
     } finally {

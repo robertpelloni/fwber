@@ -42,7 +42,7 @@ export default function MessagesPage() {
       setIsLoading(true)
       setError(null)
       const conversationsData = await getConversations(token)
-      setConversations(conversationsData)
+      setConversations(Array.isArray(conversationsData) ? conversationsData : [])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load conversations')
     } finally {

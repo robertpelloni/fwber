@@ -227,7 +227,7 @@ export default function ContentUnlocksPage() {
                   </Link>
                 </div>
               ) : (
-                available.map((item) => {
+                Array.isArray(available) && available.map((item) => {
                   const Icon = contentTypeIcons[item.type] || Eye
                   return (
                     <div
@@ -302,7 +302,7 @@ export default function ContentUnlocksPage() {
                   </p>
                 </div>
               ) : (
-                unlocks.map((unlock) => {
+                Array.isArray(unlocks) && unlocks.map((unlock) => {
                   const Icon = contentTypeIcons[unlock.content_type] || Eye
                   return (
                     <div

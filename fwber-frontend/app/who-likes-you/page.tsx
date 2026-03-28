@@ -60,7 +60,7 @@ export default function WhoLikesYouPage() {
             </div>
           ) : likedUsers.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {likedUsers.map((user) => (
+              {Array.isArray(likedUsers) && likedUsers.map((user) => (
                 <div key={user.id} className="bg-white rounded-lg shadow overflow-hidden">
                   <div className="relative h-48 w-full">
                     <Image

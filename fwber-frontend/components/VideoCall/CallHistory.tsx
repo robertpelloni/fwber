@@ -21,7 +21,7 @@ export function CallHistory() {
     return <div className="p-4 text-center text-gray-500">Loading history...</div>;
   }
 
-  if (history.length === 0) {
+  if (!Array.isArray(history) || history.length === 0) {
     return <div className="p-4 text-center text-gray-500">No call history yet.</div>;
   }
 

@@ -70,7 +70,7 @@ export default function LeaderboardPage() {
                 <h2 className="text-xl font-bold">Top Token Holders</h2>
               </div>
               <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                {data.top_holders.map((user, index) => (
+                {data.top_holders?.map((user, index) => (
                   <div key={index} className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <span className={`w-8 h-8 flex items-center justify-center rounded-full font-bold ${
@@ -101,7 +101,7 @@ export default function LeaderboardPage() {
                 <h2 className="text-xl font-bold">Top Referrers</h2>
               </div>
               <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                {data.top_referrers.map((user, index) => (
+                {data.top_referrers?.map((user, index) => (
                   <div key={index} className="p-4 flex flex-col gap-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">

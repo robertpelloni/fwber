@@ -27,8 +27,8 @@ export default function FriendsPage() {
         api.get('/friends'),
         api.get('/friends/requests/pending')
       ]) as any[];
-      setFriends(friendsRes.data);
-      setRequests(requestsRes.data);
+      setFriends(Array.isArray(friendsRes.data) ? friendsRes.data : []);
+      setRequests(Array.isArray(requestsRes.data) ? requestsRes.data : []);
     } catch (err) {
       console.error('Error fetching friends data:', err);
       error('Failed to load friends data');
@@ -48,7 +48,7 @@ export default function FriendsPage() {
     try {
       setLoading(true);
       const response = await api.get(`/users/search?q=${searchQuery}`) as any;
-      setSearchResults(response.data);
+      setSearchResults(Array.isArray(response.data) ? response.data : []);
       setActiveTab('search');
     } catch (err) {
       console.error('Error searching users:', err);

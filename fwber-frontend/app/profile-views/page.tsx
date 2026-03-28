@@ -46,7 +46,7 @@ export default function ProfileViewsPage() {
       apiClient.get<ViewStats>(`/profile/${user.id}/view-stats`)
     ])
       .then(([viewersRes, statsRes]) => {
-        setViewers(viewersRes.data)
+        setViewers(Array.isArray(viewersRes.data) ? viewersRes.data : [])
         setStats(statsRes.data)
       })
       .catch(console.error)
