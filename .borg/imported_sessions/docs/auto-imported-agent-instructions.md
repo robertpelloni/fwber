@@ -1,11 +1,44 @@
 # Auto-imported Agent Instructions
 
-Generated at: 2026-03-28T13:33:27.864Z
+Generated at: 2026-03-28T15:18:50.901Z
 
 These instructions were derived automatically from imported sessions across supported tools.
 
 ## Durable instructions
 
+- **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Keep parity notes explicit when integrating external harnesses into Borg. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **copilot-cli** — "userMessage": "insanely great! outstanding! continue to proceed as you recommend! don't stop the party! don't terminate any processes in this session please! keep on goin!insanely great! outstanding! continue to proceed as you recommend! d _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json`)_
+- **copilot-cli** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/023-go-bridge-and-hypercode.md`)_
+- **copilot-cli** — Keep parity notes explicit when integrating external harnesses into Borg. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/023-go-bridge-and-hypercode.md`)_
+- **copilot-cli** — Use port 3847 for the autopilot dashboard. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
+- **copilot-cli** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
+- **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 3847 for autopilot configuration. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — The Go sidecar should have a separate config directory and separate lock file. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 3847 for autopilot configuration. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — The Go sidecar should have a separate config directory and separate lock file. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 3847 for autopilot configuration. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — The Go sidecar should have a separate config directory and separate lock file. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 3847 for autopilot configuration. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — The Go sidecar should have a separate config directory and separate lock file. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **copilot-cli** — "userMessage": "insanely great! outstanding! continue to proceed as you recommend! don't stop the party! don't terminate any processes in this session please! keep on goin!insanely great! outstanding! continue to proceed as you recommend! d _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json`)_
+- **copilot-cli** — Use port 3847 for autopilot configuration. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
+- **copilot-cli** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
+- **copilot-cli** — The Go sidecar should have a separate config directory and separate lock file. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
+- **copilot-cli** — - Prefer fixes that remove real operator pain: startup failures, misleading dashboards, noisy extension/runtime errors, and broken continuity pipelines. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
+- **copilot-cli** — "userMessage": "insanely great! outstanding! continue to proceed as you recommend! don't stop the party! don't terminate any processes in this session please! keep on goin!insanely great! outstanding! continue to proceed as you recommend! d _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json`)_
+- **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Set the server port to 8080 in '/test/file.ts'. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **copilot-cli** — Use port 3847 for the Copilot Chat probing. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
+- **copilot-cli** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
+- **copilot-cli** — The importer must not re-import its own generated instruction docs. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
+- **copilot-cli** — The Go sidecar must remain separate with its own configuration and lock file. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
+- **copilot-cli** — Skip slow LLM fallback when no OpenAI key is configured during session import. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
+- **copilot-cli** — "userMessage": "insanely great! outstanding! continue to proceed as you recommend! don't stop the party! don't terminate any processes in this session please! keep on goin!insanely great! outstanding! continue to proceed as you recommend! d _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json`)_
 - **claude-code** — Set the server port to 8080 in '/test/file.ts'. _(source: `C:/Users/hyper/.claude/projects/C--Users-hyper--claude-mem-observer-sessions/439fadfe-7e6e-48e7-a46c-cda905d89e22.jsonl`)_
 - **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
 - **borg** — The Go-sidecar validation workflow is: Set-Location go; gofmt -w .; go test ./... _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
@@ -223,37 +256,4 @@ These instructions were derived automatically from imported sessions across supp
 - **copilot-cli** — To merge changes from apps/maestro, stash local changes, move to origin/main, and reapply the stash. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/004-maestro-fork-merge.md`)_
 - **copilot-cli** — Bundle React Flow/XYFlow libraries into a vendor chunk to avoid 'Cannot read properties of undefined' errors. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/004-maestro-fork-merge.md`)_
 - **copilot-cli** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/files/paste-1774573723688.txt`)_
-- **copilot-cli** — If encountering EADDRINUSE error, ensure that another service is not using port 4000. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/files/paste-1774573723688.txt`)_
-- **copilot-cli** — Use node packages from the C:\Users\hyper\workspace\borg\node_modules directory. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/files/paste-1774573723688.txt`)_
-- **copilot-cli** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/files/paste-1774577504582.txt`)_
-- **copilot-cli** — Retry control-plane startup on port 4001 if port 4000 is unavailable. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/files/paste-1774577504582.txt`)_
-- **copilot-cli** — Use 10 seconds for catalog ingestion startup delay and 24 hours for the interval. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/files/paste-1774577504582.txt`)_
-- **copilot-cli** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/005-stabilizing-startup-and-sync.md`)_
-- **copilot-cli** — Maestro's Borg sync should target the correct default Borg control-plane URL/port (127.0.0.1:4000). _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/005-stabilizing-startup-and-sync.md`)_
-- **copilot-cli** — Start.bat launches Borg only, keeping Maestro separate from Borg startup. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/005-stabilizing-startup-and-sync.md`)_
-- **copilot-cli** — Borg web no longer relies on live Google Fonts during build. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/005-stabilizing-startup-and-sync.md`)_
-- **copilot-cli** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/006-fixing-mcp-policy.md`)_
-- **copilot-cli** — Do not default legacy autopilot/orchestrator web surfaces to 'localhost:3847'; make them opt-in via explicit env variables. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/006-fixing-mcp-policy.md`)_
-- **copilot-cli** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/files/paste-1774635239708.txt`)_
-- **copilot-cli** — Use port 3847 for the Borg orchestrator. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/007-building-session-import-pipeli.md`)_
-- **copilot-cli** — Ensure that the `better-sqlite3` package is rebuilt if startup fails due to missing native bindings. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/007-building-session-import-pipeli.md`)_
-- **copilot-cli** — Use `startAutoImport()` for the session import service to enable continuous session discovery. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/007-building-session-import-pipeli.md`)_
-- **copilot-cli** — Use a shared WebSocket resolver instead of hardcoded addresses in components. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/007-building-session-import-pipeli.md`)_
-- **copilot-cli** — Update the top-level documentation to mention the automatic session import feature once validated. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/007-building-session-import-pipeli.md`)_
-- **copilot-cli** — Exclude `.borg/imported_sessions` from discovery to prevent self-import loops. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/008-closing-lanes-starting-parser.md`)_
-- **copilot-cli** — Use `extension-storage` helpers or extension-backed storage instead of raw `localStorage` for content-script/sidebar flows. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/008-closing-lanes-starting-parser.md`)_
-- **copilot-cli** — The `MAESTRO_STRICT_NATIVE_RUNTIME=1` environment variable can be set to enforce strict failure in the native runtime preflight. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/008-closing-lanes-starting-parser.md`)_
-- **copilot-cli** — Update dashboard helper text to mention single-server snippets once implemented. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/008-closing-lanes-starting-parser.md`)_
-- **copilot-cli** — Use port 3000 for the Prism local dashboard. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/009-prism-assimilation-start.md`)_
-- **copilot-cli** — Prism local SQLite database should be located at ~/.prism-mcp/data.db. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/009-prism-assimilation-start.md`)_
-- **copilot-cli** — Borg's SessionImportService now has two discovery modes: file-based and database-backed using Prism. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/009-prism-assimilation-start.md`)_
-- **copilot-cli** — Prism ledger rows are imported as 'prism-ledger' and handoffs as 'prism-handoff'. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/009-prism-assimilation-start.md`)_
-- **copilot-cli** — Exclude empty window chat sessions from Copilot Chat imports using the path APPDATA\Code\User\globalStorage\emptyWindowChatSessions. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/009-prism-assimilation-start.md`)_
-- **copilot-cli** — Ignore specific paths in Cursor workspace metadata to prevent false positives during imports. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/009-prism-assimilation-start.md`)_
-- **copilot-cli** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/010-hardening-session-import.md`)_
-- **copilot-cli** — Set `NEXT_PUBLIC_BORG_ORCHESTRATOR_URL=http://127.0.0.1:4000` in the environment configuration. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/010-hardening-session-import.md`)_
-- **copilot-cli** — Set `NEXT_PUBLIC_AUTOPILOT_URL=http://127.0.0.1:4000` in the environment configuration. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/010-hardening-session-import.md`)_
-- **copilot-cli** — Implement a fix in `SessionImportService` to catch `ENOENT` errors from deleted files during import and return null instead of crashing. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/010-hardening-session-import.md`)_
-- **copilot-cli** — Wrap candidate import work in `scanAndImport()` with a try/catch to prevent a single missing file from crashing the entire import process. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/010-hardening-session-import.md`)_
-- **copilot-cli** — Add regression tests to cover scenarios where files are discovered and deleted before import, specifically in `SessionImportService.test.ts`. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/010-hardening-session-import.md`)_
 

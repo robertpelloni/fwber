@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "savedAt": "2026-03-28T13:33:32.300Z",
+  "savedAt": "2026-03-28T15:18:52.666Z",
   "memories": [
     {
       "id": "fab11857d774c9e8",
@@ -23367,6 +23367,4315 @@
       },
       "createdAt": "2026-03-28T13:33:27.295Z",
       "accessedAt": "2026-03-28T13:33:27.295Z",
+      "accessCount": 0
+    },
+    {
+      "id": "e9d3aa319210c842",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (copilot-cli) ended with status imported.\nWorking directory: C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots\nLog tail: \"06e2373228aff8b42dda508b8188113f\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\routing.go\", | \"420fced64a3d4e1ed7031dfdeb6a4565\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\routing_test.go\", | \"8b3e1111ac99372254107f83ae5f0c5d\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\status.go\", | \"e210a461391d72417f8e104e61c424e8\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\status_test.go\", | \"1c9c853670458f2802c2c5de8f6a3ce9\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\sessionimport\\\\summary.go\", | \"44bae55aff8b7c81623ba4b395010417\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\sessionimport\\\\summary_test.go\", | \"f2f0ddb5c19c3cf84368fc34f9bbc436\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\catalog.go\", | \"2703019faff41b5c7a92b17e07203d79\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\catalog_test.go\", | \"364e225ee47d3749c648adc378e7f87e\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\summary.go\", | \"ba5b1b4bceb0263685734468f278503d\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\summary_test.go\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "4f6ca302-ce78-4670-8659-5e94bb818d3b",
+        "sourcePath": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "copilot-cli",
+          "imported"
+        ],
+        "sessionId": "imported:copilot-cli:6593a30fa46e",
+        "structuredSessionSummary": {
+          "sessionId": "imported:copilot-cli:6593a30fa46e",
+          "name": "{",
+          "cliType": "copilot-cli",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots",
+          "restartCount": 0,
+          "startedAt": 1774705655640.7065,
+          "stoppedAt": 1774705691912,
+          "lastActivityAt": 1774705655640.7065,
+          "logTail": [
+            "\"06e2373228aff8b42dda508b8188113f\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\routing.go\",",
+            "\"420fced64a3d4e1ed7031dfdeb6a4565\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\routing_test.go\",",
+            "\"8b3e1111ac99372254107f83ae5f0c5d\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\status.go\",",
+            "\"e210a461391d72417f8e104e61c424e8\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\status_test.go\",",
+            "\"1c9c853670458f2802c2c5de8f6a3ce9\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\sessionimport\\\\summary.go\",",
+            "\"44bae55aff8b7c81623ba4b395010417\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\sessionimport\\\\summary_test.go\",",
+            "\"f2f0ddb5c19c3cf84368fc34f9bbc436\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\catalog.go\",",
+            "\"2703019faff41b5c7a92b17e07203d79\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\catalog_test.go\",",
+            "\"364e225ee47d3749c648adc378e7f87e\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\summary.go\",",
+            "\"ba5b1b4bceb0263685734468f278503d\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\summary_test.go\"",
+            "}"
+          ],
+          "recordedAt": 1774705695973,
+          "contentHash": "session-2131778081"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T13:48:15.974Z",
+      "accessedAt": "2026-03-28T13:48:15.974Z",
+      "accessCount": 0
+    },
+    {
+      "id": "d85fee6f76cb178d",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"please begin analysis and continue to proceed as you recommend. insanely great!\",",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "4f6ca302-ce78-4670-8659-5e94bb818d3b",
+        "sessionId": "imported:copilot-cli:6593a30fa46e",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T13:48:16.361Z",
+      "accessedAt": "2026-03-28T13:48:16.361Z",
+      "accessCount": 0
+    },
+    {
+      "id": "ed17e312cdf357a5",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"insanely great! outstanding! continue to proceed as you recommend! don't stop the party! don't terminate any processes in this session please! keep on goin!insanely great! outstanding! continue to proceed as you recommend! d",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "4f6ca302-ce78-4670-8659-5e94bb818d3b",
+        "sessionId": "imported:copilot-cli:6593a30fa46e",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "instruction",
+          "memory"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T13:48:16.592Z",
+      "accessedAt": "2026-03-28T13:48:16.592Z",
+      "accessCount": 0
+    },
+    {
+      "id": "84d8752a0cc4f0a1",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"<pasted_content file=\\\"C:\\\\Users\\\\hyper\\\\.copilot\\\\session-state\\\\19ddbe49-0d66-45a6-a9d2-393395d8953e\\\\files\\\\paste-1774505117140.txt\\\" size=\\\"30.7 KB\\\" lines=\\\"403\\\" />\",",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "4f6ca302-ce78-4670-8659-5e94bb818d3b",
+        "sessionId": "imported:copilot-cli:6593a30fa46e",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "memory",
+          "database"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T13:48:16.835Z",
+      "accessedAt": "2026-03-28T13:48:16.835Z",
+      "accessCount": 0
+    },
+    {
+      "id": "c7e4f4bcb8f1160b",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"borg on  main [$] via  v24.10.0 on ☁️ (us-east-1) took 1m26s\\n❯ .\\\\start.bat\\nStarting Borg...\\nInstalling dependencies...\\nScope: all 24 workspace projects\\nLockfile is up to date, resolution step is skipped\\nAlready up t",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "4f6ca302-ce78-4670-8659-5e94bb818d3b",
+        "sessionId": "imported:copilot-cli:6593a30fa46e",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T13:48:17.075Z",
+      "accessedAt": "2026-03-28T13:48:17.075Z",
+      "accessCount": 0
+    },
+    {
+      "id": "17341dec91a42f2a",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"<pasted_content file=\\\"C:\\\\Users\\\\hyper\\\\.copilot\\\\session-state\\\\19ddbe49-0d66-45a6-a9d2-393395d8953e\\\\files\\\\paste-1774506452821.txt\\\" size=\\\"30.6 KB\\\" lines=\\\"400\\\" />\",",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "4f6ca302-ce78-4670-8659-5e94bb818d3b",
+        "sessionId": "imported:copilot-cli:6593a30fa46e",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "memory",
+          "database"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T13:48:17.304Z",
+      "accessedAt": "2026-03-28T13:48:17.304Z",
+      "accessCount": 0
+    },
+    {
+      "id": "bbe4a96f02503105",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"proceed\",",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "4f6ca302-ce78-4670-8659-5e94bb818d3b",
+        "sessionId": "imported:copilot-cli:6593a30fa46e",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T13:48:17.535Z",
+      "accessedAt": "2026-03-28T13:48:17.535Z",
+      "accessCount": 0
+    },
+    {
+      "id": "57537ed76261f29c",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Problem: keep landing stabilization-first fixes that improve startup reliability, truthful operator UX, and session/memo (copilot-cli) ended with status imported.\nWorking directory: C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e\nLog tail: - Do not terminate running processes in this session. | - The Go port lane must remain sidecar-only for now: separate config directory, separate lock file, no rewiring of the main startup path until parity is much deeper and still fully validated. | - `apps/borg-extension/pages/content` still has broader pre-existing type errors around the newer root-store API shape; recent storage-noise edits were checked against filtered compiler output and no longer add new `SidebarManager`/storage- | - Maestro's `better-sqlite3` dependency is currently shared with the workspace root through a junctioned pnpm install, so naive rebuilds still risk fixing Node 24 for Borg while breaking Electron 28 for Maestro, or the reverse. | - Repo-wide test stabilization is still blocked on wider `@borg/core` harness drift and should not be conflated with the focused fixes above. | - Antigravity inspection found VS Code Insiders logs and UI state, but no durable Antigravity transcript/session store suitable for import yet. | - OpenAI import is intentionally limited to explicit OpenAI/ChatGPT roots rather than broad `Downloads` crawling, to keep discovery truthful and avoid noisy false positives. | - Prism behavioral warning import is intentionally additive and read-only; Borg preserves Prism correction signals in imported metadata without claiming full behavioral-learning or dashboard parity yet. | - The Go sidecar now covers config, providers, CLI, import roots/summaries, runtime rollups, memory status, and discovered sessions well enough that the next best gaps are likely endpoint discoverability and additional compact operator summ | - Verified for the startup/dashboard truthfulness lane: `packages/cli` start tests passed, `apps/web` tRPC route tests passed, `pnpm -C packages/cli exec tsc --noEmit` passed, `pnpm -C apps/web exec tsc --noEmit --pretty false` passed, and | - The `memories` startup crash root cause was a LanceDB race: `openTable('memories')` failure was treated as unconditional absence, so a concurrent creator could make `createTable()` throw. The adapter is now idempotent under that contentio | - Real machine import run after these fixes: discovered `316`, imported `24`, skipped `292`, stored `76` parsed memories, and wrote `.borg/imported_sessions/docs/auto-imported-agent-instructions.md`. Processed tools included `aider`, `borg`",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "edf2880a-863c-454a-86dc-c923d41c4f73",
+        "sourcePath": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "sessionFormat": "md",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "copilot-cli",
+          "imported"
+        ],
+        "sessionId": "imported:copilot-cli:fa68760415a9",
+        "structuredSessionSummary": {
+          "sessionId": "imported:copilot-cli:fa68760415a9",
+          "name": "Problem: keep landing stabilization-first fixes that improve startup reliability, truthful operator UX, and session/memo",
+          "cliType": "copilot-cli",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e",
+          "restartCount": 0,
+          "startedAt": 1774705451230.175,
+          "stoppedAt": 1774705697723,
+          "lastActivityAt": 1774705451230.175,
+          "logTail": [
+            "- Do not terminate running processes in this session.",
+            "- The Go port lane must remain sidecar-only for now: separate config directory, separate lock file, no rewiring of the main startup path until parity is much deeper and still fully validated.",
+            "- `apps/borg-extension/pages/content` still has broader pre-existing type errors around the newer root-store API shape; recent storage-noise edits were checked against filtered compiler output and no longer add new `SidebarManager`/storage-",
+            "- Maestro's `better-sqlite3` dependency is currently shared with the workspace root through a junctioned pnpm install, so naive rebuilds still risk fixing Node 24 for Borg while breaking Electron 28 for Maestro, or the reverse.",
+            "- Repo-wide test stabilization is still blocked on wider `@borg/core` harness drift and should not be conflated with the focused fixes above.",
+            "- Antigravity inspection found VS Code Insiders logs and UI state, but no durable Antigravity transcript/session store suitable for import yet.",
+            "- OpenAI import is intentionally limited to explicit OpenAI/ChatGPT roots rather than broad `Downloads` crawling, to keep discovery truthful and avoid noisy false positives.",
+            "- Prism behavioral warning import is intentionally additive and read-only; Borg preserves Prism correction signals in imported metadata without claiming full behavioral-learning or dashboard parity yet.",
+            "- The Go sidecar now covers config, providers, CLI, import roots/summaries, runtime rollups, memory status, and discovered sessions well enough that the next best gaps are likely endpoint discoverability and additional compact operator summ",
+            "- Verified for the startup/dashboard truthfulness lane: `packages/cli` start tests passed, `apps/web` tRPC route tests passed, `pnpm -C packages/cli exec tsc --noEmit` passed, `pnpm -C apps/web exec tsc --noEmit --pretty false` passed, and",
+            "- The `memories` startup crash root cause was a LanceDB race: `openTable('memories')` failure was treated as unconditional absence, so a concurrent creator could make `createTable()` throw. The adapter is now idempotent under that contentio",
+            "- Real machine import run after these fixes: discovered `316`, imported `24`, skipped `292`, stored `76` parsed memories, and wrote `.borg/imported_sessions/docs/auto-imported-agent-instructions.md`. Processed tools included `aider`, `borg`"
+          ],
+          "recordedAt": 1774705705686,
+          "contentHash": "session-965503404"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T13:48:25.686Z",
+      "accessedAt": "2026-03-28T13:48:25.686Z",
+      "accessCount": 0
+    },
+    {
+      "id": "82f620f7a9cfc3be",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Use port 3847 for the Copilot Chat probing.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "edf2880a-863c-454a-86dc-c923d41c4f73",
+        "sessionId": "imported:copilot-cli:fa68760415a9",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "networking",
+          "runtime",
+          "copilot-cli",
+          "instruction"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T13:48:26.025Z",
+      "accessedAt": "2026-03-28T13:48:26.025Z",
+      "accessCount": 0
+    },
+    {
+      "id": "3b475de1f886fa6b",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Use port 4000 for the Borg control plane.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "edf2880a-863c-454a-86dc-c923d41c4f73",
+        "sessionId": "imported:copilot-cli:fa68760415a9",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "networking",
+          "runtime",
+          "copilot-cli",
+          "instruction"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T13:48:26.218Z",
+      "accessedAt": "2026-03-28T13:48:26.218Z",
+      "accessCount": 0
+    },
+    {
+      "id": "eece33131e79c29f",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Exclusions in imported-session discovery include outputs from '.borg/imported_sessions'.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "edf2880a-863c-454a-86dc-c923d41c4f73",
+        "sessionId": "imported:copilot-cli:fa68760415a9",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "import",
+          "discovery",
+          "copilot-cli",
+          "memory",
+          "networking"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T13:48:26.425Z",
+      "accessedAt": "2026-03-28T13:48:26.425Z",
+      "accessCount": 0
+    },
+    {
+      "id": "c824fa566aab691e",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The importer must not re-import its own generated instruction docs.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "edf2880a-863c-454a-86dc-c923d41c4f73",
+        "sessionId": "imported:copilot-cli:fa68760415a9",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "import",
+          "instructions",
+          "copilot-cli",
+          "instruction",
+          "networking"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T13:48:26.643Z",
+      "accessedAt": "2026-03-28T13:48:26.643Z",
+      "accessCount": 0
+    },
+    {
+      "id": "7ed729e111d876c1",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The Go sidecar must remain separate with its own configuration and lock file.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "edf2880a-863c-454a-86dc-c923d41c4f73",
+        "sessionId": "imported:copilot-cli:fa68760415a9",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "architecture",
+          "configuration",
+          "copilot-cli",
+          "instruction"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T13:48:26.876Z",
+      "accessedAt": "2026-03-28T13:48:26.876Z",
+      "accessCount": 0
+    },
+    {
+      "id": "380e7cbb441c1d13",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Skip slow LLM fallback when no OpenAI key is configured during session import.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "edf2880a-863c-454a-86dc-c923d41c4f73",
+        "sessionId": "imported:copilot-cli:fa68760415a9",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "import",
+          "performance",
+          "copilot-cli",
+          "memory",
+          "networking"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T13:48:27.134Z",
+      "accessedAt": "2026-03-28T13:48:27.134Z",
+      "accessCount": 0
+    },
+    {
+      "id": "ed3de2bdc5af4ecb",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/handoffs\nLog tail: \"user\": 0, | \"agent\": 0, | \"project\": 781, | \"discovery\": 0, | \"decision\": 0, | \"progress\": 0, | \"warning\": 0, | \"fix\": 0 | }, | \"recentContext\": [], | \"notes\": \"Automatic background handoff\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "a9a6fdce-c68f-41d6-b351-255f565a59be",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774705377904.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:a8b85dcd4174",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:a8b85dcd4174",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+          "restartCount": 0,
+          "startedAt": 1774705377904.1206,
+          "stoppedAt": 1774705707395,
+          "lastActivityAt": 1774705377904.1206,
+          "logTail": [
+            "\"user\": 0,",
+            "\"agent\": 0,",
+            "\"project\": 781,",
+            "\"discovery\": 0,",
+            "\"decision\": 0,",
+            "\"progress\": 0,",
+            "\"warning\": 0,",
+            "\"fix\": 0",
+            "},",
+            "\"recentContext\": [],",
+            "\"notes\": \"Automatic background handoff\"",
+            "}"
+          ],
+          "recordedAt": 1774705707917,
+          "contentHash": "session-1495733144"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T13:48:27.917Z",
+      "accessedAt": "2026-03-28T13:48:27.917Z",
+      "accessCount": 0
+    },
+    {
+      "id": "3f6dc7e983e2920b",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/handoffs\nLog tail: \"user\": 0, | \"agent\": 0, | \"project\": 781, | \"discovery\": 0, | \"decision\": 0, | \"progress\": 0, | \"warning\": 0, | \"fix\": 0 | }, | \"recentContext\": [], | \"notes\": \"Automatic background handoff\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "f83b9229-55d5-490b-a9e5-7769c88438a2",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774705077903.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:29a846959471",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:29a846959471",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+          "restartCount": 0,
+          "startedAt": 1774705077903.5764,
+          "stoppedAt": 1774705708156,
+          "lastActivityAt": 1774705077903.5764,
+          "logTail": [
+            "\"user\": 0,",
+            "\"agent\": 0,",
+            "\"project\": 781,",
+            "\"discovery\": 0,",
+            "\"decision\": 0,",
+            "\"progress\": 0,",
+            "\"warning\": 0,",
+            "\"fix\": 0",
+            "},",
+            "\"recentContext\": [],",
+            "\"notes\": \"Automatic background handoff\"",
+            "}"
+          ],
+          "recordedAt": 1774705708580,
+          "contentHash": "session-1046040976"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T13:48:28.580Z",
+      "accessedAt": "2026-03-28T13:48:28.580Z",
+      "accessCount": 0
+    },
+    {
+      "id": "cd6b84a79ecdf204",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/agent_memory\nLog tail: \"memory\" | ], | \"section\": \"general\", | \"memoryKind\": \"memory\", | \"extractionSource\": \"heuristic\" | }, | \"createdAt\": \"2026-03-28T13:48:17.535Z\", | \"accessedAt\": \"2026-03-28T13:48:17.535Z\", | \"accessCount\": 0 | } | ]",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "5f53d8ee-ec35-4132-9d02-a5d4fdb09444",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:590354fc1eae",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:590354fc1eae",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/agent_memory",
+          "restartCount": 0,
+          "startedAt": 1774704812310.692,
+          "stoppedAt": 1774705708842,
+          "lastActivityAt": 1774704812310.692,
+          "logTail": [
+            "\"memory\"",
+            "],",
+            "\"section\": \"general\",",
+            "\"memoryKind\": \"memory\",",
+            "\"extractionSource\": \"heuristic\"",
+            "},",
+            "\"createdAt\": \"2026-03-28T13:48:17.535Z\",",
+            "\"accessedAt\": \"2026-03-28T13:48:17.535Z\",",
+            "\"accessCount\": 0",
+            "}",
+            "]"
+          ],
+          "recordedAt": 1774705711326,
+          "contentHash": "session-1242075953"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T13:48:31.326Z",
+      "accessedAt": "2026-03-28T13:48:31.326Z",
+      "accessCount": 0
+    },
+    {
+      "id": "d72f84cd54fcc684",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Use port 4000 for the Borg control plane.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "5f53d8ee-ec35-4132-9d02-a5d4fdb09444",
+        "sessionId": "imported:borg:590354fc1eae",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "networking",
+          "runtime",
+          "borg",
+          "instruction"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T13:48:31.558Z",
+      "accessedAt": "2026-03-28T13:48:31.558Z",
+      "accessCount": 0
+    },
+    {
+      "id": "8a2718d235a05a02",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Set the server port to 8080 in '/test/file.ts'.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "5f53d8ee-ec35-4132-9d02-a5d4fdb09444",
+        "sessionId": "imported:borg:590354fc1eae",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "configuration",
+          "runtime",
+          "networking",
+          "borg",
+          "memory",
+          "validation",
+          "mcp"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T13:48:31.747Z",
+      "accessedAt": "2026-03-28T13:48:31.747Z",
+      "accessCount": 0
+    },
+    {
+      "id": "585dd22ccc63a790",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/handoffs\nLog tail: \"user\": 0, | \"agent\": 0, | \"project\": 800, | \"discovery\": 0, | \"decision\": 0, | \"progress\": 0, | \"warning\": 0, | \"fix\": 0 | }, | \"recentContext\": [], | \"notes\": \"Automatic background handoff\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "6431ba67-1305-4785-9413-538bdf56e968",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774706578264.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:ca96f702530b",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:ca96f702530b",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+          "restartCount": 0,
+          "startedAt": 1774706578264.9355,
+          "stoppedAt": 1774706594475,
+          "lastActivityAt": 1774706578264.9355,
+          "logTail": [
+            "\"user\": 0,",
+            "\"agent\": 0,",
+            "\"project\": 800,",
+            "\"discovery\": 0,",
+            "\"decision\": 0,",
+            "\"progress\": 0,",
+            "\"warning\": 0,",
+            "\"fix\": 0",
+            "},",
+            "\"recentContext\": [],",
+            "\"notes\": \"Automatic background handoff\"",
+            "}"
+          ],
+          "recordedAt": 1774706595896,
+          "contentHash": "session-495764725"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T14:03:15.897Z",
+      "accessedAt": "2026-03-28T14:03:15.897Z",
+      "accessCount": 0
+    },
+    {
+      "id": "2be6cba987796de4",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (copilot-cli) ended with status imported.\nWorking directory: C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots\nLog tail: \"06e2373228aff8b42dda508b8188113f\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\routing.go\", | \"420fced64a3d4e1ed7031dfdeb6a4565\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\routing_test.go\", | \"8b3e1111ac99372254107f83ae5f0c5d\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\status.go\", | \"e210a461391d72417f8e104e61c424e8\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\status_test.go\", | \"1c9c853670458f2802c2c5de8f6a3ce9\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\sessionimport\\\\summary.go\", | \"44bae55aff8b7c81623ba4b395010417\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\sessionimport\\\\summary_test.go\", | \"f2f0ddb5c19c3cf84368fc34f9bbc436\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\catalog.go\", | \"2703019faff41b5c7a92b17e07203d79\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\catalog_test.go\", | \"364e225ee47d3749c648adc378e7f87e\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\summary.go\", | \"ba5b1b4bceb0263685734468f278503d\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\summary_test.go\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "8b3e0257-bf10-4e3a-87b2-d763e1ac1a2a",
+        "sourcePath": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "copilot-cli",
+          "imported"
+        ],
+        "sessionId": "imported:copilot-cli:af5f7d3da635",
+        "structuredSessionSummary": {
+          "sessionId": "imported:copilot-cli:af5f7d3da635",
+          "name": "{",
+          "cliType": "copilot-cli",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots",
+          "restartCount": 0,
+          "startedAt": 1774706490536.2634,
+          "stoppedAt": 1774706596357,
+          "lastActivityAt": 1774706490536.2634,
+          "logTail": [
+            "\"06e2373228aff8b42dda508b8188113f\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\routing.go\",",
+            "\"420fced64a3d4e1ed7031dfdeb6a4565\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\routing_test.go\",",
+            "\"8b3e1111ac99372254107f83ae5f0c5d\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\status.go\",",
+            "\"e210a461391d72417f8e104e61c424e8\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\status_test.go\",",
+            "\"1c9c853670458f2802c2c5de8f6a3ce9\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\sessionimport\\\\summary.go\",",
+            "\"44bae55aff8b7c81623ba4b395010417\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\sessionimport\\\\summary_test.go\",",
+            "\"f2f0ddb5c19c3cf84368fc34f9bbc436\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\catalog.go\",",
+            "\"2703019faff41b5c7a92b17e07203d79\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\catalog_test.go\",",
+            "\"364e225ee47d3749c648adc378e7f87e\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\summary.go\",",
+            "\"ba5b1b4bceb0263685734468f278503d\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\summary_test.go\"",
+            "}"
+          ],
+          "recordedAt": 1774706603971,
+          "contentHash": "session-499976207"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T14:03:23.971Z",
+      "accessedAt": "2026-03-28T14:03:23.971Z",
+      "accessCount": 0
+    },
+    {
+      "id": "4b040784f04b23e4",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"please begin analysis and continue to proceed as you recommend. insanely great!\",",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "8b3e0257-bf10-4e3a-87b2-d763e1ac1a2a",
+        "sessionId": "imported:copilot-cli:af5f7d3da635",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:03:24.313Z",
+      "accessedAt": "2026-03-28T14:03:24.313Z",
+      "accessCount": 0
+    },
+    {
+      "id": "5df6dc3ec10b011e",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"insanely great! outstanding! continue to proceed as you recommend! don't stop the party! don't terminate any processes in this session please! keep on goin!insanely great! outstanding! continue to proceed as you recommend! d",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "8b3e0257-bf10-4e3a-87b2-d763e1ac1a2a",
+        "sessionId": "imported:copilot-cli:af5f7d3da635",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "instruction",
+          "memory"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:03:24.537Z",
+      "accessedAt": "2026-03-28T14:03:24.537Z",
+      "accessCount": 0
+    },
+    {
+      "id": "39a564556a869287",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"<pasted_content file=\\\"C:\\\\Users\\\\hyper\\\\.copilot\\\\session-state\\\\19ddbe49-0d66-45a6-a9d2-393395d8953e\\\\files\\\\paste-1774505117140.txt\\\" size=\\\"30.7 KB\\\" lines=\\\"403\\\" />\",",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "8b3e0257-bf10-4e3a-87b2-d763e1ac1a2a",
+        "sessionId": "imported:copilot-cli:af5f7d3da635",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "memory",
+          "database"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:03:24.770Z",
+      "accessedAt": "2026-03-28T14:03:24.770Z",
+      "accessCount": 0
+    },
+    {
+      "id": "a52db6293e326bc3",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"borg on  main [$] via  v24.10.0 on ☁️ (us-east-1) took 1m26s\\n❯ .\\\\start.bat\\nStarting Borg...\\nInstalling dependencies...\\nScope: all 24 workspace projects\\nLockfile is up to date, resolution step is skipped\\nAlready up t",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "8b3e0257-bf10-4e3a-87b2-d763e1ac1a2a",
+        "sessionId": "imported:copilot-cli:af5f7d3da635",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:03:25.007Z",
+      "accessedAt": "2026-03-28T14:03:25.007Z",
+      "accessCount": 0
+    },
+    {
+      "id": "91d52b92ab7c565b",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"<pasted_content file=\\\"C:\\\\Users\\\\hyper\\\\.copilot\\\\session-state\\\\19ddbe49-0d66-45a6-a9d2-393395d8953e\\\\files\\\\paste-1774506452821.txt\\\" size=\\\"30.6 KB\\\" lines=\\\"400\\\" />\",",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "8b3e0257-bf10-4e3a-87b2-d763e1ac1a2a",
+        "sessionId": "imported:copilot-cli:af5f7d3da635",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "memory",
+          "database"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:03:25.224Z",
+      "accessedAt": "2026-03-28T14:03:25.224Z",
+      "accessCount": 0
+    },
+    {
+      "id": "ddcfedbf61db8387",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"proceed\",",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "8b3e0257-bf10-4e3a-87b2-d763e1ac1a2a",
+        "sessionId": "imported:copilot-cli:af5f7d3da635",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:03:25.451Z",
+      "accessedAt": "2026-03-28T14:03:25.451Z",
+      "accessCount": 0
+    },
+    {
+      "id": "02a3af4559db2cc7",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/handoffs\nLog tail: \"user\": 0, | \"agent\": 0, | \"project\": 800, | \"discovery\": 0, | \"decision\": 0, | \"progress\": 0, | \"warning\": 0, | \"fix\": 0 | }, | \"recentContext\": [], | \"notes\": \"Automatic background handoff\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "75e187b2-2e66-4a5e-8354-aca3b7111e6d",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774706277925.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:bbd08081184d",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:bbd08081184d",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+          "restartCount": 0,
+          "startedAt": 1774706277925.9685,
+          "stoppedAt": 1774706606116,
+          "lastActivityAt": 1774706277925.9685,
+          "logTail": [
+            "\"user\": 0,",
+            "\"agent\": 0,",
+            "\"project\": 800,",
+            "\"discovery\": 0,",
+            "\"decision\": 0,",
+            "\"progress\": 0,",
+            "\"warning\": 0,",
+            "\"fix\": 0",
+            "},",
+            "\"recentContext\": [],",
+            "\"notes\": \"Automatic background handoff\"",
+            "}"
+          ],
+          "recordedAt": 1774706607400,
+          "contentHash": "session-1498667539"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T14:03:27.400Z",
+      "accessedAt": "2026-03-28T14:03:27.400Z",
+      "accessCount": 0
+    },
+    {
+      "id": "65c90a7a632ebe60",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/handoffs\nLog tail: \"user\": 0, | \"agent\": 0, | \"project\": 800, | \"discovery\": 0, | \"decision\": 0, | \"progress\": 0, | \"warning\": 0, | \"fix\": 0 | }, | \"recentContext\": [], | \"notes\": \"Automatic background handoff\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "a7011fe8-2c4f-4e5f-8c63-97b5e716f8b7",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774705977925.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:1fa8f03a7284",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:1fa8f03a7284",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+          "restartCount": 0,
+          "startedAt": 1774705977925.5657,
+          "stoppedAt": 1774706607638,
+          "lastActivityAt": 1774705977925.5657,
+          "logTail": [
+            "\"user\": 0,",
+            "\"agent\": 0,",
+            "\"project\": 800,",
+            "\"discovery\": 0,",
+            "\"decision\": 0,",
+            "\"progress\": 0,",
+            "\"warning\": 0,",
+            "\"fix\": 0",
+            "},",
+            "\"recentContext\": [],",
+            "\"notes\": \"Automatic background handoff\"",
+            "}"
+          ],
+          "recordedAt": 1774706609096,
+          "contentHash": "session-850085078"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T14:03:29.097Z",
+      "accessedAt": "2026-03-28T14:03:29.097Z",
+      "accessCount": 0
+    },
+    {
+      "id": "699cd066dc9f5e7c",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Problem: keep landing stabilization-first fixes that improve startup reliability, truthful operator UX, and session/memo (copilot-cli) ended with status imported.\nWorking directory: C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e\nLog tail: - Do not terminate running processes in this session. | - The Go port lane must remain sidecar-only for now: separate config directory, separate lock file, no rewiring of the main startup path until parity is much deeper and still fully validated. | - `apps/borg-extension/pages/content` still has broader pre-existing type errors around the newer root-store API shape; recent storage-noise edits were checked against filtered compiler output and no longer add new `SidebarManager`/storage- | - Maestro's `better-sqlite3` dependency is currently shared with the workspace root through a junctioned pnpm install, so naive rebuilds still risk fixing Node 24 for Borg while breaking Electron 28 for Maestro, or the reverse. | - Repo-wide test stabilization is still blocked on wider `@borg/core` harness drift and should not be conflated with the focused fixes above. | - Antigravity inspection found VS Code Insiders logs and UI state, but no durable Antigravity transcript/session store suitable for import yet. | - OpenAI import is intentionally limited to explicit OpenAI/ChatGPT roots rather than broad `Downloads` crawling, to keep discovery truthful and avoid noisy false positives. | - Prism behavioral warning import is intentionally additive and read-only; Borg preserves Prism correction signals in imported metadata without claiming full behavioral-learning or dashboard parity yet. | - The Go sidecar now covers config, providers, CLI, import roots/summaries, runtime rollups, memory status, and discovered sessions well enough that the next best gaps are likely endpoint discoverability and additional compact operator summ | - Verified for the startup/dashboard truthfulness lane: `packages/cli` start tests passed, `apps/web` tRPC route tests passed, `pnpm -C packages/cli exec tsc --noEmit` passed, `pnpm -C apps/web exec tsc --noEmit --pretty false` passed, and | - The `memories` startup crash root cause was a LanceDB race: `openTable('memories')` failure was treated as unconditional absence, so a concurrent creator could make `createTable()` throw. The adapter is now idempotent under that contentio | - Real machine import run after these fixes: discovered `316`, imported `24`, skipped `292`, stored `76` parsed memories, and wrote `.borg/imported_sessions/docs/auto-imported-agent-instructions.md`. Processed tools included `aider`, `borg`",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "b1e96de7-ebb2-4067-9142-622370a447a3",
+        "sourcePath": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "sessionFormat": "md",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "copilot-cli",
+          "imported"
+        ],
+        "sessionId": "imported:copilot-cli:d9aad30538a5",
+        "structuredSessionSummary": {
+          "sessionId": "imported:copilot-cli:d9aad30538a5",
+          "name": "Problem: keep landing stabilization-first fixes that improve startup reliability, truthful operator UX, and session/memo",
+          "cliType": "copilot-cli",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e",
+          "restartCount": 0,
+          "startedAt": 1774705732130.4448,
+          "stoppedAt": 1774706609357,
+          "lastActivityAt": 1774705732130.4448,
+          "logTail": [
+            "- Do not terminate running processes in this session.",
+            "- The Go port lane must remain sidecar-only for now: separate config directory, separate lock file, no rewiring of the main startup path until parity is much deeper and still fully validated.",
+            "- `apps/borg-extension/pages/content` still has broader pre-existing type errors around the newer root-store API shape; recent storage-noise edits were checked against filtered compiler output and no longer add new `SidebarManager`/storage-",
+            "- Maestro's `better-sqlite3` dependency is currently shared with the workspace root through a junctioned pnpm install, so naive rebuilds still risk fixing Node 24 for Borg while breaking Electron 28 for Maestro, or the reverse.",
+            "- Repo-wide test stabilization is still blocked on wider `@borg/core` harness drift and should not be conflated with the focused fixes above.",
+            "- Antigravity inspection found VS Code Insiders logs and UI state, but no durable Antigravity transcript/session store suitable for import yet.",
+            "- OpenAI import is intentionally limited to explicit OpenAI/ChatGPT roots rather than broad `Downloads` crawling, to keep discovery truthful and avoid noisy false positives.",
+            "- Prism behavioral warning import is intentionally additive and read-only; Borg preserves Prism correction signals in imported metadata without claiming full behavioral-learning or dashboard parity yet.",
+            "- The Go sidecar now covers config, providers, CLI, import roots/summaries, runtime rollups, memory status, and discovered sessions well enough that the next best gaps are likely endpoint discoverability and additional compact operator summ",
+            "- Verified for the startup/dashboard truthfulness lane: `packages/cli` start tests passed, `apps/web` tRPC route tests passed, `pnpm -C packages/cli exec tsc --noEmit` passed, `pnpm -C apps/web exec tsc --noEmit --pretty false` passed, and",
+            "- The `memories` startup crash root cause was a LanceDB race: `openTable('memories')` failure was treated as unconditional absence, so a concurrent creator could make `createTable()` throw. The adapter is now idempotent under that contentio",
+            "- Real machine import run after these fixes: discovered `316`, imported `24`, skipped `292`, stored `76` parsed memories, and wrote `.borg/imported_sessions/docs/auto-imported-agent-instructions.md`. Processed tools included `aider`, `borg`"
+          ],
+          "recordedAt": 1774706610769,
+          "contentHash": "session-1648409319"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T14:03:30.769Z",
+      "accessedAt": "2026-03-28T14:03:30.769Z",
+      "accessCount": 0
+    },
+    {
+      "id": "d4756ef5ecb91e60",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Problem: keep landing stabilization-first fixes that improve startup reliability, truthful operator UX, and session/memory continuity without widening scope or trampling the dirty worktree.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "b1e96de7-ebb2-4067-9142-622370a447a3",
+        "sessionId": "imported:copilot-cli:d9aad30538a5",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "copilot-cli",
+          "memory",
+          "ui"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:03:31.090Z",
+      "accessedAt": "2026-03-28T14:03:31.090Z",
+      "accessCount": 0
+    },
+    {
+      "id": "31d0795b97e4838a",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "- Prefer fixes that remove real operator pain: startup failures, misleading dashboards, noisy extension/runtime errors, and broken continuity pipelines.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "b1e96de7-ebb2-4067-9142-622370a447a3",
+        "sessionId": "imported:copilot-cli:d9aad30538a5",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "copilot-cli",
+          "instruction",
+          "ui"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:03:31.291Z",
+      "accessedAt": "2026-03-28T14:03:31.291Z",
+      "accessCount": 0
+    },
+    {
+      "id": "687041706c04505b",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "- When package-wide validation is noisy, separate regressions caused by current edits from known pre-existing failures.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "b1e96de7-ebb2-4067-9142-622370a447a3",
+        "sessionId": "imported:copilot-cli:d9aad30538a5",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "copilot-cli",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:03:31.494Z",
+      "accessedAt": "2026-03-28T14:03:31.494Z",
+      "accessCount": 0
+    },
+    {
+      "id": "a91e4de8a1d107c1",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "- Completed: the new `@borg/core` imported-session pipeline now discovers external session transcripts, stores converted sessions plus parsed memories, generates `.borg/imported_sessions/docs/auto-imported-agent-instructions.md`, and is val",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "b1e96de7-ebb2-4067-9142-622370a447a3",
+        "sessionId": "imported:copilot-cli:d9aad30538a5",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "copilot-cli",
+          "memory",
+          "networking"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:03:31.693Z",
+      "accessedAt": "2026-03-28T14:03:31.693Z",
+      "accessCount": 0
+    },
+    {
+      "id": "53f3fb09ea134f52",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "- Completed: the importer no longer re-imports its own generated instruction docs; `.borg/imported_sessions` output paths are now excluded from discovery.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "b1e96de7-ebb2-4067-9142-622370a447a3",
+        "sessionId": "imported:copilot-cli:d9aad30538a5",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "copilot-cli",
+          "memory",
+          "networking"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:03:31.892Z",
+      "accessedAt": "2026-03-28T14:03:31.892Z",
+      "accessCount": 0
+    },
+    {
+      "id": "c5d053b64d6dc32a",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "- Completed: MCP bulk import now accepts a single server entry without outer braces, so snippets like `\"prism-mcp\": { ... }` import cleanly from the dashboard.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "b1e96de7-ebb2-4067-9142-622370a447a3",
+        "sessionId": "imported:copilot-cli:d9aad30538a5",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "copilot-cli",
+          "memory",
+          "networking",
+          "mcp",
+          "ui"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:03:32.089Z",
+      "accessedAt": "2026-03-28T14:03:32.089Z",
+      "accessCount": 0
+    },
+    {
+      "id": "50fe256df70eebc9",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/agent_memory\nLog tail: ], | \"recordedAt\": 1774706609096, | \"contentHash\": \"session-850085078\" | }, | \"memoryKind\": \"session_summary\" | \"createdAt\": \"2026-03-28T14:03:29.097Z\", | \"accessedAt\": \"2026-03-28T14:03:29.097Z\", | \"accessCount\": 0 | } | ]",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "09091ac9-10e0-4633-afe0-73f7f27b7be7",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:08eef0135ef4",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:08eef0135ef4",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/agent_memory",
+          "restartCount": 0,
+          "startedAt": 1774705716595.4622,
+          "stoppedAt": 1774706612308,
+          "lastActivityAt": 1774705716595.4622,
+          "logTail": [
+            "],",
+            "\"recordedAt\": 1774706609096,",
+            "\"contentHash\": \"session-850085078\"",
+            "},",
+            "\"memoryKind\": \"session_summary\"",
+            "\"createdAt\": \"2026-03-28T14:03:29.097Z\",",
+            "\"accessedAt\": \"2026-03-28T14:03:29.097Z\",",
+            "\"accessCount\": 0",
+            "}",
+            "]"
+          ],
+          "recordedAt": 1774706618568,
+          "contentHash": "session-258094398"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T14:03:38.568Z",
+      "accessedAt": "2026-03-28T14:03:38.568Z",
+      "accessCount": 0
+    },
+    {
+      "id": "dec4c182c64de5ed",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"content\": \"{ (copilot-cli) ended with status imported.\\nWorking directory: C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots\\nLog tail: \\\"06e2373228aff8b42dda508b8188113f\\\": \\\"C:\\\\\\\\Users\\\\\\\\hyper\\",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "09091ac9-10e0-4633-afe0-73f7f27b7be7",
+        "sessionId": "imported:borg:08eef0135ef4",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "borg",
+          "memory",
+          "networking",
+          "database"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:03:38.899Z",
+      "accessedAt": "2026-03-28T14:03:38.899Z",
+      "accessCount": 0
+    },
+    {
+      "id": "f2c36a24a326dc3f",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"source\": \"session_import\",",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "09091ac9-10e0-4633-afe0-73f7f27b7be7",
+        "sessionId": "imported:borg:08eef0135ef4",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "borg",
+          "memory",
+          "networking"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:03:39.122Z",
+      "accessedAt": "2026-03-28T14:03:39.122Z",
+      "accessCount": 0
+    },
+    {
+      "id": "a383561fff1b94fb",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"importedSessionId\": \"e72c1216-9ff4-42ee-a6de-656fc5d13435\",",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "09091ac9-10e0-4633-afe0-73f7f27b7be7",
+        "sessionId": "imported:borg:08eef0135ef4",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "borg",
+          "memory",
+          "networking"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:03:40.712Z",
+      "accessedAt": "2026-03-28T14:03:40.712Z",
+      "accessCount": 0
+    },
+    {
+      "id": "e189863395abbace",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"sourcePath\": \"C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json\",",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "09091ac9-10e0-4633-afe0-73f7f27b7be7",
+        "sessionId": "imported:borg:08eef0135ef4",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "borg",
+          "memory",
+          "database"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:03:40.928Z",
+      "accessedAt": "2026-03-28T14:03:40.928Z",
+      "accessCount": 0
+    },
+    {
+      "id": "9c1b4b2dd3cc26cc",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"sessionId\": \"imported:copilot-cli:c1046c786578\",",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "09091ac9-10e0-4633-afe0-73f7f27b7be7",
+        "sessionId": "imported:borg:08eef0135ef4",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "borg",
+          "memory",
+          "networking"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:03:41.136Z",
+      "accessedAt": "2026-03-28T14:03:41.136Z",
+      "accessCount": 0
+    },
+    {
+      "id": "c49c0d618c3f11ef",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"workingDirectory\": \"C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots\",",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "09091ac9-10e0-4633-afe0-73f7f27b7be7",
+        "sessionId": "imported:borg:08eef0135ef4",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "borg",
+          "memory",
+          "database"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:03:41.334Z",
+      "accessedAt": "2026-03-28T14:03:41.334Z",
+      "accessCount": 0
+    },
+    {
+      "id": "f01bda67e1abb7b6",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/handoffs\nLog tail: \"user\": 0, | \"agent\": 0, | \"project\": 781, | \"discovery\": 0, | \"decision\": 0, | \"progress\": 0, | \"warning\": 0, | \"fix\": 0 | }, | \"recentContext\": [], | \"notes\": \"Automatic background handoff\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "0db9b8f0-3614-4888-8b9c-b72c29383324",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774705677908.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:571dc390ca56",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:571dc390ca56",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+          "restartCount": 0,
+          "startedAt": 1774705677908.5906,
+          "stoppedAt": 1774706621550,
+          "lastActivityAt": 1774705677908.5906,
+          "logTail": [
+            "\"user\": 0,",
+            "\"agent\": 0,",
+            "\"project\": 781,",
+            "\"discovery\": 0,",
+            "\"decision\": 0,",
+            "\"progress\": 0,",
+            "\"warning\": 0,",
+            "\"fix\": 0",
+            "},",
+            "\"recentContext\": [],",
+            "\"notes\": \"Automatic background handoff\"",
+            "}"
+          ],
+          "recordedAt": 1774706629956,
+          "contentHash": "session-364038799"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T14:03:49.956Z",
+      "accessedAt": "2026-03-28T14:03:49.956Z",
+      "accessCount": 0
+    },
+    {
+      "id": "a45dac5dfb74b7b4",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/handoffs\nLog tail: \"user\": 0, | \"agent\": 0, | \"project\": 825, | \"discovery\": 0, | \"decision\": 0, | \"progress\": 0, | \"warning\": 0, | \"fix\": 0 | }, | \"recentContext\": [], | \"notes\": \"Automatic background handoff\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "1670867a-e793-434d-b54e-70d15098f505",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774707478279.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:d9460ae5cc30",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:d9460ae5cc30",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+          "restartCount": 0,
+          "startedAt": 1774707478279.2505,
+          "stoppedAt": 1774707490299,
+          "lastActivityAt": 1774707478279.2505,
+          "logTail": [
+            "\"user\": 0,",
+            "\"agent\": 0,",
+            "\"project\": 825,",
+            "\"discovery\": 0,",
+            "\"decision\": 0,",
+            "\"progress\": 0,",
+            "\"warning\": 0,",
+            "\"fix\": 0",
+            "},",
+            "\"recentContext\": [],",
+            "\"notes\": \"Automatic background handoff\"",
+            "}"
+          ],
+          "recordedAt": 1774707492470,
+          "contentHash": "session-1153190167"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T14:18:12.470Z",
+      "accessedAt": "2026-03-28T14:18:12.470Z",
+      "accessCount": 0
+    },
+    {
+      "id": "11903aa793d43cf3",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Problem: keep landing stabilization-first fixes that improve startup reliability, truthful operator UX, and session/memo (copilot-cli) ended with status imported.\nWorking directory: C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e\nLog tail: - Do not terminate running processes in this session. | - The Go port lane must remain sidecar-only for now: separate config directory, separate lock file, no rewiring of the main startup path until parity is much deeper and still fully validated. | - `apps/borg-extension/pages/content` still has broader pre-existing type errors around the newer root-store API shape; recent storage-noise edits were checked against filtered compiler output and no longer add new `SidebarManager`/storage- | - Maestro's `better-sqlite3` dependency is currently shared with the workspace root through a junctioned pnpm install, so naive rebuilds still risk fixing Node 24 for Borg while breaking Electron 28 for Maestro, or the reverse. | - Repo-wide test stabilization is still blocked on wider `@borg/core` harness drift and should not be conflated with the focused fixes above. | - Antigravity inspection found VS Code Insiders logs and UI state, but no durable Antigravity transcript/session store suitable for import yet. | - OpenAI import is intentionally limited to explicit OpenAI/ChatGPT roots rather than broad `Downloads` crawling, to keep discovery truthful and avoid noisy false positives. | - Prism behavioral warning import is intentionally additive and read-only; Borg preserves Prism correction signals in imported metadata without claiming full behavioral-learning or dashboard parity yet. | - The Go sidecar now covers config, providers, CLI, import roots/summaries, runtime rollups, memory status, and discovered sessions well enough that the next best gaps are likely endpoint discoverability and additional compact operator summ | - Verified for the startup/dashboard truthfulness lane: `packages/cli` start tests passed, `apps/web` tRPC route tests passed, `pnpm -C packages/cli exec tsc --noEmit` passed, `pnpm -C apps/web exec tsc --noEmit --pretty false` passed, and | - The `memories` startup crash root cause was a LanceDB race: `openTable('memories')` failure was treated as unconditional absence, so a concurrent creator could make `createTable()` throw. The adapter is now idempotent under that contentio | - Real machine import run after these fixes: discovered `316`, imported `24`, skipped `292`, stored `76` parsed memories, and wrote `.borg/imported_sessions/docs/auto-imported-agent-instructions.md`. Processed tools included `aider`, `borg`",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "3330a1b6-9d5d-474e-a1f2-ffffa14ed7d8",
+        "sourcePath": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "sessionFormat": "md",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "copilot-cli",
+          "imported"
+        ],
+        "sessionId": "imported:copilot-cli:b083420d8c48",
+        "structuredSessionSummary": {
+          "sessionId": "imported:copilot-cli:b083420d8c48",
+          "name": "Problem: keep landing stabilization-first fixes that improve startup reliability, truthful operator UX, and session/memo",
+          "cliType": "copilot-cli",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e",
+          "restartCount": 0,
+          "startedAt": 1774707266862.1277,
+          "stoppedAt": 1774707493260,
+          "lastActivityAt": 1774707266862.1277,
+          "logTail": [
+            "- Do not terminate running processes in this session.",
+            "- The Go port lane must remain sidecar-only for now: separate config directory, separate lock file, no rewiring of the main startup path until parity is much deeper and still fully validated.",
+            "- `apps/borg-extension/pages/content` still has broader pre-existing type errors around the newer root-store API shape; recent storage-noise edits were checked against filtered compiler output and no longer add new `SidebarManager`/storage-",
+            "- Maestro's `better-sqlite3` dependency is currently shared with the workspace root through a junctioned pnpm install, so naive rebuilds still risk fixing Node 24 for Borg while breaking Electron 28 for Maestro, or the reverse.",
+            "- Repo-wide test stabilization is still blocked on wider `@borg/core` harness drift and should not be conflated with the focused fixes above.",
+            "- Antigravity inspection found VS Code Insiders logs and UI state, but no durable Antigravity transcript/session store suitable for import yet.",
+            "- OpenAI import is intentionally limited to explicit OpenAI/ChatGPT roots rather than broad `Downloads` crawling, to keep discovery truthful and avoid noisy false positives.",
+            "- Prism behavioral warning import is intentionally additive and read-only; Borg preserves Prism correction signals in imported metadata without claiming full behavioral-learning or dashboard parity yet.",
+            "- The Go sidecar now covers config, providers, CLI, import roots/summaries, runtime rollups, memory status, and discovered sessions well enough that the next best gaps are likely endpoint discoverability and additional compact operator summ",
+            "- Verified for the startup/dashboard truthfulness lane: `packages/cli` start tests passed, `apps/web` tRPC route tests passed, `pnpm -C packages/cli exec tsc --noEmit` passed, `pnpm -C apps/web exec tsc --noEmit --pretty false` passed, and",
+            "- The `memories` startup crash root cause was a LanceDB race: `openTable('memories')` failure was treated as unconditional absence, so a concurrent creator could make `createTable()` throw. The adapter is now idempotent under that contentio",
+            "- Real machine import run after these fixes: discovered `316`, imported `24`, skipped `292`, stored `76` parsed memories, and wrote `.borg/imported_sessions/docs/auto-imported-agent-instructions.md`. Processed tools included `aider`, `borg`"
+          ],
+          "recordedAt": 1774707499394,
+          "contentHash": "session-1814182074"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T14:18:19.395Z",
+      "accessedAt": "2026-03-28T14:18:19.395Z",
+      "accessCount": 0
+    },
+    {
+      "id": "d6c152b0e646f25b",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Use port 3847 for autopilot configuration.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "3330a1b6-9d5d-474e-a1f2-ffffa14ed7d8",
+        "sessionId": "imported:copilot-cli:b083420d8c48",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "networking",
+          "configuration",
+          "copilot-cli",
+          "instruction"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:18:19.768Z",
+      "accessedAt": "2026-03-28T14:18:19.768Z",
+      "accessCount": 0
+    },
+    {
+      "id": "4f0eefccd63643f4",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Use port 4000 for the Borg control plane.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "3330a1b6-9d5d-474e-a1f2-ffffa14ed7d8",
+        "sessionId": "imported:copilot-cli:b083420d8c48",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "networking",
+          "runtime",
+          "copilot-cli",
+          "instruction"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:18:19.998Z",
+      "accessedAt": "2026-03-28T14:18:19.998Z",
+      "accessCount": 0
+    },
+    {
+      "id": "3c347e2ee2840fff",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The Go sidecar should have a separate config directory and separate lock file.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "3330a1b6-9d5d-474e-a1f2-ffffa14ed7d8",
+        "sessionId": "imported:copilot-cli:b083420d8c48",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "configuration",
+          "runtime",
+          "copilot-cli",
+          "instruction"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:18:20.227Z",
+      "accessedAt": "2026-03-28T14:18:20.227Z",
+      "accessCount": 0
+    },
+    {
+      "id": "2e9704c50c1fad31",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Borg now preserves Prism correction signals in imported metadata.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "3330a1b6-9d5d-474e-a1f2-ffffa14ed7d8",
+        "sessionId": "imported:copilot-cli:b083420d8c48",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "data",
+          "import",
+          "copilot-cli",
+          "memory",
+          "networking"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:18:20.464Z",
+      "accessedAt": "2026-03-28T14:18:20.464Z",
+      "accessCount": 0
+    },
+    {
+      "id": "2436a5c6aaf55742",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The Orchestrator proxy buffers non-SSE upstream responses to prevent crashes.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "3330a1b6-9d5d-474e-a1f2-ffffa14ed7d8",
+        "sessionId": "imported:copilot-cli:b083420d8c48",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "proxy",
+          "resilience",
+          "copilot-cli",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:18:20.691Z",
+      "accessedAt": "2026-03-28T14:18:20.691Z",
+      "accessCount": 0
+    },
+    {
+      "id": "155c044317ca70c0",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The `memories` startup crash was due to a LanceDB race condition.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "3330a1b6-9d5d-474e-a1f2-ffffa14ed7d8",
+        "sessionId": "imported:copilot-cli:b083420d8c48",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "database",
+          "error",
+          "copilot-cli",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:18:20.925Z",
+      "accessedAt": "2026-03-28T14:18:20.925Z",
+      "accessCount": 0
+    },
+    {
+      "id": "6c4eb54cd898575c",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/handoffs\nLog tail: \"user\": 0, | \"agent\": 0, | \"project\": 825, | \"discovery\": 0, | \"decision\": 0, | \"progress\": 0, | \"warning\": 0, | \"fix\": 0 | }, | \"recentContext\": [], | \"notes\": \"Automatic background handoff\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "bc29941d-602d-489e-8ac2-4ab12f275a7c",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774707178280.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:24a7f87dfa8d",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:24a7f87dfa8d",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+          "restartCount": 0,
+          "startedAt": 1774707178279.9546,
+          "stoppedAt": 1774707501149,
+          "lastActivityAt": 1774707178279.9546,
+          "logTail": [
+            "\"user\": 0,",
+            "\"agent\": 0,",
+            "\"project\": 825,",
+            "\"discovery\": 0,",
+            "\"decision\": 0,",
+            "\"progress\": 0,",
+            "\"warning\": 0,",
+            "\"fix\": 0",
+            "},",
+            "\"recentContext\": [],",
+            "\"notes\": \"Automatic background handoff\"",
+            "}"
+          ],
+          "recordedAt": 1774707501726,
+          "contentHash": "session-2067046087"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T14:18:21.726Z",
+      "accessedAt": "2026-03-28T14:18:21.726Z",
+      "accessCount": 0
+    },
+    {
+      "id": "b1476b9b9c93df4b",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/handoffs\nLog tail: \"user\": 0, | \"agent\": 0, | \"project\": 825, | \"discovery\": 0, | \"decision\": 0, | \"progress\": 0, | \"warning\": 0, | \"fix\": 0 | }, | \"recentContext\": [], | \"notes\": \"Automatic background handoff\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "1f357c32-bc1d-4a1e-a69b-96702f55e57c",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774706878266.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:3f3ac5c165fa",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:3f3ac5c165fa",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+          "restartCount": 0,
+          "startedAt": 1774706878267.2178,
+          "stoppedAt": 1774707501988,
+          "lastActivityAt": 1774706878267.2178,
+          "logTail": [
+            "\"user\": 0,",
+            "\"agent\": 0,",
+            "\"project\": 825,",
+            "\"discovery\": 0,",
+            "\"decision\": 0,",
+            "\"progress\": 0,",
+            "\"warning\": 0,",
+            "\"fix\": 0",
+            "},",
+            "\"recentContext\": [],",
+            "\"notes\": \"Automatic background handoff\"",
+            "}"
+          ],
+          "recordedAt": 1774707502515,
+          "contentHash": "session-1894707859"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T14:18:22.516Z",
+      "accessedAt": "2026-03-28T14:18:22.516Z",
+      "accessCount": 0
+    },
+    {
+      "id": "51890e846c781732",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (copilot-cli) ended with status imported.\nWorking directory: C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots\nLog tail: \"06e2373228aff8b42dda508b8188113f\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\routing.go\", | \"420fced64a3d4e1ed7031dfdeb6a4565\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\routing_test.go\", | \"8b3e1111ac99372254107f83ae5f0c5d\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\status.go\", | \"e210a461391d72417f8e104e61c424e8\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\status_test.go\", | \"1c9c853670458f2802c2c5de8f6a3ce9\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\sessionimport\\\\summary.go\", | \"44bae55aff8b7c81623ba4b395010417\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\sessionimport\\\\summary_test.go\", | \"f2f0ddb5c19c3cf84368fc34f9bbc436\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\catalog.go\", | \"2703019faff41b5c7a92b17e07203d79\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\catalog_test.go\", | \"364e225ee47d3749c648adc378e7f87e\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\summary.go\", | \"ba5b1b4bceb0263685734468f278503d\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\summary_test.go\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "56f1b104-b51c-4daa-af0d-c77be37f7f5c",
+        "sourcePath": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "copilot-cli",
+          "imported"
+        ],
+        "sessionId": "imported:copilot-cli:1d2ce8c1db6f",
+        "structuredSessionSummary": {
+          "sessionId": "imported:copilot-cli:1d2ce8c1db6f",
+          "name": "{",
+          "cliType": "copilot-cli",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots",
+          "restartCount": 0,
+          "startedAt": 1774706829739.6553,
+          "stoppedAt": 1774707502819,
+          "lastActivityAt": 1774706829739.6553,
+          "logTail": [
+            "\"06e2373228aff8b42dda508b8188113f\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\routing.go\",",
+            "\"420fced64a3d4e1ed7031dfdeb6a4565\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\routing_test.go\",",
+            "\"8b3e1111ac99372254107f83ae5f0c5d\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\status.go\",",
+            "\"e210a461391d72417f8e104e61c424e8\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\status_test.go\",",
+            "\"1c9c853670458f2802c2c5de8f6a3ce9\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\sessionimport\\\\summary.go\",",
+            "\"44bae55aff8b7c81623ba4b395010417\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\sessionimport\\\\summary_test.go\",",
+            "\"f2f0ddb5c19c3cf84368fc34f9bbc436\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\catalog.go\",",
+            "\"2703019faff41b5c7a92b17e07203d79\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\catalog_test.go\",",
+            "\"364e225ee47d3749c648adc378e7f87e\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\summary.go\",",
+            "\"ba5b1b4bceb0263685734468f278503d\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\summary_test.go\"",
+            "}"
+          ],
+          "recordedAt": 1774707507415,
+          "contentHash": "session-1097251502"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T14:18:27.416Z",
+      "accessedAt": "2026-03-28T14:18:27.416Z",
+      "accessCount": 0
+    },
+    {
+      "id": "2d39355d3d2df966",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"please begin analysis and continue to proceed as you recommend. insanely great!\",",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "56f1b104-b51c-4daa-af0d-c77be37f7f5c",
+        "sessionId": "imported:copilot-cli:1d2ce8c1db6f",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:18:27.771Z",
+      "accessedAt": "2026-03-28T14:18:27.771Z",
+      "accessCount": 0
+    },
+    {
+      "id": "9a5f533c29c415ff",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"insanely great! outstanding! continue to proceed as you recommend! don't stop the party! don't terminate any processes in this session please! keep on goin!insanely great! outstanding! continue to proceed as you recommend! d",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "56f1b104-b51c-4daa-af0d-c77be37f7f5c",
+        "sessionId": "imported:copilot-cli:1d2ce8c1db6f",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "instruction",
+          "memory"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:18:28.010Z",
+      "accessedAt": "2026-03-28T14:18:28.010Z",
+      "accessCount": 0
+    },
+    {
+      "id": "672581fac840350e",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"<pasted_content file=\\\"C:\\\\Users\\\\hyper\\\\.copilot\\\\session-state\\\\19ddbe49-0d66-45a6-a9d2-393395d8953e\\\\files\\\\paste-1774505117140.txt\\\" size=\\\"30.7 KB\\\" lines=\\\"403\\\" />\",",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "56f1b104-b51c-4daa-af0d-c77be37f7f5c",
+        "sessionId": "imported:copilot-cli:1d2ce8c1db6f",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "memory",
+          "database"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:18:28.251Z",
+      "accessedAt": "2026-03-28T14:18:28.251Z",
+      "accessCount": 0
+    },
+    {
+      "id": "b9ce8ace89b5933f",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"borg on  main [$] via  v24.10.0 on ☁️ (us-east-1) took 1m26s\\n❯ .\\\\start.bat\\nStarting Borg...\\nInstalling dependencies...\\nScope: all 24 workspace projects\\nLockfile is up to date, resolution step is skipped\\nAlready up t",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "56f1b104-b51c-4daa-af0d-c77be37f7f5c",
+        "sessionId": "imported:copilot-cli:1d2ce8c1db6f",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:18:28.511Z",
+      "accessedAt": "2026-03-28T14:18:28.511Z",
+      "accessCount": 0
+    },
+    {
+      "id": "d5ef329f0ef0461d",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"<pasted_content file=\\\"C:\\\\Users\\\\hyper\\\\.copilot\\\\session-state\\\\19ddbe49-0d66-45a6-a9d2-393395d8953e\\\\files\\\\paste-1774506452821.txt\\\" size=\\\"30.6 KB\\\" lines=\\\"400\\\" />\",",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "56f1b104-b51c-4daa-af0d-c77be37f7f5c",
+        "sessionId": "imported:copilot-cli:1d2ce8c1db6f",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "memory",
+          "database"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:18:30.340Z",
+      "accessedAt": "2026-03-28T14:18:30.340Z",
+      "accessCount": 0
+    },
+    {
+      "id": "8b4533e4195358b0",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"proceed\",",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "56f1b104-b51c-4daa-af0d-c77be37f7f5c",
+        "sessionId": "imported:copilot-cli:1d2ce8c1db6f",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T14:18:30.609Z",
+      "accessedAt": "2026-03-28T14:18:30.609Z",
+      "accessCount": 0
+    },
+    {
+      "id": "92cc0d7a0fca26c3",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/agent_memory\nLog tail: ], | \"recordedAt\": 1774707502515, | \"contentHash\": \"session-1894707859\" | }, | \"memoryKind\": \"session_summary\" | \"createdAt\": \"2026-03-28T14:18:22.516Z\", | \"accessedAt\": \"2026-03-28T14:18:22.516Z\", | \"accessCount\": 0 | } | ]",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "05a8e839-5c84-4d03-8a19-c85ec41464d7",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:a6d64062eac0",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:a6d64062eac0",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/agent_memory",
+          "restartCount": 0,
+          "startedAt": 1774706635201.2283,
+          "stoppedAt": 1774707510849,
+          "lastActivityAt": 1774706635201.2283,
+          "logTail": [
+            "],",
+            "\"recordedAt\": 1774707502515,",
+            "\"contentHash\": \"session-1894707859\"",
+            "},",
+            "\"memoryKind\": \"session_summary\"",
+            "\"createdAt\": \"2026-03-28T14:18:22.516Z\",",
+            "\"accessedAt\": \"2026-03-28T14:18:22.516Z\",",
+            "\"accessCount\": 0",
+            "}",
+            "]"
+          ],
+          "recordedAt": 1774707520246,
+          "contentHash": "session-1649363076"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T14:18:40.246Z",
+      "accessedAt": "2026-03-28T14:18:40.246Z",
+      "accessCount": 0
+    },
+    {
+      "id": "1f5d9b1005067399",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Use port 3847 for autopilot configuration.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "05a8e839-5c84-4d03-8a19-c85ec41464d7",
+        "sessionId": "imported:borg:a6d64062eac0",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "networking",
+          "configuration",
+          "copilot-cli",
+          "borg",
+          "instruction"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:18:40.508Z",
+      "accessedAt": "2026-03-28T14:18:40.508Z",
+      "accessCount": 0
+    },
+    {
+      "id": "b84d4b721c902e7b",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Use port 4000 for the Borg control plane.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "05a8e839-5c84-4d03-8a19-c85ec41464d7",
+        "sessionId": "imported:borg:a6d64062eac0",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "networking",
+          "runtime",
+          "copilot-cli",
+          "borg",
+          "instruction"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:18:40.735Z",
+      "accessedAt": "2026-03-28T14:18:40.735Z",
+      "accessCount": 0
+    },
+    {
+      "id": "e66b2da35370a6f6",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The Go sidecar should have a separate config directory and separate lock file.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "05a8e839-5c84-4d03-8a19-c85ec41464d7",
+        "sessionId": "imported:borg:a6d64062eac0",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "configuration",
+          "runtime",
+          "copilot-cli",
+          "borg",
+          "instruction"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:18:40.964Z",
+      "accessedAt": "2026-03-28T14:18:40.964Z",
+      "accessCount": 0
+    },
+    {
+      "id": "30215ec860875bb7",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Borg now preserves Prism correction signals in imported metadata.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "05a8e839-5c84-4d03-8a19-c85ec41464d7",
+        "sessionId": "imported:borg:a6d64062eac0",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "data",
+          "import",
+          "copilot-cli",
+          "borg",
+          "memory",
+          "networking"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:18:41.197Z",
+      "accessedAt": "2026-03-28T14:18:41.197Z",
+      "accessCount": 0
+    },
+    {
+      "id": "deda2dd852d18f88",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The Orchestrator proxy buffers non-SSE upstream responses to prevent crashes.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "05a8e839-5c84-4d03-8a19-c85ec41464d7",
+        "sessionId": "imported:borg:a6d64062eac0",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "proxy",
+          "resilience",
+          "copilot-cli",
+          "borg",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:18:41.435Z",
+      "accessedAt": "2026-03-28T14:18:41.435Z",
+      "accessCount": 0
+    },
+    {
+      "id": "191215a2435efadc",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The `memories` startup crash was due to a LanceDB race condition.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "05a8e839-5c84-4d03-8a19-c85ec41464d7",
+        "sessionId": "imported:borg:a6d64062eac0",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "database",
+          "error",
+          "copilot-cli",
+          "borg",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:18:41.663Z",
+      "accessedAt": "2026-03-28T14:18:41.663Z",
+      "accessCount": 0
+    },
+    {
+      "id": "8895f6b428ffd681",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/handoffs\nLog tail: \"user\": 0, | \"agent\": 0, | \"project\": 849, | \"discovery\": 0, | \"decision\": 0, | \"progress\": 0, | \"warning\": 0, | \"fix\": 0 | }, | \"recentContext\": [], | \"notes\": \"Automatic background handoff\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "e74d574e-9574-44ff-9064-49778af207f4",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774708078309.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:bea1a52f9144",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:bea1a52f9144",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+          "restartCount": 0,
+          "startedAt": 1774708078309.6035,
+          "stoppedAt": 1774708389890,
+          "lastActivityAt": 1774708078309.6035,
+          "logTail": [
+            "\"user\": 0,",
+            "\"agent\": 0,",
+            "\"project\": 849,",
+            "\"discovery\": 0,",
+            "\"decision\": 0,",
+            "\"progress\": 0,",
+            "\"warning\": 0,",
+            "\"fix\": 0",
+            "},",
+            "\"recentContext\": [],",
+            "\"notes\": \"Automatic background handoff\"",
+            "}"
+          ],
+          "recordedAt": 1774708390492,
+          "contentHash": "session-748709012"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T14:33:10.493Z",
+      "accessedAt": "2026-03-28T14:33:10.493Z",
+      "accessCount": 0
+    },
+    {
+      "id": "c1f18c77014eac47",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/handoffs\nLog tail: \"user\": 0, | \"agent\": 0, | \"project\": 849, | \"discovery\": 0, | \"decision\": 0, | \"progress\": 0, | \"warning\": 0, | \"fix\": 0 | }, | \"recentContext\": [], | \"notes\": \"Automatic background handoff\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "ab081922-2f72-4d08-8c08-55570e92b98d",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774707778294.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:9711eb047d8a",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:9711eb047d8a",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+          "restartCount": 0,
+          "startedAt": 1774707778294.3462,
+          "stoppedAt": 1774708390758,
+          "lastActivityAt": 1774707778294.3462,
+          "logTail": [
+            "\"user\": 0,",
+            "\"agent\": 0,",
+            "\"project\": 849,",
+            "\"discovery\": 0,",
+            "\"decision\": 0,",
+            "\"progress\": 0,",
+            "\"warning\": 0,",
+            "\"fix\": 0",
+            "},",
+            "\"recentContext\": [],",
+            "\"notes\": \"Automatic background handoff\"",
+            "}"
+          ],
+          "recordedAt": 1774708391324,
+          "contentHash": "session-1830578273"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T14:33:11.324Z",
+      "accessedAt": "2026-03-28T14:33:11.324Z",
+      "accessCount": 0
+    },
+    {
+      "id": "5bcdd417404eaa4a",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/agent_memory\nLog tail: \"memory\" | ], | \"section\": \"general\", | \"memoryKind\": \"memory\", | \"extractionSource\": \"llm\" | }, | \"createdAt\": \"2026-03-28T14:18:41.663Z\", | \"accessedAt\": \"2026-03-28T14:18:41.663Z\", | \"accessCount\": 0 | } | ]",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "3fdcc698-e58f-4f46-96ce-a63086490fa6",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:25e7671d8ed4",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:25e7671d8ed4",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/agent_memory",
+          "restartCount": 0,
+          "startedAt": 1774707525532.1965,
+          "stoppedAt": 1774708391550,
+          "lastActivityAt": 1774707525532.1965,
+          "logTail": [
+            "\"memory\"",
+            "],",
+            "\"section\": \"general\",",
+            "\"memoryKind\": \"memory\",",
+            "\"extractionSource\": \"llm\"",
+            "},",
+            "\"createdAt\": \"2026-03-28T14:18:41.663Z\",",
+            "\"accessedAt\": \"2026-03-28T14:18:41.663Z\",",
+            "\"accessCount\": 0",
+            "}",
+            "]"
+          ],
+          "recordedAt": 1774708397884,
+          "contentHash": "session-1131232620"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T14:33:17.884Z",
+      "accessedAt": "2026-03-28T14:33:17.884Z",
+      "accessCount": 0
+    },
+    {
+      "id": "48ff8892854c472e",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Use port 4000 for the Borg control plane.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "3fdcc698-e58f-4f46-96ce-a63086490fa6",
+        "sessionId": "imported:borg:25e7671d8ed4",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "networking",
+          "runtime",
+          "borg",
+          "instruction"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:33:18.156Z",
+      "accessedAt": "2026-03-28T14:33:18.156Z",
+      "accessCount": 0
+    },
+    {
+      "id": "a311bf28b5c5df71",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Use port 3847 for autopilot configuration.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "3fdcc698-e58f-4f46-96ce-a63086490fa6",
+        "sessionId": "imported:borg:25e7671d8ed4",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "networking",
+          "configuration",
+          "borg",
+          "instruction"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:33:18.402Z",
+      "accessedAt": "2026-03-28T14:33:18.402Z",
+      "accessCount": 0
+    },
+    {
+      "id": "dbb8467fd40d7012",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The Go sidecar should have a separate config directory and separate lock file.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "3fdcc698-e58f-4f46-96ce-a63086490fa6",
+        "sessionId": "imported:borg:25e7671d8ed4",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "configuration",
+          "runtime",
+          "borg",
+          "instruction"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:33:18.642Z",
+      "accessedAt": "2026-03-28T14:33:18.642Z",
+      "accessCount": 0
+    },
+    {
+      "id": "4a48aeb77d5b3a3d",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Borg now preserves Prism correction signals in imported metadata.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "3fdcc698-e58f-4f46-96ce-a63086490fa6",
+        "sessionId": "imported:borg:25e7671d8ed4",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "data",
+          "import",
+          "borg",
+          "memory",
+          "networking"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:33:18.876Z",
+      "accessedAt": "2026-03-28T14:33:18.876Z",
+      "accessCount": 0
+    },
+    {
+      "id": "66fb2ead91b61d88",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The Orchestrator proxy buffers non-SSE upstream responses to prevent crashes.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "3fdcc698-e58f-4f46-96ce-a63086490fa6",
+        "sessionId": "imported:borg:25e7671d8ed4",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "proxy",
+          "resilience",
+          "borg",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:33:19.106Z",
+      "accessedAt": "2026-03-28T14:33:19.106Z",
+      "accessCount": 0
+    },
+    {
+      "id": "a3ccc174cfd50719",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The `memories` startup crash was due to a LanceDB race condition.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "3fdcc698-e58f-4f46-96ce-a63086490fa6",
+        "sessionId": "imported:borg:25e7671d8ed4",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "database",
+          "error",
+          "borg",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:33:19.350Z",
+      "accessedAt": "2026-03-28T14:33:19.350Z",
+      "accessCount": 0
+    },
+    {
+      "id": "ab552b4935f43229",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/handoffs\nLog tail: \"user\": 0, | \"agent\": 0, | \"project\": 858, | \"discovery\": 0, | \"decision\": 0, | \"progress\": 0, | \"warning\": 0, | \"fix\": 0 | }, | \"recentContext\": [], | \"notes\": \"Automatic background handoff\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "500f0d34-2417-418b-8038-f5f6a076afe8",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774708979589.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:ec44b845dce7",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:ec44b845dce7",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+          "restartCount": 0,
+          "startedAt": 1774708979589.4592,
+          "stoppedAt": 1774709291266,
+          "lastActivityAt": 1774708979589.4592,
+          "logTail": [
+            "\"user\": 0,",
+            "\"agent\": 0,",
+            "\"project\": 858,",
+            "\"discovery\": 0,",
+            "\"decision\": 0,",
+            "\"progress\": 0,",
+            "\"warning\": 0,",
+            "\"fix\": 0",
+            "},",
+            "\"recentContext\": [],",
+            "\"notes\": \"Automatic background handoff\"",
+            "}"
+          ],
+          "recordedAt": 1774709291941,
+          "contentHash": "session-1543310999"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T14:48:11.941Z",
+      "accessedAt": "2026-03-28T14:48:11.941Z",
+      "accessCount": 0
+    },
+    {
+      "id": "9c7fc061056ca4b2",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/handoffs\nLog tail: \"user\": 0, | \"agent\": 0, | \"project\": 858, | \"discovery\": 0, | \"decision\": 0, | \"progress\": 0, | \"warning\": 0, | \"fix\": 0 | }, | \"recentContext\": [], | \"notes\": \"Automatic background handoff\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "b214fd54-24d7-478b-9dc8-33322e2cc707",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774708678314.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:07c1aadc5fae",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:07c1aadc5fae",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+          "restartCount": 0,
+          "startedAt": 1774708678314.928,
+          "stoppedAt": 1774709292196,
+          "lastActivityAt": 1774708678314.928,
+          "logTail": [
+            "\"user\": 0,",
+            "\"agent\": 0,",
+            "\"project\": 858,",
+            "\"discovery\": 0,",
+            "\"decision\": 0,",
+            "\"progress\": 0,",
+            "\"warning\": 0,",
+            "\"fix\": 0",
+            "},",
+            "\"recentContext\": [],",
+            "\"notes\": \"Automatic background handoff\"",
+            "}"
+          ],
+          "recordedAt": 1774709292745,
+          "contentHash": "session-1507801377"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T14:48:12.745Z",
+      "accessedAt": "2026-03-28T14:48:12.745Z",
+      "accessCount": 0
+    },
+    {
+      "id": "9e0c016cb6a36821",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/agent_memory\nLog tail: \"memory\" | ], | \"section\": \"general\", | \"memoryKind\": \"memory\", | \"extractionSource\": \"llm\" | }, | \"createdAt\": \"2026-03-28T14:33:19.350Z\", | \"accessedAt\": \"2026-03-28T14:33:19.350Z\", | \"accessCount\": 0 | } | ]",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "38a544b2-5efb-48cc-9ad0-a3d7bf77ffed",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:dcacf059c27d",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:dcacf059c27d",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/agent_memory",
+          "restartCount": 0,
+          "startedAt": 1774708403177.4448,
+          "stoppedAt": 1774709294535,
+          "lastActivityAt": 1774708403177.4448,
+          "logTail": [
+            "\"memory\"",
+            "],",
+            "\"section\": \"general\",",
+            "\"memoryKind\": \"memory\",",
+            "\"extractionSource\": \"llm\"",
+            "},",
+            "\"createdAt\": \"2026-03-28T14:33:19.350Z\",",
+            "\"accessedAt\": \"2026-03-28T14:33:19.350Z\",",
+            "\"accessCount\": 0",
+            "}",
+            "]"
+          ],
+          "recordedAt": 1774709305190,
+          "contentHash": "session-1735908085"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T14:48:25.190Z",
+      "accessedAt": "2026-03-28T14:48:25.190Z",
+      "accessCount": 0
+    },
+    {
+      "id": "b4347ce317b4dac4",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Use port 3847 for autopilot configuration.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "38a544b2-5efb-48cc-9ad0-a3d7bf77ffed",
+        "sessionId": "imported:borg:dcacf059c27d",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "networking",
+          "configuration",
+          "borg",
+          "instruction"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:48:25.449Z",
+      "accessedAt": "2026-03-28T14:48:25.449Z",
+      "accessCount": 0
+    },
+    {
+      "id": "47bdea095ad3a3f1",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Use port 4000 for the Borg control plane.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "38a544b2-5efb-48cc-9ad0-a3d7bf77ffed",
+        "sessionId": "imported:borg:dcacf059c27d",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "networking",
+          "runtime",
+          "borg",
+          "instruction"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:48:25.679Z",
+      "accessedAt": "2026-03-28T14:48:25.679Z",
+      "accessCount": 0
+    },
+    {
+      "id": "ed41f6e9baacab23",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The Go sidecar should have a separate config directory and separate lock file.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "38a544b2-5efb-48cc-9ad0-a3d7bf77ffed",
+        "sessionId": "imported:borg:dcacf059c27d",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "configuration",
+          "runtime",
+          "borg",
+          "instruction"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:48:25.921Z",
+      "accessedAt": "2026-03-28T14:48:25.921Z",
+      "accessCount": 0
+    },
+    {
+      "id": "9d73610c1ace6389",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Borg now preserves Prism correction signals in imported metadata.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "38a544b2-5efb-48cc-9ad0-a3d7bf77ffed",
+        "sessionId": "imported:borg:dcacf059c27d",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "data",
+          "import",
+          "borg",
+          "memory",
+          "networking"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:48:26.168Z",
+      "accessedAt": "2026-03-28T14:48:26.168Z",
+      "accessCount": 0
+    },
+    {
+      "id": "59e7ea42ddd51efc",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The Orchestrator proxy buffers non-SSE upstream responses to prevent crashes.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "38a544b2-5efb-48cc-9ad0-a3d7bf77ffed",
+        "sessionId": "imported:borg:dcacf059c27d",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "proxy",
+          "resilience",
+          "borg",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:48:26.451Z",
+      "accessedAt": "2026-03-28T14:48:26.451Z",
+      "accessCount": 0
+    },
+    {
+      "id": "b32d83dc9a1d3fe4",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The `memories` startup crash was due to a LanceDB race condition.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "38a544b2-5efb-48cc-9ad0-a3d7bf77ffed",
+        "sessionId": "imported:borg:dcacf059c27d",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "database",
+          "error",
+          "borg",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T14:48:26.681Z",
+      "accessedAt": "2026-03-28T14:48:26.681Z",
+      "accessCount": 0
+    },
+    {
+      "id": "3b6d1a6d2c451888",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/handoffs\nLog tail: \"user\": 0, | \"agent\": 0, | \"project\": 849, | \"discovery\": 0, | \"decision\": 0, | \"progress\": 0, | \"warning\": 0, | \"fix\": 0 | }, | \"recentContext\": [], | \"notes\": \"Automatic background handoff\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "1c1cd904-336f-4fd4-809d-9153934d38dd",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774708378309.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:09868b961d90",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:09868b961d90",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+          "restartCount": 0,
+          "startedAt": 1774708378309.4734,
+          "stoppedAt": 1774709306917,
+          "lastActivityAt": 1774708378309.4734,
+          "logTail": [
+            "\"user\": 0,",
+            "\"agent\": 0,",
+            "\"project\": 849,",
+            "\"discovery\": 0,",
+            "\"decision\": 0,",
+            "\"progress\": 0,",
+            "\"warning\": 0,",
+            "\"fix\": 0",
+            "},",
+            "\"recentContext\": [],",
+            "\"notes\": \"Automatic background handoff\"",
+            "}"
+          ],
+          "recordedAt": 1774709307954,
+          "contentHash": "session-1229821037"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T14:48:27.954Z",
+      "accessedAt": "2026-03-28T14:48:27.954Z",
+      "accessCount": 0
+    },
+    {
+      "id": "7bfbe9e16f97eeed",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/handoffs\nLog tail: \"user\": 0, | \"agent\": 0, | \"project\": 868, | \"discovery\": 0, | \"decision\": 0, | \"progress\": 0, | \"warning\": 0, | \"fix\": 0 | }, | \"recentContext\": [], | \"notes\": \"Automatic background handoff\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "39c6e237-172b-4eb2-815c-9e3822a23779",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774709879611.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:e3cf0946186d",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:e3cf0946186d",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+          "restartCount": 0,
+          "startedAt": 1774709879611.4177,
+          "stoppedAt": 1774710193274,
+          "lastActivityAt": 1774709879611.4177,
+          "logTail": [
+            "\"user\": 0,",
+            "\"agent\": 0,",
+            "\"project\": 868,",
+            "\"discovery\": 0,",
+            "\"decision\": 0,",
+            "\"progress\": 0,",
+            "\"warning\": 0,",
+            "\"fix\": 0",
+            "},",
+            "\"recentContext\": [],",
+            "\"notes\": \"Automatic background handoff\"",
+            "}"
+          ],
+          "recordedAt": 1774710193725,
+          "contentHash": "session-305761007"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T15:03:13.726Z",
+      "accessedAt": "2026-03-28T15:03:13.726Z",
+      "accessCount": 0
+    },
+    {
+      "id": "aa323382dedbb25a",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/handoffs\nLog tail: \"user\": 0, | \"agent\": 0, | \"project\": 868, | \"discovery\": 0, | \"decision\": 0, | \"progress\": 0, | \"warning\": 0, | \"fix\": 0 | }, | \"recentContext\": [], | \"notes\": \"Automatic background handoff\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "82ffb89a-021f-4541-ba24-8674afe5b23e",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774709579604.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:330f6f496b15",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:330f6f496b15",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+          "restartCount": 0,
+          "startedAt": 1774709579606.0305,
+          "stoppedAt": 1774710194131,
+          "lastActivityAt": 1774709579606.0305,
+          "logTail": [
+            "\"user\": 0,",
+            "\"agent\": 0,",
+            "\"project\": 868,",
+            "\"discovery\": 0,",
+            "\"decision\": 0,",
+            "\"progress\": 0,",
+            "\"warning\": 0,",
+            "\"fix\": 0",
+            "},",
+            "\"recentContext\": [],",
+            "\"notes\": \"Automatic background handoff\"",
+            "}"
+          ],
+          "recordedAt": 1774710194469,
+          "contentHash": "session-433506086"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T15:03:14.470Z",
+      "accessedAt": "2026-03-28T15:03:14.470Z",
+      "accessCount": 0
+    },
+    {
+      "id": "039a937f75dc4879",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/agent_memory\nLog tail: ], | \"recordedAt\": 1774709307954, | \"contentHash\": \"session-1229821037\" | }, | \"memoryKind\": \"session_summary\" | \"createdAt\": \"2026-03-28T14:48:27.954Z\", | \"accessedAt\": \"2026-03-28T14:48:27.954Z\", | \"accessCount\": 0 | } | ]",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "73c60d40-9bc1-43e8-a249-4d12a17f9894",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:ab7c816b4f56",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:ab7c816b4f56",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/agent_memory",
+          "restartCount": 0,
+          "startedAt": 1774709310469.7703,
+          "stoppedAt": 1774710194760,
+          "lastActivityAt": 1774709310469.7703,
+          "logTail": [
+            "],",
+            "\"recordedAt\": 1774709307954,",
+            "\"contentHash\": \"session-1229821037\"",
+            "},",
+            "\"memoryKind\": \"session_summary\"",
+            "\"createdAt\": \"2026-03-28T14:48:27.954Z\",",
+            "\"accessedAt\": \"2026-03-28T14:48:27.954Z\",",
+            "\"accessCount\": 0",
+            "}",
+            "]"
+          ],
+          "recordedAt": 1774710201711,
+          "contentHash": "session-612993240"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T15:03:21.711Z",
+      "accessedAt": "2026-03-28T15:03:21.711Z",
+      "accessCount": 0
+    },
+    {
+      "id": "cbb52b34063e22fc",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Use port 4000 for the Borg control plane.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "73c60d40-9bc1-43e8-a249-4d12a17f9894",
+        "sessionId": "imported:borg:ab7c816b4f56",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "networking",
+          "runtime",
+          "borg",
+          "instruction"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:03:21.989Z",
+      "accessedAt": "2026-03-28T15:03:21.989Z",
+      "accessCount": 0
+    },
+    {
+      "id": "02febcf803907889",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Use port 3847 for autopilot configuration.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "73c60d40-9bc1-43e8-a249-4d12a17f9894",
+        "sessionId": "imported:borg:ab7c816b4f56",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "networking",
+          "configuration",
+          "borg",
+          "instruction"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:03:22.248Z",
+      "accessedAt": "2026-03-28T15:03:22.248Z",
+      "accessCount": 0
+    },
+    {
+      "id": "1accb345b1da20a9",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The Go sidecar should have a separate config directory and separate lock file.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "73c60d40-9bc1-43e8-a249-4d12a17f9894",
+        "sessionId": "imported:borg:ab7c816b4f56",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "configuration",
+          "runtime",
+          "borg",
+          "instruction"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:03:22.497Z",
+      "accessedAt": "2026-03-28T15:03:22.497Z",
+      "accessCount": 0
+    },
+    {
+      "id": "29131ac42d75609a",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Borg now preserves Prism correction signals in imported metadata.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "73c60d40-9bc1-43e8-a249-4d12a17f9894",
+        "sessionId": "imported:borg:ab7c816b4f56",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "data",
+          "import",
+          "networking",
+          "borg",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:03:22.735Z",
+      "accessedAt": "2026-03-28T15:03:22.735Z",
+      "accessCount": 0
+    },
+    {
+      "id": "a434919329eef03d",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The Orchestrator proxy buffers non-SSE upstream responses to prevent crashes.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "73c60d40-9bc1-43e8-a249-4d12a17f9894",
+        "sessionId": "imported:borg:ab7c816b4f56",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "proxy",
+          "resilience",
+          "borg",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:03:22.987Z",
+      "accessedAt": "2026-03-28T15:03:22.987Z",
+      "accessCount": 0
+    },
+    {
+      "id": "1768a84acf55c121",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The `memories` startup crash was due to a LanceDB race condition.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "73c60d40-9bc1-43e8-a249-4d12a17f9894",
+        "sessionId": "imported:borg:ab7c816b4f56",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "database",
+          "error",
+          "borg",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:03:23.243Z",
+      "accessedAt": "2026-03-28T15:03:23.243Z",
+      "accessCount": 0
+    },
+    {
+      "id": "684a75c89506e43d",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/handoffs\nLog tail: \"user\": 0, | \"agent\": 0, | \"project\": 858, | \"discovery\": 0, | \"decision\": 0, | \"progress\": 0, | \"warning\": 0, | \"fix\": 0 | }, | \"recentContext\": [], | \"notes\": \"Automatic background handoff\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "85ff2394-d1f0-4172-936a-fe455b56144b",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774709279590.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:e73b1fdec107",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:e73b1fdec107",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+          "restartCount": 0,
+          "startedAt": 1774709279591.4204,
+          "stoppedAt": 1774710203506,
+          "lastActivityAt": 1774709279591.4204,
+          "logTail": [
+            "\"user\": 0,",
+            "\"agent\": 0,",
+            "\"project\": 858,",
+            "\"discovery\": 0,",
+            "\"decision\": 0,",
+            "\"progress\": 0,",
+            "\"warning\": 0,",
+            "\"fix\": 0",
+            "},",
+            "\"recentContext\": [],",
+            "\"notes\": \"Automatic background handoff\"",
+            "}"
+          ],
+          "recordedAt": 1774710203922,
+          "contentHash": "session-257289257"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T15:03:23.922Z",
+      "accessedAt": "2026-03-28T15:03:23.922Z",
+      "accessCount": 0
+    },
+    {
+      "id": "ce0712c6773e4194",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/handoffs\nLog tail: \"user\": 0, | \"agent\": 0, | \"project\": 878, | \"discovery\": 0, | \"decision\": 0, | \"progress\": 0, | \"warning\": 0, | \"fix\": 0 | }, | \"recentContext\": [], | \"notes\": \"Automatic background handoff\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "f0db3b81-c143-42b5-8744-96e610825158",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774710779634.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:3f94ba118ed8",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:3f94ba118ed8",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+          "restartCount": 0,
+          "startedAt": 1774710779634.9827,
+          "stoppedAt": 1774711096774,
+          "lastActivityAt": 1774710779634.9827,
+          "logTail": [
+            "\"user\": 0,",
+            "\"agent\": 0,",
+            "\"project\": 878,",
+            "\"discovery\": 0,",
+            "\"decision\": 0,",
+            "\"progress\": 0,",
+            "\"warning\": 0,",
+            "\"fix\": 0",
+            "},",
+            "\"recentContext\": [],",
+            "\"notes\": \"Automatic background handoff\"",
+            "}"
+          ],
+          "recordedAt": 1774711097322,
+          "contentHash": "session-1580925607"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T15:18:17.323Z",
+      "accessedAt": "2026-03-28T15:18:17.323Z",
+      "accessCount": 0
+    },
+    {
+      "id": "5361c049e56c8390",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Problem: keep landing stabilization-first fixes that improve startup reliability, truthful operator UX, and session/memo (copilot-cli) ended with status imported.\nWorking directory: C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e\nLog tail: - The Go port lane must remain sidecar-only for now: separate config directory, separate lock file, no rewiring of the main startup path until parity is much deeper and still fully validated. | - `apps/borg-extension/pages/content` still has broader pre-existing type errors around the newer root-store API shape; recent storage-noise edits were checked against filtered compiler output and no longer add new `SidebarManager`/storage- | - Maestro's `better-sqlite3` dependency is currently shared with the workspace root through a junctioned pnpm install, so naive rebuilds still risk fixing Node 24 for Borg while breaking Electron 28 for Maestro, or the reverse. | - Repo-wide test stabilization is still blocked on wider `@borg/core` harness drift and should not be conflated with the focused fixes above. | - Antigravity inspection found VS Code Insiders logs and UI state, but no durable Antigravity transcript/session store suitable for import yet. | - Antigravity still does not have a source-backed CLI/session harness contract in this repo; it remains a provider/investigation lane rather than a truthfully integrated harness entry. | - OpenAI import is intentionally limited to explicit OpenAI/ChatGPT roots rather than broad `Downloads` crawling, to keep discovery truthful and avoid noisy false positives. | - Prism behavioral warning import is intentionally additive and read-only; Borg preserves Prism correction signals in imported metadata without claiming full behavioral-learning or dashboard parity yet. | - The Go sidecar now covers config, providers, CLI, import roots/summaries, runtime rollups, memory status, and discovered sessions well enough that the next best gaps are likely endpoint discoverability and additional compact operator summ | - Verified for the startup/dashboard truthfulness lane: `packages/cli` start tests passed, `apps/web` tRPC route tests passed, `pnpm -C packages/cli exec tsc --noEmit` passed, `pnpm -C apps/web exec tsc --noEmit --pretty false` passed, and | - The `memories` startup crash root cause was a LanceDB race: `openTable('memories')` failure was treated as unconditional absence, so a concurrent creator could make `createTable()` throw. The adapter is now idempotent under that contentio | - Real machine import run after these fixes: discovered `316`, imported `24`, skipped `292`, stored `76` parsed memories, and wrote `.borg/imported_sessions/docs/auto-imported-agent-instructions.md`. Processed tools included `aider`, `borg`",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "7f3cb04f-5103-4d47-a527-29887eba5bce",
+        "sourcePath": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "sessionFormat": "md",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "copilot-cli",
+          "imported"
+        ],
+        "sessionId": "imported:copilot-cli:22271d77ec9a",
+        "structuredSessionSummary": {
+          "sessionId": "imported:copilot-cli:22271d77ec9a",
+          "name": "Problem: keep landing stabilization-first fixes that improve startup reliability, truthful operator UX, and session/memo",
+          "cliType": "copilot-cli",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e",
+          "restartCount": 0,
+          "startedAt": 1774710699849.5593,
+          "stoppedAt": 1774711098261,
+          "lastActivityAt": 1774710699849.5593,
+          "logTail": [
+            "- The Go port lane must remain sidecar-only for now: separate config directory, separate lock file, no rewiring of the main startup path until parity is much deeper and still fully validated.",
+            "- `apps/borg-extension/pages/content` still has broader pre-existing type errors around the newer root-store API shape; recent storage-noise edits were checked against filtered compiler output and no longer add new `SidebarManager`/storage-",
+            "- Maestro's `better-sqlite3` dependency is currently shared with the workspace root through a junctioned pnpm install, so naive rebuilds still risk fixing Node 24 for Borg while breaking Electron 28 for Maestro, or the reverse.",
+            "- Repo-wide test stabilization is still blocked on wider `@borg/core` harness drift and should not be conflated with the focused fixes above.",
+            "- Antigravity inspection found VS Code Insiders logs and UI state, but no durable Antigravity transcript/session store suitable for import yet.",
+            "- Antigravity still does not have a source-backed CLI/session harness contract in this repo; it remains a provider/investigation lane rather than a truthfully integrated harness entry.",
+            "- OpenAI import is intentionally limited to explicit OpenAI/ChatGPT roots rather than broad `Downloads` crawling, to keep discovery truthful and avoid noisy false positives.",
+            "- Prism behavioral warning import is intentionally additive and read-only; Borg preserves Prism correction signals in imported metadata without claiming full behavioral-learning or dashboard parity yet.",
+            "- The Go sidecar now covers config, providers, CLI, import roots/summaries, runtime rollups, memory status, and discovered sessions well enough that the next best gaps are likely endpoint discoverability and additional compact operator summ",
+            "- Verified for the startup/dashboard truthfulness lane: `packages/cli` start tests passed, `apps/web` tRPC route tests passed, `pnpm -C packages/cli exec tsc --noEmit` passed, `pnpm -C apps/web exec tsc --noEmit --pretty false` passed, and",
+            "- The `memories` startup crash root cause was a LanceDB race: `openTable('memories')` failure was treated as unconditional absence, so a concurrent creator could make `createTable()` throw. The adapter is now idempotent under that contentio",
+            "- Real machine import run after these fixes: discovered `316`, imported `24`, skipped `292`, stored `76` parsed memories, and wrote `.borg/imported_sessions/docs/auto-imported-agent-instructions.md`. Processed tools included `aider`, `borg`"
+          ],
+          "recordedAt": 1774711101858,
+          "contentHash": "session-1028758876"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T15:18:21.859Z",
+      "accessedAt": "2026-03-28T15:18:21.859Z",
+      "accessCount": 0
+    },
+    {
+      "id": "aa36b98417289b41",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Use port 3847 for the autopilot dashboard.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "7f3cb04f-5103-4d47-a527-29887eba5bce",
+        "sessionId": "imported:copilot-cli:22271d77ec9a",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "networking",
+          "runtime",
+          "copilot-cli",
+          "instruction",
+          "ui"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:18:23.926Z",
+      "accessedAt": "2026-03-28T15:18:23.926Z",
+      "accessCount": 0
+    },
+    {
+      "id": "dbe860f3b86ba9de",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Use port 4000 for the Borg control plane.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "7f3cb04f-5103-4d47-a527-29887eba5bce",
+        "sessionId": "imported:copilot-cli:22271d77ec9a",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "networking",
+          "runtime",
+          "copilot-cli",
+          "instruction"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:18:24.184Z",
+      "accessedAt": "2026-03-28T15:18:24.184Z",
+      "accessCount": 0
+    },
+    {
+      "id": "bc560eca350c569f",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The Go sidecar exposes a read-only summary endpoint at `/api/runtime/status`.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "7f3cb04f-5103-4d47-a527-29887eba5bce",
+        "sessionId": "imported:copilot-cli:22271d77ec9a",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "api",
+          "go-sidecar",
+          "copilot-cli",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:18:24.454Z",
+      "accessedAt": "2026-03-28T15:18:24.454Z",
+      "accessCount": 0
+    },
+    {
+      "id": "737decd7889212a8",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The importer does not re-import its own generated instruction documents.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "7f3cb04f-5103-4d47-a527-29887eba5bce",
+        "sessionId": "imported:copilot-cli:22271d77ec9a",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "import",
+          "process",
+          "copilot-cli",
+          "memory",
+          "networking"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:18:24.707Z",
+      "accessedAt": "2026-03-28T15:18:24.707Z",
+      "accessCount": 0
+    },
+    {
+      "id": "65e58c20c79b5984",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Home-directory import coverage includes `~/.opencode` and `~/.aider`.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "7f3cb04f-5103-4d47-a527-29887eba5bce",
+        "sessionId": "imported:copilot-cli:22271d77ec9a",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "import",
+          "directory",
+          "copilot-cli",
+          "memory",
+          "networking"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:18:24.952Z",
+      "accessedAt": "2026-03-28T15:18:24.952Z",
+      "accessCount": 0
+    },
+    {
+      "id": "adbe45d83d4fd00b",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Borg's startup dashboard port truthfulness is now lock-aware end-to-end.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "7f3cb04f-5103-4d47-a527-29887eba5bce",
+        "sessionId": "imported:copilot-cli:22271d77ec9a",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+        "tags": [
+          "startup",
+          "dashboard",
+          "port",
+          "copilot-cli",
+          "memory",
+          "networking",
+          "ui"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:18:25.200Z",
+      "accessedAt": "2026-03-28T15:18:25.200Z",
+      "accessCount": 0
+    },
+    {
+      "id": "e6262a4d391d8c2b",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/handoffs\nLog tail: \"user\": 0, | \"agent\": 0, | \"project\": 878, | \"discovery\": 0, | \"decision\": 0, | \"progress\": 0, | \"warning\": 0, | \"fix\": 0 | }, | \"recentContext\": [], | \"notes\": \"Automatic background handoff\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "09a85a31-9d5a-4e18-a741-3083488fbb3c",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774710479621.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:57ed11aac732",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:57ed11aac732",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+          "restartCount": 0,
+          "startedAt": 1774710479622.0664,
+          "stoppedAt": 1774711105463,
+          "lastActivityAt": 1774710479622.0664,
+          "logTail": [
+            "\"user\": 0,",
+            "\"agent\": 0,",
+            "\"project\": 878,",
+            "\"discovery\": 0,",
+            "\"decision\": 0,",
+            "\"progress\": 0,",
+            "\"warning\": 0,",
+            "\"fix\": 0",
+            "},",
+            "\"recentContext\": [],",
+            "\"notes\": \"Automatic background handoff\"",
+            "}"
+          ],
+          "recordedAt": 1774711105829,
+          "contentHash": "session-1282511641"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T15:18:25.830Z",
+      "accessedAt": "2026-03-28T15:18:25.830Z",
+      "accessCount": 0
+    },
+    {
+      "id": "4541d6aa74b3d0b6",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "# Checkpoint History (copilot-cli) ended with status imported.\nWorking directory: C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints\nLog tail: | 12 | Stabilizing startup and tests | 012-stabilizing-startup-and-tests.md | | | 13 | Fixing repo test regressions | 013-fixing-repo-test-regressions.md | | | 14 | Fixing Maestro regressions | 014-fixing-maestro-regressions.md | | | 15 | Fixing Maestro test drift | 015-fixing-maestro-test-drift.md | | | 16 | Assimilating HyperCode Harness | 016-assimilating-hypercode-harness.md | | | 17 | Closing Maestro Test Drift | 017-closing-maestro-test-drift.md | | | 18 | Go Sidecar and Importers | 018-go-sidecar-and-importers.md | | | 19 | Go Interop and Maestro Warnings | 019-go-interop-and-maestro-warning.md | | | 20 | Chunk Fixes and Naming | 020-chunk-fixes-and-naming.md | | | 21 | Go Parity Slices | 021-go-parity-slices.md | | | 22 | Go Sidecar Visibility Expansion | 022-go-sidecar-visibility-expansio.md | | | 23 | Go Bridge and HyperCode | 023-go-bridge-and-hypercode.md |",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "fda9f299-3d74-4ef8-9962-4e6f23036a7d",
+        "sourcePath": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/index.md",
+        "sessionFormat": "md",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "copilot-cli",
+          "imported"
+        ],
+        "sessionId": "imported:copilot-cli:9ca0b6fc6d27",
+        "structuredSessionSummary": {
+          "sessionId": "imported:copilot-cli:9ca0b6fc6d27",
+          "name": "# Checkpoint History",
+          "cliType": "copilot-cli",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints",
+          "restartCount": 0,
+          "startedAt": 1774710470987.261,
+          "stoppedAt": 1774711106143,
+          "lastActivityAt": 1774710470987.261,
+          "logTail": [
+            "| 12 | Stabilizing startup and tests | 012-stabilizing-startup-and-tests.md |",
+            "| 13 | Fixing repo test regressions | 013-fixing-repo-test-regressions.md |",
+            "| 14 | Fixing Maestro regressions | 014-fixing-maestro-regressions.md |",
+            "| 15 | Fixing Maestro test drift | 015-fixing-maestro-test-drift.md |",
+            "| 16 | Assimilating HyperCode Harness | 016-assimilating-hypercode-harness.md |",
+            "| 17 | Closing Maestro Test Drift | 017-closing-maestro-test-drift.md |",
+            "| 18 | Go Sidecar and Importers | 018-go-sidecar-and-importers.md |",
+            "| 19 | Go Interop and Maestro Warnings | 019-go-interop-and-maestro-warning.md |",
+            "| 20 | Chunk Fixes and Naming | 020-chunk-fixes-and-naming.md |",
+            "| 21 | Go Parity Slices | 021-go-parity-slices.md |",
+            "| 22 | Go Sidecar Visibility Expansion | 022-go-sidecar-visibility-expansio.md |",
+            "| 23 | Go Bridge and HyperCode | 023-go-bridge-and-hypercode.md |"
+          ],
+          "recordedAt": 1774711106795,
+          "contentHash": "session-1884981310"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T15:18:26.795Z",
+      "accessedAt": "2026-03-28T15:18:26.795Z",
+      "accessCount": 0
+    },
+    {
+      "id": "15b3d2578103ba0d",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "| 6 | Fixing MCP policy | 006-fixing-mcp-policy.md |",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "fda9f299-3d74-4ef8-9962-4e6f23036a7d",
+        "sessionId": "imported:copilot-cli:9ca0b6fc6d27",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/index.md",
+        "tags": [
+          "copilot-cli",
+          "memory",
+          "mcp"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T15:18:27.142Z",
+      "accessedAt": "2026-03-28T15:18:27.142Z",
+      "accessCount": 0
+    },
+    {
+      "id": "6c689767bb88be96",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "| 7 | Building session import pipeline | 007-building-session-import-pipeli.md |",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "fda9f299-3d74-4ef8-9962-4e6f23036a7d",
+        "sessionId": "imported:copilot-cli:9ca0b6fc6d27",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/index.md",
+        "tags": [
+          "copilot-cli",
+          "memory",
+          "networking",
+          "validation",
+          "ui"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T15:18:27.390Z",
+      "accessedAt": "2026-03-28T15:18:27.390Z",
+      "accessCount": 0
+    },
+    {
+      "id": "e11743a7ef754e4d",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "| 10 | Hardening session import | 010-hardening-session-import.md |",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "fda9f299-3d74-4ef8-9962-4e6f23036a7d",
+        "sessionId": "imported:copilot-cli:9ca0b6fc6d27",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/index.md",
+        "tags": [
+          "copilot-cli",
+          "memory",
+          "networking"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T15:18:27.639Z",
+      "accessedAt": "2026-03-28T15:18:27.639Z",
+      "accessCount": 0
+    },
+    {
+      "id": "2bec5608d9890716",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "| 13 | Fixing repo test regressions | 013-fixing-repo-test-regressions.md |",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "fda9f299-3d74-4ef8-9962-4e6f23036a7d",
+        "sessionId": "imported:copilot-cli:9ca0b6fc6d27",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/index.md",
+        "tags": [
+          "copilot-cli",
+          "memory",
+          "validation"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T15:18:27.896Z",
+      "accessedAt": "2026-03-28T15:18:27.896Z",
+      "accessCount": 0
+    },
+    {
+      "id": "f1ac7a1677926208",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "| 14 | Fixing Maestro regressions | 014-fixing-maestro-regressions.md |",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "fda9f299-3d74-4ef8-9962-4e6f23036a7d",
+        "sessionId": "imported:copilot-cli:9ca0b6fc6d27",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/index.md",
+        "tags": [
+          "copilot-cli",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T15:18:28.145Z",
+      "accessedAt": "2026-03-28T15:18:28.145Z",
+      "accessCount": 0
+    },
+    {
+      "id": "1b69d79d568e1700",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "| 15 | Fixing Maestro test drift | 015-fixing-maestro-test-drift.md |",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "fda9f299-3d74-4ef8-9962-4e6f23036a7d",
+        "sessionId": "imported:copilot-cli:9ca0b6fc6d27",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/index.md",
+        "tags": [
+          "copilot-cli",
+          "memory",
+          "validation"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T15:18:28.392Z",
+      "accessedAt": "2026-03-28T15:18:28.392Z",
+      "accessCount": 0
+    },
+    {
+      "id": "22d458af4a3f2bcb",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "<overview> (copilot-cli) ended with status imported.\nWorking directory: C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints\nLog tail: - `Set-Location go; gofmt -w .; go test ./...` | 6. Update docs/plan again only if the new catalog identities materially change operator-facing surfaces. | Blockers / cautions: | - Do not claim literal 100% parity with every external CLI unless the repo truly exposes that parity. | - The user explicitly wants that end state, but the current safe path is still incremental, source-backed integration. | - No processes should be terminated in this session. | - The worktree is broad/dirty; continue keeping edits tightly scoped. | If continuing from this checkpoint, the next best concrete implementation is: | - add Cursor/Copilot/Antigravity-class harness identities to the authoritative TypeScript harness catalog and align the Go/CLI metadata surfaces around that, with explicit parity notes and no fake tool-registry claims. | </next_steps>",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "9beeb6e0-7dcc-49d9-ba71-83e65d3f0c9c",
+        "sourcePath": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/023-go-bridge-and-hypercode.md",
+        "sessionFormat": "md",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "copilot-cli",
+          "imported"
+        ],
+        "sessionId": "imported:copilot-cli:8895ae22e3ee",
+        "structuredSessionSummary": {
+          "sessionId": "imported:copilot-cli:8895ae22e3ee",
+          "name": "<overview>",
+          "cliType": "copilot-cli",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints",
+          "restartCount": 0,
+          "startedAt": 1774710470982.4543,
+          "stoppedAt": 1774711108657,
+          "lastActivityAt": 1774710470982.4543,
+          "logTail": [
+            "- `Set-Location go; gofmt -w .; go test ./...`",
+            "6. Update docs/plan again only if the new catalog identities materially change operator-facing surfaces.",
+            "Blockers / cautions:",
+            "- Do not claim literal 100% parity with every external CLI unless the repo truly exposes that parity.",
+            "- The user explicitly wants that end state, but the current safe path is still incremental, source-backed integration.",
+            "- No processes should be terminated in this session.",
+            "- The worktree is broad/dirty; continue keeping edits tightly scoped.",
+            "If continuing from this checkpoint, the next best concrete implementation is:",
+            "- add Cursor/Copilot/Antigravity-class harness identities to the authoritative TypeScript harness catalog and align the Go/CLI metadata surfaces around that, with explicit parity notes and no fake tool-registry claims.",
+            "</next_steps>"
+          ],
+          "recordedAt": 1774711113719,
+          "contentHash": "session-1776360734"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T15:18:33.720Z",
+      "accessedAt": "2026-03-28T15:18:33.720Z",
+      "accessCount": 0
+    },
+    {
+      "id": "791aabc3a398e36b",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Use port 4000 for the Borg control plane.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "9beeb6e0-7dcc-49d9-ba71-83e65d3f0c9c",
+        "sessionId": "imported:copilot-cli:8895ae22e3ee",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/023-go-bridge-and-hypercode.md",
+        "tags": [
+          "networking",
+          "runtime",
+          "copilot-cli",
+          "instruction"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:18:34.040Z",
+      "accessedAt": "2026-03-28T15:18:34.040Z",
+      "accessCount": 0
+    },
+    {
+      "id": "6e351035c2de06d0",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The TypeScript session supervisor bridge exposes catalog/list/get/create/start/stop/restart routes.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "9beeb6e0-7dcc-49d9-ba71-83e65d3f0c9c",
+        "sessionId": "imported:copilot-cli:8895ae22e3ee",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/023-go-bridge-and-hypercode.md",
+        "tags": [
+          "API",
+          "bridge",
+          "session",
+          "copilot-cli",
+          "memory",
+          "mcp"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:18:34.307Z",
+      "accessedAt": "2026-03-28T15:18:34.307Z",
+      "accessCount": 0
+    },
+    {
+      "id": "81bd88e0849f61ca",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Borg's CLI/session harness catalog does not yet represent Cursor, Copilot, or Antigravity as harness identities.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "9beeb6e0-7dcc-49d9-ba71-83e65d3f0c9c",
+        "sessionId": "imported:copilot-cli:8895ae22e3ee",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/023-go-bridge-and-hypercode.md",
+        "tags": [
+          "catalog",
+          "CLI",
+          "harness",
+          "copilot-cli",
+          "memory",
+          "mcp"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:18:34.581Z",
+      "accessedAt": "2026-03-28T15:18:34.581Z",
+      "accessCount": 0
+    },
+    {
+      "id": "e8f43dcba374aec4",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The HyperCode submodule contains a real tool registry available at submodules/hypercode/tools/*.go.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "9beeb6e0-7dcc-49d9-ba71-83e65d3f0c9c",
+        "sessionId": "imported:copilot-cli:8895ae22e3ee",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/023-go-bridge-and-hypercode.md",
+        "tags": [
+          "HyperCode",
+          "tools",
+          "registry",
+          "copilot-cli",
+          "memory",
+          "mcp"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:18:34.871Z",
+      "accessedAt": "2026-03-28T15:18:34.871Z",
+      "accessCount": 0
+    },
+    {
+      "id": "ecaf81111a92e74b",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The runtime status composition reuses existing truthful helpers in the Go application.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "9beeb6e0-7dcc-49d9-ba71-83e65d3f0c9c",
+        "sessionId": "imported:copilot-cli:8895ae22e3ee",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/023-go-bridge-and-hypercode.md",
+        "tags": [
+          "Go",
+          "runtime",
+          "status",
+          "copilot-cli",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:18:35.151Z",
+      "accessedAt": "2026-03-28T15:18:35.151Z",
+      "accessCount": 0
+    },
+    {
+      "id": "7d226497e2395258",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Keep parity notes explicit when integrating external harnesses into Borg.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "9beeb6e0-7dcc-49d9-ba71-83e65d3f0c9c",
+        "sessionId": "imported:copilot-cli:8895ae22e3ee",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/023-go-bridge-and-hypercode.md",
+        "tags": [
+          "parity",
+          "integration",
+          "documentation",
+          "copilot-cli",
+          "memory"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:18:37.189Z",
+      "accessedAt": "2026-03-28T15:18:37.189Z",
+      "accessCount": 0
+    },
+    {
+      "id": "6c615006f0a979e1",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (copilot-cli) ended with status imported.\nWorking directory: C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots\nLog tail: \"2703019faff41b5c7a92b17e07203d79\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\catalog_test.go\", | \"364e225ee47d3749c648adc378e7f87e\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\summary.go\", | \"ba5b1b4bceb0263685734468f278503d\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\summary_test.go\", | \"ef29f465ab7c60b99516b3511291423b\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\interop\\\\sessionbridge.go\", | \"aebb91432b74b6b09d951b6de7626a41\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\interop\\\\sessionbridge_test.go\", | \"abf248d88ec5f73dfe5aab09f362cdfb\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\packages\\\\core\\\\src\\\\orchestrator\\\\council\\\\services\\\\cli-registry.ts\", | \"c9670968c9c115da897cd27a101ea5c3\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\packages\\\\core\\\\src\\\\orchestrator\\\\council\\\\services\\\\environment-manager.ts\", | \"8ea6af67561f44ace4854801715841a5\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\packages\\\\core\\\\src\\\\orchestrator\\\\council\\\\types.ts\", | \"505f8ca63b3f0a6eb1e3db6b25a4c15b\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\packages\\\\core\\\\src\\\\routers\\\\council\\\\sessionRouter.ts\", | \"5ad8cf4c168ba786386aaee23cb245eb\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\packages\\\\core\\\\src\\\\supervisor\\\\cliHarnessCatalog.ts\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "bbcdcf1d-fefd-4cb7-8345-77971526c3e3",
+        "sourcePath": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "copilot-cli",
+          "imported"
+        ],
+        "sessionId": "imported:copilot-cli:3a724b14d1fd",
+        "structuredSessionSummary": {
+          "sessionId": "imported:copilot-cli:3a724b14d1fd",
+          "name": "{",
+          "cliType": "copilot-cli",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots",
+          "restartCount": 0,
+          "startedAt": 1774710334365.6902,
+          "stoppedAt": 1774711117515,
+          "lastActivityAt": 1774710334365.6902,
+          "logTail": [
+            "\"2703019faff41b5c7a92b17e07203d79\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\catalog_test.go\",",
+            "\"364e225ee47d3749c648adc378e7f87e\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\summary.go\",",
+            "\"ba5b1b4bceb0263685734468f278503d\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\providers\\\\summary_test.go\",",
+            "\"ef29f465ab7c60b99516b3511291423b\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\interop\\\\sessionbridge.go\",",
+            "\"aebb91432b74b6b09d951b6de7626a41\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\go\\\\internal\\\\interop\\\\sessionbridge_test.go\",",
+            "\"abf248d88ec5f73dfe5aab09f362cdfb\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\packages\\\\core\\\\src\\\\orchestrator\\\\council\\\\services\\\\cli-registry.ts\",",
+            "\"c9670968c9c115da897cd27a101ea5c3\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\packages\\\\core\\\\src\\\\orchestrator\\\\council\\\\services\\\\environment-manager.ts\",",
+            "\"8ea6af67561f44ace4854801715841a5\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\packages\\\\core\\\\src\\\\orchestrator\\\\council\\\\types.ts\",",
+            "\"505f8ca63b3f0a6eb1e3db6b25a4c15b\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\packages\\\\core\\\\src\\\\routers\\\\council\\\\sessionRouter.ts\",",
+            "\"5ad8cf4c168ba786386aaee23cb245eb\": \"C:\\\\Users\\\\hyper\\\\workspace\\\\borg\\\\packages\\\\core\\\\src\\\\supervisor\\\\cliHarnessCatalog.ts\"",
+            "}"
+          ],
+          "recordedAt": 1774711118461,
+          "contentHash": "session-1733086149"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T15:18:38.461Z",
+      "accessedAt": "2026-03-28T15:18:38.461Z",
+      "accessCount": 0
+    },
+    {
+      "id": "16658e3a4528403c",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"please begin analysis and continue to proceed as you recommend. insanely great!\",",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "bbcdcf1d-fefd-4cb7-8345-77971526c3e3",
+        "sessionId": "imported:copilot-cli:3a724b14d1fd",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T15:18:38.827Z",
+      "accessedAt": "2026-03-28T15:18:38.827Z",
+      "accessCount": 0
+    },
+    {
+      "id": "c7926e111b159103",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"insanely great! outstanding! continue to proceed as you recommend! don't stop the party! don't terminate any processes in this session please! keep on goin!insanely great! outstanding! continue to proceed as you recommend! d",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "bbcdcf1d-fefd-4cb7-8345-77971526c3e3",
+        "sessionId": "imported:copilot-cli:3a724b14d1fd",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "instruction",
+          "memory"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T15:18:39.099Z",
+      "accessedAt": "2026-03-28T15:18:39.099Z",
+      "accessCount": 0
+    },
+    {
+      "id": "d9e2934ecb8c44f6",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"<pasted_content file=\\\"C:\\\\Users\\\\hyper\\\\.copilot\\\\session-state\\\\19ddbe49-0d66-45a6-a9d2-393395d8953e\\\\files\\\\paste-1774505117140.txt\\\" size=\\\"30.7 KB\\\" lines=\\\"403\\\" />\",",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "bbcdcf1d-fefd-4cb7-8345-77971526c3e3",
+        "sessionId": "imported:copilot-cli:3a724b14d1fd",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "memory",
+          "database"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T15:18:39.360Z",
+      "accessedAt": "2026-03-28T15:18:39.360Z",
+      "accessCount": 0
+    },
+    {
+      "id": "5d2dae9ec52c0ab4",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"borg on  main [$] via  v24.10.0 on ☁️ (us-east-1) took 1m26s\\n❯ .\\\\start.bat\\nStarting Borg...\\nInstalling dependencies...\\nScope: all 24 workspace projects\\nLockfile is up to date, resolution step is skipped\\nAlready up t",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "bbcdcf1d-fefd-4cb7-8345-77971526c3e3",
+        "sessionId": "imported:copilot-cli:3a724b14d1fd",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T15:18:39.636Z",
+      "accessedAt": "2026-03-28T15:18:39.636Z",
+      "accessCount": 0
+    },
+    {
+      "id": "5d432d57854d06e6",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"<pasted_content file=\\\"C:\\\\Users\\\\hyper\\\\.copilot\\\\session-state\\\\19ddbe49-0d66-45a6-a9d2-393395d8953e\\\\files\\\\paste-1774506452821.txt\\\" size=\\\"30.6 KB\\\" lines=\\\"400\\\" />\",",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "bbcdcf1d-fefd-4cb7-8345-77971526c3e3",
+        "sessionId": "imported:copilot-cli:3a724b14d1fd",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "memory",
+          "database"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T15:18:39.905Z",
+      "accessedAt": "2026-03-28T15:18:39.905Z",
+      "accessCount": 0
+    },
+    {
+      "id": "45aca5982e89c699",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "\"userMessage\": \"proceed\",",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "copilot-cli",
+        "importedSessionId": "bbcdcf1d-fefd-4cb7-8345-77971526c3e3",
+        "sessionId": "imported:copilot-cli:3a724b14d1fd",
+        "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json",
+        "tags": [
+          "copilot-cli",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "heuristic"
+      },
+      "createdAt": "2026-03-28T15:18:40.192Z",
+      "accessedAt": "2026-03-28T15:18:40.192Z",
+      "accessCount": 0
+    },
+    {
+      "id": "b54d4b1103e4b209",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/agent_memory\nLog tail: \"memory\" | ], | \"section\": \"general\", | \"memoryKind\": \"memory\", | \"extractionSource\": \"heuristic\" | }, | \"createdAt\": \"2026-03-28T15:18:38.827Z\", | \"accessedAt\": \"2026-03-28T15:18:38.827Z\", | \"accessCount\": 0 | } | ]",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "02f09d45-84d1-4fa2-8977-7b4d600fd0a7",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:f87d0801a3f7",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:f87d0801a3f7",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/agent_memory",
+          "restartCount": 0,
+          "startedAt": 1774710207002.1577,
+          "stoppedAt": 1774711120452,
+          "lastActivityAt": 1774710207002.1577,
+          "logTail": [
+            "\"memory\"",
+            "],",
+            "\"section\": \"general\",",
+            "\"memoryKind\": \"memory\",",
+            "\"extractionSource\": \"heuristic\"",
+            "},",
+            "\"createdAt\": \"2026-03-28T15:18:38.827Z\",",
+            "\"accessedAt\": \"2026-03-28T15:18:38.827Z\",",
+            "\"accessCount\": 0",
+            "}",
+            "]"
+          ],
+          "recordedAt": 1774711127368,
+          "contentHash": "session-87165753"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T15:18:47.368Z",
+      "accessedAt": "2026-03-28T15:18:47.368Z",
+      "accessCount": 0
+    },
+    {
+      "id": "7a1e4d19d6ed07b2",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Use port 4000 for the Borg control plane.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "02f09d45-84d1-4fa2-8977-7b4d600fd0a7",
+        "sessionId": "imported:borg:f87d0801a3f7",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "networking",
+          "runtime",
+          "borg",
+          "instruction"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:18:47.655Z",
+      "accessedAt": "2026-03-28T15:18:47.655Z",
+      "accessCount": 0
+    },
+    {
+      "id": "f8572c7e2ac7402f",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The TypeScript session supervisor bridge exposes catalog/list/get/create/start/stop/restart routes.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "02f09d45-84d1-4fa2-8977-7b4d600fd0a7",
+        "sessionId": "imported:borg:f87d0801a3f7",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "API",
+          "bridge",
+          "session",
+          "borg",
+          "memory",
+          "mcp"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:18:47.904Z",
+      "accessedAt": "2026-03-28T15:18:47.904Z",
+      "accessCount": 0
+    },
+    {
+      "id": "3af9f5d63909dd13",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Borg's CLI/session harness catalog does not yet represent Cursor, Copilot, or Antigravity as harness identities.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "02f09d45-84d1-4fa2-8977-7b4d600fd0a7",
+        "sessionId": "imported:borg:f87d0801a3f7",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "catalog",
+          "CLI",
+          "harness",
+          "borg",
+          "memory",
+          "mcp"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:18:48.165Z",
+      "accessedAt": "2026-03-28T15:18:48.165Z",
+      "accessCount": 0
+    },
+    {
+      "id": "72e5bce92ee7f4c7",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The HyperCode submodule contains a real tool registry available at submodules/hypercode/tools/*.go.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "02f09d45-84d1-4fa2-8977-7b4d600fd0a7",
+        "sessionId": "imported:borg:f87d0801a3f7",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "HyperCode",
+          "tools",
+          "registry",
+          "borg",
+          "memory",
+          "mcp"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:18:48.430Z",
+      "accessedAt": "2026-03-28T15:18:48.430Z",
+      "accessCount": 0
+    },
+    {
+      "id": "dcf0a4ba98423b71",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "The runtime status composition reuses existing truthful helpers in the Go application.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "02f09d45-84d1-4fa2-8977-7b4d600fd0a7",
+        "sessionId": "imported:borg:f87d0801a3f7",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "Go",
+          "runtime",
+          "status",
+          "borg",
+          "memory"
+        ],
+        "section": "general",
+        "memoryKind": "memory",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:18:48.689Z",
+      "accessedAt": "2026-03-28T15:18:48.689Z",
+      "accessCount": 0
+    },
+    {
+      "id": "67abf05569e0a34e",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "Keep parity notes explicit when integrating external harnesses into Borg.",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "02f09d45-84d1-4fa2-8977-7b4d600fd0a7",
+        "sessionId": "imported:borg:f87d0801a3f7",
+        "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+        "tags": [
+          "parity",
+          "integration",
+          "documentation",
+          "borg",
+          "memory"
+        ],
+        "section": "instructions",
+        "memoryKind": "instruction",
+        "extractionSource": "llm"
+      },
+      "createdAt": "2026-03-28T15:18:48.956Z",
+      "accessedAt": "2026-03-28T15:18:48.956Z",
+      "accessCount": 0
+    },
+    {
+      "id": "f68bc0b307bb9239",
+      "type": "long_term",
+      "namespace": "project",
+      "content": "{ (borg) ended with status imported.\nWorking directory: C:/Users/hyper/workspace/fwber/.borg/handoffs\nLog tail: \"user\": 0, | \"agent\": 0, | \"project\": 868, | \"discovery\": 0, | \"decision\": 0, | \"progress\": 0, | \"warning\": 0, | \"fix\": 0 | }, | \"recentContext\": [], | \"notes\": \"Automatic background handoff\" | }",
+      "metadata": {
+        "source": "session_import",
+        "sourceTool": "borg",
+        "importedSessionId": "6613115d-3546-4c9f-81db-1f2b7ecce4af",
+        "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774710179611.json",
+        "sessionFormat": "json",
+        "section": "general",
+        "tags": [
+          "session-summary",
+          "borg",
+          "imported"
+        ],
+        "sessionId": "imported:borg:36055ea32281",
+        "structuredSessionSummary": {
+          "sessionId": "imported:borg:36055ea32281",
+          "name": "{",
+          "cliType": "borg",
+          "status": "imported",
+          "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+          "restartCount": 0,
+          "startedAt": 1774710179612.1611,
+          "stoppedAt": 1774711129246,
+          "lastActivityAt": 1774710179612.1611,
+          "logTail": [
+            "\"user\": 0,",
+            "\"agent\": 0,",
+            "\"project\": 868,",
+            "\"discovery\": 0,",
+            "\"decision\": 0,",
+            "\"progress\": 0,",
+            "\"warning\": 0,",
+            "\"fix\": 0",
+            "},",
+            "\"recentContext\": [],",
+            "\"notes\": \"Automatic background handoff\"",
+            "}"
+          ],
+          "recordedAt": 1774711129622,
+          "contentHash": "session-1136470872"
+        },
+        "memoryKind": "session_summary"
+      },
+      "createdAt": "2026-03-28T15:18:49.623Z",
+      "accessedAt": "2026-03-28T15:18:49.623Z",
       "accessCount": 0
     }
   ]
