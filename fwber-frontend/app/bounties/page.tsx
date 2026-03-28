@@ -296,7 +296,7 @@ export default function BountiesPage() {
                   const primaryPhoto = bounty.user.photos.find(p => p.is_primary) || bounty.user.photos[0]
                   const displayName = bounty.user.profile?.display_name || bounty.user.name
                   const timeLeft = getTimeRemaining(bounty.expires_at)
-                  const isExpiringSoon = timeLeft.includes('h') || timeLeft.includes('soon')
+                  const isExpiringSoon = timeLeft && (timeLeft.includes('h') || timeLeft.includes('soon'))
 
                   return (
                     <Link

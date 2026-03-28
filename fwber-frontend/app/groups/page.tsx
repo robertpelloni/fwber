@@ -18,9 +18,13 @@ export default function GroupsPage() {
   const myGroups = myGroupsData?.data || [];
 
   const filteredGroups = groups.filter((group) => {
-    const matchesSearch = group.name.toLowerCase().includes(search.toLowerCase()) ||
-    (group.description && group.description.toLowerCase().includes(search.toLowerCase())) ||
-    (group.tags && group.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase())));
+    const groupName = group.name || '';
+    const groupDesc = group.description || '';
+    const searchQuery = search.toLowerCase();
+
+    const matchesSearch = groupName.toLowerCase().includes(searchQuery) ||
+    groupDesc.toLowerCase().includes(searchQuery) ||
+    (Array.isArray(group.tags) && group.tags.some(tag => tag && tag.toLowerCase().includes(searchQuery)));
 
     const matchesCategory = selectedCategory ? group.category === selectedCategory : true;
 

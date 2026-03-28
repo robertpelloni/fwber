@@ -88,7 +88,7 @@ function getCategoryIcon(category: string | null): React.ComponentType<{ classNa
   if (!category) return categoryIcons.default
   const lower = category.toLowerCase()
   for (const [key, icon] of Object.entries(categoryIcons)) {
-    if (lower.includes(key)) return icon
+    if (lower && lower.includes(key)) return icon
   }
   return categoryIcons.default
 }
@@ -96,7 +96,7 @@ function getCategoryIcon(category: string | null): React.ComponentType<{ classNa
 function DealCard({ deal }: { deal: Deal }) {
   const CategoryIcon = getCategoryIcon(deal.merchant.category)
   const timeLeft = getTimeRemaining(deal.expires_at)
-  const isExpiringSoon = timeLeft.includes('h') || timeLeft.includes('soon')
+  const isExpiringSoon = timeLeft && (timeLeft.includes('h') || timeLeft.includes('soon'))
   const hasTrackedView = useRef(false)
 
   const trackInteraction = useCallback(async (type: 'view' | 'click' | 'redemption') => {
