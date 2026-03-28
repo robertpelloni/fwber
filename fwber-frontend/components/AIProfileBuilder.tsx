@@ -143,7 +143,7 @@ export default function AIProfileBuilder({
                     <input
                       type="checkbox"
                       data-testid={`interest-${interest.toLowerCase().replace(/\s+/g, '-')}`}
-                      checked={preferences.interests.includes(interest)}
+                      checked={Array.isArray(preferences.interests) && preferences.interests.includes(interest)}
                       onChange={(e) => {
                         if (e.target.checked) {
                           setPreferences(prev => ({
