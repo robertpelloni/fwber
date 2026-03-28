@@ -7,7 +7,7 @@ import { apiClient } from '@/lib/api/client'
 import {
   Star, ArrowLeft, RefreshCw, Share2,
   Heart, HeartCrack, Sparkles, Moon,
-  Infinity as InfinityIcon, Compass
+  Infinity as InfinityIcon, Compass, Skull
 } from 'lucide-react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
