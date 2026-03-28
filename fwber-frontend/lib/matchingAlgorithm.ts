@@ -195,7 +195,7 @@ export function calculateMatchScore(
   for (const check of preferencesChecks) {
     if (check.userPref && check.userPref.length > 0) {
       totalPreferences++;
-      if (check.matchValue && check.userPref.includes(check.matchValue)) {
+      if (check.matchValue && Array.isArray(check.userPref) && check.userPref.includes(check.matchValue)) {
         preferenceMatches++;
         reasons.push(`Matching ${check.name}`);
       }

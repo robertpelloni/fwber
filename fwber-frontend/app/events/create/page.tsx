@@ -95,7 +95,8 @@ export default function CreateEventPage() {
     // The current backend implementation just attaches groups.
     // So if I host as Group A, I should probably attach Group A.
     if (selectedHostGroupId) {
-        if (!payload.shared_group_ids.includes(selectedHostGroupId)) {
+        const sharedGroupIds = payload.shared_group_ids;
+        if (Array.isArray(sharedGroupIds) && !sharedGroupIds.includes(selectedHostGroupId)) {
             payload.shared_group_ids.push(selectedHostGroupId);
         }
     }
