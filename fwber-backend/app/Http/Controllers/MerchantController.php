@@ -100,7 +100,13 @@ class MerchantController extends Controller
             return response()->json(['message' => 'Merchant profile not found.'], 403);
         }
 
-        // In a real app, we might check: if ($profile->verification_status !== 'verified') ...
+        // Production Requirement: Merchant must be verified to post promotions
+        if ($profile->verification_status !== 'verified') {
+            return response()->json([
+                'message' => 'Merchant verification required. Please ensure your business details are complete and contact support.',
+                'status' => $profile->verification_status
+            ], 403);
+        }
 
         $validated = $request->validated();
 
