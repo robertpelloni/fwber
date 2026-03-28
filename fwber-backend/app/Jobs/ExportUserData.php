@@ -109,8 +109,9 @@ class ExportUserData implements ShouldQueue
 
             Log::info("Data export completed for user {$userId}. File: {$zipFileName}");
 
-            // Notify user (TODO: Implement Email/Notification)
-            // For now, we update a cache key or status record if we had one.
+            // Notify user
+            $downloadUrl = route('api.user.export.download', ['filename' => $zipFileName]);
+            $this->user->notify(new \App\Notifications\DataExportCompletedNotification($downloadUrl));
 
         } catch (\Exception $e) {
             Log::error("Data export failed for user {$userId}: " . $e->getMessage());
