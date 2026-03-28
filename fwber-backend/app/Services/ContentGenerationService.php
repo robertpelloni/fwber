@@ -729,10 +729,15 @@ class ContentGenerationService
     }
     
     private function analyzeEngagementPatterns(User $user): array { 
+        $messages = BulletinMessage::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->limit(100)
+            ->get();
+
         return [
-            'peak_hours' => [],
-            'content_types' => [],
-            'interaction_style' => 'balanced',
+            'peak_hours' => $messages->groupBy(fn($m) => $m->created_at->format('H'))->map->count()->toArray(),
+            'content_types' => $messages->groupBy('type')->map->count()->toArray(),
+            'interaction_style' => $messages->count() > 50 ? 'highly_active' : 'observational',
         ];
     }
     
@@ -742,14 +747,35 @@ class ContentGenerationService
             ->count();
         return [
             'messages_last_7_days' => $count,
+            'unique_contributors' => BulletinMessage::where('bulletin_board_id', $board->id)->distinct('user_id')->count(),
         ];
     }
     
     private function getPopularBoardTopics(BulletinBoard $board): array { 
-        return [];
+        // Analyze recent messages to extract common keywords
+        $content = BulletinMessage::where('bulletin_board_id', $board->id)
+            ->where('created_at', '>=', now()->subDays(30))
+            ->pluck('content')
+            ->join(' ');
+
+        $words = str_word_count(strtolower($content), 1);
+        $stopWords = ['the', 'and', 'for', 'you', 'this', 'that', 'with'];
+        $filtered = array_filter($words, fn($w) => strlen($w) > 3 && !in_array($w, $stopWords));
+        
+        $counts = array_count_values($filtered);
+        arsort($counts);
+        
+        return array_slice($counts, 0, 10, true);
     }
     
     private function getBoardUserDemographics(BulletinBoard $board): array { 
-        return [];
+        $userIds = BulletinMessage::where('bulletin_board_id', $board->id)->distinct('user_id')->pluck('user_id');
+        $users = User::whereIn('id', $userIds)->get();
+
+        return [
+            'avg_age' => $users->avg('age'),
+            'gender_distribution' => $users->groupBy('gender')->map->count()->toArray(),
+            'total_verified' => $users->where('is_id_verified', true)->count(),
+        ];
     }
 }
