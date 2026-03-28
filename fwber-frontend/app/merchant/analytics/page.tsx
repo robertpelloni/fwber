@@ -188,7 +188,7 @@ export default function MerchantAnalyticsPage() {
                                     </div>
                                 </div>
                                 <p className="text-sm text-zinc-400 leading-relaxed max-w-sm">
-                                    Your broadcasts are consistently correlating with an increase in "Energetic" and "Happy" sentiment in the 1-mile radius.
+                                    Your broadcasts are consistently correlating with an increase in &quot;Energetic&quot; and &quot;Happy&quot; sentiment in the 1-mile radius.
                                 </p>
                             </CardContent>
                         </Card>

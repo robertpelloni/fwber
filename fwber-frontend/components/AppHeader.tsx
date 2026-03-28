@@ -35,7 +35,8 @@ import {
     Briefcase,
     CalendarHeart,
     Shield,
-    Gamepad2
+    Gamepad2,
+    Globe
 } from 'lucide-react'
 
 interface AppHeaderProps {

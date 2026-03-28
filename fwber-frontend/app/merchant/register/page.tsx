@@ -222,14 +222,14 @@ export default function MerchantRegisterPage() {
                   <CheckCircle2 className="w-6 h-6 mr-3 flex-shrink-0 text-amber-200" />
                   <div>
                     <strong className="block text-lg">Real-time Promotions</strong>
-                    <span className="text-amber-100/90 text-sm">Push flash deals that appear instantly on users' local feeds.</span>
+                    <span className="text-amber-100/90 text-sm">Push flash deals that appear instantly on users&apos; local feeds.</span>
                   </div>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle2 className="w-6 h-6 mr-3 flex-shrink-0 text-amber-200" />
                   <div>
                     <strong className="block text-lg">Zero Commission Fees</strong>
-                    <span className="text-amber-100/90 text-sm">We don't take a cut of your sales. You keep what you earn.</span>
+                    <span className="text-amber-100/90 text-sm">We don&apos;t take a cut of your sales. You keep what you earn.</span>
                   </div>
                 </li>
               </ul>

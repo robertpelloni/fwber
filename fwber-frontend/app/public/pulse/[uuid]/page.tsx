@@ -103,7 +103,7 @@ export default function LivePulseBoard() {
                                 <Info className="w-6 h-6 text-zinc-400" />
                             </div>
                             <p className="text-2xl text-zinc-300 font-medium leading-tight max-w-2xl">
-                                "{data.analysis.summary}"
+                                &quot;{data.analysis.summary}&quot;
                             </p>
                         </div>
                     </section>
@@ -127,7 +127,7 @@ export default function LivePulseBoard() {
 
                 {/* Trends Column */}
                 <div className="space-y-8">
-                    <section className="bg-zinc-900/50 backdrop-blur-md border-2 border-white/5 p-8 rounded-[2rem] h-full">
+                    <section className="bg-zinc-900/50 backdrop-blur-md border-2 border-white/5 p-8 rounded-[2rem] h-full&quot;">
                         <span className="text-xs font-black uppercase tracking-widest text-zinc-500 mb-8 block">Trending Topics Nearby</span>
                         <div className="space-y-4">
                             {data.analysis.trending_keywords.map((kw, i) => (
