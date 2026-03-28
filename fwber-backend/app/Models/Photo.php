@@ -174,12 +174,12 @@ class Photo extends Model
     {
         $deleted = true;
         
-        if ($this->file_path && Storage::exists($this->file_path)) {
-            $deleted = Storage::delete($this->file_path) && $deleted;
+        if ($this->file_path && Storage::disk('public')->exists($this->file_path)) {
+            $deleted = Storage::disk('public')->delete($this->file_path) && $deleted;
         }
         
-        if ($this->thumbnail_path && Storage::exists($this->thumbnail_path)) {
-            $deleted = Storage::delete($this->thumbnail_path) && $deleted;
+        if ($this->thumbnail_path && Storage::disk('public')->exists($this->thumbnail_path)) {
+            $deleted = Storage::disk('public')->delete($this->thumbnail_path) && $deleted;
         }
         
         return $deleted;

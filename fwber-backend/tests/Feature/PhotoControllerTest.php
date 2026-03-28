@@ -57,6 +57,10 @@ class PhotoControllerTest extends TestCase
 
         $response = $this->actingAs($user)->deleteJson("/api/photos/{$photo->id}");
 
+        if ($response->status() !== 200) {
+            dump($response->json());
+        }
+
         $response->assertStatus(200);
         $this->assertDatabaseMissing('photos', ['id' => $photo->id]);
     }

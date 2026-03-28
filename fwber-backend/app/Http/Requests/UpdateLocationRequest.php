@@ -17,6 +17,10 @@ class UpdateLocationRequest extends FormRequest
             'latitude' => 'required',
             'longitude' => 'required',
             'accuracy' => 'sometimes',
+            'privacy_level' => 'sometimes|string|in:public,friends,private',
+            'heading' => 'sometimes|numeric',
+            'speed' => 'sometimes|numeric',
+            'altitude' => 'sometimes|numeric',
         ];
     }
 }

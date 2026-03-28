@@ -933,10 +933,10 @@ class PhotoController extends Controller
             // 4. Match check
             // Find any active match between these users
             $match = \App\Models\UserMatch::where(function($q) use ($user, $photo) {
-                    $q->where('user_id_1', $user->id)->where('user_id_2', $photo->user_id);
+                    $q->where('user1_id', $user->id)->where('user2_id', $photo->user_id);
                 })
                 ->orWhere(function($q) use ($user, $photo) {
-                    $q->where('user_id_1', $photo->user_id)->where('user_id_2', $user->id);
+                    $q->where('user1_id', $photo->user_id)->where('user2_id', $user->id);
                 })
                 ->first();
 
