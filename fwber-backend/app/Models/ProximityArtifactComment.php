@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, ProximityArtifactComment> $replies
  * @property-read int|null $replies_count
  * @property-read \App\Models\User $user
+ *
  * @method static \Database\Factories\ProximityArtifactCommentFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityArtifactComment newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityArtifactComment newQuery()
@@ -36,6 +37,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityArtifactComment whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityArtifactComment withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityArtifactComment withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class ProximityArtifactComment extends Model
@@ -54,17 +56,17 @@ class ProximityArtifactComment extends Model
         return $this->belongsTo(ProximityArtifact::class, 'proximity_artifact_id');
     }
 
-    public function user()
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function parent()
+    public function parent(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(self::class, 'parent_id');
     }
 
-    public function replies()
+    public function replies(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(self::class, 'parent_id');
     }

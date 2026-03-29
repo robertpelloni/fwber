@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\User $accused
  * @property-read \App\Models\User|null $moderator
  * @property-read \App\Models\User $reporter
+ *
  * @method static \Database\Factories\ReportFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Report newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Report newQuery()
@@ -35,6 +36,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Report whereResolutionNotes($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Report whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Report whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Report extends Model

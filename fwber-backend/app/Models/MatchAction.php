@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $targetUser
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MatchAction newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MatchAction newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MatchAction query()
@@ -25,6 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MatchAction whereTargetUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MatchAction whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MatchAction whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class MatchAction extends Model

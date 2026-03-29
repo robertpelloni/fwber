@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\ChatroomMessage $message
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessageReaction byEmoji(string $emoji)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessageReaction byUser(int $userId)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessageReaction newModelQuery()
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessageReaction whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessageReaction whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessageReaction whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class ChatroomMessageReaction extends Model

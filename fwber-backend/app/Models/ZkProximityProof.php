@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ZkProximityProof newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ZkProximityProof newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ZkProximityProof query()
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ZkProximityProof whereTargetEntityType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ZkProximityProof whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ZkProximityProof whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class ZkProximityProof extends Model

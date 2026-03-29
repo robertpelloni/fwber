@@ -8,9 +8,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @property-read \App\Models\GroupMessage|null $message
  * @property-read \App\Models\User|null $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupMessageRead newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupMessageRead newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupMessageRead query()
+ *
  * @mixin \Eloquent
  */
 class GroupMessageRead extends Model

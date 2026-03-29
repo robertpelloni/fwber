@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Promotion> $promotions
  * @property-read int|null $promotions_count
  * @property-read \App\Models\User $user
+ *
  * @method static \Database\Factories\MerchantProfileFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MerchantProfile newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MerchantProfile newQuery()
@@ -31,6 +32,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MerchantProfile whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MerchantProfile whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MerchantProfile whereVerificationStatus($value)
+ *
  * @mixin \Eloquent
  */
 class MerchantProfile extends Model

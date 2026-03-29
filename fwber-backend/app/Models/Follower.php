@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Follower newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Follower newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Follower query()
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Follower whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Follower whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Follower whereUsername($value)
+ *
  * @mixin \Eloquent
  */
 class Follower extends Model

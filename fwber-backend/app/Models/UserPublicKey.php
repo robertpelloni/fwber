@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPublicKey newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPublicKey newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPublicKey query()
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPublicKey wherePublicKey($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPublicKey whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPublicKey whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class UserPublicKey extends Model

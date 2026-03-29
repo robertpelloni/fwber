@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, BulletinMessage> $replies
  * @property-read int|null $replies_count
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage notExpired()
@@ -49,6 +50,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage whereReplyCount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class BulletinMessage extends Model

@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User|null $mentionedUser
  * @property-read \App\Models\ChatroomMessage $message
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessageMention byUser(int $userId)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessageMention newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessageMention newQuery()
@@ -23,6 +24,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessageMention whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessageMention whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessageMention whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class ChatroomMessageMention extends Model

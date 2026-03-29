@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $merchant
  * @property-read \App\Models\User|null $payer
+ *
  * @method static \Database\Factories\MerchantPaymentFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MerchantPayment newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MerchantPayment newQuery()
@@ -37,6 +38,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MerchantPayment whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MerchantPayment whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MerchantPayment whereWebhookUrl($value)
+ *
  * @mixin \Eloquent
  */
 class MerchantPayment extends Model

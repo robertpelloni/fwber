@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\UserMatch $match
  * @property-read \App\Models\Photo $photo
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PhotoReveal newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PhotoReveal newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PhotoReveal query()
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PhotoReveal whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PhotoReveal whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PhotoReveal whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class PhotoReveal extends Model

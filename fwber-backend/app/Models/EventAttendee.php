@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $transaction_id
  * @property-read \App\Models\Event $event
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EventAttendee newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EventAttendee newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EventAttendee query()
@@ -29,6 +30,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EventAttendee whereTransactionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EventAttendee whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EventAttendee whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class EventAttendee extends Model

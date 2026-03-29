@@ -70,6 +70,8 @@ return [
 
     'asset_url' => env('ASSET_URL'),
 
+    'csp_relaxed' => env('CSP_RELAXED', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

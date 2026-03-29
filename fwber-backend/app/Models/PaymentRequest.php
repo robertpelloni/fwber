@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $payer
  * @property-read \App\Models\User $requester
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentRequest newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentRequest newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentRequest query()
@@ -29,6 +30,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentRequest whereRequesterId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentRequest whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentRequest whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class PaymentRequest extends Model

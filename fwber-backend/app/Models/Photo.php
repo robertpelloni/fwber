@@ -41,6 +41,7 @@ use Illuminate\Support\Facades\Storage;
  * @property-read string $thumbnail_url
  * @property-read string $url
  * @property-read \App\Models\User $user
+ *
  * @method static \Database\Factories\PhotoFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo newQuery()
@@ -68,6 +69,7 @@ use Illuminate\Support\Facades\Storage;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereWidth($value)
+ *
  * @mixin \Eloquent
  */
 class Photo extends Model

@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $messages_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BulletinMessage> $recentMessages
  * @property-read int|null $recent_messages_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard active()
  * @method static \Database\Factories\BulletinBoardFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard nearLocation(float $lat, float $lng, int $radiusMeters = 5000)
@@ -46,6 +47,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard whereRadiusMeters($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class BulletinBoard extends Model

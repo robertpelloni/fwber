@@ -112,7 +112,6 @@ class AiWingmanController extends Controller
     /**
      * Analyze a draft message and provide feedback.
      *
-     * @param  Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function analyzeDraft(AnalyzeDraftRequest $request, string $matchId)
@@ -316,7 +315,6 @@ class AiWingmanController extends Controller
     /**
      * Analyze a user quirk for "Red Flags".
      *
-     * @param  Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function checkQuirk(AnalyzeQuirkRequest $request)

@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $role_changed_at
  * @property-read \App\Models\Group $group
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupMember newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupMember newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupMember query()
@@ -47,6 +48,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupMember whereRoleChangedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupMember whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupMember whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class GroupMember extends Model

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $blocked_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Block newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Block newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Block query()
@@ -19,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Block whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Block whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Block whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Block extends Model

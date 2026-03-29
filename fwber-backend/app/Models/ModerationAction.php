@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\User $moderator
  * @property-read \App\Models\ProximityArtifact|null $targetArtifact
  * @property-read \App\Models\User|null $targetUser
+ *
  * @method static \Database\Factories\ModerationActionFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ModerationAction newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ModerationAction newQuery()
@@ -32,6 +33,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ModerationAction whereTargetArtifactId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ModerationAction whereTargetUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ModerationAction whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ModerationAction extends Model

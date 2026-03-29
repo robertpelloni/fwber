@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \App\Models\User|null $user
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProximityArtifactVote> $votes
  * @property-read int|null $votes_count
+ *
  * @method static Builder<static>|ProximityArtifact active()
  * @method static \Database\Factories\ProximityArtifactFactory factory($count = null, $state = [])
  * @method static Builder<static>|ProximityArtifact newModelQuery()
@@ -56,6 +57,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static Builder<static>|ProximityArtifact withTrashed(bool $withTrashed = true)
  * @method static Builder<static>|ProximityArtifact withinBox(float $lat, float $lng, float $radiusMeters)
  * @method static Builder<static>|ProximityArtifact withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class ProximityArtifact extends Model
@@ -126,17 +128,17 @@ class ProximityArtifact extends Model
         return round($value + $offset, 7);
     }
 
-    public function user()
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function comments()
+    public function comments(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ProximityArtifactComment::class);
     }
 
-    public function votes()
+    public function votes(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ProximityArtifactVote::class);
     }

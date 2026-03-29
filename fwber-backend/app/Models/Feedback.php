@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User|null $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Feedback newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Feedback newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Feedback query()
@@ -33,6 +34,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Feedback whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Feedback whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Feedback whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class Feedback extends Model

@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $recipient
  * @property-read \App\Models\User|null $sender
+ *
  * @method static \Database\Factories\VouchFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vouch newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vouch newQuery()
@@ -34,6 +35,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vouch whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vouch whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vouch whereVoucherName($value)
+ *
  * @mixin \Eloquent
  */
 class Vouch extends Model

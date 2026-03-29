@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $is_active
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Gift newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Gift newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Gift query()
@@ -27,6 +28,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Gift whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Gift whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Gift whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Gift extends Model

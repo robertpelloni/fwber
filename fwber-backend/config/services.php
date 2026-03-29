@@ -73,4 +73,8 @@ return [
         'api_url' => env('IMAGE_MODERATION_API_URL', 'https://api.example.com/moderate/image'),
     ],
 
+    'zk' => [
+        'secret' => env('ZK_SECRET', 'fwber-zk-hardware-enclave-secret'),
+    ],
+
 ];

@@ -32,6 +32,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\User $creator
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Group> $groups
  * @property-read int|null $groups_count
+ *
  * @method static \Database\Factories\EventFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Event newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Event newQuery()
@@ -54,6 +55,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereTokenCost($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Event whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Event extends Model

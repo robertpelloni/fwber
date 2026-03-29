@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $receiver
  * @property-read \App\Models\User $sender
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Message between(int $userId1, int $userId2)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Message newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Message newQuery()
@@ -53,6 +54,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Message whereTranscription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Message whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Message whereUuid($value)
+ *
  * @mixin \Eloquent
  */
 class Message extends Model

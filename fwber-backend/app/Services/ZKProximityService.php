@@ -24,7 +24,7 @@ class ZKProximityService
         // HMAC-SHA256(geohash + timestamp + target_entity_id, APP_KEY)
         $expectedSignature = hash_hmac('sha256',
             $proofPayload['geohash'].$timestamp.$publicSignals['target_entity_id'],
-            env('ZK_SECRET', 'fwber-zk-hardware-enclave-secret')
+            config('services.zk.secret')
         );
 
         if (! hash_equals($expectedSignature, $proofPayload['signature'])) {

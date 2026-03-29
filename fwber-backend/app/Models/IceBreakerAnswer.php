@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\User $matchUser
  * @property-read \App\Models\IceBreakerQuestion $question
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|IceBreakerAnswer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|IceBreakerAnswer newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|IceBreakerAnswer query()
@@ -27,6 +28,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|IceBreakerAnswer whereQuestionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|IceBreakerAnswer whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|IceBreakerAnswer whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class IceBreakerAnswer extends Model

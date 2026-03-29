@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $user
+ *
  * @method static \Database\Factories\GeoSpoofDetectionFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GeoSpoofDetection highRisk()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GeoSpoofDetection newModelQuery()
@@ -44,6 +45,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GeoSpoofDetection whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GeoSpoofDetection whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GeoSpoofDetection whereVelocityKmh($value)
+ *
  * @mixin \Eloquent
  */
 class GeoSpoofDetection extends Model

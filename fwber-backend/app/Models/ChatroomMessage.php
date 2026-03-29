@@ -38,6 +38,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, ChatroomMessage> $replies
  * @property-read int|null $replies_count
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage announcements()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage byType(string $type)
  * @method static \Database\Factories\ChatroomMessageFactory factory($count = null, $state = [])
@@ -66,6 +67,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class ChatroomMessage extends Model

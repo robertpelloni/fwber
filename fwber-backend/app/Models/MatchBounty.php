@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MatchBounty newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MatchBounty newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MatchBounty onlyTrashed()
@@ -34,6 +35,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MatchBounty whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MatchBounty withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MatchBounty withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class MatchBounty extends Model

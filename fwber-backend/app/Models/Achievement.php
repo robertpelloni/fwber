@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
  * @property-read int|null $users_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Achievement newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Achievement newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Achievement query()
@@ -32,6 +33,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Achievement whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Achievement whereRewardTokens($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Achievement whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Achievement extends Model

@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $user
  * @property-read \App\Models\Venue $venue
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VenueCheckin newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VenueCheckin newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VenueCheckin query()
@@ -25,6 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VenueCheckin whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VenueCheckin whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VenueCheckin whereVenueId($value)
+ *
  * @mixin \Eloquent
  */
 class VenueCheckin extends Model

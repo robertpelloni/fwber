@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\UserMatch $match
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RelationshipTier newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RelationshipTier newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RelationshipTier query()
@@ -37,6 +38,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RelationshipTier whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RelationshipTier whereUser1ConfirmedMeetingAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RelationshipTier whereUser2ConfirmedMeetingAt($value)
+ *
  * @mixin \Eloquent
  */
 class RelationshipTier extends Model

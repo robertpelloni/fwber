@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read string $formatted_distance
  * @property-read string $privacy_level_display
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation active()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation byPrivacyLevel($level)
  * @method static \Database\Factories\UserLocationFactory factory($count = null, $state = [])
@@ -51,6 +52,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation withinRadius($latitude, $longitude, $radiusMeters)
+ *
  * @mixin \Eloquent
  */
 class UserLocation extends Model

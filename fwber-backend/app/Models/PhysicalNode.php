@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\MerchantProfile $merchant
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PhysicalNode newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PhysicalNode newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PhysicalNode query()
@@ -33,6 +34,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PhysicalNode whereNodeType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PhysicalNode whereNodeUuid($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PhysicalNode whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class PhysicalNode extends Model

@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\ProximityArtifact|null $artifact
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityArtifactVote newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityArtifactVote newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityArtifactVote query()
@@ -24,6 +25,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityArtifactVote whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityArtifactVote whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityArtifactVote whereValue($value)
+ *
  * @mixin \Eloquent
  */
 class ProximityArtifactVote extends Model
@@ -36,12 +38,12 @@ class ProximityArtifactVote extends Model
         'value',
     ];
 
-    public function artifact()
+    public function artifact(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(ProximityArtifact::class, 'proximity_artifact_id');
     }
 
-    public function user()
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
     }

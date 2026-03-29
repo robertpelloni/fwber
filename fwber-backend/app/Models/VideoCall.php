@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $caller
  * @property-read \App\Models\User $receiver
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VideoCall newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VideoCall newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VideoCall query()
@@ -29,6 +30,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VideoCall whereStartedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VideoCall whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VideoCall whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class VideoCall extends Model

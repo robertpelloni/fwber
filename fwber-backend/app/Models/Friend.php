@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $friend
  * @property-read \App\Models\User $user
+ *
  * @method static \Database\Factories\FriendFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Friend newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Friend newQuery()
@@ -25,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Friend whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Friend whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Friend whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class Friend extends Model

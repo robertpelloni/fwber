@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\Gift $gift
  * @property-read \App\Models\User $receiver
  * @property-read \App\Models\User $sender
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGift newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGift newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGift query()
@@ -28,6 +29,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGift whereReceiverId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGift whereSenderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGift whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class UserGift extends Model

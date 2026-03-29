@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $clicks
  * @property int $redemptions
  * @property-read \App\Models\MerchantProfile $merchantProfile
+ *
  * @method static \Database\Factories\PromotionFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion newQuery()
@@ -48,6 +49,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion whereViews($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Promotion withinBox(float $lat, float $lng, float $radiusMeters)
+ *
  * @mixin \Eloquent
  */
 class Promotion extends Model

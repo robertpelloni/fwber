@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $avatar_status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
  * @method static \Database\Factories\UserPhysicalProfileFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPhysicalProfile newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPhysicalProfile newQuery()
@@ -48,6 +49,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPhysicalProfile whereTattoos($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPhysicalProfile whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPhysicalProfile whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class UserPhysicalProfile extends Model

@@ -40,6 +40,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, ProximityChatroomMessage> $replies
  * @property-read int|null $replies_count
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage announcements()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage byType(string $type)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage networking()
@@ -71,6 +72,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage whereReplyCount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class ProximityChatroomMessage extends Model

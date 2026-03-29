@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Promotion $promotion
  * @property-read \App\Models\User|null $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PromotionEvent newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PromotionEvent newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PromotionEvent query()
@@ -25,6 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PromotionEvent whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PromotionEvent whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PromotionEvent whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class PromotionEvent extends Model

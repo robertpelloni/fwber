@@ -42,9 +42,9 @@ class SecurityHeaders
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
         // Content Security Policy (CSP)
-        // Strict by default in production; relaxed in non-production or when explicitly allowed via env
+        // Strict by default in production; relaxed in non-production or when explicitly allowed via config
         $isProd = app()->environment('production');
-        $relaxed = (bool) env('CSP_RELAXED', ! $isProd);
+        $relaxed = (bool) config('app.csp_relaxed', ! $isProd);
 
         $scriptDirectives = ($isProd && ! $relaxed)
             ? "script-src 'self'"

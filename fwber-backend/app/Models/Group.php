@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read int|null $members_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\GroupPost> $posts
  * @property-read int|null $posts_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Group active()
  * @method static \Database\Factories\GroupFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Group newModelQuery()
@@ -62,6 +63,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Group whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Group whereVisibility($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Group whereWalletId($value)
+ *
  * @mixin \Eloquent
  */
 class Group extends Model

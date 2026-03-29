@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read \App\Models\RelationshipTier|null $relationshipTier
  * @property-read \App\Models\User $user1
  * @property-read \App\Models\User $user2
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserMatch newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserMatch newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserMatch query()
@@ -34,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserMatch whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserMatch whereUser1Id($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserMatch whereUser2Id($value)
+ *
  * @mixin \Eloquent
  */
 class UserMatch extends Model

@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\User $host
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AudioRoomParticipant> $participants
  * @property-read int|null $participants_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AudioRoom newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AudioRoom newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AudioRoom query()
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AudioRoom whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AudioRoom whereTopic($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AudioRoom whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class AudioRoom extends Model

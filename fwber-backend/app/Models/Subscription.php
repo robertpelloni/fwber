@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $trial_ends_at
  * @property \Illuminate\Support\Carbon|null $ends_at
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription query()
@@ -31,6 +32,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereTrialEndsAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class Subscription extends Model

@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\AudioRoom $room
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AudioRoomParticipant newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AudioRoomParticipant newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AudioRoomParticipant query()
@@ -25,6 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AudioRoomParticipant whereRole($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AudioRoomParticipant whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AudioRoomParticipant whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class AudioRoomParticipant extends Model

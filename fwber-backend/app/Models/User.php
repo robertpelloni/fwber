@@ -97,6 +97,26 @@ use NotificationChannels\WebPush\HasPushSubscriptions;
  * @property-read int|null $tokens_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Vouch> $vouches
  * @property-read int|null $vouches_count
+ * @property-read \App\Models\UserProfile|null $profile
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Photo> $photos
+ * @property-read \App\Models\Photo|null $primaryPhoto
+ * @property-read \App\Models\MerchantProfile|null $merchantProfile
+ * @property-read \App\Models\User|null $referrer
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $referrals
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Vouch> $vouches
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TokenTransaction> $tokenTransactions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserMatch> $matches_as_user1
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserMatch> $matches_as_user2
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Message> $sent_messages
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Message> $received_messages
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Group> $groups
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Event> $events
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Subscription> $subscriptions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserGift> $gifts_received
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserGift> $gifts_sent
+ * @property-read bool $two_factor_enabled
+ * @property-read bool $streak_just_updated
+ *
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()
@@ -133,6 +153,7 @@ use NotificationChannels\WebPush\HasPushSubscriptions;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUnlimitedSwipes($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereWalletAddress($value)
+ *
  * @mixin \Eloquent
  */
 class User extends Authenticatable
@@ -204,27 +225,27 @@ class User extends Authenticatable
 
     // Relationships
 
-    public function merchantProfile()
+    public function merchantProfile(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(MerchantProfile::class);
     }
 
-    public function referrer()
+    public function referrer(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'referrer_id');
     }
 
-    public function referrals()
+    public function referrals(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(User::class, 'referrer_id');
     }
 
-    public function vouches()
+    public function vouches(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Vouch::class, 'to_user_id');
     }
 
-    public function tokenTransactions()
+    public function tokenTransactions(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(TokenTransaction::class);
     }
@@ -234,107 +255,107 @@ class User extends Authenticatable
         return $this->hasEnabledTwoFactorAuthentication();
     }
 
-    public function profile()
+    public function profile(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(UserProfile::class);
     }
 
-    public function photos()
+    public function photos(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Photo::class);
     }
 
-    public function primaryPhoto()
+    public function primaryPhoto(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(Photo::class)->where('is_primary', true);
     }
 
-    public function boosts()
+    public function boosts(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Boost::class);
     }
 
-    public function events()
+    public function events(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Event::class, 'created_by_user_id');
     }
 
-    public function attendingEvents()
+    public function attendingEvents(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Event::class, 'event_attendees')
             ->withPivot('status')
             ->withTimestamps();
     }
 
-    public function createdGroups()
+    public function createdGroups(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Group::class, 'created_by_user_id');
     }
 
-    public function groups()
+    public function groups(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Group::class, 'group_members')
             ->withPivot('role', 'joined_at')
             ->withTimestamps();
     }
 
-    public function notificationPreferences()
+    public function notificationPreferences(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(NotificationPreference::class);
     }
 
-    public function matchesAsUser1()
+    public function matchesAsUser1(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(UserMatch::class, 'user1_id');
     }
 
-    public function matchesAsUser2()
+    public function matchesAsUser2(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(UserMatch::class, 'user2_id');
     }
 
-    public function sentMessages()
+    public function sentMessages(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Message::class, 'sender_id');
     }
 
-    public function receivedMessages()
+    public function receivedMessages(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Message::class, 'receiver_id');
     }
 
-    public function subscriptions()
+    public function subscriptions(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Subscription::class);
     }
 
-    public function giftsSent()
+    public function giftsSent(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(UserGift::class, 'sender_id');
     }
 
-    public function giftsReceived()
+    public function giftsReceived(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(UserGift::class, 'receiver_id');
     }
 
-    public function matchActions()
+    public function matchActions(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(MatchAction::class);
     }
 
-    public function deviceTokens()
+    public function deviceTokens(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(DeviceToken::class);
     }
 
-    public function friends()
+    public function friends(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(User::class, 'friends', 'user_id', 'friend_id')
             ->wherePivot('status', 'accepted');
     }
 
-    public function achievements()
+    public function achievements(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Achievement::class, 'user_achievements')
             ->withPivot('unlocked_at')

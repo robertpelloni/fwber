@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User|null $creator
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShadowThrottle active()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShadowThrottle newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShadowThrottle newQuery()
@@ -35,6 +36,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShadowThrottle whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShadowThrottle whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShadowThrottle whereVisibilityReduction($value)
+ *
  * @mixin \Eloquent
  */
 class ShadowThrottle extends Model

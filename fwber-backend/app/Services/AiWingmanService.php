@@ -850,6 +850,13 @@ EOT;
                 'scientific_explanation' => $decoded['scientific_explanation'] ?? 'Data insufficient for meaningful analysis.',
             ];
         }
+
+        return [
+            'nemesis_type' => 'The Ghost',
+            'clashing_traits' => ['Undefined', 'Null', 'None'],
+            'why_it_would_fail' => 'The AI failed to materialize your nemesis. You are safe... for now.',
+            'scientific_explanation' => 'JSON parsing error caused a temporal rift in the personality matrix.',
+        ];
     }
 
     /**

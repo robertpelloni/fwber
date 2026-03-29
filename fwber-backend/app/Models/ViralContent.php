@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $views
  * @property bool $reward_claimed
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ViralContent newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ViralContent newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ViralContent query()
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ViralContent whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ViralContent whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ViralContent whereViews($value)
+ *
  * @mixin \Eloquent
  */
 class ViralContent extends Model

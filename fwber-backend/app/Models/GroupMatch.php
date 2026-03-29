@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\Group $group1
  * @property-read \App\Models\Group $group2
  * @property-read \App\Models\User $initiator
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupMatch newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupMatch newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupMatch query()
@@ -25,6 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupMatch whereInitiatedByUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupMatch whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupMatch whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class GroupMatch extends Model

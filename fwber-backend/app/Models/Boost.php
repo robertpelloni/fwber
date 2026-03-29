@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $user
+ *
  * @method static Builder<static>|Boost active()
  * @method static Builder<static>|Boost newModelQuery()
  * @method static Builder<static>|Boost newQuery()
@@ -29,6 +30,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static Builder<static>|Boost whereStatus($value)
  * @method static Builder<static>|Boost whereUpdatedAt($value)
  * @method static Builder<static>|Boost whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class Boost extends Model

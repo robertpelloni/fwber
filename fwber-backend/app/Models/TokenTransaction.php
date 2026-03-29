@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TokenTransaction newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TokenTransaction newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TokenTransaction query()
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TokenTransaction whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TokenTransaction whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TokenTransaction whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class TokenTransaction extends Model

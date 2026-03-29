@@ -49,6 +49,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $members_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProximityChatroomMessage> $messages
  * @property-read int|null $messages_count
+ * @property-read float $distance_meters
+ * @property-read bool $is_within_proximity
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $moderators
  * @property-read int|null $moderators_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $networkingMembers
@@ -57,6 +59,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $social_members_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $visibleMembers
  * @property-read int|null $visible_members_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom active()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom byCity(string $city)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom byType(string $type)
@@ -98,6 +101,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereVenueName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereVenueType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom withinRadius(float $latitude, float $longitude, int $radiusMeters)
+ *
  * @mixin \Eloquent
  */
 class ProximityChatroom extends Model

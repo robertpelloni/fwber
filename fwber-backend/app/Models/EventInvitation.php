@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\Event $event
  * @property-read \App\Models\User $invitee
  * @property-read \App\Models\User $inviter
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EventInvitation newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EventInvitation newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EventInvitation query()
@@ -25,6 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EventInvitation whereInviterId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EventInvitation whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|EventInvitation whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class EventInvitation extends Model

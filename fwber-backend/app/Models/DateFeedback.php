@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\UserMatch $match
  * @property-read \App\Models\User $reporter
  * @property-read \App\Models\User $subject
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|DateFeedback newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|DateFeedback newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|DateFeedback query()
@@ -30,6 +31,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|DateFeedback whereSafetyConcerns($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|DateFeedback whereSubjectUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|DateFeedback whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class DateFeedback extends Model

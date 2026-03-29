@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $matchUser
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ScrapbookEntry forPair(int $userId, int $matchId)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ScrapbookEntry newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ScrapbookEntry newQuery()
@@ -38,6 +39,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ScrapbookEntry whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ScrapbookEntry whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ScrapbookEntry whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class ScrapbookEntry extends Model

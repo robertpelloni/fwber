@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $creator
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CreatorSubscription active()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CreatorSubscription newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CreatorSubscription newQuery()
@@ -28,6 +29,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CreatorSubscription whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CreatorSubscription whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CreatorSubscription whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class CreatorSubscription extends Model

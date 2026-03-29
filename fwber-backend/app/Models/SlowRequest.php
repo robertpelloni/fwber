@@ -23,6 +23,12 @@ use Illuminate\Database\Eloquent\Prunable;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User|null $user
+ * @property-read float $avg_queries
+ * @property-read float $avg_memory
+ * @property-read float $avg_duration
+ * @property-read int $count
+ * @property-read string $endpoint
+ *
  * @method static Builder<static>|SlowRequest newModelQuery()
  * @method static Builder<static>|SlowRequest newQuery()
  * @method static Builder<static>|SlowRequest query()
@@ -41,6 +47,7 @@ use Illuminate\Database\Eloquent\Prunable;
  * @method static Builder<static>|SlowRequest whereUrl($value)
  * @method static Builder<static>|SlowRequest whereUserAgent($value)
  * @method static Builder<static>|SlowRequest whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class SlowRequest extends Model

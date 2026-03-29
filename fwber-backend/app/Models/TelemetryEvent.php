@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Prunable;
  * @property \Illuminate\Support\Carbon $recorded_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TelemetryEvent newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TelemetryEvent newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TelemetryEvent query()
@@ -24,6 +25,7 @@ use Illuminate\Database\Eloquent\Prunable;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TelemetryEvent whereRecordedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TelemetryEvent whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TelemetryEvent whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class TelemetryEvent extends Model

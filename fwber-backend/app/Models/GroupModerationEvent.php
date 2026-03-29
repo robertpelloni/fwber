@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Group $group
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupModerationEvent newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupModerationEvent newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupModerationEvent query()
@@ -30,6 +31,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupModerationEvent whereReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupModerationEvent whereTargetUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupModerationEvent whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class GroupModerationEvent extends Model

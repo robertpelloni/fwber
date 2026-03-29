@@ -82,6 +82,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $is_federated
  * @property string|null $emotion_updated_at
  * @property-read \App\Models\User $user
+ *
  * @method static \Database\Factories\UserProfileFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserProfile newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserProfile newQuery()
@@ -160,6 +161,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserProfile whereWantsChildren($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserProfile whereZkIdIssuer($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserProfile whereZodiacSign($value)
+ *
  * @mixin \Eloquent
  */
 class UserProfile extends Model
@@ -261,7 +263,7 @@ class UserProfile extends Model
         'social_media' => 'array',
     ];
 
-    public function user()
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
     }

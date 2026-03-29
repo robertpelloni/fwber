@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ContentUnlock newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ContentUnlock newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ContentUnlock query()
@@ -24,6 +25,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ContentUnlock whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ContentUnlock whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ContentUnlock whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class ContentUnlock extends Model

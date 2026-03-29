@@ -40,6 +40,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
+ *
  * @method static \Database\Factories\VenueFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Venue newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Venue newQuery()
@@ -70,6 +71,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Venue whereVerificationStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Venue whereWebsite($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Venue whereZipCode($value)
+ *
  * @mixin \Eloquent
  */
 class Venue extends Authenticatable

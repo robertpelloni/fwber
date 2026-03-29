@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\ProximityChatroomMessage $message
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessageReaction newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessageReaction newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessageReaction query()
@@ -24,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessageReaction whereProximityChatroomMessageId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessageReaction whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessageReaction whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class ProximityChatroomMessageReaction extends Model

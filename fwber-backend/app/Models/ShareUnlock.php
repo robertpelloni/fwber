@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $targetProfile
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShareUnlock newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShareUnlock newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShareUnlock query()
@@ -22,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShareUnlock whereTargetProfileId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShareUnlock whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShareUnlock whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class ShareUnlock extends Model

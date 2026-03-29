@@ -1,11 +1,30 @@
 # Auto-imported Agent Instructions
 
-Generated at: 2026-03-29T00:33:36.479Z
+Generated at: 2026-03-29T01:03:48.174Z
 
 These instructions were derived automatically from imported sessions across supported tools.
 
 ## Durable instructions
 
+- **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 3847 for the autopilot configuration. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Borg control plane prefers live lock-file port over stale environment defaults. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — MCP bulk import now accepts a single server entry without outer braces. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Always use 'git -c submodule.recurse=false' due to broken submodule metadata. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Antigravity importer is labeled as 'Experimental' and should not claim stable transcript parity until verification. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Normalize paths in tests for compatibility on Windows. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use in-memory SQLite for integration tests to avoid touching the live database. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Always use 'git -c submodule.recurse=false' due to broken submodule metadata. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Antigravity importer is labeled as 'Experimental' and should not claim stable transcript parity until verification. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **copilot-cli** — Use port 3847 for the autopilot configuration. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
+- **copilot-cli** — Borg control plane prefers live lock-file port over stale environment defaults. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
+- **copilot-cli** — MCP bulk import now accepts a single server entry without outer braces. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
+- **copilot-cli** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/026-antigravity-importer-and-tests.md`)_
+- **copilot-cli** — Normalize paths in tests for compatibility on Windows. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/026-antigravity-importer-and-tests.md`)_
+- **copilot-cli** — Use in-memory SQLite for integration tests to avoid touching the live database. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/026-antigravity-importer-and-tests.md`)_
+- **copilot-cli** — Always use 'git -c submodule.recurse=false' due to broken submodule metadata. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/026-antigravity-importer-and-tests.md`)_
+- **copilot-cli** — Antigravity importer is labeled as 'Experimental' and should not claim stable transcript parity until verification. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/026-antigravity-importer-and-tests.md`)_
 - **borg** — The Go sidecar must remain sidecar-only for now: separate config directory, separate lock file. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
 - **borg** — The Go sidecar exposes a read-only summary endpoint at /api/runtime/status that combines health and lock visibility. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
 - **borg** — Use port 3847 for dashboard probing in Borg. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
@@ -237,23 +256,4 @@ These instructions were derived automatically from imported sessions across supp
 - **opencode** — 3. **Analyze Dependencies** — Build a dependency view up to depth 3, tracking visited nodes to avoid loops. Categorize: imports, function calls, services, external packages. Note external systems or generated code to exclude. _(source: `C:/Users/hyper/.opencode/commands/capture-knowledge.md`)_
 - **opencode** — 2. For each design doc: summarize key architectural decisions and constraints, highlight components, interfaces, and data flows that must be respected. _(source: `C:/Users/hyper/.opencode/commands/check-implementation.md`)_
 - **opencode** — For each design doc: summarize key architectural decisions and constraints, highlight components, interfaces, and data flows that must be respected. _(source: `C:/Users/hyper/.opencode/commands/check-implementation.md`)_
-- **opencode** — description: Debug an issue with structured root-cause analysis before changing code. _(source: `C:/Users/hyper/.opencode/commands/debug.md`)_
-- **opencode** — 1. **Gather Context** — If not already provided, ask for: issue description (what is happening vs what should happen), error messages/logs/screenshots, recent related changes or deployments, and scope of impact. _(source: `C:/Users/hyper/.opencode/commands/debug.md`)_
-- **opencode** — Use kebab-case for feature names, e.g., `user-authentication`. _(source: `C:/Users/hyper/.opencode/commands/execute-plan.md`)_
-- **opencode** — Present a task queue grouped by section with status: `todo`, `in-progress`, `done`, `blocked`. _(source: `C:/Users/hyper/.opencode/commands/execute-plan.md`)_
-- **opencode** — After each task status change, generate a markdown snippet for the planning doc. _(source: `C:/Users/hyper/.opencode/commands/execute-plan.md`)_
-- **opencode** — Produce a summary that includes Completed, In Progress, Blocked, Skipped/Deferred, and New Tasks. _(source: `C:/Users/hyper/.opencode/commands/execute-plan.md`)_
-- **opencode** — Remind to update the planning doc and sync related docs if decisions changed. _(source: `C:/Users/hyper/.opencode/commands/execute-plan.md`)_
-- **opencode** — 1. **Capture Requirement** — If not already provided, ask for: feature name (kebab-case, e.g., `user-authentication`), what problem it solves and who will use it, and key user stories. _(source: `C:/Users/hyper/.opencode/commands/new-requirement.md`)_
-- **opencode** — 7. **Next Steps** — This command focuses on documentation. When ready to implement, use `/execute-plan`. Generate a PR description covering: summary, requirements doc link, key changes, test status, and a readiness checklist. _(source: `C:/Users/hyper/.opencode/commands/new-requirement.md`)_
-- **opencode** — **Capture Requirement** — If not already provided, ask for: feature name (kebab-case, e.g., `user-authentication`), what problem it solves and who will use it, and key user stories. _(source: `C:/Users/hyper/.opencode/commands/new-requirement.md`)_
-- **opencode** — 2. **Validate Quality** — Ensure it is specific and reusable (not generic advice). Avoid storing secrets or sensitive data. _(source: `C:/Users/hyper/.opencode/commands/remember.md`)_
-- **opencode** — 3. **Store** — Call `memory.storeKnowledge` with title, content, tags, scope. If MCP tools are unavailable, use `npx ai-devkit@latest memory store` instead. _(source: `C:/Users/hyper/.opencode/commands/remember.md`)_
-- **opencode** — Avoid storing secrets or sensitive data. _(source: `C:/Users/hyper/.opencode/commands/remember.md`)_
-- **opencode** — If MCP tools are unavailable, use `npx ai-devkit@latest memory store` instead. _(source: `C:/Users/hyper/.opencode/commands/remember.md`)_
-- **opencode** — - Non-functional requirements that must be preserved _(source: `C:/Users/hyper/.opencode/commands/review-design.md`)_
-- **opencode** — 1. **Gather Context** — If not already provided, ask for: feature name/branch, summary of changes (link to design & requirements docs), target environment, existing test suites, and any flaky/slow tests to avoid. _(source: `C:/Users/hyper/.opencode/commands/writing-test.md`)_
-- **opencode** — **Gather Context** — If not already provided, ask for: feature name/branch, summary of changes (link to design & requirements docs), target environment, existing test suites, and any flaky/slow tests to avoid. _(source: `C:/Users/hyper/.opencode/commands/writing-test.md`)_
-- **codex** — Why do I need to use npx.cmd and not the npx in that directory? What is npx (not npx.cmd or npx.ps1) exactly? What about running npx.ps1 instead of cmd? I would rather use powershell and not cmd. Is it in the path? _(source: `C:/Users/hyper/.codex/history.jsonl`)_
-- **codex** — Does codex use cmd or powershell by default for its environment? Can I set this? _(source: `C:/Users/hyper/.codex/history.jsonl`)_
 

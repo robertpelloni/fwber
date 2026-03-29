@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SafeWalk active()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SafeWalk newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SafeWalk newQuery()
@@ -40,6 +41,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SafeWalk whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SafeWalk whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SafeWalk whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class SafeWalk extends Model

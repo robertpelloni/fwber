@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Photo $photo
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PhotoUnlock newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PhotoUnlock newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PhotoUnlock query()
@@ -25,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PhotoUnlock whereUnlockedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PhotoUnlock whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PhotoUnlock whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class PhotoUnlock extends Model

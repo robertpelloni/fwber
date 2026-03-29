@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|HardwareToken newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|HardwareToken newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|HardwareToken query()
@@ -27,6 +28,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|HardwareToken whereTokenUuid($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|HardwareToken whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|HardwareToken whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class HardwareToken extends Model

@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\Chatroom|null $chatroom
  * @property-read \App\Models\User $creator
  * @property-read \App\Models\User|null $scanner
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BurnerLink newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BurnerLink newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BurnerLink query()
@@ -30,6 +31,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BurnerLink whereToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BurnerLink whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BurnerLink whereUsedAt($value)
+ *
  * @mixin \Eloquent
  */
 class BurnerLink extends Model

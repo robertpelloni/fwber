@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\User $matchmaker
  * @property-read \App\Models\User $subject
  * @property-read \App\Models\User $target
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MatchAssist newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MatchAssist newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MatchAssist query()
@@ -28,6 +29,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MatchAssist whereSubjectId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MatchAssist whereTargetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MatchAssist whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class MatchAssist extends Model

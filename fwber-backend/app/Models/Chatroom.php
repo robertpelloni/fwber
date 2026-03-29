@@ -40,6 +40,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $moderators_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ChatroomMessage> $recentMessages
  * @property-read int|null $recent_messages_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom active()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom byCategory(string $category)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom byCity(string $city)
@@ -69,6 +70,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom whereTokenEntryFee($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Chatroom extends Model
