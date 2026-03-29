@@ -7,6 +7,67 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property int $chatroom_id
+ * @property int $user_id
+ * @property int|null $parent_id
+ * @property string $content
+ * @property string $type
+ * @property array<array-key, mixed>|null $metadata
+ * @property bool $is_edited
+ * @property bool $is_deleted
+ * @property bool $is_pinned
+ * @property bool $is_announcement
+ * @property int $reaction_count
+ * @property int $reply_count
+ * @property \Illuminate\Support\Carbon|null $edited_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Chatroom $chatroom
+ * @property-read string $display_content
+ * @property-read string $display_user
+ * @property-read string $preview
+ * @property-read array $reaction_summary
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ChatroomMessageMention> $mentions
+ * @property-read int|null $mentions_count
+ * @property-read ChatroomMessage|null $parent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ChatroomMessageReaction> $reactions
+ * @property-read int|null $reactions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ChatroomMessage> $replies
+ * @property-read int|null $replies_count
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage announcements()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage byType(string $type)
+ * @method static \Database\Factories\ChatroomMessageFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage notDeleted()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage pinned()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage recent(int $limit = 50)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage replies()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage topLevel()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage whereChatroomId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage whereContent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage whereEditedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage whereIsAnnouncement($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage whereIsDeleted($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage whereIsEdited($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage whereIsPinned($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage whereMetadata($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage whereParentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage whereReactionCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage whereReplyCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ChatroomMessage whereUserId($value)
+ * @mixin \Eloquent
+ */
 class ChatroomMessage extends Model
 {
     use HasFactory;

@@ -6,6 +6,39 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $match_id
+ * @property string $current_tier
+ * @property int $messages_exchanged
+ * @property int $days_connected
+ * @property bool $has_met_in_person
+ * @property \Illuminate\Support\Carbon|null $first_matched_at
+ * @property \Illuminate\Support\Carbon|null $last_message_at
+ * @property \Illuminate\Support\Carbon|null $met_in_person_at
+ * @property \Illuminate\Support\Carbon|null $user1_confirmed_meeting_at
+ * @property \Illuminate\Support\Carbon|null $user2_confirmed_meeting_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\UserMatch $match
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RelationshipTier newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RelationshipTier newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RelationshipTier query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RelationshipTier whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RelationshipTier whereCurrentTier($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RelationshipTier whereDaysConnected($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RelationshipTier whereFirstMatchedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RelationshipTier whereHasMetInPerson($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RelationshipTier whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RelationshipTier whereLastMessageAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RelationshipTier whereMatchId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RelationshipTier whereMessagesExchanged($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RelationshipTier whereMetInPersonAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RelationshipTier whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RelationshipTier whereUser1ConfirmedMeetingAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RelationshipTier whereUser2ConfirmedMeetingAt($value)
+ * @mixin \Eloquent
+ */
 class RelationshipTier extends Model
 {
     protected $fillable = [

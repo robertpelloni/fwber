@@ -8,6 +8,56 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int $id
+ * @property int|null $user_id
+ * @property string $type
+ * @property string $content
+ * @property numeric $location_lat
+ * @property numeric $location_lng
+ * @property int $visibility_radius_m
+ * @property string $moderation_status
+ * @property array<array-key, mixed>|null $meta
+ * @property \Illuminate\Support\Carbon $expires_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property bool $is_flagged
+ * @property int $flag_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProximityArtifactComment> $comments
+ * @property-read int|null $comments_count
+ * @property-read float $fuzzed_latitude
+ * @property-read float $fuzzed_longitude
+ * @property-read \App\Models\User|null $user
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProximityArtifactVote> $votes
+ * @property-read int|null $votes_count
+ * @method static Builder<static>|ProximityArtifact active()
+ * @method static \Database\Factories\ProximityArtifactFactory factory($count = null, $state = [])
+ * @method static Builder<static>|ProximityArtifact newModelQuery()
+ * @method static Builder<static>|ProximityArtifact newQuery()
+ * @method static Builder<static>|ProximityArtifact onlyTrashed()
+ * @method static Builder<static>|ProximityArtifact query()
+ * @method static Builder<static>|ProximityArtifact type(string $type)
+ * @method static Builder<static>|ProximityArtifact whereContent($value)
+ * @method static Builder<static>|ProximityArtifact whereCreatedAt($value)
+ * @method static Builder<static>|ProximityArtifact whereDeletedAt($value)
+ * @method static Builder<static>|ProximityArtifact whereExpiresAt($value)
+ * @method static Builder<static>|ProximityArtifact whereFlagCount($value)
+ * @method static Builder<static>|ProximityArtifact whereId($value)
+ * @method static Builder<static>|ProximityArtifact whereIsFlagged($value)
+ * @method static Builder<static>|ProximityArtifact whereLocationLat($value)
+ * @method static Builder<static>|ProximityArtifact whereLocationLng($value)
+ * @method static Builder<static>|ProximityArtifact whereMeta($value)
+ * @method static Builder<static>|ProximityArtifact whereModerationStatus($value)
+ * @method static Builder<static>|ProximityArtifact whereType($value)
+ * @method static Builder<static>|ProximityArtifact whereUpdatedAt($value)
+ * @method static Builder<static>|ProximityArtifact whereUserId($value)
+ * @method static Builder<static>|ProximityArtifact whereVisibilityRadiusM($value)
+ * @method static Builder<static>|ProximityArtifact withTrashed(bool $withTrashed = true)
+ * @method static Builder<static>|ProximityArtifact withinBox(float $lat, float $lng, float $radiusMeters)
+ * @method static Builder<static>|ProximityArtifact withoutTrashed()
+ * @mixin \Eloquent
+ */
 class ProximityArtifact extends Model
 {
     use HasFactory, Prunable, SoftDeletes;

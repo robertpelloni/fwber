@@ -6,6 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property-read \App\Models\Group|null $group
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\GroupMessageRead> $reads
+ * @property-read int|null $reads_count
+ * @property-read \App\Models\User|null $sender
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupMessage newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupMessage newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupMessage notDeleted()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GroupMessage query()
+ * @mixin \Eloquent
+ */
 class GroupMessage extends Model
 {
     protected $fillable = [

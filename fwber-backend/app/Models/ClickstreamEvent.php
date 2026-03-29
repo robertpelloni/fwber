@@ -4,6 +4,33 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property int|null $user_id
+ * @property string $session_id
+ * @property string $event_name
+ * @property array<array-key, mixed>|null $payload
+ * @property string|null $url
+ * @property string|null $ip_address
+ * @property string|null $user_agent
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClickstreamEvent newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClickstreamEvent newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClickstreamEvent query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClickstreamEvent whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClickstreamEvent whereEventName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClickstreamEvent whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClickstreamEvent whereIpAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClickstreamEvent wherePayload($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClickstreamEvent whereSessionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClickstreamEvent whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClickstreamEvent whereUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClickstreamEvent whereUserAgent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ClickstreamEvent whereUserId($value)
+ * @mixin \Eloquent
+ */
 class ClickstreamEvent extends Model
 {
     /**

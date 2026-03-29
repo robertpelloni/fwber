@@ -95,8 +95,7 @@ export const initEcho = (token?: string) => {
     options.auth.withCredentials = true;
 
     if (isDev) {
-         // @ts-ignore
-         Pusher.logToConsole = false; 
+         (Pusher as any).logToConsole = false; 
     }
 
     const echo = new Echo({

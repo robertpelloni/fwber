@@ -7,6 +7,47 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string|null $description
+ * @property numeric $center_lat
+ * @property numeric $center_lng
+ * @property int $radius_meters
+ * @property string|null $geohash
+ * @property bool $is_active
+ * @property int $message_count
+ * @property int $active_users
+ * @property \Illuminate\Support\Carbon|null $last_activity_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $activeUsers
+ * @property-read int|null $active_users_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BulletinMessage> $messages
+ * @property-read int|null $messages_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BulletinMessage> $recentMessages
+ * @property-read int|null $recent_messages_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard active()
+ * @method static \Database\Factories\BulletinBoardFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard nearLocation(float $lat, float $lng, int $radiusMeters = 5000)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard whereActiveUsers($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard whereCenterLat($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard whereCenterLng($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard whereGeohash($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard whereLastActivityAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard whereMessageCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard whereRadiusMeters($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinBoard whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class BulletinBoard extends Model
 {
     use HasFactory;

@@ -159,7 +159,7 @@ export class BulletinBoardAPI {
     } catch (error) {
       // Check if offline
       if (typeof navigator !== 'undefined' && !navigator.onLine) {
-        console.log('Offline, storing message for sync');
+        console.debug('Offline, storing message for sync');
         await storeOfflineMessage({
           uuid: uuidv4(),
           boardId,

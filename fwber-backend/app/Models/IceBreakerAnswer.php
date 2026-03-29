@@ -6,6 +6,29 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property int $question_id
+ * @property int $match_user_id
+ * @property string $answer
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User $matchUser
+ * @property-read \App\Models\IceBreakerQuestion $question
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IceBreakerAnswer newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IceBreakerAnswer newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IceBreakerAnswer query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IceBreakerAnswer whereAnswer($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IceBreakerAnswer whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IceBreakerAnswer whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IceBreakerAnswer whereMatchUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IceBreakerAnswer whereQuestionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IceBreakerAnswer whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IceBreakerAnswer whereUserId($value)
+ * @mixin \Eloquent
+ */
 class IceBreakerAnswer extends Model
 {
     use HasFactory;

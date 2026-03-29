@@ -335,8 +335,7 @@ export default function RealTimeChat({
             // Register background sync
             if ('serviceWorker' in navigator && 'SyncManager' in window) {
               const registration = await navigator.serviceWorker.ready;
-              // @ts-ignore
-              await registration.sync.register('chat-message');
+              await (registration as any).sync.register('chat-message');
             }
 
             showSuccess('Saved Offline', 'Voice message will be sent when online');

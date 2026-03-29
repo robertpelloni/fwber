@@ -6,6 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
+/**
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApiToken newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApiToken newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApiToken query()
+ * @mixin \Eloquent
+ */
 class ApiToken extends Model
 {
     use HasFactory;

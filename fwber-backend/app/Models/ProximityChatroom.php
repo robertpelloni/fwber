@@ -8,6 +8,98 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string|null $description
+ * @property string $type
+ * @property string|null $venue_name
+ * @property string|null $venue_type
+ * @property string|null $event_name
+ * @property \Illuminate\Support\Carbon|null $event_date
+ * @property \Illuminate\Support\Carbon|null $event_start_time
+ * @property \Illuminate\Support\Carbon|null $event_end_time
+ * @property numeric $latitude
+ * @property numeric $longitude
+ * @property int $radius_meters
+ * @property string|null $geohash
+ * @property string|null $city
+ * @property string|null $neighborhood
+ * @property string|null $address
+ * @property array<array-key, mixed>|null $tags
+ * @property array<array-key, mixed>|null $settings
+ * @property int $created_by
+ * @property bool $is_active
+ * @property numeric $token_entry_fee
+ * @property bool $is_public
+ * @property bool $requires_approval
+ * @property int $max_members
+ * @property int $current_members
+ * @property int $message_count
+ * @property \Illuminate\Support\Carbon|null $last_activity_at
+ * @property \Illuminate\Support\Carbon|null $expires_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $activeMembers
+ * @property-read int|null $active_members_count
+ * @property-read \App\Models\User $creator
+ * @property-read string $display_name
+ * @property-read string $url
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $members
+ * @property-read int|null $members_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProximityChatroomMessage> $messages
+ * @property-read int|null $messages_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $moderators
+ * @property-read int|null $moderators_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $networkingMembers
+ * @property-read int|null $networking_members_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $socialMembers
+ * @property-read int|null $social_members_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $visibleMembers
+ * @property-read int|null $visible_members_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom active()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom byCity(string $city)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom byType(string $type)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom byVenueType(string $venueType)
+ * @method static \Database\Factories\ProximityChatroomFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom public()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereCity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereCurrentMembers($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereEventDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereEventEndTime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereEventName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereEventStartTime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereExpiresAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereGeohash($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereIsPublic($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereLastActivityAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereLatitude($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereLongitude($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereMaxMembers($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereMessageCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereNeighborhood($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereRadiusMeters($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereRequiresApproval($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereSettings($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereTags($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereTokenEntryFee($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereVenueName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom whereVenueType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroom withinRadius(float $latitude, float $longitude, int $radiusMeters)
+ * @mixin \Eloquent
+ */
 class ProximityChatroom extends Model
 {
     use HasFactory;

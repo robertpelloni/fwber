@@ -1,11 +1,33 @@
 # Auto-imported Agent Instructions
 
-Generated at: 2026-03-28T23:33:22.739Z
+Generated at: 2026-03-29T00:33:36.479Z
 
 These instructions were derived automatically from imported sessions across supported tools.
 
 ## Durable instructions
 
+- **borg** — The Go sidecar must remain sidecar-only for now: separate config directory, separate lock file. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — The Go sidecar exposes a read-only summary endpoint at /api/runtime/status that combines health and lock visibility. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 3847 for dashboard probing in Borg. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 3847 for dashboard probing in Borg. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — The Go sidecar must remain sidecar-only for now: separate config directory, separate lock file. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — The Go sidecar exposes a read-only summary endpoint at /api/runtime/status that combines health and lock visibility. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 3847 for dashboard probing in Borg. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — The Go sidecar must remain sidecar-only for now: separate config directory, separate lock file. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — The Go sidecar exposes a read-only summary endpoint at /api/runtime/status that combines health and lock visibility. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **copilot-cli** — "userMessage": "insanely great! outstanding! continue to proceed as you recommend! don't stop the party! don't terminate any processes in this session please! keep on goin!insanely great! outstanding! continue to proceed as you recommend! d _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json`)_
+- **copilot-cli** — Use port 3847 for dashboard probing in Borg. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
+- **copilot-cli** — The Go sidecar must remain sidecar-only for now: separate config directory, separate lock file. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
+- **copilot-cli** — The Go sidecar exposes a read-only summary endpoint at /api/runtime/status that combines health and lock visibility. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
+- **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Only stage validated changes from the active workspace for commit; do not include unrelated files from a dirty worktree. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Confirm that the commit message includes the trailer 'Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>' when creating a git commit. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Antigravity is modeled as a metadata-only harness and should not be represented as a source-backed CLI tool until a proper contract is established. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **copilot-cli** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/025-harness-parity-and-detection.md`)_
+- **copilot-cli** — Only stage validated changes from the active workspace for commit; do not include unrelated files from a dirty worktree. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/025-harness-parity-and-detection.md`)_
+- **copilot-cli** — Antigravity is modeled as a metadata-only harness and should not be represented as a source-backed CLI tool until a proper contract is established. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/025-harness-parity-and-detection.md`)_
+- **copilot-cli** — Confirm that the commit message includes the trailer 'Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>' when creating a git commit. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/025-harness-parity-and-detection.md`)_
+- **copilot-cli** — "userMessage": "insanely great! outstanding! continue to proceed as you recommend! don't stop the party! don't terminate any processes in this session please! keep on goin!insanely great! outstanding! continue to proceed as you recommend! d _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json`)_
 - **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
 - **borg** — Use TCP port for the proxy that returns controlled JSON responses instead of raw server throws. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
 - **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
@@ -234,26 +256,4 @@ These instructions were derived automatically from imported sessions across supp
 - **opencode** — **Gather Context** — If not already provided, ask for: feature name/branch, summary of changes (link to design & requirements docs), target environment, existing test suites, and any flaky/slow tests to avoid. _(source: `C:/Users/hyper/.opencode/commands/writing-test.md`)_
 - **codex** — Why do I need to use npx.cmd and not the npx in that directory? What is npx (not npx.cmd or npx.ps1) exactly? What about running npx.ps1 instead of cmd? I would rather use powershell and not cmd. Is it in the path? _(source: `C:/Users/hyper/.codex/history.jsonl`)_
 - **codex** — Does codex use cmd or powershell by default for its environment? Can I set this? _(source: `C:/Users/hyper/.codex/history.jsonl`)_
-- **codex** — Can you modify the config file to use powershell like you did above for all the entries? Is uv.exe on the path? _(source: `C:/Users/hyper/.codex/history.jsonl`)_
-- **codex** — how can i use codex with copilot inference/models? _(source: `C:/Users/hyper/.codex/history.jsonl`)_
-- **codex** — Why do I need to use npx.cmd and not the npx in that directory? _(source: `C:/Users/hyper/.codex/history.jsonl`)_
-- **codex** — I would rather use powershell and not cmd. _(source: `C:/Users/hyper/.codex/history.jsonl`)_
-- **copilot-cli** — Use port 4000 for the litellm proxy. _(source: `C:/Users/hyper/.copilot/session-state/5726f0d5-fce7-4cdc-a8d7-13102be8811c/plan.md`)_
-- **copilot-cli** — Create/Update 'litellm_config.yaml' in the workspace root. _(source: `C:/Users/hyper/.copilot/session-state/5726f0d5-fce7-4cdc-a8d7-13102be8811c/plan.md`)_
-- **copilot-cli** — Update 'codebuff.json' or 'llm_config.json' to point to 'http://0.0.0.0:4000'. _(source: `C:/Users/hyper/.copilot/session-state/5726f0d5-fce7-4cdc-a8d7-13102be8811c/plan.md`)_
-- **copilot-cli** — Configure Copilot CLI to use 'antigravity' models. _(source: `C:/Users/hyper/.copilot/session-state/5726f0d5-fce7-4cdc-a8d7-13102be8811c/plan.md`)_
-- **copilot-cli** — Handle auth tokens securely using environment variables. _(source: `C:/Users/hyper/.copilot/session-state/5726f0d5-fce7-4cdc-a8d7-13102be8811c/plan.md`)_
-- **copilot-cli** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/.copilot/session-state/5726f0d5-fce7-4cdc-a8d7-13102be8811c/checkpoints/001-configured-litellm-proxy-and-t.md`)_
-- **copilot-cli** — Set the environment variable $env:PYTHONIOENCODING="utf-8" to start litellm correctly on Windows. _(source: `C:/Users/hyper/.copilot/session-state/5726f0d5-fce7-4cdc-a8d7-13102be8811c/checkpoints/001-configured-litellm-proxy-and-t.md`)_
-- **copilot-cli** — Configure dual authentication for models in litellm_config.yaml by using vertex_ai for 'antigravity' models and github_copilot for 'copilot' models. _(source: `C:/Users/hyper/.copilot/session-state/5726f0d5-fce7-4cdc-a8d7-13102be8811c/checkpoints/001-configured-litellm-proxy-and-t.md`)_
-- **copilot-cli** — Disable `initializeIdleServers` in the backend to prevent servers from starting automatically. _(source: `C:/Users/hyper/.copilot/session-state/8628b998-6c29-453f-b9bc-e931c35bbe27/checkpoints/001-removed-auth-and-implemented-l.md`)_
-- **copilot-cli** — Use the `warm-cache` script to populate the tool cache; run it via `npm run warm-cache` in the backend. _(source: `C:/Users/hyper/.copilot/session-state/8628b998-6c29-453f-b9bc-e931c35bbe27/checkpoints/001-removed-auth-and-implemented-l.md`)_
-- **copilot-cli** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/.copilot/session-state/5726f0d5-fce7-4cdc-a8d7-13102be8811c/checkpoints/002-configured-dual-auth-and-fixed.md`)_
-- **copilot-cli** — Configure Vertex AI authentication using the file `C:\Users\hyper\workspace\adc.json`. _(source: `C:/Users/hyper/.copilot/session-state/5726f0d5-fce7-4cdc-a8d7-13102be8811c/checkpoints/002-configured-dual-auth-and-fixed.md`)_
-- **copilot-cli** — Use environment variable `GITHUB_TOKEN` for GitHub Copilot authentication. _(source: `C:/Users/hyper/.copilot/session-state/5726f0d5-fce7-4cdc-a8d7-13102be8811c/checkpoints/002-configured-dual-auth-and-fixed.md`)_
-- **copilot-cli** — Patch the `banner.py` file in the `litellm` package to avoid `UnicodeEncodeError` on Windows. _(source: `C:/Users/hyper/.copilot/session-state/5726f0d5-fce7-4cdc-a8d7-13102be8811c/checkpoints/002-configured-dual-auth-and-fixed.md`)_
-- **copilot-cli** — Confirm which port `litellm` is actually serving on (4000 or 25192) and test models accordingly. _(source: `C:/Users/hyper/.copilot/session-state/5726f0d5-fce7-4cdc-a8d7-13102be8811c/checkpoints/002-configured-dual-auth-and-fixed.md`)_
-- **copilot-cli** — - Prefer scoped validation over whole-monorepo noise. _(source: `C:/Users/hyper/.copilot/session-state/f2a96e99-015b-41c0-b234-a5971aeb37bc/plan.md`)_
-- **copilot-cli** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/.copilot/session-state/8628b998-6c29-453f-b9bc-e931c35bbe27/checkpoints/002-borg-parity-and-dashboard.md`)_
-- **copilot-cli** — The always-visible tools feature was implemented by adding 'alwaysVisibleTools' to Borg's config and modifying the JsonConfigProvider to support load/save methods. _(source: `C:/Users/hyper/.copilot/session-state/8628b998-6c29-453f-b9bc-e931c35bbe27/checkpoints/002-borg-parity-and-dashboard.md`)_
 

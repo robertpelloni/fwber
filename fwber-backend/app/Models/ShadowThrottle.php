@@ -6,6 +6,37 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property string $reason
+ * @property int $severity
+ * @property numeric $visibility_reduction
+ * @property \Illuminate\Support\Carbon $started_at
+ * @property \Illuminate\Support\Carbon|null $expires_at
+ * @property string|null $notes
+ * @property int|null $created_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User|null $creator
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShadowThrottle active()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShadowThrottle newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShadowThrottle newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShadowThrottle query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShadowThrottle whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShadowThrottle whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShadowThrottle whereExpiresAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShadowThrottle whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShadowThrottle whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShadowThrottle whereReason($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShadowThrottle whereSeverity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShadowThrottle whereStartedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShadowThrottle whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShadowThrottle whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShadowThrottle whereVisibilityReduction($value)
+ * @mixin \Eloquent
+ */
 class ShadowThrottle extends Model
 {
     use HasFactory;

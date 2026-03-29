@@ -14,6 +14,44 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * Purpose: Track user locations for proximity-based discovery
  *
  * Created: 2025-01-19
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property numeric $latitude
+ * @property numeric $longitude
+ * @property numeric|null $accuracy
+ * @property numeric|null $heading
+ * @property numeric|null $speed
+ * @property numeric|null $altitude
+ * @property bool $is_active
+ * @property string $privacy_level
+ * @property \Illuminate\Support\Carbon $last_updated
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read string $formatted_distance
+ * @property-read string $privacy_level_display
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation active()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation byPrivacyLevel($level)
+ * @method static \Database\Factories\UserLocationFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation whereAccuracy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation whereAltitude($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation whereHeading($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation whereLastUpdated($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation whereLatitude($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation whereLongitude($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation wherePrivacyLevel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation whereSpeed($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserLocation withinRadius($latitude, $longitude, $radiusMeters)
+ * @mixin \Eloquent
  */
 class UserLocation extends Model
 {

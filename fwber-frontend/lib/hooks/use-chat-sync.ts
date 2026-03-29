@@ -14,7 +14,7 @@ export function useChatSync(token: string | null) {
         const pending = await getPendingMessages();
         if (pending.length === 0) return;
 
-        console.log(`Syncing ${pending.length} offline messages...`);
+        console.debug(`Syncing ${pending.length} offline messages...`);
 
         for (const msg of pending) {
             try {

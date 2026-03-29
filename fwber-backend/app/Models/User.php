@@ -10,6 +10,131 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use NotificationChannels\WebPush\HasPushSubscriptions;
 
+/**
+ * @property int $id
+ * @property string $role
+ * @property string $name
+ * @property string $email
+ * @property string|null $actor_uri
+ * @property int $is_remote
+ * @property string|null $referral_code
+ * @property int $golden_tickets_remaining
+ * @property int|null $referrer_id
+ * @property string|null $wallet_address
+ * @property string|null $merchant_secret
+ * @property string|null $merchant_name
+ * @property numeric $token_balance
+ * @property string|null $avatar_url
+ * @property \Illuminate\Support\Carbon|null $email_verified_at
+ * @property \Illuminate\Support\Carbon|null $onboarding_completed_at
+ * @property string $password
+ * @property string|null $decoy_password
+ * @property int|null $decoy_user_id
+ * @property bool $is_decoy
+ * @property string|null $two_factor_secret
+ * @property string|null $two_factor_recovery_codes
+ * @property \Illuminate\Support\Carbon|null $two_factor_confirmed_at
+ * @property string|null $remember_token
+ * @property int $current_streak
+ * @property \Illuminate\Support\Carbon|null $last_active_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string $tier
+ * @property \Illuminate\Support\Carbon|null $tier_expires_at
+ * @property bool $unlimited_swipes
+ * @property \Illuminate\Support\Carbon|null $last_daily_bonus_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Achievement> $achievements
+ * @property-read int|null $achievements_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Event> $attendingEvents
+ * @property-read int|null $attending_events_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Boost> $boosts
+ * @property-read int|null $boosts_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Group> $createdGroups
+ * @property-read int|null $created_groups_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\DeviceToken> $deviceTokens
+ * @property-read int|null $device_tokens_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Event> $events
+ * @property-read int|null $events_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, User> $friends
+ * @property-read int|null $friends_count
+ * @property-read bool $streak_just_updated
+ * @property-read bool $two_factor_enabled
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserGift> $giftsReceived
+ * @property-read int|null $gifts_received_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserGift> $giftsSent
+ * @property-read int|null $gifts_sent_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Group> $groups
+ * @property-read int|null $groups_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MatchAction> $matchActions
+ * @property-read int|null $match_actions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserMatch> $matchesAsUser1
+ * @property-read int|null $matches_as_user1_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserMatch> $matchesAsUser2
+ * @property-read int|null $matches_as_user2_count
+ * @property-read \App\Models\MerchantProfile|null $merchantProfile
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NotificationPreference> $notificationPreferences
+ * @property-read int|null $notification_preferences_count
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
+ * @property-read int|null $notifications_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Photo> $photos
+ * @property-read int|null $photos_count
+ * @property-read \App\Models\Photo|null $primaryPhoto
+ * @property-read \App\Models\UserProfile|null $profile
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \NotificationChannels\WebPush\PushSubscription> $pushSubscriptions
+ * @property-read int|null $push_subscriptions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Message> $receivedMessages
+ * @property-read int|null $received_messages_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, User> $referrals
+ * @property-read int|null $referrals_count
+ * @property-read User|null $referrer
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Message> $sentMessages
+ * @property-read int|null $sent_messages_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Subscription> $subscriptions
+ * @property-read int|null $subscriptions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TokenTransaction> $tokenTransactions
+ * @property-read int|null $token_transactions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
+ * @property-read int|null $tokens_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Vouch> $vouches
+ * @property-read int|null $vouches_count
+ * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereActorUri($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereAvatarUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereCurrentStreak($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereDecoyPassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereDecoyUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmailVerifiedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereGoldenTicketsRemaining($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereIsDecoy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereIsRemote($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereLastActiveAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereLastDailyBonusAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereMerchantName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereMerchantSecret($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereOnboardingCompletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereReferralCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereReferrerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRole($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereTier($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereTierExpiresAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereTokenBalance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereTwoFactorConfirmedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereTwoFactorRecoveryCodes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereTwoFactorSecret($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUnlimitedSwipes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereWalletAddress($value)
+ * @mixin \Eloquent
+ */
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, HasPushSubscriptions, HasTwoFactorAuthentication, Notifiable, SafelyHydratesAttributes;

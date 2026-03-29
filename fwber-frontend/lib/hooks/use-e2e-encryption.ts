@@ -22,7 +22,7 @@ export function useE2EEncryption() {
         const needsRotation = metadata && (Date.now() - metadata.createdAt > KEY_MAX_AGE_MS);
 
         if (!keyPair || needsRotation) {
-          console.log(needsRotation ? 'E2E keys expired. Rotating...' : 'Generating initial E2E keys...');
+          console.debug(needsRotation ? 'E2E keys expired. Rotating...' : 'Generating initial E2E keys...');
           keyPair = await Crypto.generateKeyPair();
           await Storage.storeKeyPair(user.id, keyPair);
 

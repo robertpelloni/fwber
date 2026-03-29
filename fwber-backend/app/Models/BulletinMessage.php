@@ -7,6 +7,50 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property int $bulletin_board_id
+ * @property int $user_id
+ * @property string $content
+ * @property bool $is_moderated
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property bool $is_anonymous
+ * @property \Illuminate\Support\Carbon|null $expires_at
+ * @property array<array-key, mixed>|null $metadata
+ * @property int $reaction_count
+ * @property int $reply_count
+ * @property int|null $parent_message_id
+ * @property-read \App\Models\BulletinBoard $bulletinBoard
+ * @property-read string|null $author_avatar
+ * @property-read string $author_name
+ * @property-read BulletinMessage|null $parentMessage
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BulletinReaction> $reactions
+ * @property-read int|null $reactions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, BulletinMessage> $replies
+ * @property-read int|null $replies_count
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage notExpired()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage notModerated()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage recent(int $hours = 24)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage whereBulletinBoardId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage whereContent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage whereExpiresAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage whereIsAnonymous($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage whereIsModerated($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage whereMetadata($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage whereParentMessageId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage whereReactionCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage whereReplyCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BulletinMessage whereUserId($value)
+ * @mixin \Eloquent
+ */
 class BulletinMessage extends Model
 {
     use HasFactory;

@@ -7,6 +7,72 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property int $proximity_chatroom_id
+ * @property int $user_id
+ * @property int|null $parent_id
+ * @property string $content
+ * @property string $message_type
+ * @property array<array-key, mixed>|null $metadata
+ * @property bool $is_edited
+ * @property bool $is_deleted
+ * @property bool $is_pinned
+ * @property bool $is_announcement
+ * @property bool $is_networking
+ * @property bool $is_social
+ * @property int $reaction_count
+ * @property int $reply_count
+ * @property \Illuminate\Support\Carbon|null $edited_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read string $display_content
+ * @property-read string $display_user
+ * @property-read string $preview
+ * @property-read array $reaction_summary
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProximityChatroomMessageMention> $mentions
+ * @property-read int|null $mentions_count
+ * @property-read ProximityChatroomMessage|null $parent
+ * @property-read \App\Models\ProximityChatroom $proximityChatroom
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProximityChatroomMessageReaction> $reactions
+ * @property-read int|null $reactions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ProximityChatroomMessage> $replies
+ * @property-read int|null $replies_count
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage announcements()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage byType(string $type)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage networking()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage notDeleted()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage pinned()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage recent(int $limit = 50)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage replies()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage social()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage topLevel()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage whereContent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage whereEditedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage whereIsAnnouncement($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage whereIsDeleted($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage whereIsEdited($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage whereIsNetworking($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage whereIsPinned($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage whereIsSocial($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage whereMessageType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage whereMetadata($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage whereParentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage whereProximityChatroomId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage whereReactionCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage whereReplyCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProximityChatroomMessage whereUserId($value)
+ * @mixin \Eloquent
+ */
 class ProximityChatroomMessage extends Model
 {
     use HasFactory;

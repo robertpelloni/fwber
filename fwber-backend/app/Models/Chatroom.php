@@ -8,6 +8,69 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string|null $description
+ * @property string $type
+ * @property string|null $category
+ * @property string|null $city
+ * @property string|null $neighborhood
+ * @property int $created_by
+ * @property bool $is_public
+ * @property bool $is_active
+ * @property numeric $token_entry_fee
+ * @property int $member_count
+ * @property int $message_count
+ * @property \Illuminate\Support\Carbon|null $last_activity_at
+ * @property \Illuminate\Support\Carbon|null $expires_at
+ * @property array<array-key, mixed>|null $settings
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $activeMembers
+ * @property-read int|null $active_members_count
+ * @property-read \App\Models\User $creator
+ * @property-read string $display_name
+ * @property-read string $url
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $members
+ * @property-read int|null $members_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ChatroomMessage> $messages
+ * @property-read int|null $messages_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $moderators
+ * @property-read int|null $moderators_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ChatroomMessage> $recentMessages
+ * @property-read int|null $recent_messages_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom active()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom byCategory(string $category)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom byCity(string $city)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom city()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom event()
+ * @method static \Database\Factories\ChatroomFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom interest()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom public()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom whereCategory($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom whereCity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom whereExpiresAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom whereIsPublic($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom whereLastActivityAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom whereMemberCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom whereMessageCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom whereNeighborhood($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom whereSettings($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom whereTokenEntryFee($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Chatroom whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class Chatroom extends Model
 {
     use HasFactory;

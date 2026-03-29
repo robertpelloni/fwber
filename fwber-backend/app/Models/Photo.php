@@ -17,6 +17,58 @@ use Illuminate\Support\Facades\Storage;
  *
  * Created: 2025-01-19
  * Multi-AI: Serena analysis + Chroma knowledge + Sequential thinking
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property string $filename
+ * @property string|null $original_filename
+ * @property string|null $file_path
+ * @property string|null $thumbnail_path
+ * @property string|null $mime_type
+ * @property int|null $file_size
+ * @property int|null $width
+ * @property int|null $height
+ * @property bool $is_primary
+ * @property bool $is_private
+ * @property numeric|null $unlock_price
+ * @property int $sort_order
+ * @property array<array-key, mixed>|null $metadata
+ * @property string|null $original_path
+ * @property bool $is_encrypted
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read bool $is_unlocked
+ * @property-read string $thumbnail_url
+ * @property-read string $url
+ * @property-read \App\Models\User $user
+ * @method static \Database\Factories\PhotoFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo primary()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo private()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo public()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereFilePath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereFileSize($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereFilename($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereHeight($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereIsEncrypted($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereIsPrimary($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereIsPrivate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereMetadata($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereMimeType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereOriginalFilename($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereOriginalPath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereSortOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereThumbnailPath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereUnlockPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereWidth($value)
+ * @mixin \Eloquent
  */
 class Photo extends Model
 {

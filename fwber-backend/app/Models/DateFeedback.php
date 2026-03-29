@@ -5,6 +5,33 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property int $match_id
+ * @property int $reporting_user_id
+ * @property int $subject_user_id
+ * @property int $rating 1-5 stars
+ * @property string|null $feedback_text
+ * @property bool $safety_concerns
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\UserMatch $match
+ * @property-read \App\Models\User $reporter
+ * @property-read \App\Models\User $subject
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DateFeedback newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DateFeedback newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DateFeedback query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DateFeedback whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DateFeedback whereFeedbackText($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DateFeedback whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DateFeedback whereMatchId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DateFeedback whereRating($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DateFeedback whereReportingUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DateFeedback whereSafetyConcerns($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DateFeedback whereSubjectUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DateFeedback whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class DateFeedback extends Model
 {
     use HasFactory;
