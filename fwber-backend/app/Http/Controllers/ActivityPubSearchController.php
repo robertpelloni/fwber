@@ -112,10 +112,17 @@ class ActivityPubSearchController extends Controller
                 ]
             );
 
-            // 2. Log the follow intent (In a real system, this would queue an ActivityPub 'Follow' activity)
+            // 2. Log the follow intent
             Log::info("User {$user->id} requested to follow federated actor: {$actorId}");
 
-            // TODO: Sign and dispatch 'Follow' activity to remote inbox
+            // 3. Sign and dispatch 'Follow' activity to remote inbox
+            $activityPubService = app(\App\Services\ActivityPubService::class);
+            $activityPubService->dispatchToRemoteInbox($actorId, [
+                '@context' => 'https://www.w3.org/ns/activitystreams',
+                'type' => 'Follow',
+                'actor' => url("/api/v1/actor/{$user->id}"),
+                'object' => $actorId,
+            ]);
 
             return response()->json([
                 'success' => true,
