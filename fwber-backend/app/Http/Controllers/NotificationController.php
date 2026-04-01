@@ -6,27 +6,85 @@ use App\Http\Requests\SubscribePushRequest;
 use App\Http\Requests\UnsubscribePushRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class NotificationController extends Controller
 {
-    private function transformNotification($notification): array
+    private function normalizeJsonValue(mixed $value): mixed
     {
-        $data = \is_array($notification->data) ? $notification->data : [];
+        if (\is_array($value)) {
+            $normalized = [];
+
+            foreach ($value as $key => $item) {
+                $normalized[$key] = $this->normalizeJsonValue($item);
+            }
+
+            return $normalized;
+        }
+
+        if (\is_string($value) && ! mb_check_encoding($value, 'UTF-8')) {
+            return mb_scrub($value, 'UTF-8');
+        }
+
+        return $value;
+    }
+
+    private function decodeNotificationData(mixed $rawData, string $notificationId): array
+    {
+        if (\is_array($rawData)) {
+            return $this->normalizeJsonValue($rawData);
+        }
+
+        if (! \is_string($rawData) || $rawData === '') {
+            return [];
+        }
+
+        try {
+            $decoded = json_decode($rawData, true, 512, JSON_THROW_ON_ERROR | JSON_INVALID_UTF8_SUBSTITUTE);
+        } catch (\JsonException $exception) {
+            Log::warning('Skipping malformed notification payload', [
+                'notification_id' => $notificationId,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return [];
+        }
+
+        return \is_array($decoded) ? $this->normalizeJsonValue($decoded) : [];
+    }
+
+    private function normalizeTimestamp(mixed $timestamp): ?string
+    {
+        if ($timestamp === null) {
+            return null;
+        }
+
+        if ($timestamp instanceof Carbon) {
+            return $timestamp->toISOString();
+        }
+
+        return Carbon::parse($timestamp)->toISOString();
+    }
+
+    private function transformNotification(object $notification, array $data): array
+    {
         $title = $data['title'] ?? $data['subject'] ?? 'Notification';
         $message = $data['message'] ?? $data['body'] ?? $data['content'] ?? '';
 
         return [
             'id' => $notification->id,
             'type' => $data['type'] ?? class_basename($notification->type),
-            'data' => $data,
-            'title' => $title,
-            'body' => $message,
-            'message' => $message,
+            'data' => $this->normalizeJsonValue($data),
+            'title' => $this->normalizeJsonValue($title),
+            'body' => $this->normalizeJsonValue($message),
+            'message' => $this->normalizeJsonValue($message),
             'read' => $notification->read_at !== null,
-            'read_at' => $notification->read_at,
-            'timestamp' => $notification->created_at?->toISOString(),
-            'created_at' => $notification->created_at,
+            'read_at' => $this->normalizeTimestamp($notification->read_at),
+            'timestamp' => $this->normalizeTimestamp($notification->created_at),
+            'created_at' => $this->normalizeTimestamp($notification->created_at),
         ];
     }
 
@@ -39,16 +97,22 @@ class NotificationController extends Controller
     public function index(Request $request): JsonResponse
     {
         $user = Auth::user();
-        $notifications = $user->notifications()
+        $notifications = DB::table('notifications')
+            ->where('notifiable_type', $user->getMorphClass())
+            ->where('notifiable_id', $user->getKey())
             ->orderBy('created_at', 'desc')
             ->limit(50)
             ->get()
-            ->map(fn ($notification) => $this->transformNotification($notification));
+            ->map(function (object $notification) {
+                $data = $this->decodeNotificationData($notification->data ?? null, (string) $notification->id);
+
+                return $this->transformNotification($notification, $data);
+            });
 
         return response()->json([
             'notifications' => $notifications,
             'unread_count' => $user->unreadNotifications()->count(),
-        ]);
+        ], 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
     }
 
     public function count(): JsonResponse

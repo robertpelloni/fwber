@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.13`
+- **Current version:** `1.0.14`
 - **Release date:** `2026-04-01`
-- **Release name:** `Notifications Route Repair`
+- **Release name:** `Notifications Payload Hardening`
 
 ## Summary
 
-This release repairs the backend `/notifications` route conflict that could return the wrong controller after login, and trims remaining low-value login-page prefetch and websocket noise.
+This release hardens the backend `/notifications` endpoint so malformed stored notification payloads no longer crash authenticated notification fetches, preserving the feed even when individual rows are bad.
 
 ## Version Sources of Truth
 

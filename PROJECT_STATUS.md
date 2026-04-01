@@ -1,7 +1,7 @@
-# Project Status — fwber v1.0.13 (Notifications Route Repair)
+# Project Status — fwber v1.0.14 (Notifications Payload Hardening)
 
 **Date:** 2026-04-01  
-**Version:** 1.0.13 "Notifications Route Repair"  
+**Version:** 1.0.14 "Notifications Payload Hardening"  
 **Status:** 🚀 **PATCHED AND READY TO REDEPLOY**
 
 ---
@@ -12,6 +12,6 @@
 - **Protected Widgets**: Achievements and related widgets now wait for authenticated state before issuing requests.
 
 ## ✅ Release Focus
-- [x] Repaired the backend `/notifications` route conflict causing post-login notification fetch failures.
-- [x] Disabled login-page prefetch noise and quieted known low-value websocket connection errors.
-- [ ] Awaiting rebuild and production redeploy verification.
+- [x] Hardened the backend `/notifications` endpoint against malformed stored notification payloads.
+- [x] Added a regression test to keep bad notification rows from crashing authenticated fetches again.
+- [ ] Awaiting backend deployment and live verification.

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.14] - 2026-04-01 — Notifications Payload Hardening
+
+### Fixed
+- Hardened the backend notifications feed to decode stored payloads defensively and survive malformed notification rows instead of returning HTTP 500 for the whole endpoint.
+- Normalized notification response data to JSON-safe UTF-8 strings before returning it to authenticated clients.
+- Added a regression test covering malformed stored notification payloads.
+
 ## [1.0.13] - 2026-04-01 — Notifications Route Repair
 
 ### Fixed
