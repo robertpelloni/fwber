@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.9] - 2026-04-01 — Asset Recovery & Protected Prefetch Hardening
+
+### Fixed
+- Disabled app-shell prefetch for authenticated header and sidebar routes beyond the original small subset, covering the remaining noisy navigation targets such as messages, groups, events, conference pulse, and proximity chatrooms.
+- Stopped dashboard achievements from logging expected unauthenticated errors after auth expiry or stale session state.
+- Allowed stale asset recovery to retry after a short cooldown instead of blocking all further recovery attempts for the same version.
+
 ## [1.0.7] - 2026-04-01 — Dashboard Auth Query Cleanup
 
 ### Fixed

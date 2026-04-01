@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.8`
+- **Current version:** `1.0.9`
 - **Release date:** `2026-04-01`
-- **Release name:** `Protected Route Navigation Noise Reduction`
+- **Release name:** `Asset Recovery & Protected Prefetch Hardening`
 
 ## Summary
 
-This release disables prefetch on the remaining noisy protected-route navigation links and quiets expected SafeWalk auth-expiry polling errors so production navigation logs stay clean without changing authenticated behavior.
+This release broadens protected-route prefetch suppression in the authenticated app shell, quiets expected achievements auth-expiry noise, and allows stale-asset recovery to retry after a cooldown so clients stuck on missing chunks can recover more reliably.
 
 ## Version Sources of Truth
 

@@ -51,11 +51,7 @@ interface NavItem {
 }
 
 function shouldDisablePrefetch(href: string) {
-    return href === '/recommendations'
-        || href === '/matches'
-        || href === '/settings'
-        || href === '/settings/account'
-        || href === '/settings/subscription'
+    return href !== '/dashboard' && href !== '/help'
 }
 
 const navLinks: NavItem[] = [

@@ -1,7 +1,7 @@
-# Project Status — fwber v1.0.8 (Protected Route Navigation Noise Reduction)
+# Project Status — fwber v1.0.9 (Asset Recovery & Protected Prefetch Hardening)
 
 **Date:** 2026-04-01  
-**Version:** 1.0.8 "Protected Route Navigation Noise Reduction"  
+**Version:** 1.0.9 "Asset Recovery & Protected Prefetch Hardening"  
 **Status:** 🚀 **PATCHED AND READY TO REDEPLOY**
 
 ---
@@ -12,6 +12,6 @@
 - **Protected Widgets**: Achievements and related widgets now wait for authenticated state before issuing requests.
 
 ## ✅ Release Focus
-- [x] Disabled prefetch on the remaining protected dashboard/settings routes that were generating noisy RSC fallback logs.
-- [x] Quieted expected SafeWalk auth-expiry polling noise without changing authenticated behavior.
+- [x] Disabled app-shell prefetch for the wider set of authenticated navigation targets still showing RSC fallback noise.
+- [x] Quieted achievements auth-expiry noise and made stale-asset recovery retryable after cooldown.
 - [ ] Awaiting rebuild and production redeploy verification.

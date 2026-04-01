@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Award, Lock, CheckCircle2, Trophy, Flame, Heart, Eye, MessageCircle, Users, Zap, UserCheck } from 'lucide-react'
-import { apiClient } from '@/lib/api/client'
+import { ApiError, apiClient } from '@/lib/api/client'
 import { useAuth } from '@/lib/auth-context'
 
 interface Achievement {
@@ -50,6 +50,11 @@ export function AchievementsList() {
         setIsLoading(false)
       })
       .catch(err => {
+        if (err instanceof ApiError && err.isAuthError) {
+          setAchievements([])
+          setIsLoading(false)
+          return
+        }
         console.error('Failed to fetch achievements', err)
         setIsLoading(false)
       })

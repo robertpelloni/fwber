@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 
 const VERSION_KEY = 'fwber_frontend_version'
 const RECOVERY_FLAG = 'fwber_asset_recovery_attempted'
+const RECOVERY_TTL_MS = 5 * 60 * 1000
 
 async function clearClientCaches(): Promise<void> {
   if (typeof window === 'undefined') {
@@ -40,6 +41,27 @@ export default function AssetRecovery() {
     const currentVersion = process.env.NEXT_PUBLIC_FRONTEND_VERSION || process.env.NEXT_PUBLIC_PROJECT_VERSION || 'unknown'
     const previousVersion = localStorage.getItem(VERSION_KEY)
 
+    const getLastRecoveryAttempt = () => {
+      const rawValue = localStorage.getItem(RECOVERY_FLAG)
+
+      if (!rawValue) {
+        return null
+      }
+
+      const [version, timestamp] = rawValue.split(':')
+      const parsedTimestamp = Number(timestamp)
+
+      if (!version || Number.isNaN(parsedTimestamp)) {
+        localStorage.removeItem(RECOVERY_FLAG)
+        return null
+      }
+
+      return {
+        version,
+        timestamp: parsedTimestamp,
+      }
+    }
+
     if (previousVersion && previousVersion !== currentVersion) {
       void clearClientCaches().finally(() => {
         localStorage.removeItem(RECOVERY_FLAG)
@@ -52,11 +74,15 @@ export default function AssetRecovery() {
     localStorage.setItem(VERSION_KEY, currentVersion)
 
     const recoverFromAssetError = (message: string) => {
-      if (!shouldRecoverAssetError(message) || localStorage.getItem(RECOVERY_FLAG) === currentVersion) {
+      const lastRecoveryAttempt = getLastRecoveryAttempt()
+      const recoveredRecently = lastRecoveryAttempt?.version === currentVersion
+        && Date.now() - lastRecoveryAttempt.timestamp < RECOVERY_TTL_MS
+
+      if (!shouldRecoverAssetError(message) || recoveredRecently) {
         return
       }
 
-      localStorage.setItem(RECOVERY_FLAG, currentVersion)
+      localStorage.setItem(RECOVERY_FLAG, `${currentVersion}:${Date.now()}`)
 
       void clearClientCaches().finally(() => {
         window.location.reload()
