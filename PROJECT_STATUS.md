@@ -1,7 +1,7 @@
-# Project Status — fwber v1.0.15 (Notifications Legacy Schema Compatibility)
+# Project Status — fwber v1.0.16 (Auth Restore And Legacy Notifications Stability)
 
 **Date:** 2026-04-01  
-**Version:** 1.0.15 "Notifications Legacy Schema Compatibility"  
+**Version:** 1.0.16 "Auth Restore And Legacy Notifications Stability"  
 **Status:** 🚀 **PATCHED AND READY TO REDEPLOY**
 
 ---
@@ -12,6 +12,7 @@
 - **Protected Widgets**: Achievements and related widgets now wait for authenticated state before issuing requests.
 
 ## ✅ Release Focus
-- [x] Added compatibility for DreamHost's legacy `notifications` table schema used in live production.
-- [x] Kept malformed-payload hardening and expanded regression coverage for both schema paths.
-- [ ] Awaiting backend redeploy and live verification.
+- [x] Prevented transient frontend auth-restore failures from clearing valid sessions during boot.
+- [x] Deferred protected photo/notification requests until auth initialization completes.
+- [x] Completed legacy DreamHost notifications support for count and read mutations.
+- [ ] Awaiting live rollout verification for the combined auth and notifications hotfix.

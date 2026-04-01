@@ -85,4 +85,38 @@ class NotificationControllerTest extends TestCase
             ->assertJsonPath('notifications.0.body', 'Legacy Body')
             ->assertJsonPath('notifications.0.type', 'system');
     }
+
+    public function test_legacy_notifications_can_be_marked_as_read(): void
+    {
+        $user = User::factory()->create();
+
+        Schema::drop('notifications');
+        Schema::create('notifications', function (Blueprint $table): void {
+            $table->uuid('id')->primary();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('title');
+            $table->text('body')->nullable();
+            $table->timestamp('read_at')->nullable();
+            $table->timestamps();
+        });
+
+        $notificationId = (string) Str::uuid();
+
+        DB::table('notifications')->insert([
+            'id' => $notificationId,
+            'user_id' => $user->getKey(),
+            'title' => 'Legacy Title',
+            'body' => 'Legacy Body',
+            'read_at' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->actingAs($user)
+            ->postJson("/api/notifications/{$notificationId}/read")
+            ->assertOk()
+            ->assertJsonPath('success', true);
+
+        $this->assertNotNull(DB::table('notifications')->where('id', $notificationId)->value('read_at'));
+    }
 }

@@ -29,7 +29,7 @@ interface NotificationBellProps {
 }
 
 export function NotificationBell({ className = '' }: NotificationBellProps) {
-  const { token } = useAuth();
+  const { token, isAuthenticated, isLoading: authLoading } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -37,7 +37,7 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
 
   // Fetch notifications
   const fetchNotifications = useCallback(async () => {
-    if (!token) return;
+    if (authLoading || !isAuthenticated || !token) return;
 
     setIsLoading(true);
     try {
@@ -49,7 +49,7 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [token]);
+  }, [authLoading, isAuthenticated, token]);
 
   // Mark notification as read
   const markAsRead = async (notificationId: string) => {
@@ -81,10 +81,14 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
 
   // Fetch on mount and periodically
   useEffect(() => {
+    if (authLoading || !isAuthenticated || !token) {
+      return;
+    }
+
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 30000); // Refresh every 30s
     return () => clearInterval(interval);
-  }, [fetchNotifications]);
+  }, [authLoading, fetchNotifications, isAuthenticated, token]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -292,11 +296,11 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
  * Compact notification indicator for mobile/small spaces
  */
 export function NotificationDot({ className = '' }: { className?: string }) {
-  const { token } = useAuth();
+  const { token, isAuthenticated, isLoading: authLoading } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    if (!token) return;
+    if (authLoading || !isAuthenticated || !token) return;
 
     const fetchCount = async () => {
       try {
@@ -310,7 +314,7 @@ export function NotificationDot({ className = '' }: { className?: string }) {
     fetchCount();
     const interval = setInterval(fetchCount, 30000);
     return () => clearInterval(interval);
-  }, [token]);
+  }, [authLoading, isAuthenticated, token]);
 
   if (unreadCount === 0) return null;
 

@@ -70,6 +70,10 @@ interface AuthContextType extends AuthState {
 
 const BROWSER_API_BASE_URL = '/api'
 
+function isTransientAuthResponse(status: number): boolean {
+  return status >= 500 || status === 429
+}
+
 function clearStoredAuth(): void {
   if (typeof window === 'undefined') {
     return
@@ -234,7 +238,59 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         try {
-          JSON.parse(userStr)
+          const storedUser = JSON.parse(userStr) as User
+          setApiClientAuthToken(token)
+
+          const response = await fetch(`${BROWSER_API_BASE_URL}/auth/me`, {
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          })
+
+          if (!response.ok) {
+            if (isTransientAuthResponse(response.status)) {
+              if (!cancelled) {
+                dispatch({
+                  type: 'AUTH_SUCCESS',
+                  payload: { user: storedUser, token },
+                })
+
+                try {
+                  setUserContext(storedUser)
+                } catch (error) {
+                  console.error('Logging/Sentry error:', error)
+                }
+              }
+              return
+            }
+
+            clearStoredAuth()
+            clearUserContext()
+
+            if (!cancelled) {
+              dispatch({ type: 'INITIALIZE_END' })
+            }
+            return
+          }
+
+          const verifiedUser = await response.json()
+
+          if (!cancelled) {
+            setApiClientAuthToken(token)
+            dispatch({
+              type: 'AUTH_SUCCESS',
+              payload: { user: verifiedUser, token },
+            })
+
+            try {
+              setUserContext(verifiedUser)
+              logAuth.sessionRestored(verifiedUser.id)
+            } catch (error) {
+              console.error('Logging/Sentry error:', error)
+            }
+          }
         } catch (error) {
           console.error('AuthContext Restore Error:', error)
           clearStoredAuth()
@@ -243,43 +299,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
           return
         }
-
-        const response = await fetch(`${BROWSER_API_BASE_URL}/auth/me`, {
-          method: 'GET',
-          headers: {
-            Accept: 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        })
-
-        if (!response.ok) {
-          clearStoredAuth()
-          clearUserContext()
-
-          if (!cancelled) {
-            dispatch({ type: 'INITIALIZE_END' })
-          }
-          return
-        }
-
-        const verifiedUser = await response.json()
-
-        if (!cancelled) {
-          setApiClientAuthToken(token)
-          dispatch({
-            type: 'AUTH_SUCCESS',
-            payload: { user: verifiedUser, token },
-          })
-
-          try {
-            setUserContext(verifiedUser)
-            logAuth.sessionRestored(verifiedUser.id)
-          } catch (error) {
-            console.error('Logging/Sentry error:', error)
-          }
-        }
       } catch (err) {
         console.error('AuthContext: Critical Init Error', err)
+
+        const cachedUser = localStorage.getItem('fwber_user')
+        const cachedToken = localStorage.getItem('fwber_token')
+
+        if (cachedUser && cachedToken) {
+          try {
+            const parsedUser = JSON.parse(cachedUser) as User
+            setApiClientAuthToken(cachedToken)
+
+            if (!cancelled) {
+              dispatch({
+                type: 'AUTH_SUCCESS',
+                payload: { user: parsedUser, token: cachedToken },
+              })
+            }
+
+            try {
+              setUserContext(parsedUser)
+            } catch (error) {
+              console.error('Logging/Sentry error:', error)
+            }
+
+            return
+          } catch (restoreError) {
+            console.error('AuthContext Cache Restore Error:', restoreError)
+          }
+        }
+
         clearStoredAuth()
         clearUserContext()
 

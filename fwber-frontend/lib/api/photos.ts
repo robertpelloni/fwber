@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useAuth } from '@/lib/auth-context'
 
 // Define local interface to avoid circular dependency with faceBlur types
 interface FileWithFaceBlurMetadata extends File {
@@ -328,11 +329,18 @@ export const photoAPI = new PhotoAPI()
 
 // React hook for photo management
 export function usePhotos() {
+  const { token, isAuthenticated, isLoading: authLoading } = useAuth()
   const [photos, setPhotos] = useState<Photo[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const fetchPhotos = async () => {
+    const storedToken = typeof window !== 'undefined' ? localStorage.getItem('fwber_token') : null
+    if (!token && !storedToken) {
+      setPhotos([])
+      return
+    }
+
     setLoading(true)
     setError(null)
     
@@ -454,8 +462,18 @@ export function usePhotos() {
   }
 
   useEffect(() => {
-    fetchPhotos()
-  }, [])
+    const storedToken = typeof window !== 'undefined' ? localStorage.getItem('fwber_token') : null
+
+    if (authLoading) {
+      return
+    }
+
+    if (!isAuthenticated && !storedToken) {
+      return
+    }
+
+    void fetchPhotos()
+  }, [authLoading, isAuthenticated, token])
 
   return {
     photos,

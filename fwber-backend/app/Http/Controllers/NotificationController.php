@@ -106,6 +106,11 @@ class NotificationController extends Controller
         ];
     }
 
+    private function legacyNotificationsQuery(object $user)
+    {
+        return DB::table('notifications')->where('user_id', $user->getKey());
+    }
+
     /**
      * List all notifications for the authenticated user.
      *
@@ -140,8 +145,7 @@ class NotificationController extends Controller
         return response()->json([
             'notifications' => $notifications,
             'unread_count' => $this->usesLegacyNotificationsSchema()
-                ? DB::table('notifications')
-                    ->where('user_id', $user->getKey())
+                ? $this->legacyNotificationsQuery($user)
                     ->whereNull('read_at')
                     ->count()
                 : $user->unreadNotifications()->count(),
@@ -154,8 +158,7 @@ class NotificationController extends Controller
 
         return response()->json([
             'unread_count' => $this->usesLegacyNotificationsSchema()
-                ? DB::table('notifications')
-                    ->where('user_id', $user->getKey())
+                ? $this->legacyNotificationsQuery($user)
                     ->whereNull('read_at')
                     ->count()
                 : $user->unreadNotifications()->count(),
@@ -171,6 +174,27 @@ class NotificationController extends Controller
     public function markAsRead(string $id): JsonResponse
     {
         $user = Auth::user();
+
+        if ($this->usesLegacyNotificationsSchema()) {
+            $updated = $this->legacyNotificationsQuery($user)
+                ->where('id', $id)
+                ->whereNull('read_at')
+                ->update(['read_at' => now(), 'updated_at' => now()]);
+
+            if ($updated === 0) {
+                $exists = $this->legacyNotificationsQuery($user)->where('id', $id)->exists();
+
+                if (! $exists) {
+                    return response()->json(['message' => 'Notification not found'], 404);
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Notification marked as read',
+            ]);
+        }
+
         $notification = $user->notifications()->where('id', $id)->first();
 
         if (! $notification) {
@@ -194,6 +218,18 @@ class NotificationController extends Controller
     public function markAllAsRead(): JsonResponse
     {
         $user = Auth::user();
+
+        if ($this->usesLegacyNotificationsSchema()) {
+            $this->legacyNotificationsQuery($user)
+                ->whereNull('read_at')
+                ->update(['read_at' => now(), 'updated_at' => now()]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'All notifications marked as read',
+            ]);
+        }
+
         $user->unreadNotifications->markAsRead();
 
         return response()->json([

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.16] - 2026-04-01 — Auth Restore And Legacy Notifications Stability
+
+### Fixed
+- Prevented transient `/auth/me` failures and early protected requests from wiping valid frontend auth state during session restore.
+- Delayed photo and notification fetches until auth initialization completes so boot-time `401` responses do not trigger logout loops.
+- Completed legacy DreamHost notifications support for unread counts and mark-as-read flows, with regression coverage.
+
 ## [1.0.15] - 2026-04-01 — Notifications Legacy Schema Compatibility
 
 ### Fixed

@@ -209,6 +209,7 @@ async function request<T>(
     ...defaultHeaders,
     ...(headers as Record<string, string>),
   };
+  const hadAuthHeader = Boolean(finalHeaders.Authorization);
 
   let lastError: Error | null = null;
   const maxAttempts = retry + 1;
@@ -251,7 +252,7 @@ async function request<T>(
         // Don't retry client errors (except 429 rate limit) or auth errors
         if ((apiError.isClientError && !apiError.isRateLimitError) || apiError.isAuthError) {
           // If auth error in browser, clear storage and redirect
-          if (apiError.isAuthError && typeof window !== 'undefined') {
+          if (apiError.isAuthError && typeof window !== 'undefined' && hadAuthHeader) {
             setApiClientAuthToken(null);
             localStorage.removeItem('fwber_token');
             localStorage.removeItem('fwber_user');
