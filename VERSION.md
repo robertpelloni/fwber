@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.27`
+- **Current version:** `1.0.28`
 - **Release date:** `2026-04-01`
-- **Release name:** `Recommendation And Matching Resilience`
+- **Release name:** `Production Auth Probe Repair`
 
 ## Summary
 
-This release hardens production recommendation and matching APIs so optional AI, vector, and location recommendation failures degrade safely instead of taking down authenticated endpoints.
+This release repairs the built-in `/test-auth` production probe so it uses the live frontend API proxy instead of dead localhost-only backend URLs.
 
 ## Version Sources of Truth
 

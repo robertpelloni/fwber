@@ -8,6 +8,12 @@ All notable changes to this project will be documented in this file.
 - Corrected recommendation engagement scoring to query `events.starts_at`, matching the live schema and preventing production `/api/recommendations/feed` failures caused by the nonexistent `start_time` column.
 - Added regression coverage proving recommendation engagement scoring counts recent attended events through the `starts_at` event timestamp.
 - Fixed the subscription settings page and swipe matches page to consume the shared frontend API client's unwrapped responses correctly instead of reading nonexistent nested `data` payloads.
+## [1.0.28] - 2026-04-01 — Production Auth Probe Repair
+
+### Fixed
+- Updated the `/test-auth` frontend page to use the live browser-safe `/api` proxy instead of hardcoded `http://localhost:8000/api` URLs.
+- Restored the production auth probe so release verification can exercise real login and protected profile access from the deployed frontend.
+
 ## [1.0.27] - 2026-04-01 — Recommendation And Matching Resilience
 
 ### Fixed

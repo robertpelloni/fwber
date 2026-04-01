@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 
+const API_BASE_URL = '/api'
+
 export default function TestAuthPage() {
   const [email, setEmail] = useState('test2@fwber.me')
   const [password, setPassword] = useState('password123')
@@ -13,7 +15,7 @@ export default function TestAuthPage() {
     setResult('Testing login...')
     
     try {
-      const response = await fetch('http://localhost:8000/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -24,11 +26,11 @@ export default function TestAuthPage() {
 
       const data = await response.json()
       
-      if (response.ok) {
-        setResult(`✅ Login successful! Token: ${data.token?.substring(0, 20)}...`)
-        
-        // Test protected endpoint
-        const userResponse = await fetch('http://localhost:8000/api/user', {
+        if (response.ok) {
+          setResult(`✅ Login successful! Token: ${data.token?.substring(0, 20)}...`)
+          
+          // Test protected endpoint
+        const userResponse = await fetch(`${API_BASE_URL}/user`, {
           headers: {
             'Authorization': `Bearer ${data.token}`,
             'Accept': 'application/json',
