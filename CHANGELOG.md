@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.12] - 2026-04-01 — Auth Token Source Hardening
+
+### Fixed
+- Added an in-memory auth token source in the shared API client so freshly authenticated sessions can make protected requests immediately, even before browser storage effects settle.
+- Cleared the shared API client token alongside browser auth storage on logout and auth-expiry handling to keep token state consistent.
+
 ## [1.0.11] - 2026-04-01 — Auth Persistence Race Fix
 
 ### Fixed

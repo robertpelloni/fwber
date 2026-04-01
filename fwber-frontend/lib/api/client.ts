@@ -25,6 +25,11 @@ const getBaseUrl = () => {
 };
 
 const BASE_URL = getBaseUrl();
+let currentAuthToken: string | null = null;
+
+export function setApiClientAuthToken(token: string | null): void {
+  currentAuthToken = token;
+}
 
 export interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>;
@@ -143,7 +148,7 @@ export class NetworkError extends Error {
  * Get authorization headers from localStorage
  */
 function getAuthHeaders(): Record<string, string> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('fwber_token') : null;
+  const token = currentAuthToken ?? (typeof window !== 'undefined' ? localStorage.getItem('fwber_token') : null);
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
@@ -247,6 +252,7 @@ async function request<T>(
         if ((apiError.isClientError && !apiError.isRateLimitError) || apiError.isAuthError) {
           // If auth error in browser, clear storage and redirect
           if (apiError.isAuthError && typeof window !== 'undefined') {
+            setApiClientAuthToken(null);
             localStorage.removeItem('fwber_token');
             localStorage.removeItem('fwber_user');
             // Check if we are already on login page to avoid redirect loops

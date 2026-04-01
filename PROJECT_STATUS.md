@@ -1,7 +1,7 @@
-# Project Status — fwber v1.0.11 (Auth Persistence Race Fix)
+# Project Status — fwber v1.0.12 (Auth Token Source Hardening)
 
 **Date:** 2026-04-01  
-**Version:** 1.0.11 "Auth Persistence Race Fix"  
+**Version:** 1.0.12 "Auth Token Source Hardening"  
 **Status:** 🚀 **PATCHED AND READY TO REDEPLOY**
 
 ---
@@ -12,6 +12,6 @@
 - **Protected Widgets**: Achievements and related widgets now wait for authenticated state before issuing requests.
 
 ## ✅ Release Focus
-- [x] Persisted auth tokens immediately when login/register/two-factor flows succeed.
-- [x] Removed the race where post-login API calls could see no token yet and force an immediate logout.
+- [x] Added an in-memory auth token source for the shared API client immediately after successful auth flows.
+- [x] Kept API-client token state aligned with storage clearing on logout and auth expiry.
 - [ ] Awaiting rebuild and production redeploy verification.

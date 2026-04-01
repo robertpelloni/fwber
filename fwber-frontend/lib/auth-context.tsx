@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useReducer, useEffect, ReactNode, useMemo, useCallback } from 'react'
 import { logAuth, setUserContext, clearUserContext } from './logger'
+import { setApiClientAuthToken } from './api/client'
 
 // Types
 interface User {
@@ -74,6 +75,7 @@ function clearStoredAuth(): void {
     return
   }
 
+  setApiClientAuthToken(null)
   localStorage.removeItem('fwber_token')
   localStorage.removeItem('fwber_user')
 }
@@ -83,6 +85,7 @@ function persistStoredAuth(user: User, token: string): void {
     return
   }
 
+  setApiClientAuthToken(token)
   localStorage.setItem('fwber_token', token)
   localStorage.setItem('fwber_user', JSON.stringify(user))
 }
@@ -223,6 +226,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         if (!token || !userStr) {
+          setApiClientAuthToken(null)
           if (!cancelled) {
             dispatch({ type: 'INITIALIZE_END' })
           }
@@ -261,6 +265,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const verifiedUser = await response.json()
 
         if (!cancelled) {
+          setApiClientAuthToken(token)
           dispatch({
             type: 'AUTH_SUCCESS',
             payload: { user: verifiedUser, token },

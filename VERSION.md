@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.11`
+- **Current version:** `1.0.12`
 - **Release date:** `2026-04-01`
-- **Release name:** `Auth Persistence Race Fix`
+- **Release name:** `Auth Token Source Hardening`
 
 ## Summary
 
-This release fixes a frontend auth persistence race where freshly authenticated sessions could be cleared by immediate post-login API requests before the token had been persisted for the shared API client to use.
+This release hardens the shared API client to use an in-memory auth token immediately after login, removing the dependency on `localStorage` timing for post-login authenticated requests.
 
 ## Version Sources of Truth
 
