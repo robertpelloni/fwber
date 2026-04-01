@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class NotificationController extends Controller
 {
@@ -88,6 +89,23 @@ class NotificationController extends Controller
         ];
     }
 
+    private function usesLegacyNotificationsSchema(): bool
+    {
+        return Schema::hasColumn('notifications', 'user_id')
+            && ! Schema::hasColumn('notifications', 'notifiable_type')
+            && ! Schema::hasColumn('notifications', 'notifiable_id');
+    }
+
+    private function legacyNotificationData(object $notification): array
+    {
+        return [
+            'title' => $notification->title ?? 'Notification',
+            'body' => $notification->body ?? '',
+            'message' => $notification->body ?? '',
+            'type' => 'system',
+        ];
+    }
+
     /**
      * List all notifications for the authenticated user.
      *
@@ -97,21 +115,36 @@ class NotificationController extends Controller
     public function index(Request $request): JsonResponse
     {
         $user = Auth::user();
-        $notifications = DB::table('notifications')
-            ->where('notifiable_type', $user->getMorphClass())
-            ->where('notifiable_id', $user->getKey())
-            ->orderBy('created_at', 'desc')
-            ->limit(50)
-            ->get()
-            ->map(function (object $notification) {
-                $data = $this->decodeNotificationData($notification->data ?? null, (string) $notification->id);
+        $notificationsQuery = DB::table('notifications')->orderBy('created_at', 'desc')->limit(50);
 
-                return $this->transformNotification($notification, $data);
-            });
+        if ($this->usesLegacyNotificationsSchema()) {
+            $notifications = $notificationsQuery
+                ->where('user_id', $user->getKey())
+                ->get()
+                ->map(fn (object $notification) => $this->transformNotification(
+                    $notification,
+                    $this->legacyNotificationData($notification)
+                ));
+        } else {
+            $notifications = $notificationsQuery
+                ->where('notifiable_type', $user->getMorphClass())
+                ->where('notifiable_id', $user->getKey())
+                ->get()
+                ->map(function (object $notification) {
+                    $data = $this->decodeNotificationData($notification->data ?? null, (string) $notification->id);
+
+                    return $this->transformNotification($notification, $data);
+                });
+        }
 
         return response()->json([
             'notifications' => $notifications,
-            'unread_count' => $user->unreadNotifications()->count(),
+            'unread_count' => $this->usesLegacyNotificationsSchema()
+                ? DB::table('notifications')
+                    ->where('user_id', $user->getKey())
+                    ->whereNull('read_at')
+                    ->count()
+                : $user->unreadNotifications()->count(),
         ], 200, [], JSON_INVALID_UTF8_SUBSTITUTE);
     }
 
@@ -120,7 +153,12 @@ class NotificationController extends Controller
         $user = Auth::user();
 
         return response()->json([
-            'unread_count' => $user->unreadNotifications()->count(),
+            'unread_count' => $this->usesLegacyNotificationsSchema()
+                ? DB::table('notifications')
+                    ->where('user_id', $user->getKey())
+                    ->whereNull('read_at')
+                    ->count()
+                : $user->unreadNotifications()->count(),
         ]);
     }
 

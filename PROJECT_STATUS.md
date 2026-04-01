@@ -1,7 +1,7 @@
-# Project Status — fwber v1.0.14 (Notifications Payload Hardening)
+# Project Status — fwber v1.0.15 (Notifications Legacy Schema Compatibility)
 
 **Date:** 2026-04-01  
-**Version:** 1.0.14 "Notifications Payload Hardening"  
+**Version:** 1.0.15 "Notifications Legacy Schema Compatibility"  
 **Status:** 🚀 **PATCHED AND READY TO REDEPLOY**
 
 ---
@@ -12,6 +12,6 @@
 - **Protected Widgets**: Achievements and related widgets now wait for authenticated state before issuing requests.
 
 ## ✅ Release Focus
-- [x] Hardened the backend `/notifications` endpoint against malformed stored notification payloads.
-- [x] Added a regression test to keep bad notification rows from crashing authenticated fetches again.
-- [ ] Awaiting backend deployment and live verification.
+- [x] Added compatibility for DreamHost's legacy `notifications` table schema used in live production.
+- [x] Kept malformed-payload hardening and expanded regression coverage for both schema paths.
+- [ ] Awaiting backend redeploy and live verification.

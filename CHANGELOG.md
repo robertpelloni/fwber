@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.15] - 2026-04-01 — Notifications Legacy Schema Compatibility
+
+### Fixed
+- Made the backend notifications endpoint support both legacy `notifications(user_id,title,body,...)` tables and newer Laravel-style notification tables.
+- Preserved malformed-payload hardening while avoiding production SQL errors on older DreamHost schema versions.
+- Added regression coverage for the legacy notifications schema path.
+
 ## [1.0.14] - 2026-04-01 — Notifications Payload Hardening
 
 ### Fixed
