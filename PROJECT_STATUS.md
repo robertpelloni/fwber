@@ -1,7 +1,7 @@
-# Project Status — fwber v1.0.7 (Dashboard Auth Query Cleanup)
+# Project Status — fwber v1.0.8 (Protected Route Navigation Noise Reduction)
 
 **Date:** 2026-04-01  
-**Version:** 1.0.7 "Dashboard Auth Query Cleanup"  
+**Version:** 1.0.8 "Protected Route Navigation Noise Reduction"  
 **Status:** 🚀 **PATCHED AND READY TO REDEPLOY**
 
 ---
@@ -12,7 +12,6 @@
 - **Protected Widgets**: Achievements and related widgets now wait for authenticated state before issuing requests.
 
 ## ✅ Release Focus
-- [x] Removed remaining direct dashboard browser calls to `api.fwber.me`.
-- [x] Reduced auth-init request noise from protected widgets.
-- [x] Rebuilt successfully after the cleanup.
-- [ ] Awaiting production redeploy verification.
+- [x] Disabled prefetch on the remaining protected dashboard/settings routes that were generating noisy RSC fallback logs.
+- [x] Quieted expected SafeWalk auth-expiry polling noise without changing authenticated behavior.
+- [ ] Awaiting rebuild and production redeploy verification.

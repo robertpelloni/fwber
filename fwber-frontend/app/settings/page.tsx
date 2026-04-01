@@ -61,6 +61,7 @@ function SettingsLink({ href, icon, title, description, badge, disabled }: Setti
   return (
     <Link
       href={href}
+      prefetch={false}
       className="flex items-center gap-4 p-4 bg-white rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-sm transition-all group"
     >
       <div className="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 group-hover:bg-purple-200 transition-colors">

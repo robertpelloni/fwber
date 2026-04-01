@@ -9,6 +9,12 @@ All notable changes to this project will be documented in this file.
 - Gated achievements and related protected dashboard widgets so they do not fire unauthenticated requests during auth initialization.
 - Reduced stray direct browser requests to `api.fwber.me` that were still producing unauthenticated and network-noise logs after the earlier production fixes.
 
+## [1.0.8] - 2026-04-01 — Protected Route Navigation Noise Reduction
+
+### Fixed
+- Disabled client prefetch on the remaining protected dashboard and settings navigation links that were surfacing noisy RSC payload fallback logs during background prefetch.
+- Stopped `SafeWalkTracker` from logging expected auth errors after session expiry or logout by treating authenticated API failures as a quiet reset instead of a console error.
+
 ## [1.0.6] - 2026-04-01 — Payments, Notifications & Realtime Hardening
 
 ### Fixed

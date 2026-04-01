@@ -7,6 +7,7 @@ import { ShieldAlert, MapPin, XCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ApiError } from '@/lib/api/client';
 
 export default function SafeWalkTracker() {
     const { user } = useAuth();
@@ -24,6 +25,10 @@ export default function SafeWalkTracker() {
                 const { walk } = await getActiveWalk();
                 setActiveWalk(walk);
             } catch (e) {
+                if (e instanceof ApiError && e.isAuthError) {
+                    setActiveWalk(null);
+                    return;
+                }
                 console.error('Failed to fetch active walk status', e);
             }
         };

@@ -439,7 +439,7 @@ function StatCard({ icon, label, value, subtext, color, link }: StatCardProps) {
   };
 
   return (
-    <Link href={link} className="block group">
+    <Link href={link} prefetch={false} className="block group">
       <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all hover:border-purple-300">
         <div className={`w-12 h-12 rounded-lg ${colorClasses[color]} flex items-center justify-center mb-4`}>
           {icon}
@@ -463,6 +463,7 @@ function ActionButton({ href, label, icon, color }: { href: string; label: strin
   return (
     <Link
       href={href}
+      prefetch={false}
       className={`flex items-center gap-3 p-4 border-2 border-gray-200 rounded-lg transition-all ${colorClasses[color as keyof typeof colorClasses]}`}
     >
       <span className="text-2xl">{icon}</span>

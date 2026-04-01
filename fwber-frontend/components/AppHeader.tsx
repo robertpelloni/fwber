@@ -50,6 +50,14 @@ interface NavItem {
     icon: LucideIcon
 }
 
+function shouldDisablePrefetch(href: string) {
+    return href === '/recommendations'
+        || href === '/matches'
+        || href === '/settings'
+        || href === '/settings/account'
+        || href === '/settings/subscription'
+}
+
 const navLinks: NavItem[] = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
     { href: '/recommendations', label: 'For You', icon: Sparkles },
@@ -165,6 +173,7 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                                     <Link
                                         key={link.href}
                                         href={link.href}
+                                        prefetch={!shouldDisablePrefetch(link.href)}
                                         className={getUtilityLinkClasses(active)}
                                     >
                                         <link.icon className="h-4 w-4" />
@@ -218,6 +227,7 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                                     <Link
                                         key={link.href}
                                         href={link.href}
+                                        prefetch={!shouldDisablePrefetch(link.href)}
                                         onClick={() => setMobileMenuOpen(false)}
                                         className={getNavLinkClasses(active)}
                                     >
@@ -251,6 +261,7 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                                         <Link
                                             key={link.href}
                                             href={link.href}
+                                            prefetch={!shouldDisablePrefetch(link.href)}
                                             onClick={() => setMobileMenuOpen(false)}
                                             className={getNavLinkClasses(active, true)}
                                         >
@@ -311,6 +322,7 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                                     <Link
                                         key={link.href}
                                         href={link.href}
+                                        prefetch={!shouldDisablePrefetch(link.href)}
                                         className={getNavLinkClasses(active)}
                                     >
                                         <link.icon className="h-5 w-5" />

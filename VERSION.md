@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.7`
+- **Current version:** `1.0.8`
 - **Release date:** `2026-04-01`
-- **Release name:** `Dashboard Auth Query Cleanup`
+- **Release name:** `Protected Route Navigation Noise Reduction`
 
 ## Summary
 
-This release removes the remaining dashboard-era direct frontend API calls that were bypassing the shared authenticated `/api` client, and gates protected widgets so they do not fire unauthenticated requests during auth initialization.
+This release disables prefetch on the remaining noisy protected-route navigation links and quiets expected SafeWalk auth-expiry polling errors so production navigation logs stay clean without changing authenticated behavior.
 
 ## Version Sources of Truth
 
