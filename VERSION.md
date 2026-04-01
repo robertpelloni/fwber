@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.20`
+- **Current version:** `1.0.21`
 - **Release date:** `2026-04-01`
-- **Release name:** `Notification Schema Memoization`
+- **Release name:** `Health Version Source Repair`
 
 ## Summary
 
-This release memoizes notification schema detection within each request so the hot notifications path stops repeating the same cache-backed legacy-schema lookup during a single response cycle.
+This release makes the backend health endpoint report the real deployed application version by sourcing `config('app.version')` from the repository `VERSION` file instead of an ancient hardcoded fallback.
 
 ## Version Sources of Truth
 

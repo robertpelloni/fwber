@@ -29,6 +29,8 @@ class HealthCheckTest extends TestCase
                     'cache' => ['status' => 'ok'],
                 ],
             ]);
+
+        $this->assertSame(trim(file_get_contents(base_path('../VERSION'))), $response->json('version'));
     }
 
     public function test_liveness_probe_returns_200()

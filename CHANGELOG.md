@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.21] - 2026-04-01 — Health Version Source Repair
+
+### Fixed
+- Updated the backend app version config to read the repository `VERSION` file so `/api/health` reports the actual deployed release instead of the stale `1.0.2` fallback.
+- Added regression coverage to ensure the health endpoint version matches the repository version signal used for deployment tracking.
+
 ## [1.0.20] - 2026-04-01 — Notification Schema Memoization
 
 ### Fixed

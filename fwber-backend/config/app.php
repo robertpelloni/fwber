@@ -3,6 +3,17 @@
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 
+$repositoryVersion = '1.0.2';
+$repositoryVersionPath = dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'VERSION';
+
+if (is_file($repositoryVersionPath)) {
+    $resolvedRepositoryVersion = trim((string) file_get_contents($repositoryVersionPath));
+
+    if ($resolvedRepositoryVersion !== '') {
+        $repositoryVersion = $resolvedRepositoryVersion;
+    }
+}
+
 return [
 
     /*
@@ -27,7 +38,7 @@ return [
     |
     */
 
-    'version' => env('APP_VERSION', '1.0.2'),
+    'version' => env('APP_VERSION', $repositoryVersion),
 
     /*
     |--------------------------------------------------------------------------
