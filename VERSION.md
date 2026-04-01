@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.29`
+- **Current version:** `1.0.30`
 - **Release date:** `2026-04-01`
-- **Release name:** `Auth Probe Default Cleanup`
+- **Release name:** `Vercel Trigger Script LF Fix`
 
 ## Summary
 
-This release removes stale hardcoded demo credentials from `/test-auth` so the production auth probe behaves like an honest manual smoke test against the live API.
+This release fixes the frontend Vercel retrigger script so it runs with LF line endings under `bash`, allowing safe production redeploy nudges when the frontend rollout stalls behind the backend release.
 
 ## Version Sources of Truth
 

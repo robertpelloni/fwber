@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.30] - 2026-04-01 — Vercel Trigger Script LF Fix
+
+### Fixed
+- Normalized `fwber-frontend/vercel-ignore-build.sh` for POSIX `bash` execution so the frontend-only Vercel deploy trigger no longer fails on CRLF line endings.
+- Added a `.gitattributes` rule to keep repository shell scripts checked out with LF endings, preventing the deploy trigger from regressing on future Windows-side edits.
+- Touched the trigger script comment as a safe no-op change so Vercel can pick up a fresh frontend deployment after the stalled `v1.0.29` rollout.
+
 ## [1.0.25] - 2026-04-01 — Recommendations Feed Schema Repair
 
 ### Fixed
