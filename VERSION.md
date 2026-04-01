@@ -1,40 +1,17 @@
-# Changelog
+# Version Reference
 
-All notable changes to this project will be documented in this file.
+- **Current version:** `1.0.4`
+- **Release date:** `2026-04-01`
+- **Release name:** `Frontend Security Patch`
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## Summary
 
-## [1.0.0] - 2026-03-28
+This release upgrades `fwber-frontend` from `next@15.0.3` to `next@15.0.7` so Vercel no longer blocks deployment for CVE-2025-66478.
 
-### Added
-- **Final Polish**: Reached 100% completion on the roadmap.
-- **Multi-Region Load Balancing**: Finalized global deployment architecture for high availability.
-- **Production Build Stability**: Fixed Next.js build errors, missing Lucide icons, and linting issues.
-- **Auth Redirect Loops**: Resolved issues with proxy redirects causing 401 errors.
-- **Next.js Version Alignment**: Harmonized all environments to stable `Next.js 15.0.3` and `React 18.3.1`.
+## Version Sources of Truth
 
-## [0.99.6] - 2026-03-25
+- Root version file: `VERSION`
+- Root package metadata: `package.json`
+- Frontend package metadata: `fwber-frontend/package.json`
+- Historical release notes: `CHANGELOG.md`
 
-### Added
-- Integrated Rust `fwber-geo` microservice into Laravel `LocationController` for high-performance spatial queries.
-- Implemented `GeoScreenerService` in Laravel to communicate with the Rust backend.
-- Created `ActivityPubSearchController` for federated user discovery via WebFinger.
-- New **Scientific Nemesis** UI in the AI Wingman Arcade.
-- New **Merchant Vibe Broadcast** UI for business partners.
-- New **Business Intelligence** dashboard for merchants.
-- "Global Federation" settings section for user opt-in and discovery.
-
-### Fixed
-- Resolved 500 Internal Server Errors caused by global exception handler swallowing 401/422 responses.
-- Fixed `TypeError: includes is not a function` in frontend components by adding `Array.isArray()` guards.
-- Corrected "Double API" and "Missing API" URL prefixing in `use-analytics.ts` and `client.ts`.
-- Fixed CSS/JS asset blocking (`nosniff`) via `next.config.js` and `.htaccess` header consolidation.
-
-### Changed
-- Refactored `next.config.js` to use a unified headers management system.
-- Moved `/api/location` out of `auth:sanctum` group temporarily for debugging (to be restored).
-- Updated AI Agent instructions (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `GPT.md`) for autonomous operations.
-
-## [0.99.1] - 2026-03-24
-- Initial Gold Pre-release with Event Sourcing and AI Avatars.
