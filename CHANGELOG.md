@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.20] - 2026-04-01 — Notification Schema Memoization
+
+### Fixed
+- Memoized legacy notification schema detection inside `NotificationController` so a single `/api/notifications` request no longer repeats the same cache-backed schema capability lookup.
+- Added regression coverage proving the legacy-schema cache is resolved only once per request while preserving legacy notification compatibility behavior.
+
 ## [1.0.17] - 2026-04-01 — Auth Restore Network Fallback
 
 ### Fixed

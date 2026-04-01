@@ -1,7 +1,7 @@
-# Project Status — fwber v1.0.19 (Cache Fallback Expansion And Notification Schema Caching)
+# Project Status — fwber v1.0.20 (Notification Schema Memoization)
 
 **Date:** 2026-04-01  
-**Version:** 1.0.19 "Cache Fallback Expansion And Notification Schema Caching"  
+**Version:** 1.0.20 "Notification Schema Memoization"  
 **Status:** 🚀 **PATCHED AND READY TO REDEPLOY**
 
 ---
@@ -12,7 +12,7 @@
 - **Protected Widgets**: Achievements and related widgets now wait for authenticated state before issuing requests.
 
 ## ✅ Release Focus
-- [x] Expanded the safe tagged-cache fallback to more live DreamHost runtime paths beyond the original `subscriptions` and `matches` repairs.
-- [x] Covered event, profile view, Stripe subscription cache invalidation, cleanup job, and AI matching invalidation paths with the shared fallback.
-- [x] Cached legacy notification schema detection to reduce repeated `information_schema` lookups on the notifications hot path.
-- [ ] Awaiting redeploy and live verification that no new cache-tag exceptions appear and notification schema-check warnings taper off.
+- [x] Confirmed `v1.0.19` is fully live on DreamHost and Vercel after a forced clean frontend redeploy.
+- [x] Memoized legacy notification schema detection per request so the notifications hot path no longer repeats the same cache-backed capability check during one response.
+- [x] Added regression coverage for the per-request schema memoization path on the legacy notifications schema.
+- [ ] Awaiting redeploy and live verification that notification-path slow-query warning noise tapers off further under production traffic.

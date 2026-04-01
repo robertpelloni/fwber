@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Schema;
 
 class NotificationController extends Controller
 {
+    private ?bool $legacyNotificationsSchema = null;
+
     private function normalizeJsonValue(mixed $value): mixed
     {
         if (\is_array($value)) {
@@ -92,11 +94,17 @@ class NotificationController extends Controller
 
     private function usesLegacyNotificationsSchema(): bool
     {
-        return Cache::remember('notifications:schema:is_legacy', 300, function () {
+        if ($this->legacyNotificationsSchema !== null) {
+            return $this->legacyNotificationsSchema;
+        }
+
+        $this->legacyNotificationsSchema = Cache::remember('notifications:schema:is_legacy', 300, function () {
             return Schema::hasColumn('notifications', 'user_id')
                 && ! Schema::hasColumn('notifications', 'notifiable_type')
                 && ! Schema::hasColumn('notifications', 'notifiable_id');
         });
+
+        return $this->legacyNotificationsSchema;
     }
 
     private function legacyNotificationData(object $notification): array

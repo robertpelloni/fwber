@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.19`
+- **Current version:** `1.0.20`
 - **Release date:** `2026-04-01`
-- **Release name:** `Cache Fallback Expansion And Notification Schema Caching`
+- **Release name:** `Notification Schema Memoization`
 
 ## Summary
 
-This release expands the production-safe tagged-cache fallback to additional live runtime paths and caches notification schema detection so the hot notification path stops repeatedly introspecting `information_schema`.
+This release memoizes notification schema detection within each request so the hot notifications path stops repeating the same cache-backed legacy-schema lookup during a single response cycle.
 
 ## Version Sources of Truth
 

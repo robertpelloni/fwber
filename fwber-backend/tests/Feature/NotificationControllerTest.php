@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -84,6 +85,56 @@ class NotificationControllerTest extends TestCase
             ->assertJsonPath('notifications.0.title', 'Legacy Title')
             ->assertJsonPath('notifications.0.body', 'Legacy Body')
             ->assertJsonPath('notifications.0.type', 'system');
+    }
+
+    public function test_notifications_endpoint_only_resolves_legacy_schema_once_per_request(): void
+    {
+        $user = User::factory()->create();
+
+        Cache::forget('notifications:schema:is_legacy');
+
+        Schema::drop('notifications');
+        Schema::create('notifications', function (Blueprint $table): void {
+            $table->uuid('id')->primary();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('title');
+            $table->text('body')->nullable();
+            $table->timestamp('read_at')->nullable();
+            $table->timestamps();
+        });
+
+        DB::table('notifications')->insert([
+            'id' => (string) Str::uuid(),
+            'user_id' => $user->getKey(),
+            'title' => 'Legacy Title',
+            'body' => 'Legacy Body',
+            'read_at' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $rememberCalls = 0;
+
+        Cache::spy();
+        Cache::shouldReceive('remember')
+            ->once()
+            ->withArgs(function (string $key, int $ttl, callable $resolver) use (&$rememberCalls): bool {
+                $this->assertSame('notifications:schema:is_legacy', $key);
+                $this->assertSame(300, $ttl);
+                $rememberCalls++;
+
+                return is_callable($resolver);
+            })
+            ->andReturnUsing(function (string $key, int $ttl, callable $resolver) {
+                return $resolver();
+            });
+
+        $this->actingAs($user)
+            ->getJson('/api/notifications')
+            ->assertOk()
+            ->assertJsonPath('unread_count', 1);
+
+        $this->assertSame(1, $rememberCalls);
     }
 
     public function test_legacy_notifications_can_be_marked_as_read(): void
