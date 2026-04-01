@@ -2,7 +2,7 @@
 
 # fwber Vercel Ignored Build Step Script
 # Touching this file is a safe way to trigger a frontend-only Vercel deploy when needed.
-# Last forced deploy trigger: v1.0.11 production rollout verification.
+# Last forced deploy trigger: v1.0.12 production rollout verification.
 # Usage: Set "Ignored Build Step" in Vercel to: bash vercel-ignore-build.sh
 
 # Determine the path to check
