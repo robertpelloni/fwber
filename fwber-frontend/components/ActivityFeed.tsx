@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { PresenceIndicator, usePresenceContext } from './realtime/PresenceComponents';
+import { api } from '@/lib/api/client';
 
 interface ActivityItem {
   id: string;
@@ -62,18 +63,9 @@ export function ActivityFeed({
     }
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/dashboard/activity?limit=${maxItems}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      
-      if (response.ok) {
-        const data = await response.json();
-        setActivities(data || []);
-        setError(null);
-      } else {
-        throw new Error('Failed to fetch activities');
-      }
+      const data = await api.get<ActivityItem[]>(`/dashboard/activity?limit=${maxItems}`);
+      setActivities(data || []);
+      setError(null);
     } catch (err) {
       console.error('Failed to fetch activities:', err);
       setError('Unable to load activity feed');

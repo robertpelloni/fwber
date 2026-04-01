@@ -4,7 +4,6 @@ import { useAuth } from '@/lib/auth-context';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useQuery } from '@tanstack/react-query';
 import { Heart, Users, MessageSquare, TrendingUp, Clock, Zap, Award, Target } from 'lucide-react';
-import axios from 'axios';
 import Image from 'next/image';
 import Link from 'next/link';
 import ProfileCompletenessWidget from '@/components/ProfileCompletenessWidget';
@@ -18,6 +17,7 @@ import { ReferralModal } from '@/components/viral/ReferralModal';
 import { RoastGenerator } from '@/components/viral/RoastGenerator';
 import { DailyStreakModal } from '@/components/gamification/DailyStreakModal';
 import { useEffect, useState } from 'react';
+import { api } from '@/lib/api/client';
 
 interface DashboardStats {
   total_matches: number;
@@ -35,7 +35,7 @@ interface DashboardStats {
 
 export default function DashboardPage() {
   // Get user for legacy cards section
-  const { user } = useAuth();
+  const { user, token, isAuthenticated } = useAuth();
   // Activity feed now uses its own component with real-time presence
 
   const [showStreakModal, setShowStreakModal] = useState(false);
@@ -43,27 +43,14 @@ export default function DashboardPage() {
 
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard-stats'],
-    queryFn: async () => {
-      const token = localStorage.getItem('fwber_token');
-      const response = await axios.get<DashboardStats & { streak_just_updated: boolean }>(
-        `${process.env.NEXT_PUBLIC_API_URL}/dashboard/stats`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      return response.data;
-    },
+    enabled: isAuthenticated && !!token,
+    queryFn: () => api.get<DashboardStats & { streak_just_updated: boolean }>('/dashboard/stats'),
   });
 
   const { data: leaderboardData } = useQuery({
     queryKey: ['vouch-leaderboard'],
-    queryFn: async () => {
-      const token = localStorage.getItem('fwber_token');
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/leaderboard`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      return response.data;
-    },
+    enabled: isAuthenticated && !!token,
+    queryFn: () => api.get('/leaderboard'),
   });
 
   // Effect to check if we should show the streak modal

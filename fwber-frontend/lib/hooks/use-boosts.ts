@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import { api } from '@/lib/api/client';
+import { useAuth } from '@/lib/auth-context';
 
 export interface Boost {
   id: number;
@@ -11,16 +12,13 @@ export interface Boost {
 }
 
 export function useActiveBoost() {
+  const { token, isAuthenticated } = useAuth();
   return useQuery({
     queryKey: ['active-boost'],
+    enabled: isAuthenticated && !!token,
     queryFn: async () => {
-      const token = localStorage.getItem('fwber_token');
       try {
-        const response = await axios.get<Boost>(
-          `${process.env.NEXT_PUBLIC_API_URL}/boosts/active`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        return response.data;
+        return await api.get<Boost>('/boosts/active');
       } catch (error: any) {
         if (error.response?.status === 404) {
           return null;
@@ -36,31 +34,25 @@ export function useActiveBoost() {
 }
 
 export function useBoostHistory() {
+  const { token, isAuthenticated } = useAuth();
   return useQuery({
     queryKey: ['boost-history'],
-    queryFn: async () => {
-      const token = localStorage.getItem('fwber_token');
-      const response = await axios.get<Boost[]>(
-        `${process.env.NEXT_PUBLIC_API_URL}/boosts/history`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      return response.data;
-    },
+    enabled: isAuthenticated && !!token,
+    queryFn: () => api.get<Boost[]>('/boosts/history'),
   });
 }
 
 export function usePurchaseBoost() {
   const queryClient = useQueryClient();
+  const { token, isAuthenticated } = useAuth();
 
   return useMutation({
     mutationFn: async ({ type, paymentMethod }: { type: 'standard' | 'super', paymentMethod?: 'stripe' | 'token' }) => {
-      const token = localStorage.getItem('fwber_token');
-      const response = await axios.post<Boost>(
-        `${process.env.NEXT_PUBLIC_API_URL}/boosts/purchase`,
-        { type, payment_method: paymentMethod },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      return response.data;
+      if (!isAuthenticated || !token) {
+        throw new Error('Authentication required');
+      }
+
+      return await api.post<Boost>('/boosts/purchase', { type, payment_method: paymentMethod });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['active-boost'] });

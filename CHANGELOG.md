@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.7] - 2026-04-01 — Dashboard Auth Query Cleanup
+
+### Fixed
+- Replaced remaining dashboard widget calls that still bypassed the shared authenticated API client for stats, leaderboard, activity, profile completeness, and boosts.
+- Gated achievements and related protected dashboard widgets so they do not fire unauthenticated requests during auth initialization.
+- Reduced stray direct browser requests to `api.fwber.me` that were still producing unauthenticated and network-noise logs after the earlier production fixes.
+
 ## [1.0.6] - 2026-04-01 — Payments, Notifications & Realtime Hardening
 
 ### Fixed

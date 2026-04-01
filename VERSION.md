@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.6`
+- **Current version:** `1.0.7`
 - **Release date:** `2026-04-01`
-- **Release name:** `Payments, Notifications & Realtime Hardening`
+- **Release name:** `Dashboard Auth Query Cleanup`
 
 ## Summary
 
-This release hardens the remaining live production paths by guarding Stripe initialization when the publishable key is missing, routing notification fetches through the shared API client, adding a notifications count endpoint, and preventing realtime from guessing broken production websocket hosts.
+This release removes the remaining dashboard-era direct frontend API calls that were bypassing the shared authenticated `/api` client, and gates protected widgets so they do not fire unauthenticated requests during auth initialization.
 
 ## Version Sources of Truth
 

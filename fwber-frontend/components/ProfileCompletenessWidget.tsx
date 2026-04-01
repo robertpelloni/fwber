@@ -2,8 +2,9 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { CheckCircle2, Circle, AlertTriangle } from 'lucide-react';
-import axios from 'axios';
 import Link from 'next/link';
+import { useAuth } from '@/lib/auth-context';
+import { api } from '@/lib/api/client';
 
 interface CompletenessData {
   percentage: number;
@@ -21,16 +22,11 @@ interface CompletenessData {
 }
 
 export default function ProfileCompletenessWidget() {
+  const { token, isAuthenticated } = useAuth();
   const { data, isLoading } = useQuery({
     queryKey: ['profile-completeness'],
-    queryFn: async () => {
-      const token = localStorage.getItem('fwber_token');
-      const response = await axios.get<CompletenessData>(
-        `${process.env.NEXT_PUBLIC_API_URL}/profile/completeness`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      return response.data;
-    },
+    enabled: isAuthenticated && !!token,
+    queryFn: () => api.get<CompletenessData>('/profile/completeness'),
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 

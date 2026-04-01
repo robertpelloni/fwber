@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Award, Lock, CheckCircle2, Trophy, Flame, Heart, Eye, MessageCircle, Users, Zap, UserCheck } from 'lucide-react'
 import { apiClient } from '@/lib/api/client'
+import { useAuth } from '@/lib/auth-context'
 
 interface Achievement {
   id: number
@@ -32,10 +33,17 @@ const iconMap: Record<string, any> = {
 }
 
 export function AchievementsList() {
+  const { token, isAuthenticated } = useAuth()
   const [achievements, setAchievements] = useState<Achievement[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    if (!isAuthenticated || !token) {
+      setAchievements([])
+      setIsLoading(false)
+      return
+    }
+
     apiClient.get<AchievementsResponse>('/achievements')
       .then(res => {
         setAchievements(res.data.achievements)
@@ -45,7 +53,7 @@ export function AchievementsList() {
         console.error('Failed to fetch achievements', err)
         setIsLoading(false)
       })
-  }, [])
+  }, [isAuthenticated, token])
 
   if (isLoading) {
     return <div className="animate-pulse space-y-4">
