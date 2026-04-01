@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.25`
+- **Current version:** `1.0.26`
 - **Release date:** `2026-04-01`
-- **Release name:** `Recommendations Feed Schema Repair`
+- **Release name:** `Frontend API Contract Repair`
 
 ## Summary
 
-This release repairs the recommendations feed event timestamp query so production no longer references the nonexistent `events.start_time` column, and it hardens key frontend pages to consume the shared API client's unwrapped responses correctly.
+This release repairs frontend pages that were still treating the shared `api` helper as if it returned nested `data` payloads, and it realigns the friends UI with the backend's actual friend route contract.
 
 ## Version Sources of Truth
 

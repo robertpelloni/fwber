@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api/client';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { format } from 'date-fns';
-import { CreditCard, Calendar, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import Link from 'next/link';
 
 interface Subscription {
@@ -25,8 +24,16 @@ interface Payment {
   description?: string;
 }
 
+interface PaymentHistoryResponse {
+  data: Payment[];
+}
+
+interface CancelSubscriptionResponse {
+  message: string;
+  ends_at: string | null;
+}
+
 export default function SubscriptionPage() {
-  const { user } = useAuth();
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [history, setHistory] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,11 +44,11 @@ export default function SubscriptionPage() {
     const fetchData = async () => {
       try {
         const [subsRes, historyRes] = await Promise.all([
-          api.get('/subscriptions'),
-          api.get('/subscriptions/history'),
+          api.get<Subscription[]>('/subscriptions'),
+          api.get<PaymentHistoryResponse>('/subscriptions/history'),
         ]);
-        setSubscriptions((subsRes as any).data);
-        setHistory((historyRes as any).data.data); // Pagination wrapper
+        setSubscriptions(Array.isArray(subsRes) ? subsRes : []);
+        setHistory(Array.isArray(historyRes.data) ? historyRes.data : []);
       } catch (error) {
         console.error('Failed to fetch subscription data:', error);
       } finally {
@@ -61,16 +68,16 @@ export default function SubscriptionPage() {
     setMessage(null);
 
     try {
-      const response = await api.post('/subscriptions/cancel');
-      setMessage({ type: 'success', text: (response as any).data.message });
+      const response = await api.post<CancelSubscriptionResponse>('/subscriptions/cancel', {});
+      setMessage({ type: 'success', text: response.message });
       
       // Refresh subscriptions
-      const subsRes = await api.get('/subscriptions');
-      setSubscriptions((subsRes as any).data);
-    } catch (error: any) {
+      const subsRes = await api.get<Subscription[]>('/subscriptions');
+      setSubscriptions(Array.isArray(subsRes) ? subsRes : []);
+    } catch (error) {
       setMessage({ 
         type: 'error', 
-        text: error.response?.data?.message || 'Failed to cancel subscription.' 
+        text: error instanceof Error ? error.message : 'Failed to cancel subscription.',
       });
     } finally {
       setCancelling(false);

@@ -1,8 +1,18 @@
 'use client';
 
+interface FriendRequest {
+  id: number;
+  status: 'pending' | 'accepted' | 'declined';
+  user?: {
+    id: number;
+    name?: string;
+    email?: string;
+  };
+}
+
 interface FriendRequestListProps {
-  friendRequests: any[];
-  onRespondToRequest: (requestId: number, status: 'accepted' | 'declined') => void;
+  friendRequests: FriendRequest[];
+  onRespondToRequest: (requesterUserId: number, status: 'accepted' | 'declined') => void;
 }
 
 export default function FriendRequestList({ friendRequests, onRespondToRequest }: FriendRequestListProps) {
@@ -16,13 +26,15 @@ export default function FriendRequestList({ friendRequests, onRespondToRequest }
           </div>
           <div className="space-x-4">
             <button
-              onClick={() => onRespondToRequest(request.id, 'accepted')}
+              onClick={() => request.user?.id && onRespondToRequest(request.user.id, 'accepted')}
+              disabled={!request.user?.id}
               className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg"
             >
               Accept
             </button>
             <button
-              onClick={() => onRespondToRequest(request.id, 'declined')}
+              onClick={() => request.user?.id && onRespondToRequest(request.user.id, 'declined')}
+              disabled={!request.user?.id}
               className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg"
             >
               Decline

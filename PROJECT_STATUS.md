@@ -1,7 +1,7 @@
-# Project Status — fwber v1.0.25 (Recommendations Feed Schema Repair)
+# Project Status — fwber v1.0.26 (Frontend API Contract Repair)
 
 **Date:** 2026-04-01  
-**Version:** 1.0.25 "Recommendations Feed Schema Repair"  
+**Version:** 1.0.26 "Frontend API Contract Repair"  
 **Status:** 🚀 **PATCHED AND READY TO REDEPLOY**
 
 ---
@@ -12,7 +12,9 @@
 - **Protected Widgets**: Achievements and related widgets now wait for authenticated state before issuing requests.
 
 ## ✅ Release Focus
-- [x] Verified `v1.0.24` is fully live on DreamHost and Vercel, with all public login aliases reporting the new version and no fresh `personal_access_tokens.last_used_at` slow query after rollout.
-- [x] Traced current recommendation feed failures to a live schema mismatch where recommendation engagement scoring queried `events.start_time` even though the production schema exposes `events.starts_at`.
-- [x] Fixed frontend subscription and match pages that were still treating the shared API client as if it returned nested `data` payloads, preventing client-side crashes when live endpoints return normal unwrapped JSON.
-- [ ] Awaiting redeploy and live verification that `/api/recommendations/feed` and the affected frontend pages recover cleanly on production.
+- [x] Verified `v1.0.25` is fully live on DreamHost and Vercel, with public login aliases reporting the new version.
+- [x] Fixed the main subscription management page to consume unwrapped `api` responses correctly for subscriptions, payment history, and cancellation feedback.
+- [x] Rewired the friends page to the backend's real friend routes so search, send request, accept, decline, and remove flows match production API contracts.
+- [x] Fixed the public pulse node page to consume the direct public payload instead of reading `response.data`.
+- [x] Revalidated the frontend with `npm run lint`, `npm run type-check`, and `npm run build` before release.
+- [ ] Awaiting redeploy and live verification that the affected frontend pages recover cleanly on production.

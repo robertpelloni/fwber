@@ -8,6 +8,12 @@ All notable changes to this project will be documented in this file.
 - Corrected recommendation engagement scoring to query `events.starts_at`, matching the live schema and preventing production `/api/recommendations/feed` failures caused by the nonexistent `start_time` column.
 - Added regression coverage proving recommendation engagement scoring counts recent attended events through the `starts_at` event timestamp.
 - Fixed the subscription settings page and swipe matches page to consume the shared frontend API client's unwrapped responses correctly instead of reading nonexistent nested `data` payloads.
+## [1.0.26] - 2026-04-01 — Frontend API Contract Repair
+
+### Fixed
+- Repaired the main subscription management page to consume the shared frontend `api` helper correctly for subscription lists, payment history, and cancel responses instead of dereferencing nonexistent nested `data` payloads.
+- Realigned the friends page with the backend's actual `/friends`, `/friends/requests`, `/friends/search`, and `/friends/requests/{userId}` routes so loading, searching, sending requests, and responding to requests no longer call stale endpoints.
+- Fixed the public pulse node page to consume the unwrapped public payload directly so live venue pulse screens render instead of failing on `response.data`.
 
 ## [1.0.24] - 2026-04-01 — Sanctum Token Touch Throttle
 

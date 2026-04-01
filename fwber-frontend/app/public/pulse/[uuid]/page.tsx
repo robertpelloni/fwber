@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { api } from '@/lib/api/client';
-import { Activity, MessageSquare, TrendingUp, Zap, Users, Shield, Info } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Activity, TrendingUp, Zap, Users, Shield, Info } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface VibeData {
     node_name: string;
@@ -29,8 +29,8 @@ export default function LivePulseBoard() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const response = await api.get(`/public/pulse/node/${uuid}`) as any;
-                setData(response.data);
+                const response = await api.get<VibeData>(`/public/pulse/node/${uuid}`);
+                setData(response);
             } catch (error) {
                 console.error('Failed to fetch node data', error);
             } finally {

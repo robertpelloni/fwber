@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, UserPlus, Users } from 'lucide-react';
@@ -11,24 +10,39 @@ import FriendRequestList from '@/components/friends/FriendRequestList';
 import { api } from '@/lib/api/client';
 import { useToast } from '@/lib/hooks/use-toast';
 
+interface FriendUser {
+  id: number;
+  name: string;
+  email: string;
+  profile?: {
+    display_name?: string;
+    avatar_url?: string;
+  };
+}
+
+interface FriendRequest {
+  id: number;
+  status: 'pending' | 'accepted' | 'declined';
+  user?: FriendUser;
+}
+
 export default function FriendsPage() {
   const [activeTab, setActiveTab] = useState('friends');
   const [searchQuery, setSearchQuery] = useState('');
-  const [friends, setFriends] = useState([]);
-  const [requests, setRequests] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
+  const [friends, setFriends] = useState<FriendUser[]>([]);
+  const [requests, setRequests] = useState<FriendRequest[]>([]);
+  const [searchResults, setSearchResults] = useState<FriendUser[]>([]);
   const [loading, setLoading] = useState(true);
   const { success, error, ToastContainer } = useToast();
-  const router = useRouter();
 
   const fetchData = useCallback(async () => {
     try {
       const [friendsRes, requestsRes] = await Promise.all([
-        api.get('/friends'),
-        api.get('/friends/requests/pending')
-      ]) as any[];
-      setFriends(Array.isArray(friendsRes.data) ? friendsRes.data : []);
-      setRequests(Array.isArray(requestsRes.data) ? requestsRes.data : []);
+        api.get<FriendUser[]>('/friends'),
+        api.get<FriendRequest[]>('/friends/requests'),
+      ]);
+      setFriends(Array.isArray(friendsRes) ? friendsRes : []);
+      setRequests(Array.isArray(requestsRes) ? requestsRes : []);
     } catch (err) {
       console.error('Error fetching friends data:', err);
       error('Failed to load friends data');
@@ -47,8 +61,10 @@ export default function FriendsPage() {
 
     try {
       setLoading(true);
-      const response = await api.get(`/users/search?q=${searchQuery}`) as any;
-      setSearchResults(Array.isArray(response.data) ? response.data : []);
+      const response = await api.get<FriendUser[]>('/friends/search', {
+        params: { q: searchQuery },
+      });
+      setSearchResults(Array.isArray(response) ? response : []);
       setActiveTab('search');
     } catch (err) {
       console.error('Error searching users:', err);
@@ -60,43 +76,24 @@ export default function FriendsPage() {
 
   const sendFriendRequest = async (userId: number) => {
     try {
-      await api.post(`/friends/request/${userId}`);
+      await api.post('/friends/requests', { friend_id: userId });
       success('Friend request sent');
       // Remove from search results or update UI
-      setSearchResults(prev => prev.filter((u: any) => u.id !== userId));
+      setSearchResults(prev => prev.filter((u) => u.id !== userId));
     } catch (err) {
       console.error('Error sending friend request:', err);
       error('Failed to send friend request');
     }
   };
 
-  const handleRespondToRequest = async (requestId: number, status: 'accepted' | 'declined') => {
-    if (status === 'accepted') {
-      await handleAcceptRequest(requestId);
-    } else {
-      await handleRejectRequest(requestId);
-    }
-  };
-
-  const handleAcceptRequest = async (requestId: number) => {
+  const handleRespondToRequest = async (requesterUserId: number, status: 'accepted' | 'declined') => {
     try {
-      await api.post(`/friends/accept/${requestId}`);
-      success('Friend request accepted');
+      await api.post(`/friends/requests/${requesterUserId}`, { status });
+      success(status === 'accepted' ? 'Friend request accepted' : 'Friend request rejected');
       fetchData(); // Refresh lists
     } catch (err) {
-      console.error('Error accepting friend request:', err);
-      error('Failed to accept friend request');
-    }
-  };
-
-  const handleRejectRequest = async (requestId: number) => {
-    try {
-      await api.post(`/friends/reject/${requestId}`);
-      success('Friend request rejected');
-      setRequests(prev => prev.filter((r: any) => r.id !== requestId));
-    } catch (err) {
-      console.error('Error rejecting friend request:', err);
-      error('Failed to reject friend request');
+      console.error('Error responding to friend request:', err);
+      error(`Failed to ${status === 'accepted' ? 'accept' : 'reject'} friend request`);
     }
   };
 
@@ -106,7 +103,7 @@ export default function FriendsPage() {
     try {
       await api.delete(`/friends/${friendId}`);
       success('Friend removed');
-      setFriends(prev => prev.filter((f: any) => f.id !== friendId));
+      setFriends(prev => prev.filter((f) => f.id !== friendId));
     } catch (err) {
       console.error('Error removing friend:', err);
       error('Failed to remove friend');
