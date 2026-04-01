@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.23`
+- **Current version:** `1.0.24`
 - **Release date:** `2026-04-01`
-- **Release name:** `Notification Polling Load Reduction`
+- **Release name:** `Sanctum Token Touch Throttle`
 
 ## Summary
 
-This release reduces production notification traffic by polling the lightweight unread-count endpoint while the header bell is closed and only fetching the full notifications feed when the drawer is open.
+This release throttles Sanctum `personal_access_tokens.last_used_at` writes so bearer-authenticated polling endpoints stop updating token usage on every single request while still preserving recent token activity data.
 
 ## Version Sources of Truth
 

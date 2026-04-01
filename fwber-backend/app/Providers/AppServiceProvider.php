@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Sanctum\Sanctum;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -32,6 +33,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         try {
+            Sanctum::usePersonalAccessTokenModel(\App\Models\PersonalAccessToken::class);
+
             // Prevent N+1 queries in non-production environments
             Model::preventLazyLoading(! $this->app->isProduction());
 

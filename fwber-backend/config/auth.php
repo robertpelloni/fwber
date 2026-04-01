@@ -148,4 +148,16 @@ return [
     */
     'api_token_expiration' => env('API_TOKEN_EXPIRATION', 30),
 
+    /*
+    |--------------------------------------------------------------------------
+    | API Token Last Used Touch Interval
+    |--------------------------------------------------------------------------
+    |
+    | The minimum number of seconds between persisted last_used_at updates for
+    | bearer-token requests. This reduces write amplification on hot polling
+    | endpoints while preserving recent token activity data.
+    |
+    */
+    'api_token_touch_interval_seconds' => env('API_TOKEN_TOUCH_INTERVAL_SECONDS', 300),
+
 ];

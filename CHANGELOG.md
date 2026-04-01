@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.24] - 2026-04-01 — Sanctum Token Touch Throttle
+
+### Fixed
+- Registered a custom Sanctum personal access token model that throttles `last_used_at` persistence to once per configured interval instead of writing on every bearer-authenticated request.
+- Added backend regression coverage proving first-touch, within-window skip, and post-window refresh behavior for throttled token usage tracking.
+
 ## [1.0.23] - 2026-04-01 — Notification Polling Load Reduction
 
 ### Fixed
