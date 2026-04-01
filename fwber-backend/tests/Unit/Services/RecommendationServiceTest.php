@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Services;
 
+use App\Models\Event;
 use App\Models\TelemetryEvent;
 use App\Models\User;
 use App\Models\UserProfile;
@@ -172,5 +173,46 @@ class RecommendationServiceTest extends TestCase
         $this->assertContains('coding', $topics);
         $this->assertContains('laravel', $topics);
         $this->assertContains('framework', $topics);
+    }
+
+    public function test_calculate_engagement_score_counts_recent_attending_events_using_starts_at()
+    {
+        $user = User::factory()->create();
+
+        $recentEvent = Event::create([
+            'title' => 'Recent Event',
+            'description' => 'Recent recommendation signal',
+            'type' => 'social',
+            'location_name' => 'Detroit',
+            'latitude' => 42.3314,
+            'longitude' => -83.0458,
+            'starts_at' => now()->subDays(5),
+            'ends_at' => now()->subDays(5)->addHours(2),
+            'created_by_user_id' => $user->id,
+            'status' => 'active',
+        ]);
+
+        $oldEvent = Event::create([
+            'title' => 'Old Event',
+            'description' => 'Outside recommendation window',
+            'type' => 'social',
+            'location_name' => 'Detroit',
+            'latitude' => 42.3314,
+            'longitude' => -83.0458,
+            'starts_at' => now()->subDays(45),
+            'ends_at' => now()->subDays(45)->addHours(2),
+            'created_by_user_id' => $user->id,
+            'status' => 'completed',
+        ]);
+
+        $user->attendingEvents()->attach([$recentEvent->id, $oldEvent->id], ['status' => 'attending']);
+
+        $reflection = new \ReflectionClass($this->service);
+        $method = $reflection->getMethod('calculateEngagementScore');
+        $method->setAccessible(true);
+
+        $score = $method->invoke($this->service, $user);
+
+        $this->assertGreaterThan(0.09, $score);
     }
 }

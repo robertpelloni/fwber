@@ -487,7 +487,7 @@ class RecommendationService
         $score += min($groupCount / 5, 1.0) * 0.3;
 
         // Event attendance (max 3 events = 0.3 points)
-        $eventCount = $user->attendingEvents()->where('start_time', '>=', now()->subDays(30))->count();
+        $eventCount = $user->attendingEvents()->where('starts_at', '>=', now()->subDays(30))->count();
         $score += min($eventCount / 3, 1.0) * 0.3;
 
         return min($score, 1.0);

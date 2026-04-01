@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.25] - 2026-04-01 — Recommendations Feed Schema Repair
+
+### Fixed
+- Corrected recommendation engagement scoring to query `events.starts_at`, matching the live schema and preventing production `/api/recommendations/feed` failures caused by the nonexistent `start_time` column.
+- Added regression coverage proving recommendation engagement scoring counts recent attended events through the `starts_at` event timestamp.
+- Fixed the subscription settings page and swipe matches page to consume the shared frontend API client's unwrapped responses correctly instead of reading nonexistent nested `data` payloads.
+
 ## [1.0.24] - 2026-04-01 — Sanctum Token Touch Throttle
 
 ### Fixed

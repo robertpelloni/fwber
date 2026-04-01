@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.24`
+- **Current version:** `1.0.25`
 - **Release date:** `2026-04-01`
-- **Release name:** `Sanctum Token Touch Throttle`
+- **Release name:** `Recommendations Feed Schema Repair`
 
 ## Summary
 
-This release throttles Sanctum `personal_access_tokens.last_used_at` writes so bearer-authenticated polling endpoints stop updating token usage on every single request while still preserving recent token activity data.
+This release repairs the recommendations feed event timestamp query so production no longer references the nonexistent `events.start_time` column, and it hardens key frontend pages to consume the shared API client's unwrapped responses correctly.
 
 ## Version Sources of Truth
 

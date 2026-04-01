@@ -37,8 +37,8 @@ export default function MatchesPage() {
   const fetchMatches = useCallback(async (filters = {}) => {
     try {
       setLoading(true);
-      const response = await api.get('/matches', { params: filters }) as any;
-      setMatches(response.data.matches || []);
+      const response = await api.get<{ matches?: any[] }>('/matches', { params: filters });
+      setMatches(Array.isArray(response.matches) ? response.matches : []);
       setCurrentIndex(0);
       setIsPlaying(false);
     } catch (err) {
@@ -68,12 +68,12 @@ export default function MatchesPage() {
     setCurrentIndex(nextIndex);
 
     try {
-      const response = await api.post('/matches/action', {
+      const response = await api.post<{ is_match?: boolean }>('/matches/action', {
         target_user_id: targetUserId,
         action,
-      }) as any;
+      });
 
-      if (response.data.is_match) {
+      if (response.is_match) {
         success(`You matched with ${matches[currentIndex].name || 'Voice Only Profile'}!`);
         // Optionally show match modal
       }
