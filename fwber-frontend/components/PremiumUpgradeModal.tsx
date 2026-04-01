@@ -54,6 +54,7 @@ export const PremiumUpgradeModal = ({ isOpen, onClose }: PremiumUpgradeModalProp
 
   const tokenBalance = parseFloat(wallet?.balance || '0');
   const tokenPrice = 200;
+  const stripeEnabled = !!stripePromise;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
@@ -111,16 +112,22 @@ export const PremiumUpgradeModal = ({ isOpen, onClose }: PremiumUpgradeModalProp
                 </button>
                 <button
                   onClick={() => setPaymentMethod('stripe')}
+                  disabled={!stripeEnabled}
                   className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-all ${
                     paymentMethod === 'stripe'
                       ? 'bg-white dark:bg-gray-700 shadow-sm text-purple-600 dark:text-purple-400'
                       : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
-                  }`}
+                  } ${!stripeEnabled ? 'cursor-not-allowed opacity-50' : ''}`}
                 >
                   <CreditCard className="w-4 h-4" />
                   Card
                 </button>
               </div>
+              {!stripeEnabled && (
+                <p className="text-xs text-amber-600 text-center">
+                  Card payments are unavailable until `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is configured in production.
+                </p>
+              )}
             </div>
 
             <DialogFooter className="flex-col sm:flex-col gap-2">
@@ -141,7 +148,7 @@ export const PremiumUpgradeModal = ({ isOpen, onClose }: PremiumUpgradeModalProp
               </Button>
             </DialogFooter>
           </>
-        ) : (
+        ) : stripeEnabled ? (
           <Elements stripe={stripePromise} options={{ clientSecret }}>
             <StripePaymentForm 
               onSuccess={handleSuccess} 
@@ -149,6 +156,10 @@ export const PremiumUpgradeModal = ({ isOpen, onClose }: PremiumUpgradeModalProp
               amount={19.99}
             />
           </Elements>
+        ) : (
+          <div className="py-4 text-sm text-amber-600">
+            Card payments are currently unavailable because Stripe is not configured.
+          </div>
         )}
       </DialogContent>
     </Dialog>

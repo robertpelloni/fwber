@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.5`
+- **Current version:** `1.0.6`
 - **Release date:** `2026-04-01`
-- **Release name:** `Frontend Auth & Asset Recovery`
+- **Release name:** `Payments, Notifications & Realtime Hardening`
 
 ## Summary
 
-This release hardens live frontend recovery by revalidating stored auth with `/api/auth/me` and clearing stale service-worker/cache state when old `_next` assets break after deployment.
+This release hardens the remaining live production paths by guarding Stripe initialization when the publishable key is missing, routing notification fetches through the shared API client, adding a notifications count endpoint, and preventing realtime from guessing broken production websocket hosts.
 
 ## Version Sources of Truth
 

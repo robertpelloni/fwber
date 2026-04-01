@@ -10,7 +10,10 @@ import { apiClient } from '@/lib/api/client';
 import { Loader2, DollarSign, Coins } from 'lucide-react';
 
 // Initialize Stripe outside component
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY || '');
+const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+const stripePromise = stripePublishableKey
+    ? loadStripe(stripePublishableKey)
+    : null;
 
 interface TopUpModalProps {
     isOpen: boolean;
@@ -30,6 +33,7 @@ export default function TopUpModal({ isOpen, onClose, onSuccess }: TopUpModalPro
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [step, setStep] = useState<'select' | 'pay'>('select');
+    const stripeEnabled = !!stripePromise;
 
     // Reset state when modal opens/closes
     useEffect(() => {
@@ -152,16 +156,22 @@ export default function TopUpModal({ isOpen, onClose, onSuccess }: TopUpModalPro
                         </div>
 
                         {clientSecret && (
-                            <Elements stripe={stripePromise} options={{
-                                clientSecret,
-                                appearance: { theme: 'stripe' }
-                            }}>
-                                <StripePaymentForm
-                                    amount={selectedAmount || 0}
-                                    onSuccess={handlePaymentSuccess}
-                                    onCancel={() => setStep('select')}
-                                />
-                            </Elements>
+                            stripeEnabled ? (
+                                <Elements stripe={stripePromise} options={{
+                                    clientSecret,
+                                    appearance: { theme: 'stripe' }
+                                }}>
+                                    <StripePaymentForm
+                                        amount={selectedAmount || 0}
+                                        onSuccess={handlePaymentSuccess}
+                                        onCancel={() => setStep('select')}
+                                    />
+                                </Elements>
+                            ) : (
+                                <div className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+                                    Card payments are temporarily unavailable because the Stripe publishable key is not configured.
+                                </div>
+                            )
                         )}
                     </div>
                 )}

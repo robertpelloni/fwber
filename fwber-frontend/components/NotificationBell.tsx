@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Bell, X, Check, MessageSquare, Heart, UserPlus, Eye, AlertCircle, Gift, Calendar } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { PresenceIndicator } from '@/components/realtime/PresenceComponents';
+import { api } from '@/lib/api/client';
 
 interface Notification {
   id: string;
@@ -40,14 +41,9 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
 
     setIsLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/notifications`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setNotifications(data.notifications || []);
-        setUnreadCount(data.unread_count || 0);
-      }
+      const data = await api.get<{ notifications?: Notification[]; unread_count?: number }>('/notifications');
+      setNotifications(data.notifications || []);
+      setUnreadCount(data.unread_count || 0);
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
     } finally {
@@ -60,10 +56,7 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
     if (!token) return;
 
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/notifications/${notificationId}/read`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.post(`/notifications/${notificationId}/read`);
       setNotifications(prev =>
         prev.map(n => (n.id === notificationId ? { ...n, read: true } : n))
       );
@@ -78,10 +71,7 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
     if (!token) return;
 
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/notifications/read-all`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.post('/notifications/read-all');
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
       setUnreadCount(0);
     } catch (error) {
@@ -310,13 +300,8 @@ export function NotificationDot({ className = '' }: { className?: string }) {
 
     const fetchCount = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/notifications/count`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setUnreadCount(data.unread_count || 0);
-        }
+        const data = await api.get<{ unread_count?: number }>('/notifications/count');
+        setUnreadCount(data.unread_count || 0);
       } catch (error) {
         console.error('Failed to fetch notification count:', error);
       }

@@ -10,6 +10,26 @@ use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
+    private function transformNotification($notification): array
+    {
+        $data = \is_array($notification->data) ? $notification->data : [];
+        $title = $data['title'] ?? $data['subject'] ?? 'Notification';
+        $message = $data['message'] ?? $data['body'] ?? $data['content'] ?? '';
+
+        return [
+            'id' => $notification->id,
+            'type' => $data['type'] ?? class_basename($notification->type),
+            'data' => $data,
+            'title' => $title,
+            'body' => $message,
+            'message' => $message,
+            'read' => $notification->read_at !== null,
+            'read_at' => $notification->read_at,
+            'timestamp' => $notification->created_at?->toISOString(),
+            'created_at' => $notification->created_at,
+        ];
+    }
+
     /**
      * List all notifications for the authenticated user.
      *
@@ -23,24 +43,19 @@ class NotificationController extends Controller
             ->orderBy('created_at', 'desc')
             ->limit(50)
             ->get()
-            ->map(function ($notification) {
-                $data = $notification->data;
-
-                return [
-                    'id' => $notification->id,
-                    'type' => $notification->type,
-                    'data' => $data,
-                    'title' => $data['title'] ?? null,
-                    'message' => $data['message'] ?? $data['body'] ?? null,
-                    'read' => $notification->read_at !== null,
-                    'read_at' => $notification->read_at,
-                    'timestamp' => $notification->created_at->toISOString(),
-                    'created_at' => $notification->created_at,
-                ];
-            });
+            ->map(fn ($notification) => $this->transformNotification($notification));
 
         return response()->json([
             'notifications' => $notifications,
+            'unread_count' => $user->unreadNotifications()->count(),
+        ]);
+    }
+
+    public function count(): JsonResponse
+    {
+        $user = Auth::user();
+
+        return response()->json([
             'unread_count' => $user->unreadNotifications()->count(),
         ]);
     }

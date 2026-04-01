@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.6] - 2026-04-01 — Payments, Notifications & Realtime Hardening
+
+### Fixed
+- Guarded Stripe initialization so card-payment UI fails closed instead of throwing when `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is missing.
+- Removed the stray `NEXT_PUBLIC_STRIPE_KEY` usage and aligned wallet/premium payment flows on the publishable-key setting.
+- Routed notification UI requests through the shared API client and added `GET /api/notifications/count`.
+- Hardened backend notification serialization so malformed legacy notification payloads do not 500 the entire notifications feed.
+- Prevented realtime from guessing invalid production websocket hosts when Reverb/Pusher env is incomplete, reducing noisy connection errors.
+
 ## [1.0.5] - 2026-04-01 — Frontend Auth & Asset Recovery
 
 ### Fixed

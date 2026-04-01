@@ -29,6 +29,16 @@ export const initEcho = (token?: string) => {
         appKey = 'app-key';
     }
 
+    const hasExplicitRealtimeConfig = Boolean(
+        process.env.NEXT_PUBLIC_REVERB_HOST ||
+        process.env.NEXT_PUBLIC_PUSHER_HOST ||
+        process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER
+    );
+
+    if (!isDev && !hasExplicitRealtimeConfig) {
+        return null;
+    }
+
     const options: any = {
         broadcaster: 'reverb',
         key: appKey,
@@ -73,14 +83,14 @@ export const initEcho = (token?: string) => {
     }
 
     if (token) {
-        options.authEndpoint = `${process.env.NEXT_PUBLIC_API_URL}/broadcasting/auth`;
+        options.authEndpoint = '/api/broadcasting/auth';
         options.auth = {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
         };
     } else {
-        options.authEndpoint = `${process.env.NEXT_PUBLIC_API_URL}/broadcasting/auth`;
+        options.authEndpoint = '/api/broadcasting/auth';
         options.auth = {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',

@@ -135,7 +135,8 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
     try {
       const echo = initEcho(token);
       if (!echo) {
-        throw new Error('Failed to initialize Echo');
+        setStatus({ connected: false, connecting: false, error: null });
+        return;
       }
 
       echoRef.current = echo;
