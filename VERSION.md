@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.26`
+- **Current version:** `1.0.27`
 - **Release date:** `2026-04-01`
-- **Release name:** `Frontend API Contract Repair`
+- **Release name:** `Recommendation And Matching Resilience`
 
 ## Summary
 
-This release repairs frontend pages that were still treating the shared `api` helper as if it returned nested `data` payloads, and it realigns the friends UI with the backend's actual friend route contract.
+This release hardens production recommendation and matching APIs so optional AI, vector, and location recommendation failures degrade safely instead of taking down authenticated endpoints.
 
 ## Version Sources of Truth
 

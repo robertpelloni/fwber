@@ -49,55 +49,68 @@ class AIMatchingService
                 return [];
             }
 
-            // 1. Generate embedding for current user query (or use their profile embedding)
-            // For now, we use the user's own profile as the query vector
-            // We need to re-generate it or fetch it.
-            // Better to assume we have it in Redis?
-            // Let's generate it on the fly for the query to be sure
-            $queryText = $this->vectorService->formatProfileForEmbedding($userProfile);
-            $queryVector = $this->vectorService->generateEmbedding($queryText);
+            try {
+                // 1. Generate embedding for current user query (or use their profile embedding)
+                // For now, we use the user's own profile as the query vector
+                // We need to re-generate it or fetch it.
+                // Better to assume we have it in Redis?
+                // Let's generate it on the fly for the query to be sure
+                $queryText = $this->vectorService->formatProfileForEmbedding($userProfile);
+                $queryVector = $this->vectorService->generateEmbedding($queryText);
 
-            if (empty($queryVector)) {
-                return $this->fallbackToHeuristicMatching($user, $filters, $limit);
-            }
-
-            // 2. Search Vector DB for candidates (Get 100 to filtering)
-            $vectorResults = $this->vectorService->search($queryVector, 100);
-            $candidateIds = array_column($vectorResults, 'user_id');
-
-            // 3. Hydrate Candidates
-            $candidates = User::whereIn('id', $candidateIds)
-                ->whereKeyNot($user->id) // Exclude self
-                ->with('profile')
-                ->get();
-
-            // 4. Apply Hard Filters (Distance, Age, Gender) & Heuristic Scoring
-            // Reuse existing scoring logic for Re-Ranking
-            $behavioralPrefs = $this->analyzeUserBehavior($user);
-
-            $scoredCandidates = $candidates->map(function ($candidate) use ($user, $userProfile, $behavioralPrefs) {
-                // Filter out if missing profile
-                if (! $candidate->profile) {
-                    return null;
+                if (empty($queryVector)) {
+                    return $this->fallbackToHeuristicMatching($user, $filters, $limit);
                 }
 
-                // Application Level Filtering (Distance, Age, etc) happens here effectively
-                // because we check compatibility which includes these factors.
-                // However, we should explicitly check hard filters if strict.
-                // For now, let's rely on the score.
+                // 2. Search Vector DB for candidates (Get 100 to filtering)
+                $vectorResults = $this->vectorService->search($queryVector, 100);
+                $candidateIds = array_column($vectorResults, 'user_id');
 
-                $score = $this->calculateAdvancedScore($user, $userProfile, $candidate, $behavioralPrefs);
-                $candidate->ai_score = $score;
+                if ($candidateIds === []) {
+                    return $this->fallbackToHeuristicMatching($user, $filters, $limit);
+                }
 
-                return $candidate;
-            })->filter()->values();
+                // 3. Hydrate Candidates
+                $candidates = User::whereIn('id', $candidateIds)
+                    ->whereKeyNot($user->id) // Exclude self
+                    ->with('profile')
+                    ->get();
 
-            // Sort by combined score
-            return $scoredCandidates
-                ->sortByDesc('ai_score')
-                ->take($limit)
-                ->values()
-                ->all();
+                // 4. Apply Hard Filters (Distance, Age, Gender) & Heuristic Scoring
+                // Reuse existing scoring logic for Re-Ranking
+                $behavioralPrefs = $this->analyzeUserBehavior($user);
+
+                $scoredCandidates = $candidates->map(function ($candidate) use ($user, $userProfile, $behavioralPrefs) {
+                    // Filter out if missing profile
+                    if (! $candidate->profile) {
+                        return null;
+                    }
+
+                    // Application Level Filtering (Distance, Age, etc) happens here effectively
+                    // because we check compatibility which includes these factors.
+                    // However, we should explicitly check hard filters if strict.
+                    // For now, let's rely on the score.
+
+                    $score = $this->calculateAdvancedScore($user, $userProfile, $candidate, $behavioralPrefs);
+                    $candidate->ai_score = $score;
+
+                    return $candidate;
+                })->filter()->values();
+
+                // Sort by combined score
+                return $scoredCandidates
+                    ->sortByDesc('ai_score')
+                    ->take($limit)
+                    ->values()
+                    ->all();
+            } catch (\Throwable $exception) {
+                Log::warning('AI matching fell back to heuristic matching', [
+                    'user_id' => $user->id,
+                    'error' => $exception->getMessage(),
+                ]);
+
+                return $this->fallbackToHeuristicMatching($user, $filters, $limit);
+            }
         });
     }
 

@@ -35,9 +35,13 @@ class RecommendationService
     /**
      * Get personalized recommendations for a user
      */
-    public function getRecommendations(int $userId, array $context = []): array
+    public function getRecommendations(int $userId, array $context = [], ?array $types = null): array
     {
-        $cacheKey = "recommendations_{$userId}_".md5(serialize($context));
+        $requestedTypes = $this->normalizeRequestedTypes($types);
+        $cacheKey = "recommendations_{$userId}_".md5(serialize([
+            'context' => $context,
+            'types' => $requestedTypes,
+        ]));
 
         // Check cache first
         if ($cached = Cache::get($cacheKey)) {
@@ -49,33 +53,40 @@ class RecommendationService
             return [];
         }
 
-        // Get user profile and behavior data
-        $userProfile = $this->getUserProfile($user);
-        $userBehavior = $this->getUserBehavior($user);
-        $contextualData = $this->getContextualData($context);
+        $sources = [];
 
-        // Generate recommendations using multiple strategies
-        $recommendations = [];
+        if (in_array('content', $requestedTypes, true)) {
+            $userProfile = $this->getUserProfile($user);
+            $userBehavior = $this->getUserBehavior($user);
+            $sources['content'] = $this->resolveRecommendationSource('content', function () use ($userProfile, $userBehavior) {
+                return $this->getContentBasedRecommendations($userProfile, $userBehavior);
+            });
+        }
 
-        // 1. Content-based recommendations
-        $contentBased = $this->getContentBasedRecommendations($userProfile, $userBehavior);
+        if (in_array('collaborative', $requestedTypes, true)) {
+            $userBehavior = $userBehavior ?? $this->getUserBehavior($user);
+            $sources['collaborative'] = $this->resolveRecommendationSource('collaborative', function () use ($user, $userBehavior) {
+                return $this->getCollaborativeRecommendations($user, $userBehavior);
+            });
+        }
 
-        // 2. Collaborative filtering
-        $collaborative = $this->getCollaborativeRecommendations($user, $userBehavior);
+        if (in_array('ai', $requestedTypes, true)) {
+            $userProfile = $userProfile ?? $this->getUserProfile($user);
+            $userBehavior = $userBehavior ?? $this->getUserBehavior($user);
+            $contextualData = $this->getContextualData($context);
+            $sources['ai'] = $this->resolveRecommendationSource('ai', function () use ($userProfile, $userBehavior, $contextualData) {
+                return $this->getAIRecommendations($userProfile, $userBehavior, $contextualData);
+            });
+        }
 
-        // 3. AI-powered recommendations
-        $aiRecommendations = $this->getAIRecommendations($userProfile, $userBehavior, $contextualData);
-
-        // 4. Location-based recommendations
-        $locationBased = $this->getLocationBasedRecommendations($user, $context);
+        if (in_array('location', $requestedTypes, true)) {
+            $sources['location'] = $this->resolveRecommendationSource('location', function () use ($user, $context) {
+                return $this->getLocationBasedRecommendations($user, $context);
+            });
+        }
 
         // Combine and rank recommendations
-        $recommendations = $this->combineRecommendations([
-            'content' => $contentBased,
-            'collaborative' => $collaborative,
-            'ai' => $aiRecommendations,
-            'location' => $locationBased,
-        ]);
+        $recommendations = $this->combineRecommendations($sources);
 
         // Apply diversity and freshness filters
         $recommendations = $this->applyDiversityFilter($recommendations);
@@ -288,17 +299,22 @@ class RecommendationService
         $recommendations = [];
         $profile = $user->profile;
 
-        if (! $profile || ! $profile->latitude || ! $profile->longitude) {
+        $latitude = $context['latitude'] ?? $profile?->latitude;
+        $longitude = $context['longitude'] ?? $profile?->longitude;
+        $radius = isset($context['radius']) ? (int) $context['radius'] : 5000;
+
+        if (! is_numeric($latitude) || ! is_numeric($longitude)) {
             return $recommendations;
         }
 
+        $latitude = (float) $latitude;
+        $longitude = (float) $longitude;
+        $radius = max(100, min($radius, 50000));
+
         // Find nearby bulletin boards
-        $nearbyBoards = BulletinBoard::whereRaw('ST_Distance_Sphere(location, POINT(?, ?)) <= ?', [
-            $profile->longitude,
-            $profile->latitude,
-            5000, // 5km radius
-        ])->where('is_active', true)
-            ->orderByRaw('ST_Distance_Sphere(location, POINT(?, ?))', [$profile->longitude, $profile->latitude])
+        $nearbyBoards = BulletinBoard::query()
+            ->active()
+            ->nearLocation($latitude, $longitude, $radius)
             ->limit(5)
             ->get();
 
@@ -309,7 +325,7 @@ class RecommendationService
                     'id' => $board->id,
                     'name' => $board->name,
                     'description' => $board->description,
-                    'distance' => $this->calculateDistance($profile->latitude, $profile->longitude, $board->center_lat, $board->center_lng),
+                    'distance' => $this->calculateDistance($latitude, $longitude, (float) $board->center_lat, (float) $board->center_lng),
                 ],
                 'score' => $this->calculateLocationScore($board, $user),
                 'reason' => 'Near your location',
@@ -354,6 +370,32 @@ class RecommendationService
         });
 
         return array_slice($uniqueRecommendations, 0, $this->recommendationConfig['max_recommendations']);
+    }
+
+    private function normalizeRequestedTypes(?array $types): array
+    {
+        $allowedTypes = ['content', 'collaborative', 'ai', 'location'];
+        $requestedTypes = $types === null || $types === []
+            ? $allowedTypes
+            : array_values(array_intersect($allowedTypes, $types));
+
+        return $requestedTypes === [] ? $allowedTypes : $requestedTypes;
+    }
+
+    private function resolveRecommendationSource(string $source, callable $resolver): array
+    {
+        try {
+            $recommendations = $resolver();
+
+            return is_array($recommendations) ? $recommendations : [];
+        } catch (\Throwable $exception) {
+            Log::error('Recommendation source failed', [
+                'source' => $source,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return [];
+        }
     }
 
     /**

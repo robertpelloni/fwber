@@ -8,6 +8,15 @@ All notable changes to this project will be documented in this file.
 - Corrected recommendation engagement scoring to query `events.starts_at`, matching the live schema and preventing production `/api/recommendations/feed` failures caused by the nonexistent `start_time` column.
 - Added regression coverage proving recommendation engagement scoring counts recent attended events through the `starts_at` event timestamp.
 - Fixed the subscription settings page and swipe matches page to consume the shared frontend API client's unwrapped responses correctly instead of reading nonexistent nested `data` payloads.
+## [1.0.27] - 2026-04-01 — Recommendation And Matching Resilience
+
+### Fixed
+- Made the recommendation service evaluate only the requested recommendation source types so `ai`, `location`, `mixed`, and feed requests stop triggering unrelated brittle code paths.
+- Fixed location recommendations to query bulletin boards through the real `center_lat` and `center_lng` schema instead of the nonexistent `location` column.
+- Hardened recommendation source execution so a failing source logs and degrades to an empty slice instead of returning a 500 for the whole recommendations response.
+- Added an AI matching fallback guard so vector embedding/search failures fall back to heuristic matching rather than crashing `/api/matches`.
+- Added regression coverage for location-only recommendations and vector-failure fallback behavior.
+
 ## [1.0.26] - 2026-04-01 — Frontend API Contract Repair
 
 ### Fixed

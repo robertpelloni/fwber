@@ -59,10 +59,7 @@ class RecommendationController extends Controller
             $limit = $request->input('limit', 10);
 
             // Generate recommendations using the service
-            $recommendations = $this->filterRecommendationsByType(
-                $this->recommendationService->getRecommendations($user->id, $context),
-                $types
-            );
+            $recommendations = $this->recommendationService->getRecommendations($user->id, $context, $types);
 
             // Log recommendation generation for analytics
             $this->recordTelemetrySafely($user->id, 'recommendation_generated', [
