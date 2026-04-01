@@ -78,6 +78,15 @@ function clearStoredAuth(): void {
   localStorage.removeItem('fwber_user')
 }
 
+function persistStoredAuth(user: User, token: string): void {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  localStorage.setItem('fwber_token', token)
+  localStorage.setItem('fwber_user', JSON.stringify(user))
+}
+
 // Initial state
 const initialState: AuthState = {
   user: null,
@@ -334,6 +343,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       logAuth.login(email, true)
       setUserContext(data.user)
+      persistStoredAuth(data.user, data.access_token || data.token)
       dispatch({ 
         type: 'AUTH_SUCCESS', 
         payload: { 
@@ -373,6 +383,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       logAuth.login(walletAddress, true)
       setUserContext(data.user)
+      persistStoredAuth(data.user, data.access_token || data.token)
       dispatch({
         type: 'AUTH_SUCCESS',
         payload: {
@@ -414,6 +425,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Assuming the challenge endpoint returns the same structure as login on success
       setUserContext(data.user)
+      persistStoredAuth(data.user, data.access_token || data.token)
       dispatch({ 
         type: 'AUTH_SUCCESS', 
         payload: { 
@@ -475,6 +487,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       logAuth.register(email, true)
       setUserContext(data.user)
+      persistStoredAuth(data.user, data.access_token || data.token)
       dispatch({ 
         type: 'AUTH_SUCCESS', 
         payload: { 

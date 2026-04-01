@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.11] - 2026-04-01 — Auth Persistence Race Fix
+
+### Fixed
+- Persisted freshly issued auth tokens to browser storage immediately during login, wallet login, two-factor completion, and registration.
+- Prevented immediate post-login authenticated requests from racing ahead of token persistence and triggering a false logout/session-expired redirect.
+
 ## [1.0.10] - 2026-04-01 — Final Route Prefetch Cleanup
 
 ### Fixed

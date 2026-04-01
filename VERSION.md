@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.10`
+- **Current version:** `1.0.11`
 - **Release date:** `2026-04-01`
-- **Release name:** `Final Route Prefetch Cleanup`
+- **Release name:** `Auth Persistence Race Fix`
 
 ## Summary
 
-This release disables the final remaining Link-prefetch sources for `/messages` and `/proximity` that were still surfacing noisy RSC fallback logs after the broader app-shell hardening.
+This release fixes a frontend auth persistence race where freshly authenticated sessions could be cleared by immediate post-login API requests before the token had been persisted for the shared API client to use.
 
 ## Version Sources of Truth
 
