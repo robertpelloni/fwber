@@ -122,6 +122,7 @@ export function ProximityPresenceView({
             <div className="text-center pt-2">
               <Link
                 href="/proximity"
+                prefetch={false}
                 className="text-sm text-blue-600 font-medium hover:text-blue-700"
               >
                 View all {nearbyUsers.length} nearby →
@@ -135,6 +136,7 @@ export function ProximityPresenceView({
       <div className="mt-4 pt-4 border-t border-gray-100">
         <Link
           href="/proximity"
+          prefetch={false}
           className="flex items-center justify-center gap-2 w-full py-2.5 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-lg font-medium text-sm hover:from-orange-600 hover:to-pink-600 transition-colors"
         >
           <MapPin className="h-4 w-4" />
@@ -160,6 +162,7 @@ export function ProximityPresenceCompact({
   return (
     <Link
       href="/proximity"
+      prefetch={false}
       className={`flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-orange-50 to-pink-50 hover:from-orange-100 hover:to-pink-100 transition-colors ${className}`}
     >
       <div className="flex items-center gap-3">

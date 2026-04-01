@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.10] - 2026-04-01 — Final Route Prefetch Cleanup
+
+### Fixed
+- Disabled the last remaining `/messages` and `/proximity` `Link` prefetch paths outside the main app shell, including dashboard legacy cards and proximity presence widgets.
+- Reduced the remaining protected-route RSC fallback noise to actual click-time navigation instead of background prefetch attempts.
+
 ## [1.0.9] - 2026-04-01 — Asset Recovery & Protected Prefetch Hardening
 
 ### Fixed

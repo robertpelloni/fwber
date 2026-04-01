@@ -1,7 +1,7 @@
-# Project Status — fwber v1.0.9 (Asset Recovery & Protected Prefetch Hardening)
+# Project Status — fwber v1.0.10 (Final Route Prefetch Cleanup)
 
 **Date:** 2026-04-01  
-**Version:** 1.0.9 "Asset Recovery & Protected Prefetch Hardening"  
+**Version:** 1.0.10 "Final Route Prefetch Cleanup"  
 **Status:** 🚀 **PATCHED AND READY TO REDEPLOY**
 
 ---
@@ -12,6 +12,6 @@
 - **Protected Widgets**: Achievements and related widgets now wait for authenticated state before issuing requests.
 
 ## ✅ Release Focus
-- [x] Disabled app-shell prefetch for the wider set of authenticated navigation targets still showing RSC fallback noise.
-- [x] Quieted achievements auth-expiry noise and made stale-asset recovery retryable after cooldown.
+- [x] Disabled the final leftover `/messages` and `/proximity` link prefetch sources outside the app header/sidebar shell.
+- [x] Narrowed remaining route-fallback behavior to real user navigation instead of background prefetch noise.
 - [ ] Awaiting rebuild and production redeploy verification.

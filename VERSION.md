@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.9`
+- **Current version:** `1.0.10`
 - **Release date:** `2026-04-01`
-- **Release name:** `Asset Recovery & Protected Prefetch Hardening`
+- **Release name:** `Final Route Prefetch Cleanup`
 
 ## Summary
 
-This release broadens protected-route prefetch suppression in the authenticated app shell, quiets expected achievements auth-expiry noise, and allows stale-asset recovery to retry after a cooldown so clients stuck on missing chunks can recover more reliably.
+This release disables the final remaining Link-prefetch sources for `/messages` and `/proximity` that were still surfacing noisy RSC fallback logs after the broader app-shell hardening.
 
 ## Version Sources of Truth
 
