@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use BadMethodCallException;
 use Illuminate\Cache\TaggableStore;
 use Illuminate\Support\Facades\Cache;
 
@@ -10,7 +11,12 @@ class TaggedCache
     public static function remember(array $tags, string $key, \Closure $callback, \DateTimeInterface|int|null $ttl = null): mixed
     {
         if (self::supportsTags()) {
-            return Cache::tags($tags)->remember($key, $ttl, $callback);
+            try {
+                return Cache::tags($tags)->remember($key, $ttl, $callback);
+            } catch (BadMethodCallException) {
+                // Some production cache drivers report a taggable store but still reject tags at runtime.
+                // Fall back to the namespaced key strategy so hot paths keep working on shared hosting.
+            }
         }
 
         return Cache::remember(self::namespacedKey($tags, $key), $ttl, $callback);
@@ -19,9 +25,13 @@ class TaggedCache
     public static function flush(array $tags): void
     {
         if (self::supportsTags()) {
-            Cache::tags($tags)->flush();
+            try {
+                Cache::tags($tags)->flush();
 
-            return;
+                return;
+            } catch (BadMethodCallException) {
+                // Keep the fallback invalidation path below for stores that reject tags at runtime.
+            }
         }
 
         Cache::forever(self::namespaceCacheKey($tags), self::currentNamespaceVersion($tags) + 1);

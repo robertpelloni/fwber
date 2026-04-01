@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.21`
+- **Current version:** `1.0.22`
 - **Release date:** `2026-04-01`
-- **Release name:** `Health Version Source Repair`
+- **Release name:** `Tagged Cache Runtime Fallback`
 
 ## Summary
 
-This release makes the backend health endpoint report the real deployed application version by sourcing `config('app.version')` from the repository `VERSION` file instead of an ancient hardcoded fallback.
+This release hardens the shared tagged-cache helper so production endpoints keep working even when the active cache store advertises tag support but throws at runtime, restoring `/api/matches` safety on DreamHost.
 
 ## Version Sources of Truth
 

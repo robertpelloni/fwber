@@ -1,7 +1,7 @@
-# Project Status — fwber v1.0.21 (Health Version Source Repair)
+# Project Status — fwber v1.0.22 (Tagged Cache Runtime Fallback)
 
 **Date:** 2026-04-01  
-**Version:** 1.0.21 "Health Version Source Repair"  
+**Version:** 1.0.22 "Tagged Cache Runtime Fallback"  
 **Status:** 🚀 **PATCHED AND READY TO REDEPLOY**
 
 ---
@@ -12,7 +12,7 @@
 - **Protected Widgets**: Achievements and related widgets now wait for authenticated state before issuing requests.
 
 ## ✅ Release Focus
-- [x] Confirmed `v1.0.20` is fully live on DreamHost and Vercel after a forced clean frontend redeploy.
-- [x] Repaired the backend health version source so production `/api/health` reflects the deployed repository version instead of a stale hardcoded fallback.
-- [x] Added regression coverage for the health endpoint version signal.
-- [ ] Awaiting redeploy and live verification that `/api/health` now reports `1.0.21`.
+- [x] Confirmed `v1.0.21` is fully live on DreamHost and Vercel, including `/api/health` reporting the correct deployed version.
+- [x] Hardened the shared tagged-cache fallback so runtime tag failures no longer crash `/api/matches` and related cache-tagged endpoints on DreamHost.
+- [x] Added unit coverage for tagged cache runtime fallback behavior and revalidated the match filter feature suites.
+- [ ] Awaiting redeploy and live verification that `/api/matches` no longer logs cache-tagging exceptions.

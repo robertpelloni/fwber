@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.22] - 2026-04-01 — Tagged Cache Runtime Fallback
+
+### Fixed
+- Hardened the shared `TaggedCache` helper so runtime `BadMethodCallException` tag failures fall back to the namespaced non-taggable cache strategy instead of crashing endpoints.
+- Added unit coverage for both `remember()` and `flush()` fallback behavior and revalidated the `/api/matches` feature path with the match filter suites.
+
 ## [1.0.21] - 2026-04-01 — Health Version Source Repair
 
 ### Fixed
