@@ -74,6 +74,40 @@ function isTransientAuthResponse(status: number): boolean {
   return status >= 500 || status === 429
 }
 
+function restoreCachedAuth(
+  userStr: string | null,
+  token: string | null,
+  cancelled: boolean,
+  dispatch: React.Dispatch<AuthAction>
+): boolean {
+  if (!userStr || !token) {
+    return false
+  }
+
+  try {
+    const parsedUser = JSON.parse(userStr) as User
+    setApiClientAuthToken(token)
+
+    if (!cancelled) {
+      dispatch({
+        type: 'AUTH_SUCCESS',
+        payload: { user: parsedUser, token },
+      })
+    }
+
+    try {
+      setUserContext(parsedUser)
+    } catch (error) {
+      console.error('Logging/Sentry error:', error)
+    }
+
+    return true
+  } catch (restoreError) {
+    console.error('AuthContext Cache Restore Error:', restoreError)
+    return false
+  }
+}
+
 function clearStoredAuth(): void {
   if (typeof window === 'undefined') {
     return
@@ -293,7 +327,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         } catch (error) {
           console.error('AuthContext Restore Error:', error)
+
+          if (restoreCachedAuth(userStr, token, cancelled, dispatch)) {
+            return
+          }
+
           clearStoredAuth()
+          clearUserContext()
           if (!cancelled) {
             dispatch({ type: 'INITIALIZE_END' })
           }
@@ -302,31 +342,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch (err) {
         console.error('AuthContext: Critical Init Error', err)
 
-        const cachedUser = localStorage.getItem('fwber_user')
-        const cachedToken = localStorage.getItem('fwber_token')
-
-        if (cachedUser && cachedToken) {
-          try {
-            const parsedUser = JSON.parse(cachedUser) as User
-            setApiClientAuthToken(cachedToken)
-
-            if (!cancelled) {
-              dispatch({
-                type: 'AUTH_SUCCESS',
-                payload: { user: parsedUser, token: cachedToken },
-              })
-            }
-
-            try {
-              setUserContext(parsedUser)
-            } catch (error) {
-              console.error('Logging/Sentry error:', error)
-            }
-
-            return
-          } catch (restoreError) {
-            console.error('AuthContext Cache Restore Error:', restoreError)
-          }
+        if (restoreCachedAuth(localStorage.getItem('fwber_user'), localStorage.getItem('fwber_token'), cancelled, dispatch)) {
+          return
         }
 
         clearStoredAuth()

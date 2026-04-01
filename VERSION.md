@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.16`
+- **Current version:** `1.0.17`
 - **Release date:** `2026-04-01`
-- **Release name:** `Auth Restore And Legacy Notifications Stability`
+- **Release name:** `Auth Restore Network Fallback`
 
 ## Summary
 
-This release stabilizes authenticated session restore on the frontend and completes legacy production notification support on the backend so boot-time protected requests no longer force logout and DreamHost's older notifications schema works across read flows.
+This release closes the remaining frontend auth-restore gap so browser network errors during `/auth/me` restoration fall back to cached session state instead of clearing a valid login.
 
 ## Version Sources of Truth
 

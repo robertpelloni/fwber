@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.17] - 2026-04-01 — Auth Restore Network Fallback
+
+### Fixed
+- Reused cached auth state when `/auth/me` restoration fails with a browser fetch/network error instead of clearing a valid session.
+- Consolidated auth-cache restoration into a shared helper so transient restore failures and critical init failures behave consistently.
+
 ## [1.0.16] - 2026-04-01 — Auth Restore And Legacy Notifications Stability
 
 ### Fixed

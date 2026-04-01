@@ -1,7 +1,7 @@
-# Project Status — fwber v1.0.16 (Auth Restore And Legacy Notifications Stability)
+# Project Status — fwber v1.0.17 (Auth Restore Network Fallback)
 
 **Date:** 2026-04-01  
-**Version:** 1.0.16 "Auth Restore And Legacy Notifications Stability"  
+**Version:** 1.0.17 "Auth Restore Network Fallback"  
 **Status:** 🚀 **PATCHED AND READY TO REDEPLOY**
 
 ---
@@ -12,7 +12,6 @@
 - **Protected Widgets**: Achievements and related widgets now wait for authenticated state before issuing requests.
 
 ## ✅ Release Focus
-- [x] Prevented transient frontend auth-restore failures from clearing valid sessions during boot.
-- [x] Deferred protected photo/notification requests until auth initialization completes.
-- [x] Completed legacy DreamHost notifications support for count and read mutations.
-- [ ] Awaiting live rollout verification for the combined auth and notifications hotfix.
+- [x] Reused cached auth state when `/auth/me` restore fails with a browser network error.
+- [x] Kept the earlier auth-init and legacy-notifications stabilizations in place.
+- [ ] Awaiting live verification that auth restore console noise no longer corresponds to session loss.
