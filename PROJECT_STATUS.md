@@ -1,7 +1,7 @@
-# Project Status — fwber v1.0.17 (Auth Restore Network Fallback)
+# Project Status — fwber v1.0.18 (Production Cache And Recommendations Repair)
 
 **Date:** 2026-04-01  
-**Version:** 1.0.17 "Auth Restore Network Fallback"  
+**Version:** 1.0.18 "Production Cache And Recommendations Repair"  
 **Status:** 🚀 **PATCHED AND READY TO REDEPLOY**
 
 ---
@@ -12,6 +12,8 @@
 - **Protected Widgets**: Achievements and related widgets now wait for authenticated state before issuing requests.
 
 ## ✅ Release Focus
-- [x] Reused cached auth state when `/auth/me` restore fails with a browser network error.
-- [x] Kept the earlier auth-init and legacy-notifications stabilizations in place.
-- [ ] Awaiting live verification that auth restore console noise no longer corresponds to session loss.
+- [x] Added a safe fallback for tagged-cache reads and invalidation when production cache storage does not support tags.
+- [x] Repaired live `subscriptions/history` and `matches` paths to use the safe cache fallback instead of throwing cache-tag exceptions.
+- [x] Restored recommendations endpoint compatibility for serialized query params and the frontend's expected response contract.
+- [x] Fixed the federation settings page to consume unwrapped API responses safely.
+- [ ] Awaiting redeploy and live verification for subscriptions, matches, recommendations, and federation settings.

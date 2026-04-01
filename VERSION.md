@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.17`
+- **Current version:** `1.0.18`
 - **Release date:** `2026-04-01`
-- **Release name:** `Auth Restore Network Fallback`
+- **Release name:** `Production Cache And Recommendations Repair`
 
 ## Summary
 
-This release closes the remaining frontend auth-restore gap so browser network errors during `/auth/me` restoration fall back to cached session state instead of clearing a valid login.
+This release repairs the current production API failure cluster by making cache-tag usage safe on DreamHost, restoring recommendations API compatibility, and fixing the federation settings page's response-shape handling.
 
 ## Version Sources of Truth
 

@@ -22,6 +22,18 @@ interface RemoteActor {
     server: string;
 }
 
+interface FederationFollowingResponse {
+    following?: any[];
+}
+
+interface FederationFollowersResponse {
+    followers?: any[];
+}
+
+interface FederationSearchResponse {
+    actors?: RemoteActor[];
+}
+
 export default function FederationSettingsPage() {
     const { token, user } = useAuth();
     const { toast } = useToast();
@@ -35,17 +47,19 @@ export default function FederationSettingsPage() {
     const fetchConnections = useCallback(async () => {
         if (!token) return;
         try {
-            const followingsRes = await api.get('/federation/following', {
+            const followingsRes = await api.get<FederationFollowingResponse>('/federation/following', {
                 headers: { Authorization: `Bearer ${token}` }
-            }) as any;
-            setFollowing(followingsRes.data.following || []);
+            });
+            setFollowing(Array.isArray(followingsRes.following) ? followingsRes.following : []);
 
-            const followersRes = await api.get('/federation/followers', {
+            const followersRes = await api.get<FederationFollowersResponse>('/federation/followers', {
                 headers: { Authorization: `Bearer ${token}` }
-            }) as any;
-            setFollowers(followersRes.data.followers || []);
+            });
+            setFollowers(Array.isArray(followersRes.followers) ? followersRes.followers : []);
         } catch (error) {
             console.error('Failed to fetch connections:', error);
+            setFollowing([]);
+            setFollowers([]);
         }
     }, [token]);
 
@@ -86,14 +100,15 @@ export default function FederationSettingsPage() {
 
         try {
             setIsSearching(true);
-            const response = await api.get(`/federation/search?q=${encodeURIComponent(handle)}`, {
+            const response = await api.get<FederationSearchResponse>(`/federation/search?q=${encodeURIComponent(handle)}`, {
                 headers: { Authorization: `Bearer ${token}` }
-            }) as any;
+            });
             
-            setResults(response.data.actors);
+            setResults(Array.isArray(response.actors) ? response.actors : []);
             setActiveTab('search');
         } catch (error) {
             console.error('Federated search failed:', error);
+            setResults([]);
             toast({
                 variant: "destructive",
                 title: "Search Failed",

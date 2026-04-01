@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Payment;
 use App\Models\Subscription;
+use App\Support\TaggedCache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 
 class SubscriptionController extends Controller
 {
@@ -35,12 +35,11 @@ class SubscriptionController extends Controller
 
         // Cache for 5 minutes with user-specific tagged caching
         $cacheKey = config('optimization.cache_version').":subscriptions:user:{$userId}";
-        $subscriptions = Cache::tags(['subscriptions', "user:{$userId}"])
-            ->remember($cacheKey, 300, function () use ($userId) {
+        $subscriptions = TaggedCache::remember(['subscriptions', "user:{$userId}"], $cacheKey, function () use ($userId) {
                 return Subscription::where('user_id', $userId)
                     ->orderBy('created_at', 'desc')
                     ->get();
-            });
+            }, 300);
 
         return response()->json($subscriptions);
     }
@@ -74,12 +73,11 @@ class SubscriptionController extends Controller
 
         // Cache for 10 minutes with user-specific and page-specific tagged caching
         $cacheKey = config('optimization.cache_version').":payments:history:user:{$userId}:page:{$page}";
-        $payments = Cache::tags(['subscriptions', "user:{$userId}"])
-            ->remember($cacheKey, 600, function () use ($userId) {
+        $payments = TaggedCache::remember(['subscriptions', "user:{$userId}"], $cacheKey, function () use ($userId) {
                 return Payment::where('user_id', $userId)
                     ->orderBy('created_at', 'desc')
                     ->paginate(20);
-            });
+            }, 600);
 
         return response()->json($payments);
     }
@@ -133,7 +131,7 @@ class SubscriptionController extends Controller
         $subscription->save();
 
         // Invalidate cache
-        Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
+        TaggedCache::flush(['subscriptions', "user:{$user->id}"]);
 
         return response()->json([
             'message' => 'Subscription canceled successfully. You will retain access until '.$subscription->ends_at->format('Y-m-d'),

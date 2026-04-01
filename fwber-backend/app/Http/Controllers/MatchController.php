@@ -14,10 +14,10 @@ use App\Services\AIMatchingService;
 use App\Services\EmailNotificationService;
 use App\Services\MatchMakerService;
 use App\Services\PushNotificationService;
+use App\Support\TaggedCache;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -177,7 +177,7 @@ class MatchController extends Controller
         // Cache feed for 5 minutes per user with filter params
         $cacheKey = "feed:user_{$user->id}:".md5($request->getQueryString() ?? '');
 
-        $matches = Cache::tags(["matches_feed:user_{$user->id}"])->remember($cacheKey, 300, function () use ($user, $profile, $request) {
+        $matches = TaggedCache::remember(["matches_feed:user_{$user->id}"], $cacheKey, function () use ($user, $profile, $request) {
             $filters = [
                 'age_min' => $request->get('age_min'),
                 'age_max' => $request->get('age_max'),
@@ -214,7 +214,7 @@ class MatchController extends Controller
 
                 return $candidate;
             });
-        });
+        }, 300);
 
         // Emit telemetry
         app(\App\Services\TelemetryService::class)->emit('feed.viewed', [
@@ -254,7 +254,7 @@ class MatchController extends Controller
 
         $cacheKey = "matches:established:user_{$user->id}";
 
-        $conversations = Cache::tags(["matches_list:user_{$user->id}"])->remember($cacheKey, 60, function () use ($user) {
+        $conversations = TaggedCache::remember(["matches_list:user_{$user->id}"], $cacheKey, function () use ($user) {
             $matches = DB::table('matches')
                 ->where('user1_id', $user->id)
                 ->orWhere('user2_id', $user->id)
@@ -297,7 +297,7 @@ class MatchController extends Controller
                     'other_user' => $otherUser,
                 ];
             });
-        });
+        }, 60);
 
         return response()->json(['data' => $conversations]);
     }
@@ -436,7 +436,7 @@ class MatchController extends Controller
         }
 
         // Invalidate feed cache so the user doesn't see this person again immediately
-        Cache::tags(["matches_feed:user_{$user->id}"])->flush();
+        TaggedCache::flush(["matches_feed:user_{$user->id}"]);
 
         // Check for mutual match
         $isMatch = $this->checkForMatch($user->id, $targetUserId);
@@ -704,8 +704,8 @@ class MatchController extends Controller
                 ]);
 
                 // Invalidate established matches cache for both users
-                Cache::tags(["matches_list:user_{$user1}"])->flush();
-                Cache::tags(["matches_list:user_{$user2}"])->flush();
+                TaggedCache::flush(["matches_list:user_{$user1}"]);
+                TaggedCache::flush(["matches_list:user_{$user2}"]);
 
                 // Send notifications to both users
                 $userA = User::find($user1);

@@ -8,6 +8,14 @@ All notable changes to this project will be documented in this file.
 - Reused cached auth state when `/auth/me` restoration fails with a browser fetch/network error instead of clearing a valid session.
 - Consolidated auth-cache restoration into a shared helper so transient restore failures and critical init failures behave consistently.
 
+## [1.0.18] - 2026-04-01 — Production Cache And Recommendations Repair
+
+### Fixed
+- Added a backend tagged-cache fallback so production endpoints keep working when the active cache store does not support Laravel cache tags.
+- Repaired live `subscriptions` and `matches` endpoints to use the safe cache fallback instead of crashing with tag-support exceptions.
+- Made recommendations endpoints accept serialized `types` and `context` query params, restored the missing route/controller compatibility methods, and returned the frontend's expected `recommendations`/`metadata` response shape.
+- Fixed the federation settings page to consume the shared API client's unwrapped responses correctly and guard against non-array payloads.
+
 ## [1.0.16] - 2026-04-01 — Auth Restore And Legacy Notifications Stability
 
 ### Fixed
