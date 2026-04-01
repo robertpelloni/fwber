@@ -12,14 +12,16 @@ use Illuminate\Support\Str;
 
 class AvatarGenerationService
 {
-    private array $config;
-
     private MediaAnalysisInterface $mediaAnalysis;
 
     public function __construct(MediaAnalysisInterface $mediaAnalysis)
     {
         $this->mediaAnalysis = $mediaAnalysis;
-        $this->config = config('avatar_generation', [
+    }
+
+    private function config(): array
+    {
+        return config('avatar_generation', [
             'enabled' => true,
             'default_provider' => 'dalle', // or 'gemini', 'replicate'
             'providers' => [
@@ -44,12 +46,12 @@ class AvatarGenerationService
 
     public function getProviders(): array
     {
-        return $this->config['providers'];
+        return $this->config()['providers'];
     }
 
     public function generateAvatar(User $user, array $options = []): array
     {
-        $provider = $options['provider'] ?? $this->config['default_provider'];
+        $provider = $options['provider'] ?? $this->config()['default_provider'];
         $prompt = $this->buildPrompt($user, $options);
         $negativePrompt = $this->buildNegativePrompt($options);
 
@@ -113,7 +115,8 @@ class AvatarGenerationService
 
     private function generateWithDalle(string $prompt, array $options): array
     {
-        $apiKey = $this->config['providers']['dalle']['api_key'];
+        $config = $this->config();
+        $apiKey = $config['providers']['dalle']['api_key'];
 
         if (empty($apiKey)) {
             if (app()->environment('testing')) {
@@ -130,11 +133,11 @@ class AvatarGenerationService
             'Authorization' => 'Bearer '.$apiKey,
             'Content-Type' => 'application/json',
         ])->post('https://api.openai.com/v1/images/generations', [
-            'model' => $this->config['providers']['dalle']['model'],
+            'model' => $config['providers']['dalle']['model'],
             'prompt' => $prompt,
             'n' => 1,
-            'size' => $this->config['providers']['dalle']['size'],
-            'quality' => $this->config['providers']['dalle']['quality'],
+            'size' => $config['providers']['dalle']['size'],
+            'quality' => $config['providers']['dalle']['quality'],
             'response_format' => 'url',
         ]);
 
@@ -153,7 +156,8 @@ class AvatarGenerationService
 
     private function generateWithGemini(string $prompt, string $negativePrompt, array $options): array
     {
-        $apiKey = $this->config['providers']['gemini']['api_key'];
+        $config = $this->config();
+        $apiKey = $config['providers']['gemini']['api_key'];
 
         if (empty($apiKey)) {
             if (app()->environment('testing')) {
@@ -168,7 +172,7 @@ class AvatarGenerationService
 
         // Note: Actual Gemini Imagen endpoint might differ or require Vertex AI
         // Using the one from legacy code as reference
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$this->config['providers']['gemini']['model']}:generateImage?key={$apiKey}";
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$config['providers']['gemini']['model']}:generateImage?key={$apiKey}";
 
         $response = Http::post($url, [
             'prompt' => $prompt,
@@ -193,7 +197,8 @@ class AvatarGenerationService
 
     private function generateWithReplicate(string $prompt, string $negativePrompt, array $options): array
     {
-        $apiToken = $this->config['providers']['replicate']['api_token'];
+        $config = $this->config();
+        $apiToken = $config['providers']['replicate']['api_token'];
 
         if (empty($apiToken)) {
             if (app()->environment('testing')) {
@@ -207,7 +212,7 @@ class AvatarGenerationService
         }
 
         // Use provided model version or fallback to config
-        $version = $options['model'] ?? $this->config['providers']['replicate']['model'];
+        $version = $options['model'] ?? $config['providers']['replicate']['model'];
 
         $input = [
             'prompt' => $prompt,
@@ -242,7 +247,8 @@ class AvatarGenerationService
 
     private function generateWithReplicateImg2Img(string $imagePath, string $prompt, string $negativePrompt, array $options): array
     {
-        $apiToken = $this->config['providers']['replicate']['api_token'];
+        $config = $this->config();
+        $apiToken = $config['providers']['replicate']['api_token'];
 
         if (empty($apiToken)) {
             if (app()->environment('testing')) {
@@ -386,7 +392,7 @@ class AvatarGenerationService
         $get = fn ($key) => $options[$key] ?? $profile?->{$key} ?? null;
 
         // Base style
-        $parts[] = $options['style'] ?? $this->config['default_style'];
+        $parts[] = $options['style'] ?? $this->config()['default_style'];
 
         // Age
         $age = $options['age'] ?? null;

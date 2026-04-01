@@ -34,6 +34,8 @@ class DatePlannerTest extends TestCase
 
     public function test_generates_ideas_for_matched_users()
     {
+        config(['services.openai.api_key' => 'test-openai-key']);
+
         $user1 = User::factory()->create();
         UserProfile::factory()->create(['user_id' => $user1->id, 'bio' => 'Likes coffee and dogs']);
 
@@ -46,9 +48,9 @@ class DatePlannerTest extends TestCase
             'status' => 'accepted',
         ]);
 
-        // Mock OpenAI HTTP response
+        // Mock the chat completions endpoint used by AIMatchingService.
         Http::fake([
-            'api.openai.com/*' => Http::response([
+            'https://api.openai.com/v1/chat/completions' => Http::response([
                 'choices' => [
                     [
                         'message' => [
