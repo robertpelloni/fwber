@@ -135,7 +135,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [DeviceTokenController::class, 'store']);
         Route::delete('/{token}', [DeviceTokenController::class, 'destroy']);
     });
-    Route::get('/notifications', [DeviceTokenController::class, 'index']);
+    Route::get('device-tokens', [DeviceTokenController::class, 'index']);
 
     // Block routes
     Route::prefix('blocks')->group(function (): void {

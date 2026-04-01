@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.13] - 2026-04-01 — Notifications Route Repair
+
+### Fixed
+- Removed the backend `/notifications` route conflict so authenticated notification fetches resolve to `NotificationController` instead of the device-token listing controller.
+- Disabled prefetch on the login page's `/register` and `/test-auth` links to avoid background RSC fallback noise there.
+- Suppressed non-actionable websocket connection console noise for known transient `WebSocketError`/auth-code cases.
+
 ## [1.0.12] - 2026-04-01 — Auth Token Source Hardening
 
 ### Fixed
