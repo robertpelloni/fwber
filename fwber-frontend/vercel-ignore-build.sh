@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # fwber Vercel Ignored Build Step Script
+# Touching this file is a safe way to trigger a frontend-only Vercel deploy when needed.
 # Usage: Set "Ignored Build Step" in Vercel to: bash vercel-ignore-build.sh
 
 # Determine the path to check
