@@ -10,9 +10,9 @@ use App\Models\EventAttendee;
 use App\Models\Payment;
 use App\Services\Payment\PaymentGatewayInterface;
 use App\Services\TokenDistributionService;
+use App\Support\TaggedCache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class EventController extends Controller
@@ -98,7 +98,7 @@ class EventController extends Controller
         ]));
 
         // Cache for 5 minutes with tagged caching
-        $events = Cache::tags(['events'])->remember($cacheKey, 300, function () use ($request) {
+        $events = TaggedCache::remember(['events'], $cacheKey, function () use ($request) {
             $query = Event::query();
 
             // Geospatial filter
@@ -140,7 +140,7 @@ class EventController extends Controller
             }
 
             return $query->withCount('attendees')->paginate(20);
-        });
+        }, 300);
 
         return response()->json($events);
     }
@@ -218,7 +218,7 @@ class EventController extends Controller
         }
 
         // Invalidate events cache
-        Cache::tags(['events'])->flush();
+        TaggedCache::flush(['events']);
 
         return response()->json($event, 201);
     }
@@ -454,7 +454,7 @@ class EventController extends Controller
         }
 
         // Invalidate events cache (attendee counts changed)
-        Cache::tags(['events'])->flush();
+        TaggedCache::flush(['events']);
 
         return response()->json($attendee);
     }

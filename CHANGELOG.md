@@ -16,6 +16,13 @@ All notable changes to this project will be documented in this file.
 - Made recommendations endpoints accept serialized `types` and `context` query params, restored the missing route/controller compatibility methods, and returned the frontend's expected `recommendations`/`metadata` response shape.
 - Fixed the federation settings page to consume the shared API client's unwrapped responses correctly and guard against non-array payloads.
 
+## [1.0.19] - 2026-04-01 — Cache Fallback Expansion And Notification Schema Caching
+
+### Fixed
+- Expanded the non-taggable cache fallback across additional production runtime paths including events, profile views, Stripe subscription invalidation, subscription cleanup jobs, and AI matching cache invalidation.
+- Cached legacy notification schema detection so repeated notification requests stop querying `information_schema` on every hot path hit.
+- Preserved the existing `v1.0.18` production fixes while reducing the risk of future DreamHost cache-tag regressions in adjacent endpoints.
+
 ## [1.0.16] - 2026-04-01 — Auth Restore And Legacy Notifications Stability
 
 ### Fixed

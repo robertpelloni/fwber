@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -91,9 +92,11 @@ class NotificationController extends Controller
 
     private function usesLegacyNotificationsSchema(): bool
     {
-        return Schema::hasColumn('notifications', 'user_id')
-            && ! Schema::hasColumn('notifications', 'notifiable_type')
-            && ! Schema::hasColumn('notifications', 'notifiable_id');
+        return Cache::remember('notifications:schema:is_legacy', 300, function () {
+            return Schema::hasColumn('notifications', 'user_id')
+                && ! Schema::hasColumn('notifications', 'notifiable_type')
+                && ! Schema::hasColumn('notifications', 'notifiable_id');
+        });
     }
 
     private function legacyNotificationData(object $notification): array

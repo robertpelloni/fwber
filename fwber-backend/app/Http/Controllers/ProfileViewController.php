@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\TaggedCache;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -89,7 +90,7 @@ class ProfileViewController extends Controller
 
         // Invalidate stats cache for the viewed user
         Cache::forget("profile_stats:{$userId}");
-        Cache::tags(["profile_views:{$userId}"])->flush();
+        TaggedCache::flush(["profile_views:{$userId}"]);
 
         return response()->json(['message' => 'Profile view recorded']);
     }
@@ -163,7 +164,7 @@ class ProfileViewController extends Controller
 
         $cacheKey = "profile_views_list:{$userId}";
 
-        return Cache::tags(["profile_views:{$userId}"])->remember($cacheKey, 300, function () use ($userId) {
+        return TaggedCache::remember(["profile_views:{$userId}"], $cacheKey, function () use ($userId) {
             $views = DB::table('profile_views')
                 ->where('viewed_user_id', $userId)
                 ->whereNotNull('viewer_user_id')
@@ -190,7 +191,7 @@ class ProfileViewController extends Controller
             }
 
             return $viewsWithUsers;
-        });
+        }, 300);
     }
 
     /**

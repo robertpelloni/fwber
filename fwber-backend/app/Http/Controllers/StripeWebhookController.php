@@ -7,9 +7,9 @@ use App\Models\Subscription;
 use App\Models\User;
 use App\Notifications\PaymentFailedNotification;
 use App\Support\LogContext;
+use App\Support\TaggedCache;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Stripe\Exception\SignatureVerificationException;
 use Stripe\Webhook;
@@ -160,7 +160,7 @@ class StripeWebhookController extends Controller
         ));
 
         // Invalidate subscription cache for this user
-        Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
+        TaggedCache::flush(['subscriptions', "user:{$user->id}"]);
     }
 
     /**
@@ -238,7 +238,7 @@ class StripeWebhookController extends Controller
         ));
 
         // Invalidate subscription cache
-        Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
+        TaggedCache::flush(['subscriptions', "user:{$user->id}"]);
     }
 
     /**
@@ -302,7 +302,7 @@ class StripeWebhookController extends Controller
         ));
 
         // Invalidate subscription cache
-        Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
+        TaggedCache::flush(['subscriptions', "user:{$user->id}"]);
     }
 
     /**
@@ -352,7 +352,7 @@ class StripeWebhookController extends Controller
         ));
 
         // Invalidate subscription cache
-        Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
+        TaggedCache::flush(['subscriptions', "user:{$user->id}"]);
     }
 
     /**
@@ -429,7 +429,7 @@ class StripeWebhookController extends Controller
         ));
 
         // Invalidate subscription cache
-        Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
+        TaggedCache::flush(['subscriptions', "user:{$user->id}"]);
 
         // Send notification to user about failed payment
         try {
@@ -504,6 +504,6 @@ class StripeWebhookController extends Controller
         ));
 
         // Invalidate subscription cache
-        Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
+        TaggedCache::flush(['subscriptions', "user:{$user->id}"]);
     }
 }

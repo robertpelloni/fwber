@@ -5,13 +5,13 @@ namespace App\Jobs;
 use App\Models\Subscription;
 use App\Models\User;
 use App\Notifications\SubscriptionExpiredNotification;
+use App\Support\TaggedCache;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class CleanupExpiredSubscriptions implements ShouldQueue
@@ -87,7 +87,7 @@ class CleanupExpiredSubscriptions implements ShouldQueue
                 Log::info("CleanupExpiredSubscriptions: Revoked premium from user {$user->id}, subscription {$subscription->id}");
 
                 // Invalidate user's subscription cache
-                Cache::tags(['subscriptions', "user:{$user->id}"])->flush();
+                TaggedCache::flush(['subscriptions', "user:{$user->id}"]);
 
                 // Send notification to user about subscription expiration
                 try {

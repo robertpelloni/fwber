@@ -6,6 +6,7 @@ use App\Models\DateFeedback;
 use App\Models\MatchAction;
 use App\Models\User;
 use App\Models\UserProfile;
+use App\Support\TaggedCache;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -968,7 +969,7 @@ class AIMatchingService
         Cache::put('ai_behavioral_weights', $newWeights, 86400); // Cache for 24 hours
 
         Log::info('Behavioral model updated with new weights', $newWeights);
-        Cache::tags(['ai_matches'])->flush();
+        TaggedCache::flush(['ai_matches']);
     }
 
     public function generateDateIdeas(User $user1, User $user2, ?string $location = null): array

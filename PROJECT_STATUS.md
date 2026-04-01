@@ -1,7 +1,7 @@
-# Project Status — fwber v1.0.18 (Production Cache And Recommendations Repair)
+# Project Status — fwber v1.0.19 (Cache Fallback Expansion And Notification Schema Caching)
 
 **Date:** 2026-04-01  
-**Version:** 1.0.18 "Production Cache And Recommendations Repair"  
+**Version:** 1.0.19 "Cache Fallback Expansion And Notification Schema Caching"  
 **Status:** 🚀 **PATCHED AND READY TO REDEPLOY**
 
 ---
@@ -12,8 +12,7 @@
 - **Protected Widgets**: Achievements and related widgets now wait for authenticated state before issuing requests.
 
 ## ✅ Release Focus
-- [x] Added a safe fallback for tagged-cache reads and invalidation when production cache storage does not support tags.
-- [x] Repaired live `subscriptions/history` and `matches` paths to use the safe cache fallback instead of throwing cache-tag exceptions.
-- [x] Restored recommendations endpoint compatibility for serialized query params and the frontend's expected response contract.
-- [x] Fixed the federation settings page to consume unwrapped API responses safely.
-- [ ] Awaiting redeploy and live verification for subscriptions, matches, recommendations, and federation settings.
+- [x] Expanded the safe tagged-cache fallback to more live DreamHost runtime paths beyond the original `subscriptions` and `matches` repairs.
+- [x] Covered event, profile view, Stripe subscription cache invalidation, cleanup job, and AI matching invalidation paths with the shared fallback.
+- [x] Cached legacy notification schema detection to reduce repeated `information_schema` lookups on the notifications hot path.
+- [ ] Awaiting redeploy and live verification that no new cache-tag exceptions appear and notification schema-check warnings taper off.

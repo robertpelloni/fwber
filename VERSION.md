@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.18`
+- **Current version:** `1.0.19`
 - **Release date:** `2026-04-01`
-- **Release name:** `Production Cache And Recommendations Repair`
+- **Release name:** `Cache Fallback Expansion And Notification Schema Caching`
 
 ## Summary
 
-This release repairs the current production API failure cluster by making cache-tag usage safe on DreamHost, restoring recommendations API compatibility, and fixing the federation settings page's response-shape handling.
+This release expands the production-safe tagged-cache fallback to additional live runtime paths and caches notification schema detection so the hot notification path stops repeatedly introspecting `information_schema`.
 
 ## Version Sources of Truth
 
