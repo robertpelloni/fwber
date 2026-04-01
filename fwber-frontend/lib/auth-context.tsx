@@ -67,6 +67,17 @@ interface AuthContextType extends AuthState {
   updateUser: (user: User) => void
 }
 
+const BROWSER_API_BASE_URL = '/api'
+
+function clearStoredAuth(): void {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  localStorage.removeItem('fwber_token')
+  localStorage.removeItem('fwber_user')
+}
+
 // Initial state
 const initialState: AuthState = {
   user: null,
@@ -151,76 +162,123 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Initialize auth state from localStorage
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window === 'undefined') {
+      dispatch({ type: 'INITIALIZE_END' })
+      return
+    }
+
+    let cancelled = false
+
+    const initializeAuth = async () => {
       try {
         const token = localStorage.getItem('fwber_token')
         const userStr = localStorage.getItem('fwber_user')
         const devToken = localStorage.getItem('auth_token')
-        
+
         // Development bypass: if we have 'auth_token' = 'dev', treat as authenticated
         if (devToken === 'dev') {
-          dispatch({ 
-            type: 'AUTH_SUCCESS', 
-            payload: { 
-              user: { 
-                id: 1, 
-                email: 'test@example.com', 
-                name: 'Test User',
-                emailVerifiedAt: null,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-                profile: {
-                  displayName: 'Test User',
-                  dateOfBirth: '1990-01-01',
-                  gender: 'Non-binary',
-                  pronouns: 'They/Them',
-                  sexualOrientation: 'Pansexual',
-                  relationshipStyle: 'Polyamorous',
-                  bio: 'Test bio',
-                  locationLatitude: 0,
-                  locationLongitude: 0,
-                  locationDescription: 'Test Location',
-                  stiStatus: 'Negative',
-                  preferences: {},
-                  avatarUrl: null,
+          if (!cancelled) {
+            dispatch({
+              type: 'AUTH_SUCCESS',
+              payload: {
+                user: {
+                  id: 1,
+                  email: 'test@example.com',
+                  name: 'Test User',
+                  emailVerifiedAt: null,
                   createdAt: new Date().toISOString(),
-                  updatedAt: new Date().toISOString()
-                }
-              }, 
-              token: 'mock-jwt-token' 
-            } 
-          })
+                  updatedAt: new Date().toISOString(),
+                  profile: {
+                    displayName: 'Test User',
+                    dateOfBirth: '1990-01-01',
+                    gender: 'Non-binary',
+                    pronouns: 'They/Them',
+                    sexualOrientation: 'Pansexual',
+                    relationshipStyle: 'Polyamorous',
+                    bio: 'Test bio',
+                    locationLatitude: 0,
+                    locationLongitude: 0,
+                    locationDescription: 'Test Location',
+                    stiStatus: 'Negative',
+                    preferences: {},
+                    avatarUrl: null,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                  },
+                },
+                token: 'mock-jwt-token',
+              },
+            })
+          }
           return
         }
-        
-        if (token && userStr) {
-          try {
-            const user = JSON.parse(userStr)
-            dispatch({ type: 'AUTH_SUCCESS', payload: { user, token } })
-            
-            // Wrap side effects in try-catch so they don't break auth
-            try {
-              setUserContext(user)
-              logAuth.sessionRestored(user.id)
-            } catch (e) {
-              console.error('Logging/Sentry error:', e)
-            }
-          } catch (error) {
-            console.error('AuthContext Restore Error:', error)
-            // Clear invalid data
-            localStorage.removeItem('fwber_token')
-            localStorage.removeItem('fwber_user')
+
+        if (!token || !userStr) {
+          if (!cancelled) {
             dispatch({ type: 'INITIALIZE_END' })
           }
-        } else {
-          dispatch({ type: 'INITIALIZE_END' })
+          return
+        }
+
+        try {
+          JSON.parse(userStr)
+        } catch (error) {
+          console.error('AuthContext Restore Error:', error)
+          clearStoredAuth()
+          if (!cancelled) {
+            dispatch({ type: 'INITIALIZE_END' })
+          }
+          return
+        }
+
+        const response = await fetch(`${BROWSER_API_BASE_URL}/auth/me`, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        if (!response.ok) {
+          clearStoredAuth()
+          clearUserContext()
+
+          if (!cancelled) {
+            dispatch({ type: 'INITIALIZE_END' })
+          }
+          return
+        }
+
+        const verifiedUser = await response.json()
+
+        if (!cancelled) {
+          dispatch({
+            type: 'AUTH_SUCCESS',
+            payload: { user: verifiedUser, token },
+          })
+
+          try {
+            setUserContext(verifiedUser)
+            logAuth.sessionRestored(verifiedUser.id)
+          } catch (error) {
+            console.error('Logging/Sentry error:', error)
+          }
         }
       } catch (err) {
-        console.error('AuthContext: Critical Init Error', err);
-        dispatch({ type: 'INITIALIZE_END' });
+        console.error('AuthContext: Critical Init Error', err)
+        clearStoredAuth()
+        clearUserContext()
+
+        if (!cancelled) {
+          dispatch({ type: 'INITIALIZE_END' })
+        }
       }
-    } else {
-      dispatch({ type: 'INITIALIZE_END' })
+    }
+
+    void initializeAuth()
+
+    return () => {
+      cancelled = true
     }
   }, [])
 
@@ -233,14 +291,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem('fwber_token', state.token)
         localStorage.setItem('fwber_user', JSON.stringify(state.user))
       } else {
-        localStorage.removeItem('fwber_token')
-        localStorage.removeItem('fwber_user')
+        clearStoredAuth()
       }
     }
   }, [state.isAuthenticated, state.token, state.user, state.isLoading])
 
-  // API base URL
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+  // Ensure browser requests use the Next.js proxy to avoid cross-origin session drift.
+  const API_BASE_URL = typeof window !== 'undefined'
+    ? BROWSER_API_BASE_URL
+    : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api')
 
   // Login function
   const login = useCallback(async (email: string, password: string) => {
@@ -435,6 +494,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Logout function
   const logout = useCallback(() => {
     const userId = state.user?.id
+    clearStoredAuth()
     clearUserContext()
     logAuth.logout(userId)
     dispatch({ type: 'LOGOUT' })
