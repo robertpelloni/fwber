@@ -33,6 +33,14 @@ interface DashboardStats {
   last_login: string;
 }
 
+interface LeaderboardData {
+  top_holders: Array<{ name: string; balance: string; joined: string }>;
+  top_referrers: Array<{ name: string; referrals: number }>;
+  top_wingmen: Array<{ name: string; assists: number }>;
+  top_vouched: Array<{ name: string; vouches: number; breakdown?: { safe: number; fun: number; hot: number } }>;
+  top_streaks: Array<{ name: string; streak: number }>;
+}
+
 export default function DashboardPage() {
   // Get user for legacy cards section
   const { user, token, isAuthenticated } = useAuth();
@@ -50,7 +58,7 @@ export default function DashboardPage() {
   const { data: leaderboardData } = useQuery({
     queryKey: ['vouch-leaderboard'],
     enabled: isAuthenticated && !!token,
-    queryFn: () => api.get('/leaderboard'),
+    queryFn: () => api.get<LeaderboardData>('/leaderboard'),
   });
 
   // Effect to check if we should show the streak modal

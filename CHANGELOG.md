@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.23] - 2026-04-01 — Notification Polling Load Reduction
+
+### Fixed
+- Changed the header notification bell to poll `GET /notifications/count` while the drawer is closed instead of fetching the full notifications payload every 30 seconds.
+- Kept the full `GET /notifications` refresh behavior for the open drawer so the UI still shows fresh notification details when the user is actively viewing them.
+- Typed the dashboard leaderboard query explicitly so frontend type-check validation succeeds while rendering the vouch leaderboard widget.
+
 ## [1.0.22] - 2026-04-01 — Tagged Cache Runtime Fallback
 
 ### Fixed

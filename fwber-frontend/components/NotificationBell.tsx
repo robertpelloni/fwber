@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { Bell, X, Check, MessageSquare, Heart, UserPlus, Eye, AlertCircle, Gift, Calendar } from 'lucide-react';
+import { Bell, X, MessageSquare, Heart, UserPlus, Eye, AlertCircle, Gift, Calendar } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { PresenceIndicator } from '@/components/realtime/PresenceComponents';
 import { api } from '@/lib/api/client';
@@ -34,6 +34,17 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+
+  const fetchUnreadCount = useCallback(async () => {
+    if (authLoading || !isAuthenticated || !token) return;
+
+    try {
+      const data = await api.get<{ unread_count?: number }>('/notifications/count');
+      setUnreadCount(data.unread_count || 0);
+    } catch (error) {
+      console.error('Failed to fetch notification count:', error);
+    }
+  }, [authLoading, isAuthenticated, token]);
 
   // Fetch notifications
   const fetchNotifications = useCallback(async () => {
@@ -79,16 +90,20 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
     }
   };
 
-  // Fetch on mount and periodically
+  // Poll the lightweight unread-count endpoint while closed and only refresh the
+  // full notifications payload when the drawer is open.
   useEffect(() => {
     if (authLoading || !isAuthenticated || !token) {
       return;
     }
 
-    fetchNotifications();
-    const interval = setInterval(fetchNotifications, 30000); // Refresh every 30s
+    const refresh = isOpen ? fetchNotifications : fetchUnreadCount;
+
+    refresh();
+    const interval = setInterval(refresh, 30000);
+
     return () => clearInterval(interval);
-  }, [authLoading, fetchNotifications, isAuthenticated, token]);
+  }, [authLoading, fetchNotifications, fetchUnreadCount, isAuthenticated, isOpen, token]);
 
   // Close dropdown when clicking outside
   useEffect(() => {

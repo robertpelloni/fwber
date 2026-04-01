@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.22`
+- **Current version:** `1.0.23`
 - **Release date:** `2026-04-01`
-- **Release name:** `Tagged Cache Runtime Fallback`
+- **Release name:** `Notification Polling Load Reduction`
 
 ## Summary
 
-This release hardens the shared tagged-cache helper so production endpoints keep working even when the active cache store advertises tag support but throws at runtime, restoring `/api/matches` safety on DreamHost.
+This release reduces production notification traffic by polling the lightweight unread-count endpoint while the header bell is closed and only fetching the full notifications feed when the drawer is open.
 
 ## Version Sources of Truth
 
