@@ -8,6 +8,12 @@ All notable changes to this project will be documented in this file.
 - Corrected recommendation engagement scoring to query `events.starts_at`, matching the live schema and preventing production `/api/recommendations/feed` failures caused by the nonexistent `start_time` column.
 - Added regression coverage proving recommendation engagement scoring counts recent attended events through the `starts_at` event timestamp.
 - Fixed the subscription settings page and swipe matches page to consume the shared frontend API client's unwrapped responses correctly instead of reading nonexistent nested `data` payloads.
+## [1.0.29] - 2026-04-01 — Auth Probe Default Cleanup
+
+### Fixed
+- Removed stale prefilled demo credentials from `/test-auth` so the production auth probe no longer suggests invalid accounts.
+- Added explicit guidance on the page that operators should enter a real production account when using the live login/profile smoke test.
+
 ## [1.0.28] - 2026-04-01 — Production Auth Probe Repair
 
 ### Fixed

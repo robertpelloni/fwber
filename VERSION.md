@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.28`
+- **Current version:** `1.0.29`
 - **Release date:** `2026-04-01`
-- **Release name:** `Production Auth Probe Repair`
+- **Release name:** `Auth Probe Default Cleanup`
 
 ## Summary
 
-This release repairs the built-in `/test-auth` production probe so it uses the live frontend API proxy instead of dead localhost-only backend URLs.
+This release removes stale hardcoded demo credentials from `/test-auth` so the production auth probe behaves like an honest manual smoke test against the live API.
 
 ## Version Sources of Truth
 

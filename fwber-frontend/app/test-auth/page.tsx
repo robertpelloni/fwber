@@ -5,12 +5,17 @@ import { useState } from 'react'
 const API_BASE_URL = '/api'
 
 export default function TestAuthPage() {
-  const [email, setEmail] = useState('test2@fwber.me')
-  const [password, setPassword] = useState('password123')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [result, setResult] = useState<string>('')
   const [loading, setLoading] = useState(false)
 
   const testLogin = async () => {
+    if (!email || !password) {
+      setResult('⚠️ Enter a real production account email and password before running the auth probe.')
+      return
+    }
+
     setLoading(true)
     setResult('Testing login...')
     
@@ -56,6 +61,11 @@ export default function TestAuthPage() {
   return (
     <div className="p-8 max-w-2xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">fwber API Integration Test</h1>
+
+      <div className="mb-6 rounded border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
+        Use a real production account for this smoke test. This page now probes the live deployed API through the
+        frontend&apos;s `/api` proxy, so stale local demo credentials are no longer prefilled.
+      </div>
       
       <div className="space-y-4">
         <div>
