@@ -26,10 +26,26 @@ interface PromotionPerformance {
     conversionRate: number;
 }
 
+interface BroadcastHistoryItem {
+    id: number;
+    content: string;
+    created_at: string | null;
+    expires_at: string | null;
+    status: 'active' | 'expired';
+    promo_code: string | null;
+    vibe_target: string;
+    vibe_snapshot: string | null;
+    activity_score: number | null;
+    promotion_id: number | null;
+    promotion_title: string | null;
+    visibility_radius_m: number;
+}
+
 interface MerchantAnalyticsResponse {
     kpis: KPIData;
     retention: RetentionData[];
     promotions: PromotionPerformance[];
+    broadcasts: BroadcastHistoryItem[];
 }
 
 export function useMerchantAnalytics(range: AnalyticsRange) {

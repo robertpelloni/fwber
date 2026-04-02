@@ -1,38 +1,34 @@
-# Handoff — Events and Shell Stabilization
+# Handoff — Merchant Broadcast History
 
 **Date:** 2026-04-02  
 **Status:** ✅ Local release verified  
-**Version:** 1.0.40
+**Version:** 1.0.41
 
 ## Overview
-This cycle stabilized several live regressions after the bounty repair. The patch fixed the production nearby-events geospatial query path, corrected the frontend contract mismatch behind the broken boost countdown, rolled the shared app shell onto Matches and Messages, and forced a favicon refresh so browsers pick up the animated logo asset again.
+This cycle extended the merchant portal analytics surface with a proper broadcast history feed. Instead of creating a separate history endpoint, the existing `/api/merchant-portal/analytics` contract now includes recent Local Pulse merchant broadcasts, and the merchant analytics UI renders them in a compact audit panel.
 
 ## Accomplishments
-- Replaced the nearby-events `HAVING distance` geospatial pagination pattern in `EventController@index` with a safer raw distance filter/order flow that behaves cleanly under production pagination.
-- Added focused `EventControllerTest` coverage proving the nearby-events radius filter excludes distant events.
-- Fixed the frontend boost contract mismatch by unwrapping the real `{ data: boost | null }` response from `/api/boosts/active`, then hardened the countdown UI against invalid expiry timestamps so it no longer renders `NaN:NaN`.
-- Rolled the shared `AppHeader` shell onto Matches and Messages so both pages show the sidebar and keep header content clear of the floating logo.
-- Added versioned favicon/icon URLs in the root layout to force browser refreshes of the animated logo asset, and cleaned `RoastGenerator` copy so it no longer renders raw HTML entities.
+- Extended `MerchantAnalyticsService` with a `getBroadcastHistory()` aggregation that filters recent `announce` artifacts down to the merchant's own `merchant_pulse_broadcast` sends.
+- Returned the new `broadcasts` payload from `MerchantAnalyticsController@index` so the merchant portal keeps a single analytics fetch contract.
+- Added focused `MerchantAnalyticsTest` coverage for both service-level history aggregation and the analytics endpoint response shape.
+- Added a broadcast history panel to `app/merchant/analytics/page.tsx` showing content, promotion, vibe target, live vibe snapshot, promo code, radius, send time, and expiry status.
+- Suppressed `GlobalSubpageNav` on `/dashboard` and loosened the shared `AppHeader` logo/status spacing so the floating-logo region no longer collides with the dashboard top bar.
 
 ## Key Files Modified
-- `fwber-backend/app/Http/Controllers/EventController.php`
-  - Reworked the geospatial filter to avoid alias-based `HAVING` pagination behavior and sort nearby results safely by computed distance.
-- `fwber-backend/tests/Feature/EventControllerTest.php`
-  - Added regression coverage for the nearby-events radius filter path.
-- `fwber-frontend/lib/hooks/use-boosts.ts`
-  - Aligned the active boost hook with the backend's real response shape.
-- `fwber-frontend/lib/api/boosts.ts`
-  - Normalized the standalone boost helpers to the same active-boost payload contract.
-- `fwber-frontend/components/BoostButton.tsx`
-  - Added safe expiry parsing and cleaner countdown formatting/fallback behavior.
-- `fwber-frontend/components/viral/RoastGenerator.tsx`
-  - Removed raw HTML entity strings from the helper and result copy.
-- `fwber-frontend/app/matches/page.tsx`
-  - Wrapped Matches in the shared protected app shell.
-- `fwber-frontend/app/messages/page.tsx`
-  - Wrapped Messages in the shared protected app shell and moved the page header block below the shared header.
-- `fwber-frontend/app/layout.tsx`
-  - Added versioned favicon/icon URLs to force browser cache refreshes of the animated logo asset.
+- `fwber-backend/app/Services/MerchantAnalyticsService.php`
+  - Added merchant broadcast history aggregation using `merchant_pulse_broadcast` proximity artifact metadata.
+- `fwber-backend/app/Http/Controllers/MerchantAnalyticsController.php`
+  - Added the new `broadcasts` payload to the merchant analytics response.
+- `fwber-backend/tests/Feature/MerchantAnalyticsTest.php`
+  - Added regression coverage for merchant broadcast history service aggregation and endpoint output.
+- `fwber-frontend/app/merchant/analytics/page.tsx`
+  - Added a read-only broadcast history panel to the merchant analytics UI.
+- `fwber-frontend/lib/hooks/use-merchant-analytics.ts`
+  - Extended the typed analytics response with the new broadcast history records.
+- `fwber-frontend/components/AppHeader.tsx`
+  - Increased the header height slightly and shifted the connection badge farther right from the logo cluster.
+- `fwber-frontend/components/GlobalSubpageNav.tsx`
+  - Disabled the floating fallback nav on the dashboard so it cannot overlap the local header there.
 - `VERSION`
 - `package.json`
 - `fwber-frontend/package.json`
@@ -43,18 +39,16 @@ This cycle stabilized several live regressions after the bounty repair. The patc
 - `ROADMAP.md`
 
 ## Validation
-- `php artisan test tests/Feature/EventControllerTest.php tests/Feature/EventTypesTest.php tests/Feature/BoostControllerTest.php`
+- `php artisan test tests/Feature/MerchantAnalyticsTest.php tests/Feature/MerchantPulseTest.php`
 - `npm run lint`
 - `npm run type-check`
 - `npm run build`
 
 ## Notes / Risks
 - Frontend lint still reports the pre-existing `react-hooks/exhaustive-deps` warning in `fwber-frontend/lib/api/photos.ts:476`.
-- Frontend build still emits the pre-existing Sentry deprecation/configuration warnings and the `bigint` optional binding warning, but the production build completes successfully.
 - `fwber-frontend/tsconfig.tsbuildinfo` changes during frontend validation because it is tracked in git.
-- Avoid overlapping frontend builds in the same checkout; one earlier overlapping run failed on a missing `.next` manifest even though clean reruns succeeded.
 
 ## Next Recommended Slice
-1. Resume the deferred merchant follow-up by adding merchant pulse broadcast history and lifecycle tooling in the merchant portal.
+1. Follow the merchant history slice with lifecycle controls such as resend/deactivate/reporting hooks if those are still desired.
 2. Start the requested larger feature program with requirements/design/planning docs for the structured interest graph and related social-discovery surfaces.
-3. Triage the remaining browser/PWA/Sentry warning noise separately from the concrete product regressions fixed in this cycle.
+3. Triage the remaining browser/PWA/Sentry warning noise separately from the concrete product regressions fixed in recent cycles.

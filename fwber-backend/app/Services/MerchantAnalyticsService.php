@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\MerchantPayment;
 use App\Models\MerchantProfile;
+use App\Models\MerchantPayment;
+use App\Models\ProximityArtifact;
 use App\Models\Promotion;
 use Carbon\Carbon;
 
@@ -171,6 +172,48 @@ class MerchantAnalyticsService
                 'conversionRate' => round($conversionRate, 1),
             ];
         })->toArray();
+    }
+
+    public function getBroadcastHistory(MerchantProfile $merchant, string $range): array
+    {
+        $startDate = $this->getStartDate($range);
+        $promotionTitles = Promotion::where('merchant_id', $merchant->id)
+            ->pluck('title', 'id');
+
+        return ProximityArtifact::query()
+            ->where('user_id', $merchant->user_id)
+            ->where('type', 'announce')
+            ->where('created_at', '>=', $startDate)
+            ->latest('created_at')
+            ->limit(10)
+            ->get()
+            ->filter(function (ProximityArtifact $artifact) use ($merchant) {
+                $meta = is_array($artifact->meta) ? $artifact->meta : [];
+
+                return ($meta['source'] ?? null) === 'merchant_pulse_broadcast'
+                    && (int) ($meta['merchant_profile_id'] ?? 0) === $merchant->id;
+            })
+            ->map(function (ProximityArtifact $artifact) use ($promotionTitles) {
+                $meta = is_array($artifact->meta) ? $artifact->meta : [];
+                $promotionId = isset($meta['promotion_id']) ? (int) $meta['promotion_id'] : null;
+
+                return [
+                    'id' => $artifact->id,
+                    'content' => $artifact->content,
+                    'created_at' => $artifact->created_at?->toIso8601String(),
+                    'expires_at' => $artifact->expires_at?->toIso8601String(),
+                    'status' => $artifact->expires_at && $artifact->expires_at->isFuture() ? 'active' : 'expired',
+                    'promo_code' => $meta['promo_code'] ?? null,
+                    'vibe_target' => $meta['vibe_target'] ?? 'any',
+                    'vibe_snapshot' => $meta['vibe_snapshot'] ?? null,
+                    'activity_score' => isset($meta['activity_score']) ? (int) $meta['activity_score'] : null,
+                    'promotion_id' => $promotionId,
+                    'promotion_title' => $promotionId ? ($promotionTitles[$promotionId] ?? null) : null,
+                    'visibility_radius_m' => $artifact->visibility_radius_m,
+                ];
+            })
+            ->values()
+            ->all();
     }
 
     private function getStartDate(string $range): Carbon

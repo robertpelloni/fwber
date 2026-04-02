@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.40`
+- **Current version:** `1.0.41`
 - **Release date:** `2026-04-02`
-- **Release name:** `Events and Shell Stabilization`
+- **Release name:** `Merchant Broadcast History`
 
 ## Summary
 
-This release stabilizes the live experience by fixing the production nearby-events query, repairing the boost countdown contract, rolling the shared app shell onto Matches and Messages, and forcing browsers to refresh the animated favicon asset.
+This release extends the merchant portal analytics surface with recent broadcast history so merchants can audit sent Local Pulse promotions, their vibe snapshots, promo codes, radius, and expiry state from a single dashboard view.
 
 ## Version Sources of Truth
 

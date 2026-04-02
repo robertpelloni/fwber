@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { BarChart3, TrendingUp, Users, Zap, ArrowLeft, RefreshCcw, DollarSign } from 'lucide-react';
+import { BarChart3, TrendingUp, Users, Zap, ArrowLeft, RefreshCcw, DollarSign, RadioTower, Clock3, Ticket } from 'lucide-react';
 import Link from 'next/link';
 
 interface AnalyticsData {
@@ -27,6 +27,20 @@ interface AnalyticsData {
         redemptions: number;
         revenue: number;
         conversionRate: number;
+    }>;
+    broadcasts: Array<{
+        id: number;
+        content: string;
+        created_at: string | null;
+        expires_at: string | null;
+        status: 'active' | 'expired';
+        promo_code: string | null;
+        vibe_target: string;
+        vibe_snapshot: string | null;
+        activity_score: number | null;
+        promotion_id: number | null;
+        promotion_title: string | null;
+        visibility_radius_m: number;
     }>;
 }
 
@@ -49,6 +63,17 @@ export default function MerchantAnalyticsPage() {
             setLoading(false);
         }
     }, [token]);
+
+    const formatDateTime = (value: string | null) => {
+        if (!value) return 'Unknown';
+
+        return new Date(value).toLocaleString([], {
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+        });
+    };
 
     useEffect(() => {
         fetchAnalytics();
@@ -201,6 +226,95 @@ export default function MerchantAnalyticsPage() {
                             </CardContent>
                         </Card>
                     </div>
+
+                    <Card className="border-zinc-200 dark:border-zinc-800">
+                        <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <CardTitle className="flex items-center gap-2 text-lg">
+                                    <RadioTower className="w-5 h-5 text-amber-500" />
+                                    Broadcast History
+                                </CardTitle>
+                                <CardDescription>
+                                    Your latest Local Pulse merchant broadcasts, including vibe snapshots and promo codes.
+                                </CardDescription>
+                            </div>
+                            <Badge variant="secondary" className="w-fit bg-zinc-100 dark:bg-zinc-800 font-bold uppercase tracking-widest text-[10px]">
+                                {data.broadcasts.length} recent send{data.broadcasts.length !== 1 ? 's' : ''}
+                            </Badge>
+                        </CardHeader>
+                        <CardContent>
+                            {data.broadcasts.length === 0 ? (
+                                <div className="rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800 p-8 text-center">
+                                    <RadioTower className="mx-auto mb-4 h-10 w-10 text-zinc-300" />
+                                    <h3 className="text-lg font-bold">No broadcasts yet</h3>
+                                    <p className="mx-auto mt-2 max-w-xl text-sm text-zinc-500">
+                                        Send a vibe-matched pulse from the merchant vibe page to start building your broadcast history here.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {data.broadcasts.map((broadcast) => (
+                                        <div
+                                            key={broadcast.id}
+                                            className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950"
+                                        >
+                                            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                                                <div className="space-y-3">
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        <Badge
+                                                            variant="secondary"
+                                                            className={broadcast.status === 'active' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300'}
+                                                        >
+                                                            {broadcast.status}
+                                                        </Badge>
+                                                        <Badge variant="outline" className="uppercase">
+                                                            vibe {broadcast.vibe_target}
+                                                        </Badge>
+                                                        {broadcast.vibe_snapshot ? (
+                                                            <Badge variant="outline" className="uppercase">
+                                                                live {broadcast.vibe_snapshot}
+                                                            </Badge>
+                                                        ) : null}
+                                                        {broadcast.promo_code ? (
+                                                            <Badge variant="outline" className="uppercase">
+                                                                <Ticket className="mr-1 h-3 w-3" />
+                                                                {broadcast.promo_code}
+                                                            </Badge>
+                                                        ) : null}
+                                                    </div>
+                                                    <p className="text-sm font-medium leading-relaxed text-zinc-900 dark:text-zinc-100">
+                                                        {broadcast.content}
+                                                    </p>
+                                                    <div className="flex flex-wrap gap-4 text-xs font-medium text-zinc-500">
+                                                        <span className="flex items-center gap-1">
+                                                            <Clock3 className="h-3.5 w-3.5" />
+                                                            Sent {formatDateTime(broadcast.created_at)}
+                                                        </span>
+                                                        <span>Radius {broadcast.visibility_radius_m}m</span>
+                                                        {broadcast.activity_score !== null ? (
+                                                            <span>Activity score {broadcast.activity_score}</span>
+                                                        ) : null}
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-2 text-sm text-zinc-500 lg:text-right">
+                                                    <div>
+                                                        <div className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Promotion</div>
+                                                        <div className="font-semibold text-zinc-900 dark:text-zinc-100">
+                                                            {broadcast.promotion_title || 'Promotion unavailable'}
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Expires</div>
+                                                        <div>{formatDateTime(broadcast.expires_at)}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
                 </>
             ) : (
                 <Card className="border-dashed border-2 py-20">

@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.41] - 2026-04-02 — Merchant Broadcast History
+
+### Fixed
+- Extended `/api/merchant-portal/analytics` to include recent Local Pulse merchant broadcast history sourced from `merchant_pulse_broadcast` proximity artifacts.
+- Added backend regression coverage for merchant broadcast history aggregation and for the analytics endpoint returning the new history payload.
+- Added a broadcast history panel to the merchant analytics page so merchants can review recent sends, vibe snapshots, promo codes, radius, and expiry state in one place.
+- Suppressed the floating global subpage nav on the dashboard and gave the shared app header more room around the logo/connection badge cluster so the top bar no longer crowds the floating logo area.
+
 ## [1.0.40] - 2026-04-02 — Events and Shell Stabilization
 
 ### Fixed

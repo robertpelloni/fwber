@@ -215,7 +215,7 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
     return (
         <>
             <header data-app-header="true" className={`sticky top-0 z-40 bg-white shadow dark:bg-gray-900 ${showNav ? 'app-header-with-sidebar' : ''}`}>
-                <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+                <div className="mx-auto flex h-[4.625rem] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                     <div className="flex min-w-0 items-center gap-3">
                         {shouldShowBackButton && (
                             <button
@@ -228,12 +228,12 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                                 <ArrowLeft className="h-5 w-5" />
                             </button>
                         )}
-                        <Link href={homeHref} className="flex items-center gap-2 transition-opacity hover:opacity-90" aria-label="Go home">
+                        <Link href={homeHref} className="flex items-center gap-2 pr-1 transition-opacity hover:opacity-90" aria-label="Go home">
                             <Logo className="text-3xl" />
                         </Link>
                         <div className="min-w-0">
                             <div className="flex items-center gap-3">
-                                <ConnectionStatusBadge />
+                                <ConnectionStatusBadge className="ml-5 shrink-0" />
                                 {title && title !== 'FWBer' && (
                                     <span className="hidden truncate text-sm font-medium text-gray-500 dark:text-gray-400 sm:inline">
                                         {title}

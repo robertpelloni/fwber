@@ -1,7 +1,7 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 0.99.1  
-> **Last Updated:** 2026-03-25  
+> **Version:** 1.0.41  
+> **Last Updated:** 2026-04-02  
 
 ---
 
@@ -11,7 +11,7 @@
 
 ## 🟡 High: Missing UI Integrations
 - [ ] **ActivityPub Federation UI**: The backend supports WebFinger, Inbox, and Outbox, but the frontend lacks a UI to search for federated users, follow them, or view the federated feed.
-- [ ] **Merchant Portal UI**: Merchant registration, promotion creation, management, analytics, vibe analysis, and live pulse broadcasting are now wired, but the portal still needs deeper lifecycle tools like sent-broadcast history, editing/reporting controls, and broader operations polish.
+- [ ] **Merchant Portal UI**: Merchant registration, promotion creation, management, analytics, vibe analysis, live pulse broadcasting, and broadcast history are now wired, but the portal still needs deeper lifecycle tools like resend/deactivate/reporting controls and broader operations polish.
 - [ ] **AI Wingman Enhancements**: The backend supports `compatibilityAudit`, `findNemesis`, and `predictFortune`. Ensure these are fully wired up in the chat interface with rich, animated UI components.
 - [ ] **Hardware Token UI Polish**: Ensure the `app/settings/hardware/page.tsx` gracefully handles BLE pairing flows and visualizes the "ping" actions.
 

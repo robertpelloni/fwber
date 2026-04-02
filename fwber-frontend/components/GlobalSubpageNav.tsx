@@ -9,7 +9,9 @@ import { useAuth } from '@/lib/auth-context'
 import { Logo } from '@/components/Logo'
 
 function shouldHideGlobalSubpageNav(pathname: string): boolean {
-  return pathname === '/' || pathname.startsWith('/api/')
+  return pathname === '/'
+    || pathname === '/dashboard'
+    || pathname.startsWith('/api/')
 }
 
 export default function GlobalSubpageNav() {

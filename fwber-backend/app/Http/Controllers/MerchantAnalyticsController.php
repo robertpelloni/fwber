@@ -28,6 +28,7 @@ class MerchantAnalyticsController extends Controller
             'kpis' => $this->analyticsService->getKPIs($merchant, $range),
             'retention' => $this->analyticsService->getRetention($merchant, $range),
             'promotions' => $this->analyticsService->getPromotionsPerformance($merchant, $range),
+            'broadcasts' => $this->analyticsService->getBroadcastHistory($merchant, $range),
         ]);
     }
 }
