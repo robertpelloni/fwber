@@ -5,6 +5,7 @@ namespace Tests\Unit\Services;
 use App\Models\BulletinBoard;
 use App\Models\Event;
 use App\Models\TelemetryEvent;
+use App\Models\Topic;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Services\Ai\Llm\LlmManager;
@@ -241,5 +242,50 @@ class RecommendationServiceTest extends TestCase
         $this->assertCount(1, $recommendations);
         $this->assertSame('location', $recommendations[0]['type']);
         $this->assertSame('Nearby Board', $recommendations[0]['content']['name']);
+    }
+
+    public function test_recommendations_include_scene_signals_from_followed_topics(): void
+    {
+        $user = User::factory()->create();
+        UserProfile::create([
+            'user_id' => $user->id,
+            'birthdate' => '1990-01-01',
+            'interests' => ['coffee', 'design'],
+        ]);
+
+        $topic = Topic::create([
+            'slug' => 'warehouse-nights',
+            'label' => 'Warehouse Nights',
+            'description' => 'Late nights and underground rooms.',
+            'emoji' => '🌃',
+            'category' => 'culture',
+            'aliases' => ['warehouse', 'nightlife'],
+            'is_featured' => true,
+            'sort_order' => 99,
+        ]);
+
+        $user->followedTopics()->attach($topic->id, ['followed_at' => now()]);
+
+        BulletinBoard::factory()->create([
+            'name' => 'Warehouse Nights Board',
+            'description' => 'Coffee pregame before the warehouse set.',
+            'center_lat' => 42.3314,
+            'center_lng' => -83.0458,
+            'is_active' => true,
+        ]);
+
+        $recommendations = $this->service->getRecommendations($user->id, [
+            'latitude' => 42.3314,
+            'longitude' => -83.0458,
+            'radius' => 5000,
+        ], ['location']);
+
+        $this->assertCount(1, $recommendations);
+        $this->assertArrayHasKey('scene_signals', $recommendations[0]);
+        $sceneSignals = $recommendations[0]['scene_signals'];
+        $this->assertIsArray($sceneSignals['matched_topics']);
+        $this->assertContains('coffee', $sceneSignals['matched_tags']);
+        $this->assertContains('warehouse', $sceneSignals['matched_tags']);
+        $this->assertGreaterThan(0, $recommendations[0]['scene_signals']['score_boost']);
     }
 }

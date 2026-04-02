@@ -1,31 +1,25 @@
-# Handoff — Scene Discovery
+# Handoff — Recommendation Scene Signals
 
 **Date:** 2026-04-02  
 **Status:** ✅ Local release verified  
-**Version:** 1.0.47
+**Version:** 1.0.48
 
 ## Overview
-This cycle shipped the next scene-based discovery slice on top of the topic hubs release. Matches now rank and serialize shared scene overlap using followed topics plus visible social context from journals and public groups, and public profiles now expose a scene summary that makes those affinities legible outside the swipe deck. The implementation deliberately reuses the existing normalized interest, topic follow, journal visibility, and group-tag seams instead of building a second recommendation taxonomy.
+This cycle shipped the next scene-discovery extension after v1.0.47 by carrying scene signals into the recommendations hub. Recommendation items and personalized feed cards now receive scene-aligned metadata derived from followed topics and structured interests, and the backend matcher was hardened so realistic recommendation text can actually trigger those scene cues. The implementation deliberately reuses the same topic graph and scene-term seams that already power match ranking and profile summaries.
 
 ## Accomplishments
-- Extended `AIMatchingService` so the match engine now computes `scene_overlap` from followed topics, structured interests, public group metadata, and visible journal tags.
-- Added `scene_summary` serialization to profile responses through `ProfileController` and `UserProfileResource`.
-- Added backend regression coverage in `SceneDiscoveryFeatureTest` for both match-overlap and profile-summary payloads.
-- Updated the swipe deck UI to render scene overlap cards and the public profile UI to render a dedicated scene summary block.
-- Aligned the frontend `Match` client contract with the live payload (`is_confessional`, `voice_intro_url`, `age`, `gender`, `is_verified`, `photos`, scene overlap) so the typed frontend matches the shipped backend response.
-- Bumped the repository release version from `1.0.46` to `1.0.47` and refreshed release-tracking docs.
+- Extended `RecommendationService` so recommendation items are enriched with `scene_signals` built from followed topics and normalized scene terms.
+- Fixed recommendation scene matching by tokenizing content strings and allowing sensible term overlap instead of strict whole-string comparison.
+- Added focused backend regression coverage in `RecommendationServiceTest` for recommendation scene enrichment while preserving the earlier scene-discovery feature coverage.
+- Updated the recommendations hub and personalized feed card UI to render scene-aligned headlines, topic chips, and matched tags.
+- Validated the slice with backend tests plus frontend lint, clean build, and fresh type-check.
+- Bumped the repository release version from `1.0.47` to `1.0.48` and refreshed release-tracking docs.
 
 ## Key Files Modified
-- `fwber-backend/app/Services/AIMatchingService.php`
-- `fwber-backend/app/Http/Controllers/MatchController.php`
-- `fwber-backend/app/Http/Controllers/ProfileController.php`
-- `fwber-backend/app/Http/Resources/MatchResource.php`
-- `fwber-backend/app/Http/Resources/UserProfileResource.php`
-- `fwber-backend/tests/Feature/SceneDiscoveryFeatureTest.php`
-- `fwber-frontend/app/matches/page.tsx`
-- `fwber-frontend/app/profile/[id]/page.tsx`
-- `fwber-frontend/lib/api/matches.ts`
-- `fwber-frontend/lib/api/profile.ts`
+- `fwber-backend/app/Services/RecommendationService.php`
+- `fwber-backend/tests/Unit/Services/RecommendationServiceTest.php`
+- `fwber-frontend/app/recommendations/page.tsx`
+- `fwber-frontend/lib/api/recommendations.ts`
 - `VERSION`
 - `package.json`
 - `fwber-frontend/package.json`
@@ -37,7 +31,7 @@ This cycle shipped the next scene-based discovery slice on top of the topic hubs
 - `HANDOFF.md`
 
 ## Validation
-- `php artisan test tests/Feature/SceneDiscoveryFeatureTest.php tests/Feature/TopicHubFeatureTest.php`
+- `php artisan test tests/Unit/Services/RecommendationServiceTest.php tests/Feature/SceneDiscoveryFeatureTest.php`
 - `npm run lint`
 - `npm run build`
 - fresh `npm run type-check`
@@ -46,9 +40,9 @@ This cycle shipped the next scene-based discovery slice on top of the topic hubs
 - Frontend lint still reports the pre-existing `react-hooks/exhaustive-deps` warning in `fwber-frontend/lib/api/photos.ts:476`.
 - `fwber-frontend/tsconfig.tsbuildinfo` changes during frontend validation because it is tracked in git.
 - The repo still has the known `.next` / `.next/types` contention when overlapping Next jobs hit the same checkout; direct shell builds can fail after successful compilation with missing build artifacts (`pages-manifest.json`, `_document.js`). Frontend validation remains reliable when run cleanly as lint -> clean build -> fresh type-check.
-- Scene discovery currently affects match ranking/payloads and profile summaries. It does not yet reshape broader recommendation feeds or Local Pulse ranking.
+- Scene discovery now affects matches, profiles, and recommendation cards, but it still does not reshape Local Pulse ranking or deeper trust-aware recommendation inputs.
 
 ## Next Recommended Slice
-1. Extend the shipped **scene discovery** metadata into broader recommendation feeds and local loops beyond the swipe deck.
+1. Extend the shipped **scene discovery** metadata into local-feed loops and trust-aware recommendation inputs beyond the current recommendation cards.
 2. Fold relationship links, friend/circle visibility, and topic follows into a richer trust-aware discovery model without leaking private graph edges.
 3. Keep building on the topic graph rather than adding a second parallel taxonomy system.

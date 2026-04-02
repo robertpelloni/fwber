@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.48] - 2026-04-02 — Recommendation Scene Signals
+
+### Fixed
+- Extended `RecommendationService` so recommendation items are enriched with `scene_signals` derived from the same followed-topic and structured-interest graph that powers scene discovery in matches and profiles.
+- Fixed recommendation scene matching to tokenize content text and allow sensible term overlap instead of relying on brittle whole-string matching, so scene cues appear for realistic board names and descriptions.
+- Updated the recommendations hub and personalized feed cards to render scene-aligned headlines, topic chips, and matched scene tags using the live API payload.
+- Added focused backend regression coverage for recommendation scene enrichment and validated the slice with lint, clean build, and fresh type-check in the frontend.
+
 ## [1.0.46] - 2026-04-02 — Topic Hubs
 
 ### Fixed

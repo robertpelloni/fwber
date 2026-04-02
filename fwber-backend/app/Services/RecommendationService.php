@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\BulletinBoard;
 use App\Models\BulletinMessage;
 use App\Models\TelemetryEvent;
+use App\Models\Topic;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Services\Ai\Llm\LlmManager;
@@ -48,7 +49,7 @@ class RecommendationService
             return $cached;
         }
 
-        $user = User::find($userId);
+        $user = User::with(['profile', 'followedTopics'])->find($userId);
         if (! $user) {
             return [];
         }
@@ -87,6 +88,7 @@ class RecommendationService
 
         // Combine and rank recommendations
         $recommendations = $this->combineRecommendations($sources);
+        $recommendations = $this->enrichRecommendationsWithSceneSignals($user, $recommendations);
 
         // Apply diversity and freshness filters
         $recommendations = $this->applyDiversityFilter($recommendations);
@@ -107,7 +109,7 @@ class RecommendationService
 
         return [
             'id' => $user->id,
-            'interests' => $user->interests ?? [],
+            'interests' => $profile?->interests ?? [],
             'age' => $profile && $profile->birthdate ? $profile->birthdate->age : 0,
             'location' => [
                 'latitude' => $profile->latitude ?? 0,
@@ -125,7 +127,7 @@ class RecommendationService
                 'has_pets' => $profile->has_pets ?? false,
                 'languages' => $profile->languages ?? [],
             ],
-            'preferences' => $user->preferences ?? [],
+            'preferences' => $profile?->preferences ?? [],
             'activity_level' => $this->calculateActivityLevel($user),
             'engagement_score' => $this->calculateEngagementScore($user),
         ];
@@ -372,6 +374,18 @@ class RecommendationService
         return array_slice($uniqueRecommendations, 0, $this->recommendationConfig['max_recommendations']);
     }
 
+    private function enrichRecommendationsWithSceneSignals(User $user, array $recommendations): array
+    {
+        $sceneProfile = $this->buildSceneProfile($user);
+        if ($sceneProfile['terms'] === [] && $sceneProfile['topics'] === []) {
+            return $recommendations;
+        }
+
+        return array_map(function (array $recommendation) use ($sceneProfile) {
+            return $this->attachSceneSignals($recommendation, $sceneProfile);
+        }, $recommendations);
+    }
+
     private function normalizeRequestedTypes(?array $types): array
     {
         $allowedTypes = ['content', 'collaborative', 'ai', 'location'];
@@ -433,6 +447,147 @@ class RecommendationService
 
             return $age <= 168; // 1 week
         });
+    }
+
+    /**
+     * @return array{topics: array<int, array{id:int,slug:string,label:string,emoji:string|null,terms:array<int,string>}>, terms: array<int, string>}
+     */
+    private function buildSceneProfile(User $user): array
+    {
+        $profile = $user->profile;
+        $topics = $user->followedTopics->map(function (Topic $topic) {
+            $terms = Topic::normalizeTerms([
+                $topic->slug,
+                $topic->label,
+                ...($topic->aliases ?? []),
+            ]);
+
+            return [
+                'id' => $topic->id,
+                'slug' => $topic->slug,
+                'label' => $topic->label,
+                'emoji' => $topic->emoji,
+                'terms' => $terms,
+            ];
+        })->values()->all();
+
+        $terms = Topic::normalizeTerms(array_merge(
+            $profile?->interests ?? [],
+            ...array_map(fn (array $topic) => $topic['terms'], $topics)
+        ));
+
+        return [
+            'topics' => $topics,
+            'terms' => $terms,
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $recommendation
+     * @param  array{topics: array<int, array{id:int,slug:string,label:string,emoji:string|null,terms:array<int,string>}>, terms: array<int, string>}  $sceneProfile
+     * @return array<string, mixed>
+     */
+    private function attachSceneSignals(array $recommendation, array $sceneProfile): array
+    {
+        $content = $recommendation['content'] ?? [];
+        $contentTerms = $this->extractSceneTerms(array_filter([
+            is_array($content) ? ($content['title'] ?? null) : null,
+            is_array($content) ? ($content['name'] ?? null) : null,
+            is_array($content) ? ($content['description'] ?? null) : null,
+            $recommendation['reason'] ?? null,
+        ]));
+
+        if ($contentTerms === []) {
+            return $recommendation;
+        }
+
+        $matchedTopics = array_values(array_filter($sceneProfile['topics'], function (array $topic) use ($contentTerms) {
+            return $this->topicMatchesContentTerms($topic['terms'], $contentTerms);
+        }));
+
+        $matchedTags = array_slice(array_values(array_intersect($sceneProfile['terms'], $contentTerms)), 0, 4);
+        $boost = min(0.2, (count($matchedTopics) * 0.08) + (count($matchedTags) * 0.03));
+
+        $recommendation['score'] = min(1.0, (float) ($recommendation['score'] ?? 0) + $boost);
+        $recommendation['scene_signals'] = [
+            'headline' => $this->buildSceneHeadline($matchedTopics, $matchedTags),
+            'matched_topics' => array_map(function (array $topic) {
+                return [
+                    'id' => $topic['id'],
+                    'slug' => $topic['slug'],
+                    'label' => $topic['label'],
+                    'emoji' => $topic['emoji'],
+                ];
+            }, array_slice($matchedTopics, 0, 3)),
+            'matched_tags' => $matchedTags,
+            'score_boost' => round($boost, 2),
+        ];
+
+        return $recommendation;
+    }
+
+    /**
+     * @param  array<int, string>  $values
+     * @return array<int, string>
+     */
+    private function extractSceneTerms(array $values): array
+    {
+        $tokens = [];
+
+        foreach ($values as $value) {
+            if (! is_string($value)) {
+                continue;
+            }
+
+            $tokens[] = $value;
+
+            $parts = preg_split('/[^a-z0-9]+/iu', mb_strtolower($value)) ?: [];
+            foreach ($parts as $part) {
+                if ($part !== '') {
+                    $tokens[] = $part;
+                }
+            }
+        }
+
+        return Topic::normalizeTerms($tokens);
+    }
+
+    /**
+     * @param  array<int, string>  $topicTerms
+     * @param  array<int, string>  $contentTerms
+     */
+    private function topicMatchesContentTerms(array $topicTerms, array $contentTerms): bool
+    {
+        foreach ($topicTerms as $topicTerm) {
+            foreach ($contentTerms as $contentTerm) {
+                if ($topicTerm === $contentTerm
+                    || str_contains($topicTerm, $contentTerm)
+                    || str_contains($contentTerm, $topicTerm)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param  array<int, array{id:int,slug:string,label:string,emoji:string|null,terms:array<int,string>}>  $matchedTopics
+     * @param  array<int, string>  $matchedTags
+     */
+    private function buildSceneHeadline(array $matchedTopics, array $matchedTags): ?string
+    {
+        $parts = [];
+
+        if ($matchedTopics !== []) {
+            $parts[] = 'Scene match on '.implode(', ', array_map(fn (array $topic) => $topic['label'], array_slice($matchedTopics, 0, 2)));
+        }
+
+        if ($matchedTags !== []) {
+            $parts[] = 'tags like '.implode(', ', array_slice($matchedTags, 0, 2));
+        }
+
+        return $parts === [] ? null : implode(' • ', $parts);
     }
 
     /**

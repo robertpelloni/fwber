@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeft,
   Brain,
+  Compass,
   Layers,
   Loader2,
   MapPin,
@@ -242,6 +243,27 @@ export default function RecommendationsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {recommendation.scene_signals && (
+            <div className="rounded-2xl border border-cyan-200 bg-cyan-50 p-3 dark:border-cyan-900/50 dark:bg-cyan-950/20">
+              <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700 dark:text-cyan-200">
+                <Compass className="h-3.5 w-3.5" />
+                Scene-aligned +{Math.round(recommendation.scene_signals.score_boost * 100)} pts
+              </div>
+              {recommendation.scene_signals.headline && (
+                <p className="mb-2 text-sm text-gray-700 dark:text-gray-200">{recommendation.scene_signals.headline}</p>
+              )}
+              <div className="flex flex-wrap gap-2">
+                {recommendation.scene_signals.matched_topics.map((topic) => (
+                  <Badge key={topic.slug} variant="outline" className="border-cyan-300 bg-white text-cyan-700 dark:border-cyan-800 dark:bg-cyan-950/20 dark:text-cyan-200">
+                    {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
+                  </Badge>
+                ))}
+                {recommendation.scene_signals.matched_tags.map((tag) => (
+                  <Badge key={tag} variant="secondary">#{tag}</Badge>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
             {recommendation.content.distance ? <Badge variant="outline">{Math.round(recommendation.content.distance)}m away</Badge> : null}
             {recommendation.source ? <Badge variant="outline">{recommendation.source}</Badge> : null}
@@ -328,6 +350,27 @@ export default function RecommendationsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-muted-foreground">
+          {item.scene_signals && (
+            <div className="rounded-2xl border border-cyan-200 bg-cyan-50 p-3 dark:border-cyan-900/50 dark:bg-cyan-950/20">
+              <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700 dark:text-cyan-200">
+                <Compass className="h-3.5 w-3.5" />
+                Scene cue
+              </div>
+              {item.scene_signals.headline && (
+                <p className="mb-2 text-sm text-gray-700 dark:text-gray-200">{item.scene_signals.headline}</p>
+              )}
+              <div className="flex flex-wrap gap-2">
+                {item.scene_signals.matched_topics.map((topic) => (
+                  <Badge key={topic.slug} variant="outline" className="border-cyan-300 bg-white text-cyan-700 dark:border-cyan-800 dark:bg-cyan-950/20 dark:text-cyan-200">
+                    {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
+                  </Badge>
+                ))}
+                {item.scene_signals.matched_tags.map((tag) => (
+                  <Badge key={tag} variant="secondary">#{tag}</Badge>
+                ))}
+              </div>
+            </div>
+          )}
           {item.timestamp ? (
             <div className="flex items-center justify-between gap-3">
               <span>Updated</span>

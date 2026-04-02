@@ -16,6 +16,17 @@ export interface Recommendation {
   reason: string;
   source?: string;
   sources?: string[];
+  scene_signals?: {
+    headline: string | null;
+    matched_topics: Array<{
+      id: number;
+      slug: string;
+      label: string;
+      emoji?: string | null;
+    }>;
+    matched_tags: string[];
+    score_boost: number;
+  };
 }
 
 export interface RecommendationMetadata {
@@ -56,6 +67,7 @@ export interface FeedItem {
   score?: number;
   reason?: string;
   timestamp?: string;
+  scene_signals?: Recommendation['scene_signals'];
 }
 
 export interface FeedResponse {
