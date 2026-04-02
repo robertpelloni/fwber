@@ -4,12 +4,13 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 import { useAuth } from '@/lib/auth-context'
 import { useEffect, useState } from 'react'
 import { getVenues, checkInToVenue, checkOutFromVenue, getCurrentCheckin, Venue, VenueCheckin } from '@/lib/api/venues'
-import { MapPin, LogIn, LogOut } from 'lucide-react'
+import { MapPin, LogIn, LogOut, BadgeCheck, Users } from 'lucide-react'
 
 export default function VenuesPage() {
   const { token } = useAuth()
   const [venues, setVenues] = useState<Venue[]>([])
   const [currentCheckin, setCurrentCheckin] = useState<VenueCheckin | null>(null)
+  const [rankingSummary, setRankingSummary] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [location, setLocation] = useState<{lat: number, lng: number} | null>(null)
   const [locationError, setLocationError] = useState<string | null>(null)
@@ -42,12 +43,12 @@ export default function VenuesPage() {
         try {
           setLoading(true)
           const [venuesData, checkinData] = await Promise.all([
-            getVenues(token, location.lat, location.lng),
+            getVenues(token, location.lat, location.lng, 'trust-aware'),
             getCurrentCheckin(token)
           ])
-          // Handle pagination wrapper if exists, otherwise assume array
-          const venuesList = (venuesData as any).data ? (venuesData as any).data : (venuesData as any).venues || venuesData
+          const venuesList = venuesData.data ?? venuesData.venues ?? []
           setVenues(Array.isArray(venuesList) ? venuesList : [])
+          setRankingSummary(venuesData.meta?.ranking_strategy?.summary ?? null)
           setCurrentCheckin(checkinData as any)
         } catch (error) {
           console.error('Failed to fetch venues', error)
@@ -62,11 +63,12 @@ export default function VenuesPage() {
       if (!token || !location) return
       try {
         const [venuesData, checkinData] = await Promise.all([
-          getVenues(token, location.lat, location.lng),
+          getVenues(token, location.lat, location.lng, 'trust-aware'),
           getCurrentCheckin(token)
         ])
-        const venuesList = (venuesData as any).data ? (venuesData as any).data : (venuesData as any).venues || venuesData
+        const venuesList = venuesData.data ?? venuesData.venues ?? []
         setVenues(Array.isArray(venuesList) ? venuesList : [])
+        setRankingSummary(venuesData.meta?.ranking_strategy?.summary ?? null)
         setCurrentCheckin(checkinData as any)
       } catch (error) {
         console.error('Failed to refresh data', error)
@@ -108,6 +110,15 @@ export default function VenuesPage() {
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold mb-8">Venues Nearby</h1>
 
+          {rankingSummary && (
+            <div className="mb-6 rounded-xl border border-purple-200 bg-purple-50 px-4 py-3 text-sm text-purple-900">
+              <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-purple-700">
+                Trust-aware venue ranking
+              </div>
+              <p>{rankingSummary}</p>
+            </div>
+          )}
+
           {currentCheckin && (
             <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6 flex justify-between items-center">
               <div>
@@ -133,11 +144,28 @@ export default function VenuesPage() {
                     <p className="text-gray-600 flex items-center mt-1">
                       <MapPin className="h-4 w-4 mr-1" /> {venue.city}, {venue.state}
                     </p>
-                    {(venue as any).distance && (
+                    {(venue.distance_meters ?? venue.distance) && (
                        <p className="text-xs text-gray-500 mt-1">
-                         {Math.round((venue as any).distance / 100) / 10} km away
-                       </p>
-                    )}
+                          {Math.round(((venue.distance_meters ?? venue.distance ?? 0) / 100)) / 10} km away
+                        </p>
+                     )}
+                     <div className="mt-2 flex flex-wrap gap-2">
+                        {venue.verification_status === 'verified' && (
+                          <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
+                            <BadgeCheck className="mr-1 h-3 w-3" /> Verified venue
+                          </span>
+                        )}
+                        {(venue.active_checkins ?? 0) > 0 && (
+                          <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">
+                            <Users className="mr-1 h-3 w-3" /> {venue.active_checkins} active check-ins
+                          </span>
+                        )}
+                     </div>
+                     {venue.scene_signals?.headline && (
+                        <p className="mt-2 text-sm text-purple-800">
+                          {venue.scene_signals.headline}
+                        </p>
+                     )}
                   </div>
                   {currentCheckin?.venue_id === venue.id ? (
                     <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">Checked In</span>

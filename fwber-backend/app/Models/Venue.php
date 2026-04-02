@@ -139,4 +139,12 @@ class Venue extends Authenticatable
     {
         return $this->hasMany(VenueCheckin::class);
     }
+
+    public function recentCheckins()
+    {
+        return $this->hasMany(VenueCheckin::class)
+            ->whereNull('checked_out_at')
+            ->where('created_at', '>=', now()->subHours(12))
+            ->latest();
+    }
 }

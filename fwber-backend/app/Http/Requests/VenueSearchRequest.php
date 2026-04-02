@@ -17,6 +17,7 @@ class VenueSearchRequest extends FormRequest
             'lat' => 'required|numeric|between:-90,90',
             'lng' => 'required|numeric|between:-180,180',
             'radius' => 'integer|min:100|max:50000',
+            'ranking_strategy' => 'nullable|in:trust-aware,distance-only',
         ];
     }
 }

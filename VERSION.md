@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.56`
+- **Current version:** `1.0.57`
 - **Release date:** `2026-04-02`
-- **Release name:** `Trust-Aware Group Matching Ranking`
+- **Release name:** `Trust-Aware Nearby Venue Ranking`
 
 ## Summary
 
-This release extends the privacy-safe trust-aware discovery model from Local Pulse, recommendations, nearby chatrooms, events, and bulletin boards into group match discovery, ranking candidate groups with compatibility, trusted members, scene alignment, member health, and distance while keeping private graph edges out of the API payload.
+This release extends the privacy-safe trust-aware discovery model from Local Pulse, recommendations, nearby chatrooms, events, bulletin boards, and group matching into nearby venue discovery, ranking venues with trusted recent visitors, scene alignment, venue health, freshness, and distance while keeping private graph edges out of the API payload.
 
 ## Version Sources of Truth
 

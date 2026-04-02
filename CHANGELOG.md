@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.57] - 2026-04-02 — Trust-Aware Nearby Venue Ranking
+
+### Fixed
+- Reworked `GET /api/venues` so nearby venue discovery now uses the same privacy-safe trust-aware model already shipped across Local Pulse, recommendations, nearby chatrooms, events, bulletin boards, and group matching, balancing trusted recent visitors, scene alignment, venue health, freshness, and distance.
+- Added `VenueRankingService` to reuse `LocalPulseRankingService` trust-map inputs and `AIMatchingService` scene-signal helpers while keeping private social-graph data internal to server-side scoring.
+- Stabilized the venues API contract by returning `data`, `venues`, and high-level `meta.ranking_strategy` metadata for consistent frontend consumption.
+- Updated the venues page to explain trust-aware ranking, surface verification and active check-in context, and render scene-aligned venue cues.
+- Added focused backend regression coverage proving nearby venues expose ranking metadata and that a trusted, scene-aligned venue can outrank a slightly closer stranger venue.
+
 ## [1.0.56] - 2026-04-02 — Trust-Aware Group Matching Ranking
 
 ### Fixed

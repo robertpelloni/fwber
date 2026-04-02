@@ -4,10 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\VenueSearchRequest;
 use App\Models\Venue;
+use App\Services\VenueRankingService;
 use Illuminate\Http\JsonResponse;
 
 class VenueController extends Controller
 {
+    public function __construct(
+        private readonly VenueRankingService $venueRankingService,
+    ) {
+    }
+
     /**
      * Get venues near a location
      *
@@ -35,30 +41,40 @@ class VenueController extends Controller
         $lat = (float) $request->validated('lat');
         $lng = (float) $request->validated('lng');
         $radius = (int) $request->validated('radius', 10000); // Default 10km
+        $rankingStrategy = $request->validated('ranking_strategy', 'trust-aware');
 
         $haversine = '(6371000 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude))))';
 
         // Use Haversine formula for distance
-        $venues = Venue::select('*')
+        $venues = Venue::query()
+            ->select('*')
             ->selectRaw("{$haversine} AS distance", [$lat, $lng, $lat])
             ->whereRaw("{$haversine} <= ?", [$lat, $lng, $lat, $radius])
             ->where('is_active', true)
-            ->orderBy('distance')
             ->limit(20)
+            ->with(['recentCheckins.user.profile'])
+            ->withCount([
+                'checkins as active_checkins' => function ($query) {
+                    $query->whereNull('checked_out_at')
+                        ->where('created_at', '>=', now()->subHours(12));
+                },
+            ])
             ->get();
 
-        // Append active check-in count to each venue
-        $venues->each(function ($venue) {
-            $venue->active_checkins = $venue->checkins()
-                ->whereNull('checked_out_at')
-                ->where('created_at', '>=', now()->subHours(12)) // Auto-checkout after 12h logic
-                ->count();
-        });
+        if ($rankingStrategy === 'trust-aware' && $request->user()) {
+            $venues = $this->venueRankingService->rankNearby($request->user(), $venues);
+        } else {
+            $venues = $venues->sortBy('distance')->values();
+        }
 
         return response()->json([
+            'data' => $venues,
             'venues' => $venues,
             'user_location' => ['lat' => $lat, 'lng' => $lng],
             'search_radius' => $radius,
+            'meta' => [
+                'ranking_strategy' => $this->venueRankingService->buildRankingStrategy(),
+            ],
         ]);
     }
 

@@ -1,5 +1,26 @@
 import { apiClient as client } from './client'
 
+export interface VenueSceneSignals {
+  headline: string | null
+  matched_topics: Array<{
+    id: number
+    slug: string
+    label: string
+    emoji?: string | null
+  }>
+  matched_tags: string[]
+  score_boost: number
+}
+
+export interface VenueRankingStrategy {
+  trusted_visitors: boolean
+  scene_alignment: boolean
+  venue_health: boolean
+  freshness: boolean
+  distance: boolean
+  summary: string
+}
+
 export interface Venue {
   id: number
   name: string
@@ -13,6 +34,14 @@ export interface Venue {
   features: string[]
   operating_hours: any
   is_active: boolean
+  business_type?: string
+  verification_status?: string
+  max_capacity?: number
+  active_checkins?: number
+  distance?: number
+  distance_meters?: number
+  scene_signals?: VenueSceneSignals | null
+  ranking_score?: number
 }
 
 export interface VenueCheckin {
@@ -30,16 +59,29 @@ export interface VenueCheckin {
   venue?: Venue
 }
 
-export const getVenues = async (token: string, lat?: number, lng?: number) => {
+export interface VenuesResponse {
+  data: Venue[]
+  venues: Venue[]
+  meta?: {
+    ranking_strategy?: VenueRankingStrategy
+  }
+}
+
+export const getVenues = async (token: string, lat?: number, lng?: number, ranking_strategy: 'trust-aware' | 'distance-only' = 'trust-aware'): Promise<VenuesResponse> => {
   const params: any = {}
   if (lat !== undefined) params.lat = lat
   if (lng !== undefined) params.lng = lng
+  params.ranking_strategy = ranking_strategy
   
-  const response = await client.get('/venues', {
+  const response = await client.get<VenuesResponse>('/venues', {
     headers: { Authorization: `Bearer ${token}` },
     params
   })
-  return response.data
+  return {
+    data: response.data.data ?? response.data.venues ?? [],
+    venues: response.data.venues ?? response.data.data ?? [],
+    meta: response.data.meta,
+  }
 }
 
 export const getVenue = async (token: string, id: number) => {
