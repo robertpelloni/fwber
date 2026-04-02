@@ -28,7 +28,10 @@ export default function BulletinBoardsPageClient() {
     lat: location?.lat || 0,
     lng: location?.lng || 0,
     radius: 5000,
+    ranking_strategy: 'trust-aware',
   });
+  const rankingStrategy = boardsData?.meta?.ranking_strategy ?? null;
+  const boards = boardsData?.data ?? boardsData?.boards ?? [];
   
   const { data: boardData, isLoading: boardLoading } = useBulletinBoard(
     selectedBoardId || 0,
@@ -171,8 +174,17 @@ export default function BulletinBoardsPageClient() {
                 </button>
               </div>
 
+              {rankingStrategy && (
+                <div className="mb-4 rounded-xl border border-purple-200 bg-purple-50 p-3 text-sm text-purple-900">
+                  <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-purple-700">
+                    Trust-aware bulletin board ranking
+                  </div>
+                  <p>{rankingStrategy.summary}</p>
+                </div>
+              )}
+
               <div className="space-y-3">
-                {boardsData?.boards.map((board) => (
+                {boards.map((board) => (
                   <div
                     key={board.id}
                     onClick={() => setSelectedBoardId(board.id)}
@@ -186,6 +198,31 @@ export default function BulletinBoardsPageClient() {
                     <p className="text-sm text-gray-600 mt-1">
                       {board.message_count} messages • {board.active_users} active
                     </p>
+                    {board.scene_signals?.headline && (
+                      <p className="mt-2 text-sm text-purple-800">
+                        {board.scene_signals.headline}
+                      </p>
+                    )}
+                    {board.scene_signals && (
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {board.scene_signals.matched_topics.slice(0, 2).map((topic) => (
+                          <span
+                            key={`board-topic-${board.id}-${topic.slug}`}
+                            className="rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-800"
+                          >
+                            {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
+                          </span>
+                        ))}
+                        {board.scene_signals.matched_tags.slice(0, 2).map((tag) => (
+                          <span
+                            key={`board-tag-${board.id}-${tag}`}
+                            className="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700"
+                          >
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                     <p className="text-xs text-gray-500 mt-1">
                       {board.radius_meters}m radius
                     </p>

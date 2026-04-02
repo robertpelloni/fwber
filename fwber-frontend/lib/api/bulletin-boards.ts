@@ -19,6 +19,19 @@ export interface BulletinBoard {
   created_at: string;
   updated_at: string;
   recent_messages?: BulletinMessage[];
+  distance_meters?: number;
+  ranking_score?: number;
+  scene_signals?: {
+    headline: string | null;
+    matched_topics: Array<{
+      id: number;
+      slug: string;
+      label: string;
+      emoji?: string | null;
+    }>;
+    matched_tags: string[];
+    score_boost: number;
+  } | null;
 }
 
 export interface BulletinMessage {
@@ -52,6 +65,16 @@ export interface BulletinBoardFilters {
   lat: number;
   lng: number;
   radius?: number;
+  ranking_strategy?: 'trust-aware' | 'distance-only';
+}
+
+export interface BulletinBoardRankingStrategy {
+  trusted_participants: boolean;
+  scene_alignment: boolean;
+  freshness: boolean;
+  activity_health: boolean;
+  distance: boolean;
+  summary: string;
 }
 
 export class BulletinBoardAPI {
@@ -84,14 +107,19 @@ export class BulletinBoardAPI {
    * Get bulletin boards near a location
    */
   async getNearbyBoards(filters: BulletinBoardFilters): Promise<{
+    data: BulletinBoard[];
     boards: BulletinBoard[];
     user_location: LocationCoords;
     search_radius: number;
+    meta?: {
+      ranking_strategy?: BulletinBoardRankingStrategy;
+    };
   }> {
     const params = new URLSearchParams({
       lat: filters.lat.toString(),
       lng: filters.lng.toString(),
       ...(filters.radius && { radius: filters.radius.toString() }),
+      ...(filters.ranking_strategy && { ranking_strategy: filters.ranking_strategy }),
     });
 
     return this.request(`/bulletin-boards?${params}`);

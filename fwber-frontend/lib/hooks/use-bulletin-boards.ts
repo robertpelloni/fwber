@@ -10,12 +10,13 @@ export function useBulletinBoards(filters: {
   lat: number;
   lng: number;
   radius?: number;
+  ranking_strategy?: 'trust-aware' | 'distance-only';
 }) {
   const { token } = useAuth();
   const api = useBulletinBoardAPI();
   
   return useQuery({
-    queryKey: ['bulletin-boards', filters.lat, filters.lng, filters.radius],
+    queryKey: ['bulletin-boards', filters.lat, filters.lng, filters.radius, filters.ranking_strategy],
     queryFn: () => api.getNearbyBoards(filters),
     enabled: !!token,
     staleTime: 5 * 60 * 1000, // 5 minutes

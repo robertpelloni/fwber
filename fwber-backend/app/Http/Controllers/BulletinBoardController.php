@@ -6,7 +6,7 @@ use App\Events\BulletinBoardActivity;
 use App\Events\BulletinMessageCreated;
 use App\Models\BulletinBoard;
 use App\Models\BulletinMessage;
-use App\Models\User;
+use App\Services\BulletinBoardRankingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +14,11 @@ use Illuminate\Support\Facades\Validator;
 
 class BulletinBoardController extends Controller
 {
+    public function __construct(
+        private readonly BulletinBoardRankingService $rankingService,
+    ) {
+    }
+
     /**
      * Get bulletin boards near a location
      *
@@ -25,6 +30,7 @@ class BulletinBoardController extends Controller
      *   @OA\Parameter(name="lat", in="query", required=true, @OA\Schema(type="number", format="float", minimum=-90, maximum=90)),
      *   @OA\Parameter(name="lng", in="query", required=true, @OA\Schema(type="number", format="float", minimum=-180, maximum=180)),
      *   @OA\Parameter(name="radius", in="query", required=false, @OA\Schema(type="integer", minimum=100, maximum=50000), description="Meters (default 5000)"),
+     *   @OA\Parameter(name="ranking_strategy", in="query", required=false, @OA\Schema(type="string", enum={"trust-aware","distance-only"}, default="trust-aware")),
      *
      *   @OA\Response(response=200, description="Nearby boards",
      *
@@ -48,6 +54,7 @@ class BulletinBoardController extends Controller
             'lat' => 'required|numeric|between:-90,90',
             'lng' => 'required|numeric|between:-180,180',
             'radius' => 'integer|min:100|max:50000', // 100m to 50km
+            'ranking_strategy' => 'nullable|in:trust-aware,distance-only',
         ]);
 
         if ($validator->fails()) {
@@ -57,20 +64,46 @@ class BulletinBoardController extends Controller
         $lat = $request->input('lat');
         $lng = $request->input('lng');
         $radius = $request->input('radius', 5000); // Default 5km
+        $rankingStrategy = $request->input('ranking_strategy', 'trust-aware');
 
-        // Use MySQL spatial query for proximity search
-        $boards = DB::table('bulletin_boards')
-            ->where('is_active', true)
-            ->whereRaw('ST_Distance_Sphere(location, POINT(?, ?)) <= ?', [$lng, $lat, $radius])
-            ->orderByRaw('ST_Distance_Sphere(location, POINT(?, ?))', [$lng, $lat])
-            ->orderBy('last_activity_at', 'desc')
-            ->limit(20)
+        $boards = BulletinBoard::query()
+            ->active()
+            ->nearLocation($lat, $lng, $radius)
+            ->with(['recentMessages.user'])
+            ->withCount([
+                'messages as moderated_messages_count' => function ($query) {
+                    $query->where('is_moderated', true);
+                },
+            ])
             ->get();
 
+        $boards->each(function (BulletinBoard $board) use ($lat, $lng) {
+            $board->distance_meters = (int) round($board->distanceFrom($lat, $lng));
+        });
+
+        if ($rankingStrategy === 'trust-aware' && $request->user()) {
+            $boards = $this->rankingService->rankNearby($request->user(), $boards, $lat, $lng);
+        } else {
+            $boards = $boards->sort(function (BulletinBoard $left, BulletinBoard $right) {
+                $distanceComparison = ($left->distance_meters <=> $right->distance_meters);
+                if ($distanceComparison !== 0) {
+                    return $distanceComparison;
+                }
+
+                return (($right->last_activity_at?->timestamp ?? 0) <=> ($left->last_activity_at?->timestamp ?? 0));
+            })->values();
+        }
+
+        $boards = $boards->take(20)->values();
+
         return response()->json([
+            'data' => $boards,
             'boards' => $boards,
             'user_location' => ['lat' => $lat, 'lng' => $lng],
             'search_radius' => $radius,
+            'meta' => [
+                'ranking_strategy' => $this->rankingService->buildRankingStrategy(),
+            ],
         ]);
     }
 

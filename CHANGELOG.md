@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.55] - 2026-04-02 — Trust-Aware Bulletin Board Ranking
+
+### Fixed
+- Reworked nearby bulletin board discovery so `GET /api/bulletin-boards` can rank boards with the same privacy-safe trust-aware model already used by Local Pulse, recommendations, nearby chatrooms, and events, balancing trusted recent participants, scene alignment, activity health, freshness, and distance.
+- Added `BulletinBoardRankingService` to reuse `LocalPulseRankingService` trust-map inputs and `AIMatchingService` scene-signal helpers while preserving the existing nearby boards response shape and keeping private social-graph details out of the payload.
+- Updated the bulletin boards API contract and page UI to expose high-level `ranking_strategy` metadata plus scene-aligned cues for ranked boards.
+- Added focused backend regression coverage proving nearby bulletin boards expose ranking metadata and that a trusted, scene-aligned board can outrank a slightly closer stranger board.
+
 ## [1.0.54] - 2026-04-02 — Trust-Aware Event Ranking
 
 ### Fixed
