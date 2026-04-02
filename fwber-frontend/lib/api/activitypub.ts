@@ -47,6 +47,33 @@ export interface FederatedPost {
   }
 }
 
+export interface FederationOutboxNote {
+  id: string
+  type: string
+  content: string
+  attributedTo: string
+  published?: string
+  to?: string[]
+}
+
+export interface FederationOutboxActivity {
+  id: string
+  type: string
+  actor: string
+  published?: string
+  to?: string[]
+  object: FederationOutboxNote
+}
+
+export interface FederationOutboxPage {
+  '@context'?: string | string[]
+  id: string
+  type: string
+  partOf?: string
+  totalItems?: number
+  orderedItems: FederationOutboxActivity[]
+}
+
 interface FederationActorDetailResponse {
   actor: FederationActor
 }
@@ -91,4 +118,34 @@ export async function getFederatedPosts(params?: {
   })
 
   return Array.isArray(response.posts) ? response.posts : []
+}
+
+export function buildFederationOutboxHref(userId: number, limit = 20): string {
+  return `/api/federation/users/${userId}/outbox?page=true&limit=${limit}`
+}
+
+export async function getFederationOutbox(
+  userId: number,
+  params?: { limit?: number }
+): Promise<FederationOutboxPage> {
+  const response = await fetch(buildFederationOutboxHref(userId, params?.limit ?? 20), {
+    headers: {
+      Accept: 'application/activity+json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to load federation outbox (${response.status})`)
+  }
+
+  const data = (await response.json()) as Partial<FederationOutboxPage>
+
+  return {
+    id: data.id || buildFederationOutboxHref(userId, params?.limit ?? 20),
+    type: data.type || 'OrderedCollectionPage',
+    partOf: data.partOf,
+    totalItems: data.totalItems,
+    orderedItems: Array.isArray(data.orderedItems) ? data.orderedItems : [],
+    '@context': data['@context'],
+  }
 }

@@ -29,6 +29,7 @@ import {
     Share2,
     MessageSquare,
     Radio,
+    Send,
     Sparkles,
     CheckCircle2,
     ExternalLink,
@@ -226,6 +227,11 @@ export default function FederationSettingsPage() {
                     <Link href="/settings/federation/activity">
                         <Button variant="outline" size="sm" className="border-purple-200 text-purple-600 hover:bg-purple-50">
                             <Radio className="w-4 h-4 mr-2" /> Activity Center
+                        </Button>
+                    </Link>
+                    <Link href="/settings/federation/outbox">
+                        <Button variant="outline" size="sm" className="border-indigo-200 text-indigo-600 hover:bg-indigo-50">
+                            <Send className="w-4 h-4 mr-2" /> Outbox
                         </Button>
                     </Link>
                     <Link href="/settings/federation/feed">

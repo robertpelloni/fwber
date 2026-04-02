@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.0.61  
+> **Version:** 1.0.62  
 > **Last Updated:** 2026-04-02
 
 ---
@@ -10,7 +10,7 @@
 - [ ] **Verify Vercel Deployment**: Ensure the latest Next.js build with the `/api` absolute path proxy and MIME fixes is successfully deployed and running.
 
 ## 🟡 High: Missing UI Integrations
-- [ ] **ActivityPub Federation UI**: The backend supports WebFinger, Inbox, and Outbox, but the frontend lacks a UI to search for federated users, follow them, or view the federated feed.
+- [ ] **ActivityPub Federation Protocol Hardening**: Federation UI now covers search, follow relationships, actor exploration, activity center, global feed, and public outbox visibility, but signed outbound delivery, follow accept handling, and inbox signature verification still need implementation.
 - [ ] **Merchant Portal UI**: Merchant registration, promotion creation, management, analytics, vibe analysis, live pulse broadcasting, and broadcast history are now wired, but the portal still needs deeper lifecycle tools like resend/deactivate/reporting controls and broader operations polish.
 - [x] **Scene Discovery Phase 5**: Followed the topic-hub slice with topic-aware match ranking, richer profile scene cards, and scene overlap that uses interests plus visible social context instead of pure radius.
 - [x] **Recommendation Scene Signals**: Extended the recommendation hub and personalized feed with scene-aligned recommendation metadata and card rendering on top of the shared topic graph.
@@ -27,6 +27,7 @@
 - [x] **Deal Ranking / Trust Signals**: Extended nearby deals discovery with the same privacy-safe trust-aware scoring model, fixed the coupled merchant relation contract, and added high-level ranking explanation.
 - [x] **Chatroom Ranking / Trust Signals**: Extended chatroom browse discovery with the same privacy-safe trust-aware scoring model and high-level ranking explanation.
 - [x] **Sidebar Shell Sweep**: Moved the remaining requested community and discovery pages onto the shared `AppHeader` shell and promoted `/federation` as the primary federation route.
+- [x] **Federation Outbox Visibility**: Replaced the placeholder public outbox with a real ActivityStreams collection backed by active board posts, added a dedicated outbox page, and surfaced it in the federation activity center.
 - [ ] **AI Wingman Enhancements**: The backend supports `compatibilityAudit`, `findNemesis`, and `predictFortune`. Ensure these are fully wired up in the chat interface with rich, animated UI components.
 - [ ] **Hardware Token UI Polish**: Ensure the `app/settings/hardware/page.tsx` gracefully handles BLE pairing flows and visualizes the "ping" actions.
 

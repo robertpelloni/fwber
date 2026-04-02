@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.62] - 2026-04-02 — Federation Outbox Visibility
+
+### Fixed
+- Replaced the placeholder ActivityPub outbox response with a real `OrderedCollection` / `OrderedCollectionPage` backed by active public `board_post` proximity artifacts for federated users.
+- Mapped eligible local board posts into public ActivityStreams `Create` activities containing `Note` objects so fwber now exposes a meaningful outbox surface without widening private graph data.
+- Added focused backend regression coverage proving the outbox page only includes active `board_post` artifacts and excludes expired or unrelated artifact types.
+- Extended the shared federation frontend API contract with typed outbox helpers so ActivityPub pages can request and render public outbox entries consistently.
+- Added a dedicated federation outbox page plus an activity-center outbox summary so users can review the public activities currently exposed for their federated identity.
+- Expanded the federation hub navigation with an Outbox entry, keeping `/federation` as the primary route while making the new public outbox surface easier to reach.
+
 ## [1.0.61] - 2026-04-02 — Trust-Aware Chatroom Ranking & Sidebar Shell Sweep
 
 ### Fixed

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\FederatedPost;
 use App\Models\Following;
+use App\Models\ProximityArtifact;
 use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -143,6 +144,50 @@ class ActivityPubTest extends TestCase
         $response->assertStatus(200)
             ->assertHeader('Content-Type', 'application/activity+json')
             ->assertJsonPath('type', 'OrderedCollection');
+    }
+
+    public function test_outbox_page_returns_active_board_posts_as_create_activities()
+    {
+        $user = User::factory()->create(['name' => 'delta']);
+        UserProfile::factory()->create([
+            'user_id' => $user->id,
+            'is_federated' => true,
+        ]);
+
+        ProximityArtifact::factory()->create([
+            'user_id' => $user->id,
+            'type' => 'board_post',
+            'content' => 'Hello from fwber federation',
+            'expires_at' => now()->addHour(),
+            'created_at' => now()->subMinutes(5),
+        ]);
+
+        ProximityArtifact::factory()->create([
+            'user_id' => $user->id,
+            'type' => 'announce',
+            'content' => 'This should not appear in the outbox',
+            'expires_at' => now()->addHour(),
+        ]);
+
+        ProximityArtifact::factory()->create([
+            'user_id' => $user->id,
+            'type' => 'board_post',
+            'content' => 'This expired post should stay out of the public outbox',
+            'expires_at' => now()->subHour(),
+        ]);
+
+        $response = $this->getJson("/api/federation/users/{$user->id}/outbox?page=true&limit=10");
+
+        $response->assertStatus(200)
+            ->assertHeader('Content-Type', 'application/activity+json')
+            ->assertJsonPath('type', 'OrderedCollectionPage')
+            ->assertJsonPath('partOf', url("/api/federation/users/{$user->id}/outbox"))
+            ->assertJsonPath('totalItems', 1)
+            ->assertJsonCount(1, 'orderedItems')
+            ->assertJsonPath('orderedItems.0.type', 'Create')
+            ->assertJsonPath('orderedItems.0.actor', url("/api/federation/users/{$user->id}"))
+            ->assertJsonPath('orderedItems.0.object.type', 'Note')
+            ->assertJsonPath('orderedItems.0.object.content', 'Hello from fwber federation');
     }
 
     public function test_actor_detail_returns_remote_actor_with_cached_context()

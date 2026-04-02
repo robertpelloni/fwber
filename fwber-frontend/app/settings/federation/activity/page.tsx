@@ -10,6 +10,7 @@ import {
   Loader2,
   MessageSquare,
   Radio,
+   Send,
   UserPlus,
   Users,
 } from 'lucide-react'
@@ -22,10 +23,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { api } from '@/lib/api/client'
 import {
   buildFederationActorExplorerHref,
+  getFederationOutbox,
   formatFederationHandle,
+  type FederationOutboxActivity,
   type FederatedPost,
   type FederationConnection,
 } from '@/lib/api/activitypub'
+import { useAuth } from '@/lib/auth-context'
 
 interface FollowersResponse {
   followers?: FederationConnection[]
@@ -58,11 +62,22 @@ type ActivityItem =
       content: string
       actorUri: string
     }
+  | {
+      id: string
+      kind: 'outbox'
+      title: string
+      subtitle: string
+      timestamp: string
+      content: string
+      actorUri: string
+    }
 
 export default function FederationActivityPage() {
+  const { user } = useAuth()
   const [followers, setFollowers] = useState<FederationConnection[]>([])
   const [following, setFollowing] = useState<FederationConnection[]>([])
   const [posts, setPosts] = useState<FederatedPost[]>([])
+  const [outboxActivities, setOutboxActivities] = useState<FederationOutboxActivity[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -70,10 +85,11 @@ export default function FederationActivityPage() {
 
     const load = async () => {
       try {
-        const [followersResponse, followingResponse, postsResponse] = await Promise.all([
+        const [followersResponse, followingResponse, postsResponse, outboxResponse] = await Promise.all([
           api.get<FollowersResponse>('/federation/followers'),
           api.get<FollowingResponse>('/federation/following'),
           api.get<PostsResponse>('/federation/posts'),
+          user?.id ? getFederationOutbox(user.id, { limit: 12 }) : Promise.resolve({ orderedItems: [], totalItems: 0, id: '', type: 'OrderedCollectionPage' }),
         ])
 
         if (cancelled) {
@@ -83,6 +99,7 @@ export default function FederationActivityPage() {
         setFollowers(Array.isArray(followersResponse.followers) ? followersResponse.followers : [])
         setFollowing(Array.isArray(followingResponse.following) ? followingResponse.following : [])
         setPosts(Array.isArray(postsResponse.posts) ? postsResponse.posts : [])
+        setOutboxActivities(Array.isArray(outboxResponse.orderedItems) ? outboxResponse.orderedItems : [])
       } catch (error) {
         console.error('Failed to load federation activity:', error)
 
@@ -90,6 +107,7 @@ export default function FederationActivityPage() {
           setFollowers([])
           setFollowing([])
           setPosts([])
+          setOutboxActivities([])
         }
       } finally {
         if (!cancelled) {
@@ -103,7 +121,7 @@ export default function FederationActivityPage() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [user?.id])
 
   const activityItems = useMemo<ActivityItem[]>(() => {
     const followerItems = followers.map((follower) => ({
@@ -126,10 +144,20 @@ export default function FederationActivityPage() {
       actorUri: post.actor_uri,
     }))
 
-    return [...followerItems, ...postItems]
+    const outboxItems = outboxActivities.map((activity) => ({
+      id: `outbox-${activity.id}`,
+      kind: 'outbox' as const,
+      title: 'You published a federated board post',
+      subtitle: activity.object.type,
+      timestamp: activity.published || new Date().toISOString(),
+      content: activity.object.content,
+      actorUri: activity.actor,
+    }))
+
+    return [...followerItems, ...outboxItems, ...postItems]
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
       .slice(0, 12)
-  }, [followers, posts])
+  }, [followers, outboxActivities, posts])
 
   return (
     <ProtectedRoute>
@@ -202,6 +230,15 @@ export default function FederationActivityPage() {
                     Federated posts currently available through the shared global feed.
                   </CardContent>
                 </Card>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardDescription>Outbox Entries</CardDescription>
+                    <CardTitle>{outboxActivities.length}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-sm text-muted-foreground">
+                    Public activities currently exposed from your own ActivityPub outbox.
+                  </CardContent>
+                </Card>
               </div>
 
               <div className="grid gap-6 xl:grid-cols-[1.3fr_1fr]">
@@ -239,7 +276,7 @@ export default function FederationActivityPage() {
                               </Link>
                             </div>
                             <Badge variant="outline" className="shrink-0">
-                              {item.kind === 'post' ? 'Post' : 'Follower'}
+                              {item.kind === 'post' ? 'Post' : item.kind === 'outbox' ? 'Outbox' : 'Follower'}
                             </Badge>
                           </div>
                           <div
@@ -256,6 +293,38 @@ export default function FederationActivityPage() {
                 </Card>
 
                 <div className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <Send className="w-5 h-5 text-indigo-500" />
+                        Outbox
+                      </CardTitle>
+                      <CardDescription>Your public ActivityPub entries as seen through fwber.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {outboxActivities.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">No public outbox entries yet.</p>
+                      ) : (
+                        outboxActivities.slice(0, 5).map((activity) => (
+                          <div key={activity.id} className="rounded-lg border p-3">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                              {activity.object.type}
+                            </p>
+                            <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                              {activity.object.content.replace(/<[^>]+>/g, '')}
+                            </p>
+                          </div>
+                        ))
+                      )}
+                      <Button asChild variant="outline" className="w-full">
+                        <Link href="/settings/federation/outbox">
+                          <Send className="mr-2 h-4 w-4" />
+                          Open Outbox
+                        </Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
+
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-lg">

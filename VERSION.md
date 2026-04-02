@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.61`
+- **Current version:** `1.0.62`
 - **Release date:** `2026-04-02`
-- **Release name:** `Trust-Aware Chatroom Ranking & Sidebar Shell Sweep`
+- **Release name:** `Federation Outbox Visibility`
 
 ## Summary
 
-This release extends the privacy-safe trust-aware discovery model into the main chatroom browse directory and finishes the requested shared `AppHeader` sidebar shell rollout across the remaining community and discovery pages, including the new primary `/federation` route.
+This release turns the federated outbox into a real user-visible surface by exposing active public board posts as ActivityPub `Create` activities, adding a dedicated outbox page, and surfacing those entries directly inside the federation activity center.
 
 ## Version Sources of Truth
 
