@@ -8,6 +8,7 @@ import { stripePromise } from '@/lib/stripe';
 import { StripePaymentForm } from './StripePaymentForm';
 import { useQueryClient } from '@tanstack/react-query';
 import { useWallet } from '@/lib/hooks/useWallet';
+import type { PremiumInitiationResponse } from '@/lib/hooks/use-premium';
 
 interface PremiumUpgradeModalProps {
   isOpen: boolean;
@@ -18,7 +19,7 @@ export const PremiumUpgradeModal = ({ isOpen, onClose }: PremiumUpgradeModalProp
   const { mutate: initiate, isPending: isInitiating } = useInitiatePurchase();
   const { mutate: purchaseWithToken, isPending: isPurchasingToken } = usePurchasePremium();
   const { data: wallet } = useWallet();
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [paymentIntent, setPaymentIntent] = useState<PremiumInitiationResponse | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'token'>('token');
   const queryClient = useQueryClient();
 
@@ -35,7 +36,7 @@ export const PremiumUpgradeModal = ({ isOpen, onClose }: PremiumUpgradeModalProp
     } else {
       initiate('gold_monthly', {
         onSuccess: (data) => {
-          setClientSecret(data.client_secret);
+          setPaymentIntent(data);
         }
       });
     }
@@ -45,11 +46,11 @@ export const PremiumUpgradeModal = ({ isOpen, onClose }: PremiumUpgradeModalProp
     queryClient.invalidateQueries({ queryKey: ['premium-status'] });
     queryClient.invalidateQueries({ queryKey: ['user'] });
     onClose();
-    setClientSecret(null);
+    setPaymentIntent(null);
   };
 
   const handleCancel = () => {
-    setClientSecret(null);
+    setPaymentIntent(null);
   };
 
   const tokenBalance = parseFloat(wallet?.balance || '0');
@@ -60,7 +61,7 @@ export const PremiumUpgradeModal = ({ isOpen, onClose }: PremiumUpgradeModalProp
     <Dialog open={isOpen} onOpenChange={(open) => {
       if (!open) {
         onClose();
-        setClientSecret(null);
+        setPaymentIntent(null);
       }
     }}>
       <DialogContent className="sm:max-w-md">
@@ -73,7 +74,7 @@ export const PremiumUpgradeModal = ({ isOpen, onClose }: PremiumUpgradeModalProp
           </DialogDescription>
         </DialogHeader>
         
-        {!clientSecret ? (
+        {!paymentIntent ? (
           <>
             <div className="space-y-4 py-4">
               {/* Features List */}
@@ -137,7 +138,7 @@ export const PremiumUpgradeModal = ({ isOpen, onClose }: PremiumUpgradeModalProp
                 disabled={isInitiating || isPurchasingToken || (paymentMethod === 'token' && tokenBalance < tokenPrice)}
               >
                 {isInitiating || isPurchasingToken ? 'Processing...' : (
-                  paymentMethod === 'token' ? `Upgrade for ${tokenPrice} Tokens` : 'Upgrade for $19.99/mo'
+                  paymentMethod === 'token' ? `Upgrade for ${tokenPrice} Tokens` : 'Continue to card payment'
                 )}
               </Button>
               {paymentMethod === 'token' && tokenBalance < tokenPrice && (
@@ -149,11 +150,11 @@ export const PremiumUpgradeModal = ({ isOpen, onClose }: PremiumUpgradeModalProp
             </DialogFooter>
           </>
         ) : stripeEnabled ? (
-          <Elements stripe={stripePromise} options={{ clientSecret }}>
+          <Elements stripe={stripePromise} options={{ clientSecret: paymentIntent.client_secret }}>
             <StripePaymentForm 
               onSuccess={handleSuccess} 
               onCancel={handleCancel}
-              amount={19.99}
+              amount={paymentIntent.amount}
             />
           </Elements>
         ) : (

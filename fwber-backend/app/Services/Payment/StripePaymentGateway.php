@@ -17,9 +17,11 @@ class StripePaymentGateway implements PaymentGatewayInterface
     public function createPaymentIntent(float $amount, string $currency, array $metadata = []): PaymentResult
     {
         try {
+            $description = $metadata['description'] ?? null;
             $intent = $this->stripe->paymentIntents->create([
                 'amount' => (int) ($amount * 100),
                 'currency' => $currency,
+                'description' => $description,
                 'metadata' => $metadata,
                 'automatic_payment_methods' => [
                     'enabled' => true,
@@ -43,12 +45,14 @@ class StripePaymentGateway implements PaymentGatewayInterface
     public function charge(float $amount, string $currency, string $source, array $metadata = []): PaymentResult
     {
         try {
+            $description = $metadata['description'] ?? null;
             // If source starts with 'tok_', use charges (legacy)
             if (str_starts_with($source, 'tok_')) {
                 $charge = $this->stripe->charges->create([
                     'amount' => (int) ($amount * 100),
                     'currency' => $currency,
                     'source' => $source,
+                    'description' => $description,
                     'metadata' => $metadata,
                 ]);
 
@@ -65,6 +69,7 @@ class StripePaymentGateway implements PaymentGatewayInterface
                     'currency' => $currency,
                     'payment_method' => $source,
                     'confirm' => true,
+                    'description' => $description,
                     'metadata' => $metadata,
                     'automatic_payment_methods' => [
                         'enabled' => true,

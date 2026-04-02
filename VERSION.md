@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.70`
+- **Current version:** `1.0.71`
 - **Release date:** `2026-04-02`
-- **Release name:** `Stripe Renewal Rollout Follow-Up`
+- **Release name:** `Plan-Aware Premium Pricing`
 
 ## Summary
 
-This release closes the remaining obvious Stripe rollout seams by documenting the production payment/referral env defaults, adding a real premium success page for redirect-based Stripe checkouts, and awarding the same two-level premium referral commissions on successful renewal invoices that the app already grants on the initial purchase path.
+This release turns the premium purchase flow into a real backend-defined plan system for the existing `gold_monthly` offer. Stripe intent creation, direct charges, token upgrades, webhook fulfillment, and the frontend modal now all key off the same configurable plan metadata instead of silently assuming one hardcoded monthly price.
 
 ## Version Sources of Truth
 

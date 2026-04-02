@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.71] - 2026-04-02 — Plan-Aware Premium Pricing
+
+### Fixed
+- Added a backend-owned premium plan catalog in `config/premium.php` plus `PremiumPlanCatalog`, so `gold_monthly` is now a real plan definition with configurable USD price, duration, token cost, and Stripe price key instead of an ignored frontend hint.
+- Updated `PremiumController` to validate `plan_id`, reject unknown plans with `422`, and use the configured plan metadata consistently across Stripe intent creation, direct Stripe charges, token purchases, subscription records, and premium expiration windows.
+- Updated the Stripe payment-intent and webhook path to carry plan metadata end to end, so `payment_intent.succeeded` can grant premium for the configured plan duration and store the correct `stripe_price` instead of always hardcoding the monthly fallback.
+- Extended backend billing regression coverage for configured-plan initiation, configured-plan Stripe purchases, invalid plan rejection, and webhook plan metadata handling.
+- Removed the last hardcoded card-price text from `PremiumUpgradeModal`; the modal now moves users into card checkout generically and uses the backend-returned payment-intent amount when rendering the Stripe form.
+- Documented the premium plan env knobs in `.env.example`, keeping rollout config aligned with the new backend plan catalog.
+
 ## [1.0.70] - 2026-04-02 — Stripe Renewal Rollout Follow-Up
 
 ### Fixed

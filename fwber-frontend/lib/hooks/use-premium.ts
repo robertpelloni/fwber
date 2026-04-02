@@ -8,6 +8,21 @@ export interface PremiumStatus {
   unlimited_swipes: boolean;
 }
 
+export interface PremiumInitiationResponse {
+  client_secret: string;
+  amount: number;
+  currency: string;
+  plan_id: string;
+  plan: {
+    id: string;
+    name: string;
+    display_name: string;
+    price_usd: number;
+    currency: string;
+    interval: 'month' | 'year';
+  };
+}
+
 export const usePremiumStatus = () => {
   return useQuery<PremiumStatus>({
     queryKey: ['premium-status'],
@@ -34,7 +49,7 @@ export const usePurchasePremium = () => {
 export const useInitiatePurchase = () => {
   return useMutation({
     mutationFn: async (planId: string = 'gold_monthly') => {
-      return await api.post<{ client_secret: string }>('/premium/initiate', { plan_id: planId });
+      return await api.post<PremiumInitiationResponse>('/premium/initiate', { plan_id: planId });
     },
   });
 };

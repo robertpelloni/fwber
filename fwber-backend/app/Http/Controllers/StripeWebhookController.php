@@ -7,6 +7,7 @@ use App\Models\Subscription;
 use App\Models\User;
 use App\Notifications\PaymentFailedNotification;
 use App\Services\ReferralCommissionService;
+use App\Support\PremiumPlanCatalog;
 use App\Support\LogContext;
 use App\Support\TaggedCache;
 use Carbon\Carbon;
@@ -17,7 +18,10 @@ use Stripe\Webhook;
 
 class StripeWebhookController extends Controller
 {
-    public function __construct(private readonly ReferralCommissionService $referralCommissionService)
+    public function __construct(
+        private readonly ReferralCommissionService $referralCommissionService,
+        private readonly PremiumPlanCatalog $premiumPlanCatalog
+    )
     {
     }
 
@@ -125,7 +129,12 @@ class StripeWebhookController extends Controller
         }
 
         // Wrap payment + user update + subscription creation in transaction for atomicity
-        \DB::transaction(function () use ($user, $paymentIntent) {
+        $plan = $this->premiumPlanCatalog->resolveOrDefault($paymentIntent->metadata->plan_id ?? null);
+        $durationDays = (int) ($paymentIntent->metadata->duration_days ?? $plan['duration_days']);
+        $stripePrice = $paymentIntent->metadata->stripe_price ?? $plan['stripe_price'];
+        $description = $paymentIntent->description ?? $plan['description'];
+
+        \DB::transaction(function () use ($user, $paymentIntent, $plan, $durationDays, $stripePrice, $description) {
             // Log Payment
             Payment::create([
                 'user_id' => $user->id,
@@ -134,25 +143,25 @@ class StripeWebhookController extends Controller
                 'payment_gateway' => 'stripe',
                 'transaction_id' => $paymentIntent->id,
                 'status' => 'succeeded',
-                'description' => $paymentIntent->description ?? 'Premium Subscription',
+                'description' => $description,
                 'metadata' => method_exists($paymentIntent, 'toArray') ? $paymentIntent->toArray() : (array) $paymentIntent,
             ]);
 
             // Grant Premium
             $user->tier = 'gold';
-            $user->tier_expires_at = Carbon::now()->addDays(30);
+            $user->tier_expires_at = Carbon::now()->addDays($durationDays);
             $user->unlimited_swipes = true;
             $user->save();
 
             // Create Subscription record
             \App\Models\Subscription::create([
                 'user_id' => $user->id,
-                'name' => 'gold',
+                'name' => $plan['name'],
                 'stripe_id' => $paymentIntent->id,
                 'stripe_status' => 'active',
-                'stripe_price' => 'price_premium_monthly',
+                'stripe_price' => $stripePrice,
                 'quantity' => 1,
-                'ends_at' => Carbon::now()->addDays(30),
+                'ends_at' => Carbon::now()->addDays($durationDays),
             ]);
         });
 

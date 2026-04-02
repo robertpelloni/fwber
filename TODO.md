@@ -6,7 +6,7 @@
 ---
 
 ## 🔴 Critical: Bug Fixes & Stability
-- [ ] **Complete Stripe Production Rollout**: Billing is now hardened so premium no longer grants Gold without real Stripe proof, but production still needs live env keys, `PAYMENT_DRIVER=stripe`, frontend publishable key wiring, Stripe webhook registration, and an operations-ready payout/reconciliation checklist.
+- [ ] **Complete Stripe Production Rollout**: Billing now has backend-owned plan metadata, real Stripe proof requirements, a success return route, and renewal MLM payouts, but production still needs live env keys, frontend publishable key wiring, Stripe webhook registration, and an operations-ready payout/reconciliation checklist.
 - [ ] **Fix 500 Errors on Production**: The `/api/location`, `/api/photos`, and `/api/safety/walk/active` endpoints are throwing 500 errors on DreamHost. Add explicit `Log::error($e)` to `bootstrap/app.php` exception handler to capture the silent trace and fix the root cause (likely validation, permissions, or missing env vars).
 - [ ] **Verify Vercel Deployment**: Ensure the latest Next.js build with the `/api` absolute path proxy and MIME fixes is successfully deployed and running.
 

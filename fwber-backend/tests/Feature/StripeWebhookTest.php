@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Carbon\Carbon;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -21,7 +22,14 @@ class StripeWebhookTest extends TestCase
 
     public function test_payment_intent_succeeded_creates_payment_and_grants_premium()
     {
+        Carbon::setTestNow('2026-04-02 12:00:00');
         $user = User::factory()->create();
+
+        config([
+            'premium.plans.gold_monthly.duration_days' => 45,
+            'premium.plans.gold_monthly.stripe_price' => 'price_gold_monthly_custom',
+            'premium.plans.gold_monthly.description' => 'Gold Monthly Subscription',
+        ]);
 
         $payload = [
             'id' => 'evt_test_123',
@@ -31,8 +39,8 @@ class StripeWebhookTest extends TestCase
                     'id' => 'pi_test_123',
                     'amount' => 999,
                     'currency' => 'usd',
-                    'metadata' => ['user_id' => $user->id],
-                    'description' => 'Premium Subscription',
+                    'metadata' => ['user_id' => $user->id, 'plan_id' => 'gold_monthly'],
+                    'description' => 'Gold Monthly Subscription',
                 ],
             ],
         ];
@@ -48,11 +56,21 @@ class StripeWebhookTest extends TestCase
             'transaction_id' => 'pi_test_123',
             'amount' => 9.99,
             'status' => 'succeeded',
+            'description' => 'Gold Monthly Subscription',
+        ]);
+
+        $this->assertDatabaseHas('subscriptions', [
+            'user_id' => $user->id,
+            'stripe_id' => 'pi_test_123',
+            'stripe_price' => 'price_gold_monthly_custom',
         ]);
 
         $user->refresh();
         $this->assertEquals('gold', $user->tier);
         $this->assertTrue((bool) $user->unlimited_swipes);
+        $this->assertEquals(Carbon::now()->addDays(45)->toDateTimeString(), $user->tier_expires_at->toDateTimeString());
+
+        Carbon::setTestNow();
     }
 
     public function test_subscription_created_creates_subscription()

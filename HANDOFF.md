@@ -1,54 +1,72 @@
-# Handoff — Stripe Renewal Rollout Follow-Up
+# Handoff — Plan-Aware Premium Pricing
 
 **Date:** 2026-04-02  
-**Status:** ✅ Stripe renewal rollout follow-up is ready on top of the shell-polish line  
-**Version:** 1.0.70  
-**Latest pushed commit:** `6def8a266` (`fix: polish shell theme and realtime UX (v1.0.69)`)
+**Status:** ✅ Plan-aware premium pricing is ready on top of the Stripe renewal follow-up  
+**Version:** 1.0.71  
+**Latest pushed commit:** `e29eaf6f1` (`fix: close stripe renewal rollout gaps (v1.0.70)`)
 
 ## Overview
-This handoff covers the next billing follow-up after `v1.0.69`. The remaining code-fixable Stripe rollout gaps were: missing production payment/referral env examples, a frontend Stripe return URL pointing to a nonexistent `/premium/success` route, and subscription renewal webhooks that recorded the Stripe payment but skipped the two-level referral MLM payout path.
+This handoff covers the next billing slice after `v1.0.70`. The remaining code-level Stripe inconsistency was that the frontend already sent `plan_id`, but the backend still hardcoded `$19.99`, `30` days, and `price_premium_monthly` across initiation, direct purchases, and webhook fulfillment.
 
-This release closes those seams directly: `.env.example` now documents the actual Stripe/referral knobs, the frontend now serves `/premium/success`, and renewal invoice success now awards the same configured level-1 and level-2 cash/FWBcoin commissions already granted on initial premium purchases.
+This release resolves that mismatch by introducing a backend-owned premium plan catalog for the live `gold_monthly` plan, validating `plan_id`, propagating plan metadata through Stripe and token purchase flows, and using the configured plan information during webhook fulfillment instead of silently reverting to hardcoded monthly defaults.
 
 Active release work continues in the clean `C:\Users\hyper\workspace\fwber\temp_build\billing-push-clean` worktree rather than the dirty root checkout.
 
-## What Shipped in v1.0.70
+## What Shipped in v1.0.71
 
-### 1. Stripe return path repair
-- Added `fwber-frontend/app/premium/success/page.tsx`.
-- Stripe redirect-based confirmations now land on a dedicated success screen instead of a missing route.
-- The success screen automatically forwards users to `/settings/subscription`, keeping post-payment verification inside the existing billing UI.
+### 1. Backend premium plan catalog
+- Added `fwber-backend/config/premium.php` with the current `gold_monthly` plan definition.
+- Added `fwber-backend/app/Support/PremiumPlanCatalog.php` so controllers can resolve the current plan consistently instead of duplicating defaults.
+- The plan now has one backend home for:
+  - USD price
+  - currency
+  - duration
+  - token cost
+  - Stripe price key
+  - display/description metadata
 
-### 2. Renewal commission parity
-- `fwber-backend/app/Http/Controllers/StripeWebhookController.php` now injects `ReferralCommissionService`.
-- On `invoice.payment_succeeded`, once the renewal payment is located or created, the controller now calls `awardPremiumCommissions(..., 'stripe_renewal')`.
-- This keeps recurring Stripe premium revenue aligned with the MLM-style referral behavior already implemented for first-time premium purchases.
+### 2. Plan-aware premium controller flow
+- `PremiumController` now validates `plan_id` on both:
+  - `/api/premium/initiate`
+  - `/api/premium/purchase`
+- Unknown plan IDs now return `422` instead of silently granting the default monthly plan.
+- Stripe intent creation, direct card charging, token spending, subscription creation, and premium expiration now all use the resolved plan metadata.
 
-### 3. Production env documentation repair
+### 3. Stripe metadata propagation
+- `StripePaymentGateway` now forwards the configured plan description into Stripe intent/charge creation.
+- Stripe request metadata now includes:
+  - `plan_id`
+  - `plan_name`
+  - `stripe_price`
+  - `duration_days`
+- `StripeWebhookController::handlePaymentIntentSucceeded()` now uses that plan metadata plus `PremiumPlanCatalog` to determine the correct subscription duration and persisted `stripe_price`.
+
+### 4. Production env documentation repair
 - `fwber-backend/.env.example` now includes:
   - `PAYMENT_DRIVER=stripe`
-  - `REFERRAL_PREMIUM_LEVEL_1_CASH_USD`
-  - `REFERRAL_PREMIUM_LEVEL_1_TOKEN_AMOUNT`
-  - `REFERRAL_PREMIUM_LEVEL_2_CASH_USD`
-  - `REFERRAL_PREMIUM_LEVEL_2_TOKEN_AMOUNT`
-- These values now line up with the knobs already read by `config/referrals.php`, so operators no longer have to infer the rollout config from source alone.
+  - `PREMIUM_GOLD_MONTHLY_PRICE_USD`
+  - `PREMIUM_GOLD_MONTHLY_CURRENCY`
+  - `PREMIUM_GOLD_MONTHLY_DURATION_DAYS`
+  - `PREMIUM_GOLD_MONTHLY_TOKEN_COST`
+  - `PREMIUM_GOLD_MONTHLY_STRIPE_PRICE`
+- This keeps deploy-time Stripe pricing/duration config aligned with the new backend plan catalog.
 
-### 4. Renewal regression coverage
-- `fwber-backend/tests/Feature/StripeWebhookTest.php` now includes a renewal-specific assertion path.
-- The new test proves a successful renewal invoice:
-  - records the payment
-  - awards the level-1 commission
-  - awards the level-2 commission
-- This protects the recurring-revenue referral path from silently regressing.
+### 5. Frontend premium modal cleanup
+- `PremiumUpgradeModal` no longer hardcodes `$19.99/mo` as the visible card CTA.
+- The modal now treats card checkout as a backend-driven step and passes the backend-returned payment-intent amount into `StripePaymentForm`.
+- This removes the last obvious frontend/backend mismatch for the current live premium plan.
 
-### 5. Validation findings
-- Backend billing validation passed:
+### 6. Regression coverage and validation
+- `PremiumControllerTest` now covers:
+  - configured-plan initiation metadata
+  - invalid plan rejection
+  - configured-plan Stripe pricing
+- `StripeWebhookTest` now proves `payment_intent.succeeded` uses configured plan metadata for subscription pricing and expiry.
+- Validation passed:
   - `php artisan test tests\Feature\PremiumControllerTest.php tests\Feature\StripeWebhookTest.php`
-- Frontend validation passed through the stable Windows path:
-  - `npm run lint` (with the existing `lib/api/photos.ts:476` warning only)
+  - `npm run lint`
   - `npm run type-check`
   - `cmd /c "npm run build"`
-- Direct overlapping PowerShell-driven Next builds in this shared worktree can still fail after successful compilation with missing `.next` manifest files; the source tree is healthy, but the workspace remains prone to Windows artifact races when multiple builds contend for `.next`.
 
 ## What Shipped in v1.0.65
 
