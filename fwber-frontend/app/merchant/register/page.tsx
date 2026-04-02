@@ -19,8 +19,6 @@ const formSchema = z.object({
   category: z.string().min(1, 'Please select a category'),
   description: z.string().optional(),
   address: z.string().optional(),
-  phone: z.string().optional(),
-  website: z.string().url('Must be a valid URL').optional().or(z.literal('')),
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -53,8 +51,6 @@ export default function MerchantRegisterPage() {
       category: '',
       description: '',
       address: '',
-      phone: '',
-      website: '',
     },
   })
 
@@ -140,30 +136,6 @@ export default function MerchantRegisterPage() {
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-sm font-semibold">Phone Number</Label>
-                    <Input 
-                      id="phone" 
-                      placeholder="(555) 123-4567" 
-                      className="h-11"
-                      {...register('phone')} 
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="website" className="text-sm font-semibold">Website</Label>
-                    <Input 
-                      id="website" 
-                      placeholder="https://yourdomain.com" 
-                      className="h-11"
-                      {...register('website')} 
-                    />
-                    {errors.website && (
-                      <p className="text-sm text-red-500 font-medium">{errors.website.message}</p>
-                    )}
-                  </div>
-                </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="address" className="text-sm font-semibold">Physical Address</Label>
                   <Input 
@@ -221,8 +193,8 @@ export default function MerchantRegisterPage() {
                 <li className="flex items-start">
                   <CheckCircle2 className="w-6 h-6 mr-3 flex-shrink-0 text-amber-200" />
                   <div>
-                    <strong className="block text-lg">Real-time Promotions</strong>
-                    <span className="text-amber-100/90 text-sm">Push flash deals that appear instantly on users&apos; local feeds.</span>
+                    <strong className="block text-lg">Verification-Aware Launch</strong>
+                    <span className="text-amber-100/90 text-sm">Complete your merchant profile first, then unlock live promotions after approval.</span>
                   </div>
                 </li>
                 <li className="flex items-start">
@@ -255,8 +227,8 @@ export default function MerchantRegisterPage() {
                 <div className="flex gap-4">
                   <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold flex-shrink-0">3</div>
                   <div>
-                    <p className="font-semibold text-gray-900 dark:text-white">Create Promotions</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Start posting deals to nearby users right away.</p>
+                    <p className="font-semibold text-gray-900 dark:text-white">Verification Review</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Keep your profile accurate while your merchant account is reviewed before promotions go live.</p>
                   </div>
                 </div>
               </div>

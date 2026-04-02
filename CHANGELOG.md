@@ -9,6 +9,14 @@ All notable changes to this project will be documented in this file.
 - Reworked `fwber-frontend/app/recommendations/page.tsx` to use the shared protected app shell and styling, and added a `Back Home` action there.
 - Updated the shared `AppHeader` to use normal browser navigation for the routes that were repeatedly triggering failed RSC payload fetches before falling back anyway (`/help`, `/conference-pulse`, `/burner`, `/nearby`, `/leaderboard`, and `/wingman`).
 
+## [1.0.33] - 2026-04-02 — Merchant Contract Repair
+
+### Fixed
+- Aligned the frontend merchant API types and response unwrapping with the backend's real profile, promotion, verification, and promo-code fields.
+- Repaired merchant analytics to consume the shared frontend API client correctly and render the backend's `kpis`, `retention`, and `promotions` payload shape.
+- Added a dedicated `/merchant/profile` page and updated merchant dashboard/header flows so verification state is visible and unverified merchants are steered toward profile completion instead of immediate promotion creation.
+- Removed unsupported merchant registration fields, corrected onboarding copy around verification, added optional promo-code entry to the promotion form, and ignored root-level `.vercel/` checkout noise in the safe repo.
+
 ## [1.0.31] - 2026-04-02 — Federation Activity Center
 
 ### Fixed

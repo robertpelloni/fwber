@@ -7,24 +7,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { BarChart3, TrendingUp, Users, Zap, Calendar, ArrowLeft, RefreshCcw } from 'lucide-react';
+import { BarChart3, TrendingUp, Users, Zap, ArrowLeft, RefreshCcw, DollarSign } from 'lucide-react';
 import Link from 'next/link';
 
 interface AnalyticsData {
-    traffic: {
-        total_pings: number;
-        unique_users: number;
-        avg_stay_time: string;
+    kpis: {
+        kFactor: number;
+        totalReach: number;
+        conversionRate: number;
+        totalRevenue: number;
+        revenueChange: number;
     };
-    promotions: {
-        total_claims: number;
-        active_reach: number;
-        conversion_rate: number;
-    };
-    vibe_impact: {
-        sentiment_shift: number;
-        top_keyword: string;
-    };
+    retention: Array<{ label: string; value: number; previousValue: number }>;
+    promotions: Array<{
+        id: number;
+        title: string;
+        views: number;
+        clicks: number;
+        redemptions: number;
+        revenue: number;
+        conversionRate: number;
+    }>;
 }
 
 export default function MerchantAnalyticsPage() {
@@ -36,10 +39,10 @@ export default function MerchantAnalyticsPage() {
         if (!token) return;
         try {
             setLoading(true);
-            const response = await api.get('/merchant-portal/analytics', {
+            const response = await api.get<AnalyticsData>('/merchant-portal/analytics', {
                 headers: { Authorization: `Bearer ${token}` }
-            }) as any;
-            setData(response.data);
+            });
+            setData(response);
         } catch (error) {
             console.error('Failed to fetch merchant analytics:', error);
         } finally {
@@ -97,7 +100,7 @@ export default function MerchantAnalyticsPage() {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-4xl font-black tracking-tighter text-zinc-900 dark:text-white italic">
-                                    {data.traffic.unique_users}
+                                    {data.kpis.totalReach}
                                 </div>
                                 <p className="text-[10px] text-zinc-400 mt-1 font-bold uppercase tracking-widest">
                                     Unique Discoveries in Range
@@ -113,10 +116,10 @@ export default function MerchantAnalyticsPage() {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-4xl font-black tracking-tighter text-amber-600 italic">
-                                    {Math.round(data.promotions.conversion_rate * 100)}%
+                                    {Math.round(data.kpis.conversionRate)}%
                                 </div>
                                 <p className="text-[10px] text-zinc-400 mt-1 font-bold uppercase tracking-widest">
-                                    Claim rate on active broadcasts
+                                    Redemption rate on merchant traffic
                                 </p>
                             </CardContent>
                         </Card>
@@ -124,15 +127,15 @@ export default function MerchantAnalyticsPage() {
                         <Card className="border-zinc-200 dark:border-zinc-800 shadow-lg">
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-xs font-black uppercase tracking-widest text-zinc-500 flex items-center gap-2">
-                                    <TrendingUp className="w-3 h-3 text-blue-500" /> Vibe Impact
+                                    <DollarSign className="w-3 h-3 text-blue-500" /> Revenue
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <div className="text-4xl font-black tracking-tighter text-blue-600 italic uppercase">
-                                    #{data.vibe_impact.top_keyword}
+                                    ${data.kpis.totalRevenue.toFixed(0)}
                                 </div>
                                 <p className="text-[10px] text-zinc-400 mt-1 font-bold uppercase tracking-widest">
-                                    Top trending local keyword
+                                    {data.kpis.revenueChange >= 0 ? '+' : ''}{data.kpis.revenueChange}% vs previous period
                                 </p>
                             </CardContent>
                         </Card>
@@ -150,20 +153,20 @@ export default function MerchantAnalyticsPage() {
                                     <div className="space-y-1">
                                         <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Total Claims</span>
                                         <div className="text-3xl font-black text-zinc-900 dark:text-white tracking-tighter">
-                                            {data.promotions.total_claims}
+                                            {data.promotions.reduce((sum, promotion) => sum + promotion.redemptions, 0)}
                                         </div>
                                     </div>
                                     <div className="h-12 w-32 bg-amber-500/10 rounded-lg flex items-center justify-center border border-amber-500/20">
-                                        <span className="text-amber-600 font-black text-xs">+{Math.round(Math.random() * 15)}% vs LW</span>
+                                        <span className="text-amber-600 font-black text-xs">K-Factor {data.kpis.kFactor.toFixed(2)}</span>
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-zinc-400">
                                         <span>Active Reach</span>
-                                        <span>{data.promotions.active_reach} users</span>
+                                        <span>{data.kpis.totalReach} users</span>
                                     </div>
                                     <div className="h-2 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                                        <div className="h-full bg-amber-500 rounded-full" style={{width: '65%'}} />
+                                        <div className="h-full bg-amber-500 rounded-full" style={{width: `${Math.min(100, data.kpis.conversionRate)}%`}} />
                                     </div>
                                 </div>
                             </CardContent>
@@ -172,8 +175,8 @@ export default function MerchantAnalyticsPage() {
                         <Card className="border-zinc-200 dark:border-zinc-800 bg-zinc-950 text-white overflow-hidden relative">
                             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 blur-[100px] rounded-full -mr-32 -mt-32" />
                             <CardHeader>
-                                <CardTitle className="text-lg text-white">Sentiment Trajectory</CardTitle>
-                                <CardDescription className="text-zinc-500">How your business affects the local neighborhood vibe.</CardDescription>
+                                <CardTitle className="text-lg text-white">Retention Snapshot</CardTitle>
+                                <CardDescription className="text-zinc-500">Repeat engagement across recent merchant cohorts.</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-8 relative z-10">
                                 <div className="flex items-center gap-4">
@@ -181,15 +184,20 @@ export default function MerchantAnalyticsPage() {
                                         <TrendingUp className="w-8 h-8 text-blue-400" />
                                     </div>
                                     <div>
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Shift</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Best Cohort</span>
                                         <div className="text-2xl font-black text-white tracking-tighter">
-                                            +{Math.round(data.vibe_impact.sentiment_shift * 100)}% Mood Lift
+                                            {data.retention[0]?.label || 'Day 1'}: {data.retention[0]?.value || 0}%
                                         </div>
                                     </div>
                                 </div>
-                                <p className="text-sm text-zinc-400 leading-relaxed max-w-sm">
-                                    Your broadcasts are consistently correlating with an increase in &quot;Energetic&quot; and &quot;Happy&quot; sentiment in the 1-mile radius.
-                                </p>
+                                <div className="space-y-3">
+                                    {data.retention.map((entry) => (
+                                        <div key={entry.label} className="flex items-center justify-between text-sm">
+                                            <span className="text-zinc-400">{entry.label}</span>
+                                            <span className="font-semibold text-white">{entry.value}%</span>
+                                        </div>
+                                    ))}
+                                </div>
                             </CardContent>
                         </Card>
                     </div>

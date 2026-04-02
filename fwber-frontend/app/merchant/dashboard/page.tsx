@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { getMerchantProfile, getPromotions, MerchantProfile, Promotion } from '@/lib/api/merchant'
 import { Button } from '@/components/ui/button'
@@ -9,9 +10,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Skeleton } from '@/components/ui/skeleton'
 import { PlusCircle, Tag, Radio } from 'lucide-react'
 import NeighborhoodVibe from '@/components/merchant/NeighborhoodVibe'
+import { Badge } from '@/components/ui/badge'
 
 export default function MerchantDashboard() {
   const { token } = useAuth()
+  const router = useRouter()
   const [profile, setProfile] = useState<MerchantProfile | null>(null)
   const [promotions, setPromotions] = useState<Promotion[]>([])
   const [loading, setLoading] = useState(true)
@@ -39,6 +42,16 @@ export default function MerchantDashboard() {
      return <DashboardSkeleton />
   }
 
+  const verificationStatus = profile?.verification_status ?? 'pending'
+  const isVerified = verificationStatus === 'verified'
+  const statusLabel = verificationStatus.charAt(0).toUpperCase() + verificationStatus.slice(1)
+  const statusClasses =
+    verificationStatus === 'verified'
+      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+      : verificationStatus === 'rejected'
+        ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+        : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
+
   return (
     <div className="space-y-6 px-4 sm:px-0 pb-20">
         {/* Welcome Section */}
@@ -56,13 +69,46 @@ export default function MerchantDashboard() {
                         Vibe Broadcast
                     </Button>
                 </Link>
-                <Link href="/merchant/promotions/new">                    <Button className="bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/20">
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        New Promotion
+                {isVerified ? (
+                    <Link href="/merchant/promotions/new">
+                        <Button className="bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/20">
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            New Promotion
+                        </Button>
+                    </Link>
+                ) : (
+                    <Button
+                        variant="outline"
+                        className="border-amber-500 text-amber-700 hover:bg-amber-50"
+                        onClick={() => router.push('/merchant/profile')}
+                    >
+                        Complete Profile
                     </Button>
-                </Link>
+                )}
             </div>
         </div>
+
+        <Card className="border-amber-200 dark:border-amber-900/40">
+            <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <CardTitle className="text-lg text-gray-900 dark:text-white">Verification Status</CardTitle>
+                    <CardDescription>
+                        Merchants must be verified before promotions can go live.
+                    </CardDescription>
+                </div>
+                <Badge className={statusClasses}>{statusLabel}</Badge>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                    {isVerified
+                      ? 'Your merchant profile is verified and ready to publish promotions.'
+                      : 'Review your business details and keep them current while verification is pending.'}
+                </p>
+                <Button variant="outline" onClick={() => router.push('/merchant/profile')}>
+                    Manage Profile
+                </Button>
+            </CardContent>
+        </Card>
 
         {/* Real-time Intel */}
         {token && <NeighborhoodVibe token={token} />}
@@ -105,10 +151,12 @@ export default function MerchantDashboard() {
                         <Tag className="h-10 w-10 text-gray-400 mb-4" />
                         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">No promotions yet</h3>
                         <p className="text-gray-500 dark:text-gray-400 mb-4 max-w-sm">
-                            Create your first promotion to start attracting customers to your business.
+                            {isVerified
+                              ? 'Create your first promotion to start attracting customers to your business.'
+                              : 'Finish your merchant profile and wait for verification before publishing your first promotion.'}
                         </p>
-                         <Link href="/merchant/promotions/new">
-                            <Button variant="outline">Create Promotion</Button>
+                         <Link href={isVerified ? "/merchant/promotions/new" : "/merchant/profile"}>
+                            <Button variant="outline">{isVerified ? 'Create Promotion' : 'Review Profile'}</Button>
                         </Link>
                     </CardContent>
                 </Card>

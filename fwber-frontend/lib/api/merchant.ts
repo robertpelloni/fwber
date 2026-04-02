@@ -1,6 +1,8 @@
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
+export type MerchantVerificationStatus = 'pending' | 'verified' | 'rejected';
+
 export interface MerchantProfile {
   id: number;
   user_id: number;
@@ -8,7 +10,7 @@ export interface MerchantProfile {
   category: string;
   description: string | null;
   address: string | null;
-  is_verified: boolean;
+  verification_status: MerchantVerificationStatus;
   created_at: string;
   updated_at: string;
 }
@@ -18,9 +20,10 @@ export interface Promotion {
   merchant_id: number;
   title: string;
   description: string | null;
+  promo_code?: string | null;
   discount_value: string;
-  latitude: number;
-  longitude: number;
+  lat: number;
+  lng: number;
   radius: number;
   token_cost: number;
   starts_at: string;
@@ -40,6 +43,7 @@ export interface MerchantRegistrationData {
 export interface CreatePromotionData {
   title: string;
   description?: string;
+  promo_code?: string;
   discount_value: string;
   lat: number;
   lng: number;
@@ -68,7 +72,7 @@ export async function registerMerchant(token: string, data: MerchantRegistration
   }
 
   const result = await response.json();
-  return result.data || result;
+  return result.user?.merchant_profile || result.user?.merchantProfile || result.profile || result.data || result;
 }
 
 /**
@@ -90,7 +94,7 @@ export async function getMerchantProfile(token: string): Promise<MerchantProfile
   }
 
   const result = await response.json();
-  return result.data || result;
+  return result.profile || result.data || result;
 }
 
 /**
@@ -113,7 +117,7 @@ export async function updateMerchantProfile(token: string, data: Partial<Merchan
   }
 
   const result = await response.json();
-  return result.data || result;
+  return result.profile || result.data || result;
 }
 
 /**
@@ -158,5 +162,5 @@ export async function createPromotion(token: string, data: CreatePromotionData):
   }
 
   const result = await response.json();
-  return result.data || result;
+  return result.promotion || result.data || result;
 }

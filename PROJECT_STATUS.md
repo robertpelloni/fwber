@@ -1,19 +1,20 @@
-# Project Status — fwber v1.0.32 (Navigation UX Patch)
+# Project Status — fwber v1.0.33 (Merchant Contract Repair)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.32 "Navigation UX Patch"
+**Version:** 1.0.33 "Merchant Contract Repair"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## Navigation And Discovery Polish
-- **Settings Escape Hatch**: The main settings page now exposes a clear back-to-dashboard control.
-- **Recommendations Restyle**: The recommendations page now uses the shared protected app shell and styling instead of the old standalone red/dark layout, and it now includes a `Back Home` action.
-- **RSC Noise Mitigation**: Shared AppHeader links for the repeatedly noisy routes now use normal browser navigation, avoiding broken client-side RSC transition attempts on those destinations.
+## Merchant Portal Contract And Verification Polish
+- **Merchant API Alignment**: The frontend merchant types and helpers now match the backend's real `verification_status`, `lat`/`lng`, promo-code, and response payload shapes.
+- **Merchant Analytics Repair**: The analytics page now consumes the shared API client correctly and renders the backend's `kpis`, `retention`, and promotion performance payloads.
+- **Profile And Verification UX**: Merchants now have a dedicated profile page, visible verification status on the dashboard, and navigation to profile management from the shared merchant header.
+- **Onboarding Accuracy**: Merchant registration no longer submits unsupported `phone` and `website` fields, and merchant onboarding/promotions copy now reflects the verification gate before promotions can go live.
 
 ## ✅ Release Focus
-- [x] Added a visible way back home from the main settings page.
-- [x] Brought `/recommendations` into the shared site theme and navigation pattern.
-- [x] Mitigated repeated RSC fallback noise for shared-header navigation to affected routes.
+- [x] Repaired merchant frontend/backend contract mismatches that were breaking profile, analytics, and promotion flows.
+- [x] Added merchant profile management and surfaced verification state in the merchant UI.
+- [x] Corrected merchant onboarding and promotion creation flows to match live backend validation and gating.
 - [x] Revalidated the frontend with `npm run type-check`.
 - [x] Revalidated the frontend with `npm run build`.

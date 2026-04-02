@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.32`
+- **Current version:** `1.0.33`
 - **Release date:** `2026-04-02`
-- **Release name:** `Navigation UX Patch`
+- **Release name:** `Merchant Contract Repair`
 
 ## Summary
 
-This release adds clear home/back affordances to the settings and recommendations pages, refreshes the recommendations page to use the shared app shell, and routes several noisy shared-header destinations through normal browser navigation to avoid broken RSC transition attempts.
+This release repairs the merchant portal contract with the backend, adds a dedicated merchant profile management page with verification visibility, and updates merchant onboarding, dashboard, promotions, and analytics flows to match the live API behavior.
 
 ## Version Sources of Truth
 

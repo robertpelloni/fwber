@@ -12,8 +12,8 @@ import {
   PlusCircle,
   Settings,
   LogOut,
-  MapPin,
-  LayoutDashboard
+  LayoutDashboard,
+  Store
 } from 'lucide-react'
 
 interface MerchantHeaderProps {
@@ -24,6 +24,7 @@ interface MerchantHeaderProps {
 const navLinks = [
   { href: '/merchant/dashboard', label: 'Dashboard', icon: Home },
   { href: '/merchant/promotions', label: 'Promotions', icon: LayoutDashboard },
+  { href: '/merchant/profile', label: 'Profile', icon: Store },
   { href: '/merchant/promotions/new', label: 'New Promotion', icon: PlusCircle },
 ]
 

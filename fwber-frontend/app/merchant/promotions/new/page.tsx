@@ -26,6 +26,7 @@ const LocationPicker = dynamic(() => import('@/components/LocationPicker'), {
 const formSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters'),
   description: z.string().optional(),
+  promo_code: z.string().max(50, 'Promo code must be 50 characters or fewer').optional(),
   discount_value: z.string().min(1, 'Discount value is required'),
   radius: z.coerce.number().min(10, 'Radius must be at least 10 meters').max(5000, 'Radius cannot exceed 5000 meters'),
   starts_at: z.string(),
@@ -61,6 +62,7 @@ export default function NewPromotionPage() {
     defaultValues: {
       title: '',
       description: '',
+      promo_code: '',
       discount_value: '',
       radius: 100,
       starts_at: format(now, "yyyy-MM-dd'T'HH:mm"),
@@ -80,6 +82,7 @@ export default function NewPromotionPage() {
       await createPromotion(token, {
         title: values.title,
         description: values.description,
+        promo_code: values.promo_code || undefined,
         discount_value: values.discount_value,
         lat: values.location.lat,
         lng: values.location.lng,
@@ -136,6 +139,16 @@ export default function NewPromotionPage() {
                   {...register('title')} 
                 />
                 {errors.title && <p className="text-sm text-red-500">{errors.title.message}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="promo_code">Promo Code</Label>
+                <Input 
+                  id="promo_code" 
+                  placeholder="e.g. DETROIT_HAPPY_HOUR" 
+                  {...register('promo_code')} 
+                />
+                {errors.promo_code && <p className="text-sm text-red-500">{errors.promo_code.message}</p>}
               </div>
 
               <div className="space-y-2">
