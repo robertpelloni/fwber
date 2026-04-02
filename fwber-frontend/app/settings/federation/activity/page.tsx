@@ -1,0 +1,359 @@
+'use client'
+
+import { useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
+import { formatDistanceToNow } from 'date-fns'
+import {
+  ArrowLeft,
+  Globe,
+  Loader2,
+  MessageSquare,
+  Radio,
+  UserPlus,
+  Users,
+} from 'lucide-react'
+
+import ProtectedRoute from '@/components/ProtectedRoute'
+import AppHeader from '@/components/AppHeader'
+import { api } from '@/lib/api/client'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+
+interface FederationConnection {
+  id: number
+  actor_uri: string
+  username?: string | null
+  domain?: string | null
+  status?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+interface FederatedPost {
+  id: number
+  actor_uri: string
+  actor_username?: string | null
+  actor_domain?: string | null
+  actor_avatar?: string | null
+  content: string
+  published_at: string
+  url?: string | null
+  metadata?: {
+    name?: string
+  }
+}
+
+interface FollowersResponse {
+  followers?: FederationConnection[]
+}
+
+interface FollowingResponse {
+  following?: FederationConnection[]
+}
+
+interface PostsResponse {
+  posts?: FederatedPost[]
+}
+
+type ActivityItem =
+  | {
+      id: string
+      kind: 'post'
+      title: string
+      subtitle: string
+      timestamp: string
+      content: string
+    }
+  | {
+      id: string
+      kind: 'follower'
+      title: string
+      subtitle: string
+      timestamp: string
+      content: string
+    }
+
+function formatHandle(username?: string | null, domain?: string | null, fallback?: string) {
+  if (username && domain) {
+    return `@${username}@${domain}`
+  }
+
+  return fallback || 'Unknown federated actor'
+}
+
+export default function FederationActivityPage() {
+  const [followers, setFollowers] = useState<FederationConnection[]>([])
+  const [following, setFollowing] = useState<FederationConnection[]>([])
+  const [posts, setPosts] = useState<FederatedPost[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+
+    const load = async () => {
+      try {
+        const [followersResponse, followingResponse, postsResponse] = await Promise.all([
+          api.get<FollowersResponse>('/federation/followers'),
+          api.get<FollowingResponse>('/federation/following'),
+          api.get<PostsResponse>('/federation/posts'),
+        ])
+
+        if (cancelled) {
+          return
+        }
+
+        setFollowers(Array.isArray(followersResponse.followers) ? followersResponse.followers : [])
+        setFollowing(Array.isArray(followingResponse.following) ? followingResponse.following : [])
+        setPosts(Array.isArray(postsResponse.posts) ? postsResponse.posts : [])
+      } catch (error) {
+        console.error('Failed to load federation activity:', error)
+
+        if (!cancelled) {
+          setFollowers([])
+          setFollowing([])
+          setPosts([])
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    load()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const activityItems = useMemo<ActivityItem[]>(() => {
+    const followerItems = followers.map((follower) => ({
+      id: `follower-${follower.id}`,
+      kind: 'follower' as const,
+      title: `${formatHandle(follower.username, follower.domain)} followed you`,
+      subtitle: follower.status ? `Status: ${follower.status}` : 'Remote follower',
+      timestamp: follower.updated_at || follower.created_at || new Date().toISOString(),
+      content: 'A federated profile connected to your public ActivityPub identity.',
+    }))
+
+    const postItems = posts.slice(0, 20).map((post) => ({
+      id: `post-${post.id}`,
+      kind: 'post' as const,
+      title: post.metadata?.name || formatHandle(post.actor_username, post.actor_domain, post.actor_uri),
+      subtitle: formatHandle(post.actor_username, post.actor_domain, post.actor_uri),
+      timestamp: post.published_at,
+      content: post.content,
+    }))
+
+    return [...followerItems, ...postItems]
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .slice(0, 12)
+  }, [followers, posts])
+
+  return (
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <AppHeader />
+        <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Radio className="w-8 h-8 text-purple-500" />
+                  Federation Activity
+                </h1>
+                <p className="text-gray-500 dark:text-gray-400 mt-1">
+                  Track federated followers, outbound follows, and recent remote posts in one place.
+                </p>
+              </div>
+              <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                Activity Center
+              </Badge>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <Button asChild variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
+                <Link href="/settings/federation">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Federation Settings
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="border-purple-200 text-purple-700 hover:bg-purple-50">
+                <Link href="/settings/federation/feed">
+                  <Globe className="w-4 h-4 mr-2" />
+                  Global Feed
+                </Link>
+              </Button>
+            </div>
+          </div>
+
+          {isLoading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+            </div>
+          ) : (
+            <>
+              <div className="grid gap-4 md:grid-cols-3">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardDescription>Followers</CardDescription>
+                    <CardTitle>{followers.length}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-sm text-muted-foreground">
+                    Remote profiles that currently follow your federated identity.
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardDescription>Following</CardDescription>
+                    <CardTitle>{following.length}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-sm text-muted-foreground">
+                    Outbound ActivityPub follow relationships initiated from fwber.
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardDescription>Remote Posts Cached</CardDescription>
+                    <CardTitle>{posts.length}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-sm text-muted-foreground">
+                    Federated posts currently available through the shared global feed.
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="grid gap-6 xl:grid-cols-[1.3fr_1fr]">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-xl">
+                      <MessageSquare className="w-5 h-5 text-purple-500" />
+                      Recent Activity
+                    </CardTitle>
+                    <CardDescription>
+                      A merged timeline of inbound follows and the latest remote posts cached by fwber.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {activityItems.length === 0 ? (
+                      <div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
+                        No federated activity yet. Follow someone from another server to start the stream.
+                      </div>
+                    ) : (
+                      activityItems.map((item) => (
+                        <div key={item.id} className="rounded-xl border bg-white p-4 shadow-sm dark:bg-gray-950/30">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="font-semibold text-sm text-gray-900 dark:text-white">{item.title}</p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{item.subtitle}</p>
+                            </div>
+                            <Badge variant="outline" className="shrink-0">
+                              {item.kind === 'post' ? 'Post' : 'Follower'}
+                            </Badge>
+                          </div>
+                          <div
+                            className="mt-3 text-sm text-gray-700 dark:text-gray-200 prose dark:prose-invert max-w-none"
+                            dangerouslySetInnerHTML={{ __html: item.content }}
+                          />
+                          <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                            {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}
+                          </p>
+                        </div>
+                      ))
+                    )}
+                  </CardContent>
+                </Card>
+
+                <div className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <Users className="w-5 h-5 text-blue-500" />
+                        Followers
+                      </CardTitle>
+                      <CardDescription>People on other servers who can see your federated posts.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {followers.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">No remote followers yet.</p>
+                      ) : (
+                        followers.slice(0, 8).map((follower) => (
+                          <div key={follower.id} className="flex items-center justify-between gap-3 rounded-lg border p-3">
+                            <div>
+                              <p className="font-medium text-sm">{formatHandle(follower.username, follower.domain)}</p>
+                              <p className="text-xs text-muted-foreground">{follower.status || 'accepted'}</p>
+                            </div>
+                            <Badge variant="outline">Inbound</Badge>
+                          </div>
+                        ))
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <UserPlus className="w-5 h-5 text-green-500" />
+                        Following
+                      </CardTitle>
+                      <CardDescription>Remote profiles you have already discovered from fwber.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {following.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">You are not following any remote profiles yet.</p>
+                      ) : (
+                        following.slice(0, 8).map((connection) => (
+                          <div key={connection.id} className="flex items-center justify-between gap-3 rounded-lg border p-3">
+                            <div>
+                              <p className="font-medium text-sm">{formatHandle(connection.username, connection.domain)}</p>
+                              <p className="text-xs text-muted-foreground">{connection.status || 'pending'}</p>
+                            </div>
+                            <Badge variant="outline">Outbound</Badge>
+                          </div>
+                        ))
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Top Remote Voices</CardTitle>
+                      <CardDescription>Profiles contributing the most recent posts to your federated cache.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {posts.slice(0, 5).map((post) => {
+                        const authorName = post.metadata?.name || post.actor_username || 'Federated User'
+                        const handle = formatHandle(post.actor_username, post.actor_domain, post.actor_uri)
+
+                        return (
+                          <div key={post.id} className="flex items-center gap-3 rounded-lg border p-3">
+                            <div className="relative h-10 w-10 overflow-hidden rounded-full bg-purple-100">
+                              {post.actor_avatar ? (
+                                <Image src={post.actor_avatar} alt="" fill sizes="40px" className="object-cover" />
+                              ) : (
+                                <div className="flex h-full w-full items-center justify-center font-semibold text-purple-700">
+                                  {authorName.charAt(0)}
+                                </div>
+                              )}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="truncate text-sm font-medium">{authorName}</p>
+                              <p className="truncate text-xs text-muted-foreground">{handle}</p>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </>
+          )}
+        </main>
+      </div>
+    </ProtectedRoute>
+  )
+}

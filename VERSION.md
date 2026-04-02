@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.30`
-- **Release date:** `2026-04-01`
-- **Release name:** `Vercel Trigger Script LF Fix`
+- **Current version:** `1.0.31`
+- **Release date:** `2026-04-02`
+- **Release name:** `Federation Activity Center`
 
 ## Summary
 
-This release fixes the frontend Vercel retrigger script so it runs with LF line endings under `bash`, allowing safe production redeploy nudges when the frontend rollout stalls behind the backend release.
+This release repairs the frontend federation feed contract, adds a dedicated federation activity center, and improves the main federation settings page with clearer navigation and a working federated-handle copy action.
 
 ## Version Sources of Truth
 

@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.31] - 2026-04-02 — Federation Activity Center
+
+### Fixed
+- Repaired `fwber-frontend/app/settings/federation/feed/page.tsx` to consume the backend's real `{ posts: [...] }` response shape instead of reading a nonexistent nested `data` payload.
+- Updated the global federation feed to render the current `FederatedPost` model fields such as `actor_uri`, `actor_username`, `actor_domain`, `actor_avatar`, and `metadata`.
+- Added a protected federation activity center page at `/settings/federation/activity` that merges remote followers and cached federated posts into a single recent-activity view.
+- Added direct navigation between federation settings, the activity center, and the global feed, and made "Copy Federated Handle" actually write to the clipboard with toast feedback.
+
 ## [1.0.30] - 2026-04-01 — Vercel Trigger Script LF Fix
 
 ### Fixed

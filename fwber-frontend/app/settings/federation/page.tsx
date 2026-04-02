@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
-import { Globe, Search, UserPlus, Shield, Info, ArrowLeft, Share2, MessageSquare } from 'lucide-react';
+import { Globe, Search, UserPlus, Shield, Info, ArrowLeft, Share2, MessageSquare, Radio } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -119,6 +119,28 @@ export default function FederationSettingsPage() {
         }
     };
 
+    const federatedHandle = user?.email ? `@${user.email.split('@')[0]}@api.fwber.me` : '';
+
+    const copyFederatedHandle = async () => {
+        if (!federatedHandle) {
+            return;
+        }
+
+        try {
+            await navigator.clipboard.writeText(federatedHandle);
+            toast({
+                title: 'Federated handle copied',
+                description: 'Share it on other ActivityPub servers so people can follow you.',
+            });
+        } catch (error) {
+            toast({
+                variant: 'destructive',
+                title: 'Copy failed',
+                description: 'Could not copy your federated handle to the clipboard.',
+            });
+        }
+    };
+
     return (
         <div className="max-w-4xl mx-auto space-y-8 pb-24 px-4">
             {/* Header */}
@@ -139,6 +161,11 @@ export default function FederationSettingsPage() {
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
+                    <Link href="/settings/federation/activity">
+                        <Button variant="outline" size="sm" className="border-purple-200 text-purple-600 hover:bg-purple-50">
+                            <Radio className="w-4 h-4 mr-2" /> Activity Center
+                        </Button>
+                    </Link>
                     <Link href="/settings/federation/feed">
                         <Button variant="outline" size="sm" className="border-blue-200 text-blue-600 hover:bg-blue-50">
                             <MessageSquare className="w-4 h-4 mr-2" /> View Global Feed
@@ -293,9 +320,15 @@ export default function FederationSettingsPage() {
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-lg font-mono text-[10px] break-all border border-zinc-200 dark:border-zinc-700">
-                                {user?.email ? `@${user.email.split('@')[0]}@api.fwber.me` : 'Loading...'}
+                                {federatedHandle || 'Loading...'}
                             </div>
-                            <Button variant="ghost" size="sm" className="w-full text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="w-full text-[10px] font-bold uppercase tracking-widest text-zinc-400"
+                                onClick={copyFederatedHandle}
+                                disabled={!federatedHandle}
+                            >
                                 <Share2 className="w-3 h-3 mr-2" /> Copy Federated Handle
                             </Button>
                         </CardContent>
@@ -306,8 +339,8 @@ export default function FederationSettingsPage() {
                             <Info className="w-3 h-3" /> Federation FAQ
                         </h4>
                         <ul className="text-[10px] text-zinc-500 space-y-2 font-medium">
-                            <li>â€¢ Can I match with users on Mastodon? <br/><span className="text-zinc-400 font-normal">Matching is limited to local fwber nodes for safety.</span></li>
-                            <li>â€¢ Who can see my face reveals? <br/><span className="text-zinc-400 font-normal">Reveals are only visible within the fwber E2E encrypted layer.</span></li>
+                            <li>- Can I match with users on Mastodon? <br/><span className="text-zinc-400 font-normal">Matching is limited to local fwber nodes for safety.</span></li>
+                            <li>- Who can see my face reveals? <br/><span className="text-zinc-400 font-normal">Reveals are only visible within the fwber E2E encrypted layer.</span></li>
                         </ul>
                     </div>
                 </div>
