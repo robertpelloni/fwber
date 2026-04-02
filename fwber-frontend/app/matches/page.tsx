@@ -190,9 +190,9 @@ export default function MatchesPage() {
             )}
           </div>
           
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 text-white h-1/2 flex flex-col justify-end pointer-events-none">
-            <div className="flex justify-between items-end">
-              <div>
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 text-white h-1/2 flex flex-col justify-end pointer-events-none">
+              <div className="flex justify-between items-end">
+                <div>
                 <h2 className="text-3xl font-bold flex items-center gap-2">
                   {isConfessional ? 'Voice Only Profile' : currentMatch.name}
                   {!isConfessional && currentMatch.age && <span className="text-gray-300">, {currentMatch.age}</span>}
@@ -203,6 +203,18 @@ export default function MatchesPage() {
                   <span>{currentMatch.distance} miles away</span>
                 </div>
               </div>
+              {!isConfessional && Array.isArray(currentMatch.shared_interests) && currentMatch.shared_interests.length > 0 && (
+                <div className="mb-3 flex flex-wrap gap-2">
+                  {currentMatch.shared_interests.map((interest: string) => (
+                    <span
+                      key={interest}
+                      className="rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-white/90"
+                    >
+                      {interest}
+                    </span>
+                  ))}
+                </div>
+              )}
               {!isConfessional && (
                 <Button
                   size="icon"
@@ -217,7 +229,16 @@ export default function MatchesPage() {
                 </Button>
               )}
             </div>
-            {!isConfessional && <p className="line-clamp-2 mb-16">{currentMatch.bio}</p>}
+            {!isConfessional && (
+              <>
+                {currentMatch.shared_interest_count > 0 && (
+                  <p className="mb-2 text-sm font-medium text-amber-200">
+                    {currentMatch.shared_interest_count} shared interest{currentMatch.shared_interest_count === 1 ? '' : 's'}
+                  </p>
+                )}
+                <p className="line-clamp-2 mb-16">{currentMatch.bio}</p>
+              </>
+            )}
             {isConfessional && (
                 <div className="flex gap-4 mb-16 text-sm text-zinc-400 font-medium">
                     <span>Gender: {currentMatch.gender || '??'}</span>

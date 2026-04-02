@@ -257,4 +257,39 @@ class MatchFilterTest extends TestCase
             ->assertJsonCount(1, 'matches')
             ->assertJsonPath('matches.0.id', $match->id);
     }
+
+    public function test_can_filter_matches_by_shared_interests()
+    {
+        $user = User::factory()->create();
+        UserProfile::factory()->create([
+            'user_id' => $user->id,
+            'latitude' => 40.7128,
+            'longitude' => -74.0060,
+            'interests' => ['music', 'travel', 'foodie'],
+        ]);
+
+        $match = User::factory()->create();
+        UserProfile::factory()->create([
+            'user_id' => $match->id,
+            'latitude' => 40.7128,
+            'longitude' => -74.0060,
+            'interests' => ['travel', 'art'],
+        ]);
+
+        $nonMatch = User::factory()->create();
+        UserProfile::factory()->create([
+            'user_id' => $nonMatch->id,
+            'latitude' => 40.7128,
+            'longitude' => -74.0060,
+            'interests' => ['fitness', 'gaming'],
+        ]);
+
+        $response = $this->actingAs($user)->getJson('/api/matches?interests[]=travel');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(1, 'matches')
+            ->assertJsonPath('matches.0.id', $match->id)
+            ->assertJsonPath('matches.0.shared_interests.0', 'travel')
+            ->assertJsonPath('matches.0.shared_interest_count', 1);
+    }
 }

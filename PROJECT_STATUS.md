@@ -1,22 +1,23 @@
-# Project Status — fwber v1.0.41 (Merchant Broadcast History)
+# Project Status — fwber v1.0.42 (Structured Match Interests)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.41 "Merchant Broadcast History"
+**Version:** 1.0.42 "Structured Match Interests"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## Merchant Broadcast History
-- **Analytics History Feed**: `/api/merchant-portal/analytics` now returns recent `merchant_pulse_broadcast` history alongside the existing KPI, retention, and promotion metrics payload.
-- **Pulse Audit Trail**: Merchants can now see each recent broadcast's content, associated promotion, vibe target, live vibe snapshot, promo code, visibility radius, send time, and expiry status.
-- **Single Fetch Contract**: The analytics page keeps using one API request instead of bolting on a second history endpoint, so the merchant portal stays coherent and easy to maintain.
-- **Header Overlap Polish**: The dashboard now suppresses the floating global subpage nav and uses a roomier app-header logo/badge layout so the hover-logo area no longer crowds the top bar.
+## Structured Match Interests
+- **Canonical Interests**: Profile interests are now normalized on write so matching can treat `Travel`, `travel`, and duplicate picks as one structured signal instead of noisy freeform variants.
+- **Interest-Aware Match Feed**: `/api/matches` now accepts `interests[]` filters and returns `shared_interests` plus `shared_interest_count` for each candidate.
+- **Shared-Interest Ranking**: The AI matching heuristic now boosts candidates with overlapping interests instead of treating interests as profile copy only.
+- **Matches UI Upgrade**: The matches page now lets users filter by interests and shows shared-interest chips directly on the swipe card.
 
 ## ✅ Release Focus
-- [x] Extended merchant analytics with recent broadcast history sourced from `merchant_pulse_broadcast` proximity artifacts.
-- [x] Added backend regression coverage for broadcast history aggregation and the analytics endpoint payload.
-- [x] Added a merchant analytics history panel that surfaces recent sends, vibe snapshots, promo codes, radius, and expiry status.
-- [x] Polished the dashboard header spacing by suppressing the floating fallback nav there and shifting the app-header status cluster away from the logo.
-- [x] Revalidated backend coverage with `php artisan test tests/Feature/MerchantAnalyticsTest.php tests/Feature/MerchantPulseTest.php`.
+- [x] Normalized profile interests into canonical lowercase tags on save so match filtering can rely on stable values.
+- [x] Extended `/api/matches` with shared-interest filtering, overlap-aware scoring, and shared-interest response metadata.
+- [x] Added backend regression coverage for shared-interest filtering on the match feed.
+- [x] Added interest filter controls and shared-interest chip rendering to the matches page.
+- [x] Tightened the `interest-social-graph` design docs so phase 1 matches the real codebase seam: existing profile interests first, taxonomy tables later.
+- [x] Revalidated backend coverage with `php artisan test tests/Feature/MatchFilterTest.php tests/Unit/Services/AIMatchingServiceTest.php`.
 - [x] Revalidated the frontend with `npm run type-check`.
 - [x] Revalidated the frontend with `npm run lint`.

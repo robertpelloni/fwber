@@ -61,7 +61,7 @@
 ---
 
 ## 🎯 Next Immediate Milestones
-1. Extend the **Merchant Portal UI** (B2B) with lifecycle controls, resend/deactivate/reporting tooling, and broader operations polish.
-2. Wire up the **ActivityPub Inbox/Outbox UI** for federated profiles.
-3. Polish the **AI Wingman UI** (Proactive nudges, Cosmic Match visualization).
-4. Deploy and integrate the **Rust Geo-Screener**.
+1. Expand the new **Structured Interest Graph** slice from shared-interest matching into curated taxonomy/catalog APIs and profile-level metadata.
+2. Add **visibility primitives** for friends-only and circle-only content before journals and relationship-link surfaces land.
+3. Extend the **Merchant Portal UI** (B2B) with lifecycle controls, resend/deactivate/reporting tooling, and broader operations polish.
+4. Wire up the **ActivityPub Inbox/Outbox UI** for federated profiles.

@@ -10,6 +10,14 @@ All notable changes to this project will be documented in this file.
 - Added a broadcast history panel to the merchant analytics page so merchants can review recent sends, vibe snapshots, promo codes, radius, and expiry state in one place.
 - Suppressed the floating global subpage nav on the dashboard and gave the shared app header more room around the logo/connection badge cluster so the top bar no longer crowds the floating logo area.
 
+## [1.0.42] - 2026-04-02 — Structured Match Interests
+
+### Fixed
+- Normalized profile interest values on save so duplicate and case-variant interests collapse into canonical matchable tags.
+- Extended `/api/matches` to accept `interests[]` filters, rank shared-interest overlap higher, and return `shared_interests` metadata for each candidate.
+- Added match-feed regression coverage for shared-interest filtering and reused the existing profile interest seam instead of introducing a second phase-1 graph storage path.
+- Added shared-interest chips to the swipe card UI and interest filter controls to the matches page so users can narrow discovery around common interests immediately.
+
 ## [1.0.40] - 2026-04-02 — Events and Shell Stabilization
 
 ### Fixed

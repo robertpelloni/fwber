@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.41`
+- **Current version:** `1.0.42`
 - **Release date:** `2026-04-02`
-- **Release name:** `Merchant Broadcast History`
+- **Release name:** `Structured Match Interests`
 
 ## Summary
 
-This release extends the merchant portal analytics surface with recent broadcast history so merchants can audit sent Local Pulse promotions, their vibe snapshots, promo codes, radius, and expiry state from a single dashboard view.
+This release turns the existing profile interest list into a real structured matching signal by normalizing saved interests, letting the match feed filter on them, and surfacing shared-interest overlap directly in the swipe UI.
 
 ## Version Sources of Truth
 

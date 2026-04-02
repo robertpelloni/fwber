@@ -182,6 +182,7 @@ class MatchController extends Controller
                 'age_min' => $request->get('age_min'),
                 'age_max' => $request->get('age_max'),
                 'max_distance' => $request->get('max_distance'),
+                'interests' => $request->input('interests', []),
                 'smoking' => $request->get('smoking'),
                 'drinking' => $request->get('drinking'),
                 'body_type' => $request->get('body_type'),
@@ -205,6 +206,9 @@ class MatchController extends Controller
             return collect($candidates)->map(function ($candidate) use ($profile) {
                 // Map ai_score to compatibility_score for the resource
                 $candidate->setAttribute('compatibility_score', $candidate->ai_score);
+                $sharedInterests = $this->matchingService->getSharedInterests($profile, $candidate->profile);
+                $candidate->setAttribute('shared_interests', $sharedInterests);
+                $candidate->setAttribute('shared_interest_count', count($sharedInterests));
 
                 // Calculate distance for display (service uses it for scoring but doesn't return it)
                 $candidate->setAttribute(

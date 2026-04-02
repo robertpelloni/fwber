@@ -275,6 +275,11 @@ class UserProfile extends Model
         return $this->birthdate?->age;
     }
 
+    public function setInterestsAttribute($value): void
+    {
+        $this->attributes['interests'] = json_encode($this->normalizeInterestValues($value));
+    }
+
     protected static function booted()
     {
         static::saved(function ($profile) {
@@ -291,5 +296,33 @@ class UserProfile extends Model
                 );
             }
         });
+    }
+
+    /**
+     * Keep freeform interest arrays canonical so matching can reason over them consistently.
+     *
+     * @param  mixed  $value
+     * @return array<int, string>
+     */
+    private function normalizeInterestValues($value): array
+    {
+        if (! is_array($value)) {
+            return [];
+        }
+
+        $normalized = array_map(function ($interest) {
+            if (! is_string($interest)) {
+                return null;
+            }
+
+            $interest = preg_replace('/\s+/', ' ', trim($interest));
+            if ($interest === null || $interest === '') {
+                return null;
+            }
+
+            return mb_strtolower($interest);
+        }, $value);
+
+        return array_values(array_unique(array_filter($normalized)));
     }
 }

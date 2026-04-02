@@ -9,6 +9,30 @@ interface MatchFilterProps {
   onFilterChange: (filters: any) => void;
 }
 
+const INTEREST_OPTIONS = [
+  'music',
+  'movies',
+  'sports',
+  'gaming',
+  'travel',
+  'cooking',
+  'reading',
+  'art',
+  'fitness',
+  'outdoors',
+  'tech',
+  'nightlife',
+  'photography',
+  'dancing',
+  'foodie',
+  'fashion',
+  'politics',
+  'volunteering',
+  'hot tubs',
+  'saunas',
+  'spas',
+] as const
+
 export default function MatchFilter({ onFilterChange }: MatchFilterProps) {
   const { user } = useAuth();
   // Threshold for Premium Filters: 100 FWB tokens
@@ -22,6 +46,7 @@ export default function MatchFilter({ onFilterChange }: MatchFilterProps) {
     drinking: '',
     body_type: '',
     height_min: '',
+    interests: [] as string[],
     // Premium
     cannabis: '',
     diet: '',
@@ -39,6 +64,15 @@ export default function MatchFilter({ onFilterChange }: MatchFilterProps) {
       [field]: value,
     }));
   };
+
+  const handleInterestToggle = (interest: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      interests: prev.interests.includes(interest)
+        ? prev.interests.filter((value) => value !== interest)
+        : [...prev.interests, interest],
+    }))
+  }
 
   const handleApplyFilters = () => {
     onFilterChange(filters);
@@ -127,6 +161,33 @@ export default function MatchFilter({ onFilterChange }: MatchFilterProps) {
               onChange={(e) => handleInputChange('height_min', e.target.value)}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             />
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <label className="block text-sm font-medium text-gray-700">Shared interests</label>
+            <span className="text-xs text-gray-500">Boost profiles that overlap with your vibe</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {INTEREST_OPTIONS.map((interest) => {
+              const selected = filters.interests.includes(interest)
+
+              return (
+                <button
+                  key={interest}
+                  type="button"
+                  onClick={() => handleInterestToggle(interest)}
+                  className={`rounded-full border px-3 py-1.5 text-sm font-medium transition ${
+                    selected
+                      ? 'border-indigo-600 bg-indigo-600 text-white shadow-sm'
+                      : 'border-gray-300 bg-white text-gray-700 hover:border-indigo-300 hover:text-indigo-600'
+                  }`}
+                >
+                  {interest}
+                </button>
+              )
+            })}
           </div>
         </div>
       </div>

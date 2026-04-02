@@ -201,6 +201,8 @@ class AIMatchingService
             ->whereHas('profile')
             ->with(['profile']);
 
+        $normalizedInterestFilters = $this->normalizeInterestValues($filters['interests'] ?? []);
+
         // Determine effective location for the current user
         $myLat = $userProfile->is_travel_mode ? $userProfile->travel_latitude : $userProfile->latitude;
         $myLon = $userProfile->is_travel_mode ? $userProfile->travel_longitude : $userProfile->longitude;
@@ -319,6 +321,16 @@ class AIMatchingService
                 $q->where('wants_children', $filters['wants_children'] === 'yes');
             }
         });
+
+        if ($normalizedInterestFilters !== []) {
+            $query->whereHas('profile', function ($q) use ($normalizedInterestFilters) {
+                $q->where(function ($interestQuery) use ($normalizedInterestFilters) {
+                    foreach ($normalizedInterestFilters as $interest) {
+                        $interestQuery->orWhereJsonContains('interests', $interest);
+                    }
+                });
+            });
+        }
 
         // Verified Only
         if (! empty($filters['verified_only']) && $filters['verified_only']) {
@@ -878,7 +890,71 @@ class AIMatchingService
             ->whereIn('action', ['like', 'super_like'])
             ->exists();
 
-        return $mutualInterest ? 50 : 0;
+        $sharedInterestScore = $this->calculateSharedInterestScore($user->profile, $candidate->profile);
+
+        return min(100, ($mutualInterest ? 50 : 0) + $sharedInterestScore);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function getSharedInterests(UserProfile $userProfile, UserProfile $candidateProfile, int $limit = 3): array
+    {
+        $sharedInterests = array_values(array_intersect(
+            $this->normalizeInterestValues($userProfile->interests ?? []),
+            $this->normalizeInterestValues($candidateProfile->interests ?? [])
+        ));
+
+        return array_slice($sharedInterests, 0, $limit);
+    }
+
+    private function calculateSharedInterestScore(?UserProfile $userProfile, ?UserProfile $candidateProfile): float
+    {
+        if (! $userProfile || ! $candidateProfile) {
+            return 0;
+        }
+
+        $myInterests = $this->normalizeInterestValues($userProfile->interests ?? []);
+        $theirInterests = $this->normalizeInterestValues($candidateProfile->interests ?? []);
+
+        if ($myInterests === [] || $theirInterests === []) {
+            return 0;
+        }
+
+        $sharedInterests = array_intersect($myInterests, $theirInterests);
+        if ($sharedInterests === []) {
+            return 0;
+        }
+
+        $overlapRatio = count($sharedInterests) / max(count($myInterests), count($theirInterests));
+
+        return $overlapRatio * 50;
+    }
+
+    /**
+     * @param  mixed  $values
+     * @return array<int, string>
+     */
+    private function normalizeInterestValues($values): array
+    {
+        if (! is_array($values)) {
+            return [];
+        }
+
+        $normalized = array_map(function ($value) {
+            if (! is_string($value)) {
+                return null;
+            }
+
+            $value = preg_replace('/\s+/', ' ', trim($value));
+            if ($value === null || $value === '') {
+                return null;
+            }
+
+            return mb_strtolower($value);
+        }, $values);
+
+        return array_values(array_unique(array_filter($normalized)));
     }
 
     private function calculateDistance(UserProfile $profile1, UserProfile $profile2): float
