@@ -17,6 +17,7 @@ import PWAInstallPrompt from '@/components/PWAInstallPrompt'
 import AnalyticsProvider from '@/components/AnalyticsProvider'
 import SafeWalkTracker from '@/components/safety/SafeWalkTracker'
 import AssetRecovery from '@/components/AssetRecovery'
+import GlobalSubpageNav from '@/components/GlobalSubpageNav'
 
 const inter = Inter({
   variable: '--font-inter',
@@ -108,6 +109,7 @@ export default function RootLayout({
                 <AssetRecovery />
                 <NotificationPermissionHandler />
                 <SentryInitializer />
+                <GlobalSubpageNav />
                 <PWAInstallPrompt />
                 <Suspense fallback={null}>
                   <AnalyticsProvider />

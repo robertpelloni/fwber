@@ -9,6 +9,15 @@ All notable changes to this project will be documented in this file.
 - Reworked `fwber-frontend/app/recommendations/page.tsx` to use the shared protected app shell and styling, and added a `Back Home` action there.
 - Updated the shared `AppHeader` to use normal browser navigation for the routes that were repeatedly triggering failed RSC payload fetches before falling back anyway (`/help`, `/conference-pulse`, `/burner`, `/nearby`, `/leaderboard`, and `/wingman`).
 
+## [1.0.35] - 2026-04-02 — Federation Explorer Navigation
+
+### Fixed
+- Added a backend federated actor-detail endpoint plus actor-filtered federated post retrieval so the frontend can inspect real cached actor context safely.
+- Added a new `/settings/federation/actors` explorer and wired the federation hub, activity center, and feed into a shared actor drill-in flow.
+- Removed the duplicate homepage `PWAInstallPrompt` mount so install-banner handling only runs from the root layout.
+- Updated shared app and merchant headers so the fwber logo always routes home and non-home pages get a back control.
+- Added a global subpage navigation control for routes that do not use the shared headers yet, giving those pages a consistent back/home affordance too.
+
 ## [1.0.34] - 2026-04-02 — Federation Trust Polish
 
 ### Fixed

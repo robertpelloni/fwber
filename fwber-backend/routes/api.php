@@ -28,6 +28,7 @@ Route::prefix('federation')->group(function () {
     Route::get('following', [\App\Http\Controllers\ActivityPubSearchController::class, 'getFollowing']);
     Route::get('followers', [\App\Http\Controllers\ActivityPubSearchController::class, 'getFollowers']);
     Route::get('posts', [\App\Http\Controllers\ActivityPubSearchController::class, 'getPosts']);
+    Route::get('actors/detail', [\App\Http\Controllers\ActivityPubController::class, 'actorDetail']);
     // Will bypass standard sanctum auth, requires Http Signature validation instead
     Route::post('users/{id}/inbox', [\App\Http\Controllers\ActivityPubInboxController::class, 'handle']);
     Route::get('users/{id}/outbox', [\App\Http\Controllers\ActivityPubOutboxController::class, 'index']);

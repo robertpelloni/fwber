@@ -35,24 +35,12 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-
-interface RemoteActor {
-    id: string;
-    type: string;
-    preferredUsername: string;
-    name?: string;
-    summary?: string;
-    icon?: { url: string };
-    server: string;
-}
-
-interface FederationConnection {
-    id: number;
-    actor_uri: string;
-    username?: string | null;
-    domain?: string | null;
-    status?: string | null;
-}
+import {
+    buildFederationActorExplorerHref,
+    formatFederationHandle,
+    type FederationActor,
+    type FederationConnection,
+} from '@/lib/api/activitypub';
 
 interface FederationFollowingResponse {
     following?: FederationConnection[];
@@ -63,7 +51,7 @@ interface FederationFollowersResponse {
 }
 
 interface FederationSearchResponse {
-    actors?: RemoteActor[];
+    actors?: FederationActor[];
 }
 
 export default function FederationSettingsPage() {
@@ -72,11 +60,11 @@ export default function FederationSettingsPage() {
     const [handle, setHandle] = useState('');
     const [isSearching, setIsSearching] = useState(false);
     const [isFederationSaving, setIsFederationSaving] = useState(false);
-    const [results, setResults] = useState<RemoteActor[]>([]);
+    const [results, setResults] = useState<FederationActor[]>([]);
     const [following, setFollowing] = useState<FederationConnection[]>([]);
     const [followers, setFollowers] = useState<FederationConnection[]>([]);
     const [activeTab, setActiveTab] = useState<'search' | 'following' | 'followers'>('search');
-    const [selectedActor, setSelectedActor] = useState<RemoteActor | null>(null);
+    const [selectedActor, setSelectedActor] = useState<FederationActor | null>(null);
 
     const isFederated = Boolean(user?.profile?.is_federated);
 
@@ -339,7 +327,12 @@ export default function FederationSettingsPage() {
                                                             {actor.icon && <Image src={actor.icon.url} alt="" fill sizes="40px" className="object-cover" />}
                                                         </div>
                                                         <div>
-                                                            <p className="font-bold text-sm">@{actor.preferredUsername}@{actor.server}</p>
+                                                            <Link
+                                                                href={buildFederationActorExplorerHref(actor.id)}
+                                                                className="font-bold text-sm hover:text-blue-600 dark:hover:text-blue-400"
+                                                            >
+                                                                {formatFederationHandle(actor.preferredUsername, actor.server, actor.id)}
+                                                            </Link>
                                                             <p className="text-xs text-zinc-500">{actor.name || 'External Actor'}</p>
                                                         </div>
                                                     </div>
@@ -352,6 +345,11 @@ export default function FederationSettingsPage() {
                                                         >
                                                             <Eye className="w-4 h-4 mr-2" />
                                                             Details
+                                                        </Button>
+                                                        <Button asChild size="sm" variant="outline" className="border-blue-200 text-blue-600 hover:bg-blue-50">
+                                                            <Link href={buildFederationActorExplorerHref(actor.id)}>
+                                                                Explore
+                                                            </Link>
                                                         </Button>
                                                         <Button 
                                                             size="sm" 
@@ -385,7 +383,12 @@ export default function FederationSettingsPage() {
                                                 {f.username?.[0].toUpperCase()}
                                             </div>
                                             <div>
-                                                <p className="font-bold text-sm">@{f.username}@{f.domain}</p>
+                                                <Link
+                                                    href={buildFederationActorExplorerHref(f.actor_uri)}
+                                                    className="font-bold text-sm hover:text-blue-600 dark:hover:text-blue-400"
+                                                >
+                                                    {formatFederationHandle(f.username, f.domain, f.actor_uri)}
+                                                </Link>
                                                 <p className="text-[10px] text-zinc-400 uppercase tracking-widest font-bold">Status: {f.status}</p>
                                             </div>
                                         </div>
@@ -408,7 +411,12 @@ export default function FederationSettingsPage() {
                                                 {f.username?.[0].toUpperCase()}
                                             </div>
                                             <div>
-                                                <p className="font-bold text-sm">@{f.username}@{f.domain}</p>
+                                                <Link
+                                                    href={buildFederationActorExplorerHref(f.actor_uri)}
+                                                    className="font-bold text-sm hover:text-blue-600 dark:hover:text-blue-400"
+                                                >
+                                                    {formatFederationHandle(f.username, f.domain, f.actor_uri)}
+                                                </Link>
                                                 <p className="text-[10px] text-zinc-400 uppercase tracking-widest font-bold">Remote Follower</p>
                                             </div>
                                         </div>
@@ -483,7 +491,12 @@ export default function FederationSettingsPage() {
                                         ) : null}
                                     </div>
                                     <div>
-                                        <p className="text-base font-semibold">@{selectedActor.preferredUsername}@{selectedActor.server}</p>
+                                        <Link
+                                            href={buildFederationActorExplorerHref(selectedActor.id)}
+                                            className="text-base font-semibold hover:text-blue-600 dark:hover:text-blue-400"
+                                        >
+                                            {formatFederationHandle(selectedActor.preferredUsername, selectedActor.server, selectedActor.id)}
+                                        </Link>
                                         <p className="text-sm text-zinc-500">{selectedActor.name || 'External Actor'}</p>
                                     </div>
                                 </DialogTitle>
@@ -506,6 +519,12 @@ export default function FederationSettingsPage() {
                                 </div>
 
                                 <div className="flex flex-wrap justify-end gap-2">
+                                    <Button asChild variant="outline">
+                                        <Link href={buildFederationActorExplorerHref(selectedActor.id)}>
+                                            <Eye className="w-4 h-4 mr-2" />
+                                            Open Explorer
+                                        </Link>
+                                    </Button>
                                     <Button
                                         variant="outline"
                                         onClick={() => window.open(selectedActor.id, '_blank', 'noopener,noreferrer')}

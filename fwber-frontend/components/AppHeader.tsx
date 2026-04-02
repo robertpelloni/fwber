@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { Logo } from '@/components/Logo'
 import { ConnectionStatusBadge } from './realtime/PresenceComponents'
@@ -12,6 +12,7 @@ import {
     type LucideIcon,
     Menu,
     X,
+    ArrowLeft,
     Home,
     Heart,
     MessageSquare,
@@ -127,6 +128,7 @@ function getUtilityLinkClasses(isActive: boolean) {
 export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeaderProps) {
     const { user, logout } = useAuth()
     const pathname = usePathname()
+    const router = useRouter()
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
     useEffect(() => {
@@ -145,9 +147,29 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
 
     const userDisplayName = user?.name || user?.email || 'User'
     const userInitial = userDisplayName.charAt(0).toUpperCase()
+    const homeHref = user ? '/dashboard' : '/'
+    const shouldShowBackButton = pathname !== homeHref
 
     const handleLogout = () => {
         logout()
+    }
+
+    const navigateHome = () => {
+        if (shouldUseHardNavigation(homeHref)) {
+            window.location.href = homeHref
+            return
+        }
+
+        router.push(homeHref)
+    }
+
+    const handleBack = () => {
+        if (typeof window !== 'undefined' && window.history.length > 1) {
+            router.back()
+            return
+        }
+
+        navigateHome()
     }
 
     const renderNavLink = (
@@ -192,10 +214,21 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
 
     return (
         <>
-            <header className={`sticky top-0 z-40 bg-white shadow dark:bg-gray-900 ${showNav ? 'app-header-with-sidebar' : ''}`}>
+            <header data-app-header="true" className={`sticky top-0 z-40 bg-white shadow dark:bg-gray-900 ${showNav ? 'app-header-with-sidebar' : ''}`}>
                 <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                     <div className="flex min-w-0 items-center gap-3">
-                        <Link href="/dashboard" className="flex items-center gap-2 transition-opacity hover:opacity-90" aria-label="Go to dashboard">
+                        {shouldShowBackButton && (
+                            <button
+                                type="button"
+                                onClick={handleBack}
+                                className="rounded-full p-2 text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                                aria-label="Go back"
+                                title="Go back"
+                            >
+                                <ArrowLeft className="h-5 w-5" />
+                            </button>
+                        )}
+                        <Link href={homeHref} className="flex items-center gap-2 transition-opacity hover:opacity-90" aria-label="Go home">
                             <Logo className="text-3xl" />
                         </Link>
                         <div className="min-w-0">

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\FederatedPost;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -164,10 +165,15 @@ class ActivityPubSearchController extends Controller
     /**
      * Get recent federated posts.
      */
-    public function getPosts()
+    public function getPosts(Request $request)
     {
-        $posts = \App\Models\FederatedPost::orderBy('published_at', 'desc')
-            ->limit(50)
+        $limit = min(max((int) $request->query('limit', 50), 1), 100);
+        $actorUri = $request->query('actor_uri');
+
+        $posts = FederatedPost::query()
+            ->when($actorUri, fn ($query) => $query->where('actor_uri', $actorUri))
+            ->orderBy('published_at', 'desc')
+            ->limit($limit)
             ->get();
 
         return response()->json([

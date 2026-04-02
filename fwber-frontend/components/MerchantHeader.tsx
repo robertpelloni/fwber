@@ -2,10 +2,12 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { Logo } from '@/components/Logo'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import {
+  ArrowLeft,
   Home,
   Menu,
   X,
@@ -30,16 +32,40 @@ const navLinks = [
 
 export default function MerchantHeader({ title = 'fwber Merchant', showNav = true }: MerchantHeaderProps) {
   const { user, logout } = useAuth()
+  const pathname = usePathname()
+  const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const homeHref = '/merchant/dashboard'
+  const shouldShowBackButton = pathname !== homeHref
+
+  const handleBack = () => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      router.back()
+      return
+    }
+
+    router.push(homeHref)
+  }
 
   return (
-    <header className="bg-white dark:bg-gray-900 shadow sticky top-0 z-40">
+    <header data-app-header="true" className="bg-white dark:bg-gray-900 shadow sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo & Brand */}
           <div className="flex items-center gap-3">
-            <Link href="/merchant/dashboard" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+            {shouldShowBackButton && (
+              <button
+                type="button"
+                onClick={handleBack}
+                className="rounded-full p-2 text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                aria-label="Go back"
+                title="Go back"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+            )}
+            <Link href={homeHref} className="flex items-center gap-2 hover:opacity-90 transition-opacity" aria-label="Go home">
               <Logo className="text-3xl" />
               <span className="hidden sm:inline-block font-semibold text-gray-900 dark:text-white px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded text-xs uppercase tracking-wider">Merchant</span>
             </Link>

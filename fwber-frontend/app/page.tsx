@@ -6,7 +6,6 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 import { Logo } from '@/components/Logo'
 import SexQuote from '@/components/SexQuote'
-import PWAInstallPrompt from '@/components/PWAInstallPrompt'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { useThemeStyle } from '@/components/ThemeProvider'
 import { Shield, Heart, Zap, MapPin, MessageCircle, Users, Menu, X, Lock, Ghost, Layers, FileText, Code, Building2, CheckCircle2, Sparkles, GitMerge, Shirt, RefreshCw, Flame, Link as LinkIcon, Rainbow, Video, Gift, Home, UserPlus, Star } from 'lucide-react'
@@ -407,7 +406,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      <PWAInstallPrompt />
     </div>
   )
 }

@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.34`
+- **Current version:** `1.0.35`
 - **Release date:** `2026-04-02`
-- **Release name:** `Federation Trust Polish`
+- **Release name:** `Federation Explorer Navigation`
 
 ## Summary
 
-This release repairs the federation visibility workflow, fixes the broken security-page federation toggle, adds richer remote actor detail and follow-state guidance to the federation hub, and replaces misleading "soon" feed actions with explicit read-only messaging.
+This release adds a real federated actor explorer, brings cached actor context into the backend and federation surfaces, fixes duplicated install-prompt mounting, and establishes consistent home/back navigation across shared headers plus routes that previously lacked a common shell.
 
 ## Version Sources of Truth
 

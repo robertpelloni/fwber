@@ -2,9 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Models\FederatedPost;
+use App\Models\Following;
 use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class ActivityPubTest extends TestCase
@@ -139,5 +143,92 @@ class ActivityPubTest extends TestCase
         $response->assertStatus(200)
             ->assertHeader('Content-Type', 'application/activity+json')
             ->assertJsonPath('type', 'OrderedCollection');
+    }
+
+    public function test_actor_detail_returns_remote_actor_with_cached_context()
+    {
+        $user = User::factory()->create();
+        UserProfile::factory()->create([
+            'user_id' => $user->id,
+            'is_federated' => true,
+        ]);
+
+        Sanctum::actingAs($user);
+
+        Following::create([
+            'user_id' => $user->id,
+            'actor_uri' => 'https://remote.test/users/ava',
+            'username' => 'ava',
+            'domain' => 'remote.test',
+            'status' => 'pending',
+        ]);
+
+        FederatedPost::create([
+            'guid' => 'remote-note-1',
+            'actor_uri' => 'https://remote.test/users/ava',
+            'actor_username' => 'ava',
+            'actor_domain' => 'remote.test',
+            'content' => '<p>Hello from the fediverse</p>',
+            'url' => 'https://remote.test/@ava/1',
+            'metadata' => [
+                'name' => 'Ava Remote',
+                'preferredUsername' => 'ava',
+                'summary' => 'Cached summary',
+            ],
+            'published_at' => now()->subMinute(),
+        ]);
+
+        Http::fake([
+            'https://remote.test/users/ava' => Http::response([
+                'id' => 'https://remote.test/users/ava',
+                'type' => 'Person',
+                'preferredUsername' => 'ava',
+                'name' => 'Ava Remote',
+                'summary' => '<p>Remote summary</p>',
+                'url' => 'https://remote.test/@ava',
+                'inbox' => 'https://remote.test/users/ava/inbox',
+                'outbox' => 'https://remote.test/users/ava/outbox',
+            ], 200),
+        ]);
+
+        $response = $this->getJson('/api/federation/actors/detail?uri='.urlencode('https://remote.test/users/ava'));
+
+        $response->assertStatus(200)
+            ->assertJsonPath('actor.id', 'https://remote.test/users/ava')
+            ->assertJsonPath('actor.preferredUsername', 'ava')
+            ->assertJsonPath('actor.name', 'Ava Remote')
+            ->assertJsonPath('actor.summary', 'Remote summary')
+            ->assertJsonPath('actor.cachedPostsCount', 1)
+            ->assertJsonPath('actor.followingStatus', 'pending')
+            ->assertJsonPath('actor.url', 'https://remote.test/@ava');
+    }
+
+    public function test_posts_endpoint_supports_actor_filtering()
+    {
+        FederatedPost::create([
+            'guid' => 'remote-note-1',
+            'actor_uri' => 'https://remote.test/users/ava',
+            'actor_username' => 'ava',
+            'actor_domain' => 'remote.test',
+            'content' => '<p>Hello from Ava</p>',
+            'url' => 'https://remote.test/@ava/1',
+            'published_at' => now()->subMinute(),
+        ]);
+
+        FederatedPost::create([
+            'guid' => 'remote-note-2',
+            'actor_uri' => 'https://elsewhere.test/users/max',
+            'actor_username' => 'max',
+            'actor_domain' => 'elsewhere.test',
+            'content' => '<p>Hello from Max</p>',
+            'url' => 'https://elsewhere.test/@max/1',
+            'published_at' => now(),
+        ]);
+
+        $response = $this->getJson('/api/federation/posts?actor_uri='.urlencode('https://remote.test/users/ava').'&limit=10');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(1, 'posts')
+            ->assertJsonPath('posts.0.actor_uri', 'https://remote.test/users/ava');
     }
 }

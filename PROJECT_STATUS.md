@@ -1,21 +1,23 @@
-# Project Status — fwber v1.0.34 (Federation Trust Polish)
+# Project Status — fwber v1.0.35 (Federation Explorer Navigation)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.34 "Federation Trust Polish"
+**Version:** 1.0.35 "Federation Explorer Navigation"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## Federation Visibility And Trust Polish
-- **Real Federation Toggle**: The security settings federation switch now persists through the real profile update API and updates local auth state consistently.
-- **Federation Visibility UX**: The federation hub now shows whether your public profile is actually discoverable, and it prevents sharing/follow actions that do not make sense while federation is disabled.
-- **Remote Actor Detail**: Search results now include a drill-in modal so users can inspect a remote actor's summary and server before following.
-- **Honest Feed Actions**: The global federation feed now labels reply/boost/like controls as read-only upcoming features instead of implying live interactions that do not exist yet.
+## Federation Explorer And Navigation Hardening
+- **Actor Explorer Backend**: The backend now exposes authenticated remote actor detail plus actor-scoped cached post retrieval for federation UI drill-in flows.
+- **Actor Explorer UI**: `/settings/federation/actors` now resolves remote actor identity, follow state, and cached posts from one shared frontend federation helper.
+- **PWA Prompt Cleanup**: The duplicate homepage `PWAInstallPrompt` mount is gone, leaving one global install-prompt listener in the root layout.
+- **Universal Subpage Navigation**: Shared app and merchant headers now provide consistent logo-home and back affordances, and a global fallback nav covers routes that still bypass those headers.
 
 ## ✅ Release Focus
-- [x] Fixed the broken federation enable/disable flow so settings no longer misreport federation state.
-- [x] Added higher-trust federation onboarding and actor review UX in the settings hub.
-- [x] Clarified read-only federation feed actions to match current backend capability.
+- [x] Added backend federation actor-detail and actor-filtered post support.
+- [x] Added the shared frontend federation API layer and actor explorer route.
+- [x] Wired federation settings, activity, and feed pages into the explorer flow.
+- [x] Removed duplicate PWA install-prompt mounting.
+- [x] Added consistent home/back navigation to shared and non-shared subpage shells.
+- [x] Revalidated backend federation coverage with `php artisan test tests/Feature/ActivityPubTest.php`.
 - [x] Revalidated the frontend with `npm run type-check`.
-- [x] Revalidated the frontend with `npm run lint`.
 - [x] Revalidated the frontend with `npm run build`.

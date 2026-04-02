@@ -16,34 +16,16 @@ import {
 
 import ProtectedRoute from '@/components/ProtectedRoute'
 import AppHeader from '@/components/AppHeader'
-import { api } from '@/lib/api/client'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-
-interface FederationConnection {
-  id: number
-  actor_uri: string
-  username?: string | null
-  domain?: string | null
-  status?: string | null
-  created_at?: string
-  updated_at?: string
-}
-
-interface FederatedPost {
-  id: number
-  actor_uri: string
-  actor_username?: string | null
-  actor_domain?: string | null
-  actor_avatar?: string | null
-  content: string
-  published_at: string
-  url?: string | null
-  metadata?: {
-    name?: string
-  }
-}
+import { api } from '@/lib/api/client'
+import {
+  buildFederationActorExplorerHref,
+  formatFederationHandle,
+  type FederatedPost,
+  type FederationConnection,
+} from '@/lib/api/activitypub'
 
 interface FollowersResponse {
   followers?: FederationConnection[]
@@ -65,6 +47,7 @@ type ActivityItem =
       subtitle: string
       timestamp: string
       content: string
+      actorUri: string
     }
   | {
       id: string
@@ -73,15 +56,8 @@ type ActivityItem =
       subtitle: string
       timestamp: string
       content: string
+      actorUri: string
     }
-
-function formatHandle(username?: string | null, domain?: string | null, fallback?: string) {
-  if (username && domain) {
-    return `@${username}@${domain}`
-  }
-
-  return fallback || 'Unknown federated actor'
-}
 
 export default function FederationActivityPage() {
   const [followers, setFollowers] = useState<FederationConnection[]>([])
@@ -133,19 +109,21 @@ export default function FederationActivityPage() {
     const followerItems = followers.map((follower) => ({
       id: `follower-${follower.id}`,
       kind: 'follower' as const,
-      title: `${formatHandle(follower.username, follower.domain)} followed you`,
+      title: `${formatFederationHandle(follower.username, follower.domain, follower.actor_uri)} followed you`,
       subtitle: follower.status ? `Status: ${follower.status}` : 'Remote follower',
       timestamp: follower.updated_at || follower.created_at || new Date().toISOString(),
       content: 'A federated profile connected to your public ActivityPub identity.',
+      actorUri: follower.actor_uri,
     }))
 
     const postItems = posts.slice(0, 20).map((post) => ({
       id: `post-${post.id}`,
       kind: 'post' as const,
-      title: post.metadata?.name || formatHandle(post.actor_username, post.actor_domain, post.actor_uri),
-      subtitle: formatHandle(post.actor_username, post.actor_domain, post.actor_uri),
+      title: post.metadata?.name || formatFederationHandle(post.actor_username, post.actor_domain, post.actor_uri),
+      subtitle: formatFederationHandle(post.actor_username, post.actor_domain, post.actor_uri),
       timestamp: post.published_at,
       content: post.content,
+      actorUri: post.actor_uri,
     }))
 
     return [...followerItems, ...postItems]
@@ -247,8 +225,18 @@ export default function FederationActivityPage() {
                         <div key={item.id} className="rounded-xl border bg-white p-4 shadow-sm dark:bg-gray-950/30">
                           <div className="flex items-start justify-between gap-3">
                             <div>
-                              <p className="font-semibold text-sm text-gray-900 dark:text-white">{item.title}</p>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{item.subtitle}</p>
+                              <Link
+                                href={buildFederationActorExplorerHref(item.actorUri)}
+                                className="font-semibold text-sm text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
+                              >
+                                {item.title}
+                              </Link>
+                              <Link
+                                href={buildFederationActorExplorerHref(item.actorUri)}
+                                className="mt-1 block text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+                              >
+                                {item.subtitle}
+                              </Link>
                             </div>
                             <Badge variant="outline" className="shrink-0">
                               {item.kind === 'post' ? 'Post' : 'Follower'}
@@ -283,7 +271,12 @@ export default function FederationActivityPage() {
                         followers.slice(0, 8).map((follower) => (
                           <div key={follower.id} className="flex items-center justify-between gap-3 rounded-lg border p-3">
                             <div>
-                              <p className="font-medium text-sm">{formatHandle(follower.username, follower.domain)}</p>
+                              <Link
+                                href={buildFederationActorExplorerHref(follower.actor_uri)}
+                                className="font-medium text-sm hover:text-blue-600 dark:hover:text-blue-400"
+                              >
+                                {formatFederationHandle(follower.username, follower.domain, follower.actor_uri)}
+                              </Link>
                               <p className="text-xs text-muted-foreground">{follower.status || 'accepted'}</p>
                             </div>
                             <Badge variant="outline">Inbound</Badge>
@@ -308,7 +301,12 @@ export default function FederationActivityPage() {
                         following.slice(0, 8).map((connection) => (
                           <div key={connection.id} className="flex items-center justify-between gap-3 rounded-lg border p-3">
                             <div>
-                              <p className="font-medium text-sm">{formatHandle(connection.username, connection.domain)}</p>
+                              <Link
+                                href={buildFederationActorExplorerHref(connection.actor_uri)}
+                                className="font-medium text-sm hover:text-blue-600 dark:hover:text-blue-400"
+                              >
+                                {formatFederationHandle(connection.username, connection.domain, connection.actor_uri)}
+                              </Link>
                               <p className="text-xs text-muted-foreground">{connection.status || 'pending'}</p>
                             </div>
                             <Badge variant="outline">Outbound</Badge>
@@ -326,7 +324,7 @@ export default function FederationActivityPage() {
                     <CardContent className="space-y-3">
                       {posts.slice(0, 5).map((post) => {
                         const authorName = post.metadata?.name || post.actor_username || 'Federated User'
-                        const handle = formatHandle(post.actor_username, post.actor_domain, post.actor_uri)
+                        const handle = formatFederationHandle(post.actor_username, post.actor_domain, post.actor_uri)
 
                         return (
                           <div key={post.id} className="flex items-center gap-3 rounded-lg border p-3">
@@ -340,8 +338,18 @@ export default function FederationActivityPage() {
                               )}
                             </div>
                             <div className="min-w-0">
-                              <p className="truncate text-sm font-medium">{authorName}</p>
-                              <p className="truncate text-xs text-muted-foreground">{handle}</p>
+                              <Link
+                                href={buildFederationActorExplorerHref(post.actor_uri)}
+                                className="truncate text-sm font-medium hover:text-blue-600 dark:hover:text-blue-400"
+                              >
+                                {authorName}
+                              </Link>
+                              <Link
+                                href={buildFederationActorExplorerHref(post.actor_uri)}
+                                className="truncate text-xs text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400"
+                              >
+                                {handle}
+                              </Link>
                             </div>
                           </div>
                         )

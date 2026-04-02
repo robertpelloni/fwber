@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { useAuth } from '@/lib/auth-context'
-import { api } from '@/lib/api/client'
 import AppHeader from '@/components/AppHeader'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -12,26 +11,12 @@ import { Button } from '@/components/ui/button'
 import { Loader2, Globe, Users, MessageSquare, Repeat, Heart, ArrowLeft, Radio } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import Image from 'next/image'
-
-interface FederatedPost {
-  id: number
-  actor_uri: string
-  actor_username?: string
-  actor_domain?: string
-  actor_avatar?: string
-  content: string
-  published_at: string
-  url?: string | null
-  metadata?: {
-    name?: string
-    preferredUsername?: string
-    summary?: string
-  }
-}
-
-interface FederationPostsResponse {
-  posts?: FederatedPost[]
-}
+import {
+  buildFederationActorExplorerHref,
+  formatFederationHandle,
+  getFederatedPosts,
+  type FederatedPost,
+} from '@/lib/api/activitypub'
 
 function ReadOnlyFederationAction({
   icon: Icon,
@@ -66,8 +51,8 @@ export default function GlobalFeedPage() {
       }
 
       try {
-        const response = await api.get<FederationPostsResponse>('/federation/posts')
-        setPosts(Array.isArray(response.posts) ? response.posts : [])
+        const response = await getFederatedPosts()
+        setPosts(response)
       } catch (error) {
         console.error('Failed to fetch federated posts:', error)
         setPosts([])
@@ -134,9 +119,7 @@ export default function GlobalFeedPage() {
             <div className="space-y-6">
               {posts.map((post) => {
                 const authorName = post.metadata?.name || post.actor_username || 'Federated User'
-                const actorHandle = post.actor_domain && post.actor_username
-                  ? `@${post.actor_username}@${post.actor_domain}`
-                  : post.actor_uri
+                const actorHandle = formatFederationHandle(post.actor_username, post.actor_domain, post.actor_uri)
 
                 return (
                   <Card key={post.id} className="overflow-hidden hover:shadow-md transition-shadow">
@@ -152,14 +135,22 @@ export default function GlobalFeedPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-3">
-                          <p className="font-bold text-gray-900 dark:text-white truncate">
+                          <Link
+                            href={buildFederationActorExplorerHref(post.actor_uri)}
+                            className="font-bold text-gray-900 dark:text-white truncate hover:text-blue-600 dark:hover:text-blue-400"
+                          >
                             {authorName}
-                          </p>
+                          </Link>
                           <time className="text-xs text-gray-500 whitespace-nowrap">
                             {formatDistanceToNow(new Date(post.published_at), { addSuffix: true })}
                           </time>
                         </div>
-                        <p className="text-xs text-gray-500 truncate">{actorHandle}</p>
+                        <Link
+                          href={buildFederationActorExplorerHref(post.actor_uri)}
+                          className="text-xs text-gray-500 truncate hover:text-blue-600 dark:hover:text-blue-400"
+                        >
+                          {actorHandle}
+                        </Link>
                       </div>
                     </CardHeader>
                     <CardContent>
