@@ -1,72 +1,47 @@
-# Handoff — Plan-Aware Premium Pricing
+# Handoff — Production 500 Endpoint Hardening
 
 **Date:** 2026-04-02  
-**Status:** ✅ Plan-aware premium pricing is ready on top of the Stripe renewal follow-up  
-**Version:** 1.0.71  
-**Latest pushed commit:** `e29eaf6f1` (`fix: close stripe renewal rollout gaps (v1.0.70)`)
+**Status:** ✅ Production 500 endpoint hardening is ready on top of the plan-aware pricing slice  
+**Version:** 1.0.72  
+**Latest pushed commit:** `dc88a8965` (`fix: make premium pricing plan-aware (v1.0.71)`)
 
 ## Overview
-This handoff covers the next billing slice after `v1.0.70`. The remaining code-level Stripe inconsistency was that the frontend already sent `plan_id`, but the backend still hardcoded `$19.99`, `30` days, and `price_premium_monthly` across initiation, direct purchases, and webhook fulfillment.
+This handoff covers the next backend stability slice after `v1.0.71`. `TODO.md` explicitly called out DreamHost production 500s on `/api/location`, `/api/photos`, and `/api/safety/walk/active`, but the old “add logging in bootstrap/app.php” hint was stale because the exception handler already logs API exceptions.
 
-This release resolves that mismatch by introducing a backend-owned premium plan catalog for the live `gold_monthly` plan, validating `plan_id`, propagating plan metadata through Stripe and token purchase flows, and using the configured plan information during webhook fulfillment instead of silently reverting to hardcoded monthly defaults.
+This release instead targets the likely production-only brittle spots directly: synchronous event-store coupling in location writes, null-path storage assumptions in photo URL accessors, and missing safety tables on DreamHost. The fix is to degrade those paths safely rather than surfacing full 500s for recoverable or optional failures.
 
 Active release work continues in the clean `C:\Users\hyper\workspace\fwber\temp_build\billing-push-clean` worktree rather than the dirty root checkout.
 
-## What Shipped in v1.0.71
+## What Shipped in v1.0.72
 
-### 1. Backend premium plan catalog
-- Added `fwber-backend/config/premium.php` with the current `gold_monthly` plan definition.
-- Added `fwber-backend/app/Support/PremiumPlanCatalog.php` so controllers can resolve the current plan consistently instead of duplicating defaults.
-- The plan now has one backend home for:
-  - USD price
-  - currency
-  - duration
-  - token cost
-  - Stripe price key
-  - display/description metadata
+### 1. Location write hardening
+- `LocationController::update()` previously treated event-store append failure as fatal because the append lived inside the outer request `try/catch`.
+- The endpoint now catches event-store append failures locally, logs a warning, and still persists the `user_locations` projection.
+- This preserves the user-facing location feature even if the event log infrastructure is temporarily unavailable or misconfigured on DreamHost.
 
-### 2. Plan-aware premium controller flow
-- `PremiumController` now validates `plan_id` on both:
-  - `/api/premium/initiate`
-  - `/api/premium/purchase`
-- Unknown plan IDs now return `422` instead of silently granting the default monthly plan.
-- Stripe intent creation, direct card charging, token spending, subscription creation, and premium expiration now all use the resolved plan metadata.
+### 2. Photo accessor hardening
+- `Photo::getUrlAttribute()` and `Photo::getThumbnailUrlAttribute()` now return empty strings when a legacy row has no path or when storage URL generation throws.
+- This prevents `/api/photos` from crashing on malformed or older production rows and keeps the endpoint response usable enough for the frontend to render a recoverable empty-state/photo fallback.
 
-### 3. Stripe metadata propagation
-- `StripePaymentGateway` now forwards the configured plan description into Stripe intent/charge creation.
-- Stripe request metadata now includes:
-  - `plan_id`
-  - `plan_name`
-  - `stripe_price`
-  - `duration_days`
-- `StripeWebhookController::handlePaymentIntentSucceeded()` now uses that plan metadata plus `PremiumPlanCatalog` to determine the correct subscription duration and persisted `stripe_price`.
+### 3. Safety schema-drift fallback
+- `SafetyController::getActiveWalk()` now catches `QueryException` and returns `walk: null` if `safe_walks` is unavailable.
+- `SafetyController::getContacts()` now follows the same pattern and returns an empty contacts list on missing-table drift.
+- This matches the app’s existing precedent of degrading optional telemetry/secondary features instead of crashing the full API response on legacy schema drift.
 
-### 4. Production env documentation repair
-- `fwber-backend/.env.example` now includes:
-  - `PAYMENT_DRIVER=stripe`
-  - `PREMIUM_GOLD_MONTHLY_PRICE_USD`
-  - `PREMIUM_GOLD_MONTHLY_CURRENCY`
-  - `PREMIUM_GOLD_MONTHLY_DURATION_DAYS`
-  - `PREMIUM_GOLD_MONTHLY_TOKEN_COST`
-  - `PREMIUM_GOLD_MONTHLY_STRIPE_PRICE`
-- This keeps deploy-time Stripe pricing/duration config aligned with the new backend plan catalog.
+### 4. Regression coverage
+- `LocationControllerTest` now proves location update still succeeds when `EventStore::append()` throws.
+- `PhotoControllerTest` now proves listing photos with null storage paths does not 500.
+- New `SafetyControllerTest` proves:
+  - active walk lookup works normally
+  - active walk lookup degrades to `walk: null` when `safe_walks` is missing
 
-### 5. Frontend premium modal cleanup
-- `PremiumUpgradeModal` no longer hardcodes `$19.99/mo` as the visible card CTA.
-- The modal now treats card checkout as a backend-driven step and passes the backend-returned payment-intent amount into `StripePaymentForm`.
-- This removes the last obvious frontend/backend mismatch for the current live premium plan.
-
-### 6. Regression coverage and validation
-- `PremiumControllerTest` now covers:
-  - configured-plan initiation metadata
-  - invalid plan rejection
-  - configured-plan Stripe pricing
-- `StripeWebhookTest` now proves `payment_intent.succeeded` uses configured plan metadata for subscription pricing and expiry.
-- Validation passed:
-  - `php artisan test tests\Feature\PremiumControllerTest.php tests\Feature\StripeWebhookTest.php`
-  - `npm run lint`
-  - `npm run type-check`
-  - `cmd /c "npm run build"`
+### 5. Root-cause findings
+- `bootstrap/app.php` was already logging API exceptions, so the old TODO guidance to “add explicit `Log::error($e)`” was outdated.
+- The plausible production-specific failure classes were:
+  - **sidecar/event-store coupling** for `/api/location`
+  - **legacy/null row assumptions** for `/api/photos`
+  - **schema drift / missing optional tables** for `/api/safety/walk/active`
+- The release hardens those assumptions instead of widening generic catches everywhere.
 
 ## What Shipped in v1.0.65
 

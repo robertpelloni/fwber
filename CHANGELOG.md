@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.72] - 2026-04-02 — Production 500 Endpoint Hardening
+
+### Fixed
+- Hardened `LocationController::update()` so user location writes no longer fail outright if event-sourcing append calls blow up; the location projection now still saves while the event-store failure is logged as a warning.
+- Hardened `Photo` URL accessors so legacy or partially migrated photo rows with missing storage paths no longer crash `/api/photos`; the API now returns empty URL strings instead of surfacing a 500.
+- Hardened `SafetyController` read endpoints to degrade safely when DreamHost is missing the safety tables, returning an empty contacts list or `walk: null` rather than a database-shaped 500.
+- Added regression coverage for event-store failure during `/api/location`, null-path photo listing on `/api/photos`, and missing `safe_walks` schema handling on `/api/safety/walk/active`.
+
 ## [1.0.71] - 2026-04-02 — Plan-Aware Premium Pricing
 
 ### Fixed

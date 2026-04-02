@@ -2,15 +2,23 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Core\EventSourcing\EventStore;
 use App\Models\User;
 use App\Models\UserLocation;
 use App\Models\UserProfile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
 use Tests\TestCase;
 
 class LocationControllerTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function tearDown(): void
+    {
+        Mockery::close();
+        parent::tearDown();
+    }
 
     public function test_user_can_update_location()
     {
@@ -30,6 +38,31 @@ class LocationControllerTest extends TestCase
             'latitude' => 40.7128,
             'longitude' => -74.0060,
             'privacy_level' => 'public',
+        ]);
+    }
+
+    public function test_user_can_update_location_when_event_store_append_fails()
+    {
+        $user = User::factory()->create();
+        UserProfile::factory()->create(['user_id' => $user->id]);
+
+        $eventStore = Mockery::mock(EventStore::class);
+        $eventStore->shouldReceive('getCurrentVersion')->once()->andReturn(0);
+        $eventStore->shouldReceive('append')->once()->andThrow(new \RuntimeException('event store offline'));
+        $this->app->instance(EventStore::class, $eventStore);
+
+        $response = $this->actingAs($user)->postJson('/api/location', [
+            'latitude' => 40.7128,
+            'longitude' => -74.0060,
+            'accuracy' => 10,
+            'privacy_level' => 'public',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('user_locations', [
+            'user_id' => $user->id,
+            'latitude' => 40.7128,
+            'longitude' => -74.0060,
         ]);
     }
 

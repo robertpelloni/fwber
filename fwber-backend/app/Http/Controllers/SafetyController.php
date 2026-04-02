@@ -6,7 +6,9 @@ use App\Models\EmergencyContact;
 use App\Models\SafeWalk;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class SafetyController extends Controller
 {
@@ -14,9 +16,18 @@ class SafetyController extends Controller
 
     public function getContacts(): JsonResponse
     {
-        $contacts = EmergencyContact::where('user_id', Auth::id())
-            ->orderByDesc('is_primary')
-            ->get();
+        try {
+            $contacts = EmergencyContact::where('user_id', Auth::id())
+                ->orderByDesc('is_primary')
+                ->get();
+        } catch (QueryException $exception) {
+            Log::warning('Emergency contacts unavailable; returning empty list', [
+                'user_id' => Auth::id(),
+                'error' => $exception->getMessage(),
+            ]);
+
+            $contacts = collect();
+        }
 
         return response()->json(['contacts' => $contacts]);
     }
@@ -150,10 +161,19 @@ class SafetyController extends Controller
 
     public function getActiveWalk(): JsonResponse
     {
-        $walk = SafeWalk::where('user_id', Auth::id())
-            ->active()
-            ->latest()
-            ->first();
+        try {
+            $walk = SafeWalk::where('user_id', Auth::id())
+                ->active()
+                ->latest()
+                ->first();
+        } catch (QueryException $exception) {
+            Log::warning('Safe walk table unavailable; returning no active walk', [
+                'user_id' => Auth::id(),
+                'error' => $exception->getMessage(),
+            ]);
+
+            $walk = null;
+        }
 
         return response()->json(['walk' => $walk]);
     }

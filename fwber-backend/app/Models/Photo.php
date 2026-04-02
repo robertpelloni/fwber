@@ -131,7 +131,15 @@ class Photo extends Model
      */
     public function getUrlAttribute(): string
     {
-        return Storage::disk('public')->url($this->file_path);
+        if (! $this->file_path) {
+            return '';
+        }
+
+        try {
+            return Storage::disk('public')->url($this->file_path);
+        } catch (\Throwable $exception) {
+            return '';
+        }
     }
 
     /**
@@ -141,7 +149,15 @@ class Photo extends Model
     {
         $path = $this->thumbnail_path ?: $this->file_path;
 
-        return Storage::disk('public')->url($path);
+        if (! $path) {
+            return '';
+        }
+
+        try {
+            return Storage::disk('public')->url($path);
+        } catch (\Throwable $exception) {
+            return '';
+        }
     }
 
     /**

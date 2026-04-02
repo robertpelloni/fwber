@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.71`
+- **Current version:** `1.0.72`
 - **Release date:** `2026-04-02`
-- **Release name:** `Plan-Aware Premium Pricing`
+- **Release name:** `Production 500 Endpoint Hardening`
 
 ## Summary
 
-This release turns the premium purchase flow into a real backend-defined plan system for the existing `gold_monthly` offer. Stripe intent creation, direct charges, token upgrades, webhook fulfillment, and the frontend modal now all key off the same configurable plan metadata instead of silently assuming one hardcoded monthly price.
+This release hardens the backend against the most plausible DreamHost-only 500s called out in `TODO.md`: location updates now survive event-store outages, photo listing no longer crashes on null storage paths, and safety reads degrade cleanly when the optional safety tables are missing.
 
 ## Version Sources of Truth
 

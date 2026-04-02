@@ -49,6 +49,23 @@ class PhotoControllerTest extends TestCase
         $response->assertJsonCount(1, 'data');
     }
 
+    public function test_user_can_list_photos_with_missing_paths_without_500()
+    {
+        Storage::fake('public');
+        $user = User::factory()->create();
+        Photo::factory()->create([
+            'user_id' => $user->id,
+            'file_path' => null,
+            'thumbnail_path' => null,
+        ]);
+
+        $response = $this->actingAs($user)->getJson('/api/photos');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.0.url', '');
+        $response->assertJsonPath('data.0.thumbnail_url', '');
+    }
+
     public function test_user_can_delete_photo()
     {
         Storage::fake('public');

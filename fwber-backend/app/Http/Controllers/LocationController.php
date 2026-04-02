@@ -111,12 +111,19 @@ class LocationController extends Controller
                 null // Location name resolution would go here
             );
 
-            $this->eventStore->append(
-                $event,
-                'UserLocation',
-                $currentVersion + 1,
-                ['ip' => $request->ip(), 'user_agent' => $request->userAgent()]
-            );
+            try {
+                $this->eventStore->append(
+                    $event,
+                    'UserLocation',
+                    $currentVersion + 1,
+                    ['ip' => $request->ip(), 'user_agent' => $request->userAgent()]
+                );
+            } catch (Throwable $eventStoreException) {
+                Log::warning('Location event append failed; continuing with projection update', [
+                    'user_id' => $user->id,
+                    'error' => $eventStoreException->getMessage(),
+                ]);
+            }
             // ----------------------------------
 
             // Get or create user location (Projection Update)
