@@ -7,6 +7,7 @@ import { MessageMetadata } from '@/components/MessageStatusIndicator';
 import { PresenceIndicator, PresenceStatus } from '@/components/PresenceIndicator';
 import { EvolvingAvatar } from '@/components/ui/EvolvingAvatar';
 import { WingmanSuggestions } from '@/components/ai/WingmanSuggestions';
+import { WingmanDashboardModal } from '@/components/ai/WingmanDashboardModal';
 import AudioRecorder from '@/components/AudioRecorder';
 import { api } from '@/lib/api/client';
 import { Languages, Loader2, Sparkles, Gift as GiftIcon, Lock, Video, MoreVertical, Paperclip, X, ThumbsUp, Heart, Laugh, BookOpen, MessageSquareQuote, Star, Zap } from 'lucide-react';
@@ -423,6 +424,8 @@ export default function RealTimeChat({
           </button>
 
           <TipButton recipientId={parseInt(recipientId)} recipientName={recipientName} compact />
+
+          <WingmanDashboardModal matchId={recipientId} matchName={recipientName} />
 
           <Popover>
             <PopoverTrigger asChild>

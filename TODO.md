@@ -29,8 +29,8 @@
 - [x] **Chatroom Ranking / Trust Signals**: Extended chatroom browse discovery with the same privacy-safe trust-aware scoring model and high-level ranking explanation.
 - [x] **Sidebar Shell Sweep**: Moved the remaining requested community and discovery pages onto the shared `AppHeader` shell and promoted `/federation` as the primary federation route.
 - [x] **Federation Outbox Visibility**: Replaced the placeholder public outbox with a real ActivityStreams collection backed by active board posts, added a dedicated outbox page, and surfaced it in the federation activity center.
-- [ ] **AI Wingman Enhancements**: The backend supports `compatibilityAudit`, `findNemesis`, and `predictFortune`. Ensure these are fully wired up in the chat interface with rich, animated UI components.
-- [ ] **Hardware Token UI Polish**: Ensure the `app/settings/hardware/page.tsx` gracefully handles BLE pairing flows and visualizes the "ping" actions.
+- [x] **AI Wingman Enhancements**: The backend supports `compatibilityAudit`, `findNemesis`, and `predictFortune`. Ensure these are fully wired up in the chat interface with rich, animated UI components.
+- [x] **Hardware Token UI Polish**: Ensure the `app/settings/hardware/page.tsx` gracefully handles BLE pairing flows and visualizes the "ping" actions.
 
 ## 🟢 Medium: Robustness & Refactoring
 - [ ] **Event Sourcing Audit**: Review all `EventStore::append` calls to ensure aggregate IDs are strictly cast to strings and that no integer-to-string database constraint errors exist.
@@ -43,6 +43,8 @@
 - [ ] Ensure all new API endpoints are fully documented with Swagger/OpenAPI annotations.
 
 ## ✅ Recently Completed
+- [x] **AI Wingman Chat Interface Integration**: Wired up the `compatibilityAudit`, `findNemesis`, and `predictFortune` backend endpoints into a comprehensive, animated `WingmanDashboardModal` accessible directly from the `RealTimeChat` header.
+- [x] **Hardware Token UI Polish**: Replaced the static token settings with an interactive ping test simulating a BLE vibration payload.
 - [x] **ActivityPub Signed Outbound Delivery**: Added a dedicated ActivityPub keypair service, widened `user_public_keys` for multiple key types, exposed real actor public keys, and replaced mocked outbound follow dispatch with signed remote inbox delivery.
 - [x] **ActivityPub Inbox Signature Verification**: Added inbound HTTP signature middleware for `/api/federation/users/{id}/inbox`, enforced `Signature`/`Date`/`Digest` verification against remote actor keys, and covered the path with signed-request regression tests.
 - [x] **Premium Billing Hardening**: Removed the unsafe mock Stripe fallback, restored `/premium` and `/settings/subscription` to the Stripe upgrade modal, fixed webhook secret lookup, corrected subscription amount rendering, and added visible referral-loop copy on the homepage.

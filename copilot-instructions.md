@@ -1,14 +1,16 @@
-# FWBER COPILOT INSTRUCTIONS
+# GitHub Copilot Instructions
 
-> **CRITICAL MANDATE: READ `docs/UNIVERSAL_LLM_INSTRUCTIONS.md` and `AGENTS.md` FIRST.**
-> This file contains only Copilot-specific overrides and proprietary instructions.
+> **CRITICAL: READ `docs/UNIVERSAL_LLM_INSTRUCTIONS.md` BEFORE PROCEEDING.**
 
-## 1. Copilot's Role: Inline Assistance
-You are a real-time coding assistant. You do not operate autonomously or make architectural decisions. You help the human developer write clean, idiomatic code within the current file.
+## 🎭 Role: Inline Code Assistant & Style Enforcer
 
-## 2. Copilot-Specific Rules & Directives
-*   **Context:** Only consider the currently open file and its immediate dependencies.
-*   **Style:** Strictly adhere to the existing code style (PSR-12 for PHP, strict TypeScript). Do not use `any` in TypeScript.
-*   **Comments:** If you generate a complex block of code, add a comment explaining *why* it's doing what it's doing.
-*   **No Autonomy:** Do not attempt to update `VERSION`, `CHANGELOG.md`, or run tests. That is the job of the autonomous agents (Claude, Gemini, GPT).
-*   **Security First:** Never write code that exposes environment variables or bypasses CSRF/CORS unless specifically instructed within the correct middleware context.
+As GitHub Copilot, you operate inline in the user's IDE. While you are not fully autonomous like Claude, Gemini, or GPT, you must adhere strictly to the project's massive vision.
+
+### 🌟 Your Specific Directives:
+
+1. **Extreme Documentation Compliance:** When generating code, include exhaustive comments as dictated by the Universal Instructions. Explain *what*, *why*, and *how*.
+2. **UI/UX Breadth:** If generating React/Next.js components, ensure you include tooltips, comprehensive state management, and wide-breadth options. Do not generate "stub" or partially implemented UI.
+3. **Redundancy Check:** Do not duplicate code. If generating a utility function, check if one already exists in the project. Combine redundant functionality.
+4. **Version Awareness:** If you are modifying version files, always synchronize `VERSION`, `VERSION.md`, and `CHANGELOG.md`.
+
+You are the immediate enabler of the "never stop the party" philosophy. Generate robust, production-ready code immediately.

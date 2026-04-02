@@ -1,0 +1,377 @@
+{
+  "version": "0.99.1",
+  "timestamp": 1774999926438,
+  "sessionId": "current",
+  "stats": {
+    "totalCount": 7543,
+    "sessionCount": 21,
+    "workingCount": 28,
+    "longTermCount": 7494,
+    "observationCount": 28,
+    "uniqueObservationCount": 28,
+    "promptCount": 0,
+    "sessionSummaryCount": 1394,
+    "session": 21,
+    "working": 28,
+    "long_term": 7494,
+    "user": 0,
+    "agent": 0,
+    "project": 7543,
+    "discovery": 0,
+    "decision": 0,
+    "progress": 24,
+    "warning": 4,
+    "fix": 0
+  },
+  "recentContext": [
+    {
+      "content": "JIT tool context for desktop-commander__read_multiple_files:\nFocus query: desktop-commander__read_multiple_files PROJECT_STATUS.md ROADMAP.md TODO.md\nRelevant files: PROJECT_STATUS.md, ROADMAP.md, TODO.md, PROJECT_STATUS.md, src\nPotentially relevant observations:\n- list_files completed — list_files completed in 17ms. Error: ENOENT: no such file or directory, scandir 'C:\\Users\\hyper\\workspace\\fwber\\packages\\tools\\src' (warning · list_files)\n- desktop-commander__get_config failed — desktop-commander__get_config failed after 224ms. Tool execution failed: Tool desktop-commander__get_config not found in any connected MCP server. (warning · desktop-commander__get_config)\n- filesystem__list_allowed_directories failed — filesystem__list_allowed_directories failed after 422ms. Tool execution failed: Tool filesystem__list_allowed_directories not found in any connected MCP server. (warning · filesystem__list_allowed_directories)\nPotentially relevant session summaries:\n- # Deep Project Analysis & Gap Report (v2.10.x -> v2.11.x) (antigravity) ended with status imported. Working directory: C:/Users/hyper/.gemini/antigravity/brain/3470b8d2-1741-4d32-8b6f-5d7570a0e300 Log tail: ## 3. Recommended Roadmap Updates\n- <overview> (copilot-cli) ended with status imported. Working directory: C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints Log tail: - do a consistency review across `README.md`, `VISION.md`, `ROADMAP.md`\nUse only the parts that still match the current intent; ignore stale context.",
+      "metadata": {
+        "source": "pre_tool_context",
+        "tags": [
+          "tool-context",
+          "pre-tool",
+          "desktop-commander__read_multiple_files"
+        ],
+        "toolName": "desktop-commander__read_multiple_files",
+        "query": "desktop-commander__read_multiple_files PROJECT_STATUS.md ROADMAP.md TODO.md",
+        "matchedPaths": [
+          "C:/Users/hyper/workspace/fwber/PROJECT_STATUS.md",
+          "C:/Users/hyper/workspace/fwber/ROADMAP.md",
+          "C:/Users/hyper/workspace/fwber/TODO.md",
+          "C:/Users/hyper/workspace/fwber/docs/PROJECT_STATUS.md",
+          "packages/tools/src"
+        ],
+        "observationCount": 3,
+        "summaryCount": 2,
+        "preview": "JIT context: 3 observations · 2 summarysummaries · 5 file hits"
+      }
+    },
+    {
+      "content": "JIT tool context for list_files:\nFocus query: list_files src\nRelevant files: src\nPotentially relevant observations:\n- filesystem__list_allowed_directories failed — filesystem__list_allowed_directories failed after 422ms. Tool execution failed: Tool filesystem__list_allowed_directories not found in any connected MCP server. (warning · filesystem__list_allowed_directories)\nPotentially relevant session summaries:\n- # Lead Pipeline Kanban Visualization (antigravity) ended with status imported. Working directory: C:/Users/hyper/.gemini/antigravity/brain/12eb2d84-e027-4b6d-b7d0-71597be9110e Log tail: - Plumb the `onStatusChange` event handler down to the\n- # Marketing Automation Dashboard (antigravity) ended with status imported. Working directory: C:/Users/hyper/.gemini/antigravity/brain/12eb2d84-e027-4b6d-b7d0-71597be9110e Log tail: - **Performance Analytics Header**: Display key metrics (T\nUse only the parts that still match the current intent; ignore stale context.",
+      "metadata": {
+        "source": "pre_tool_context",
+        "tags": [
+          "tool-context",
+          "pre-tool",
+          "list_files"
+        ],
+        "toolName": "list_files",
+        "query": "list_files src",
+        "matchedPaths": [
+          "packages/tools/src"
+        ],
+        "observationCount": 1,
+        "summaryCount": 2,
+        "preview": "JIT context: 1 observation · 2 summarysummaries · 1 file hit"
+      }
+    },
+    {
+      "content": "JIT tool context for get_eviction_history:\nFocus query: get_eviction_history\nPotentially relevant observations:\n- get_eviction_history completed — get_eviction_history completed in 333ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 378ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 1265ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 922ms. [] (progress · get_eviction_history)\nPotentially relevant session summaries:\n- { (borg) ended with status imported. Working directory: C:/Users/hyper/workspace/fwber/.borg/handoffs Log tail: ], | \"toolName\": \"get_eviction_history\", | \"query\": \"get_eviction_history\", | \"matchedPaths\": [], | \"observationCount\": 4, | \"su\n- { (borg) ended with status imported. Working directory: C:/Users/hyper/workspace/fwber/.borg/handoffs Log tail: ], | \"toolName\": \"get_eviction_history\", | \"query\": \"get_eviction_history\", | \"matchedPaths\": [], | \"observationCount\": 4, | \"su\nUse only the parts that still match the current intent; ignore stale context.",
+      "metadata": {
+        "source": "pre_tool_context",
+        "tags": [
+          "tool-context",
+          "pre-tool",
+          "get_eviction_history"
+        ],
+        "toolName": "get_eviction_history",
+        "query": "get_eviction_history",
+        "matchedPaths": [],
+        "observationCount": 4,
+        "summaryCount": 2,
+        "preview": "JIT context: 4 observations · 2 summarysummaries"
+      }
+    },
+    {
+      "content": "JIT tool context for desktop-commander__get_config:\nFocus query: desktop-commander__get_config\nPotentially relevant observations:\n- get_eviction_history completed — get_eviction_history completed in 333ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 378ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 1265ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 922ms. [] (progress · get_eviction_history)\nPotentially relevant session summaries:\n- # Phase 14: i18n Activation (antigravity) ended with status imported. Working directory: C:/Users/hyper/.gemini/antigravity/brain/3e499543-fbca-4f7e-8aa2-d372678d293f Log tail: - A `locale` setting is already captured in the browser `naviga\n- # Visual Workflow Engine Integration (Phase 3) (antigravity) ended with status imported. Working directory: C:/Users/hyper/.gemini/antigravity/brain/3aebc32b-c0ad-4992-8415-0242decddc59 Log tail: - Bind the button to `trpc.workflow.start({ \nUse only the parts that still match the current intent; ignore stale context.",
+      "metadata": {
+        "source": "pre_tool_context",
+        "tags": [
+          "tool-context",
+          "pre-tool",
+          "desktop-commander__get_config"
+        ],
+        "toolName": "desktop-commander__get_config",
+        "query": "desktop-commander__get_config",
+        "matchedPaths": [],
+        "observationCount": 4,
+        "summaryCount": 2,
+        "preview": "JIT context: 4 observations · 2 summarysummaries"
+      }
+    },
+    {
+      "content": "JIT tool context for filesystem__list_allowed_directories:\nFocus query: filesystem__list_allowed_directories\nPotentially relevant session summaries:\n- # Implementation Plan: Dashboard Honesty Pass (Task 008) (antigravity) ended with status imported. Working directory: C:/Users/hyper/.gemini/antigravity/brain/31973c7f-8521-42c4-a05a-45092cb99691 Log tail: ### Automated Tests | - Run `shell\n- # Task 009: Health, Logs & Operator Surfaces (antigravity) ended with status imported. Working directory: C:/Users/hyper/.gemini/antigravity/brain/31973c7f-8521-42c4-a05a-45092cb99691 Log tail: - Add entries for **Health**, **Logs**, and **\nUse only the parts that still match the current intent; ignore stale context.",
+      "metadata": {
+        "source": "pre_tool_context",
+        "tags": [
+          "tool-context",
+          "pre-tool",
+          "filesystem__list_allowed_directories"
+        ],
+        "toolName": "filesystem__list_allowed_directories",
+        "query": "filesystem__list_allowed_directories",
+        "matchedPaths": [],
+        "observationCount": 0,
+        "summaryCount": 2,
+        "preview": "JIT context: 2 summarysummaries"
+      }
+    },
+    {
+      "content": "JIT tool context for get_eviction_history:\nFocus query: get_eviction_history\nPotentially relevant observations:\n- get_eviction_history completed — get_eviction_history completed in 258ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 1072ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 919ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 777ms. [] (progress · get_eviction_history)\nPotentially relevant session summaries:\n- # Operator UX implementation plan (copilot-cli) ended with status imported. Working directory: C:/Users/hyper/.copilot/session-state/f2c2fdd1-a7d3-4c1d-9972-f007967c8482 Log tail: 1. Extend the backlog slice toward the universal integrated \n- <overview> (copilot-cli) ended with status imported. Working directory: C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints Log tail: - extend Borg import support with Prism-style universal migration ideas\nUse only the parts that still match the current intent; ignore stale context.",
+      "metadata": {
+        "source": "pre_tool_context",
+        "tags": [
+          "tool-context",
+          "pre-tool",
+          "get_eviction_history"
+        ],
+        "toolName": "get_eviction_history",
+        "query": "get_eviction_history",
+        "matchedPaths": [],
+        "observationCount": 4,
+        "summaryCount": 2,
+        "preview": "JIT context: 4 observations · 2 summarysummaries"
+      }
+    },
+    {
+      "content": "JIT tool context for get_eviction_history:\nFocus query: get_eviction_history\nPotentially relevant observations:\n- get_eviction_history completed — get_eviction_history completed in 1072ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 919ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 777ms. [] (progress · get_eviction_history)\nPotentially relevant session summaries:\n- # Operator UX implementation plan (copilot-cli) ended with status imported. Working directory: C:/Users/hyper/.copilot/session-state/f2c2fdd1-a7d3-4c1d-9972-f007967c8482 Log tail: 1. Extend the backlog slice toward the universal integrated \n- <overview> (copilot-cli) ended with status imported. Working directory: C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints Log tail: - extend Borg import support with Prism-style universal migration ideas\nUse only the parts that still match the current intent; ignore stale context.",
+      "metadata": {
+        "source": "pre_tool_context",
+        "tags": [
+          "tool-context",
+          "pre-tool",
+          "get_eviction_history"
+        ],
+        "toolName": "get_eviction_history",
+        "query": "get_eviction_history",
+        "matchedPaths": [],
+        "observationCount": 3,
+        "summaryCount": 2,
+        "preview": "JIT context: 3 observations · 2 summarysummaries"
+      }
+    },
+    {
+      "content": "JIT tool context for get_eviction_history:\nFocus query: get_eviction_history\nPotentially relevant observations:\n- get_eviction_history completed — get_eviction_history completed in 919ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 777ms. [] (progress · get_eviction_history)\nPotentially relevant session summaries:\n- # Operator UX implementation plan (copilot-cli) ended with status imported. Working directory: C:/Users/hyper/.copilot/session-state/f2c2fdd1-a7d3-4c1d-9972-f007967c8482 Log tail: 1. Extend the backlog slice toward the universal integrated \n- <overview> (copilot-cli) ended with status imported. Working directory: C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints Log tail: - extend Borg import support with Prism-style universal migration ideas\nUse only the parts that still match the current intent; ignore stale context.",
+      "metadata": {
+        "source": "pre_tool_context",
+        "tags": [
+          "tool-context",
+          "pre-tool",
+          "get_eviction_history"
+        ],
+        "toolName": "get_eviction_history",
+        "query": "get_eviction_history",
+        "matchedPaths": [],
+        "observationCount": 2,
+        "summaryCount": 2,
+        "preview": "JIT context: 2 observations · 2 summarysummaries"
+      }
+    },
+    {
+      "content": "JIT tool context for get_eviction_history:\nFocus query: get_eviction_history\nPotentially relevant observations:\n- get_eviction_history completed — get_eviction_history completed in 777ms. [] (progress · get_eviction_history)\nPotentially relevant session summaries:\n- # Operator UX implementation plan (copilot-cli) ended with status imported. Working directory: C:/Users/hyper/.copilot/session-state/f2c2fdd1-a7d3-4c1d-9972-f007967c8482 Log tail: 1. Extend the backlog slice toward the universal integrated \n- <overview> (copilot-cli) ended with status imported. Working directory: C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints Log tail: - extend Borg import support with Prism-style universal migration ideas\nUse only the parts that still match the current intent; ignore stale context.",
+      "metadata": {
+        "source": "pre_tool_context",
+        "tags": [
+          "tool-context",
+          "pre-tool",
+          "get_eviction_history"
+        ],
+        "toolName": "get_eviction_history",
+        "query": "get_eviction_history",
+        "matchedPaths": [],
+        "observationCount": 1,
+        "summaryCount": 2,
+        "preview": "JIT context: 1 observation · 2 summarysummaries"
+      }
+    },
+    {
+      "content": "JIT tool context for get_eviction_history:\nFocus query: get_eviction_history\nPotentially relevant session summaries:\n- # Operator UX implementation plan (copilot-cli) ended with status imported. Working directory: C:/Users/hyper/.copilot/session-state/f2c2fdd1-a7d3-4c1d-9972-f007967c8482 Log tail: 1. Extend the backlog slice toward the universal integrated \n- <overview> (copilot-cli) ended with status imported. Working directory: C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints Log tail: - extend Borg import support with Prism-style universal migration ideas\nUse only the parts that still match the current intent; ignore stale context.",
+      "metadata": {
+        "source": "pre_tool_context",
+        "tags": [
+          "tool-context",
+          "pre-tool",
+          "get_eviction_history"
+        ],
+        "toolName": "get_eviction_history",
+        "query": "get_eviction_history",
+        "matchedPaths": [],
+        "observationCount": 0,
+        "summaryCount": 2,
+        "preview": "JIT context: 2 summarysummaries"
+      }
+    },
+    {
+      "content": "JIT tool context for get_eviction_history:\nFocus query: get_eviction_history\nPotentially relevant observations:\n- get_eviction_history completed — get_eviction_history completed in 916ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 216ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 1077ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 268ms. [] (progress · get_eviction_history)\nPotentially relevant session summaries:\n- { (borg) ended with status imported. Working directory: C:/Users/hyper/workspace/fwber/.borg/handoffs Log tail: ], | \"toolName\": \"get_eviction_history\", | \"query\": \"get_eviction_history\", | \"matchedPaths\": [], | \"observationCount\": 0, | \"su\n- { (borg) ended with status imported. Working directory: C:/Users/hyper/workspace/fwber/.borg/handoffs Log tail: ], | \"toolName\": \"get_eviction_history\", | \"query\": \"get_eviction_history\", | \"matchedPaths\": [], | \"observationCount\": 0, | \"su\nUse only the parts that still match the current intent; ignore stale context.",
+      "metadata": {
+        "source": "pre_tool_context",
+        "tags": [
+          "tool-context",
+          "pre-tool",
+          "get_eviction_history"
+        ],
+        "toolName": "get_eviction_history",
+        "query": "get_eviction_history",
+        "matchedPaths": [],
+        "observationCount": 4,
+        "summaryCount": 2,
+        "preview": "JIT context: 4 observations · 2 summarysummaries"
+      }
+    },
+    {
+      "content": "JIT tool context for get_eviction_history:\nFocus query: get_eviction_history\nPotentially relevant observations:\n- get_eviction_history completed — get_eviction_history completed in 216ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 1077ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 268ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 237ms. [] (progress · get_eviction_history)\nPotentially relevant session summaries:\n- { (borg) ended with status imported. Working directory: C:/Users/hyper/workspace/fwber/.borg/handoffs Log tail: ], | \"toolName\": \"get_eviction_history\", | \"query\": \"get_eviction_history\", | \"matchedPaths\": [], | \"observationCount\": 0, | \"su\n- { (borg) ended with status imported. Working directory: C:/Users/hyper/workspace/fwber/.borg/handoffs Log tail: ], | \"toolName\": \"get_eviction_history\", | \"query\": \"get_eviction_history\", | \"matchedPaths\": [], | \"observationCount\": 0, | \"su\nUse only the parts that still match the current intent; ignore stale context.",
+      "metadata": {
+        "source": "pre_tool_context",
+        "tags": [
+          "tool-context",
+          "pre-tool",
+          "get_eviction_history"
+        ],
+        "toolName": "get_eviction_history",
+        "query": "get_eviction_history",
+        "matchedPaths": [],
+        "observationCount": 4,
+        "summaryCount": 2,
+        "preview": "JIT context: 4 observations · 2 summarysummaries"
+      }
+    },
+    {
+      "content": "JIT tool context for get_eviction_history:\nFocus query: get_eviction_history\nPotentially relevant observations:\n- get_eviction_history completed — get_eviction_history completed in 268ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 237ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 228ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 258ms. [] (progress · get_eviction_history)\nPotentially relevant session summaries:\n- # Operator UX implementation plan (copilot-cli) ended with status imported. Working directory: C:/Users/hyper/.copilot/session-state/f2c2fdd1-a7d3-4c1d-9972-f007967c8482 Log tail: 1. Extend the backlog slice toward the universal integrated \n- <overview> (copilot-cli) ended with status imported. Working directory: C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints Log tail: - extend Borg import support with Prism-style universal migration ideas\nUse only the parts that still match the current intent; ignore stale context.",
+      "metadata": {
+        "source": "pre_tool_context",
+        "tags": [
+          "tool-context",
+          "pre-tool",
+          "get_eviction_history"
+        ],
+        "toolName": "get_eviction_history",
+        "query": "get_eviction_history",
+        "matchedPaths": [],
+        "observationCount": 4,
+        "summaryCount": 2,
+        "preview": "JIT context: 4 observations · 2 summarysummaries"
+      }
+    },
+    {
+      "content": "JIT tool context for get_eviction_history:\nFocus query: get_eviction_history\nPotentially relevant observations:\n- get_eviction_history completed — get_eviction_history completed in 992ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 1255ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 916ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 216ms. [] (progress · get_eviction_history)\nPotentially relevant session summaries:\n- { (borg) ended with status imported. Working directory: C:/Users/hyper/workspace/fwber/.borg/handoffs Log tail: ], | \"toolName\": \"get_eviction_history\", | \"query\": \"get_eviction_history\", | \"matchedPaths\": [], | \"observationCount\": 0, | \"su\n- { (borg) ended with status imported. Working directory: C:/Users/hyper/workspace/fwber/.borg/handoffs Log tail: ], | \"toolName\": \"get_eviction_history\", | \"query\": \"get_eviction_history\", | \"matchedPaths\": [], | \"observationCount\": 0, | \"su\nUse only the parts that still match the current intent; ignore stale context.",
+      "metadata": {
+        "source": "pre_tool_context",
+        "tags": [
+          "tool-context",
+          "pre-tool",
+          "get_eviction_history"
+        ],
+        "toolName": "get_eviction_history",
+        "query": "get_eviction_history",
+        "matchedPaths": [],
+        "observationCount": 4,
+        "summaryCount": 2,
+        "preview": "JIT context: 4 observations · 2 summarysummaries"
+      }
+    },
+    {
+      "content": "JIT tool context for get_eviction_history:\nFocus query: get_eviction_history\nPotentially relevant observations:\n- get_eviction_history completed — get_eviction_history completed in 1255ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 916ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 216ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 1077ms. [] (progress · get_eviction_history)\nPotentially relevant session summaries:\n- { (borg) ended with status imported. Working directory: C:/Users/hyper/workspace/fwber/.borg/handoffs Log tail: ], | \"toolName\": \"get_eviction_history\", | \"query\": \"get_eviction_history\", | \"matchedPaths\": [], | \"observationCount\": 0, | \"su\n- { (borg) ended with status imported. Working directory: C:/Users/hyper/workspace/fwber/.borg/handoffs Log tail: ], | \"toolName\": \"get_eviction_history\", | \"query\": \"get_eviction_history\", | \"matchedPaths\": [], | \"observationCount\": 0, | \"su\nUse only the parts that still match the current intent; ignore stale context.",
+      "metadata": {
+        "source": "pre_tool_context",
+        "tags": [
+          "tool-context",
+          "pre-tool",
+          "get_eviction_history"
+        ],
+        "toolName": "get_eviction_history",
+        "query": "get_eviction_history",
+        "matchedPaths": [],
+        "observationCount": 4,
+        "summaryCount": 2,
+        "preview": "JIT context: 4 observations · 2 summarysummaries"
+      }
+    },
+    {
+      "content": "JIT tool context for get_eviction_history:\nFocus query: get_eviction_history\nPotentially relevant observations:\n- get_eviction_history completed — get_eviction_history completed in 931ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 1350ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 992ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 1255ms. [] (progress · get_eviction_history)\nPotentially relevant session summaries:\n- { (borg) ended with status imported. Working directory: C:/Users/hyper/workspace/fwber/.borg/handoffs Log tail: ], | \"toolName\": \"get_eviction_history\", | \"query\": \"get_eviction_history\", | \"matchedPaths\": [], | \"observationCount\": 0, | \"su\n- { (borg) ended with status imported. Working directory: C:/Users/hyper/workspace/fwber/.borg/handoffs Log tail: ], | \"toolName\": \"get_eviction_history\", | \"query\": \"get_eviction_history\", | \"matchedPaths\": [], | \"observationCount\": 0, | \"su\nUse only the parts that still match the current intent; ignore stale context.",
+      "metadata": {
+        "source": "pre_tool_context",
+        "tags": [
+          "tool-context",
+          "pre-tool",
+          "get_eviction_history"
+        ],
+        "toolName": "get_eviction_history",
+        "query": "get_eviction_history",
+        "matchedPaths": [],
+        "observationCount": 4,
+        "summaryCount": 2,
+        "preview": "JIT context: 4 observations · 2 summarysummaries"
+      }
+    },
+    {
+      "content": "JIT tool context for get_eviction_history:\nFocus query: get_eviction_history\nPotentially relevant observations:\n- get_eviction_history completed — get_eviction_history completed in 1350ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 992ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 1255ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 916ms. [] (progress · get_eviction_history)\nPotentially relevant session summaries:\n- { (borg) ended with status imported. Working directory: C:/Users/hyper/workspace/fwber/.borg/handoffs Log tail: ], | \"toolName\": \"get_eviction_history\", | \"query\": \"get_eviction_history\", | \"matchedPaths\": [], | \"observationCount\": 0, | \"su\n- { (borg) ended with status imported. Working directory: C:/Users/hyper/workspace/fwber/.borg/handoffs Log tail: ], | \"toolName\": \"get_eviction_history\", | \"query\": \"get_eviction_history\", | \"matchedPaths\": [], | \"observationCount\": 0, | \"su\nUse only the parts that still match the current intent; ignore stale context.",
+      "metadata": {
+        "source": "pre_tool_context",
+        "tags": [
+          "tool-context",
+          "pre-tool",
+          "get_eviction_history"
+        ],
+        "toolName": "get_eviction_history",
+        "query": "get_eviction_history",
+        "matchedPaths": [],
+        "observationCount": 4,
+        "summaryCount": 2,
+        "preview": "JIT context: 4 observations · 2 summarysummaries"
+      }
+    },
+    {
+      "content": "JIT tool context for get_eviction_history:\nFocus query: get_eviction_history\nPotentially relevant observations:\n- get_eviction_history completed — get_eviction_history completed in 901ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 931ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 1350ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 992ms. [] (progress · get_eviction_history)\nPotentially relevant session summaries:\n- { (borg) ended with status imported. Working directory: C:/Users/hyper/workspace/fwber/.borg/handoffs Log tail: ], | \"toolName\": \"get_eviction_history\", | \"query\": \"get_eviction_history\", | \"matchedPaths\": [], | \"observationCount\": 0, | \"su\n- { (borg) ended with status imported. Working directory: C:/Users/hyper/workspace/fwber/.borg/handoffs Log tail: ], | \"toolName\": \"get_eviction_history\", | \"query\": \"get_eviction_history\", | \"matchedPaths\": [], | \"observationCount\": 0, | \"su\nUse only the parts that still match the current intent; ignore stale context.",
+      "metadata": {
+        "source": "pre_tool_context",
+        "tags": [
+          "tool-context",
+          "pre-tool",
+          "get_eviction_history"
+        ],
+        "toolName": "get_eviction_history",
+        "query": "get_eviction_history",
+        "matchedPaths": [],
+        "observationCount": 4,
+        "summaryCount": 2,
+        "preview": "JIT context: 4 observations · 2 summarysummaries"
+      }
+    },
+    {
+      "content": "JIT tool context for get_eviction_history:\nFocus query: get_eviction_history\nPotentially relevant observations:\n- get_eviction_history completed — get_eviction_history completed in 1367ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 901ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 931ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 1350ms. [] (progress · get_eviction_history)\nPotentially relevant session summaries:\n- { (borg) ended with status imported. Working directory: C:/Users/hyper/workspace/fwber/.borg/handoffs Log tail: ], | \"toolName\": \"get_eviction_history\", | \"query\": \"get_eviction_history\", | \"matchedPaths\": [], | \"observationCount\": 0, | \"su\n- { (borg) ended with status imported. Working directory: C:/Users/hyper/workspace/fwber/.borg/handoffs Log tail: ], | \"toolName\": \"get_eviction_history\", | \"query\": \"get_eviction_history\", | \"matchedPaths\": [], | \"observationCount\": 0, | \"su\nUse only the parts that still match the current intent; ignore stale context.",
+      "metadata": {
+        "source": "pre_tool_context",
+        "tags": [
+          "tool-context",
+          "pre-tool",
+          "get_eviction_history"
+        ],
+        "toolName": "get_eviction_history",
+        "query": "get_eviction_history",
+        "matchedPaths": [],
+        "observationCount": 4,
+        "summaryCount": 2,
+        "preview": "JIT context: 4 observations · 2 summarysummaries"
+      }
+    },
+    {
+      "content": "JIT tool context for get_eviction_history:\nFocus query: get_eviction_history\nPotentially relevant observations:\n- get_eviction_history completed — get_eviction_history completed in 731ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 740ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 846ms. [] (progress · get_eviction_history)\n- get_eviction_history completed — get_eviction_history completed in 1367ms. [] (progress · get_eviction_history)\nPotentially relevant session summaries:\n- { (borg) ended with status imported. Working directory: C:/Users/hyper/workspace/fwber/.borg/handoffs Log tail: ], | \"toolName\": \"get_eviction_history\", | \"query\": \"get_eviction_history\", | \"matchedPaths\": [], | \"observationCount\": 0, | \"su\n- { (borg) ended with status imported. Working directory: C:/Users/hyper/workspace/fwber/.borg/handoffs Log tail: ], | \"toolName\": \"get_eviction_history\", | \"query\": \"get_eviction_history\", | \"matchedPaths\": [], | \"observationCount\": 0, | \"su\nUse only the parts that still match the current intent; ignore stale context.",
+      "metadata": {
+        "source": "pre_tool_context",
+        "tags": [
+          "tool-context",
+          "pre-tool",
+          "get_eviction_history"
+        ],
+        "toolName": "get_eviction_history",
+        "query": "get_eviction_history",
+        "matchedPaths": [],
+        "observationCount": 4,
+        "summaryCount": 2,
+        "preview": "JIT context: 4 observations · 2 summarysummaries"
+      }
+    }
+  ],
+  "notes": "Automatic background handoff"
+}

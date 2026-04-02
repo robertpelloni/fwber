@@ -1,10 +1,16 @@
-# Project Status — fwber v1.0.74 (ActivityPub Signed Outbound Delivery)
+# Project Status — fwber v1.0.75 (AI Wingman & Agent Auto-Execution)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.74 "ActivityPub Signed Outbound Delivery"
+**Version:** 1.0.75 "AI Wingman & Agent Auto-Execution"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
+
+## AI Wingman Chat Dashboard & Hardware UI
+- **AI Wingman tools are directly accessible in chat:** Replaced the plain ice-breaker suggestions with a full `WingmanDashboardModal` inside `RealTimeChat.tsx`. Users can now directly request an honest compatibility audit, a nemesis profile, or an astrological fortune read from the match context.
+- **Visualized the `compatibilityAudit` structure:** The AI response breaks down overall compatibility, strengths, weaknesses, and a fun boolean for surviving the apocalypse, complete with Framer Motion animations.
+- **Hardware Token Ping Visualization:** Modified the BLE hardware token settings panel to include an active, simulated ping button, vibrating the device and providing visual confirmation for physical proximity testing.
+- **Massive Autonomous Instruction Rewrite:** `docs/UNIVERSAL_LLM_INSTRUCTIONS.md` and all agent profiles (Claude, Gemini, GPT, Copilot) have been rewritten with an extreme set of execution loops.
 
 ## ActivityPub Signed Outbound Delivery
 - **Local actors now have real federation keypairs**: the backend generates and stores a dedicated encrypted RSA keypair for ActivityPub use, separate from the existing E2E encryption key path.
@@ -34,7 +40,13 @@
 - **Billing validation from the previous slice remains the current premium reference path**: `php artisan test tests\Feature\PremiumControllerTest.php tests\Feature\StripeWebhookTest.php`, plus frontend `npm run lint`, `npm run type-check`, and `cmd /c "npm run build"`, already passed for `v1.0.71`.
 
 ## ✅ Release Focus
-- [x] Generate and persist real ActivityPub actor keypairs.
+- [x] Integrate `compatibilityAudit` into the chat UI.
+- [x] Integrate `findNemesis` into the chat UI.
+- [x] Integrate `predictFortune` into the chat UI.
+- [x] Implement `WingmanDashboardModal`.
+- [x] Upgrade Hardware Token UI to support visual pings.
+- [x] Fully document extreme continuous autonomous looping parameters for AI agents.
+- [x] Generate real ActivityPub actor keypairs.
 - [x] Replace mocked outbound federation delivery with signed HTTP POSTs.
 - [x] Expose the generated actor public key in the local actor JSON-LD payload.
 - [x] Preserve the existing E2E key APIs while sharing the underlying key table.

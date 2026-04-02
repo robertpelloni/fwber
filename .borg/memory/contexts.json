@@ -1,5 +1,2520 @@
 [
   {
+    "id": "ctx/1774751617765/6ibnze",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774751618228,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "84e5786e-1310-421c-9432-ab94cbda3291",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774750684316.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:c95a1f3396f9",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:c95a1f3396f9",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+        "restartCount": 0,
+        "startedAt": 1774750684317.0464,
+        "stoppedAt": 1774751617419,
+        "lastActivityAt": 1774750684317.0464,
+        "logTail": [
+          "\"user\": 0,",
+          "\"agent\": 0,",
+          "\"project\": 1437,",
+          "\"discovery\": 0,",
+          "\"decision\": 0,",
+          "\"progress\": 0,",
+          "\"warning\": 0,",
+          "\"fix\": 0",
+          "},",
+          "\"recentContext\": [],",
+          "\"notes\": \"Automatic background handoff\"",
+          "}"
+        ],
+        "recordedAt": 1774751617764,
+        "contentHash": "session-1545964805"
+      },
+      "memoryKind": "session_summary",
+      "id": "e6594265c396befe",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774751617765
+    }
+  },
+  {
+    "id": "ctx/1774751616916/qc82i",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774751617366,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "f98cbd28-ef4f-49fb-8b86-1490f5408a57",
+      "sessionId": "imported:borg:f7e1171cc4ab",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "architecture",
+        "deployment",
+        "borg",
+        "instruction"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "4b976e649b38cf90",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774751616916
+    }
+  },
+  {
+    "id": "ctx/1774751616369/z78w7p",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774751616889,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "f98cbd28-ef4f-49fb-8b86-1490f5408a57",
+      "sessionId": "imported:borg:f7e1171cc4ab",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "git",
+        "workflow",
+        "borg",
+        "instruction"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "7cd74e5b3388b078",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774751616369
+    }
+  },
+  {
+    "id": "ctx/1774751615824/t0ur0e",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774751616326,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "f98cbd28-ef4f-49fb-8b86-1490f5408a57",
+      "sessionId": "imported:borg:f7e1171cc4ab",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "import",
+        "mcp",
+        "copilot-cli",
+        "networking",
+        "borg",
+        "memory"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "7b723214e3aa6631",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774751615824
+    }
+  },
+  {
+    "id": "ctx/1774751615308/3g0vot",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774751615795,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "f98cbd28-ef4f-49fb-8b86-1490f5408a57",
+      "sessionId": "imported:borg:f7e1171cc4ab",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "api",
+        "go",
+        "copilot-cli",
+        "borg",
+        "memory"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "02a221deace333b0",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774751615308
+    }
+  },
+  {
+    "id": "ctx/1774751614837/k0o5wo",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774751615280,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "f98cbd28-ef4f-49fb-8b86-1490f5408a57",
+      "sessionId": "imported:borg:f7e1171cc4ab",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "networking",
+        "runtime",
+        "ui",
+        "borg",
+        "instruction"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "ad9cd3bdf58bf210",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774751614837
+    }
+  },
+  {
+    "id": "ctx/1774751614338/gg6b6v",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774751614802,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "f98cbd28-ef4f-49fb-8b86-1490f5408a57",
+      "sessionId": "imported:borg:f7e1171cc4ab",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "networking",
+        "runtime",
+        "borg",
+        "instruction"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "f7c9481160d4eb73",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774751614338
+    }
+  },
+  {
+    "id": "ctx/1774751613811/j8kt68f",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774751614305,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "f98cbd28-ef4f-49fb-8b86-1490f5408a57",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:f7e1171cc4ab",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:f7e1171cc4ab",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/agent_memory",
+        "restartCount": 0,
+        "startedAt": 1774750719258.602,
+        "stoppedAt": 1774751606610,
+        "lastActivityAt": 1774750719258.602,
+        "logTail": [
+          "],",
+          "\"recordedAt\": 1774750717776,",
+          "\"contentHash\": \"session-2106399746\"",
+          "},",
+          "\"memoryKind\": \"session_summary\"",
+          "\"createdAt\": \"2026-03-29T02:18:37.777Z\",",
+          "\"accessedAt\": \"2026-03-29T02:18:37.777Z\",",
+          "\"accessCount\": 0",
+          "}",
+          "]"
+        ],
+        "recordedAt": 1774751613810,
+        "contentHash": "session-124238004"
+      },
+      "memoryKind": "session_summary",
+      "id": "405e4816b824d2e2",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774751613810
+    }
+  },
+  {
+    "id": "ctx/1774751606100/g48e5t",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774751606565,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "d5656df6-a43c-42b4-94cc-86e0938a0384",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774750984328.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:44c00ab3d15a",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:44c00ab3d15a",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+        "restartCount": 0,
+        "startedAt": 1774750984328.516,
+        "stoppedAt": 1774751605717,
+        "lastActivityAt": 1774750984328.516,
+        "logTail": [
+          "\"user\": 0,",
+          "\"agent\": 0,",
+          "\"project\": 1447,",
+          "\"discovery\": 0,",
+          "\"decision\": 0,",
+          "\"progress\": 0,",
+          "\"warning\": 0,",
+          "\"fix\": 0",
+          "},",
+          "\"recentContext\": [],",
+          "\"notes\": \"Automatic background handoff\"",
+          "}"
+        ],
+        "recordedAt": 1774751606098,
+        "contentHash": "session-2028274661"
+      },
+      "memoryKind": "session_summary",
+      "id": "cd567dd2d298f932",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774751606100
+    }
+  },
+  {
+    "id": "ctx/1774751605192/e82igp",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774751605688,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "d3614fbf-374e-4fd9-99e8-7ecccac00601",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774751284337.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:13ce73588bb4",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:13ce73588bb4",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+        "restartCount": 0,
+        "startedAt": 1774751284337.6147,
+        "stoppedAt": 1774751604724,
+        "lastActivityAt": 1774751284337.6147,
+        "logTail": [
+          "\"user\": 0,",
+          "\"agent\": 0,",
+          "\"project\": 1447,",
+          "\"discovery\": 0,",
+          "\"decision\": 0,",
+          "\"progress\": 0,",
+          "\"warning\": 0,",
+          "\"fix\": 0",
+          "},",
+          "\"recentContext\": [],",
+          "\"notes\": \"Automatic background handoff\"",
+          "}"
+        ],
+        "recordedAt": 1774751605191,
+        "contentHash": "session-1340947211"
+      },
+      "memoryKind": "session_summary",
+      "id": "8b4804a96ea14a02",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774751605192
+    }
+  },
+  {
+    "id": "ctx/1774751603392/zuzwbc",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774751603858,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "4b4bbb31-c068-4ad6-8709-589b77ecba55",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774751585413.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:5940b9622acb",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:5940b9622acb",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+        "restartCount": 0,
+        "startedAt": 1774751585414.2097,
+        "stoppedAt": 1774751602907,
+        "lastActivityAt": 1774751585414.2097,
+        "logTail": [
+          "\"user\": 0,",
+          "\"agent\": 0,",
+          "\"project\": 1447,",
+          "\"discovery\": 0,",
+          "\"decision\": 0,",
+          "\"progress\": 0,",
+          "\"warning\": 0,",
+          "\"fix\": 0",
+          "},",
+          "\"recentContext\": [],",
+          "\"notes\": \"Automatic background handoff\"",
+          "}"
+        ],
+        "recordedAt": 1774751603391,
+        "contentHash": "session-2054807954"
+      },
+      "memoryKind": "session_summary",
+      "id": "e4065b17754dbe33",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774751603392
+    }
+  },
+  {
+    "id": "ctx/1774750717777/stdjyh",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774750718259,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "c56a8883-9306-4f5d-80c1-ee8700827fd8",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774749784301.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:14d0b8a6b041",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:14d0b8a6b041",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+        "restartCount": 0,
+        "startedAt": 1774749784302.5078,
+        "stoppedAt": 1774750717104,
+        "lastActivityAt": 1774749784302.5078,
+        "logTail": [
+          "\"user\": 0,",
+          "\"agent\": 0,",
+          "\"project\": 1426,",
+          "\"discovery\": 0,",
+          "\"decision\": 0,",
+          "\"progress\": 0,",
+          "\"warning\": 0,",
+          "\"fix\": 0",
+          "},",
+          "\"recentContext\": [],",
+          "\"notes\": \"Automatic background handoff\"",
+          "}"
+        ],
+        "recordedAt": 1774750717776,
+        "contentHash": "session-2106399746"
+      },
+      "memoryKind": "session_summary",
+      "id": "6d3952cd2239ae2b",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774750717777
+    }
+  },
+  {
+    "id": "ctx/1774750716628/l5f99",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774750717046,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "7bbef2ad-8703-4d13-a0b3-13e2a719f777",
+      "sessionId": "imported:borg:d3e65bb32812",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "architecture",
+        "deployment",
+        "borg",
+        "instruction"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "76776520f9908a29",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774750716628
+    }
+  },
+  {
+    "id": "ctx/1774750716161/h70y9t",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774750716600,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "7bbef2ad-8703-4d13-a0b3-13e2a719f777",
+      "sessionId": "imported:borg:d3e65bb32812",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "git",
+        "workflow",
+        "borg",
+        "instruction"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "85bfc44a8e925fca",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774750716161
+    }
+  },
+  {
+    "id": "ctx/1774750715695/ybgdm1",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774750716133,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "7bbef2ad-8703-4d13-a0b3-13e2a719f777",
+      "sessionId": "imported:borg:d3e65bb32812",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "import",
+        "mcp",
+        "copilot-cli",
+        "borg",
+        "memory",
+        "networking"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "f508b894941d4e37",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774750715695
+    }
+  },
+  {
+    "id": "ctx/1774750715189/638dh",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774750715666,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "7bbef2ad-8703-4d13-a0b3-13e2a719f777",
+      "sessionId": "imported:borg:d3e65bb32812",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "api",
+        "go",
+        "copilot-cli",
+        "borg",
+        "memory"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "f251a4074b1090f0",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774750715189
+    }
+  },
+  {
+    "id": "ctx/1774750714710/zfy07m",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774750715161,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "7bbef2ad-8703-4d13-a0b3-13e2a719f777",
+      "sessionId": "imported:borg:d3e65bb32812",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "networking",
+        "runtime",
+        "borg",
+        "ui",
+        "instruction"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "d55b33a32ab62b3b",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774750714710
+    }
+  },
+  {
+    "id": "ctx/1774750714171/i37te",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774750714677,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "7bbef2ad-8703-4d13-a0b3-13e2a719f777",
+      "sessionId": "imported:borg:d3e65bb32812",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "networking",
+        "runtime",
+        "borg",
+        "instruction"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "604c7eb35072e30c",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774750714171
+    }
+  },
+  {
+    "id": "ctx/1774750705923/3ixbb",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774750714142,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "7bbef2ad-8703-4d13-a0b3-13e2a719f777",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:d3e65bb32812",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:d3e65bb32812",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/agent_memory",
+        "restartCount": 0,
+        "startedAt": 1774749820227.6765,
+        "stoppedAt": 1774750700829,
+        "lastActivityAt": 1774749820227.6765,
+        "logTail": [
+          "],",
+          "\"recordedAt\": 1774749819331,",
+          "\"contentHash\": \"session-602139872\"",
+          "},",
+          "\"memoryKind\": \"session_summary\"",
+          "\"createdAt\": \"2026-03-29T02:03:39.332Z\",",
+          "\"accessedAt\": \"2026-03-29T02:03:39.332Z\",",
+          "\"accessCount\": 0",
+          "}",
+          "]"
+        ],
+        "recordedAt": 1774750705922,
+        "contentHash": "session-79348867"
+      },
+      "memoryKind": "session_summary",
+      "id": "16e57dcb80fac304",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774750705923
+    }
+  },
+  {
+    "id": "ctx/1774750700231/7mclw",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774750700774,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "eb5a0c10-988b-4ef4-b7bc-29a75ff1bd17",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774750084313.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:fa0cc5c2e71e",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:fa0cc5c2e71e",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+        "restartCount": 0,
+        "startedAt": 1774750084313.8994,
+        "stoppedAt": 1774750699679,
+        "lastActivityAt": 1774750084313.8994,
+        "logTail": [
+          "\"user\": 0,",
+          "\"agent\": 0,",
+          "\"project\": 1437,",
+          "\"discovery\": 0,",
+          "\"decision\": 0,",
+          "\"progress\": 0,",
+          "\"warning\": 0,",
+          "\"fix\": 0",
+          "},",
+          "\"recentContext\": [],",
+          "\"notes\": \"Automatic background handoff\"",
+          "}"
+        ],
+        "recordedAt": 1774750700230,
+        "contentHash": "session-2136393816"
+      },
+      "memoryKind": "session_summary",
+      "id": "51bf7e0de872ad18",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774750700231
+    }
+  },
+  {
+    "id": "ctx/1774750698940/83n47k",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774750699491,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "5145650d-12c9-4d1f-80c3-0f6558b619a3",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774750384316.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:68ebfbbf4ca1",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:68ebfbbf4ca1",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+        "restartCount": 0,
+        "startedAt": 1774750384316.2727,
+        "stoppedAt": 1774750698260,
+        "lastActivityAt": 1774750384316.2727,
+        "logTail": [
+          "\"user\": 0,",
+          "\"agent\": 0,",
+          "\"project\": 1437,",
+          "\"discovery\": 0,",
+          "\"decision\": 0,",
+          "\"progress\": 0,",
+          "\"warning\": 0,",
+          "\"fix\": 0",
+          "},",
+          "\"recentContext\": [],",
+          "\"notes\": \"Automatic background handoff\"",
+          "}"
+        ],
+        "recordedAt": 1774750698939,
+        "contentHash": "session-117408060"
+      },
+      "memoryKind": "session_summary",
+      "id": "a72eefd85acf85f9",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774750698940
+    }
+  },
+  {
+    "id": "ctx/1774749819332/2b1zcq",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774749819844,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "46b5fddd-5210-4a69-9ac1-6cf4ee97d365",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774748884282.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:eceb12c4f6e1",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:eceb12c4f6e1",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+        "restartCount": 0,
+        "startedAt": 1774748884283.6196,
+        "stoppedAt": 1774749818871,
+        "lastActivityAt": 1774748884283.6196,
+        "logTail": [
+          "\"user\": 0,",
+          "\"agent\": 0,",
+          "\"project\": 1416,",
+          "\"discovery\": 0,",
+          "\"decision\": 0,",
+          "\"progress\": 0,",
+          "\"warning\": 0,",
+          "\"fix\": 0",
+          "},",
+          "\"recentContext\": [],",
+          "\"notes\": \"Automatic background handoff\"",
+          "}"
+        ],
+        "recordedAt": 1774749819331,
+        "contentHash": "session-602139872"
+      },
+      "memoryKind": "session_summary",
+      "id": "83f6f7a2f46367b7",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774749819332
+    }
+  },
+  {
+    "id": "ctx/1774749818359/o35m6l",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774749818810,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "858e2781-94ea-4a04-8216-e815f1150935",
+      "sessionId": "imported:borg:e161eb44b253",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "architecture",
+        "deployment",
+        "borg",
+        "instruction"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "4aab329814dfb760",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774749818359
+    }
+  },
+  {
+    "id": "ctx/1774749817816/8w6ab9",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774749818326,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "858e2781-94ea-4a04-8216-e815f1150935",
+      "sessionId": "imported:borg:e161eb44b253",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "networking",
+        "runtime",
+        "borg",
+        "instruction"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "f060f02934301b34",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774749817816
+    }
+  },
+  {
+    "id": "ctx/1774749817280/wm1bg5",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774749817774,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "858e2781-94ea-4a04-8216-e815f1150935",
+      "sessionId": "imported:borg:e161eb44b253",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "networking",
+        "runtime",
+        "borg",
+        "instruction",
+        "ui"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "b2692fc304d626e1",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774749817280
+    }
+  },
+  {
+    "id": "ctx/1774749816769/tpampc",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774749817250,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "858e2781-94ea-4a04-8216-e815f1150935",
+      "sessionId": "imported:borg:e161eb44b253",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "development",
+        "product",
+        "borg",
+        "instruction",
+        "networking"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "7be1df4b043fb18d",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774749816769
+    }
+  },
+  {
+    "id": "ctx/1774749816266/qpman",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774749816735,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "858e2781-94ea-4a04-8216-e815f1150935",
+      "sessionId": "imported:borg:e161eb44b253",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "git",
+        "workflow",
+        "borg",
+        "instruction"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "79739a38a9cdab61",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774749816266
+    }
+  },
+  {
+    "id": "ctx/1774749815713/79z9sb",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774749816235,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "858e2781-94ea-4a04-8216-e815f1150935",
+      "sessionId": "imported:borg:e161eb44b253",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "import",
+        "mcp",
+        "copilot-cli",
+        "borg",
+        "memory",
+        "networking"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "1ed7fb29c6841868",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774749815713
+    }
+  },
+  {
+    "id": "ctx/1774749815183/0jhzk",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774749815669,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "858e2781-94ea-4a04-8216-e815f1150935",
+      "sessionId": "imported:borg:e161eb44b253",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "api",
+        "go",
+        "copilot-cli",
+        "borg",
+        "memory"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "4c99fa3ccbec6d2e",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774749815183
+    }
+  },
+  {
+    "id": "ctx/1774749814499/6cckti",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774749815145,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "858e2781-94ea-4a04-8216-e815f1150935",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:e161eb44b253",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:e161eb44b253",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/agent_memory",
+        "restartCount": 0,
+        "startedAt": 1774748920346.2207,
+        "stoppedAt": 1774749807011,
+        "lastActivityAt": 1774748920346.2207,
+        "logTail": [
+          "],",
+          "\"recordedAt\": 1774748917037,",
+          "\"contentHash\": \"session-1676001354\"",
+          "},",
+          "\"memoryKind\": \"session_summary\"",
+          "\"createdAt\": \"2026-03-29T01:48:37.037Z\",",
+          "\"accessedAt\": \"2026-03-29T01:48:37.037Z\",",
+          "\"accessCount\": 0",
+          "}",
+          "]"
+        ],
+        "recordedAt": 1774749814498,
+        "contentHash": "session-1675879243"
+      },
+      "memoryKind": "session_summary",
+      "id": "0ee6f5df181b6f28",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774749814499
+    }
+  },
+  {
+    "id": "ctx/1774749806471/g3l4g",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774749806944,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "ec40e4fd-29cb-49fa-80fc-cb33abbed5c3",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774749184289.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:376137c757b1",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:376137c757b1",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+        "restartCount": 0,
+        "startedAt": 1774749184290.0007,
+        "stoppedAt": 1774749805908,
+        "lastActivityAt": 1774749184290.0007,
+        "logTail": [
+          "\"user\": 0,",
+          "\"agent\": 0,",
+          "\"project\": 1426,",
+          "\"discovery\": 0,",
+          "\"decision\": 0,",
+          "\"progress\": 0,",
+          "\"warning\": 0,",
+          "\"fix\": 0",
+          "},",
+          "\"recentContext\": [],",
+          "\"notes\": \"Automatic background handoff\"",
+          "}"
+        ],
+        "recordedAt": 1774749806470,
+        "contentHash": "session-2144304751"
+      },
+      "memoryKind": "session_summary",
+      "id": "df20df638ff088e7",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774749806471
+    }
+  },
+  {
+    "id": "ctx/1774749805316/7xmjdk",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774749805880,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "c25b302c-5702-449f-b917-4de2ca9e9f2e",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774749484293.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:01b19d933501",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:01b19d933501",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+        "restartCount": 0,
+        "startedAt": 1774749484294.1733,
+        "stoppedAt": 1774749801139,
+        "lastActivityAt": 1774749484294.1733,
+        "logTail": [
+          "\"user\": 0,",
+          "\"agent\": 0,",
+          "\"project\": 1426,",
+          "\"discovery\": 0,",
+          "\"decision\": 0,",
+          "\"progress\": 0,",
+          "\"warning\": 0,",
+          "\"fix\": 0",
+          "},",
+          "\"recentContext\": [],",
+          "\"notes\": \"Automatic background handoff\"",
+          "}"
+        ],
+        "recordedAt": 1774749805316,
+        "contentHash": "session-1358216699"
+      },
+      "memoryKind": "session_summary",
+      "id": "192e5b9ebdfcad03",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774749805316
+    }
+  },
+  {
+    "id": "ctx/1774748917037/0tt6qi",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774748917417,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "ebcae87f-14f9-4da6-a791-afd092c72c99",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774747984273.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:3d4ea3ccffc8",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:3d4ea3ccffc8",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+        "restartCount": 0,
+        "startedAt": 1774747984273.8142,
+        "stoppedAt": 1774748916506,
+        "lastActivityAt": 1774747984273.8142,
+        "logTail": [
+          "\"user\": 0,",
+          "\"agent\": 0,",
+          "\"project\": 1406,",
+          "\"discovery\": 0,",
+          "\"decision\": 0,",
+          "\"progress\": 0,",
+          "\"warning\": 0,",
+          "\"fix\": 0",
+          "},",
+          "\"recentContext\": [],",
+          "\"notes\": \"Automatic background handoff\"",
+          "}"
+        ],
+        "recordedAt": 1774748917037,
+        "contentHash": "session-1676001354"
+      },
+      "memoryKind": "session_summary",
+      "id": "ae5a52b7ed585c13",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774748917037
+    }
+  },
+  {
+    "id": "ctx/1774748916053/697ws",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774748916460,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "a930eabb-60cc-4728-ba0e-39be0f1d57c1",
+      "sessionId": "imported:borg:b8363dcccf30",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "architecture",
+        "deployment",
+        "copilot-cli",
+        "instruction",
+        "borg"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "7431f0398deaa6d3",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774748916053
+    }
+  },
+  {
+    "id": "ctx/1774748915686/sle0s9",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774748916026,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "a930eabb-60cc-4728-ba0e-39be0f1d57c1",
+      "sessionId": "imported:borg:b8363dcccf30",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "networking",
+        "runtime",
+        "copilot-cli",
+        "instruction",
+        "borg"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "6554bf32a94de508",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774748915686
+    }
+  },
+  {
+    "id": "ctx/1774748915312/4gs1",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774748915662,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "a930eabb-60cc-4728-ba0e-39be0f1d57c1",
+      "sessionId": "imported:borg:b8363dcccf30",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "networking",
+        "runtime",
+        "copilot-cli",
+        "instruction",
+        "ui",
+        "borg"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "2cf1b1642da1b2a4",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774748915312
+    }
+  },
+  {
+    "id": "ctx/1774748914900/1banum",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774748915270,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "a930eabb-60cc-4728-ba0e-39be0f1d57c1",
+      "sessionId": "imported:borg:b8363dcccf30",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "development",
+        "product",
+        "networking",
+        "borg",
+        "instruction"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "0109532ae2076791",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774748914900
+    }
+  },
+  {
+    "id": "ctx/1774748914526/2gyxap",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774748914875,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "a930eabb-60cc-4728-ba0e-39be0f1d57c1",
+      "sessionId": "imported:borg:b8363dcccf30",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "git",
+        "workflow",
+        "borg",
+        "instruction"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "cac681ba6ae1bc2f",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774748914526
+    }
+  },
+  {
+    "id": "ctx/1774748909964/1qm8w",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774748914498,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "a930eabb-60cc-4728-ba0e-39be0f1d57c1",
+      "sessionId": "imported:borg:b8363dcccf30",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "import",
+        "mcp",
+        "copilot-cli",
+        "networking",
+        "borg",
+        "memory"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "51f252e107d8981e",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774748909964
+    }
+  },
+  {
+    "id": "ctx/1774748909563/1ix3aw",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774748909939,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "a930eabb-60cc-4728-ba0e-39be0f1d57c1",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:b8363dcccf30",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:b8363dcccf30",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/agent_memory",
+        "restartCount": 0,
+        "startedAt": 1774748013890.7754,
+        "stoppedAt": 1774748903505,
+        "lastActivityAt": 1774748013890.7754,
+        "logTail": [
+          "],",
+          "\"recordedAt\": 1774748011654,",
+          "\"contentHash\": \"session-1857153156\"",
+          "},",
+          "\"memoryKind\": \"session_summary\"",
+          "\"createdAt\": \"2026-03-29T01:33:31.654Z\",",
+          "\"accessedAt\": \"2026-03-29T01:33:31.654Z\",",
+          "\"accessCount\": 0",
+          "}",
+          "]"
+        ],
+        "recordedAt": 1774748909563,
+        "contentHash": "session-1462096312"
+      },
+      "memoryKind": "session_summary",
+      "id": "cc3e00346ea39d35",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774748909563
+    }
+  },
+  {
+    "id": "ctx/1774748902932/1uh6rm",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774748903452,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "64d935ba-080c-4cbd-b665-2689c4e86f6f",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774748284280.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:f4ca4d8639a9",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:f4ca4d8639a9",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+        "restartCount": 0,
+        "startedAt": 1774748284281.702,
+        "stoppedAt": 1774748902427,
+        "lastActivityAt": 1774748284281.702,
+        "logTail": [
+          "\"user\": 0,",
+          "\"agent\": 0,",
+          "\"project\": 1416,",
+          "\"discovery\": 0,",
+          "\"decision\": 0,",
+          "\"progress\": 0,",
+          "\"warning\": 0,",
+          "\"fix\": 0",
+          "},",
+          "\"recentContext\": [],",
+          "\"notes\": \"Automatic background handoff\"",
+          "}"
+        ],
+        "recordedAt": 1774748902932,
+        "contentHash": "session-651087387"
+      },
+      "memoryKind": "session_summary",
+      "id": "3eb7bc498487b925",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774748902932
+    }
+  },
+  {
+    "id": "ctx/1774748901842/e2r87",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774748902264,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "d24c7911-6b03-4614-b63d-9b565542ce13",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774748584283.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:6a7381a9ee76",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:6a7381a9ee76",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+        "restartCount": 0,
+        "startedAt": 1774748584283.9023,
+        "stoppedAt": 1774748897631,
+        "lastActivityAt": 1774748584283.9023,
+        "logTail": [
+          "\"user\": 0,",
+          "\"agent\": 0,",
+          "\"project\": 1416,",
+          "\"discovery\": 0,",
+          "\"decision\": 0,",
+          "\"progress\": 0,",
+          "\"warning\": 0,",
+          "\"fix\": 0",
+          "},",
+          "\"recentContext\": [],",
+          "\"notes\": \"Automatic background handoff\"",
+          "}"
+        ],
+        "recordedAt": 1774748901841,
+        "contentHash": "session-665780124"
+      },
+      "memoryKind": "session_summary",
+      "id": "62abfcb61975b561",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774748901842
+    }
+  },
+  {
+    "id": "ctx/1774748011654/bdxcv6",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774748012028,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "52811a1e-316c-412a-a506-a234e00ed512",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774747084254.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:ab34484e5f54",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:ab34484e5f54",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+        "restartCount": 0,
+        "startedAt": 1774747084256.1206,
+        "stoppedAt": 1774748011184,
+        "lastActivityAt": 1774747084256.1206,
+        "logTail": [
+          "\"user\": 0,",
+          "\"agent\": 0,",
+          "\"project\": 1390,",
+          "\"discovery\": 0,",
+          "\"decision\": 0,",
+          "\"progress\": 0,",
+          "\"warning\": 0,",
+          "\"fix\": 0",
+          "},",
+          "\"recentContext\": [],",
+          "\"notes\": \"Automatic background handoff\"",
+          "}"
+        ],
+        "recordedAt": 1774748011654,
+        "contentHash": "session-1857153156"
+      },
+      "memoryKind": "session_summary",
+      "id": "c1702a4b3a8f9196",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774748011654
+    }
+  },
+  {
+    "id": "ctx/1774748010799/cku2ak",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774748011139,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "15252782-9f5a-43f2-9a59-4204df1d19e3",
+      "sessionId": "imported:borg:f6a8a6cb3bae",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "api",
+        "go",
+        "copilot-cli",
+        "memory",
+        "borg"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "17178131179f1abd",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774748010798
+    }
+  },
+  {
+    "id": "ctx/1774748010392/1w7unp",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774748010774,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "15252782-9f5a-43f2-9a59-4204df1d19e3",
+      "sessionId": "imported:borg:f6a8a6cb3bae",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "import",
+        "data",
+        "copilot-cli",
+        "instruction",
+        "networking",
+        "memory",
+        "borg"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "5ce234e318f7e90b",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774748010392
+    }
+  },
+  {
+    "id": "ctx/1774748010025/34bjsw",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774748010366,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "15252782-9f5a-43f2-9a59-4204df1d19e3",
+      "sessionId": "imported:borg:f6a8a6cb3bae",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "architecture",
+        "deployment",
+        "copilot-cli",
+        "instruction",
+        "borg"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "6281fb995c6435dc",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774748010025
+    }
+  },
+  {
+    "id": "ctx/1774748009657/7bdswj",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774748010001,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "15252782-9f5a-43f2-9a59-4204df1d19e3",
+      "sessionId": "imported:borg:f6a8a6cb3bae",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "validation",
+        "runtime",
+        "copilot-cli",
+        "memory",
+        "database",
+        "borg"
+      ],
+      "section": "general",
+      "memoryKind": "memory",
+      "extractionSource": "llm",
+      "id": "6ae448b3c15c8814",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774748009657
+    }
+  },
+  {
+    "id": "ctx/1774748009218/yogc1",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774748009633,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "15252782-9f5a-43f2-9a59-4204df1d19e3",
+      "sessionId": "imported:borg:f6a8a6cb3bae",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "networking",
+        "runtime",
+        "copilot-cli",
+        "instruction",
+        "borg"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "10faa8cd4f1d6f78",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774748009218
+    }
+  },
+  {
+    "id": "ctx/1774748008863/qjoiu6",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774748009194,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "15252782-9f5a-43f2-9a59-4204df1d19e3",
+      "sessionId": "imported:borg:f6a8a6cb3bae",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "networking",
+        "runtime",
+        "copilot-cli",
+        "instruction",
+        "ui",
+        "borg"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "00e148d09fad2cf3",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774748008863
+    }
+  },
+  {
+    "id": "ctx/1774748008475/h1zej",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774748008839,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "15252782-9f5a-43f2-9a59-4204df1d19e3",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:f6a8a6cb3bae",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:f6a8a6cb3bae",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/agent_memory",
+        "restartCount": 0,
+        "startedAt": 1774747127070.2932,
+        "stoppedAt": 1774748001328,
+        "lastActivityAt": 1774747127070.2932,
+        "logTail": [
+          "\"instruction\"",
+          "],",
+          "\"section\": \"instructions\",",
+          "\"memoryKind\": \"instruction\",",
+          "\"extractionSource\": \"llm\"",
+          "},",
+          "\"createdAt\": \"2026-03-29T01:18:43.959Z\",",
+          "\"accessedAt\": \"2026-03-29T01:18:43.959Z\",",
+          "\"accessCount\": 0",
+          "}",
+          "]"
+        ],
+        "recordedAt": 1774748008474,
+        "contentHash": "session-1596419808"
+      },
+      "memoryKind": "session_summary",
+      "id": "c3b79345cff38faf",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774748008475
+    }
+  },
+  {
+    "id": "ctx/1774748000913/s7se3u",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774748001280,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "96d43f47-57ac-47cd-92bb-1654de1d36e8",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774747384268.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:09e613b94edf",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:09e613b94edf",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+        "restartCount": 0,
+        "startedAt": 1774747384268.9395,
+        "stoppedAt": 1774748000150,
+        "lastActivityAt": 1774747384268.9395,
+        "logTail": [
+          "\"user\": 0,",
+          "\"agent\": 0,",
+          "\"project\": 1406,",
+          "\"discovery\": 0,",
+          "\"decision\": 0,",
+          "\"progress\": 0,",
+          "\"warning\": 0,",
+          "\"fix\": 0",
+          "},",
+          "\"recentContext\": [],",
+          "\"notes\": \"Automatic background handoff\"",
+          "}"
+        ],
+        "recordedAt": 1774748000913,
+        "contentHash": "session-1487288372"
+      },
+      "memoryKind": "session_summary",
+      "id": "cae614bfbf099787",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774748000913
+    }
+  },
+  {
+    "id": "ctx/1774747999584/mbl8i",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774747999991,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "bd96ed70-351d-42b0-ba4a-f6b26079ceab",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774747684270.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:a3eec06cd695",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:a3eec06cd695",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+        "restartCount": 0,
+        "startedAt": 1774747684271.4263,
+        "stoppedAt": 1774747997771,
+        "lastActivityAt": 1774747684271.4263,
+        "logTail": [
+          "\"user\": 0,",
+          "\"agent\": 0,",
+          "\"project\": 1406,",
+          "\"discovery\": 0,",
+          "\"decision\": 0,",
+          "\"progress\": 0,",
+          "\"warning\": 0,",
+          "\"fix\": 0",
+          "},",
+          "\"recentContext\": [],",
+          "\"notes\": \"Automatic background handoff\"",
+          "}"
+        ],
+        "recordedAt": 1774747999583,
+        "contentHash": "session-1708069845"
+      },
+      "memoryKind": "session_summary",
+      "id": "94c64e995fed5972",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774747999584
+    }
+  },
+  {
+    "id": "ctx/1774747123959/bumhq",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774747124347,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "4f38b097-168c-425e-bfbf-d12dbb196547",
+      "sessionId": "imported:borg:08eb17b9e9df",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "development",
+        "product",
+        "networking",
+        "borg",
+        "instruction"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "1d55fb36925dd1c5",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774747123959
+    }
+  },
+  {
+    "id": "ctx/1774747123577/2qdksr",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774747123933,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "4f38b097-168c-425e-bfbf-d12dbb196547",
+      "sessionId": "imported:borg:08eb17b9e9df",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "git",
+        "workflow",
+        "borg",
+        "instruction"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "3955d320293658f3",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774747123577
+    }
+  },
+  {
+    "id": "ctx/1774747123209/bidxgvi",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774747123553,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "4f38b097-168c-425e-bfbf-d12dbb196547",
+      "sessionId": "imported:borg:08eb17b9e9df",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "import",
+        "mcp",
+        "copilot-cli",
+        "networking",
+        "borg",
+        "memory"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "cd3b9933abeb7078",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774747123209
+    }
+  },
+  {
+    "id": "ctx/1774747122820/b3iyad",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774747123184,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "4f38b097-168c-425e-bfbf-d12dbb196547",
+      "sessionId": "imported:borg:08eb17b9e9df",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "control-plane",
+        "runtime",
+        "copilot-cli",
+        "networking",
+        "borg",
+        "instruction"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "73217a78a3aaa082",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774747122820
+    }
+  },
+  {
+    "id": "ctx/1774747122435/ykal9l",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774747122793,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "4f38b097-168c-425e-bfbf-d12dbb196547",
+      "sessionId": "imported:borg:08eb17b9e9df",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "networking",
+        "runtime",
+        "copilot-cli",
+        "borg",
+        "instruction"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "b5e1b1b05efcae8e",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774747122435
+    }
+  },
+  {
+    "id": "ctx/1774747122040/4tmuyj",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774747122410,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "4f38b097-168c-425e-bfbf-d12dbb196547",
+      "sessionId": "imported:borg:08eb17b9e9df",
+      "path": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "tags": [
+        "networking",
+        "runtime",
+        "borg",
+        "instruction"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "3fd872b6bbce9d0f",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774747122040
+    }
+  },
+  {
+    "id": "ctx/1774747115995/fkv0vf",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774747122011,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "4f38b097-168c-425e-bfbf-d12dbb196547",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:08eb17b9e9df",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:08eb17b9e9df",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/agent_memory",
+        "restartCount": 0,
+        "startedAt": 1774746228755.6887,
+        "stoppedAt": 1774747110468,
+        "lastActivityAt": 1774746228755.6887,
+        "logTail": [
+          "],",
+          "\"recordedAt\": 1774747101007,",
+          "\"contentHash\": \"session-1830180646\"",
+          "},",
+          "\"memoryKind\": \"session_summary\"",
+          "\"createdAt\": \"2026-03-29T01:18:21.008Z\",",
+          "\"accessedAt\": \"2026-03-29T01:18:21.008Z\",",
+          "\"accessCount\": 0",
+          "}",
+          "]"
+        ],
+        "recordedAt": 1774747115994,
+        "contentHash": "session-267920603"
+      },
+      "memoryKind": "session_summary",
+      "id": "f58b9737a3d83d88",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774747115995
+    }
+  },
+  {
+    "id": "ctx/1774747110033/2ujgs",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774747110423,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "copilot-cli",
+      "importedSessionId": "527167a3-68b9-49c8-9295-5803af4cb55f",
+      "sessionId": "imported:copilot-cli:26878af76040",
+      "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+      "tags": [
+        "api",
+        "go",
+        "copilot-cli",
+        "memory"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "22bc591365ea73df",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774747110033
+    }
+  },
+  {
+    "id": "ctx/1774747109472/iln5r",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774747110005,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "copilot-cli",
+      "importedSessionId": "527167a3-68b9-49c8-9295-5803af4cb55f",
+      "sessionId": "imported:copilot-cli:26878af76040",
+      "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+      "tags": [
+        "import",
+        "data",
+        "copilot-cli",
+        "instruction",
+        "networking",
+        "memory"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "6c41245bad87ff02",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774747109472
+    }
+  },
+  {
+    "id": "ctx/1774747108974/z7bkhi",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774747109440,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "copilot-cli",
+      "importedSessionId": "527167a3-68b9-49c8-9295-5803af4cb55f",
+      "sessionId": "imported:copilot-cli:26878af76040",
+      "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+      "tags": [
+        "architecture",
+        "deployment",
+        "copilot-cli",
+        "instruction"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "7e4668563d4a4497",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774747108974
+    }
+  },
+  {
+    "id": "ctx/1774747108465/dc7t9m",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774747108940,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "copilot-cli",
+      "importedSessionId": "527167a3-68b9-49c8-9295-5803af4cb55f",
+      "sessionId": "imported:copilot-cli:26878af76040",
+      "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+      "tags": [
+        "validation",
+        "runtime",
+        "copilot-cli",
+        "memory",
+        "database"
+      ],
+      "section": "general",
+      "memoryKind": "memory",
+      "extractionSource": "llm",
+      "id": "6f154e8f5808e26c",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774747108465
+    }
+  },
+  {
+    "id": "ctx/1774747107965/10cwzq",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774747108431,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "copilot-cli",
+      "importedSessionId": "527167a3-68b9-49c8-9295-5803af4cb55f",
+      "sessionId": "imported:copilot-cli:26878af76040",
+      "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+      "tags": [
+        "networking",
+        "runtime",
+        "copilot-cli",
+        "instruction"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "d9c5f59e1ca73665",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774747107965
+    }
+  },
+  {
+    "id": "ctx/1774747107416/v5ojpm",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774747107934,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "copilot-cli",
+      "importedSessionId": "527167a3-68b9-49c8-9295-5803af4cb55f",
+      "sessionId": "imported:copilot-cli:26878af76040",
+      "path": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+      "tags": [
+        "networking",
+        "runtime",
+        "copilot-cli",
+        "instruction",
+        "ui"
+      ],
+      "section": "instructions",
+      "memoryKind": "instruction",
+      "extractionSource": "llm",
+      "id": "148415079a23fd1d",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774747107416
+    }
+  },
+  {
+    "id": "ctx/1774747106731/gokvvb",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774747107384,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "copilot-cli",
+      "importedSessionId": "527167a3-68b9-49c8-9295-5803af4cb55f",
+      "sourcePath": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md",
+      "sessionFormat": "md",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "copilot-cli",
+        "imported"
+      ],
+      "sessionId": "imported:copilot-cli:26878af76040",
+      "structuredSessionSummary": {
+        "sessionId": "imported:copilot-cli:26878af76040",
+        "name": "Problem: keep landing stabilization-first fixes that improve startup reliability, truthful operator UX, and session/memo",
+        "cliType": "copilot-cli",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e",
+        "restartCount": 0,
+        "startedAt": 1774746289343.6375,
+        "stoppedAt": 1774747102467,
+        "lastActivityAt": 1774746289343.6375,
+        "logTail": [
+          "- Local git commands still require `-c submodule.recurse=false` because the repo has broken submodule metadata under `data/bobbybookmarks`.",
+          "- OpenAI import is intentionally limited to explicit OpenAI/ChatGPT roots rather than broad `Downloads` crawling, to keep discovery truthful and avoid noisy false positives.",
+          "- Prism behavioral warning import is intentionally additive and read-only; Borg preserves Prism correction signals in imported metadata without claiming full behavioral-learning or dashboard parity yet.",
+          "- The Go sidecar now covers config, providers, CLI, import roots/summaries, runtime rollups, memory status, and discovered sessions well enough that the next best gaps are likely endpoint discoverability and additional compact operator summ",
+          "- The weakest remaining Go HTTP tests are now mostly limited to a few simple import-surface smoke checks such as `/api/import/sources`; prefer continuing to harden existing payload assertions over adding new sidecar features.",
+          "- Verified for the harness parity summary lane: `pnpm -C packages/cli exec tsc --noEmit`, `pnpm -C packages/core exec tsc --noEmit`, `pnpm -C apps/web exec tsc --noEmit --pretty false`, and `Set-Location go; gofmt -w .; go test ./...` all p",
+          "- Verified for the CLI detection hardening lane: `pnpm -C packages/core exec tsc --noEmit`, `pnpm -C packages/core exec vitest run src/services/cli-harness-detection.test.ts src/orchestrator/council/services/__tests__/cli-registry.test.ts`",
+          "- Verified for the Antigravity importer spike: `pnpm -C packages/core exec vitest run src/services/SessionImportService.test.ts` and `pnpm -C packages/core exec tsc --noEmit` passed after adding Experimental `~/.gemini/antigravity/brain` di",
+          "- Verified for imported-session regression expansion: `pnpm -C packages/core exec vitest run src/routers/sessionRouter.imported.test.ts`, `pnpm -C packages/core exec vitest run src/services/ImportedSessionStore.test.ts`, `pnpm -C packages/c",
+          "- Verified for the startup/dashboard truthfulness lane: `packages/cli` start tests passed, `apps/web` tRPC route tests passed, `pnpm -C packages/cli exec tsc --noEmit` passed, `pnpm -C apps/web exec tsc --noEmit --pretty false` passed, and",
+          "- The `memories` startup crash root cause was a LanceDB race: `openTable('memories')` failure was treated as unconditional absence, so a concurrent creator could make `createTable()` throw. The adapter is now idempotent under that contentio",
+          "- Real machine import run after these fixes: discovered `316`, imported `24`, skipped `292`, stored `76` parsed memories, and wrote `.borg/imported_sessions/docs/auto-imported-agent-instructions.md`. Processed tools included `aider`, `borg`"
+        ],
+        "recordedAt": 1774747106730,
+        "contentHash": "session-868408362"
+      },
+      "memoryKind": "session_summary",
+      "id": "88b1377e9a99f5b0",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774747106731
+    }
+  },
+  {
+    "id": "ctx/1774747101008/lj9wqh",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774747101605,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "cf812f17-725b-4bfa-924c-afbdd77fa8d0",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774746484242.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:0638e2f872cb",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:0638e2f872cb",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+        "restartCount": 0,
+        "startedAt": 1774746484243.2102,
+        "stoppedAt": 1774747100446,
+        "lastActivityAt": 1774746484243.2102,
+        "logTail": [
+          "\"user\": 0,",
+          "\"agent\": 0,",
+          "\"project\": 1390,",
+          "\"discovery\": 0,",
+          "\"decision\": 0,",
+          "\"progress\": 0,",
+          "\"warning\": 0,",
+          "\"fix\": 0",
+          "},",
+          "\"recentContext\": [],",
+          "\"notes\": \"Automatic background handoff\"",
+          "}"
+        ],
+        "recordedAt": 1774747101007,
+        "contentHash": "session-1830180646"
+      },
+      "memoryKind": "session_summary",
+      "id": "d80cd42f2e1e8770",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774747101008
+    }
+  },
+  {
+    "id": "ctx/1774747099594/q0qi7j",
+    "title": "Untitled",
+    "source": "session_import",
+    "createdAt": 1774747100411,
+    "chunks": 1,
+    "metadata": {
+      "source": "session_import",
+      "sourceTool": "borg",
+      "importedSessionId": "78528a1e-ada8-41c3-af84-b7cf3a87bc0d",
+      "sourcePath": "C:/Users/hyper/workspace/fwber/.borg/handoffs/handoff_1774746784246.json",
+      "sessionFormat": "json",
+      "section": "general",
+      "tags": [
+        "session-summary",
+        "borg",
+        "imported"
+      ],
+      "sessionId": "imported:borg:3a1f8865bedb",
+      "structuredSessionSummary": {
+        "sessionId": "imported:borg:3a1f8865bedb",
+        "name": "{",
+        "cliType": "borg",
+        "status": "imported",
+        "workingDirectory": "C:/Users/hyper/workspace/fwber/.borg/handoffs",
+        "restartCount": 0,
+        "startedAt": 1774746784247.33,
+        "stoppedAt": 1774747097763,
+        "lastActivityAt": 1774746784247.33,
+        "logTail": [
+          "\"user\": 0,",
+          "\"agent\": 0,",
+          "\"project\": 1390,",
+          "\"discovery\": 0,",
+          "\"decision\": 0,",
+          "\"progress\": 0,",
+          "\"warning\": 0,",
+          "\"fix\": 0",
+          "},",
+          "\"recentContext\": [],",
+          "\"notes\": \"Automatic background handoff\"",
+          "}"
+        ],
+        "recordedAt": 1774747099593,
+        "contentHash": "session-1052120888"
+      },
+      "memoryKind": "session_summary",
+      "id": "b7a20b450449cc9b",
+      "type": "long_term",
+      "namespace": "project",
+      "createdAt": 1774747099594
+    }
+  },
+  {
     "id": "ctx/1774746225853/uqveyv",
     "title": "Untitled",
     "source": "session_import",

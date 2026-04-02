@@ -93,3 +93,4 @@ frontend_build.tar.gz
 # Build artifacts
 *.tar.gz
 temp_build/
+metamcp.db

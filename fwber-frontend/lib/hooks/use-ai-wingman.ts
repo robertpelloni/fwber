@@ -50,6 +50,14 @@ export interface QuirkCheckResponse {
   share_id?: string;
 }
 
+export interface CompatibilityAuditResponse {
+  overall_score: number;
+  strengths: string[];
+  weaknesses: string[];
+  surviving_the_apocalypse_together: boolean;
+  share_id?: string;
+}
+
 export function useAiWingman() {
 
   const [error, setError] = useState<string | null>(null);
@@ -136,6 +144,15 @@ export function useAiWingman() {
     },
   });
 
+  const getCompatibilityAudit = useMutation({
+    mutationFn: async (targetId: string) => {
+      return api.post<CompatibilityAuditResponse>(`/wingman/compatibility-audit/${targetId}`);
+    },
+    onError: (err: any) => {
+      setError(err.message || 'Failed to get compatibility audit');
+    },
+  });
+
   return {
     getIceBreakers,
     getReplySuggestions,
@@ -146,6 +163,7 @@ export function useAiWingman() {
     getCosmicMatch,
     findNemesis,
     checkQuirk,
+    getCompatibilityAudit,
     error,
     setError,
   };

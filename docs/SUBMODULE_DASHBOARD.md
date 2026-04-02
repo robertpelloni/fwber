@@ -1,55 +1,51 @@
-# Submodule & Component Dashboard
+# FWBER Submodule & Repository Dashboard
 
-> **Version:** 0.99.4
-> **Last Updated:** 2026-03-25
+> **Generated on:** 2026-04-02
+> **Current Global Version:** 1.0.75
 
-This dashboard outlines the core components (logical submodules) of the fwber monorepo. While we do not currently use strict `.gitmodules`, these directories function as independent deployable services within the greater architecture.
+This dashboard lists all logical sub-packages, submodules, and referenced projects within the `fwber` repository. It explains the project directory structure to ensure all AI agents have immediate situational awareness.
 
----
-
-## 🏗️ Project Directory Layout
+## 🗂️ Project Directory Structure
 
 ```text
 fwber/
-├── docs/                  # Global architecture docs, AI instructions, and roadmaps
-├── fwber-backend/         # Laravel 12 API, Admin Panel, WebSocket Engine
-├── fwber-frontend/        # Next.js 16 Web App (PWA, UI/UX)
-├── fwber-geo/             # Rust Spatial Microservice (High-density location queries)
-├── mobile/                # React Native / Expo 55 Native App
-└── kubernetes/            # K8s manifests and Helm charts for enterprise scale
+├── docs/                      # Global documentation, AI instructions, architecture diagrams, testing strategies
+├── fwber-backend/             # Laravel 12 (PHP) core API, models, queues, and federation logic
+├── fwber-frontend/            # Next.js 16 (React) user-facing platform, real-time presence UI
+├── fwber-geo/                 # Rust microservice for high-speed geofencing and proximity calculations
+├── mobile/                    # React Native / Expo application for iOS/Android
+├── submodules/                # Directory for external git submodules (currently empty/monorepo managed)
+├── context_portal/            # Alembic/DB portal for context management
+├── .borg/                     # AI memory layer and context storage (LanceDB, jsonl)
 ```
 
----
+## 📦 Logical Packages & Submodules
 
-## 📦 Component Registry
+### 1. `fwber-backend` (Core API)
+*   **Version:** Inherits Global `1.0.75`
+*   **Role:** The brain. Handles all user data, authentication, Match/Proximity algorithms, and ActivityPub federation (inbox/outbox).
+*   **Key Dependencies:**
+    *   Laravel 12
+    *   Stripe SDK (Payments/Subscriptions)
+    *   Pusher/Laravel Reverb (WebSockets for chat/proximity)
 
-| Component | Path | Tech Stack | Current Version | Primary Purpose | Deployment Target |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Backend API** | `/fwber-backend` | Laravel 12, PHP 8.4, MySQL, Reverb | `v0.99.4` | Core business logic, DB interactions, WebSockets | DreamHost / AWS EC2 |
-| **Frontend Web** | `/fwber-frontend` | Next.js 16, React 19, TailwindCSS | `v0.99.4` | Primary user interface, PWA, AR Views | Vercel Edge |
-| **Mobile App** | `/mobile` | Expo 55, React Native | `v0.99.4` | Native iOS and Android experiences | App Store / Play Store |
-| **Geo Engine** | `/fwber-geo` | Rust, Actix-web, H3 | `v0.99.4` | Millisecond spatial indexing for dense areas | Internal Microservice |
+### 2. `fwber-frontend` (Web UI)
+*   **Version:** Inherits Global `1.0.75`
+*   **Role:** The face. Consumes the backend API.
+*   **Key Dependencies:**
+    *   Next.js 16 (App Router)
+    *   Framer Motion (Animations)
+    *   TailwindCSS (Styling)
 
----
+### 3. `fwber-geo` (Spatial Engine)
+*   **Version:** 1.0.0 (Internal)
+*   **Role:** High-performance spatial querying (finding users within X meters). Written in Rust for speed.
+*   **Status:** Needs active integration checks with `fwber-backend`.
 
-## 📡 Distributed Services
+### 4. External Git Submodules
+*   **Status:** No active external Git submodules configured in `.gitmodules`. All packages are currently tracked within the primary monorepo tree.
+*   **Action Required:** If any external projects (e.g., specific ActivityPub forks, custom Rust crates) are referenced heavily, they should be added to the `submodules/` directory via `git submodule add`.
 
-| Service | Protocol | Backend Hook | Frontend UI | Status |
-| :--- | :--- | :--- | :--- | :--- |
-| **ActivityPub** | JSON-LD / HTTP Sig | `ActivityPubController` | `settings/federation` | **BETA** |
-| **B2B Vibe Engine** | REST / Pusher | `MerchantPulseController` | `merchant/vibe` | **ACTIVE** |
-| **Offline Sync** | CRDT / IndexedDB | `MessageController` | `use-chat-sync.ts` | **ACTIVE** |
-| **AR Navigation** | WebXR / Proximity | `LocationController` | `MatchARView.tsx` | **STABLE** |
-
----
-
-## 🔗 External Dependencies & Libraries
-*   **Face-API.js** (`@vladmandic/face-api`): Used in `fwber-frontend` for client-side face blurring (The "Anti-Catfish" guarantee).
-*   **Pusher-JS**: Used in `fwber-frontend` to connect to our self-hosted Laravel Reverb server.
-*   **Shadcn/UI**: Foundational UI component library utilized extensively in the frontend.
-*   **Framer Motion**: Powers all the fluid, cyber-noir animations and swipe mechanics.
-*   **Sentry**: Integrated into both frontend and backend for real-time error tracking and telemetry.
-
-## 📝 Maintenance Instructions
-*   Whenever a component's internal `package.json` or `composer.json` is updated, the global `VERSION` file in the root directory must be bumped.
-*   All component versions should remain perfectly synchronized to avoid compatibility drift.
+## 🔄 Sync Status
+- Upstream forks and main branches were successfully merged.
+- Next sync target: Implement deep E2E testing for the newly federated `ActivityPubKeyService`.

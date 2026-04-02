@@ -1,11 +1,52 @@
 # Auto-imported Agent Instructions
 
-Generated at: 2026-03-29T01:03:48.174Z
+Generated at: 2026-03-29T02:33:39.465Z
 
 These instructions were derived automatically from imported sessions across supported tools.
 
 ## Durable instructions
 
+- **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 3847 for the Borg dashboard. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Go sidecar exposes a summary endpoint at `/api/runtime/status`. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — MCP bulk import now accepts a single server entry without outer braces. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Always use 'git -c submodule.recurse=false' due to broken submodule metadata. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — The Go sidecar must remain isolated, with a separate config directory and lock file. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 3847 for the Borg dashboard. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Go sidecar exposes a summary endpoint at `/api/runtime/status`. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — MCP bulk import now accepts a single server entry without outer braces. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Always use 'git -c submodule.recurse=false' due to broken submodule metadata. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — The Go sidecar must remain isolated, with a separate config directory and lock file. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Go sidecar exposes a summary endpoint at `/api/runtime/status`. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — MCP bulk import now accepts a single server entry without outer braces. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Always use 'git -c submodule.recurse=false' due to broken submodule metadata. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Antigravity importer is labeled as 'Experimental' and should not claim stable transcript parity until verification. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 3847 for the Borg dashboard. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — The Go sidecar must remain isolated, with a separate config directory and lock file. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — MCP bulk import now accepts a single server entry without outer braces. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Always use 'git -c submodule.recurse=false' due to broken submodule metadata. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Antigravity importer is labeled as 'Experimental' and should not claim stable transcript parity until verification. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 3847 for the Borg dashboard. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — The Go sidecar must remain isolated, with a separate config directory and lock file. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 3847 for the Borg dashboard. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — The Go sidecar must remain isolated, with a separate config directory and lock file. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Imported-session discovery includes VS Code / Insiders Copilot Chat transcripts and avoids known Cursor workspace metadata files. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Go sidecar exposes a summary endpoint at `/api/runtime/status`. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Use port 3847 for the autopilot configuration. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Borg control plane prefers live lock-file port over stale environment defaults. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — MCP bulk import now accepts a single server entry without outer braces. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Always use 'git -c submodule.recurse=false' due to broken submodule metadata. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **borg** — Antigravity importer is labeled as 'Experimental' and should not claim stable transcript parity until verification. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
+- **copilot-cli** — Use port 3847 for the Borg dashboard. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
+- **copilot-cli** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
+- **copilot-cli** — The Go sidecar must remain isolated, with a separate config directory and lock file. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
+- **copilot-cli** — Imported-session discovery includes VS Code / Insiders Copilot Chat transcripts and avoids known Cursor workspace metadata files. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
+- **copilot-cli** — Go sidecar exposes a summary endpoint at `/api/runtime/status`. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
 - **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
 - **borg** — Use port 3847 for the autopilot configuration. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
 - **borg** — Borg control plane prefers live lock-file port over stale environment defaults. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
@@ -215,45 +256,4 @@ These instructions were derived automatically from imported sessions across supp
 - **copilot-cli** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
 - **copilot-cli** — The importer must not re-import its own generated instruction docs. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
 - **copilot-cli** — The Go sidecar must remain separate with its own configuration and lock file. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
-- **copilot-cli** — Skip slow LLM fallback when no OpenAI key is configured during session import. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
-- **copilot-cli** — "userMessage": "insanely great! outstanding! continue to proceed as you recommend! don't stop the party! don't terminate any processes in this session please! keep on goin!insanely great! outstanding! continue to proceed as you recommend! d _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json`)_
-- **claude-code** — Set the server port to 8080 in '/test/file.ts'. _(source: `C:/Users/hyper/.claude/projects/C--Users-hyper--claude-mem-observer-sessions/439fadfe-7e6e-48e7-a46c-cda905d89e22.jsonl`)_
-- **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
-- **borg** — The Go-sidecar validation workflow is: Set-Location go; gofmt -w .; go test ./... _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
-- **borg** — All new endpoints and runtime-status enrichments must be tested in the Go HTTP surface. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
-- **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
-- **borg** — The Go-sidecar validation workflow is: Set-Location go; gofmt -w .; go test ./... _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
-- **borg** — All new endpoints and runtime-status enrichments must be tested in the Go HTTP surface. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
-- **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
-- **borg** — The Go-sidecar validation workflow is: Set-Location go; gofmt -w .; go test ./... _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
-- **borg** — All new endpoints and runtime-status enrichments must be tested in the Go HTTP surface. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
-- **copilot-cli** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/022-go-sidecar-visibility-expansio.md`)_
-- **copilot-cli** — The Go-sidecar validation workflow is: Set-Location go; gofmt -w .; go test ./... _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/022-go-sidecar-visibility-expansio.md`)_
-- **copilot-cli** — All new endpoints and runtime-status enrichments must be tested in the Go HTTP surface. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/checkpoints/022-go-sidecar-visibility-expansio.md`)_
-- **copilot-cli** — "userMessage": "insanely great! outstanding! continue to proceed as you recommend! don't stop the party! don't terminate any processes in this session please! keep on goin!insanely great! outstanding! continue to proceed as you recommend! d _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json`)_
-- **copilot-cli** — Use port 3847 for the dashboard. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
-- **copilot-cli** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
-- **copilot-cli** — MCP bulk import now accepts a single server entry without outer braces. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
-- **copilot-cli** — The importer no longer re-imports its own generated instruction docs. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
-- **copilot-cli** — The Go sidecar exposes a read-only summary endpoint at /api/runtime/status. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
-- **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
-- **borg** — Please proceed without terminating any processes in the session. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
-- **copilot-cli** — Use port 3847 for the stale dashboard/autopilot. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
-- **copilot-cli** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
-- **copilot-cli** — Borg Orchestrator warning copy no longer collapses legacyNEXT_PUBLIC_AUTOPILOT_URL. _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/plan.md`)_
-- **copilot-cli** — "userMessage": "insanely great! outstanding! continue to proceed as you recommend! don't stop the party! don't terminate any processes in this session please! keep on goin!insanely great! outstanding! continue to proceed as you recommend! d _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json`)_
-- **borg** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
-- **borg** — Automatically perform background handoff. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
-- **borg** — No processes should be terminated during this session. _(source: `C:/Users/hyper/workspace/fwber/.borg/agent_memory/memories.json`)_
-- **copilot-cli** — "userMessage": "insanely great! outstanding! continue to proceed as you recommend! don't stop the party! don't terminate any processes in this session please! keep on goin!insanely great! outstanding! continue to proceed as you recommend! d _(source: `C:/Users/hyper/.copilot/session-state/19ddbe49-0d66-45a6-a9d2-393395d8953e/rewind-snapshots/index.json`)_
-- **opencode** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/.opencode/parts/msg_19ba2662ee265piiqvh5y/prt_19ba2662ee2quqxcvge.json`)_
-- **opencode** — Use port 4000 for the Borg control plane. _(source: `C:/Users/hyper/.opencode/parts/msg_19ba7c7a432m1dzlkdxuem/prt_19ba7c7a432kuajlt00.json`)_
-- **opencode** — Running 'pnpm dev' launches the complete stack (Core and UI). _(source: `C:/Users/hyper/.opencode/parts/msg_19ba7c7a432m1dzlkdxuem/prt_19ba7c7a432kuajlt00.json`)_
-- **opencode** — All contributions must be made on feature branches prefixed with 'feat/' and submitted via pull requests. _(source: `C:/Users/hyper/.opencode/parts/msg_19ba7c7a432m1dzlkdxuem/prt_19ba7c7a432kuajlt00.json`)_
-- **claude-code** — "description": "Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, update or optimize an existing skill, run evals to test a skill, benchmark skill perfo _(source: `C:/Users/hyper/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/b52df038-3553-423e-bae4-e30047e7b98e/d7d0b68d-757a-4bcf-8066-30cebb32a462/manifest.json`)_
-- **claude-code** — "description": "Comprehensive superskill consolidating 41 professional development skills across planning, testing, debugging, code review, git workflow, writing, architecture, meta-skills, thinking frameworks, and communication. Use when y _(source: `C:/Users/hyper/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/b52df038-3553-423e-bae4-e30047e7b98e/d7d0b68d-757a-4bcf-8066-30cebb32a462/manifest.json`)_
-- **claude-code** — Use when users want to create a skill from scratch, update or optimize an existing skill, run evals to test a skill, benchmark skill performance with variance analysis, or optimize a skill's description for better trigge _(source: `C:/Users/hyper/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/b52df038-3553-423e-bae4-e30047e7b98e/d7d0b68d-757a-4bcf-8066-30cebb32a462/manifest.json`)_
-- **opencode** — 3. **Analyze Dependencies** — Build a dependency view up to depth 3, tracking visited nodes to avoid loops. Categorize: imports, function calls, services, external packages. Note external systems or generated code to exclude. _(source: `C:/Users/hyper/.opencode/commands/capture-knowledge.md`)_
-- **opencode** — 2. For each design doc: summarize key architectural decisions and constraints, highlight components, interfaces, and data flows that must be respected. _(source: `C:/Users/hyper/.opencode/commands/check-implementation.md`)_
-- **opencode** — For each design doc: summarize key architectural decisions and constraints, highlight components, interfaces, and data flows that must be respected. _(source: `C:/Users/hyper/.opencode/commands/check-implementation.md`)_
 

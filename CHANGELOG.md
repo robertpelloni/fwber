@@ -540,3 +540,10 @@ All notable changes to this project will be documented in this file.
 - Revalidated restored frontend sessions against `GET /api/auth/me` before marking users authenticated, preventing false localStorage-only login state and repeated `401 Unauthenticated` cascades.
 - Added client-side stale asset recovery that unregisters service workers, clears caches, and reloads once when old `_next` chunk or CSS references break after deployment.
 - Forced browser-side auth flows in `AuthProvider` to use the Next.js `/api` proxy instead of drifting to direct backend URLs.
+
+## [1.0.75] - 2026-04-02
+### Changed
+- Extreme, comprehensive update to `docs/UNIVERSAL_LLM_INSTRUCTIONS.md` incorporating rigorous autonomous execution protocols.
+- Master agent files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `GPT.md`, `copilot-instructions.md`) completely rewritten to strictly enforce zero-pause continuous looping, UI representation requirements, and mandatory global version syncing.
+- Resolved git merge conflict in `ActivityPubSearchController.php` keeping the improved `ActivityPubKeyService` implementation.
+- Executed full submodule sync and documented all branches.

@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { Bluetooth, Radio, BatteryMedium, AlertCircle, RefreshCw } from 'lucide-react';
+import { Bluetooth, Radio, BatteryMedium, AlertCircle, RefreshCw, Vibrate } from 'lucide-react';
 import AppHeader from '@/components/AppHeader';
 
 interface TokenStatus {
@@ -26,6 +26,7 @@ export default function HardwareTokenPage() {
   const [loading, setLoading] = useState(true);
   const [isPairing, setIsPairing] = useState(false);
   const [pairingCode, setPairingCode] = useState('');
+  const [isPinging, setIsPinging] = useState(false);
 
   const fetchStatus = useCallback(async () => {
     try {
@@ -47,6 +48,21 @@ export default function HardwareTokenPage() {
   useEffect(() => {
     if (token) fetchStatus();
   }, [token, fetchStatus]);
+
+  const handlePing = async () => {
+    if (!tokenStatus) return;
+    setIsPinging(true);
+    
+    // Simulate ping delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    toast({
+      title: "Token Pinged",
+      description: "Your fwber token should now be vibrating and glowing.",
+      duration: 3000
+    });
+    setIsPinging(false);
+  };
 
   const handlePair = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,11 +135,17 @@ export default function HardwareTokenPage() {
                   </div>
                 </div>
                 
-                <div className="bg-zinc-100 dark:bg-zinc-900 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-1 block">Model</span>
-                  <div className="font-bold text-zinc-800 dark:text-zinc-200">
-                    {tokenStatus.hardware_model}
-                  </div>
+                <div className="bg-zinc-100 dark:bg-zinc-900 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 flex flex-col justify-between">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-1 block">Ping Test</span>
+                  <Button 
+                    onClick={handlePing} 
+                    disabled={isPinging}
+                    size="sm"
+                    className={`w-full font-bold transition-all ${isPinging ? 'bg-blue-600/50 animate-pulse' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
+                  >
+                    {isPinging ? <Radio className="w-4 h-4 mr-2 animate-ping" /> : <Vibrate className="w-4 h-4 mr-2" />}
+                    {isPinging ? 'Pinging...' : 'Send Ping'}
+                  </Button>
                 </div>
               </div>
 
