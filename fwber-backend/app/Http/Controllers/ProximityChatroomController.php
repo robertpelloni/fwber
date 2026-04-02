@@ -11,6 +11,7 @@ use App\Models\ProximityChatroom;
 use App\Models\User;
 use App\Services\ContentModerationService;
 use App\Services\LocationService;
+use App\Services\ProximityChatroomRankingService;
 use App\Services\TokenDistributionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -25,14 +26,18 @@ class ProximityChatroomController extends Controller
 
     protected $locationService;
 
+    protected $rankingService;
+
     public function __construct(
         ContentModerationService $contentModeration,
         TokenDistributionService $tokenService,
-        LocationService $locationService
+        LocationService $locationService,
+        ProximityChatroomRankingService $rankingService
     ) {
         $this->contentModeration = $contentModeration;
         $this->tokenService = $tokenService;
         $this->locationService = $locationService;
+        $this->rankingService = $rankingService;
     }
 
     /**
@@ -63,6 +68,7 @@ class ProximityChatroomController extends Controller
         $type = $validated['type'] ?? null;
         $venueType = $validated['venue_type'] ?? null;
         $tags = $validated['tags'] ?? [];
+        $rankingStrategy = $validated['ranking_strategy'] ?? 'trust-aware';
 
         $query = ProximityChatroom::active()->public()
             ->withinRadius($latitude, $longitude, $radiusMeters);
@@ -85,8 +91,6 @@ class ProximityChatroomController extends Controller
         }]);
 
         $chatrooms = $query->with(['creator', 'activeMembers'])
-            ->orderBy('distance')
-            ->limit(20)
             ->get();
 
         // Add distance information to each chatroom
@@ -94,13 +98,25 @@ class ProximityChatroomController extends Controller
             $chatroom->distance_meters = $this->locationService->calculateDistance($latitude, $longitude, $chatroom->latitude, $chatroom->longitude);
         });
 
+        if ($rankingStrategy === 'trust-aware') {
+            $chatrooms = $this->rankingService->rankNearby(Auth::user(), $chatrooms, $latitude, $longitude);
+        } else {
+            $chatrooms = $chatrooms->sortBy('distance_meters')->values();
+        }
+
+        $chatrooms = $chatrooms->take(20)->values();
+
         return response()->json([
+            'data' => $chatrooms,
             'chatrooms' => $chatrooms,
             'user_location' => [
                 'latitude' => $latitude,
                 'longitude' => $longitude,
             ],
             'search_radius' => $radiusMeters,
+            'meta' => [
+                'ranking_strategy' => $this->rankingService->buildRankingStrategy(),
+            ],
         ]);
     }
 

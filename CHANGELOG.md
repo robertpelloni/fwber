@@ -18,6 +18,14 @@ All notable changes to this project will be documented in this file.
 - Updated the recommendations hub API types and UI to explain the ranking strategy consistently across mixed recommendations and personalized feed views.
 - Added focused recommendation regression coverage and fixed two real backend recommendation-path bugs uncovered during rollout: SQLite-incompatible `HOUR(created_at)` usage in activity-pattern analysis and incorrect `TelemetryEvent` persistence using `created_at` instead of `recorded_at`.
 
+## [1.0.53] - 2026-04-02 — Trust-Aware Nearby Chatroom Ranking
+
+### Fixed
+- Reworked nearby proximity chatroom discovery so `GET /api/proximity-chatrooms/nearby` can rank rooms with the same privacy-safe trust-aware model already used by Local Pulse and recommendations, balancing trusted creators, scene alignment, recent activity, and distance.
+- Added `ProximityChatroomRankingService` to reuse `LocalPulseRankingService` trust-map inputs and `AIMatchingService` scene-signal helpers without widening the payload's private social graph surface.
+- Updated the nearby chatrooms API contract and page UI to expose high-level `ranking_strategy` metadata plus scene-aligned headlines for ranked rooms.
+- Added focused backend regression coverage proving nearby chatrooms expose ranking metadata and that a trusted, scene-aligned room can outrank a slightly closer stranger room.
+
 ## [1.0.50] - 2026-04-02 — Session Transfer Handoff Refresh
 
 ### Fixed

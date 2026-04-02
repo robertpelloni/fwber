@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useNearbyProximityChatrooms, useCreateProximityChatroom } from '@/lib/hooks/use-proximity-chatrooms';
-import { MapPin, Users, MessageCircle, Plus, Search, Filter, Map, Navigation } from 'lucide-react';
+import { MapPin, Users, MessageCircle, Plus, Search, Filter, Map, Navigation, Compass } from 'lucide-react';
 
 interface LocationState {
   latitude: number | null;
@@ -63,7 +63,10 @@ export default function ProximityChatroomsPage() {
     radius_meters: radius,
     type: selectedType === 'all' ? undefined : selectedType,
     search: searchTerm || undefined,
+    ranking_strategy: 'trust-aware',
   });
+  const rankingStrategy = nearbyChatrooms?.meta?.ranking_strategy ?? null;
+  const chatroomResults = nearbyChatrooms?.data ?? nearbyChatrooms?.chatrooms ?? [];
 
   const handleCreateChatroom = async (formData: {
     name: string;
@@ -226,6 +229,22 @@ export default function ProximityChatroomsPage() {
           </div>
         </div>
 
+        {rankingStrategy && (
+          <div className="bg-cyan-50 border border-cyan-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700 mb-2">
+              <Compass className="h-4 w-4" />
+              Ranking strategy
+            </div>
+            <p className="text-sm text-cyan-900 mb-3">{rankingStrategy.summary}</p>
+            <div className="flex flex-wrap gap-2 text-xs">
+              {rankingStrategy.trusted_connections && <span className="px-2 py-1 rounded-full bg-white border border-cyan-200 text-cyan-700">Trusted creators</span>}
+              {rankingStrategy.scene_alignment && <span className="px-2 py-1 rounded-full bg-white border border-cyan-200 text-cyan-700">Scene alignment</span>}
+              {rankingStrategy.freshness && <span className="px-2 py-1 rounded-full bg-white border border-cyan-200 text-cyan-700">Recent activity</span>}
+              {rankingStrategy.distance && <span className="px-2 py-1 rounded-full bg-white border border-cyan-200 text-cyan-700">Distance</span>}
+            </div>
+          </div>
+        )}
+
         {/* Chatrooms List */}
         <div className="space-y-4">
           {isLoading && (
@@ -242,7 +261,7 @@ export default function ProximityChatroomsPage() {
             </div>
           )}
 
-          {nearbyChatrooms?.data?.length === 0 && !isLoading && (
+          {chatroomResults.length === 0 && !isLoading && (
             <div className="text-center py-12">
               <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">No nearby chatrooms found</h3>
@@ -258,7 +277,7 @@ export default function ProximityChatroomsPage() {
             </div>
           )}
 
-          {nearbyChatrooms?.data?.map((chatroom) => (
+          {chatroomResults.map((chatroom) => (
             <div key={chatroom.id} className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -283,9 +302,15 @@ export default function ProximityChatroomsPage() {
                       </span>
                     )}
                   </div>
-                  
+                   
                   <p className="text-gray-600 mb-3">{chatroom.description}</p>
-                  
+
+                  {chatroom.scene_signals?.headline && (
+                    <div className="rounded-lg border border-cyan-200 bg-cyan-50 px-3 py-2 mb-3">
+                      <p className="text-sm text-cyan-900">{chatroom.scene_signals.headline}</p>
+                    </div>
+                  )}
+                   
                   <div className="flex items-center space-x-6 text-sm text-gray-500">
                     <div className="flex items-center space-x-1">
                       <Users className="h-4 w-4" />

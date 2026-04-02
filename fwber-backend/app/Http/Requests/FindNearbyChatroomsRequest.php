@@ -16,7 +16,8 @@ use Illuminate\Foundation\Http\FormRequest;
  *   @OA\Property(property="radius_meters", type="integer", minimum=50, maximum=5000),
  *   @OA\Property(property="type", type="string", enum={"conference", "event", "venue", "area", "temporary"}),
  *   @OA\Property(property="venue_type", type="string", maxLength=50),
- *   @OA\Property(property="tags", type="array", @OA\Items(type="string"))
+ *   @OA\Property(property="tags", type="array", @OA\Items(type="string")),
+ *   @OA\Property(property="ranking_strategy", type="string", enum={"trust-aware", "distance-only"})
  * )
  */
 class FindNearbyChatroomsRequest extends FormRequest
@@ -40,9 +41,10 @@ class FindNearbyChatroomsRequest extends FormRequest
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'radius_meters' => 'nullable|integer|min:50|max:5000',
-            'type' => 'nullable|in:conference,event,venue,area,temporary',
+            'type' => 'nullable|in:conference,event,venue,area,temporary,networking,social,dating,professional,casual',
             'venue_type' => 'nullable|string|max:50',
             'tags' => 'nullable|array',
+            'ranking_strategy' => 'nullable|in:trust-aware,distance-only',
         ];
     }
 

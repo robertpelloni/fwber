@@ -44,6 +44,25 @@ export interface ProximityChatroom {
   url: string;
   display_name: string;
   token_entry_fee?: number;
+  scene_signals?: {
+    headline: string | null;
+    matched_topics: Array<{
+      id: number;
+      slug: string;
+      label: string;
+      emoji?: string | null;
+    }>;
+    matched_tags: string[];
+    score_boost: number;
+  } | null;
+}
+
+export interface ProximityChatroomRankingStrategy {
+  trusted_connections: boolean;
+  scene_alignment: boolean;
+  freshness: boolean;
+  distance: boolean;
+  summary: string;
 }
 
 export interface ProximityChatroomMember {
@@ -190,6 +209,7 @@ export interface FindNearbyRequest {
   venue_type?: string;
   tags?: string[];
   search?: string;
+  ranking_strategy?: 'trust-aware' | 'distance-only';
 }
 
 export interface UpdateLocationRequest {
@@ -211,6 +231,9 @@ export interface ProximityChatroomResponse {
     longitude: number;
   };
   search_radius: number;
+  meta?: {
+    ranking_strategy?: ProximityChatroomRankingStrategy;
+  };
 }
 
 export interface NearbyNetworkingResponse {
@@ -263,6 +286,7 @@ export async function findNearby(filters: FindNearbyRequest): Promise<ProximityC
     filters.tags.forEach(tag => params.append('tags[]', tag));
   }
   if (filters.search) params.append('search', filters.search);
+  if (filters.ranking_strategy) params.append('ranking_strategy', filters.ranking_strategy);
 
   const response = await apiClient.get<ProximityChatroomResponse>(`/proximity-chatrooms/nearby?${params.toString()}`);
   return response.data;
