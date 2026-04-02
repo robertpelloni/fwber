@@ -1,17 +1,17 @@
-# Project Status — fwber v1.0.72 (Production 500 Endpoint Hardening)
+# Project Status — fwber v1.0.73 (ActivityPub Inbox Signature Verification)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.72 "Production 500 Endpoint Hardening"
+**Version:** 1.0.73 "ActivityPub Inbox Signature Verification"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## Production 500 Endpoint Hardening
-- **Location writes now survive sidecar/event-store failure**: `/api/location` no longer returns a fatal 500 just because the event-sourcing append step fails; the user location projection still persists and the append failure is downgraded to logged telemetry.
-- **Photo listing now tolerates broken legacy rows**: `/api/photos` no longer crashes when older or partially migrated photo records are missing `file_path` / `thumbnail_path`; the accessors now return empty URL strings instead of throwing.
-- **Safety reads now degrade when optional tables are absent**: `/api/safety/walk/active` now returns `walk: null` rather than a database exception if DreamHost is missing the `safe_walks` table, and safety contacts follow the same empty-state fallback pattern.
-- **The 500 triage note in `TODO.md` is now code-addressed**: the old instruction to add logging in `bootstrap/app.php` turned out to be stale because the exception handler already logs API failures; the meaningful fix was endpoint hardening around the actual brittle paths.
-- **Regression coverage now matches the suspected DreamHost failure modes**: backend tests now prove location still succeeds if the event store fails, photo listing tolerates null paths, and safety active-walk lookup degrades cleanly on schema drift.
+## ActivityPub Inbox Signature Verification
+- **Unsigned federation payloads are now rejected at the route boundary**: `/api/federation/users/{id}/inbox` now requires a valid HTTP signature before the inbox controller will touch the activity body.
+- **Inbound signature checks now cover the important replay and tamper surfaces**: the new verification path enforces `Signature`, `Date`, and `Digest` headers, rejects stale requests, and verifies the signature against the remote actor's published RSA public key.
+- **Payload actors must match the signing key owner**: the middleware now rejects requests where the signed key belongs to one actor but the JSON activity claims to be from another.
+- **Existing inbox flows are still intact once authenticated**: Follow, Undo, and Accept handling continue to work after the route guard, and the old inbox tests now send real signed requests instead of anonymous JSON.
+- **The next federation gap is narrower now**: outbound ActivityPub delivery is still mocked in `ActivityPubService`, so signed outbound posts/follows and local actor key generation are the remaining high-value federation slice.
 
 ## Premium Billing Hardening
 - **Unsafe Gold grant removed**: `/api/premium/purchase` no longer falls back to the mock `tok_visa` token. Stripe upgrades now require either a real `payment_method_id` or a confirmed `payment_intent_id`.
@@ -28,10 +28,16 @@
 - **Validation Path Is Cleaner on Windows**: `tsconfig.json` now excludes stale renamed dependency folders so `tsc` no longer walks backup `node_modules` directories, and the old stale folder from the earlier repair pass has been removed.
 
 ## Current Validation / Delivery State
+- **ActivityPub backend coverage is green**: `php artisan test tests\Feature\ActivityPubTest.php tests\Feature\ActivityPubSignatureTest.php` passes with the new inbound signature middleware and signed-request helpers.
 - **Endpoint-specific backend coverage is green**: `php artisan test tests\Feature\LocationControllerTest.php tests\Feature\PhotoControllerTest.php tests\Feature\SafetyControllerTest.php` passes with the new DreamHost-hardening assertions.
 - **Billing validation from the previous slice remains the current premium reference path**: `php artisan test tests\Feature\PremiumControllerTest.php tests\Feature\StripeWebhookTest.php`, plus frontend `npm run lint`, `npm run type-check`, and `cmd /c "npm run build"`, already passed for `v1.0.71`.
 
 ## ✅ Release Focus
+- [x] Require valid HTTP signatures on inbound ActivityPub inbox requests.
+- [x] Reject stale/tampered federation requests before controller processing.
+- [x] Keep the established Follow / Undo / Accept inbox flows working with signed requests.
+- [x] Add regression coverage for valid and invalid signature paths.
+- [x] Document outbound signed delivery as the next federation implementation gap.
 - [x] Keep `/api/location` from failing the whole request when event-store append work flakes.
 - [x] Keep `/api/photos` from 500ing on legacy rows with missing storage paths.
 - [x] Keep `/api/safety/walk/active` from 500ing when DreamHost is missing the safety tables.

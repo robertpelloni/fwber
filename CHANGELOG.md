@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.73] - 2026-04-02 — ActivityPub Inbox Signature Verification
+
+### Fixed
+- Added `HttpSignatureService` plus `VerifyActivityPubSignature` middleware so the ActivityPub inbox now rejects unsigned or invalid remote activities before the controller processes Follow, Accept, Undo, or Create payloads.
+- Enforced inbound `Signature`, `Date`, and `Digest` validation and remote actor public-key resolution, including rejection of stale requests and key/payload actor mismatches.
+- Applied the new signature middleware directly to the federation inbox route through the Laravel 11 bootstrap alias wiring.
+- Upgraded the existing ActivityPub inbox tests to use real RSA-signed requests and added a dedicated signature regression suite covering missing signatures, invalid signatures, stale dates, and actor/key mismatches.
+
 ## [1.0.72] - 2026-04-02 — Production 500 Endpoint Hardening
 
 ### Fixed

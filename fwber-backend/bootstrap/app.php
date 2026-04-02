@@ -25,13 +25,14 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\CheckDailyBonus::class,
         ]);
 
-        $middleware->alias([
-            'role' => \App\Http\Middleware\CheckUserRole::class,
-            'feature' => \App\Http\Middleware\FeatureEnabled::class,
-            'rate_limit_advanced' => \App\Http\Middleware\AdvancedRateLimiting::class,
-            'edge.cache' => \App\Http\Middleware\EdgeCacheResponse::class,
-        ]);
-    })
+         $middleware->alias([
+             'role' => \App\Http\Middleware\CheckUserRole::class,
+             'feature' => \App\Http\Middleware\FeatureEnabled::class,
+             'rate_limit_advanced' => \App\Http\Middleware\AdvancedRateLimiting::class,
+             'edge.cache' => \App\Http\Middleware\EdgeCacheResponse::class,
+             'verify.activitypub-signature' => \App\Http\Middleware\VerifyActivityPubSignature::class,
+         ]);
+     })
     ->withExceptions(function (Exceptions $exceptions): void {
         \Sentry\Laravel\Integration::handles($exceptions);
 

@@ -1,16 +1,54 @@
-# Handoff — Production 500 Endpoint Hardening
+# Handoff — ActivityPub Inbox Signature Verification
 
 **Date:** 2026-04-02  
-**Status:** ✅ Production 500 endpoint hardening is ready on top of the plan-aware pricing slice  
-**Version:** 1.0.72  
-**Latest pushed commit:** `dc88a8965` (`fix: make premium pricing plan-aware (v1.0.71)`)
+**Status:** ✅ ActivityPub inbox signature verification is ready on top of the production-500 hardening slice  
+**Version:** 1.0.73  
+**Latest pushed commit:** `df6f99417` (`fix: harden production 500 endpoints (v1.0.72)`)
 
 ## Overview
-This handoff covers the next backend stability slice after `v1.0.71`. `TODO.md` explicitly called out DreamHost production 500s on `/api/location`, `/api/photos`, and `/api/safety/walk/active`, but the old “add logging in bootstrap/app.php” hint was stale because the exception handler already logs API exceptions.
+This handoff covers the next federation security slice after `v1.0.72`. `TODO.md` called out two remaining ActivityPub protocol gaps: signed outbound delivery and inbox signature verification. This release closes the inbound side first by requiring valid HTTP signatures on the public inbox route before any Follow, Accept, Undo, or Create activity is processed.
 
-This release instead targets the likely production-only brittle spots directly: synchronous event-store coupling in location writes, null-path storage assumptions in photo URL accessors, and missing safety tables on DreamHost. The fix is to degrade those paths safely rather than surfacing full 500s for recoverable or optional failures.
+The implementation keeps the scope tight and shippable: it does not yet introduce local actor private-key generation or real outbound signed delivery, but it now blocks spoofed/unsigned inbound federation traffic and gives the next slice a real security boundary to build on.
 
 Active release work continues in the clean `C:\Users\hyper\workspace\fwber\temp_build\billing-push-clean` worktree rather than the dirty root checkout.
+
+## What Shipped in v1.0.73
+
+### 1. HTTP signature verification service
+- Added `App\Services\HttpSignatureService` to verify inbound ActivityPub-style HTTP signatures.
+- The service now:
+  - parses the `Signature` header
+  - validates the request `Date` freshness window
+  - validates the `Digest` against the raw request body
+  - fetches the remote actor document and extracts the published RSA public key
+  - verifies the signature bytes against the reconstructed signed header string
+  - rejects actor/key mismatches where the signing key owner does not match the JSON payload actor
+
+### 2. Inbox middleware enforcement
+- Added `App\Http\Middleware\VerifyActivityPubSignature`.
+- Registered it through the Laravel 11 bootstrap alias map and applied it directly to `Route::post('users/{id}/inbox', ...)`.
+- The inbox route now returns `401` for unsigned or invalid federation requests instead of silently processing raw JSON from arbitrary clients.
+
+### 3. Signed-request regression coverage
+- Updated the existing `ActivityPubTest` inbox happy-path tests so they generate real RSA keypairs, fake remote actor documents, and send properly signed Follow / Undo / Accept activities.
+- Added `ActivityPubSignatureTest` covering:
+  - missing `Signature` header rejection
+  - invalid signature rejection
+  - stale `Date` rejection
+  - key-owner / payload-actor mismatch rejection
+
+### 4. Important implementation findings
+- The middleware itself worked quickly; the only meaningful bug during implementation was a host mismatch in the signed test helper.
+- Laravel's test request host reflects `APP_URL`, which is `localhost:8000` in this backend, so signed test helpers must use that host rather than assuming plain `localhost`.
+- The verifier logic is now confirmed against real Laravel request objects, not just isolated Request instances.
+
+### 5. Remaining federation gap
+- `ActivityPubService::dispatchToRemoteInbox()` is still mocked and does not yet perform real signed delivery.
+- `generateActorPayload()` still returns a mock public key rather than a user-owned generated federation key.
+- The next highest-value slice is therefore:
+  - local actor key generation/storage
+  - real actor public-key exposure
+  - signed outbound follow/post delivery
 
 ## What Shipped in v1.0.72
 

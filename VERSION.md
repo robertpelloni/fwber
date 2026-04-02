@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.72`
+- **Current version:** `1.0.73`
 - **Release date:** `2026-04-02`
-- **Release name:** `Production 500 Endpoint Hardening`
+- **Release name:** `ActivityPub Inbox Signature Verification`
 
 ## Summary
 
-This release hardens the backend against the most plausible DreamHost-only 500s called out in `TODO.md`: location updates now survive event-store outages, photo listing no longer crashes on null storage paths, and safety reads degrade cleanly when the optional safety tables are missing.
+This release hardens inbound federation by requiring valid HTTP signatures on ActivityPub inbox requests. The backend now validates `Signature`, `Date`, and `Digest` headers against the remote actor's published RSA public key before processing Follow, Accept, Undo, or Create activities.
 
 ## Version Sources of Truth
 
