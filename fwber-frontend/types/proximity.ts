@@ -63,6 +63,11 @@ export interface LocalPulseResponse {
     topic_slug?: string | null;
     artifacts_count: number;
     candidates_count: number;
+    ranking_strategy?: {
+      scene_alignment: boolean;
+      trusted_connections: boolean;
+      freshness: boolean;
+    };
   };
 }
 

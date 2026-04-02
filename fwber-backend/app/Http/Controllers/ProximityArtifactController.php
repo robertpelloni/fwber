@@ -12,6 +12,7 @@ use App\Models\ProximityArtifact;
 use App\Services\AIMatchingService;
 use App\Services\GeoScreenerClient;
 use App\Services\GeoSpoofDetectionService;
+use App\Services\LocalPulseRankingService;
 use App\Services\ProximityArtifactService;
 use App\Services\ShadowThrottleService;
 use Illuminate\Http\JsonResponse;
@@ -24,6 +25,7 @@ class ProximityArtifactController extends Controller
         private GeoSpoofDetectionService $geoSpoofService,
         private GeoScreenerClient $geoScreener,
         private AIMatchingService $matchingService,
+        private LocalPulseRankingService $localPulseRankingService,
         private \App\Services\ActivityPubService $apService
     ) {}
 
@@ -425,7 +427,7 @@ class ProximityArtifactController extends Controller
                 $artifactQuery->where('meta->topic_slug', $topicSlug);
             }
 
-            $artifacts = $artifactQuery
+            $artifactModels = $artifactQuery
                 ->limit(100) // Get more, then filter and limit
                 ->get()
                 ->filter(function (ProximityArtifact $a) {
@@ -438,9 +440,15 @@ class ProximityArtifactController extends Controller
 
                     // Probabilistic inclusion based on visibility multiplier
                     return (mt_rand() / mt_getrandmax()) < $visibility;
-                })
-                ->take(20) // Limit to 20 after filtering
-                ->map(function (ProximityArtifact $a) use ($user) {
+                });
+
+            $trustMap = $this->localPulseRankingService->buildTrustMap(
+                $user,
+                $artifactModels->pluck('user_id')->filter()->map(fn ($id) => (int) $id)->all()
+            );
+
+            $artifacts = $artifactModels
+                ->map(function (ProximityArtifact $a) use ($user, $trustMap) {
                     $sceneSignals = $this->matchingService->getSceneSignalsForValues($user, array_filter([
                         $a->content,
                         $a->meta['topic_slug'] ?? null,
@@ -462,6 +470,13 @@ class ProximityArtifactController extends Controller
                         'votes_sum_value' => (int) $a->votes_sum_value ?? 0,
                         'user_vote' => $a->votes->first()?->value ?? 0,
                         'scene_signals' => $sceneSignals,
+                        'ranking_score' => $this->localPulseRankingService->calculateCompositeScore(
+                            $user,
+                            $a->user_id ? (int) $a->user_id : null,
+                            $a->created_at,
+                            $sceneSignals,
+                            $trustMap
+                        ),
                     ];
                 });
 
@@ -474,7 +489,7 @@ class ProximityArtifactController extends Controller
                 ->with('merchantProfile')
                 ->limit(20)
                 ->get()
-                ->map(function (Promotion $p) use ($user) {
+                ->map(function (Promotion $p) use ($user, $topicSlug) {
                     $sceneSignals = $this->matchingService->getSceneSignalsForValues($user, array_filter([
                         $p->title,
                         $p->description,
@@ -503,11 +518,28 @@ class ProximityArtifactController extends Controller
                         'votes_sum_value' => 0,
                         'user_vote' => 0,
                         'scene_signals' => $sceneSignals,
+                        'ranking_score' => $this->localPulseRankingService->calculateCompositeScore(
+                            $user,
+                            null,
+                            $p->starts_at,
+                            $sceneSignals,
+                            []
+                        ),
                     ];
                 });
 
-            // Merge artifacts and promotions
-            $mixedArtifacts = $artifacts->concat($promotions)->sortByDesc('created_at')->values();
+            // Merge artifacts and promotions, then rank by trust + scene alignment + freshness.
+            $mixedArtifacts = $artifacts
+                ->concat($promotions)
+                ->sortByDesc('created_at')
+                ->sortByDesc('ranking_score')
+                ->take(20)
+                ->values()
+                ->map(function (array $artifact) {
+                    unset($artifact['ranking_score']);
+
+                    return $artifact;
+                });
 
             // Get nearby match candidates (lightweight previews)
             $candidates = $this->getNearbyCompatibleCandidates($user, $profile, $lat, $lng, $radius, 10);
@@ -522,6 +554,11 @@ class ProximityArtifactController extends Controller
                     'topic_slug' => $topicSlug,
                     'artifacts_count' => $mixedArtifacts->count(),
                     'candidates_count' => count($candidates),
+                    'ranking_strategy' => [
+                        'scene_alignment' => true,
+                        'trusted_connections' => true,
+                        'freshness' => true,
+                    ],
                     'generated_at' => now()->toISOString(),
                 ],
             ];

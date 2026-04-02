@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Friend;
 use App\Models\ProximityArtifact;
 use App\Models\Topic;
 use App\Models\User;
@@ -59,5 +60,74 @@ class LocalPulseSceneSignalsTest extends TestCase
 
         $this->assertContains('coffee', $matchedTags);
         $this->assertContains('warehouse', $matchedTags);
+    }
+
+    public function test_local_pulse_ranks_trusted_scene_aligned_artifacts_ahead_of_newer_strangers(): void
+    {
+        $viewer = User::factory()->create();
+        $friend = User::factory()->create();
+        $stranger = User::factory()->create();
+
+        foreach ([$viewer, $friend, $stranger] as $user) {
+            UserProfile::factory()->create([
+                'user_id' => $user->id,
+                'latitude' => 42.3314,
+                'longitude' => -83.0458,
+                'interests' => ['coffee', 'nightlife'],
+            ]);
+        }
+
+        $topic = Topic::query()->firstOrCreate(
+            ['slug' => 'warehouse-nights'],
+            [
+                'label' => 'Warehouse Nights',
+                'description' => 'Late nights and underground rooms.',
+                'emoji' => '🌃',
+                'category' => 'culture',
+                'aliases' => ['warehouse', 'nightlife'],
+                'is_featured' => true,
+                'sort_order' => 99,
+            ]
+        );
+
+        $viewer->followedTopics()->attach($topic->id, ['followed_at' => now()]);
+
+        Friend::factory()->create([
+            'user_id' => $viewer->id,
+            'friend_id' => $friend->id,
+            'status' => 'accepted',
+        ]);
+        Friend::factory()->create([
+            'user_id' => $friend->id,
+            'friend_id' => $viewer->id,
+            'status' => 'accepted',
+        ]);
+
+        ProximityArtifact::factory()->create([
+            'user_id' => $stranger->id,
+            'content' => 'Breaking: generic post from someone new.',
+            'location_lat' => 42.3315,
+            'location_lng' => -83.0457,
+            'created_at' => now()->subMinute(),
+        ]);
+
+        ProximityArtifact::factory()->create([
+            'user_id' => $friend->id,
+            'content' => 'Coffee meetup before the warehouse set tonight.',
+            'location_lat' => 42.3316,
+            'location_lng' => -83.0456,
+            'meta' => ['topic_slug' => 'warehouse-nights'],
+            'created_at' => now()->subMinutes(10),
+        ]);
+
+        Sanctum::actingAs($viewer);
+
+        $response = $this->getJson('/api/proximity/local-pulse?lat=42.3314&lng=-83.0458&radius=1000');
+
+        $response->assertOk()
+            ->assertJsonPath('artifacts.0.content', 'Coffee meetup before the warehouse set tonight.')
+            ->assertJsonPath('meta.ranking_strategy.scene_alignment', true)
+            ->assertJsonPath('meta.ranking_strategy.trusted_connections', true)
+            ->assertJsonPath('meta.ranking_strategy.freshness', true);
     }
 }

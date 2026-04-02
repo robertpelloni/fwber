@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.50`
+- **Current version:** `1.0.51`
 - **Release date:** `2026-04-02`
-- **Release name:** `Session Transfer Handoff Refresh`
+- **Release name:** `Trust-Aware Local Pulse Ranking`
 
 ## Summary
 
-This release is a documentation and session-transfer refresh that captures the precise shipped state after Local Pulse scene signals, the dashboard shell fix, the validated workflow, and the next recommended roadmap move for the following agent/session.
+This release extends Local Pulse from scene-aware presentation into privacy-safe trust-aware ordering by ranking nearby activity with a composite of trusted connections, scene alignment, and freshness while keeping private graph edges out of the API payload.
 
 ## Version Sources of Truth
 

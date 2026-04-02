@@ -719,6 +719,12 @@ export default function LocalPulse({ initialTopicSlug, compact = false }: LocalP
               </h2>
             </div>
 
+            {localPulse.meta.ranking_strategy && (
+              <div className="mb-4 rounded-xl border border-purple-200 bg-purple-50 px-4 py-3 text-sm text-purple-900">
+                Ranked using scene alignment, trusted connections, and freshness.
+              </div>
+            )}
+
             {localPulse.artifacts.length === 0 ? (
               <div className="text-center py-12 bg-gray-50 rounded-lg">
                 <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />

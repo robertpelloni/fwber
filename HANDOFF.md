@@ -1,34 +1,29 @@
-# Handoff — Session Transfer Handoff Refresh
+# Handoff — Trust-Aware Local Pulse Ranking
 
 **Date:** 2026-04-02  
 **Status:** ✅ Local release verified  
-**Version:** 1.0.50
+**Version:** 1.0.51
 
 ## Overview
-This handoff captures the exact state of the repository after the `v1.0.49` code release. The project now has a coherent scene-discovery ladder running across matches, public profiles, recommendations, and Local Pulse cards, all built on the same followed-topic and normalized-scene-term graph. The most recent code changes shipped Local Pulse `scene_signals`, fixed a real Local Pulse schema mismatch in the candidate path, and eliminated the dashboard duplicate-logo overlap caused by the floating global subpage nav racing local-header detection. This `v1.0.50` update is purely to preserve those findings, the validated workflow, and the next recommended direction in enough detail for the next agent to resume without re-discovering the same terrain.
+This cycle moved Local Pulse from scene-aware presentation into privacy-safe trust-aware ranking. The local feed now orders artifacts with a composite of trusted connections, scene alignment, and freshness, while still keeping friendships, relationship links, and shared-circle membership internal to scoring rather than exposing them as payload details. The implementation deliberately reuses the same topic/scene graph and existing privacy/trust helpers already established across matches, profiles, journals, and relationship links.
 
 ## Shipped Baseline
-- **Latest pushed code release:** `v1.0.49`
-- **Latest pushed commit on `origin/copilot-live-fix`:** `c84834649c02a8aa3b2d9b679ffb9ec96d99e8c0`
-- **Latest documentation follow-up release:** `v1.0.50` (this handoff refresh)
+- **Latest pushed code release:** `v1.0.51`
+- **Previous baseline before this slice:** `v1.0.50`
 - **Primary working checkout:** `C:\Users\hyper\.copilot\session-state\44f0d726-859c-45b4-aae1-b7f7a064bccf\files\fwber-live-fix`
 - **Root workspace rule:** treat `C:\Users\hyper\workspace\fwber` as effectively read-only during safe recovery/release work
 
 ## What Was Completed
-1. **Scene Discovery for Matches and Profiles (`v1.0.47`)**
-   - Matches gained `scene_overlap`.
-   - Public profiles gained `scene_summary`.
-   - The frontend now renders shared scenes on swipe cards and public profile pages.
-2. **Recommendation Scene Signals (`v1.0.48`)**
-   - Recommendation items and feed cards gained `scene_signals`.
-   - The scene matcher was hardened by tokenizing realistic content text instead of relying on whole-string normalization.
-3. **Local Pulse Scene Signals (`v1.0.49`)**
-   - Local Pulse artifacts and sponsored promotions now emit the same `scene_signals` contract.
-   - Pulse cards now render scene-aligned headlines, matched topics, and matched tags.
-   - The Local Pulse candidate query was corrected to use the codebase's actual `birthdate` field instead of stale `date_of_birth`.
-4. **Shared Shell Fix (`v1.0.49`)**
-   - `GlobalSubpageNav` now waits until header detection completes before rendering.
-   - Dashboard routes are explicitly excluded, eliminating the duplicate floating-logo/header overlap.
+1. **Trust-Aware Local Pulse Ranking (`v1.0.51`)**
+   - Added `LocalPulseRankingService` to batch trust signals from accepted friendships, confirmed relationship links, and shared active circles.
+   - Reworked `ProximityArtifactController::localPulse()` so artifacts are ordered by a composite of trust, scene alignment, and freshness.
+   - Kept trust signals internal to ordering; the payload only exposes a high-level `ranking_strategy` explanation.
+   - Added regression coverage proving a trusted, scene-aligned artifact outranks a newer generic stranger post.
+2. **Previously Shipped Scene Discovery Stack**
+   - `v1.0.47`: matches + profiles
+   - `v1.0.48`: recommendations
+   - `v1.0.49`: Local Pulse scene signals + dashboard shell fix
+   - `v1.0.50`: documentation/session-transfer refresh
 
 ## Key Technical Findings
 - **The topic graph is now the canonical scene-discovery backbone.**
@@ -38,12 +33,13 @@ This handoff captures the exact state of the repository after the `v1.0.49` code
     - public profiles
     - recommendations/feed cards
     - Local Pulse cards
-- **Local Pulse still does not use scene signals for ranking.**
-  - Right now it enriches artifact/promotion presentation only.
-  - The next coherent technical step is to move scene signals from card metadata into feed ordering/ranking.
+    - Local Pulse ranking
+- **The safest trust-aware ranking design is internal scoring, not richer payload graph data.**
+  - Friendship, confirmed relationship links, and shared active circles are now used only as server-side ranking inputs.
+  - The feed explains ranking strategy at a high level without serializing private relationship context.
 - **Trust-aware discovery is still intentionally incomplete.**
-  - Relationship links, friendships, and circle visibility are already in place, but they are not yet folded into ranking logic.
-  - Future work should preserve privacy by using those signals as ranking features without exposing private edges in API payloads.
+  - Local Pulse ranking now uses privacy-safe trust signals, but recommendations and other local-feed loops still do not.
+  - Future work should extend the same pattern into recommendation ranking without exposing private edges in API payloads.
 - **A real backend bug was found during Local Pulse work.**
   - `ProximityArtifactController` still referenced `date_of_birth` in the nearby-candidate path.
   - The codebase actually uses `birthdate`.
@@ -54,12 +50,12 @@ This handoff captures the exact state of the repository after the `v1.0.49` code
   - The durable fix was to suppress rendering until detection completes, plus an explicit dashboard-route hide rule.
 
 ## Key Files Modified
+- `fwber-backend/app/Services/LocalPulseRankingService.php`
 - `fwber-backend/app/Services/AIMatchingService.php`
 - `fwber-backend/app/Http/Controllers/ProximityArtifactController.php`
 - `fwber-backend/tests/Feature/LocalPulseSceneSignalsTest.php`
 - `fwber-frontend/components/LocalPulse.tsx`
 - `fwber-frontend/types/proximity.ts`
-- `fwber-frontend/components/GlobalSubpageNav.tsx`
 - `VERSION`
 - `package.json`
 - `fwber-frontend/package.json`
@@ -86,12 +82,12 @@ This handoff captures the exact state of the repository after the `v1.0.49` code
 
 ## Notes / Risks
 - The repo still has the known `.next` / `.next/types` contention when overlapping Next jobs hit the same checkout; direct shell builds can fail after successful compilation with missing build artifacts like `pages-manifest.json` or `_document.js`.
-- Scene discovery now affects matches, profiles, recommendation cards, and Local Pulse card metadata, but it still does not reshape Local Pulse ranking or deeper trust-aware recommendation inputs.
+- Scene discovery now affects matches, profiles, recommendation cards, Local Pulse card metadata, and Local Pulse ranking, but it still does not reshape deeper trust-aware recommendation inputs.
 - Merchant lifecycle tooling, ActivityPub UI, and AI Wingman frontend wiring remain large unfinished areas compared with the more cohesive scene-discovery track.
 - The safe-checkout workflow is still important because the environment is shared and the root repository may contain unrelated or user-owned changes.
 
 ## Next Recommended Slice
-1. Extend the shipped **scene discovery** metadata from Local Pulse card cues into local-feed ranking and trust-aware recommendation inputs.
+1. Extend the same privacy-safe trust-aware scoring model from Local Pulse ranking into recommendation ranking and related local-feed loops.
 2. Fold relationship links, friend/circle visibility, and topic follows into a richer trust-aware discovery model without leaking private graph edges.
 3. Keep building on the topic graph rather than adding a second parallel taxonomy system.
 

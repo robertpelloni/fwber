@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.51] - 2026-04-02 — Trust-Aware Local Pulse Ranking
+
+### Fixed
+- Reworked Local Pulse ordering so nearby artifacts are ranked by a privacy-safe composite of trusted connections, scene alignment, and freshness instead of pure recency.
+- Added `LocalPulseRankingService` to batch friendship, confirmed relationship-link, and shared-circle checks into an internal trust map without exposing private graph edges in the API payload.
+- Updated Local Pulse response metadata and UI copy so the feed now explains that ranking uses scene alignment, trusted connections, and freshness while keeping trust details internal to ordering.
+- Added regression coverage proving a trusted, scene-aligned Local Pulse artifact outranks a newer generic stranger post.
+
 ## [1.0.50] - 2026-04-02 — Session Transfer Handoff Refresh
 
 ### Fixed
