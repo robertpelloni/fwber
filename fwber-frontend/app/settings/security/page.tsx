@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 
 export default function SecuritySettingsPage() {
   const { isReady, regenerateKeys } = useE2EEncryption();
-  const { token, user } = useAuth();
+  const { token, user, updateUser } = useAuth();
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [isFederated, setIsFederated] = useState(false);
   const [isConfessional, setIsConfessional] = useState(false);
@@ -32,6 +32,8 @@ export default function SecuritySettingsPage() {
       setIsConfessional(user.profile.is_confessional_mode);
     }
   }, [user]);
+
+  const federatedHandle = user?.email ? `@${user.email.split('@')[0]}@api.fwber.me` : '@loading@api.fwber.me';
 
   const handleCreateDecoy = async () => {
     if (decoyPassword.length < 8) {
@@ -90,6 +92,15 @@ export default function SecuritySettingsPage() {
     if (!token) return;
     try {
       await updateUserProfile(token, { is_federated: checked });
+      if (user) {
+        updateUser({
+          ...user,
+          profile: {
+            ...user.profile,
+            is_federated: checked,
+          },
+        });
+      }
       toast({
         title: "Federation Updated",
         description: checked ? "You mapped your profile to the Fediverse!" : "You have isolated your profile locally.",
@@ -253,21 +264,21 @@ export default function SecuritySettingsPage() {
                 <Switch
                   id="federation-toggle"
                   checked={isFederated}
-                  onCheckedChange={(checked) => {
-                    setIsFederated(checked);
-                    toast({
-                      title: "Federation Updated",
-                      description: checked ? "You mapped your profile to the Fediverse!" : "You have isolated your profile locally.",
-                    });
-                    // In a real implementation: Update via API hook -> /api/profile
-                  }}
+                  onCheckedChange={handleFederationToggle}
                 />
               </div>
 
               <div className="bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-200 dark:border-indigo-900 p-4 rounded-lg">
-                <p className="text-xs text-indigo-700 dark:text-indigo-300 font-mono">
-                  Your Fediverse Handle: @[your_name]@{typeof window !== 'undefined' ? window.location.hostname : 'domain.com'}
-                </p>
+                <div className="space-y-2">
+                  <p className="text-xs text-indigo-700 dark:text-indigo-300 font-mono">
+                    Your Fediverse Handle: {federatedHandle}
+                  </p>
+                  <p className="text-xs text-indigo-700/80 dark:text-indigo-300/80">
+                    {isFederated
+                      ? 'Your public profile can now be discovered from other ActivityPub servers.'
+                      : 'Enable federation before sharing your handle with the wider Fediverse.'}
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>

@@ -2,13 +2,37 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/auth-context';
+import { updateUserProfile } from '@/lib/api/profile';
 import { api } from '@/lib/api/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
-import { Globe, Search, UserPlus, Shield, Info, ArrowLeft, Share2, MessageSquare, Radio } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import {
+    Globe,
+    Search,
+    UserPlus,
+    Shield,
+    Info,
+    ArrowLeft,
+    Share2,
+    MessageSquare,
+    Radio,
+    Sparkles,
+    CheckCircle2,
+    ExternalLink,
+    Eye,
+} from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -22,12 +46,20 @@ interface RemoteActor {
     server: string;
 }
 
+interface FederationConnection {
+    id: number;
+    actor_uri: string;
+    username?: string | null;
+    domain?: string | null;
+    status?: string | null;
+}
+
 interface FederationFollowingResponse {
-    following?: any[];
+    following?: FederationConnection[];
 }
 
 interface FederationFollowersResponse {
-    followers?: any[];
+    followers?: FederationConnection[];
 }
 
 interface FederationSearchResponse {
@@ -35,14 +67,18 @@ interface FederationSearchResponse {
 }
 
 export default function FederationSettingsPage() {
-    const { token, user } = useAuth();
+    const { token, user, updateUser } = useAuth();
     const { toast } = useToast();
     const [handle, setHandle] = useState('');
     const [isSearching, setIsSearching] = useState(false);
+    const [isFederationSaving, setIsFederationSaving] = useState(false);
     const [results, setResults] = useState<RemoteActor[]>([]);
-    const [following, setFollowing] = useState<any[]>([]);
-    const [followers, setFollowers] = useState<any[]>([]);
+    const [following, setFollowing] = useState<FederationConnection[]>([]);
+    const [followers, setFollowers] = useState<FederationConnection[]>([]);
     const [activeTab, setActiveTab] = useState<'search' | 'following' | 'followers'>('search');
+    const [selectedActor, setSelectedActor] = useState<RemoteActor | null>(null);
+
+    const isFederated = Boolean(user?.profile?.is_federated);
 
     const fetchConnections = useCallback(async () => {
         if (!token) return;
@@ -66,6 +102,40 @@ export default function FederationSettingsPage() {
     useEffect(() => {
         fetchConnections();
     }, [fetchConnections]);
+
+    const handleFederationToggle = async (checked: boolean) => {
+        if (!token) {
+            return;
+        }
+
+        try {
+            setIsFederationSaving(true);
+            await updateUserProfile(token, { is_federated: checked });
+            if (user) {
+                updateUser({
+                    ...user,
+                    profile: {
+                        ...user.profile,
+                        is_federated: checked,
+                    },
+                });
+            }
+            toast({
+                title: checked ? 'Federation enabled' : 'Federation disabled',
+                description: checked
+                    ? 'Your public profile can now be discovered via WebFinger and ActivityPub.'
+                    : 'Your public profile is now isolated to fwber.',
+            });
+        } catch (error) {
+            toast({
+                variant: 'destructive',
+                title: 'Federation update failed',
+                description: 'Could not update your federation visibility right now.',
+            });
+        } finally {
+            setIsFederationSaving(false);
+        }
+    };
 
     const handleFollow = async (actorId: string) => {
         if (!token) return;
@@ -120,6 +190,7 @@ export default function FederationSettingsPage() {
     };
 
     const federatedHandle = user?.email ? `@${user.email.split('@')[0]}@api.fwber.me` : '';
+    const followedActorIds = new Set(following.map((connection) => connection.actor_uri));
 
     const copyFederatedHandle = async () => {
         if (!federatedHandle) {
@@ -178,6 +249,43 @@ export default function FederationSettingsPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Main Column */}
                 <div className="lg:col-span-2 space-y-6">
+                    <Card className={isFederated ? 'border-emerald-200 dark:border-emerald-900/30' : 'border-amber-200 dark:border-amber-900/30'}>
+                        <CardHeader>
+                            <CardTitle className="text-lg flex items-center gap-2">
+                                <Sparkles className={`w-4 h-4 ${isFederated ? 'text-emerald-500' : 'text-amber-500'}`} />
+                                Federation Visibility
+                            </CardTitle>
+                            <CardDescription>
+                                Control whether your public fwber profile is discoverable from the wider Fediverse.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="flex items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+                                <div className="space-y-1">
+                                    <Label htmlFor="federation-visibility-toggle" className="font-semibold text-sm text-zinc-900 dark:text-white">
+                                        ActivityPub broadcasting
+                                    </Label>
+                                    <p className="text-xs text-zinc-500">
+                                        {isFederated
+                                            ? 'Your federated handle is live and other servers can discover your public profile.'
+                                            : 'Turn this on before sharing your federated handle outside fwber.'}
+                                    </p>
+                                </div>
+                                <Switch
+                                    id="federation-visibility-toggle"
+                                    checked={isFederated}
+                                    onCheckedChange={handleFederationToggle}
+                                    disabled={isFederationSaving}
+                                />
+                            </div>
+                            <div className="rounded-xl bg-zinc-50 p-4 text-sm text-zinc-600 dark:bg-zinc-900/60 dark:text-zinc-300">
+                                {isFederated
+                                    ? 'Followers on other ActivityPub servers can resolve your handle and initiate follows.'
+                                    : 'Followers can still exist locally, but your handle should not be promoted until federation is enabled.'}
+                            </div>
+                        </CardContent>
+                    </Card>
+
                     <div className="flex border-b border-zinc-200 dark:border-zinc-800">
                         <button 
                             onClick={() => setActiveTab('search')}
@@ -223,7 +331,7 @@ export default function FederationSettingsPage() {
                                 {results.length > 0 && (
                                     <div className="mt-8 space-y-4">
                                         {results.map((actor) => {
-                                            const isFollowing = following.some(f => f.actor_uri === actor.id);
+                                            const isFollowing = followedActorIds.has(actor.id);
                                             return (
                                                 <div key={actor.id} className="p-4 border rounded-xl flex items-center justify-between bg-white dark:bg-zinc-900 shadow-sm transition-all hover:shadow-md">
                                                     <div className="flex items-center gap-3">
@@ -235,16 +343,27 @@ export default function FederationSettingsPage() {
                                                             <p className="text-xs text-zinc-500">{actor.name || 'External Actor'}</p>
                                                         </div>
                                                     </div>
-                                                    <Button 
-                                                        size="sm" 
-                                                        variant={isFollowing ? "secondary" : "outline"}
-                                                        className={isFollowing ? "" : "border-blue-200 text-blue-600 hover:bg-blue-50"}
-                                                        onClick={() => handleFollow(actor.id)}
-                                                        disabled={isFollowing}
-                                                    >
-                                                        <UserPlus className="w-4 h-4 mr-2" /> 
-                                                        {isFollowing ? 'Following' : 'Follow'}
-                                                    </Button>
+                                                    <div className="flex items-center gap-2">
+                                                        <Button
+                                                            size="sm"
+                                                            variant="ghost"
+                                                            className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white"
+                                                            onClick={() => setSelectedActor(actor)}
+                                                        >
+                                                            <Eye className="w-4 h-4 mr-2" />
+                                                            Details
+                                                        </Button>
+                                                        <Button 
+                                                            size="sm" 
+                                                            variant={isFollowing ? "secondary" : "outline"}
+                                                            className={isFollowing ? "" : "border-blue-200 text-blue-600 hover:bg-blue-50"}
+                                                            onClick={() => handleFollow(actor.id)}
+                                                            disabled={isFollowing || !isFederated}
+                                                        >
+                                                            {isFollowing ? <CheckCircle2 className="w-4 h-4 mr-2" /> : <UserPlus className="w-4 h-4 mr-2" />}
+                                                            {isFollowing ? 'Following' : 'Follow'}
+                                                        </Button>
+                                                    </div>
                                                 </div>
                                             );
                                         })}
@@ -270,7 +389,7 @@ export default function FederationSettingsPage() {
                                                 <p className="text-[10px] text-zinc-400 uppercase tracking-widest font-bold">Status: {f.status}</p>
                                             </div>
                                         </div>
-                                        <Badge variant="secondary">{f.status}</Badge>
+                                        <Badge variant="secondary">{f.status || 'pending'}</Badge>
                                     </div>
                                 ))
                             )}
@@ -327,10 +446,15 @@ export default function FederationSettingsPage() {
                                 size="sm"
                                 className="w-full text-[10px] font-bold uppercase tracking-widest text-zinc-400"
                                 onClick={copyFederatedHandle}
-                                disabled={!federatedHandle}
+                                disabled={!federatedHandle || !isFederated}
                             >
                                 <Share2 className="w-3 h-3 mr-2" /> Copy Federated Handle
                             </Button>
+                            {!isFederated && (
+                                <p className="text-[10px] text-amber-600">
+                                    Enable federation visibility before sharing this handle externally.
+                                </p>
+                            )}
                         </CardContent>
                     </Card>
 
@@ -341,10 +465,71 @@ export default function FederationSettingsPage() {
                         <ul className="text-[10px] text-zinc-500 space-y-2 font-medium">
                             <li>- Can I match with users on Mastodon? <br/><span className="text-zinc-400 font-normal">Matching is limited to local fwber nodes for safety.</span></li>
                             <li>- Who can see my face reveals? <br/><span className="text-zinc-400 font-normal">Reveals are only visible within the fwber E2E encrypted layer.</span></li>
+                            <li>- Why are some follows pending? <br/><span className="text-zinc-400 font-normal">Remote servers still need to accept or process the follow handshake.</span></li>
                         </ul>
                     </div>
                 </div>
             </div>
+
+            <Dialog open={Boolean(selectedActor)} onOpenChange={(open) => !open && setSelectedActor(null)}>
+                <DialogContent className="sm:max-w-xl">
+                    {selectedActor ? (
+                        <>
+                            <DialogHeader>
+                                <DialogTitle className="flex items-center gap-3">
+                                    <div className="relative h-12 w-12 overflow-hidden rounded-full border border-zinc-200 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800">
+                                        {selectedActor.icon?.url ? (
+                                            <Image src={selectedActor.icon.url} alt="" fill sizes="48px" className="object-cover" />
+                                        ) : null}
+                                    </div>
+                                    <div>
+                                        <p className="text-base font-semibold">@{selectedActor.preferredUsername}@{selectedActor.server}</p>
+                                        <p className="text-sm text-zinc-500">{selectedActor.name || 'External Actor'}</p>
+                                    </div>
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Review the remote profile before opening a follow relationship across servers.
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <div className="space-y-4">
+                                <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/60">
+                                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">Server</p>
+                                    <p className="mt-1 text-sm text-zinc-900 dark:text-white">{selectedActor.server}</p>
+                                </div>
+
+                                <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/60">
+                                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">Summary</p>
+                                    <p className="mt-1 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+                                        {selectedActor.summary || 'This remote actor has not published a summary yet.'}
+                                    </p>
+                                </div>
+
+                                <div className="flex flex-wrap justify-end gap-2">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => window.open(selectedActor.id, '_blank', 'noopener,noreferrer')}
+                                    >
+                                        <ExternalLink className="w-4 h-4 mr-2" />
+                                        Open Actor URL
+                                    </Button>
+                                    <Button
+                                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                                        onClick={() => {
+                                            void handleFollow(selectedActor.id);
+                                            setSelectedActor(null);
+                                        }}
+                                        disabled={followedActorIds.has(selectedActor.id) || !isFederated}
+                                    >
+                                        {followedActorIds.has(selectedActor.id) ? <CheckCircle2 className="w-4 h-4 mr-2" /> : <UserPlus className="w-4 h-4 mr-2" />}
+                                        {followedActorIds.has(selectedActor.id) ? 'Already Following' : 'Follow Actor'}
+                                    </Button>
+                                </div>
+                            </div>
+                        </>
+                    ) : null}
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

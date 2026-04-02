@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.33`
+- **Current version:** `1.0.34`
 - **Release date:** `2026-04-02`
-- **Release name:** `Merchant Contract Repair`
+- **Release name:** `Federation Trust Polish`
 
 ## Summary
 
-This release repairs the merchant portal contract with the backend, adds a dedicated merchant profile management page with verification visibility, and updates merchant onboarding, dashboard, promotions, and analytics flows to match the live API behavior.
+This release repairs the federation visibility workflow, fixes the broken security-page federation toggle, adds richer remote actor detail and follow-state guidance to the federation hub, and replaces misleading "soon" feed actions with explicit read-only messaging.
 
 ## Version Sources of Truth
 

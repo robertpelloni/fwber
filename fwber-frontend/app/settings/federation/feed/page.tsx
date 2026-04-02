@@ -33,6 +33,26 @@ interface FederationPostsResponse {
   posts?: FederatedPost[]
 }
 
+function ReadOnlyFederationAction({
+  icon: Icon,
+  label,
+}: {
+  icon: typeof MessageSquare
+  label: string
+}) {
+  return (
+    <button
+      type="button"
+      disabled
+      title="Federated replies, boosts, and likes are not wired up yet."
+      className="flex items-center gap-1.5 cursor-not-allowed opacity-60"
+    >
+      <Icon className="w-4 h-4" />
+      <span className="text-xs">{label}</span>
+    </button>
+  )
+}
+
 export default function GlobalFeedPage() {
   const { token } = useAuth()
   const [posts, setPosts] = useState<FederatedPost[]>([])
@@ -148,18 +168,9 @@ export default function GlobalFeedPage() {
                         dangerouslySetInnerHTML={{ __html: post.content }}
                       />
                       <div className="flex items-center gap-6 mt-6 pt-4 border-t dark:border-gray-700 text-gray-500">
-                        <button type="button" className="flex items-center gap-1.5 hover:text-blue-500 transition-colors">
-                          <MessageSquare className="w-4 h-4" />
-                          <span className="text-xs">Reply Soon</span>
-                        </button>
-                        <button type="button" className="flex items-center gap-1.5 hover:text-green-500 transition-colors">
-                          <Repeat className="w-4 h-4" />
-                          <span className="text-xs">Boost Soon</span>
-                        </button>
-                        <button type="button" className="flex items-center gap-1.5 hover:text-red-500 transition-colors">
-                          <Heart className="w-4 h-4" />
-                          <span className="text-xs">Like Soon</span>
-                        </button>
+                        <ReadOnlyFederationAction icon={MessageSquare} label="Replies coming soon" />
+                        <ReadOnlyFederationAction icon={Repeat} label="Boosts coming soon" />
+                        <ReadOnlyFederationAction icon={Heart} label="Likes coming soon" />
                       </div>
                     </CardContent>
                   </Card>

@@ -34,6 +34,8 @@ interface User {
     stiStatus: string | null
     preferences: Record<string, any> | null
     avatarUrl: string | null
+    is_federated?: boolean
+    is_confessional_mode?: boolean
     createdAt: string
     updatedAt: string
   }
