@@ -1,19 +1,19 @@
-# Project Status — fwber v1.0.49 (Local Pulse Scene Signals)
+# Project Status — fwber v1.0.50 (Session Transfer Handoff Refresh)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.49 "Local Pulse Scene Signals"
+**Version:** 1.0.50 "Session Transfer Handoff Refresh"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## Local Pulse Scene Signals
-- **Scene-Aware Local Feed Shipped**: Local Pulse artifacts and sponsored promotions now carry `scene_signals` based on followed topics and structured scene terms.
-- **Scene Cues on Pulse Cards**: The Local Pulse feed now renders scene-aligned headlines, matched topic chips, and matched tags directly on artifact cards.
-- **Shared Graph Reuse Preserved**: Local Pulse enrichment reuses the same topic graph and scene-term logic already powering matches, profiles, and recommendations.
-- **Dashboard Shell Overlap Fixed**: The floating global nav now stays out of dashboard/headered pages until header detection completes, eliminating the duplicate-logo overlap.
+## Session Transfer State
+- **Current Shipped Baseline**: `v1.0.49` is the latest code release on `origin/copilot-live-fix`, carrying Local Pulse scene signals plus the dashboard floating-logo overlap fix.
+- **Scene Discovery Footprint**: The shared topic/scene graph now affects matches (`scene_overlap`), profiles (`scene_summary`), recommendations (`scene_signals`), and Local Pulse card metadata (`scene_signals`).
+- **Safe Operational Workflow Preserved**: Work continues in the session-state checkout, while the root workspace remains effectively read-only to avoid losing parallel user changes.
+- **Frontend Validation Workflow Confirmed**: Reliable validation remains `npm run lint`, then clean `npm run build`, then fresh `npm run type-check`, with the known warning in `lib/api/photos.ts` still pre-existing.
+- **Known Runtime Quirks Captured**: The shared checkout can still hit `.next` contention if overlapping Next jobs run in the same tree; clean isolated validation remains the trustworthy signal.
 
 ## ✅ Release Focus
-- [x] Added Local Pulse scene enrichment on the backend using followed topics and structured scene terms.
-- [x] Added Local Pulse card UI for scene-aligned headlines, topic chips, and scene tags.
-- [x] Added focused backend regression coverage and fixed the stale Local Pulse `birthdate` query path.
-- [x] Fixed the dashboard floating-logo overlap in the shared shell and validated the affected frontend surfaces.
+- [x] Preserved a complete written handoff for the `v1.0.49` release baseline and the next recommended roadmap move.
+- [x] Captured the key root-cause findings from this cycle: stale Local Pulse `date_of_birth` usage and the floating global-nav/logo race against local-header detection.
+- [x] Synced the repository's versioned status docs for a clean session transfer.

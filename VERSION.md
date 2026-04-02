@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.49`
+- **Current version:** `1.0.50`
 - **Release date:** `2026-04-02`
-- **Release name:** `Local Pulse Scene Signals`
+- **Release name:** `Session Transfer Handoff Refresh`
 
 ## Summary
 
-This release extends the same scene-discovery graph into Local Pulse by adding shared `scene_signals` to pulse artifacts and sponsored promotions, rendering those cues on the pulse cards, and fixing the dashboard floating-logo overlap in the shared shell.
+This release is a documentation and session-transfer refresh that captures the precise shipped state after Local Pulse scene signals, the dashboard shell fix, the validated workflow, and the next recommended roadmap move for the following agent/session.
 
 ## Version Sources of Truth
 

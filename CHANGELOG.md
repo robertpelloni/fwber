@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.50] - 2026-04-02 — Session Transfer Handoff Refresh
+
+### Fixed
+- Expanded the session-transfer documentation so the current state after `v1.0.49` is captured in much greater detail across `HANDOFF.md`, `PROJECT_STATUS.md`, `ROADMAP.md`, `TODO.md`, `VERSION.md`, and the session plan.
+- Documented the latest discovery rollout boundaries: matches, profiles, recommendations, and Local Pulse cards now all reuse the same topic/scene graph, while Local Pulse ranking and deeper trust-aware discovery remain the next recommended slice.
+- Captured the concrete operational findings from this session, including the Local Pulse `birthdate` schema fix, the dashboard floating-logo root cause in `GlobalSubpageNav`, and the reliable frontend validation workflow for safe handoff to the next session.
+
 ## [1.0.48] - 2026-04-02 — Recommendation Scene Signals
 
 ### Fixed
@@ -9,7 +16,6 @@ All notable changes to this project will be documented in this file.
 - Fixed recommendation scene matching to tokenize content text and allow sensible term overlap instead of relying on brittle whole-string matching, so scene cues appear for realistic board names and descriptions.
 - Updated the recommendations hub and personalized feed cards to render scene-aligned headlines, topic chips, and matched scene tags using the live API payload.
 - Added focused backend regression coverage for recommendation scene enrichment and validated the slice with lint, clean build, and fresh type-check in the frontend.
-
 ## [1.0.49] - 2026-04-02 — Local Pulse Scene Signals
 
 ### Fixed
