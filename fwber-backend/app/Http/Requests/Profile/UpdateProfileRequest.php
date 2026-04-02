@@ -91,6 +91,8 @@ class UpdateProfileRequest extends FormRequest
             'is_incognito' => 'sometimes|boolean',
             'is_confessional_mode' => 'sometimes|boolean',
             'is_federated' => 'sometimes|boolean',
+            'journal_visibility_default' => 'sometimes|string|in:public,friends,circle,private',
+            'journal_circle_group_id' => 'sometimes|nullable|integer|exists:groups,id',
             'subscription_price' => 'sometimes|integer|min:0',
             'travel_location' => 'sometimes|nullable|array',
             'travel_location.latitude' => 'sometimes|numeric|between:-90,90',

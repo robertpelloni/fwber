@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.0.43
+> **Current Version:** 1.0.44
 > **Last Updated:** 2026-04-02
 
 ---
@@ -61,7 +61,7 @@
 ---
 
 ## 🎯 Next Immediate Milestones
-1. Expand the new **Structured Interest Graph** slice from shared-interest matching into curated taxonomy/catalog APIs and profile-level metadata.
-2. Add **visibility primitives** for friends-only and circle-only content, then ship **journals / field notes** on top of those rules.
+1. Expand the new **Structured Interest Graph** slice from shared-interest matching plus field notes into curated taxonomy/catalog APIs and richer profile-level metadata.
+2. Build **topic hubs**, **relationship/status links**, and **scene-based discovery** on top of the shipped journal visibility primitives.
 3. Extend the **Merchant Portal UI** (B2B) with lifecycle controls, resend/deactivate/reporting tooling, and broader operations polish.
 4. Wire up the **ActivityPub Inbox/Outbox UI** for federated profiles.

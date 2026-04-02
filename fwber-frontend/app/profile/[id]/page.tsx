@@ -15,7 +15,7 @@ import { EvolvingAvatar } from '@/components/ui/EvolvingAvatar';
 import { RelationshipTier } from '@/lib/relationshipTiers';
 import { photoAPI } from '@/lib/api/photos';
 import GiftShopModal from '@/components/gifts/GiftShopModal';
-import { Gift, ShieldCheck } from 'lucide-react';
+import { BookHeart, Gift, ShieldCheck } from 'lucide-react';
 import { VouchBadge } from '@/components/profile/VouchBadge';
 import { useToast } from '@/components/ToastProvider';
 
@@ -196,6 +196,51 @@ export default function PublicProfilePage() {
               <h3 className="text-lg font-semibold mb-2">About</h3>
               <p>{p.bio || 'No bio yet.'}</p>
             </div>
+
+            {(p.journals && p.journals.length > 0) && (
+              <div className="mb-8">
+                <div className="mb-4 flex items-center gap-2">
+                  <BookHeart className="h-5 w-5 text-pink-500" />
+                  <h3 className="text-lg font-semibold">Field Notes</h3>
+                </div>
+                <div className="space-y-4">
+                  {p.journals.map((journal) => (
+                    <article
+                      key={journal.id}
+                      className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm"
+                      style={{ borderLeftColor: journal.accent_color || '#ec4899', borderLeftWidth: '4px' }}
+                    >
+                      <div className="mb-2 flex flex-wrap items-center gap-2">
+                        <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700">
+                          {journal.visibility_label}
+                        </span>
+                        {journal.circle_group?.name && (
+                          <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-700">
+                            {journal.circle_group.name}
+                          </span>
+                        )}
+                        {journal.mood_emoji && <span className="text-base">{journal.mood_emoji}</span>}
+                      </div>
+                      <h4 className="text-base font-semibold text-gray-900 dark:text-white">
+                        {journal.title || 'Untitled field note'}
+                      </h4>
+                      <p className="mt-2 whitespace-pre-wrap text-sm text-gray-600 dark:text-gray-300">
+                        {journal.content}
+                      </p>
+                      {journal.tags.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {journal.tags.map((tag) => (
+                            <span key={tag} className="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                              #{tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </article>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Photo Gate */}
             <div className="mb-8">

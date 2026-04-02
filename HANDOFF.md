@@ -1,21 +1,35 @@
-# Handoff — Copyright 2026 Refresh
+# Handoff — Field Notes and Journal Privacy
 
 **Date:** 2026-04-02  
 **Status:** ✅ Local release verified  
-**Version:** 1.0.43
+**Version:** 1.0.44
 
 ## Overview
-This cycle applied the requested copyright refresh by updating the public homepage footer from 2025 to 2026, then synchronized the release/version documents so the repo state stays coherent for the next pushed patch. The broader social-graph work remains queued behind the in-progress visibility and journals slice, but this release intentionally keeps scope tight so the legal/footer copy on the live site is correct immediately.
+This cycle shipped the next real social-graph slice: long-form field notes backed by reusable visibility primitives. Journals now support `public`, `friends`, `circle`, and `private` visibility, default privacy settings can be saved per profile, and public profiles render whatever field notes the current viewer is allowed to see. The implementation deliberately reuses the existing friendship and group graph instead of inventing a new circle entity.
 
 ## Accomplishments
-- Updated the homepage footer copyright notice to `© 2026 fwber. All rights reserved.` in `fwber-frontend/app/page.tsx`.
-- Bumped the repository release version from `1.0.42` to `1.0.43` across the root and frontend package metadata.
-- Refreshed `CHANGELOG.md`, `PROJECT_STATUS.md`, `VERSION.md`, `TODO.md`, and `ROADMAP.md` so the release ledger and next-step guidance stay aligned.
-- Replaced the stale prior handoff summary with this focused release note so the next session starts from the current patch state.
+- Added the backend `Journal` model, journal migrations, resources, controllers, routes, and a reusable `ContentVisibilityService`.
+- Added journal privacy defaults to `user_profiles` so new notes can inherit a saved audience and optional default circle group.
+- Added backend feature coverage for circle note creation, friend visibility, circle visibility, and journal privacy settings persistence.
+- Added a frontend `/journal` page for authoring and managing field notes, a `/settings/privacy` page for default visibility, and a new app-nav entry for field notes.
+- Extended public profile rendering so visible field notes appear directly on profile pages.
+- Bumped the repository release version from `1.0.43` to `1.0.44` and refreshed release-tracking docs.
 
 ## Key Files Modified
-- `fwber-frontend/app/page.tsx`
-  - Updated the public footer copyright string from 2025 to 2026.
+- `fwber-backend/app/Models/Journal.php`
+- `fwber-backend/app/Services/ContentVisibilityService.php`
+- `fwber-backend/app/Http/Controllers/JournalController.php`
+- `fwber-backend/app/Http/Controllers/JournalPrivacyController.php`
+- `fwber-backend/app/Http/Resources/JournalResource.php`
+- `fwber-backend/database/migrations/2026_04_02_063500_add_journal_visibility_defaults_to_user_profiles.php`
+- `fwber-backend/database/migrations/2026_04_02_063600_create_journals_table.php`
+- `fwber-backend/tests/Feature/JournalFeatureTest.php`
+- `fwber-frontend/app/journal/page.tsx`
+- `fwber-frontend/app/settings/privacy/page.tsx`
+- `fwber-frontend/app/profile/[id]/page.tsx`
+- `fwber-frontend/lib/api/journals.ts`
+- `fwber-frontend/lib/hooks/use-journals.ts`
+- `fwber-frontend/components/AppHeader.tsx`
 - `VERSION`
 - `package.json`
 - `fwber-frontend/package.json`
@@ -27,6 +41,7 @@ This cycle applied the requested copyright refresh by updating the public homepa
 - `HANDOFF.md`
 
 ## Validation
+- `php artisan test tests/Feature/JournalFeatureTest.php`
 - `npm run lint`
 - `npm run type-check`
 - `npm run build`
@@ -34,9 +49,10 @@ This cycle applied the requested copyright refresh by updating the public homepa
 ## Notes / Risks
 - Frontend lint still reports the pre-existing `react-hooks/exhaustive-deps` warning in `fwber-frontend/lib/api/photos.ts:476`.
 - `fwber-frontend/tsconfig.tsbuildinfo` changes during frontend validation because it is tracked in git.
-- The next product release should resume the in-progress social-graph work at visibility primitives plus journals, rather than stacking more unrelated patch releases.
+- The first concurrent `npm run type-check` failed because the repo still has the known `.next/types` contention when build and type-check overlap in the same checkout; a fresh post-build `npm run type-check` passed cleanly.
+- `circle` currently maps to one existing group per note/default. That keeps the MVP coherent, but the next slice can expand into richer circle/topic semantics if needed.
 
 ## Next Recommended Slice
-1. Ship reusable visibility primitives for `public`, `friends`, `groups/circle`, and `private` social content.
-2. Build journals / field notes directly on top of those visibility rules so the first long-form social-graph surface is usable end to end.
-3. Resume topic hubs and scene discovery only after those shared privacy/content primitives exist.
+1. Build **topic hubs** that connect journals, Local Pulse, and groups around structured interests.
+2. Add **relationship/status links** and profile-level social graph descriptors that can feed both discovery and visibility decisions.
+3. Extend discovery beyond proximity with **scene-based interest discovery** using the shipped journals/visibility primitives as the content layer.

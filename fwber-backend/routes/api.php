@@ -499,6 +499,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('scrapbook/{id}/pin', [\App\Http\Controllers\ScrapbookController::class, 'togglePin']);
     Route::delete('scrapbook/{id}', [\App\Http\Controllers\ScrapbookController::class, 'destroy']);
 
+    // Journals / Field Notes
+    Route::get('journals', [\App\Http\Controllers\JournalController::class, 'index']);
+    Route::post('journals', [\App\Http\Controllers\JournalController::class, 'store']);
+    Route::get('journals/{journal}', [\App\Http\Controllers\JournalController::class, 'show']);
+    Route::put('journals/{journal}', [\App\Http\Controllers\JournalController::class, 'update']);
+    Route::delete('journals/{journal}', [\App\Http\Controllers\JournalController::class, 'destroy']);
+    Route::get('settings/privacy/journals', [\App\Http\Controllers\JournalPrivacyController::class, 'show']);
+    Route::put('settings/privacy/journals', [\App\Http\Controllers\JournalPrivacyController::class, 'update']);
+
     // Ice Breaker Cards
     Route::get('ice-breakers/questions', [\App\Http\Controllers\IceBreakerController::class, 'getQuestions']);
     Route::post('ice-breakers/answer', [\App\Http\Controllers\IceBreakerController::class, 'submitAnswer']);

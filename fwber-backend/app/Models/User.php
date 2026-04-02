@@ -355,6 +355,11 @@ class User extends Authenticatable
             ->wherePivot('status', 'accepted');
     }
 
+    public function journals(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Journal::class);
+    }
+
     public function achievements(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Achievement::class, 'user_achievements')

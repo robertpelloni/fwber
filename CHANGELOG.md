@@ -8,6 +8,14 @@ All notable changes to this project will be documented in this file.
 - Updated the live homepage footer copyright notice from 2025 to 2026.
 - Synced the repository version metadata and release handoff documents for the new patch release.
 
+## [1.0.44] - 2026-04-02 — Field Notes and Journal Privacy
+
+### Fixed
+- Added a new journals / field notes backend with `public`, `friends`, `circle`, and `private` visibility, plus reusable access checks built on accepted friendships and active group membership.
+- Added default journal privacy settings on profiles, including optional group-backed circle selection, and exposed those settings through authenticated privacy endpoints.
+- Added a new `/journal` authoring surface, a dedicated journal privacy settings page, and profile rendering for visible field notes so long-form social content is now usable end to end.
+- Added backend regression coverage for circle authoring, friend visibility, circle visibility, and journal privacy defaults.
+
 ## [1.0.41] - 2026-04-02 — Merchant Broadcast History
 
 ### Fixed

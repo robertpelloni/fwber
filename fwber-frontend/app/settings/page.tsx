@@ -14,6 +14,7 @@ import {
   Bell,
   MapPin,
   User,
+  BookHeart,
   Eye,
   Palette,
   HelpCircle,
@@ -384,6 +385,12 @@ export default function SettingsPage() {
                 icon={<Shield className="w-5 h-5" />}
                 title="Blocked Users"
                 description="Manage blocked users and privacy settings"
+              />
+              <SettingsLink
+                href="/settings/privacy"
+                icon={<BookHeart className="w-5 h-5" />}
+                title="Journal Privacy"
+                description="Choose who sees your field notes by default"
               />
               <SettingsLink
                 href="/settings/federation"

@@ -1,16 +1,18 @@
-# Project Status — fwber v1.0.43 (Copyright 2026 Refresh)
+# Project Status — fwber v1.0.44 (Field Notes and Journal Privacy)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.43 "Copyright 2026 Refresh"
+**Version:** 1.0.44 "Field Notes and Journal Privacy"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## Copyright 2026 Refresh
-- **Footer Year Corrected**: The public homepage footer now shows `© 2026 fwber. All rights reserved.` instead of the stale 2025 notice.
-- **Release Metadata Synced**: Root and frontend package versions, release notes, and handoff/status docs now reflect the new patch release.
+## Field Notes and Journal Privacy
+- **Long-form Journals Shipped**: Users can now create private, friends-only, circle-only, or public field notes from a dedicated `/journal` page.
+- **Reusable Visibility Layer Added**: Journal access reuses accepted friendships plus active group membership so `circle` content ships without inventing a second social graph.
+- **Privacy Defaults Added**: Users can save default journal visibility and an optional default circle group from a dedicated settings page.
+- **Profile Surface Wired**: Public profiles now render the subset of field notes the viewer is allowed to see.
 
 ## ✅ Release Focus
-- [x] Updated the homepage footer copyright year to 2026.
-- [x] Bumped root and frontend package versions to `1.0.43`.
-- [x] Refreshed changelog, version reference, roadmap notes, and handoff documentation for the new release.
+- [x] Added journal storage, visibility enforcement, and privacy-default APIs.
+- [x] Added frontend authoring, navigation, and settings surfaces for field notes.
+- [x] Exposed visible field notes on public profiles and covered the rules with backend feature tests.

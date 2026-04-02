@@ -114,6 +114,26 @@ export interface UserProfile {
     current_emotion?: string;
     is_federated?: boolean;
     voice_intro_url?: string | null;
+    journal_visibility_default?: 'public' | 'friends' | 'circle' | 'private' | null;
+    journal_circle_group_id?: number | null;
+    journals?: Array<{
+      id: number;
+      title: string | null;
+      content: string;
+      visibility: 'public' | 'friends' | 'circle' | 'private';
+      visibility_label: string;
+      circle_group_id: number | null;
+      circle_group?: {
+        id: number;
+        name: string;
+        privacy: 'public' | 'private';
+      } | null;
+      tags: string[];
+      mood_emoji?: string | null;
+      accent_color?: string | null;
+      created_at: string;
+      updated_at: string;
+    }>;
   };
 }
 

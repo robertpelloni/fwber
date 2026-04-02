@@ -10,6 +10,7 @@ use App\Http\Requests\Profile\UpdateProfileRequest;
 use App\Http\Resources\UserProfileResource;
 use App\Models\User;
 use App\Models\UserProfile;
+use App\Services\ContentVisibilityService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -28,7 +29,8 @@ use Illuminate\Support\Facades\Log;
 class ProfileController extends Controller
 {
     public function __construct(
-        private readonly EventStore $eventStore
+        private readonly EventStore $eventStore,
+        private readonly ContentVisibilityService $contentVisibilityService
     ) {}
 
     /**
@@ -69,6 +71,11 @@ class ProfileController extends Controller
         if (! $user->profile) {
             return response()->json(['message' => 'Profile not found'], 404);
         }
+
+        $user->setRelation(
+            'journals',
+            $this->contentVisibilityService->getVisibleJournalsForProfile($user, request()->user(), 3)
+        );
 
         // Return resource (it handles privacy/sanitization)
         return response()->json([
@@ -164,6 +171,11 @@ class ProfileController extends Controller
                     'profile_complete' => false,
                 ], 404);
             }
+
+            $user->setRelation(
+                'journals',
+                $user->journals()->with('circleGroup:id,name,privacy')->latest()->limit(5)->get()
+            );
 
             return response()->json([
                 'success' => true,
@@ -375,6 +387,8 @@ class ProfileController extends Controller
                     'is_incognito',
                     'is_confessional_mode',
                     'is_federated',
+                    'journal_visibility_default',
+                    'journal_circle_group_id',
                     'subscription_price',
                 ])));
 

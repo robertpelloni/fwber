@@ -81,6 +81,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $current_emotion
  * @property bool $is_federated
  * @property string|null $emotion_updated_at
+ * @property string $journal_visibility_default
+ * @property int|null $journal_circle_group_id
  * @property-read \App\Models\User $user
  *
  * @method static \Database\Factories\UserProfileFactory factory($count = null, $state = [])
@@ -235,6 +237,8 @@ class UserProfile extends Model
         'is_confessional_mode',
         'is_federated',
         'voice_intro_url',
+        'journal_visibility_default',
+        'journal_circle_group_id',
     ];
 
     protected $casts = [
@@ -247,6 +251,7 @@ class UserProfile extends Model
         'is_incognito' => 'boolean',
         'is_confessional_mode' => 'boolean',
         'is_federated' => 'boolean',
+        'journal_circle_group_id' => 'integer',
         'has_children' => 'boolean',
         'wants_children' => 'boolean',
         'has_pets' => 'boolean',

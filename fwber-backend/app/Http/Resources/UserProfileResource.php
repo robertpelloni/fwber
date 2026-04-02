@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\JournalResource;
 
 /**
  * User Profile API Resource
@@ -88,6 +89,8 @@ class UserProfileResource extends JsonResource
                 'sti_status' => $profile?->sti_status ?? [],
                 'is_incognito' => (bool) $profile?->is_incognito,
                 'voice_intro_url' => $profile?->voice_intro_url,
+                'journal_visibility_default' => $profile?->journal_visibility_default,
+                'journal_circle_group_id' => $profile?->journal_circle_group_id,
 
                 // Physical Attributes
                 'height_cm' => $profile?->height_cm,
@@ -173,6 +176,9 @@ class UserProfileResource extends JsonResource
                             'created_at' => $vouch->created_at->toISOString(),
                         ];
                     });
+                }),
+                'journals' => $this->when($this->relationLoaded('journals'), function () {
+                    return JournalResource::collection($this->journals);
                 }),
             ],
         ];
