@@ -1,29 +1,27 @@
-# Handoff — Federation Outbox Visibility
+# Handoff — Federation Follow Accept Handling
 
 **Date:** 2026-04-02  
 **Status:** ✅ Local release verified  
-**Version:** 1.0.62
+**Version:** 1.0.63
 
 ## Overview
-This cycle focused on making fwber's federated identity feel more real and inspectable. The backend ActivityPub outbox is no longer a placeholder collection: it now exposes active public `board_post` artifacts as ActivityStreams `Create` activities, and the frontend now lets users inspect those public entries through both the federation activity center and a dedicated outbox page.
+This cycle focused on making fwber's federated follow workflow behave more like a real ActivityPub implementation. The inbox now processes `Accept` responses for outbound follow requests, matching local `Following` records can transition from `pending` to `accepted`, and outbound follow payloads now point at fwber's real actor endpoint instead of a stale legacy path.
 
 ## Shipped Baseline
-- **Latest pushed code release:** `v1.0.62`
-- **Previous baseline before this slice:** `v1.0.61`
+- **Latest pushed code release:** `v1.0.63`
+- **Previous baseline before this slice:** `v1.0.62`
 - **Primary working checkout:** `C:\Users\hyper\.copilot\session-state\44f0d726-859c-45b4-aae1-b7f7a064bccf\files\fwber-live-fix`
 - **Root workspace rule:** treat `C:\Users\hyper\workspace\fwber` as effectively read-only during safe recovery/release work
 
 ## What Was Completed
-1. **Federation Outbox Backend (`v1.0.62`)**
-   - Replaced the placeholder `ActivityPubOutboxController` response with a real `OrderedCollection` and `OrderedCollectionPage`.
-   - Queried active `board_post` `ProximityArtifact` records for federated users and mapped them into public ActivityStreams `Create` activities containing `Note` objects.
-   - Preserved privacy boundaries by exposing only public post content and high-level actor URIs rather than any underlying trust or graph state.
-   - Added focused backend regression coverage proving the outbox page includes only active board posts and excludes expired or non-board-post artifacts.
-2. **Federation Outbox Frontend**
-   - Extended `fwber-frontend/lib/api/activitypub.ts` with typed outbox payload helpers and a direct outbox fetch helper.
-   - Added `app/settings/federation/outbox/page.tsx` as a dedicated public outbox inspector for the signed-in user's federated identity.
-   - Updated the federation activity center to merge outbox activities into the timeline and added an outbox summary card with a direct deep link.
-   - Added an Outbox action to the main federation hub so the public collection is easy to reach from `/federation`.
+1. **Federation Follow Accept Handling (`v1.0.63`)**
+   - Added inbox handling for `Accept` activities that wrap a `Follow`, allowing fwber to reconcile outbound follow requests with remote acceptance.
+   - Required the accepted follow payload to target fwber's actual local actor URI and to match the remote actor/object pairing before mutating local follow state.
+   - Updated matching `Following` rows from `pending` to `accepted` instead of leaving remote follows stuck indefinitely.
+   - Corrected outbound follow activities to use `url('/api/federation/users/{id}')` as the local actor identifier.
+2. **Federation Regression Coverage**
+   - Extended `ActivityPubTest` with coverage that proves a pending local following becomes accepted after an inbound `Accept` activity.
+   - Re-ran the broader ActivityPub suite so actor resolution, follow/unfollow handling, outbox behavior, and cached remote actor detail all stayed green.
 3. **Previously Shipped Discovery / Federation Baseline**
      - `v1.0.47`: matches + profiles
      - `v1.0.48`: recommendations
@@ -41,29 +39,24 @@ This cycle focused on making fwber's federated identity feel more real and inspe
      - `v1.0.60`: deal trust-aware ranking
      - `v1.0.61`: chatroom trust-aware ranking + sidebar shell sweep
      - `v1.0.62`: federation outbox visibility
+     - `v1.0.63`: federation follow accept handling
 
 ## Key Technical Findings
-- **Federation UI is now broader than the old TODO wording implied.**
-  - The frontend already supports federation search, follow/follower lists, actor exploration, global feed viewing, activity center summaries, and now a dedicated public outbox page.
-  - The next federation gap is no longer "build the UI"; it is protocol hardening.
-- **The public outbox can ship independently of signed delivery.**
-  - Existing code already had a conceptual seam for broadcasting public board posts through `ActivityPubService`.
-  - Exposing a correct outbox based on those same local posts gives immediate user-visible value without blocking on HTTP signatures and remote delivery plumbing.
-- **`ProximityArtifact` is the current canonical source for local public ActivityPub notes.**
-  - The outbox uses active, non-expired `board_post` artifacts owned by the federated local user.
-  - Expired artifacts and other artifact types stay out of the public ActivityStreams collection.
-- **The largest federation gaps now are protocol-level, not page-level.**
+- **The outbound follow actor URI was wrong before this slice.**
+  - `ActivityPubSearchController::follow()` was emitting `Follow` activities with `/api/v1/actor/{id}`, but fwber's actual actor endpoint is `/api/federation/users/{id}`.
+  - That mismatch would prevent any strict remote implementation from accepting and echoing the follow request coherently.
+- **Follow accept handling was the highest-leverage protocol fix after outbox visibility.**
+  - The codebase already stored outbound follow state in `followings.status`, but nothing ever moved records beyond `pending`.
+  - Adding `Accept` handling gives immediate user-visible correctness without taking on the larger HTTP-signature and remote delivery problem in the same release.
+- **The biggest remaining federation gaps are still signed delivery and inbound verification.**
   - `ActivityPubService::dispatchToRemoteInbox()` is still effectively mocked/log-only.
-  - Follow accept handshakes and inbox signature verification remain missing.
-  - Future federation work should focus on signed outbound delivery, acceptance flow, and verification before trying to widen the content surface further.
+  - Inbox requests are still accepted without HTTP signature verification.
+  - Future federation work should now focus on signed outbound delivery first, then inbox verification.
 
 ## Key Files Modified
-- `fwber-backend/app/Http/Controllers/ActivityPubOutboxController.php`
+- `fwber-backend/app/Http/Controllers/ActivityPubInboxController.php`
+- `fwber-backend/app/Http/Controllers/ActivityPubSearchController.php`
 - `fwber-backend/tests/Feature/ActivityPubTest.php`
-- `fwber-frontend/lib/api/activitypub.ts`
-- `fwber-frontend/app/settings/federation/activity/page.tsx`
-- `fwber-frontend/app/settings/federation/outbox/page.tsx`
-- `fwber-frontend/app/settings/federation/page.tsx`
 - `VERSION`
 - `package.json`
 - `fwber-frontend/package.json`
@@ -91,18 +84,18 @@ This cycle focused on making fwber's federated identity feel more real and inspe
 
 ## Notes / Risks
 - The repo still has the known `.next` / `.next/types` contention when overlapping Next jobs hit the same checkout; clean isolated builds remain the trustworthy signal.
-- The outbox now accurately reflects local public board-post activity, but remote delivery is still not cryptographically signed or verified.
-- Federation is now more user-visible, which makes the missing follow-accept and signature-verification paths more important to address before broadening protocol claims.
+- Follow state transitions are more realistic now, but outbound delivery is still not cryptographically signed and may still fail against strict remote implementations.
+- Inbox requests are still trusted without HTTP signature verification, so federation correctness is improved but not yet hardened against forged remote activity.
 - Merchant lifecycle tooling, deeper federation protocol hardening, and AI Wingman frontend wiring remain large unfinished areas compared with the more cohesive shipped discovery stack.
 - The safe-checkout workflow is still important because the environment is shared and the root repository may contain unrelated or user-owned changes.
 
 ## Next Recommended Slice
-1. Implement signed outbound ActivityPub delivery so public outbox entries can be sent to remote inboxes with a credible protocol story.
-2. Add follow accept handling and inbox signature verification so inbound federation state is trustworthy and interoperable.
-3. After protocol hardening, expand the public outbox beyond board posts only if the additional local artifact types map cleanly to ActivityStreams objects.
+1. Implement signed outbound ActivityPub delivery so follow and content activities can actually reach remote inboxes with a credible protocol story.
+2. Add inbox signature verification so inbound federation state is trustworthy and interoperable.
+3. After signed delivery and verification, expand the public outbox beyond board posts only if additional local artifact types map cleanly to ActivityStreams objects.
 
 ## Suggested Resume Procedure
-1. Start from `origin/main` after `v1.0.62`.
+1. Start from `origin/main` after `v1.0.63`.
 2. Re-read `HANDOFF.md`, `PROJECT_STATUS.md`, `ROADMAP.md`, `TODO.md`, and the session `plan.md`.
 3. Stay in the session-state checkout and avoid changing the root workspace copy.
 4. Create a new SQL todo for the next slice before implementing.

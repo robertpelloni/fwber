@@ -131,6 +131,45 @@ class ActivityPubTest extends TestCase
         ]);
     }
 
+    public function test_inbox_handles_follow_accept_for_pending_following()
+    {
+        $user = User::factory()->create(['name' => 'local-user']);
+        UserProfile::factory()->create([
+            'user_id' => $user->id,
+            'is_federated' => true,
+        ]);
+
+        Following::create([
+            'user_id' => $user->id,
+            'actor_uri' => 'https://remote.test/users/ava',
+            'username' => 'ava',
+            'domain' => 'remote.test',
+            'status' => 'pending',
+        ]);
+
+        $payload = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'type' => 'Accept',
+            'actor' => 'https://remote.test/users/ava',
+            'object' => [
+                'type' => 'Follow',
+                'actor' => url("/api/federation/users/{$user->id}"),
+                'object' => 'https://remote.test/users/ava',
+            ],
+        ];
+
+        $response = $this->postJson("/api/federation/users/{$user->id}/inbox", $payload);
+
+        $response->assertStatus(202)
+            ->assertJson(['status' => 'accept_processed']);
+
+        $this->assertDatabaseHas('followings', [
+            'user_id' => $user->id,
+            'actor_uri' => 'https://remote.test/users/ava',
+            'status' => 'accepted',
+        ]);
+    }
+
     public function test_outbox_returns_ordered_collection()
     {
         $user = User::factory()->create();

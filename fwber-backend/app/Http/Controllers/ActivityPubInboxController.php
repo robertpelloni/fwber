@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Following;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -32,6 +33,12 @@ class ActivityPubInboxController extends Controller
         switch ($type) {
             case 'Follow':
                 return $this->handleFollow($user, $activity);
+
+            case 'Accept':
+                if (($activity['object']['type'] ?? null) === 'Follow') {
+                    return $this->handleAccept($user, $activity);
+                }
+                break;
 
             case 'Undo':
                 if (isset($activity['object']['type']) && $activity['object']['type'] === 'Follow') {
@@ -109,6 +116,43 @@ class ActivityPubInboxController extends Controller
         $user->notify(new \App\Notifications\FederatedFollowNotification($username, $domain));
 
         return response()->json(['status' => 'follow_processed'], 202);
+    }
+
+    /**
+     * Process an incoming Accept activity for a follow initiated by this user.
+     */
+    protected function handleAccept(User $user, array $activity)
+    {
+        $actorUri = $activity['actor'] ?? null;
+        $object = $activity['object'] ?? null;
+        $expectedActorUri = url("/api/federation/users/{$user->id}");
+
+        if (! $actorUri || ! is_array($object)) {
+            return response()->json(['error' => 'Malformed Accept activity'], 400);
+        }
+
+        if (($object['type'] ?? null) !== 'Follow' || ($object['actor'] ?? null) !== $expectedActorUri) {
+            return response()->json(['status' => 'ignored_accept'], 202);
+        }
+
+        $followedActorUri = $object['object'] ?? null;
+        if (! is_string($followedActorUri) || $followedActorUri !== $actorUri) {
+            return response()->json(['status' => 'ignored_accept'], 202);
+        }
+
+        $following = Following::where('user_id', $user->id)
+            ->where('actor_uri', $actorUri)
+            ->first();
+
+        if (! $following) {
+            return response()->json(['status' => 'accept_without_follow'], 202);
+        }
+
+        $following->update(['status' => 'accepted']);
+
+        Log::info("ActivityPub: Follow accepted for user {$user->id} by {$actorUri}");
+
+        return response()->json(['status' => 'accept_processed'], 202);
     }
 
     /**

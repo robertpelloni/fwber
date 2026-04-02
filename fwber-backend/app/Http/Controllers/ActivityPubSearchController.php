@@ -121,7 +121,7 @@ class ActivityPubSearchController extends Controller
             $activityPubService->dispatchToRemoteInbox($actorId, [
                 '@context' => 'https://www.w3.org/ns/activitystreams',
                 'type' => 'Follow',
-                'actor' => url("/api/v1/actor/{$user->id}"),
+                'actor' => url("/api/federation/users/{$user->id}"),
                 'object' => $actorId,
             ]);
 

@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.63] - 2026-04-02 — Federation Follow Accept Handling
+
+### Fixed
+- Added ActivityPub inbox handling for `Accept` activities wrapping `Follow`, so fwber now transitions matching local `Following` records from `pending` to `accepted` when a remote server confirms the follow.
+- Bound accept processing to the expected local actor URI and remote actor/object pairing so unrelated or malformed `Accept` payloads are ignored instead of mutating follow state.
+- Corrected outbound federated follow payloads to identify the local actor via `/api/federation/users/{id}` rather than the stale `/api/v1/actor/{id}` path, aligning follow requests with the actual exposed actor endpoint.
+- Added focused backend regression coverage proving inbox `Accept` activities promote pending follow relationships to accepted status without regressing the existing inbox/outbox ActivityPub contract.
+
 ## [1.0.62] - 2026-04-02 — Federation Outbox Visibility
 
 ### Fixed

@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.0.62
+> **Current Version:** 1.0.63
 > **Last Updated:** 2026-04-02
 
 ---
@@ -55,13 +55,13 @@
 | **AI Integration** | Evolving | 100% | 85% | Avatars, Wingman, Roasts, Content Gen. |
 | **Social / Viral** | Evolving | 100% | 80% | Rate My Cat, Bounties, Referrals. |
 | **Economy** | Evolving | 100% | 80% | FWB Tokens, Stripe, Wallet, Leaderboard. |
-| **Federation** | Beta | 90% | 35% | WebFinger, search, follows, feed, activity center, actor explorer, and public outbox UI now work; signed delivery and inbox verification still need protocol hardening. |
+| **Federation** | Beta | 92% | 35% | WebFinger, search, follows, feed, activity center, actor explorer, public outbox UI, and follow accept state transitions now work; signed delivery and inbox verification still need protocol hardening. |
 | **B2B / Merchant** | Beta | 95% | 45% | Registration, promotions, analytics, vibe analysis, live pulse broadcasts, and broadcast history now work; deeper merchant lifecycle controls still need UI. |
 
 ---
 
 ## 🎯 Next Immediate Milestones
-1. Finish **ActivityPub protocol hardening** with signed outbound delivery, follow accept handshakes, and inbox signature verification now that the public outbox UI is visible.
+1. Finish **ActivityPub protocol hardening** with signed outbound delivery and inbox signature verification now that follow accept handling is in place.
 2. Expand the shipped **scene discovery** stack from Local Pulse, recommendations, nearby chatrooms, chatroom browse, events, bulletin boards, group matching, venues, nearby users, audio rooms, and deals trust-aware ranking into the remaining local-feed and discovery loops.
 3. Extend the **Merchant Portal UI** (B2B) with lifecycle controls, resend/deactivate/reporting tooling, and broader operations polish.
 4. Add deeper trust-aware discovery inputs that combine relationship links, circles, and topic hubs without weakening privacy gates.

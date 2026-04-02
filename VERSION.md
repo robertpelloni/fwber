@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.62`
+- **Current version:** `1.0.63`
 - **Release date:** `2026-04-02`
-- **Release name:** `Federation Outbox Visibility`
+- **Release name:** `Federation Follow Accept Handling`
 
 ## Summary
 
-This release turns the federated outbox into a real user-visible surface by exposing active public board posts as ActivityPub `Create` activities, adding a dedicated outbox page, and surfacing those entries directly inside the federation activity center.
+This release hardens the federation follow loop by processing inbound ActivityPub `Accept` activities for pending follows and aligning outbound follow payloads with fwber's real actor endpoint.
 
 ## Version Sources of Truth
 

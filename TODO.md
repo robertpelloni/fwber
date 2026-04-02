@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.0.62  
+> **Version:** 1.0.63  
 > **Last Updated:** 2026-04-02
 
 ---
@@ -10,7 +10,7 @@
 - [ ] **Verify Vercel Deployment**: Ensure the latest Next.js build with the `/api` absolute path proxy and MIME fixes is successfully deployed and running.
 
 ## 🟡 High: Missing UI Integrations
-- [ ] **ActivityPub Federation Protocol Hardening**: Federation UI now covers search, follow relationships, actor exploration, activity center, global feed, and public outbox visibility, but signed outbound delivery, follow accept handling, and inbox signature verification still need implementation.
+- [ ] **ActivityPub Federation Protocol Hardening**: Federation UI now covers search, follow relationships, actor exploration, activity center, global feed, public outbox visibility, and follow accept state transitions, but signed outbound delivery and inbox signature verification still need implementation.
 - [ ] **Merchant Portal UI**: Merchant registration, promotion creation, management, analytics, vibe analysis, live pulse broadcasting, and broadcast history are now wired, but the portal still needs deeper lifecycle tools like resend/deactivate/reporting controls and broader operations polish.
 - [x] **Scene Discovery Phase 5**: Followed the topic-hub slice with topic-aware match ranking, richer profile scene cards, and scene overlap that uses interests plus visible social context instead of pure radius.
 - [x] **Recommendation Scene Signals**: Extended the recommendation hub and personalized feed with scene-aligned recommendation metadata and card rendering on top of the shared topic graph.
