@@ -142,6 +142,19 @@ class PremiumControllerTest extends TestCase
         $this->assertEquals(15.0, (float) $levelTwo->fresh()->token_balance);
     }
 
+    public function test_stripe_purchase_requires_payment_proof()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)
+            ->postJson('/api/premium/purchase');
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'error' => 'A Stripe payment method or confirmed payment intent is required.',
+            ]);
+    }
+
     public function test_cannot_purchase_premium_with_insufficient_tokens()
     {
         $user = User::factory()->create(['token_balance' => 100]);

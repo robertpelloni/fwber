@@ -147,7 +147,14 @@ class PremiumController extends Controller
             if ($request->has('payment_intent_id')) {
                 $result = $this->paymentGateway->verifyPayment($request->input('payment_intent_id'));
             } else {
-                $paymentMethodId = $request->input('payment_method_id', 'tok_visa'); // Default for mock
+                $paymentMethodId = $request->input('payment_method_id');
+
+                if (! $paymentMethodId) {
+                    return response()->json([
+                        'error' => 'A Stripe payment method or confirmed payment intent is required.',
+                    ], 422);
+                }
+
                 $result = $this->paymentGateway->charge($amount, $currency, $paymentMethodId);
             }
 

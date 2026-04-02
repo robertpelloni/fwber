@@ -131,6 +131,21 @@ export default function HomePage() {
               </Link>
             </div>
 
+            <div className="mt-8 mx-auto max-w-3xl rounded-2xl border border-purple-200/70 dark:border-purple-800/70 bg-white/80 dark:bg-gray-900/70 backdrop-blur-sm p-5 text-left shadow-sm">
+              <div className="flex items-start gap-3">
+                <div className="mt-1 rounded-full bg-purple-100 dark:bg-purple-900/60 p-2">
+                  <Gift className="w-5 h-5 text-purple-600 dark:text-purple-300" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-gray-900 dark:text-white">How the referral loop works</h3>
+                  <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                    Invite friends for instant perks now. Once premium billing is fully live, a direct Gold upgrade can pay a small cash reward plus FWBcoin,
+                    and second-level upgrades can pay a smaller follow-on bonus.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="mt-12 pt-8 border-t border-gray-200/60 dark:border-gray-700/60">
               <p className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-6">
                 A Community for Every Orientation and Identity

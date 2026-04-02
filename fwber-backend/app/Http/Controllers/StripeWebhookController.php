@@ -21,7 +21,8 @@ class StripeWebhookController extends Controller
         $startTime = microtime(true);
         $payload = $request->getContent();
         $sig_header = $request->header('Stripe-Signature');
-        $endpoint_secret = config('services.stripe.webhook_secret');
+        $endpoint_secret = config('services.stripe.webhook.secret')
+            ?? config('services.stripe.webhook_secret');
 
         try {
             $event = Webhook::constructEvent(

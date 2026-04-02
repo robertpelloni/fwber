@@ -1,42 +1,44 @@
-# Handoff — FWBcoin Rename & Validation Follow-Up
+# Handoff — Premium Billing Hardening
 
 **Date:** 2026-04-02  
-**Status:** ✅ Interest-graph follow-up fully validated; FWBcoin rename applied to shipped user-facing references  
-**Version:** 1.0.66  
-**Latest pushed commit:** `f9913594e` (`feat: bridge structured interests into topics (v1.0.65)`)
+**Status:** ✅ Premium purchase flow hardened; visible upgrade pages rerouted through the Stripe modal  
+**Version:** 1.0.67  
+**Latest pushed commit:** `d86ab8bbb` (`fix: rename FWBcoin references (v1.0.66)`)
 
 ## Overview
-This handoff now covers the post-`v1.0.65` follow-up. After the structured interest-graph bridge was pushed, fresh frontend verification exposed a small set of real TypeScript mismatches introduced by that slice, while the intermittent PowerShell build failures were confirmed to be `.next` artifact races rather than source regressions. The user also requested a naming change to **FWBcoin**.
+This handoff now covers the post-`v1.0.66` billing hardening follow-up. The live branch still allowed premium upgrades to grant Gold without Stripe proof because the backend fell back to a mock `tok_visa` payment method, and both visible upgrade pages still posted directly to that unsafe endpoint.
 
-This follow-up applies the FWBcoin rename across shipped user-facing references, fixes the frontend type mismatches from the interest-graph slice, and confirms the current codebase with a clean frontend lint/build/type-check pass in a fresh subprocess.
+This release removes that unsafe fallback, restores the live upgrade entry points to the existing Stripe modal flow, fixes the Stripe webhook config lookup, adds a regression test for missing payment proof, and adds concise homepage copy that explains the intended two-level premium referral/FWBcoin loop.
 
 The original repo-recovery context still matters: all active work remains in the clean `C:\Users\hyper\workspace\fwber-mainline-repair` worktree, and the dirty root checkout remains preserved untouched.
 
-## What Shipped in v1.0.66
+## What Shipped in v1.0.67
 
-### 1. FWBcoin rename
-- All shipped user-facing legacy token copy now reads **FWBcoin**.
-- This rename is intentionally presentation-level:
-  - backend reward fields remain neutral (`token_amount`, `earned_token_rewards`)
-  - no database or API key rename was required
-- Updated surfaces include:
-  - `fwber-frontend/components/viral/ReferralModal.tsx`
-  - release/handoff/status docs that described premium reward payouts
+### 1. Premium purchase hardening
+- `PremiumController@purchasePremium` no longer falls back to the mock Stripe token.
+- Stripe purchases must now include either:
+  - `payment_method_id`, or
+  - `payment_intent_id`
+- Requests that omit both now fail with `422` instead of silently activating Gold.
 
-### 2. Frontend type-fix follow-up for the interest graph
-- Fixed the new frontend type mismatches introduced by the structured-interest work:
-  - added the missing `interests` field to the profile API type
-  - guarded optional `formData.interests` access in the profile editor
-  - unified match-filter interest option typing so fallback options can legally omit/provide `emoji`
+### 2. Frontend upgrade path repair
+- `/premium` now opens `PremiumUpgradeModal` instead of directly posting to `/premium/purchase`.
+- `/settings/subscription` no longer sends `payment_method_id: 'tok_visa'`; it also uses `PremiumUpgradeModal`.
+- This restores the intended UX:
+  - Stripe card checkout through the existing Elements flow
+  - optional token purchase through the explicit 200 FWB path
+  - no more one-click premium activation without payment proof
 
-### 3. Final validation findings
-- Fresh frontend lint passes with only the pre-existing warning:
-  - `fwber-frontend/lib/api/photos.ts:476`
-- Fresh frontend build succeeds in a clean subprocess.
-- Fresh frontend type-check succeeds once `.next/types` are regenerated from a successful build.
-- Conclusion:
-  - the earlier missing `.next` manifest/trace errors were transient worktree artifact races during overlapping builds
-  - the real code-level follow-up issues were the three TypeScript mismatches above, and those are now fixed
+### 3. Stripe config and subscription display fixes
+- `StripeWebhookController` now reads the nested `services.stripe.webhook.secret` config path and still accepts the older flat key as a fallback.
+- `fwber-frontend/app/subscription/page.tsx` now renders stored payment amounts as dollars directly instead of dividing them by 100 again.
+
+### 4. Referral-loop explanation
+- The homepage now includes a brief explainer card that tells users:
+  - invites already unlock perks
+  - direct premium upgrades are intended to pay a small reward plus FWBcoin
+  - second-level upgrades are intended to pay a smaller follow-on bonus
+- The existing referral modal copy on the live branch was preserved.
 
 ## What Shipped in v1.0.65
 

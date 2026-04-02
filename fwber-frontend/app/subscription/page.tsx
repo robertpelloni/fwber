@@ -217,7 +217,7 @@ export default function SubscriptionPage() {
                           {format(new Date(payment.created_at), 'MMM d, yyyy')}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          ${(payment.amount / 100).toFixed(2)} {payment.currency.toUpperCase()}
+                          ${Number(payment.amount).toFixed(2)} {payment.currency.toUpperCase()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${

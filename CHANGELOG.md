@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.67] - 2026-04-02 — Premium Billing Hardening
+
+### Fixed
+- Closed the unsafe premium-upgrade shortcut by requiring either a real Stripe `payment_method_id` or a confirmed `payment_intent_id` before `/api/premium/purchase` can grant Gold.
+- Fixed Stripe webhook signature verification to read the nested `services.stripe.webhook.secret` config path while preserving the legacy fallback key for compatibility.
+- Replaced the legacy direct-purchase flows on `/premium` and `/settings/subscription` with the existing `PremiumUpgradeModal`, so visible upgrade entry points return to Stripe Elements or the explicit 200 FWB token path instead of silently granting Gold.
+- Added backend regression coverage proving Stripe purchases without payment proof now fail with `422`, and corrected the subscription history amount display so stored dollar amounts no longer render as cents.
+- Added concise front-page copy that explains the two-level premium referral/FWBcoin loop without implying live cash payouts before billing is configured.
+
 ## [1.0.66] - 2026-04-02 — FWBcoin Rename & Validation Follow-Up
 
 ### Fixed

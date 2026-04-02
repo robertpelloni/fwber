@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.66`
+- **Current version:** `1.0.67`
 - **Release date:** `2026-04-02`
-- **Release name:** `FWBcoin Rename & Validation Follow-Up`
+- **Release name:** `Premium Billing Hardening`
 
 ## Summary
 
-This follow-up release renames the user-facing legacy token label to FWBcoin, keeps the structured interest-graph bridge intact, and incorporates the frontend type fixes and clean validation pass for the interest-graph work.
+This release hardens premium billing by requiring real Stripe payment proof, reroutes the visible upgrade pages back through the existing Stripe modal flow, fixes the Stripe webhook secret lookup, and adds concise homepage copy explaining the two-level premium referral/FWBcoin loop.
 
 ## Version Sources of Truth
 

@@ -1,15 +1,17 @@
-# Project Status — fwber v1.0.66 (FWBcoin Rename & Validation Follow-Up)
+# Project Status — fwber v1.0.67 (Premium Billing Hardening)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.66 "FWBcoin Rename & Validation Follow-Up"
+**Version:** 1.0.67 "Premium Billing Hardening"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## FWBcoin Rename & Validation Follow-Up
-- **FWBcoin Branding Renamed**: All shipped user-facing legacy token copy in the viral rewards experience and release documentation now reads **FWBcoin**, while the existing backend token accounting contract remains stable.
-- **Structured Interest Graph Type Fixes Landed**: The follow-up frontend fixes align the profile API types with the new top-level `interests` field, guard optional interest access in the live profile editor, and unify the match-filter interest option typing.
-- **Frontend Validation Closed Cleanly**: A fresh subprocess validation now confirms lint passes with only the long-standing `fwber-frontend/lib/api/photos.ts:476` warning, Next build succeeds, and frontend type-check passes.
+## Premium Billing Hardening
+- **Unsafe Gold grant removed**: `/api/premium/purchase` no longer falls back to the mock `tok_visa` token. Stripe upgrades now require either a real `payment_method_id` or a confirmed `payment_intent_id`.
+- **Visible upgrade surfaces are back on the safe path**: both `/premium` and `/settings/subscription` now open the existing `PremiumUpgradeModal`, which routes card payments through Stripe Elements and keeps the explicit 200 FWB upgrade option.
+- **Webhook verification matches the live config shape**: the Stripe webhook controller now reads `services.stripe.webhook.secret` first and still honors the older flat key as a compatibility fallback.
+- **Referral loop copy is now user-visible on the homepage**: the landing page now briefly explains that direct and second-level premium upgrades can eventually earn small cash/FWBcoin rewards once billing is fully configured.
+- **Subscription history dollars display correctly**: the standalone subscription history page no longer divides already-stored currency amounts by 100 a second time.
 
 ## Structured Interest Graph Bridge
 - **Profile Interests Now Resolve Into Topics**: Profile updates canonicalize interest values against the existing topic taxonomy, map aliases onto stable topic slugs, preserve unmatched freeform interests, and automatically sync matched topics into `followedTopics()` without disturbing prior follows.

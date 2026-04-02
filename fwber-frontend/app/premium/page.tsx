@@ -2,28 +2,16 @@
 
 import React from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { api } from '@/lib/api/client';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { PremiumUpgradeModal } from '@/components/PremiumUpgradeModal';
+import { usePremiumStatus } from '@/lib/hooks/use-premium';
 import { Check, Star, Zap, Eye, MapPin, Ghost } from 'lucide-react';
 
 export default function PremiumPage() {
-  const { user, token } = useAuth();
-  const [isUpgrading, setIsUpgrading] = React.useState(false);
-  const [isPremium, setIsPremium] = React.useState(false);
-
-  const handleUpgrade = async () => {
-    if (!token) return;
-    setIsUpgrading(true);
-    try {
-      await api.post('/premium/purchase');
-      setIsPremium(true);
-    } catch (error) {
-      console.error(error);
-      alert('Upgrade failed.');
-    } finally {
-      setIsUpgrading(false);
-    }
-  };
+  const { user } = useAuth();
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = React.useState(false);
+  const { data: premiumStatus } = usePremiumStatus();
+  const isPremium = premiumStatus?.is_premium ?? user?.tier === 'gold';
 
   const features = [
     {
@@ -109,27 +97,33 @@ export default function PremiumPage() {
               ) : (
                 <>
                   <p className="text-lg leading-6 font-medium text-gray-900">
-                    Pay once, own it forever
+                    Gold membership
                   </p>
                   <div className="mt-4 flex items-center justify-center text-5xl font-extrabold text-gray-900">
-                    <span>$29.99</span>
+                    <span>$19.99</span>
                     <span className="ml-3 text-xl font-medium text-gray-500">/mo</span>
                   </div>
+                  <p className="mt-4 text-sm text-gray-500">
+                    Secure card checkout runs through Stripe. You can also unlock Gold with 200 FWB in-app.
+                  </p>
                   <div className="mt-6">
                     <button
                       type="button"
                       className="w-full flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50"
-                      onClick={handleUpgrade}
-                      disabled={isUpgrading}
+                      onClick={() => setIsUpgradeModalOpen(true)}
                       data-testid="upgrade-button"
                     >
-                      {isUpgrading ? 'Processing...' : 'Upgrade to Gold'}
+                      Upgrade to Gold
                     </button>
                   </div>
                 </>
               )}
             </div>
           </div>
+          <PremiumUpgradeModal
+            isOpen={isUpgradeModalOpen}
+            onClose={() => setIsUpgradeModalOpen(false)}
+          />
         </div>
       </div>
     </ProtectedRoute>

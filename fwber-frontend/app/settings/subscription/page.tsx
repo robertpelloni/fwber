@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import { useAuth } from '@/lib/auth-context';
+import { PremiumUpgradeModal } from '@/components/PremiumUpgradeModal';
 import { api } from '@/lib/api/client';
 import { CreditCard, Check, Clock, AlertCircle, Star } from 'lucide-react';
 import Link from 'next/link';
@@ -24,10 +24,9 @@ interface PremiumStatus {
 }
 
 function SubscriptionContent() {
-  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [purchasing, setPurchasing] = useState(false);
   const [canceling, setCanceling] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [status, setStatus] = useState<PremiumStatus | null>(null);
   const [history, setHistory] = useState<Payment[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -51,27 +50,6 @@ function SubscriptionContent() {
       setError('Failed to load subscription details.');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handlePurchase = async () => {
-    try {
-      setPurchasing(true);
-      setError(null);
-      setSuccessMessage(null);
-
-      // Call the purchase endpoint (using mock gateway by default)
-      await api.post('/premium/purchase', {
-        payment_method_id: 'tok_visa' // Mock token
-      });
-
-      setSuccessMessage('Premium subscription activated successfully!');
-      await fetchData(); // Refresh data
-    } catch (err: any) {
-      console.error('Purchase failed:', err);
-      setError(err.message || 'Purchase failed. Please try again.');
-    } finally {
-      setPurchasing(false);
     }
   };
 
@@ -188,19 +166,17 @@ function SubscriptionContent() {
                       </li>
                     </ul>
                     <button
-                      onClick={handlePurchase}
-                      disabled={purchasing}
+                      onClick={() => setShowUpgradeModal(true)}
                       className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                     >
-                      {purchasing ? (
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      ) : (
-                        <>
-                          <Star className="w-4 h-4 fill-current" />
-                          Upgrade for $19.99/mo
-                        </>
-                      )}
+                      <>
+                        <Star className="w-4 h-4 fill-current" />
+                        Upgrade for $19.99/mo
+                      </>
                     </button>
+                    <p className="mt-3 text-xs text-purple-700">
+                      Card checkout runs through Stripe. Wallet members can also upgrade with 200 FWB.
+                    </p>
                     {error && (
                       <div className="mt-4 p-3 bg-red-50 text-red-700 text-sm rounded-md flex items-center gap-2">
                         <AlertCircle className="w-4 h-4" />
@@ -218,6 +194,13 @@ function SubscriptionContent() {
               </div>
             </div>
           </section>
+          <PremiumUpgradeModal
+            isOpen={showUpgradeModal}
+            onClose={() => {
+              setShowUpgradeModal(false);
+              void fetchData();
+            }}
+          />
 
           {/* Payment History */}
           <section>
