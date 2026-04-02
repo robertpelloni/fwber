@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.38] - 2026-04-02 — Merchant Pulse Broadcast Activation
+
+### Fixed
+- Replaced the stubbed `POST /api/merchant/pulse/broadcast` flow with a real merchant broadcast path that reuses proximity `announce` artifacts, promotion-owned coordinates, and token spending.
+- Added explicit vibe-target gating so merchant broadcasts now either send immediately when the live neighborhood mood matches or fail clearly without charging tokens.
+- Updated the merchant vibe deck UI to reflect real send semantics, surface the live detected vibe on failures, and stop promising a nonexistent queued delivery path.
+- Added focused regression coverage for successful broadcast sends, vibe-mismatch rejection, and missing-location guidance.
+
 ## [1.0.32] - 2026-04-02 — Navigation UX Patch
 
 ### Fixed

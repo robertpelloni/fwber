@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
-import { api } from '@/lib/api/client';
+import { api, ApiError } from '@/lib/api/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -26,6 +26,7 @@ export default function VibeBroadcastPage() {
         discount_code: '',
         vibe_target: 'any'
     });
+    const [currentVibe, setCurrentVibe] = useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -33,22 +34,36 @@ export default function VibeBroadcastPage() {
 
         try {
             setIsSubmitting(true);
-            await api.post('/merchant/pulse/broadcast', formData, {
+            const response = await api.post<{
+                current_vibe?: string;
+                token_cost: number;
+                status: string;
+            }>('/merchant/pulse/broadcast', formData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
+            setCurrentVibe(response.current_vibe ?? null);
+
             toast({
-                title: "Broadcast Queued",
-                description: "Your vibe-targeted message will be sent when the neighborhood mood matches.",
+                title: "Broadcast Sent",
+                description: `Your pulse is live now and cost ${response.token_cost} FWB Tokens.`,
             });
 
             router.push('/merchant/dashboard');
         } catch (error) {
             console.error('Broadcast failed:', error);
+
+            let description = "Ensure you have enough FWB Tokens and an active promotion location before sending a pulse.";
+            if (error instanceof ApiError) {
+                description = error.message;
+                const vibe = typeof error.data?.current_vibe === 'string' ? error.data.current_vibe : null;
+                setCurrentVibe(vibe);
+            }
+
             toast({
                 variant: "destructive",
                 title: "Broadcast Failed",
-                description: "Ensure you have enough FWB Tokens to trigger a high-priority pulse.",
+                description,
             });
         } finally {
             setIsSubmitting(false);
@@ -86,7 +101,7 @@ export default function VibeBroadcastPage() {
                         <Card className="border-zinc-200 dark:border-zinc-800 shadow-xl">
                             <CardHeader>
                                 <CardTitle className="text-lg">Compose Vibe</CardTitle>
-                                <CardDescription>Broadcast a high-priority notification to all users within a 1-mile radius.</CardDescription>
+                                <CardDescription>Broadcast a high-priority notification to all users within a 1-mile radius when the live neighborhood vibe already matches your trigger.</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-6">
                                 <div className="space-y-2">
@@ -130,7 +145,7 @@ export default function VibeBroadcastPage() {
                                             <RadioGroupItem value="any" id="any" />
                                             <Label htmlFor="any" className="flex flex-col">
                                                 <span className="font-bold">Instant</span>
-                                                <span className="text-[10px] text-zinc-500">Send immediately</span>
+                                                <span className="text-[10px] text-zinc-500">Send immediately with no vibe gate</span>
                                             </Label>
                                         </div>
                                         <div className="flex items-center space-x-2 border rounded-xl p-4 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50">
@@ -176,6 +191,11 @@ export default function VibeBroadcastPage() {
                             <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest flex items-center gap-2">
                                 <Shield className="w-3 h-3" /> Costs 50 FWB Tokens per transmission
                             </p>
+                            {currentVibe && (
+                                <p className="text-[10px] text-amber-600 font-bold uppercase tracking-widest">
+                                    Live vibe detected: {currentVibe}
+                                </p>
+                            )}
                         </div>
                     </form>
                 </div>

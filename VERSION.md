@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.37`
+- **Current version:** `1.0.38`
 - **Release date:** `2026-04-02`
-- **Release name:** `Merchant Vibe Contract Fix`
+- **Release name:** `Merchant Pulse Broadcast Activation`
 
 ## Summary
 
-This release repairs the merchant neighborhood-vibe contract by aligning the frontend widget with the shared API client's unwrapped response shape and by sourcing merchant vibe coordinates from the latest mapped promotion when merchant profiles do not carry their own lat/lng fields.
+This release activates the merchant pulse broadcast flow by turning the old stub into a real proximity announce send, charging tokens only on successful sends, and blocking vibe-mismatched broadcasts without creating artifacts or pretending they were queued.
 
 ## Version Sources of Truth
 

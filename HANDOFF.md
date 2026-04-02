@@ -1,57 +1,49 @@
-# Handoff — Stabilization & Launch Consolidation (Phase 3)
+# Handoff — Merchant Pulse Broadcast Activation
 
-**Date:** 2026-03-21  
-**Status:** ✅ Production Ready  
-**Version:** 0.5.0-beta
+**Date:** 2026-04-02  
+**Status:** ✅ Local release verified  
+**Version:** 1.0.38
 
 ## Overview
-This cycle focused on methodically verifying every core site function and ensuring deployment stability for DreamHost and Vercel. All backend tests are green, and the frontend build is verified.
+This cycle completed the next merchant-portal slice by replacing the fake merchant pulse broadcast queue with a real broadcast path. Merchant broadcasts now reuse proximity announce artifacts, spend tokens only on successful sends, and reject vibe-target mismatches honestly without pretending work was queued anywhere.
 
 ## Accomplishments
-- **Deep Federation (ActivityPub Hardening)**:
-    - Implemented `Follower` model and database migration for cross-server relationships.
-    - Upgraded `ActivityPubInboxController` to process real `Follow` and `Undo` activities.
-    - Added automated broadcasting: Public "Local Pulse" board posts are now automatically pushed to federated followers via the `ActivityPubService`.
-- **Full Verification**: 322 backend tests passed (1042 assertions). 100% of core and experimental features are verified green.
-- **Experimental Features Verified**:
-    - **Burner Communication Bridge**: Verified 24-hour self-destructing links.
-    - **Audio Dating Rooms**: Verified WebRTC signaling and mesh network creation.
-    - **ActivityPub Federation**: Verified Actor, Inbox, and Outbox endpoints for decentralization.
-    - **Rust Geo-Screener**: Built and verified H3 spatial indexing service on port 8081.
-    - **React Native Wrapper**: Verified Expo/WebView shell and native location logic.
-    - **Video Chat**: Verified backend signaling logic and call history endpoints.
-- **Viral Campaign Launch**: Implemented "Rate My Pussy" (`/rate-my-pussy`) — a bait-and-switch cat rating site designed to drive traffic.
-- **Detroit Launch Materials**: Prepared initial designs for flyers and bar coasters in `docs/marketing/launch-materials/`.
-- **Growth Optimizations**:
-    - Made "Rate My Cat" and "Roast My Profile" the primary landing CTAs for guests.
-    - Added share buttons to high-value success events (Achievements, Matches, Profile 100%).
-    - Gamified the community leaderboard with reward badges and rank sharing.
-- **Frontend Stabilized**: Next.js production build verified success.
-- **AI Avatar Hardening**: Verified trait extraction and img2img metadata flows.
-- **Analytics Ready**: Confirmed real-time data metrics for launch tracking.
-- **AWS Integration**: Confirmed S3 and Rekognition hooks are active.
+- Activated `POST /api/merchant/pulse/broadcast` with a real send path in `MerchantPulseController`.
+- Reused the merchant's latest mapped promotion as the owned broadcast location source.
+- Charged 50 FWB Tokens only when a broadcast actually sends.
+- Added live vibe-target gating for `any`, `energetic`, `chill`, and `romantic`.
+- Returned explicit `blocked_vibe_mismatch` and missing-location failures so the frontend can guide merchants clearly.
+- Updated the merchant vibe deck UI copy and toast handling to reflect real send-or-block behavior instead of a fake queued state.
+- Added regression coverage for successful send, mismatch rejection, and missing-location failure, while preserving the earlier vibe-location tests.
 
 ## Key Files Modified
-- `docs/marketing/launch-materials/`: New physical marketing assets.
-- `fwber-frontend/app/page.tsx`: Updated landing page CTAs.
-- `fwber-frontend/app/leaderboard/page.tsx`: Added gamification rewards.
-- `fwber-frontend/components/MatchModal.tsx`: Added social sharing.
-- `fwber-backend/app/Models/MatchAction.php`: Added `action` to fillable for tests.
-- `fwber-backend/tests/Feature/VideoChatTest.php`: New verification suite.
-- `fwber-backend/app/Http/Controllers/CatPhotoController.php`: New viral feature controller.
-- `fwber-frontend/app/rate-my-pussy/page.tsx`: New viral landing page.
-- `PROJECT_STATUS.md`: Updated to 100% verified.
-- `TODO.md`: Marked all launch preparation tasks as complete.
-- `CHANGELOG.md`: Added Phase 3 details.
+- `fwber-backend/app/Http/Controllers/MerchantPulseController.php`
+  - Added real artifact creation, token spending, vibe gating, and explicit response metadata.
+- `fwber-backend/tests/Feature/MerchantPulseTest.php`
+  - Added focused broadcast tests and disabled the daily-login bonus middleware in this suite so token assertions stay isolated to merchant pulse behavior.
+- `fwber-frontend/app/merchant/vibe/page.tsx`
+  - Updated success/failure messaging, surfaced the live detected vibe, and aligned the deck copy with the real backend contract.
+- `VERSION`
+- `package.json`
+- `fwber-frontend/package.json`
+- `CHANGELOG.md`
+- `PROJECT_STATUS.md`
+- `VERSION.md`
+- `TODO.md`
+- `ROADMAP.md`
 
-## Technical Debt & Risks
-- **Redis Requirement**: Some tests are skipped because the local environment lacks the PHP Redis extension. Production requires Redis for performance caching and `Cache::tags()`.
-- **API Keys**: DALL-E and Replicate flows require `OPENAI_API_KEY` or `REPLICATE_API_TOKEN` in production.
+## Validation
+- `php artisan test tests/Feature/MerchantPulseTest.php tests/Feature/MerchantPromotionCrudTest.php tests/Feature/MerchantAnalyticsTest.php`
+- `npm run lint`
+- `npm run type-check`
+- `npm run build`
 
-## Next Steps
-1. **Detroit Metro Beta**: Execute content strategy from `docs/marketing/CONTENT_STRATEGY.md`.
-2. **Real-world Testing**: Test Solana wallet integration in a live dev environment.
-3. **Marketing Assets**: Prepare flyers and stickers for the Detroit launch.
+## Notes / Risks
+- Frontend lint still reports the pre-existing `react-hooks/exhaustive-deps` warning in `fwber-frontend/lib/api/photos.ts:476`.
+- Frontend build still emits the pre-existing Sentry deprecation/configuration warnings and the `bigint` optional binding warning, but the production build completes successfully.
+- `fwber-frontend/tsconfig.tsbuildinfo` changes during frontend validation because it is tracked in git.
 
----
-*Generated by Gemini CLI — Closing Cycle with Green Build.*
+## Next Recommended Slice
+1. Add merchant pulse broadcast history in the merchant portal so sent broadcasts can be reviewed after launch.
+2. Expose artifact/reporting or deactivate controls for merchant broadcasts if the announce stream needs moderation or lifecycle management from the portal.
+3. Consider whether vibe-targeted broadcasts need a real deferred/queued scheduler later; right now the system is intentionally honest and immediate-only.

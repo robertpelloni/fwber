@@ -56,12 +56,12 @@
 | **Social / Viral** | Evolving | 100% | 80% | Rate My Cat, Bounties, Referrals. |
 | **Economy** | Evolving | 100% | 80% | FWB Tokens, Stripe, Wallet, Leaderboard. |
 | **Federation** | Beta | 90% | 20% | WebFinger works, Inbox/Outbox needs UI. |
-| **B2B / Merchant** | Beta | 90% | 10% | Backend pulse API exists; Merchant portal UI needed. |
+| **B2B / Merchant** | Beta | 95% | 35% | Registration, promotions, analytics, vibe analysis, and live pulse broadcasts now work; deeper merchant lifecycle/history tools still need UI. |
 
 ---
 
 ## 🎯 Next Immediate Milestones
-1. Build out the **Merchant Portal UI** (B2B).
+1. Extend the **Merchant Portal UI** (B2B) with broadcast history, lifecycle controls, and deeper operations tooling.
 2. Wire up the **ActivityPub Inbox/Outbox UI** for federated profiles.
 3. Polish the **AI Wingman UI** (Proactive nudges, Cosmic Match visualization).
 4. Deploy and integrate the **Rust Geo-Screener**.
