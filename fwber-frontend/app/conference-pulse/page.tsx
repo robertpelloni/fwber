@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import AppHeader from '@/components/AppHeader';
 import { useAuth } from '@/lib/auth-context';
 import { useConferencePulse } from '@/lib/hooks/use-proximity-chatrooms';
 import { Search, MapPin, Users, Coffee, Briefcase, Wifi, Navigation, Sparkles } from 'lucide-react';
@@ -370,7 +371,10 @@ export default function ConferencePulsePage() {
         }
       `}</style>
 
-            <div className="conference-page">
+            <div className="min-h-screen bg-gray-950">
+                <AppHeader title="Conference Pulse" />
+
+                <div className="conference-page">
                 {/* Header */}
                 <header className="conference-header">
                     <div className="conference-header-inner">
@@ -481,6 +485,7 @@ export default function ConferencePulsePage() {
                         ))}
                     </div>
                 )}
+                </div>
             </div>
         </>
     );

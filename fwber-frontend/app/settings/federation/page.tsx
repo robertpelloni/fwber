@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { updateUserProfile } from '@/lib/api/profile';
 import { api } from '@/lib/api/client';
+import AppHeader from '@/components/AppHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -201,7 +202,9 @@ export default function FederationSettingsPage() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto space-y-8 pb-24 px-4">
+        <div className="min-h-screen bg-background">
+            <AppHeader title="Global Federation" />
+            <div className="max-w-4xl mx-auto space-y-8 pb-24 px-4 pt-8">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
@@ -479,12 +482,12 @@ export default function FederationSettingsPage() {
                 </div>
             </div>
 
-            <Dialog open={Boolean(selectedActor)} onOpenChange={(open) => !open && setSelectedActor(null)}>
-                <DialogContent className="sm:max-w-xl">
-                    {selectedActor ? (
-                        <>
-                            <DialogHeader>
-                                <DialogTitle className="flex items-center gap-3">
+                <Dialog open={Boolean(selectedActor)} onOpenChange={(open) => !open && setSelectedActor(null)}>
+                    <DialogContent className="sm:max-w-xl">
+                        {selectedActor ? (
+                            <>
+                                <DialogHeader>
+                                    <DialogTitle className="flex items-center gap-3">
                                     <div className="relative h-12 w-12 overflow-hidden rounded-full border border-zinc-200 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800">
                                         {selectedActor.icon?.url ? (
                                             <Image src={selectedActor.icon.url} alt="" fill sizes="48px" className="object-cover" />
@@ -547,8 +550,9 @@ export default function FederationSettingsPage() {
                             </div>
                         </>
                     ) : null}
-                </DialogContent>
-            </Dialog>
+                    </DialogContent>
+                </Dialog>
+            </div>
         </div>
     );
 }

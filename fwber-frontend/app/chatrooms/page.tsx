@@ -8,7 +8,7 @@ import type { ChatroomFilters } from '@/lib/api/chatrooms';
 
 export default function ChatroomsPage() {
   const [activeTab, setActiveTab] = useState<'all' | 'nearby'>('all');
-  const [filters, setFilters] = useState<ChatroomFilters>({});
+  const [filters, setFilters] = useState<ChatroomFilters>({ ranking_strategy: 'trust-aware' });
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
@@ -62,11 +62,15 @@ export default function ChatroomsPage() {
 
   const displayChatrooms = activeTab === 'nearby' 
     ? nearbyChatrooms?.chatrooms 
-    : (showSearch ? searchResults?.data : chatrooms?.data);
-    
+    : (showSearch ? searchResults?.data : (chatrooms?.chatrooms ?? chatrooms?.data));
+     
   const isLoading = activeTab === 'nearby' 
     ? nearbyLoading 
     : (showSearch ? searchLoading : chatroomsLoading);
+
+  const chatroomRankingSummary = activeTab === 'all' && !showSearch
+    ? chatrooms?.meta?.ranking_strategy?.summary
+    : null;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -227,6 +231,15 @@ export default function ChatroomsPage() {
           </div>
         )}
 
+        {chatroomRankingSummary && (
+          <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+            <div className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-blue-700">
+              <span>Trust-aware chatroom ranking</span>
+            </div>
+            <p>{chatroomRankingSummary}</p>
+          </div>
+        )}
+
         {/* Chatrooms List */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200">
@@ -280,12 +293,42 @@ export default function ChatroomsPage() {
                             💎 {chatroom.token_entry_fee} Tokens
                           </span>
                         )}
+                        {'ranking_score' in chatroom && typeof chatroom.ranking_score === 'number' && (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                            Ranked {Math.round(chatroom.ranking_score)}
+                          </span>
+                        )}
                       </div>
-                      
+                       
                       {chatroom.description && (
                         <p className="text-gray-600 mb-3 line-clamp-2">{chatroom.description}</p>
                       )}
-                      
+
+                      {(chatroom.scene_signals?.matched_topics?.length || chatroom.scene_signals?.matched_tags?.length) ? (
+                        <div className="mb-3 flex flex-wrap gap-2">
+                          {chatroom.scene_signals?.matched_topics?.slice(0, 2).map((topic) => (
+                            <span
+                              key={topic.slug}
+                              className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-1 text-xs font-medium text-purple-700"
+                            >
+                              {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
+                            </span>
+                          ))}
+                          {chatroom.scene_signals?.matched_tags?.slice(0, 2).map((tag) => (
+                            <span
+                              key={tag}
+                              className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-1 text-xs font-medium text-blue-700"
+                            >
+                              #{tag}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+
+                      {chatroom.scene_signals?.headline && (
+                        <p className="mb-3 text-sm text-purple-700">{chatroom.scene_signals.headline}</p>
+                      )}
+                       
                       <div className="flex items-center gap-4 text-sm text-gray-500">
                         <span>👥 {chatroom.member_count || (chatroom as any).current_members} members</span>
                         <span>💬 {chatroom.message_count} messages</span>

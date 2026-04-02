@@ -88,7 +88,7 @@ const navLinks: NavItem[] = [
     { href: '/bulletin-boards', label: 'Boards', icon: Layout },
     { href: '/deals', label: 'Deals', icon: Tag },
     { href: '/bounties', label: 'Bounties', icon: Target },
-    { href: '/settings/federation', label: 'Global Federation', icon: Globe },
+    { href: '/federation', label: 'Global Federation', icon: Globe },
     { href: '/nearby', label: 'Nearby', icon: MapPin },
     { href: '/wingman', label: 'Arcade', icon: Gamepad2 },
     { href: '/merchant/dashboard', label: 'Merchant Hub', icon: Briefcase },

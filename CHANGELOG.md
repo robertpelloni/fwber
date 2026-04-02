@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.61] - 2026-04-02 — Trust-Aware Chatroom Ranking & Sidebar Shell Sweep
+
+### Fixed
+- Reworked chatroom browse discovery so the main chatroom directory can opt into the same privacy-safe trust-aware model already shipped across Local Pulse, recommendations, nearby chatrooms, events, bulletin boards, group matching, venues, nearby users, audio rooms, and deals, balancing trusted creators, scene alignment, community health, and freshness.
+- Added `ChatroomRankingService`, updated `ChatroomController` to return ranked browse metadata, and extended the frontend chatroom contract/page so ranked chatrooms surface high-level strategy copy, scene cues, and ranking scores without exposing private graph edges.
+- Added focused backend regression coverage proving chatrooms expose ranking metadata and that a trusted, scene-aligned room can outrank a busier generic room.
+- Moved the remaining requested discovery/community surfaces onto the shared `AppHeader` shell so the desktop left sidebar now appears consistently on groups, events, proximity chatrooms, conference pulse, date planner, audio rooms, burner bridge, bulletin boards, nearby, leaderboard, and federation.
+- Promoted `/federation` to the primary federation route, pointed the main nav there, and kept the existing settings federation page working behind the new primary entrypoint.
+
 ## [1.0.60] - 2026-04-02 — Trust-Aware Deal Ranking
 
 ### Fixed

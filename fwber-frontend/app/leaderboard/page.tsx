@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import AppHeader from '@/components/AppHeader'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { apiClient } from '@/lib/api/client'
 import VouchLeaderboard from '@/components/VouchLeaderboard'
@@ -44,13 +45,22 @@ export default function LeaderboardPage() {
     }
   }
 
-  if (loading) return <div className="p-8 text-center">Loading leaderboard...</div>
+  if (loading) return (
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <AppHeader title="Leaderboard" />
+        <div className="p-8 text-center">Loading leaderboard...</div>
+      </div>
+    </ProtectedRoute>
+  )
   if (!data) return null
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <AppHeader title="Leaderboard" />
+        <div className="py-8">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Community Leaderboard</h1>
             <button 
@@ -198,6 +208,7 @@ export default function LeaderboardPage() {
                 )}
               </div>
             </div>
+          </div>
           </div>
         </div>
       </div>

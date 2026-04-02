@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import AppHeader from '@/components/AppHeader';
 import { useAuth } from '@/lib/auth-context';
 import { useNearbyProximityChatrooms, useCreateProximityChatroom } from '@/lib/hooks/use-proximity-chatrooms';
 import { MapPin, Users, MessageCircle, Plus, Search, Filter, Map, Navigation, Compass } from 'lucide-react';
@@ -118,6 +119,8 @@ export default function ProximityChatroomsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <AppHeader title="Proximity Chatrooms" />
+
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

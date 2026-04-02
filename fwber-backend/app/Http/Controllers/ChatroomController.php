@@ -7,9 +7,11 @@ use App\Http\Requests\StoreChatroomRequest;
 use App\Http\Requests\UpdateChatroomRequest;
 use App\Models\Chatroom;
 use App\Models\User;
+use App\Services\ChatroomRankingService;
 use App\Services\ContentModerationService;
 use App\Services\TokenDistributionService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -21,10 +23,13 @@ class ChatroomController extends Controller
 
     protected $tokenService;
 
-    public function __construct(ContentModerationService $contentModeration, TokenDistributionService $tokenService)
+    protected $rankingService;
+
+    public function __construct(ContentModerationService $contentModeration, TokenDistributionService $tokenService, ChatroomRankingService $rankingService)
     {
         $this->contentModeration = $contentModeration;
         $this->tokenService = $tokenService;
+        $this->rankingService = $rankingService;
     }
 
     /**
@@ -57,6 +62,9 @@ class ChatroomController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        $rankingStrategy = $request->get('ranking_strategy', 'trust-aware');
+        $perPage = max(1, min(100, (int) $request->get('per_page', 20)));
+        $page = max(1, (int) $request->get('page', 1));
         $query = Chatroom::active()->public();
 
         // Filter by type
@@ -79,24 +87,51 @@ class ChatroomController extends Controller
             $query->where('name', 'like', '%'.$request->search.'%');
         }
 
-        // Sort by activity
         $sortBy = $request->get('sort', 'activity');
+
+        if ($rankingStrategy === 'trust-aware' && Auth::check()) {
+            $chatrooms = $query->with([
+                'creator:id,name,avatar_url',
+                'creator.profile:id,user_id,bio',
+                'recentMessages.user',
+            ])->get();
+
+            $chatrooms = $this->rankingService->rankBrowse(Auth::user(), $chatrooms, $sortBy);
+
+            $paginated = new LengthAwarePaginator(
+                $chatrooms->forPage($page, $perPage)->values(),
+                $chatrooms->count(),
+                $perPage,
+                $page,
+                [
+                    'path' => $request->url(),
+                    'query' => $request->query(),
+                ]
+            );
+
+            $payload = $paginated->toArray();
+            $payload['chatrooms'] = $payload['data'];
+            $payload['meta'] = array_merge($payload['meta'] ?? [], [
+                'ranking_strategy' => $this->rankingService->buildRankingStrategy(),
+            ]);
+
+            return response()->json($payload);
+        }
+
         switch ($sortBy) {
             case 'newest':
                 $query->orderBy('created_at', 'desc');
                 break;
-            case 'most_active':
-                $query->orderBy('last_activity_at', 'desc');
-                break;
             case 'most_members':
                 $query->orderBy('member_count', 'desc');
                 break;
+            case 'most_active':
             default:
                 $query->orderBy('last_activity_at', 'desc');
         }
 
         $chatrooms = $query->with(['creator', 'recentMessages.user'])
-            ->paginate(20);
+            ->paginate($perPage);
 
         return response()->json($chatrooms);
     }

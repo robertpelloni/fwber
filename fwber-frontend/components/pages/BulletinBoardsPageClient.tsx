@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import AppHeader from '@/components/AppHeader';
 import { useAuth } from '@/lib/auth-context';
 import { LocationCoords } from '@/lib/api/bulletin-boards';
 import { useRouter } from 'next/navigation';
@@ -105,10 +106,13 @@ export default function BulletinBoardsPageClient() {
 
   if (boardsLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading bulletin boards...</p>
+      <div className="min-h-screen bg-gray-50">
+        <AppHeader title="Bulletin Boards" />
+        <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading bulletin boards...</p>
+          </div>
         </div>
       </div>
     );
@@ -116,16 +120,19 @@ export default function BulletinBoardsPageClient() {
 
   if (boardsError) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-red-600 text-xl mb-4">⚠️</div>
-          <p className="text-red-600 mb-4">Failed to load bulletin boards</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            Retry
-          </button>
+      <div className="min-h-screen bg-gray-50">
+        <AppHeader title="Bulletin Boards" />
+        <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
+          <div className="text-center">
+            <div className="text-red-600 text-xl mb-4">⚠️</div>
+            <p className="text-red-600 mb-4">Failed to load bulletin boards</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              Retry
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -133,6 +140,7 @@ export default function BulletinBoardsPageClient() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <AppHeader title="Bulletin Boards" />
       <div className="max-w-4xl mx-auto p-4">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">

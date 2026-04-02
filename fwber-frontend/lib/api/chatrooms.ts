@@ -21,7 +21,20 @@ export interface Chatroom {
     id: number;
     name: string;
     email: string;
+    avatar_url?: string | null;
   };
+  ranking_score?: number;
+  scene_signals?: {
+    headline?: string | null;
+    matched_topics: Array<{
+      id: number;
+      slug: string;
+      label: string;
+      emoji?: string | null;
+    }>;
+    matched_tags: string[];
+    score_boost: number;
+  } | null;
   recent_messages?: ChatroomMessage[];
   members?: ChatroomMember[];
   url: string;
@@ -126,7 +139,8 @@ export interface ChatroomFilters {
   category?: string;
   city?: string;
   search?: string;
-  sort?: 'newest' | 'most_active' | 'most_members';
+  sort?: 'activity' | 'newest' | 'most_active' | 'most_members';
+  ranking_strategy?: 'trust-aware' | 'activity';
 }
 
 export interface MessageFilters {
@@ -138,10 +152,20 @@ export interface MessageFilters {
 
 export interface ChatroomResponse {
   data: Chatroom[];
+  chatrooms?: Chatroom[];
   current_page: number;
   last_page: number;
   per_page: number;
   total: number;
+  meta?: {
+    ranking_strategy?: {
+      trusted_creators: boolean;
+      scene_alignment: boolean;
+      community_health: boolean;
+      freshness: boolean;
+      summary: string;
+    };
+  };
 }
 
 export interface MessageResponse {
@@ -171,6 +195,7 @@ export async function getChatrooms(filters: ChatroomFilters = {}): Promise<Chatr
   if (filters.city) params.append('city', filters.city);
   if (filters.search) params.append('search', filters.search);
   if (filters.sort) params.append('sort', filters.sort);
+  if (filters.ranking_strategy) params.append('ranking_strategy', filters.ranking_strategy);
 
   const response = await apiClient.get<ChatroomResponse>(`/chatrooms?${params.toString()}`);
   return response.data;

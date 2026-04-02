@@ -2,6 +2,7 @@
 
 import { useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import AppHeader from '@/components/AppHeader';
 import { useAuth } from '@/lib/auth-context';
 import { useDateIdeas } from '@/lib/hooks/use-date-planner';
 import {
@@ -315,7 +316,10 @@ function DatePlannerContent() {
         }
       `}</style>
 
-            <div className="dp-page">
+            <div className="min-h-screen bg-gray-950">
+                <AppHeader title="Date Planner" />
+
+                <div className="dp-page">
                 <div className="dp-container">
                     <div className="dp-header">
                         <h1>🗓️ AI Date Planner</h1>
@@ -389,6 +393,7 @@ function DatePlannerContent() {
                             <p>No ideas generated yet. Try entering a location for better results.</p>
                         </div>
                     ) : null}
+                </div>
                 </div>
             </div>
         </>

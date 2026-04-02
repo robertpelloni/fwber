@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import QRCode from 'react-qr-code';
+import AppHeader from '@/components/AppHeader';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -69,48 +70,52 @@ export default function BurnerGeneratorPage() {
     };
 
     return (
-        <div className="container max-w-lg mx-auto py-8 px-4">
-            <Card className="border-border">
-                <CardHeader className="text-center">
-                    <SmartphoneNfc className="w-12 h-12 text-primary mx-auto mb-2" />
-                    <CardTitle className="text-2xl font-bold">Burner Bridge</CardTitle>
-                    <CardDescription>
-                        Show this QR code to instantly spin up a temporary 24-hour anonymous chatroom with someone IRL.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="flex flex-col items-center space-y-6">
-                    {loading ? (
-                        <Skeleton className="w-64 h-64 rounded-xl" />
-                    ) : error ? (
-                        <div className="text-destructive text-center p-4 bg-destructive/10 rounded-lg">
-                            {error}
-                        </div>
-                    ) : burnerData ? (
-                        <div className="flex flex-col items-center space-y-6">
-                            <div className="p-4 bg-white rounded-xl shadow-inner">
-                                <QRCode
-                                    value={burnerData.url}
-                                    size={256}
-                                    level="H"
-                                    className="rounded-lg"
-                                />
-                            </div>
-                            <div className="text-sm text-muted-foreground text-center">
-                                Valid until {new Date(burnerData.expires_at).toLocaleString()}
-                            </div>
+        <div className="min-h-screen bg-background">
+            <AppHeader title="Burner Bridge" />
 
-                            <div className="flex w-full space-x-2">
-                                <Button variant="outline" className="flex-1 gap-2" onClick={copyLink}>
-                                    <Copy className="w-4 h-4" /> Copy Link
-                                </Button>
-                                <Button variant="secondary" className="flex-1 gap-2" onClick={generateLink}>
-                                    <RefreshCw className="w-4 h-4" /> Regenerate
-                                </Button>
+            <div className="container mx-auto max-w-lg px-4 py-8">
+                <Card className="border-border">
+                    <CardHeader className="text-center">
+                        <SmartphoneNfc className="mx-auto mb-2 h-12 w-12 text-primary" />
+                        <CardTitle className="text-2xl font-bold">Burner Bridge</CardTitle>
+                        <CardDescription>
+                            Show this QR code to instantly spin up a temporary 24-hour anonymous chatroom with someone IRL.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex flex-col items-center space-y-6">
+                        {loading ? (
+                            <Skeleton className="h-64 w-64 rounded-xl" />
+                        ) : error ? (
+                            <div className="rounded-lg bg-destructive/10 p-4 text-center text-destructive">
+                                {error}
                             </div>
-                        </div>
-                    ) : null}
-                </CardContent>
-            </Card>
+                        ) : burnerData ? (
+                            <div className="flex flex-col items-center space-y-6">
+                                <div className="rounded-xl bg-white p-4 shadow-inner">
+                                    <QRCode
+                                        value={burnerData.url}
+                                        size={256}
+                                        level="H"
+                                        className="rounded-lg"
+                                    />
+                                </div>
+                                <div className="text-center text-sm text-muted-foreground">
+                                    Valid until {new Date(burnerData.expires_at).toLocaleString()}
+                                </div>
+
+                                <div className="flex w-full space-x-2">
+                                    <Button variant="outline" className="flex-1 gap-2" onClick={copyLink}>
+                                        <Copy className="w-4 h-4" /> Copy Link
+                                    </Button>
+                                    <Button variant="secondary" className="flex-1 gap-2" onClick={generateLink}>
+                                        <RefreshCw className="w-4 h-4" /> Regenerate
+                                    </Button>
+                                </div>
+                            </div>
+                        ) : null}
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     );
 }

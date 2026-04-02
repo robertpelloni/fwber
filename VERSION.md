@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.60`
+- **Current version:** `1.0.61`
 - **Release date:** `2026-04-02`
-- **Release name:** `Trust-Aware Deal Ranking`
+- **Release name:** `Trust-Aware Chatroom Ranking & Sidebar Shell Sweep`
 
 ## Summary
 
-This release extends the privacy-safe trust-aware discovery model from Local Pulse, recommendations, nearby chatrooms, events, bulletin boards, group matching, venues, nearby users, and audio rooms into nearby deals, ranking promotions with trusted merchants, scene alignment, deal health, freshness, and distance while keeping private graph edges out of the API payload.
+This release extends the privacy-safe trust-aware discovery model into the main chatroom browse directory and finishes the requested shared `AppHeader` sidebar shell rollout across the remaining community and discovery pages, including the new primary `/federation` route.
 
 ## Version Sources of Truth
 

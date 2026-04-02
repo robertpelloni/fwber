@@ -1,5 +1,6 @@
 'use client'
 
+import AppHeader from '@/components/AppHeader'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { useAuth } from '@/lib/auth-context'
 import { useEffect, useState, useMemo } from 'react'
@@ -117,32 +118,44 @@ export default function NearbyPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
-      </div>
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+          <AppHeader title="Nearby" />
+          <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+          </div>
+        </div>
+      </ProtectedRoute>
     )
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-red-500">
-        <div className="text-center">
-          <p className="text-xl mb-4">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Try Again
-          </button>
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+          <AppHeader title="Nearby" />
+          <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center text-red-500">
+            <div className="text-center">
+              <p className="text-xl mb-4">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Try Again
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      </ProtectedRoute>
     )
   }
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-6xl mx-auto">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+        <AppHeader title="Nearby" />
+        <div className="p-8">
+          <div className="max-w-6xl mx-auto">
           <div className="bg-white rounded-lg shadow-md p-8 mb-6">
             {/* Header with Real-time Status */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -349,6 +362,7 @@ export default function NearbyPage() {
                 Found {nearbyUsers.length} people within {radius}m of your location
               </p>
             </div>
+          </div>
           </div>
         </div>
       </div>
