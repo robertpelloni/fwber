@@ -84,3 +84,16 @@ export async function incrementRetryCount(id: number): Promise<void> {
         store.put(message);
     }
 }
+
+export function getLastSyncAt(): string | null {
+    if (typeof window !== 'undefined') {
+        return localStorage.getItem('fwber_last_chat_sync');
+    }
+    return null;
+}
+
+export function setLastSyncAt(isoString: string): void {
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('fwber_last_chat_sync', isoString);
+    }
+}

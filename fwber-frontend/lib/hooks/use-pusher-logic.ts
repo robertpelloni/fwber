@@ -76,6 +76,29 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
   useEffect(() => { encryptRef.current = encrypt; }, [encrypt]);
   useEffect(() => { isE2EReadyRef.current = isE2EReady; }, [isE2EReady]);
 
+  const injectMissedMessages = useCallback((missedMessages: any[]) => {
+    setChatMessages((prev) => {
+      const existingIds = new Set(prev.map(m => m.id || m.message_id));
+      const newMessages = missedMessages
+        .filter(m => !existingIds.has(m.id))
+        .map(m => ({
+          ...m,
+          from_user_id: String(m.sender_id),
+          to_user_id: String(m.receiver_id || user?.id),
+          timestamp: m.sent_at,
+          status: 'delivered'
+        }));
+        
+      if (newMessages.length === 0) return prev;
+      
+      const merged = [...prev, ...newMessages].sort((a, b) => 
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      );
+      
+      return merged;
+    });
+  }, [user?.id]);
+
   const handleMessage = async (data: any) => {
     logWebSocket.messageReceived(data.type || 'pusher_message', data.from_user_id || 'unknown');
 
@@ -384,6 +407,7 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
     updatePresence,
     sendNotification,
     loadConversationHistory,
+    injectMissedMessages,
     clearMessages,
     clearNotifications,
     isReady: !status.connecting,
@@ -409,6 +433,7 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
     updatePresence,
     sendNotification,
     loadConversationHistory,
+    injectMissedMessages,
     clearMessages,
     clearNotifications
   ]);

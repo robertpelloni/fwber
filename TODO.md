@@ -34,7 +34,7 @@
 
 ## 🟢 Medium: Robustness & Refactoring
 - [ ] **Event Sourcing Audit**: Review all `EventStore::append` calls to ensure aggregate IDs are strictly cast to strings and that no integer-to-string database constraint errors exist.
-- [ ] **Offline Sync Conflict Resolution**: Enhance `use-chat-sync.ts` to handle complex CRDT conflict resolution when merging offline messages with server state.
+- [x] **Offline Sync Conflict Resolution**: Enhance `use-chat-sync.ts` to handle complex CRDT conflict resolution when merging offline messages with server state.
 - [ ] **Rust Geo-Screener Integration**: Transition the PHP `LocationController` to offload dense spatial queries to the `fwber-geo` Rust microservice.
 
 ## ⚪ Low: Technical Debt & Documentation
@@ -43,6 +43,7 @@
 - [ ] Ensure all new API endpoints are fully documented with Swagger/OpenAPI annotations.
 
 ## ✅ Recently Completed
+- [x] **Offline Sync CRDT Integration**: Upgraded the `useChatSync.ts` basic retry queue to a full CRDT batching system sending `last_sync_at` (logical clock) to the new `POST /messages/sync-batch` endpoint.
 - [x] **AI Wingman Chat Interface Integration**: Wired up the `compatibilityAudit`, `findNemesis`, and `predictFortune` backend endpoints into a comprehensive, animated `WingmanDashboardModal` accessible directly from the `RealTimeChat` header.
 - [x] **Hardware Token UI Polish**: Replaced the static token settings with an interactive ping test simulating a BLE vibration payload.
 - [x] **ActivityPub Signed Outbound Delivery**: Added a dedicated ActivityPub keypair service, widened `user_public_keys` for multiple key types, exposed real actor public keys, and replaced mocked outbound follow dispatch with signed remote inbox delivery.

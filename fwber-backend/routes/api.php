@@ -335,6 +335,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Direct Messages
     Route::get('messages/unread-count', [\App\Http\Controllers\MessageController::class, 'unreadCount']);
+    Route::post('messages/sync-batch', [\App\Http\Controllers\MessageController::class, 'syncBatch'])->middleware('throttle:messaging');
     Route::post('messages', [\App\Http\Controllers\MessageController::class, 'store'])->middleware('throttle:messaging');
     Route::post('messages/translate', [\App\Http\Controllers\TranslationController::class, 'translate'])->middleware('throttle:content_generation');
     Route::get('messages/{userId}', [\App\Http\Controllers\MessageController::class, 'index']);

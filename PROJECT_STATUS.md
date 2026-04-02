@@ -1,10 +1,15 @@
-# Project Status — fwber v1.0.75 (AI Wingman & Agent Auto-Execution)
+# Project Status — fwber v1.0.76 (Offline CRDT Batch Sync)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.75 "AI Wingman & Agent Auto-Execution"
+**Version:** 1.0.76 "Offline CRDT Batch Sync"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
+
+## Offline CRDT Batch Sync & Logical Clocks
+- **Batch Sync Controller:** Created `MessageController::syncBatch` which consumes arrays of offline messages, verifies UUID idempotency, records historical dates, inserts the `MessageSent` events at their proper `created_at` timestamp, and updates the local Match. 
+- **Logical Timestamp Tracking:** The `fwber-frontend` now maintains a `fwber_last_chat_sync` logical timestamp. `useChatSync.ts` queries the backend since the last sync time and receives any server-side messages the user missed while offline.
+- **WebSocket Reconnection Injection:** Built `injectMissedMessages` inside `usePusherLogic.ts` that safely sorts incoming batch updates against live chat arrays without duplicating UUIDs.
 
 ## AI Wingman Chat Dashboard & Hardware UI
 - **AI Wingman tools are directly accessible in chat:** Replaced the plain ice-breaker suggestions with a full `WingmanDashboardModal` inside `RealTimeChat.tsx`. Users can now directly request an honest compatibility audit, a nemesis profile, or an astrological fortune read from the match context.
@@ -40,6 +45,10 @@
 - **Billing validation from the previous slice remains the current premium reference path**: `php artisan test tests\Feature\PremiumControllerTest.php tests\Feature\StripeWebhookTest.php`, plus frontend `npm run lint`, `npm run type-check`, and `cmd /c "npm run build"`, already passed for `v1.0.71`.
 
 ## ✅ Release Focus
+- [x] Create `POST /api/messages/sync-batch`.
+- [x] Deduplicate offline messages by UUID.
+- [x] Fetch missed server messages since `last_sync_at`.
+- [x] Inject missed offline messages via `use-chat-sync.ts`.
 - [x] Integrate `compatibilityAudit` into the chat UI.
 - [x] Integrate `findNemesis` into the chat UI.
 - [x] Integrate `predictFortune` into the chat UI.

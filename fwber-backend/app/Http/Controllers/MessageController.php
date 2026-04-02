@@ -561,4 +561,122 @@ class MessageController extends Controller
             'id' => $message->id,
         ], 201);
     }
+
+    /**
+     * CRDT-based Offline Batch Sync
+     *
+     * Accepts a batch of pending offline messages and deletions from the client.
+     * Reconciles them securely, appends them to the event store, and returns
+     * any server-side messages the client missed since their last sync timestamp.
+     */
+    public function syncBatch(Request $request): JsonResponse
+    {
+        $senderId = Auth::id();
+        $validated = $request->validate([
+            'last_sync_at' => 'nullable|date',
+            'messages' => 'array',
+            'messages.*.uuid' => 'required|uuid',
+            'messages.*.recipient_id' => 'required|exists:users,id',
+            'messages.*.content' => 'required|string',
+            'messages.*.type' => 'required|string',
+            'messages.*.is_encrypted' => 'required|boolean',
+            'messages.*.created_at' => 'required|date',
+        ]);
+
+        $syncedIds = [];
+        $failedUuids = [];
+        $messages = $validated['messages'] ?? [];
+        $lastSyncAt = $validated['last_sync_at'] ?? null;
+
+        // Group messages by recipient to optimize match lookups
+        $groupedByRecipient = collect($messages)->groupBy('recipient_id');
+        
+        foreach ($groupedByRecipient as $receiverId => $userMessages) {
+            // Verify relationship once per recipient
+            $match = UserMatch::where(function ($query) use ($senderId, $receiverId) {
+                $query->where('user1_id', $senderId)->where('user2_id', $receiverId)
+                    ->orWhere('user1_id', $receiverId)->where('user2_id', $senderId);
+            })->where('is_active', true)->first();
+
+            if (! $match) {
+                foreach ($userMessages as $msg) {
+                    $failedUuids[] = ['uuid' => $msg['uuid'], 'reason' => 'No active match'];
+                }
+                continue;
+            }
+
+            // Get current aggregate version for the event store
+            $currentVersion = $this->eventStore->getCurrentVersion((string) $match->id, 'Chatroom');
+
+            foreach ($userMessages as $msg) {
+                // Idempotency: Check if this message UUID already exists
+                $existing = Message::where('uuid', $msg['uuid'])->first();
+                if ($existing) {
+                    $syncedIds[] = $msg['uuid'];
+                    continue;
+                }
+
+                // Insert historical message
+                $messageModel = Message::create([
+                    'uuid' => $msg['uuid'],
+                    'sender_id' => $senderId,
+                    'receiver_id' => $receiverId,
+                    'content' => $msg['content'],
+                    'message_type' => $msg['type'],
+                    'is_encrypted' => $msg['is_encrypted'],
+                    'sent_at' => $msg['created_at'],
+                ]);
+
+                // Append historical event
+                $currentVersion++;
+                $event = new MessageSent(
+                    (string) $match->id,
+                    (int) $senderId,
+                    (int) $receiverId,
+                    (string) $msg['content'],
+                    (string) $msg['type'],
+                    json_encode(['message_id' => $messageModel->id, 'is_batch_sync' => true, 'client_uuid' => $msg['uuid']])
+                );
+                
+                try {
+                    $this->eventStore->append($event, 'Chatroom', $currentVersion, ['ip' => $request->ip()]);
+                    $syncedIds[] = $msg['uuid'];
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error("Failed to append offline message event", ['uuid' => $msg['uuid'], 'error' => $e->getMessage()]);
+                    $failedUuids[] = ['uuid' => $msg['uuid'], 'reason' => 'Event sourcing conflict'];
+                }
+            }
+
+            // Update match last activity
+            $match->update(['last_message_at' => now()]);
+        }
+
+        // Fetch missed messages from the server since last sync
+        $missedMessages = [];
+        if ($lastSyncAt) {
+            $missedMessages = Message::where('receiver_id', $senderId)
+                ->where('sent_at', '>', $lastSyncAt)
+                ->orderBy('sent_at', 'asc')
+                ->get()
+                ->map(function($m) {
+                    return [
+                        'id' => $m->id,
+                        'uuid' => $m->uuid,
+                        'sender_id' => $m->sender_id,
+                        'content' => $m->content,
+                        'type' => $m->message_type,
+                        'is_encrypted' => $m->is_encrypted,
+                        'sent_at' => $m->sent_at,
+                    ];
+                });
+        }
+
+        return response()->json([
+            'success' => true,
+            'synced_uuids' => $syncedIds,
+            'failed_uuids' => $failedUuids,
+            'missed_messages' => $missedMessages,
+            'server_time' => now()->toIso8601String(),
+        ]);
+    }
 }
