@@ -9,9 +9,11 @@ use App\Http\Requests\UpdateLocationPrivacyRequest;
 use App\Http\Requests\UpdateLocationRequest;
 use App\Models\UserLocation;
 use App\Services\GeoScreenerService;
+use App\Services\NearbyUserRankingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * Location Controller - Real-time Location Tracking API
@@ -26,7 +28,8 @@ class LocationController extends Controller
 {
     public function __construct(
         private readonly EventStore $eventStore,
-        private readonly GeoScreenerService $geoScreener
+        private readonly GeoScreenerService $geoScreener,
+        private readonly NearbyUserRankingService $nearbyUserRankingService,
     ) {}
 
     /**
@@ -209,6 +212,7 @@ class LocationController extends Controller
             $longitude = $validated['longitude'];
             $radius = $validated['radius'] ?? 1000; // Default 1km
             $limit = $validated['limit'] ?? 20; // Default 20 users
+            $rankingStrategy = $validated['ranking_strategy'] ?? 'distance';
 
             // --- RUST GEO-SCREENER OFFloading ---
             $candidateIds = $this->geoScreener->getNearbyUserIds($latitude, $longitude, $radius);
@@ -216,7 +220,7 @@ class LocationController extends Controller
 
             // Get nearby users based on privacy settings
             $query = UserLocation::active()
-                ->with(['user.profile'])
+                ->with(['user.profile', 'user.groups'])
                 ->where('user_id', '!=', $user->id); // Exclude current user
 
             if ($candidateIds !== null) {
@@ -266,6 +270,15 @@ class LocationController extends Controller
                 ->limit($limit)
                 ->get();
 
+            if ($rankingStrategy === 'trust-aware') {
+                $nearbyUsers = $this->nearbyUserRankingService->rankNearby(
+                    $user,
+                    $nearbyUsers,
+                    (float) $latitude,
+                    (float) $longitude
+                );
+            }
+
             // Format response data
             $formattedUsers = $nearbyUsers->map(function ($location) {
                 return [
@@ -278,10 +291,14 @@ class LocationController extends Controller
                         'longitude' => $location->longitude,
                         'accuracy' => $location->accuracy,
                         'distance' => $location->formatted_distance,
+                        'distance_meters' => isset($location->distance_meters) ? (int) $location->distance_meters : null,
                         'last_updated' => $location->last_updated,
                     ],
                     'privacy_level' => $location->privacy_level,
                     'is_recent' => $location->isRecent(),
+                    'distance_meters' => isset($location->distance_meters) ? (int) $location->distance_meters : null,
+                    'ranking_score' => isset($location->ranking_score) ? (float) $location->ranking_score : null,
+                    'scene_signals' => $location->scene_signals ?? null,
                 ];
             });
 
@@ -291,6 +308,9 @@ class LocationController extends Controller
                 'meta' => [
                     'total' => $formattedUsers->count(),
                     'radius' => $radius,
+                    'ranking_strategy' => $rankingStrategy === 'trust-aware'
+                        ? $this->nearbyUserRankingService->buildRankingStrategy()
+                        : null,
                     'center' => [
                         'latitude' => $latitude,
                         'longitude' => $longitude,
@@ -298,7 +318,7 @@ class LocationController extends Controller
                 ],
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             Log::error('Nearby users error', [
                 'user_id' => auth()->id(),
                 'error' => $e->getMessage(),

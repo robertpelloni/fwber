@@ -1,24 +1,24 @@
-# Handoff — Trust-Aware Nearby Venue Ranking
+# Handoff — Trust-Aware Nearby User Ranking
 
 **Date:** 2026-04-02  
 **Status:** ✅ Local release verified  
-**Version:** 1.0.57
+**Version:** 1.0.58
 
 ## Overview
-This cycle moved nearby venue discovery onto the same privacy-safe trust-aware ranking model already established in Local Pulse, recommendations, nearby chatrooms, events, bulletin boards, and group matching. Venue results now balance trusted recent visitors, scene alignment, venue health, freshness, and distance while still keeping friendships, relationship links, and shared-circle membership internal to scoring rather than exposing them as payload details. The implementation deliberately reuses the same topic/scene graph and existing privacy/trust helpers already established across matches, profiles, journals, relationship links, Local Pulse, recommendations, nearby chatrooms, events, bulletin boards, group matching, and venue discovery.
+This cycle moved nearby people discovery onto the same privacy-safe trust-aware ranking model already established in Local Pulse, recommendations, nearby chatrooms, events, bulletin boards, group matching, and venues. Nearby user results now balance trusted connections, scene alignment, activity recency, and distance while still keeping friendships, relationship links, and shared-circle membership internal to scoring rather than exposing them as payload details. The implementation deliberately reuses the same topic/scene graph and existing privacy/trust helpers already established across matches, profiles, journals, relationship links, Local Pulse, recommendations, nearby chatrooms, events, bulletin boards, group matching, venues, and nearby-person discovery.
 
 ## Shipped Baseline
-- **Latest pushed code release:** `v1.0.57`
+- **Latest pushed code release:** `v1.0.58`
 - **Previous baseline before this slice:** `v1.0.50`
 - **Primary working checkout:** `C:\Users\hyper\.copilot\session-state\44f0d726-859c-45b4-aae1-b7f7a064bccf\files\fwber-live-fix`
 - **Root workspace rule:** treat `C:\Users\hyper\workspace\fwber` as effectively read-only during safe recovery/release work
 
 ## What Was Completed
-1. **Trust-Aware Nearby Venue Ranking (`v1.0.57`)**
-   - Added `VenueRankingService` to rank `GET /api/venues` results with the same privacy-safe trust map already used by Local Pulse, recommendations, nearby chatrooms, events, bulletin boards, and group matching.
-   - Reused `LocalPulseRankingService` for trust scoring and `AIMatchingService` for scene-signal enrichment so nearby venue discovery now reflects trusted recent visitors, scene alignment, venue health, freshness, and distance.
-   - Stabilized the venues response contract with `data`, `venues`, and `meta.ranking_strategy` so the venues UI consumes one ranked shape consistently.
-   - Added focused regression coverage proving nearby venues expose ranking metadata and that a trusted, scene-aligned venue can outrank a slightly closer stranger venue.
+1. **Trust-Aware Nearby User Ranking (`v1.0.58`)**
+   - Added `NearbyUserRankingService` to rank `GET /api/location/nearby` results with the same privacy-safe trust map already used by Local Pulse, recommendations, nearby chatrooms, events, bulletin boards, group matching, and venues.
+   - Reused `LocalPulseRankingService` for trust scoring and `AIMatchingService` for scene-signal enrichment so nearby people discovery now reflects trusted connections, scene alignment, activity recency, and distance.
+   - Extended the nearby users response contract with ranked `data` plus high-level `meta.ranking_strategy` metadata, scene cues, and ranking scores so the nearby UI consumes one ranked shape consistently.
+   - Added focused regression coverage proving nearby users expose ranking metadata and that a trusted, scene-aligned person can outrank a slightly closer stranger.
 2. **Previously Shipped Scene Discovery Stack**
     - `v1.0.47`: matches + profiles
     - `v1.0.48`: recommendations
@@ -40,13 +40,14 @@ This cycle moved nearby venue discovery onto the same privacy-safe trust-aware r
     - bulletin board ranking
     - group matching ranking
     - venue ranking
+    - nearby user ranking
     - Local Pulse cards
     - Local Pulse ranking
 - **The safest trust-aware ranking design is internal scoring, not richer payload graph data.**
   - Friendship, confirmed relationship links, and shared active circles are now used only as server-side ranking inputs.
   - The feed explains ranking strategy at a high level without serializing private relationship context.
 - **Trust-aware discovery is still intentionally incomplete.**
-  - Local Pulse, recommendations, nearby chatroom ranking, event ranking, bulletin board ranking, group matching ranking, and venue ranking now use privacy-safe trust signals, but other local-feed and discovery loops still do not.
+  - Local Pulse, recommendations, nearby chatroom ranking, event ranking, bulletin board ranking, group matching ranking, venue ranking, and nearby-user ranking now use privacy-safe trust signals, but other local-feed and discovery loops still do not.
   - Future work should extend the same pattern into the remaining discovery surfaces without exposing private edges in API payloads.
 - **A real backend bug was found during Local Pulse work.**
   - `ProximityArtifactController` still referenced `date_of_birth` in the nearby-candidate path.
@@ -59,17 +60,16 @@ This cycle moved nearby venue discovery onto the same privacy-safe trust-aware r
 
 ## Key Files Modified
 - `fwber-backend/app/Services/LocalPulseRankingService.php`
-- `fwber-backend/app/Services/VenueRankingService.php`
-- `fwber-backend/app/Http/Controllers/VenueController.php`
-- `fwber-backend/app/Http/Requests/VenueSearchRequest.php`
-- `fwber-backend/app/Models/Venue.php`
-- `fwber-backend/tests/Feature/VenueRankingTest.php`
-- `fwber-backend/tests/Feature/VenueControllerTest.php`
-- `fwber-backend/tests/Feature/VenueCheckinControllerTest.php`
+- `fwber-backend/app/Services/NearbyUserRankingService.php`
+- `fwber-backend/app/Http/Controllers/LocationController.php`
+- `fwber-backend/app/Http/Requests/GetNearbyUsersRequest.php`
+- `fwber-backend/app/Models/UserLocation.php`
+- `fwber-backend/tests/Feature/NearbyUsersRankingTest.php`
+- `fwber-backend/tests/Feature/LocationControllerTest.php`
 - `fwber-backend/app/Services/AIMatchingService.php`
 - `fwber-backend/app/Services/LocalPulseRankingService.php`
-- `fwber-frontend/app/venues/page.tsx`
-- `fwber-frontend/lib/api/venues.ts`
+- `fwber-frontend/app/nearby/page.tsx`
+- `fwber-frontend/lib/api/location.ts`
 - `VERSION`
 - `package.json`
 - `fwber-frontend/package.json`
@@ -82,7 +82,7 @@ This cycle moved nearby venue discovery onto the same privacy-safe trust-aware r
 
 ## Validation Workflow That Proved Reliable
 - **Backend**
-  - `php artisan test tests/Feature/VenueControllerTest.php tests/Feature/VenueCheckinControllerTest.php tests/Feature/VenueRankingTest.php`
+  - `php artisan test tests/Feature/LocationControllerTest.php tests/Feature/NearbyUsersRankingTest.php`
 - **Frontend**
   1. `npm run lint`
   2. clean `npm run build`
@@ -96,17 +96,17 @@ This cycle moved nearby venue discovery onto the same privacy-safe trust-aware r
 
 ## Notes / Risks
 - The repo still has the known `.next` / `.next/types` contention when overlapping Next jobs hit the same checkout; direct shell builds can fail after successful compilation with missing build artifacts like `pages-manifest.json` or `_document.js`.
-- Scene discovery now affects matches, profiles, recommendation cards, recommendation ranking, nearby chatroom ranking, event ranking, bulletin board ranking, group matching ranking, venue ranking, Local Pulse card metadata, and Local Pulse ranking, but it still does not reshape every remaining local-feed surface.
+- Scene discovery now affects matches, profiles, recommendation cards, recommendation ranking, nearby chatroom ranking, event ranking, bulletin board ranking, group matching ranking, venue ranking, nearby-user ranking, Local Pulse card metadata, and Local Pulse ranking, but it still does not reshape every remaining local-feed surface.
 - Merchant lifecycle tooling, ActivityPub UI, and AI Wingman frontend wiring remain large unfinished areas compared with the more cohesive scene-discovery track.
 - The safe-checkout workflow is still important because the environment is shared and the root repository may contain unrelated or user-owned changes.
 
 ## Next Recommended Slice
-1. Extend the same privacy-safe trust-aware scoring model from Local Pulse, recommendations, nearby chatrooms, event ranking, bulletin board ranking, group matching ranking, and venue ranking into the remaining local-feed and discovery loops.
+1. Extend the same privacy-safe trust-aware scoring model from Local Pulse, recommendations, nearby chatrooms, event ranking, bulletin board ranking, group matching ranking, venue ranking, and nearby-user ranking into the remaining local-feed and discovery loops.
 2. Fold relationship links, friend/circle visibility, and topic follows into a richer trust-aware discovery model without leaking private graph edges.
 3. Keep building on the topic graph rather than adding a second parallel taxonomy system.
 
 ## Suggested Resume Procedure
-1. Start from `origin/copilot-live-fix` after `v1.0.57`.
+1. Start from `origin/copilot-live-fix` after `v1.0.58`.
 2. Re-read `HANDOFF.md`, `PROJECT_STATUS.md`, `ROADMAP.md`, `TODO.md`, and the session `plan.md`.
 3. Stay in the session-state checkout and avoid changing the root workspace copy.
 4. Create a new SQL todo for the next slice before implementing.

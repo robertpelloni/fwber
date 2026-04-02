@@ -11,7 +11,7 @@ import {
   OnlineUsersList
 } from '@/components/realtime/PresenceComponents'
 import { ProximityPresenceView } from '@/components/realtime/ProximityPresenceView'
-import { MapPin, Users, RefreshCw, Wifi } from 'lucide-react'
+import { MapPin, Users, RefreshCw, Wifi, Sparkles } from 'lucide-react'
 
 export default function NearbyPage() {
   const { token, logout } = useAuth()
@@ -19,6 +19,7 @@ export default function NearbyPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null)
+  const [rankingSummary, setRankingSummary] = useState<string | null>(null)
   const [radius, setRadius] = useState(1000) // 1km default
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -30,7 +31,7 @@ export default function NearbyPage() {
   const proximityUsers = useMemo(() => nearbyUsers.map(u => ({
     id: String(u.id),
     displayName: u.display_name,
-    distance: parseFloat(u.location.distance.replace(/[^\d.]/g, '')) / 1000, // Convert to km
+    distance: ((u.distance_meters ?? u.location.distance_meters ?? parseFloat(u.location.distance.replace(/[^\d.]/g, '')) * (u.location.distance.includes('km') ? 1000 : 1)) || 0) / 1000,
   })), [nearbyUsers])
 
   useEffect(() => {
@@ -58,9 +59,11 @@ export default function NearbyPage() {
           longitude: location.longitude,
           radius: radius,
           limit: 50,
+          ranking_strategy: 'trust-aware',
         })
         
         setNearbyUsers(response.data)
+        setRankingSummary(response.meta?.ranking_strategy?.summary ?? null)
         setError(null)
       } catch (err: any) {
         console.error('Failed to fetch nearby users:', err)
@@ -90,8 +93,10 @@ export default function NearbyPage() {
           longitude: userLocation.longitude,
           radius: radius,
           limit: 50,
+          ranking_strategy: 'trust-aware',
         })
         setNearbyUsers(response.data)
+        setRankingSummary(response.meta?.ranking_strategy?.summary ?? null)
       } catch (err) {
         console.error('Failed to refresh:', err)
       }
@@ -209,6 +214,16 @@ export default function NearbyPage() {
               </div>
             </div>
 
+            {rankingSummary && (
+              <div className="mb-6 rounded-xl border border-purple-200 bg-purple-50 px-4 py-3 text-sm text-purple-900">
+                <div className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-purple-700">
+                  <Sparkles className="h-4 w-4" />
+                  <span>Trust-aware nearby ranking</span>
+                </div>
+                <p>{rankingSummary}</p>
+              </div>
+            )}
+
             {nearbyUsers.length === 0 ? (
               <div className="text-center py-12">
                 <div className="text-gray-400 text-6xl mb-4">📍</div>
@@ -266,6 +281,39 @@ export default function NearbyPage() {
                           {user.is_recent ? 'Active' : 'Inactive'}
                         </span>
                       </div>
+
+                      {typeof user.ranking_score === 'number' && (
+                        <div className="mb-3 inline-flex rounded-full bg-purple-100 px-2.5 py-1 text-xs font-medium text-purple-800">
+                          Ranked {Math.round(user.ranking_score)}
+                        </div>
+                      )}
+
+                      {user.scene_signals?.headline && (
+                        <p className="mb-3 text-sm text-purple-800">
+                          {user.scene_signals.headline}
+                        </p>
+                      )}
+
+                      {(user.scene_signals?.matched_topics?.length || user.scene_signals?.matched_tags?.length) ? (
+                        <div className="mb-3 flex flex-wrap gap-2">
+                          {user.scene_signals?.matched_topics?.slice(0, 2).map((topic) => (
+                            <span
+                              key={topic.slug}
+                              className="rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-700"
+                            >
+                              {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
+                            </span>
+                          ))}
+                          {user.scene_signals?.matched_tags?.slice(0, 2).map((tag) => (
+                            <span
+                              key={tag}
+                              className="rounded-full bg-orange-100 px-2 py-1 text-xs font-medium text-orange-700"
+                            >
+                              #{tag}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
 
                       <div className={`space-y-2 text-sm text-gray-600 ${viewMode === 'list' ? 'flex gap-4' : ''}`}>
                         {user.age && (

@@ -30,11 +30,25 @@ export interface NearbyUser {
   display_name: string;
   age?: number;
   gender?: string;
+  distance_meters?: number | null;
+  ranking_score?: number | null;
+  scene_signals?: {
+    headline?: string;
+    matched_topics: Array<{
+      id: number;
+      slug: string;
+      label: string;
+      emoji?: string | null;
+    }>;
+    matched_tags: string[];
+    score_boost: number;
+  } | null;
   location: {
     latitude: number;
     longitude: number;
     accuracy?: number;
     distance: string;
+    distance_meters?: number | null;
     last_updated: string;
   };
   privacy_level: 'public' | 'friends' | 'private';
@@ -47,6 +61,13 @@ export interface NearbyUsersResponse {
   meta: {
     total: number;
     radius: number;
+    ranking_strategy?: {
+      trust_connections: boolean;
+      scene_alignment: boolean;
+      activity_recency: boolean;
+      distance: boolean;
+      summary: string;
+    } | null;
     center: {
       latitude: number;
       longitude: number;
@@ -120,6 +141,7 @@ export async function getNearbyUsers(
     longitude: number;
     radius?: number;
     limit?: number;
+    ranking_strategy?: 'distance' | 'trust-aware';
   }
 ): Promise<NearbyUsersResponse> {
   const searchParams = new URLSearchParams({
@@ -127,6 +149,7 @@ export async function getNearbyUsers(
     longitude: params.longitude.toString(),
     ...(params.radius && { radius: params.radius.toString() }),
     ...(params.limit && { limit: params.limit.toString() }),
+    ...(params.ranking_strategy && { ranking_strategy: params.ranking_strategy }),
   });
 
   const response = await fetch(`${API_BASE_URL}/location/nearby?${searchParams}`, {

@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.58] - 2026-04-02 — Trust-Aware Nearby User Ranking
+
+### Fixed
+- Reworked `GET /api/location/nearby` so nearby people discovery now uses the same privacy-safe trust-aware model already shipped across Local Pulse, recommendations, nearby chatrooms, events, bulletin boards, group matching, and venues, balancing trusted connections, scene alignment, activity recency, and distance.
+- Added `NearbyUserRankingService` to reuse `LocalPulseRankingService` trust-map inputs and `AIMatchingService` scene-signal helpers while keeping private social-graph data internal to server-side scoring.
+- Extended the nearby users API contract with high-level `meta.ranking_strategy` metadata plus scene signals and ranking scores for stable frontend consumption without exposing private relationship details.
+- Updated the nearby people page to request trust-aware ranking, explain why trusted scene-aligned people surface first, and render nearby scene cues inline on each result card.
+- Added focused backend regression coverage proving nearby users expose ranking metadata and that a trusted, scene-aligned person can outrank a slightly closer stranger.
+
 ## [1.0.57] - 2026-04-02 — Trust-Aware Nearby Venue Ranking
 
 ### Fixed
