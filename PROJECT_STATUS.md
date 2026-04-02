@@ -1,18 +1,18 @@
-# Project Status — fwber v1.0.44 (Field Notes and Journal Privacy)
+# Project Status — fwber v1.0.45 (Relationship Links)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.44 "Field Notes and Journal Privacy"
+**Version:** 1.0.45 "Relationship Links"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## Field Notes and Journal Privacy
-- **Long-form Journals Shipped**: Users can now create private, friends-only, circle-only, or public field notes from a dedicated `/journal` page.
-- **Reusable Visibility Layer Added**: Journal access reuses accepted friendships plus active group membership so `circle` content ships without inventing a second social graph.
-- **Privacy Defaults Added**: Users can save default journal visibility and an optional default circle group from a dedicated settings page.
-- **Profile Surface Wired**: Public profiles now render the subset of field notes the viewer is allowed to see.
+## Relationship Links
+- **Mutual Link Flow Shipped**: Accepted friends can now propose and confirm explicit relationship/status links instead of relying only on freeform profile text.
+- **Visibility-Aware Profile Display**: Confirmed relationship links render on profiles only when the viewer satisfies the link visibility (`public`, `friends`, or owner/participant access).
+- **Connections UI Expanded**: Friends & Connections now includes relationship-link creation, pending request review, editing, and removal.
+- **Friendship Cleanup Preserved**: Removing a friendship now also removes any relationship link between that pair so the social graph stays consistent.
 
 ## ✅ Release Focus
-- [x] Added journal storage, visibility enforcement, and privacy-default APIs.
-- [x] Added frontend authoring, navigation, and settings surfaces for field notes.
-- [x] Exposed visible field notes on public profiles and covered the rules with backend feature tests.
+- [x] Added relationship-link storage, request/confirm/update/delete APIs, and profile visibility handling.
+- [x] Added Friends & Connections management UI for relationship links and pending confirmations.
+- [x] Exposed visible relationship links on public profiles and covered the rules with backend feature tests.

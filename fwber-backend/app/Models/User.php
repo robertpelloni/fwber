@@ -360,6 +360,16 @@ class User extends Authenticatable
         return $this->hasMany(Journal::class);
     }
 
+    public function outgoingRelationshipLinks(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(RelationshipLink::class);
+    }
+
+    public function incomingRelationshipLinks(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(RelationshipLink::class, 'related_user_id');
+    }
+
     public function achievements(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Achievement::class, 'user_achievements')

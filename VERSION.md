@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.44`
+- **Current version:** `1.0.45`
 - **Release date:** `2026-04-02`
-- **Release name:** `Field Notes and Journal Privacy`
+- **Release name:** `Relationship Links`
 
 ## Summary
 
-This release adds long-form field notes with reusable social-visibility rules, default journal privacy settings, and public-profile journal rendering tied to existing friend and group relationships.
+This release adds consensual relationship links between accepted friends, including pending confirmation flows, per-link visibility controls, Friends & Connections management UI, and public-profile rendering for visible links.
 
 ## Version Sources of Truth
 

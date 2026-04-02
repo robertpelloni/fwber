@@ -76,6 +76,10 @@ class ProfileController extends Controller
             'journals',
             $this->contentVisibilityService->getVisibleJournalsForProfile($user, request()->user(), 3)
         );
+        $user->setRelation(
+            'relationshipLinks',
+            $this->contentVisibilityService->getVisibleRelationshipLinksForProfile($user, request()->user(), 3)
+        );
 
         // Return resource (it handles privacy/sanitization)
         return response()->json([
@@ -175,6 +179,10 @@ class ProfileController extends Controller
             $user->setRelation(
                 'journals',
                 $user->journals()->with('circleGroup:id,name,privacy')->latest()->limit(5)->get()
+            );
+            $user->setRelation(
+                'relationshipLinks',
+                $this->contentVisibilityService->getOwnedRelationshipLinks($user)
             );
 
             return response()->json([

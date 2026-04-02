@@ -6,6 +6,7 @@ use App\Models\Friend;
 use App\Models\Group;
 use App\Models\GroupMember;
 use App\Models\Journal;
+use App\Models\RelationshipLink;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -86,6 +87,68 @@ class ContentVisibilityService
             ->wherePivot('is_banned', false)
             ->wherePivot('is_active', true)
             ->first();
+    }
+
+    public function canViewRelationshipLink(?User $viewer, User $owner, RelationshipLink $relationshipLink): bool
+    {
+        if (! $relationshipLink->isConfirmed()) {
+            return false;
+        }
+
+        if ($viewer && ($viewer->id === $owner->id || $relationshipLink->involvesUser($viewer->id))) {
+            return true;
+        }
+
+        return match ($relationshipLink->visibility) {
+            RelationshipLink::VISIBILITY_PUBLIC => true,
+            RelationshipLink::VISIBILITY_FRIENDS => $viewer ? $this->areFriends($viewer, $owner) : false,
+            default => false,
+        };
+    }
+
+    public function getVisibleRelationshipLinksForProfile(User $owner, ?User $viewer, int $limit = 3): Collection
+    {
+        $links = RelationshipLink::query()
+            ->with(['user.profile', 'relatedUser.profile'])
+            ->whereNotNull('confirmed_at')
+            ->where(function (Builder $query) use ($owner) {
+                $query->where('user_id', $owner->id)
+                    ->orWhere('related_user_id', $owner->id);
+            })
+            ->latest('confirmed_at')
+            ->get();
+
+        if ($viewer && $viewer->id === $owner->id) {
+            return $links->take($limit)->values();
+        }
+
+        return $links
+            ->filter(fn (RelationshipLink $link) => $this->canViewRelationshipLink($viewer, $owner, $link))
+            ->take($limit)
+            ->values();
+    }
+
+    public function getOwnedRelationshipLinks(User $owner): Collection
+    {
+        return RelationshipLink::query()
+            ->with(['user.profile', 'relatedUser.profile'])
+            ->whereNotNull('confirmed_at')
+            ->where(function (Builder $query) use ($owner) {
+                $query->where('user_id', $owner->id)
+                    ->orWhere('related_user_id', $owner->id);
+            })
+            ->latest('confirmed_at')
+            ->get();
+    }
+
+    public function getPendingRelationshipLinks(User $owner): Collection
+    {
+        return RelationshipLink::query()
+            ->with(['user.profile', 'relatedUser.profile'])
+            ->whereNull('confirmed_at')
+            ->where('related_user_id', $owner->id)
+            ->latest('requested_at')
+            ->get();
     }
 
     public function areFriends(User|int $firstUser, User|int $secondUser): bool

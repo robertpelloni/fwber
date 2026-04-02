@@ -562,6 +562,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/search', [FriendController::class, 'search']);
     });
 
+    Route::prefix('relationship-links')->group(function () {
+        Route::get('/', [\App\Http\Controllers\RelationshipLinkController::class, 'index']);
+        Route::get('/requests', [\App\Http\Controllers\RelationshipLinkController::class, 'pendingRequests']);
+        Route::post('/', [\App\Http\Controllers\RelationshipLinkController::class, 'store'])->middleware('throttle:friend_requests');
+        Route::post('/{relationshipLink}/respond', [\App\Http\Controllers\RelationshipLinkController::class, 'respond']);
+        Route::put('/{relationshipLink}', [\App\Http\Controllers\RelationshipLinkController::class, 'update']);
+        Route::delete('/{relationshipLink}', [\App\Http\Controllers\RelationshipLinkController::class, 'destroy']);
+    });
+
     // Location routes (Phase 5A - Location-Based Social Features)
     Route::prefix('location')->group(function () {
         Route::get('aura/{matchId}', [LocationController::class, 'aura']);

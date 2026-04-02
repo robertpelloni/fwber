@@ -134,6 +134,24 @@ export interface UserProfile {
       created_at: string;
       updated_at: string;
     }>;
+    relationship_links?: Array<{
+      id: number;
+      relationship_type: 'dating' | 'partner' | 'spouse' | 'other';
+      relationship_type_label: string;
+      visibility: 'public' | 'friends' | 'private';
+      visibility_label: string;
+      note?: string | null;
+      requested_at?: string | null;
+      confirmed_at?: string | null;
+      is_confirmed: boolean;
+      requested_by_user_id: number;
+      related_user: {
+        id: number;
+        name: string;
+        display_name?: string | null;
+        avatar_url?: string | null;
+      } | null;
+    }>;
   };
 }
 

@@ -16,6 +16,14 @@ All notable changes to this project will be documented in this file.
 - Added a new `/journal` authoring surface, a dedicated journal privacy settings page, and profile rendering for visible field notes so long-form social content is now usable end to end.
 - Added backend regression coverage for circle authoring, friend visibility, circle visibility, and journal privacy defaults.
 
+## [1.0.45] - 2026-04-02 — Relationship Links
+
+### Fixed
+- Added a new `relationship_links` domain so accepted friends can propose, confirm, update, and remove mutual relationship/status links with `public`, `friends`, or `private` visibility.
+- Extended the reusable visibility and profile serialization flows so confirmed relationship links appear on profiles only when the viewer is allowed to see them.
+- Added relationship-link management to the Friends & Connections page, including request handling and per-link editing, plus public-profile rendering for visible links.
+- Added focused backend regression coverage for friend-only proposal rules, confirmation, friend-scoped visibility, and relationship-link cleanup when friendships are removed.
+
 ## [1.0.41] - 2026-04-02 — Merchant Broadcast History
 
 ### Fixed

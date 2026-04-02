@@ -15,7 +15,7 @@ import { EvolvingAvatar } from '@/components/ui/EvolvingAvatar';
 import { RelationshipTier } from '@/lib/relationshipTiers';
 import { photoAPI } from '@/lib/api/photos';
 import GiftShopModal from '@/components/gifts/GiftShopModal';
-import { BookHeart, Gift, ShieldCheck } from 'lucide-react';
+import { BookHeart, Gift, HeartHandshake, ShieldCheck } from 'lucide-react';
 import { VouchBadge } from '@/components/profile/VouchBadge';
 import { useToast } from '@/components/ToastProvider';
 
@@ -235,6 +235,38 @@ export default function PublicProfilePage() {
                             </span>
                           ))}
                         </div>
+                      )}
+                    </article>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {(p.relationship_links && p.relationship_links.length > 0) && (
+              <div className="mb-8">
+                <div className="mb-4 flex items-center gap-2">
+                  <HeartHandshake className="h-5 w-5 text-rose-500" />
+                  <h3 className="text-lg font-semibold">Relationship Links</h3>
+                </div>
+                <div className="space-y-4">
+                  {p.relationship_links.map((link) => (
+                    <article
+                      key={link.id}
+                      className="rounded-2xl border border-rose-100 bg-rose-50/60 p-4 shadow-sm dark:border-rose-900/40 dark:bg-rose-950/20"
+                    >
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-rose-700 dark:bg-rose-900/40 dark:text-rose-200">
+                          {link.relationship_type_label}
+                        </span>
+                        <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                          {link.visibility_label}
+                        </span>
+                      </div>
+                      <p className="mt-3 text-sm font-medium text-gray-900 dark:text-white">
+                        Linked with {link.related_user?.display_name || link.related_user?.name || 'a connection'}
+                      </p>
+                      {link.note && (
+                        <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">{link.note}</p>
                       )}
                     </article>
                   ))}

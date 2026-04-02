@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\JournalResource;
+use App\Http\Resources\RelationshipLinkResource;
 
 /**
  * User Profile API Resource
@@ -179,6 +180,13 @@ class UserProfileResource extends JsonResource
                 }),
                 'journals' => $this->when($this->relationLoaded('journals'), function () {
                     return JournalResource::collection($this->journals);
+                }),
+                'relationship_links' => $this->when($this->relationLoaded('relationshipLinks'), function () {
+                    $ownerId = $this->id;
+
+                    return $this->relationshipLinks->map(
+                        fn ($relationshipLink) => (new RelationshipLinkResource($relationshipLink))->forOwner($ownerId)
+                    )->values();
                 }),
             ],
         ];

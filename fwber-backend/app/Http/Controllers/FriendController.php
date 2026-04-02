@@ -6,6 +6,7 @@ use App\Http\Requests\Friend\InviteFriendRequest;
 use App\Http\Requests\Friend\RespondToFriendRequest;
 use App\Http\Requests\Friend\SendFriendRequest;
 use App\Models\Friend;
+use App\Models\RelationshipLink;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -126,6 +127,16 @@ class FriendController extends Controller
     public function removeFriend($friendId)
     {
         $user = Auth::user();
+
+        RelationshipLink::query()
+            ->where(function ($q) use ($user, $friendId) {
+                $q->where(function ($forward) use ($user, $friendId) {
+                    $forward->where('user_id', $user->id)->where('related_user_id', $friendId);
+                })->orWhere(function ($reverse) use ($user, $friendId) {
+                    $reverse->where('user_id', $friendId)->where('related_user_id', $user->id);
+                });
+            })
+            ->delete();
 
         Friend::where(function ($q) use ($user, $friendId) {
             $q->where('user_id', $user->id)->where('friend_id', $friendId);
