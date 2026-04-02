@@ -25,6 +25,7 @@ import {
   Ghost,
   Download,
   Globe,
+  ArrowLeft,
 } from 'lucide-react';
 
 interface SettingsLinkProps {
@@ -250,12 +251,23 @@ export default function SettingsPage() {
         {/* Header */}
         <header className="bg-white shadow-sm">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div className="flex items-center gap-3">
-              <Settings className="h-8 w-8 text-gray-600" />
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-                <p className="text-sm text-gray-500">Manage your account and preferences</p>
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <Settings className="h-8 w-8 text-gray-600" />
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+                  <p className="text-sm text-gray-500">Manage your account and preferences</p>
+                </div>
               </div>
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:border-purple-300 hover:text-purple-600"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                <div>
+                  Back
+                </div>
+              </Link>
             </div>
           </div>
         </header>

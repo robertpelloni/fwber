@@ -1,19 +1,19 @@
-# Project Status — fwber v1.0.31 (Federation Activity Center)
+# Project Status — fwber v1.0.32 (Navigation UX Patch)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.31 "Federation Activity Center"
+**Version:** 1.0.32 "Navigation UX Patch"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## Fediverse Frontend Repair
-- **Feed Contract Fix**: The frontend federation feed now consumes the backend's real `{ posts: [...] }` shape instead of assuming a stale nested response contract.
-- **Activity Center Added**: A new `/settings/federation/activity` page now surfaces follower counts, following counts, cached remote posts, and a merged recent-activity timeline.
-- **Settings UX Polish**: Federation settings now link cleanly to both the global feed and activity center, and the federated handle copy button now performs a real clipboard copy with toast feedback.
+## Navigation And Discovery Polish
+- **Settings Escape Hatch**: The main settings page now exposes a clear back-to-dashboard control.
+- **Recommendations Restyle**: The recommendations page now uses the shared protected app shell and styling instead of the old standalone red/dark layout, and it now includes a `Back Home` action.
+- **RSC Noise Mitigation**: Shared AppHeader links for the repeatedly noisy routes now use normal browser navigation, avoiding broken client-side RSC transition attempts on those destinations.
 
 ## ✅ Release Focus
-- [x] Repaired the federation feed page so cached ActivityPub posts render against the current backend payload shape.
-- [x] Added a dedicated federation activity center page using existing followers, following, and posts endpoints.
-- [x] Improved federation settings navigation and made the federated handle copy interaction functional.
+- [x] Added a visible way back home from the main settings page.
+- [x] Brought `/recommendations` into the shared site theme and navigation pattern.
+- [x] Mitigated repeated RSC fallback noise for shared-header navigation to affected routes.
 - [x] Revalidated the frontend with `npm run type-check`.
-- [x] Revalidated the frontend with `npm run build`, including the new federation routes.
+- [x] Revalidated the frontend with `npm run build`.

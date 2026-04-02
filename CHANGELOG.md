@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.32] - 2026-04-02 — Navigation UX Patch
+
+### Fixed
+- Added a clear back-to-dashboard control on the main settings page so users can leave settings without relying on browser navigation.
+- Reworked `fwber-frontend/app/recommendations/page.tsx` to use the shared protected app shell and styling, and added a `Back Home` action there.
+- Updated the shared `AppHeader` to use normal browser navigation for the routes that were repeatedly triggering failed RSC payload fetches before falling back anyway (`/help`, `/conference-pulse`, `/burner`, `/nearby`, `/leaderboard`, and `/wingman`).
+
 ## [1.0.31] - 2026-04-02 — Federation Activity Center
 
 ### Fixed

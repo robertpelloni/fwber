@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.31`
+- **Current version:** `1.0.32`
 - **Release date:** `2026-04-02`
-- **Release name:** `Federation Activity Center`
+- **Release name:** `Navigation UX Patch`
 
 ## Summary
 
-This release repairs the frontend federation feed contract, adds a dedicated federation activity center, and improves the main federation settings page with clearer navigation and a working federated-handle copy action.
+This release adds clear home/back affordances to the settings and recommendations pages, refreshes the recommendations page to use the shared app shell, and routes several noisy shared-header destinations through normal browser navigation to avoid broken RSC transition attempts.
 
 ## Version Sources of Truth
 

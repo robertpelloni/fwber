@@ -50,8 +50,21 @@ interface NavItem {
     icon: LucideIcon
 }
 
+const hardNavigationRoutes = new Set([
+    '/help',
+    '/conference-pulse',
+    '/burner',
+    '/nearby',
+    '/leaderboard',
+    '/wingman',
+])
+
 function shouldDisablePrefetch(href: string) {
     return href !== '/dashboard' && href !== '/help'
+}
+
+function shouldUseHardNavigation(href: string) {
+    return hardNavigationRoutes.has(href)
 }
 
 const navLinks: NavItem[] = [
@@ -137,6 +150,46 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
         logout()
     }
 
+    const renderNavLink = (
+        link: NavItem,
+        className: string,
+        options?: {
+            onClick?: () => void
+        }
+    ) => {
+        const content = (
+            <>
+                <link.icon className="h-5 w-5" />
+                <span>{link.label}</span>
+            </>
+        )
+
+        if (shouldUseHardNavigation(link.href)) {
+            return (
+                <a
+                    key={link.href}
+                    href={link.href}
+                    onClick={options?.onClick}
+                    className={className}
+                >
+                    {content}
+                </a>
+            )
+        }
+
+        return (
+            <Link
+                key={link.href}
+                href={link.href}
+                prefetch={!shouldDisablePrefetch(link.href)}
+                onClick={options?.onClick}
+                className={className}
+            >
+                {content}
+            </Link>
+        )
+    }
+
     return (
         <>
             <header className={`sticky top-0 z-40 bg-white shadow dark:bg-gray-900 ${showNav ? 'app-header-with-sidebar' : ''}`}>
@@ -166,15 +219,26 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                                 const active = isActivePath(pathname, link.href)
 
                                 return (
-                                    <Link
-                                        key={link.href}
-                                        href={link.href}
-                                        prefetch={!shouldDisablePrefetch(link.href)}
-                                        className={getUtilityLinkClasses(active)}
-                                    >
-                                        <link.icon className="h-4 w-4" />
-                                        <span>{link.label}</span>
-                                    </Link>
+                                    shouldUseHardNavigation(link.href) ? (
+                                        <a
+                                            key={link.href}
+                                            href={link.href}
+                                            className={getUtilityLinkClasses(active)}
+                                        >
+                                            <link.icon className="h-4 w-4" />
+                                            <span>{link.label}</span>
+                                        </a>
+                                    ) : (
+                                        <Link
+                                            key={link.href}
+                                            href={link.href}
+                                            prefetch={!shouldDisablePrefetch(link.href)}
+                                            className={getUtilityLinkClasses(active)}
+                                        >
+                                            <link.icon className="h-4 w-4" />
+                                            <span>{link.label}</span>
+                                        </Link>
+                                    )
                                 )
                             })}
 
@@ -219,18 +283,9 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                             {navLinks.map((link) => {
                                 const active = isActivePath(pathname, link.href)
 
-                                return (
-                                    <Link
-                                        key={link.href}
-                                        href={link.href}
-                                        prefetch={!shouldDisablePrefetch(link.href)}
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className={getNavLinkClasses(active)}
-                                    >
-                                        <link.icon className="h-5 w-5" />
-                                        <span>{link.label}</span>
-                                    </Link>
-                                )
+                                return renderNavLink(link, getNavLinkClasses(active), {
+                                    onClick: () => setMobileMenuOpen(false),
+                                })
                             })}
                         </nav>
 
@@ -254,16 +309,28 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                                     const active = isActivePath(pathname, link.href)
 
                                     return (
-                                        <Link
-                                            key={link.href}
-                                            href={link.href}
-                                            prefetch={!shouldDisablePrefetch(link.href)}
-                                            onClick={() => setMobileMenuOpen(false)}
-                                            className={getNavLinkClasses(active, true)}
-                                        >
-                                            <link.icon className="h-5 w-5" />
-                                            <span>{link.label}</span>
-                                        </Link>
+                                        shouldUseHardNavigation(link.href) ? (
+                                            <a
+                                                key={link.href}
+                                                href={link.href}
+                                                onClick={() => setMobileMenuOpen(false)}
+                                                className={getNavLinkClasses(active, true)}
+                                            >
+                                                <link.icon className="h-5 w-5" />
+                                                <span>{link.label}</span>
+                                            </a>
+                                        ) : (
+                                            <Link
+                                                key={link.href}
+                                                href={link.href}
+                                                prefetch={!shouldDisablePrefetch(link.href)}
+                                                onClick={() => setMobileMenuOpen(false)}
+                                                className={getNavLinkClasses(active, true)}
+                                            >
+                                                <link.icon className="h-5 w-5" />
+                                                <span>{link.label}</span>
+                                            </Link>
+                                        )
                                     )
                                 })}
 
@@ -314,28 +381,18 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
 
                                 const active = isActivePath(pathname, link.href)
 
-                                return (
-                                    <Link
-                                        key={link.href}
-                                        href={link.href}
-                                        prefetch={!shouldDisablePrefetch(link.href)}
-                                        className={getNavLinkClasses(active)}
-                                    >
-                                        <link.icon className="h-5 w-5" />
-                                        <span>{link.label}</span>
-                                    </Link>
-                                )
+                                return renderNavLink(link, getNavLinkClasses(active))
                             })}
                         </nav>
 
                         <div className="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950/60">
-                            <Link
+                            <a
                                 href="/help"
                                 className="flex items-center gap-2 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
                             >
                                 <HelpCircle className="h-4 w-4" />
                                 <span>Need help?</span>
-                            </Link>
+                            </a>
                         </div>
                     </div>
                 </aside>

@@ -1,10 +1,28 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/lib/auth-context';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
 import {
-  useRecommendations,
+  ArrowLeft,
+  Brain,
+  Layers,
+  Loader2,
+  MapPin,
+  Newspaper,
+  RefreshCw,
+  Sparkles,
+  Trash2,
+  TrendingUp,
+  Users,
+} from 'lucide-react';
+
+import ProtectedRoute from '@/components/ProtectedRoute';
+import AppHeader from '@/components/AppHeader';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/lib/auth-context';
+import {
   useTrendingRecommendations,
   usePersonalizedFeed,
   useRecommendationFeedback,
@@ -15,50 +33,78 @@ import {
   useMixedRecommendations,
   useRecommendationCache,
 } from '@/lib/hooks/use-recommendations';
-import { useLocation } from '@/lib/hooks/use-location';
+import type { FeedItem, Recommendation, TrendingContent } from '@/lib/api/recommendations';
+
+type RecommendationTab =
+  | 'mixed'
+  | 'ai'
+  | 'location'
+  | 'collaborative'
+  | 'content'
+  | 'trending'
+  | 'feed';
+
+const TAB_CONFIG: Array<{
+  id: RecommendationTab;
+  label: string;
+  description: string;
+  icon: typeof Sparkles;
+}> = [
+  { id: 'mixed', label: 'Mixed', description: 'All recommendation types', icon: Layers },
+  { id: 'ai', label: 'AI', description: 'AI-generated picks', icon: Brain },
+  { id: 'location', label: 'Nearby', description: 'Location-aware matches', icon: MapPin },
+  { id: 'collaborative', label: 'Collaborative', description: 'Based on similar users', icon: Users },
+  { id: 'content', label: 'Content', description: 'Content-based suggestions', icon: Newspaper },
+  { id: 'trending', label: 'Trending', description: 'Popular right now', icon: TrendingUp },
+  { id: 'feed', label: 'Feed', description: 'Your personalized feed', icon: Sparkles },
+];
 
 export default function RecommendationsPage() {
-  const { user, isAuthenticated, isLoading: loading } = useAuth();
-  const router = useRouter();
-  const [activeTab, setActiveTab] = useState('mixed');
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const [activeTab, setActiveTab] = useState<RecommendationTab>('mixed');
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const { clearCache, refreshRecommendations } = useRecommendationCache();
+  const feedbackMutation = useRecommendationFeedback();
 
-  // Get user's current location for location-based recommendations
   useEffect(() => {
-    if (navigator.geolocation && isAuthenticated) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-        },
-        (error) => {
-          console.warn('Geolocation error:', error);
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
-      );
+    if (!navigator.geolocation || !isAuthenticated) {
+      return;
     }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+      },
+      (error) => {
+        console.warn('Geolocation error:', error);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+    );
   }, [isAuthenticated]);
 
-  // Recommendation queries
   const { data: mixedRecommendations, isLoading: isLoadingMixed } = useMixedRecommendations({
     limit: 10,
-    context: userLocation ? {
-      latitude: userLocation.latitude,
-      longitude: userLocation.longitude,
-      radius: 5000,
-    } : undefined,
+    context: userLocation
+      ? {
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
+          radius: 5000,
+        }
+      : undefined,
     enabled: isAuthenticated,
   });
 
   const { data: aiRecommendations, isLoading: isLoadingAI } = useAIRecommendations({
     limit: 5,
-    context: userLocation ? {
-      latitude: userLocation.latitude,
-      longitude: userLocation.longitude,
-    } : undefined,
+    context: userLocation
+      ? {
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
+        }
+      : undefined,
     enabled: isAuthenticated,
   });
 
@@ -92,14 +138,6 @@ export default function RecommendationsPage() {
     enabled: isAuthenticated,
   });
 
-  const feedbackMutation = useRecommendationFeedback();
-
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      router.push('/login');
-    }
-  }, [isAuthenticated, loading, router]);
-
   const handleRecommendationAction = async (
     recommendationId: string,
     action: 'click' | 'like' | 'dislike' | 'share' | 'ignore',
@@ -113,111 +151,42 @@ export default function RecommendationsPage() {
         content_id: contentId,
         rating,
       });
-
-      // Show success feedback
-      // Feedback submitted successfully — UI will update via React Query
     } catch (error) {
       console.error('Failed to submit feedback:', error);
     }
   };
 
-  const handleClearCache = () => {
-    clearCache();
-    refreshRecommendations();
-  };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen text-white">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-red-500"></div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return null;
-  }
-
-  const renderRecommendationCard = (recommendation: any, index: number) => (
-    <div key={recommendation.id || index} className="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-      <div className="flex justify-between items-start mb-4">
-        <div className="flex-1">
-          <h3 className="text-xl font-bold text-white mb-2">
-            {recommendation.content.title || recommendation.content.name || `Recommendation ${index + 1}`}
-          </h3>
-          <p className="text-gray-300 mb-3">
-            {recommendation.content.description || recommendation.reason}
-          </p>
-          <div className="flex items-center space-x-4 text-sm text-gray-400">
-            <span className="bg-red-600 px-2 py-1 rounded text-white text-xs">
-              {recommendation.type.toUpperCase()}
-            </span>
-            <span>Score: {(recommendation.score * 100).toFixed(1)}%</span>
-            {recommendation.content.distance && (
-              <span>{Math.round(recommendation.content.distance)}m away</span>
-            )}
-          </div>
-        </div>
-        <div className="flex space-x-2">
-          <button
-            onClick={() => handleRecommendationAction(
-              recommendation.id,
-              'like',
-              recommendation.content.id,
-              5
-            )}
-            className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors"
-          >
-            👍
-          </button>
-          <button
-            onClick={() => handleRecommendationAction(
-              recommendation.id,
-              'dislike',
-              recommendation.content.id,
-              1
-            )}
-            className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition-colors"
-          >
-            👎
-          </button>
-          <button
-            onClick={() => handleRecommendationAction(
-              recommendation.id,
-              'share',
-              recommendation.content.id
-            )}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors"
-          >
-            📤
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-
-  const getCurrentRecommendations = () => {
+  const currentItems = useMemo(() => {
     switch (activeTab) {
       case 'mixed':
-        return mixedRecommendations?.recommendations || [];
+        return (mixedRecommendations?.recommendations || []) as Recommendation[];
       case 'ai':
-        return aiRecommendations?.recommendations || [];
+        return (aiRecommendations?.recommendations || []) as Recommendation[];
       case 'location':
-        return locationRecommendations?.recommendations || [];
+        return (locationRecommendations?.recommendations || []) as Recommendation[];
       case 'collaborative':
-        return collaborativeRecommendations?.recommendations || [];
+        return (collaborativeRecommendations?.recommendations || []) as Recommendation[];
       case 'content':
-        return contentRecommendations?.recommendations || [];
+        return (contentRecommendations?.recommendations || []) as Recommendation[];
       case 'trending':
-        return trendingRecommendations?.trending || [];
+        return (trendingRecommendations?.trending || []) as TrendingContent[];
       case 'feed':
-        return personalizedFeed?.feed || [];
+        return (personalizedFeed?.feed || []) as FeedItem[];
       default:
-        return [];
+        return [] as Recommendation[];
     }
-  };
+  }, [
+    activeTab,
+    aiRecommendations?.recommendations,
+    collaborativeRecommendations?.recommendations,
+    contentRecommendations?.recommendations,
+    locationRecommendations?.recommendations,
+    mixedRecommendations?.recommendations,
+    personalizedFeed?.feed,
+    trendingRecommendations?.trending,
+  ]);
 
-  const getCurrentLoading = () => {
+  const isCurrentLoading = useMemo(() => {
     switch (activeTab) {
       case 'mixed':
         return isLoadingMixed;
@@ -236,129 +205,299 @@ export default function RecommendationsPage() {
       default:
         return false;
     }
+  }, [
+    activeTab,
+    isLoadingAI,
+    isLoadingCollaborative,
+    isLoadingContent,
+    isLoadingFeed,
+    isLoadingLocation,
+    isLoadingMixed,
+    isLoadingTrending,
+  ]);
+
+  const mixedMetadata = activeTab === 'mixed' ? mixedRecommendations?.metadata : null;
+
+  const renderRecommendationCard = (recommendation: Recommendation, index: number) => {
+    const title = recommendation.content.title || recommendation.content.name || `Recommendation ${index + 1}`;
+    const description = recommendation.content.description || recommendation.reason;
+    const contentId = String(recommendation.content.id || recommendation.id);
+
+    return (
+      <Card key={recommendation.id || `${activeTab}-${index}`} className="h-full border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+        <CardHeader className="space-y-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="space-y-2">
+              <Badge variant="outline" className="border-purple-200 bg-purple-50 text-purple-700 dark:border-purple-900 dark:bg-purple-950 dark:text-purple-200">
+                {recommendation.type.toUpperCase()}
+              </Badge>
+              <CardTitle className="text-xl text-gray-900 dark:text-white">{title}</CardTitle>
+            </div>
+            <Badge variant="secondary" className="shrink-0">
+              {(recommendation.score * 100).toFixed(1)}%
+            </Badge>
+          </div>
+          <CardDescription className="text-sm text-gray-600 dark:text-gray-300">
+            {description}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+            {recommendation.content.distance ? <Badge variant="outline">{Math.round(recommendation.content.distance)}m away</Badge> : null}
+            {recommendation.source ? <Badge variant="outline">{recommendation.source}</Badge> : null}
+            {recommendation.sources?.length ? <Badge variant="outline">{recommendation.sources.join(', ')}</Badge> : null}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => handleRecommendationAction(recommendation.id, 'like', contentId, 5)}
+            >
+              Like
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => handleRecommendationAction(recommendation.id, 'dislike', contentId, 1)}
+            >
+              Pass
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => handleRecommendationAction(recommendation.id, 'share', contentId)}
+            >
+              Share
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderTrendingCard = (item: TrendingContent, index: number) => (
+    <Card key={item.id || `${activeTab}-${index}`} className="h-full border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+      <CardHeader className="space-y-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="space-y-2">
+            <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-200">
+              {item.type}
+            </Badge>
+            <CardTitle className="text-xl text-gray-900 dark:text-white">{item.title}</CardTitle>
+          </div>
+          <Badge variant="secondary">#{index + 1}</Badge>
+        </div>
+        <CardDescription className="text-sm text-gray-600 dark:text-gray-300">
+          {item.description}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3 text-sm text-muted-foreground">
+        <div className="flex items-center justify-between gap-3">
+          <span>Engagement score</span>
+          <span className="font-medium text-gray-900 dark:text-white">{item.engagement_score.toFixed(1)}</span>
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <span>Trending since</span>
+          <span className="font-medium text-gray-900 dark:text-white">{new Date(item.trending_since).toLocaleString()}</span>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const renderFeedCard = (item: FeedItem, index: number) => {
+    const title = item.content?.title || item.content?.name || `Feed item ${index + 1}`;
+    const description = item.reason || item.content?.description || 'Personalized recommendation item';
+
+    return (
+      <Card key={item.id || `${activeTab}-${index}`} className="h-full border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+        <CardHeader className="space-y-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="space-y-2">
+              <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700 dark:border-green-900 dark:bg-green-950 dark:text-green-200">
+                {item.type}
+              </Badge>
+              <CardTitle className="text-xl text-gray-900 dark:text-white">{title}</CardTitle>
+            </div>
+            {typeof item.score === 'number' ? <Badge variant="secondary">{(item.score * 100).toFixed(1)}%</Badge> : null}
+          </div>
+          <CardDescription className="text-sm text-gray-600 dark:text-gray-300">
+            {description}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3 text-sm text-muted-foreground">
+          {item.timestamp ? (
+            <div className="flex items-center justify-between gap-3">
+              <span>Updated</span>
+              <span className="font-medium text-gray-900 dark:text-white">{new Date(item.timestamp).toLocaleString()}</span>
+            </div>
+          ) : null}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderCurrentCard = (item: Recommendation | TrendingContent | FeedItem, index: number) => {
+    if (activeTab === 'trending') {
+      return renderTrendingCard(item as TrendingContent, index);
+    }
+
+    if (activeTab === 'feed') {
+      return renderFeedCard(item as FeedItem, index);
+    }
+
+    return renderRecommendationCard(item as Recommendation, index);
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold text-red-500">AI-Powered Recommendations</h1>
-          <div className="flex space-x-4">
-            <button
-              onClick={handleClearCache}
-              className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded transition-colors"
-            >
-              Clear Cache
-            </button>
-            <button
-              onClick={refreshRecommendations}
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition-colors"
-            >
-              Refresh
-            </button>
-          </div>
-        </div>
-
-        {/* Location Status */}
-        {userLocation ? (
-          <div className="bg-green-900 border border-green-600 p-4 rounded-lg mb-6">
-            <p className="text-green-200">
-              📍 Location enabled: {userLocation.latitude.toFixed(4)}, {userLocation.longitude.toFixed(4)}
-            </p>
-          </div>
-        ) : (
-          <div className="bg-yellow-900 border border-yellow-600 p-4 rounded-lg mb-6">
-            <p className="text-yellow-200">
-              ⚠️ Location not available - some recommendations may be limited
-            </p>
-          </div>
-        )}
-
-        {/* Tab Navigation */}
-        <div className="mb-8 border-b border-gray-700">
-          <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-            {[
-              { id: 'mixed', label: 'Mixed', description: 'All recommendation types' },
-              { id: 'ai', label: 'AI-Powered', description: 'AI-generated recommendations' },
-              { id: 'location', label: 'Location', description: 'Nearby recommendations' },
-              { id: 'collaborative', label: 'Collaborative', description: 'Based on similar users' },
-              { id: 'content', label: 'Content', description: 'Content-based filtering' },
-              { id: 'trending', label: 'Trending', description: 'Popular right now' },
-              { id: 'feed', label: 'Feed', description: 'Personalized feed' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${activeTab === tab.id
-                    ? 'border-red-500 text-red-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                title={tab.description}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </nav>
-        </div>
-
-        {/* Recommendations Content */}
-        <div className="space-y-6">
-          {getCurrentLoading() ? (
-            <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
-              <span className="ml-4 text-gray-400">Loading recommendations...</span>
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+        <AppHeader />
+        <main className="mx-auto max-w-6xl px-4 py-8 space-y-8">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div>
+                <h1 className="flex items-center gap-3 text-3xl font-bold text-gray-900 dark:text-white">
+                  <Sparkles className="h-8 w-8 text-purple-500" />
+                  Recommendations
+                </h1>
+                <p className="mt-1 text-gray-500 dark:text-gray-400">
+                  Personalized discovery across AI, collaborative, nearby, and trending signals.
+                </p>
+              </div>
+              <Badge variant="outline" className="border-purple-200 bg-purple-50 text-purple-700 dark:border-purple-900 dark:bg-purple-950 dark:text-purple-200">
+                Discovery Hub
+              </Badge>
             </div>
-          ) : (
-            <>
-              {getCurrentRecommendations().length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {getCurrentRecommendations().map((recommendation, index) =>
-                    renderRecommendationCard(recommendation, index)
-                  )}
+
+            <div className="flex flex-wrap gap-3">
+              <Button asChild variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-900 dark:text-blue-300 dark:hover:bg-blue-950">
+                <Link href="/dashboard">
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back Home
+                </Link>
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  clearCache();
+                  refreshRecommendations();
+                }}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Clear Cache
+              </Button>
+              <Button type="button" variant="outline" onClick={refreshRecommendations}>
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Refresh
+              </Button>
+            </div>
+          </div>
+
+          <Card className="border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+            <CardHeader>
+              <CardTitle className="text-lg text-gray-900 dark:text-white">Context</CardTitle>
+              <CardDescription>
+                Recommendation quality improves when location and recent activity are available.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {userLocation ? (
+                <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-900 dark:bg-green-950 dark:text-green-200">
+                  Location enabled near {userLocation.latitude.toFixed(4)}, {userLocation.longitude.toFixed(4)}.
                 </div>
               ) : (
-                <div className="text-center py-12">
-                  <div className="text-gray-400 text-lg mb-4">
-                    No recommendations available for this category
-                  </div>
-                  <p className="text-gray-500">
-                    Try refreshing or check back later for new recommendations.
-                  </p>
+                <div className="rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-800 dark:border-yellow-900 dark:bg-yellow-950 dark:text-yellow-200">
+                  Location is unavailable, so nearby recommendations may be limited until the browser shares position.
                 </div>
               )}
-            </>
-          )}
-        </div>
+            </CardContent>
+          </Card>
 
-        {/* Metadata */}
-        {activeTab === 'mixed' && mixedRecommendations?.metadata && (
-          <div className="mt-8 bg-gray-800 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold mb-2">Recommendation Metadata</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-              <div>
-                <span className="text-gray-400">Total:</span>
-                <span className="ml-2 text-white">{mixedRecommendations.metadata.total}</span>
-              </div>
-              <div>
-                <span className="text-gray-400">Types:</span>
-                <span className="ml-2 text-white">{mixedRecommendations.metadata.types.join(', ')}</span>
-              </div>
-              <div>
-                <span className="text-gray-400">Generated:</span>
-                <span className="ml-2 text-white">
-                  {new Date(mixedRecommendations.metadata.generated_at).toLocaleTimeString()}
-                </span>
-              </div>
-              <div>
-                <span className="text-gray-400">Cache Hit:</span>
-                <span className={`ml-2 ${mixedRecommendations.metadata.cache_hit ? 'text-green-400' : 'text-red-400'}`}>
-                  {mixedRecommendations.metadata.cache_hit ? 'Yes' : 'No'}
-                </span>
-              </div>
-            </div>
+          <div className="flex flex-wrap gap-3">
+            {TAB_CONFIG.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'border-purple-200 bg-purple-50 text-purple-700 dark:border-purple-900 dark:bg-purple-950 dark:text-purple-200'
+                      : 'border-gray-200 bg-white text-gray-600 hover:border-purple-200 hover:text-purple-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-purple-900 dark:hover:text-purple-200'
+                  }`}
+                  title={tab.description}
+                >
+                  <span className="inline-flex items-center gap-2">
+                    <Icon className="h-4 w-4" />
+                    {tab.label}
+                  </span>
+                </button>
+              );
+            })}
           </div>
-        )}
+
+          <section className="space-y-6">
+            {isCurrentLoading || authLoading ? (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
+              </div>
+            ) : currentItems.length > 0 ? (
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+                {currentItems.map((item, index) => renderCurrentCard(item, index))}
+              </div>
+            ) : (
+              <Card className="border-dashed border-2 border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900">
+                <CardContent className="py-12 text-center">
+                  <p className="text-lg font-medium text-gray-900 dark:text-white">
+                    No recommendations available for this category yet.
+                  </p>
+                  <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    Try refreshing, enabling location, or checking back after more activity.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </section>
+
+          {mixedMetadata ? (
+            <Card className="border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+              <CardHeader>
+                <CardTitle className="text-lg text-gray-900 dark:text-white">Mixed recommendation metadata</CardTitle>
+                <CardDescription>Live details for the current combined recommendation batch.</CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <div className="rounded-lg border p-4">
+                  <p className="text-sm text-muted-foreground">Total</p>
+                  <p className="mt-1 text-lg font-semibold text-gray-900 dark:text-white">{mixedMetadata.total}</p>
+                </div>
+                <div className="rounded-lg border p-4">
+                  <p className="text-sm text-muted-foreground">Types</p>
+                  <p className="mt-1 text-sm font-medium text-gray-900 dark:text-white">{mixedMetadata.types.join(', ')}</p>
+                </div>
+                <div className="rounded-lg border p-4">
+                  <p className="text-sm text-muted-foreground">Generated</p>
+                  <p className="mt-1 text-sm font-medium text-gray-900 dark:text-white">
+                    {new Date(mixedMetadata.generated_at).toLocaleTimeString()}
+                  </p>
+                </div>
+                <div className="rounded-lg border p-4">
+                  <p className="text-sm text-muted-foreground">Cache hit</p>
+                  <p className={`mt-1 text-sm font-medium ${mixedMetadata.cache_hit ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                    {mixedMetadata.cache_hit ? 'Yes' : 'No'}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : null}
+        </main>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }
