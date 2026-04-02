@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.38`
+- **Current version:** `1.0.39`
 - **Release date:** `2026-04-02`
-- **Release name:** `Merchant Pulse Broadcast Activation`
+- **Release name:** `Bounty Flow Repair`
 
 ## Summary
 
-This release activates the merchant pulse broadcast flow by turning the old stub into a real proximity announce send, charging tokens only on successful sends, and blocking vibe-mismatched broadcasts without creating artifacts or pretending they were queued.
+This release repairs the matchmaker bounty flow by aligning the bounty API payload with the frontend's real expectations, fixing dead bounty navigation, and switching creation/suggestion flows onto the live bounty contract while preserving the public share page.
 
 ## Version Sources of Truth
 

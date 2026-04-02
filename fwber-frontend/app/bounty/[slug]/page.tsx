@@ -107,7 +107,7 @@ export default function BountyPage() {
     
     setSuggesting(true);
     try {
-      await apiClient.post(`/matchmaker/bounty/${slug}/suggest`, {
+      await apiClient.post(`/bounties/${slug}/suggest`, {
         candidate_id: selectedFriend.id
       });
       

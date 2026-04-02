@@ -17,6 +17,15 @@ class MatchBountyController extends Controller
 {
     protected $tokenDistributionService;
 
+    /**
+     * The related user payload the bounty surfaces need for cards and detail views.
+     */
+    private const BOUNTY_USER_RELATIONS = [
+        'user:id,name,avatar_url',
+        'user.profile:id,user_id,display_name,bio,birthdate,gender',
+        'user.photos:id,user_id,file_path,thumbnail_path,is_primary,is_private',
+    ];
+
     public function __construct(TokenDistributionService $tokenDistributionService)
     {
         $this->tokenDistributionService = $tokenDistributionService;
@@ -27,7 +36,7 @@ class MatchBountyController extends Controller
      */
     public function index(Request $request)
     {
-        $query = MatchBounty::with(['user:id,name,avatar_url'])
+        $query = MatchBounty::with(self::BOUNTY_USER_RELATIONS)
             ->where('status', 'active')
             ->where(function ($q) {
                 $q->whereNull('expires_at')
@@ -41,7 +50,7 @@ class MatchBountyController extends Controller
 
         if ($request->has('sort')) {
             $sort = $request->sort;
-            if ($sort === 'reward_high') {
+            if ($sort === 'reward' || $sort === 'reward_high') {
                 $query->orderByDesc('token_reward');
             } elseif ($sort === 'reward_low') {
                 $query->orderBy('token_reward');
@@ -98,6 +107,7 @@ class MatchBountyController extends Controller
                 return response()->json([
                     'message' => 'Bounty created successfully',
                     'bounty' => $bounty,
+                    'share_url' => config('app.url').'/bounty/'.$bounty->slug,
                 ], 201);
             });
         } catch (\Exception $e) {
@@ -112,7 +122,7 @@ class MatchBountyController extends Controller
      */
     public function show($slug)
     {
-        $bounty = MatchBounty::with(['user:id,name,avatar_url'])->where('slug', $slug)->firstOrFail();
+        $bounty = MatchBounty::with(self::BOUNTY_USER_RELATIONS)->where('slug', $slug)->firstOrFail();
 
         return response()->json([
             'bounty' => $bounty,

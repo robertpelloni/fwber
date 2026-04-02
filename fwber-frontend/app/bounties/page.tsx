@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import AppHeader from '@/components/AppHeader'
+import CreateBountyModal from '@/components/CreateBountyModal'
 import { apiClient } from '@/lib/api/client'
 import { 
   Coins, Users, ArrowLeft, Clock, 
@@ -19,6 +20,7 @@ interface BountyUser {
   profile: {
     display_name: string
     age: number
+    birthdate?: string | null
     gender: string
   } | null
   photos: {
@@ -86,6 +88,7 @@ export default function BountiesPage() {
   const [showFilters, setShowFilters] = useState(false)
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
     async function fetchBounties() {
@@ -121,7 +124,7 @@ export default function BountiesPage() {
     }
 
     fetchBounties()
-  }, [sortBy, minReward, page])
+  }, [sortBy, minReward, page, refreshKey])
 
   const handleSortChange = (newSort: string) => {
     setSortBy(newSort)
@@ -135,6 +138,7 @@ export default function BountiesPage() {
 
   const handleRefresh = () => {
     setPage(1)
+    setRefreshKey(prev => prev + 1)
   }
 
   const minRewardOptions = [
@@ -154,7 +158,7 @@ export default function BountiesPage() {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <Link 
-                href="/home" 
+                href="/dashboard" 
                 className="p-2 -ml-2 hover:bg-purple-800/30 rounded-lg transition"
               >
                 <ArrowLeft className="w-5 h-5 text-gray-400" />
@@ -293,7 +297,8 @@ export default function BountiesPage() {
             <>
               <div className="grid gap-4 sm:grid-cols-2">
                 {bounties.map(bounty => {
-                  const primaryPhoto = bounty.user.photos.find(p => p.is_primary) || bounty.user.photos[0]
+                  const photos = bounty.user.photos ?? []
+                  const primaryPhoto = photos.find(p => p.is_primary) || photos[0]
                   const displayName = bounty.user.profile?.display_name || bounty.user.name
                   const timeLeft = getTimeRemaining(bounty.expires_at)
                   const isExpiringSoon = timeLeft && (timeLeft.includes('h') || timeLeft.includes('soon'))
@@ -390,12 +395,10 @@ export default function BountiesPage() {
                 <h3 className="font-semibold">Looking for your match?</h3>
                 <p className="text-sm text-pink-100">Create a bounty and let others help find your perfect match</p>
               </div>
-              <Link
-                href="/profile/bounty/create"
-                className="px-4 py-2 bg-white text-purple-600 rounded-lg font-medium hover:bg-purple-50 transition"
-              >
-                Create Bounty
-              </Link>
+              <CreateBountyModal
+                triggerLabel="Create Bounty"
+                triggerClassName="shrink-0 border-white/30 bg-white text-purple-600 hover:bg-purple-50 hover:text-purple-700"
+              />
             </div>
           </div>
         </main>

@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Photo;
+use App\Models\UserProfile;
 use App\Models\User;
 use App\Services\MatchMakerService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -19,11 +21,16 @@ class MatchBountyTest extends TestCase
             'last_daily_bonus_at' => now(),
         ]);
 
-        $response = $this->actingAs($user)->postJson('/api/matchmaker/bounty', [
+        $response = $this->actingAs($user)->postJson('/api/bounties', [
             'token_reward' => 500,
         ]);
 
         $response->assertStatus(201);
+        $response->assertJsonStructure([
+            'message',
+            'bounty' => ['id', 'slug', 'token_reward', 'status'],
+            'share_url',
+        ]);
 
         $this->assertDatabaseHas('match_bounties', [
             'user_id' => $user->id,
@@ -33,6 +40,86 @@ class MatchBountyTest extends TestCase
 
         // Check if tokens were deducted (escrowed)
         $this->assertEquals(500, $user->fresh()->token_balance);
+    }
+
+    public function test_bounty_index_returns_rich_user_payload_and_supports_reward_alias(): void
+    {
+        $viewer = User::factory()->create([
+            'last_daily_bonus_at' => now(),
+        ]);
+
+        $higherRewardUser = User::factory()->create([
+            'name' => 'High Reward',
+            'avatar_url' => 'https://cdn.example.com/high.jpg',
+            'last_daily_bonus_at' => now(),
+        ]);
+        UserProfile::factory()->create([
+            'user_id' => $higherRewardUser->id,
+            'display_name' => 'High Roller',
+            'bio' => 'Loves bold introductions.',
+            'gender' => 'female',
+            'birthdate' => now()->subYears(29)->toDateString(),
+        ]);
+        Photo::factory()->create([
+            'user_id' => $higherRewardUser->id,
+            'file_path' => 'photos/high-primary.jpg',
+            'thumbnail_path' => 'photos/high-primary-thumb.jpg',
+            'is_primary' => true,
+            'is_private' => false,
+        ]);
+
+        $lowerRewardUser = User::factory()->create([
+            'name' => 'Low Reward',
+            'avatar_url' => 'https://cdn.example.com/low.jpg',
+            'last_daily_bonus_at' => now(),
+        ]);
+        UserProfile::factory()->create([
+            'user_id' => $lowerRewardUser->id,
+            'display_name' => 'Low Roller',
+            'gender' => 'male',
+            'birthdate' => now()->subYears(31)->toDateString(),
+        ]);
+
+        \App\Models\MatchBounty::create([
+            'user_id' => $lowerRewardUser->id,
+            'slug' => 'lowreward',
+            'token_reward' => 100,
+            'status' => 'active',
+            'expires_at' => now()->addDays(7),
+        ]);
+
+        \App\Models\MatchBounty::create([
+            'user_id' => $higherRewardUser->id,
+            'slug' => 'highreward',
+            'token_reward' => 500,
+            'status' => 'active',
+            'expires_at' => now()->addDays(7),
+        ]);
+
+        $response = $this->actingAs($viewer)->getJson('/api/bounties?sort=reward&page=1&per_page=20');
+
+        $response->assertOk();
+        $response->assertJsonPath('data.0.slug', 'highreward');
+        $response->assertJsonPath('data.0.user.profile.display_name', 'High Roller');
+        $response->assertJsonPath('data.0.user.profile.gender', 'female');
+        $response->assertJsonPath('data.0.user.photos.0.is_primary', true);
+        $response->assertJsonStructure([
+            'data' => [
+                [
+                    'slug',
+                    'token_reward',
+                    'user' => [
+                        'id',
+                        'name',
+                        'avatar_url',
+                        'profile' => ['display_name', 'bio', 'birthdate', 'gender', 'age'],
+                        'photos' => [
+                            ['id', 'is_primary', 'url', 'thumbnail_url'],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 
     public function test_matchmaker_gets_bounty_reward_on_match()

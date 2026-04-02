@@ -168,6 +168,8 @@ class UserProfile extends Model
 {
     use HasFactory, SafelyHydratesAttributes;
 
+    protected $appends = ['age'];
+
     protected $fillable = [
         'user_id',
         'display_name',
@@ -266,6 +268,11 @@ class UserProfile extends Model
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getAgeAttribute(): ?int
+    {
+        return $this->birthdate?->age;
     }
 
     protected static function booted()

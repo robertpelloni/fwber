@@ -15,12 +15,20 @@ import { Copy, Sparkles, CheckCircle2 } from "lucide-react";
 import { apiClient } from "@/lib/api/client";
 import { useToast } from "@/lib/hooks/use-toast";
 
-export default function CreateBountyModal() {
+interface CreateBountyModalProps {
+  triggerClassName?: string;
+  triggerLabel?: string;
+}
+
+export default function CreateBountyModal({
+  triggerClassName,
+  triggerLabel = "Create Match Bounty",
+}: CreateBountyModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [tokenAmount, setTokenAmount] = useState(100);
   const [loading, setLoading] = useState(false);
   const [createdBountyUrl, setCreatedBountyUrl] = useState<string | null>(null);
-  const { success, error, info } = useToast();
+  const { success, error } = useToast();
 
   const handleCreate = async () => {
     if (tokenAmount < 10) {
@@ -30,7 +38,7 @@ export default function CreateBountyModal() {
 
     setLoading(true);
     try {
-      const response = await apiClient.post<{ share_url: string }>('/matchmaker/bounty', {
+      const response = await apiClient.post<{ share_url: string }>('/bounties', {
         token_reward: tokenAmount,
       });
 
@@ -64,13 +72,13 @@ export default function CreateBountyModal() {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && reset()}>
       <DialogTrigger asChild>
-        <Button 
-            variant="outline" 
-            className="w-full gap-2 border-pink-500/50 text-pink-500 hover:bg-pink-500/10 hover:text-pink-400"
+        <Button
+            variant="outline"
+            className={triggerClassName ?? "w-full gap-2 border-pink-500/50 text-pink-500 hover:bg-pink-500/10 hover:text-pink-400"}
             onClick={() => setIsOpen(true)}
         >
           <Sparkles className="h-4 w-4" />
-          Create Match Bounty
+          {triggerLabel}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md bg-gray-900 border-gray-800 text-white">
@@ -103,8 +111,8 @@ export default function CreateBountyModal() {
                 </span>
               </div>
               <p className="text-xs text-gray-500">
-                You will only be charged when a successful match is made.
-              </p>
+                 Tokens move into escrow now and are only paid out when a successful match is made.
+               </p>
             </div>
             <DialogFooter>
                 <Button 

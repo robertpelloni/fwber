@@ -10,6 +10,14 @@ All notable changes to this project will be documented in this file.
 - Updated the merchant vibe deck UI to reflect real send semantics, surface the live detected vibe on failures, and stop promising a nonexistent queued delivery path.
 - Added focused regression coverage for successful broadcast sends, vibe-mismatch rejection, and missing-location guidance.
 
+## [1.0.39] - 2026-04-02 — Bounty Flow Repair
+
+### Fixed
+- Expanded the `/api/bounties` payload to include the profile and photo relations the bounty cards actually render, and added a regression test covering the live `sort=reward` contract.
+- Added an `age` accessor to `UserProfile` so bounty cards and detail views receive the age field they already expect from serialized profile objects.
+- Switched bounty creation onto `POST /api/bounties`, kept shareable bounty detail pages on the public legacy GET route, and moved authenticated suggestions onto the live `/api/bounties/{slug}/suggest` endpoint.
+- Replaced the dead `/home` and `/profile/bounty/create` bounty links with the live dashboard route and the existing reusable create-bounty modal.
+
 ## [1.0.32] - 2026-04-02 — Navigation UX Patch
 
 ### Fixed
