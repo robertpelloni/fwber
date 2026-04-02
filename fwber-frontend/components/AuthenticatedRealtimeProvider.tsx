@@ -32,6 +32,8 @@ export function AuthenticatedRealtimeProvider({
   const contextValue: WebSocketContextValue = {
     connectionStatus: {
         connected: websocket.connectionStatus.connected,
+        connecting: websocket.connectionStatus.connecting,
+        configured: websocket.connectionStatus.configured,
         reconnectAttempts: websocket.connectionStatus.reconnectAttempts
     },
     onlineUsers: (websocket.onlineUsers || []) as any,

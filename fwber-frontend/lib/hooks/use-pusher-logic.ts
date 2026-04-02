@@ -53,6 +53,17 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
   const [typingIndicators, setTypingIndicators] = useState<TypingIndicator[]>([]);
   const [videoSignals, setVideoSignals] = useState<VideoSignal[]>([]);
   const [wingmanNudges, setWingmanNudges] = useState<any[]>([]);
+  const isRealtimeConfigured = useMemo(() => {
+    if (process.env.NODE_ENV === 'development') {
+      return true;
+    }
+
+    return Boolean(
+      process.env.NEXT_PUBLIC_REVERB_HOST ||
+      process.env.NEXT_PUBLIC_PUSHER_HOST ||
+      process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER
+    );
+  }, []);
 
   const echoRef = useRef<any>(null);
 
@@ -130,6 +141,11 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
   const connect = useCallback(async () => {
     if (echoRef.current || !user?.id || !token) return;
 
+    if (!isRealtimeConfigured) {
+      setStatus({ connected: false, connecting: false, error: null });
+      return;
+    }
+
     setStatus(prev => ({ ...prev, connecting: true, error: null }));
 
     try {
@@ -178,7 +194,7 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
       console.error('Failed to connect to Pusher', e);
       setStatus({ connected: false, connecting: false, error: e as Error });
     }
-  }, [user?.id, token]);
+  }, [user?.id, token, isRealtimeConfigured]);
 
   const disconnect = useCallback(() => {
     if (echoRef.current) {
@@ -346,6 +362,8 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
   return useMemo(() => ({
     connectionStatus: {
       connected: status.connected,
+      connecting: status.connecting,
+      configured: isRealtimeConfigured,
       connectionId: 'pusher',
       userId: user?.id || null,
       reconnectAttempts: 0
@@ -374,6 +392,7 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
     status.connected,
     status.connecting,
     user?.id,
+    isRealtimeConfigured,
     messages,
     onlineUsers,
     presenceUpdates,

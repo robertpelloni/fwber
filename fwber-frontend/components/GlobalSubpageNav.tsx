@@ -23,15 +23,28 @@ export default function GlobalSubpageNav() {
   const [headerCheckComplete, setHeaderCheckComplete] = useState(false)
 
   useEffect(() => {
-    let frameId = 0
-
-    frameId = window.requestAnimationFrame(() => {
+    const updateHeaderPresence = () => {
       setHasLocalHeader(Boolean(document.querySelector('[data-app-header="true"]')))
       setHeaderCheckComplete(true)
+    }
+
+    updateHeaderPresence()
+
+    const frameId = window.requestAnimationFrame(updateHeaderPresence)
+    const timeoutId = window.setTimeout(updateHeaderPresence, 250)
+    const observer = new MutationObserver(updateHeaderPresence)
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['data-app-header'],
     })
 
     return () => {
       window.cancelAnimationFrame(frameId)
+      window.clearTimeout(timeoutId)
+      observer.disconnect()
     }
   }, [pathname])
 

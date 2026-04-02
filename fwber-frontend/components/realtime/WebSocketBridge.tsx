@@ -28,6 +28,8 @@ export function WebSocketPresenceProvider({ children }: { children: React.ReactN
     })),
     connectionStatus: {
       connected: wsContext.connectionStatus.connected,
+      connecting: (wsContext.connectionStatus as any).connecting ?? false,
+      configured: (wsContext.connectionStatus as any).configured ?? true,
       reconnectAttempts: wsContext.connectionStatus.reconnectAttempts ?? 0,
     },
     sendTypingIndicator: wsContext.sendTypingIndicator,

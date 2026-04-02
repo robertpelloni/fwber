@@ -31,6 +31,7 @@ import {
   Loader2,
   Coins,
   DollarSign,
+  Sparkles,
 } from 'lucide-react';
 
 interface ReferralModalProps {
@@ -65,6 +66,7 @@ export function ReferralModal({ trigger }: ReferralModalProps) {
   const { user } = useAuth();
   const { success } = useToast();
   const [isOpen, setIsOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'invite' | 'vouch'>('invite');
 
   const origin = typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL || 'https://fwber.me');
 
@@ -104,6 +106,16 @@ export function ReferralModal({ trigger }: ReferralModalProps) {
     success('Link copied to clipboard.');
   };
 
+  const openInviteTab = () => {
+    setActiveTab('invite');
+    setIsOpen(true);
+  };
+
+  const openVouchTab = () => {
+    setActiveTab('vouch');
+    setIsOpen(true);
+  };
+
   const handleNativeShare = async (title: string, text: string, url: string) => {
     if (!url) return;
 
@@ -118,14 +130,37 @@ export function ReferralModal({ trigger }: ReferralModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        {trigger || (
-          <Button variant="outline" className="gap-2">
-            <Gift className="w-4 h-4" />
-            Invite & Earn
-          </Button>
-        )}
-      </DialogTrigger>
+      {trigger ? (
+        <DialogTrigger asChild>{trigger}</DialogTrigger>
+      ) : (
+        <div className="flex flex-col items-end gap-2">
+          <div className="flex flex-wrap justify-end gap-2">
+            <Button
+              type="button"
+              onClick={openInviteTab}
+              className="group relative gap-2 overflow-hidden border border-amber-300/70 bg-gradient-to-r from-amber-400 via-yellow-300 to-orange-400 px-5 text-sm font-extrabold text-slate-950 shadow-[0_0_24px_rgba(251,191,36,0.45)] transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_32px_rgba(251,191,36,0.65)]"
+            >
+              <span className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.65),_transparent_55%)] opacity-80" />
+              <span className="absolute inset-y-0 left-[-35%] w-1/3 -skew-x-12 bg-white/40 blur-md transition-transform duration-500 group-hover:translate-x-[230%]" />
+              <Sparkles className="relative h-4 w-4 animate-pulse" />
+              <Gift className="relative h-4 w-4" />
+              <span className="relative">Invite &amp; Earn</span>
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={openVouchTab}
+              className="gap-2 border-blue-300/70 bg-gradient-to-r from-sky-500/15 to-indigo-500/15 font-semibold text-blue-700 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:border-blue-400 hover:bg-blue-500/10 hover:text-blue-800 dark:text-blue-100 dark:hover:text-white"
+            >
+              <Shield className="h-4 w-4" />
+              Get Vouched
+            </Button>
+          </div>
+          <p className="max-w-[260px] text-right text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-500">
+            Earn real money from referrals!
+          </p>
+        </div>
+      )}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
@@ -147,7 +182,7 @@ export function ReferralModal({ trigger }: ReferralModalProps) {
           </div>
         </div>
 
-        <Tabs defaultValue="invite" className="w-full">
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'invite' | 'vouch')} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="invite">Invite Friends</TabsTrigger>
             <TabsTrigger value="vouch">Get Vouched</TabsTrigger>

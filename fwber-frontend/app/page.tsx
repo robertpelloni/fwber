@@ -7,7 +7,6 @@ import Link from 'next/link'
 import { Logo } from '@/components/Logo'
 import SexQuote from '@/components/SexQuote'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { useThemeStyle } from '@/components/ThemeProvider'
 import { Shield, Heart, Zap, MapPin, MessageCircle, Users, Menu, X, Lock, Ghost, Layers, FileText, Code, Building2, CheckCircle2, Sparkles, GitMerge, Shirt, RefreshCw, Flame, Link as LinkIcon, Rainbow, Video, Gift, Home, UserPlus, Star } from 'lucide-react'
 import { useState, Suspense } from 'react'
 import ReferralBanner from '@/components/ReferralBanner'
@@ -15,7 +14,6 @@ import ReferralBanner from '@/components/ReferralBanner'
 export default function HomePage() {
   const { isAuthenticated, isLoading } = useAuth()
   const router = useRouter()
-  const { themeStyle } = useThemeStyle()
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
@@ -46,12 +44,12 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
+      <div className="min-h-screen bg-white dark:bg-slate-950">
       <Suspense fallback={null}>
         <ReferralBanner />
       </Suspense>
       {/* Navigation */}
-      <nav className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-50">
+      <nav className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/90 backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/85">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
@@ -84,12 +82,7 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <div className={`relative overflow-hidden pt-16 pb-4 lg:pt-32 lg:pb-8 transition-colors duration-500
-        ${themeStyle === 'speakeasy' ? 'bg-gradient-to-b from-stone-100 to-stone-50 dark:from-stone-950 dark:to-black' : ''}
-        ${themeStyle === 'neon' ? 'bg-gradient-to-b from-slate-900 via-purple-900/10 to-black dark:from-black dark:via-purple-900/10 dark:to-black' : ''}
-        ${themeStyle === 'clean' ? 'bg-white dark:bg-gray-50' : ''}
-        ${themeStyle === 'classic' ? 'bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800' : ''}
-      `}>
+      <div className="relative overflow-hidden bg-gradient-to-b from-slate-50 via-white to-fuchsia-50/40 pt-16 pb-4 transition-colors duration-500 dark:from-slate-950 dark:via-slate-900 dark:to-fuchsia-950/15 lg:pt-32 lg:pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
             <div className="mb-6 flex justify-center">
@@ -100,11 +93,11 @@ export default function HomePage() {
               Real Connections. Zero Trace.
             </h2>
             
-            <p className="text-lg md:text-xl font-medium text-black dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+            <p className="text-lg md:text-xl font-medium text-slate-900 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
               The open-source adult network built on privacy. Meet locals, verify with AI, and chat with end-to-end encryption.
             </p>
             
-            <div className="w-full max-w-2xl mx-auto mb-10 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 shadow-sm">
+            <div className="w-full max-w-2xl mx-auto mb-10 rounded-[28px] border border-white/70 bg-white/70 p-4 shadow-[0_24px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/35">
               <SexQuote />
             </div>
 
@@ -131,16 +124,21 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="mt-8 mx-auto max-w-3xl rounded-2xl border border-purple-200/70 dark:border-purple-800/70 bg-white/80 dark:bg-gray-900/70 backdrop-blur-sm p-5 text-left shadow-sm">
+            <div className="mt-8 mx-auto max-w-3xl rounded-2xl border border-purple-200/70 bg-white/85 p-5 text-left shadow-[0_16px_45px_rgba(168,85,247,0.12)] backdrop-blur-sm dark:border-purple-800/70 dark:bg-gray-900/75">
               <div className="flex items-start gap-3">
-                <div className="mt-1 rounded-full bg-purple-100 dark:bg-purple-900/60 p-2">
+                <div className="mt-1 rounded-full bg-gradient-to-br from-purple-100 to-fuchsia-100 p-2 dark:from-purple-900/60 dark:to-fuchsia-900/50">
                   <Gift className="w-5 h-5 text-purple-600 dark:text-purple-300" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-white">How the referral loop works</h3>
-                  <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                    Invite friends for instant perks now. Once premium billing is fully live, a direct Gold upgrade can pay a small cash reward plus FWBcoin,
-                    and second-level upgrades can pay a smaller follow-on bonus.
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-white">Bring your people with you</h3>
+                    <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+                      referral rewards
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                    Send invites, grow your circle faster, and stack FWBcoin as your network moves. As Gold referrals roll through, direct upgrades are designed to unlock a small
+                    real-money bonus, with a smaller follow-on reward one level deeper.
                   </p>
                 </div>
               </div>
@@ -172,18 +170,8 @@ export default function HomePage() {
         </div>
         
         {/* Decorative blobs */}
-        <div className={`absolute top-0 left-0 -ml-20 -mt-20 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob transition-colors duration-500
-          ${themeStyle === 'clean' ? 'hidden' : ''}
-          ${themeStyle === 'speakeasy' ? 'bg-amber-200 dark:bg-amber-900/20' : ''}
-          ${themeStyle === 'neon' ? 'bg-fuchsia-500/30 dark:bg-fuchsia-600/20' : ''}
-          ${themeStyle === 'classic' ? 'bg-blue-100' : ''}
-        `}></div>
-        <div className={`absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000 transition-colors duration-500
-          ${themeStyle === 'clean' ? 'hidden' : ''}
-          ${themeStyle === 'speakeasy' ? 'bg-red-200 dark:bg-red-900/20' : ''}
-          ${themeStyle === 'neon' ? 'bg-cyan-500/30 dark:bg-cyan-600/20' : ''}
-          ${themeStyle === 'classic' ? 'bg-purple-100' : ''}
-        `}></div>
+        <div className="absolute top-0 left-0 -ml-20 -mt-20 h-96 w-96 rounded-full bg-sky-200/70 opacity-60 blur-3xl transition-colors duration-500 dark:bg-sky-500/10"></div>
+        <div className="absolute top-0 right-0 -mr-20 -mt-20 h-96 w-96 rounded-full bg-fuchsia-200/70 opacity-60 blur-3xl transition-colors duration-500 dark:bg-fuchsia-500/10"></div>
       </div>
 
       {/* Why fwber Section (Moved Up) */}

@@ -217,7 +217,7 @@ export function ConnectionStatusBadge({
     }
   }, []);
 
-  const { connected, reconnectAttempts } = context.connectionStatus;
+  const { connected, connecting, configured = true, reconnectAttempts } = context.connectionStatus;
   const isReconnecting = !connected && reconnectAttempts > 0;
 
   if (!isOnline) {
@@ -225,6 +225,24 @@ export function ConnectionStatusBadge({
       <div className={`inline-flex items-center gap-1.5 text-xs ${className}`}>
         <span className="w-2 h-2 bg-red-500 rounded-full" />
         <span className="text-red-600 font-medium">Offline</span>
+      </div>
+    );
+  }
+
+  if (!configured) {
+    return (
+      <div className={`inline-flex items-center gap-1.5 text-xs ${className}`}>
+        <span className="w-2 h-2 bg-slate-400 rounded-full" />
+        <span className="text-slate-500">Realtime off</span>
+      </div>
+    );
+  }
+
+  if (connecting && !connected) {
+    return (
+      <div className={`inline-flex items-center gap-1.5 text-xs ${className}`}>
+        <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+        <span className="text-blue-600">Connecting...</span>
       </div>
     );
   }

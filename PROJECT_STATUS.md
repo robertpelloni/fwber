@@ -1,16 +1,16 @@
-# Project Status — fwber v1.0.68 (Billing Launch Docs Refresh)
+# Project Status — fwber v1.0.69 (Shell Theme & Realtime UX Polish)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.68 "Billing Launch Docs Refresh"
+**Version:** 1.0.69 "Shell Theme & Realtime UX Polish"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## Billing Launch Docs Refresh
-- **Top-level docs now match the shipped app**: `README.md`, `ROADMAP.md`, `TODO.md`, and `DEPLOY.md` no longer advertise the stale `0.99.x` / `1.0.63` line and now describe the current billing-hardened beta reality.
-- **Stripe launch work is now explicit in-repo**: `DEPLOY.md` includes the required frontend publishable key, backend Stripe env variables, webhook registration requirements, and a concrete billing go-live checklist.
-- **The roadmap now names Stripe rollout as a milestone**: production billing configuration and payout/commission operations are called out directly instead of being implicit follow-up work.
-- **The TODO ledger now separates shipped billing hardening from remaining launch ops**: the unsafe premium shortcut fix is recorded as complete, while Stripe production rollout remains a visible critical item.
+## Shell Theme & Realtime UX Polish
+- **One visual system now drives the app shell**: the extra theme-style picker is gone, the frontend now sticks to a single tuned light/dark palette, and the homepage hero/quote surfaces use the same cleaner visual language instead of theme-by-theme branching.
+- **The viral rewards call-to-action is more explicit**: dashboard users now get a brighter `Invite & Earn` button, a direct `Get Vouched` sibling action, and clearer referral copy around real-money upside plus FWBcoin rewards.
+- **The floating logo/header collision is fixed at the root**: `GlobalSubpageNav` now keeps observing for late-mounted local headers, preventing the fallback back/home bubble from sitting on top of the real app header across recommendation, conference, nearby, leaderboard, and similar pages.
+- **Realtime status is less misleading**: presence context now carries whether Reverb/Pusher is configured, allowing the header badge to show `Realtime off` when signaling is disabled by env instead of always looking like a broken live connection.
 
 ## Premium Billing Hardening
 - **Unsafe Gold grant removed**: `/api/premium/purchase` no longer falls back to the mock `tok_visa` token. Stripe upgrades now require either a real `payment_method_id` or a confirmed `payment_intent_id`.

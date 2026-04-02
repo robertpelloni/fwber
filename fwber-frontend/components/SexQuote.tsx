@@ -43,16 +43,14 @@ export default function SexQuote() {
   if (!quote) return null;
 
   return (
-    <div className="relative p-6 mb-8 rounded-2xl bg-[#2A0A4A] border border-[#FF0099]/30 shadow-[0_0_30px_rgba(255,0,153,0.3)] overflow-hidden group">
-      {/* Ambient Glow Effects */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#00F0FF]/30 to-[#FF0099]/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none animate-pulse"></div>
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-[#FF0099]/20 to-[#00F0FF]/30 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none animate-pulse animation-delay-1000"></div>
-      
-      <div className="relative flex items-start gap-4 z-10">
-        <div className="p-2 rounded-lg bg-[#2A0A4A]/80 border border-[#00F0FF]/50 backdrop-blur-sm shadow-[0_0_10px_rgba(0,240,255,0.2)]">
-          <Quote className="h-5 w-5 text-[#00F0FF]" />
+    <div className="relative overflow-hidden rounded-2xl border border-fuchsia-200/70 bg-gradient-to-br from-white via-fuchsia-50/80 to-cyan-50/90 p-6 shadow-[0_18px_50px_rgba(168,85,247,0.12)] dark:border-fuchsia-500/20 dark:bg-gradient-to-br dark:from-slate-950 dark:via-fuchsia-950/45 dark:to-slate-900 dark:shadow-[0_18px_50px_rgba(0,0,0,0.45)]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(244,114,182,0.18),_transparent_35%),radial-gradient(circle_at_bottom_left,_rgba(34,211,238,0.16),_transparent_30%)] pointer-events-none" />
+
+      <div className="relative z-10 flex items-start gap-4">
+        <div className="rounded-xl border border-fuchsia-200/80 bg-white/85 p-2.5 shadow-sm dark:border-cyan-400/20 dark:bg-white/10">
+          <Quote className="h-5 w-5 text-fuchsia-500 dark:text-cyan-300" />
         </div>
-        <p className="text-lg md:text-xl font-light leading-relaxed text-transparent bg-clip-text bg-gradient-to-r from-[#00F0FF] via-[#d4fafa] to-[#FF0099] italic tracking-wide drop-shadow-[0_0_2px_rgba(0,240,255,0.5)]">
+        <p className="text-lg md:text-xl font-medium italic leading-relaxed text-slate-800 dark:bg-gradient-to-r dark:from-cyan-200 dark:via-white dark:to-fuchsia-200 dark:bg-clip-text dark:text-transparent">
           &ldquo;{quote}&rdquo;
         </p>
       </div>

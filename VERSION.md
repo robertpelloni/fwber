@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.68`
+- **Current version:** `1.0.69`
 - **Release date:** `2026-04-02`
-- **Release name:** `Billing Launch Docs Refresh`
+- **Release name:** `Shell Theme & Realtime UX Polish`
 
 ## Summary
 
-This release refreshes the top-level repository docs around the shipped billing hardening work, bringing README / ROADMAP / TODO / DEPLOY forward to the live state and adding a concrete Stripe production go-live checklist.
+This release cleans up the user-facing shell by fixing the fallback floating-nav overlap that was colliding with page headers, simplifying the frontend to one cohesive light/dark theme path, making the viral rewards trigger louder, and clarifying realtime status when Reverb / Pusher is not configured.
 
 ## Version Sources of Truth
 

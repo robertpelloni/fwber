@@ -1,40 +1,37 @@
-# Handoff — Billing Launch Docs Refresh
+# Handoff — Shell Theme & Realtime UX Polish
 
 **Date:** 2026-04-02  
-**Status:** ✅ Billing hardening is shipped and the repo docs now reflect the real launch state  
-**Version:** 1.0.68  
-**Latest pushed commit:** `77e537c8d` (`fix: harden premium billing flow (v1.0.67)`)
+**Status:** ✅ Shell polish and realtime UX cleanup are ready on top of the billing-hardening line  
+**Version:** 1.0.69  
+**Latest pushed commit:** `3a5ce22a6` (`docs: refresh billing launch guidance (v1.0.68)`)
 
 ## Overview
-This handoff now covers the post-`v1.0.67` docs/operations follow-up. The billing hardening work is already shipped, but the top-level repo docs were still stale and under-described the remaining Stripe production rollout work.
+This handoff covers the frontend shell follow-up after `v1.0.68`. User feedback pointed to repeated “floating logo over logo” collisions across discovery pages, an overcomplicated theme system, and a confusing `Disconnected` badge even when realtime was simply not configured.
 
-This release refreshes the repo-level operational docs so the written project state now matches the shipped app, and it adds a concrete Stripe go-live checklist that captures the real remaining launch tasks.
+This release addresses those as one cohesive UI/system slice: it fixes the fallback subpage nav race that was overlapping the real header, simplifies appearance controls to a single light/dark system, improves the referral CTA cluster, and makes the realtime badge explain when Echo is intentionally off.
 
-The original repo-recovery context still matters: all active work remains in the clean `C:\Users\hyper\workspace\fwber-mainline-repair` worktree, and the dirty root checkout remains preserved untouched.
+Active release work continues in the clean `C:\Users\hyper\workspace\fwber\temp_build\billing-push-clean` worktree rather than the dirty root checkout.
 
-## What Shipped in v1.0.68
+## What Shipped in v1.0.69
 
-### 1. Repo docs refresh
-- `README.md` now advertises the current beta/version/stack instead of stale `0.99.1` messaging.
-- `ROADMAP.md` now reflects `1.0.68` and explicitly calls out the Stripe production rollout as a next milestone.
-- `TODO.md` now records Stripe production rollout as an active critical item and premium billing hardening as recently completed.
-- `DEPLOY.md` now includes the Stripe env/config requirements and a concrete billing go-live checklist.
+### 1. Global shell collision fix
+- `GlobalSubpageNav` no longer performs only a single-frame header check.
+- It now re-checks via `requestAnimationFrame`, a short timeout, and a `MutationObserver`, which prevents the fallback floating back/home pill from persisting on pages that mount `AppHeader` slightly later.
+- This is the root fix for the repeated “floating logo over the logo under it” reports across discovery and utility pages.
 
-### 2. Remaining launch work is now explicit
-- The repo now clearly documents that Stripe launch still requires:
-  - frontend publishable key
-  - backend `PAYMENT_DRIVER=stripe`
-  - backend Stripe secret + webhook secret
-  - dashboard webhook registration
-  - end-to-end premium + referral verification
-  - a product/ops decision on manual cash commission handling vs Stripe Connect payouts
+### 2. Theme simplification
+- The extra theme-style system (`classic`, `speakeasy`, `neon`, `clean`) has been retired from the active UI path.
+- `ThemeToggle` now focuses on a single polished light/dark appearance model instead of stacking a second style picker on top.
+- The base design tokens in `globals.css` were tightened around that one light/dark system, and the homepage hero was updated to use it consistently.
 
-### 3. Previous shipped billing hardening remains intact
-- The `v1.0.67` protections still stand:
-  - no fallback `tok_visa` premium activation
-  - `/premium` and `/settings/subscription` route through the Stripe modal
-  - webhook secret lookup matches the live nested config
-  - homepage referral/FWBcoin loop copy is visible
+### 3. Referral/homepage polish
+- `ReferralModal` now exposes a louder `Invite & Earn` CTA plus a direct `Get Vouched` button that opens the vouch tab immediately.
+- The homepage quote box now uses a lighter, more editorial treatment, and the referral explainer copy reads more like product messaging instead of a billing footnote.
+
+### 4. Realtime status clarification
+- Presence context now carries whether realtime is actually configured.
+- The header badge can therefore show `Realtime off` when frontend Reverb/Pusher env is missing, instead of always showing a failure-shaped `Disconnected` state.
+- This also explains the current video-chat situation: signaling depends on the same realtime stack, so video chat will remain inert until Reverb/Pusher is configured and reachable.
 
 ## What Shipped in v1.0.65
 

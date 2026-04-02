@@ -19,6 +19,8 @@ export interface WebSocketContextValue {
   typingIndicators?: TypingIndicatorData[];
   connectionStatus: {
     connected: boolean;
+    connecting?: boolean;
+    configured?: boolean;
     reconnectAttempts: number;
   };
   sendTypingIndicator?: (recipientId: string, isTyping: boolean, chatroomId?: string) => void;
@@ -30,6 +32,8 @@ const defaultContextValue: WebSocketContextValue = {
   typingIndicators: [],
   connectionStatus: {
     connected: false,
+    connecting: false,
+    configured: false,
     reconnectAttempts: 0,
   },
 };

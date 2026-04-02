@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.69] - 2026-04-02 — Shell Theme & Realtime UX Polish
+
+### Fixed
+- Simplified the frontend appearance controls to a single polished light/dark theme path, removed the extra theme-style switcher, and tuned the homepage hero/quote treatment so the landing page feels more cohesive instead of mixing multiple visual systems.
+- Made the Viral Rewards trigger louder with a flashy **Invite & Earn** CTA, added a sibling **Get Vouched** entry point that opens the vouch tab directly, and reinforced the real-money referral upside in the dashboard control cluster.
+- Fixed the floating fallback subpage nav so it keeps watching for late-mounted local headers instead of lingering on top of the real app header/logo across discovery pages.
+- Clarified realtime status by distinguishing an actually disconnected session from a frontend with Reverb/Pusher intentionally unconfigured, so the header badge now reflects when realtime is simply off.
+
 ## [1.0.68] - 2026-04-02 — Billing Launch Docs Refresh
 
 ### Fixed
