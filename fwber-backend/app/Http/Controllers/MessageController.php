@@ -565,9 +565,28 @@ class MessageController extends Controller
     /**
      * CRDT-based Offline Batch Sync
      *
-     * Accepts a batch of pending offline messages and deletions from the client.
-     * Reconciles them securely, appends them to the event store, and returns
-     * any server-side messages the client missed since their last sync timestamp.
+     * @OA\Post(
+     *   path="/messages/sync-batch",
+     *   tags={"Messaging"},
+     *   summary="CRDT Offline Batch Sync",
+     *   description="Accepts a batch of offline messages and reconciles them securely. Returns missed server-side messages.",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       @OA\Property(property="last_sync_at", type="string", format="date-time", nullable=true),
+     *       @OA\Property(property="messages", type="array", @OA\Items(
+     *           @OA\Property(property="uuid", type="string", format="uuid"),
+     *           @OA\Property(property="recipient_id", type="integer"),
+     *           @OA\Property(property="content", type="string"),
+     *           @OA\Property(property="type", type="string"),
+     *           @OA\Property(property="is_encrypted", type="boolean"),
+     *           @OA\Property(property="created_at", type="string", format="date-time")
+     *       ))
+     *     )
+     *   ),
+     *   @OA\Response(response=200, description="Batch synced successfully")
+     * )
      */
     public function syncBatch(Request $request): JsonResponse
     {

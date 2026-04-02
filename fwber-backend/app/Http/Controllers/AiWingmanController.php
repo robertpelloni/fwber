@@ -269,6 +269,16 @@ class AiWingmanController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
+    /**
+     * @OA\Get(
+     *   path="/wingman/fortune",
+     *   tags={"AI Wingman"},
+     *   summary="Predict astrological fortune",
+     *   description="Reads the user's astrological fortune.",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="Fortune predicted")
+     * )
+     */
     public function predictFortune(Request $request)
     {
         $user = Auth::user();
@@ -302,6 +312,16 @@ class AiWingmanController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
+    /**
+     * @OA\Get(
+     *   path="/wingman/nemesis",
+     *   tags={"AI Wingman"},
+     *   summary="Find a nemesis profile",
+     *   description="Generates a nemesis profile based on clashing traits.",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="Nemesis found")
+     * )
+     */
     public function findNemesis(Request $request)
     {
         $user = Auth::user();
@@ -313,9 +333,21 @@ class AiWingmanController extends Controller
     }
 
     /**
-     * Analyze a user quirk for "Red Flags".
-     *
-     * @return \Illuminate\Http\JsonResponse
+     * @OA\Post(
+     *   path="/wingman/quirk-check",
+     *   tags={"AI Wingman"},
+     *   summary="Analyze a user quirk",
+     *   description="Evaluates a specific quirk for green/beige/red flags.",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"quirk"},
+     *       @OA\Property(property="quirk", type="string", example="Bites string cheese")
+     *     )
+     *   ),
+     *   @OA\Response(response=200, description="Quirk analyzed")
+     * )
      */
     public function checkQuirk(AnalyzeQuirkRequest $request)
     {
@@ -335,6 +367,18 @@ class AiWingmanController extends Controller
      * Requires mutual match. Token-gated (5 FWB tokens).
      *
      * @return \Illuminate\Http\JsonResponse
+     */
+    /**
+     * @OA\Post(
+     *   path="/wingman/compatibility-audit/{targetId}",
+     *   tags={"AI Wingman"},
+     *   summary="Perform a full compatibility audit",
+     *   description="Deeply audits the compatibility between the user and a match.",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="targetId", in="path", required=true, @OA\Schema(type="string")),
+     *   @OA\Response(response=200, description="Audit completed"),
+     *   @OA\Response(response=403, description="Must be matched to audit")
+     * )
      */
     public function compatibilityAudit(Request $request, string $targetId)
     {

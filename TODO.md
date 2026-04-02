@@ -33,14 +33,14 @@
 - [x] **Hardware Token UI Polish**: Ensure the `app/settings/hardware/page.tsx` gracefully handles BLE pairing flows and visualizes the "ping" actions.
 
 ## 🟢 Medium: Robustness & Refactoring
-- [ ] **Event Sourcing Audit**: Review all `EventStore::append` calls to ensure aggregate IDs are strictly cast to strings and that no integer-to-string database constraint errors exist.
+- [x] **Event Sourcing Audit**: Review all `EventStore::append` calls to ensure aggregate IDs are strictly cast to strings and that no integer-to-string database constraint errors exist.
 - [x] **Offline Sync Conflict Resolution**: Enhance `use-chat-sync.ts` to handle complex CRDT conflict resolution when merging offline messages with server state.
-- [ ] **Rust Geo-Screener Integration**: Transition the PHP `LocationController` to offload dense spatial queries to the `fwber-geo` Rust microservice.
+- [x] **Rust Geo-Screener Integration**: Transition the PHP `LocationController` to offload dense spatial queries to the `fwber-geo` Rust microservice.
 
 ## ⚪ Low: Technical Debt & Documentation
-- [ ] Update `cypress` E2E tests to cover the new ZK-Identity and AR Navigation flows.
-- [ ] Clean up unused local test files and outdated `.txt` debug logs from the root directory.
-- [ ] Ensure all new API endpoints are fully documented with Swagger/OpenAPI annotations.
+- [x] Update `cypress` E2E tests to cover the new ZK-Identity and AR Navigation flows.
+- [x] Clean up unused local test files and outdated `.txt` debug logs from the root directory.
+- [x] Ensure all new API endpoints are fully documented with Swagger/OpenAPI annotations.
 
 ## ✅ Recently Completed
 - [x] **Offline Sync CRDT Integration**: Upgraded the `useChatSync.ts` basic retry queue to a full CRDT batching system sending `last_sync_at` (logical clock) to the new `POST /messages/sync-batch` endpoint.
