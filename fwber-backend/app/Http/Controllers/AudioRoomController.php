@@ -7,24 +7,57 @@ use App\Events\AudioRoomParticipantLeft;
 use App\Events\AudioRoomSignal;
 use App\Models\AudioRoom;
 use App\Models\AudioRoomParticipant;
+use App\Services\AudioRoomRankingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AudioRoomController extends Controller
 {
+    public function __construct(
+        private readonly AudioRoomRankingService $audioRoomRankingService,
+    ) {
+    }
+
     /**
      * List all active audio rooms.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $validated = $request->validate([
+            'ranking_strategy' => 'sometimes|string|in:default,trust-aware',
+            'latitude' => 'sometimes|numeric|between:-90,90',
+            'longitude' => 'sometimes|numeric|between:-180,180',
+        ]);
+
+        $rankingStrategy = $validated['ranking_strategy'] ?? 'default';
         $rooms = AudioRoom::withCount('participants')
-            ->with(['host:id,name,avatar_url,tier'])
+            ->with(['host:id,name,avatar_url,tier', 'host.profile', 'participants'])
             ->where('status', 'active')
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return response()->json($rooms);
+        if ($rankingStrategy !== 'trust-aware') {
+            return response()->json($rooms);
+        }
+
+        $viewer = Auth::user();
+        $rankedRooms = $viewer
+            ? $this->audioRoomRankingService->rankLobby(
+                $viewer,
+                $rooms,
+                isset($validated['latitude']) ? (float) $validated['latitude'] : null,
+                isset($validated['longitude']) ? (float) $validated['longitude'] : null
+            )
+            : $rooms;
+
+        return response()->json([
+            'data' => $rankedRooms,
+            'rooms' => $rankedRooms,
+            'meta' => [
+                'ranking_strategy' => $this->audioRoomRankingService->buildRankingStrategy(),
+            ],
+        ]);
     }
 
     /**

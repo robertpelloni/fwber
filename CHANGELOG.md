@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.59] - 2026-04-02 — Trust-Aware Audio Room Ranking
+
+### Fixed
+- Reworked `GET /api/audio-rooms` so the audio-room lobby can opt into the same privacy-safe trust-aware model already shipped across Local Pulse, recommendations, nearby chatrooms, events, bulletin boards, group matching, venues, and nearby users, balancing trusted hosts, scene alignment, participant health, freshness, and distance when host location is available.
+- Added `AudioRoomRankingService` to reuse `LocalPulseRankingService` trust-map inputs, `AIMatchingService` scene-signal helpers, and host location data while keeping private social-graph data internal to server-side scoring.
+- Extended the ranked audio-room lobby response with `data`, `rooms`, and high-level `meta.ranking_strategy` metadata plus scene cues and ranking scores, while preserving the legacy raw array response for non-ranked callers.
+- Updated the audio-room lobby page to request trust-aware ranking, explain why trusted scene-aligned rooms surface first, and render room distance plus scene cues inline on each room card.
+- Added focused backend regression coverage proving audio rooms expose ranking metadata and that a trusted, scene-aligned room can outrank a slightly closer stranger room.
+
 ## [1.0.58] - 2026-04-02 — Trust-Aware Nearby User Ranking
 
 ### Fixed
