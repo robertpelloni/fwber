@@ -35,10 +35,9 @@ class E2EKeyManagementController extends Controller
         $user = Auth::user();
 
         UserPublicKey::updateOrCreate(
-            ['user_id' => $user->id],
+            ['user_id' => $user->id, 'key_type' => $request->input('key_type', 'ECDH')],
             [
                 'public_key' => Crypt::encryptString($request->public_key),
-                'key_type' => $request->input('key_type', 'ECDH'),
                 'device_id' => $request->input('device_id'),
                 'last_rotated_at' => now(),
             ]
@@ -62,7 +61,9 @@ class E2EKeyManagementController extends Controller
      */
     public function show($userId)
     {
-        $key = UserPublicKey::where('user_id', $userId)->first();
+        $key = UserPublicKey::where('user_id', $userId)
+            ->where('key_type', 'ECDH')
+            ->first();
 
         if (! $key) {
             return response()->json(['error' => 'Public key not found for this user'], 404);
@@ -79,7 +80,9 @@ class E2EKeyManagementController extends Controller
     public function me()
     {
         $user = Auth::user();
-        $key = UserPublicKey::where('user_id', $user->id)->first();
+        $key = UserPublicKey::where('user_id', $user->id)
+            ->where('key_type', 'ECDH')
+            ->first();
 
         if (! $key) {
             return response()->json(['error' => 'Public key not found'], 404);

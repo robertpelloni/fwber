@@ -33,7 +33,9 @@ class E2EKeyManagementTest extends TestCase
         ]);
 
         // Verify encryption
-        $storedKey = UserPublicKey::where('user_id', $user->id)->first();
+        $storedKey = UserPublicKey::where('user_id', $user->id)
+            ->where('key_type', 'ECDH')
+            ->first();
         $this->assertNotEquals($publicKey, $storedKey->public_key);
         $this->assertEquals($publicKey, Crypt::decryptString($storedKey->public_key));
     }

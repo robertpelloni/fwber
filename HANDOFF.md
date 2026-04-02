@@ -1,16 +1,63 @@
-# Handoff — ActivityPub Inbox Signature Verification
+# Handoff — ActivityPub Signed Outbound Delivery
 
 **Date:** 2026-04-02  
-**Status:** ✅ ActivityPub inbox signature verification is ready on top of the production-500 hardening slice  
-**Version:** 1.0.73  
-**Latest pushed commit:** `df6f99417` (`fix: harden production 500 endpoints (v1.0.72)`)
+**Status:** ✅ ActivityPub signed outbound delivery is ready on top of the inbox-signature slice  
+**Version:** 1.0.74  
+**Latest pushed commit:** `64c4b0f18` (`feat: verify ActivityPub inbox signatures (v1.0.73)`)
 
 ## Overview
-This handoff covers the next federation security slice after `v1.0.72`. `TODO.md` called out two remaining ActivityPub protocol gaps: signed outbound delivery and inbox signature verification. This release closes the inbound side first by requiring valid HTTP signatures on the public inbox route before any Follow, Accept, Undo, or Create activity is processed.
+This handoff covers the next federation protocol slice after `v1.0.73`. The inbound side was already protected by HTTP signature verification, but outbound delivery was still mocked and local actors were still publishing a fake public key. This release closes that remaining protocol gap by generating real actor keypairs, exposing the real public key, and signing outbound Follow / follower-delivery requests before they leave the server.
 
-The implementation keeps the scope tight and shippable: it does not yet introduce local actor private-key generation or real outbound signed delivery, but it now blocks spoofed/unsigned inbound federation traffic and gives the next slice a real security boundary to build on.
+The implementation also had to widen the existing shared key-storage table carefully so the new ActivityPub keypair would not break the E2E encryption endpoints that were already using `user_public_keys`.
 
 Active release work continues in the clean `C:\Users\hyper\workspace\fwber\temp_build\billing-push-clean` worktree rather than the dirty root checkout.
+
+## What Shipped in v1.0.74
+
+### 1. Dedicated ActivityPub keypair service
+- Added `App\Services\ActivityPubKeyService`.
+- The service now:
+  - generates a 2048-bit RSA keypair for local federated actors
+  - stores the public/private key material encrypted at rest
+  - publishes the stable local actor URI + `#main-key` key ID
+  - lazily provisions the keypair when actor data or outbound delivery needs it
+
+### 2. Shared key-table expansion without breaking E2E
+- Added a migration that expands `user_public_keys` with:
+  - `private_key`
+  - multi-key support via unique `(user_id, key_type)`
+- The migration includes a SQLite-safe table rebuild path because dropping the original single-column unique index by a fixed name was not portable across test databases.
+- Existing E2E key management now explicitly queries `key_type = ECDH`, so the older `/api/security/keys` behavior survives even though the table now stores ActivityPub RSA keys too.
+
+### 3. Real outbound ActivityPub delivery
+- `ActivityPubService::dispatchToRemoteInbox()` is no longer a no-op logger.
+- The service now:
+  - fetches the remote actor document
+  - resolves the remote inbox URL
+  - encodes the activity body as ActivityPub JSON
+  - signs the request with the local actor private key using the shared HTTP Signature logic
+  - performs the outbound POST
+- This path is used both by direct follow initiation and by follower broadcast delivery.
+
+### 4. Real actor public-key exposure
+- `generateActorPayload()` now pulls the real generated public key from `ActivityPubKeyService`.
+- Local actor JSON-LD no longer advertises the old hardcoded `MockPublicKeyForIteration0347` placeholder.
+- Remote servers now have a real verification target for both inbound and outbound federation interactions.
+
+### 5. Regression coverage and findings
+- Added `ActivityPubOutboundTest` covering:
+  - actor endpoint public-key generation/exposure
+  - signed outbound follow delivery to a remote inbox
+- Re-ran the existing ActivityPub inbox and E2E key suites because the same key table is now shared.
+- Important implementation finding:
+  - the first migration attempt failed on SQLite because the original unique index name was auto-generated differently than expected, so the final migration rebuilds the table on SQLite rather than relying on a named `dropUnique`.
+
+### 6. Remaining next-step candidates
+- The old ActivityPub protocol hardening TODO is now effectively complete for the currently shipped search/follow/outbox scope.
+- The next strong repo-backed slices are now things like:
+  - merchant portal lifecycle controls
+  - AI wingman UI wiring
+  - event-sourcing audit
 
 ## What Shipped in v1.0.73
 

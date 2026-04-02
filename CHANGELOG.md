@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.74] - 2026-04-02 — ActivityPub Signed Outbound Delivery
+
+### Fixed
+- Added `ActivityPubKeyService` plus a widening migration for `user_public_keys`, so the backend now stores a dedicated encrypted ActivityPub RSA keypair alongside the existing E2E key record instead of forcing both concerns through the same single-row slot.
+- Replaced the mocked `ActivityPubService::dispatchToRemoteInbox()` with real remote actor fetch + inbox resolution + HTTP Signature dispatch, so federated follow requests and follower broadcasts now perform signed outbound POSTs instead of only logging intent.
+- Updated actor payload generation to expose the real generated public key rather than the old mock placeholder, making local actor documents usable for remote signature verification.
+- Hardened the schema expansion for SQLite test runs by rebuilding `user_public_keys` there instead of assuming a portable named unique index drop.
+- Scoped the existing E2E key-management queries to `key_type = ECDH`, preserving the current encryption-key APIs after the table began holding ActivityPub key material too.
+- Added outbound federation regression coverage for actor public-key generation/exposure and signed follow delivery, alongside the existing inbox-signature and E2E key-management suites.
+
 ## [1.0.73] - 2026-04-02 — ActivityPub Inbox Signature Verification
 
 ### Fixed

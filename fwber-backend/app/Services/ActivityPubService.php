@@ -3,10 +3,17 @@
 namespace App\Services;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use RuntimeException;
 
 class ActivityPubService
 {
+    public function __construct(
+        protected ActivityPubKeyService $activityPubKeyService,
+        protected HttpSignatureService $httpSignatureService
+    ) {}
+
     /**
      * Broadcast an activity to all accepted followers.
      */
@@ -19,24 +26,53 @@ class ActivityPubService
             ->get();
 
         foreach ($followers as $follower) {
-            $this->dispatchToRemoteInbox($follower->actor_uri, $activity);
+            $this->dispatchToRemoteInbox($user, $follower->actor_uri, $activity);
         }
     }
 
     /**
-     * Dispatch an ActivityPub payload to a remote Inbox.
-     * In a real implementation, this would use a signed HTTP request.
+     * Dispatch a signed ActivityPub payload to a remote Inbox.
      */
-    public function dispatchToRemoteInbox(string $actorUri, array $activity): void
+    public function dispatchToRemoteInbox(User $user, string $actorUri, array $activity): void
     {
-        // 1. Resolve Inbox from Actor URI (WebFinger or Actor fetch)
-        // 2. Sign with User's Private Key
-        // 3. POST to remote server
+        $actorResponse = Http::accept('application/activity+json')
+            ->withHeaders(['Accept' => 'application/activity+json, application/ld+json'])
+            ->timeout(5)
+            ->get($actorUri);
 
-        Log::info("ActivityPub: Dispatching activity type '{$activity['type']}' to {$actorUri}");
+        if (! $actorResponse->successful()) {
+            throw new RuntimeException("Unable to resolve ActivityPub actor {$actorUri}.");
+        }
 
-        // Mocking the actual network call
-        // Http::withHeaders(['Signature' => '...'])->post($inbox, $activity);
+        $actorDocument = $actorResponse->json();
+        $inboxUrl = is_array($actorDocument) ? ($actorDocument['inbox'] ?? null) : null;
+
+        if (! is_string($inboxUrl) || trim($inboxUrl) === '') {
+            throw new RuntimeException("Remote actor {$actorUri} did not publish an inbox URL.");
+        }
+
+        $body = json_encode($activity, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        if (! is_string($body)) {
+            throw new RuntimeException('Unable to encode ActivityPub payload.');
+        }
+
+        $headers = $this->httpSignatureService->buildSignedHeaders(
+            $this->activityPubKeyService->keyId($user),
+            $this->activityPubKeyService->getPrivateKey($user),
+            'POST',
+            $inboxUrl,
+            $body
+        );
+
+        $response = Http::withHeaders($headers)
+            ->withBody($body, 'application/activity+json')
+            ->send('POST', $inboxUrl);
+
+        if (! $response->successful()) {
+            throw new RuntimeException("Remote inbox {$inboxUrl} rejected '{$activity['type']}' with status {$response->status()}.");
+        }
+
+        Log::info("ActivityPub: Dispatched signed activity type '{$activity['type']}' to {$inboxUrl}");
     }
 
     /**
@@ -46,10 +82,11 @@ class ActivityPubService
     public function generateActorPayload(User $user): array
     {
         $profile = $user->profile;
-        $actorUri = url("/api/federation/users/{$user->id}");
+        $actorUri = $this->activityPubKeyService->actorUri($user);
         $inboxUri = url("/api/federation/users/{$user->id}/inbox");
         $outboxUri = url("/api/federation/users/{$user->id}/outbox");
-        $publicKeyId = "{$actorUri}#main-key";
+        $publicKeyId = $this->activityPubKeyService->keyId($user);
+        $publicKeyPem = $this->activityPubKeyService->getPublicKey($user);
 
         return [
             '@context' => [
@@ -84,7 +121,7 @@ class ActivityPubService
             'publicKey' => [
                 'id' => $publicKeyId,
                 'owner' => $actorUri,
-                'publicKeyPem' => "-----BEGIN PUBLIC KEY-----\nMockPublicKeyForIteration0347\n-----END PUBLIC KEY-----",
+                'publicKeyPem' => $publicKeyPem,
             ],
         ];
     }

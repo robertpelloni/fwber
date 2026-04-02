@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.0.73  
+> **Version:** 1.0.74  
 > **Last Updated:** 2026-04-02
 
 ---
@@ -11,7 +11,7 @@
 - [ ] **Verify Vercel Deployment**: Ensure the latest Next.js build with the `/api` absolute path proxy and MIME fixes is successfully deployed and running.
 
 ## 🟡 High: Missing UI Integrations
-- [ ] **ActivityPub Federation Protocol Hardening**: Federation UI now covers search, follow relationships, actor exploration, activity center, global feed, public outbox visibility, follow accept state transitions, and inbound inbox signature verification, but signed outbound delivery plus local actor key generation still need implementation.
+- [x] **ActivityPub Federation Protocol Hardening**: Federation UI now covers search, follow relationships, actor exploration, activity center, global feed, public outbox visibility, follow accept state transitions, inbound inbox signature verification, local actor key generation, and signed outbound delivery.
 - [ ] **Merchant Portal UI**: Merchant registration, promotion creation, management, analytics, vibe analysis, live pulse broadcasting, and broadcast history are now wired, but the portal still needs deeper lifecycle tools like resend/deactivate/reporting controls and broader operations polish.
 - [x] **Scene Discovery Phase 5**: Followed the topic-hub slice with topic-aware match ranking, richer profile scene cards, and scene overlap that uses interests plus visible social context instead of pure radius.
 - [x] **Recommendation Scene Signals**: Extended the recommendation hub and personalized feed with scene-aligned recommendation metadata and card rendering on top of the shared topic graph.
@@ -43,6 +43,7 @@
 - [ ] Ensure all new API endpoints are fully documented with Swagger/OpenAPI annotations.
 
 ## ✅ Recently Completed
+- [x] **ActivityPub Signed Outbound Delivery**: Added a dedicated ActivityPub keypair service, widened `user_public_keys` for multiple key types, exposed real actor public keys, and replaced mocked outbound follow dispatch with signed remote inbox delivery.
 - [x] **ActivityPub Inbox Signature Verification**: Added inbound HTTP signature middleware for `/api/federation/users/{id}/inbox`, enforced `Signature`/`Date`/`Digest` verification against remote actor keys, and covered the path with signed-request regression tests.
 - [x] **Premium Billing Hardening**: Removed the unsafe mock Stripe fallback, restored `/premium` and `/settings/subscription` to the Stripe upgrade modal, fixed webhook secret lookup, corrected subscription amount rendering, and added visible referral-loop copy on the homepage.
 

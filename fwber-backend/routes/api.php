@@ -24,9 +24,9 @@ use Illuminate\Support\Facades\Route;
 // Federation (ActivityPub)
 Route::prefix('federation')->group(function () {
     Route::get('search', [\App\Http\Controllers\ActivityPubSearchController::class, 'search']);
-    Route::post('follow', [\App\Http\Controllers\ActivityPubSearchController::class, 'follow']);
-    Route::get('following', [\App\Http\Controllers\ActivityPubSearchController::class, 'getFollowing']);
-    Route::get('followers', [\App\Http\Controllers\ActivityPubSearchController::class, 'getFollowers']);
+    Route::post('follow', [\App\Http\Controllers\ActivityPubSearchController::class, 'follow'])->middleware('auth:sanctum');
+    Route::get('following', [\App\Http\Controllers\ActivityPubSearchController::class, 'getFollowing'])->middleware('auth:sanctum');
+    Route::get('followers', [\App\Http\Controllers\ActivityPubSearchController::class, 'getFollowers'])->middleware('auth:sanctum');
     Route::get('posts', [\App\Http\Controllers\ActivityPubSearchController::class, 'getPosts']);
     Route::get('actors/detail', [\App\Http\Controllers\ActivityPubController::class, 'actorDetail']);
     Route::post('users/{id}/inbox', [\App\Http\Controllers\ActivityPubInboxController::class, 'handle'])

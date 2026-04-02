@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.73`
+- **Current version:** `1.0.74`
 - **Release date:** `2026-04-02`
-- **Release name:** `ActivityPub Inbox Signature Verification`
+- **Release name:** `ActivityPub Signed Outbound Delivery`
 
 ## Summary
 
-This release hardens inbound federation by requiring valid HTTP signatures on ActivityPub inbox requests. The backend now validates `Signature`, `Date`, and `Digest` headers against the remote actor's published RSA public key before processing Follow, Accept, Undo, or Create activities.
+This release closes the outbound side of the ActivityPub hardening work. The backend now generates a dedicated RSA keypair for local actors, exposes the real public key in actor payloads, and sends signed Follow or follower-broadcast activities to remote inboxes instead of just logging mocked dispatch intent.
 
 ## Version Sources of Truth
 

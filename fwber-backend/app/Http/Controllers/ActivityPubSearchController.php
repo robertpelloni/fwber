@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\FederatedPost;
+use App\Services\ActivityPubKeyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -92,8 +93,16 @@ class ActivityPubSearchController extends Controller
         $user = auth()->user();
         $actorId = $request->input('actor_id');
 
+        if (! $user) {
+            return response()->json(['error' => 'Authentication required'], 401);
+        }
+
         if (! $actorId) {
             return response()->json(['error' => 'Actor ID required'], 422);
+        }
+
+        if (! ($user->profile?->is_federated)) {
+            return response()->json(['error' => 'Federation must be enabled before following remote actors'], 422);
         }
 
         try {
@@ -118,10 +127,11 @@ class ActivityPubSearchController extends Controller
 
             // 3. Sign and dispatch 'Follow' activity to remote inbox
             $activityPubService = app(\App\Services\ActivityPubService::class);
-            $activityPubService->dispatchToRemoteInbox($actorId, [
+            $activityPubKeyService = app(ActivityPubKeyService::class);
+            $activityPubService->dispatchToRemoteInbox($user, $actorId, [
                 '@context' => 'https://www.w3.org/ns/activitystreams',
                 'type' => 'Follow',
-                'actor' => url("/api/federation/users/{$user->id}"),
+                'actor' => $activityPubKeyService->actorUri($user),
                 'object' => $actorId,
             ]);
 

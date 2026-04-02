@@ -5,6 +5,7 @@ namespace App\Services;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
+use RuntimeException;
 
 class HttpSignatureService
 {
@@ -87,6 +88,68 @@ class HttpSignatureService
         ];
     }
 
+    /**
+     * Build outbound HTTP Signature headers for an ActivityPub request.
+     *
+     * @return array<string, string>
+     */
+    public function buildSignedHeaders(
+        string $keyId,
+        string $privateKeyPem,
+        string $method,
+        string $url,
+        string $body,
+        string $contentType = 'application/activity+json'
+    ): array {
+        $date = now()->toRfc7231String();
+        $digest = 'SHA-256='.base64_encode(hash('sha256', $body, true));
+        $headers = ['(request-target)', 'host', 'date', 'digest', 'content-type'];
+        $host = parse_url($url, PHP_URL_HOST);
+        $port = parse_url($url, PHP_URL_PORT);
+        $path = parse_url($url, PHP_URL_PATH) ?: '/';
+        $query = parse_url($url, PHP_URL_QUERY);
+
+        if (! is_string($host) || $host === '') {
+            throw new RuntimeException('Cannot sign request without a valid host.');
+        }
+
+        if (is_int($port)) {
+            $host .= ":{$port}";
+        }
+
+        if (is_string($query) && $query !== '') {
+            $path .= "?{$query}";
+        }
+
+        $signatureString = $this->buildOutboundSignatureString(
+            strtolower($method),
+            $path,
+            $host,
+            $date,
+            $digest,
+            $contentType,
+            $headers
+        );
+
+        $privateKey = openssl_pkey_get_private($privateKeyPem);
+        if ($privateKey === false || ! openssl_sign($signatureString, $signature, $privateKey, OPENSSL_ALGO_SHA256)) {
+            throw new RuntimeException('Unable to sign outbound ActivityPub request.');
+        }
+
+        return [
+            'Accept' => 'application/activity+json, application/ld+json',
+            'Content-Type' => $contentType,
+            'Date' => $date,
+            'Digest' => $digest,
+            'Signature' => sprintf(
+                'keyId="%s",algorithm="rsa-sha256",headers="%s",signature="%s"',
+                $keyId,
+                implode(' ', $headers),
+                base64_encode($signature)
+            ),
+        ];
+    }
+
     protected function dateHeaderIsFresh(string $dateHeader): bool
     {
         try {
@@ -163,6 +226,35 @@ class HttpSignatureService
         }
 
         return $lines === [] ? null : implode("\n", $lines);
+    }
+
+    /**
+     * @param  array<int, string>  $headers
+     */
+    protected function buildOutboundSignatureString(
+        string $method,
+        string $requestUri,
+        string $host,
+        string $date,
+        string $digest,
+        string $contentType,
+        array $headers
+    ): string {
+        $headerValues = [
+            '(request-target)' => $method.' '.$requestUri,
+            'host' => $host,
+            'date' => $date,
+            'digest' => $digest,
+            'content-type' => $contentType,
+        ];
+
+        return collect($headers)
+            ->map(function (string $header) use ($headerValues): string {
+                $normalizedHeader = strtolower(trim($header));
+
+                return $normalizedHeader.': '.$headerValues[$normalizedHeader];
+            })
+            ->implode("\n");
     }
 
     /**

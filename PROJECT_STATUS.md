@@ -1,17 +1,17 @@
-# Project Status — fwber v1.0.73 (ActivityPub Inbox Signature Verification)
+# Project Status — fwber v1.0.74 (ActivityPub Signed Outbound Delivery)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.73 "ActivityPub Inbox Signature Verification"
+**Version:** 1.0.74 "ActivityPub Signed Outbound Delivery"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## ActivityPub Inbox Signature Verification
-- **Unsigned federation payloads are now rejected at the route boundary**: `/api/federation/users/{id}/inbox` now requires a valid HTTP signature before the inbox controller will touch the activity body.
-- **Inbound signature checks now cover the important replay and tamper surfaces**: the new verification path enforces `Signature`, `Date`, and `Digest` headers, rejects stale requests, and verifies the signature against the remote actor's published RSA public key.
-- **Payload actors must match the signing key owner**: the middleware now rejects requests where the signed key belongs to one actor but the JSON activity claims to be from another.
-- **Existing inbox flows are still intact once authenticated**: Follow, Undo, and Accept handling continue to work after the route guard, and the old inbox tests now send real signed requests instead of anonymous JSON.
-- **The next federation gap is narrower now**: outbound ActivityPub delivery is still mocked in `ActivityPubService`, so signed outbound posts/follows and local actor key generation are the remaining high-value federation slice.
+## ActivityPub Signed Outbound Delivery
+- **Local actors now have real federation keypairs**: the backend generates and stores a dedicated encrypted RSA keypair for ActivityPub use, separate from the existing E2E encryption key path.
+- **Actor documents now expose the real public key**: `/api/federation/users/{id}` no longer returns the mock `MockPublicKeyForIteration0347` placeholder and instead publishes the generated key that remote servers can verify against.
+- **Outbound federation is now real instead of mocked**: `ActivityPubService::dispatchToRemoteInbox()` now resolves the remote actor's inbox, signs the outbound request with the local actor's private key, and performs the POST for Follow requests and follower broadcasts.
+- **Federation auth is now two-sided**: inbound inbox traffic is already protected by signature verification from `v1.0.73`, and outbound follow delivery now signs requests with the same HTTP Signature contract.
+- **The shared key table no longer blocks federation**: `user_public_keys` now supports multiple key types per user plus optional private-key storage, while the older E2E endpoints stay pinned to `ECDH` records.
 
 ## Premium Billing Hardening
 - **Unsafe Gold grant removed**: `/api/premium/purchase` no longer falls back to the mock `tok_visa` token. Stripe upgrades now require either a real `payment_method_id` or a confirmed `payment_intent_id`.
@@ -28,11 +28,17 @@
 - **Validation Path Is Cleaner on Windows**: `tsconfig.json` now excludes stale renamed dependency folders so `tsc` no longer walks backup `node_modules` directories, and the old stale folder from the earlier repair pass has been removed.
 
 ## Current Validation / Delivery State
+- **Full federation backend coverage is green**: `php artisan test tests\Feature\ActivityPubTest.php tests\Feature\ActivityPubSignatureTest.php tests\Feature\ActivityPubOutboundTest.php tests\Feature\E2EKeyManagementTest.php` passes after the outbound signing work and the shared-key-table migration.
 - **ActivityPub backend coverage is green**: `php artisan test tests\Feature\ActivityPubTest.php tests\Feature\ActivityPubSignatureTest.php` passes with the new inbound signature middleware and signed-request helpers.
 - **Endpoint-specific backend coverage is green**: `php artisan test tests\Feature\LocationControllerTest.php tests\Feature\PhotoControllerTest.php tests\Feature\SafetyControllerTest.php` passes with the new DreamHost-hardening assertions.
 - **Billing validation from the previous slice remains the current premium reference path**: `php artisan test tests\Feature\PremiumControllerTest.php tests\Feature\StripeWebhookTest.php`, plus frontend `npm run lint`, `npm run type-check`, and `cmd /c "npm run build"`, already passed for `v1.0.71`.
 
 ## ✅ Release Focus
+- [x] Generate and persist real ActivityPub actor keypairs.
+- [x] Replace mocked outbound federation delivery with signed HTTP POSTs.
+- [x] Expose the generated actor public key in the local actor JSON-LD payload.
+- [x] Preserve the existing E2E key APIs while sharing the underlying key table.
+- [x] Add regression coverage for actor key exposure and signed follow delivery.
 - [x] Require valid HTTP signatures on inbound ActivityPub inbox requests.
 - [x] Reject stale/tampered federation requests before controller processing.
 - [x] Keep the established Follow / Undo / Accept inbox flows working with signed requests.

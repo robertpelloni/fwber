@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $user_id
  * @property string $public_key
+ * @property string|null $private_key
  * @property string $key_type
  * @property string|null $device_id
  * @property \Illuminate\Support\Carbon|null $last_rotated_at
@@ -35,6 +36,7 @@ class UserPublicKey extends Model
     protected $fillable = [
         'user_id',
         'public_key',
+        'private_key',
         'key_type',
         'device_id',
         'last_rotated_at',

@@ -17,10 +17,9 @@ class E2EKeyManagementService
         $encryptedKey = Crypt::encryptString($publicKey);
 
         return UserPublicKey::updateOrCreate(
-            ['user_id' => $userId],
+            ['user_id' => $userId, 'key_type' => $keyType],
             [
                 'public_key' => $encryptedKey,
-                'key_type' => $keyType,
                 'device_id' => $deviceId,
                 'last_rotated_at' => now(),
             ]
@@ -32,7 +31,9 @@ class E2EKeyManagementService
      */
     public function getPublicKey(int $userId): ?string
     {
-        $record = UserPublicKey::where('user_id', $userId)->first();
+        $record = UserPublicKey::where('user_id', $userId)
+            ->where('key_type', 'ECDH')
+            ->first();
 
         if (! $record) {
             return null;
@@ -51,6 +52,8 @@ class E2EKeyManagementService
      */
     public function deletePublicKey(int $userId): void
     {
-        UserPublicKey::where('user_id', $userId)->delete();
+        UserPublicKey::where('user_id', $userId)
+            ->where('key_type', 'ECDH')
+            ->delete();
     }
 }
