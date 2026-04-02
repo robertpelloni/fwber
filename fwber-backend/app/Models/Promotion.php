@@ -82,6 +82,11 @@ class Promotion extends Model
         'is_active' => 'boolean',
     ];
 
+    public function merchant()
+    {
+        return $this->belongsTo(MerchantProfile::class, 'merchant_id');
+    }
+
     public function merchantProfile()
     {
         return $this->belongsTo(MerchantProfile::class, 'merchant_id');

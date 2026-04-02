@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.0.59  
+> **Version:** 1.0.60  
 > **Last Updated:** 2026-04-02
 
 ---
@@ -24,6 +24,7 @@
 - [x] **Venue Ranking / Trust Signals**: Extended nearby venue discovery with the same privacy-safe trust-aware scoring model and high-level ranking explanation.
 - [x] **Nearby User Ranking / Trust Signals**: Extended nearby people discovery with the same privacy-safe trust-aware scoring model and high-level ranking explanation.
 - [x] **Audio Room Ranking / Trust Signals**: Extended the audio-room lobby with the same privacy-safe trust-aware scoring model and high-level ranking explanation.
+- [x] **Deal Ranking / Trust Signals**: Extended nearby deals discovery with the same privacy-safe trust-aware scoring model, fixed the coupled merchant relation contract, and added high-level ranking explanation.
 - [ ] **AI Wingman Enhancements**: The backend supports `compatibilityAudit`, `findNemesis`, and `predictFortune`. Ensure these are fully wired up in the chat interface with rich, animated UI components.
 - [ ] **Hardware Token UI Polish**: Ensure the `app/settings/hardware/page.tsx` gracefully handles BLE pairing flows and visualizes the "ping" actions.
 

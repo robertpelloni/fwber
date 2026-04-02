@@ -26,6 +26,10 @@ class BrowseDealsRequest extends FormRequest
             'lng' => 'required|numeric|between:-180,180',
             'radius' => 'nullable|integer|min:100|max:50000', // meters, default 5km
             'category' => 'nullable|string|max:50',
+            'sort' => 'nullable|string|in:distance,discount,expiring,newest',
+            'per_page' => 'nullable|integer|min:1|max:100',
+            'page' => 'nullable|integer|min:1',
+            'ranking_strategy' => 'nullable|string|in:distance,trust-aware',
         ];
     }
 }

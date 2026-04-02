@@ -1,18 +1,18 @@
-# Project Status — fwber v1.0.59 (Trust-Aware Audio Room Ranking)
+# Project Status — fwber v1.0.60 (Trust-Aware Deal Ranking)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.59 "Trust-Aware Audio Room Ranking"
+**Version:** 1.0.60 "Trust-Aware Deal Ranking"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## Trust-Aware Audio Room Ranking
-- **Trust-Aware Audio Rooms Shipped**: The audio-room lobby now ranks rooms with a privacy-safe composite of trusted hosts, scene alignment, participant health, freshness, and distance when host location is available instead of pure newest-first ordering alone.
-- **Privacy Boundaries Preserved**: Friendship, confirmed relationship-link, and shared-circle checks stay internal to ranking; the ranked audio-room API exposes only a high-level ranking strategy summary instead of private graph details.
-- **Shared Graph Reuse Preserved**: Audio-room ranking now reuses the same trust map and scene-signal architecture already powering matches, recommendations, nearby chatrooms, events, bulletin boards, group matching, venues, nearby users, Local Pulse card cues, and Local Pulse ranking.
-- **Audio Lobby Explanation Added**: The audio-room lobby now explains why trusted, scene-aligned rooms surface first and shows room distance plus scene cues directly on each card.
+## Trust-Aware Deal Ranking
+- **Trust-Aware Deals Shipped**: Nearby deals now rank with a privacy-safe composite of trusted merchants, scene alignment, deal health, freshness, and distance instead of relying only on baseline sort choices.
+- **Browse Contract Stabilized**: The promotions browse path now has a canonical `merchant()` relation alias on `Promotion`, and `GET /api/deals` returns paginated ranked payloads with `deals` and `meta.ranking_strategy` for consistent frontend consumption.
+- **Privacy Boundaries Preserved**: Friendship, confirmed relationship-link, and shared-circle checks stay internal to ranking; the ranked deals API exposes only a high-level ranking strategy summary instead of private graph details.
+- **Deals UI Explanation Added**: The deals page now explains why trusted, scene-aligned merchants surface first and shows merchant verification, scene cues, ranking score, and distance directly on each card.
 
 ## ✅ Release Focus
-- [x] Extended the audio-room lobby with the same privacy-safe trust-aware composite already used by Local Pulse, recommendations, nearby chatrooms, events, bulletin boards, group matching, venues, and nearby users.
-- [x] Preserved a tight change boundary by ranking only the lobby listing seam and keeping trust data internal to ordering.
-- [x] Added audio-room ranking metadata/UI explanation and focused regression coverage for the new ranked discovery contract.
+- [x] Extended nearby deal discovery with the same privacy-safe trust-aware composite already used by Local Pulse, recommendations, nearby chatrooms, events, bulletin boards, group matching, venues, nearby users, and audio rooms.
+- [x] Fixed the directly coupled `merchant` versus `merchantProfile` browse-path mismatch without widening the API's private graph surface.
+- [x] Added ranked deal metadata/UI explanation and focused regression coverage while preserving pagination behavior.

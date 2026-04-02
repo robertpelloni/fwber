@@ -10,11 +10,17 @@ use App\Http\Requests\Merchant\UpdateMerchantProfileRequest;
 use App\Http\Requests\Merchant\UpdatePromotionRequest;
 use App\Models\MerchantProfile;
 use App\Models\Promotion;
+use App\Services\DealRankingService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class MerchantController extends Controller
 {
+    public function __construct(
+        private readonly DealRankingService $dealRankingService,
+    ) {
+    }
+
     /**
      * Register the current user as a merchant.
      */
@@ -199,25 +205,28 @@ class MerchantController extends Controller
      */
     public function browseDeals(BrowseDealsRequest $request)
     {
-        $lat = $request->lat;
-        $lng = $request->lng;
-        $radius = $request->radius ?? 5000; // 5km default
+        $validated = $request->validated();
+        $lat = (float) $validated['lat'];
+        $lng = (float) $validated['lng'];
+        $radius = $validated['radius'] ?? 5000; // 5km default
+        $rankingStrategy = $validated['ranking_strategy'] ?? 'distance';
+        $perPage = $validated['per_page'] ?? 20;
 
-        $query = Promotion::with(['merchant:id,business_name,category,address'])
+        $query = Promotion::with(['merchant:id,user_id,business_name,category,description,address,verification_status'])
             ->where('is_active', true)
             ->where('starts_at', '<=', now())
             ->where('expires_at', '>', now())
             ->withinBox($lat, $lng, $radius);
 
         // Filter by merchant category if provided
-        if ($request->has('category')) {
-            $query->whereHas('merchant', function ($q) use ($request) {
-                $q->where('category', $request->category);
+        if (! empty($validated['category'])) {
+            $query->whereHas('merchant', function ($q) use ($validated) {
+                $q->where('category', $validated['category']);
             });
         }
 
         // Sort options
-        $sort = $request->sort ?? 'distance';
+        $sort = $validated['sort'] ?? 'distance';
         if ($sort === 'newest') {
             $query->orderByDesc('created_at');
         } elseif ($sort === 'expiring') {
@@ -227,7 +236,26 @@ class MerchantController extends Controller
         }
         // Default: distance-based (withinBox already filters, but we could add raw distance calc)
 
-        $deals = $query->paginate($request->per_page ?? 20);
+        $deals = $query->paginate($perPage);
+
+        if ($rankingStrategy === 'trust-aware' && Auth::check()) {
+            $rankedDeals = $this->dealRankingService->rankNearby(
+                Auth::user(),
+                $deals->getCollection(),
+                $lat,
+                $lng
+            );
+
+            $deals->setCollection($rankedDeals);
+            $dealsArray = $deals->toArray();
+
+            return response()->json(array_merge($dealsArray, [
+                'deals' => $dealsArray['data'],
+                'meta' => [
+                    'ranking_strategy' => $this->dealRankingService->buildRankingStrategy(),
+                ],
+            ]));
+        }
 
         return response()->json($deals);
     }

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.60] - 2026-04-02 — Trust-Aware Deal Ranking
+
+### Fixed
+- Reworked `GET /api/deals` so nearby deal discovery can opt into the same privacy-safe trust-aware model already shipped across Local Pulse, recommendations, nearby chatrooms, events, bulletin boards, group matching, venues, nearby users, and audio rooms, balancing trusted merchants, scene alignment, deal health, freshness, and distance.
+- Added `DealRankingService` to reuse `LocalPulseRankingService` trust-map inputs, `AIMatchingService` scene-signal helpers, and geo distance scoring while keeping private social-graph details internal to server-side ordering.
+- Fixed the coupled promotions browse-path contract by adding a canonical `merchant()` relation alias on `Promotion` and loading the merchant fields the deals UI and ranker now depend on.
+- Extended the ranked deals response with paginated `data`, convenience `deals`, and high-level `meta.ranking_strategy` metadata plus scene cues, ranking scores, and merchant verification state without breaking existing pagination consumers.
+- Updated the deals page to request trust-aware ranking, explain why trusted scene-aligned merchants surface first, and render merchant verification, scene cues, ranking score, and distance inline on each card.
+- Added focused backend regression coverage proving deals expose ranking metadata and that a trusted, scene-aligned merchant offer can outrank a slightly closer generic deal.
+
 ## [1.0.59] - 2026-04-02 — Trust-Aware Audio Room Ranking
 
 ### Fixed
