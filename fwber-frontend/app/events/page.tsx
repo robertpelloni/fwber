@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useNearbyEvents } from '@/lib/hooks/use-events';
 import { EventCard } from '@/components/EventCard';
 import Link from 'next/link';
-import { Plus, MapPin } from 'lucide-react';
+import { Plus, MapPin, Sparkles } from 'lucide-react';
 import EventInvitationsList from '@/components/events/EventInvitationsList';
 
 export default function EventsPage() {
@@ -42,6 +42,7 @@ export default function EventsPage() {
     50,
     selectedType
   );
+  const rankingStrategy = data?.meta?.ranking_strategy ?? null;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -84,6 +85,16 @@ export default function EventsPage() {
       {location.error && (
         <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded mb-4">
             Location access denied or unavailable. Showing all events.
+        </div>
+      )}
+
+      {rankingStrategy && (
+        <div className="mb-6 rounded-2xl border border-purple-200 bg-purple-50 px-4 py-4 text-sm text-purple-900">
+          <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-purple-700">
+            <Sparkles className="h-4 w-4" />
+            <span>Trust-aware event ranking</span>
+          </div>
+          <p>{rankingStrategy.summary}</p>
         </div>
       )}
 

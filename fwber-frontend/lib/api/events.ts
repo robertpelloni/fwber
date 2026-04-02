@@ -1,6 +1,26 @@
 import { apiClient } from './client';
 import { PaginatedResponse } from './types';
 
+export interface EventSceneSignals {
+  headline: string | null;
+  matched_topics: Array<{
+    id: number;
+    slug: string;
+    label: string;
+    emoji?: string | null;
+  }>;
+  matched_tags: string[];
+  score_boost: number;
+}
+
+export interface EventRankingStrategy {
+  trusted_connections: boolean;
+  scene_alignment: boolean;
+  freshness: boolean;
+  distance: boolean;
+  summary: string;
+}
+
 export interface Event {
   id: number;
   title: string;
@@ -20,7 +40,16 @@ export interface Event {
   creator?: any;
   attendees?: any[];
   chatroom_id?: number;
+  distance_meters?: number;
+  ranking_score?: number;
+  scene_signals?: EventSceneSignals | null;
 }
+
+export type EventsResponse = PaginatedResponse<Event> & {
+  meta: PaginatedResponse<Event>['meta'] & {
+    ranking_strategy?: EventRankingStrategy;
+  };
+};
 
 export interface CreateEventRequest {
   title: string;
@@ -37,8 +66,8 @@ export interface CreateEventRequest {
   shared_group_ids?: number[];
 }
 
-export async function getNearbyEvents(latitude?: number, longitude?: number, radius: number = 50, type?: string): Promise<PaginatedResponse<Event>> {
-  const params: any = { radius };
+export async function getNearbyEvents(latitude?: number, longitude?: number, radius: number = 50, type?: string): Promise<EventsResponse> {
+  const params: any = { radius, ranking_strategy: 'trust-aware' };
   if (latitude && longitude) {
     params.latitude = latitude;
     params.longitude = longitude;
@@ -46,7 +75,7 @@ export async function getNearbyEvents(latitude?: number, longitude?: number, rad
   if (type) {
     params.type = type;
   }
-  const response = await apiClient.get<PaginatedResponse<Event>>('/events', { params });
+  const response = await apiClient.get<EventsResponse>('/events', { params });
   return response.data;
 }
 

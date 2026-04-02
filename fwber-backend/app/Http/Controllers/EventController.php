@@ -8,9 +8,11 @@ use App\Models\Chatroom;
 use App\Models\Event;
 use App\Models\EventAttendee;
 use App\Models\Payment;
+use App\Services\EventRankingService;
 use App\Services\Payment\PaymentGatewayInterface;
 use App\Services\TokenDistributionService;
 use App\Support\TaggedCache;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,10 +23,13 @@ class EventController extends Controller
 
     protected $tokenService;
 
-    public function __construct(PaymentGatewayInterface $paymentGateway, TokenDistributionService $tokenService)
+    protected $rankingService;
+
+    public function __construct(PaymentGatewayInterface $paymentGateway, TokenDistributionService $tokenService, EventRankingService $rankingService)
     {
         $this->paymentGateway = $paymentGateway;
         $this->tokenService = $tokenService;
+        $this->rankingService = $rankingService;
     }
 
     /**
@@ -62,6 +67,15 @@ class EventController extends Controller
      *     ),
      *
      *     @OA\Parameter(
+     *         name="ranking_strategy",
+     *         in="query",
+     *         description="Discovery ordering strategy",
+     *         required=false,
+     *
+     *         @OA\Schema(type="string", enum={"trust-aware", "distance-only"}, default="trust-aware")
+     *     ),
+     *
+     *     @OA\Parameter(
      *         name="status",
      *         in="query",
      *         description="Filter by event status",
@@ -87,41 +101,47 @@ class EventController extends Controller
      */
     public function index(Request $request)
     {
+        $rankingStrategy = $request->input('ranking_strategy', 'trust-aware');
+        $perPage = 20;
+        $page = max(1, (int) $request->input('page', 1));
+
         // Generate cache key based on query parameters
         $cacheKey = config('optimization.cache_version').':events:index:'.md5(json_encode([
             'lat' => $request->latitude,
             'lon' => $request->longitude,
             'radius' => $request->radius,
+            'ranking_strategy' => $rankingStrategy,
+            'viewer_id' => $rankingStrategy === 'trust-aware' ? Auth::id() : null,
             'status' => $request->status,
             'type' => $request->type,
-            'page' => $request->input('page', 1),
         ]));
 
         // Cache for 5 minutes with tagged caching
-        $events = TaggedCache::remember(['events'], $cacheKey, function () use ($request) {
+        $events = TaggedCache::remember(['events'], $cacheKey, function () use ($request, $rankingStrategy) {
             $query = Event::query();
+            $latitude = null;
+            $longitude = null;
 
             // Geospatial filter
             if ($request->has(['latitude', 'longitude', 'radius'])) {
-                $lat = (float) $request->latitude;
-                $lon = (float) $request->longitude;
+                $latitude = (float) $request->latitude;
+                $longitude = (float) $request->longitude;
                 $radius = max(0.1, (float) $request->radius); // km
 
                 if (DB::getDriverName() === 'sqlite') {
                     // Simple box approximation for testing
                     $latRange = $radius / 111;
-                    $lonRange = $radius / (111 * cos(deg2rad($lat)));
+                    $lonRange = $radius / (111 * cos(deg2rad($latitude)));
 
-                    $query->whereBetween('latitude', [$lat - $latRange, $lat + $latRange])
-                        ->whereBetween('longitude', [$lon - $lonRange, $lon + $lonRange]);
+                    $query->whereBetween('latitude', [$latitude - $latRange, $latitude + $latRange])
+                        ->whereBetween('longitude', [$longitude - $lonRange, $longitude + $lonRange]);
                 } else {
                     $distanceSql = '(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude))))';
 
                     $query->select('*')
-                        ->selectRaw("{$distanceSql} AS distance", [$lat, $lon, $lat])
+                        ->selectRaw("{$distanceSql} AS distance", [$latitude, $longitude, $latitude])
                         // Avoid relying on HAVING against a selected alias during pagination count queries.
-                        ->whereRaw("{$distanceSql} < ?", [$lat, $lon, $lat, $radius])
-                        ->orderByRaw("{$distanceSql} asc", [$lat, $lon, $lat]);
+                        ->whereRaw("{$distanceSql} < ?", [$latitude, $longitude, $latitude, $radius]);
                 }
             } else {
                 $query->orderBy('starts_at', 'asc');
@@ -139,10 +159,47 @@ class EventController extends Controller
                 $query->where('type', $request->type);
             }
 
-            return $query->withCount('attendees')->paginate(20);
+            $events = $query->withCount('attendees')->get();
+
+            if ($latitude !== null && $longitude !== null) {
+                $events->each(function (Event $event) use ($latitude, $longitude) {
+                    $event->distance_meters = app(\App\Services\LocationService::class)->calculateDistance(
+                        $latitude,
+                        $longitude,
+                        $event->latitude,
+                        $event->longitude
+                    );
+                });
+
+                if ($rankingStrategy === 'trust-aware' && Auth::check()) {
+                    $events = $this->rankingService->rankNearby(Auth::user(), $events, $latitude, $longitude);
+                } else {
+                    $events = $events->sortBy('distance_meters')->values();
+                }
+            } else {
+                $events = $events->sortBy('starts_at')->values();
+            }
+
+            return $events->values();
         }, 300);
 
-        return response()->json($events);
+        $paginatedEvents = new LengthAwarePaginator(
+            $events->forPage($page, $perPage)->values(),
+            $events->count(),
+            $perPage,
+            $page,
+            [
+                'path' => $request->url(),
+                'query' => $request->query(),
+            ]
+        );
+
+        $payload = $paginatedEvents->toArray();
+        $payload['meta'] = array_merge($payload['meta'] ?? [], [
+            'ranking_strategy' => $this->rankingService->buildRankingStrategy(),
+        ]);
+
+        return response()->json($payload);
     }
 
     /**

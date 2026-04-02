@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.54] - 2026-04-02 — Trust-Aware Event Ranking
+
+### Fixed
+- Reworked nearby event discovery so `GET /api/events` can rank results with the same privacy-safe trust-aware model already used by Local Pulse, recommendations, and nearby chatrooms, balancing trusted organizers, scene alignment, freshness, and distance.
+- Added `EventRankingService` to reuse `LocalPulseRankingService` trust-map inputs and `AIMatchingService` scene-signal helpers while preserving the existing paginated events contract and keeping private social-graph details out of the payload.
+- Updated the events API contract and events page UI to expose high-level `ranking_strategy` metadata plus scene-aligned event card cues for ranked results.
+- Added focused backend regression coverage proving nearby events expose ranking metadata and that a trusted, scene-aligned event can outrank a slightly closer stranger event.
+
 ## [1.0.51] - 2026-04-02 — Trust-Aware Local Pulse Ranking
 
 ### Fixed
