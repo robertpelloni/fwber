@@ -1,7 +1,7 @@
 # DEPLOY.md — The fwber Operations Guide
 
-> **Last Updated:** 2026-03-25
-> **Version:** 0.99.1
+> **Last Updated:** 2026-04-02
+> **Version:** 1.0.68
 
 This document serves as the single source of truth for deploying the fwber distributed architecture.
 
@@ -16,6 +16,7 @@ The Next.js 16.1 frontend is optimized for deployment on Vercel Edge Network.
 3. **Environment Variables**: Add the following to Vercel:
    * `NEXT_PUBLIC_API_URL=https://api.fwber.me` (CRITICAL: Do not include `/api` at the end)
    * `NEXT_PUBLIC_WS_URL=wss://ws.fwber.me`
+   * `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...` (required for live premium card checkout)
 4. **Build Settings**: 
    * Build Command: `npm run build`
    * Output Directory: `.next`
@@ -32,17 +33,21 @@ DreamHost hosts the Laravel 12 API, Database, and WebSockets.
 3. **Database**: MySQL 8+ hosted internally on DreamHost (`mysql.fwber.me`).
 4. **Environment (`.env`)**:
    ```ini
-   APP_ENV=production
-   APP_DEBUG=false
-   APP_URL=https://api.fwber.me
-   
-   CACHE_STORE=database
-   QUEUE_CONNECTION=database
-   SESSION_DRIVER=database
-   BROADCAST_DRIVER=reverb
-   
-   CORS_ALLOWED_ORIGINS="https://www.fwber.me,https://fwber.me"
-   ```
+    APP_ENV=production
+    APP_DEBUG=false
+    APP_URL=https://api.fwber.me
+    PAYMENT_DRIVER=stripe
+    
+    CACHE_STORE=database
+    QUEUE_CONNECTION=database
+    SESSION_DRIVER=database
+    BROADCAST_DRIVER=reverb
+    STRIPE_KEY=pk_live_or_pk_test
+    STRIPE_SECRET=sk_live_or_sk_test
+    STRIPE_WEBHOOK_SECRET=whsec_...
+    
+    CORS_ALLOWED_ORIGINS="https://www.fwber.me,https://fwber.me"
+    ```
 5. **Deployment Command**:
    ```bash
    cd ~/fwber/fwber-backend && git pull origin main && php artisan config:clear && php artisan config:cache && php artisan migrate --force
@@ -89,3 +94,21 @@ Always run this checklist after a major version bump:
 3. [ ] Perform a test ZK-Identity verification (checks cryptography and DB).
 4. [ ] Upload a test photo (verifies AWS S3 credentials).
 5. [ ] Establish a test chat (verifies Reverb WebSocket persistence).
+
+---
+
+## 💳 6. Stripe Billing Go-Live Checklist
+
+Run this checklist before re-enabling billing in production:
+1. [ ] Confirm the frontend has `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`.
+2. [ ] Confirm the backend has `PAYMENT_DRIVER=stripe`, `STRIPE_SECRET`, and `STRIPE_WEBHOOK_SECRET`.
+3. [ ] In the Stripe dashboard, register the production webhook endpoint that points at the backend webhook route.
+4. [ ] Subscribe the webhook to premium-relevant events:
+   - `payment_intent.succeeded`
+   - `customer.subscription.created`
+   - `customer.subscription.updated`
+   - `customer.subscription.deleted`
+5. [ ] Verify `/premium` and `/settings/subscription` open the Stripe modal instead of granting Gold directly.
+6. [ ] Complete one real or Stripe-test premium purchase and confirm the webhook marks Gold active.
+7. [ ] Verify referral commission rows and FWBcoin rewards are recorded for both direct and second-level uplines.
+8. [ ] Decide whether cash commissions stay ledger-only for manual ops or move to Stripe Connect payouts with KYC/tax handling.

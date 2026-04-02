@@ -1,10 +1,16 @@
-# Project Status — fwber v1.0.67 (Premium Billing Hardening)
+# Project Status — fwber v1.0.68 (Billing Launch Docs Refresh)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.67 "Premium Billing Hardening"
+**Version:** 1.0.68 "Billing Launch Docs Refresh"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
+
+## Billing Launch Docs Refresh
+- **Top-level docs now match the shipped app**: `README.md`, `ROADMAP.md`, `TODO.md`, and `DEPLOY.md` no longer advertise the stale `0.99.x` / `1.0.63` line and now describe the current billing-hardened beta reality.
+- **Stripe launch work is now explicit in-repo**: `DEPLOY.md` includes the required frontend publishable key, backend Stripe env variables, webhook registration requirements, and a concrete billing go-live checklist.
+- **The roadmap now names Stripe rollout as a milestone**: production billing configuration and payout/commission operations are called out directly instead of being implicit follow-up work.
+- **The TODO ledger now separates shipped billing hardening from remaining launch ops**: the unsafe premium shortcut fix is recorded as complete, while Stripe production rollout remains a visible critical item.
 
 ## Premium Billing Hardening
 - **Unsafe Gold grant removed**: `/api/premium/purchase` no longer falls back to the mock `tok_visa` token. Stripe upgrades now require either a real `payment_method_id` or a confirmed `payment_intent_id`.

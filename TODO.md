@@ -1,11 +1,12 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.0.63  
+> **Version:** 1.0.68  
 > **Last Updated:** 2026-04-02
 
 ---
 
 ## 🔴 Critical: Bug Fixes & Stability
+- [ ] **Complete Stripe Production Rollout**: Billing is now hardened so premium no longer grants Gold without real Stripe proof, but production still needs live env keys, `PAYMENT_DRIVER=stripe`, frontend publishable key wiring, Stripe webhook registration, and an operations-ready payout/reconciliation checklist.
 - [ ] **Fix 500 Errors on Production**: The `/api/location`, `/api/photos`, and `/api/safety/walk/active` endpoints are throwing 500 errors on DreamHost. Add explicit `Log::error($e)` to `bootstrap/app.php` exception handler to capture the silent trace and fix the root cause (likely validation, permissions, or missing env vars).
 - [ ] **Verify Vercel Deployment**: Ensure the latest Next.js build with the `/api` absolute path proxy and MIME fixes is successfully deployed and running.
 
@@ -40,6 +41,9 @@
 - [ ] Update `cypress` E2E tests to cover the new ZK-Identity and AR Navigation flows.
 - [ ] Clean up unused local test files and outdated `.txt` debug logs from the root directory.
 - [ ] Ensure all new API endpoints are fully documented with Swagger/OpenAPI annotations.
+
+## ✅ Recently Completed
+- [x] **Premium Billing Hardening**: Removed the unsafe mock Stripe fallback, restored `/premium` and `/settings/subscription` to the Stripe upgrade modal, fixed webhook secret lookup, corrected subscription amount rendering, and added visible referral-loop copy on the homepage.
 
 ---
 *This file is continuously updated by autonomous AI agents. Do not leave items unchecked if they are completed.*

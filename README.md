@@ -8,8 +8,8 @@
 
 Privacy-first proximity dating platform. Open source. Work in progress.
 
-**Status:** Beta (v0.99.1) — functional but seeking early testers in Detroit metro.  
-**Stack:** Laravel 12 (PHP 8.4) + Next.js 16 (React 18) + MySQL  
+**Status:** Beta (v1.0.68) — functional but still finishing billing launch and production hardening.  
+**Stack:** Laravel 12 (PHP 8.2+) + Next.js 15 (React 18) + MySQL / SQLite  
 **License:** MIT
 
 ## What This Is
@@ -35,7 +35,7 @@ A dating app where AI avatars replace photos until you choose to reveal yourself
 ## Quick Start
 
 ### Prerequisites
-- **Backend:** PHP 8.4+, Composer 2.x, MySQL or SQLite
+- **Backend:** PHP 8.2+, Composer 2.x, MySQL or SQLite
 - **Frontend:** Node.js 20+, npm
 
 ### Backend
@@ -75,6 +75,10 @@ docker compose -f docker-compose.dev.yml exec laravel php artisan migrate
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
 | [SECURITY.md](SECURITY.md) | Security policy |
 | [AGENTS.md](AGENTS.md) | AI agent protocols |
+
+## Billing Launch Notes
+
+Premium upgrades now require a real Stripe payment method or payment intent before Gold is granted. To take billing live, configure the backend Stripe secrets, add the frontend publishable key, set `PAYMENT_DRIVER=stripe`, and register the webhook endpoint described in [DEPLOY.md](DEPLOY.md).
 
 ## Contributing
 

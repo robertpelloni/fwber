@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.0.63
+> **Current Version:** 1.0.68
 > **Last Updated:** 2026-04-02
 
 ---
@@ -65,3 +65,4 @@
 2. Expand the shipped **scene discovery** stack from Local Pulse, recommendations, nearby chatrooms, chatroom browse, events, bulletin boards, group matching, venues, nearby users, audio rooms, and deals trust-aware ranking into the remaining local-feed and discovery loops.
 3. Extend the **Merchant Portal UI** (B2B) with lifecycle controls, resend/deactivate/reporting tooling, and broader operations polish.
 4. Add deeper trust-aware discovery inputs that combine relationship links, circles, and topic hubs without weakening privacy gates.
+5. Finish the **Stripe production rollout** by wiring live env values, webhook registration, and payout/commission operations on top of the now-hardened premium purchase path.

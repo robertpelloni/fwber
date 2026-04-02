@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.68] - 2026-04-02 — Billing Launch Docs Refresh
+
+### Fixed
+- Brought the top-level repo docs forward to the live billing state by updating `README.md`, `ROADMAP.md`, `TODO.md`, and `DEPLOY.md` from stale `0.99.x` / `1.0.63` metadata to the shipped `1.0.67+` line.
+- Added a concrete Stripe production go-live checklist covering frontend publishable key wiring, backend Stripe env/config, webhook registration, premium flow verification, referral commission verification, and the outstanding payout operations decision.
+- Clarified the current stack and release messaging in `README.md` so the repo now advertises the actual Laravel 12 + Next.js 15 beta state instead of older placeholder version text.
+
 ## [1.0.67] - 2026-04-02 — Premium Billing Hardening
 
 ### Fixed

@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.67`
+- **Current version:** `1.0.68`
 - **Release date:** `2026-04-02`
-- **Release name:** `Premium Billing Hardening`
+- **Release name:** `Billing Launch Docs Refresh`
 
 ## Summary
 
-This release hardens premium billing by requiring real Stripe payment proof, reroutes the visible upgrade pages back through the existing Stripe modal flow, fixes the Stripe webhook secret lookup, and adds concise homepage copy explaining the two-level premium referral/FWBcoin loop.
+This release refreshes the top-level repository docs around the shipped billing hardening work, bringing README / ROADMAP / TODO / DEPLOY forward to the live state and adding a concrete Stripe production go-live checklist.
 
 ## Version Sources of Truth
 

@@ -1,44 +1,40 @@
-# Handoff — Premium Billing Hardening
+# Handoff — Billing Launch Docs Refresh
 
 **Date:** 2026-04-02  
-**Status:** ✅ Premium purchase flow hardened; visible upgrade pages rerouted through the Stripe modal  
-**Version:** 1.0.67  
-**Latest pushed commit:** `d86ab8bbb` (`fix: rename FWBcoin references (v1.0.66)`)
+**Status:** ✅ Billing hardening is shipped and the repo docs now reflect the real launch state  
+**Version:** 1.0.68  
+**Latest pushed commit:** `77e537c8d` (`fix: harden premium billing flow (v1.0.67)`)
 
 ## Overview
-This handoff now covers the post-`v1.0.66` billing hardening follow-up. The live branch still allowed premium upgrades to grant Gold without Stripe proof because the backend fell back to a mock `tok_visa` payment method, and both visible upgrade pages still posted directly to that unsafe endpoint.
+This handoff now covers the post-`v1.0.67` docs/operations follow-up. The billing hardening work is already shipped, but the top-level repo docs were still stale and under-described the remaining Stripe production rollout work.
 
-This release removes that unsafe fallback, restores the live upgrade entry points to the existing Stripe modal flow, fixes the Stripe webhook config lookup, adds a regression test for missing payment proof, and adds concise homepage copy that explains the intended two-level premium referral/FWBcoin loop.
+This release refreshes the repo-level operational docs so the written project state now matches the shipped app, and it adds a concrete Stripe go-live checklist that captures the real remaining launch tasks.
 
 The original repo-recovery context still matters: all active work remains in the clean `C:\Users\hyper\workspace\fwber-mainline-repair` worktree, and the dirty root checkout remains preserved untouched.
 
-## What Shipped in v1.0.67
+## What Shipped in v1.0.68
 
-### 1. Premium purchase hardening
-- `PremiumController@purchasePremium` no longer falls back to the mock Stripe token.
-- Stripe purchases must now include either:
-  - `payment_method_id`, or
-  - `payment_intent_id`
-- Requests that omit both now fail with `422` instead of silently activating Gold.
+### 1. Repo docs refresh
+- `README.md` now advertises the current beta/version/stack instead of stale `0.99.1` messaging.
+- `ROADMAP.md` now reflects `1.0.68` and explicitly calls out the Stripe production rollout as a next milestone.
+- `TODO.md` now records Stripe production rollout as an active critical item and premium billing hardening as recently completed.
+- `DEPLOY.md` now includes the Stripe env/config requirements and a concrete billing go-live checklist.
 
-### 2. Frontend upgrade path repair
-- `/premium` now opens `PremiumUpgradeModal` instead of directly posting to `/premium/purchase`.
-- `/settings/subscription` no longer sends `payment_method_id: 'tok_visa'`; it also uses `PremiumUpgradeModal`.
-- This restores the intended UX:
-  - Stripe card checkout through the existing Elements flow
-  - optional token purchase through the explicit 200 FWB path
-  - no more one-click premium activation without payment proof
+### 2. Remaining launch work is now explicit
+- The repo now clearly documents that Stripe launch still requires:
+  - frontend publishable key
+  - backend `PAYMENT_DRIVER=stripe`
+  - backend Stripe secret + webhook secret
+  - dashboard webhook registration
+  - end-to-end premium + referral verification
+  - a product/ops decision on manual cash commission handling vs Stripe Connect payouts
 
-### 3. Stripe config and subscription display fixes
-- `StripeWebhookController` now reads the nested `services.stripe.webhook.secret` config path and still accepts the older flat key as a fallback.
-- `fwber-frontend/app/subscription/page.tsx` now renders stored payment amounts as dollars directly instead of dividing them by 100 again.
-
-### 4. Referral-loop explanation
-- The homepage now includes a brief explainer card that tells users:
-  - invites already unlock perks
-  - direct premium upgrades are intended to pay a small reward plus FWBcoin
-  - second-level upgrades are intended to pay a smaller follow-on bonus
-- The existing referral modal copy on the live branch was preserved.
+### 3. Previous shipped billing hardening remains intact
+- The `v1.0.67` protections still stand:
+  - no fallback `tok_visa` premium activation
+  - `/premium` and `/settings/subscription` route through the Stripe modal
+  - webhook secret lookup matches the live nested config
+  - homepage referral/FWBcoin loop copy is visible
 
 ## What Shipped in v1.0.65
 
