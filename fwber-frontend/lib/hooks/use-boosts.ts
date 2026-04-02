@@ -11,6 +11,11 @@ export interface Boost {
   status: 'active' | 'expired';
 }
 
+interface ActiveBoostResponse {
+  data: Boost | null;
+  message?: string;
+}
+
 export function useActiveBoost() {
   const { token, isAuthenticated } = useAuth();
   return useQuery({
@@ -18,7 +23,8 @@ export function useActiveBoost() {
     enabled: isAuthenticated && !!token,
     queryFn: async () => {
       try {
-        return await api.get<Boost>('/boosts/active');
+        const response = await api.get<ActiveBoostResponse>('/boosts/active');
+        return response.data;
       } catch (error: any) {
         if (error.response?.status === 404) {
           return null;

@@ -7,6 +7,8 @@ import { Heart, X, Star, MessageCircle, MapPin, Info, Mic2, Play, Pause } from '
 import { api } from '@/lib/api/client';
 import { useToast } from '@/lib/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import AppHeader from '@/components/AppHeader';
 import MatchFilter from '@/components/MatchFilter';
 import Image from 'next/image';
 import ProfileViewModal from '@/components/ProfileViewModal';
@@ -89,17 +91,31 @@ export default function MatchesPage() {
   };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading matches...</div>;
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+          <AppHeader />
+          <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
+            <div className="text-sm text-gray-500 dark:text-gray-400">Loading matches...</div>
+          </div>
+        </div>
+      </ProtectedRoute>
+    );
   }
 
   if (matches.length === 0 || currentIndex >= matches.length) {
     return (
-      <div className="container mx-auto p-4 max-w-md text-center">
-        <ToastContainer />
-        <h2 className="text-2xl font-bold mb-4">No more matches</h2>
-        <p className="text-gray-500 mb-6">Check back later or adjust your filters.</p>
-        <Button onClick={() => fetchMatches()}>Refresh</Button>
-      </div>
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+          <AppHeader />
+          <div className="mx-auto max-w-md px-4 py-8 text-center">
+            <ToastContainer />
+            <h2 className="mb-4 text-2xl font-bold">No more matches</h2>
+            <p className="mb-6 text-gray-500">Check back later or adjust your filters.</p>
+            <Button onClick={() => fetchMatches()}>Refresh</Button>
+          </div>
+        </div>
+      </ProtectedRoute>
     );
   }
 
@@ -107,18 +123,21 @@ export default function MatchesPage() {
   const isConfessional = currentMatch.is_confessional;
 
   return (
-    <div className="container mx-auto p-4 max-w-md">
-      <ToastContainer />
-      <div className="mb-4 space-y-4">
-        <div className="flex justify-between items-center">
-            <CreateBountyModal />
-            <BoostButton />
-        </div>
-        <MatchFilter onFilterChange={handleFilterChange} />
-      </div>
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+        <AppHeader />
+        <div className="mx-auto max-w-md px-4 py-8">
+          <ToastContainer />
+          <div className="mb-4 space-y-4">
+            <div className="flex items-center justify-between gap-3">
+              <CreateBountyModal />
+              <BoostButton />
+            </div>
+            <MatchFilter onFilterChange={handleFilterChange} />
+          </div>
 
-      <Card className={`overflow-hidden h-[600px] relative ${isConfessional ? 'bg-zinc-950 border-purple-500/30' : ''}`}>
-        <div className="h-full relative">
+          <Card className={`relative h-[600px] overflow-hidden ${isConfessional ? 'border-purple-500/30 bg-zinc-950' : ''}`}>
+            <div className="relative h-full">
           {/* Image/Content Area */}
           <div 
             className={`h-3/4 relative cursor-pointer ${isConfessional ? 'bg-zinc-900 flex flex-col items-center justify-center p-8' : 'bg-gray-200'}`}
@@ -236,30 +255,32 @@ export default function MatchesPage() {
               <Heart className="h-8 w-8" />
             </Button>
           </div>
-        </div>
-      </Card>
+            </div>
+          </Card>
 
-      {isProfileOpen && (
-        <ProfileViewModal
-          isOpen={isProfileOpen}
-          onClose={() => setIsProfileOpen(false)}
-          user={{
-            id: currentMatch.id,
-            profile: {
-              display_name: currentMatch.name,
-              age: currentMatch.age,
-              bio: currentMatch.bio,
-              photos: currentMatch.photos || (currentMatch.avatarUrl ? [{
-                id: 1,
-                url: currentMatch.avatarUrl,
-                is_private: false,
-                is_primary: true
-              }] : [])
-            }
-          }}
-          messagesExchanged={0} // Discovery phase
-        />
-      )}
-    </div>
+          {isProfileOpen && (
+            <ProfileViewModal
+              isOpen={isProfileOpen}
+              onClose={() => setIsProfileOpen(false)}
+              user={{
+                id: currentMatch.id,
+                profile: {
+                  display_name: currentMatch.name,
+                  age: currentMatch.age,
+                  bio: currentMatch.bio,
+                  photos: currentMatch.photos || (currentMatch.avatarUrl ? [{
+                    id: 1,
+                    url: currentMatch.avatarUrl,
+                    is_private: false,
+                    is_primary: true
+                  }] : [])
+                }
+              }}
+              messagesExchanged={0}
+            />
+          )}
+        </div>
+      </div>
+    </ProtectedRoute>
   );
 }

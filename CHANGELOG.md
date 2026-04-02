@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.40] - 2026-04-02 — Events and Shell Stabilization
+
+### Fixed
+- Replaced the nearby-events geospatial `HAVING distance` pagination path with a safer distance filter/order query and added regression coverage for radius filtering so production geolocated event requests stop returning 500s.
+- Fixed the active boost badge to consume the backend's real `/api/boosts/active` payload shape and fall back cleanly when expiry data is invalid, eliminating the `Boost Active / NaN:NaN` countdown bug.
+- Restored the shared app shell on Matches and Messages so the sidebar is present and top-level content no longer sits under the floating logo area.
+- Added versioned favicon/icon URLs to force browser refreshes of the animated fwber logo asset, and cleaned the roast/hype dialog copy so it no longer renders raw HTML entities.
+
 ## [1.0.38] - 2026-04-02 — Merchant Pulse Broadcast Activation
 
 ### Fixed

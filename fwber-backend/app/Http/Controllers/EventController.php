@@ -103,9 +103,9 @@ class EventController extends Controller
 
             // Geospatial filter
             if ($request->has(['latitude', 'longitude', 'radius'])) {
-                $lat = $request->latitude;
-                $lon = $request->longitude;
-                $radius = $request->radius; // km
+                $lat = (float) $request->latitude;
+                $lon = (float) $request->longitude;
+                $radius = max(0.1, (float) $request->radius); // km
 
                 if (DB::getDriverName() === 'sqlite') {
                     // Simple box approximation for testing
@@ -115,13 +115,13 @@ class EventController extends Controller
                     $query->whereBetween('latitude', [$lat - $latRange, $lat + $latRange])
                         ->whereBetween('longitude', [$lon - $lonRange, $lon + $lonRange]);
                 } else {
+                    $distanceSql = '(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude))))';
+
                     $query->select('*')
-                        ->selectRaw(
-                            '(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance',
-                            [$lat, $lon, $lat]
-                        )
-                        ->having('distance', '<', $radius)
-                        ->orderBy('distance');
+                        ->selectRaw("{$distanceSql} AS distance", [$lat, $lon, $lat])
+                        // Avoid relying on HAVING against a selected alias during pagination count queries.
+                        ->whereRaw("{$distanceSql} < ?", [$lat, $lon, $lat, $radius])
+                        ->orderByRaw("{$distanceSql} asc", [$lat, $lon, $lat]);
                 }
             } else {
                 $query->orderBy('starts_at', 'asc');

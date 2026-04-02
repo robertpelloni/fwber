@@ -25,6 +25,8 @@ const inter = Inter({
   display: 'swap', // Optimize font loading
 })
 
+const faviconVersion = process.env.NEXT_PUBLIC_FRONTEND_VERSION || process.env.NEXT_PUBLIC_PROJECT_VERSION || '1.0.40'
+
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
@@ -41,10 +43,10 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   icons: {
     icon: [
-      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: `/favicon.svg?v=${faviconVersion}`, type: 'image/svg+xml' },
       { url: '/icons/icon-192x192.png', type: 'image/png', sizes: '192x192' },
       { url: '/icons/icon-512x512.png', type: 'image/png', sizes: '512x512' },
-      { url: '/icon.svg', type: 'image/svg+xml', sizes: 'any' },
+      { url: `/icon.svg?v=${faviconVersion}`, type: 'image/svg+xml', sizes: 'any' },
     ],
     apple: [
       { url: '/icons/icon-192x192.png' },

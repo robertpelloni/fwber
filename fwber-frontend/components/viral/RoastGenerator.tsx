@@ -6,19 +6,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Button, ButtonProps } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/lib/hooks/use-toast';
-import { useAuth } from '@/lib/auth-context';
 import { wingmanApi } from '@/lib/api/wingman';
 import { Flame, Share2, Sparkles, Loader2, Twitter, MessageCircle } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface RoastGeneratorProps {
   trigger?: React.ReactNode;
 }
 
 export function RoastGenerator({ trigger }: RoastGeneratorProps) {
-  const { user } = useAuth();
   const { success, error } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -104,7 +102,7 @@ export function RoastGenerator({ trigger }: RoastGeneratorProps) {
               <p className="text-muted-foreground">
                 {mode === 'roast' 
                   ? "Ready to get humbled? Our AI will analyze your profile and roast you explicitly." 
-                  : "Need an ego boost? Let our AI tell you why you&apos;re a catch."}
+                  : "Need an ego boost? Let our AI tell you why you're a catch."}
               </p>
               <Button 
                 size="lg" 
@@ -122,7 +120,7 @@ export function RoastGenerator({ trigger }: RoastGeneratorProps) {
             <div className={`p-6 rounded-xl border-2 ${mode === 'roast' ? 'bg-orange-50 border-orange-200 dark:bg-orange-950/20 dark:border-orange-900' : 'bg-yellow-50 border-yellow-200 dark:bg-yellow-950/20 dark:border-yellow-900'}`}>
               <div className="text-4xl mb-4 text-center">{mode === 'roast' ? '💀' : '🤩'}</div>
               <p className="text-lg font-medium text-center italic leading-relaxed">
-                &quot;{result}&quot;
+                <>{'"'}{result}{'"'}</>
               </p>
             </div>
 

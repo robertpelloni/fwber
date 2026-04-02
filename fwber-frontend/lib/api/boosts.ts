@@ -3,22 +3,24 @@ import { api } from './client';
 export interface Boost {
   id: number;
   user_id: number;
+  started_at?: string;
   expires_at: string;
+  boost_type?: 'standard' | 'super';
+  status?: 'active' | 'expired';
   created_at: string;
   updated_at: string;
 }
 
-export interface BoostResponse {
-  success: boolean;
-  message: string;
-  boost: Boost;
+interface ActiveBoostResponse {
+  data: Boost | null;
+  message?: string;
 }
 
 /**
  * Purchase a profile boost
  */
-export async function purchaseBoost(): Promise<BoostResponse> {
-  return api.post<BoostResponse>('/boosts/purchase');
+export async function purchaseBoost(payload: { type: 'standard' | 'super'; payment_method?: 'stripe' | 'token'; payment_method_id?: string }): Promise<Boost> {
+  return api.post<Boost>('/boosts/purchase', payload);
 }
 
 /**
@@ -26,8 +28,8 @@ export async function purchaseBoost(): Promise<BoostResponse> {
  */
 export async function getActiveBoost(): Promise<Boost | null> {
   try {
-    const response = await api.get<{ active: boolean; boost: Boost | null }>('/boosts/active');
-    return response.boost;
+    const response = await api.get<ActiveBoostResponse>('/boosts/active');
+    return response.data;
   } catch (error) {
     return null;
   }

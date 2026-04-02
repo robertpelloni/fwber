@@ -18,6 +18,7 @@ import { CallHistory } from '@/components/VideoCall/CallHistory'
 import RealTimeChat from '@/components/RealTimeChat'
 import { DateFeedbackModal } from '@/components/matches/DateFeedbackModal'
 import MatchARView from '@/components/ar/MatchARView'
+import AppHeader from '@/components/AppHeader'
 
 export default function MessagesPage() {
   const { token, isAuthenticated } = useAuth()
@@ -115,8 +116,11 @@ export default function MessagesPage() {
   if (isLoading) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+        <div className="min-h-screen bg-gray-50">
+          <AppHeader />
+          <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+          </div>
         </div>
       </ProtectedRoute>
     )
@@ -125,15 +129,18 @@ export default function MessagesPage() {
   if (error) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-red-500 text-xl mb-4">Error: {error}</div>
-            <button
-              onClick={loadConversations}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              Try Again
-            </button>
+        <div className="min-h-screen bg-gray-50">
+          <AppHeader />
+          <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
+            <div className="text-center">
+              <div className="text-red-500 text-xl mb-4">Error: {error}</div>
+              <button
+                onClick={loadConversations}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              >
+                Try Again
+              </button>
+            </div>
           </div>
         </div>
       </ProtectedRoute>
@@ -143,17 +150,18 @@ export default function MessagesPage() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <header className="bg-white shadow">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center py-6">
+        <AppHeader />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">Messages</h1>
                 <p className="text-gray-600">
                   {conversations.length} conversation{conversations.length !== 1 ? 's' : ''}
                 </p>
               </div>
-              <div className="flex items-center space-x-4">
+              <div className="flex flex-wrap items-center gap-3">
                 <button
                   onClick={() => setIsHistoryOpen(true)}
                   className="bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-700"
@@ -181,9 +189,7 @@ export default function MessagesPage() {
               </div>
             </div>
           </div>
-        </header>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {conversations.length === 0 ? (
             <div className="text-center">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">No Conversations Yet</h2>

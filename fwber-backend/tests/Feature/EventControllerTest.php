@@ -52,6 +52,29 @@ class EventControllerTest extends TestCase
         $this->assertDatabaseHas('events', ['title' => 'Test Event']);
     }
 
+    public function test_nearby_event_query_respects_radius_filter()
+    {
+        $user = User::factory()->create();
+        $nearbyEvent = Event::factory()->create([
+            'created_by_user_id' => $user->id,
+            'latitude' => 40.7128,
+            'longitude' => -74.0060,
+        ]);
+        $distantEvent = Event::factory()->create([
+            'created_by_user_id' => $user->id,
+            'latitude' => 41.7128,
+            'longitude' => -74.0060,
+        ]);
+
+        $response = $this->actingAs($user)
+            ->getJson('/api/events?latitude=40.7128&longitude=-74.0060&radius=10');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(1, 'data')
+            ->assertJsonFragment(['id' => $nearbyEvent->id])
+            ->assertJsonMissing(['id' => $distantEvent->id]);
+    }
+
     public function test_can_rsvp_to_event()
     {
         $creator = User::factory()->create();

@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.39`
+- **Current version:** `1.0.40`
 - **Release date:** `2026-04-02`
-- **Release name:** `Bounty Flow Repair`
+- **Release name:** `Events and Shell Stabilization`
 
 ## Summary
 
-This release repairs the matchmaker bounty flow by aligning the bounty API payload with the frontend's real expectations, fixing dead bounty navigation, and switching creation/suggestion flows onto the live bounty contract while preserving the public share page.
+This release stabilizes the live experience by fixing the production nearby-events query, repairing the boost countdown contract, rolling the shared app shell onto Matches and Messages, and forcing browsers to refresh the animated favicon asset.
 
 ## Version Sources of Truth
 
