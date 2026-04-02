@@ -373,7 +373,7 @@ export default function HomePage() {
               <div className="flex items-baseline gap-1">
                 <Logo className="text-3xl" />
               </div>
-              <p className="text-gray-500 mt-2">© 2025 fwber. All rights reserved.</p>
+              <p className="text-gray-500 mt-2">© 2026 fwber. All rights reserved.</p>
             </div>
             <div className="flex space-x-8">
               <Link href="/privacy" className="text-gray-600 hover:text-gray-900">Privacy Policy</Link>

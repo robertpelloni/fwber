@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.43] - 2026-04-02 — Copyright 2026 Refresh
+
+### Fixed
+- Updated the live homepage footer copyright notice from 2025 to 2026.
+- Synced the repository version metadata and release handoff documents for the new patch release.
+
 ## [1.0.41] - 2026-04-02 — Merchant Broadcast History
 
 ### Fixed

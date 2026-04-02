@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.42`
+- **Current version:** `1.0.43`
 - **Release date:** `2026-04-02`
-- **Release name:** `Structured Match Interests`
+- **Release name:** `Copyright 2026 Refresh`
 
 ## Summary
 
-This release turns the existing profile interest list into a real structured matching signal by normalizing saved interests, letting the match feed filter on them, and surfacing shared-interest overlap directly in the swipe UI.
+This release updates the live homepage footer copyright to 2026 and syncs the repository versioning and handoff documents so the shipped metadata matches the current calendar year.
 
 ## Version Sources of Truth
 
