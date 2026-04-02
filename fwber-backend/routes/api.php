@@ -508,6 +508,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('settings/privacy/journals', [\App\Http\Controllers\JournalPrivacyController::class, 'show']);
     Route::put('settings/privacy/journals', [\App\Http\Controllers\JournalPrivacyController::class, 'update']);
 
+    Route::prefix('topics')->group(function () {
+        Route::get('/', [\App\Http\Controllers\TopicController::class, 'index']);
+        Route::get('/followed', [\App\Http\Controllers\TopicController::class, 'followed']);
+        Route::get('/{slug}', [\App\Http\Controllers\TopicController::class, 'show']);
+        Route::post('/{slug}/follow', [\App\Http\Controllers\TopicController::class, 'follow']);
+        Route::delete('/{slug}/follow', [\App\Http\Controllers\TopicController::class, 'unfollow']);
+    });
+
     // Ice Breaker Cards
     Route::get('ice-breakers/questions', [\App\Http\Controllers\IceBreakerController::class, 'getQuestions']);
     Route::post('ice-breakers/answer', [\App\Http\Controllers\IceBreakerController::class, 'submitAnswer']);

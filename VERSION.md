@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.45`
+- **Current version:** `1.0.46`
 - **Release date:** `2026-04-02`
-- **Release name:** `Relationship Links`
+- **Release name:** `Topic Hubs`
 
 ## Summary
 
-This release adds consensual relationship links between accepted friends, including pending confirmation flows, per-link visibility controls, Friends & Connections management UI, and public-profile rendering for visible links.
+This release adds structured topic hubs across interests, journals, groups, and Local Pulse, including follow/unfollow flows, topic browse/detail pages, and topic-aware Local Pulse filtering and posting.
 
 ## Version Sources of Truth
 

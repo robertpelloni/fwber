@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.46] - 2026-04-02 — Topic Hubs
+
+### Fixed
+- Added a canonical `topics` catalog with seeded hub metadata, user follow/unfollow pivots, authenticated topic list/detail APIs, and topic-aware aggregation across public groups, visible journals, and Local Pulse artifacts.
+- Extended Local Pulse backend validation and feed/create flows so proximity artifacts can carry an optional `topic_slug`, and added regression coverage for follows, hub aggregation, and topic-scoped pulse filtering.
+- Added a new `/topics` browse surface, `/topics/[slug]` hub detail page, reusable topic API/hooks/components, topic navigation, and richer group cards so users can explore scenes beyond pure proximity.
+- Added topic filters and topic-linked posting to Local Pulse while preserving the existing app shell and route build behavior.
+
 ## [1.0.43] - 2026-04-02 — Copyright 2026 Refresh
 
 ### Fixed

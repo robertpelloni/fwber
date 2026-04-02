@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
+import AppHeader from '@/components/AppHeader';
 import LocalPulse from '@/components/LocalPulse';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
@@ -31,6 +32,7 @@ export default function LocalPulsePage() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
+        <AppHeader title="Local Pulse" />
         <LocalPulse />
       </div>
     </ProtectedRoute>

@@ -11,7 +11,7 @@ import type {
  */
 export function useLocalPulse(params: LocalPulseParams, token: string | null, enabled: boolean = true) {
   return useQuery<LocalPulseResponse>({
-    queryKey: ['local-pulse', params.lat, params.lng, params.radius],
+    queryKey: ['local-pulse', params.lat, params.lng, params.radius, params.topic_slug],
     queryFn: () => {
       if (!token) throw new Error('Authentication required');
       return proximityApi.getLocalPulse(params, token);
@@ -28,14 +28,15 @@ export function useLocalPulse(params: LocalPulseParams, token: string | null, en
 export function useProximityArtifacts(
   lat: number,
   lng: number,
-  radius: number = 1000,
-  type?: string,
-  token?: string | null,
-  enabled: boolean = true
+    radius: number = 1000,
+    type?: string,
+    topicSlug?: string,
+    token?: string | null,
+    enabled: boolean = true
 ) {
   return useQuery({
-    queryKey: ['proximity-artifacts', lat, lng, radius, type],
-    queryFn: () => proximityApi.getArtifactsFeed(lat, lng, radius, type, token || undefined),
+    queryKey: ['proximity-artifacts', lat, lng, radius, type, topicSlug],
+    queryFn: () => proximityApi.getArtifactsFeed(lat, lng, radius, type, topicSlug, token || undefined),
     enabled: enabled && !!lat && !!lng,
     staleTime: 30000,
     refetchInterval: 60000,

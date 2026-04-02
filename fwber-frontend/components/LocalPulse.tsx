@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useLocalPulse, useCreateProximityArtifact, useFlagProximityArtifact, useVoteArtifact, useCommentArtifact } from '@/lib/hooks/use-proximity';
 import { useLocalPulseRealtime } from '@/lib/hooks/use-local-pulse-realtime';
+import { useTopics } from '@/lib/hooks/use-topics';
 import { apiClient } from '@/lib/api/client';
 import {
   MapPin,
@@ -307,7 +309,12 @@ const CandidateCard = ({ candidate }: { candidate: MatchCandidate }) => {
   );
 };
 
-export default function LocalPulse() {
+interface LocalPulseProps {
+  initialTopicSlug?: string;
+  compact?: boolean;
+}
+
+export default function LocalPulse({ initialTopicSlug, compact = false }: LocalPulseProps) {
   const { token } = useAuth();
   const [location, setLocation] = useState<LocationState>({
     latitude: null,
@@ -317,11 +324,32 @@ export default function LocalPulse() {
   const [radius, setRadius] = useState(1000);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showAR, setShowAR] = useState(false);
+  const [selectedTopicSlug, setSelectedTopicSlug] = useState(initialTopicSlug ?? '');
   const [newArtifact, setNewArtifact] = useState({
     type: 'chat' as ArtifactType,
     content: '',
   });
   const [dropAmount, setDropAmount] = useState('');
+  const { data: topics = [] } = useTopics({ featured: true });
+
+  useEffect(() => {
+    if (initialTopicSlug) {
+      setSelectedTopicSlug(initialTopicSlug);
+      return;
+    }
+
+    if (typeof window !== 'undefined') {
+      const topicFromQuery = new URLSearchParams(window.location.search).get('topic');
+      if (topicFromQuery) {
+        setSelectedTopicSlug(topicFromQuery);
+      }
+    }
+  }, [initialTopicSlug]);
+
+  const selectedTopic = useMemo(
+    () => topics.find((topic) => topic.slug === selectedTopicSlug) ?? null,
+    [topics, selectedTopicSlug]
+  );
 
   const createArtifact = useCreateProximityArtifact();
   const flagArtifact = useFlagProximityArtifact();
@@ -358,6 +386,7 @@ export default function LocalPulse() {
       lat: location.latitude || 0,
       lng: location.longitude || 0,
       radius,
+      topic_slug: selectedTopicSlug || undefined,
     },
     token,
     !!location.latitude && !!location.longitude
@@ -374,7 +403,8 @@ export default function LocalPulse() {
           lat: location.latitude,
           lng: location.longitude,
           radius,
-          amount: newArtifact.type === 'token_drop' ? parseFloat(dropAmount) : undefined
+          amount: newArtifact.type === 'token_drop' ? parseFloat(dropAmount) : undefined,
+          topic_slug: selectedTopicSlug || undefined,
         },
         token,
       });
@@ -448,25 +478,29 @@ export default function LocalPulse() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-3">
-            <Sparkles className="h-8 w-8 text-purple-600" />
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Local Pulse</h1>
-              <p className="text-gray-600">Discover nearby people and conversations</p>
+            <div className="flex items-center space-x-3">
+              <Sparkles className="h-8 w-8 text-purple-600" />
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Local Pulse</h1>
+                <p className="text-gray-600">
+                  {selectedTopic ? `Discover nearby people and conversations around ${selectedTopic.label}.` : 'Discover nearby people and conversations'}
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setShowAR(true)}
-              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 flex items-center space-x-2"
-            >
-              <Camera className="h-4 w-4" />
-              <span>AR View</span>
-            </button>
-            <button
-              onClick={() => setShowCreateForm(!showCreateForm)}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+            <div className="flex items-center space-x-2">
+              {!compact && (
+                <button
+                  onClick={() => setShowAR(true)}
+                  className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 flex items-center space-x-2"
+                >
+                  <Camera className="h-4 w-4" />
+                  <span>AR View</span>
+                </button>
+              )}
+              <button
+                onClick={() => setShowCreateForm(!showCreateForm)}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2"
             >
               <Send className="h-4 w-4" />
               <span>Post</span>
@@ -476,18 +510,52 @@ export default function LocalPulse() {
 
         {/* Radius Selector */}
         <div className="bg-white rounded-lg shadow-sm border p-4">
-          <label htmlFor="radius-select" className="block text-sm font-medium text-gray-700 mb-2">Search Radius</label>
-          <select
-            id="radius-select"
-            value={radius}
-            onChange={(e) => setRadius(Number(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value={500}>500m (~0.3 miles)</option>
-            <option value={1000}>1km (~0.6 miles)</option>
-            <option value={2000}>2km (~1.2 miles)</option>
-            <option value={5000}>5km (~3 miles)</option>
-          </select>
+          <div className={`grid gap-4 ${compact ? 'md:grid-cols-1' : 'md:grid-cols-2'}`}>
+            <label htmlFor="radius-select" className="block">
+              <span className="block text-sm font-medium text-gray-700 mb-2">Search Radius</span>
+              <select
+                id="radius-select"
+                value={radius}
+                onChange={(e) => setRadius(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value={500}>500m (~0.3 miles)</option>
+                <option value={1000}>1km (~0.6 miles)</option>
+                <option value={2000}>2km (~1.2 miles)</option>
+                <option value={5000}>5km (~3 miles)</option>
+              </select>
+            </label>
+            <label className="block">
+              <span className="block text-sm font-medium text-gray-700 mb-2">Topic Filter</span>
+              <select
+                value={selectedTopicSlug}
+                onChange={(e) => setSelectedTopicSlug(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">All scenes</option>
+                {topics.map((topic) => (
+                  <option key={topic.slug} value={topic.slug}>
+                    {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          {selectedTopic && (
+            <div className="mt-4 rounded-2xl bg-purple-50 px-4 py-3 text-sm text-purple-900">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="font-semibold">
+                    {selectedTopic.emoji ? `${selectedTopic.emoji} ` : ''}{selectedTopic.label}
+                  </div>
+                  <p className="mt-1 text-purple-800">{selectedTopic.description}</p>
+                </div>
+                <Link href={`/topics/${selectedTopic.slug}`} className="shrink-0 font-semibold text-purple-700 hover:text-purple-800">
+                  Open hub
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -555,6 +623,22 @@ export default function LocalPulse() {
               </p>
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Attach to topic</label>
+              <select
+                value={selectedTopicSlug}
+                onChange={(e) => setSelectedTopicSlug(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">No topic</option>
+                {topics.map((topic) => (
+                  <option key={topic.slug} value={topic.slug}>
+                    {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <div className="flex space-x-3">
               <button
                 onClick={() => setShowCreateForm(false)}
@@ -592,13 +676,13 @@ export default function LocalPulse() {
 
       {/* Local Pulse Content */}
       {localPulse && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className={`grid grid-cols-1 gap-6 ${compact ? '' : 'lg:grid-cols-3'}`}>
           {/* Proximity Artifacts (2 columns on large screens) */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className={`${compact ? '' : 'lg:col-span-2'} space-y-4`}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-900 flex items-center space-x-2">
                 <MessageCircle className="h-6 w-6" />
-                <span>Nearby Activity</span>
+                <span>{selectedTopic ? `${selectedTopic.label} Activity` : 'Nearby Activity'}</span>
                 <span className="text-sm font-normal text-gray-500">
                   ({localPulse.meta.artifacts_count})
                 </span>
@@ -636,7 +720,7 @@ export default function LocalPulse() {
           </div>
 
           {/* Match Candidates (1 column on large screens) */}
-          <div className="space-y-4">
+          {!compact && <div className="space-y-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-900 flex items-center space-x-2">
                 <Users className="h-6 w-6" />
@@ -661,7 +745,7 @@ export default function LocalPulse() {
                 ))}
               </div>
             )}
-          </div>
+          </div>}
         </div>
       )}
 

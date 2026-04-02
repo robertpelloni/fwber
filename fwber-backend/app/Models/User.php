@@ -365,6 +365,13 @@ class User extends Authenticatable
         return $this->hasMany(RelationshipLink::class);
     }
 
+    public function followedTopics(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Topic::class, 'topic_user_follows')
+            ->withPivot('followed_at')
+            ->withTimestamps();
+    }
+
     public function incomingRelationshipLinks(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(RelationshipLink::class, 'related_user_id');

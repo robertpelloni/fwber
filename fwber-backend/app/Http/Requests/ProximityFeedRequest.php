@@ -26,6 +26,7 @@ class ProximityFeedRequest extends FormRequest
             'lng' => 'required|numeric|between:-180,180',
             'radius' => 'nullable|integer|min:100|max:10000',
             'type' => 'nullable|in:chat,board_post,announce',
+            'topic_slug' => 'nullable|string|exists:topics,slug',
         ];
     }
 
@@ -42,6 +43,7 @@ class ProximityFeedRequest extends FormRequest
             'radius.min' => 'Radius must be at least 100 meters.',
             'radius.max' => 'Radius cannot exceed 10,000 meters.',
             'type.in' => 'Type must be one of: chat, board_post, announce.',
+            'topic_slug.exists' => 'Selected topic does not exist.',
         ];
     }
 }

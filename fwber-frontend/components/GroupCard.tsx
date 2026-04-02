@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Users, Lock, Globe, Coins } from 'lucide-react';
+import { Users, Lock, Globe, Coins, Hash } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -36,7 +36,7 @@ export function GroupCard({ group }: GroupCardProps) {
 
   return (
     <Link href={`/groups/${group.id}`}>
-      <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">
+        <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">
         <CardHeader className="pb-2">
           <div className="flex justify-between items-start">
             <div className="flex items-center gap-2">
@@ -61,6 +61,21 @@ export function GroupCard({ group }: GroupCardProps) {
           <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
             {group.description || 'No description provided.'}
           </p>
+          {(group.category || (group.tags && group.tags.length > 0)) && (
+            <div className="mb-4 flex flex-wrap gap-2">
+              {group.category && (
+                <span className="inline-flex items-center rounded-full bg-purple-50 px-2.5 py-1 text-xs font-semibold text-purple-700">
+                  <Hash className="mr-1 h-3 w-3" />
+                  <span>{group.category}</span>
+                </span>
+              )}
+              {group.tags?.slice(0, 3).map((tag) => (
+                <span key={tag} className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
           <div className="flex items-center justify-between text-sm text-muted-foreground">
             <div className="flex items-center">
                 <Users className="w-4 h-4 mr-1" />

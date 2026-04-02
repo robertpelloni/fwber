@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.0.45
+> **Current Version:** 1.0.46
 > **Last Updated:** 2026-04-02
 
 ---
@@ -61,7 +61,7 @@
 ---
 
 ## 🎯 Next Immediate Milestones
-1. Expand the new **Structured Interest Graph** slice from shared-interest matching, field notes, and relationship links into curated taxonomy/catalog APIs and richer profile-level metadata.
-2. Build **topic hubs** and **scene-based discovery** on top of the shipped journal and relationship metadata primitives.
+1. Extend the shipped **topic hubs** into deeper **scene-based discovery** for matches, profile cards, and local feeds.
+2. Add richer profile-level scene metadata and recommendations on top of the new topic follow graph.
 3. Extend the **Merchant Portal UI** (B2B) with lifecycle controls, resend/deactivate/reporting tooling, and broader operations polish.
 4. Wire up the **ActivityPub Inbox/Outbox UI** for federated profiles.

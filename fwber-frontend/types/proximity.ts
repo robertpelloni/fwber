@@ -16,6 +16,7 @@ export interface ProximityArtifact {
     amount?: number;
     claimed?: boolean;
     claimed_by?: number;
+    topic_slug?: string;
     // Promotion specific fields
     title?: string;
     discount?: number;
@@ -44,6 +45,7 @@ export interface LocalPulseResponse {
     center_lat: number;
     center_lng: number;
     radius_m: number;
+    topic_slug?: string | null;
     artifacts_count: number;
     candidates_count: number;
   };
@@ -56,12 +58,14 @@ export interface CreateArtifactRequest {
   lng: number;
   radius?: number;
   amount?: number;
+  topic_slug?: string;
 }
 
 export interface LocalPulseParams {
   lat: number;
   lng: number;
   radius?: number;
+  topic_slug?: string;
 }
 
 export interface ProximityChatroom {

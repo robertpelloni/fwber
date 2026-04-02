@@ -59,14 +59,15 @@ class ProximityArtifactController extends Controller
         $lng = (float) $validated['lng'];
         $radius = (int) ($validated['radius'] ?? 1000);
         $type = $validated['type'] ?? 'all';
+        $topicSlug = $validated['topic_slug'] ?? null;
 
         // Round coordinates to ~110m precision for caching grid
         $gridLat = round($lat, 3);
         $gridLng = round($lng, 3);
 
-        $cacheKey = "proximity:feed:lat:{$gridLat}:lng:{$gridLng}:radius:{$radius}:type:{$type}";
+        $cacheKey = "proximity:feed:lat:{$gridLat}:lng:{$gridLng}:radius:{$radius}:type:{$type}:topic:".($topicSlug ?? 'all');
 
-        $artifacts = Cache::remember($cacheKey, 60, function () use ($lat, $lng, $radius, $validated, $user) {
+        $artifacts = Cache::remember($cacheKey, 60, function () use ($lat, $lng, $radius, $validated, $user, $topicSlug) {
             $q = ProximityArtifact::query()
                 ->withCount('comments')
                 ->withSum('votes', 'value')
@@ -77,6 +78,10 @@ class ProximityArtifactController extends Controller
                 ->withinBox($lat, $lng, $radius);
             if (isset($validated['type'])) {
                 $q->type($validated['type']);
+            }
+
+            if ($topicSlug) {
+                $q->where('meta->topic_slug', $topicSlug);
             }
 
             return $q->orderByDesc('created_at')->limit(100)->get()
@@ -147,6 +152,9 @@ class ProximityArtifactController extends Controller
                 'location_lng' => $lng,
                 'visibility_radius_m' => (int) ($validated['radius'] ?? 1000),
                 'amount' => $validated['amount'] ?? 0,
+                'meta' => array_filter([
+                    'topic_slug' => $validated['topic_slug'] ?? null,
+                ], fn ($value) => $value !== null && $value !== ''),
             ]);
         } catch (\Throwable $e) {
             return response()->json(['error' => $e->getMessage()], 422);
@@ -390,17 +398,18 @@ class ProximityArtifactController extends Controller
         $lat = (float) $validated['lat'];
         $lng = (float) $validated['lng'];
         $radius = (int) ($validated['radius'] ?? 1000);
+        $topicSlug = $validated['topic_slug'] ?? null;
 
         // Round coordinates to ~110m precision for caching grid
         $gridLat = round($lat, 3);
         $gridLng = round($lng, 3);
 
-        $cacheKey = "proximity:pulse:user:{$user->id}:lat:{$gridLat}:lng:{$gridLng}:radius:{$radius}";
+        $cacheKey = "proximity:pulse:user:{$user->id}:lat:{$gridLat}:lng:{$gridLng}:radius:{$radius}:topic:".($topicSlug ?? 'all');
 
         // Cache for 2 minutes
-        $response = Cache::remember($cacheKey, 120, function () use ($user, $profile, $lat, $lng, $radius) {
+        $response = Cache::remember($cacheKey, 120, function () use ($user, $profile, $lat, $lng, $radius, $topicSlug) {
             // Get proximity artifacts with shadow throttle filtering
-            $artifacts = ProximityArtifact::query()
+            $artifactQuery = ProximityArtifact::query()
                 ->withCount('comments')
                 ->withSum('votes', 'value')
                 ->with(['votes' => function ($q) use ($user) {
@@ -408,7 +417,13 @@ class ProximityArtifactController extends Controller
                 }])
                 ->active()
                 ->withinBox($lat, $lng, $radius)
-                ->orderByDesc('created_at')
+                ->orderByDesc('created_at');
+
+            if ($topicSlug) {
+                $artifactQuery->where('meta->topic_slug', $topicSlug);
+            }
+
+            $artifacts = $artifactQuery
                 ->limit(100) // Get more, then filter and limit
                 ->get()
                 ->filter(function (ProximityArtifact $a) {
@@ -487,6 +502,7 @@ class ProximityArtifactController extends Controller
                     'center_lat' => $lat,
                     'center_lng' => $lng,
                     'radius_m' => $radius,
+                    'topic_slug' => $topicSlug,
                     'artifacts_count' => $mixedArtifacts->count(),
                     'candidates_count' => count($candidates),
                     'generated_at' => now()->toISOString(),

@@ -37,6 +37,7 @@ class LocalPulseRequest extends FormRequest
             'lat' => 'required|numeric|between:-90,90',
             'lng' => 'required|numeric|between:-180,180',
             'radius' => 'nullable|integer|min:100|max:10000',
+            'topic_slug' => 'nullable|string|exists:topics,slug',
         ];
     }
 
@@ -54,6 +55,7 @@ class LocalPulseRequest extends FormRequest
             'lng.between' => 'Longitude must be between -180 and 180.',
             'radius.min' => 'Radius must be at least 100 meters.',
             'radius.max' => 'Radius must not exceed 10000 meters.',
+            'topic_slug.exists' => 'Selected topic does not exist.',
         ];
     }
 }

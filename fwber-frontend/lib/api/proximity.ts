@@ -14,11 +14,11 @@ export const proximityApi = {
    * Get Local Pulse merged feed (artifacts + match candidates)
    */
   getLocalPulse: async (params: LocalPulseParams, token: string): Promise<LocalPulseResponse> => {
-    const { lat, lng, radius = 1000 } = params;
+    const { lat, lng, radius = 1000, topic_slug } = params;
     const response = await axios.get<LocalPulseResponse>(
       `${API_BASE_URL}/proximity/local-pulse`,
       {
-        params: { lat, lng, radius },
+        params: { lat, lng, radius, topic_slug },
         headers: { Authorization: `Bearer ${token}` },
       }
     );
@@ -33,10 +33,11 @@ export const proximityApi = {
     lng: number,
     radius: number = 1000,
     type?: string,
+    topic_slug?: string,
     token?: string
   ): Promise<{ artifacts: ProximityArtifact[] }> => {
     const response = await axios.get(`${API_BASE_URL}/proximity/feed`, {
-      params: { lat, lng, radius, type },
+      params: { lat, lng, radius, type, topic_slug },
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     return response.data;
