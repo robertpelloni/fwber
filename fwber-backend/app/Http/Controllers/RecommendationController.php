@@ -114,6 +114,7 @@ class RecommendationController extends Controller
             'metadata' => [
                 'generated_at' => now()->toISOString(),
                 'user_id' => $user->id,
+                'ranking_strategy' => $this->buildRankingStrategy(),
             ],
         ]);
     }
@@ -341,13 +342,26 @@ class RecommendationController extends Controller
                 'context' => $context,
                 'generated_at' => now()->toISOString(),
                 'cache_hit' => false,
+                'ranking_strategy' => $this->buildRankingStrategy(),
             ],
             'data' => $recommendations,
             'meta' => [
                 'total' => $total,
                 'types' => $types,
                 'context' => $context,
+                'ranking_strategy' => $this->buildRankingStrategy(),
             ],
+        ];
+    }
+
+    private function buildRankingStrategy(): array
+    {
+        return [
+            'trusted_connections' => true,
+            'scene_alignment' => true,
+            'freshness' => true,
+            'base_relevance' => true,
+            'summary' => 'Recommendations balance trusted connections, scene alignment, freshness, and base relevance without exposing private graph details.',
         ];
     }
 
@@ -358,7 +372,7 @@ class RecommendationController extends Controller
                 'user_id' => $userId,
                 'event' => $event,
                 'payload' => $payload,
-                'created_at' => now(),
+                'recorded_at' => now(),
             ]);
         } catch (QueryException $exception) {
             Log::warning('Recommendation telemetry persistence failed', [

@@ -1,29 +1,31 @@
-# Handoff — Trust-Aware Local Pulse Ranking
+# Handoff — Trust-Aware Recommendation Ranking
 
 **Date:** 2026-04-02  
 **Status:** ✅ Local release verified  
-**Version:** 1.0.51
+**Version:** 1.0.52
 
 ## Overview
-This cycle moved Local Pulse from scene-aware presentation into privacy-safe trust-aware ranking. The local feed now orders artifacts with a composite of trusted connections, scene alignment, and freshness, while still keeping friendships, relationship links, and shared-circle membership internal to scoring rather than exposing them as payload details. The implementation deliberately reuses the same topic/scene graph and existing privacy/trust helpers already established across matches, profiles, journals, and relationship links.
+This cycle moved recommendations and personalized feed ordering onto the same privacy-safe trust-aware ranking model already established in Local Pulse. Recommendation batches now balance trusted connections, scene alignment, freshness, and base relevance while still keeping friendships, relationship links, and shared-circle membership internal to scoring rather than exposing them as payload details. The implementation deliberately reuses the same topic/scene graph and existing privacy/trust helpers already established across matches, profiles, journals, relationship links, Local Pulse, and recommendation scene signals.
 
 ## Shipped Baseline
-- **Latest pushed code release:** `v1.0.51`
+- **Latest pushed code release:** `v1.0.52`
 - **Previous baseline before this slice:** `v1.0.50`
 - **Primary working checkout:** `C:\Users\hyper\.copilot\session-state\44f0d726-859c-45b4-aae1-b7f7a064bccf\files\fwber-live-fix`
 - **Root workspace rule:** treat `C:\Users\hyper\workspace\fwber` as effectively read-only during safe recovery/release work
 
 ## What Was Completed
-1. **Trust-Aware Local Pulse Ranking (`v1.0.51`)**
-   - Added `LocalPulseRankingService` to batch trust signals from accepted friendships, confirmed relationship links, and shared active circles.
-   - Reworked `ProximityArtifactController::localPulse()` so artifacts are ordered by a composite of trust, scene alignment, and freshness.
-   - Kept trust signals internal to ordering; the payload only exposes a high-level `ranking_strategy` explanation.
-   - Added regression coverage proving a trusted, scene-aligned artifact outranks a newer generic stranger post.
+1. **Trust-Aware Recommendation Ranking (`v1.0.52`)**
+   - Extended `RecommendationService` so recommendation batches preserve author metadata long enough to apply the same privacy-safe trust-aware composite scoring already used by Local Pulse.
+   - Reworked recommendation and personalized-feed ordering so mixed recommendation results now balance trust, scene alignment, freshness, and base relevance.
+   - Kept trust signals internal to ordering; recommendation payloads expose only a high-level `ranking_strategy` explanation consumed by the recommendations hub UI.
+   - Added focused regression coverage for recommendation ranking metadata and service-level trust-aware ordering.
+   - Fixed two real recommendation-path bugs uncovered during rollout: SQLite-incompatible `HOUR(created_at)` usage in `analyzeActivityPatterns()` and incorrect `TelemetryEvent` persistence using `created_at` instead of `recorded_at`.
 2. **Previously Shipped Scene Discovery Stack**
    - `v1.0.47`: matches + profiles
    - `v1.0.48`: recommendations
    - `v1.0.49`: Local Pulse scene signals + dashboard shell fix
    - `v1.0.50`: documentation/session-transfer refresh
+   - `v1.0.51`: Local Pulse trust-aware ranking
 
 ## Key Technical Findings
 - **The topic graph is now the canonical scene-discovery backbone.**
@@ -32,14 +34,19 @@ This cycle moved Local Pulse from scene-aware presentation into privacy-safe tru
     - matches
     - public profiles
     - recommendations/feed cards
+    - recommendation ranking
     - Local Pulse cards
     - Local Pulse ranking
 - **The safest trust-aware ranking design is internal scoring, not richer payload graph data.**
   - Friendship, confirmed relationship links, and shared active circles are now used only as server-side ranking inputs.
   - The feed explains ranking strategy at a high level without serializing private relationship context.
 - **Trust-aware discovery is still intentionally incomplete.**
-  - Local Pulse ranking now uses privacy-safe trust signals, but recommendations and other local-feed loops still do not.
-  - Future work should extend the same pattern into recommendation ranking without exposing private edges in API payloads.
+  - Local Pulse and recommendation ranking now use privacy-safe trust signals, but other local-feed and discovery loops still do not.
+  - Future work should extend the same pattern beyond recommendations without exposing private edges in API payloads.
+- **Two recommendation-path bugs surfaced only when validating the new release slice.**
+  - `RecommendationService::analyzeActivityPatterns()` used SQLite-incompatible `HOUR(created_at)`, causing 500s in test-backed recommendation generation.
+  - `RecommendationController::recordTelemetrySafely()` attempted to mass-assign `created_at` on `TelemetryEvent`, but the model accepts `recorded_at`.
+  - Both are now fixed and should be remembered as part of the recommendation validation baseline.
 - **A real backend bug was found during Local Pulse work.**
   - `ProximityArtifactController` still referenced `date_of_birth` in the nearby-candidate path.
   - The codebase actually uses `birthdate`.
@@ -51,9 +58,15 @@ This cycle moved Local Pulse from scene-aware presentation into privacy-safe tru
 
 ## Key Files Modified
 - `fwber-backend/app/Services/LocalPulseRankingService.php`
+- `fwber-backend/app/Services/RecommendationService.php`
+- `fwber-backend/app/Http/Controllers/RecommendationController.php`
+- `fwber-backend/tests/Feature/RecommendationRankingFeatureTest.php`
+- `fwber-backend/tests/Unit/Services/RecommendationServiceTest.php`
 - `fwber-backend/app/Services/AIMatchingService.php`
 - `fwber-backend/app/Http/Controllers/ProximityArtifactController.php`
 - `fwber-backend/tests/Feature/LocalPulseSceneSignalsTest.php`
+- `fwber-frontend/app/recommendations/page.tsx`
+- `fwber-frontend/lib/api/recommendations.ts`
 - `fwber-frontend/components/LocalPulse.tsx`
 - `fwber-frontend/types/proximity.ts`
 - `VERSION`
@@ -68,7 +81,7 @@ This cycle moved Local Pulse from scene-aware presentation into privacy-safe tru
 
 ## Validation Workflow That Proved Reliable
 - **Backend**
-  - `php artisan test tests/Feature/LocalPulseSceneSignalsTest.php tests/Feature/TopicHubFeatureTest.php tests/Feature/SceneDiscoveryFeatureTest.php`
+  - `php artisan test tests/Unit/Services/RecommendationServiceTest.php tests/Feature/RecommendationRankingFeatureTest.php tests/Feature/LocalPulseSceneSignalsTest.php`
 - **Frontend**
   1. `npm run lint`
   2. clean `npm run build`
@@ -82,17 +95,17 @@ This cycle moved Local Pulse from scene-aware presentation into privacy-safe tru
 
 ## Notes / Risks
 - The repo still has the known `.next` / `.next/types` contention when overlapping Next jobs hit the same checkout; direct shell builds can fail after successful compilation with missing build artifacts like `pages-manifest.json` or `_document.js`.
-- Scene discovery now affects matches, profiles, recommendation cards, Local Pulse card metadata, and Local Pulse ranking, but it still does not reshape deeper trust-aware recommendation inputs.
+- Scene discovery now affects matches, profiles, recommendation cards, recommendation ranking, Local Pulse card metadata, and Local Pulse ranking, but it still does not reshape every remaining local-feed surface.
 - Merchant lifecycle tooling, ActivityPub UI, and AI Wingman frontend wiring remain large unfinished areas compared with the more cohesive scene-discovery track.
 - The safe-checkout workflow is still important because the environment is shared and the root repository may contain unrelated or user-owned changes.
 
 ## Next Recommended Slice
-1. Extend the same privacy-safe trust-aware scoring model from Local Pulse ranking into recommendation ranking and related local-feed loops.
+1. Extend the same privacy-safe trust-aware scoring model from Local Pulse and recommendations into the remaining local-feed and discovery loops.
 2. Fold relationship links, friend/circle visibility, and topic follows into a richer trust-aware discovery model without leaking private graph edges.
 3. Keep building on the topic graph rather than adding a second parallel taxonomy system.
 
 ## Suggested Resume Procedure
-1. Start from `origin/copilot-live-fix` after `c84834649c02a8aa3b2d9b679ffb9ec96d99e8c0` plus this documentation refresh.
+1. Start from `origin/copilot-live-fix` after `v1.0.52`.
 2. Re-read `HANDOFF.md`, `PROJECT_STATUS.md`, `ROADMAP.md`, `TODO.md`, and the session `plan.md`.
 3. Stay in the session-state checkout and avoid changing the root workspace copy.
 4. Create a new SQL todo for the next slice before implementing.

@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.0.51
+> **Current Version:** 1.0.52
 > **Last Updated:** 2026-04-02
 
 ---
@@ -61,7 +61,7 @@
 ---
 
 ## 🎯 Next Immediate Milestones
-1. Expand the shipped **scene discovery** stack from Local Pulse trust-aware ranking into richer trust-aware recommendation inputs and additional local-feed loops.
+1. Expand the shipped **scene discovery** stack from Local Pulse and recommendation trust-aware ranking into the remaining local-feed and discovery loops.
 2. Extend the **Merchant Portal UI** (B2B) with lifecycle controls, resend/deactivate/reporting tooling, and broader operations polish.
 3. Wire up the **ActivityPub Inbox/Outbox UI** for federated profiles.
-4. Add deeper trust-aware recommendation inputs that combine relationship links, circles, and topic hubs without weakening privacy gates.
+4. Add deeper trust-aware discovery inputs that combine relationship links, circles, and topic hubs without weakening privacy gates.

@@ -10,6 +10,14 @@ All notable changes to this project will be documented in this file.
 - Updated Local Pulse response metadata and UI copy so the feed now explains that ranking uses scene alignment, trusted connections, and freshness while keeping trust details internal to ordering.
 - Added regression coverage proving a trusted, scene-aligned Local Pulse artifact outranks a newer generic stranger post.
 
+## [1.0.52] - 2026-04-02 — Trust-Aware Recommendation Ranking
+
+### Fixed
+- Reworked recommendation and personalized-feed ordering so combined recommendation batches now rank with the same privacy-safe trust-aware model already shipped for Local Pulse, balancing trusted connections, scene alignment, freshness, and base relevance.
+- Extended `RecommendationService` to preserve author metadata through recommendation normalization, apply trust-aware composite ranking with `LocalPulseRankingService`, and surface high-level `ranking_strategy` metadata without exposing private graph edges in the payload.
+- Updated the recommendations hub API types and UI to explain the ranking strategy consistently across mixed recommendations and personalized feed views.
+- Added focused recommendation regression coverage and fixed two real backend recommendation-path bugs uncovered during rollout: SQLite-incompatible `HOUR(created_at)` usage in activity-pattern analysis and incorrect `TelemetryEvent` persistence using `created_at` instead of `recorded_at`.
+
 ## [1.0.50] - 2026-04-02 — Session Transfer Handoff Refresh
 
 ### Fixed

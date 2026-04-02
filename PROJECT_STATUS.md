@@ -1,18 +1,18 @@
-# Project Status — fwber v1.0.51 (Trust-Aware Local Pulse Ranking)
+# Project Status — fwber v1.0.52 (Trust-Aware Recommendation Ranking)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.51 "Trust-Aware Local Pulse Ranking"
+**Version:** 1.0.52 "Trust-Aware Recommendation Ranking"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## Trust-Aware Local Pulse Ranking
-- **Trust-Aware Feed Ordering Shipped**: Local Pulse artifacts now rank by a privacy-safe composite of trusted connections, scene alignment, and freshness instead of pure recency.
-- **Privacy Boundaries Preserved**: Friendship, confirmed relationship-link, and shared-circle checks stay internal to ranking; no private graph edges are serialized into the feed payload.
-- **Shared Graph Reuse Preserved**: Local Pulse ranking now builds on the same topic/scene graph already driving matches, profiles, recommendations, and pulse-card scene cues.
-- **Feed Explanation Added**: Local Pulse now exposes high-level ranking-strategy metadata so the UI can explain why the feed prioritizes trusted, scene-aligned, fresh activity.
+## Trust-Aware Recommendation Ranking
+- **Trust-Aware Recommendation Ordering Shipped**: Recommendation batches and personalized feed items now rank by a privacy-safe composite of trusted connections, scene alignment, freshness, and base relevance instead of relying only on raw recommendation score ordering.
+- **Privacy Boundaries Preserved**: Friendship, confirmed relationship-link, and shared-circle checks remain internal to ranking; the API exposes only a high-level ranking strategy summary rather than private graph details.
+- **Shared Graph Reuse Preserved**: Recommendation ranking now reuses the same topic/scene graph and trust map architecture already powering matches, profiles, Local Pulse card cues, and Local Pulse ranking.
+- **Recommendations Hub Explanation Added**: The recommendations UI now surfaces ranking-strategy metadata so mixed recommendations and personalized feed views explain why trusted, scene-aligned, fresh items rise first.
 
 ## ✅ Release Focus
-- [x] Added a batch trust-map service for Local Pulse ranking using friendships, confirmed relationship links, and shared active circles.
-- [x] Reordered Local Pulse artifacts by trust + scene alignment + freshness without widening the payload's private social graph surface.
-- [x] Added regression coverage for the new ordering behavior and updated the Local Pulse UI/types to explain the ranking strategy.
+- [x] Extended recommendation and personalized-feed ranking with the same privacy-safe trust-aware composite already used by Local Pulse.
+- [x] Preserved recommendation author metadata long enough for internal trust scoring while keeping private graph edges out of serialized payloads.
+- [x] Added recommendation ranking-strategy metadata/UI explanation and regression coverage for both the new ranking contract and the surfaced backend bugs fixed during rollout.

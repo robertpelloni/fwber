@@ -29,12 +29,21 @@ export interface Recommendation {
   };
 }
 
+export interface RecommendationRankingStrategy {
+  trusted_connections: boolean;
+  scene_alignment: boolean;
+  freshness: boolean;
+  base_relevance: boolean;
+  summary: string;
+}
+
 export interface RecommendationMetadata {
   total: number;
   types: string[];
   context: Record<string, any>;
   generated_at: string;
   cache_hit: boolean;
+  ranking_strategy?: RecommendationRankingStrategy;
 }
 
 export interface RecommendationResponse {
@@ -81,6 +90,7 @@ export interface FeedResponse {
   metadata: {
     generated_at: string;
     user_id: number;
+    ranking_strategy?: RecommendationRankingStrategy;
   };
 }
 

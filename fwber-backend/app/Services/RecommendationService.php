@@ -16,11 +16,14 @@ class RecommendationService
 {
     private LlmManager $llmManager;
 
+    private LocalPulseRankingService $localPulseRankingService;
+
     private array $recommendationConfig;
 
-    public function __construct(LlmManager $llmManager)
+    public function __construct(LlmManager $llmManager, LocalPulseRankingService $localPulseRankingService)
     {
         $this->llmManager = $llmManager;
+        $this->localPulseRankingService = $localPulseRankingService;
         $this->recommendationConfig = config('recommendations', [
             'enabled' => true,
             'providers' => ['openai', 'gemini'],
@@ -89,10 +92,12 @@ class RecommendationService
         // Combine and rank recommendations
         $recommendations = $this->combineRecommendations($sources);
         $recommendations = $this->enrichRecommendationsWithSceneSignals($user, $recommendations);
+        $recommendations = $this->applyTrustAwareRanking($user, $recommendations);
 
         // Apply diversity and freshness filters
         $recommendations = $this->applyDiversityFilter($recommendations);
         $recommendations = $this->applyFreshnessFilter($recommendations);
+        $recommendations = $this->finalizeRecommendations($recommendations);
 
         // Cache results
         Cache::put($cacheKey, $recommendations, $this->recommendationConfig['cache_ttl']);
@@ -371,7 +376,7 @@ class RecommendationService
             return $b['score'] <=> $a['score'];
         });
 
-        return array_slice($uniqueRecommendations, 0, $this->recommendationConfig['max_recommendations']);
+        return array_values($uniqueRecommendations);
     }
 
     private function enrichRecommendationsWithSceneSignals(User $user, array $recommendations): array
@@ -384,6 +389,47 @@ class RecommendationService
         return array_map(function (array $recommendation) use ($sceneProfile) {
             return $this->attachSceneSignals($recommendation, $sceneProfile);
         }, $recommendations);
+    }
+
+    private function applyTrustAwareRanking(User $user, array $recommendations): array
+    {
+        if ($recommendations === []) {
+            return $recommendations;
+        }
+
+        $authorIds = array_values(array_unique(array_filter(array_map(
+            fn (array $recommendation) => $this->extractRecommendationAuthorId($recommendation),
+            $recommendations
+        ))));
+
+        $trustMap = $this->localPulseRankingService->buildTrustMap($user, $authorIds);
+
+        $rankedRecommendations = array_map(function (array $recommendation) use ($trustMap, $user) {
+            $authorId = $this->extractRecommendationAuthorId($recommendation);
+            $createdAt = $this->extractRecommendationCreatedAt($recommendation);
+            $sceneSignals = isset($recommendation['scene_signals']) && is_array($recommendation['scene_signals'])
+                ? $recommendation['scene_signals']
+                : null;
+
+            $recommendation['_ranking_score'] = round(
+                ((float) ($recommendation['score'] ?? 0) * 40)
+                + $this->localPulseRankingService->calculateCompositeScore($user, $authorId, $createdAt, $sceneSignals, $trustMap),
+                2
+            );
+
+            return $recommendation;
+        }, $recommendations);
+
+        usort($rankedRecommendations, function (array $left, array $right) {
+            $rankingComparison = (($right['_ranking_score'] ?? 0) <=> ($left['_ranking_score'] ?? 0));
+            if ($rankingComparison !== 0) {
+                return $rankingComparison;
+            }
+
+            return (($right['score'] ?? 0) <=> ($left['score'] ?? 0));
+        });
+
+        return $rankedRecommendations;
     }
 
     private function normalizeRequestedTypes(?array $types): array
@@ -590,6 +636,51 @@ class RecommendationService
         return $parts === [] ? null : implode(' • ', $parts);
     }
 
+    private function extractRecommendationAuthorId(array $recommendation): ?int
+    {
+        $content = isset($recommendation['content']) && is_array($recommendation['content'])
+            ? $recommendation['content']
+            : [];
+
+        foreach (['creator_id', 'author_id', 'user_id', 'created_by_user_id'] as $key) {
+            $value = $content[$key] ?? null;
+            if (is_numeric($value)) {
+                return (int) $value;
+            }
+        }
+
+        return null;
+    }
+
+    private function extractRecommendationCreatedAt(array $recommendation): ?\Carbon\CarbonInterface
+    {
+        $content = isset($recommendation['content']) && is_array($recommendation['content'])
+            ? $recommendation['content']
+            : [];
+
+        $createdAt = $content['created_at'] ?? $recommendation['created_at'] ?? null;
+        if (! $createdAt) {
+            return null;
+        }
+
+        try {
+            return \Carbon\Carbon::parse($createdAt);
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    private function finalizeRecommendations(array $recommendations): array
+    {
+        $trimmedRecommendations = array_slice(array_values($recommendations), 0, $this->recommendationConfig['max_recommendations']);
+
+        return array_map(function (array $recommendation) {
+            unset($recommendation['_ranking_score']);
+
+            return $recommendation;
+        }, $trimmedRecommendations);
+    }
+
     /**
      * Build OpenAI prompt for recommendations
      */
@@ -772,7 +863,10 @@ class RecommendationService
                     'type' => $event->payload['content_type'],
                     'title' => $event->payload['title'] ?? 'Untitled',
                     'description' => $event->payload['description'] ?? '',
-                    'created_at' => $event->created_at,
+                    'created_at' => $event->created_at?->toISOString(),
+                    'creator_id' => isset($event->payload['creator_id']) && is_numeric($event->payload['creator_id'])
+                        ? (int) $event->payload['creator_id']
+                        : null,
                 ];
             }
         }
@@ -843,7 +937,18 @@ class RecommendationService
         return BulletinMessage::where('user_id', $userId)
             ->with('bulletinBoard')
             ->get()
-            ->toArray();
+            ->map(function (BulletinMessage $message) {
+                return [
+                    'id' => $message->id,
+                    'title' => $message->bulletinBoard?->name ?? 'Community update',
+                    'description' => $message->content,
+                    'content' => $message->content,
+                    'created_at' => $message->created_at?->toISOString(),
+                    'creator_id' => $message->user_id,
+                    'bulletin_board_id' => $message->bulletin_board_id,
+                ];
+            })
+            ->all();
     }
 
     /**
@@ -944,10 +1049,17 @@ class RecommendationService
      */
     private function analyzeActivityPatterns(User $user): array
     {
-        $hours = BulletinMessage::where('user_id', $user->id)
+        $timestamps = BulletinMessage::where('user_id', $user->id)
             ->where('created_at', '>=', now()->subDays(90))
-            ->selectRaw('HOUR(created_at) as hour')
-            ->pluck('hour');
+            ->pluck('created_at');
+
+        $hours = $timestamps->map(function ($timestamp) {
+            try {
+                return \Carbon\Carbon::parse($timestamp)->hour;
+            } catch (\Throwable) {
+                return null;
+            }
+        })->filter(fn ($hour) => is_int($hour))->values();
 
         if ($hours->isEmpty()) {
             return ['unknown' => 1.0];

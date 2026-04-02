@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.51`
+- **Current version:** `1.0.52`
 - **Release date:** `2026-04-02`
-- **Release name:** `Trust-Aware Local Pulse Ranking`
+- **Release name:** `Trust-Aware Recommendation Ranking`
 
 ## Summary
 
-This release extends Local Pulse from scene-aware presentation into privacy-safe trust-aware ordering by ranking nearby activity with a composite of trusted connections, scene alignment, and freshness while keeping private graph edges out of the API payload.
+This release extends the privacy-safe trust-aware discovery model from Local Pulse into recommendations and personalized feed ordering, ranking items with trusted connections, scene alignment, freshness, and base relevance while keeping private graph edges out of the API payload.
 
 ## Version Sources of Truth
 

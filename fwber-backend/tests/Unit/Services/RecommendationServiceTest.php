@@ -4,12 +4,14 @@ namespace Tests\Unit\Services;
 
 use App\Models\BulletinBoard;
 use App\Models\Event;
+use App\Models\Friend;
 use App\Models\TelemetryEvent;
 use App\Models\Topic;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Services\Ai\Llm\LlmManager;
 use App\Services\Ai\Llm\LlmProviderInterface;
+use App\Services\LocalPulseRankingService;
 use App\Services\RecommendationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
@@ -44,7 +46,7 @@ class RecommendationServiceTest extends TestCase
             ->andReturn($this->geminiDriver);
 
         // We use the real service now, but mock LLM
-        $this->service = new RecommendationService($this->llmManager);
+        $this->service = new RecommendationService($this->llmManager, new LocalPulseRankingService);
     }
 
     public function test_find_similar_users()
@@ -287,5 +289,67 @@ class RecommendationServiceTest extends TestCase
         $this->assertContains('coffee', $sceneSignals['matched_tags']);
         $this->assertContains('warehouse', $sceneSignals['matched_tags']);
         $this->assertGreaterThan(0, $recommendations[0]['scene_signals']['score_boost']);
+    }
+
+    public function test_apply_trust_aware_ranking_prioritizes_trusted_scene_aligned_recommendations(): void
+    {
+        $viewer = User::factory()->create();
+        $friend = User::factory()->create();
+        $stranger = User::factory()->create();
+
+        Friend::factory()->create([
+            'user_id' => $viewer->id,
+            'friend_id' => $friend->id,
+            'status' => 'accepted',
+        ]);
+        Friend::factory()->create([
+            'user_id' => $friend->id,
+            'friend_id' => $viewer->id,
+            'status' => 'accepted',
+        ]);
+
+        $recommendations = [
+            [
+                'id' => 'stranger-post',
+                'type' => 'collaborative',
+                'content' => [
+                    'id' => 101,
+                    'title' => 'Generic update',
+                    'description' => 'Something new nearby.',
+                    'creator_id' => $stranger->id,
+                    'created_at' => now()->subMinute()->toISOString(),
+                ],
+                'score' => 0.72,
+                'reason' => 'Users like you enjoyed this',
+            ],
+            [
+                'id' => 'friend-post',
+                'type' => 'collaborative',
+                'content' => [
+                    'id' => 102,
+                    'title' => 'Warehouse coffee set',
+                    'description' => 'Coffee meetup before the warehouse set tonight.',
+                    'creator_id' => $friend->id,
+                    'created_at' => now()->subMinutes(10)->toISOString(),
+                ],
+                'score' => 0.48,
+                'reason' => 'Users like you enjoyed this',
+                'scene_signals' => [
+                    'headline' => 'Scene match on Warehouse Nights',
+                    'matched_topics' => [],
+                    'matched_tags' => ['coffee', 'warehouse'],
+                    'score_boost' => 0.14,
+                ],
+            ],
+        ];
+
+        $reflection = new \ReflectionClass($this->service);
+        $method = $reflection->getMethod('applyTrustAwareRanking');
+        $method->setAccessible(true);
+
+        $ranked = $method->invoke($this->service, $viewer, $recommendations);
+
+        $this->assertSame('friend-post', $ranked[0]['id']);
+        $this->assertGreaterThan($ranked[1]['_ranking_score'], $ranked[0]['_ranking_score']);
     }
 }

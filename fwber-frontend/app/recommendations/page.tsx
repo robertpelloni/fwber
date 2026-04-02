@@ -218,6 +218,32 @@ export default function RecommendationsPage() {
   ]);
 
   const mixedMetadata = activeTab === 'mixed' ? mixedRecommendations?.metadata : null;
+  const currentRankingStrategy = useMemo(() => {
+    switch (activeTab) {
+      case 'mixed':
+        return mixedRecommendations?.metadata?.ranking_strategy ?? null;
+      case 'ai':
+        return aiRecommendations?.metadata?.ranking_strategy ?? null;
+      case 'location':
+        return locationRecommendations?.metadata?.ranking_strategy ?? null;
+      case 'collaborative':
+        return collaborativeRecommendations?.metadata?.ranking_strategy ?? null;
+      case 'content':
+        return contentRecommendations?.metadata?.ranking_strategy ?? null;
+      case 'feed':
+        return personalizedFeed?.metadata?.ranking_strategy ?? null;
+      default:
+        return null;
+    }
+  }, [
+    activeTab,
+    aiRecommendations?.metadata?.ranking_strategy,
+    collaborativeRecommendations?.metadata?.ranking_strategy,
+    contentRecommendations?.metadata?.ranking_strategy,
+    locationRecommendations?.metadata?.ranking_strategy,
+    mixedRecommendations?.metadata?.ranking_strategy,
+    personalizedFeed?.metadata?.ranking_strategy,
+  ]);
 
   const renderRecommendationCard = (recommendation: Recommendation, index: number) => {
     const title = recommendation.content.title || recommendation.content.name || `Recommendation ${index + 1}`;
@@ -487,6 +513,23 @@ export default function RecommendationsPage() {
           </div>
 
           <section className="space-y-6">
+            {currentRankingStrategy ? (
+              <Card className="border-cyan-200 bg-cyan-50 dark:border-cyan-900/50 dark:bg-cyan-950/20">
+                <CardContent className="space-y-3 p-6">
+                  <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-cyan-700 dark:text-cyan-200">
+                    <Compass className="h-4 w-4" />
+                    Ranking strategy
+                  </div>
+                  <p className="text-sm text-gray-700 dark:text-gray-200">{currentRankingStrategy.summary}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {currentRankingStrategy.base_relevance ? <Badge variant="outline">Base relevance</Badge> : null}
+                    {currentRankingStrategy.trusted_connections ? <Badge variant="outline">Trusted connections</Badge> : null}
+                    {currentRankingStrategy.scene_alignment ? <Badge variant="outline">Scene alignment</Badge> : null}
+                    {currentRankingStrategy.freshness ? <Badge variant="outline">Freshness</Badge> : null}
+                  </div>
+                </CardContent>
+              </Card>
+            ) : null}
             {isCurrentLoading || authLoading ? (
               <div className="flex items-center justify-center py-20">
                 <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
