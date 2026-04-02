@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.69`
+- **Current version:** `1.0.70`
 - **Release date:** `2026-04-02`
-- **Release name:** `Shell Theme & Realtime UX Polish`
+- **Release name:** `Stripe Renewal Rollout Follow-Up`
 
 ## Summary
 
-This release cleans up the user-facing shell by fixing the fallback floating-nav overlap that was colliding with page headers, simplifying the frontend to one cohesive light/dark theme path, making the viral rewards trigger louder, and clarifying realtime status when Reverb / Pusher is not configured.
+This release closes the remaining obvious Stripe rollout seams by documenting the production payment/referral env defaults, adding a real premium success page for redirect-based Stripe checkouts, and awarding the same two-level premium referral commissions on successful renewal invoices that the app already grants on the initial purchase path.
 
 ## Version Sources of Truth
 

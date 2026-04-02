@@ -188,6 +188,65 @@ class StripeWebhookTest extends TestCase
         $this->assertEquals('free', $user->tier);
     }
 
+    public function test_invoice_payment_succeeded_awards_renewal_referral_commissions()
+    {
+        $levelTwo = User::factory()->create();
+        $levelOne = User::factory()->create(['referrer_id' => $levelTwo->id]);
+        $user = User::factory()->create(['referrer_id' => $levelOne->id, 'tier' => 'gold']);
+
+        Subscription::create([
+            'user_id' => $user->id,
+            'name' => 'gold',
+            'stripe_id' => 'sub_test_renewal',
+            'stripe_status' => 'active',
+            'stripe_price' => 'price_test',
+            'quantity' => 1,
+            'ends_at' => now()->addMonth(),
+        ]);
+
+        $payload = [
+            'id' => 'evt_test_invoice_success_123',
+            'type' => 'invoice.payment_succeeded',
+            'data' => [
+                'object' => [
+                    'id' => 'in_test_renewal_123',
+                    'subscription' => 'sub_test_renewal',
+                    'payment_intent' => 'pi_test_renewal_123',
+                    'amount_paid' => 1999,
+                    'currency' => 'usd',
+                    'number' => 'INV-123',
+                ],
+            ],
+        ];
+
+        $this->mockWebhookEvent($payload);
+
+        $this->postJson('/api/stripe/webhook', $payload)->assertOk();
+
+        $this->assertDatabaseHas('payments', [
+            'user_id' => $user->id,
+            'transaction_id' => 'pi_test_renewal_123',
+            'amount' => 19.99,
+            'status' => 'succeeded',
+        ]);
+
+        $this->assertDatabaseHas('referral_commissions', [
+            'purchaser_user_id' => $user->id,
+            'beneficiary_user_id' => $levelOne->id,
+            'level' => 1,
+            'cash_amount' => 2.00,
+            'token_amount' => 50.0000,
+        ]);
+
+        $this->assertDatabaseHas('referral_commissions', [
+            'purchaser_user_id' => $user->id,
+            'beneficiary_user_id' => $levelTwo->id,
+            'level' => 2,
+            'cash_amount' => 0.50,
+            'token_amount' => 15.0000,
+        ]);
+    }
+
     private function mockWebhookEvent($payload)
     {
         $event = json_decode(json_encode($payload));

@@ -6,6 +6,7 @@ use App\Models\Payment;
 use App\Models\Subscription;
 use App\Models\User;
 use App\Notifications\PaymentFailedNotification;
+use App\Services\ReferralCommissionService;
 use App\Support\LogContext;
 use App\Support\TaggedCache;
 use Carbon\Carbon;
@@ -16,6 +17,10 @@ use Stripe\Webhook;
 
 class StripeWebhookController extends Controller
 {
+    public function __construct(private readonly ReferralCommissionService $referralCommissionService)
+    {
+    }
+
     public function handleWebhook(Request $request)
     {
         $startTime = microtime(true);
@@ -476,10 +481,10 @@ class StripeWebhookController extends Controller
         }
 
         // Check if payment already recorded
-        $existingPayment = Payment::where('transaction_id', $invoice->payment_intent)->first();
-        if (! $existingPayment) {
+        $paymentRecord = Payment::where('transaction_id', $invoice->payment_intent)->first();
+        if (! $paymentRecord) {
             // Log the successful renewal payment
-            Payment::create([
+            $paymentRecord = Payment::create([
                 'user_id' => $user->id,
                 'amount' => $invoice->amount_paid / 100,
                 'currency' => $invoice->currency,
@@ -493,6 +498,13 @@ class StripeWebhookController extends Controller
                 ],
             ]);
         }
+
+        $this->referralCommissionService->awardPremiumCommissions(
+            $user->fresh(),
+            $subscription->fresh(),
+            $paymentRecord,
+            'stripe_renewal'
+        );
 
         Log::info("Stripe Webhook: Subscription renewal successful for user {$user->id}", LogContext::fromPayment(
             transactionId: $invoice->payment_intent,

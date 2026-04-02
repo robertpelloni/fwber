@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.70] - 2026-04-02 — Stripe Renewal Rollout Follow-Up
+
+### Fixed
+- Added the missing Stripe production-example env defaults to `fwber-backend/.env.example`, including `PAYMENT_DRIVER=stripe` plus the configurable level-1 and level-2 premium cash/FWBcoin referral reward knobs already consumed by the backend referral config.
+- Closed the missing post-checkout route by adding `/premium/success`, giving Stripe redirect-based upgrades a real confirmation screen that forwards users into subscription settings instead of landing on a dead URL.
+- Extended `StripeWebhookController` so successful renewal invoices now flow through the same two-level premium MLM commission engine as first-time premium purchases, preserving idempotency through the existing payment/commission records.
+- Added webhook regression coverage proving a Stripe subscription renewal creates the payment record and awards both level-1 and level-2 referral commissions.
+- Reconfirmed the frontend build in this Windows worktree using `cmd /c "npm run build"` after the known PowerShell manifest-race symptom, while lint still reports only the longstanding `fwber-frontend/lib/api/photos.ts:476` hook warning and fresh type-check passes.
+
 ## [1.0.69] - 2026-04-02 — Shell Theme & Realtime UX Polish
 
 ### Fixed
