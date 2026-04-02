@@ -13,21 +13,40 @@ interface VibeAnalysis {
     activity_score: number;
     summary: string;
     post_count: number;
+    last_updated?: string;
+}
+
+interface VibeResponse {
+    business_name: string;
+    location: {
+        lat: number;
+        lng: number;
+        radius: number;
+    };
+    location_source?: string;
+    analysis: VibeAnalysis;
 }
 
 export default function NeighborhoodVibe({ token }: { token: string }) {
     const [analysis, setAnalysis] = useState<VibeAnalysis | null>(null);
+    const [locationSource, setLocationSource] = useState<string | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function fetchVibe() {
             try {
-                const response = await api.get('/merchant/pulse/vibe', {
+                const response = await api.get<VibeResponse>('/merchant/pulse/vibe', {
                     headers: { Authorization: `Bearer ${token}` }
-                }) as any;
-                setAnalysis(response.data.analysis);
+                });
+                setAnalysis(response.analysis);
+                setLocationSource(response.location_source ?? null);
+                setErrorMessage(null);
             } catch (error) {
                 console.error('Failed to fetch vibe:', error);
+                const message = error instanceof Error ? error.message : 'Could not load local vibe data.';
+                setErrorMessage(message);
+                setAnalysis(null);
             } finally {
                 setLoading(false);
             }
@@ -36,7 +55,26 @@ export default function NeighborhoodVibe({ token }: { token: string }) {
     }, [token]);
 
     if (loading) return <VibeSkeleton />;
-    if (!analysis) return null;
+    if (!analysis) {
+        return (
+            <Card className="border-dashed border-amber-200 dark:border-amber-900/40 bg-amber-50/40 dark:bg-amber-950/10">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-amber-600">
+                        <Zap className="w-5 h-5 fill-current" />
+                        Local Neighborhood Vibe
+                    </CardTitle>
+                    <CardDescription>
+                        Vibe analysis needs a merchant promotion location before it can inspect the nearby pulse.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                        {errorMessage ?? 'Create or update a promotion with a map location to unlock live neighborhood sentiment.'}
+                    </p>
+                </CardContent>
+            </Card>
+        );
+    }
 
     const sentimentColor = analysis.sentiment > 0.7 ? 'text-green-500' : analysis.sentiment < 0.4 ? 'text-red-500' : 'text-amber-500';
 
@@ -51,7 +89,9 @@ export default function NeighborhoodVibe({ token }: { token: string }) {
                         </CardTitle>
                         <CardDescription>Real-time sentiment from the fwber Local Pulse</CardDescription>
                     </div>
-                    <Badge variant="outline" className="bg-amber-100 text-amber-700 border-amber-200">LIVE</Badge>
+                    <Badge variant="outline" className="bg-amber-100 text-amber-700 border-amber-200">
+                        {locationSource === 'latest_promotion' ? 'PROMO-ANCHORED' : 'LIVE'}
+                    </Badge>
                 </div>
             </CardHeader>
             <CardContent className="space-y-6">

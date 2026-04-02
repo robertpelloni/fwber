@@ -22,13 +22,22 @@ class MerchantPulseController extends Controller
             return response()->json(['error' => 'Merchant profile required'], 403);
         }
 
-        // Use merchant's business location or provided coordinates
-        $lat = $request->get('lat', $merchant->latitude);
-        $lng = $request->get('lng', $merchant->longitude);
+        $latestPromotion = $merchant->promotions()
+            ->whereNotNull('lat')
+            ->whereNotNull('lng')
+            ->latest('updated_at')
+            ->first();
+
+        // Merchant profiles do not currently persist lat/lng, so promotions are the best owned location source.
+        $lat = $request->get('lat', $latestPromotion?->lat);
+        $lng = $request->get('lng', $latestPromotion?->lng);
         $radius = $request->get('radius', 2000);
 
         if (! $lat || ! $lng) {
-            return response()->json(['error' => 'Location coordinates required'], 422);
+            return response()->json([
+                'error' => 'Location coordinates required',
+                'message' => 'Create or update a promotion with a map location before requesting neighborhood vibe analysis.',
+            ], 422);
         }
 
         $analysis = $this->vibeService->getNeighborhoodVibe((float) $lat, (float) $lng, (int) $radius);
@@ -36,6 +45,7 @@ class MerchantPulseController extends Controller
         return response()->json([
             'business_name' => $merchant->business_name,
             'location' => ['lat' => $lat, 'lng' => $lng, 'radius' => $radius],
+            'location_source' => $request->has('lat') && $request->has('lng') ? 'request' : 'latest_promotion',
             'analysis' => $analysis,
         ]);
     }

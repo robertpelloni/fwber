@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.36`
+- **Current version:** `1.0.37`
 - **Release date:** `2026-04-02`
-- **Release name:** `Merchant Promotion Management`
+- **Release name:** `Merchant Vibe Contract Fix`
 
 ## Summary
 
-This release adds merchant-owned promotion detail, update, and deactivate flows, wires the merchant frontend to those endpoints with a dedicated management page, and improves merchant navigation by surfacing analytics and campaign management links where operators actually need them.
+This release repairs the merchant neighborhood-vibe contract by aligning the frontend widget with the shared API client's unwrapped response shape and by sourcing merchant vibe coordinates from the latest mapped promotion when merchant profiles do not carry their own lat/lng fields.
 
 ## Version Sources of Truth
 
