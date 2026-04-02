@@ -28,9 +28,24 @@ class TokenDistributionService
         return $code;
     }
 
+    public function ensureReferralCode(User $user): string
+    {
+        if ($user->referral_code) {
+            return $user->referral_code;
+        }
+
+        $user->forceFill([
+            'referral_code' => $this->generateReferralCode(),
+        ])->save();
+
+        return (string) $user->referral_code;
+    }
+
     public function processSignupBonus(User $user, ?string $referrerCode = null): void
     {
         DB::transaction(function () use ($user, $referrerCode) {
+            $this->ensureReferralCode($user);
+
             // 1. Calculate Early Adopter Bonus
             // Formula: Base * (1 / (1 + (UserCount * Decay)))
             // This creates a curve where early users get significantly more
@@ -81,7 +96,7 @@ class TokenDistributionService
         });
     }
 
-    public function awardTokens(User $user, float $amount, string $type, string $description): void
+    public function awardTokens(User $user, float $amount, string $type, string $description, array $metadata = []): void
     {
         $user->token_balance += $amount;
         $user->save();
@@ -91,6 +106,7 @@ class TokenDistributionService
             'amount' => $amount,
             'type' => $type,
             'description' => $description,
+            'metadata' => $metadata,
         ]);
 
         try {

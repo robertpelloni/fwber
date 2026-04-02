@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.64] - 2026-04-02 — Referral Commissions & Onboarding Skip Flow
+
+### Fixed
+- Removed the onboarding step blockers that were preventing users from advancing past optional steps like the fitness/physical screen, and sanitized profile payloads so blank or incompatible onboarding fields are omitted instead of breaking progression.
+- Relaxed the shared backend profile update contract for onboarding's physical fields and added Cypress coverage proving users can continue through onboarding without filling every optional section immediately.
+- Added runtime referral-code backfill for legacy users so auth/session responses and referral-driven flows no longer emit `ref=null` links for accounts created before referral codes were guaranteed.
+- Added a dedicated referral summary API and rewired the viral rewards modal to consume backend-owned referral links, golden-ticket counts, vouch totals, and premium reward totals instead of constructing links from nullable cached auth state.
+- Added a new `referral_commissions` ledger plus two-level premium reward awarding so direct premium conversions now record pending USD payouts and BobCoin rewards, while second-level uplines also receive smaller commissions.
+- Extended backend regression coverage for referral summary backfill and two-level premium commission payouts on both card and token premium purchases.
+
 ## [1.0.63] - 2026-04-02 — Federation Follow Accept Handling
 
 ### Fixed

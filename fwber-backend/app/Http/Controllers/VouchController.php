@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Vouch;
 use App\Notifications\PushMessage;
 use App\Services\AchievementService;
+use App\Services\TokenDistributionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
@@ -32,6 +33,7 @@ class VouchController extends Controller
     public function generateLink(Request $request): JsonResponse
     {
         $user = $request->user();
+        app(TokenDistributionService::class)->ensureReferralCode($user);
         // Generate a signed URL that expires in 7 days
         // This ensures the link is tied to this specific user and adds a layer of trust
         // We use 'vouch.create' as the named route on the frontend (conceptually),
@@ -42,7 +44,7 @@ class VouchController extends Controller
         // Let's stick to referral_code for simplicity and shareability as established in other viral features.
         // However, the instructions mentioned "generateLink".
 
-        $url = config('app.frontend_url').'/vouch/'.$user->referral_code;
+        $url = rtrim((string) config('referrals.frontend_url', 'https://fwber.me'), '/').'/vouch/'.$user->referral_code;
 
         return response()->json([
             'url' => $url,

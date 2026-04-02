@@ -1,23 +1,26 @@
-# Project Status — fwber v1.0.63 (Federation Follow Accept Handling)
+# Project Status — fwber v1.0.64 (Referral Commissions & Onboarding Skip Flow)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.63 "Federation Follow Accept Handling"
+**Version:** 1.0.64 "Referral Commissions & Onboarding Skip Flow"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## Federation Follow Accept Handling
-- **Follow State Loop Completed Further**: `POST /api/federation/users/{id}/inbox` now processes inbound `Accept` activities for follow requests and promotes the matching local `Following` record from `pending` to `accepted`.
-- **Accept Validation Tightened**: The inbox only applies follow acceptance when the `Accept` payload references the correct local actor URI and the remote actor matches the followed actor, preventing malformed accept payloads from mutating unrelated follow state.
-- **Outbound Follow Identity Corrected**: Federated follow activities now identify the local actor with fwber's actual ActivityPub actor endpoint (`/api/federation/users/{id}`), aligning follow requests with the exposed actor document and the new inbox accept checks.
-- **Regression Coverage Added**: Focused backend tests now prove inbox `Accept` activities correctly finalize pending follows without regressing follow, unfollow, actor, or outbox behavior.
+## Referral Commissions & Onboarding Skip Flow
+- **Onboarding Progression Repaired**: Optional onboarding steps no longer hard-stop the signup flow, including the user-reported fitness/physical screen, and the frontend now sanitizes blank or incompatible profile fields before saving.
+- **Referral Code Backfill Added**: Legacy users who were missing `referral_code` now receive one automatically during auth/session and vouch-link flows, eliminating the `ref=null` links that were surfacing in Viral Rewards.
+- **Two-Level Premium Referral Ledger Shipped**: Premium purchases now record idempotent level-1 and level-2 referral commissions, tracking pending USD payouts and awarding BobCoin/FWB rewards to uplines.
+- **Viral Rewards UI Grounded in Real Data**: The dashboard referral modal now loads a dedicated referral summary API for invite links, vouch links, golden tickets, counts, and premium reward totals instead of guessing from nullable cached auth state.
+- **Regression Coverage Expanded**: Backend referral and premium tests now cover referral-code backfill plus two-level premium commission payouts, and frontend Cypress coverage now verifies onboarding skip progression through optional steps.
 
-## Federation Protocol Progress
-- **Pending Followings Can Resolve**: The federation activity UI can now represent a more realistic follow lifecycle because the backend no longer leaves all remote follow requests stuck in `pending`.
-- **Protocol Hardening Started**: This release improves protocol correctness without yet claiming full signed delivery or inbox signature verification; those remain the next hardening steps.
-- **Existing UI Benefits Automatically**: The federation activity center, actor detail view, and following lists all benefit from the corrected backend status transitions without needing new page-level UI changes.
+## Current Referral/Signup Progress
+- **Legacy Accounts Are Self-Healing**: Users do not need a manual migration step to start sharing invites; the runtime backfill path guarantees a usable referral code the next time they authenticate or open the vouch flow.
+- **Cash Rewards Are Ledgered, Not Faked**: Premium referral cash is tracked as pending USD payout entries rather than being silently treated as already-withdrawn funds, keeping the wallet semantics honest.
+- **UI and Backend Contract Are Aligned**: Referral links, vouch links, counts, and premium reward totals now come from a backend-owned summary shape, reducing drift between cached auth data and the real referral state.
 
 ## ✅ Release Focus
-- [x] Added inbox support for follow `Accept` activities and promoted matching local followings to `accepted`.
-- [x] Corrected outbound federated follow payloads to use the live fwber actor endpoint.
-- [x] Added focused backend coverage for the new accept-flow state transition while preserving the existing ActivityPub test baseline.
+- [x] Removed onboarding blockers so optional signup/profile steps can be skipped and filled later.
+- [x] Backfilled missing referral codes in runtime and via migration for legacy users.
+- [x] Added a dedicated referral summary API and updated the Viral Rewards modal to use it.
+- [x] Recorded two-level premium referral commissions with pending USD payouts and BobCoin rewards.
+- [x] Added focused regression coverage for onboarding skip and premium referral commission flows.

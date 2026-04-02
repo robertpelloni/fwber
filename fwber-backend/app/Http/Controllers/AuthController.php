@@ -13,6 +13,14 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    private function hydrateAuthUser(User $user): User
+    {
+        $tokenService = app(TokenDistributionService::class);
+        $tokenService->ensureReferralCode($user);
+
+        return $user->load('profile')->loadCount(['referrals', 'vouches']);
+    }
+
     public function register(RegisterRequest $request, TokenDistributionService $tokenService)
     {
         $validated = $request->validated();
@@ -32,7 +40,7 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'user' => $user,
+            'user' => $this->hydrateAuthUser($user),
         ]);
     }
 
@@ -88,7 +96,7 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'user' => $user,
+            'user' => $this->hydrateAuthUser($user),
         ]);
     }
 
@@ -111,11 +119,7 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
-        $user = $request->user()->load('profile')->loadCount(['referrals', 'vouches']);
-
-        // Ensure the count is accessible via the attribute name expected by frontend
-        // loadCount adds 'referrals_count' attribute.
-        return $user;
+        return $this->hydrateAuthUser($request->user());
     }
 
     public function checkReferralCode($code)
@@ -183,7 +187,7 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'user' => $user,
+            'user' => $this->hydrateAuthUser($user),
             'is_new_user' => $user->wasRecentlyCreated,
         ]);
     }

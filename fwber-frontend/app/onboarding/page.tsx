@@ -143,41 +143,46 @@ export default function OnboardingPage() {
     }
   }
 
+  const sanitizeLocationUpdate = () => {
+    const locationUpdate: Record<string, number | string> = { ...formData.location }
+
+    if (locationUpdate.latitude === 0 && locationUpdate.longitude === 0) {
+      delete locationUpdate.latitude
+      delete locationUpdate.longitude
+    }
+
+    if (!locationUpdate.city) delete locationUpdate.city
+    if (!locationUpdate.state) delete locationUpdate.state
+
+    return locationUpdate
+  }
+
+  const persistStepUpdate = async (updates: Record<string, unknown>) => {
+    if (!token) {
+      return
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return
+    }
+
+    await updateUserProfile(token, updates)
+  }
+
   const handleNext = async () => {
     setError(null)
     setIsLoading(true)
 
     try {
       if (STEPS[currentStep].id === 'basics') {
-        if (!formData.display_name || !formData.date_of_birth || !formData.gender) {
-          throw new Error('Please fill in all required fields.')
-        }
-
-        // Sanitize location data
-        const locationUpdate: any = { ...formData.location };
-        
-        // Remove 0 coordinates if they haven't been set by geolocation
-        if (locationUpdate.latitude === 0 && locationUpdate.longitude === 0) {
-            delete locationUpdate.latitude;
-            delete locationUpdate.longitude;
-        }
-        
-        // Remove empty strings
-        if (!locationUpdate.city) delete locationUpdate.city;
-        if (!locationUpdate.state) delete locationUpdate.state;
-
-        await updateUserProfile(token!, {
+        await persistStepUpdate({
           display_name: formData.display_name,
           date_of_birth: formData.date_of_birth,
           gender: formData.gender,
-          location: locationUpdate,
+          location: sanitizeLocationUpdate(),
         })
-      } else if (STEPS[currentStep].id === 'photos') {
-        if (photos.length === 0) {
-          throw new Error('Please upload at least one photo.')
-        }
       } else if (STEPS[currentStep].id === 'physical') {
-        await updateUserProfile(token!, {
+        await persistStepUpdate({
           height_cm: formData.height_cm,
           body_type: formData.body_type,
           hair_color: formData.hair_color,
@@ -186,35 +191,42 @@ export default function OnboardingPage() {
           ethnicity: formData.ethnicity,
           facial_hair: formData.facial_hair,
           fitness_level: formData.fitness_level,
-          tattoos: formData.tattoos,
-          piercings: formData.piercings,
+          tattoos: formData.tattoos ? 'yes' : undefined,
+          piercings: formData.piercings ? 'yes' : undefined,
         })
       } else if (STEPS[currentStep].id === 'lifestyle') {
-        await updateUserProfile(token!, {
+        await persistStepUpdate({
           occupation: formData.occupation,
           education: formData.education,
           smoking_status: formData.smoking_status,
           drinking_status: formData.drinking_status,
           cannabis_status: formData.cannabis_status,
           dietary_preferences: formData.dietary_preferences,
-          has_children: formData.has_children,
-          wants_children: formData.wants_children,
-          has_pets: formData.has_pets,
         })
       } else if (STEPS[currentStep].id === 'personality') {
-        await updateUserProfile(token!, {
+        const allowedRelationshipStyles = new Set([
+          'monogamous',
+          'non-monogamous',
+          'polyamorous',
+          'open',
+          'swinger',
+          'other',
+          'prefer-not-to-say',
+        ])
+
+        await persistStepUpdate({
           bio: formData.bio,
           zodiac_sign: formData.zodiac_sign,
           love_language: formData.love_language,
-          personality_type: formData.personality_type,
+          personality_type: formData.personality_type.length === 4 ? formData.personality_type : undefined,
           political_views: formData.political_views,
           religion: formData.religion,
           sleep_schedule: formData.sleep_schedule,
-          relationship_style: formData.relationship_style,
+          relationship_style: allowedRelationshipStyles.has(formData.relationship_style) ? formData.relationship_style : undefined,
           sexual_orientation: formData.sexual_orientation,
         })
       } else if (STEPS[currentStep].id === 'intimate') {
-        await updateUserProfile(token!, {
+        await persistStepUpdate({
           breast_size: formData.breast_size,
           penis_length_cm: formData.penis_length_cm,
           penis_girth_cm: formData.penis_girth_cm,
@@ -222,15 +234,15 @@ export default function OnboardingPage() {
           fetishes: formData.fetishes,
         })
       } else if (STEPS[currentStep].id === 'preferences') {
-        if (formData.looking_for.length === 0) {
-          throw new Error('Please select what you are looking for.')
-        }
-        if (formData.preferences.age_range_min > formData.preferences.age_range_max) {
-          throw new Error('Minimum age cannot be greater than maximum age.')
-        }
-        await updateUserProfile(token!, {
+        const minAge = Math.min(formData.preferences.age_range_min, formData.preferences.age_range_max)
+        const maxAge = Math.max(formData.preferences.age_range_min, formData.preferences.age_range_max)
+
+        await persistStepUpdate({
           looking_for: formData.looking_for,
-          preferences: formData.preferences,
+          preferences: {
+            age_range_min: minAge,
+            age_range_max: maxAge,
+          },
         })
       } else if (STEPS[currentStep].id === 'complete') {
         await completeOnboarding(token!)
@@ -397,7 +409,7 @@ export default function OnboardingPage() {
           <div className="space-y-4">
             <div className="text-center mb-4">
               <h3 className="text-lg font-medium">Add your best photos</h3>
-              <p className="text-sm text-gray-500">Upload at least one photo to continue.</p>
+              <p className="text-sm text-gray-500">Upload now or skip and add photos later from your profile.</p>
             </div>
             <PhotoUpload 
               photos={photos} 

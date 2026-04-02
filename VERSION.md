@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.63`
+- **Current version:** `1.0.64`
 - **Release date:** `2026-04-02`
-- **Release name:** `Federation Follow Accept Handling`
+- **Release name:** `Referral Commissions & Onboarding Skip Flow`
 
 ## Summary
 
-This release hardens the federation follow loop by processing inbound ActivityPub `Accept` activities for pending follows and aligning outbound follow payloads with fwber's real actor endpoint.
+This release fixes the onboarding skip regression, guarantees referral codes for legacy accounts, and adds a real two-level premium referral commission ledger with BobCoin rewards and a referral summary API for the viral rewards UI.
 
 ## Version Sources of Truth
 

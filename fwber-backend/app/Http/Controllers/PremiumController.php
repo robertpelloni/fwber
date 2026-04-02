@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Payment;
 use App\Models\User;
 use App\Services\Payment\PaymentGatewayInterface;
+use App\Services\ReferralCommissionService;
 use App\Services\TokenDistributionService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -16,10 +17,17 @@ class PremiumController extends Controller
 
     protected $tokenService;
 
-    public function __construct(PaymentGatewayInterface $paymentGateway, TokenDistributionService $tokenService)
+    protected $referralCommissionService;
+
+    public function __construct(
+        PaymentGatewayInterface $paymentGateway,
+        TokenDistributionService $tokenService,
+        ReferralCommissionService $referralCommissionService
+    )
     {
         $this->paymentGateway = $paymentGateway;
         $this->tokenService = $tokenService;
+        $this->referralCommissionService = $referralCommissionService;
     }
 
     public function getWhoLikesYou(Request $request)
@@ -97,24 +105,29 @@ class PremiumController extends Controller
             $tokenCost = 200; // 200 tokens for 1 month premium
 
             try {
-                $this->tokenService->spendTokens($user, $tokenCost, 'Purchased Premium Subscription (1 Month)');
+                $subscription = null;
+                DB::transaction(function () use ($user, $tokenCost, &$subscription) {
+                    $this->tokenService->spendTokens($user, $tokenCost, 'Purchased Premium Subscription (1 Month)');
 
-                // Grant premium
-                $user->tier = 'gold';
-                $user->tier_expires_at = Carbon::now()->addDays(30);
-                $user->unlimited_swipes = true;
-                $user->save();
+                    // Grant premium
+                    $user->tier = 'gold';
+                    $user->tier_expires_at = Carbon::now()->addDays(30);
+                    $user->unlimited_swipes = true;
+                    $user->save();
 
-                // Create Subscription record
-                \App\Models\Subscription::create([
-                    'user_id' => $user->id,
-                    'name' => 'gold',
-                    'stripe_id' => 'token_'.uniqid(),
-                    'stripe_status' => 'active',
-                    'stripe_price' => 'token_price_premium_monthly',
-                    'quantity' => 1,
-                    'ends_at' => Carbon::now()->addDays(30),
-                ]);
+                    // Create Subscription record
+                    $subscription = \App\Models\Subscription::create([
+                        'user_id' => $user->id,
+                        'name' => 'gold',
+                        'stripe_id' => 'token_'.uniqid(),
+                        'stripe_status' => 'active',
+                        'stripe_price' => 'token_price_premium_monthly',
+                        'quantity' => 1,
+                        'ends_at' => Carbon::now()->addDays(30),
+                    ]);
+
+                    $this->referralCommissionService->awardPremiumCommissions($user->fresh(), $subscription, null, 'token');
+                });
 
                 return response()->json([
                     'message' => 'Premium purchased successfully',
@@ -140,9 +153,12 @@ class PremiumController extends Controller
 
             if ($result->success) {
                 // Wrap payment + user update + subscription creation in transaction for atomicity
-                \DB::transaction(function () use ($user, $amount, $currency, $result) {
+                $paymentRecord = null;
+                $subscription = null;
+
+                DB::transaction(function () use ($user, $amount, $currency, $result, &$paymentRecord, &$subscription) {
                     // Log payment
-                    Payment::create([
+                    $paymentRecord = Payment::create([
                         'user_id' => $user->id,
                         'amount' => $amount,
                         'currency' => $currency,
@@ -160,7 +176,7 @@ class PremiumController extends Controller
                     $user->save();
 
                     // Create Subscription record
-                    \App\Models\Subscription::create([
+                    $subscription = \App\Models\Subscription::create([
                         'user_id' => $user->id,
                         'name' => 'gold',
                         'stripe_id' => $result->transactionId ?? 'manual_'.uniqid(),
@@ -169,6 +185,12 @@ class PremiumController extends Controller
                         'quantity' => 1,
                         'ends_at' => Carbon::now()->addDays(30),
                     ]);
+                    $this->referralCommissionService->awardPremiumCommissions(
+                        $user->fresh(),
+                        $subscription,
+                        $paymentRecord,
+                        'stripe'
+                    );
                 });
 
                 return response()->json([

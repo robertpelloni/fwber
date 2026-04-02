@@ -44,6 +44,44 @@ class PremiumControllerTest extends TestCase
         ]);
     }
 
+    public function test_stripe_purchase_awards_two_level_referral_commissions()
+    {
+        $levelTwo = User::factory()->create();
+        $levelOne = User::factory()->create(['referrer_id' => $levelTwo->id]);
+        $user = User::factory()->create(['referrer_id' => $levelOne->id]);
+
+        $mockGateway = Mockery::mock(PaymentGatewayInterface::class);
+        $mockGateway->shouldReceive('charge')
+            ->once()
+            ->with(19.99, 'USD', 'tok_visa')
+            ->andReturn(new PaymentResult(true, 'ch_referral', null, []));
+
+        $this->app->instance(PaymentGatewayInterface::class, $mockGateway);
+
+        $this->actingAs($user)->postJson('/api/premium/purchase', [
+            'payment_method_id' => 'tok_visa',
+        ])->assertOk();
+
+        $this->assertDatabaseHas('referral_commissions', [
+            'purchaser_user_id' => $user->id,
+            'beneficiary_user_id' => $levelOne->id,
+            'level' => 1,
+            'cash_amount' => 2.00,
+            'token_amount' => 50.0000,
+        ]);
+
+        $this->assertDatabaseHas('referral_commissions', [
+            'purchaser_user_id' => $user->id,
+            'beneficiary_user_id' => $levelTwo->id,
+            'level' => 2,
+            'cash_amount' => 0.50,
+            'token_amount' => 15.0000,
+        ]);
+
+        $this->assertEquals(50.0, (float) $levelOne->fresh()->token_balance);
+        $this->assertEquals(15.0, (float) $levelTwo->fresh()->token_balance);
+    }
+
     public function test_can_purchase_premium_with_tokens()
     {
         $user = User::factory()->create(['token_balance' => 300, 'last_daily_bonus_at' => now()]);
@@ -66,6 +104,42 @@ class PremiumControllerTest extends TestCase
             'amount' => -200,
             'type' => 'spend',
         ]);
+    }
+
+    public function test_token_purchase_awards_token_only_referral_commissions()
+    {
+        $levelTwo = User::factory()->create();
+        $levelOne = User::factory()->create(['referrer_id' => $levelTwo->id]);
+        $user = User::factory()->create([
+            'referrer_id' => $levelOne->id,
+            'token_balance' => 300,
+            'last_daily_bonus_at' => now(),
+        ]);
+
+        $this->actingAs($user)
+            ->postJson('/api/premium/purchase', [
+                'payment_method' => 'token',
+            ])
+            ->assertOk();
+
+        $this->assertDatabaseHas('referral_commissions', [
+            'purchaser_user_id' => $user->id,
+            'beneficiary_user_id' => $levelOne->id,
+            'level' => 1,
+            'cash_amount' => 0.00,
+            'token_amount' => 50.0000,
+        ]);
+
+        $this->assertDatabaseHas('referral_commissions', [
+            'purchaser_user_id' => $user->id,
+            'beneficiary_user_id' => $levelTwo->id,
+            'level' => 2,
+            'cash_amount' => 0.00,
+            'token_amount' => 15.0000,
+        ]);
+
+        $this->assertEquals(50.0, (float) $levelOne->fresh()->token_balance);
+        $this->assertEquals(15.0, (float) $levelTwo->fresh()->token_balance);
     }
 
     public function test_cannot_purchase_premium_with_insufficient_tokens()

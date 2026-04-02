@@ -278,6 +278,43 @@ export interface ProfileCompletenessResponse {
   is_complete: boolean;
 }
 
+function sanitizeProfileUpdatePayload<T>(value: T): T | undefined {
+  if (value === null || value === undefined) {
+    return undefined;
+  }
+
+  if (typeof File !== 'undefined' && value instanceof File) {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    const sanitizedArray = value
+      .map((item) => sanitizeProfileUpdatePayload(item))
+      .filter((item): item is Exclude<typeof item, undefined> => item !== undefined);
+
+    return sanitizedArray.length > 0 ? (sanitizedArray as T) : undefined;
+  }
+
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? (trimmed as T) : undefined;
+  }
+
+  if (typeof value === 'object') {
+    const sanitizedEntries = Object.entries(value as Record<string, unknown>)
+      .map(([key, entryValue]) => [key, sanitizeProfileUpdatePayload(entryValue)] as const)
+      .filter(([, entryValue]) => entryValue !== undefined);
+
+    if (sanitizedEntries.length === 0) {
+      return undefined;
+    }
+
+    return Object.fromEntries(sanitizedEntries) as T;
+  }
+
+  return value;
+}
+
 /**
  * Fetch a public user profile by ID
  */
@@ -337,6 +374,8 @@ export async function updateUserProfile(
     delete payload.date_of_birth;
   }
 
+  const sanitizedPayload = sanitizeProfileUpdatePayload(payload) ?? {};
+
   let body: BodyInit;
   let headers: Record<string, string> = {
     'Authorization': `Bearer ${token}`,
@@ -345,11 +384,11 @@ export async function updateUserProfile(
 
   if (updates.voice_intro) {
     const formData = new FormData();
-    Object.keys(payload).forEach(key => {
+    Object.keys(sanitizedPayload).forEach(key => {
       if (key === 'preferences' || key === 'location' || key === 'travel_location' || key === 'looking_for' || key === 'interests' || key === 'languages' || key === 'sti_status' || key === 'fetishes' || key === 'social_media') {
-        formData.append(key, JSON.stringify(payload[key]));
-      } else if (payload[key] !== undefined && payload[key] !== null) {
-        formData.append(key, payload[key]);
+        formData.append(key, JSON.stringify(sanitizedPayload[key]));
+      } else if (sanitizedPayload[key] !== undefined && sanitizedPayload[key] !== null) {
+        formData.append(key, sanitizedPayload[key]);
       }
     });
     // Add spoof _method to handle PUT with multipart
@@ -357,7 +396,7 @@ export async function updateUserProfile(
     body = formData;
   } else {
     headers['Content-Type'] = 'application/json';
-    body = JSON.stringify(payload);
+    body = JSON.stringify(sanitizedPayload);
   }
 
   const response = await fetch(`${API_BASE_URL}/profile`, {

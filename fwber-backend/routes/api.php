@@ -294,6 +294,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('premium/initiate', [\App\Http\Controllers\PremiumController::class, 'initiatePurchase']);
     Route::post('premium/purchase', [\App\Http\Controllers\PremiumController::class, 'purchasePremium']);
     Route::get('premium/status', [\App\Http\Controllers\PremiumController::class, 'getPremiumStatus']);
+    Route::get('referrals/summary', [\App\Http\Controllers\ReferralController::class, 'summary']);
 
     // Boosts
     Route::post('boosts/purchase', [\App\Http\Controllers\BoostController::class, 'purchaseBoost']);
