@@ -140,10 +140,10 @@ export function ReferralModal({ trigger }: ReferralModalProps) {
         <div className="rounded-lg border bg-muted/40 p-3 text-xs text-muted-foreground">
           <div className="font-medium text-foreground">Premium referral payouts</div>
           <div className="mt-1">
-            Direct upgrades: <strong>${summary?.reward_rules.level_1.cash_usd ?? 2}</strong> + <strong>{summary?.reward_rules.level_1.token_amount ?? 50} BobCoin</strong>
+            Direct upgrades: <strong>${summary?.reward_rules.level_1.cash_usd ?? 2}</strong> + <strong>{summary?.reward_rules.level_1.token_amount ?? 50} FWBcoin</strong>
           </div>
           <div>
-            Second level: <strong>${summary?.reward_rules.level_2.cash_usd ?? 0.5}</strong> + <strong>{summary?.reward_rules.level_2.token_amount ?? 15} BobCoin</strong>
+            Second level: <strong>${summary?.reward_rules.level_2.cash_usd ?? 0.5}</strong> + <strong>{summary?.reward_rules.level_2.token_amount ?? 15} FWBcoin</strong>
           </div>
         </div>
 
@@ -291,7 +291,7 @@ export function ReferralModal({ trigger }: ReferralModalProps) {
               <Coins className="w-4 h-4" />
               {(summary?.earned_token_rewards ?? 0).toFixed(0)}
             </div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Earned BobCoin</div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Earned FWBcoin</div>
           </div>
           <div className="rounded bg-background p-3 text-center">
             <div className="text-lg font-bold text-primary flex items-center justify-center gap-1">
@@ -310,13 +310,13 @@ export function ReferralModal({ trigger }: ReferralModalProps) {
           <div className="rounded-lg border p-3">
             <div className="font-medium text-foreground">Direct premium referrals</div>
             <div className="mt-1 text-muted-foreground">
-              {directPremium?.count ?? 0} upgrades, ${(directPremium?.cash_usd ?? 0).toFixed(2)} cash, {(directPremium?.token_amount ?? 0).toFixed(0)} BobCoin
+              {directPremium?.count ?? 0} upgrades, ${(directPremium?.cash_usd ?? 0).toFixed(2)} cash, {(directPremium?.token_amount ?? 0).toFixed(0)} FWBcoin
             </div>
           </div>
           <div className="rounded-lg border p-3">
             <div className="font-medium text-foreground">Second-level premium referrals</div>
             <div className="mt-1 text-muted-foreground">
-              {indirectPremium?.count ?? 0} upgrades, ${(indirectPremium?.cash_usd ?? 0).toFixed(2)} cash, {(indirectPremium?.token_amount ?? 0).toFixed(0)} BobCoin
+              {indirectPremium?.count ?? 0} upgrades, ${(indirectPremium?.cash_usd ?? 0).toFixed(2)} cash, {(indirectPremium?.token_amount ?? 0).toFixed(0)} FWBcoin
             </div>
           </div>
         </div>

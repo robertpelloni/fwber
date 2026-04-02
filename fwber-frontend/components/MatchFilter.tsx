@@ -10,7 +10,13 @@ interface MatchFilterProps {
   onFilterChange: (filters: any) => void;
 }
 
-const FALLBACK_INTEREST_OPTIONS = [
+type InterestOption = {
+  slug: string;
+  label: string;
+  emoji?: string | null;
+}
+
+const FALLBACK_INTEREST_OPTIONS: InterestOption[] = [
   { slug: 'music', label: 'Music' },
   { slug: 'movies', label: 'Movies' },
   { slug: 'sports', label: 'Sports' },
@@ -49,7 +55,7 @@ export default function MatchFilter({ onFilterChange }: MatchFilterProps) {
     religion: '',
     zodiac: '',
   });
-  const [topicOptions, setTopicOptions] = useState<Array<{ slug: string; label: string; emoji?: string | null }>>([]);
+  const [topicOptions, setTopicOptions] = useState<InterestOption[]>([]);
 
   useEffect(() => {
     let isMounted = true;

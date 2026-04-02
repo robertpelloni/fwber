@@ -1188,7 +1188,7 @@ export default function ProfilePage() {
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {interestTopics.map((topic) => {
-                      const selected = formData.interests.includes(topic.slug)
+                      const selected = (formData.interests ?? []).includes(topic.slug)
 
                       return (
                         <button

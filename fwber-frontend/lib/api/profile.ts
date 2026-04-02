@@ -42,6 +42,7 @@ export interface UserProfile {
     gender: string | null;
     relationship_style: string | null;
     looking_for: string[];
+    interests?: string[];
     location: {
       latitude: number | null;
       longitude: number | null;

@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.65`
+- **Current version:** `1.0.66`
 - **Release date:** `2026-04-02`
-- **Release name:** `Structured Interest Graph Bridge`
+- **Release name:** `FWBcoin Rename & Validation Follow-Up`
 
 ## Summary
 
-This release bridges freeform profile interests into the structured topic graph, syncs matched topics into scene discovery, and updates the live profile and matching UI to use topic-backed interest chips instead of only hardcoded lists.
+This follow-up release renames the user-facing legacy token label to FWBcoin, keeps the structured interest-graph bridge intact, and incorporates the frontend type fixes and clean validation pass for the interest-graph work.
 
 ## Version Sources of Truth
 

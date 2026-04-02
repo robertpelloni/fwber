@@ -1,16 +1,42 @@
-# Handoff — Structured Interest Graph Bridge
+# Handoff — FWBcoin Rename & Validation Follow-Up
 
 **Date:** 2026-04-02  
-**Status:** ✅ Backend interest-graph slice implemented; frontend clean-room validation narrowed to a flaky Next trace-file build issue  
-**Version:** 1.0.65  
-**Latest pushed commit:** `2f8f84e8a` (`feat: repair referrals and onboarding flow (v1.0.64)`)
+**Status:** ✅ Interest-graph follow-up fully validated; FWBcoin rename applied to shipped user-facing references  
+**Version:** 1.0.66  
+**Latest pushed commit:** `f9913594e` (`feat: bridge structured interests into topics (v1.0.65)`)
 
 ## Overview
-This handoff now covers the follow-through slice after the `v1.0.64` referral/onboarding repair. The next user-requested feature cluster was assessed against the existing codebase and turned out to be mostly present already: journals, topic hubs, scene-based discovery, relationship links, and circle/friends visibility all existed in meaningful form. The weakest gap was the bridge between freeform profile interests and the existing structured topic/follow graph.
+This handoff now covers the post-`v1.0.65` follow-up. After the structured interest-graph bridge was pushed, fresh frontend verification exposed a small set of real TypeScript mismatches introduced by that slice, while the intermittent PowerShell build failures were confirmed to be `.next` artifact races rather than source regressions. The user also requested a naming change to **FWBcoin**.
 
-This slice closes that gap by canonicalizing profile interests into topic slugs where possible, syncing matched topic relationships on profile save, exposing structured `interest_topics` on profile responses, and updating the live profile and matching UI to use topic-backed chips from the real taxonomy instead of duplicated hardcoded lists.
+This follow-up applies the FWBcoin rename across shipped user-facing references, fixes the frontend type mismatches from the interest-graph slice, and confirms the current codebase with a clean frontend lint/build/type-check pass in a fresh subprocess.
 
 The original repo-recovery context still matters: all active work remains in the clean `C:\Users\hyper\workspace\fwber-mainline-repair` worktree, and the dirty root checkout remains preserved untouched.
+
+## What Shipped in v1.0.66
+
+### 1. FWBcoin rename
+- All shipped user-facing legacy token copy now reads **FWBcoin**.
+- This rename is intentionally presentation-level:
+  - backend reward fields remain neutral (`token_amount`, `earned_token_rewards`)
+  - no database or API key rename was required
+- Updated surfaces include:
+  - `fwber-frontend/components/viral/ReferralModal.tsx`
+  - release/handoff/status docs that described premium reward payouts
+
+### 2. Frontend type-fix follow-up for the interest graph
+- Fixed the new frontend type mismatches introduced by the structured-interest work:
+  - added the missing `interests` field to the profile API type
+  - guarded optional `formData.interests` access in the profile editor
+  - unified match-filter interest option typing so fallback options can legally omit/provide `emoji`
+
+### 3. Final validation findings
+- Fresh frontend lint passes with only the pre-existing warning:
+  - `fwber-frontend/lib/api/photos.ts:476`
+- Fresh frontend build succeeds in a clean subprocess.
+- Fresh frontend type-check succeeds once `.next/types` are regenerated from a successful build.
+- Conclusion:
+  - the earlier missing `.next` manifest/trace errors were transient worktree artifact races during overlapping builds
+  - the real code-level follow-up issues were the three TypeScript mismatches above, and those are now fixed
 
 ## What Shipped in v1.0.65
 
@@ -111,7 +137,7 @@ The original repo-recovery context still matters: all active work remains in the
   - vouch count
   - token balance
   - pending cash reward total
-  - earned BobCoin reward total
+  - earned FWBcoin reward total
   - level-1 / level-2 premium conversion summaries
   - configured reward rules
 
@@ -121,11 +147,11 @@ The original repo-recovery context still matters: all active work remains in the
 - Added explicit commission service:
   - `ReferralCommissionService`
 - Premium upgrades now award:
-  - **Level 1:** `$2.00 + 50 BobCoin`
-  - **Level 2:** `$0.50 + 15 BobCoin`
+  - **Level 1:** `$2.00 + 50 FWBcoin`
+  - **Level 2:** `$0.50 + 15 FWBcoin`
 - Card/fiat premium purchases record:
   - pending USD payout entries in the commission ledger
-  - BobCoin payouts to uplines
+  - FWBcoin payouts to uplines
 - Token-paid premium purchases record:
   - token-only referral rewards
   - no fake “cash transfer” is implied for token-funded upgrades
@@ -138,7 +164,7 @@ The original repo-recovery context still matters: all active work remains in the
   - vouch link
   - reward rule copy
   - pending cash total
-  - earned BobCoin total
+  - earned FWBcoin total
   - direct and second-level premium totals
 - This closes the user-visible `ref=null` failure mode in the intended UI path.
 
