@@ -9,6 +9,7 @@ use App\Http\Requests\ProximityFeedRequest;
 use App\Http\Requests\StoreProximityArtifactRequest;
 use App\Models\Promotion;
 use App\Models\ProximityArtifact;
+use App\Services\AIMatchingService;
 use App\Services\GeoScreenerClient;
 use App\Services\GeoSpoofDetectionService;
 use App\Services\ProximityArtifactService;
@@ -22,6 +23,7 @@ class ProximityArtifactController extends Controller
         private ShadowThrottleService $shadowThrottleService,
         private GeoSpoofDetectionService $geoSpoofService,
         private GeoScreenerClient $geoScreener,
+        private AIMatchingService $matchingService,
         private \App\Services\ActivityPubService $apService
     ) {}
 
@@ -438,7 +440,13 @@ class ProximityArtifactController extends Controller
                     return (mt_rand() / mt_getrandmax()) < $visibility;
                 })
                 ->take(20) // Limit to 20 after filtering
-                ->map(function (ProximityArtifact $a) {
+                ->map(function (ProximityArtifact $a) use ($user) {
+                    $sceneSignals = $this->matchingService->getSceneSignalsForValues($user, array_filter([
+                        $a->content,
+                        $a->meta['topic_slug'] ?? null,
+                        ...((array) ($a->meta['tags'] ?? [])),
+                    ]));
+
                     return [
                         'id' => $a->id,
                         'type' => $a->type,
@@ -453,6 +461,7 @@ class ProximityArtifactController extends Controller
                         'comments_count' => $a->comments_count ?? 0,
                         'votes_sum_value' => (int) $a->votes_sum_value ?? 0,
                         'user_vote' => $a->votes->first()?->value ?? 0,
+                        'scene_signals' => $sceneSignals,
                     ];
                 });
 
@@ -465,7 +474,14 @@ class ProximityArtifactController extends Controller
                 ->with('merchantProfile')
                 ->limit(20)
                 ->get()
-                ->map(function (Promotion $p) {
+                ->map(function (Promotion $p) use ($user) {
+                    $sceneSignals = $this->matchingService->getSceneSignalsForValues($user, array_filter([
+                        $p->title,
+                        $p->description,
+                        $p->merchantProfile->business_name ?? null,
+                        $topicSlug,
+                    ]));
+
                     return [
                         'id' => $p->id,
                         'type' => 'promotion',
@@ -486,6 +502,7 @@ class ProximityArtifactController extends Controller
                         'comments_count' => 0,
                         'votes_sum_value' => 0,
                         'user_vote' => 0,
+                        'scene_signals' => $sceneSignals,
                     ];
                 });
 
@@ -562,14 +579,14 @@ class ProximityArtifactController extends Controller
         $ageMin = $profile->preferences['age_range']['min'] ?? 18;
         $ageMax = $profile->preferences['age_range']['max'] ?? 100;
 
-        $query->whereHas('profile', function ($q) use ($ageMin, $ageMax) {
-            // Support both SQLite (testing) and MySQL (production)
-            $sql = \Illuminate\Support\Facades\DB::connection()->getDriverName() === 'sqlite'
-                ? "(julianday('now') - julianday(date_of_birth)) / 365.25 BETWEEN ? AND ?"
-                : 'TIMESTAMPDIFF(YEAR, date_of_birth, NOW()) BETWEEN ? AND ?';
+            $query->whereHas('profile', function ($q) use ($ageMin, $ageMax) {
+                // Support both SQLite (testing) and MySQL (production)
+                $sql = \Illuminate\Support\Facades\DB::connection()->getDriverName() === 'sqlite'
+                    ? "(julianday('now') - julianday(birthdate)) / 365.25 BETWEEN ? AND ?"
+                    : 'TIMESTAMPDIFF(YEAR, birthdate, NOW()) BETWEEN ? AND ?';
 
-            $q->whereRaw($sql, [$ageMin, $ageMax]);
-        });
+                $q->whereRaw($sql, [$ageMin, $ageMax]);
+            });
 
         // Exclude users already interacted with
         $excludedIds = \Illuminate\Support\Facades\DB::table('match_actions')
@@ -603,7 +620,7 @@ class ProximityArtifactController extends Controller
 
             return [
                 'user_id' => $candidate->id,
-                'age' => $candidateProfile->date_of_birth?->diffInYears(now()),
+                'age' => $candidateProfile->birthdate?->diffInYears(now()),
                 'gender' => $candidateProfile->gender,
                 'distance_miles' => $this->calculateDistance($profile, $candidateProfile),
                 'compatibility_indicators' => $compatibilityIndicators,

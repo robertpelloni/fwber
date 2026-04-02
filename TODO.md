@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.0.48  
+> **Version:** 1.0.49  
 > **Last Updated:** 2026-04-02
 
 ---
@@ -14,6 +14,7 @@
 - [ ] **Merchant Portal UI**: Merchant registration, promotion creation, management, analytics, vibe analysis, live pulse broadcasting, and broadcast history are now wired, but the portal still needs deeper lifecycle tools like resend/deactivate/reporting controls and broader operations polish.
 - [x] **Scene Discovery Phase 5**: Followed the topic-hub slice with topic-aware match ranking, richer profile scene cards, and scene overlap that uses interests plus visible social context instead of pure radius.
 - [x] **Recommendation Scene Signals**: Extended the recommendation hub and personalized feed with scene-aligned recommendation metadata and card rendering on top of the shared topic graph.
+- [x] **Local Pulse Scene Signals**: Extended Local Pulse artifacts/promotions with shared scene metadata, pulse card rendering, and regression coverage on top of the same topic graph.
 - [ ] **AI Wingman Enhancements**: The backend supports `compatibilityAudit`, `findNemesis`, and `predictFortune`. Ensure these are fully wired up in the chat interface with rich, animated UI components.
 - [ ] **Hardware Token UI Polish**: Ensure the `app/settings/hardware/page.tsx` gracefully handles BLE pairing flows and visualizes the "ping" actions.
 

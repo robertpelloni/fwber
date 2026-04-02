@@ -10,6 +10,14 @@ All notable changes to this project will be documented in this file.
 - Updated the recommendations hub and personalized feed cards to render scene-aligned headlines, topic chips, and matched scene tags using the live API payload.
 - Added focused backend regression coverage for recommendation scene enrichment and validated the slice with lint, clean build, and fresh type-check in the frontend.
 
+## [1.0.49] - 2026-04-02 — Local Pulse Scene Signals
+
+### Fixed
+- Extended Local Pulse artifact and sponsored-promotion payloads with shared `scene_signals` built from followed topics and scene terms, reusing the same discovery graph already powering recommendations.
+- Updated the Local Pulse card UI and proximity typings to render scene-aligned headlines, matched topic chips, and matched scene tags directly in the local feed.
+- Added focused backend regression coverage for Local Pulse scene-signal payloads and fixed stale `date_of_birth` references in the Local Pulse candidate query by aligning it with the codebase's `birthdate` profile field.
+- Fixed the dashboard/header logo overlap by preventing the floating global subpage nav from rendering before local header detection completes and by suppressing it across dashboard subroutes.
+
 ## [1.0.46] - 2026-04-02 — Topic Hubs
 
 ### Fixed

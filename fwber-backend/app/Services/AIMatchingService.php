@@ -977,6 +977,63 @@ class AIMatchingService
         ];
     }
 
+    /**
+     * @param  array<int, mixed>  $values
+     * @return array<string, mixed>|null
+     */
+    public function getSceneSignalsForValues(User $user, array $values, int $topicLimit = 3, int $tagLimit = 4): ?array
+    {
+        $contentTerms = $this->extractSceneTerms($values);
+        if ($contentTerms === []) {
+            return null;
+        }
+
+        $matchedTopics = array_values(array_filter(
+            $this->getFollowedTopicCollection($user)
+                ->map(function (Topic $topic) {
+                    return [
+                        'id' => $topic->id,
+                        'slug' => $topic->slug,
+                        'label' => $topic->label,
+                        'emoji' => $topic->emoji,
+                        'terms' => Topic::normalizeTerms([
+                            $topic->slug,
+                            $topic->label,
+                            ...($topic->aliases ?? []),
+                        ]),
+                    ];
+                })
+                ->values()
+                ->all(),
+            fn (array $topic) => $this->topicMatchesContentTerms($topic['terms'], $contentTerms)
+        ));
+
+        $matchedTags = array_slice(array_values(array_intersect(
+            $this->getViewerSceneTags($user),
+            $contentTerms
+        )), 0, $tagLimit);
+
+        if ($matchedTopics === [] && $matchedTags === []) {
+            return null;
+        }
+
+        $boost = min(0.2, (count($matchedTopics) * 0.08) + (count($matchedTags) * 0.03));
+
+        return [
+            'headline' => $this->buildSceneSignalHeadline($matchedTopics, $matchedTags),
+            'matched_topics' => array_map(function (array $topic) {
+                return [
+                    'id' => $topic['id'],
+                    'slug' => $topic['slug'],
+                    'label' => $topic['label'],
+                    'emoji' => $topic['emoji'],
+                ];
+            }, array_slice($matchedTopics, 0, $topicLimit)),
+            'matched_tags' => $matchedTags,
+            'score_boost' => round($boost, 2),
+        ];
+    }
+
     private function calculateSharedInterestScore(?UserProfile $userProfile, ?UserProfile $candidateProfile): float
     {
         if (! $userProfile || ! $candidateProfile) {
@@ -1152,6 +1209,73 @@ class AIMatchingService
             ->latest()
             ->limit(5)
             ->get();
+    }
+
+    /**
+     * @param  array<int, mixed>  $values
+     * @return array<int, string>
+     */
+    private function extractSceneTerms(array $values): array
+    {
+        $tokens = [];
+
+        foreach ($values as $value) {
+            if (! is_string($value)) {
+                continue;
+            }
+
+            $tokens[] = $value;
+
+            $parts = preg_split('/[^a-z0-9]+/iu', mb_strtolower($value)) ?: [];
+            foreach ($parts as $part) {
+                if ($part !== '') {
+                    $tokens[] = $part;
+                }
+            }
+        }
+
+        return Topic::normalizeTerms($tokens);
+    }
+
+    /**
+     * @param  array<int, string>  $topicTerms
+     * @param  array<int, string>  $contentTerms
+     */
+    private function topicMatchesContentTerms(array $topicTerms, array $contentTerms): bool
+    {
+        foreach ($topicTerms as $topicTerm) {
+            foreach ($contentTerms as $contentTerm) {
+                if ($topicTerm === $contentTerm
+                    || str_contains($topicTerm, $contentTerm)
+                    || str_contains($contentTerm, $topicTerm)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param  array<int, array{id:int,slug:string,label:string,emoji:string|null,terms:array<int,string>}>  $matchedTopics
+     * @param  array<int, string>  $matchedTags
+     */
+    private function buildSceneSignalHeadline(array $matchedTopics, array $matchedTags): ?string
+    {
+        $parts = [];
+
+        if ($matchedTopics !== []) {
+            $parts[] = 'Scene match on '.implode(', ', array_map(
+                fn (array $topic) => $topic['label'],
+                array_slice($matchedTopics, 0, 2)
+            ));
+        }
+
+        if ($matchedTags !== []) {
+            $parts[] = 'tags like '.implode(', ', array_slice($matchedTags, 0, 2));
+        }
+
+        return $parts === [] ? null : implode(' • ', $parts);
     }
 
     /**

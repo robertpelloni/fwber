@@ -161,6 +161,36 @@ const ArtifactCard = ({
 
         <p className="text-sm mb-3 font-medium">{artifact.content}</p>
 
+        {artifact.scene_signals && (
+          <div className="mb-3 rounded-xl border border-black/10 bg-white/50 p-3">
+            <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-purple-700">
+              <Tag className="h-3.5 w-3.5" />
+              <span>Scene aligned +{Math.round(artifact.scene_signals.score_boost * 100)} pts</span>
+            </div>
+            {artifact.scene_signals.headline && (
+              <p className="mb-2 text-sm text-gray-700">{artifact.scene_signals.headline}</p>
+            )}
+            <div className="flex flex-wrap gap-2">
+              {artifact.scene_signals.matched_topics.map((topic) => (
+                <span
+                  key={`scene-topic-${artifact.id}-${topic.slug}`}
+                  className="rounded-full bg-purple-100 px-2.5 py-1 text-xs font-medium text-purple-800"
+                >
+                  {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
+                </span>
+              ))}
+              {artifact.scene_signals.matched_tags.map((tag) => (
+                <span
+                  key={`scene-tag-${artifact.id}-${tag}`}
+                  className="rounded-full bg-gray-900/5 px-2.5 py-1 text-xs font-medium text-gray-700"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
         {isPromotion && artifact.meta?.promo_code && (
           <div className="mb-3 bg-white/50 p-2 rounded border border-amber-200 border-dashed text-center">
             <span className="text-xs text-amber-800 block mb-1">PROMO CODE</span>

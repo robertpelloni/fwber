@@ -2,6 +2,20 @@
 
 export type ArtifactType = 'chat' | 'board_post' | 'announce' | 'token_drop' | 'promotion';
 
+export interface SceneSignalTopic {
+  id: number;
+  slug: string;
+  label: string;
+  emoji?: string | null;
+}
+
+export interface SceneSignals {
+  headline?: string | null;
+  matched_topics: SceneSignalTopic[];
+  matched_tags: string[];
+  score_boost: number;
+}
+
 export interface ProximityArtifact {
   id: number;
   type: ArtifactType;
@@ -27,6 +41,7 @@ export interface ProximityArtifact {
   comments_count?: number;
   votes_sum_value?: number;
   user_vote?: number;
+  scene_signals?: SceneSignals | null;
 }
 
 export interface MatchCandidate {

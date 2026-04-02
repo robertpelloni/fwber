@@ -11,6 +11,7 @@ import { Logo } from '@/components/Logo'
 function shouldHideGlobalSubpageNav(pathname: string): boolean {
   return pathname === '/'
     || pathname === '/dashboard'
+    || pathname.startsWith('/dashboard/')
     || pathname.startsWith('/api/')
 }
 
@@ -19,12 +20,14 @@ export default function GlobalSubpageNav() {
   const router = useRouter()
   const { user } = useAuth()
   const [hasLocalHeader, setHasLocalHeader] = useState(false)
+  const [headerCheckComplete, setHeaderCheckComplete] = useState(false)
 
   useEffect(() => {
     let frameId = 0
 
     frameId = window.requestAnimationFrame(() => {
       setHasLocalHeader(Boolean(document.querySelector('[data-app-header="true"]')))
+      setHeaderCheckComplete(true)
     })
 
     return () => {
@@ -32,7 +35,7 @@ export default function GlobalSubpageNav() {
     }
   }, [pathname])
 
-  if (shouldHideGlobalSubpageNav(pathname) || hasLocalHeader) {
+  if (!headerCheckComplete || shouldHideGlobalSubpageNav(pathname) || hasLocalHeader) {
     return null
   }
 
