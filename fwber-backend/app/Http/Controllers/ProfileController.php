@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\UserProfile;
 use App\Services\AIMatchingService;
 use App\Services\ContentVisibilityService;
+use App\Services\InterestGraphService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -32,7 +33,8 @@ class ProfileController extends Controller
     public function __construct(
         private readonly EventStore $eventStore,
         private readonly ContentVisibilityService $contentVisibilityService,
-        private readonly AIMatchingService $matchingService
+        private readonly AIMatchingService $matchingService,
+        private readonly InterestGraphService $interestGraphService
     ) {}
 
     /**
@@ -83,6 +85,7 @@ class ProfileController extends Controller
             $this->contentVisibilityService->getVisibleRelationshipLinksForProfile($user, request()->user(), 3)
         );
         $user->setAttribute('scene_summary', $this->matchingService->getSceneSummary($user));
+        $user->setAttribute('interest_topics', $this->interestGraphService->buildInterestTopics($user));
 
         // Return resource (it handles privacy/sanitization)
         return response()->json([
@@ -188,6 +191,7 @@ class ProfileController extends Controller
                 $this->contentVisibilityService->getOwnedRelationshipLinks($user)
             );
             $user->setAttribute('scene_summary', $this->matchingService->getSceneSummary($user));
+            $user->setAttribute('interest_topics', $this->interestGraphService->buildInterestTopics($user));
 
             return response()->json([
                 'success' => true,
@@ -452,6 +456,10 @@ class ProfileController extends Controller
                     );
                 }
 
+                if (array_key_exists('interests', $validated)) {
+                    $profile->interests = $this->interestGraphService->canonicalizeInterestValues($validated['interests'] ?? []);
+                }
+
                 // Handle Voice Intro File Upload
                 if ($request->hasFile('voice_intro')) {
                     $result = \App\Services\MediaUploadService::store(
@@ -463,6 +471,7 @@ class ProfileController extends Controller
                 }
 
                 $profile->save();
+                $interestTopics = $this->interestGraphService->syncProfileInterests($user, $profile->interests ?? []);
 
                 // Update user's basic info if provided
                 if (isset($validated['email'])) {
@@ -476,7 +485,9 @@ class ProfileController extends Controller
                 $user->save();
 
                 // Reload with fresh data
-                $user->load('profile');
+                $user->load(['profile', 'followedTopics']);
+                $user->setAttribute('scene_summary', $this->matchingService->getSceneSummary($user));
+                $user->setAttribute('interest_topics', $interestTopics);
 
                 Log::info('Profile updated', [
                     'user_id' => $user->id,

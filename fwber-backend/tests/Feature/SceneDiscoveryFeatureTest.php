@@ -131,6 +131,9 @@ class SceneDiscoveryFeatureTest extends TestCase
             ->assertJsonPath('data.profile.scene_summary.stats.visible_journal_count', 1);
 
         $sceneTags = $response->json('data.profile.scene_summary.scene_tags');
+        $interestTopicSlugs = collect($response->json('data.profile.interest_topics'))->pluck('slug');
+
+        $this->assertTrue($interestTopicSlugs->contains('coffee-culture'));
         $this->assertContains('coffee', $sceneTags);
         $this->assertContains('warehouse', $sceneTags);
     }

@@ -24,6 +24,7 @@ class TopicResource extends JsonResource
             'journal_count' => (int) ($this->journal_count ?? 0),
             'artifact_count' => (int) ($this->artifact_count ?? 0),
             'is_followed' => (bool) ($this->is_followed ?? false),
+            'match_source' => $this->when(isset($this->match_source), $this->match_source),
         ];
     }
 }

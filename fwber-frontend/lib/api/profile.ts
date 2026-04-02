@@ -10,6 +10,24 @@
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
+interface ProfileInterestTopic {
+  id: number;
+  slug: string;
+  label: string;
+  description: string | null;
+  emoji: string | null;
+  category: string;
+  aliases: string[];
+  is_featured: boolean;
+  sort_order: number;
+  follower_count: number;
+  group_count: number;
+  journal_count: number;
+  artifact_count: number;
+  is_followed: boolean;
+  match_source?: 'profile' | 'followed' | 'both';
+}
+
 export interface UserProfile {
   id: number;
   email: string;
@@ -31,6 +49,7 @@ export interface UserProfile {
       city: string | null;
       state: string | null;
     };
+    interest_topics?: ProfileInterestTopic[];
     // Travel Mode
     is_travel_mode?: boolean;
     travel_latitude?: number | null;

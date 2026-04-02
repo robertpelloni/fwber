@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Topic;
 use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -81,8 +82,6 @@ class ProfileUpdateTest extends TestCase
             ],
         ]);
 
-        $response->dump();
-
         $response->assertStatus(200);
     }
 
@@ -149,5 +148,48 @@ class ProfileUpdateTest extends TestCase
         $response = $this->putJson('/api/profile', $payload);
 
         $response->assertStatus(200);
+    }
+
+    public function test_profile_update_canonicalizes_interest_topics_and_syncs_followed_topics(): void
+    {
+        $user = User::factory()->create();
+        UserProfile::factory()->create([
+            'user_id' => $user->id,
+            'interests' => [],
+        ]);
+
+        $topic = Topic::firstOrCreate(
+            ['slug' => 'nightlife'],
+            [
+                'label' => 'Nightlife',
+                'description' => 'Late-night scenes and venues.',
+                'emoji' => '🌃',
+                'category' => 'culture',
+                'aliases' => ['warehouse'],
+                'is_featured' => true,
+                'sort_order' => 1,
+            ]
+        );
+
+        $response = $this->actingAs($user)->putJson('/api/profile', [
+            'interests' => ['warehouse', 'zine-making'],
+        ]);
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseHas('topic_user_follows', [
+            'user_id' => $user->id,
+            'topic_id' => $topic->id,
+        ]);
+
+        $storedInterests = $user->fresh()->profile->interests;
+        $interestTopicSlugs = collect($response->json('data.profile.interest_topics'))->pluck('slug');
+        $nightlifeTopic = collect($response->json('data.profile.interest_topics'))
+            ->firstWhere('slug', 'nightlife');
+
+        $this->assertContains('nightlife', $storedInterests);
+        $this->assertContains('zine-making', $storedInterests);
+        $this->assertTrue($interestTopicSlugs->contains('nightlife'));
+        $this->assertSame('both', $nightlifeTopic['match_source'] ?? null);
     }
 }

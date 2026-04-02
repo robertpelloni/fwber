@@ -3,10 +3,9 @@
 namespace App\Http\Resources;
 
 use Carbon\Carbon;
+use App\Http\Resources\TopicResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\JournalResource;
-use App\Http\Resources\RelationshipLinkResource;
 
 /**
  * User Profile API Resource
@@ -85,6 +84,7 @@ class UserProfileResource extends JsonResource
                 'looking_for' => $profile?->looking_for ?? [],
                 'interested_in' => $profile?->interested_in ?? [],
                 'interests' => $profile?->interests ?? [],
+                'interest_topics' => TopicResource::collection($this->interest_topics ?? collect()),
                 'languages' => $profile?->languages ?? [],
                 'fetishes' => $profile?->fetishes ?? [],
                 'sti_status' => $profile?->sti_status ?? [],

@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { getUserProfile, updateUserProfile, getProfileCompleteness, type UserProfile, type ProfileUpdateData } from '@/lib/api/profile'
+import { getTopics, type Topic } from '@/lib/api/topics'
 import { usePhotos } from '@/lib/api/photos'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -38,6 +39,8 @@ export default function ProfilePage() {
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [interestTopics, setInterestTopics] = useState<Topic[]>([])
+  const [topicsLoading, setTopicsLoading] = useState(true)
 
   // Photo management
   const { photos, uploadPhotos, deletePhoto, setPrimaryPhoto } = usePhotos()
@@ -162,6 +165,19 @@ export default function ProfilePage() {
     voice_intro: null,
   })
 
+  const getCombinedInterestValues = useCallback((data: ProfileFormData) => {
+    return Array.from(new Set([
+      ...(data.interests ?? []),
+      ...(data.preferences.hobbies ?? []),
+      ...(data.preferences.music ?? []),
+      ...(data.preferences.movies ?? []),
+      ...(data.preferences.books ?? []),
+      ...(data.preferences.sports ?? []),
+    ]
+      .map(value => value.trim().toLowerCase())
+      .filter(Boolean)))
+  }, [])
+
   // Calculate completeness from current form data
   const currentCompleteness = useMemo(() => {
     return calculateProfileCompleteness({
@@ -172,7 +188,7 @@ export default function ProfilePage() {
         : undefined,
       bio: formData.bio,
       photos: photos.map(p => p.url),
-      interests: [...formData.preferences.hobbies, ...formData.preferences.music, ...formData.preferences.sports],
+      interests: getCombinedInterestValues(formData),
       occupation: formData.preferences.occupation,
       education: formData.preferences.education,
       height: formData.preferences.height_min,
@@ -181,28 +197,37 @@ export default function ProfilePage() {
       drinking: formData.drinking_status || formData.preferences.drinking,
       smoking: formData.smoking_status || formData.preferences.smoking
     });
-  }, [
-    formData.display_name,
-    formData.date_of_birth,
-    formData.location.city,
-    formData.location.state,
-    formData.bio,
-    formData.preferences.hobbies,
-    formData.preferences.music,
-    formData.preferences.sports,
-    formData.preferences.occupation,
-    formData.preferences.education,
-    formData.preferences.height_min,
-    formData.preferences.religion,
-    formData.preferences.politics,
-    formData.preferences.drinking,
-    formData.preferences.smoking,
-    formData.religion,
-    formData.political_views,
-    formData.drinking_status,
-    formData.smoking_status,
-    photos
-  ]);
+  }, [formData, photos, getCombinedInterestValues]);
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadInterestTopics = async () => {
+      try {
+        setTopicsLoading(true)
+        const featuredTopics = await getTopics({ featured: true })
+        const topics = featuredTopics.length > 0 ? featuredTopics : await getTopics()
+
+        if (isMounted) {
+          setInterestTopics(topics.slice(0, 18))
+        }
+      } catch {
+        if (isMounted) {
+          setInterestTopics([])
+        }
+      } finally {
+        if (isMounted) {
+          setTopicsLoading(false)
+        }
+      }
+    }
+
+    void loadInterestTopics()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   const loadProfile = useCallback(async () => {
     if (!effectiveToken) return
@@ -259,6 +284,7 @@ export default function ProfilePage() {
           children: profileData.profile.children || '',
           religion: profileData.profile.religion || '',
           political_views: profileData.profile.political_views || '',
+          interests: profileData.profile.interests || [],
           voice_intro: null,
 
           preferences: {
@@ -325,7 +351,10 @@ export default function ProfilePage() {
       setError(null)
       setSuccess(null)
 
-      await updateUserProfile(effectiveToken, formData)
+      await updateUserProfile(effectiveToken, {
+        ...formData,
+        interests: getCombinedInterestValues(formData),
+      })
       setSuccess('Profile updated successfully!')
 
       // Reload profile data
@@ -419,6 +448,15 @@ export default function ProfilePage() {
         : currentArray.filter((item: string) => item !== value);
       return { ...prev, [field]: updatedArray };
     });
+  }
+
+  const handleTopicInterestToggle = (slug: string) => {
+    setFormData(prev => ({
+      ...prev,
+      interests: prev.interests?.includes(slug)
+        ? prev.interests.filter(item => item !== slug)
+        : [...(prev.interests ?? []), slug]
+    }))
   }
 
   const handleVoiceUpload = (file: File) => {
@@ -1141,6 +1179,43 @@ export default function ProfilePage() {
             <div>
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Interests & Hobbies</h2>
               <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Topic graph
+                  </label>
+                  <p className="text-sm text-gray-500 mb-3">
+                    Tie your profile into topic hubs, group scenes, and local discovery.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {interestTopics.map((topic) => {
+                      const selected = formData.interests.includes(topic.slug)
+
+                      return (
+                        <button
+                          key={topic.slug}
+                          type="button"
+                          onClick={() => handleTopicInterestToggle(topic.slug)}
+                          className={`rounded-full border px-3 py-1.5 text-sm font-medium transition ${
+                            selected
+                              ? 'border-blue-600 bg-blue-600 text-white shadow-sm'
+                              : 'border-gray-300 bg-white text-gray-700 hover:border-blue-300 hover:text-blue-600'
+                          }`}
+                        >
+                          <span className="inline-flex items-center gap-1">
+                            {topic.emoji ? <span aria-hidden="true">{topic.emoji}</span> : null}
+                            <span>{topic.label}</span>
+                          </span>
+                        </button>
+                      )
+                    })}
+                    {!topicsLoading && interestTopics.length === 0 ? (
+                      <span className="text-sm text-gray-500">
+                        Topic suggestions will appear here once the interest graph loads.
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     Hobbies

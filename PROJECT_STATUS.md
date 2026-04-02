@@ -1,26 +1,26 @@
-# Project Status — fwber v1.0.64 (Referral Commissions & Onboarding Skip Flow)
+# Project Status — fwber v1.0.65 (Structured Interest Graph Bridge)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.64 "Referral Commissions & Onboarding Skip Flow"
-**Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
+**Version:** 1.0.65 "Structured Interest Graph Bridge"
+**Status:** ✅ **Backend verified; frontend validation narrowed to a flaky Next trace-file build issue**
 
 ---
 
-## Referral Commissions & Onboarding Skip Flow
-- **Onboarding Progression Repaired**: Optional onboarding steps no longer hard-stop the signup flow, including the user-reported fitness/physical screen, and the frontend now sanitizes blank or incompatible profile fields before saving.
-- **Referral Code Backfill Added**: Legacy users who were missing `referral_code` now receive one automatically during auth/session and vouch-link flows, eliminating the `ref=null` links that were surfacing in Viral Rewards.
-- **Two-Level Premium Referral Ledger Shipped**: Premium purchases now record idempotent level-1 and level-2 referral commissions, tracking pending USD payouts and awarding BobCoin/FWB rewards to uplines.
-- **Viral Rewards UI Grounded in Real Data**: The dashboard referral modal now loads a dedicated referral summary API for invite links, vouch links, golden tickets, counts, and premium reward totals instead of guessing from nullable cached auth state.
-- **Regression Coverage Expanded**: Backend referral and premium tests now cover referral-code backfill plus two-level premium commission payouts, and frontend Cypress coverage now verifies onboarding skip progression through optional steps.
+## Structured Interest Graph Bridge
+- **Profile Interests Now Resolve Into Topics**: Profile updates canonicalize interest values against the existing topic taxonomy, map aliases onto stable topic slugs, preserve unmatched freeform interests, and automatically sync matched topics into `followedTopics()` without disturbing prior follows.
+- **Profile API Now Exposes Structured Interest Topics**: Authenticated and public profile responses include `interest_topics` with `match_source` metadata, making it clear which interest hubs come from profile text, explicit follows, or both.
+- **Live Profile Editor Uses Topic-Backed Chips**: The `/profile` page now loads topic suggestions from the live topics API, lets users toggle them directly, and merges those selections with the older hobby/music/movie/book/sport buckets when saving.
+- **Match Filters Use the Shared Topic Taxonomy**: The shared-interest filter chips in matching now pull from the same topic catalog rather than a duplicated hardcoded list, keeping profile editing and discovery aligned on the same interest graph.
+- **Validation Path Is Cleaner on Windows**: `tsconfig.json` now excludes stale renamed dependency folders so `tsc` no longer walks backup `node_modules` directories, and the old stale folder from the earlier repair pass has been removed.
 
-## Current Referral/Signup Progress
-- **Legacy Accounts Are Self-Healing**: Users do not need a manual migration step to start sharing invites; the runtime backfill path guarantees a usable referral code the next time they authenticate or open the vouch flow.
-- **Cash Rewards Are Ledgered, Not Faked**: Premium referral cash is tracked as pending USD payout entries rather than being silently treated as already-withdrawn funds, keeping the wallet semantics honest.
-- **UI and Backend Contract Are Aligned**: Referral links, vouch links, counts, and premium reward totals now come from a backend-owned summary shape, reducing drift between cached auth data and the real referral state.
+## Current Validation / Delivery State
+- **Backend interest-graph coverage is green**: `ProfileUpdateTest` and `SceneDiscoveryFeatureTest` pass with the new canonicalization, topic-sync, and `interest_topics` response assertions.
+- **Frontend lint is effectively clean for this slice**: a fresh lint run now reports only the long-standing `fwber-frontend/lib/api/photos.ts:476` `react-hooks/exhaustive-deps` warning; the new `/profile` interest-graph work does not add warnings.
+- **Frontend build remains narrowed to an existing Next artifact issue**: after a successful compile/page-generation path, one fresh build failed on a missing `.next\server\app\api\auth\[...nextauth]\route.js.nft.json` trace artifact; a clean `.next` rebuild is currently running in the repair worktree to confirm whether the failure is transient.
 
 ## ✅ Release Focus
-- [x] Removed onboarding blockers so optional signup/profile steps can be skipped and filled later.
-- [x] Backfilled missing referral codes in runtime and via migration for legacy users.
-- [x] Added a dedicated referral summary API and updated the Viral Rewards modal to use it.
-- [x] Recorded two-level premium referral commissions with pending USD payouts and BobCoin rewards.
-- [x] Added focused regression coverage for onboarding skip and premium referral commission flows.
+- [x] Bridge freeform profile interests into the structured topic graph without replacing the existing topic/follow system.
+- [x] Expose structured profile interest topics and source metadata through the profile API.
+- [x] Update the live profile and match-filter UI to use topic-backed interest chips.
+- [x] Add backend regression coverage for profile-interest canonicalization and scene-summary structured interest exposure.
+- [x] Eliminate stale `node_modules` backup folders as a TypeScript validation hazard in the fresh repair worktree.

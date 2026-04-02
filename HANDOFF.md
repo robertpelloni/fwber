@@ -1,102 +1,263 @@
-# Handoff — Federation Follow Accept Handling
+# Handoff — Structured Interest Graph Bridge
 
 **Date:** 2026-04-02  
-**Status:** ✅ Local release verified  
-**Version:** 1.0.63
+**Status:** ✅ Backend interest-graph slice implemented; frontend clean-room validation narrowed to a flaky Next trace-file build issue  
+**Version:** 1.0.65  
+**Latest pushed commit:** `2f8f84e8a` (`feat: repair referrals and onboarding flow (v1.0.64)`)
 
 ## Overview
-This cycle focused on making fwber's federated follow workflow behave more like a real ActivityPub implementation. The inbox now processes `Accept` responses for outbound follow requests, matching local `Following` records can transition from `pending` to `accepted`, and outbound follow payloads now point at fwber's real actor endpoint instead of a stale legacy path.
+This handoff now covers the follow-through slice after the `v1.0.64` referral/onboarding repair. The next user-requested feature cluster was assessed against the existing codebase and turned out to be mostly present already: journals, topic hubs, scene-based discovery, relationship links, and circle/friends visibility all existed in meaningful form. The weakest gap was the bridge between freeform profile interests and the existing structured topic/follow graph.
 
-## Shipped Baseline
-- **Latest pushed code release:** `v1.0.63`
-- **Previous baseline before this slice:** `v1.0.62`
-- **Primary working checkout:** `C:\Users\hyper\.copilot\session-state\44f0d726-859c-45b4-aae1-b7f7a064bccf\files\fwber-live-fix`
-- **Root workspace rule:** treat `C:\Users\hyper\workspace\fwber` as effectively read-only during safe recovery/release work
+This slice closes that gap by canonicalizing profile interests into topic slugs where possible, syncing matched topic relationships on profile save, exposing structured `interest_topics` on profile responses, and updating the live profile and matching UI to use topic-backed chips from the real taxonomy instead of duplicated hardcoded lists.
 
-## What Was Completed
-1. **Federation Follow Accept Handling (`v1.0.63`)**
-   - Added inbox handling for `Accept` activities that wrap a `Follow`, allowing fwber to reconcile outbound follow requests with remote acceptance.
-   - Required the accepted follow payload to target fwber's actual local actor URI and to match the remote actor/object pairing before mutating local follow state.
-   - Updated matching `Following` rows from `pending` to `accepted` instead of leaving remote follows stuck indefinitely.
-   - Corrected outbound follow activities to use `url('/api/federation/users/{id}')` as the local actor identifier.
-2. **Federation Regression Coverage**
-   - Extended `ActivityPubTest` with coverage that proves a pending local following becomes accepted after an inbound `Accept` activity.
-   - Re-ran the broader ActivityPub suite so actor resolution, follow/unfollow handling, outbox behavior, and cached remote actor detail all stayed green.
-3. **Previously Shipped Discovery / Federation Baseline**
-     - `v1.0.47`: matches + profiles
-     - `v1.0.48`: recommendations
-     - `v1.0.49`: Local Pulse scene signals + dashboard shell fix
-     - `v1.0.50`: documentation/session-transfer refresh
-    - `v1.0.51`: Local Pulse trust-aware ranking
-    - `v1.0.52`: recommendation trust-aware ranking
-    - `v1.0.53`: nearby chatroom trust-aware ranking
-    - `v1.0.54`: event trust-aware ranking
-    - `v1.0.55`: bulletin board trust-aware ranking
-    - `v1.0.56`: group matching trust-aware ranking
-    - `v1.0.57`: venue trust-aware ranking
-     - `v1.0.58`: nearby-user trust-aware ranking
-     - `v1.0.59`: audio-room trust-aware ranking
-     - `v1.0.60`: deal trust-aware ranking
-     - `v1.0.61`: chatroom trust-aware ranking + sidebar shell sweep
-     - `v1.0.62`: federation outbox visibility
-     - `v1.0.63`: federation follow accept handling
+The original repo-recovery context still matters: all active work remains in the clean `C:\Users\hyper\workspace\fwber-mainline-repair` worktree, and the dirty root checkout remains preserved untouched.
 
-## Key Technical Findings
-- **The outbound follow actor URI was wrong before this slice.**
-  - `ActivityPubSearchController::follow()` was emitting `Follow` activities with `/api/v1/actor/{id}`, but fwber's actual actor endpoint is `/api/federation/users/{id}`.
-  - That mismatch would prevent any strict remote implementation from accepting and echoing the follow request coherently.
-- **Follow accept handling was the highest-leverage protocol fix after outbox visibility.**
-  - The codebase already stored outbound follow state in `followings.status`, but nothing ever moved records beyond `pending`.
-  - Adding `Accept` handling gives immediate user-visible correctness without taking on the larger HTTP-signature and remote delivery problem in the same release.
-- **The biggest remaining federation gaps are still signed delivery and inbound verification.**
-  - `ActivityPubService::dispatchToRemoteInbox()` is still effectively mocked/log-only.
-  - Inbox requests are still accepted without HTTP signature verification.
-  - Future federation work should now focus on signed outbound delivery first, then inbox verification.
+## What Shipped in v1.0.65
 
-## Key Files Modified
-- `fwber-backend/app/Http/Controllers/ActivityPubInboxController.php`
-- `fwber-backend/app/Http/Controllers/ActivityPubSearchController.php`
-- `fwber-backend/tests/Feature/ActivityPubTest.php`
-- `VERSION`
-- `package.json`
+### 1. Structured interest graph bridge
+- Added `InterestGraphService` to:
+  - canonicalize profile interests against the existing `topics` taxonomy
+  - resolve alias-style values onto stable topic slugs
+  - preserve unmatched freeform values instead of dropping them
+  - sync matched topics into `User::followedTopics()` without removing prior follows
+- This avoids inventing a second topic system and instead bridges the already-live:
+  - `UserProfile.interests`
+  - `Topic`
+  - `followedTopics()`
+  - scene/matching surfaces
+
+### 2. Profile API enrichment
+- `ProfileController` now attaches structured `interest_topics` to both authenticated and public profile responses.
+- `TopicResource` now exposes an optional `match_source` field so clients can tell whether a topic came from:
+  - `profile`
+  - `followed`
+  - `both`
+- `UserProfileResource` now includes `interest_topics` alongside the raw `interests` array.
+
+### 3. Live profile editor alignment
+- The active `/profile` page now:
+  - fetches topic suggestions from `/api/topics`
+  - renders topic-backed chips inside the interests section
+  - loads the top-level `profile.interests` field into form state
+  - merges topic selections with the existing hobby/music/movie/book/sport buckets on save
+- This means users no longer have to rely only on the old nested preference buckets for discovery relevance.
+
+### 4. Matching UI alignment
+- `MatchFilter` now loads shared-interest chips from the real topics API instead of a duplicated hardcoded constant list.
+- A small fallback list remains so the filter still renders if topic fetches fail.
+
+### 5. Validation hardening findings
+- Added `node_modules_stale_*` exclusions to `fwber-frontend/tsconfig.json`, which prevents `tsc` from recursing into renamed dependency backup folders.
+- The stale `node_modules_stale_20260402151410` folder created during earlier dependency-repair work has now been removed from the clean worktree.
+- Fresh lint now reports only the pre-existing warning in:
+  - `fwber-frontend/lib/api/photos.ts:476`
+- Backend targeted validation for this slice is green:
+  - `php artisan test tests/Feature/ProfileUpdateTest.php tests/Feature/SceneDiscoveryFeatureTest.php`
+- One fresh frontend build failed after successful compile/static-generation work with:
+  - missing `.next\server\app\api\auth\[...nextauth]\route.js.nft.json`
+- This matches the repo's earlier pattern of intermittent flaky Next build artifacts in this environment rather than a direct source-code regression, and a clean rebuild from a freshly cleared `.next` directory is in flight.
+
+## Repository State Findings
+1. **The original root checkout was not safe to “repair in place.”**
+   - `C:\Users\hyper\workspace\fwber` had a stale local `main`, was far behind `origin/main`, and contained a very large dirty tree including tracked artifact churn and unrelated local state.
+   - A direct stash/preserve flow was too risky and too slow because of the size and shape of the tracked deletions/artifacts.
+2. **The recovery-safe solution was a clean worktree based on upstream.**
+   - A clean worktree was created at `C:\Users\hyper\workspace\fwber-mainline-repair`.
+   - Work proceeded on branch `repair-referrals-onboarding`, based directly on `origin/main`.
+   - The original dirty checkout was intentionally left untouched.
+3. **The original checkout still has a safety anchor.**
+   - Backup branch retained: `backup-pre-repair-20260402-1809`
+   - This preserves the pre-repair local branch pointer/state in the original repository.
+
+## Documentation / Product-State Findings
+- The root documentation was internally contradictory.
+  - Some files claimed the project was effectively “final” or fully production complete.
+  - Other files and the actual upstream history showed active ongoing development and unfinished areas.
+- The most trustworthy “what is actually shipped” signal was `origin/main` plus focused validation, not the louder status prose in older docs.
+- The release/version state before this slice was `v1.0.63`; this slice updates the repo to `v1.0.64`.
+
+## What Shipped in v1.0.64
+
+### 1. Onboarding progression repair
+- Users can now advance through optional onboarding steps without being forced to fill every field immediately.
+- The user-reported fitness/physical step no longer traps progression.
+- The frontend now sanitizes profile update payloads before sending them:
+  - drops `null` / `undefined`
+  - drops blank strings
+  - drops empty arrays/objects
+  - preserves meaningful booleans, numbers, files, and non-empty values
+- Problematic onboarding field mismatches are normalized or omitted instead of breaking progression.
+- The shared backend profile update contract was loosened for onboarding’s `tattoos` / `piercings` path so the flow is less brittle.
+- Added Cypress coverage:
+  - `fwber-frontend/cypress/e2e/onboarding-skip.cy.js`
+
+### 2. Referral-code repair
+- Legacy users missing `referral_code` are now repaired automatically at runtime.
+- `TokenDistributionService` now has an `ensureReferralCode()` path.
+- Auth/session-related flows hydrate users through that guarantee so cached frontend auth state is no longer the only source of truth.
+- Vouch-link generation also ensures a referral code exists before returning the share URL.
+- Added a migration to backfill missing referral codes persistently:
+  - `2026_04_02_000001_backfill_missing_referral_codes.php`
+
+### 3. Real referral summary API
+- Added backend-owned referral summary endpoint:
+  - `GET /api/referrals/summary`
+- The summary now returns:
+  - referral code
+  - invite link
+  - vouch link
+  - golden ticket count
+  - referral count
+  - vouch count
+  - token balance
+  - pending cash reward total
+  - earned BobCoin reward total
+  - level-1 / level-2 premium conversion summaries
+  - configured reward rules
+
+### 4. Two-level premium referral commissions
+- Added a dedicated commission ledger:
+  - `referral_commissions`
+- Added explicit commission service:
+  - `ReferralCommissionService`
+- Premium upgrades now award:
+  - **Level 1:** `$2.00 + 50 BobCoin`
+  - **Level 2:** `$0.50 + 15 BobCoin`
+- Card/fiat premium purchases record:
+  - pending USD payout entries in the commission ledger
+  - BobCoin payouts to uplines
+- Token-paid premium purchases record:
+  - token-only referral rewards
+  - no fake “cash transfer” is implied for token-funded upgrades
+- The commission path is idempotent via `commission_key` generation keyed to payment/subscription context.
+
+### 5. Viral Rewards UI repair
+- `ReferralModal` no longer trusts nullable cached auth fields as its primary link source.
+- It now consumes the backend referral summary API and renders:
+  - invite link
+  - vouch link
+  - reward rule copy
+  - pending cash total
+  - earned BobCoin total
+  - direct and second-level premium totals
+- This closes the user-visible `ref=null` failure mode in the intended UI path.
+
+### 6. Docs / version sync
+- Updated:
+  - `VERSION`
+  - root `package.json`
+  - `fwber-frontend/package.json`
+  - `fwber-frontend/package-lock.json`
+  - `CHANGELOG.md`
+  - `VERSION.md`
+  - `PROJECT_STATUS.md`
+  - `HANDOFF.md`
+
+## Key Backend Files Added / Changed
+- `fwber-backend/app/Http/Controllers/AuthController.php`
+- `fwber-backend/app/Http/Controllers/PremiumController.php`
+- `fwber-backend/app/Http/Controllers/ReferralController.php`
+- `fwber-backend/app/Http/Controllers/VouchController.php`
+- `fwber-backend/app/Http/Requests/Profile/UpdateProfileRequest.php`
+- `fwber-backend/app/Models/ReferralCommission.php`
+- `fwber-backend/app/Services/ReferralCommissionService.php`
+- `fwber-backend/app/Services/TokenDistributionService.php`
+- `fwber-backend/config/referrals.php`
+- `fwber-backend/database/migrations/2026_04_02_000000_create_referral_commissions_table.php`
+- `fwber-backend/database/migrations/2026_04_02_000001_backfill_missing_referral_codes.php`
+- `fwber-backend/routes/api.php`
+- `fwber-backend/tests/Feature/ReferralTest.php`
+- `fwber-backend/tests/Feature/PremiumControllerTest.php`
+
+## Key Frontend Files Added / Changed
+- `fwber-frontend/app/onboarding/page.tsx`
+- `fwber-frontend/components/viral/ReferralModal.tsx`
+- `fwber-frontend/lib/api/profile.ts`
+- `fwber-frontend/cypress/e2e/onboarding-skip.cy.js`
 - `fwber-frontend/package.json`
-- `CHANGELOG.md`
-- `PROJECT_STATUS.md`
-- `VERSION.md`
-- `TODO.md`
-- `ROADMAP.md`
-- `HANDOFF.md`
+- `fwber-frontend/package-lock.json`
 
-## Validation Workflow That Proved Reliable
-- **Backend**
-  - `php artisan test tests/Feature/ActivityPubTest.php`
-- **Frontend**
-  1. `npm run lint`
-  2. `npm run type-check`
-  3. clean `npm run build`
+## Validation Status
 
-## Validation Notes
-- Frontend lint still reports the pre-existing `react-hooks/exhaustive-deps` warning in `fwber-frontend/lib/api/photos.ts:476`.
-- `fwber-frontend/tsconfig.tsbuildinfo` changes during frontend validation because it is tracked in git.
-- The shared checkout can still hit `.next` / `.next/types` contention if overlapping Next jobs run in the same tree.
-- When direct shell builds look suspicious, a clean isolated validation pass is the trustworthy signal.
-- The frontend build still emits the known Sentry deprecation/configuration warnings and the `bigint` pure-JS fallback note, but the clean production build completed successfully.
+### Backend: green
+Targeted backend validation completed successfully:
 
-## Notes / Risks
-- The repo still has the known `.next` / `.next/types` contention when overlapping Next jobs hit the same checkout; clean isolated builds remain the trustworthy signal.
-- Follow state transitions are more realistic now, but outbound delivery is still not cryptographically signed and may still fail against strict remote implementations.
-- Inbox requests are still trusted without HTTP signature verification, so federation correctness is improved but not yet hardened against forged remote activity.
-- Merchant lifecycle tooling, deeper federation protocol hardening, and AI Wingman frontend wiring remain large unfinished areas compared with the more cohesive shipped discovery stack.
-- The safe-checkout workflow is still important because the environment is shared and the root repository may contain unrelated or user-owned changes.
+```powershell
+php artisan test tests/Feature/ReferralTest.php tests/Feature/PremiumControllerTest.php tests/Feature/TokenDistributionTest.php
+```
 
-## Next Recommended Slice
-1. Implement signed outbound ActivityPub delivery so follow and content activities can actually reach remote inboxes with a credible protocol story.
-2. Add inbox signature verification so inbound federation state is trustworthy and interoperable.
-3. After signed delivery and verification, expand the public outbox beyond board posts only if additional local artifact types map cleanly to ActivityStreams objects.
+Result:
+- **11 tests passed**
+- **42 assertions**
+
+Covered behaviors include:
+- auth/session referral-code backfill
+- referral summary response
+- premium purchase with fiat/card path
+- premium purchase with token path
+- level-1 and level-2 commission awarding
+- token distribution baseline behavior
+
+### Frontend: code path repaired, environment validation still being hardened
+The remaining instability is not currently pointing at app-code regressions. It is coming from the fresh worktree’s local Windows dependency install state.
+
+Observed frontend validation sequence:
+1. Initial `npm run lint` failed because dependencies were not installed in the fresh worktree.
+2. Plain `npm install` failed on Windows because a dependency script (`@stellar/stellar-sdk`) expected `yarn` and used shell fallback syntax that does not behave cleanly in this environment.
+3. After dependency repair attempts, repeated validation runs exposed partially populated packages inside `node_modules`, including:
+   - missing `next/dist/compiled/babel-packages`
+   - missing `date-fns/isSameDay.mjs`
+   - package roots present without `package.json`
+4. Targeted package repairs restored those files, but the cleanest remaining path is a full uninterrupted frontend reinstall in the fresh worktree followed by:
+
+```powershell
+npm ci --ignore-scripts
+npm run lint
+npm run build
+npm run type-check
+```
+
+### Known frontend validation notes
+- Lint still reports a **pre-existing warning**:
+  - `fwber-frontend/lib/api/photos.ts:476`
+  - `react-hooks/exhaustive-deps`
+- Next build still emits the known Sentry warnings/deprecations that were already present before this slice.
+- In this shared Windows environment, partially interrupted dependency installs can leave package skeletons in `node_modules`; that was the main frontend validation blocker during this cycle.
+
+## Git / Release State
+- Current pushed release: `v1.0.64`
+- Current pushed commit: `2f8f84e8a`
+- `origin/main` now points at this repair commit.
+- The clean worktree branch `repair-referrals-onboarding` is aligned with `origin/main`.
+
+## Important Operational Notes
+- Do **not** try to “clean up” the original root checkout destructively.
+- Continue any further work from the clean worktree or a fresh checkout from `origin/main`.
+- The runtime referral-code backfill is intentionally redundant with the migration so legacy users self-heal immediately even before all environments finish migrations.
+- Cash referral rewards are intentionally tracked as **pending ledger entries**, not magically deposited external money.
+
+## Biggest Remaining Risks / Follow-Ups
+1. **Frontend dependency validation in the fresh worktree still needs one uninterrupted clean pass.**
+   - The code changes themselves are in place and backend behavior is validated.
+   - The remaining friction is local install integrity, not a known frontend app logic failure.
+2. **Original dirty root checkout still exists and should remain untouched unless explicitly reconciled later.**
+3. **The broader repository docs still contain older optimistic/final-state language in places outside the files updated here.**
+   - This slice corrected the directly touched release/status docs but did not attempt a full repository-wide doc rewrite.
+
+## Recommended Next Slice
+1. Start from `origin/main` at `2f8f84e8a`.
+2. Finish one clean frontend validation pass from a fresh, uninterrupted dependency install.
+3. If frontend validation is green, decide whether to:
+   - leave the root dirty checkout alone permanently, or
+   - do a separate, careful repo housekeeping pass
+4. After frontend validation is fully green, consider a dedicated documentation reconciliation sweep across remaining contradictory project docs.
 
 ## Suggested Resume Procedure
-1. Start from `origin/main` after `v1.0.63`.
-2. Re-read `HANDOFF.md`, `PROJECT_STATUS.md`, `ROADMAP.md`, `TODO.md`, and the session `plan.md`.
-3. Stay in the session-state checkout and avoid changing the root workspace copy.
-4. Create a new SQL todo for the next slice before implementing.
-5. Reuse the established validation order and avoid overlapping Next jobs in the same checkout.
+1. Work from `C:\Users\hyper\workspace\fwber-mainline-repair` or a fresh clone of `origin/main`.
+2. Re-read:
+   - `HANDOFF.md`
+   - `PROJECT_STATUS.md`
+   - `CHANGELOG.md`
+   - session `plan.md`
+3. Avoid overlapping Next.js builds in the same checkout.
+4. Treat any broken frontend validation signal skeptically until dependency integrity is confirmed.

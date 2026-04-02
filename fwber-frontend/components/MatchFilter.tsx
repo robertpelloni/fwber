@@ -1,36 +1,28 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { Lock } from 'lucide-react';
 import Link from 'next/link';
+import { getTopics } from '@/lib/api/topics';
 
 interface MatchFilterProps {
   onFilterChange: (filters: any) => void;
 }
 
-const INTEREST_OPTIONS = [
-  'music',
-  'movies',
-  'sports',
-  'gaming',
-  'travel',
-  'cooking',
-  'reading',
-  'art',
-  'fitness',
-  'outdoors',
-  'tech',
-  'nightlife',
-  'photography',
-  'dancing',
-  'foodie',
-  'fashion',
-  'politics',
-  'volunteering',
-  'hot tubs',
-  'saunas',
-  'spas',
+const FALLBACK_INTEREST_OPTIONS = [
+  { slug: 'music', label: 'Music' },
+  { slug: 'movies', label: 'Movies' },
+  { slug: 'sports', label: 'Sports' },
+  { slug: 'gaming', label: 'Gaming' },
+  { slug: 'travel', label: 'Travel' },
+  { slug: 'cooking', label: 'Cooking' },
+  { slug: 'reading', label: 'Reading' },
+  { slug: 'art', label: 'Art' },
+  { slug: 'fitness', label: 'Fitness' },
+  { slug: 'outdoors', label: 'Outdoors' },
+  { slug: 'tech', label: 'Tech' },
+  { slug: 'nightlife', label: 'Nightlife' },
 ] as const
 
 export default function MatchFilter({ onFilterChange }: MatchFilterProps) {
@@ -57,6 +49,42 @@ export default function MatchFilter({ onFilterChange }: MatchFilterProps) {
     religion: '',
     zodiac: '',
   });
+  const [topicOptions, setTopicOptions] = useState<Array<{ slug: string; label: string; emoji?: string | null }>>([]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadTopics = async () => {
+      try {
+        const featuredTopics = await getTopics({ featured: true });
+        const topics = featuredTopics.length > 0 ? featuredTopics : await getTopics();
+
+        if (isMounted) {
+          setTopicOptions(
+            topics.slice(0, 12).map((topic) => ({
+              slug: topic.slug,
+              label: topic.label,
+              emoji: topic.emoji,
+            }))
+          );
+        }
+      } catch {
+        if (isMounted) {
+          setTopicOptions([]);
+        }
+      }
+    };
+
+    void loadTopics();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const interestOptions = useMemo(() => {
+    return topicOptions.length > 0 ? topicOptions : [...FALLBACK_INTEREST_OPTIONS];
+  }, [topicOptions]);
 
   const handleInputChange = (field: string, value: any) => {
     setFilters((prev) => ({
@@ -170,21 +198,24 @@ export default function MatchFilter({ onFilterChange }: MatchFilterProps) {
             <span className="text-xs text-gray-500">Boost profiles that overlap with your vibe</span>
           </div>
           <div className="flex flex-wrap gap-2">
-            {INTEREST_OPTIONS.map((interest) => {
-              const selected = filters.interests.includes(interest)
+            {interestOptions.map((interest) => {
+              const selected = filters.interests.includes(interest.slug)
 
               return (
                 <button
-                  key={interest}
+                  key={interest.slug}
                   type="button"
-                  onClick={() => handleInterestToggle(interest)}
+                  onClick={() => handleInterestToggle(interest.slug)}
                   className={`rounded-full border px-3 py-1.5 text-sm font-medium transition ${
                     selected
                       ? 'border-indigo-600 bg-indigo-600 text-white shadow-sm'
                       : 'border-gray-300 bg-white text-gray-700 hover:border-indigo-300 hover:text-indigo-600'
                   }`}
                 >
-                  {interest}
+                  <span className="inline-flex items-center gap-1">
+                    {interest.emoji ? <span aria-hidden="true">{interest.emoji}</span> : null}
+                    <span>{interest.label}</span>
+                  </span>
                 </button>
               )
             })}

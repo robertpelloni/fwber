@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.64`
+- **Current version:** `1.0.65`
 - **Release date:** `2026-04-02`
-- **Release name:** `Referral Commissions & Onboarding Skip Flow`
+- **Release name:** `Structured Interest Graph Bridge`
 
 ## Summary
 
-This release fixes the onboarding skip regression, guarantees referral codes for legacy accounts, and adds a real two-level premium referral commission ledger with BobCoin rewards and a referral summary API for the viral rewards UI.
+This release bridges freeform profile interests into the structured topic graph, syncs matched topics into scene discovery, and updates the live profile and matching UI to use topic-backed interest chips instead of only hardcoded lists.
 
 ## Version Sources of Truth
 

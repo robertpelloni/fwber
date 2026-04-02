@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.65] - 2026-04-02 — Structured Interest Graph Bridge
+
+### Fixed
+- Canonicalized profile interest values against the existing topic taxonomy so alias-style inputs now resolve to stable topic slugs, unmatched values are still preserved, and profile updates automatically enrich the user's followed topic graph without clobbering existing follows.
+- Exposed structured `interest_topics` on profile responses, including whether each topic came from the profile graph, existing follows, or both, so profile and scene-discovery surfaces can render a real bridge between freeform interests and topic hubs.
+- Updated the live `/profile` editor to load and save canonical top-level interests, merge them with the existing hobby/music/book/movie/sport buckets, and present topic-backed chips sourced from the actual topics API.
+- Replaced the match filter's hardcoded shared-interest chip list with topic-backed options from the live taxonomy, while keeping a small fallback list for resilience if the topics API is unavailable.
+- Added focused backend regression coverage for profile interest canonicalization/topic syncing and extended the scene discovery feature assertions to cover the new structured interest topic exposure.
+- Hardened frontend type-checking against renamed dependency snapshots by excluding `node_modules_stale_*`, and confirmed fresh lint returns only the pre-existing `fwber-frontend/lib/api/photos.ts` hook warning.
+
 ## [1.0.64] - 2026-04-02 — Referral Commissions & Onboarding Skip Flow
 
 ### Fixed
