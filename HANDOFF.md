@@ -1,36 +1,31 @@
-# Handoff — Topic Hubs
+# Handoff — Scene Discovery
 
 **Date:** 2026-04-02  
 **Status:** ✅ Local release verified  
-**Version:** 1.0.46
+**Version:** 1.0.47
 
 ## Overview
-This cycle shipped the next structured-interest slice after journals and relationship links: canonical topic hubs. Users can now browse and follow topics, open hub detail pages that aggregate public groups plus visibility-safe journals and topic-scoped Local Pulse artifacts, and filter or post Local Pulse entries against a selected topic. The implementation deliberately reuses the existing normalized interest, journal visibility, and Local Pulse seams instead of introducing a duplicate graph.
+This cycle shipped the next scene-based discovery slice on top of the topic hubs release. Matches now rank and serialize shared scene overlap using followed topics plus visible social context from journals and public groups, and public profiles now expose a scene summary that makes those affinities legible outside the swipe deck. The implementation deliberately reuses the existing normalized interest, topic follow, journal visibility, and group-tag seams instead of building a second recommendation taxonomy.
 
 ## Accomplishments
-- Added the backend `Topic` model, seeded `topics` catalog migration, `topic_user_follows` pivot, topic controller/resource, and authenticated topic routes.
-- Extended Local Pulse validation and controller flows so create/feed/local-pulse requests accept an optional `topic_slug` and persist/filter that value through artifact `meta`.
-- Added backend feature coverage for follow/unfollow, hub aggregation, and topic-scoped proximity feed filtering.
-- Added new frontend topic API/hooks/components plus `/topics` and `/topics/[slug]` pages, and surfaced topics in the main app navigation.
-- Extended Local Pulse and group cards so topics are visible in the UI and users can browse scene-specific activity directly from a hub.
-- Bumped the repository release version from `1.0.45` to `1.0.46` and refreshed release-tracking docs.
+- Extended `AIMatchingService` so the match engine now computes `scene_overlap` from followed topics, structured interests, public group metadata, and visible journal tags.
+- Added `scene_summary` serialization to profile responses through `ProfileController` and `UserProfileResource`.
+- Added backend regression coverage in `SceneDiscoveryFeatureTest` for both match-overlap and profile-summary payloads.
+- Updated the swipe deck UI to render scene overlap cards and the public profile UI to render a dedicated scene summary block.
+- Aligned the frontend `Match` client contract with the live payload (`is_confessional`, `voice_intro_url`, `age`, `gender`, `is_verified`, `photos`, scene overlap) so the typed frontend matches the shipped backend response.
+- Bumped the repository release version from `1.0.46` to `1.0.47` and refreshed release-tracking docs.
 
 ## Key Files Modified
-- `fwber-backend/app/Models/Topic.php`
-- `fwber-backend/app/Http/Controllers/TopicController.php`
-- `fwber-backend/app/Http/Resources/TopicResource.php`
-- `fwber-backend/database/migrations/2026_04_02_071745_create_topics_table.php`
-- `fwber-backend/tests/Feature/TopicHubFeatureTest.php`
-- `fwber-backend/app/Http/Controllers/ProximityArtifactController.php`
-- `fwber-backend/app/Http/Requests/StoreProximityArtifactRequest.php`
-- `fwber-backend/app/Http/Requests/ProximityFeedRequest.php`
-- `fwber-backend/app/Http/Requests/LocalPulseRequest.php`
-- `fwber-frontend/app/topics/page.tsx`
-- `fwber-frontend/app/topics/[slug]/page.tsx`
-- `fwber-frontend/components/LocalPulse.tsx`
-- `fwber-frontend/components/TopicCard.tsx`
-- `fwber-frontend/lib/api/topics.ts`
-- `fwber-frontend/lib/hooks/use-topics.ts`
+- `fwber-backend/app/Services/AIMatchingService.php`
+- `fwber-backend/app/Http/Controllers/MatchController.php`
+- `fwber-backend/app/Http/Controllers/ProfileController.php`
+- `fwber-backend/app/Http/Resources/MatchResource.php`
+- `fwber-backend/app/Http/Resources/UserProfileResource.php`
+- `fwber-backend/tests/Feature/SceneDiscoveryFeatureTest.php`
+- `fwber-frontend/app/matches/page.tsx`
+- `fwber-frontend/app/profile/[id]/page.tsx`
+- `fwber-frontend/lib/api/matches.ts`
+- `fwber-frontend/lib/api/profile.ts`
 - `VERSION`
 - `package.json`
 - `fwber-frontend/package.json`
@@ -42,7 +37,7 @@ This cycle shipped the next structured-interest slice after journals and relatio
 - `HANDOFF.md`
 
 ## Validation
-- `php artisan test tests/Feature/TopicHubFeatureTest.php`
+- `php artisan test tests/Feature/SceneDiscoveryFeatureTest.php tests/Feature/TopicHubFeatureTest.php`
 - `npm run lint`
 - `npm run build`
 - fresh `npm run type-check`
@@ -50,10 +45,10 @@ This cycle shipped the next structured-interest slice after journals and relatio
 ## Notes / Risks
 - Frontend lint still reports the pre-existing `react-hooks/exhaustive-deps` warning in `fwber-frontend/lib/api/photos.ts:476`.
 - `fwber-frontend/tsconfig.tsbuildinfo` changes during frontend validation because it is tracked in git.
-- The repo still has the known `.next/types` contention when build and type-check overlap in the same checkout; frontend validation remains reliable when run as lint -> build -> fresh type-check.
-- Topic hubs currently aggregate groups, journals, and Local Pulse artifacts. They do not yet re-rank the main matches feed or profile cards with followed-topic affinity.
+- The repo still has the known `.next` / `.next/types` contention when overlapping Next jobs hit the same checkout; direct shell builds can fail after successful compilation with missing build artifacts (`pages-manifest.json`, `_document.js`). Frontend validation remains reliable when run cleanly as lint -> clean build -> fresh type-check.
+- Scene discovery currently affects match ranking/payloads and profile summaries. It does not yet reshape broader recommendation feeds or Local Pulse ranking.
 
 ## Next Recommended Slice
-1. Extend **scene-based discovery** into the matches feed and profile recommendations using followed topics and shared hub activity.
-2. Add richer profile-level scene cards so topic follows, visible journals, and group participation reinforce each other.
+1. Extend the shipped **scene discovery** metadata into broader recommendation feeds and local loops beyond the swipe deck.
+2. Fold relationship links, friend/circle visibility, and topic follows into a richer trust-aware discovery model without leaking private graph edges.
 3. Keep building on the topic graph rather than adding a second parallel taxonomy system.

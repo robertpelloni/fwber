@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.0.46
+> **Current Version:** 1.0.47
 > **Last Updated:** 2026-04-02
 
 ---
@@ -61,7 +61,7 @@
 ---
 
 ## 🎯 Next Immediate Milestones
-1. Extend the shipped **topic hubs** into deeper **scene-based discovery** for matches, profile cards, and local feeds.
-2. Add richer profile-level scene metadata and recommendations on top of the new topic follow graph.
-3. Extend the **Merchant Portal UI** (B2B) with lifecycle controls, resend/deactivate/reporting tooling, and broader operations polish.
-4. Wire up the **ActivityPub Inbox/Outbox UI** for federated profiles.
+1. Expand the shipped **scene discovery** slice from matches/profiles into broader recommendation and local-feed loops.
+2. Extend the **Merchant Portal UI** (B2B) with lifecycle controls, resend/deactivate/reporting tooling, and broader operations polish.
+3. Wire up the **ActivityPub Inbox/Outbox UI** for federated profiles.
+4. Add deeper trust-aware recommendation inputs that combine relationship links, circles, and topic hubs without weakening privacy gates.

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, X, Star, MessageCircle, MapPin, Info, Mic2, Play, Pause } from 'lucide-react';
+import { Heart, X, Star, MessageCircle, MapPin, Info, Mic2, Play, Pause, Compass } from 'lucide-react';
 import { api } from '@/lib/api/client';
 import { useToast } from '@/lib/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -14,9 +14,10 @@ import Image from 'next/image';
 import ProfileViewModal from '@/components/ProfileViewModal';
 import CreateBountyModal from '@/components/CreateBountyModal';
 import BoostButton from '@/components/BoostButton';
+import type { Match } from '@/lib/api/matches';
 
 export default function MatchesPage() {
-  const [matches, setMatches] = useState<any[]>([]);
+  const [matches, setMatches] = useState<Match[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -39,7 +40,7 @@ export default function MatchesPage() {
   const fetchMatches = useCallback(async (filters = {}) => {
     try {
       setLoading(true);
-      const response = await api.get<{ matches?: any[] }>('/matches', { params: filters });
+      const response = await api.get<{ matches?: Match[] }>('/matches', { params: filters });
       setMatches(Array.isArray(response.matches) ? response.matches : []);
       setCurrentIndex(0);
       setIsPlaying(false);
@@ -120,7 +121,7 @@ export default function MatchesPage() {
   }
 
   const currentMatch = matches[currentIndex];
-  const isConfessional = currentMatch.is_confessional;
+  const isConfessional = Boolean(currentMatch.is_confessional);
 
   return (
     <ProtectedRoute>
@@ -215,6 +216,35 @@ export default function MatchesPage() {
                   ))}
                 </div>
               )}
+              {!isConfessional && currentMatch.scene_overlap && (
+                <div className="mb-3 rounded-2xl border border-white/15 bg-black/25 p-3 backdrop-blur-sm">
+                  <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">
+                    <Compass className="h-3.5 w-3.5" />
+                    Scene overlap {currentMatch.scene_overlap.score}%
+                  </div>
+                  {currentMatch.scene_overlap.headline && (
+                    <p className="mb-2 text-sm text-white/90">{currentMatch.scene_overlap.headline}</p>
+                  )}
+                  <div className="flex flex-wrap gap-2">
+                    {currentMatch.scene_overlap.shared_topics.map((topic) => (
+                      <span
+                        key={topic.slug}
+                        className="rounded-full border border-cyan-300/30 bg-cyan-400/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-cyan-100"
+                      >
+                        {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
+                      </span>
+                    ))}
+                    {currentMatch.scene_overlap.shared_scene_tags.slice(0, 3).map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[11px] font-medium text-white/80"
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
               {!isConfessional && (
                 <Button
                   size="icon"
@@ -231,18 +261,18 @@ export default function MatchesPage() {
             </div>
             {!isConfessional && (
               <>
-                {currentMatch.shared_interest_count > 0 && (
-                  <p className="mb-2 text-sm font-medium text-amber-200">
-                    {currentMatch.shared_interest_count} shared interest{currentMatch.shared_interest_count === 1 ? '' : 's'}
-                  </p>
-                )}
+                 {(currentMatch.shared_interest_count ?? 0) > 0 && (
+                   <p className="mb-2 text-sm font-medium text-amber-200">
+                     {currentMatch.shared_interest_count} shared interest{currentMatch.shared_interest_count === 1 ? '' : 's'}
+                   </p>
+                 )}
                 <p className="line-clamp-2 mb-16">{currentMatch.bio}</p>
               </>
             )}
             {isConfessional && (
                 <div className="flex gap-4 mb-16 text-sm text-zinc-400 font-medium">
                     <span>Gender: {currentMatch.gender || '??'}</span>
-                    <span>Age: {currentMatch.age || '??'}</span>
+                     <span>Age: {currentMatch.age ?? '??'}</span>
                 </div>
             )}
           </div>
@@ -285,16 +315,16 @@ export default function MatchesPage() {
               onClose={() => setIsProfileOpen(false)}
               user={{
                 id: currentMatch.id,
-                profile: {
-                  display_name: currentMatch.name,
-                  age: currentMatch.age,
-                  bio: currentMatch.bio,
-                  photos: currentMatch.photos || (currentMatch.avatarUrl ? [{
-                    id: 1,
-                    url: currentMatch.avatarUrl,
-                    is_private: false,
-                    is_primary: true
-                  }] : [])
+                  profile: {
+                    display_name: currentMatch.name,
+                    age: currentMatch.age ?? null,
+                    bio: currentMatch.bio ?? undefined,
+                    photos: currentMatch.photos ?? (currentMatch.avatarUrl ? [{
+                      id: 1,
+                      url: currentMatch.avatarUrl,
+                      is_private: false,
+                      is_primary: true
+                    }] : [])
                 }
               }}
               messagesExchanged={0}

@@ -10,6 +10,7 @@ use App\Http\Requests\Profile\UpdateProfileRequest;
 use App\Http\Resources\UserProfileResource;
 use App\Models\User;
 use App\Models\UserProfile;
+use App\Services\AIMatchingService;
 use App\Services\ContentVisibilityService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -30,7 +31,8 @@ class ProfileController extends Controller
 {
     public function __construct(
         private readonly EventStore $eventStore,
-        private readonly ContentVisibilityService $contentVisibilityService
+        private readonly ContentVisibilityService $contentVisibilityService,
+        private readonly AIMatchingService $matchingService
     ) {}
 
     /**
@@ -80,6 +82,7 @@ class ProfileController extends Controller
             'relationshipLinks',
             $this->contentVisibilityService->getVisibleRelationshipLinksForProfile($user, request()->user(), 3)
         );
+        $user->setAttribute('scene_summary', $this->matchingService->getSceneSummary($user));
 
         // Return resource (it handles privacy/sanitization)
         return response()->json([
@@ -184,6 +187,7 @@ class ProfileController extends Controller
                 'relationshipLinks',
                 $this->contentVisibilityService->getOwnedRelationshipLinks($user)
             );
+            $user->setAttribute('scene_summary', $this->matchingService->getSceneSummary($user));
 
             return response()->json([
                 'success' => true,

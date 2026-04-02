@@ -15,7 +15,7 @@ import { EvolvingAvatar } from '@/components/ui/EvolvingAvatar';
 import { RelationshipTier } from '@/lib/relationshipTiers';
 import { photoAPI } from '@/lib/api/photos';
 import GiftShopModal from '@/components/gifts/GiftShopModal';
-import { BookHeart, Gift, HeartHandshake, ShieldCheck } from 'lucide-react';
+import { BookHeart, Compass, Gift, HeartHandshake, ShieldCheck } from 'lucide-react';
 import { VouchBadge } from '@/components/profile/VouchBadge';
 import { useToast } from '@/components/ToastProvider';
 
@@ -196,6 +196,56 @@ export default function PublicProfilePage() {
               <h3 className="text-lg font-semibold mb-2">About</h3>
               <p>{p.bio || 'No bio yet.'}</p>
             </div>
+
+            {p.scene_summary && (
+              <div className="mb-8 rounded-3xl border border-cyan-100 bg-cyan-50/80 p-5 shadow-sm dark:border-cyan-900/40 dark:bg-cyan-950/20">
+                <div className="mb-4 flex items-center gap-2">
+                  <Compass className="h-5 w-5 text-cyan-600 dark:text-cyan-300" />
+                  <h3 className="text-lg font-semibold">Scene Summary</h3>
+                </div>
+                {p.scene_summary.headline && (
+                  <p className="mb-4 text-sm text-gray-700 dark:text-gray-200">{p.scene_summary.headline}</p>
+                )}
+                {p.scene_summary.followed_topics.length > 0 && (
+                  <div className="mb-4 flex flex-wrap gap-2">
+                    {p.scene_summary.followed_topics.map((topic) => (
+                      <span
+                        key={topic.slug}
+                        className="rounded-full border border-cyan-200 bg-white px-3 py-1 text-xs font-semibold text-cyan-700 dark:border-cyan-800 dark:bg-cyan-950/30 dark:text-cyan-200"
+                      >
+                        {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                {p.scene_summary.scene_tags.length > 0 && (
+                  <div className="mb-4 flex flex-wrap gap-2">
+                    {p.scene_summary.scene_tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-full bg-cyan-100 px-3 py-1 text-xs font-medium text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-100"
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className="grid grid-cols-1 gap-3 text-sm text-gray-600 dark:text-gray-300 sm:grid-cols-3">
+                  <div className="rounded-2xl bg-white/80 p-3 dark:bg-gray-900/40">
+                    <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Followed topics</p>
+                    <p className="mt-1 text-lg font-semibold text-gray-900 dark:text-white">{p.scene_summary.stats.followed_topic_count}</p>
+                  </div>
+                  <div className="rounded-2xl bg-white/80 p-3 dark:bg-gray-900/40">
+                    <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Visible notes</p>
+                    <p className="mt-1 text-lg font-semibold text-gray-900 dark:text-white">{p.scene_summary.stats.visible_journal_count}</p>
+                  </div>
+                  <div className="rounded-2xl bg-white/80 p-3 dark:bg-gray-900/40">
+                    <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Public groups</p>
+                    <p className="mt-1 text-lg font-semibold text-gray-900 dark:text-white">{p.scene_summary.stats.public_group_count}</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {(p.journals && p.journals.length > 0) && (
               <div className="mb-8">

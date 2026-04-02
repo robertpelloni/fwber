@@ -152,6 +152,21 @@ export interface UserProfile {
         avatar_url?: string | null;
       } | null;
     }>;
+    scene_summary?: {
+      headline: string | null;
+      followed_topics: Array<{
+        id: number;
+        slug: string;
+        label: string;
+        emoji?: string | null;
+      }>;
+      scene_tags: string[];
+      stats: {
+        followed_topic_count: number;
+        visible_journal_count: number;
+        public_group_count: number;
+      };
+    } | null;
   };
 }
 

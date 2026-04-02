@@ -188,6 +188,7 @@ class UserProfileResource extends JsonResource
                         fn ($relationshipLink) => (new RelationshipLinkResource($relationshipLink))->forOwner($ownerId)
                     )->values();
                 }),
+                'scene_summary' => $this->scene_summary ?? null,
             ],
         ];
     }

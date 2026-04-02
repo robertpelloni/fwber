@@ -10,6 +10,14 @@ All notable changes to this project will be documented in this file.
 - Added a new `/topics` browse surface, `/topics/[slug]` hub detail page, reusable topic API/hooks/components, topic navigation, and richer group cards so users can explore scenes beyond pure proximity.
 - Added topic filters and topic-linked posting to Local Pulse while preserving the existing app shell and route build behavior.
 
+## [1.0.47] - 2026-04-02 — Scene Discovery
+
+### Fixed
+- Extended the matching engine to compute `scene_overlap` metadata from followed topics, normalized interests, public group tags, and visible journal tags so match ranking now reflects shared scenes instead of pure radius plus profile overlap.
+- Added `scene_summary` serialization to profile responses so public profiles expose followed topics, active scene tags, and lightweight counts for visible notes and public groups.
+- Updated the matches swipe UI with scene-overlap cards and the public profile page with a dedicated scene summary panel, reusing the topic graph shipped in v1.0.46 instead of creating a parallel discovery taxonomy.
+- Added focused backend regression coverage for scene-overlap match payloads and profile scene summaries, and validated the frontend slice with lint, clean build, and fresh type-check after aligning the `Match` client type with the live payload.
+
 ## [1.0.43] - 2026-04-02 — Copyright 2026 Refresh
 
 ### Fixed

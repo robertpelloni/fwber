@@ -1,18 +1,19 @@
-# Project Status — fwber v1.0.46 (Topic Hubs)
+# Project Status — fwber v1.0.47 (Scene Discovery)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.46 "Topic Hubs"
+**Version:** 1.0.47 "Scene Discovery"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## Topic Hubs
-- **Canonical Topic Catalog Shipped**: Structured topic records now anchor scene discovery across interests, groups, journals, and Local Pulse.
-- **Followable Social Scenes**: Authenticated users can follow and unfollow topics, and fetch a followed-topics list for future personalization.
-- **Hub Detail Aggregation**: Topic detail now combines public groups, visibility-safe journals, and topic-scoped Local Pulse artifacts in one place.
-- **Pulse Topic Filtering Preserved**: Local Pulse posting and feed queries accept an optional topic slug so scene discovery extends beyond raw distance.
+## Scene Discovery
+- **Scene-Aware Match Ranking Shipped**: Matches now blend followed-topic overlap and structured scene tags from journals, public groups, and interests into ranking and payload metadata.
+- **Shared Scene Context in Swipe Cards**: The match deck now surfaces scene overlap headlines, topic chips, and shared scene tags alongside shared interests.
+- **Profile Scene Summaries Added**: Public profiles now serialize followed topics, scene tags, and summary counts so scene identity shows up outside the match feed too.
+- **Topic Graph Reuse Preserved**: This slice builds directly on the v1.0.46 topic-hub graph rather than introducing a second discovery taxonomy.
 
 ## ✅ Release Focus
-- [x] Added topic catalog/follow storage, topic browse/detail APIs, and topic-aware Local Pulse backend wiring.
-- [x] Added `/topics` browse and `/topics/[slug]` hub detail pages with reusable topic hooks and cards.
-- [x] Added backend regression coverage plus successful frontend lint/build/fresh-type-check validation for the topic-hub slice.
+- [x] Added scene-overlap scoring and serialization to the match engine using followed topics plus visible scene activity.
+- [x] Added profile scene summaries to public/authenticated profile responses.
+- [x] Added swipe-card and public-profile UI for scene discovery cues.
+- [x] Added backend regression coverage and successful frontend lint/build/fresh-type-check validation for the scene-discovery slice.

@@ -31,6 +31,7 @@ class MatchResource extends JsonResource
             'age' => $profile?->birthdate ? Carbon::parse($profile->birthdate)->age : null,
             'shared_interests' => $this->shared_interests ?? [],
             'shared_interest_count' => (int) ($this->shared_interest_count ?? 0),
+            'scene_overlap' => $this->scene_overlap ?? null,
         ];
     }
 }

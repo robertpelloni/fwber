@@ -209,6 +209,7 @@ class MatchController extends Controller
                 $sharedInterests = $this->matchingService->getSharedInterests($profile, $candidate->profile);
                 $candidate->setAttribute('shared_interests', $sharedInterests);
                 $candidate->setAttribute('shared_interest_count', count($sharedInterests));
+                $candidate->setAttribute('scene_overlap', $this->matchingService->getSceneOverlap(auth()->user(), $candidate));
 
                 // Calculate distance for display (service uses it for scoring but doesn't return it)
                 $candidate->setAttribute(

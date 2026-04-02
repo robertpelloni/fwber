@@ -1,12 +1,12 @@
 # Version Reference
 
-- **Current version:** `1.0.46`
+- **Current version:** `1.0.47`
 - **Release date:** `2026-04-02`
-- **Release name:** `Topic Hubs`
+- **Release name:** `Scene Discovery`
 
 ## Summary
 
-This release adds structured topic hubs across interests, journals, groups, and Local Pulse, including follow/unfollow flows, topic browse/detail pages, and topic-aware Local Pulse filtering and posting.
+This release extends the topic graph into scene discovery by adding topic-aware match overlap, public profile scene summaries, and scene cues on the swipe/profile surfaces while preserving the existing interest, group, and journal seams.
 
 ## Version Sources of Truth
 

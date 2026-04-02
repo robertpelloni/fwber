@@ -10,16 +10,48 @@
 
 import { api } from './client';
 
+export interface SceneTopic {
+  id: number;
+  slug: string;
+  label: string;
+  emoji?: string | null;
+}
+
+export interface SceneOverlap {
+  headline: string | null;
+  score: number;
+  shared_topics: SceneTopic[];
+  shared_topic_count: number;
+  shared_scene_tags: string[];
+  shared_scene_tag_count: number;
+}
+
 export interface Match {
   id: number;
   name: string;
-  email: string;
+  email: string | null;
   avatarUrl: string | null;
   bio: string | null;
   locationDescription: string | null;
   distance: number;
   compatibilityScore: number;
   lastSeenAt: string | null;
+  age?: number | null;
+  gender?: string | null;
+  is_verified?: boolean;
+  is_confessional?: boolean;
+  voice_intro_url?: string | null;
+  photos?: Array<{
+    id: number;
+    url: string;
+    is_private: boolean;
+    is_primary: boolean;
+    is_unlocked?: boolean;
+    unlock_price?: number;
+  }>;
+  shared_interests?: string[];
+  shared_interest_count?: number;
+  scene_overlap?: SceneOverlap | null;
   profile?: {
     display_name: string | null;
     bio: string | null;
@@ -70,12 +102,15 @@ export async function getMatches(filters: any = {}): Promise<Match[]> {
 
   return matches.map((m: any) => ({
     ...m,
+    age: m.age ?? null,
+    gender: m.gender ?? null,
+    photos: m.photos ?? (m.avatarUrl ? [{ id: 0, url: m.avatarUrl, is_private: false, is_primary: true }] : []),
     // Map flat fields to profile object for UI compatibility
     profile: {
       display_name: m.name,
       bio: m.bio,
-      age: m.age || null,
-      gender: m.gender || null,
+      age: m.age ?? null,
+      gender: m.gender ?? null,
       looking_for: m.looking_for || [],
       location: {
         latitude: null,
@@ -84,7 +119,7 @@ export async function getMatches(filters: any = {}): Promise<Match[]> {
         city: m.locationDescription,
         state: null,
       },
-      photos: m.avatarUrl ? [{ id: 0, url: m.avatarUrl, is_private: false, is_primary: true }] : [],
+      photos: m.photos ?? (m.avatarUrl ? [{ id: 0, url: m.avatarUrl, is_private: false, is_primary: true }] : []),
       profile_complete: true,
       completion_percentage: 100,
     }

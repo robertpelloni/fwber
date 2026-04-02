@@ -3,10 +3,14 @@
 namespace App\Services;
 
 use App\Models\DateFeedback;
+use App\Models\Group;
+use App\Models\Journal;
 use App\Models\MatchAction;
+use App\Models\Topic;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Support\TaggedCache;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -73,7 +77,7 @@ class AIMatchingService
                 // 3. Hydrate Candidates
                 $candidates = User::whereIn('id', $candidateIds)
                     ->whereKeyNot($user->id) // Exclude self
-                    ->with('profile')
+                    ->with(['profile', 'followedTopics:id,slug,label,emoji,aliases'])
                     ->get();
 
                 // 4. Apply Hard Filters (Distance, Age, Gender) & Heuristic Scoring
@@ -199,7 +203,7 @@ class AIMatchingService
         $query = User::query()
             ->whereKeyNot($user->id)
             ->whereHas('profile')
-            ->with(['profile']);
+            ->with(['profile', 'followedTopics:id,slug,label,emoji,aliases']);
 
         $normalizedInterestFilters = $this->normalizeInterestValues($filters['interests'] ?? []);
 
@@ -397,9 +401,13 @@ class AIMatchingService
         $mutualScore = $this->calculateMutualInterestScore($user, $candidate);
         $score += $mutualScore * 0.10;
 
-        // Recency score (15%)
+        // Scene affinity score (10%) favors shared followed topics and structured scene cues.
+        $sceneScore = $this->calculateSceneAffinityScore($user, $candidate);
+        $score += $sceneScore * 0.10;
+
+        // Recency score (10%)
         $recencyScore = $this->calculateRecencyScore($candidate);
-        $score += $recencyScore * 0.15;
+        $score += $recencyScore * 0.10;
 
         // Post-Date Feedback Modifier (up to +/- 15 points based on historical ratings of similar profiles)
         $feedbackModifier = $this->calculateDateFeedbackModifier($user, $candidateProfile);
@@ -426,6 +434,7 @@ class AIMatchingService
         $behavioralScore = $this->calculateBehavioralScore($candidateProfile, $behavioralPrefs);
         $communicationScore = $this->calculateCommunicationScore($userProfile, $candidateProfile);
         $mutualScore = $this->calculateMutualInterestScore($user, $candidate);
+        $sceneScore = $this->calculateSceneAffinityScore($user, $candidate);
         $recencyScore = $this->calculateRecencyScore($candidate);
 
         // Calculate total weighted score
@@ -434,7 +443,8 @@ class AIMatchingService
                       ($behavioralScore * 0.15) +
                       ($communicationScore * 0.10) +
                       ($mutualScore * 0.10) +
-                      ($recencyScore * 0.15);
+                      ($sceneScore * 0.10) +
+                      ($recencyScore * 0.10);
 
         return [
             'total_score' => round(min(100, max(0, $totalScore))),
@@ -444,6 +454,7 @@ class AIMatchingService
                 'behavioral' => round($behavioralScore),
                 'communication' => round($communicationScore),
                 'mutual' => round($mutualScore),
+                'scene' => round($sceneScore),
                 'recency' => round($recencyScore),
             ],
             'details' => [
@@ -908,6 +919,64 @@ class AIMatchingService
         return array_slice($sharedInterests, 0, $limit);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    public function getSceneOverlap(User $user, User $candidate, int $limit = 3): array
+    {
+        $sharedTopics = $this->getSharedFollowedTopics($user, $candidate, $limit);
+        $sharedSceneTags = array_slice(array_values(array_intersect(
+            $this->getViewerSceneTags($user),
+            $this->getCandidateSceneTags($candidate)
+        )), 0, $limit + 2);
+
+        $headlineParts = [];
+        if ($sharedTopics !== []) {
+            $headlineParts[] = collect($sharedTopics)->pluck('label')->implode(', ');
+        }
+        if ($sharedSceneTags !== []) {
+            $headlineParts[] = implode(', ', array_slice($sharedSceneTags, 0, 2));
+        }
+
+        return [
+            'headline' => $headlineParts === [] ? null : 'Shared scenes: '.implode(' • ', $headlineParts),
+            'score' => (int) round($this->calculateSceneAffinityScore($user, $candidate)),
+            'shared_topics' => $sharedTopics,
+            'shared_topic_count' => count($sharedTopics),
+            'shared_scene_tags' => $sharedSceneTags,
+            'shared_scene_tag_count' => count($sharedSceneTags),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getSceneSummary(User $user, int $topicLimit = 4, int $tagLimit = 6): array
+    {
+        $followedTopics = $this->getMinimalTopicsForUser($user, $topicLimit);
+        $sceneTags = array_slice(array_values(array_unique(array_merge(
+            $this->normalizeInterestValues($user->profile?->interests ?? []),
+            $this->getGroupSceneTags($user),
+            $this->getJournalSceneTags($user)
+        ))), 0, $tagLimit);
+
+        $headlineSource = array_merge(
+            collect($followedTopics)->pluck('label')->all(),
+            $sceneTags
+        );
+
+        return [
+            'headline' => $headlineSource === [] ? null : 'Currently orbiting '.implode(', ', array_slice($headlineSource, 0, 3)),
+            'followed_topics' => $followedTopics,
+            'scene_tags' => $sceneTags,
+            'stats' => [
+                'followed_topic_count' => $this->getFollowedTopicCollection($user)->count(),
+                'visible_journal_count' => $this->getVisibleJournalsForScene($user)->count(),
+                'public_group_count' => $this->getPublicGroupsForScene($user)->count(),
+            ],
+        ];
+    }
+
     private function calculateSharedInterestScore(?UserProfile $userProfile, ?UserProfile $candidateProfile): float
     {
         if (! $userProfile || ! $candidateProfile) {
@@ -929,6 +998,160 @@ class AIMatchingService
         $overlapRatio = count($sharedInterests) / max(count($myInterests), count($theirInterests));
 
         return $overlapRatio * 50;
+    }
+
+    private function calculateSceneAffinityScore(User $user, User $candidate): float
+    {
+        if (! $user->profile || ! $candidate->profile) {
+            return 0;
+        }
+
+        $sharedTopics = $this->getSharedFollowedTopics($user, $candidate, 10);
+        $sharedSceneTags = array_intersect(
+            $this->getViewerSceneTags($user),
+            $this->getCandidateSceneTags($candidate)
+        );
+
+        $topicScore = min(60, count($sharedTopics) * 25);
+        $tagScore = min(40, count($sharedSceneTags) * 8);
+
+        return min(100, $topicScore + $tagScore);
+    }
+
+    /**
+     * @return array<int, array{id:int,slug:string,label:string,emoji:string|null}>
+     */
+    private function getSharedFollowedTopics(User $user, User $candidate, int $limit = 3): array
+    {
+        $viewerTopics = $this->getFollowedTopicCollection($user)->keyBy('slug');
+
+        return $this->getFollowedTopicCollection($candidate)
+            ->filter(fn (Topic $topic) => $viewerTopics->has($topic->slug))
+            ->take($limit)
+            ->map(fn (Topic $topic) => [
+                'id' => $topic->id,
+                'slug' => $topic->slug,
+                'label' => $topic->label,
+                'emoji' => $topic->emoji,
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<int, array{id:int,slug:string,label:string,emoji:string|null}>
+     */
+    private function getMinimalTopicsForUser(User $user, int $limit): array
+    {
+        return $this->getFollowedTopicCollection($user)
+            ->take($limit)
+            ->map(fn (Topic $topic) => [
+                'id' => $topic->id,
+                'slug' => $topic->slug,
+                'label' => $topic->label,
+                'emoji' => $topic->emoji,
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection<int, Topic>
+     */
+    private function getFollowedTopicCollection(User $user): Collection
+    {
+        if ($user->relationLoaded('followedTopics')) {
+            return $user->followedTopics;
+        }
+
+        return $user->followedTopics()
+            ->select('topics.id', 'topics.slug', 'topics.label', 'topics.emoji', 'topics.aliases')
+            ->orderBy('topic_user_follows.followed_at', 'desc')
+            ->get();
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function getViewerSceneTags(User $user): array
+    {
+        $topicTerms = $this->getFollowedTopicCollection($user)
+            ->flatMap(fn (Topic $topic) => array_filter([$topic->slug, $topic->label, ...($topic->aliases ?? [])]))
+            ->all();
+
+        return array_values(array_unique(array_merge(
+            $this->normalizeInterestValues($user->profile?->interests ?? []),
+            $this->normalizeInterestValues($topicTerms)
+        )));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function getCandidateSceneTags(User $candidate): array
+    {
+        return array_values(array_unique(array_merge(
+            $this->getViewerSceneTags($candidate),
+            $this->getGroupSceneTags($candidate),
+            $this->getJournalSceneTags($candidate)
+        )));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function getGroupSceneTags(User $user): array
+    {
+        return $this->getPublicGroupsForScene($user)
+            ->flatMap(fn (Group $group) => array_filter([
+                $group->category,
+                ...((array) ($group->tags ?? [])),
+            ]))
+            ->pipe(fn (Collection $values) => $this->normalizeInterestValues($values->all()));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function getJournalSceneTags(User $user): array
+    {
+        return $this->getVisibleJournalsForScene($user)
+            ->flatMap(fn (Journal $journal) => (array) ($journal->tags ?? []))
+            ->pipe(fn (Collection $values) => $this->normalizeInterestValues($values->all()));
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection<int, Group>
+     */
+    private function getPublicGroupsForScene(User $user): Collection
+    {
+        if ($user->relationLoaded('groups')) {
+            return $user->groups
+                ->where('privacy', 'public')
+                ->values();
+        }
+
+        return $user->groups()
+            ->select('groups.id', 'groups.category', 'groups.tags', 'groups.privacy')
+            ->where('groups.privacy', 'public')
+            ->get();
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection<int, Journal>
+     */
+    private function getVisibleJournalsForScene(User $user): Collection
+    {
+        if ($user->relationLoaded('journals')) {
+            return $user->journals;
+        }
+
+        return $user->journals()
+            ->select('id', 'user_id', 'visibility', 'tags')
+            ->where('visibility', 'public')
+            ->latest()
+            ->limit(5)
+            ->get();
     }
 
     /**
