@@ -1,11 +1,33 @@
 import { apiClient } from './client';
 import { PaginatedResponse } from './types';
 
+export interface GroupSceneSignals {
+  headline: string | null;
+  matched_topics: Array<{
+    id: number;
+    slug: string;
+    label: string;
+    emoji?: string | null;
+  }>;
+  matched_tags: string[];
+  score_boost: number;
+}
+
+export interface GroupMatchRankingStrategy {
+  compatibility: boolean;
+  trusted_members: boolean;
+  scene_alignment: boolean;
+  member_health: boolean;
+  distance: boolean;
+  summary: string;
+}
+
 export interface Group {
   id: number;
   name: string;
   description?: string;
   icon?: string;
+  avatar_url?: string;
   privacy: 'public' | 'private';
   category?: string;
   tags?: string[];
@@ -21,6 +43,26 @@ export interface Group {
   posts?: GroupPost[];
   user_role?: 'admin' | 'moderator' | 'member' | 'owner';
   is_member?: boolean; // Helper if backend returns it, or we check locally
+  distance_km?: number;
+  category_match?: boolean;
+  shared_tags?: string[];
+  match_score?: number;
+  ranking_score?: number;
+  scene_signals?: GroupSceneSignals | null;
+  group?: {
+    id: number;
+    name: string;
+    description?: string;
+    category?: string;
+    tags?: string[];
+    member_count: number;
+    icon?: string;
+    avatar_url?: string;
+    privacy: 'public' | 'private';
+    distance_km?: number;
+    shared_tags?: string[];
+    scene_signals?: GroupSceneSignals | null;
+  };
 }
 
 export interface GroupMember {
@@ -72,8 +114,18 @@ export async function getGroups(): Promise<PaginatedResponse<Group>> {
 }
 
 export async function getMyGroups(): Promise<PaginatedResponse<Group>> {
-  const response = await apiClient.get<PaginatedResponse<Group>>('/groups/my-groups');
-  return response.data;
+  const response = await apiClient.get<{ data?: Group[]; groups?: Group[] }>('/groups/my-groups');
+  return {
+    data: response.data.data ?? response.data.groups ?? [],
+    meta: {
+      current_page: 1,
+      from: null,
+      last_page: 1,
+      per_page: (response.data.data ?? response.data.groups ?? []).length,
+      to: null,
+      total: (response.data.data ?? response.data.groups ?? []).length,
+    },
+  };
 }
 
 export async function getGroup(id: number): Promise<Group> {
@@ -111,9 +163,26 @@ export async function deleteGroupPost(postId: number): Promise<{ message: string
   return response.data;
 }
 
-export async function getGroupMatches(groupId: number): Promise<Group[]> {
-  const response = await apiClient.get<{ matches: Group[] }>(`/groups/${groupId}/matches`);
-  return response.data.matches;
+export interface GroupMatchesResponse {
+  data: Group[];
+  matches: Group[];
+  meta?: {
+    ranking_strategy?: GroupMatchRankingStrategy;
+  };
+}
+
+export async function getGroupMatches(groupId: number, radius?: number, ranking_strategy: 'trust-aware' | 'distance-only' = 'trust-aware'): Promise<GroupMatchesResponse> {
+  const response = await apiClient.get<GroupMatchesResponse>(`/groups/${groupId}/matches`, {
+    params: {
+      radius,
+      ranking_strategy,
+    },
+  });
+  return {
+    data: response.data.data ?? response.data.matches ?? [],
+    matches: response.data.matches ?? response.data.data ?? [],
+    meta: response.data.meta,
+  };
 }
 
 export async function requestGroupMatch(groupId: number, targetGroupId: number): Promise<{ message: string }> {

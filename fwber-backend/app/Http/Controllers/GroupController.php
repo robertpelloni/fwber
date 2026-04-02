@@ -10,6 +10,7 @@ use App\Http\Requests\Api\TransferGroupOwnershipRequest;
 use App\Http\Requests\Api\UpdateGroupRequest;
 use App\Models\Group;
 use App\Services\GroupMatchingService;
+use App\Services\GroupRankingService;
 use App\Services\GroupService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -20,10 +21,13 @@ class GroupController extends Controller
 
     protected GroupMatchingService $matchingService;
 
-    public function __construct(GroupService $groupService, GroupMatchingService $matchingService)
+    protected GroupRankingService $groupRankingService;
+
+    public function __construct(GroupService $groupService, GroupMatchingService $matchingService, GroupRankingService $groupRankingService)
     {
         $this->groupService = $groupService;
         $this->matchingService = $matchingService;
+        $this->groupRankingService = $groupRankingService;
     }
 
     /**
@@ -46,7 +50,8 @@ class GroupController extends Controller
     public function matches(int $groupId): JsonResponse
     {
         $group = Group::findOrFail($groupId);
-        $userId = Auth::id();
+        $user = Auth::user();
+        $userId = $user?->id;
 
         // Ensure user is admin or owner
         $member = $group->activeMembers()->where('user_id', $userId)->first();
@@ -55,16 +60,42 @@ class GroupController extends Controller
         }
 
         $radius = request()->input('radius', 50);
+        $rankingStrategy = request()->input('ranking_strategy', 'trust-aware');
         $matches = $this->matchingService->findMatches($group, $radius);
+        $matches->loadMissing(['activeMembers.user.profile']);
 
-        // Calculate scores for each match
-        $scoredMatches = $matches->map(function ($match) use ($group) {
-            $match->match_score = $this->matchingService->calculateCompatibilityScore($group, $match);
+        if ($rankingStrategy === 'trust-aware' && $user) {
+            $scoredMatches = $this->groupRankingService->rankMatches($user, $group, $matches);
+        } else {
+            $scoredMatches = $matches->map(function (Group $match) use ($group) {
+                $match->distance_km = round((float) ($match->distance ?? 0), 1);
+                $match->category_match = (bool) ($group->category && $match->category === $group->category);
+                $match->shared_tags = array_values(array_intersect($group->tags ?? [], $match->tags ?? []));
+                $match->match_score = $this->matchingService->calculateCompatibilityScore($group, $match);
+                $match->group = [
+                    'id' => $match->id,
+                    'name' => $match->name,
+                    'description' => $match->description,
+                    'category' => $match->category,
+                    'tags' => $match->tags ?? [],
+                    'member_count' => $match->member_count,
+                    'icon' => $match->icon,
+                    'privacy' => $match->privacy,
+                    'distance_km' => $match->distance_km,
+                    'shared_tags' => $match->shared_tags,
+                ];
 
-            return $match;
-        })->sortByDesc('match_score')->values();
+                return $match;
+            })->sortByDesc('match_score')->values();
+        }
 
-        return response()->json(['matches' => $scoredMatches]);
+        return response()->json([
+            'data' => $scoredMatches,
+            'matches' => $scoredMatches,
+            'meta' => [
+                'ranking_strategy' => $this->groupRankingService->buildRankingStrategy(),
+            ],
+        ]);
     }
 
     /**

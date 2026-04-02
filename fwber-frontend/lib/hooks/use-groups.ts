@@ -10,6 +10,7 @@ import {
   createGroupPost,
   deleteGroupPost,
   getGroupMatches,
+  GroupMatchesResponse,
   requestGroupMatch,
   getGroupMatchRequests,
   getConnectedGroups,
@@ -108,10 +109,10 @@ export function useDeleteGroupPost() {
   });
 }
 
-export function useGroupMatches(groupId: number) {
+export function useGroupMatches(groupId: number, radius?: number, rankingStrategy: 'trust-aware' | 'distance-only' = 'trust-aware') {
   return useQuery({
-    queryKey: ['groups', groupId, 'matches'],
-    queryFn: () => getGroupMatches(groupId),
+    queryKey: ['groups', groupId, 'matches', radius, rankingStrategy],
+    queryFn: () => getGroupMatches(groupId, radius, rankingStrategy),
     enabled: !!groupId,
   });
 }

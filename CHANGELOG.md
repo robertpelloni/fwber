@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.56] - 2026-04-02 — Trust-Aware Group Matching Ranking
+
+### Fixed
+- Reworked `GET /api/groups/{id}/matches` so group discovery ranking now uses the same privacy-safe trust-aware model already shipped across Local Pulse, recommendations, nearby chatrooms, events, and bulletin boards, balancing compatibility, trusted members, scene alignment, member health, and distance.
+- Added `GroupRankingService` to reuse `LocalPulseRankingService` trust-map inputs and `AIMatchingService` scene-signal helpers while preserving private graph data as internal scoring-only signals.
+- Stabilized the group matching API contract by returning `data`, `matches`, and high-level `meta.ranking_strategy` metadata that both group matching UIs can consume consistently.
+- Updated `/groups/matching` and `/groups/[id]/matches` to explain trust-aware ranking and render scene-aligned cues for ranked group matches.
+- Added focused backend regression coverage proving group matches expose ranking metadata and that a trusted, scene-aligned group can outrank a slightly closer stranger group.
+
 ## [1.0.55] - 2026-04-02 — Trust-Aware Bulletin Board Ranking
 
 ### Fixed

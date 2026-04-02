@@ -63,7 +63,9 @@ export default function GroupMatchesPage() {
   const groupId = parseInt(params.id as string);
   
   const { data: group, isLoading: isLoadingGroup } = useGroup(groupId);
-  const { data: matches, isLoading: isLoadingMatches } = useGroupMatches(groupId);
+  const { data: matchesResponse, isLoading: isLoadingMatches } = useGroupMatches(groupId);
+  const matches = matchesResponse?.data ?? matchesResponse?.matches ?? [];
+  const rankingStrategy = matchesResponse?.meta?.ranking_strategy ?? null;
 
   if (isLoadingGroup) {
     return (
@@ -95,6 +97,19 @@ export default function GroupMatchesPage() {
           </div>
         </div>
       </div>
+
+      {rankingStrategy && (
+        <Card className="mb-6 border-purple-200 bg-purple-50 dark:border-purple-900/40 dark:bg-purple-950/30">
+          <CardContent className="pt-6">
+            <div className="text-xs font-semibold uppercase tracking-wide text-purple-700 dark:text-purple-300">
+              Trust-aware group ranking
+            </div>
+            <p className="mt-2 text-sm text-purple-900 dark:text-purple-100">
+              {rankingStrategy.summary}
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {!group.matching_enabled && (
         <Card className="mb-8 border-yellow-200 bg-yellow-50 dark:bg-yellow-900/10 dark:border-yellow-900/50">
@@ -135,8 +150,15 @@ export default function GroupMatchesPage() {
                           {match.name}
                       </Link>
                   </CardTitle>
-                  <div className="mt-2 text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded inline-block">
-                    {matchReason}
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <div className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded inline-block">
+                      {matchReason}
+                    </div>
+                    {match.scene_signals?.headline && (
+                      <div className="text-xs font-medium text-purple-800 bg-purple-100 px-2 py-1 rounded inline-block dark:bg-purple-900/40 dark:text-purple-100">
+                        {match.scene_signals.headline}
+                      </div>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -144,16 +166,21 @@ export default function GroupMatchesPage() {
                     {match.description || 'No description provided.'}
                   </p>
                   
-                  <div className="flex flex-wrap gap-2 mb-4 h-14 content-start">
+                  <div className="flex flex-wrap gap-2 mb-4 min-h-14 content-start">
                       {match.category && (
                           <Badge variant="outline" className="capitalize">{match.category}</Badge>
                       )}
                       {match.tags && match.tags.slice(0, 3).map(tag => (
                           <Badge key={tag} variant="secondary" className="text-xs">#{tag}</Badge>
                       ))}
-                      {match.tags && match.tags.length > 3 && (
-                          <Badge variant="secondary" className="text-xs">+{match.tags.length - 3}</Badge>
-                      )}
+                       {match.tags && match.tags.length > 3 && (
+                           <Badge variant="secondary" className="text-xs">+{match.tags.length - 3}</Badge>
+                       )}
+                      {match.scene_signals?.matched_topics?.slice(0, 2).map((topic) => (
+                        <Badge key={`topic-${match.id}-${topic.slug}`} variant="secondary" className="text-xs bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-100">
+                          {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
+                        </Badge>
+                      ))}
                   </div>
 
                   <div className="flex items-center justify-between text-sm text-muted-foreground pt-4 border-t">
@@ -161,6 +188,11 @@ export default function GroupMatchesPage() {
                       <Users className="w-4 h-4 mr-1" />
                       {match.member_count} members
                     </span>
+                    {typeof match.match_score === 'number' && (
+                      <span className="font-semibold text-purple-700 dark:text-purple-300">
+                        {match.match_score}% match
+                      </span>
+                    )}
                   </div>
                   
                   <div className="flex gap-2 mt-4">
