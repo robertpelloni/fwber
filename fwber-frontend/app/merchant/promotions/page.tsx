@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
-import { PlusCircle, MapPin, Calendar, Tag } from 'lucide-react'
+import { PlusCircle, MapPin, Calendar, Tag, ChevronRight } from 'lucide-react'
 import { format } from 'date-fns'
 
 export default function PromotionsListPage() {
@@ -110,8 +110,16 @@ export default function PromotionsListPage() {
                             <div className="flex items-center">
                                 <Calendar className="w-3 h-3 mr-1" />
                                 Ends: {format(new Date(promo.expires_at), 'MMM d, yyyy h:mm a')}
-                            </div>
-                         </div>
+                             </div>
+                          </div>
+                          <div className="mt-4">
+                            <Button asChild variant="outline" className="border-amber-200 text-amber-700 hover:bg-amber-50">
+                              <Link href={`/merchant/promotions/${promo.id}`}>
+                                Manage Promotion
+                                <ChevronRight className="ml-2 h-4 w-4" />
+                              </Link>
+                            </Button>
+                          </div>
                     </div>
                 </div>
             </Card>

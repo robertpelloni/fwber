@@ -29,8 +29,23 @@ export interface Promotion {
   starts_at: string;
   expires_at: string;
   is_active: boolean;
+  views?: number;
+  clicks?: number;
+  redemptions?: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface PromotionMetrics {
+  views: number;
+  clicks: number;
+  redemptions: number;
+  conversion_rate: number;
+}
+
+export interface PromotionDetailResponse {
+  promotion: Promotion;
+  metrics: PromotionMetrics;
 }
 
 export interface MerchantRegistrationData {
@@ -50,6 +65,18 @@ export interface CreatePromotionData {
   radius: number;
   starts_at: string;
   expires_at: string;
+}
+
+export interface UpdatePromotionData {
+  title?: string;
+  description?: string | null;
+  promo_code?: string | null;
+  discount_value?: string;
+  radius?: number;
+  token_cost?: number;
+  starts_at?: string;
+  expires_at?: string;
+  is_active?: boolean;
 }
 
 /**
@@ -159,6 +186,73 @@ export async function createPromotion(token: string, data: CreatePromotionData):
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'Failed to create promotion' }));
     throw new Error(error.message || 'Failed to create promotion');
+  }
+
+  const result = await response.json();
+  return result.promotion || result.data || result;
+}
+
+export async function getPromotionDetail(token: string, promotionId: number | string): Promise<PromotionDetailResponse> {
+  const response = await fetch(`${API_BASE_URL}/merchant-portal/promotions/${promotionId}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Failed to fetch promotion details' }));
+    throw new Error(error.message || 'Failed to fetch promotion details');
+  }
+
+  const result = await response.json();
+
+  return {
+    promotion: result.promotion || result.data || result,
+    metrics: result.metrics || {
+      views: result.promotion?.views ?? 0,
+      clicks: result.promotion?.clicks ?? 0,
+      redemptions: result.promotion?.redemptions ?? 0,
+      conversion_rate: 0,
+    },
+  };
+}
+
+export async function updatePromotion(token: string, promotionId: number | string, data: UpdatePromotionData): Promise<Promotion> {
+  const response = await fetch(`${API_BASE_URL}/merchant-portal/promotions/${promotionId}`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Failed to update promotion' }));
+    throw new Error(error.message || 'Failed to update promotion');
+  }
+
+  const result = await response.json();
+  return result.promotion || result.data || result;
+}
+
+export async function deletePromotion(token: string, promotionId: number | string): Promise<Promotion> {
+  const response = await fetch(`${API_BASE_URL}/merchant-portal/promotions/${promotionId}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Failed to deactivate promotion' }));
+    throw new Error(error.message || 'Failed to deactivate promotion');
   }
 
   const result = await response.json();

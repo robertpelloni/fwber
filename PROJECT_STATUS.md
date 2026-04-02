@@ -1,23 +1,24 @@
-# Project Status — fwber v1.0.35 (Federation Explorer Navigation)
+# Project Status — fwber v1.0.36 (Merchant Promotion Management)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.35 "Federation Explorer Navigation"
+**Version:** 1.0.36 "Merchant Promotion Management"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## Federation Explorer And Navigation Hardening
-- **Actor Explorer Backend**: The backend now exposes authenticated remote actor detail plus actor-scoped cached post retrieval for federation UI drill-in flows.
-- **Actor Explorer UI**: `/settings/federation/actors` now resolves remote actor identity, follow state, and cached posts from one shared frontend federation helper.
-- **PWA Prompt Cleanup**: The duplicate homepage `PWAInstallPrompt` mount is gone, leaving one global install-prompt listener in the root layout.
-- **Universal Subpage Navigation**: Shared app and merchant headers now provide consistent logo-home and back affordances, and a global fallback nav covers routes that still bypass those headers.
+## Merchant Promotion Management
+- **Promotion CRUD Backend**: Merchants can now fetch a single owned promotion, update its campaign details, and deactivate it through authenticated, ownership-scoped merchant portal endpoints.
+- **Promotion Management UI**: `/merchant/promotions/[id]` now exposes campaign metrics, editable schedule/copy controls, and a deactivate action in one dedicated management surface.
+- **Merchant Navigation Upgrade**: Merchant dashboard and promotions list cards now deep-link into campaign management, and the merchant header now exposes analytics directly.
+- **Shared Merchant API Contract**: The frontend merchant helper now includes promotion detail, update, and delete calls so merchant pages use one consistent contract layer.
 
 ## ✅ Release Focus
-- [x] Added backend federation actor-detail and actor-filtered post support.
-- [x] Added the shared frontend federation API layer and actor explorer route.
-- [x] Wired federation settings, activity, and feed pages into the explorer flow.
-- [x] Removed duplicate PWA install-prompt mounting.
-- [x] Added consistent home/back navigation to shared and non-shared subpage shells.
-- [x] Revalidated backend federation coverage with `php artisan test tests/Feature/ActivityPubTest.php`.
+- [x] Added merchant promotion detail, update, and deactivate endpoints.
+- [x] Added merchant ownership regression coverage for the new promotion CRUD flow.
+- [x] Added the `/merchant/promotions/[id]` management page.
+- [x] Linked dashboard and promotions list surfaces into the new manage flow.
+- [x] Added the analytics destination to `MerchantHeader`.
+- [x] Revalidated backend merchant coverage with `php artisan test tests/Feature/MerchantPromotionCrudTest.php tests/Feature/MerchantAnalyticsTest.php`.
 - [x] Revalidated the frontend with `npm run type-check`.
+- [x] Revalidated the frontend with `npm run lint`.
 - [x] Revalidated the frontend with `npm run build`.

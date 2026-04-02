@@ -429,6 +429,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('profile', [\App\Http\Controllers\MerchantController::class, 'updateProfile']);
         Route::get('promotions', [\App\Http\Controllers\MerchantController::class, 'getPromotions']);
         Route::post('promotions', [\App\Http\Controllers\MerchantController::class, 'storePromotion']);
+        Route::get('promotions/{promotionId}', [\App\Http\Controllers\MerchantController::class, 'showPromotion']);
+        Route::put('promotions/{promotionId}', [\App\Http\Controllers\MerchantController::class, 'updatePromotion']);
+        Route::delete('promotions/{promotionId}', [\App\Http\Controllers\MerchantController::class, 'destroyPromotion']);
         Route::get('analytics', [\App\Http\Controllers\MerchantAnalyticsController::class, 'index']);
     });
 

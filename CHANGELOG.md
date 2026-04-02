@@ -9,6 +9,14 @@ All notable changes to this project will be documented in this file.
 - Reworked `fwber-frontend/app/recommendations/page.tsx` to use the shared protected app shell and styling, and added a `Back Home` action there.
 - Updated the shared `AppHeader` to use normal browser navigation for the routes that were repeatedly triggering failed RSC payload fetches before falling back anyway (`/help`, `/conference-pulse`, `/burner`, `/nearby`, `/leaderboard`, and `/wingman`).
 
+## [1.0.36] - 2026-04-02 — Merchant Promotion Management
+
+### Fixed
+- Added authenticated merchant promotion detail, update, and deactivate endpoints with ownership checks and regression coverage.
+- Added a new `/merchant/promotions/[id]` management page so merchants can review metrics, edit campaign details, and deactivate promotions without rebuilding them.
+- Linked merchant dashboard and promotions list cards into the new manage flow so live campaigns are actually actionable.
+- Added the missing analytics destination to the merchant header navigation and expanded the shared merchant API helper with promotion detail/update/delete support.
+
 ## [1.0.35] - 2026-04-02 — Federation Explorer Navigation
 
 ### Fixed

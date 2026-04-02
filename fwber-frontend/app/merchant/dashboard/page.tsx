@@ -168,20 +168,25 @@ export default function MerchantDashboard() {
                                 <CardTitle className="text-lg">{promo.title}</CardTitle>
                                 <CardDescription className="line-clamp-2">{promo.description}</CardDescription>
                             </CardHeader>
-                            <CardContent>
-                                <div className="flex justify-between items-center text-sm">
-                                    <span className="font-bold text-green-600 dark:text-green-400">{promo.discount_value}</span>
-                                    <span className={`px-2 py-1 rounded-full text-xs ${promo.is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}`}>
-                                        {promo.is_active ? 'Active' : 'Inactive'}
-                                    </span>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
-            )}
-        </div>
-    </div>
+                             <CardContent>
+                                 <div className="flex justify-between items-center text-sm">
+                                     <span className="font-bold text-green-600 dark:text-green-400">{promo.discount_value}</span>
+                                     <span className={`px-2 py-1 rounded-full text-xs ${promo.is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}`}>
+                                         {promo.is_active ? 'Active' : 'Inactive'}
+                                     </span>
+                                 </div>
+                                 <div className="mt-4">
+                                     <Link href={`/merchant/promotions/${promo.id}`} className="text-sm font-medium text-amber-600 hover:text-amber-700 hover:underline">
+                                         Manage promotion
+                                     </Link>
+                                 </div>
+                             </CardContent>
+                         </Card>
+                     ))}
+                 </div>
+             )}
+         </div>
+     </div>
   )
 }
 

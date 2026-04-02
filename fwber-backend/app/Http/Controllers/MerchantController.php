@@ -7,6 +7,7 @@ use App\Http\Requests\Merchant\RegisterMerchantRequest;
 use App\Http\Requests\Merchant\StorePromotionRequest;
 use App\Http\Requests\Merchant\TrackPromotionRequest;
 use App\Http\Requests\Merchant\UpdateMerchantProfileRequest;
+use App\Http\Requests\Merchant\UpdatePromotionRequest;
 use App\Models\MerchantProfile;
 use App\Models\Promotion;
 use Illuminate\Support\Facades\Auth;
@@ -134,6 +135,66 @@ class MerchantController extends Controller
     }
 
     /**
+     * Show a single merchant-owned promotion with interaction metrics.
+     */
+    public function showPromotion(int $promotionId)
+    {
+        $promotion = $this->resolveMerchantPromotion($promotionId);
+
+        return response()->json([
+            'promotion' => $promotion,
+            'metrics' => [
+                'views' => $promotion->views,
+                'clicks' => $promotion->clicks,
+                'redemptions' => $promotion->redemptions,
+                'conversion_rate' => $promotion->views > 0
+                    ? round(($promotion->redemptions / $promotion->views) * 100, 2)
+                    : 0.0,
+            ],
+        ]);
+    }
+
+    /**
+     * Update a single merchant-owned promotion.
+     */
+    public function updatePromotion(UpdatePromotionRequest $request, int $promotionId)
+    {
+        $promotion = $this->resolveMerchantPromotion($promotionId);
+        $validated = $request->validated();
+
+        if (array_key_exists('expires_at', $validated) && ! array_key_exists('starts_at', $validated)) {
+            $request->merge(['starts_at' => $promotion->starts_at?->toDateTimeString()]);
+            $validated = $request->validated();
+            unset($validated['starts_at']);
+        }
+
+        $promotion->update($validated);
+
+        return response()->json([
+            'message' => 'Promotion updated successfully.',
+            'promotion' => $promotion->fresh(),
+        ]);
+    }
+
+    /**
+     * Deactivate a merchant-owned promotion.
+     */
+    public function destroyPromotion(int $promotionId)
+    {
+        $promotion = $this->resolveMerchantPromotion($promotionId);
+
+        $promotion->update([
+            'is_active' => false,
+            'expires_at' => now()->lt($promotion->expires_at) ? now() : $promotion->expires_at,
+        ]);
+
+        return response()->json([
+            'message' => 'Promotion deactivated successfully.',
+            'promotion' => $promotion->fresh(),
+        ]);
+    }
+
+    /**
      * Consumer-facing: Browse active deals/promotions nearby.
      */
     public function browseDeals(BrowseDealsRequest $request)
@@ -210,5 +271,14 @@ class MerchantController extends Controller
         }
 
         return response()->json(['success' => true]);
+    }
+
+    private function resolveMerchantPromotion(int $promotionId): Promotion
+    {
+        $profile = Auth::user()?->merchantProfile;
+
+        abort_if(! $profile, 404, 'Merchant profile not found.');
+
+        return $profile->promotions()->findOrFail($promotionId);
     }
 }

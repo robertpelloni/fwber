@@ -12,7 +12,7 @@ import {
   Menu,
   X,
   PlusCircle,
-  Settings,
+  BarChart3,
   LogOut,
   LayoutDashboard,
   Store
@@ -26,6 +26,7 @@ interface MerchantHeaderProps {
 const navLinks = [
   { href: '/merchant/dashboard', label: 'Dashboard', icon: Home },
   { href: '/merchant/promotions', label: 'Promotions', icon: LayoutDashboard },
+  { href: '/merchant/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/merchant/profile', label: 'Profile', icon: Store },
   { href: '/merchant/promotions/new', label: 'New Promotion', icon: PlusCircle },
 ]
