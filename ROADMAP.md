@@ -1,59 +1,52 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.1.7
-> **Last Updated:** 2026-04-02
+> **Current Version:** 1.2.0 "The Great Simplification"
+> **Last Updated:** 2026-04-04
 
 ---
 
 ## 🗺️ High-Level Trajectory
 
-### Phase 1: Foundation & Monolith (COMPLETED)
-- Basic matching, chat, and profile systems. Monolith architecture.
+### The Pivot: Laser Focus on Core
+The `fwber` platform has undergone a massive simplification (v1.2.0). We have officially removed all bloat, including:
+- Decentralized Governance (DAOs, Councils, Merkle Provers)
+- ActivityPub Federation (Global Social Feeds, Group Actors)
+- Physical Marketplace (B2B Inventory, Tap-to-Pay, Stripe checkouts)
+- Gamification (Leaderboards, Daily Streaks, Rate-My-Cat)
+- AI Bloat (Wingman, AI Content Generation, Roast Generator)
 
-### Phase 2: The "Anti-Catfish" Guarantee (COMPLETED)
-- AI Avatars, ZK-Identity, AWS Rekognition.
+The platform is now **100% focused on its core identity**:
+**Privacy-first, proximity-based hookups determined by mutual preference.**
+
+### Phase 1: Core Foundation (COMPLETED)
+- Basic matching, chat, and profile systems.
+- Laravel + Next.js integration.
+- Database architecture and initial API.
+
+### Phase 2: Privacy & Anti-Catfish (COMPLETED)
+- ZK-Identity Verification Protocol.
+- Face Reveal mechanics.
+- End-to-End Encrypted Messaging.
 
 ### Phase 3: The "Local Pulse" & Safety (COMPLETED)
-- Proximity artifacts, Safe Walk, AR Navigation.
+- High-precision Geohashing for location tracking.
+- Safe Walk, Emergency Contacts, Panic Button.
+- AR "Ghost" Navigation for finding matches in crowds.
+- NFC Physical Tap-to-Verify (Flash Matches).
 
 ### Phase 4: Decentralization & Real-time (COMPLETED)
-- Event Sourcing, WebSockets, Offline Sync.
+- Event Sourcing migration for core domains (Location, Messages, Matches).
+- Laravel Reverb WebSocket integration for instant messaging.
+- Offline-first IndexedDB CRDT synchronization via batch sync logic.
 
-### Phase 5: Global Analysis & Intelligent Automation (COMPLETED)
-- AI Wingman, Gamification, Merchant Portal.
-
-### Phase 6: Production Hardening & Scale (COMPLETED)
-- Rust Geo-Screener, Helm Charts, Load Testing, Expo Router.
-
-### Phase 7: Physical & Federated Expansion (COMPLETED)
-- NFC Tap-to-Pay, ActivityPub Aggregation, Federated Social.
-
-### Phase 8: Decentralized Governance (COMPLETED)
-- Council Portal, Merkle Audit, Token-Weighted Voting, On-Chain Mirroring.
-
-### Phase 9: The Community Court & Global Mesh (ACTIVE)
-- **Council Appeal System** (COMPLETED).
-- **Automated Unban Logic** (COMPLETED).
-- Implement **Distributed Global Event Streaming** (Kafka).
-- Build **Native Mobile NFC Bridge**.
-
----
-
-## 🧩 Feature Matrix Status
-
-| Feature Domain | Status | Backend | Frontend | Notes |
-| :--- | :--- | :--- | :--- | :--- |
-| **Auth & Security** | Mature | 100% | 100% | ZK-Identity, ZK-Location, Federated E2E. |
-| **Matching Engine** | Mature | 100% | 100% | Event Sourced, compatibility scoring. |
-| **Governance** | Mature | 100% | 100% | Council, Merkle Audit, Appeals Court. |
-| **Location / Geo** | Mature | 100% | 100% | AR Nav, Redis Bloom, ZK-Proofs, AR Finder. |
-| **Economy** | Mature | 100% | 100% | FWB Tokens, Stripe, Marketplace, Bridge. |
-| **Federation** | Mature | 100% | 100% | Search, Reputation, Groups, Secure DMs. |
-| **Mobile App** | Mature | 100% | 90% | Expo Router, WebView Hybrid, NFC Support. |
+### Phase 5: Production Scale (ACTIVE)
+- Rust `fwber-geo` microservice deployment for high-density geographic querying.
+- Multi-region edge caching.
+- Mobile Expo Router application finalized.
 
 ---
 
 ## 🎯 Next Immediate Milestones
-1. Implement **Distributed Global Event Streaming** using Apache Kafka.
-2. Build a **Native Mobile NFC Bridge** for high-frequency hardware interaction.
-3. Develop a **Global Federated Identity** system to allow one-click login across fwber nodes.
+1. Finalize **Push Notifications** (FCM/APNS) for the React Native app.
+2. Perfect the **Battery-Efficient Background Location** tracking in the mobile app.
+3. Polish the **E2E Encryption Keys** flow for seamless multi-device syncing.

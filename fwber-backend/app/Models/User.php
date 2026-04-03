@@ -225,11 +225,6 @@ class User extends Authenticatable
 
     // Relationships
 
-    public function merchantProfile(): \Illuminate\Database\Eloquent\Relations\HasOne
-    {
-        return $this->hasOne(MerchantProfile::class);
-    }
-
     public function referrer(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'referrer_id');
@@ -384,8 +379,4 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
-    public function governanceVotes(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(GovernanceVote::class);
-    }
 }

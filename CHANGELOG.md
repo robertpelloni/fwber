@@ -757,3 +757,14 @@ All notable changes to this project will be documented in this file.
 ## [1.1.7] - 2026-04-02
 ### Fixed
 - **UI Layout**: Fixed the main application sidebar navigation. It now correctly extends completely to the bottom of the viewport on all pages, removing the unintended 4rem bottom gap.
+
+## [1.2.0] - 2026-04-04
+### Changed
+- **The Great Simplification**: Executed a massive repository and product pivot. We have permanently archived and removed all features that do not directly serve the core application mission: *proximity-based hookups based on mutual preference*.
+### Removed
+- **ActivityPub Federation**: Deleted all federated social feeds, inbox syncing, remote actor discovery, group actors, and global search aggregators.
+- **Decentralized Governance**: Archived the community council, token-weighted voting, policy executor, and Merkle-proof verification systems.
+- **Physical Marketplace**: Stripped out the B2B merchant portal, POS terminals, inventory management, and token redemptions.
+- **Economy & Gamification**: Removed FWB Tokens, Solana crypto bridges, Stripe checkout, leaderboards, daily streaks, and the viral "Rate My Cat" feature.
+- **AI Fluff**: Eliminated the AI Wingman, Roast Generator, Avatar Generation, and conversation starters.
+- **Codebase Reduction**: Dropped over 50 unneeded database tables and deleted hundreds of unused React components, massively accelerating build times and simplifying the codebase.

@@ -3,24 +3,13 @@
 import { useAuth } from '@/lib/auth-context';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useQuery } from '@tanstack/react-query';
-import { Heart, Users, MessageSquare, TrendingUp, Clock, Zap, Award, Target } from 'lucide-react';
-import Image from 'next/image';
+import { Heart, Users, MessageSquare, TrendingUp, Clock, Target } from 'lucide-react';
 import Link from 'next/link';
 import ProfileCompletenessWidget from '@/components/ProfileCompletenessWidget';
 import { ProximityPresenceCompact } from '@/components/realtime/ProximityPresenceView';
 import AppHeader from '@/components/AppHeader';
 import { ActivityFeed } from '@/components/ActivityFeed';
-import BoostButton from '@/components/BoostButton';
-import { AchievementsList } from '@/components/dashboard/AchievementsList';
-import VouchLeaderboard from '@/components/VouchLeaderboard';
-import { ReferralModal } from '@/components/viral/ReferralModal';
-import { RoastGenerator } from '@/components/viral/RoastGenerator';
-import { DailyStreakModal } from '@/components/gamification/DailyStreakModal';
-import { FederatedFeed } from '@/components/federation/FederatedFeed';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useEffect, useState } from 'react';
 import { api } from '@/lib/api/client';
-import { Globe } from 'lucide-react';
 
 interface DashboardStats {
   total_matches: number;
@@ -32,90 +21,38 @@ interface DashboardStats {
   match_score_avg: number;
   response_rate: number;
   days_active: number;
-  current_streak: number;
   last_login: string;
 }
 
-interface LeaderboardData {
-  top_holders: Array<{ name: string; balance: string; joined: string }>;
-  top_referrers: Array<{ name: string; referrals: number }>;
-  top_wingmen: Array<{ name: string; assists: number }>;
-  top_vouched: Array<{ name: string; vouches: number; breakdown?: { safe: number; fun: number; hot: number } }>;
-  top_streaks: Array<{ name: string; streak: number }>;
-}
-
 export default function DashboardPage() {
-  // Get user for legacy cards section
   const { user, token, isAuthenticated } = useAuth();
-  // Activity feed now uses its own component with real-time presence
-
-  const [showStreakModal, setShowStreakModal] = useState(false);
-  const [showLegacyFeatures, setShowLegacyFeatures] = useState(true);
 
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard-stats'],
     enabled: isAuthenticated && !!token,
-    queryFn: () => api.get<DashboardStats & { streak_just_updated: boolean }>('/dashboard/stats'),
+    queryFn: () => api.get<DashboardStats>('/dashboard/stats'),
   });
-
-  const { data: leaderboardData } = useQuery({
-    queryKey: ['vouch-leaderboard'],
-    enabled: isAuthenticated && !!token,
-    queryFn: () => api.get<LeaderboardData>('/leaderboard'),
-  });
-
-  // Effect to check if we should show the streak modal
-  useEffect(() => {
-    // Priority: Explicit backend flag (most reliable for real-time update)
-    // Fallback: LocalStorage check (prevents spam on page reload)
-    if (stats?.streak_just_updated) {
-      setShowStreakModal(true);
-    } else if (stats?.current_streak && stats.current_streak > 0) {
-      const today = new Date().toDateString();
-      const lastShown = localStorage.getItem('fwber_streak_shown_date');
-
-      // If we haven't shown it today, and user has a streak, show it
-      if (lastShown !== today) {
-        setShowStreakModal(true);
-        localStorage.setItem('fwber_streak_shown_date', today);
-      }
-    }
-  }, [stats]);
 
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-        <DailyStreakModal
-          isOpen={showStreakModal}
-          onClose={() => setShowStreakModal(false)}
-          currentStreak={stats?.current_streak || 1}
-        />
-        {/* Unified App Header with Navigation & Notifications */}
         <AppHeader />
 
-        {/* Main Content */}
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="px-4 py-6 sm:px-0">
             <div className="mb-8 flex justify-between items-end">
-
-
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                   Dashboard
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400">Here&apos;s what&apos;s happening with your matches.</p>
               </div>
-              <div className="flex gap-2">
-                <ReferralModal />
-                <RoastGenerator />
-                <BoostButton />
-              </div>
             </div>
 
             {/* Stats Grid */}
             {statsLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-                {[...Array(5)].map((_, i) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                {[...Array(4)].map((_, i) => (
                   <div key={i} className="bg-white rounded-xl border border-gray-200 p-6 animate-pulse">
                     <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
                     <div className="h-8 bg-gray-200 rounded w-1/2"></div>
@@ -123,7 +60,7 @@ export default function DashboardPage() {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <StatCard
                   icon={<Heart className="w-6 h-6" />}
                   label="Total Matches"
@@ -156,51 +93,21 @@ export default function DashboardPage() {
                   color="orange"
                   link="/matches"
                 />
-                <StatCard
-                  icon={<Zap className="w-6 h-6" />}
-                  label="Daily Streak"
-                  value={stats?.current_streak || 0}
-                  subtext="Days active"
-                  color="yellow"
-                  link="#"
-                />
               </div>
             )}
 
             {/* Two Column Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-              {/* Main Content - 2 columns */}
               <div className="lg:col-span-2 space-y-6">
-                <Tabs defaultValue="local" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 bg-gray-100 dark:bg-gray-900 p-1 rounded-xl">
-                    <TabsTrigger value="local" className="rounded-lg font-bold uppercase tracking-widest text-[10px]">
-                      <Target className="w-3 h-3 mr-2" />
-                      Local Activity
-                    </TabsTrigger>
-                    <TabsTrigger value="federated" className="rounded-lg font-bold uppercase tracking-widest text-[10px]">
-                      <Globe className="w-3 h-3 mr-2" />
-                      Federated Feed
-                    </TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="local" className="mt-4">
-                    {/* Real-time Activity Feed with Presence Indicators */}
-                    <ActivityFeed maxItems={8} showRefresh />
-                  </TabsContent>
+                <ActivityFeed maxItems={8} showRefresh />
 
-                  <TabsContent value="federated" className="mt-4">
-                    <FederatedFeed />
-                  </TabsContent>
-                </Tabs>
-
-                {/* Quick Actions */}
                 <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                     <Target className="w-5 h-5 text-purple-500" />
                     Quick Actions
                   </h3>
                   <div className="grid grid-cols-2 gap-4">
-                    <ActionButton href="/discover" label="Discover Matches" icon="🔍" color="purple" />
+                    <ActionButton href="/nearby" label="Discover Nearby" icon="📍" color="purple" />
                     <ActionButton href="/messages" label="View Messages" icon="💬" color="blue" />
                     <ActionButton href="/profile/edit" label="Edit Profile" icon="✏️" color="green" />
                     <ActionButton href="/settings" label="Settings" icon="⚙️" color="gray" />
@@ -208,36 +115,23 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Sidebar - 1 column */}
               <div className="space-y-6">
-                {/* Profile Completeness Widget */}
                 <ProfileCompletenessWidget />
-
-                {/* Who's Nearby */}
                 <ProximityPresenceCompact nearbyUsers={[]} />
 
-                {/* Vouch Leaderboard */}
-                {leaderboardData?.top_vouched && (
-                  <VouchLeaderboard data={leaderboardData.top_vouched} />
-                )}
-
-                {/* Achievements */}
-                <AchievementsList />
-
-                {/* Account Info */}
-                <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl border border-purple-200 p-6">
+                <div className="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl border border-purple-200 dark:border-purple-800 p-6">
                   <div className="flex items-center gap-2 mb-3">
-                    <Clock className="w-5 h-5 text-purple-600" />
-                    <span className="text-sm font-medium text-purple-900">Account Status</span>
+                    <Clock className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                    <span className="text-sm font-medium text-purple-900 dark:text-purple-100">Account Status</span>
                   </div>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Member since:</span>
-                      <span className="font-medium text-gray-900">{stats?.days_active || 0} days</span>
+                      <span className="text-gray-600 dark:text-gray-400">Member since:</span>
+                      <span className="font-medium text-gray-900 dark:text-white">{stats?.days_active || 0} days</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Last active:</span>
-                      <span className="font-medium text-gray-900">
+                      <span className="text-gray-600 dark:text-gray-400">Last active:</span>
+                      <span className="font-medium text-gray-900 dark:text-white">
                         {stats?.last_login ? new Date(stats.last_login).toLocaleDateString() : 'Today'}
                       </span>
                     </div>
@@ -246,203 +140,6 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Legacy Feature Cards - Collapsed */}
-            <div className="mt-8">
-              <button
-                onClick={() => setShowLegacyFeatures(!showLegacyFeatures)}
-                className="text-sm text-gray-600 hover:text-gray-900 mb-4 flex items-center gap-2"
-              >
-                <span>{showLegacyFeatures ? '▲' : '▼'}</span>
-                {showLegacyFeatures ? 'Hide extra features' : 'Show all features'}
-              </button>
-              <div className={showLegacyFeatures ? '' : 'hidden'}>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-                  {/* Profile Card */}
-                  <div className="bg-white p-6 rounded-lg shadow">
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Profile</h3>
-                    <p className="text-gray-600 mb-4">
-                      {user?.profile?.bio
-                        ? 'Profile set up'
-                        : 'Complete your profile to get started'
-                      }
-                    </p>
-                    <Link
-                      href="/profile"
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-600 bg-blue-100 hover:bg-blue-200"
-                    >
-                      Manage Profile
-                    </Link>
-                  </div>
-
-                  {/* Matches Card */}
-                  <div className="bg-white p-6 rounded-lg shadow">
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Matches</h3>
-                    <p className="text-gray-600 mb-4">
-                      Discover and connect with compatible people
-                    </p>
-                    <Link
-                      href="/matches"
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-green-600 bg-green-100 hover:bg-green-200"
-                    >
-                      View Matches
-                    </Link>
-                  </div>
-
-                  {/* Messages Card */}
-                  <div className="bg-white p-6 rounded-lg shadow">
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Messages</h3>
-                    <p className="text-gray-600 mb-4">
-                      Chat with your matches
-                    </p>
-                    <Link
-                      href="/messages"
-                      prefetch={false}
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-purple-600 bg-purple-100 hover:bg-purple-200"
-                    >
-                      View Messages
-                    </Link>
-                  </div>
-
-                  {/* Bulletin Boards Card */}
-                  <div className="bg-white p-6 rounded-lg shadow">
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">📍 Bulletin Boards</h3>
-                    <p className="text-gray-600 mb-4">
-                      Connect with your local community
-                    </p>
-                    <Link
-                      href="/bulletin-boards"
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-orange-600 bg-orange-100 hover:bg-orange-200"
-                    >
-                      Local Boards
-                    </Link>
-                  </div>
-
-                  {/* AI Recommendations Card */}
-                  <div className="bg-gradient-to-br from-purple-50 to-blue-50 p-6 rounded-lg shadow border border-purple-200">
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">🤖 AI Recommendations</h3>
-                    <p className="text-gray-600 mb-4">
-                      Get personalized recommendations powered by AI
-                    </p>
-                    <Link
-                      href="/recommendations"
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-                    >
-                      View Recommendations
-                    </Link>
-                  </div>
-
-                  {/* WebSocket Real-time Card */}
-                  <div className="bg-gradient-to-br from-green-50 to-teal-50 p-6 rounded-lg shadow border border-green-200">
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">⚡ Real-time Communication</h3>
-                    <p className="text-gray-600 mb-4">
-                      WebSocket-powered real-time chat and notifications
-                    </p>
-                    <Link
-                      href="/websocket"
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700"
-                    >
-                      Test WebSocket
-                    </Link>
-                  </div>
-
-                  {/* AI Content Generation Card */}
-                  <div className="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 rounded-lg shadow border border-indigo-200">
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">🎨 AI Content Generation</h3>
-                    <p className="text-gray-600 mb-4">
-                      Create engaging content with AI-powered assistance
-                    </p>
-                    <Link
-                      href="/content-generation"
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
-                    >
-                      Generate Content
-                    </Link>
-                  </div>
-
-                  {/* Chatrooms Card */}
-                  <div className="bg-gradient-to-br from-pink-50 to-rose-50 p-6 rounded-lg shadow border border-pink-200">
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">💬 Real-time Chatrooms</h3>
-                    <p className="text-gray-600 mb-4">
-                      Join location-based chatrooms and connect with people in your area
-                    </p>
-                    <Link
-                      href="/chatrooms"
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700"
-                    >
-                      Join Chatrooms
-                    </Link>
-                  </div>
-
-                  {/* Proximity Chatrooms Card */}
-                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-lg shadow border border-blue-200">
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">🌐 Proximity Chatrooms</h3>
-                    <p className="text-gray-600 mb-4">
-                      Connect with people nearby for networking, social interaction, and professional opportunities
-                    </p>
-                    <Link
-                      href="/proximity-chatrooms"
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                    >
-                      Find Nearby Chatrooms
-                    </Link>
-                  </div>
-                </div>
-
-                {/* User Info */}
-                <div className="mt-8 bg-white p-6 rounded-lg shadow">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Account Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="font-medium text-gray-700">Email:</span>
-                      <span className="ml-2 text-gray-600">{user?.email}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Member since:</span>
-                      <span className="ml-2 text-gray-600">
-                        {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Email verified:</span>
-                      <span className="ml-2 text-gray-600">
-                        {user?.emailVerifiedAt ? 'Yes' : 'No'}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">Last updated:</span>
-                      <span className="ml-2 text-gray-600">
-                        {user?.updatedAt ? new Date(user.updatedAt).toLocaleString() : 'N/A'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Quick Actions */}
-                <div className="mt-8">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
-                  <div className="flex flex-wrap justify-center gap-4">
-                    <Link
-                      href="/test-auth"
-                      className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                    >
-                      API Test Page
-                    </Link>
-                    <Link
-                      href="/profile/edit"
-                      className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                    >
-                      Edit Profile
-                    </Link>
-                    <Link
-                      href="/settings"
-                      className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                    >
-                      Settings
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </main>
       </div>
@@ -450,7 +147,6 @@ export default function DashboardPage() {
   );
 }
 
-// Helper Components
 interface StatCardProps {
   icon: React.ReactNode;
   label: string;
@@ -462,22 +158,22 @@ interface StatCardProps {
 
 function StatCard({ icon, label, value, subtext, color, link }: StatCardProps) {
   const colorClasses = {
-    purple: 'bg-purple-100 text-purple-600',
-    blue: 'bg-blue-100 text-blue-600',
-    green: 'bg-green-100 text-green-600',
-    orange: 'bg-orange-100 text-orange-600',
-    yellow: 'bg-yellow-100 text-yellow-600',
+    purple: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
+    blue: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
+    green: 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400',
+    orange: 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400',
+    yellow: 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400',
   };
 
   return (
     <Link href={link} prefetch={false} className="block group">
-      <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all hover:border-purple-300">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-all hover:border-purple-300 dark:hover:border-purple-700">
         <div className={`w-12 h-12 rounded-lg ${colorClasses[color]} flex items-center justify-center mb-4`}>
           {icon}
         </div>
-        <div className="text-3xl font-bold text-gray-900 mb-1">{value}</div>
-        <div className="text-sm font-medium text-gray-700 mb-1">{label}</div>
-        <div className="text-xs text-gray-500">{subtext}</div>
+        <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{value}</div>
+        <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{label}</div>
+        <div className="text-xs text-gray-500 dark:text-gray-400">{subtext}</div>
       </div>
     </Link>
   );
@@ -485,21 +181,20 @@ function StatCard({ icon, label, value, subtext, color, link }: StatCardProps) {
 
 function ActionButton({ href, label, icon, color }: { href: string; label: string; icon: string; color: string }) {
   const colorClasses = {
-    purple: 'hover:bg-purple-50 hover:border-purple-300',
-    blue: 'hover:bg-blue-50 hover:border-blue-300',
-    green: 'hover:bg-green-50 hover:border-green-300',
-    gray: 'hover:bg-gray-50 hover:border-gray-300',
+    purple: 'hover:bg-purple-50 hover:border-purple-300 dark:hover:bg-purple-900/20 dark:hover:border-purple-700',
+    blue: 'hover:bg-blue-50 hover:border-blue-300 dark:hover:bg-blue-900/20 dark:hover:border-blue-700',
+    green: 'hover:bg-green-50 hover:border-green-300 dark:hover:bg-green-900/20 dark:hover:border-green-700',
+    gray: 'hover:bg-gray-50 hover:border-gray-300 dark:hover:bg-gray-800 dark:hover:border-gray-600',
   };
 
   return (
     <Link
       href={href}
       prefetch={false}
-      className={`flex items-center gap-3 p-4 border-2 border-gray-200 rounded-lg transition-all ${colorClasses[color as keyof typeof colorClasses]}`}
+      className={`flex items-center gap-3 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg transition-all ${colorClasses[color as keyof typeof colorClasses]}`}
     >
       <span className="text-2xl">{icon}</span>
-      <span className="text-sm font-medium text-gray-700">{label}</span>
+      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>
     </Link>
   );
 }
-

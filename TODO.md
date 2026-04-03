@@ -1,23 +1,22 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.1.7  
-> **Last Updated:** 2026-04-02
+> **Version:** 1.2.0  
+> **Last Updated:** 2026-04-04
 
 ---
 
-## 🔴 Critical: Global Reliability
-- [ ] **Kafka/Kinesis Migration**: Finalize the event streaming migration from Redis to a distributed broker for global instance parity.
+## 🔴 Critical: Core Experience
+- [ ] **Battery-Efficient Background Location**: Implement OS-level background location tracking in the React Native Expo app to ensure proximity alerts trigger even when the app is closed.
+- [ ] **Push Notifications**: Integrate FCM/APNS to alert users of nearby matches or new secure messages.
 
-## 🟡 High: Feature Polish
-- [ ] **NFC "Tap-to-Pay" Production Test**: Perform a live token-to-inventory redemption using two native mobile devices.
+## 🟡 High: Stability
+- [ ] **E2E Multi-Device Sync**: Polish the indexedDB key storage to support recovering E2E keys when a user logs in from a new browser.
 
 ## ✅ Recently Completed
+- [x] **The Great Simplification**: Permanently removed all non-core bloat (Federation, Governance, Economy, Gamification).
+- [x] **Database Cleanup**: Dropped 50+ unused tables and foreign key constraints.
+- [x] **Routing Polish**: Streamlined `api.php` and `AppHeader.tsx` to strictly serve proximity dating workflows.
 - [x] **Sidebar UI Bug**: Fixed the left navigation bar to extend to the bottom of the viewport on all pages.
-- [x] **WASM Performance Benchmarks**: Built hardware acceleration tests for browser-based crypto.
-- [x] **Instance Event Relay**: Implemented real-time domain event replication via ActivityPub.
-- [x] **Native NFC Bridge**: Fully integrated hardware access for mobile physical interactions.
-- [x] **On-Chain Governance Mirroring**: Anchored community proposal roots to Solana.
-- [x] **Council Appeal System**: Built the "Community Court" and appeals dashboard.
 
 ---
 *This file is continuously updated by autonomous AI agents. Do not leave items unchecked if they are completed.*

@@ -21,25 +21,7 @@ import {
     User,
     Settings,
     LogOut,
-    BookHeart,
-    CreditCard,
-    Calendar,
-    Radio,
-    Zap,
-    Wallet,
-    Trophy,
-    Sparkles,
-    HelpCircle,
-    Tag,
-    Target,
-    Layout,
-    Mic,
-    Briefcase,
-    Compass,
-    CalendarHeart,
-    Shield,
-    Gamepad2,
-    Globe
+    Shield
 } from 'lucide-react'
 
 interface AppHeaderProps {
@@ -55,11 +37,7 @@ interface NavItem {
 
 const hardNavigationRoutes = new Set([
     '/help',
-    '/conference-pulse',
-    '/burner',
     '/nearby',
-    '/leaderboard',
-    '/wingman',
 ])
 
 function shouldDisablePrefetch(href: string) {
@@ -72,34 +50,15 @@ function shouldUseHardNavigation(href: string) {
 
 const navLinks: NavItem[] = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
-    { href: '/recommendations', label: 'For You', icon: Sparkles },
     { href: '/matches', label: 'Matches', icon: Heart },
     { href: '/messages', label: 'Messages', icon: MessageSquare },
-    { href: '/events', label: 'Events', icon: Calendar },
-    { href: '/groups', label: 'Groups', icon: Users },
-    { href: '/topics', label: 'Topics', icon: Compass },
-    { href: '/proximity-chatrooms', label: 'Local Chat', icon: Radio },
-    { href: '/journal', label: 'Field Notes', icon: BookHeart },
-    { href: '/conference-pulse', label: 'Conference', icon: Briefcase },
-    { href: '/date-planner', label: 'Date Planner', icon: CalendarHeart },
-    { href: '/safety', label: 'Safety', icon: Shield },
-    { href: '/audio-rooms', label: 'Audio Rooms', icon: Mic },
-    { href: '/burner', label: 'Burner Bridge', icon: Zap },
-    { href: '/bulletin-boards', label: 'Boards', icon: Layout },
-    { href: '/deals', label: 'Deals', icon: Tag },
-    { href: '/bounties', label: 'Bounties', icon: Target },
-    { href: '/federation', label: 'Global Federation', icon: Globe },
     { href: '/nearby', label: 'Nearby', icon: MapPin },
-    { href: '/wingman', label: 'Arcade', icon: Gamepad2 },
-    { href: '/merchant/dashboard', label: 'Merchant Hub', icon: Briefcase },
-    { href: '/wallet', label: 'Wallet', icon: Wallet },
-    { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
+    { href: '/safety', label: 'Safety', icon: Shield },
 ]
 
 const accountLinks: NavItem[] = [
     { href: '/settings', label: 'Settings', icon: Settings },
     { href: '/settings/account', label: 'Account', icon: User },
-    { href: '/settings/subscription', label: 'Billing', icon: CreditCard },
 ]
 
 function isActivePath(pathname: string, href: string) {
