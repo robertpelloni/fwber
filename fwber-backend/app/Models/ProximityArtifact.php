@@ -24,9 +24,12 @@ class ProximityArtifact extends Model
     protected $fillable = [
         'user_id',
         'type',
+        'content',
         'latitude',
         'longitude',
         'geohash',
+        'visibility_radius_m',
+        'expires_at',
         'metadata',
         'is_flagged',
         'flag_reason',
@@ -37,6 +40,8 @@ class ProximityArtifact extends Model
         'longitude' => 'float',
         'metadata' => 'array',
         'is_flagged' => 'boolean',
+        'visibility_radius_m' => 'integer',
+        'expires_at' => 'datetime',
     ];
 
     public function user(): BelongsTo

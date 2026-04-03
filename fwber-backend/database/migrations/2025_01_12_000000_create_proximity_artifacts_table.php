@@ -15,9 +15,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('type'); // encounter, location_ping, etc.
+            $table->text('content')->nullable();
             $table->decimal('latitude', 10, 8);
             $table->decimal('longitude', 11, 8);
             $table->string('geohash')->index();
+            $table->integer('visibility_radius_m')->default(1000);
+            $table->timestamp('expires_at')->nullable();
             $table->json('metadata')->nullable();
             
             // Safety/Moderation

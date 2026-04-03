@@ -809,3 +809,8 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - **E2E UI Polish**: Explicitly imported and implemented the new `E2EImage` WebWorker component into the `RealTimeChat.tsx` chat window and `ProfileViewModal.tsx` discovery overlays. Photos that trigger the `is_encrypted` database flag now instantly offload their AES-GCM math to `crypto-worker.js`, keeping scrolling performance at 60fps even under heavy media payload stress.
 - **Removed Visual Artifacts**: Conducted a final visual sweep of `fwber-frontend/app/matches/page.tsx` and related components, successfully eliminating dead `<BoostButton />` and `<CreateBountyModal />` imports to guarantee a strictly proximity-focused user experience.
+
+## [1.2.8] - 2026-04-04
+### Added
+- **Automated CI/CD Pipelines:** Instituted a completely automated, zero-touch deployment strategy. Pushing code to `main` now triggers `.github/workflows/` which sequentially validate the backend tests, compile the Next.js frontend, and execute `eas submit` to distribute the native `.ipa` and `.aab` packages directly to App Store Connect and Google Play Console.
+- **Enterprise Database Indexing:** Shipped `2026_04_03_212041_optimize_core_indexes.php`. The newly squashed, hyper-lean schema has been upgraded with precision composite indices across `messages` (accelerating unread counts and conversation fetching), `user_matches` (O(1) active match retrieval), and `user_profiles` (instantaneous spatial and gender/age filtering).

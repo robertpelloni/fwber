@@ -1,0 +1,50 @@
+name: Backend CI (Tests & Linting)
+
+on:
+  push:
+    paths:
+      - 'fwber-backend/**'
+      - '.github/workflows/backend-tests.yml'
+  pull_request:
+    paths:
+      - 'fwber-backend/**'
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Run PHPUnit Tests
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./fwber-backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
+          coverage: none
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: /tmp/composer-cache
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Prepare Database environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan migrate:fresh --env=testing
+
+      - name: Execute Tests via Artisan
+        run: php artisan test
