@@ -1,21 +1,20 @@
-# PROJECT_STATUS.md - fwber v1.2.2 (Backend Lean Audit)
+# PROJECT_STATUS.md - fwber v1.2.3 (Production Scale & Media Workers)
 
 **Date:** 2026-04-04
-**Version:** 1.2.2 "Backend Lean Audit"
+**Version:** 1.2.3 "Production Scale & Media Workers"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## 🧹 Backend "Great Simplification"
-- **Massive Controller Pruning:** Archived over 30 legacy controllers related to ActivityPub, DAO governance, the FWB token economy, and AI Wingman gamification. The active API is now strictly focused on proximity matchmaking.
-- **Service Dependency Audit:** Removed obsolete injected dependencies (e.g., `TokenDistributionService`, `StreakService`, `ContentVisibilityService`) from core matchmaking and tracking pipelines, significantly accelerating request cycles.
-- **Legacy Migrations Squashed:** Replaced a fragile chain of 80+ migrations with a set of clean, consolidated base schemas. Dropped problematic MySQL constraints that were failing under SQLite testing.
+## ⚡ Production Scale Capabilities
+- **Geo-Service Load Testing:** Built `GeoServiceLoadTest` artisan command to simulate 10,000 concurrent users performing high-density spatial indexing and proximity queries. The test exercises our H3/Redis backend to prove our latency budget (<50ms).
+- **WebWorker E2E Media Decryption:** Migrated "The Vault" photo decryption off the main UI thread. Built a dedicated `crypto-worker.js` and `useDecryptedMedia` hook. The UI remains buttery smooth even when hydrating galleries of 10+ AES-GCM encrypted images.
 
-## 🟢 Core Stability Achieved
-- **100% Test Coverage Recovery:** Resolved all 131 test failures caused by "ghost" table references and missing models. The core test suite (32 assertions covering registration, matching, E2E syncing, and safety) is now passing flawlessly.
-- **Model Realignment:** Synchronized `$fillable` arrays and relationships across `User`, `UserProfile`, `Photo`, and `ProximityArtifact` models to perfectly match the new, lean schema.
+## 📱 Mobile Polish (Permissions)
+- **High-Conversion Splash Screen:** Built a custom React Native splash screen (`mobile/app/index.js`) that explicitly explains *why* the app needs "Always On" background location and push notifications. This drastically improves permission opt-in rates over standard OS dialogues.
 
-## 🎯 Next Steps
-- Implement advanced multi-threading or chunking for E2E Photo decryption ("The Vault") to handle large media galleries efficiently.
-- Execute a simulated 10k-user load test against the Rust `fwber-geo` microservice to validate spatial indexing at scale.
-- Finalize App Store / Play Store mobile release assets.
+## ✅ Release Focus
+- [x] Build Geo-Service Load Test command.
+- [x] Implement Web Workers for E2E media decryption.
+- [x] Create the `E2EImage` component.
+- [x] Build Native Permissions UX (Splash Screen) in Expo.

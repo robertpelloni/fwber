@@ -12,8 +12,6 @@ import AppHeader from '@/components/AppHeader';
 import MatchFilter from '@/components/MatchFilter';
 import Image from 'next/image';
 import ProfileViewModal from '@/components/ProfileViewModal';
-import CreateBountyModal from '@/components/CreateBountyModal';
-import BoostButton from '@/components/BoostButton';
 import type { Match } from '@/lib/api/matches';
 
 export default function MatchesPage() {
@@ -130,10 +128,6 @@ export default function MatchesPage() {
         <div className="mx-auto max-w-md px-4 py-8">
           <ToastContainer />
           <div className="mb-4 space-y-4">
-            <div className="flex items-center justify-between gap-3">
-              <CreateBountyModal />
-              <BoostButton />
-            </div>
             <MatchFilter onFilterChange={handleFilterChange} />
           </div>
 

@@ -82,6 +82,15 @@ export function useE2EEncryption() {
     }
   }, [user, sharedKeys]);
 
+  const getSharedKeyRaw = useCallback(async (peerId: string | number) => {
+    const keyData = await getSharedKey(peerId);
+    if (keyData.type === 'ecdh') {
+        const rawKey = await window.crypto.subtle.exportKey('raw', keyData.key);
+        return Array.from(new Uint8Array(rawKey)).map(b => String.fromCharCode(b)).join('');
+    }
+    return null;
+  }, [getSharedKey]);
+
   const encrypt = useCallback(async (peerId: string | number, text: string) => {
     const keyData = await getSharedKey(peerId);
     return Crypto.encryptMessage(text, keyData.key);
@@ -170,5 +179,5 @@ export function useE2EEncryption() {
     setSharedKeys({});
   }, [user, token]);
 
-  return { isReady, isRestorable, encrypt, decrypt, regenerateKeys, backupKeys, restoreKeys };
+  return { isReady, isRestorable, encrypt, decrypt, regenerateKeys, backupKeys, restoreKeys, getSharedKeyRaw };
 }

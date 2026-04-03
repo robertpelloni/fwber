@@ -1,4 +1,4 @@
-import { StyleSheet, View, BackHandler, Linking, Platform } from 'react-native';
+import { StyleSheet, View, BackHandler, Linking, Platform, Text, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useEffect, useRef, useState } from 'react';
@@ -22,11 +22,8 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
     if (locations && locations.length > 0) {
       const location = locations[0];
       try {
-        // Retrieve token from SecureStore for background API call
         const userToken = await SecureStore.getItemAsync('userToken');
         if (!userToken) return;
-
-        console.log('Background location received:', location.coords.latitude, location.coords.longitude);
         
         await fetch(`https://api.${TARGET_DOMAIN}/api/location`, {
           method: 'POST',
@@ -51,19 +48,67 @@ export default function Home() {
   const insets = useSafeAreaInsets();
   const webViewRef = useRef(null);
   const [canGoBack, setCanGoBack] = useState(false);
-  const [locationGranted, setLocationGranted] = useState(false);
+  const [permissionsGranted, setPermissionsGranted] = useState<boolean | null>(null);
   const [nfcSupported, setNfcSupported] = useState(false);
+  const [isRequesting, setIsRequesting] = useState(false);
 
-  // 1. Initialize Native Capabilities
+  // Initial check of existing permissions
   useEffect(() => {
     (async () => {
-      // Location Permissions
-      const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
-      if (foregroundStatus === 'granted') {
-        const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
-        if (backgroundStatus === 'granted') {
-           setLocationGranted(true);
-           // Start tracking
+      const { status } = await Location.getForegroundPermissionsAsync();
+      if (status === 'granted') {
+         setPermissionsGranted(true);
+         startTracking();
+      } else {
+         setPermissionsGranted(false);
+      }
+    })();
+  }, []);
+
+  const requestAllPermissions = async () => {
+      setIsRequesting(true);
+      try {
+          // Location Permissions
+          const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
+          if (foregroundStatus === 'granted') {
+            const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
+            if (backgroundStatus === 'granted') {
+              await startTracking();
+            }
+            setPermissionsGranted(true);
+          } else {
+            setPermissionsGranted(false);
+          }
+
+          // NFC
+          try {
+            const supported = await NfcManager.isSupported();
+            setNfcSupported(supported);
+            if (supported) {
+              await NfcManager.start();
+            }
+          } catch (e) {
+            console.warn('NFC initialization failed', e);
+          }
+
+          // Notifications
+          const { status: existingStatus } = await Notifications.getPermissionsAsync();
+          let finalStatus = existingStatus;
+          if (existingStatus !== 'granted') {
+            const { status } = await Notifications.requestPermissionsAsync();
+            finalStatus = status;
+          }
+          if (finalStatus === 'granted') {
+            const token = (await Notifications.getExpoPushTokenAsync()).data;
+            await SecureStore.setItemAsync('pushToken', token);
+          }
+      } finally {
+          setIsRequesting(false);
+      }
+  };
+
+  const startTracking = async () => {
+       try {
            await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
              accuracy: Location.Accuracy.Balanced,
              timeInterval: 60000, // 1 minute
@@ -74,34 +119,10 @@ export default function Home() {
                notificationColor: "#FF1493"
              }
            });
-        }
-      }
-
-      // NFC
-      try {
-        const supported = await NfcManager.isSupported();
-        setNfcSupported(supported);
-        if (supported) {
-          await NfcManager.start();
-        }
-      } catch (e) {
-        console.warn('NFC initialization failed', e);
-      }
-
-      // Notifications
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-      if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-      if (finalStatus === 'granted') {
-        const token = (await Notifications.getExpoPushTokenAsync()).data;
-        console.log('Push Token:', token);
-        await SecureStore.setItemAsync('pushToken', token);
-      }
-    })();
-  }, []);
+       } catch (e) {
+           console.log("Tracking failed to start", e);
+       }
+  };
 
   // 2. NFC Native -> WebView Bridge
   useEffect(() => {
@@ -206,6 +227,51 @@ export default function Home() {
     }
   };
 
+  if (permissionsGranted === null) {
+      return <View style={styles.container} />; // Loading state
+  }
+
+  if (!permissionsGranted) {
+      return (
+          <SafeAreaView style={styles.splashContainer}>
+              <View style={styles.splashContent}>
+                  <Text style={styles.splashTitle}>fwber</Text>
+                  <Text style={styles.splashSubtitle}>Real connections happen offline.</Text>
+                  
+                  <View style={styles.permissionCard}>
+                      <Text style={styles.permissionTitle}>📍 Background Location</Text>
+                      <Text style={styles.permissionText}>
+                          We need "Always On" location access so your phone can vibrate when a highly compatible match walks past you, even if the app is closed in your pocket.
+                      </Text>
+                  </View>
+                  
+                  <View style={styles.permissionCard}>
+                      <Text style={styles.permissionTitle}>🔔 Push Notifications</Text>
+                      <Text style={styles.permissionText}>
+                          Get instant alerts when someone likes you back or sends you an encrypted message.
+                      </Text>
+                  </View>
+
+                  <TouchableOpacity 
+                      style={styles.button} 
+                      onPress={requestAllPermissions}
+                      disabled={isRequesting}
+                  >
+                      {isRequesting ? (
+                          <ActivityIndicator color="#fff" />
+                      ) : (
+                          <Text style={styles.buttonText}>Enable Capabilities</Text>
+                      )}
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity onPress={() => setPermissionsGranted(true)}>
+                      <Text style={styles.skipText}>Skip for now (App won't work well)</Text>
+                  </TouchableOpacity>
+              </View>
+          </SafeAreaView>
+      );
+  }
+
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <WebView
@@ -216,7 +282,7 @@ export default function Home() {
         showsVerticalScrollIndicator={false}
         onNavigationStateChange={handleNavigationStateChange}
         onMessage={onMessage}
-        geolocationEnabled={locationGranted}
+        geolocationEnabled={true}
       />
     </View>
   );
@@ -230,5 +296,70 @@ const styles = StyleSheet.create({
   webview: {
     flex: 1,
     backgroundColor: 'transparent',
+  },
+  splashContainer: {
+    flex: 1,
+    backgroundColor: '#09090b',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  splashContent: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  splashTitle: {
+    fontSize: 48,
+    fontWeight: '900',
+    fontStyle: 'italic',
+    color: '#ec4899',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  splashSubtitle: {
+    fontSize: 18,
+    color: '#a1a1aa',
+    textAlign: 'center',
+    marginBottom: 48,
+  },
+  permissionCard: {
+    backgroundColor: '#18181b',
+    padding: 20,
+    borderRadius: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#27272a',
+  },
+  permissionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 8,
+  },
+  permissionText: {
+    fontSize: 14,
+    color: '#a1a1aa',
+    lineHeight: 20,
+  },
+  button: {
+    backgroundColor: '#ec4899',
+    padding: 16,
+    borderRadius: 999,
+    alignItems: 'center',
+    marginTop: 24,
+    shadowColor: '#ec4899',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  skipText: {
+    color: '#52525b',
+    textAlign: 'center',
+    marginTop: 24,
+    fontSize: 14,
   }
 });

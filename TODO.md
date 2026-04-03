@@ -5,19 +5,16 @@
 
 ---
 
-## 🔴 Critical: Performance
-- [ ] **Geo-Service Load Test**: Run a simulation of 10,000 concurrent users in a 1km radius to ensure the Rust `fwber-geo` service and Geohash precision hold up.
-- [ ] **E2E Photo Hydration**: Optimize the decryption speed for full galleries in the "The Vault".
+## 🔴 Critical: Scale & Edge Cases
+- [ ] **Native App Deployment Pipeline**: Finalize App Store Connect and Google Play Console automated builds (Fastlane/EAS) so we can distribute the .ipa and .aab.
 
 ## 🟡 High: Mobile Polish
-- [ ] **Native Permissions UX**: Build a dedicated "Enable Location" splash screen for mobile to improve background permission opt-in rates.
+- [ ] **Background Fetch Refresh**: Test what happens to the background worker token if the user is logged out of the web view. We need to clear the SecureStore token to prevent ghost pings.
 
 ## ✅ Recently Completed
-- [x] **Background Location**: OS-level tracking in Expo.
-- [x] **Push Notifications**: Expo/Laravel integration.
-- [x] **E2E Key Recovery**: Backup/Restore with passphrase.
-- [x] **The Great Simplification**: Permanently removed all non-core bloat.
-- [x] **Build Fixes**: Resolved module resolution and icon deprecation errors.
+- [x] **Web Worker Photo Hydration**: Offloaded AES-GCM photo decryption to a background thread to prevent UI freezing.
+- [x] **Geo-Service Load Testing**: Built the simulation artisan command.
+- [x] **Native Permissions UX**: Built a dedicated "Enable Location" splash screen for mobile to improve background permission opt-in rates.
 
 ---
 *This file is continuously updated by autonomous AI agents. Do not leave items unchecked if they are completed.*

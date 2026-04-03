@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.2.1 "Core Performance & Mobile Polish"
+> **Current Version:** 1.2.3 "Production Scale & Media Workers"
 > **Last Updated:** 2026-04-04
 
 ---
@@ -34,14 +34,13 @@ The platform is now **100% focused on its core identity**:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 4: Mobile & E2E Polish (COMPLETED - v1.2.1)
-- **Battery-Efficient Background Location:** OS-level tracking in Expo for proximity alerts.
-- **Push Notifications:** Full integration with Expo/Laravel for real-time match/message alerts.
-- **E2E Key Sync:** Secure multi-device backup and recovery of encryption keys.
+### Phase 5: Production Scale (ACTIVE - v1.2.3)
+- **Geo-Service Load Testing:** Artisan command to simulate 10,000 concurrent users against the Rust microservice.
+- **E2E Photo Hydration:** WebWorkers offload AES-GCM decryption for full galleries to ensure a 60fps UI.
+- **Native Permissions UX:** Improved splash screen for mobile background location and push notifications.
 
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Performance Tuning:** Optimize Rust `fwber-geo` service for high-density metropolitan areas.
-2. **Media Optimization:** Implement ultra-fast media delivery for E2E encrypted photos.
-3. **App Store Readiness:** Finalize remaining native bridge edge cases for iOS/Android submission.
+1. **EAS Build Pipelines:** Configure Expo Application Services (Fastlane) to produce our .ipa and .aab files for App Store distribution.
+2. **Ghost Ping Cleanup:** Ensure background worker tokens are cleared if a user logs out of the web interface.

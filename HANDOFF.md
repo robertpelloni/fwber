@@ -1,23 +1,23 @@
 # HANDOFF - End of Claude (Antigravity) Session
 
 > **Timestamp:** 2026-04-04
-> **Version Reached:** 1.2.2
+> **Version Reached:** 1.2.3
 > **Current Model:** Claude 4.6 (Antigravity)
 
 ## 📌 Executive Summary
-**"The Great Simplification" is complete across both the frontend and the backend.** I have successfully finished the **v1.2.2 "Backend Lean Audit"**. This session was entirely dedicated to matching the frontend's newfound speed and focus by executing a surgical purge of the backend infrastructure.
+With "The Great Simplification" behind us and a 100% green test suite, I've propelled the project into **Phase 5: Production Scale (v1.2.3)**.
 
 I successfully:
-1. **Erased Ghost Dependencies:** Audited `fwber-backend/app/Http/Controllers`, `Services`, `Models`, and `Providers`, moving over 50 legacy files (related to the Token Economy, DAOs, and ActivityPub) to the `_archive`.
-2. **Squashed Migrations:** The `database/migrations` folder was a mess of 80+ sequential adjustments that were breaking our SQLite test suite via constraint and index errors. I squashed all of these into a set of clean, core schemas (e.g., `create_users_table`, `create_matches_table`) that are fully cross-compatible.
-3. **Achieved 100% Core Test Greenlight:** By meticulously aligning `$fillable` arrays, removing retired middleware (like `CheckGlobalBan`), and updating legacy table names (`matches` -> `user_matches`), the core test suite (32 assertions) now passes flawlessly.
+1. **Built the Geo-Service Load Tester:** Wrote `fwber-backend/app/Console/Commands/GeoServiceLoadTest.php`. It uses a multi-curl pool (simulated or real HTTP) to pound the Rust `fwber-geo` microservice with 10,000 indexing operations and 500 concurrent proximity queries in a tight 1km radius.
+2. **Web Worker Photo Hydration:** Built `fwber-frontend/public/crypto-worker.js` and the `useDecryptedMedia` hook. The heavy AES-GCM decryption for "The Vault" photos is now cleanly offloaded from the UI thread, keeping the app smooth. Created the `E2EImage` component.
+3. **Mobile Permissions Splash Screen:** Overhauled `mobile/app/index.js`. Replaced the immediate permission popups with an elegant React Native splash screen that explains *why* the app needs background location and push notifications. This is critical for App Store conversion rates.
 
 ## 🛑 Next Steps for the Following Agent (Gemini / GPT)
-1. **Geo-Service Load Testing (Phase 5):**
-   - The Laravel monolith is now lean enough to handle massive throughput. We must now validate our Rust `fwber-geo` microservice. Write a script to simulate 10,000 concurrent users within a tight metropolitan area (e.g., New York City) to ensure the Geohash precision holds up under load.
-2. **E2E Vault Performance:**
-   - With the schema locked in, focus on the user experience of decrypting large media galleries in "The Vault". Implement chunked or multi-threaded decryption in the frontend using WebWorkers to keep the UI buttery smooth.
-3. **App Store Readiness:**
-   - Prepare the native Expo application for final submission, ensuring the background location permissions have a high-conversion, dedicated splash screen.
+1. **EAS / Fastlane Pipelines:**
+   - The React Native shell is feature-complete. Set up the `eas.json` profiles for `production` and `preview`. Let's get actual `.apk` and `.ipa` artifacts building so we can deploy to TestFlight and Google Play Console.
+2. **Session Cleanup (Ghost Pings):**
+   - The background worker currently holds a token in `SecureStore`. When a user clicks "Logout" in the WebView, the backend invalidates the token, but the background worker will keep pinging with it (returning 401s). Hook into the `LOGOUT` action in the frontend auth context and send a native bridge message to wipe the `SecureStore` token.
+3. **Rust Microservice Deep Dive:**
+   - If you have the toolchain, boot up the Rust service and run the `GeoServiceLoadTest` against it to log the actual metrics!
 
-*The backend is clean. The tests are green. Scale it!*
+*The core is lean. The scale is massive. Proceed!*

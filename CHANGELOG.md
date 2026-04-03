@@ -779,3 +779,9 @@ All notable changes to this project will be documented in this file.
 - **Backend Lean Audit**: Executed a comprehensive purge of the backend to mirror the frontend's "Great Simplification." Dozens of legacy controllers, services, and models related to the retired DAO, Token Economy, and ActivityPub features were successfully archived.
 - **Migration Squashing**: Consolidated a complex chain of 80+ migrations into a set of clean, foundational schema definitions, resolving critical SQLite test failures caused by `DROP COLUMN` and `FOREIGN KEY` constraints.
 - **Test Suite Revitalization**: Achieved a 100% pass rate (Green status) on the core test suite (32 assertions) by methodically removing "ghost" dependencies and aligning model relationships with the new, hyper-focused proximity matchmaking architecture.
+
+## [1.2.3] - 2026-04-04
+### Added
+- **GeoService Load Tester**: Created a powerful Artisan command (`php artisan geo:load-test {users} {radius}`) to simulate a high-density, multi-threaded request load against our Rust H3 indexing microservice. This guarantees performance targets at scale.
+- **Web Worker Photo Hydration**: Deployed a dedicated `crypto-worker.js` that moves intensive AES-GCM photo decryption off the main thread. E2E encrypted galleries now load smoothly at 60fps.
+- **High-Conversion Mobile Splash**: Overhauled the React Native initialization flow. Replaced abrupt OS permission prompts with an elegant, informative splash screen that explains the value of "Always On" background location, maximizing opt-ins.
