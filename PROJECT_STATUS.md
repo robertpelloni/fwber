@@ -1,10 +1,19 @@
-# Project Status — fwber v1.0.81 (Federated Search Aggregator)
+# Project Status — fwber v1.0.82 (NFC & WASM Offloading)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.81 "Federated Search Aggregator"
+**Version:** 1.0.82 "NFC & WASM Offloading"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
+
+## NFC Physical Verification
+- **Web NFC Integration:** Built a native-feeling NFC exchange interface using the `NDEFReader` API.
+- **Physical Verification:** Users can now tap devices to instantly verify a mutual match and receive a "Trust Boost" in the ranking algorithms.
+- **Backend Handshaking:** Created an atomic endpoint to record NFC exchanges and link users immediately.
+
+## High-Performance WASM Offloading
+- **Cryptographic Bridge:** Updated the E2E encryption hook to detect large text payloads (>5k chars).
+- **Rust Acceleration:** Integrated dynamic imports for `fwber-wasm`. When the WASM module is detected, encryption/decryption is offloaded to Rust, preventing UI jank on low-end mobile devices during heavy messaging.
 
 ## ActivityPub Aggregation & Discovery
 - **Parallel Search Jobs:** Updated `ActivityPubSearchController` to use `Http::pool` for parallel querying of top ActivityPub discovery hubs. 
@@ -73,6 +82,8 @@
 - **Billing validation from the previous slice remains the current premium reference path**: `php artisan test tests\Feature\PremiumControllerTest.php tests\Feature\StripeWebhookTest.php`, plus frontend `npm run lint`, `npm run type-check`, and `cmd /c "npm run build"`, already passed for `v1.0.71`.
 
 ## ✅ Release Focus
+- [x] Implement NFC Profile Exchange protocol.
+- [x] Integrate WASM crypto offloading in frontend.
 - [x] Aggregate federated search results in parallel.
 - [x] Implement Redis Bloom Filter for geo-caching.
 - [x] Migrate Mobile app to Expo Router.

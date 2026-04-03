@@ -328,6 +328,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('matches/{id}/insights', [\App\Http\Controllers\MatchInsightsController::class, 'show']);
     Route::post('matches/{id}/insights/unlock', [\App\Http\Controllers\MatchInsightsController::class, 'unlock']);
     Route::post('matches/action', [\App\Http\Controllers\MatchController::class, 'action'])->middleware('throttle:matching');
+    Route::post('matches/nfc-exchange', [\App\Http\Controllers\MatchController::class, 'nfcExchange']);
 
     // Post-Date Feedback
     Route::post('matches/{matchId}/feedback', [\App\Http\Controllers\DateFeedbackController::class, 'store']);

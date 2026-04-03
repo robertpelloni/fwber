@@ -2,7 +2,25 @@
  * E2E Encryption - Cryptographic Primitives
  *
  * Uses Web Crypto API for ECDH key exchange and AES-GCM encryption.
+ * Supports WASM offloading for high-performance media payloads.
  */
+
+// WASM Bridge (Lazy loaded)
+let wasmModule: any = null;
+
+async function loadWasm() {
+  if (wasmModule) return wasmModule;
+  try {
+    // @ts-ignore
+    wasmModule = await import('@/lib/wasm/fwber_wasm');
+    await wasmModule.default();
+    console.log('E2E: WASM encryption acceleration active');
+    return wasmModule;
+  } catch (e) {
+    console.debug('E2E: WASM acceleration not available, using WebCrypto fallback');
+    return null;
+  }
+}
 
 // Configuration for ECDH
 const ECDH_ALGO = {
@@ -81,6 +99,25 @@ export async function encryptMessage(
   text: string,
   sharedKey: CryptoKey
 ): Promise<string> {
+  // Attempt WASM offload for large payloads
+  if (text.length > 5000) {
+    const wasm = await loadWasm();
+    if (wasm) {
+      try {
+        const rawKey = await window.crypto.subtle.exportKey('raw', sharedKey);
+        const keyHex = Array.from(new Uint8Array(rawKey)).map(b => b.toString(16).padStart(2, '0')).join('');
+        const result = wasm.encrypt_message(text, keyHex);
+        return JSON.stringify({
+          iv: result.nonce,
+          data: result.ciphertext,
+          wasm: true
+        });
+      } catch (e) {
+        console.warn('WASM encryption failed, falling back to WebCrypto', e);
+      }
+    }
+  }
+
   const iv = window.crypto.getRandomValues(new Uint8Array(12)); // 96-bit IV for AES-GCM
   const encoder = new TextEncoder();
   const data = encoder.encode(text);
@@ -112,6 +149,17 @@ export async function decryptMessage(
 ): Promise<string> {
   try {
     const payload = JSON.parse(encryptedJson);
+
+    // Check if was encrypted via WASM
+    if (payload.wasm) {
+        const wasm = await loadWasm();
+        if (wasm) {
+            const rawKey = await window.crypto.subtle.exportKey('raw', sharedKey);
+            const keyHex = Array.from(new Uint8Array(rawKey)).map(b => b.toString(16).padStart(2, '0')).join('');
+            return wasm.decrypt_message(payload.data, payload.iv, keyHex);
+        }
+    }
+
     const iv = new Uint8Array(payload.iv);
     const data = new Uint8Array(payload.data);
 

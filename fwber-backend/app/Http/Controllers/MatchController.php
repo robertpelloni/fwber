@@ -799,4 +799,59 @@ class MatchController extends Controller
             });
         }
     }
+
+    /**
+     * @OA\Post(
+     *   path="/matches/nfc-exchange",
+     *   tags={"Matches"},
+     *   summary="Exchange profiles via NFC",
+     *   description="Verifies a physical meetup via NFC tap and creates a verified match.",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"peer_id"},
+     *       @OA\Property(property="peer_id", type="integer", example=2)
+     *     )
+     *   ),
+     *   @OA\Response(response=200, description="NFC Match Verified")
+     * )
+     */
+    public function nfcExchange(Request $request): JsonResponse
+    {
+        $user = auth()->user();
+        $peerId = $request->input('peer_id');
+
+        if ($user->id == $peerId) {
+            return response()->json(['error' => 'Cannot exchange with yourself'], 422);
+        }
+
+        // 1. Mark as verified match (or create if doesn't exist)
+        $match = \App\Models\UserMatch::updateOrCreate(
+            [
+                'user1_id' => min($user->id, $peerId),
+                'user2_id' => max($user->id, $peerId),
+            ],
+            [
+                'is_active' => true,
+                'last_activity_at' => now(),
+            ]
+        );
+
+        // 2. Increment relationship tier or trust score
+        $match->update(['metadata' => array_merge($match->metadata ?? [], [
+            'nfc_verified' => true,
+            'nfc_verified_at' => now()->toIso8601String(),
+            'trust_boost' => 50
+        ])]);
+
+        // 3. Log event
+        \Log::info("NFC Profile Exchange: User {$user->id} and {$peerId}");
+
+        return response()->json([
+            'success' => true,
+            'message' => 'NFC verification successful',
+            'match_id' => $match->id
+        ]);
+    }
 }

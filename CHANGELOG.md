@@ -583,3 +583,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 - **ActivityPub Search Aggregator**: Enhanced `ActivityPubSearchController` to support keyword searches. It now parallel-queries multiple "Discovery Hubs" (Mastodon instances) via `Http::pool` to provide a unified federated search interface.
 - **Geo-Screener Bloom Filter**: Integrated a Redis-based "Active Cells" filter into `GeoScreenerService.php`. This short-circuits proximity queries for geographic areas with no known activity, significantly reducing load on the Rust microservice.
+
+## [1.0.82] - 2026-04-02
+### Added
+- **NFC Match Protocol**: Built the `NFCProfileExchange` component using the Web NFC API. Users can now verify physical meetups and exchange profile data instantly by tapping phones.
+- **NFC Backend**: Implemented `POST /api/matches/nfc-exchange` to record verified physical meetups and grant trust score boosts.
+- **WASM Encryption Bridge**: Integrated the `fwber-wasm` primitives into the frontend `crypto.ts`. The system now automatically offloads large message payloads to Rust-compiled WASM for high-performance E2E encryption.

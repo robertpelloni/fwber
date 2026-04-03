@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.0.81
+> **Current Version:** 1.0.82
 > **Last Updated:** 2026-04-02
 
 ---
@@ -45,6 +45,8 @@
 - Prepare **Mobile Expo Router** migration for the `mobile/` directory (COMPLETED).
 - Develop a **Sub-millisecond Real-time Proximity Cache** (COMPLETED).
 - Finalize **ActivityPub Search Aggregator** (COMPLETED).
+- Implement **WASM Encryption Primitives** (COMPLETED).
+- Build a **NFC Match Protocol** (COMPLETED).
 
 ---
 
@@ -52,7 +54,7 @@
 
 | Feature Domain | Status | Backend | Frontend | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| **Auth & Security** | Mature | 100% | 100% | ZK-Identity, WebAuthn, Sanctum, OTP. |
+| **Auth & Security** | Mature | 100% | 100% | ZK-Identity, WebAuthn, NFC Sync, WASM. |
 | **Matching Engine** | Mature | 100% | 100% | Event Sourced, compatibility scoring. |
 | **Messaging** | Mature | 100% | 100% | E2E Encrypted, CRDT Batch Offline Sync. |
 | **Location / Geo** | Mature | 100% | 100% | AR Nav, Redis Bloom, Rust Geo-Screener. |
@@ -67,6 +69,6 @@
 ---
 
 ## 🎯 Next Immediate Milestones
-1. Complete **WASM Encryption Integration** into the React frontend using the `fwber-wasm` primitives.
-2. Implement **Distributed Global Event Streaming** using Apache Kafka or AWS Kinesis for multi-instance federation scaling.
-3. Build a **NFC Match Protocol** for the mobile app to allow instant physical profile exchange via phone-tapping.
+1. Implement **Distributed Global Event Streaming** using Apache Kafka or AWS Kinesis for multi-instance federation scaling.
+2. Build a **ZK-Location Verification** system for physical taps.
+3. Develop a **Federated Reputation System** based on Vouch scores across instances.
