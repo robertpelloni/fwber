@@ -38,6 +38,14 @@ class PolicyExecutor
                     $this->banUser($proposal, $payload['params']);
                     break;
 
+                case 'unban_user':
+                    $this->unbanUser($proposal, $payload['params']);
+                    break;
+
+                case 'unban_actor':
+                    $this->unbanActor($proposal, $payload['params']);
+                    break;
+
                 default:
                     Log::warning("Governance Executor: Unknown action '{$action}' for proposal {$proposal->id}");
                     return false;
@@ -90,6 +98,33 @@ class PolicyExecutor
         }
 
         Log::info("Governance Executor: Local user '{$userId}' banned via community vote.");
+    }
+
+    protected function unbanUser(GovernanceProposal $proposal, array $params): void
+    {
+        $userId = $params['user_id'];
+
+        \App\Models\GlobalBan::where('bannable_identifier', (string) $userId)
+            ->where('type', 'user')
+            ->delete();
+
+        $user = \App\Models\User::find($userId);
+        if ($user) {
+            $user->update(['is_active' => true]);
+        }
+
+        Log::info("Governance Executor: Local user '{$userId}' unbanned via community vote.");
+    }
+
+    protected function unbanActor(GovernanceProposal $proposal, array $params): void
+    {
+        $actorUri = $params['actor_uri'];
+
+        \App\Models\GlobalBan::where('bannable_identifier', $actorUri)
+            ->where('type', 'actor')
+            ->delete();
+
+        Log::info("Governance Executor: Federated actor '{$actorUri}' unbanned via community vote.");
     }
 
     protected function updateSiteSetting(array $params): void

@@ -15,12 +15,17 @@ export default function ProtectedRoute({
   redirectTo = '/login',
   requireOnboarding = true
 }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading, user } = useAuth()
+  const { isAuthenticated, isLoading, user, isBanned } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
     if (!isLoading) {
-      if (!isAuthenticated) {
+      if (isBanned) {
+        // Allow access to the appeals page if banned
+        if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/council/appeals')) {
+          router.push('/council/appeals')
+        }
+      } else if (!isAuthenticated) {
         router.push(redirectTo)
       } else if (requireOnboarding && user && !user.onboarding_completed_at) {
         // Check if we are already on the onboarding page to avoid loops

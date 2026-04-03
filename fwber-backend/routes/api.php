@@ -455,6 +455,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('governance/proposals', [\App\Http\Controllers\GovernanceController::class, 'store']);
     Route::post('governance/proposals/{id}/vote', [\App\Http\Controllers\GovernanceController::class, 'vote']);
     Route::get('governance/proposals/{id}/proof', [\App\Http\Controllers\GovernanceController::class, 'getVoteProof']);
+    Route::post('governance/appeals', [\App\Http\Controllers\GovernanceAppealController::class, 'store']);
 
     // Economy & Swaps
     Route::get('economy/rates', [\App\Http\Controllers\Api\SwapController::class, 'getRates']);

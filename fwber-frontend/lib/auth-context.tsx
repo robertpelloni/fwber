@@ -47,6 +47,7 @@ interface AuthState {
   isLoading: boolean
   isAuthenticated: boolean
   requiresTwoFactor: boolean
+  isBanned: boolean
   error: string | null
 }
 
@@ -55,6 +56,7 @@ type AuthAction =
   | { type: 'AUTH_SUCCESS'; payload: { user: User; token: string } }
   | { type: 'AUTH_FAILURE'; payload: string }
   | { type: 'TWO_FACTOR_REQUIRED' }
+  | { type: 'BANNED' }
   | { type: 'LOGOUT' }
   | { type: 'CLEAR_ERROR' }
   | { type: 'UPDATE_USER'; payload: User }
@@ -137,6 +139,7 @@ const initialState: AuthState = {
   isLoading: true,
   isAuthenticated: false,
   requiresTwoFactor: false,
+  isBanned: false,
   error: null,
 }
 
@@ -155,6 +158,7 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
         isLoading: false,
         isAuthenticated: true,
         requiresTwoFactor: false,
+        isBanned: false,
         user: action.payload.user,
         token: action.payload.token,
         error: null,
@@ -166,12 +170,21 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
         requiresTwoFactor: true,
         error: null,
       }
+    case 'BANNED':
+        return {
+          ...state,
+          isLoading: false,
+          isAuthenticated: true, // They are technically auth'd but restricted
+          isBanned: true,
+          error: 'Your account is globally banned.',
+        }
     case 'AUTH_FAILURE':
       return {
         ...state,
         isLoading: false,
         isAuthenticated: false,
         requiresTwoFactor: false,
+        isBanned: false,
         user: null,
         token: null,
         error: action.payload,
@@ -181,6 +194,7 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
         ...state,
         isAuthenticated: false,
         requiresTwoFactor: false,
+        isBanned: false,
         user: null,
         token: null,
         error: null,
@@ -286,6 +300,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           })
 
           if (!response.ok) {
+            if (response.status === 403) {
+              const data = await response.json();
+              if (data.code === 'GLOBAL_BAN') {
+                  dispatch({ type: 'BANNED' });
+                  return;
+              }
+            }
+            
             if (isTransientAuthResponse(response.status)) {
               if (!cancelled) {
                 dispatch({

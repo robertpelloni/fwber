@@ -704,3 +704,12 @@ All notable changes to this project will be documented in this file.
 - **Global Ban Infrastructure**: Implemented the `global_bans` registry and `CheckGlobalBan` middleware to enforce community decisions across all API endpoints.
 - **Federated Filter**: Updated the ActivityPub Inbox to automatically reject activities from actors banned via community vote.
 - **On-Chain Audit Polish**: Enhanced the `VoteVerifier` to include a verification state for Solana-anchored roots, providing end-to-end transparency for governance outcomes.
+
+## [1.1.0] - 2026-04-02
+### Added
+- **Council Appeal System**: Implemented the project's first "Community Court" judicial layer. Banned users can now submit formal appeals to the Council.
+- **Automated Unban Proposals**: Appeals automatically generate a project-wide `Unban` proposal, allowing the community to decide on the user's reinstatement.
+- **Restriction UI**: Built a dedicated `/council/appeals` portal for account restriction management.
+- **Policy Executor Expansion**: Added `unban_user` and `unban_actor` actions to the automated execution engine.
+### Changed
+- **Auth Hardening**: Enhanced the `CheckGlobalBan` middleware to handle graceful redirects and restricted API access for banned entities.
