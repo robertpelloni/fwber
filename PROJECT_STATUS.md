@@ -1,17 +1,20 @@
-# Project Status — fwber v1.1.1 (Federated ID & Native NFC)
+# Project Status — fwber v1.1.2 (Kafka Ready & Federated Login)
 
 **Date:** 2026-04-02  
-**Version:** 1.1.1 "Federated ID & Native NFC"
+**Version:** 1.1.2 "Kafka Ready & Federated Login"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## Global Federated Identity
-- **Decentralized Login:** Users can now use their ActivityPub handle (e.g. Mastodon) to log in to the fwber network. 
-- **Shadow User Sync:** Implemented automated local user creation for remote actors, ensuring that federated identities have a persistent home on our nodes.
-- **WebFinger Auth:** Secure challenge-response handshake that verifies Actor ownership via profile summary commitments.
+## Pluggable Event Infrastructure
+- **Kafka Migration Ready:** Implemented the `KafkaEventBus` driver. The platform can now transition from Redis to Apache Kafka by simply updating the `EVENT_BUS_DRIVER` environment variable.
+- **Unified Event Log:** Centralized all domain events (Matching, Messages, Locations) into a consistent stream format, enabling cross-instance state replication.
 
-## Native Mobile NFC Bridge
+## Federated Login UX
+- **Identity Bridge:** Launched the `/login` extension for ActivityPub handles. 
+- **Proof-of-Control:** Integrated a challenge-response UI that guides users through verifying Actor ownership via remote profile commitments.
+
+## Global Federated Identity
 - **Hardware Integration:** The mobile app now utilizes `react-native-nfc-manager` to handle tap events.
 - **WebView Injection:** Built a real-time JS injection bridge that pushes native NFC scans directly into the web interface, solving browser-based NFC reliability issues on mobile.
 
@@ -38,7 +41,7 @@
 - **Real-time Rates:** Integrated live price feeds from CoinGecko for precise cross-chain conversion quotes.
 
 ## ✅ Release Focus
+- [x] Implement Pluggable Event Bus (Kafka/Redis).
+- [x] Build Federated Login UI.
 - [x] Build Global Federated Identity system.
 - [x] Build Native Mobile NFC Bridge.
-- [x] Build Council Appeal system and UI.
-- [x] Implement automated Unban proposals.

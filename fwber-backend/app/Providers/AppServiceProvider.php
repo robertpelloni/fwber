@@ -28,7 +28,13 @@ class AppServiceProvider extends ServiceProvider
 
         // --- DISTRIBUTED EVENT SOURCING INFRASTRUCTURE ---
         $this->app->singleton(\App\Domain\Core\EventSourcing\Contracts\EventBusInterface::class, function ($app) {
-            return new \App\Domain\Core\EventSourcing\Buses\RedisStreamEventBus;
+            $driver = config('events.default', 'redis');
+
+            return match ($driver) {
+                'kafka' => new \App\Domain\Core\EventSourcing\Buses\KafkaEventBus,
+                'log'   => new \App\Domain\Core\EventSourcing\Buses\LogEventBus,
+                default => new \App\Domain\Core\EventSourcing\Buses\RedisStreamEventBus,
+            };
         });
 
         $this->app->singleton(\App\Domain\Core\EventSourcing\EventStore::class, function ($app) {

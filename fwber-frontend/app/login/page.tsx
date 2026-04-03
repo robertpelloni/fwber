@@ -7,6 +7,8 @@ import Link from 'next/link'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
+import { FederatedAuthModal } from '@/components/auth/FederatedAuthModal'
+import { Globe } from 'lucide-react'
 import bs58 from 'bs58'
 
 export default function LoginPage() {
@@ -16,6 +18,7 @@ export default function LoginPage() {
   const [recoveryCode, setRecoveryCode] = useState('')
   const [isRecovery, setIsRecovery] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isFedModalOpen, setIsFedModalOpen] = useState(false)
   const { login, loginWithWallet, verifyTwoFactor, error, clearError, isAuthenticated, requiresTwoFactor } = useAuth()
   const router = useRouter()
   const { publicKey, signMessage, disconnect } = useWallet()
@@ -307,6 +310,15 @@ export default function LoginPage() {
           </div>
 
           <div className="flex flex-col items-center justify-center space-y-4">
+            <button
+              type="button"
+              onClick={() => setIsFedModalOpen(true)}
+              className="group relative w-full flex justify-center py-2 px-4 border border-zinc-200 dark:border-zinc-800 text-sm font-bold rounded-md text-zinc-900 dark:text-white bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-all shadow-sm"
+            >
+              <Globe className="w-4 h-4 mr-2 text-purple-500" />
+              Sign in with ActivityPub
+            </button>
+
             {!publicKey ? (
               <WalletMultiButton />
             ) : (
@@ -323,6 +335,8 @@ export default function LoginPage() {
 
         </form>
       </div>
+
+      <FederatedAuthModal isOpen={isFedModalOpen} onOpenChange={setIsFedModalOpen} />
     </div>
   )
 }
