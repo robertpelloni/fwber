@@ -9,7 +9,6 @@ import { getPublicProfile, type UserProfile } from '@/lib/api/profile';
 import { performMatchAction } from '@/lib/api/matches';
 import { api } from '@/lib/api/client';
 import { PresenceIndicator } from '@/components/realtime/PresenceComponents';
-import TipButton from '@/components/tipping/TipButton';
 import PhotoRevealGate from '@/components/PhotoRevealGate';
 import { EvolvingAvatar } from '@/components/ui/EvolvingAvatar';
 import { RelationshipTier } from '@/lib/relationshipTiers';
@@ -152,7 +151,6 @@ export default function PublicProfilePage() {
                     {p.location?.city}, {p.location?.state}
                   </p>
                 </div>
-                <TipButton recipientId={profile.id} recipientName={p.display_name || 'User'} />
               </div>
             </div>
           </div>
@@ -188,7 +186,6 @@ export default function PublicProfilePage() {
                     {p.location?.city}, {p.location?.state}
                   </p>
                 </div>
-                <TipButton recipientId={profile.id} recipientName={p.display_name || 'User'} />
               </div>
             </div>
 

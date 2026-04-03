@@ -9,6 +9,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\WebPush\WebPushChannel;
 use NotificationChannels\WebPush\WebPushMessage;
+use NotificationChannels\ExpoPushNotifications\ExpoChannel;
+use NotificationChannels\ExpoPushNotifications\ExpoMessage;
 
 class NewMessageNotification extends Notification implements ShouldQueue
 {
@@ -38,7 +40,7 @@ class NewMessageNotification extends Notification implements ShouldQueue
     public function via(object $notifiable): array
     {
         // Default to database and push only for messages
-        return $this->getChannels($notifiable, 'new_message', ['database', WebPushChannel::class]);
+        return $this->getChannels($notifiable, 'new_message', ['database', WebPushChannel::class, ExpoChannel::class]);
     }
 
     /**
@@ -48,9 +50,21 @@ class NewMessageNotification extends Notification implements ShouldQueue
     {
         return (new WebPushMessage)
             ->title('New Message from '.$this->sender->name)
-            ->body($this->messageContent)
+            ->body('You have a new encrypted message.')
             ->action('Reply', 'reply_message')
-            ->data(['url' => '/chatrooms/'.$this->chatroomId]);
+            ->data(['url' => '/messages']);
+    }
+
+    /**
+     * Get the Expo representation of the notification.
+     */
+    public function toExpoPush($notifiable)
+    {
+        return (new ExpoMessage())
+            ->title('New Message from '.$this->sender->name)
+            ->body('You have a new encrypted message.')
+            ->data(['url' => '/messages', 'type' => 'new_message'])
+            ->priority('high');
     }
 
     /**

@@ -3,13 +3,14 @@
 namespace App\Notifications\Traits;
 
 use NotificationChannels\WebPush\WebPushChannel;
+use NotificationChannels\ExpoPushNotifications\ExpoChannel;
 
 trait ChecksNotificationPreferences
 {
     /**
      * Get the notification's delivery channels based on user preferences.
      */
-    protected function getChannels(object $notifiable, string $type, array $defaultChannels = ['mail', 'database', WebPushChannel::class]): array
+    protected function getChannels(object $notifiable, string $type, array $defaultChannels = ['mail', 'database', WebPushChannel::class, ExpoChannel::class]): array
     {
         // If notifiable is not a User (e.g. AnonymousNotifiable), return defaults
         if (! method_exists($notifiable, 'notificationPreferences')) {
@@ -35,6 +36,7 @@ trait ChecksNotificationPreferences
 
         if ($preference->push) {
             $channels[] = WebPushChannel::class;
+            $channels[] = ExpoChannel::class;
         }
 
         return $channels;

@@ -344,6 +344,16 @@ class User extends Authenticatable
         return $this->hasMany(DeviceToken::class);
     }
 
+    /**
+     * Route notifications for the Expo channel.
+     *
+     * @return array|string
+     */
+    public function routeNotificationForExpo()
+    {
+        return $this->deviceTokens()->pluck('token')->toArray();
+    }
+
     public function friends(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(User::class, 'friends', 'user_id', 'friend_id')

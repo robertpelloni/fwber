@@ -156,14 +156,6 @@ const nextConfig = {
         source: '/api/:path*', 
         destination: 'https://api.fwber.me/api/:path*',
       },
-      {
-        source: '/.well-known/webfinger',
-        destination: 'https://api.fwber.me/.well-known/webfinger',
-      },
-      {
-        source: '/.well-known/nodeinfo',
-        destination: 'https://api.fwber.me/.well-known/nodeinfo',
-      },
     ];
   },
 }

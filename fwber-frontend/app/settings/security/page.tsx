@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useE2EEncryption } from '@/lib/hooks/use-e2e-encryption';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Lock, RefreshCw, Key, ShieldCheck, AlertTriangle, Globe, UserX, Mic2, Zap, Loader2 } from 'lucide-react';
+import { Lock, RefreshCw, Key, ShieldCheck, AlertTriangle, UserX, Mic2, Zap, Loader2 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import AppHeader from '@/components/AppHeader';
 import { useAuth } from '@/lib/auth-context';
@@ -16,10 +16,13 @@ import { Input } from '@/components/ui/input';
 import { runEncryptionBenchmark, BenchmarkResult } from '@/lib/wasm/benchmark';
 
 export default function SecuritySettingsPage() {
-  const { isReady, regenerateKeys } = useE2EEncryption();
+  const { isReady, regenerateKeys, backupKeys, restoreKeys } = useE2EEncryption();
   const { token, user, updateUser } = useAuth();
   const [isRegenerating, setIsRegenerating] = useState(false);
-  const [isFederated, setIsFederated] = useState(false);
+  const [backupPassphrase, setBackupPassphrase] = useState('');
+  const [restorePassphrase, setRestorePassphrase] = useState('');
+  const [isBackingUp, setIsBackingUp] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(false);
   const [isConfessional, setIsConfessional] = useState(false);
   const [decoyPassword, setDecoyPassword] = useState('');
   const [isDecoyLoading, setIsDecoyLoading] = useState(false);
@@ -28,15 +31,10 @@ export default function SecuritySettingsPage() {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (user?.profile?.is_federated !== undefined) {
-      setIsFederated(user.profile.is_federated);
-    }
     if (user?.profile?.is_confessional_mode !== undefined) {
       setIsConfessional(user.profile.is_confessional_mode);
     }
   }, [user]);
-
-  const federatedHandle = user?.email ? `@${user.email.split('@')[0]}@api.fwber.me` : '@loading@api.fwber.me';
 
   const handleRunBenchmark = async () => {
     setIsBenchmarking(true);
@@ -99,34 +97,6 @@ export default function SecuritySettingsPage() {
       });
     } finally {
       setIsRegenerating(false);
-    }
-  };
-
-  const handleFederationToggle = async (checked: boolean) => {
-    setIsFederated(checked);
-    if (!token) return;
-    try {
-      await updateUserProfile(token, { is_federated: checked });
-      if (user) {
-        updateUser({
-          ...user,
-          profile: {
-            ...user.profile,
-            is_federated: checked,
-          },
-        });
-      }
-      toast({
-        title: "Federation Updated",
-        description: checked ? "You mapped your profile to the Fediverse!" : "You have isolated your profile locally.",
-      });
-    } catch (error) {
-      setIsFederated(!checked); // revert on failure
-      toast({
-        title: "Error",
-        description: "Failed to update federation settings.",
-        variant: "destructive",
-      });
     }
   };
 
@@ -196,12 +166,101 @@ export default function SecuritySettingsPage() {
                 <Lock className="w-5 h-5 text-blue-500" />
                 End-to-End Encryption
               </CardTitle>
+              <CardDescription>
+                Your private keys never leave your device unencrypted. Back them up with a passphrase you'll remember.
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <Button variant="destructive" onClick={handleRegenerateKeys} disabled={isRegenerating}>
-                {isRegenerating ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <Key className="mr-2 h-4 w-4" />}
-                Regenerate Keys
-              </Button>
+            <CardContent className="space-y-6">
+              {/* --- Key Backup --- */}
+              <div className="space-y-3 p-4 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-100 dark:border-blue-900/30">
+                <h3 className="text-sm font-semibold text-blue-700 dark:text-blue-300 flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4" /> Backup Keys
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Encrypt your private keys with a passphrase and store the backup on our server. If you switch devices, you can recover your chat history.
+                </p>
+                <div className="flex gap-2">
+                  <Input
+                    type="password"
+                    placeholder="Enter a strong passphrase"
+                    value={backupPassphrase}
+                    onChange={e => setBackupPassphrase(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button
+                    variant="default"
+                    disabled={isBackingUp || backupPassphrase.length < 8}
+                    onClick={async () => {
+                      setIsBackingUp(true);
+                      try {
+                        await backupKeys(backupPassphrase);
+                        toast({ title: 'Backup Complete', description: 'Your encrypted keys have been securely uploaded.' });
+                        setBackupPassphrase('');
+                      } catch (e: any) {
+                        toast({ title: 'Backup Failed', description: e.message || 'Could not back up keys.', variant: 'destructive' });
+                      } finally {
+                        setIsBackingUp(false);
+                      }
+                    }}
+                  >
+                    {isBackingUp ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ShieldCheck className="mr-2 h-4 w-4" />}
+                    Backup
+                  </Button>
+                </div>
+                {backupPassphrase.length > 0 && backupPassphrase.length < 8 && (
+                  <p className="text-xs text-red-500">Passphrase must be at least 8 characters.</p>
+                )}
+              </div>
+
+              {/* --- Key Restore --- */}
+              <div className="space-y-3 p-4 bg-green-50 dark:bg-green-900/10 rounded-lg border border-green-100 dark:border-green-900/30">
+                <h3 className="text-sm font-semibold text-green-700 dark:text-green-300 flex items-center gap-2">
+                  <Key className="w-4 h-4" /> Restore Keys
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  If you're on a new device, enter the passphrase you used during backup to recover your encryption keys and chat history.
+                </p>
+                <div className="flex gap-2">
+                  <Input
+                    type="password"
+                    placeholder="Enter your backup passphrase"
+                    value={restorePassphrase}
+                    onChange={e => setRestorePassphrase(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button
+                    variant="default"
+                    disabled={isRestoring || restorePassphrase.length < 8}
+                    onClick={async () => {
+                      setIsRestoring(true);
+                      try {
+                        await restoreKeys(restorePassphrase);
+                        toast({ title: 'Keys Restored', description: 'Your encryption keys have been recovered. Chat history is now accessible.' });
+                        setRestorePassphrase('');
+                      } catch (e: any) {
+                        toast({ title: 'Restore Failed', description: e.message || 'Incorrect passphrase or no backup found.', variant: 'destructive' });
+                      } finally {
+                        setIsRestoring(false);
+                      }
+                    }}
+                  >
+                    {isRestoring ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Key className="mr-2 h-4 w-4" />}
+                    Restore
+                  </Button>
+                </div>
+              </div>
+
+              {/* --- Danger Zone: Regenerate --- */}
+              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                  <AlertTriangle className="w-3 h-3 inline mr-1 text-red-500" />
+                  Regenerating keys will make all previous encrypted messages permanently unreadable on this device.
+                </p>
+                <Button variant="destructive" onClick={handleRegenerateKeys} disabled={isRegenerating}>
+                  {isRegenerating ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <Key className="mr-2 h-4 w-4" />}
+                  Regenerate Keys
+                </Button>
+              </div>
             </CardContent>
           </Card>
 

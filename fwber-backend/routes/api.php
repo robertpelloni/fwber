@@ -61,6 +61,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('security/keys')->group(function () {
         Route::post('/', [\App\Http\Controllers\E2EKeyManagementController::class, 'store']);
         Route::get('/me', [\App\Http\Controllers\E2EKeyManagementController::class, 'me']);
+        Route::post('/backup', [\App\Http\Controllers\E2EKeyManagementController::class, 'backup']);
+        Route::get('/restore', [\App\Http\Controllers\E2EKeyManagementController::class, 'restore']);
         Route::get('/{userId}', [\App\Http\Controllers\E2EKeyManagementController::class, 'show']);
     });
 

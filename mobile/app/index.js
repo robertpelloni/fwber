@@ -3,9 +3,49 @@ import { WebView } from 'react-native-webview';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useEffect, useRef, useState } from 'react';
 import * as Location from 'expo-location';
+import * as TaskManager from 'expo-task-manager';
+import * as SecureStore from 'expo-secure-store';
+import * as Notifications from 'expo-notifications';
 import NfcManager, { NfcTech, Ndef } from 'react-native-nfc-manager';
 
 const TARGET_DOMAIN = 'fwber.me';
+const LOCATION_TASK_NAME = 'background-location-task';
+
+// Define the background task for location tracking
+TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
+  if (error) {
+    console.error('Background location task error:', error);
+    return;
+  }
+  if (data) {
+    const { locations } = data;
+    if (locations && locations.length > 0) {
+      const location = locations[0];
+      try {
+        // Retrieve token from SecureStore for background API call
+        const userToken = await SecureStore.getItemAsync('userToken');
+        if (!userToken) return;
+
+        console.log('Background location received:', location.coords.latitude, location.coords.longitude);
+        
+        await fetch(`https://api.${TARGET_DOMAIN}/api/location`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userToken}`
+          },
+          body: JSON.stringify({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            accuracy: location.coords.accuracy,
+          })
+        });
+      } catch (err) {
+        console.error('Failed to update background location', err);
+      }
+    }
+  }
+});
 
 export default function Home() {
   const insets = useSafeAreaInsets();
@@ -17,9 +57,25 @@ export default function Home() {
   // 1. Initialize Native Capabilities
   useEffect(() => {
     (async () => {
-      // Location
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      setLocationGranted(status === 'granted');
+      // Location Permissions
+      const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
+      if (foregroundStatus === 'granted') {
+        const { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
+        if (backgroundStatus === 'granted') {
+           setLocationGranted(true);
+           // Start tracking
+           await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+             accuracy: Location.Accuracy.Balanced,
+             timeInterval: 60000, // 1 minute
+             distanceInterval: 50, // 50 meters
+             foregroundService: {
+               notificationTitle: "fwber is active",
+               notificationBody: "Monitoring nearby matches...",
+               notificationColor: "#FF1493"
+             }
+           });
+        }
+      }
 
       // NFC
       try {
@@ -30,6 +86,19 @@ export default function Home() {
         }
       } catch (e) {
         console.warn('NFC initialization failed', e);
+      }
+
+      // Notifications
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus === 'granted') {
+        const token = (await Notifications.getExpoPushTokenAsync()).data;
+        console.log('Push Token:', token);
+        await SecureStore.setItemAsync('pushToken', token);
       }
     })();
   }, []);
@@ -70,6 +139,27 @@ export default function Home() {
     try {
       const data = JSON.parse(event.nativeEvent.data);
       
+      if (data.type === 'SET_AUTH_TOKEN') {
+        // Store token for background tasks
+        await SecureStore.setItemAsync('userToken', data.token);
+
+        // Sync push token if we have one
+        const pushToken = await SecureStore.getItemAsync('pushToken');
+        if (pushToken) {
+           await fetch(`https://api.${TARGET_DOMAIN}/api/device-tokens`, {
+             method: 'POST',
+             headers: { 
+               'Content-Type': 'application/json',
+               'Authorization': `Bearer ${data.token}`
+             },
+             body: JSON.stringify({
+               token: pushToken,
+               platform: Platform.OS
+             })
+           });
+        }
+      }
+
       if (data.type === 'START_NFC_SCAN') {
         // Trigger native NFC prompt
         NfcManager.registerTagEvent();

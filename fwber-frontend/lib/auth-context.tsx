@@ -130,6 +130,14 @@ function persistStoredAuth(user: User, token: string): void {
   setApiClientAuthToken(token)
   localStorage.setItem('fwber_token', token)
   localStorage.setItem('fwber_user', JSON.stringify(user))
+
+  // --- NATIVE BRIDGE: Push token to mobile app if running in WebView ---
+  if ((window as any).ReactNativeWebView) {
+    (window as any).ReactNativeWebView.postMessage(JSON.stringify({
+      type: 'SET_AUTH_TOKEN',
+      token: token
+    }));
+  }
 }
 
 // Initial state
@@ -225,6 +233,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 // Provider component
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(authReducer, initialState)
+
+  // --- NATIVE BRIDGE: Token Sync ---
+  useEffect(() => {
+    if (state.isAuthenticated && state.token && (window as any).ReactNativeWebView) {
+      (window as any).ReactNativeWebView.postMessage(JSON.stringify({
+        type: 'SET_AUTH_TOKEN',
+        token: state.token
+      }));
+    }
+  }, [state.isAuthenticated, state.token]);
 
   // Initialize auth state from localStorage
   useEffect(() => {

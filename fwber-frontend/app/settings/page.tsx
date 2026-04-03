@@ -17,7 +17,7 @@ import {
   BookHeart,
   Eye,
   Palette,
-  HelpCircle,
+  CircleHelp,
   ChevronRight,
   LogOut,
   CreditCard,
@@ -458,7 +458,7 @@ export default function SettingsPage() {
             <div className="space-y-3">
               <SettingsLink
                 href="/help"
-                icon={<HelpCircle className="w-5 h-5" />}
+                icon={<CircleHelp className="w-5 h-5" />}
                 title="Help & Support"
                 description="Get help with your account"
               />

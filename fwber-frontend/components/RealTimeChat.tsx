@@ -6,8 +6,6 @@ import { useAuth } from '@/lib/auth-context';
 import { MessageMetadata } from '@/components/MessageStatusIndicator';
 import { PresenceIndicator, PresenceStatus } from '@/components/PresenceIndicator';
 import { EvolvingAvatar } from '@/components/ui/EvolvingAvatar';
-import { WingmanSuggestions } from '@/components/ai/WingmanSuggestions';
-import { WingmanDashboardModal } from '@/components/ai/WingmanDashboardModal';
 import AudioRecorder from '@/components/AudioRecorder';
 import { api } from '@/lib/api/client';
 import { Languages, Loader2, Sparkles, Gift as GiftIcon, Lock, Video, MoreVertical, Paperclip, X, ThumbsUp, Heart, Laugh, BookOpen, MessageSquareQuote, Star, Zap } from 'lucide-react';
@@ -22,9 +20,6 @@ import { useE2EEncryption } from '@/lib/hooks/use-e2e-encryption';
 import { useChatSync } from '@/lib/hooks/use-chat-sync';
 import { storeOfflineMessage } from '@/lib/offline-store';
 import { v4 as uuidv4 } from 'uuid';
-import TipButton from '@/components/tipping/TipButton';
-import { ConversationCoach } from '@/components/chat/ConversationCoach';
-import { TierUnlockGuide } from '@/components/chat/TierUnlockGuide';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -423,10 +418,6 @@ export default function RealTimeChat({
             <GiftIcon className="w-5 h-5" />
           </button>
 
-          <TipButton recipientId={parseInt(recipientId)} recipientName={recipientName} compact />
-
-          <WingmanDashboardModal matchId={recipientId} matchName={recipientName} />
-
           <Popover>
             <PopoverTrigger asChild>
               <button
@@ -531,10 +522,7 @@ export default function RealTimeChat({
         </div>
       </div>
 
-      {/* Tier Unlock Guide Overlay */}
-      <TierUnlockGuide matchId={recipientId} />
-
-      {/* Wingman Proactive Nudge Banner */}
+      {/* Banner */}
       <AnimatePresence>
         {activeNudge && (
           <motion.div
@@ -549,7 +537,7 @@ export default function RealTimeChat({
               </div>
               <div className="flex-1 min-w-0">
                 <h4 className="text-red-400 font-semibold text-sm flex items-center justify-between">
-                  Wingman Suggestion
+                  Suggestion
                   <button
                     onClick={() => setActiveNudge(null)}
                     className="text-gray-400 hover:text-white transition-colors p-1"
@@ -707,17 +695,6 @@ export default function RealTimeChat({
 
       {/* Message Input */}
       <div className="p-4 border-t border-gray-700">
-        <div className="mb-2">
-          <WingmanSuggestions
-            matchId={recipientId}
-            onSelectSuggestion={(suggestion) => {
-              setMessage(suggestion);
-              handleTypingChange(suggestion);
-            }}
-            mode={(messages as ChatMessage[]).length === 0 ? 'ice-breaker' : 'reply'}
-          />
-        </div>
-
         {selectedFile && (
           <div className="mb-2 px-3 py-1 bg-gray-700 rounded flex justify-between items-center">
             <span className="text-sm text-gray-300 truncate max-w-xs">{selectedFile.name}</span>

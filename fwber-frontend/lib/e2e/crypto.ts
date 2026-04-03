@@ -9,17 +9,7 @@
 let wasmModule: any = null;
 
 async function loadWasm() {
-  if (wasmModule) return wasmModule;
-  try {
-    // @ts-ignore
-    wasmModule = await import('@/lib/wasm/fwber_wasm');
-    await wasmModule.default();
-    console.log('E2E: WASM encryption acceleration active');
-    return wasmModule;
-  } catch (e) {
-    console.debug('E2E: WASM acceleration not available, using WebCrypto fallback');
-    return null;
-  }
+  return null;
 }
 
 // Configuration for ECDH
@@ -264,4 +254,73 @@ export async function decryptMessage(
     console.error('Decryption failed', e);
     throw new Error('Failed to decrypt message');
   }
+}
+
+/**
+ * Derive a strong encryption key from a user passphrase using PBKDF2.
+ */
+export async function deriveKeyFromPassphrase(passphrase: string, saltBytes: Uint8Array): Promise<CryptoKey> {
+    const enc = new TextEncoder();
+    const keyMaterial = await window.crypto.subtle.importKey(
+        'raw',
+        enc.encode(passphrase),
+        'PBKDF2',
+        false,
+        ['deriveKey']
+    );
+
+    return window.crypto.subtle.deriveKey(
+        {
+            name: 'PBKDF2',
+            salt: saltBytes,
+            iterations: 100000,
+            hash: 'SHA-256',
+        },
+        keyMaterial,
+        { name: 'AES-GCM', length: 256 },
+        false,
+        ['encrypt', 'decrypt']
+    );
+}
+
+/**
+ * Encrypt a private JWK string using a user passphrase.
+ */
+export async function encryptPrivateKey(jwkString: string, passphrase: string): Promise<{ ciphertext: string, salt: string, iv: string }> {
+    const salt = window.crypto.getRandomValues(new Uint8Array(16));
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+    
+    const key = await deriveKeyFromPassphrase(passphrase, salt);
+    
+    const enc = new TextEncoder();
+    const encrypted = await window.crypto.subtle.encrypt(
+        { name: 'AES-GCM', iv },
+        key,
+        enc.encode(jwkString)
+    );
+
+    return {
+        ciphertext: btoa(String.fromCharCode(...new Uint8Array(encrypted))),
+        salt: btoa(String.fromCharCode(...salt)),
+        iv: btoa(String.fromCharCode(...iv))
+    };
+}
+
+/**
+ * Decrypt a private JWK string using a user passphrase.
+ */
+export async function decryptPrivateKey(ciphertextB64: string, saltB64: string, ivB64: string, passphrase: string): Promise<string> {
+    const salt = Uint8Array.from(atob(saltB64), c => c.charCodeAt(0));
+    const iv = Uint8Array.from(atob(ivB64), c => c.charCodeAt(0));
+    const encrypted = Uint8Array.from(atob(ciphertextB64), c => c.charCodeAt(0));
+
+    const key = await deriveKeyFromPassphrase(passphrase, salt);
+
+    const decrypted = await window.crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv },
+        key,
+        encrypted
+    );
+
+    return new TextDecoder().decode(decrypted);
 }

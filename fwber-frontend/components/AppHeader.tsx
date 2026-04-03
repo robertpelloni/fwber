@@ -21,7 +21,8 @@ import {
     User,
     Settings,
     LogOut,
-    Shield
+    Shield,
+    CircleHelp
 } from 'lucide-react'
 
 interface AppHeaderProps {
@@ -386,7 +387,7 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                                 href="/help"
                                 className="flex items-center gap-2 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
                             >
-                                <HelpCircle className="h-4 w-4" />
+                                <CircleHelp className="h-4 w-4" />
                                 <span>Need help?</span>
                             </a>
                         </div>

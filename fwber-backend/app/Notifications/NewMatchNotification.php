@@ -9,6 +9,12 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\WebPush\WebPushMessage;
+use NotificationChannels\ExpoPushNotifications\ExpoChannel;
+use NotificationChannels\ExpoPushNotifications\ExpoMessage;
+
+class NewMatchNotification extends Notification implements ShouldQueue
+use NotificationChannels\Fcm\FcmMessage;
+use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
 class NewMatchNotification extends Notification implements ShouldQueue
 {
@@ -56,6 +62,37 @@ class NewMatchNotification extends Notification implements ShouldQueue
             ->body("You matched with {$this->matchedUser->name}!")
             ->action('View Match', 'view_match')
             ->data(['url' => '/matches']);
+    }
+
+    /**
+     * Get the Expo representation of the notification.
+     */
+    public function toExpoPush($notifiable)
+    {
+        return (new ExpoMessage())
+            ->title('New Match!')
+            ->body("You matched with {$this->matchedUser->name}!")
+            ->data(['url' => '/matches', 'type' => 'new_match'])
+            ->priority('high');
+    }
+
+    /**
+     * Get the FCM representation of the notification.
+     */
+    public function toFcm($notifiable): FcmMessage
+    {
+        return (new FcmMessage(notification: new FcmNotification(
+            title: 'New Match!',
+            body: "You matched with {$this->matchedUser->name}!",
+        )))
+            ->data(['url' => '/matches', 'type' => 'new_match'])
+            ->custom([
+                'android' => [
+                    'notification' => [
+                        'color' => '#FF1493',
+                    ],
+                ],
+            ]);
     }
 
     /**

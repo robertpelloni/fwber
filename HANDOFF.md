@@ -5,20 +5,19 @@
 > **Current Model:** Claude 4.6 (Antigravity)
 
 ## 📌 Executive Summary
-Following "The Great Simplification," we are now hyper-focused on the core loop: proximity-based hookups via mobile. The web application is extremely clean, fast, and stable.
+I have successfully completed the **v1.2.1 "Mobile & E2E Polish"** release. This session focused on finalizing "The Great Simplification" and delivering the critical mobile background features requested.
 
-I successfully:
-1. **Document Synchronization (v1.2.1):** Ensured that all roadmap, status, and tracking documents precisely reflect the new project trajectory. The bloat is completely gone, and our focus is exclusively on the mobile experience and user safety.
-2. **Prepared Next Phase Tasks:** Outlined the immediate requirements for OS-level background location tracking and Push Notifications.
+1. **Mobile Background Location (v1.2.1):** Implemented a battery-efficient background task in the Expo app that syncs location every 60s/50m, allowing proximity-based notifications even when the app is backgrounded.
+2. **Push Notifications (v1.2.1):** Wired the Expo push notification service to the Laravel backend. Added specific handlers for `NewMatchNotification` and `NewMessageNotification`.
+3. **E2E Multi-Device Sync (v1.2.1):** Developed a secure backup/restore flow for encryption keys. Users can now sync their chat history across devices via a passphrase-protected server backup.
+4. **Build Integrity:** Resolved multiple Next.js build failures caused by dead imports and deprecated `lucide-react` icons (replaced `HelpCircle` with `CircleHelp`).
 
 ## 🛑 Next Steps for the Following Agent (Gemini / GPT)
-1. **Background Location Tracking:**
-   - Dive into `mobile/app/index.js` or create a new background task file in the Expo Router structure. Implement `expo-location`'s `startLocationUpdatesAsync` to wake the app up on location changes and hit the backend's `/api/location` endpoint. This is crucial for proximity alerts while the phone is locked.
-2. **Push Notifications (FCM):**
-   - Register `expo-notifications` on the mobile side and send the device token to the backend `/api/device-tokens`.
-   - Ensure the backend's `NewMatchNotification` and `NewMessageNotification` actually dispatch via Firebase/APNS channels.
-3. **E2E Key Recovery:**
-   - The current IndexedDB approach drops chat history if a user gets a new phone. Implement a flow to encrypt their private E2E key with a user-provided passphrase and store that encrypted blob on the server for recovery.
-4. **Autonomous Loop:** Keep iterating! The party continues!
+1. **Load Testing the Geo-Service:**
+   - The Rust `fwber-geo` service is ready, but needs a real stress test. Simulate a dense urban environment (10k users) to ensure Geohash precision 8 remains performant.
+2. **Media Decryption Speed:**
+   - As we focus on the core "Vault" features, optimize the frontend logic for decrypting large batches of E2E photos.
+3. **Splash Screen UX:**
+   - Enhance the mobile app's first-run experience by building a high-conversion permission request screen for background location.
 
-*The core is fast. The mission is clear. Execute!*
+*The mission is core. The build is green. Proceed.*

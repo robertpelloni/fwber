@@ -6,19 +6,23 @@
 
 ---
 
-## 📱 Mobile Core Foundation
-- **Battery-Efficient Tracking:** Initiated integration for OS-level background location tracking in the Expo Router app. This will allow proximity alerts to trigger even when the device is locked in a user's pocket.
-- **Push Notification Prep:** Laid the groundwork for FCM/APNS integration to push real-time alerts for matches and messages.
+## 📱 Mobile Core & Background Location
+- **Battery-Efficient Tracking:** Implemented OS-level background location tracking using `expo-location` and `TaskManager`. Proximity alerts now trigger even when the app is closed.
+- **Push Notifications:** Fully integrated Expo Push Notifications with the Laravel backend. Users now receive native alerts for matches and new encrypted messages.
+- **Token Persistence:** Added secure token storage via `expo-secure-store` to allow background tasks to communicate with the API.
 
-## 🔐 E2E Key Recovery
-- **Multi-Device Sync:** Began polishing the IndexedDB key storage architecture to support securely backing up and recovering E2E keys when a user logs in from a new browser or device.
+## 🔐 E2E Key Backup & Restore
+- **Multi-Device Parity:** Users can now back up their E2E private keys (encrypted with a passphrase) to the server.
+- **Recovery Flow:** Added a proactive dashboard alert that guides users to restore their keys on new devices, ensuring chat history is never lost.
+- **WASM Cleanse:** Gracefully handled environments where Rust/WASM is unavailable while maintaining high-speed WebCrypto fallbacks.
 
-## 🎯 Next Steps
-- Finalize the React Native mobile app (Expo Router) for background location.
-- Perfect the End-to-End Encryption key backup/recovery flow.
-- Finalize Push Notifications (FCM/APNS).
+## 🔪 The Great Simplification (Finalized)
+- **Aggressive Pruning:** Deleted an additional 36 legacy routes and dozens of unused components. The frontend route list has been reduced from 85 to 49 core pages.
+- **Clean Documentation:** Updated the Help Center and developer docs to reflect the removed ActivityPub, Governance, and Economy features.
 
 ## ✅ Release Focus
-- [x] Initiate Background Location Tracking integration.
-- [x] Initiate E2E Multi-device sync architecture.
-- [x] Prepare FCM/APNS Notification handlers.
+- [x] Finalize Background Location tracking.
+- [x] Integrate Push Notifications (Expo/FCM).
+- [x] Build E2E Key Backup/Restore UI & Logic.
+- [x] Finalize frontend bloat deletion.
+- [x] Fix deprecated Lucide icon references causing build failures.

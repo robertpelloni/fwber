@@ -3,13 +3,16 @@
 import { useAuth } from '@/lib/auth-context';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useQuery } from '@tanstack/react-query';
-import { Heart, Users, MessageSquare, TrendingUp, Clock, Target } from 'lucide-react';
+import { Heart, Users, MessageSquare, TrendingUp, Clock, Target, AlertCircle, Key } from 'lucide-react';
 import Link from 'next/link';
 import ProfileCompletenessWidget from '@/components/ProfileCompletenessWidget';
 import { ProximityPresenceCompact } from '@/components/realtime/ProximityPresenceView';
 import AppHeader from '@/components/AppHeader';
 import { ActivityFeed } from '@/components/ActivityFeed';
 import { api } from '@/lib/api/client';
+import { useE2EEncryption } from '@/lib/hooks/use-e2e-encryption';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 
 interface DashboardStats {
   total_matches: number;
@@ -26,6 +29,7 @@ interface DashboardStats {
 
 export default function DashboardPage() {
   const { user, token, isAuthenticated } = useAuth();
+  const { isRestorable } = useE2EEncryption();
 
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard-stats'],
@@ -40,6 +44,22 @@ export default function DashboardPage() {
 
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="px-4 py-6 sm:px-0">
+            {/* E2E Restore Alert */}
+            {isRestorable && (
+              <Alert className="mb-6 border-blue-500 bg-blue-50 dark:bg-blue-900/10">
+                <Key className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <AlertTitle className="text-blue-800 dark:text-blue-300 font-bold">Encrypted Keys Found</AlertTitle>
+                <AlertDescription className="text-blue-700 dark:text-blue-400 flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2">
+                  <span>We found a backup of your encryption keys. Restore them now to read your existing messages on this device.</span>
+                  <Link href="/settings/security">
+                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white whitespace-nowrap">
+                      Go to Security
+                    </Button>
+                  </Link>
+                </AlertDescription>
+              </Alert>
+            )}
+
             <div className="mb-8 flex justify-between items-end">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">

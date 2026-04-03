@@ -1,14 +1,14 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.2.1 "Mobile Core Polish"
+> **Current Version:** 1.2.1 "Core Performance & Mobile Polish"
 > **Last Updated:** 2026-04-04
 
 ---
 
 ## 🗺️ High-Level Trajectory
 
-### The Pivot: Laser Focus on Core
-The `fwber` platform has undergone a massive simplification (v1.2.0). We have officially removed all bloat, including:
+### The Pivot: Laser Focus on Core (COMPLETED)
+The `fwber` platform has undergone a massive simplification (v1.2.0/v1.2.1). We have officially removed all bloat, including:
 - Decentralized Governance (DAOs, Councils, Merkle Provers)
 - ActivityPub Federation (Global Social Feeds, Group Actors)
 - Physical Marketplace (B2B Inventory, Tap-to-Pay, Stripe checkouts)
@@ -34,19 +34,14 @@ The platform is now **100% focused on its core identity**:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 4: Decentralization & Real-time (COMPLETED)
-- Event Sourcing migration for core domains (Location, Messages, Matches).
-- Laravel Reverb WebSocket integration for instant messaging.
-- Offline-first IndexedDB CRDT synchronization via batch sync logic.
-
-### Phase 5: Production Scale (ACTIVE)
-- Rust `fwber-geo` microservice deployment for high-density geographic querying.
-- Multi-region edge caching.
-- Mobile Expo Router application finalized.
+### Phase 4: Mobile & E2E Polish (COMPLETED - v1.2.1)
+- **Battery-Efficient Background Location:** OS-level tracking in Expo for proximity alerts.
+- **Push Notifications:** Full integration with Expo/Laravel for real-time match/message alerts.
+- **E2E Key Sync:** Secure multi-device backup and recovery of encryption keys.
 
 ---
 
 ## 🎯 Next Immediate Milestones
-1. Finalize **Push Notifications** (FCM/APNS) for the React Native app.
-2. Perfect the **Battery-Efficient Background Location** tracking in the mobile app.
-3. Polish the **E2E Encryption Keys** flow for seamless multi-device syncing.
+1. **Performance Tuning:** Optimize Rust `fwber-geo` service for high-density metropolitan areas.
+2. **Media Optimization:** Implement ultra-fast media delivery for E2E encrypted photos.
+3. **App Store Readiness:** Finalize remaining native bridge edge cases for iOS/Android submission.
