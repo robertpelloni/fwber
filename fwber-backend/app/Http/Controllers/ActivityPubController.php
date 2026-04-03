@@ -34,6 +34,25 @@ class ActivityPubController extends Controller
     }
 
     /**
+     * Resolves the Group profile via /api/federation/groups/{id}
+     */
+    public function group($id, ActivityPubService $service)
+    {
+        $group = \App\Models\Group::where('id', $id)
+            ->where('is_federated', true)
+            ->first();
+
+        if (! $group) {
+            return response()->json(['error' => 'Group not found'], 404);
+        }
+
+        $payload = $service->generateGroupPayload($group);
+
+        return response()->json($payload)
+            ->header('Content-Type', 'application/activity+json');
+    }
+
+    /**
      * Resolve a remote actor for the authenticated federation UI.
      */
     public function actorDetail(Request $request)

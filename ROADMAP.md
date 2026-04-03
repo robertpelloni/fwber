@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.0.84
+> **Current Version:** 1.0.86
 > **Last Updated:** 2026-04-02
 
 ---
@@ -37,18 +37,23 @@
 - Merchant/B2B Portal: Dashboard, Deactivation/Resend logic, CSV Exports, Live Vibe detection.
 - Unified scene discovery across all match algorithms.
 
-### Phase 6: Production Hardening & Scale (ACTIVE)
+### Phase 6: Production Hardening & Scale (COMPLETED)
 - Rust `fwber-geo` microservice deployment for high-density geographic querying.
-- Kubernetes / Helm chart finalization for enterprise scale (COMPLETED).
-- Multi-region edge caching (Cloudflare + Vercel) (COMPLETED).
-- Load testing the unified Event Store (COMPLETED).
-- Prepare **Mobile Expo Router** migration for the `mobile/` directory (COMPLETED).
-- Develop a **Sub-millisecond Real-time Proximity Cache** (COMPLETED).
-- Finalize **ActivityPub Search Aggregator** (COMPLETED).
-- Implement **WASM Encryption Primitives** (COMPLETED).
-- Build a **NFC Match Protocol** with **ZK-Location Verification** (COMPLETED).
-- Develop **Distributed Global Event Streaming** (COMPLETED).
-- Build a **Physical Item Marketplace** (Backend) (COMPLETED).
+- Kubernetes / Helm chart finalization for enterprise scale.
+- Multi-region edge caching (Cloudflare + Vercel).
+- Load testing the unified Event Store.
+- Prepare **Mobile Expo Router** migration for the `mobile/` directory.
+
+### Phase 7: Physical & Federated Expansion (ACTIVE)
+- Develop a **Sub-millisecond Real-time Proximity Cache**.
+- Finalize **ActivityPub Search Aggregator**.
+- Implement **WASM Encryption Primitives**.
+- Build a **NFC Match Protocol** with **ZK-Location Verification**.
+- Develop **Distributed Global Event Streaming**.
+- Build a **Physical Item Marketplace**.
+- Implement **Federated Reputation Aggregator** (COMPLETED).
+- Implement **ActivityPub Group Actors** (COMPLETED).
+- Enable **Native NFC Support** (Permissions) (COMPLETED).
 
 ---
 
@@ -62,15 +67,15 @@
 | **Location / Geo** | Mature | 100% | 100% | AR Nav, Redis Bloom, ZK-Location Proofs. |
 | **AI Integration** | Mature | 100% | 100% | Avatars, Wingman modals, Roast, Content Gen. |
 | **Social / Viral** | Mature | 100% | 100% | Rate My Cat, Bounties, Referrals. |
-| **Economy** | Mature | 100% | 85% | FWB Tokens, Stripe, Marketplace Backend. |
-| **Federation** | Mature | 100% | 100% | WebFinger, Aggregated Search, Signed Activities. |
+| **Economy** | Mature | 100% | 100% | FWB Tokens, Stripe, Marketplace Shop. |
+| **Federation** | Mature | 100% | 100% | Aggregated Search, Reputation, Group Actors. |
 | **B2B / Merchant** | Mature | 100% | 100% | Registration, Inventory, analytics CSV export. |
 | **DevOps / Infra** | Mature | 100% | 100% | Helm Chart, Edge Caching, Event Streaming. |
-| **Mobile App** | Mature | 100% | 100% | Expo Router, WebView Hybrid, Native Geofencing. |
+| **Mobile App** | Mature | 100% | 100% | Expo Router, WebView Hybrid, NFC Support. |
 
 ---
 
 ## 🎯 Next Immediate Milestones
-1. Build the **Marketplace UI** in the React frontend.
-2. Finalize the **Federated Reputation Aggregator** to sync Vouch scores across instances.
-3. Implement **ActivityPub Group Actors** for federated bulletin boards.
+1. Build a **NFC "Tap-to-Pay"** protocol linking physical inventory purchases with device tapping.
+2. Develop a **Federated Feed Aggregator** to combine local and remote posts into a unified social experience.
+3. Implement **ZK-Age Verification** to prove 18+ status without sharing birthdates via ActivityPub.

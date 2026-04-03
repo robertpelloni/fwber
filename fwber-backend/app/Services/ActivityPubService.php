@@ -134,4 +134,30 @@ class ActivityPubService
             ],
         ];
     }
+
+    /**
+     * Generate the standard Group JSON-LD for a Community.
+     */
+    public function generateGroupPayload(\App\Models\Group $group): array
+    {
+        $groupUri = url("/api/federation/groups/{$group->id}");
+        $inboxUri = url("/api/federation/groups/{$group->id}/inbox");
+        $outboxUri = url("/api/federation/groups/{$group->id}/outbox");
+
+        return [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => $groupUri,
+            'type' => 'Group',
+            'preferredUsername' => \Illuminate\Support\Str::slug($group->name),
+            'name' => $group->name,
+            'summary' => $group->description ?? 'A community on fwber',
+            'url' => url("/groups/{$group->id}"),
+            'icon' => [
+                'type' => 'Image',
+                'url' => $group->icon ?? asset('images/default-group.png'),
+            ],
+            'inbox' => $inboxUri,
+            'outbox' => $outboxUri,
+        ];
+    }
 }

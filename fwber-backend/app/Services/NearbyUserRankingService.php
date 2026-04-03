@@ -76,6 +76,19 @@ class NearbyUserRankingService
                 $location->distance = $distanceMeters;
                 $location->distance_meters = $distanceMeters;
                 $location->scene_signals = $sceneSignals;
+
+                // --- FEDERATED REPUTATION BOOST ---
+                $federatedBoost = 0;
+                if ($location->user?->profile?->is_federated) {
+                    $reputation = \DB::table('federated_actor_reputations')
+                        ->where('actor_uri', 'like', '%' . $location->user->name . '%') // Simplified lookup for demo
+                        ->first();
+                    if ($reputation) {
+                        $federatedBoost = min(15, ($reputation->vouch_count / 10)); // Max 15 points boost
+                    }
+                }
+                // ----------------------------------
+
                 $location->ranking_score = round(
                     $this->localPulseRankingService->calculateCompositeScore(
                         $viewer,
@@ -92,7 +105,8 @@ class NearbyUserRankingService
                         $positiveActions->get($candidateId, collect()),
                         $activeMatches->get($candidateId, collect())
                     )
-                    + $this->calculateDistanceScore($distanceMeters),
+                    + $this->calculateDistanceScore($distanceMeters)
+                    + $federatedBoost,
                     2
                 );
 

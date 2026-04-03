@@ -608,3 +608,11 @@ All notable changes to this project will be documented in this file.
 - **Marketplace UI**: Built a dedicated shop interface (`/marketplace/{merchantId}`) where users can browse physical items and spend FWB Tokens.
 - **Purchase Workflow**: Integrated an animated "Purchase Confirmed" screen displaying unique redemption codes for merchant verification.
 - **Marketplace API Library**: Created `lib/api/marketplace.ts` to centralize token-based B2B transactions.
+
+## [1.0.86] - 2026-04-02
+### Added
+- **Federated Reputation Aggregator**: Implemented a background job to periodically sync vouch scores and membership age from remote ActivityPub actors. Surrogate trust data is now cached locally in `federated_actor_reputations`.
+- **ActivityPub Group Actors**: Added support for federated community profiles. Groups can now be marked as `is_federated` and are exposed via standard ActivityStreams `Group` JSON-LD.
+- **Mobile NFC Permissions**: Updated `mobile/app.json` to include native NFC hardware permissions for Android, enabling physical profile exchange support.
+### Changed
+- **Trust-Aware Ranking**: Updated `NearbyUserRankingService` to incorporate cached federated reputation into the composite trust score.

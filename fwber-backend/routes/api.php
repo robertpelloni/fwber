@@ -35,6 +35,7 @@ Route::prefix('federation')->group(function () {
 
     // Return Actor profile
     Route::get('users/{id}', [\App\Http\Controllers\ActivityPubController::class, 'actor']);
+    Route::get('groups/{id}', [\App\Http\Controllers\ActivityPubController::class, 'group']);
 });
 
 Route::post('auth/register', [\App\Http\Controllers\AuthController::class, 'register'])->middleware('throttle:auth');

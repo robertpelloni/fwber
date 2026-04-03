@@ -1,21 +1,17 @@
-# Project Status — fwber v1.0.85 (Marketplace UI)
+# Project Status — fwber v1.0.86 (Federated Reputation & Group Actors)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.85 "Marketplace UI"
+**Version:** 1.0.86 "Federated Reputation & Group Actors"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## Physical Marketplace (B2B UI)
-- **Shop Frontend:** Launched the `/marketplace` route for browsing real-world inventory at venues.
-- **Transactional UX:** Created a seamless purchase flow including confirmation modals and a unique `FWB-XXXX` code display for easy in-person redemption.
-- **Animated Redemption:** Leveraged Framer Motion to provide high-fidelity feedback upon token expenditure.
+## Federated Trust & Reputation
+- **Reputation Aggregation:** Launched the `SyncFederatedReputation` job which periodically pulls vouch scores from external instances.
+- **Cross-Instance Trust:** Integrated federated reputation into the `NearbyUserRankingService`, allowing highly vouched users from other servers to rank higher in local discovery feeds.
+- **Group Actors:** Enabled federation for Communities. Groups are now valid ActivityPub actors, allowing federated users to "Follow" and "Join" local boards.
 
-## Physical Marketplace (B2B Backend)
-- **Token-to-Item Economy:** Users can now spend their earned FWB Tokens on real-world items at participating venues.
-- **Inventory Management:** Merchants have a dedicated controller for managing stock, pricing in tokens, and item availability.
-
-## Distributed Global Event Streaming
+## NFC Physical Proof & ZK-Location
 - **Redis Stream Driver:** Implemented the first production driver for the `EventBusInterface`. High-volume events (Location, Messages, Matches) are now streamed to Redis in real-time.
 - **Pluggable Architecture:** Refactored the `EventStore` to be bus-agnostic, making future migration to Kafka or Kinesis a single-line config change.
 
@@ -94,6 +90,9 @@
 - **Billing validation from the previous slice remains the current premium reference path**: `php artisan test tests\Feature\PremiumControllerTest.php tests\Feature\StripeWebhookTest.php`, plus frontend `npm run lint`, `npm run type-check`, and `cmd /c "npm run build"`, already passed for `v1.0.71`.
 
 ## ✅ Release Focus
+- [x] Implement Federated Reputation Aggregator.
+- [x] Implement ActivityPub Group Actors.
+- [x] Enable Mobile NFC hardware permissions.
 - [x] Build Marketplace UI for users to spend tokens.
 - [x] Build Physical Item Marketplace for merchants.
 - [x] Implement Distributed Global Event Streaming (Redis).
