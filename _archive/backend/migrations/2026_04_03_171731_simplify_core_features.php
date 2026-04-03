@@ -11,7 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        $driver = \Illuminate\Support\Facades\DB::getDriverName();
+
         // Remove Bloat Tables (Governance, Federation, Economy, AI, Social, Merchant)
+        // Child tables first to avoid FK constraint issues in SQLite
         $tablesToDrop = [
             'governance_votes',
             'governance_appeals',
@@ -23,45 +26,45 @@ return new class extends Migration
             'followers',
             'followings',
             'swap_transactions',
-            'merchant_inventories',
             'inventory_redemptions',
+            'merchant_inventories',
             'merchant_promotions',
             'promotions',
             'merchant_profiles',
-            'cat_photos',
             'cat_photo_ratings',
+            'cat_photos',
             'ai_avatars',
             'wingman_assists',
-            'bounties',
             'bounty_suggestions',
-            'gifts',
+            'bounties',
             'user_gifts',
+            'gifts',
             'token_transactions',
-            'subscriptions',
             'subscription_plans',
-            'event_groups',
-            'events',
+            'subscriptions',
             'event_invitations',
             'event_rsvps',
-            'groups',
+            'event_groups',
+            'events',
             'group_members',
             'group_posts',
-            'bulletin_boards',
+            'groups',
             'bulletin_messages',
             'bulletin_subscriptions',
-            'proximity_artifacts',
+            'bulletin_boards',
             'proximity_artifact_comments',
             'proximity_artifact_votes',
-            'proximity_chatrooms',
-            'proximity_chatroom_messages',
+            'proximity_artifacts',
             'proximity_chatroom_members',
-            'chatrooms',
+            'proximity_chatroom_messages',
+            'proximity_chatrooms',
             'chatroom_members',
             'chatroom_messages',
-            'audio_rooms',
+            'chatrooms',
             'audio_room_members',
-            'video_calls',
+            'audio_rooms',
             'video_call_signals',
+            'video_calls',
             'journals',
             'topics',
             'relationship_links',
@@ -75,7 +78,9 @@ return new class extends Migration
         ];
 
         // Disable foreign key checks temporarily to drop safely
-        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        if ($driver === 'mysql') {
+            \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        }
 
         foreach ($tablesToDrop as $table) {
             Schema::dropIfExists($table);
@@ -83,14 +88,34 @@ return new class extends Migration
 
         // Drop unused columns in users / user_profiles
         if (Schema::hasColumn('user_profiles', 'is_federated')) {
-            Schema::table('user_profiles', function (Blueprint $table) {
-                $table->dropForeign(['journal_circle_group_id']);
+            Schema::table('user_profiles', function (Blueprint $table) use ($driver) {
+                if ($driver === 'sqlite') {
+                    try { \Illuminate\Support\Facades\DB::statement('DROP INDEX IF EXISTS user_profiles_is_federated_index'); } catch (\Exception $e) {}
+                    try { \Illuminate\Support\Facades\DB::statement('DROP INDEX IF EXISTS user_profiles_journal_circle_group_id_index'); } catch (\Exception $e) {}
+                } else {
+                    try { $table->dropIndex(['is_federated']); } catch (\Exception $e) {}
+                    try { $table->dropIndex(['journal_circle_group_id']); } catch (\Exception $e) {}
+                }
+                
+                try { $table->dropForeign(['journal_circle_group_id']); } catch (\Exception $e) {}
                 $table->dropColumn(['is_federated', 'is_confessional_mode', 'journal_visibility_default', 'journal_circle_group_id']);
             });
         }
 
         if (Schema::hasColumn('users', 'token_balance')) {
-            Schema::table('users', function (Blueprint $table) {
+            Schema::table('users', function (Blueprint $table) use ($driver) {
+                // Drop indices first to satisfy SQLite
+                if ($driver === 'sqlite') {
+                    try { \Illuminate\Support\Facades\DB::statement('DROP INDEX IF EXISTS users_token_balance_index'); } catch (\Exception $e) {}
+                    try { \Illuminate\Support\Facades\DB::statement('DROP INDEX IF EXISTS users_referrer_id_index'); } catch (\Exception $e) {}
+                    try { \Illuminate\Support\Facades\DB::statement('DROP INDEX IF EXISTS users_referral_code_index'); } catch (\Exception $e) {}
+                    try { \Illuminate\Support\Facades\DB::statement('DROP INDEX IF EXISTS users_referral_code_unique'); } catch (\Exception $e) {}
+                } else {
+                    try { $table->dropIndex(['token_balance']); } catch (\Exception $e) {}
+                    try { $table->dropIndex(['referrer_id']); } catch (\Exception $e) {}
+                    try { $table->dropIndex(['referral_code']); } catch (\Exception $e) {}
+                }
+
                 if (Schema::hasColumn('users', 'referrer_id')) {
                     try { $table->dropForeign(['referrer_id']); } catch (\Exception $e) {}
                 }
@@ -103,7 +128,9 @@ return new class extends Migration
             });
         }
 
-        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        if ($driver === 'mysql') {
+            \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        }
     }
 
     /**

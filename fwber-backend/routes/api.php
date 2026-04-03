@@ -42,9 +42,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Profile & Photos
     Route::get('profile', [\App\Http\Controllers\ProfileController::class, 'show']);
+    Route::get('profile/completeness', [\App\Http\Controllers\DashboardController::class, 'getProfileCompleteness']);
     Route::put('profile', [\App\Http\Controllers\ProfileController::class, 'update']);
     Route::delete('profile', [\App\Http\Controllers\ProfileController::class, 'destroy']);
     Route::get('users/{id}', [\App\Http\Controllers\ProfileController::class, 'showPublic']);
+
+    Route::get('onboarding/status', [\App\Http\Controllers\OnboardingController::class, 'getStatus']);
+    Route::post('onboarding/complete', [\App\Http\Controllers\OnboardingController::class, 'complete']);
 
     Route::get('physical-profile', [\App\Http\Controllers\UserPhysicalProfileController::class, 'show']);
     Route::put('physical-profile', [\App\Http\Controllers\UserPhysicalProfileController::class, 'upsert']);
@@ -99,6 +103,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('notifications', [\App\Http\Controllers\NotificationController::class, 'index']);
     Route::get('notifications/count', [\App\Http\Controllers\NotificationController::class, 'count']);
     Route::post('notifications/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead']);
+    Route::get('notification-preferences', [\App\Http\Controllers\NotificationPreferenceController::class, 'index']);
+    Route::put('notification-preferences', [\App\Http\Controllers\NotificationPreferenceController::class, 'update']);
     Route::prefix('device-tokens')->group(function (): void {
         Route::post('/', [\App\Http\Controllers\DeviceTokenController::class, 'store']);
         Route::delete('/{token}', [\App\Http\Controllers\DeviceTokenController::class, 'destroy']);
@@ -111,6 +117,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::post('reports', [\App\Http\Controllers\ReportController::class, 'store']);
     Route::post('safety/panic', [\App\Http\Controllers\SafetyController::class, 'triggerPanic']);
+    Route::get('safety/walk/active', [\App\Http\Controllers\SafetyController::class, 'getActiveWalk']);
     Route::post('safety/walk/start', [\App\Http\Controllers\SafetyController::class, 'startSafeWalk']);
     Route::post('safety/walk/{walkId}/end', [\App\Http\Controllers\SafetyController::class, 'endSafeWalk']);
 
@@ -119,6 +126,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('verify-zk', [\App\Http\Controllers\IdentityController::class, 'verify']);
         Route::get('status', [\App\Http\Controllers\IdentityController::class, 'status']);
     });
+
+    Route::prefix('verification')->group(function () {
+        Route::post('verify', [\App\Http\Controllers\VerificationController::class, 'verify']);
+        Route::get('status', [\App\Http\Controllers\VerificationController::class, 'status']);
+    });
+
     Route::prefix('hardware-tokens')->group(function () {
         Route::post('register', [\App\Http\Controllers\HardwareTokenController::class, 'register']);
         Route::post('ping', [\App\Http\Controllers\HardwareTokenController::class, 'ping']);

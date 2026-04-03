@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Services\GeoScreenerClient;
+use App\Services\GeoScreenerService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -33,19 +33,12 @@ class SyncLocationToGeoScreener implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(GeoScreenerClient $geoScreener): void
+    public function handle(GeoScreenerService $geoScreener): void
     {
-        // Only attempt sync if the screener is actually enabled in the environment
-        if (! $geoScreener->isEnabled()) {
-            return;
-        }
-
         $success = $geoScreener->indexLocation($this->userId, $this->lat, $this->lng);
 
         if (! $success) {
             Log::warning("Failed to sync location for user {$this->userId} to Rust Geo-Screener.");
-            // We could optionally throw an exception here to let the worker retry,
-            // but for a spatial cache it's often better to just drop it and wait for the next ping.
         }
     }
 }

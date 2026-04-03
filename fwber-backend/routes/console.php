@@ -67,26 +67,6 @@ Artisan::command('schema:fix-missing', function () {
 Schedule::command('model:prune')->daily();
 Schedule::command('sanctum:prune-expired --hours=24')->daily();
 
-// Background jobs for premium features
-use App\Jobs\CleanupExpiredSubscriptions;
-use App\Jobs\ExpireBoosts;
-use App\Jobs\SendEventReminders;
-
-// Expire boosts every 15 minutes
-Schedule::job(new ExpireBoosts)->everyFifteenMinutes()
-    ->name('expire-boosts')
-    ->withoutOverlapping();
-
-// Send event reminders every hour
-Schedule::job(new SendEventReminders)->hourly()
-    ->name('send-event-reminders')
-    ->withoutOverlapping();
-
-// Cleanup expired subscriptions daily at 2 AM
-Schedule::job(new CleanupExpiredSubscriptions)->dailyAt('02:00')
-    ->name('cleanup-expired-subscriptions')
-    ->withoutOverlapping();
-
 // Analyze slow requests for performance alerts every hour
 use App\Jobs\AnalyzeSlowRequests;
 

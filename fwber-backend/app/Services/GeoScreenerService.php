@@ -27,12 +27,35 @@ class GeoScreenerService
 
     /**
      * Index a user's location in the Rust H3 spatial index and the local Bloom filter.
+     * Includes debouncing to prevent excessive HTTP calls.
      */
     public function indexLocation(int $userId, float $lat, float $lng): bool
     {
         if (! $this->enabled) {
             return false;
         }
+
+        // --- OPTIMIZATION: Debouncing based on movement ---
+        try {
+            $lastLocKey = "geo:last_loc:user_{$userId}";
+            $lastLoc = Redis::get($lastLocKey);
+
+            if ($lastLoc) {
+                $last = json_decode($lastLoc, true);
+                $dist = $this->calculateDistance($lat, $lng, $last['lat'], $last['lng']);
+                
+                // If user moved less than 10 meters, skip Rust indexing but update Redis Bloom proxy
+                if ($dist < 10) {
+                    return true;
+                }
+            }
+
+            // Cache new location for next debounce check (expires in 1 hour)
+            Redis::setex($lastLocKey, 3600, json_encode(['lat' => $lat, 'lng' => $lng]));
+        } catch (\Exception $e) {
+            Log::warning("GeoDebounce: Check failed: ".$e->getMessage());
+        }
+        // --------------------------------------------------
 
         // 1. Mark the cell as active in Redis (Bloom Filter proxy)
         if ($this->bloomEnabled) {
@@ -110,6 +133,21 @@ class GeoScreenerService
 
             return null;
         }
+    }
+
+    /**
+     * Calculate approximate distance in meters (Haversine)
+     */
+    protected function calculateDistance(float $lat1, float $lon1, float $lat2, float $lon2): float
+    {
+        $earthRadius = 6371000;
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+             cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+             sin($dLon / 2) * sin($dLon / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        return $earthRadius * $c;
     }
 
     /**

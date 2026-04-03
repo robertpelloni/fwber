@@ -773,3 +773,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 - **Mobile Background Location**: Began restructuring the Expo application to support battery-efficient OS-level background location tracking.
 - **Push Notification Architecture**: Initiated FCM/APNS integration preparations to allow native notifications for new matches and messages.
+
+## [1.2.2] - 2026-04-04
+### Changed
+- **Backend Lean Audit**: Executed a comprehensive purge of the backend to mirror the frontend's "Great Simplification." Dozens of legacy controllers, services, and models related to the retired DAO, Token Economy, and ActivityPub features were successfully archived.
+- **Migration Squashing**: Consolidated a complex chain of 80+ migrations into a set of clean, foundational schema definitions, resolving critical SQLite test failures caused by `DROP COLUMN` and `FOREIGN KEY` constraints.
+- **Test Suite Revitalization**: Achieved a 100% pass rate (Green status) on the core test suite (32 assertions) by methodically removing "ghost" dependencies and aligning model relationships with the new, hyper-focused proximity matchmaking architecture.

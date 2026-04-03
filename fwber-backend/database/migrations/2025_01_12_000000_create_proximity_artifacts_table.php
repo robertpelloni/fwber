@@ -6,29 +6,32 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
-        if (Schema::hasTable('proximity_artifacts')) {
-            return;
-        }
-
         Schema::create('proximity_artifacts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
-            $table->enum('type', ['chat', 'board_post', 'announce']);
-            $table->text('content');
-            $table->decimal('location_lat', 10, 7)->index();
-            $table->decimal('location_lng', 10, 7)->index();
-            $table->unsignedInteger('visibility_radius_m')->default(1000);
-            $table->enum('moderation_status', ['clean', 'flagged', 'shadow_throttled', 'removed'])->default('clean');
-            $table->json('meta')->nullable();
-            $table->timestamp('expires_at')->index();
-            $table->timestamps();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('type'); // encounter, location_ping, etc.
+            $table->decimal('latitude', 10, 8);
+            $table->decimal('longitude', 11, 8);
+            $table->string('geohash')->index();
+            $table->json('metadata')->nullable();
+            
+            // Safety/Moderation
+            $table->boolean('is_flagged')->default(false);
+            $table->string('flag_reason')->nullable();
+            $table->softDeletes();
 
-            $table->index(['type', 'expires_at']);
+            $table->timestamps();
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('proximity_artifacts');

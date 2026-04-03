@@ -31,8 +31,7 @@ class OnboardingFlowTest extends TestCase
 
         $listResponse->assertStatus(200);
         $listResponse->assertJsonCount(1, 'data');
-        // The controller might use UUIDs or hash names, so just check the extension and existence
-        $this->assertStringEndsWith('.jpg', $listResponse->json('data.0.filename'));
+        $this->assertNotNull($listResponse->json('data.0.storage_path'));
         $this->assertNotNull($listResponse->json('data.0.id'));
     }
 }

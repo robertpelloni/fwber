@@ -1,312 +1,146 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
-use App\Http\Requests\Merchant\BrowseDealsRequest;
-use App\Http\Requests\Merchant\RegisterMerchantRequest;
-use App\Http\Requests\Merchant\StorePromotionRequest;
-use App\Http\Requests\Merchant\TrackPromotionRequest;
-use App\Http\Requests\Merchant\UpdateMerchantProfileRequest;
-use App\Http\Requests\Merchant\UpdatePromotionRequest;
-use App\Models\MerchantProfile;
-use App\Models\Promotion;
-use App\Services\DealRankingService;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Merchant\CreatePaymentRequest;
+use App\Models\MerchantPayment;
+use App\Models\User;
+use App\Services\TokenDistributionService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class MerchantController extends Controller
 {
-    public function __construct(
-        private readonly DealRankingService $dealRankingService,
-    ) {
+    protected $tokenService;
+
+    public function __construct(TokenDistributionService $tokenService)
+    {
+        $this->tokenService = $tokenService;
     }
 
     /**
-     * Register the current user as a merchant.
+     * Generate or regenerate merchant secret
      */
-    public function register(RegisterMerchantRequest $request)
+    public function generateKeys(Request $request): JsonResponse
     {
-        $user = Auth::user();
+        $user = $request->user();
 
-        if ($user->role === 'merchant' || $user->merchantProfile) {
-            return response()->json(['message' => 'User is already a merchant.'], 400);
+        $secret = 'sk_'.Str::random(32);
+
+        $user->merchant_secret = $secret;
+        $user->merchant_name = $request->input('merchant_name', $user->merchant_name ?? $user->name);
+        $user->save();
+
+        return response()->json(['merchant_secret' => $secret, 'merchant_name' => $user->merchant_name]);
+    }
+
+    /**
+     * Create a payment intent (Called by Merchant Server)
+     */
+    public function createPayment(CreatePaymentRequest $request): JsonResponse
+    {
+        $secret = $request->header('X-Merchant-Secret');
+        if (! $secret) {
+            return response()->json(['error' => 'Missing X-Merchant-Secret header'], 401);
         }
 
-        $validated = $request->validated();
+        $merchant = User::where('merchant_secret', $secret)->first();
+        if (! $merchant) {
+            return response()->json(['error' => 'Invalid merchant secret'], 401);
+        }
 
-        DB::transaction(function () use ($user, $validated) {
-            // Update user role if not already set (though check above handles it partially)
-            if ($user->role !== 'merchant') {
-                $user->role = 'merchant';
-                $user->save();
+        $payment = MerchantPayment::create([
+            'merchant_id' => $merchant->id,
+            'amount' => $request->amount,
+            'description' => $request->description,
+            'redirect_url' => $request->redirect_url,
+            'webhook_url' => $request->webhook_url,
+            'status' => 'pending',
+            'metadata' => $request->input('metadata'),
+        ]);
+
+        // Construct Checkout URL (assuming frontend runs on same domain or configured URL)
+        // For local dev, hardcode or use config
+        $baseUrl = config('app.frontend_url', 'http://localhost:3000');
+        $checkoutUrl = "{$baseUrl}/pay/{$payment->id}";
+
+        return response()->json([
+            'id' => $payment->id,
+            'checkout_url' => $checkoutUrl,
+        ]);
+    }
+
+    /**
+     * Get payment details (Called by Checkout Page)
+     */
+    public function show(string $id): JsonResponse
+    {
+        $payment = MerchantPayment::with('merchant:id,name,merchant_name')->findOrFail($id);
+
+        return response()->json([
+            'payment' => $payment,
+            'merchant_name' => $payment->merchant->merchant_name ?? $payment->merchant->name,
+        ]);
+    }
+
+    /**
+     * Confirm payment (Called by Payer via Checkout Page)
+     */
+    public function confirm(Request $request, string $id): JsonResponse
+    {
+        $user = $request->user();
+        $payment = MerchantPayment::with('merchant')->findOrFail($id);
+
+        if ($payment->status !== 'pending') {
+            return response()->json(['error' => 'Payment already processed'], 400);
+        }
+
+        if ($user->token_balance < $payment->amount) {
+            return response()->json(['error' => 'Insufficient balance'], 400);
+        }
+
+        if ($user->id === $payment->merchant_id) {
+            return response()->json(['error' => 'Cannot pay yourself'], 400);
+        }
+
+        try {
+            DB::transaction(function () use ($user, $payment) {
+                // Deduct from User
+                $this->tokenService->spendTokens($user, $payment->amount, "Payment to {$payment->merchant->name}: {$payment->description}");
+
+                // Credit Merchant
+                $this->tokenService->awardTokens($payment->merchant, $payment->amount, 'merchant_sale', "Sale: {$payment->description}");
+
+                $payment->update([
+                    'status' => 'paid',
+                    'payer_id' => $user->id,
+                    'paid_at' => now(),
+                ]);
+            });
+
+            // Trigger Webhook (Fire and forget style ideally, but sync for now)
+            if ($payment->webhook_url) {
+                try {
+                    Http::timeout(2)->post($payment->webhook_url, [
+                        'event' => 'payment.succeeded',
+                        'payment' => $payment->fresh(),
+                    ]);
+                } catch (\Exception $e) {
+                    \Log::error('Merchant webhook failed', ['url' => $payment->webhook_url, 'error' => $e->getMessage()]);
+                }
             }
 
-            MerchantProfile::create([
-                'user_id' => $user->id,
-                'business_name' => $validated['business_name'],
-                'description' => $validated['description'] ?? null,
-                'category' => $validated['category'],
-                'address' => $validated['address'] ?? null,
-                'verification_status' => 'pending',
-            ]);
-        });
-
-        return response()->json([
-            'message' => 'Merchant profile created successfully.',
-            'user' => $user->fresh()->load('merchantProfile'),
-        ], 201);
-    }
-
-    /**
-     * Get the current user's merchant profile.
-     */
-    public function getProfile()
-    {
-        $user = Auth::user();
-
-        if (! $user->merchantProfile) {
-            return response()->json(['message' => 'Merchant profile not found.'], 404);
-        }
-
-        return response()->json($user->merchantProfile);
-    }
-
-    /**
-     * Update the merchant profile.
-     */
-    public function updateProfile(UpdateMerchantProfileRequest $request)
-    {
-        $user = Auth::user();
-        $profile = $user->merchantProfile;
-
-        if (! $profile) {
-            return response()->json(['message' => 'Merchant profile not found.'], 404);
-        }
-
-        $validated = $request->validated();
-
-        $profile->update($validated);
-
-        return response()->json([
-            'message' => 'Merchant profile updated.',
-            'profile' => $profile,
-        ]);
-    }
-
-    /**
-     * Create a new promotion.
-     */
-    public function storePromotion(StorePromotionRequest $request)
-    {
-        $user = Auth::user();
-        $profile = $user->merchantProfile;
-
-        if (! $profile) {
-            return response()->json(['message' => 'Merchant profile not found.'], 403);
-        }
-
-        // Production Requirement: Merchant must be verified to post promotions
-        if ($profile->verification_status !== 'verified') {
             return response()->json([
-                'message' => 'Merchant verification required. Please ensure your business details are complete and contact support.',
-                'status' => $profile->verification_status,
-            ], 403);
+                'success' => true,
+                'redirect_url' => $payment->redirect_url,
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
         }
-
-        $validated = $request->validated();
-
-        $promotion = $profile->promotions()->create($validated);
-
-        return response()->json([
-            'message' => 'Promotion created successfully.',
-            'promotion' => $promotion,
-        ], 201);
-    }
-
-    /**
-     * List merchant's promotions.
-     */
-    public function getPromotions()
-    {
-        $user = Auth::user();
-        $profile = $user->merchantProfile;
-
-        if (! $profile) {
-            return response()->json(['message' => 'Merchant profile not found.'], 404);
-        }
-
-        $promotions = $profile->promotions()->orderBy('created_at', 'desc')->get();
-
-        return response()->json($promotions);
-    }
-
-    /**
-     * Show a single merchant-owned promotion with interaction metrics.
-     */
-    public function showPromotion(int $promotionId)
-    {
-        $promotion = $this->resolveMerchantPromotion($promotionId);
-
-        return response()->json([
-            'promotion' => $promotion,
-            'metrics' => [
-                'views' => $promotion->views,
-                'clicks' => $promotion->clicks,
-                'redemptions' => $promotion->redemptions,
-                'conversion_rate' => $promotion->views > 0
-                    ? round(($promotion->redemptions / $promotion->views) * 100, 2)
-                    : 0.0,
-            ],
-        ]);
-    }
-
-    /**
-     * Update a single merchant-owned promotion.
-     */
-    public function updatePromotion(UpdatePromotionRequest $request, int $promotionId)
-    {
-        $promotion = $this->resolveMerchantPromotion($promotionId);
-        $validated = $request->validated();
-
-        if (array_key_exists('expires_at', $validated) && ! array_key_exists('starts_at', $validated)) {
-            $request->merge(['starts_at' => $promotion->starts_at?->toDateTimeString()]);
-            $validated = $request->validated();
-            unset($validated['starts_at']);
-        }
-
-        $promotion->update($validated);
-
-        return response()->json([
-            'message' => 'Promotion updated successfully.',
-            'promotion' => $promotion->fresh(),
-        ]);
-    }
-
-    /**
-     * Deactivate a merchant-owned promotion.
-     */
-    public function destroyPromotion(int $promotionId)
-    {
-        $promotion = $this->resolveMerchantPromotion($promotionId);
-
-        $promotion->update([
-            'is_active' => false,
-            'expires_at' => now()->lt($promotion->expires_at) ? now() : $promotion->expires_at,
-        ]);
-
-        return response()->json([
-            'message' => 'Promotion deactivated successfully.',
-            'promotion' => $promotion->fresh(),
-        ]);
-    }
-
-    /**
-     * Consumer-facing: Browse active deals/promotions nearby.
-     */
-    public function browseDeals(BrowseDealsRequest $request)
-    {
-        $validated = $request->validated();
-        $lat = (float) $validated['lat'];
-        $lng = (float) $validated['lng'];
-        $radius = $validated['radius'] ?? 5000; // 5km default
-        $rankingStrategy = $validated['ranking_strategy'] ?? 'distance';
-        $perPage = $validated['per_page'] ?? 20;
-
-        $query = Promotion::with(['merchant:id,user_id,business_name,category,description,address,verification_status'])
-            ->where('is_active', true)
-            ->where('starts_at', '<=', now())
-            ->where('expires_at', '>', now())
-            ->withinBox($lat, $lng, $radius);
-
-        // Filter by merchant category if provided
-        if (! empty($validated['category'])) {
-            $query->whereHas('merchant', function ($q) use ($validated) {
-                $q->where('category', $validated['category']);
-            });
-        }
-
-        // Sort options
-        $sort = $validated['sort'] ?? 'distance';
-        if ($sort === 'newest') {
-            $query->orderByDesc('created_at');
-        } elseif ($sort === 'expiring') {
-            $query->orderBy('expires_at');
-        } elseif ($sort === 'discount') {
-            $query->orderByDesc('discount_value');
-        }
-        // Default: distance-based (withinBox already filters, but we could add raw distance calc)
-
-        $deals = $query->paginate($perPage);
-
-        if ($rankingStrategy === 'trust-aware' && Auth::check()) {
-            $rankedDeals = $this->dealRankingService->rankNearby(
-                Auth::user(),
-                $deals->getCollection(),
-                $lat,
-                $lng
-            );
-
-            $deals->setCollection($rankedDeals);
-            $dealsArray = $deals->toArray();
-
-            return response()->json(array_merge($dealsArray, [
-                'deals' => $dealsArray['data'],
-                'meta' => [
-                    'ranking_strategy' => $this->dealRankingService->buildRankingStrategy(),
-                ],
-            ]));
-        }
-
-        return response()->json($deals);
-    }
-
-    /**
-     * Get merchant categories for filtering.
-     */
-    public function getCategories()
-    {
-        $categories = MerchantProfile::select('category')
-            ->distinct()
-            ->whereNotNull('category')
-            ->orderBy('category')
-            ->pluck('category');
-
-        return response()->json(['categories' => $categories]);
-    }
-
-    /**
-     * Track promotion interaction (View, Click, Redemption).
-     */
-    public function trackPromotion(TrackPromotionRequest $request, $id)
-    {
-        $promotion = Promotion::findOrFail($id);
-
-        // Record the event
-        \App\Models\PromotionEvent::create([
-            'promotion_id' => $promotion->id,
-            'user_id' => Auth::id(), // Nullable for guests
-            'type' => $request->type,
-            'metadata' => $request->metadata,
-        ]);
-
-        // Update aggregate counters
-        if ($request->type === 'view') {
-            $promotion->increment('views');
-        } elseif ($request->type === 'click') {
-            $promotion->increment('clicks');
-        } elseif ($request->type === 'redemption') {
-            $promotion->increment('redemptions');
-        }
-
-        return response()->json(['success' => true]);
-    }
-
-    private function resolveMerchantPromotion(int $promotionId): Promotion
-    {
-        $profile = Auth::user()?->merchantProfile;
-
-        abort_if(! $profile, 404, 'Merchant profile not found.');
-
-        return $profile->promotions()->findOrFail($promotionId);
     }
 }

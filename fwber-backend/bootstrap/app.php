@@ -21,9 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // $middleware->append(\App\Http\Middleware\InjectLoggingContext::class);
 
         $middleware->api(append: [
-            \App\Http\Middleware\CheckGlobalBan::class,
             \App\Http\Middleware\TrackUserActivity::class,
-            \App\Http\Middleware\CheckDailyBonus::class,
         ]);
 
          $middleware->alias([
@@ -31,7 +29,6 @@ return Application::configure(basePath: dirname(__DIR__))
              'feature' => \App\Http\Middleware\FeatureEnabled::class,
              'rate_limit_advanced' => \App\Http\Middleware\AdvancedRateLimiting::class,
              'edge.cache' => \App\Http\Middleware\EdgeCacheResponse::class,
-             'verify.activitypub-signature' => \App\Http\Middleware\VerifyActivityPubSignature::class,
          ]);
      })
     ->withExceptions(function (Exceptions $exceptions): void {

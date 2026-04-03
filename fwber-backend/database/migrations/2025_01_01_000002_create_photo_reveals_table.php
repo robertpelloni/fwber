@@ -12,7 +12,7 @@ return new class extends Migration
             Schema::create('photo_reveals', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained()->onDelete('cascade');
-                $table->foreignId('match_id')->constrained('matches')->onDelete('cascade');
+                $table->foreignId('match_id')->constrained('user_matches')->onDelete('cascade');
                 $table->foreignId('photo_id')->constrained()->onDelete('cascade');
                 $table->string('status')->default('active');
                 $table->timestamps();

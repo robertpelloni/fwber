@@ -1387,7 +1387,7 @@ class AIMatchingService
         // Calculate relative weights
         $likes = $actionCounts['like'] ?? 1;
         $superLikes = $actionCounts['super_like'] ?? 1;
-        $matches = DB::table('matches')->where('created_at', '>=', now()->subDays(30))->count() ?: 1;
+        $matches = DB::table('user_matches')->where('created_at', '>=', now()->subDays(30))->count() ?: 1;
 
         // Simple probability heuristic: how indicative is an action of a match?
         $likeWeight = min(0.5, ($matches / $likes) * 1.5);
