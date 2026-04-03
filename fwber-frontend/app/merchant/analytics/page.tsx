@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { BarChart3, TrendingUp, Users, Zap, ArrowLeft, RefreshCcw, DollarSign, RadioTower, Clock3, Ticket } from 'lucide-react';
+import { BarChart3, TrendingUp, Users, Zap, ArrowLeft, RefreshCcw, DollarSign, RadioTower, Clock3, Ticket, Download, Trash2, Send } from 'lucide-react';
 import Link from 'next/link';
 
 interface AnalyticsData {
@@ -49,11 +49,13 @@ export default function MerchantAnalyticsPage() {
     const [data, setData] = useState<AnalyticsData | null>(null);
     const [loading, setLoading] = useState(true);
 
+    const [range, setRange] = useState('30d');
+
     const fetchAnalytics = useCallback(async () => {
         if (!token) return;
         try {
             setLoading(true);
-            const response = await api.get<AnalyticsData>('/merchant-portal/analytics', {
+            const response = await api.get<AnalyticsData>(`/merchant-portal/analytics?range=${range}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setData(response);
@@ -62,7 +64,40 @@ export default function MerchantAnalyticsPage() {
         } finally {
             setLoading(false);
         }
-    }, [token]);
+    }, [token, range]);
+
+    const handleDeactivate = async (broadcastId: number) => {
+        if (!token) return;
+        if (!confirm('Are you sure you want to deactivate this live broadcast?')) return;
+        
+        try {
+            await api.post(`/merchant/pulse/${broadcastId}/deactivate`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            fetchAnalytics();
+        } catch (error) {
+            console.error('Failed to deactivate broadcast:', error);
+        }
+    };
+
+    const handleExport = async () => {
+        if (!token) return;
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/merchant-portal/analytics/export?range=${range}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `fwber_merchant_report_${range}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Failed to export CSV:', error);
+        }
+    };
 
     const formatDateTime = (value: string | null) => {
         if (!value) return 'Unknown';
@@ -98,14 +133,24 @@ export default function MerchantAnalyticsPage() {
                         </p>
                     </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                    <select 
+                        value={range} 
+                        onChange={(e) => setRange(e.target.value)}
+                        className="bg-zinc-100 dark:bg-zinc-800 border-none text-xs font-bold uppercase tracking-widest px-3 py-2 rounded-md"
+                    >
+                        <option value="7d">Last 7 Days</option>
+                        <option value="30d">Last 30 Days</option>
+                        <option value="90d">Last 90 Days</option>
+                    </select>
+                    <Button variant="outline" size="sm" onClick={handleExport} disabled={loading}>
+                        <Download className="w-4 h-4 mr-2" />
+                        Export CSV
+                    </Button>
                     <Button variant="outline" size="sm" onClick={fetchAnalytics} disabled={loading}>
                         <RefreshCcw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                         Refresh Data
                     </Button>
-                    <Badge variant="secondary" className="bg-zinc-100 dark:bg-zinc-800 font-bold uppercase tracking-widest text-[10px]">
-                        Period: Last 30 Days
-                    </Badge>
                 </div>
             </div>
 
@@ -296,16 +341,30 @@ export default function MerchantAnalyticsPage() {
                                                         ) : null}
                                                     </div>
                                                 </div>
-                                                <div className="space-y-2 text-sm text-zinc-500 lg:text-right">
-                                                    <div>
-                                                        <div className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Promotion</div>
-                                                        <div className="font-semibold text-zinc-900 dark:text-zinc-100">
-                                                            {broadcast.promotion_title || 'Promotion unavailable'}
+                                                <div className="space-y-2 flex flex-col items-start lg:items-end justify-between">
+                                                    <div className="space-y-2 text-sm text-zinc-500 lg:text-right">
+                                                        <div>
+                                                            <div className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Promotion</div>
+                                                            <div className="font-semibold text-zinc-900 dark:text-zinc-100">
+                                                                {broadcast.promotion_title || 'Promotion unavailable'}
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Expires</div>
+                                                            <div>{formatDateTime(broadcast.expires_at)}</div>
                                                         </div>
                                                     </div>
-                                                    <div>
-                                                        <div className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Expires</div>
-                                                        <div>{formatDateTime(broadcast.expires_at)}</div>
+                                                    <div className="flex items-center gap-2 pt-2">
+                                                        <Link href={`/merchant/vibe?content=${encodeURIComponent(broadcast.content)}&code=${encodeURIComponent(broadcast.promo_code || '')}&target=${broadcast.vibe_target}`}>
+                                                            <Button variant="outline" size="sm" className="h-8 text-xs font-bold uppercase tracking-widest text-blue-600 hover:text-blue-700">
+                                                                <Send className="w-3 h-3 mr-1" /> Resend
+                                                            </Button>
+                                                        </Link>
+                                                        {broadcast.status === 'active' && (
+                                                            <Button variant="outline" size="sm" onClick={() => handleDeactivate(broadcast.id)} className="h-8 text-xs font-bold uppercase tracking-widest border-red-200 text-red-600 hover:bg-red-50">
+                                                                <Trash2 className="w-3 h-3 mr-1" /> Deactivate
+                                                            </Button>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>

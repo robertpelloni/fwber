@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "fwber.fullname" . }}-geo
+  labels:
+    {{- include "fwber.labels" . | nindent 4 }}
+    app.kubernetes.io/component: geo
+spec:
+  replicas: {{ .Values.geo.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "fwber.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: geo
+  template:
+    metadata:
+      labels:
+        {{- include "fwber.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: geo
+    spec:
+      containers:
+        - name: geo
+          image: "{{ .Values.geo.image.repository }}:{{ .Values.geo.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8081
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 200m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "fwber.fullname" . }}-geo
+  labels:
+    {{- include "fwber.labels" . | nindent 4 }}
+    app.kubernetes.io/component: geo
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8081
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "fwber.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: geo

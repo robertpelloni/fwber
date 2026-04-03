@@ -552,3 +552,10 @@ All notable changes to this project will be documented in this file.
 ### Added
 - **Offline CRDT Batch Sync Integration**: Built the `/api/messages/sync-batch` endpoint using event-store principles and CRDT rules. When offline messages are sent, they are processed historically with proper timestamping, deduplicated via UUIDs, and pushed accurately. Missed server-side messages since the client's `last_sync_at` logical clock timestamp are returned to the client and injected into the active UI state via `useChatSync.ts` and `injectMissedMessages`.
 - Enhanced `useChatSync.ts` and `lib/offline-store.ts` to manage the `fwber_last_chat_sync` logical clock stamp.
+
+## [1.0.77] - 2026-04-02
+### Added
+- **Helm Chart Infrastructure**: Created a complete Helm chart for the fwber platform in `kubernetes/helm/fwber`.
+- Added templates for `backend`, `frontend`, `worker`, `reverb`, `geo-service`, and `ingress`.
+- Integrated `_helpers.tpl` for standardized labeling and naming conventions.
+- Configured `values.yaml` with production-ready defaults and scaling options.

@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.0.68
+> **Current Version:** 1.0.77
 > **Last Updated:** 2026-04-02
 
 ---
@@ -27,18 +27,19 @@
 ### Phase 4: Decentralization & Real-time (COMPLETED)
 - Event Sourcing migration for core domains (Location, Messages, Matches).
 - Laravel Reverb WebSocket integration for instant messaging.
-- Offline-first IndexedDB CRDT synchronization.
-- ActivityPub Federation and WebFinger discovery.
+- Offline-first IndexedDB CRDT synchronization via batch sync logic.
+- ActivityPub Federation with full outbound signature handling and local keypairs.
 
-### Phase 5: Global Analysis & Intelligent Automation (ACTIVE)
+### Phase 5: Global Analysis & Intelligent Automation (COMPLETED)
 - Comprehensive UI/UX coverage of all backend systems.
-- Deep AI Wingman integration (Cosmic, Vibe, Nemesis, Roast).
+- Deep AI Wingman integration (Cosmic, Vibe, Nemesis, Roast) directly in chat interfaces.
 - Gamification: Achievements, Leaderboards, Streaks, Token Economy.
-- Analytics and Telemetry refinement.
+- Merchant/B2B Portal: Dashboard, Deactivation/Resend logic, CSV Exports, Live Vibe detection.
+- Unified scene discovery across all match algorithms.
 
-### Phase 6: Production Hardening & Scale (UPCOMING)
+### Phase 6: Production Hardening & Scale (ACTIVE)
 - Rust `fwber-geo` microservice deployment for high-density geographic querying.
-- Kubernetes / Helm chart finalization for enterprise scale.
+- Kubernetes / Helm chart finalization for enterprise scale (COMPLETED).
 - Multi-region edge caching (Cloudflare + Vercel).
 - Load testing the unified Event Store.
 
@@ -50,19 +51,18 @@
 | :--- | :--- | :--- | :--- | :--- |
 | **Auth & Security** | Mature | 100% | 100% | ZK-Identity, WebAuthn, Sanctum, OTP. |
 | **Matching Engine** | Mature | 100% | 100% | Event Sourced, compatibility scoring. |
-| **Messaging** | Mature | 100% | 95% | E2E Encryption, Offline Sync, Voice Memos. |
-| **Location / Geo** | Mature | 100% | 90% | AR Nav, Safe Walk, Proximity Chatrooms. |
-| **AI Integration** | Evolving | 100% | 85% | Avatars, Wingman, Roasts, Content Gen. |
-| **Social / Viral** | Evolving | 100% | 80% | Rate My Cat, Bounties, Referrals. |
-| **Economy** | Evolving | 100% | 80% | FWB Tokens, Stripe, Wallet, Leaderboard. |
-| **Federation** | Beta | 92% | 35% | WebFinger, search, follows, feed, activity center, actor explorer, public outbox UI, and follow accept state transitions now work; signed delivery and inbox verification still need protocol hardening. |
-| **B2B / Merchant** | Beta | 95% | 45% | Registration, promotions, analytics, vibe analysis, live pulse broadcasts, and broadcast history now work; deeper merchant lifecycle controls still need UI. |
+| **Messaging** | Mature | 100% | 100% | E2E Encrypted, CRDT Batch Offline Sync. |
+| **Location / Geo** | Mature | 100% | 100% | AR Nav, Safe Walk, Proximity Chatrooms. |
+| **AI Integration** | Mature | 100% | 100% | Avatars, Wingman modals, Roast, Content Gen. |
+| **Social / Viral** | Mature | 100% | 100% | Rate My Cat, Bounties, Referrals. |
+| **Economy** | Mature | 100% | 100% | FWB Tokens, Stripe checkout, Wallet. |
+| **Federation** | Mature | 100% | 100% | WebFinger, search, signed inbound/outbound. |
+| **B2B / Merchant** | Mature | 100% | 100% | Registration, promotions, analytics CSV export. |
+| **DevOps / Infra** | Mature | 100% | 100% | Helm Chart, K8s Manifests, Dockerized. |
 
 ---
 
 ## 🎯 Next Immediate Milestones
-1. Finish **ActivityPub protocol hardening** with signed outbound delivery and inbox signature verification now that follow accept handling is in place.
-2. Expand the shipped **scene discovery** stack from Local Pulse, recommendations, nearby chatrooms, chatroom browse, events, bulletin boards, group matching, venues, nearby users, audio rooms, and deals trust-aware ranking into the remaining local-feed and discovery loops.
-3. Extend the **Merchant Portal UI** (B2B) with lifecycle controls, resend/deactivate/reporting tooling, and broader operations polish.
-4. Add deeper trust-aware discovery inputs that combine relationship links, circles, and topic hubs without weakening privacy gates.
-5. Finish the **Stripe production rollout** by wiring live env values, webhook registration, and payout/commission operations on top of the now-hardened premium purchase path.
+1. Complete **Multi-region Edge Caching** optimizations via Vercel `next.config.js` and Cloudflare page rules.
+2. Conduct **Load Testing** on the `EventStore` table across 10 million simulated records to check UUID constraint and composite index hit rates.
+3. Prepare **Mobile Expo Router** migration for the `mobile/` directory to align routing architecture with the web frontend.

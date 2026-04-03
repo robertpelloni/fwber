@@ -435,6 +435,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('promotions/{promotionId}', [\App\Http\Controllers\MerchantController::class, 'updatePromotion']);
         Route::delete('promotions/{promotionId}', [\App\Http\Controllers\MerchantController::class, 'destroyPromotion']);
         Route::get('analytics', [\App\Http\Controllers\MerchantAnalyticsController::class, 'index']);
+        Route::get('analytics/export', [\App\Http\Controllers\MerchantAnalyticsController::class, 'exportCsv']);
     });
 
     // Merchant API (Authenticated)
@@ -639,6 +640,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware(['role:merchant'])->prefix('merchant/pulse')->group(function () {
         Route::get('vibe', [\App\Http\Controllers\MerchantPulseController::class, 'getVibe']);
         Route::post('broadcast', [\App\Http\Controllers\MerchantPulseController::class, 'broadcast']);
+        Route::post('{id}/deactivate', [\App\Http\Controllers\MerchantPulseController::class, 'deactivateBroadcast']);
     });
 
     // Hardware Token API

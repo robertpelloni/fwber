@@ -1,10 +1,15 @@
-# Project Status — fwber v1.0.76 (Offline CRDT Batch Sync)
+# Project Status — fwber v1.0.77 (Production Helm Chart)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.76 "Offline CRDT Batch Sync"
+**Version:** 1.0.77 "Production Helm Chart"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
+
+## Production Helm Chart & Scalability
+- **Standardized Helm Chart:** Created a full Helm chart in `kubernetes/helm/fwber` to replace raw manifests. This enables environment-specific `values.yaml` files, templated resource management, and cleaner CI/CD integration.
+- **Templated Components:** Built templates for `backend` (PHP-FPM), `frontend` (Next.js), `reverb` (WebSockets), `geo-service` (Rust), and `worker` (Queues).
+- **Ingress Management:** Consolidated access via a templated Nginx Ingress rule with support for cert-manager and multiple hostnames.
 
 ## Offline CRDT Batch Sync & Logical Clocks
 - **Batch Sync Controller:** Created `MessageController::syncBatch` which consumes arrays of offline messages, verifies UUID idempotency, records historical dates, inserts the `MessageSent` events at their proper `created_at` timestamp, and updates the local Match. 
@@ -45,6 +50,9 @@
 - **Billing validation from the previous slice remains the current premium reference path**: `php artisan test tests\Feature\PremiumControllerTest.php tests\Feature\StripeWebhookTest.php`, plus frontend `npm run lint`, `npm run type-check`, and `cmd /c "npm run build"`, already passed for `v1.0.71`.
 
 ## ✅ Release Focus
+- [x] Create standardized Helm Chart for enterprise deployment.
+- [x] Template all monorepo components (PHP, Next.js, Rust).
+- [x] Configure production-ready default values.
 - [x] Create `POST /api/messages/sync-batch`.
 - [x] Deduplicate offline messages by UUID.
 - [x] Fetch missed server messages since `last_sync_at`.

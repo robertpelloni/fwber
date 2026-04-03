@@ -158,4 +158,40 @@ class MerchantPulseController extends Controller
             'location_source' => 'latest_promotion',
         ]);
     }
+
+    /**
+     * @OA\Post(
+     *   path="/merchant/pulse/{id}/deactivate",
+     *   tags={"Merchant Pulse"},
+     *   summary="Deactivate a broadcast",
+     *   description="Deactivates an active live broadcast.",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(response=200, description="Deactivated"),
+     *   @OA\Response(response=404, description="Broadcast not found")
+     * )
+     */
+    public function deactivateBroadcast(Request $request, int $id)
+    {
+        $merchant = \App\Models\MerchantProfile::where('user_id', auth()->id())->firstOrFail();
+
+        $artifact = \App\Models\ProximityArtifact::where('id', $id)
+            ->where('creator_id', auth()->id())
+            ->where('artifact_type', 'merchant_announce')
+            ->firstOrFail();
+
+        if ($artifact->expires_at && $artifact->expires_at->isPast()) {
+            return response()->json(['message' => 'Broadcast is already expired'], 400);
+        }
+
+        $artifact->update([
+            'expires_at' => now(),
+            'is_anonymous' => true, // Hide it immediately from proximity feeds or mark as inactive
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Broadcast deactivated successfully.',
+        ]);
+    }
 }

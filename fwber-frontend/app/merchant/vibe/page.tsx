@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { api, ApiError } from '@/lib/api/client';
 import { Button } from '@/components/ui/button';
@@ -16,15 +16,18 @@ import { Radio, Zap, Shield, Send, ArrowLeft, Target } from 'lucide-react';
 import Link from 'next/link';
 import NeighborhoodVibe from '@/components/merchant/NeighborhoodVibe';
 
+import { useSearchParams } from 'next/navigation';
+
 export default function VibeBroadcastPage() {
     const { token, user } = useAuth();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
-        content: '',
-        discount_code: '',
-        vibe_target: 'any'
+        content: searchParams?.get('content') || '',
+        discount_code: searchParams?.get('code') || '',
+        vibe_target: searchParams?.get('target') || 'any'
     });
     const [currentVibe, setCurrentVibe] = useState<string | null>(null);
 
