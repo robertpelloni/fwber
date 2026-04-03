@@ -455,6 +455,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('governance/proposals', [\App\Http\Controllers\GovernanceController::class, 'store']);
     Route::post('governance/proposals/{id}/vote', [\App\Http\Controllers\GovernanceController::class, 'vote']);
 
+    // Economy & Swaps
+    Route::get('economy/swaps', [\App\Http\Controllers\Api\SwapController::class, 'index']);
+    Route::post('economy/swaps/initiate', [\App\Http\Controllers\Api\SwapController::class, 'initiate']);
+
     // Merchant API (Authenticated)
     Route::post('merchant/keys', [\App\Http\Controllers\Api\MerchantController::class, 'generateKeys']);
     Route::post('merchant/payment/{id}/confirm', [\App\Http\Controllers\Api\MerchantController::class, 'confirm']);

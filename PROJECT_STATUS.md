@@ -1,10 +1,19 @@
-# Project Status — fwber v1.0.90 (Governance Council)
+# Project Status — fwber v1.0.91 (Global Bridge & Cross-Server E2E)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.90 "Governance Council"
+**Version:** 1.0.91 "Global Bridge & Cross-Server E2E"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
+
+## Global Token Bridge & Economy
+- **Asset Bridging:** Users can now swap liquid FWB Tokens for external assets (SOL, USDC) or Federated Vouchers.
+- **Fee Infrastructure:** Implemented a 2% bridge fee protocol to support project sustainability.
+- **Wallet Integration:** Launched the "Global Bridge" tab in the wallet with real-time transaction tracking and destination address validation.
+
+## Cross-Instance E2E Security
+- **Federated Key Exchange:** The E2E hook now resolve remote actor public keys (RSA) from ActivityPub profiles.
+- **RSA-OAEP Hybrid Encryption:** Implemented high-performance hybrid encryption for outbound federated DMs, ensuring privacy persists across instance boundaries.
 
 ## Decentralized Governance (The Council)
 - **Weighted Participation:** Users can now influence the project's direction. The `/council` portal calculates voting power based on liquid FWB Token balances.
@@ -109,9 +118,10 @@
 - **Billing validation from the previous slice remains the current premium reference path**: `php artisan test tests\Feature\PremiumControllerTest.php tests\Feature\StripeWebhookTest.php`, plus frontend `npm run lint`, `npm run type-check`, and `cmd /c "npm run build"`, already passed for `v1.0.71`.
 
 ## ✅ Release Focus
+- [x] Implement Cross-Instance E2E Encryption (Outbound).
+- [x] Build Global Token Exchange (Bridge) UI.
+- [x] Build Automated Proposal Execution jobs.
 - [x] Build Governance & Voting portal.
-- [x] Implement token-weighted voting logic.
-- [x] Implement Federated Secure DMs.
 - [x] Implement ZK-Age Verification.
 - [x] Build NFC "Tap-to-Pay" protocol for merchants.
 - [x] Enable Mobile NFC hardware permissions.

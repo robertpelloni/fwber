@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.0.90
+> **Current Version:** 1.0.91
 > **Last Updated:** 2026-04-02
 
 ---
@@ -62,8 +62,9 @@
 ### Phase 8: Decentralized Governance (ACTIVE)
 - Build a **Governance & Voting** portal (Council) (COMPLETED).
 - Implement **Token-Weighted Voting Logic** (COMPLETED).
-- Implement **Cross-Instance E2E Encryption** using remote actor public keys.
-- Develop a **Global Token Exchange** to allow swapping FWB Tokens for other assets.
+- Implement **Cross-Instance E2E Encryption** (Outbound) (COMPLETED).
+- Develop a **Global Token Exchange** (Bridge) (COMPLETED).
+- Build **Automated Proposal Execution** jobs (COMPLETED).
 
 ---
 
@@ -71,21 +72,21 @@
 
 | Feature Domain | Status | Backend | Frontend | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| **Auth & Security** | Mature | 100% | 100% | ZK-Identity, ZK-Location, NFC Sync, WASM. |
+| **Auth & Security** | Mature | 100% | 100% | ZK-Identity, ZK-Location, Federated E2E. |
 | **Matching Engine** | Mature | 100% | 100% | Event Sourced, compatibility scoring. |
 | **Messaging** | Mature | 100% | 100% | E2E Encrypted, CRDT Sync, Federated DMs. |
 | **Location / Geo** | Mature | 100% | 100% | AR Nav, Redis Bloom, ZK-Proofs, AR Finder. |
 | **AI Integration** | Mature | 100% | 100% | Avatars, Wingman modals, Roast, Content Gen. |
 | **Social / Viral** | Mature | 100% | 100% | Rate My Cat, Bounties, Federated Social. |
-| **Economy** | Mature | 100% | 100% | FWB Tokens, Stripe, Marketplace, NFC Pay. |
+| **Economy** | Mature | 100% | 100% | FWB Tokens, Stripe, Marketplace, Bridge. |
 | **Federation** | Mature | 100% | 100% | Search, Reputation, Groups, Secure DMs. |
-| **Governance** | Mature | 100% | 100% | Council Portal, Weighted Voting, Proposals. |
+| **Governance** | Mature | 100% | 100% | Council Portal, Weighted Voting, Auto-Exec. |
 | **DevOps / Infra** | Mature | 100% | 100% | Helm Chart, Edge Caching, Event Streaming. |
 | **Mobile App** | Mature | 100% | 100% | Expo Router, WebView Hybrid, NFC Support. |
 
 ---
 
 ## 🎯 Next Immediate Milestones
-1. Implement **Cross-Instance E2E Encryption** using remote actor public keys.
-2. Develop a **Global Token Exchange** to allow swapping FWB Tokens for other assets.
-3. Build **Automated Proposal Execution** jobs for community policy enforcement.
+1. Implement **Distributed Global Content Search** using ZincSearch or Meilisearch for federated posts.
+2. Develop a **Multi-Chain Wallet Bridge** (Ethereum/Solana/Polygon) for liquid FWB Token transfers.
+3. Build a **Community Moderation DAO** interface allowing elected moderators to ban federated actors.

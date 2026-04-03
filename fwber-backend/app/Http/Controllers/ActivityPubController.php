@@ -122,6 +122,7 @@ class ActivityPubController extends Controller
                 'url' => $actorUrl,
                 'inbox' => $actor['inbox'] ?? null,
                 'outbox' => $actor['outbox'] ?? null,
+                'publicKey' => $actor['publicKey'] ?? null,
                 'isVerified' => (bool) ($actor['isVerified'] ?? false),
                 'gender' => $actor['gender'] ?? null,
                 'orientation' => $actor['orientation'] ?? null,

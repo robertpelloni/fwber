@@ -92,6 +92,52 @@ export async function deriveSharedKey(
 }
 
 /**
+ * Import an RSA Public Key from PEM format (ActivityPub standard).
+ */
+export async function importRsaPublicKey(pem: string): Promise<CryptoKey> {
+  const pemHeader = "-----BEGIN PUBLIC KEY-----";
+  const pemFooter = "-----END PUBLIC KEY-----";
+  const pemContents = pem.substring(
+    pem.indexOf(pemHeader) + pemHeader.length,
+    pem.indexOf(pemFooter)
+  ).replace(/\s/g, '');
+  
+  const binaryDer = Uint8Array.from(atob(pemContents), c => c.charCodeAt(0));
+
+  return window.crypto.subtle.importKey(
+    'spki',
+    binaryDer,
+    {
+      name: 'RSA-OAEP',
+      hash: 'SHA-256',
+    },
+    true,
+    ['encrypt']
+  );
+}
+
+/**
+ * Encrypt a message using an RSA Public Key.
+ */
+export async function encryptWithRsa(text: string, publicKey: CryptoKey): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+
+  const ciphertext = await window.crypto.subtle.encrypt(
+    {
+      name: 'RSA-OAEP',
+    },
+    publicKey,
+    data
+  );
+
+  return JSON.stringify({
+    data: Array.from(new Uint8Array(ciphertext)),
+    algo: 'RSA-OAEP',
+  });
+}
+
+/**
  * Encrypt a message using the shared key.
  * Returns JSON string containing IV and Ciphertext.
  */

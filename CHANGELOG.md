@@ -644,3 +644,9 @@ All notable changes to this project will be documented in this file.
 - **Token-Weighted Voting**: Implemented a core voting engine where a user's voting power is proportional to their FWB Token balance. 
 - **Council UI**: Built a high-fidelity dashboard (`/council`) for browsing and participating in active community proposals.
 - **Proposals Engine**: Created backend infrastructure to manage community-driven policy, moderation, and technical upgrades.
+
+## [1.0.91] - 2026-04-02
+### Added
+- **Cross-Instance E2E Encryption (Outbound)**: Integrated RSA-OAEP encryption for federated direct messages. The frontend now automatically imports remote actor public keys to secure cross-server communications.
+- **Global Token Bridge (Economy)**: Launched the `SwapController` and a new "Global Bridge" UI in the wallet. Users can now initiate swaps from FWB Tokens to external assets (SOL, USDC) via a secure bridging protocol.
+- **Automated Governance Processing**: Built the `ProcessGovernanceProposals` background job to reconcile token-weighted votes and finalize community decisions upon expiry.

@@ -11,6 +11,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import PaymentRequests from './PaymentRequests';
 import SendTokenModal from './SendTokenModal';
 import TopUpModal from './TopUpModal';
+import { SwapInterface } from './SwapInterface';
 
 const WalletMultiButton = dynamic(
     () => import('@solana/wallet-adapter-react-ui').then((mod) => mod.WalletMultiButton),
@@ -25,7 +26,7 @@ export default function WalletDashboard() {
     const [withdrawAmount, setWithdrawAmount] = useState('');
     const [depositAmount, setDepositAmount] = useState('');
     const [loading, setLoading] = useState(false);
-    const [activeTab, setActiveTab] = useState<'wallet' | 'requests' | 'merchant'>('wallet');
+    const [activeTab, setActiveTab] = useState<'wallet' | 'requests' | 'merchant' | 'bridge'>('wallet');
     const [isSendOpen, setIsSendOpen] = useState(false);
     const [isTopUpOpen, setIsTopUpOpen] = useState(false);
     const [merchantKeys, setMerchantKeys] = useState<{ merchant_secret: string } | null>(null);
@@ -102,7 +103,7 @@ export default function WalletDashboard() {
 
             {/* Tabs */}
             <div className="flex space-x-1 p-1 bg-gray-100 dark:bg-gray-700/50 rounded-lg overflow-x-auto">
-                {(['wallet', 'requests', 'merchant'] as const).map(tab => (
+                {(['wallet', 'requests', 'merchant', 'bridge'] as const).map(tab => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
@@ -266,6 +267,12 @@ export default function WalletDashboard() {
             {activeTab === 'requests' && (
                 <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                     <PaymentRequests />
+                </div>
+            )}
+
+            {activeTab === 'bridge' && (
+                <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <SwapInterface />
                 </div>
             )}
 
