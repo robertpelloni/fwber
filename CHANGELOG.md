@@ -726,3 +726,10 @@ All notable changes to this project will be documented in this file.
 - **Kafka Driver**: Implemented a production-ready `KafkaEventBus` for high-throughput multi-server replication (requires `rdkafka`).
 - **Federated Login UI**: Launched the "Sign in with ActivityPub" feature. Users can now authenticate via a secure challenge-response modal using their mastodon/mastodon handles.
 - **Event Bus Configuration**: Centralized event routing in `config/events.php`.
+
+## [1.1.3] - 2026-04-02
+### Added
+- **Native NFC Mobile Integration**: Fully wired the React frontend to the native mobile hardware via the `useNfc` hook and `NFCProfileExchange` component.
+- **Autonomous Governance Scheduler**: Integrated council proposal finalization and ActivityPub content ingestion into the Laravel master schedule.
+- **On-Chain Governance Mirroring**: Finalized proposals now automatically anchor their Merkle Roots to the Solana blockchain for immutable proof-of-tally.
+- **Visual Physical Proofs**: Enhanced the NFC handshake UI with a high-fidelity "Radar" verification state for better physical interaction feedback.

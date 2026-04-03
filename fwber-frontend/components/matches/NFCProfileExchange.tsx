@@ -3,11 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Smartphone, Zap, Loader2, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Smartphone, Zap, Loader2, CheckCircle2, AlertTriangle, RefreshCw } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api/client';
 import { useToast } from '@/components/ui/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNfc } from '@/lib/hooks/use-nfc';
 
 import geohash from 'ngeohash';
 import { v4 as uuidv4 } from 'uuid';
@@ -15,12 +16,48 @@ import { v4 as uuidv4 } from 'uuid';
 export function NFCProfileExchange() {
     const { user, token } = useAuth();
     const { toast } = useToast();
-    const [isScanning, setIsScanning] = useState(false);
-    const [status, setStatus] = useState<'idle' | 'scanning' | 'writing' | 'success' | 'error' | 'payment_pending'>('idle');
+    const { isNative, lastScan, startScan, writeTag, setLastScan } = useNfc();
+    
+    const [status, setStatus] = useState<'idle' | 'scanning' | 'writing' | 'success' | 'error' | 'payment_pending' | 'verifying'>('idle');
     const [pendingPayment, setPendingPayment] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
 
+    // Watch for native scans
+    useEffect(() => {
+        if (lastScan && (status === 'scanning' || status === 'idle')) {
+            processNfcData(lastScan);
+            setLastScan(null);
+        }
+    }, [lastScan, status]);
+
+    const processNfcData = (data: any) => {
+        if (data.type === 'fwber_profile' && data.userId) {
+            handleMatch(data.userId, data.nonce, 'MOCK_GEOHASH_FROM_NATIVE');
+        }
+        if (data.type === 'fwber_payment_request') {
+            setPendingPayment(data);
+            setStatus('payment_pending');
+            toast({
+                title: "Payment Request Received",
+                description: `Confirm purchase of ${data.itemName} for ${data.price} FWB.`,
+            });
+        }
+    };
+
     const startNFCExchange = async () => {
+        if (isNative) {
+            setStatus('scanning');
+            startScan();
+            // Also broadcast our profile via native write
+            writeTag(JSON.stringify({
+                type: 'fwber_profile',
+                userId: user?.id,
+                nonce: uuidv4().substring(0, 8),
+                timestamp: Date.now()
+            }));
+            return;
+        }
+
         if (!('NDEFReader' in window)) {
             setStatus('error');
             setError('NFC is not supported on this browser or device.');
@@ -29,7 +66,6 @@ export function NFCProfileExchange() {
 
         try {
             setStatus('scanning');
-            setIsScanning(true);
             
             // 1. Get current location for ZK-proof
             const position = await new Promise<GeolocationPosition>((resolve, reject) => {
@@ -55,20 +91,7 @@ export function NFCProfileExchange() {
                 const textDecoder = new TextDecoder();
                 const peerData = JSON.parse(textDecoder.decode(record.data));
                 
-                if (peerData.type === 'fwber_profile' && peerData.userId) {
-                    // Generate local proof using THEIR nonce and OUR location
-                    // This proves we are both in the same geohash
-                    handleMatch(peerData.userId, peerData.nonce, locationHash);
-                }
-
-                if (peerData.type === 'fwber_payment_request') {
-                    setPendingPayment(peerData);
-                    setStatus('payment_pending');
-                    toast({
-                        title: "Payment Request Received",
-                        description: `Confirm purchase of ${peerData.itemName} for ${peerData.price} FWB.`,
-                    });
-                }
+                processNfcData(peerData);
             });
 
             // Write our own data: Profile ID + our random nonce
@@ -91,11 +114,12 @@ export function NFCProfileExchange() {
 
     const handleMatch = async (peerId: string | number, peerNonce: string, myLocationHash: string) => {
         try {
+            setStatus('verifying');
             // The "proof" is sent to the backend. 
             // The backend will expect a matching proof from the other user.
             await api.post(`/matches/nfc-exchange`, { 
                 peer_id: peerId,
-                location_proof: myLocationHash, // In a real ZK system, this would be a cryptographic commitment
+                location_proof: myLocationHash, 
                 nonce: peerNonce
             }, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -109,15 +133,13 @@ export function NFCProfileExchange() {
         } catch (err) {
             setStatus('error');
             setError('Location proof mismatch or match error');
-        } finally {
-            setIsScanning(false);
-        }
+        } 
     };
 
     const confirmPayment = async () => {
         if (!pendingPayment) return;
         try {
-            setStatus('scanning'); // Re-using state for loader
+            setStatus('verifying');
             await api.post(`/marketplace/purchase/${pendingPayment.itemId}`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -135,7 +157,7 @@ export function NFCProfileExchange() {
     };
 
     return (
-        <Card className="border-amber-500/30 bg-gradient-to-br from-zinc-900 to-amber-950/20">
+        <Card className="border-amber-500/30 bg-gradient-to-br from-zinc-900 to-amber-950/20 relative overflow-hidden">
             <CardHeader className="pb-2">
                 <CardTitle className="text-amber-500 flex items-center gap-2 italic uppercase tracking-tighter">
                     <Smartphone className="w-5 h-5" />
@@ -171,6 +193,22 @@ export function NFCProfileExchange() {
                                 {status === 'scanning' ? 'Ready to Scan...' : 'Broadcasting Profile...'}
                             </p>
                             <Button variant="ghost" size="sm" onClick={() => setStatus('idle')} className="text-zinc-500 text-[10px]">Cancel</Button>
+                        </motion.div>
+                    )}
+
+                    {status === 'verifying' && (
+                        <motion.div key="verifying" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center py-8 space-y-6">
+                            <div className="relative">
+                                <div className="absolute inset-0 bg-blue-500/20 rounded-full animate-ping" />
+                                <div className="absolute inset-0 bg-blue-500/10 rounded-full animate-pulse scale-150" />
+                                <div className="p-6 bg-blue-600 rounded-full shadow-[0_0_30px_rgba(37,99,235,0.4)] relative z-10">
+                                    <RefreshCw className="w-10 h-10 text-white animate-spin" />
+                                </div>
+                            </div>
+                            <div className="text-center">
+                                <p className="text-lg font-black text-white uppercase italic tracking-tighter">Proximity Handshake</p>
+                                <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">Verifying Physical Proof-of-Presence...</p>
+                            </div>
                         </motion.div>
                     )}
 

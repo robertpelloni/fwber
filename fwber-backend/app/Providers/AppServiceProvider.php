@@ -30,11 +30,17 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(\App\Domain\Core\EventSourcing\Contracts\EventBusInterface::class, function ($app) {
             $driver = config('events.default', 'redis');
 
-            return match ($driver) {
+            $mainBus = match ($driver) {
                 'kafka' => new \App\Domain\Core\EventSourcing\Buses\KafkaEventBus,
                 'log'   => new \App\Domain\Core\EventSourcing\Buses\LogEventBus,
                 default => new \App\Domain\Core\EventSourcing\Buses\RedisStreamEventBus,
             };
+
+            // Wrap in Composite bus to enable Federated Relay
+            return new \App\Domain\Core\EventSourcing\Buses\CompositeEventBus([
+                $mainBus,
+                new \App\Domain\Core\EventSourcing\Buses\FederatedRelayBus,
+            ]);
         });
 
         $this->app->singleton(\App\Domain\Core\EventSourcing\EventStore::class, function ($app) {
