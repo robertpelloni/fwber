@@ -1,10 +1,14 @@
-# Project Status — fwber v1.0.91 (Global Bridge & Cross-Server E2E)
+# Project Status — fwber v1.0.92 (Governance Migration Fix)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.91 "Global Bridge & Cross-Server E2E"
+**Version:** 1.0.92 "Governance Migration Fix"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
+
+## Deployment & Stability
+- **Migration Repair:** Resolved a critical deployment failure caused by duplicate table creation in the governance schema. Cleanly separated proposals and votes into distinct database transactions.
+- **Defensive Migrations:** Added existence checks to the voting table migration to prevent future concurrency or state-desync issues during automated deployments.
 
 ## Global Token Bridge & Economy
 - **Asset Bridging:** Users can now swap liquid FWB Tokens for external assets (SOL, USDC) or Federated Vouchers.

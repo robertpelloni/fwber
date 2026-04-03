@@ -21,22 +21,10 @@ return new class extends Migration
             $table->string('status')->default('active'); // active, passed, failed, archived
             $table->timestamps();
         });
-
-        Schema::create('governance_votes', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('governance_proposal_id')->constrained()->onDelete('cascade');
-            $table->integer('option_index');
-            $table->decimal('token_weight', 12, 4); // The weight is the number of tokens the user held/committed at time of vote
-            $table->timestamps();
-
-            $table->unique(['user_id', 'governance_proposal_id'], 'user_proposal_unique_vote');
-        });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('governance_votes');
         Schema::dropIfExists('governance_proposals');
     }
 };

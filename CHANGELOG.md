@@ -650,3 +650,7 @@ All notable changes to this project will be documented in this file.
 - **Cross-Instance E2E Encryption (Outbound)**: Integrated RSA-OAEP encryption for federated direct messages. The frontend now automatically imports remote actor public keys to secure cross-server communications.
 - **Global Token Bridge (Economy)**: Launched the `SwapController` and a new "Global Bridge" UI in the wallet. Users can now initiate swaps from FWB Tokens to external assets (SOL, USDC) via a secure bridging protocol.
 - **Automated Governance Processing**: Built the `ProcessGovernanceProposals` background job to reconcile token-weighted votes and finalize community decisions upon expiry.
+
+## [1.0.92] - 2026-04-02
+### Fixed
+- **Migration Conflict**: Fixed a duplicate table creation error in the Governance migrations. Decoupled `governance_proposals` and `governance_votes` into their respective migration files to ensure deployment stability.
