@@ -602,3 +602,9 @@ All notable changes to this project will be documented in this file.
 - **Redemption Protocol**: Implemented a secure transaction flow where users receive a `FWB-XXXX` redemption code upon purchase. Merchants can verify and mark these as redeemed via the new `MerchantInventoryController`.
 - **Distributed Event Streaming Infrastructure**: Created a pluggable `EventBusInterface` and a `RedisStreamEventBus` implementation. All domain events are now automatically published to **Redis Streams**, enabling multi-instance global state replication.
 - **EventStore Refactor**: Upgraded the `EventStore` to support dependency-injected event buses.
+
+## [1.0.85] - 2026-04-02
+### Added
+- **Marketplace UI**: Built a dedicated shop interface (`/marketplace/{merchantId}`) where users can browse physical items and spend FWB Tokens.
+- **Purchase Workflow**: Integrated an animated "Purchase Confirmed" screen displaying unique redemption codes for merchant verification.
+- **Marketplace API Library**: Created `lib/api/marketplace.ts` to centralize token-based B2B transactions.

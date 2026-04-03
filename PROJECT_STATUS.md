@@ -1,15 +1,19 @@
-# Project Status — fwber v1.0.84 (Marketplace & Distributed Events)
+# Project Status — fwber v1.0.85 (Marketplace UI)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.84 "Marketplace & Distributed Events"
+**Version:** 1.0.85 "Marketplace UI"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## Physical Marketplace (B2B Expansion)
+## Physical Marketplace (B2B UI)
+- **Shop Frontend:** Launched the `/marketplace` route for browsing real-world inventory at venues.
+- **Transactional UX:** Created a seamless purchase flow including confirmation modals and a unique `FWB-XXXX` code display for easy in-person redemption.
+- **Animated Redemption:** Leveraged Framer Motion to provide high-fidelity feedback upon token expenditure.
+
+## Physical Marketplace (B2B Backend)
 - **Token-to-Item Economy:** Users can now spend their earned FWB Tokens on real-world items at participating venues.
 - **Inventory Management:** Merchants have a dedicated controller for managing stock, pricing in tokens, and item availability.
-- **Secure Redemption:** Implemented a unique code generation and verification system to prevent double-spending of tokens on physical inventory.
 
 ## Distributed Global Event Streaming
 - **Redis Stream Driver:** Implemented the first production driver for the `EventBusInterface`. High-volume events (Location, Messages, Matches) are now streamed to Redis in real-time.
@@ -90,6 +94,7 @@
 - **Billing validation from the previous slice remains the current premium reference path**: `php artisan test tests\Feature\PremiumControllerTest.php tests\Feature\StripeWebhookTest.php`, plus frontend `npm run lint`, `npm run type-check`, and `cmd /c "npm run build"`, already passed for `v1.0.71`.
 
 ## ✅ Release Focus
+- [x] Build Marketplace UI for users to spend tokens.
 - [x] Build Physical Item Marketplace for merchants.
 - [x] Implement Distributed Global Event Streaming (Redis).
 - [x] Build ZK-Location Verification for physical taps.
