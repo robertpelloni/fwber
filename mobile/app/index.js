@@ -1,8 +1,9 @@
-import { StyleSheet, View, BackHandler, Linking } from 'react-native';
+import { StyleSheet, View, BackHandler, Linking, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useEffect, useRef, useState } from 'react';
 import * as Location from 'expo-location';
+import NfcManager, { NfcTech, Ndef } from 'react-native-nfc-manager';
 
 const TARGET_DOMAIN = 'fwber.me';
 
@@ -11,16 +12,81 @@ export default function Home() {
   const webViewRef = useRef(null);
   const [canGoBack, setCanGoBack] = useState(false);
   const [locationGranted, setLocationGranted] = useState(false);
+  const [nfcSupported, setNfcSupported] = useState(false);
 
-  // 1. Request Native Location Permissions on Mount
+  // 1. Initialize Native Capabilities
   useEffect(() => {
     (async () => {
+      // Location
       const { status } = await Location.requestForegroundPermissionsAsync();
       setLocationGranted(status === 'granted');
+
+      // NFC
+      try {
+        const supported = await NfcManager.isSupported();
+        setNfcSupported(supported);
+        if (supported) {
+          await NfcManager.start();
+        }
+      } catch (e) {
+        console.warn('NFC initialization failed', e);
+      }
     })();
   }, []);
 
-  // 2. Handle Android Hardware Back Button
+  // 2. NFC Native -> WebView Bridge
+  useEffect(() => {
+    if (!nfcSupported) return;
+
+    const startNfcDiscovery = async () => {
+        try {
+            await NfcManager.requestTechnology(NfcTech.Ndef);
+            const tag = await NfcManager.getTag();
+            
+            if (tag && tag.ndefMessage) {
+                const message = Ndef.decodeMessage(tag.ndefMessage[0].payload);
+                const payload = Ndef.text.decodePayload(tag.ndefMessage[0].payload);
+                
+                // Inject into WebView
+                const js = `
+                  if (window.handleNativeNFC) {
+                    window.handleNativeNFC(${JSON.stringify(payload)});
+                  }
+                `;
+                webViewRef.current?.injectJavaScript(js);
+            }
+        } catch (ex) {
+            console.warn('NFC Read Error', ex);
+        } finally {
+            NfcManager.cancelTechnologyRequest();
+        }
+    };
+
+    // We can trigger this via a message from the WebView
+  }, [nfcSupported]);
+
+  // 3. WebView -> Native Bridge
+  const onMessage = async (event) => {
+    try {
+      const data = JSON.parse(event.nativeEvent.data);
+      
+      if (data.type === 'START_NFC_SCAN') {
+        // Trigger native NFC prompt
+        NfcManager.registerTagEvent();
+      }
+
+      if (data.type === 'NFC_WRITE') {
+        await NfcManager.requestTechnology(NfcTech.Ndef);
+        const bytes = Ndef.encodeMessage([Ndef.textRecord(data.payload)]);
+        await NfcManager.ndefHandler.writeNdefMessage(bytes);
+        NfcManager.cancelTechnologyRequest();
+      }
+    } catch (e) {
+      console.error('Bridge Error', e);
+    }
+  };
+
+  // 4. Handle Android Hardware Back Button
   useEffect(() => {
     const handleBackPress = () => {
       if (canGoBack && webViewRef.current) {
@@ -59,6 +125,7 @@ export default function Home() {
         bounces={false}
         showsVerticalScrollIndicator={false}
         onNavigationStateChange={handleNavigationStateChange}
+        onMessage={onMessage}
         geolocationEnabled={locationGranted}
       />
     </View>

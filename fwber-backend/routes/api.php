@@ -462,6 +462,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('economy/swaps', [\App\Http\Controllers\Api\SwapController::class, 'index']);
     Route::post('economy/swaps/initiate', [\App\Http\Controllers\Api\SwapController::class, 'initiate']);
 
+    // Federated Identity (WebFinger Auth)
+    Route::post('auth/federated/challenge', [\App\Http\Controllers\ActivityPubAuthController::class, 'challenge']);
+    Route::post('auth/federated/verify', [\App\Http\Controllers\ActivityPubAuthController::class, 'verify']);
+
     // Merchant API (Authenticated)
     Route::post('merchant/keys', [\App\Http\Controllers\Api\MerchantController::class, 'generateKeys']);
     Route::post('merchant/payment/{id}/confirm', [\App\Http\Controllers\Api\MerchantController::class, 'confirm']);

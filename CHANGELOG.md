@@ -713,3 +713,9 @@ All notable changes to this project will be documented in this file.
 - **Policy Executor Expansion**: Added `unban_user` and `unban_actor` actions to the automated execution engine.
 ### Changed
 - **Auth Hardening**: Enhanced the `CheckGlobalBan` middleware to handle graceful redirects and restricted API access for banned entities.
+
+## [1.1.1] - 2026-04-02
+### Added
+- **Native Mobile NFC Bridge**: Refactored the `mobile/` app to support native NFC hardware. Built a bidirectional bridge between the React Native NFC Manager and the Next.js WebView, enabling reliable high-frequency "Tap-to-Pay" and "Flash Matching".
+- **Global Federated Identity**: Launched the decentralized login system. Users can now authenticate with any `fwber` node using their external ActivityPub handle (@user@server) via a secure WebFinger challenge-response protocol.
+- **Shadow User Provisioning**: Implemented automatic local account creation for verified federated actors, allowing for cross-instance social persistence.
