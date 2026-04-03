@@ -1,10 +1,15 @@
-# Project Status — fwber v1.0.79 (EventStore Load Tested)
+# Project Status — fwber v1.0.80 (Mobile Expo Router)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.79 "EventStore Load Tested"
+**Version:** 1.0.80 "Mobile Expo Router"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
+
+## Mobile Architecture Refactor
+- **Expo Router Integration:** Successfully migrated the `mobile/` directory to the modern filesystem-based routing paradigm. Deleted redundant `App.js` and `index.js`.
+- **Modern Stack:** Updated mobile dependencies to support React 19 and React Native 0.83, ensuring longevity and performance.
+- **Root Layout & Index:** Implemented `app/_layout.js` for safe-area management and `app/index.js` for the core hybrid WebView experience with native back-button handling.
 
 ## Event Store Performance & Integrity
 - **Simulated High Load:** Successfully executed the `event-store:load-test` command against 100,000 records. 
@@ -59,6 +64,8 @@
 - **Billing validation from the previous slice remains the current premium reference path**: `php artisan test tests\Feature\PremiumControllerTest.php tests\Feature\StripeWebhookTest.php`, plus frontend `npm run lint`, `npm run type-check`, and `cmd /c "npm run build"`, already passed for `v1.0.71`.
 
 ## ✅ Release Focus
+- [x] Migrate Mobile app to Expo Router.
+- [x] Standardize Mobile directory structure.
 - [x] Load test EventStore under high record volume.
 - [x] Verify event unique constraint enforcement.
 - [x] Optimize Next.js Cache-Control headers for production.

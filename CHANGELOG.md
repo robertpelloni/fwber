@@ -571,3 +571,10 @@ All notable changes to this project will be documented in this file.
 - **EventStore Load Testing**: Implemented a new Artisan command `event-store:load-test` to simulate high-volume event data.
 - **Performance Verification**: Verified sub-millisecond lookup and stream fetch performance under a 100,000 record load, ensuring production readiness.
 - **Unique Constraint Integrity**: Confirmed that the `domain_events` unique index correctly prevents aggregate version collisions.
+
+## [1.0.80] - 2026-04-02
+### Changed
+- **Mobile Expo Router Migration**: Completely refactored the `mobile/` React Native application.
+- Replaced the single-file `App.js` with an `app/` directory using file-based routing.
+- Integrated `expo-router` v3.5.0 and updated core dependencies for React 19 and React Native 0.83.
+- Standardized the entry point to `expo-router/entry` and added deep linking support via a new URI scheme.

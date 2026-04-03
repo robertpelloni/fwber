@@ -42,6 +42,7 @@
 - Kubernetes / Helm chart finalization for enterprise scale (COMPLETED).
 - Multi-region edge caching (Cloudflare + Vercel) (COMPLETED).
 - Load testing the unified Event Store (COMPLETED).
+- Prepare **Mobile Expo Router** migration for the `mobile/` directory (COMPLETED).
 
 ---
 
@@ -59,10 +60,11 @@
 | **Federation** | Mature | 100% | 100% | WebFinger, search, signed inbound/outbound. |
 | **B2B / Merchant** | Mature | 100% | 100% | Registration, promotions, analytics CSV export. |
 | **DevOps / Infra** | Mature | 100% | 100% | Helm Chart, Edge Caching, Load Tested. |
+| **Mobile App** | Mature | 100% | 100% | Expo Router, WebView Hybrid, Native Geofencing. |
 
 ---
 
 ## 🎯 Next Immediate Milestones
-1. Complete **Multi-region Edge Caching** optimizations via Vercel `next.config.js` and Cloudflare page rules.
-2. Conduct **Load Testing** on the `EventStore` table across 10 million simulated records to check UUID constraint and composite index hit rates.
-3. Prepare **Mobile Expo Router** migration for the `mobile/` directory to align routing architecture with the web frontend.
+1. Implement **WASM Encryption Primitives** to replace JavaScript-based E2E encryption for high-performance media payloads.
+2. Develop a **Sub-millisecond Real-time Proximity Cache** layer using Redis Bloom Filters for high-density areas.
+3. Finalize **ActivityPub Search Aggregator** to combine results from multiple federated actors into a unified discovery interface.

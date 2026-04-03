@@ -1,13 +1,12 @@
-import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, BackHandler, Linking } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useEffect, useRef, useState } from 'react';
 import * as Location from 'expo-location';
 
 const TARGET_DOMAIN = 'fwber.me';
 
-function WebViewContainer() {
+export default function Home() {
   const insets = useSafeAreaInsets();
   const webViewRef = useRef(null);
   const [canGoBack, setCanGoBack] = useState(false);
@@ -26,31 +25,28 @@ function WebViewContainer() {
     const handleBackPress = () => {
       if (canGoBack && webViewRef.current) {
         webViewRef.current.goBack();
-        return true; // Prevent default OS exit
+        return true;
       }
-      return false; // Allow exit if we are at the app root
+      return false;
     };
 
     BackHandler.addEventListener('hardwareBackPress', handleBackPress);
     return () => BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
   }, [canGoBack]);
 
-  // 3. Intercept External Links
   const handleNavigationStateChange = (navState) => {
     setCanGoBack(navState.canGoBack);
-
     const { url } = navState;
     if (!url) return;
 
     try {
       const hostname = new URL(url).hostname;
-      // If navigating to Stripe, Twitter, etc., pop out to system browser
-      if (!hostname.includes(TARGET_DOMAIN)) {
-        webViewRef.current.stopLoading(); // Stop webview from redirecting
-        Linking.openURL(url); // Push to Safari/Chrome natively
+      if (!hostname.includes(TARGET_DOMAIN) && !url.includes('localhost')) {
+        webViewRef.current.stopLoading();
+        Linking.openURL(url);
       }
     } catch (error) {
-      // Ignore invalid URLs
+      // Ignore
     }
   };
 
@@ -63,25 +59,16 @@ function WebViewContainer() {
         bounces={false}
         showsVerticalScrollIndicator={false}
         onNavigationStateChange={handleNavigationStateChange}
-        geolocationEnabled={locationGranted} // Bind Native -> Web API
+        geolocationEnabled={locationGranted}
       />
-      <StatusBar style="auto" />
     </View>
-  );
-}
-
-export default function App() {
-  return (
-    <SafeAreaProvider>
-      <WebViewContainer />
-    </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000', // Matches common fwber dark theme boundary
+    backgroundColor: '#000',
   },
   webview: {
     flex: 1,

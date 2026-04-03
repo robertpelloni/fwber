@@ -2,6 +2,7 @@
   "expo": {
     "name": "fwber",
     "slug": "fwber",
+    "scheme": "fwber",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
