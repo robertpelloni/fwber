@@ -1,17 +1,21 @@
-# Project Status — fwber v1.0.83 (ZK-Location Proofs)
+# Project Status — fwber v1.0.84 (Marketplace & Distributed Events)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.83 "ZK-Location Proofs"
+**Version:** 1.0.84 "Marketplace & Distributed Events"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## NFC Physical Proof & ZK-Location
-- **Geohash Commitments:** Updated the NFC tap sequence to capture local GPS coordinates and generate a precision-8 geohash.
-- **Relay Handshake:** Implemented a stateful Redis handshake in the backend. Both users must "report in" with their location proofs within 15 seconds of a tap to verify the meetup.
-- **Privacy First:** Physical verification now occurs without either user sharing their raw coordinates with the other, utilizing the server as a blind matching relay.
+## Physical Marketplace (B2B Expansion)
+- **Token-to-Item Economy:** Users can now spend their earned FWB Tokens on real-world items at participating venues.
+- **Inventory Management:** Merchants have a dedicated controller for managing stock, pricing in tokens, and item availability.
+- **Secure Redemption:** Implemented a unique code generation and verification system to prevent double-spending of tokens on physical inventory.
 
-## NFC Physical Verification
+## Distributed Global Event Streaming
+- **Redis Stream Driver:** Implemented the first production driver for the `EventBusInterface`. High-volume events (Location, Messages, Matches) are now streamed to Redis in real-time.
+- **Pluggable Architecture:** Refactored the `EventStore` to be bus-agnostic, making future migration to Kafka or Kinesis a single-line config change.
+
+## NFC Physical Proof & ZK-Location
 - **Web NFC Integration:** Built a native-feeling NFC exchange interface using the `NDEFReader` API.
 - **Backend Handshaking:** Created an atomic endpoint to record NFC exchanges and link users immediately.
 
@@ -86,6 +90,8 @@
 - **Billing validation from the previous slice remains the current premium reference path**: `php artisan test tests\Feature\PremiumControllerTest.php tests\Feature\StripeWebhookTest.php`, plus frontend `npm run lint`, `npm run type-check`, and `cmd /c "npm run build"`, already passed for `v1.0.71`.
 
 ## ✅ Release Focus
+- [x] Build Physical Item Marketplace for merchants.
+- [x] Implement Distributed Global Event Streaming (Redis).
 - [x] Build ZK-Location Verification for physical taps.
 - [x] Implement NFC Profile Exchange protocol.
 - [x] Integrate WASM crypto offloading in frontend.

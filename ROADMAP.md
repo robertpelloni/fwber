@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.0.83
+> **Current Version:** 1.0.84
 > **Last Updated:** 2026-04-02
 
 ---
@@ -47,6 +47,8 @@
 - Finalize **ActivityPub Search Aggregator** (COMPLETED).
 - Implement **WASM Encryption Primitives** (COMPLETED).
 - Build a **NFC Match Protocol** with **ZK-Location Verification** (COMPLETED).
+- Develop **Distributed Global Event Streaming** (COMPLETED).
+- Build a **Physical Item Marketplace** (Backend) (COMPLETED).
 
 ---
 
@@ -54,21 +56,21 @@
 
 | Feature Domain | Status | Backend | Frontend | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| **Auth & Security** | Mature | 100% | 100% | ZK-Identity, ZK-Location, NFC Handshake, WASM. |
+| **Auth & Security** | Mature | 100% | 100% | ZK-Identity, ZK-Location, NFC Sync, WASM. |
 | **Matching Engine** | Mature | 100% | 100% | Event Sourced, compatibility scoring. |
 | **Messaging** | Mature | 100% | 100% | E2E Encrypted, CRDT Batch Offline Sync. |
 | **Location / Geo** | Mature | 100% | 100% | AR Nav, Redis Bloom, ZK-Location Proofs. |
 | **AI Integration** | Mature | 100% | 100% | Avatars, Wingman modals, Roast, Content Gen. |
 | **Social / Viral** | Mature | 100% | 100% | Rate My Cat, Bounties, Referrals. |
-| **Economy** | Mature | 100% | 100% | FWB Tokens, Stripe checkout, Wallet. |
+| **Economy** | Mature | 100% | 85% | FWB Tokens, Stripe, Marketplace Backend. |
 | **Federation** | Mature | 100% | 100% | WebFinger, Aggregated Search, Signed Activities. |
-| **B2B / Merchant** | Mature | 100% | 100% | Registration, promotions, analytics CSV export. |
-| **DevOps / Infra** | Mature | 100% | 100% | Helm Chart, Edge Caching, Load Tested. |
+| **B2B / Merchant** | Mature | 100% | 100% | Registration, Inventory, analytics CSV export. |
+| **DevOps / Infra** | Mature | 100% | 100% | Helm Chart, Edge Caching, Event Streaming. |
 | **Mobile App** | Mature | 100% | 100% | Expo Router, WebView Hybrid, Native Geofencing. |
 
 ---
 
 ## 🎯 Next Immediate Milestones
-1. Implement **Distributed Global Event Streaming** using Apache Kafka or AWS Kinesis for multi-instance federation scaling.
-2. Build a **Federated Reputation System** based on Vouch scores across instances.
-3. Develop a **Physical Item Marketplace** allowing users to spend FWB Tokens on real-world merchant inventory.
+1. Build the **Marketplace UI** in the React frontend.
+2. Finalize the **Federated Reputation Aggregator** to sync Vouch scores across instances.
+3. Implement **ActivityPub Group Actors** for federated bulletin boards.

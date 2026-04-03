@@ -57,4 +57,9 @@ class MerchantProfile extends Model
     {
         return $this->hasMany(Promotion::class, 'merchant_id');
     }
+
+    public function inventories()
+    {
+        return $this->hasMany(MerchantInventory::class);
+    }
 }

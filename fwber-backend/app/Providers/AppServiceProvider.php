@@ -25,6 +25,17 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(\App\Services\FeatureFlagService::class, function ($app) {
             return new \App\Services\FeatureFlagService;
         });
+
+        // --- DISTRIBUTED EVENT SOURCING INFRASTRUCTURE ---
+        $this->app->singleton(\App\Domain\Core\EventSourcing\Contracts\EventBusInterface::class, function ($app) {
+            return new \App\Domain\Core\EventSourcing\Buses\RedisStreamEventBus;
+        });
+
+        $this->app->singleton(\App\Domain\Core\EventSourcing\EventStore::class, function ($app) {
+            return new \App\Domain\Core\EventSourcing\EventStore(
+                $app->make(\App\Domain\Core\EventSourcing\Contracts\EventBusInterface::class)
+            );
+        });
     }
 
     /**

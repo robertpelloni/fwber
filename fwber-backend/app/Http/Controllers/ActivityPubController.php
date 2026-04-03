@@ -107,6 +107,7 @@ class ActivityPubController extends Controller
                 'gender' => $actor['gender'] ?? null,
                 'orientation' => $actor['orientation'] ?? null,
                 'relationshipStatus' => $actor['relationshipStatus'] ?? null,
+                'reputation' => $actor['reputation'] ?? null,
                 'cachedPostsCount' => (clone $cachedPostsQuery)->count(),
                 'lastCachedPostAt' => $latestCachedPost?->published_at?->toIso8601String(),
                 'followingStatus' => $following?->status,

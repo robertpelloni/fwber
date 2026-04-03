@@ -595,3 +595,10 @@ All notable changes to this project will be documented in this file.
 - **ZK-Location Verification for NFC Taps**: Enhanced the NFC Profile Exchange to include a cryptographic physical proximity proof.
 - **Handshake Protocol**: Implemented a Redis-backed 15-second handshake window in `MatchController.php`. Matches are now only "Physical Verified" if both participants provide matching precision-8 geohashes, proving proximity without raw GPS exchange.
 - **Frontend Geohash Integration**: Integrated `ngeohash` in the React frontend to generate location commitments during the NFC tap sequence.
+
+## [1.0.84] - 2026-04-02
+### Added
+- **Physical Item Marketplace**: Built a new B2B extension allowing merchants to list physical inventory (drinks, merchandise) for sale via FWB Tokens.
+- **Redemption Protocol**: Implemented a secure transaction flow where users receive a `FWB-XXXX` redemption code upon purchase. Merchants can verify and mark these as redeemed via the new `MerchantInventoryController`.
+- **Distributed Event Streaming Infrastructure**: Created a pluggable `EventBusInterface` and a `RedisStreamEventBus` implementation. All domain events are now automatically published to **Redis Streams**, enabling multi-instance global state replication.
+- **EventStore Refactor**: Upgraded the `EventStore` to support dependency-injected event buses.

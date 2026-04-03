@@ -437,7 +437,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('promotions/{promotionId}', [\App\Http\Controllers\MerchantController::class, 'destroyPromotion']);
         Route::get('analytics', [\App\Http\Controllers\MerchantAnalyticsController::class, 'index']);
         Route::get('analytics/export', [\App\Http\Controllers\MerchantAnalyticsController::class, 'exportCsv']);
+
+        // Marketplace (Merchant Actions)
+        Route::get('inventory', [\App\Http\Controllers\MerchantInventoryController::class, 'store']); // Use same for list
+        Route::post('inventory', [\App\Http\Controllers\MerchantInventoryController::class, 'store']);
+        Route::post('inventory/redeem', [\App\Http\Controllers\MerchantInventoryController::class, 'redeem']);
     });
+
+    // Marketplace (User Actions)
+    Route::get('marketplace/{merchantId}', [\App\Http\Controllers\MerchantInventoryController::class, 'index']);
+    Route::post('marketplace/purchase/{itemId}', [\App\Http\Controllers\MerchantInventoryController::class, 'purchase']);
 
     // Merchant API (Authenticated)
     Route::post('merchant/keys', [\App\Http\Controllers\Api\MerchantController::class, 'generateKeys']);

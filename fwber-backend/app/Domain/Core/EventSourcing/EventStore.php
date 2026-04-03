@@ -3,12 +3,17 @@
 namespace App\Domain\Core\EventSourcing;
 
 use App\Domain\Core\Events\DomainEvent;
+use App\Domain\Core\EventSourcing\Contracts\EventBusInterface;
 use Illuminate\Support\Facades\DB;
 
 class EventStore
 {
+    public function __construct(
+        protected ?EventBusInterface $eventBus = null
+    ) {}
+
     /**
-     * Append a new event to the event store.
+     * Append a new event to the event store and dispatch to the distributed bus.
      *
      * @param  DomainEvent  $event  The event to append.
      * @param  string  $aggregateType  The type of the aggregate (e.g., 'UserLocation')
@@ -19,6 +24,7 @@ class EventStore
      */
     public function append(DomainEvent $event, string $aggregateType, int $expectedVersion, array $metadata = []): void
     {
+        // 1. Persistence (Immutable Audit Log)
         DB::table('domain_events')->insert([
             'aggregate_uuid' => $event->aggregateUuid,
             'aggregate_type' => $aggregateType,
@@ -29,9 +35,13 @@ class EventStore
             'recorded_at' => $event->occurredAt->format('Y-m-d H:i:s.u'),
         ]);
 
-        // In a full CQRS setup, we would dispatch this to an Event Bus here
-        // so that projectors can update the read models.
+        // 2. Local Event Dispatching (Standard Laravel Events)
         event($event);
+
+        // 3. Distributed Event Publishing (Redis Streams / Kafka)
+        if ($this->eventBus) {
+            $this->eventBus->publish($event, $aggregateType, $metadata);
+        }
     }
 
     /**

@@ -34,8 +34,15 @@ return new class extends Migration
             return;
         }
 
+        try {
+            Schema::table('user_public_keys', function (Blueprint $table) {
+                $table->dropUnique('user_public_keys_user_id_unique');
+            });
+        } catch (\Throwable $e) {
+            // Ignore if index doesn't exist
+        }
+
         Schema::table('user_public_keys', function (Blueprint $table) {
-            $table->dropUnique('user_public_keys_user_id_unique');
             $table->text('private_key')->nullable()->after('public_key');
             $table->unique(['user_id', 'key_type'], 'user_public_keys_user_id_key_type_unique');
         });

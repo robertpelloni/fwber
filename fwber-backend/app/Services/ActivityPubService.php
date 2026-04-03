@@ -98,6 +98,9 @@ class ActivityPubService
                     'orientation' => 'fwber:orientation',
                     'relationshipStatus' => 'fwber:relationshipStatus',
                     'isVerified' => 'fwber:isVerified',
+                    'reputation' => 'fwber:reputation',
+                    'vouchCount' => 'fwber:vouchCount',
+                    'memberSince' => 'fwber:memberSince',
                 ],
             ],
             'id' => $actorUri,
@@ -116,6 +119,12 @@ class ActivityPubService
             'orientation' => $profile->sexual_orientation ?? 'unspecified',
             'relationshipStatus' => $profile->relationship_type ?? 'single',
             'isVerified' => (bool) ($profile->is_id_verified ?? false),
+
+            'reputation' => [
+                'vouchCount' => (int) $user->vouches()->count(),
+                'memberSince' => $user->created_at->toIso8601String(),
+            ],
+
             'inbox' => $inboxUri,
             'outbox' => $outboxUri,
             'publicKey' => [
