@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.2.8 "CI/CD Scale & Database Optimization"
+> **Current Version:** 1.2.9 "Go-To-Market Polish & E2E UX"
 > **Last Updated:** 2026-04-04
 
 ---
@@ -34,7 +34,9 @@ The platform is now **100% focused on its core identity**:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.2.8)
+### Phase 5: Production Scale (COMPLETED - v1.2.9)
+- **Native Push Linking:** The Expo mobile app correctly interprets push notification JSON objects and executes deep linking into the `RealTimeChat.tsx` or `ProfileViewModal.tsx`.
+- **E2E Global UX:** Persistent `<E2ERecoveryAlert />` injected into `<ProtectedRoute />` protects users from losing chat history across device upgrades.
 - **Geo-Service Load Testing:** Artisan command simulated 10,000 concurrent users against the Rust microservice (Avg: 1.5ms).
 - **Database Optimization:** Migrated `optimize_core_indexes` to ensure spatial, conversational, and matchmaking indices scale to millions of rows seamlessly.
 - **E2E Photo Hydration:** WebWorkers explicitly wired into the `RealTimeChat.tsx` and `ProfileViewModal.tsx` interfaces to offload AES-GCM photo decryption for full galleries.

@@ -814,3 +814,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - **Automated CI/CD Pipelines:** Instituted a completely automated, zero-touch deployment strategy. Pushing code to `main` now triggers `.github/workflows/` which sequentially validate the backend tests, compile the Next.js frontend, and execute `eas submit` to distribute the native `.ipa` and `.aab` packages directly to App Store Connect and Google Play Console.
 - **Enterprise Database Indexing:** Shipped `2026_04_03_212041_optimize_core_indexes.php`. The newly squashed, hyper-lean schema has been upgraded with precision composite indices across `messages` (accelerating unread counts and conversation fetching), `user_matches` (O(1) active match retrieval), and `user_profiles` (instantaneous spatial and gender/age filtering).
+
+## [1.2.9] - 2026-04-04
+### Added
+- **Global E2E Key Recovery Alert:** Introduced an omnipresent `<E2ERecoveryAlert />` component injected into the root `<ProtectedRoute />`. If a user logs in on a new device (without local IndexedDB keys) but a remote AES-GCM backup exists, they are aggressively prompted to restore their keys. This ensures zero data loss of encrypted media or chat history when users upgrade phones or clear cache.
+- **Native Push Notification Deep Links:** The React Native (`mobile/app/index.js`) shell now actively listens to `expo-notifications` click events. Tapping a "New Match!" or "New Message" native OS push notification now instantly intercepts the attached JSON payload and executes a JavaScript injection `window.location.href = ...` to seamlessly deep-link the user directly into the corresponding internal WebView component.

@@ -3,6 +3,7 @@
 import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import { useEffect, ReactNode } from 'react'
+import { E2ERecoveryAlert } from '@/components/E2ERecoveryAlert'
 
 interface ProtectedRouteProps {
   children: ReactNode
@@ -51,5 +52,10 @@ export default function ProtectedRoute({
     return null
   }
 
-  return <>{children}</>
+  return (
+    <>
+      {children}
+      <E2ERecoveryAlert />
+    </>
+  )
 }

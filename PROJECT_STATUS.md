@@ -1,21 +1,19 @@
-# PROJECT_STATUS.md - fwber v1.2.8 (CI/CD Scale & Database Optimization)
+# PROJECT_STATUS.md - fwber v1.2.9 (Go-To-Market Polish & E2E UX)
 
 **Date:** 2026-04-04
-**Version:** 1.2.8 "CI/CD Scale & Database Optimization"
+**Version:** 1.2.9 "Go-To-Market Polish & E2E UX"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## 🛠️ Fully Automated Deployment Pipelines
-- **Mobile Distribution Automation:** Constructed `.github/workflows/mobile-release.yml` utilizing `eas build` and `eas submit`. Pushing a tag to `main` now automatically builds the `.ipa` and `.aab` artifacts and submits them natively to TestFlight and Google Play Console.
-- **Backend CI Guards:** Added `.github/workflows/backend-tests.yml` to automatically execute the `phpunit` core testing suite on every pull request, safeguarding the 100% "Green" status of our core matchmaking and location logic.
-- **Frontend CI Checks:** Engineered `.github/workflows/frontend-build.yml` to run a strict Next.js test build using Vercel-like configurations, blocking any broken React or Tailwind styling from merging.
+## 🔔 Native Push Routing
+- **Deep Linking:** Overhauled the React Native `mobile/app/index.js` wrapper to explicitly hook into the `expo-notifications` response listeners. When a user taps a background push notification (e.g. "New Match!"), the mobile shell automatically intercepts the attached URL payload and seamlessly routes the internal `WebView` to the correct chat or match screen.
 
-## 🗄️ Database Hyper-Scale Indexing
-- **O(1) Data Retrieval:** Deployed the `optimize_core_indexes` migration. By adding highly specific composite keys across `user_matches`, `match_actions`, `messages`, and `user_profiles`, our database architecture is now fully prepared to scale to millions of rows while maintaining sub-millisecond retrieval speeds for all primary queries.
+## 🔐 Global E2E Key Recovery UX
+- **Persistent Alerting:** Removed the easy-to-miss dashboard notification and constructed a global, animated `<E2ERecoveryAlert />` component.
+- **Data Safety:** This alert is now permanently injected into the root `<ProtectedRoute />` wrapper. If a user logs into a new device (where local IndexedDB E2E keys are missing) but a remote backup is detected, they are continuously prompted to recover their keys, ensuring zero loss of chat history or media across device upgrades.
 
 ## ✅ Release Focus
-- [x] Configure GitHub Actions for Native App Store submissions.
-- [x] Construct CI/CD safeguards for PHPUnit testing.
-- [x] Establish CI/CD guards for Next.js deployments.
-- [x] Audit and fix missing database indices across the squashed models.
+- [x] Wire up Native Push Notification deep links in Expo.
+- [x] Build global `<E2ERecoveryAlert />`.
+- [x] Clean up redundant Dashboard code.

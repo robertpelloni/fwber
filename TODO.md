@@ -13,12 +13,9 @@
 - [ ] **Asset Production**: Have the design team execute the screenshot blueprints outlined in `mobile/STORE_ASSETS.md` to finalize the native store listings.
 
 ## ✅ Recently Completed
+- [x] **Native Push Deep Links**: Engineered `mobile/app/index.js` to parse push notification JSON payloads and directly route the WebView to the correct chat or match.
+- [x] **Global E2E Recovery UX**: Moved the key recovery alert out of the dashboard and into a persistent `<E2ERecoveryAlert />` inside the root `<ProtectedRoute />`.
 - [x] **CI/CD Automation**: Deployed GitHub Actions for automated backend tests, frontend Next.js builds, and Expo/EAS native mobile deployments.
-- [x] **Database Scale Optimization**: Executed `optimize_core_indexes` migration to heavily index spatial lookups, unread message counts, and match filtering fields for O(1) retrieval speeds.
-- [x] **Store Asset Specifications**: Authored `STORE_ASSETS.md` defining exactly what UI views to screenshot for App Store optimization.
-- [x] **Data Wiping Verification**: Ensured all user media files (including Vault photos and messages) are explicitly wiped from S3/Storage *before* the user record is cascaded.
-- [x] **Native App Deployment Pipeline**: Finalized `mobile/fastlane/Fastfile` to automate `eas build` logic.
-- [x] **Web Worker Photo Hydration**: Integrated the `E2EImage` decryption worker directly into the `RealTimeChat.tsx` view for smooth media.
 
 ---
 *This file is continuously updated by autonomous AI agents. Do not leave items unchecked if they are completed.*

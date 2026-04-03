@@ -51,6 +51,7 @@ export default function Home() {
   const [permissionsGranted, setPermissionsGranted] = useState<boolean | null>(null);
   const [nfcSupported, setNfcSupported] = useState(false);
   const [isRequesting, setIsRequesting] = useState(false);
+  const [targetUrl, setTargetUrl] = useState(`https://${TARGET_DOMAIN}`);
 
   // Initial check of existing permissions
   useEffect(() => {
@@ -63,6 +64,33 @@ export default function Home() {
          setPermissionsGranted(false);
       }
     })();
+
+    // Handle Push Notifications when the app is foregrounded
+    const foregroundSubscription = Notifications.addNotificationReceivedListener(notification => {
+        console.log('Received notification in foreground:', notification);
+    });
+
+    // Handle Push Notifications when the user taps them (background/killed)
+    const responseSubscription = Notifications.addNotificationResponseReceivedListener(response => {
+        const url = response.notification.request.content.data.url;
+        
+        if (url) {
+            console.log('User tapped notification, routing to:', url);
+            // If the WebView is already loaded, we can inject JS to navigate
+            if (webViewRef.current) {
+                const js = `window.location.href = "${url.startsWith('/') ? url : '/' + url}"; true;`;
+                webViewRef.current.injectJavaScript(js);
+            } else {
+                // If WebView hasn't mounted yet, set the initial URL
+                setTargetUrl(`https://${TARGET_DOMAIN}${url.startsWith('/') ? url : '/' + url}`);
+            }
+        }
+    });
+
+    return () => {
+        foregroundSubscription.remove();
+        responseSubscription.remove();
+    };
   }, []);
 
   const requestAllPermissions = async () => {
@@ -288,7 +316,7 @@ export default function Home() {
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <WebView
         ref={webViewRef}
-        source={{ uri: `https://${TARGET_DOMAIN}` }}
+        source={{ uri: targetUrl }}
         style={styles.webview}
         bounces={false}
         showsVerticalScrollIndicator={false}
