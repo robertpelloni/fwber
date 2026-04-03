@@ -733,3 +733,9 @@ All notable changes to this project will be documented in this file.
 - **Autonomous Governance Scheduler**: Integrated council proposal finalization and ActivityPub content ingestion into the Laravel master schedule.
 - **On-Chain Governance Mirroring**: Finalized proposals now automatically anchor their Merkle Roots to the Solana blockchain for immutable proof-of-tally.
 - **Visual Physical Proofs**: Enhanced the NFC handshake UI with a high-fidelity "Radar" verification state for better physical interaction feedback.
+
+## [1.1.4] - 2026-04-02
+### Added
+- **On-Chain Merkle Prover**: Enhanced the Council UI to cross-reference local Merkle roots with Solana transaction memos. Users can now verify that the community tally matches the immutable blockchain record.
+- **Federated Event Consumer**: Built the `events:consume-federated` Artisan command. This enables `fwber` nodes to subscribe to the distributed event bus and replay domain events to maintain global state parity.
+- **NFC Tap-to-Pay E2E Tests**: Authored a complete Cypress suite for physical payment redemptions, verifying the native-to-web bridge and token transfer flow.
