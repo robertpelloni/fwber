@@ -689,3 +689,11 @@ All notable changes to this project will be documented in this file.
 - **Merkle Proof API**: Implemented a new endpoint `/api/governance/proposals/{id}/proof` that generates the sibling-hash path for a user's specific weighted vote.
 ### Changed
 - **Council UI Overhaul**: Split the Council portal into "Active Proposals" and "History & Audit" sections for better clarity and long-term transparency.
+
+## [1.0.98] - 2026-04-02
+### Added
+- **On-Chain Governance Mirroring**: Integrated Solana anchoring for the community council. Finalized proposals now automatically anchor their Merkle roots to the Solana blockchain for immutable third-party auditing.
+- **OnChainAuditor Service**: Created a new backend service to handle blockchain JSON-RPC interactions and transaction management.
+- **iOS NFC Support**: Enabled native NFC entitlements and usage descriptions in the `mobile/` app for cross-platform physical verification parity.
+### Changed
+- **Council Audit UX**: Updated the `/council` portal to display on-chain transaction hashes with direct links to the Solana Explorer.

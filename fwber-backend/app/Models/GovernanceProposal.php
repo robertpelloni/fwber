@@ -19,6 +19,8 @@ class GovernanceProposal extends Model
         'starts_at',
         'expires_at',
         'status',
+        'merkle_root',
+        'on_chain_tx',
         'executed_at',
     ];
 

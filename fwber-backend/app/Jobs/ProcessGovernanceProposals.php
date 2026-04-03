@@ -61,6 +61,9 @@ class ProcessGovernanceProposals implements ShouldQueue
             'description' => $proposal->description . "\n\n--- GOVERNANCE RESULT ---\nPassed with winner: {$winnerOption}\nMerkle Root: {$merkleRoot}"
         ]);
 
+        // 4. Anchor to Blockchain for Immutability
+        app(\App\Services\Governance\OnChainAuditor::class)->anchorProposal($proposal);
+
         Log::info("Governance: Proposal {$proposal->id} ('{$proposal->title}') finalized as PASSED. Winner: {$winnerOption}");
 
         // 3. Notify Voters

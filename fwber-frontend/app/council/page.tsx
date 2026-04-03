@@ -24,6 +24,8 @@ interface Proposal {
     expires_at: string;
     votes_count: number;
     status: string;
+    merkle_root: string;
+    on_chain_tx: string;
     results: Array<{ option_index: number, total_weight: string }>;
 }
 
@@ -223,7 +225,28 @@ function ProposalCard({
                         </div>
                     </div>
                     
-                    {isFinalized && <VoteVerifier proposalId={proposal.id} />}
+                    {isFinalized && (
+                        <div className="space-y-4">
+                            <VoteVerifier proposalId={proposal.id} />
+                            
+                            {proposal.on_chain_tx && (
+                                <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                                        <span className="text-[10px] font-black uppercase text-blue-500 tracking-widest italic">On-Chain Verified (Solana)</span>
+                                    </div>
+                                    <a 
+                                        href={`https://explorer.solana.com/tx/${proposal.on_chain_tx}?cluster=devnet`} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="text-zinc-400 hover:text-blue-400 transition-colors"
+                                    >
+                                        <ExternalLink className="w-3 h-3" />
+                                    </a>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 <div className="w-full md:w-80 bg-zinc-50 dark:bg-zinc-950 border-t md:border-t-0 md:border-l border-zinc-100 dark:border-zinc-800 p-6 flex flex-col gap-4">

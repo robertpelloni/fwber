@@ -16,7 +16,11 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.hyperfield.fwber",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "fwber needs access to your location to find nearby matches and venues."
+        "NSLocationWhenInUseUsageDescription": "fwber needs access to your location to find nearby matches and venues.",
+        "NFCReaderUsageDescription": "fwber needs access to NFC to verify physical profile exchanges and process tap-to-pay transactions."
+      },
+      "entitlements": {
+        "com.apple.developer.nfc.readersession.formats": ["NDEF"]
       }
     },
     "android": {

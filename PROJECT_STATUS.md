@@ -1,40 +1,56 @@
-# Project Status — fwber v1.0.97 (Merkle Prover & Audit UI)
+# Project Status — fwber v1.0.98 (On-Chain Audit & iOS NFC)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.97 "Merkle Prover & Audit UI"
+**Version:** 1.0.98 "On-Chain Audit & iOS NFC"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## Cryptographic Vote Verification
-- **Frontend Prover:** Launched the `VoteVerifier.tsx` component. Users can now perform a local SHA-256 reconstruction of the Merkle path to verify their vote inclusion against the proposal's published root.
-- **Audit Interface:** Redesigned the `/council` portal with a dedicated "History & Audit" section, treating governance outcomes as permanent, verifiable records.
-- **Proof-as-a-Service:** The backend now provides a optimized proof-generation endpoint, reconstructing the Merkle tree on-the-fly to serve sibling hashes.
+## On-Chain Governance Proofs
+- **Solana Anchoring:** Finalized Merkle roots from community proposals are now recorded on the Solana blockchain.
+- **Immutable History:** This provides a third-party verifiable trail of all governance outcomes, making the platform's policy changes audit-ready and tamper-proof.
+- **Explorer Integration:** The Council portal now links directly to on-chain transaction hashes, providing total transparency to the community.
+
+## Mobile Cross-Platform NFC
+- **iOS Entitlements:** Enabled full NFC support for iOS devices in the mobile app. 
+- **Unified Handshake:** Users on both iOS and Android can now participate in "Flash Matching" and "Tap-to-Pay" transactions using the same native protocol.
+
+## Governance Transparency & Auditing
+- **Merkle Roots:** Finalized proposals now generate and store a SHA-256 Merkle root of all participant votes.
+- **Real-time Notifications:** Integrated WebSocket alerts for the voting lifecycle. Participants are instantly notified via Laravel Reverb when a proposal shifts from `active` to `passed` or `failed`.
 
 ## Automated Policy & Rule Updates
 - **Closed-Loop Governance:** Proposals of type `policy` now automatically execute their associated changes upon passing.
-- **Dynamic Site Settings:** Implemented the `site_settings` table, enabling the community to vote on and change project constants (e.g. `daily_token_bonus`) without code deployments.
 
 ## Council Proposal Creation
-- **Frontend Submission:** Users can now launch new community proposals directly from the `/council` dashboard via the `CreateProposalModal`.
+- **Frontend Submission:** Users can now launch new community proposals directly from the `/council` dashboard.
 
 ## Full Federated E2E Security
-- **Asymmetric Decryption:** Completed the security loop for cross-server DMs. Users now generate and persist RSA keypairs in the browser, enabling native decryption of incoming ActivityPub messages.
-- **RSA-OAEP Bridge:** The frontend now automatically imports remote actor public keys and performs high-performance hybrid encryption for outbound federated messaging.
+- **Asymmetric Decryption:** Completed the security loop for cross-server DMs. Users now generate and persist RSA keypairs in the browser.
 
 ## Governance Execution & Policy
 - **Automated Reconciler:** Launched the `ProcessGovernanceProposals` background job that finalizes expired community proposals. 
-- **Proven Integrity:** Verified the weighted-vote summation logic via comprehensive feature testing in `GovernanceExecutionTest.php`.
 
 ## Global Token Bridge & Economy
 - **Asset Bridging:** Users can now swap liquid FWB Tokens for external assets (SOL, USDC).
-- **Price Simulation:** The swap interface now includes real-time simulated price feeds and 2% bridge fee calculations for transparent user expenditure.
+- **Price Simulation:** The swap interface now includes real-time simulated price feeds.
 
 ## ✅ Release Focus
+- [x] Implement On-Chain Governance mirroring (Solana).
+- [x] Enable iOS native NFC entitlements.
 - [x] Build Frontend Merkle Prover UI.
 - [x] Implement Merkle-tree vote verification.
 - [x] Build real-time governance notifications.
 - [x] Integrate real-time market price APIs.
+- [x] Schedule background governance reconcilers.
+- [x] Build Automated Rule Updates (Policy Executor).
+- [x] Create Proposal Creation UI in frontend.
+- [x] Polish Global Token Swap UI with price feeds.
+- [x] Implement Full Cross-Instance E2E Encryption/Decryption.
+- [x] Build Automated Proposal Execution jobs.
+- [x] Build Governance & Voting portal.
+- [x] Implement token-weighted voting logic.
+- [x] Build Global Token Exchange (Bridge) UI.
 - [x] Implement ZK-Age Verification.
 - [x] Build NFC "Tap-to-Pay" protocol for merchants.
 - [x] Enable Mobile NFC hardware permissions.
