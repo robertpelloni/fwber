@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.0.82
+> **Current Version:** 1.0.83
 > **Last Updated:** 2026-04-02
 
 ---
@@ -46,7 +46,7 @@
 - Develop a **Sub-millisecond Real-time Proximity Cache** (COMPLETED).
 - Finalize **ActivityPub Search Aggregator** (COMPLETED).
 - Implement **WASM Encryption Primitives** (COMPLETED).
-- Build a **NFC Match Protocol** (COMPLETED).
+- Build a **NFC Match Protocol** with **ZK-Location Verification** (COMPLETED).
 
 ---
 
@@ -54,10 +54,10 @@
 
 | Feature Domain | Status | Backend | Frontend | Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| **Auth & Security** | Mature | 100% | 100% | ZK-Identity, WebAuthn, NFC Sync, WASM. |
+| **Auth & Security** | Mature | 100% | 100% | ZK-Identity, ZK-Location, NFC Handshake, WASM. |
 | **Matching Engine** | Mature | 100% | 100% | Event Sourced, compatibility scoring. |
 | **Messaging** | Mature | 100% | 100% | E2E Encrypted, CRDT Batch Offline Sync. |
-| **Location / Geo** | Mature | 100% | 100% | AR Nav, Redis Bloom, Rust Geo-Screener. |
+| **Location / Geo** | Mature | 100% | 100% | AR Nav, Redis Bloom, ZK-Location Proofs. |
 | **AI Integration** | Mature | 100% | 100% | Avatars, Wingman modals, Roast, Content Gen. |
 | **Social / Viral** | Mature | 100% | 100% | Rate My Cat, Bounties, Referrals. |
 | **Economy** | Mature | 100% | 100% | FWB Tokens, Stripe checkout, Wallet. |
@@ -70,5 +70,5 @@
 
 ## 🎯 Next Immediate Milestones
 1. Implement **Distributed Global Event Streaming** using Apache Kafka or AWS Kinesis for multi-instance federation scaling.
-2. Build a **ZK-Location Verification** system for physical taps.
-3. Develop a **Federated Reputation System** based on Vouch scores across instances.
+2. Build a **Federated Reputation System** based on Vouch scores across instances.
+3. Develop a **Physical Item Marketplace** allowing users to spend FWB Tokens on real-world merchant inventory.

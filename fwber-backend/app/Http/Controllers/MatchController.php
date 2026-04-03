@@ -821,12 +821,48 @@ class MatchController extends Controller
     {
         $user = auth()->user();
         $peerId = $request->input('peer_id');
+        $locationProof = $request->input('location_proof'); // Geohash
+        $nonce = $request->input('nonce');
 
         if ($user->id == $peerId) {
             return response()->json(['error' => 'Cannot exchange with yourself'], 422);
         }
 
-        // 1. Mark as verified match (or create if doesn't exist)
+        $handshakeKey = "nfc_handshake:" . min($user->id, $peerId) . ":" . max($user->id, $peerId);
+        
+        // 1. Check if the other user already submitted their half of the tap
+        $existingHandshake = \Illuminate\Support\Facades\Redis::get($handshakeKey);
+
+        if (!$existingHandshake) {
+            // Store our intent for 15 seconds
+            \Illuminate\Support\Facades\Redis::setex($handshakeKey, 15, json_encode([
+                'user_id' => $user->id,
+                'location' => $locationProof,
+                'timestamp' => now()->timestamp
+            ]));
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Handshake initiated. Waiting for peer...',
+                'status' => 'pending'
+            ]);
+        }
+
+        $peerData = json_decode($existingHandshake, true);
+        
+        // 2. Validate Peer's Location Proof matches ours (or is adjacent)
+        // For simplicity in this slice, we require exact geohash match at precision 8 (~19m)
+        if ($peerData['user_id'] != $peerId) {
+             return response()->json(['error' => 'Handshake user mismatch'], 400);
+        }
+
+        if ($peerData['location'] !== $locationProof) {
+            return response()->json(['error' => 'Location verification failed. You must be physically together.'], 403);
+        }
+
+        // 3. Handshake successful - Finalize the match
+        \Illuminate\Support\Facades\Redis::del($handshakeKey);
+
         $match = \App\Models\UserMatch::updateOrCreate(
             [
                 'user1_id' => min($user->id, $peerId),
@@ -838,19 +874,17 @@ class MatchController extends Controller
             ]
         );
 
-        // 2. Increment relationship tier or trust score
         $match->update(['metadata' => array_merge($match->metadata ?? [], [
             'nfc_verified' => true,
             'nfc_verified_at' => now()->toIso8601String(),
-            'trust_boost' => 50
+            'trust_boost' => 75, // Higher boost for location-verified taps
+            'verification_method' => 'nfc_zk_location'
         ])]);
-
-        // 3. Log event
-        \Log::info("NFC Profile Exchange: User {$user->id} and {$peerId}");
 
         return response()->json([
             'success' => true,
-            'message' => 'NFC verification successful',
+            'message' => 'NFC and Location verified successfully',
+            'status' => 'verified',
             'match_id' => $match->id
         ]);
     }

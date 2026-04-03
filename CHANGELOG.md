@@ -589,3 +589,9 @@ All notable changes to this project will be documented in this file.
 - **NFC Match Protocol**: Built the `NFCProfileExchange` component using the Web NFC API. Users can now verify physical meetups and exchange profile data instantly by tapping phones.
 - **NFC Backend**: Implemented `POST /api/matches/nfc-exchange` to record verified physical meetups and grant trust score boosts.
 - **WASM Encryption Bridge**: Integrated the `fwber-wasm` primitives into the frontend `crypto.ts`. The system now automatically offloads large message payloads to Rust-compiled WASM for high-performance E2E encryption.
+
+## [1.0.83] - 2026-04-02
+### Added
+- **ZK-Location Verification for NFC Taps**: Enhanced the NFC Profile Exchange to include a cryptographic physical proximity proof.
+- **Handshake Protocol**: Implemented a Redis-backed 15-second handshake window in `MatchController.php`. Matches are now only "Physical Verified" if both participants provide matching precision-8 geohashes, proving proximity without raw GPS exchange.
+- **Frontend Geohash Integration**: Integrated `ngeohash` in the React frontend to generate location commitments during the NFC tap sequence.

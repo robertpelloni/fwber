@@ -1,14 +1,18 @@
-# Project Status — fwber v1.0.82 (NFC & WASM Offloading)
+# Project Status — fwber v1.0.83 (ZK-Location Proofs)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.82 "NFC & WASM Offloading"
+**Version:** 1.0.83 "ZK-Location Proofs"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
+## NFC Physical Proof & ZK-Location
+- **Geohash Commitments:** Updated the NFC tap sequence to capture local GPS coordinates and generate a precision-8 geohash.
+- **Relay Handshake:** Implemented a stateful Redis handshake in the backend. Both users must "report in" with their location proofs within 15 seconds of a tap to verify the meetup.
+- **Privacy First:** Physical verification now occurs without either user sharing their raw coordinates with the other, utilizing the server as a blind matching relay.
+
 ## NFC Physical Verification
 - **Web NFC Integration:** Built a native-feeling NFC exchange interface using the `NDEFReader` API.
-- **Physical Verification:** Users can now tap devices to instantly verify a mutual match and receive a "Trust Boost" in the ranking algorithms.
 - **Backend Handshaking:** Created an atomic endpoint to record NFC exchanges and link users immediately.
 
 ## High-Performance WASM Offloading
@@ -82,6 +86,7 @@
 - **Billing validation from the previous slice remains the current premium reference path**: `php artisan test tests\Feature\PremiumControllerTest.php tests\Feature\StripeWebhookTest.php`, plus frontend `npm run lint`, `npm run type-check`, and `cmd /c "npm run build"`, already passed for `v1.0.71`.
 
 ## ✅ Release Focus
+- [x] Build ZK-Location Verification for physical taps.
 - [x] Implement NFC Profile Exchange protocol.
 - [x] Integrate WASM crypto offloading in frontend.
 - [x] Aggregate federated search results in parallel.

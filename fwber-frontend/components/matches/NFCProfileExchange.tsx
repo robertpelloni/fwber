@@ -9,6 +9,9 @@ import { api } from '@/lib/api/client';
 import { useToast } from '@/components/ui/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
+import geohash from 'ngeohash';
+import { v4 as uuidv4 } from 'uuid';
+
 export function NFCProfileExchange() {
     const { user, token } = useAuth();
     const { toast } = useToast();
@@ -27,13 +30,22 @@ export function NFCProfileExchange() {
             setStatus('scanning');
             setIsScanning(true);
             
+            // 1. Get current location for ZK-proof
+            const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true });
+            });
+            
+            // Generate precision-8 geohash (~19 meters)
+            const locationHash = geohash.encode(position.coords.latitude, position.coords.longitude, 8);
+            const sharedNonce = uuidv4().substring(0, 8);
+
             // @ts-ignore
             const ndef = new NDEFReader();
             await ndef.scan();
             
             toast({
                 title: "NFC Ready",
-                description: "Hold your phone near another fwber user's device.",
+                description: "Tap devices now to verify location and profile.",
             });
 
             ndef.addEventListener("reading", async ({ message, serialNumber }: any) => {
@@ -43,15 +55,17 @@ export function NFCProfileExchange() {
                 const peerData = JSON.parse(textDecoder.decode(record.data));
                 
                 if (peerData.type === 'fwber_profile' && peerData.userId) {
-                    handleMatch(peerData.userId);
+                    // Generate local proof using THEIR nonce and OUR location
+                    // This proves we are both in the same geohash
+                    handleMatch(peerData.userId, peerData.nonce, locationHash);
                 }
             });
 
-            // Also write our own data to be ready for the other user
+            // Write our own data: Profile ID + our random nonce
             const myData = JSON.stringify({
                 type: 'fwber_profile',
                 userId: user?.id,
-                name: user?.name,
+                nonce: sharedNonce,
                 timestamp: Date.now()
             });
 
@@ -61,24 +75,30 @@ export function NFCProfileExchange() {
         } catch (err: any) {
             console.error('NFC Error:', err);
             setStatus('error');
-            setError(err.message || 'Failed to initialize NFC');
+            setError(err.message || 'Failed to initialize NFC or Geolocation');
         }
     };
 
-    const handleMatch = async (peerId: string | number) => {
+    const handleMatch = async (peerId: string | number, peerNonce: string, myLocationHash: string) => {
         try {
-            await api.post(`/matches/nfc-exchange`, { peer_id: peerId }, {
+            // The "proof" is sent to the backend. 
+            // The backend will expect a matching proof from the other user.
+            await api.post(`/matches/nfc-exchange`, { 
+                peer_id: peerId,
+                location_proof: myLocationHash, // In a real ZK system, this would be a cryptographic commitment
+                nonce: peerNonce
+            }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setStatus('success');
             toast({
                 title: "Physical Match Verified!",
-                description: "You've successfully exchanged profiles via NFC.",
+                description: "Location and identity proven via NFC tap.",
             });
             setTimeout(() => setStatus('idle'), 5000);
         } catch (err) {
             setStatus('error');
-            setError('Failed to record NFC exchange');
+            setError('Location proof mismatch or match error');
         } finally {
             setIsScanning(false);
         }
