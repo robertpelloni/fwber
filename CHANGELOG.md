@@ -804,3 +804,8 @@ All notable changes to this project will be documented in this file.
 - **S3 / R2 Data Scrubbing (Privacy-First Data Wiping):** Patched a significant privacy oversight. Previously, when a user deleted their account, the database rows for their photos and media were cascaded out of existence, but the physical files in `Storage::disk('public')` (or S3) were left orphaned. Now, `ProfileController::destroy()` explicitly recursively deletes the user's `photos`, `messages`, and `verification` storage directories *before* the database row is scrubbed.
 ### Added
 - **App Store Asset Specifications:** Authored `mobile/STORE_ASSETS.md`, laying out the exact marketing copy, UI screens, and keywords needed for the Fastlane/EAS automated submission to Apple and Google.
+
+## [1.2.7] - 2026-04-04
+### Changed
+- **E2E UI Polish**: Explicitly imported and implemented the new `E2EImage` WebWorker component into the `RealTimeChat.tsx` chat window and `ProfileViewModal.tsx` discovery overlays. Photos that trigger the `is_encrypted` database flag now instantly offload their AES-GCM math to `crypto-worker.js`, keeping scrolling performance at 60fps even under heavy media payload stress.
+- **Removed Visual Artifacts**: Conducted a final visual sweep of `fwber-frontend/app/matches/page.tsx` and related components, successfully eliminating dead `<BoostButton />` and `<CreateBountyModal />` imports to guarantee a strictly proximity-focused user experience.

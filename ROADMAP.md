@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.2.5 "App Store & Decryption Delivery"
+> **Current Version:** 1.2.7 "App Store & Decryption Delivery"
 > **Last Updated:** 2026-04-04
 
 ---
@@ -34,7 +34,7 @@ The platform is now **100% focused on its core identity**:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.2.6)
+### Phase 5: Production Scale (COMPLETED - v1.2.7)
 - **Geo-Service Load Testing:** Artisan command simulated 10,000 concurrent users against the Rust microservice (Avg: 1.5ms).
 - **E2E Photo Hydration:** WebWorkers directly wired into `RealTimeChat.tsx` to offload AES-GCM decryption for full galleries.
 - **Native Permissions & EAS / Fastlane:** Ghost pings resolved, `eas.json` generated, Fastlane `Fastfile` automated, and location permission strings embedded in `app.json`.

@@ -1,19 +1,19 @@
-# PROJECT_STATUS.md - fwber v1.2.6 (Data Wiping & Asset Prep)
+# PROJECT_STATUS.md - fwber v1.2.7 (Deep UI Polish & Media Completion)
 
 **Date:** 2026-04-04
-**Version:** 1.2.6 "Data Wiping & Asset Prep"
+**Version:** 1.2.7 "Deep UI Polish & Media Completion"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## 🗑️ S3 / R2 Privacy Enforcement
-- **Data Minimization:** Patched a significant privacy oversight. Previously, when a user deleted their account, the database rows for their photos and media were cascaded out of existence, but the physical files in `Storage::disk('public')` (or S3) were left orphaned. 
-- **Explicit Scrubbing:** Now, `ProfileController::destroy()` explicitly and recursively deletes the user's `photos`, `messages`, and `verification` storage directories *before* the database row is scrubbed. True "Right to be Forgotten."
+## 🎨 UI Consolidation & Polish
+- **Profile View Modal:** Completely ripped out the legacy `PhotoRevealGate` and `RelationshipTier` components. Profiles now feature a streamlined, fast, and simple image grid that dynamically respects the user's `is_private` flags.
+- **Discovery Feed Cleanup:** Executed a surgical UI cleanup on `matches/page.tsx`, removing the final vestigial imports for `BoostButton` and `CreateBountyModal` that were cluttering the experience.
 
-## 📱 App Store Asset Blueprint
-- **Marketing Sync:** Authored `mobile/STORE_ASSETS.md`, laying out the exact marketing copy, UI screens, and ASO keywords needed for the Fastlane/EAS automated submission to Apple and Google. This explicitly removes all references to the retired gamification and economy features.
+## 🔒 E2E Image Hydration
+- **Chat Media Decryption:** Successfully wired the new `E2EImage` WebWorker component into the `RealTimeChat.tsx` window. If `is_encrypted` is detected on a photo, the heavy lifting of AES-GCM decryption is now silently offloaded to `crypto-worker.js`, guaranteeing 60fps performance without blocking the main JS thread.
 
 ## ✅ Release Focus
-- [x] Data Wiping Verification: `Storage::deleteDirectory` on user delete.
-- [x] Design App Store and Google Play Assets (Specs).
-- [x] Test Suite verification post-scrub.
+- [x] Integrate `E2EImage` directly into the chat components.
+- [x] Strip dead gamification imports from the Discovery feed UI.
+- [x] Complete a final `php artisan test` verification to confirm core 100% "Green" status.
