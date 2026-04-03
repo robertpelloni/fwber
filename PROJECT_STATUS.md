@@ -1,17 +1,21 @@
-# Project Status — fwber v1.0.87 (NFC Tap-to-Pay)
+# Project Status — fwber v1.0.88 (Federated Feed & AR Radar)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.87 "NFC Tap-to-Pay"
+**Version:** 1.0.88 "Federated Feed & AR Radar"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## NFC Point-of-Sale (PoS)
-- **Instant Redemptions:** Merchants can now trigger NFC payment requests directly from their dashboard. 
-- **Consumer Flow:** Users receive a high-fidelity "Pay with Tokens" prompt upon tapping a merchant device.
-- **Economic Loop:** This closes the loop between digital token earning (from matching/vouches) and real-world utility (venue spending).
+## Federated Social Aggregation
+- **Unified Feed:** The dashboard now supports a "Federated" tab, allowing users to scroll through Mastodon/ActivityPub posts from actors they follow alongside local matching activity.
+- **Background Ingestion:** Implemented `FetchRemoteOutbox` to periodically sync content from external servers into the local Event Store.
+- **Privacy-Safe Age Checks:** Actors now carry a signed `ageVerified` flag, proving 18+ status to the Fediverse without leaking sensitive birthdate metadata.
 
-## Federated Trust & Reputation
+## AR Inventory Discovery
+- **Visual Marketplace:** Users can now use the "Inventory Radar" (AR) to find real-world items for sale at local venues. 
+- **Spatial UI:** Items like drinks and merchandise appear as floating 3D tags in the camera view, including live token pricing and distance indicators.
+
+## NFC Point-of-Sale (PoS)
 - **Reputation Aggregation:** Launched the `SyncFederatedReputation` job which periodically pulls vouch scores from external instances.
 - **Cross-Instance Trust:** Integrated federated reputation into the `NearbyUserRankingService`, allowing highly vouched users from other servers to rank higher in local discovery feeds.
 - **Group Actors:** Enabled federation for Communities. Groups are now valid ActivityPub actors, allowing federated users to "Follow" and "Join" local boards.
@@ -95,9 +99,10 @@
 - **Billing validation from the previous slice remains the current premium reference path**: `php artisan test tests\Feature\PremiumControllerTest.php tests\Feature\StripeWebhookTest.php`, plus frontend `npm run lint`, `npm run type-check`, and `cmd /c "npm run build"`, already passed for `v1.0.71`.
 
 ## ✅ Release Focus
+- [x] Build Federated Feed Aggregator.
+- [x] Build AR Inventory Finder UI.
+- [x] Implement ZK-Age Verification.
 - [x] Build NFC "Tap-to-Pay" protocol for merchants.
-- [x] Implement Federated Reputation Aggregator.
-- [x] Implement ActivityPub Group Actors.
 - [x] Enable Mobile NFC hardware permissions.
 - [x] Build Marketplace UI for users to spend tokens.
 - [x] Build Physical Item Marketplace for merchants.

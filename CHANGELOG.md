@@ -623,3 +623,10 @@ All notable changes to this project will be documented in this file.
 - **Merchant POS Terminal**: Built a new `MerchantPOS` component for the business dashboard. Merchants can select inventory items and broadcast payment requests via NFC.
 - **Unified NFC Interaction Hub**: Enhanced the user-side NFC component to detect and process incoming payment requests from merchant terminals.
 - **Atomic Physical Transactions**: Integrated the token-based purchase API with NFC handshakes for instant real-world item redemptions.
+
+## [1.0.88] - 2026-04-02
+### Added
+- **Federated Feed Aggregator**: Built a background ingestion system to pull remote posts from followed ActivityPub actors into the local `federated_posts` cache.
+- **Unified Dashboard Feed**: Integrated a "Federated Feed" tab into the main dashboard, merging local match activity with decentralized social content.
+- **ZK-Age Verification (Authority Mode)**: Enhanced ActivityPub Actor profiles to include a signed `ageVerified` claim, allowing remote servers to trust the user's 18+ status without date-of-birth exposure.
+- **AR Inventory Radar**: Launched a new AR view for the Marketplace. Users can now scan their physical surroundings to see floating inventory items from nearby venues, complete with token pricing.

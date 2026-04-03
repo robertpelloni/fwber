@@ -16,8 +16,11 @@ import VouchLeaderboard from '@/components/VouchLeaderboard';
 import { ReferralModal } from '@/components/viral/ReferralModal';
 import { RoastGenerator } from '@/components/viral/RoastGenerator';
 import { DailyStreakModal } from '@/components/gamification/DailyStreakModal';
+import { FederatedFeed } from '@/components/federation/FederatedFeed';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api/client';
+import { Globe } from 'lucide-react';
 
 interface DashboardStats {
   total_matches: number;
@@ -168,11 +171,30 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
               {/* Main Content - 2 columns */}
               <div className="lg:col-span-2 space-y-6">
-                {/* Real-time Activity Feed with Presence Indicators */}
-                <ActivityFeed maxItems={8} showRefresh />
+                <Tabs defaultValue="local" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 bg-gray-100 dark:bg-gray-900 p-1 rounded-xl">
+                    <TabsTrigger value="local" className="rounded-lg font-bold uppercase tracking-widest text-[10px]">
+                      <Target className="w-3 h-3 mr-2" />
+                      Local Activity
+                    </TabsTrigger>
+                    <TabsTrigger value="federated" className="rounded-lg font-bold uppercase tracking-widest text-[10px]">
+                      <Globe className="w-3 h-3 mr-2" />
+                      Federated Feed
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="local" className="mt-4">
+                    {/* Real-time Activity Feed with Presence Indicators */}
+                    <ActivityFeed maxItems={8} showRefresh />
+                  </TabsContent>
+
+                  <TabsContent value="federated" className="mt-4">
+                    <FederatedFeed />
+                  </TabsContent>
+                </Tabs>
 
                 {/* Quick Actions */}
-                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
                   <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
                     <Target className="w-5 h-5 text-purple-500" />
                     Quick Actions

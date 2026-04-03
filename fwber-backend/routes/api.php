@@ -446,6 +446,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Marketplace (User Actions)
+    Route::get('marketplace/nearby', [\App\Http\Controllers\MerchantInventoryController::class, 'nearby']);
     Route::get('marketplace/{merchantId}', [\App\Http\Controllers\MerchantInventoryController::class, 'index']);
     Route::post('marketplace/purchase/{itemId}', [\App\Http\Controllers\MerchantInventoryController::class, 'purchase']);
 

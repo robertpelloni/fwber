@@ -98,6 +98,7 @@ class ActivityPubService
                     'orientation' => 'fwber:orientation',
                     'relationshipStatus' => 'fwber:relationshipStatus',
                     'isVerified' => 'fwber:isVerified',
+                    'ageVerified' => 'fwber:ageVerified',
                     'reputation' => 'fwber:reputation',
                     'vouchCount' => 'fwber:vouchCount',
                     'memberSince' => 'fwber:memberSince',
@@ -119,6 +120,7 @@ class ActivityPubService
             'orientation' => $profile->sexual_orientation ?? 'unspecified',
             'relationshipStatus' => $profile->relationship_type ?? 'single',
             'isVerified' => (bool) ($profile->is_id_verified ?? false),
+            'ageVerified' => (bool) ($profile->birthdate && \Carbon\Carbon::parse($profile->birthdate)->age >= 18),
 
             'reputation' => [
                 'vouchCount' => (int) $user->vouches()->count(),

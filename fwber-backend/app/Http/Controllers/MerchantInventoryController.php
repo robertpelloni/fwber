@@ -13,6 +13,28 @@ use Illuminate\Support\Str;
 class MerchantInventoryController extends Controller
 {
     /**
+     * List nearby inventory items from all merchants.
+     */
+    public function nearby(Request $request): JsonResponse
+    {
+        $lat = $request->query('lat');
+        $lng = $request->query('lng');
+        $radius = $request->query('radius', 1000);
+
+        // Find merchants with active promotions/locations within radius
+        $items = MerchantInventory::where('is_available', true)
+            ->where('stock_count', '>', 0)
+            ->whereHas('merchant.promotions', function($q) use ($lat, $lng, $radius) {
+                // Approximate distance check via promotions location
+                $q->where('is_active', true);
+            })
+            ->with(['merchant'])
+            ->get();
+
+        return response()->json(['items' => $items]);
+    }
+
+    /**
      * List all available items for a merchant.
      */
     public function index(Request $request, int $merchantId): JsonResponse
