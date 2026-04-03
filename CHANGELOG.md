@@ -630,3 +630,10 @@ All notable changes to this project will be documented in this file.
 - **Unified Dashboard Feed**: Integrated a "Federated Feed" tab into the main dashboard, merging local match activity with decentralized social content.
 - **ZK-Age Verification (Authority Mode)**: Enhanced ActivityPub Actor profiles to include a signed `ageVerified` claim, allowing remote servers to trust the user's 18+ status without date-of-birth exposure.
 - **AR Inventory Radar**: Launched a new AR view for the Marketplace. Users can now scan their physical surroundings to see floating inventory items from nearby venues, complete with token pricing.
+
+## [1.0.89] - 2026-04-02
+### Added
+- **Federated Secure DMs**: Implemented end-to-end ActivityPub direct messaging.
+- **Inbound DM Handling**: Updated the Inbox controller to process private `Note` activities with restricted `to` addressing.
+- **Outbound DM Routing**: Enhanced the Message Controller to automatically detect federated actor URIs and dispatch signed private activities via the delivery service.
+- **Unified Chat History**: Federated DMs are now seamlessly merged into the main messaging table, enabling cross-instance private conversations.

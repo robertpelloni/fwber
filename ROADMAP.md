@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.0.86
+> **Current Version:** 1.0.89
 > **Last Updated:** 2026-04-02
 
 ---
@@ -44,16 +44,20 @@
 - Load testing the unified Event Store.
 - Prepare **Mobile Expo Router** migration for the `mobile/` directory.
 
-### Phase 7: Physical & Federated Expansion (ACTIVE)
+### Phase 7: Physical & Federated Expansion (COMPLETED)
 - Develop a **Sub-millisecond Real-time Proximity Cache**.
 - Finalize **ActivityPub Search Aggregator**.
 - Implement **WASM Encryption Primitives**.
 - Build a **NFC Match Protocol** with **ZK-Location Verification**.
 - Develop **Distributed Global Event Streaming**.
 - Build a **Physical Item Marketplace**.
-- Implement **Federated Reputation Aggregator** (COMPLETED).
-- Implement **ActivityPub Group Actors** (COMPLETED).
-- Enable **Native NFC Support** (Permissions) (COMPLETED).
+- Implement **Federated Reputation Aggregator**.
+- Implement **ActivityPub Group Actors**.
+- Build a **NFC "Tap-to-Pay"** protocol.
+- Build a **Federated Feed Aggregator**.
+- Implement **ZK-Age Verification**.
+- Build an **AR Inventory Finder**.
+- Implement **Federated Secure DMs**.
 
 ---
 
@@ -63,19 +67,19 @@
 | :--- | :--- | :--- | :--- | :--- |
 | **Auth & Security** | Mature | 100% | 100% | ZK-Identity, ZK-Location, NFC Sync, WASM. |
 | **Matching Engine** | Mature | 100% | 100% | Event Sourced, compatibility scoring. |
-| **Messaging** | Mature | 100% | 100% | E2E Encrypted, CRDT Batch Offline Sync. |
-| **Location / Geo** | Mature | 100% | 100% | AR Nav, Redis Bloom, ZK-Location Proofs. |
+| **Messaging** | Mature | 100% | 100% | E2E Encrypted, CRDT Sync, Federated DMs. |
+| **Location / Geo** | Mature | 100% | 100% | AR Nav, Redis Bloom, ZK-Proofs, AR Finder. |
 | **AI Integration** | Mature | 100% | 100% | Avatars, Wingman modals, Roast, Content Gen. |
-| **Social / Viral** | Mature | 100% | 100% | Rate My Cat, Bounties, Referrals. |
-| **Economy** | Mature | 100% | 100% | FWB Tokens, Stripe, Marketplace Shop. |
-| **Federation** | Mature | 100% | 100% | Aggregated Search, Reputation, Group Actors. |
-| **B2B / Merchant** | Mature | 100% | 100% | Registration, Inventory, analytics CSV export. |
+| **Social / Viral** | Mature | 100% | 100% | Rate My Cat, Bounties, Federated Social. |
+| **Economy** | Mature | 100% | 100% | FWB Tokens, Stripe, Marketplace, NFC Pay. |
+| **Federation** | Mature | 100% | 100% | Search, Reputation, Groups, Secure DMs. |
+| **B2B / Merchant** | Mature | 100% | 100% | Registration, Inventory, Analytics, POS UI. |
 | **DevOps / Infra** | Mature | 100% | 100% | Helm Chart, Edge Caching, Event Streaming. |
 | **Mobile App** | Mature | 100% | 100% | Expo Router, WebView Hybrid, NFC Support. |
 
 ---
 
 ## 🎯 Next Immediate Milestones
-1. Develop a **Federated Feed Aggregator** to combine local and remote posts.
-2. Implement **ZK-Age Verification** for decentralized identities.
-3. Build an **AR Inventory Finder** to help users find merchants with specific marketplace items.
+1. Implement **Cross-Instance E2E Encryption** using remote actor public keys.
+2. Build a **Governance & Voting** portal for decentralized community moderation.
+3. Develop a **Global Token Exchange** to allow swapping FWB Tokens for other assets.

@@ -63,10 +63,26 @@ class ActivityPubInboxController extends Controller
             return response()->json(['status' => 'ignored_type'], 202);
         }
 
-        // Only store if we are actually following this person (or they are a follower? usually following)
-        // For simplicity in this demo, we store it if it's sent to us.
-
         $actorUri = $activity['actor'] ?? null;
+        
+        // --- SECURE FEDERATED DM LOGIC ---
+        $to = $object['to'] ?? [];
+        if (is_string($to)) $to = [$to];
+        
+        $isPublic = false;
+        foreach ($to as $recipient) {
+            if ($recipient === 'https://www.w3.org/ns/activitystreams#Public' || str_contains($recipient, '#Public')) {
+                $isPublic = true;
+                break;
+            }
+        }
+
+        if (!$isPublic) {
+            // This is likely a Direct Message (DM)
+            return $this->handleDirectMessage($user, $activity, $object);
+        }
+        // ---------------------------------
+
         $parsed = parse_url($actorUri);
         $domain = $parsed['host'] ?? null;
         $pathParts = explode('/', trim($parsed['path'] ?? '', '/'));
@@ -86,6 +102,31 @@ class ActivityPubInboxController extends Controller
         );
 
         return response()->json(['status' => 'post_stored'], 202);
+    }
+
+    /**
+     * Handle incoming Federated DM
+     */
+    protected function handleDirectMessage(User $user, array $activity, array $object)
+    {
+        $actorUri = $activity['actor'];
+        
+        // We'll store it as a special type of Message
+        // For now, we reuse the existing messages table but with a federated_actor_uri
+        \App\Models\Message::create([
+            'sender_id' => 0, // System/Federated ID
+            'receiver_id' => $user->id,
+            'content' => $object['content'] ?? '[Encrypted Content]',
+            'message_type' => 'federated_dm',
+            'is_encrypted' => isset($object['content']) && str_contains($object['content'], 'cipher'),
+            'sent_at' => isset($object['published']) ? \Carbon\Carbon::parse($object['published']) : now(),
+            'metadata' => json_encode([
+                'actor_uri' => $actorUri,
+                'guid' => $object['id']
+            ])
+        ]);
+
+        return response()->json(['status' => 'dm_stored'], 202);
     }
 
     /**

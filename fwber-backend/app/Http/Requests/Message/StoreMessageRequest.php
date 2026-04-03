@@ -22,9 +22,9 @@ class StoreMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'receiver_id' => 'required|exists:users,id',
+            'receiver_id' => 'required|string',
             'content' => 'nullable|string|max:5000',
-            'message_type' => 'sometimes|string|in:text,image,video,audio,file',
+            'message_type' => 'sometimes|string',
             'media' => 'nullable|file',
             // media_duration provided by clients for audio/video; we clamp to type-specific caps later
             'media_duration' => 'nullable|integer|min:1',

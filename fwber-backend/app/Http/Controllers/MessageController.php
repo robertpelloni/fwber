@@ -107,15 +107,21 @@ class MessageController extends Controller
         $senderId = Auth::id();
         $receiverId = $validated['receiver_id'];
 
+        // --- FEDERATED DM ROUTING ---
+        if (filter_var($receiverId, FILTER_VALIDATE_URL)) {
+            return $this->storeFederated($request, $receiverId);
+        }
+        // ----------------------------
+
         // Block enforcement (either direction blocks messaging)
-        if (Block::isBlockedBetween($senderId, $receiverId)) {
+        if (Block::isBlockedBetween($senderId, (int) $receiverId)) {
             return response()->json(['error' => 'Messaging blocked between users'], 403);
         }
 
         // Find the match between these users (eager load relationshipTier to avoid N+1)
         $match = UserMatch::where(function ($query) use ($senderId, $receiverId) {
-            $query->where('user1_id', $senderId)->where('user2_id', $receiverId)
-                ->orWhere('user1_id', $receiverId)->where('user2_id', $senderId);
+            $query->where('user1_id', $senderId)->where('user2_id', (int) $receiverId)
+                ->orWhere('user1_id', (int) $receiverId)->where('user2_id', $senderId);
         })->where('is_active', true)->with('relationshipTier')->first();
 
         if (! $match) {
@@ -410,6 +416,64 @@ class MessageController extends Controller
      *   @OA\Response(response=401, description="Unauthenticated")
      * )
      */
+    /**
+     * Send a DM to a remote federated actor.
+     */
+    protected function storeFederated(StoreMessageRequest $request, string $actorUri): JsonResponse
+    {
+        $user = Auth::user();
+        $validated = $request->validated();
+        $content = $validated['content'] ?? '';
+
+        // 1. Resolve remote actor inbox
+        $activityPubService = app(\App\Services\ActivityPubService::class);
+        
+        // 2. Prepare the private Note activity
+        $activityId = url("/api/federation/activities/" . \Illuminate\Support\Str::uuid());
+        $activity = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => $activityId,
+            'type' => 'Create',
+            'actor' => url("/api/federation/users/{$user->id}"),
+            'to' => [$actorUri],
+            'object' => [
+                'id' => $activityId . "#object",
+                'type' => 'Note',
+                'attributedTo' => url("/api/federation/users/{$user->id}"),
+                'content' => $content,
+                'to' => [$actorUri],
+                'published' => now()->toIso8601String(),
+            ]
+        ];
+
+        try {
+            $activityPubService->dispatchToRemoteInbox($user, $actorUri, $activity);
+            
+            // 3. Store locally for chat history
+            $message = \App\Models\Message::create([
+                'sender_id' => $user->id,
+                'receiver_id' => 0,
+                'content' => $content,
+                'message_type' => 'federated_dm',
+                'is_encrypted' => $validated['is_encrypted'] ?? false,
+                'sent_at' => now(),
+                'metadata' => json_encode([
+                    'actor_uri' => $actorUri,
+                    'is_outbound' => true
+                ])
+            ]);
+
+            return response()->json([
+                'message' => 'Federated DM sent successfully',
+                'id' => $message->id,
+            ], 201);
+
+        } catch (\Exception $e) {
+            \Log::error("Federated DM delivery failed: " . $e->getMessage());
+            return response()->json(['error' => 'Failed to deliver federated message'], 500);
+        }
+    }
+
     public function markAsRead(int $messageId): JsonResponse
     {
         $message = Message::findOrFail($messageId);

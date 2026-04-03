@@ -1,10 +1,15 @@
-# Project Status — fwber v1.0.88 (Federated Feed & AR Radar)
+# Project Status — fwber v1.0.89 (Federated Secure DMs)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.88 "Federated Feed & AR Radar"
+**Version:** 1.0.89 "Federated Secure DMs"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
+
+## Federated Direct Messaging
+- **Cross-Instance DMs:** Users can now send private messages to any valid ActivityPub actor URI.
+- **Protocol Parity:** Outbound messages are wrapped in signed `Create Note` activities with restricted `to` fields, conforming to the Mastodon/Pleroma DM standard.
+- **Inbox Logic:** Updated the federation inbox to distinguish between public follower broadcasts and private person-to-person notes.
 
 ## Federated Social Aggregation
 - **Unified Feed:** The dashboard now supports a "Federated" tab, allowing users to scroll through Mastodon/ActivityPub posts from actors they follow alongside local matching activity.
@@ -99,6 +104,7 @@
 - **Billing validation from the previous slice remains the current premium reference path**: `php artisan test tests\Feature\PremiumControllerTest.php tests\Feature\StripeWebhookTest.php`, plus frontend `npm run lint`, `npm run type-check`, and `cmd /c "npm run build"`, already passed for `v1.0.71`.
 
 ## ✅ Release Focus
+- [x] Implement Federated Secure DMs.
 - [x] Build Federated Feed Aggregator.
 - [x] Build AR Inventory Finder UI.
 - [x] Implement ZK-Age Verification.
