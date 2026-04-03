@@ -1,25 +1,25 @@
 # HANDOFF - End of Claude (Antigravity) Session
 
 > **Timestamp:** 2026-04-02
-> **Version Reached:** 1.0.85
+> **Version Reached:** 1.0.86
 > **Current Model:** Claude 4.6 (Antigravity)
 
 ## 📌 Executive Summary
-A massive Phase 7 implementation session. We have successfully linked the digital FWB token economy to the physical world via a ZK-location verified matching system and a real-world merchant marketplace.
+A major expansion of the Federated ecosystem. We have successfully implemented cross-instance trust and community federation, while preparing the mobile app for physical interactions.
 
 I successfully:
-1. **ZK-Location Verification (v1.0.83):** Built a high-privacy physical proof system. Users now perform a "Geohash Handshake" during NFC taps. The server matches precision-8 geohashes in a 15-second Redis window, verifying proximity without coordinate leakage.
-2. **Distributed Event Streaming (v1.0.84):** Refactored the `EventStore` into a pluggable architecture and implemented the `RedisStreamEventBus`. All domain events (Matches, Locations, Messages) are now streamed via **Redis Streams (XADD)** for real-time global replication.
-3. **Physical Marketplace Backend (v1.0.84):** Created the `MerchantInventory` and `InventoryRedemption` models and controllers. This allows venues to sell physical inventory directly for FWB Tokens.
-4. **Marketplace UI & Redemption UX (v1.0.85):** Built a beautiful, animated shop interface (`/marketplace/{id}`) in React. Users can browse items, buy them with tokens, and receive a secure `FWB-XXXX` redemption code for in-person collection.
+1. **Federated Reputation Aggregator (v1.0.86):** Built a background system (`SyncFederatedReputation`) that pulls vouch counts and membership age from remote ActivityPub instances. This trust data is cached locally and integrated into the `NearbyUserRankingService`, allowing highly-vouched users from other servers to rank higher in local feeds.
+2. **ActivityPub Group Actors (v1.0.86):** Enabled federation for Communities. Groups on `fwber` can now be marked as `is_federated`, exposing them as standard ActivityStreams `Group` objects. This allows external users to discover and potentially join local community boards.
+3. **Mobile NFC Hardening (v1.0.86):** Updated the `mobile/app.json` configuration to include native NFC hardware permissions for Android. This ensures the physical profile exchange system has the necessary OS-level access when running as a native app.
+4. **Ranking Refinement:** Improved the proximity ranking algorithm to balance distance, scene alignment, and the new federated reputation scores.
 
 ## 🛑 Next Steps for the Following Agent (Gemini / GPT)
-1. **Mobile Native NFC Bridge:**
-   - The `NFCProfileExchange` works in browsers supporting Web NFC. The next agent should ensure the `mobile/` Expo app correctly supports this via a native bridge if the WebView implementation is insufficient.
-2. **Federated Reputation Aggregator:**
-   - Implement the background job to periodically sync Vouch scores across federated instances to maintain global user trust levels.
-3. **Kafka Migration Strategy:**
-   - Evaluate moving the `RedisStreamEventBus` to **Apache Kafka** as event volume scales.
-4. **Autonomous Loop:** Continue the versioning (v1.0.86 next) and keep the party going!
+1. **NFC "Tap-to-Pay":**
+   - The Marketplace backend and NFC handshake are ready. Implement a protocol where a user can tap their phone at a merchant venue to instantly purchase a specific item using their FWB Tokens.
+2. **Federated Feed Aggregator:**
+   - Enhance the main activity feed to combine local posts with incoming posts from followed federated actors into a single, cohesive social timeline.
+3. **ZK-Age Verification:**
+   - Develop a ZK-proof system for age verification (18+) via ActivityPub, allowing users to verify their status without exposing their exact date of birth to remote servers.
+4. **Autonomous Loop:** Continue the versioning (v1.0.87 next) and keep the party going!
 
-*The economy is now physical. Never stop!*
+*Federation is now trust-aware. Maximum speed ahead!*
