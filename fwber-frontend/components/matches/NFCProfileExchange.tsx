@@ -16,7 +16,8 @@ export function NFCProfileExchange() {
     const { user, token } = useAuth();
     const { toast } = useToast();
     const [isScanning, setIsScanning] = useState(false);
-    const [status, setStatus] = useState<'idle' | 'scanning' | 'writing' | 'success' | 'error'>('idle');
+    const [status, setStatus] = useState<'idle' | 'scanning' | 'writing' | 'success' | 'error' | 'payment_pending'>('idle');
+    const [pendingPayment, setPendingPayment] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
 
     const startNFCExchange = async () => {
@@ -58,6 +59,15 @@ export function NFCProfileExchange() {
                     // Generate local proof using THEIR nonce and OUR location
                     // This proves we are both in the same geohash
                     handleMatch(peerData.userId, peerData.nonce, locationHash);
+                }
+
+                if (peerData.type === 'fwber_payment_request') {
+                    setPendingPayment(peerData);
+                    setStatus('payment_pending');
+                    toast({
+                        title: "Payment Request Received",
+                        description: `Confirm purchase of ${peerData.itemName} for ${peerData.price} FWB.`,
+                    });
                 }
             });
 
@@ -104,6 +114,26 @@ export function NFCProfileExchange() {
         }
     };
 
+    const confirmPayment = async () => {
+        if (!pendingPayment) return;
+        try {
+            setStatus('scanning'); // Re-using state for loader
+            await api.post(`/marketplace/purchase/${pendingPayment.itemId}`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setStatus('success');
+            toast({
+                title: "Payment Confirmed",
+                description: `Successfully paid ${pendingPayment.price} FWB to merchant.`,
+            });
+            setPendingPayment(null);
+            setTimeout(() => setStatus('idle'), 5000);
+        } catch (err: any) {
+            setStatus('error');
+            setError(err.message || 'Payment failed');
+        }
+    };
+
     return (
         <Card className="border-amber-500/30 bg-gradient-to-br from-zinc-900 to-amber-950/20">
             <CardHeader className="pb-2">
@@ -147,7 +177,23 @@ export function NFCProfileExchange() {
                     {status === 'success' && (
                         <motion.div key="success" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center py-4 text-green-500">
                             <CheckCircle2 className="w-12 h-12 mb-2" />
-                            <p className="font-black uppercase italic">Match Confirmed</p>
+                            <p className="font-black uppercase italic">Confirmed</p>
+                        </motion.div>
+                    )}
+
+                    {status === 'payment_pending' && pendingPayment && (
+                        <motion.div key="payment" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center py-4 space-y-4">
+                            <div className="bg-amber-500/10 border border-amber-500/30 p-4 rounded-xl w-full text-center">
+                                <p className="text-[10px] text-amber-500 font-bold uppercase tracking-widest mb-1">Pay with Tokens</p>
+                                <p className="text-white font-bold">{pendingPayment.itemName}</p>
+                                <p className="text-amber-500 font-black text-xl">{pendingPayment.price} FWB</p>
+                            </div>
+                            <div className="flex gap-2 w-full">
+                                <Button variant="outline" className="flex-1" onClick={() => setStatus('idle')}>Decline</Button>
+                                <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold" onClick={confirmPayment}>
+                                    Pay Now
+                                </Button>
+                            </div>
                         </motion.div>
                     )}
 

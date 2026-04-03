@@ -76,6 +76,6 @@
 ---
 
 ## 🎯 Next Immediate Milestones
-1. Build a **NFC "Tap-to-Pay"** protocol linking physical inventory purchases with device tapping.
-2. Develop a **Federated Feed Aggregator** to combine local and remote posts into a unified social experience.
-3. Implement **ZK-Age Verification** to prove 18+ status without sharing birthdates via ActivityPub.
+1. Develop a **Federated Feed Aggregator** to combine local and remote posts.
+2. Implement **ZK-Age Verification** for decentralized identities.
+3. Build an **AR Inventory Finder** to help users find merchants with specific marketplace items.

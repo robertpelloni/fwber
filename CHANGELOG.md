@@ -616,3 +616,10 @@ All notable changes to this project will be documented in this file.
 - **Mobile NFC Permissions**: Updated `mobile/app.json` to include native NFC hardware permissions for Android, enabling physical profile exchange support.
 ### Changed
 - **Trust-Aware Ranking**: Updated `NearbyUserRankingService` to incorporate cached federated reputation into the composite trust score.
+
+## [1.0.87] - 2026-04-02
+### Added
+- **NFC Tap-to-Pay Protocol**: Linked the physical device tapping system with the FWB Token marketplace.
+- **Merchant POS Terminal**: Built a new `MerchantPOS` component for the business dashboard. Merchants can select inventory items and broadcast payment requests via NFC.
+- **Unified NFC Interaction Hub**: Enhanced the user-side NFC component to detect and process incoming payment requests from merchant terminals.
+- **Atomic Physical Transactions**: Integrated the token-based purchase API with NFC handshakes for instant real-world item redemptions.

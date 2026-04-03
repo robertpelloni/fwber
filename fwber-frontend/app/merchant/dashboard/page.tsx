@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { PlusCircle, Tag, Radio } from 'lucide-react'
 import NeighborhoodVibe from '@/components/merchant/NeighborhoodVibe'
 import { Badge } from '@/components/ui/badge'
+import { MerchantPOS } from '@/components/merchant/MerchantPOS'
 
 export default function MerchantDashboard() {
   const { token } = useAuth()
@@ -111,7 +112,14 @@ export default function MerchantDashboard() {
         </Card>
 
         {/* Real-time Intel */}
-        {token && <NeighborhoodVibe token={token} />}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+                {token && <NeighborhoodVibe token={token} />}
+            </div>
+            <div>
+                <MerchantPOS />
+            </div>
+        </div>
 
         {/* Stats Grid */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

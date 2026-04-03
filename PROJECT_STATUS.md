@@ -1,10 +1,15 @@
-# Project Status — fwber v1.0.86 (Federated Reputation & Group Actors)
+# Project Status — fwber v1.0.87 (NFC Tap-to-Pay)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.86 "Federated Reputation & Group Actors"
+**Version:** 1.0.87 "NFC Tap-to-Pay"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
+
+## NFC Point-of-Sale (PoS)
+- **Instant Redemptions:** Merchants can now trigger NFC payment requests directly from their dashboard. 
+- **Consumer Flow:** Users receive a high-fidelity "Pay with Tokens" prompt upon tapping a merchant device.
+- **Economic Loop:** This closes the loop between digital token earning (from matching/vouches) and real-world utility (venue spending).
 
 ## Federated Trust & Reputation
 - **Reputation Aggregation:** Launched the `SyncFederatedReputation` job which periodically pulls vouch scores from external instances.
@@ -90,6 +95,7 @@
 - **Billing validation from the previous slice remains the current premium reference path**: `php artisan test tests\Feature\PremiumControllerTest.php tests\Feature\StripeWebhookTest.php`, plus frontend `npm run lint`, `npm run type-check`, and `cmd /c "npm run build"`, already passed for `v1.0.71`.
 
 ## ✅ Release Focus
+- [x] Build NFC "Tap-to-Pay" protocol for merchants.
 - [x] Implement Federated Reputation Aggregator.
 - [x] Implement ActivityPub Group Actors.
 - [x] Enable Mobile NFC hardware permissions.
