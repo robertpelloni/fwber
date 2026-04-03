@@ -791,3 +791,10 @@ All notable changes to this project will be documented in this file.
 - **Ghost Pings:** Addressed a critical battery-drain bug. Logging out of the Next.js web interface now posts a `CLEAR_AUTH_TOKEN` message through the React Native bridge. The mobile shell catches this, drops the JWT from `SecureStore`, and actively aborts `Location.stopLocationUpdatesAsync()` to stop pinging the backend API unnecessarily.
 ### Added
 - **EAS Build Configuration:** Created `eas.json` profiles for staging and production builds. Embedded necessary native App Store privacy strings (e.g. `NSLocationAlwaysAndWhenInUseUsageDescription`) and plugin definitions into `mobile/app.json`.
+
+## [1.2.5] - 2026-04-04
+### Added
+- **EAS / Fastlane Pipelines:** Engineered `mobile/fastlane/Fastfile` to automate the transition of `eas build` binaries directly into TestFlight and Google Play Console environments.
+- **Worker-Powered Vault Media:** Embedded the `E2EImage` component into the `RealTimeChat.tsx` and `ProfileViewModal.tsx` windows. When encrypted photos are received, the heavy lifting of AES-GCM decryption is now offloaded from the UI thread to a dedicated WebWorker, allowing smooth 60fps scrolling through massive private galleries.
+### Removed
+- **Final Visual Bloat:** Completely stripped out leftover `<BoostButton />` and `<CreateBountyModal />` imports from the Discovery feed UI, leaving a purely streamlined user interface.

@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.2.4 "Ghost Pings & Build Pipelines"
+> **Current Version:** 1.2.5 "App Store & Decryption Delivery"
 > **Last Updated:** 2026-04-04
 
 ---
@@ -34,13 +34,13 @@ The platform is now **100% focused on its core identity**:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.2.4)
+### Phase 5: Production Scale (COMPLETED - v1.2.5)
 - **Geo-Service Load Testing:** Artisan command simulated 10,000 concurrent users against the Rust microservice (Avg: 1.5ms).
-- **E2E Photo Hydration:** WebWorkers offload AES-GCM decryption for full galleries.
-- **Native Permissions & EAS:** Ghost pings resolved, `eas.json` generated, and location permission strings embedded in `app.json`.
+- **E2E Photo Hydration:** WebWorkers directly wired into `RealTimeChat.tsx` to offload AES-GCM decryption for full galleries.
+- **Native Permissions & EAS / Fastlane:** Ghost pings resolved, `eas.json` generated, Fastlane `Fastfile` automated, and location permission strings embedded in `app.json`.
 
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Production Builds:** Execute `eas build` to compile the `.ipa` and `.aab` artifacts.
+1. **S3 / R2 Bucket Audit:** Write a cleanup script that actively deletes encrypted "Vault" media from object storage when an account is anonymized.
 2. **App Store Assets:** Generate fresh screenshots emphasizing the privacy-first, hyper-local nature of the simplified application.

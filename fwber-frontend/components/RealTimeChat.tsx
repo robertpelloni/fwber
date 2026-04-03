@@ -21,6 +21,7 @@ import { useChatSync } from '@/lib/hooks/use-chat-sync';
 import { storeOfflineMessage } from '@/lib/offline-store';
 import { v4 as uuidv4 } from 'uuid';
 import Image from 'next/image';
+import { E2EImage } from '@/components/E2EImage';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useRouter } from 'next/navigation';
@@ -601,13 +602,14 @@ export default function RealTimeChat({
                   {mediaUrl && (
                     <div className="mb-2">
                       {messageType === 'image' ? (
-                        <Image
+                        <E2EImage
                           src={mediaUrl.startsWith('http') ? mediaUrl : `${BACKEND_URL}${mediaUrl}`}
                           alt="Attachment"
                           width={200}
                           height={200}
                           className="w-full h-auto rounded-lg"
-                          loading="lazy"
+                          isEncrypted={!!msg.is_encrypted}
+                          peerId={Number(recipientId)}
                         />
                       ) : messageType === 'video' ? (
                         <video

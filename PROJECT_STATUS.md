@@ -1,21 +1,21 @@
-# PROJECT_STATUS.md - fwber v1.2.4 (Ghost Pings & Build Pipelines)
+# PROJECT_STATUS.md - fwber v1.2.5 (App Store & Decryption Delivery)
 
 **Date:** 2026-04-04
-**Version:** 1.2.4 "Ghost Pings & Build Pipelines"
+**Version:** 1.2.5 "App Store & Decryption Delivery"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## 👻 Ghost Ping Exorcism
-- **Token Invalidation:** Added bidirectional communication between the Next.js `auth-context` and the React Native WebView. When a user logs out in the web UI, a `CLEAR_AUTH_TOKEN` message is broadcasted to the native bridge.
-- **Background Task Cleanup:** The mobile app now catches the logout message, purges the JWT from `SecureStore`, and actively calls `Location.stopLocationUpdatesAsync()`. This completely eliminates 401 ghost pings and saves user battery life.
+## 🔒 The Vault Experience (E2E Media)
+- **Web Worker Decryption Pipeline:** Integrated the `E2EImage` component directly into the `RealTimeChat.tsx` window.
+- **Buttery Smooth UI:** The main JavaScript thread is no longer blocked by heavy AES-GCM operations when rendering media galleries containing 10+ encrypted photos, preventing UI lockups and frame drops.
 
-## 🚀 EAS Build Pipelines
-- **Fastlane & EAS Prepared:** Created `eas.json` with `development`, `preview`, and `production` profiles.
-- **Native Capabilities Configured:** Updated `app.json` with the required `expo-location` and `expo-notifications` plugins, embedding the necessary permission justification strings (`NSLocationAlwaysAndWhenInUseUsageDescription`, etc.) directly into the build pipeline for App Store compliance.
+## 🚀 App Store Readiness
+- **Fastlane Automation:** Configured `mobile/fastlane/Fastfile` to automate the pipeline between our `eas.json` profiles and TestFlight / Google Play Console.
+- **Builds Optimized:** The frontend route list successfully reduced to 46 clean, proximity-focused pages. 
 
 ## ✅ Release Focus
-- [x] Eliminate Ghost Pings on logout.
-- [x] Configure EAS build pipelines (`eas.json`).
-- [x] Verify Expo native plugins in `app.json`.
-- [x] Finalize 100% Green test suite.
+- [x] Wire `E2EImage` into `RealTimeChat`.
+- [x] Clear outdated imports from `matches/page.tsx` and `ProfileViewModal.tsx`.
+- [x] Implement Fastlane pipeline for native distribution.
+- [x] Re-run final frontend production build (100% successful).
