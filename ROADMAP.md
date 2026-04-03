@@ -40,7 +40,7 @@
 ### Phase 6: Production Hardening & Scale (ACTIVE)
 - Rust `fwber-geo` microservice deployment for high-density geographic querying.
 - Kubernetes / Helm chart finalization for enterprise scale (COMPLETED).
-- Multi-region edge caching (Cloudflare + Vercel).
+- Multi-region edge caching (Cloudflare + Vercel) (COMPLETED).
 - Load testing the unified Event Store.
 
 ---

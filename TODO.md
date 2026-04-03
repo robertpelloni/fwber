@@ -10,10 +10,11 @@
 - [ ] **Mobile Expo Router Migration**: Prepare `mobile/` directory to align routing architecture with the web frontend.
 
 ## 🟡 High: Performance & Edge
-- [ ] **Multi-region Edge Caching**: Optimize Vercel `next.config.js` and Cloudflare page rules for geographic speed.
+- [x] **Multi-region Edge Caching**: Optimized Vercel `next.config.js` with immutable headers and documented Cloudflare edge caching strategies in `docs/ai/deployment/cloudflare-edge-caching.md`.
 - [ ] **WASM Encryption Primitives**: Port client-side encryption logic to Rust-compiled WASM for higher performance.
 
 ## ✅ Recently Completed
+- [x] **Multi-region Edge Caching**: Configured immutable static headers and documented Cloudflare Page Rule strategies.
 - [x] **Helm Chart Infrastructure**: Created a standardized Helm chart for enterprise deployment of the full monorepo stack.
 - [x] **Offline Sync CRDT Integration**: Upgraded the `useChatSync.ts` basic retry queue to a full CRDT batching system sending `last_sync_at` (logical clock) to the new `POST /messages/sync-batch` endpoint.
 

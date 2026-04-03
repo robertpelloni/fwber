@@ -1,10 +1,14 @@
-# Project Status — fwber v1.0.77 (Production Helm Chart)
+# Project Status — fwber v1.0.78 (Multi-Region Edge Caching)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.77 "Production Helm Chart"
+**Version:** 1.0.78 "Multi-Region Edge Caching"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
+
+## Multi-Region Edge Caching & Performance
+- **Optimized Headers:** Updated `next.config.js` to enforce immutable long-term caching for static assets (`/_next/static`, `/static`, `/fonts`) and revalidation-ready headers for images.
+- **Edge Strategy:** Documented the Cloudflare Page Rule architecture in `docs/ai/deployment/cloudflare-edge-caching.md` to ensure global low latency.
 
 ## Production Helm Chart & Scalability
 - **Standardized Helm Chart:** Created a full Helm chart in `kubernetes/helm/fwber` to replace raw manifests. This enables environment-specific `values.yaml` files, templated resource management, and cleaner CI/CD integration.
@@ -50,6 +54,8 @@
 - **Billing validation from the previous slice remains the current premium reference path**: `php artisan test tests\Feature\PremiumControllerTest.php tests\Feature\StripeWebhookTest.php`, plus frontend `npm run lint`, `npm run type-check`, and `cmd /c "npm run build"`, already passed for `v1.0.71`.
 
 ## ✅ Release Focus
+- [x] Optimize Next.js Cache-Control headers for production.
+- [x] Document Cloudflare global edge caching strategy.
 - [x] Create standardized Helm Chart for enterprise deployment.
 - [x] Template all monorepo components (PHP, Next.js, Rust).
 - [x] Configure production-ready default values.

@@ -559,3 +559,9 @@ All notable changes to this project will be documented in this file.
 - Added templates for `backend`, `frontend`, `worker`, `reverb`, `geo-service`, and `ingress`.
 - Integrated `_helpers.tpl` for standardized labeling and naming conventions.
 - Configured `values.yaml` with production-ready defaults and scaling options.
+
+## [1.0.78] - 2026-04-02
+### Changed
+- **Multi-region Edge Caching**: Optimized `next.config.js` with immutable Cache-Control headers for static assets, fonts, and images.
+### Added
+- **Cloudflare Strategy Documentation**: Created `docs/ai/deployment/cloudflare-edge-caching.md` outlining the recommended page rules for global performance.
