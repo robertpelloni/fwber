@@ -1,27 +1,21 @@
-# Project Status — fwber v1.0.95 (Real-time Rates & Task Automation)
+# Project Status — fwber v1.0.96 (Merkle Audit & Real-time Council)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.95 "Real-time Rates & Task Automation"
+**Version:** 1.0.96 "Merkle Audit & Real-time Council"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## Task Automation (Scheduler)
-- **Autonomous Governance:** The system now automatically reconciles community votes every 60 seconds using the Laravel task scheduler. 
-- **Federated Social Sync:** Configured background ingestion of ActivityPub outboxes to refresh the global social feed every 5 minutes.
-
-## Real-time Market Integration
-- **CoinGecko Bridge:** Integrated live price feeds for Solana (SOL) and Circle (USDC).
-- **Dynamic Swap Quotes:** The `/council` and wallet dashboards now calculate token conversions based on real-world market data instead of static simulations.
+## Governance Transparency & Auditing
+- **Merkle Roots:** Finalized proposals now generate and store a SHA-256 Merkle root of all participant votes. This provides a decentralized proof-of-tally that users can verify independently.
+- **Real-time Notifications:** Integrated WebSocket alerts for the voting lifecycle. Participants are instantly notified via Laravel Reverb when a proposal shifts from `active` to `passed` or `failed`.
 
 ## Automated Policy & Rule Updates
 - **Closed-Loop Governance:** Proposals of type `policy` now automatically execute their associated changes upon passing.
 - **Dynamic Site Settings:** Implemented the `site_settings` table, enabling the community to vote on and change project constants (e.g. `daily_token_bonus`) without code deployments.
-- **Verified Execution:** Covered the policy execution lifecycle with 100% green feature tests in `PolicyExecutionTest.php`.
 
 ## Council Proposal Creation
 - **Frontend Submission:** Users can now launch new community proposals directly from the `/council` dashboard via the `CreateProposalModal`.
-- **Validation:** Integrated token-balance checks to ensure only invested participants (>100 FWB) can initiate project-wide votes.
 
 ## Full Federated E2E Security
 - **Asymmetric Decryption:** Completed the security loop for cross-server DMs. Users now generate and persist RSA keypairs in the browser, enabling native decryption of incoming ActivityPub messages.
@@ -35,10 +29,9 @@
 - **Asset Bridging:** Users can now swap liquid FWB Tokens for external assets (SOL, USDC).
 - **Price Simulation:** The swap interface now includes real-time simulated price feeds and 2% bridge fee calculations for transparent user expenditure.
 
-## Deployment & Stability
-- **Migration Repair:** Resolved a critical deployment failure caused by duplicate table creation in the governance schema (v1.0.92).
-
 ## ✅ Release Focus
+- [x] Implement Merkle-tree vote verification.
+- [x] Build real-time governance notifications.
 - [x] Integrate real-time market price APIs.
 - [x] Schedule background governance reconcilers.
 - [x] Build Automated Rule Updates (Policy Executor).

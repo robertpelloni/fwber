@@ -676,3 +676,9 @@ All notable changes to this project will be documented in this file.
 - **Market Rates API**: Created the `/api/economy/rates` endpoint to centralize FWB exchange rate logic and external market data.
 ### Changed
 - **Wallet Polish**: Updated the `SwapInterface` to fetch and display live market rates and dynamic estimated receive amounts.
+
+## [1.0.96] - 2026-04-02
+### Added
+- **Governance Result Notifications**: Users now receive real-time WebSocket and database notifications when a proposal they voted on is finalized.
+- **Merkle Proposal Verification**: Implemented a cryptographic audit trail for the Governance Council. Each finalized proposal now carries a `merkle_root` of all weighted votes, ensuring mathematical transparency of the democratic outcome.
+- **MerkleTreeService**: Created a new utility for generating SHA-256 Merkle roots from vote datasets.

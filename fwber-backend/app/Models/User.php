@@ -383,4 +383,9 @@ class User extends Authenticatable
             ->withPivot('unlocked_at')
             ->withTimestamps();
     }
+
+    public function governanceVotes(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(GovernanceVote::class);
+    }
 }

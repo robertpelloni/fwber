@@ -28,7 +28,16 @@ class ProcessGovernanceProposals implements ShouldQueue
 
     protected function finalizeProposal(GovernanceProposal $proposal): void
     {
-        // 1. Sum up weighted votes
+        // 1. Calculate Merkle Root of all votes for transparency
+        $allVotes = DB::table('governance_votes')
+            ->where('governance_proposal_id', $proposal->id)
+            ->orderBy('id')
+            ->get();
+
+        $leaves = $allVotes->map(fn($v) => "{$v->user_id}:{$v->option_index}:{$v->token_weight}")->toArray();
+        $merkleRoot = app(\App\Services\Governance\MerkleTreeService::class)->generateRoot($leaves);
+
+        // 2. Sum up weighted votes
         $results = DB::table('governance_votes')
             ->where('governance_proposal_id', $proposal->id)
             ->select('option_index', DB::raw('SUM(token_weight) as total_weight'))
@@ -37,7 +46,7 @@ class ProcessGovernanceProposals implements ShouldQueue
             ->get();
 
         if ($results->isEmpty()) {
-            $proposal->update(['status' => 'failed']);
+            $proposal->update(['status' => 'failed', 'merkle_root' => $merkleRoot]);
             return;
         }
 
@@ -45,16 +54,25 @@ class ProcessGovernanceProposals implements ShouldQueue
         $winnerIndex = $results->first()->option_index;
         $winnerOption = $proposal->options[$winnerIndex] ?? 'Unknown';
 
-        // 2. Determine if it passed (Simple majority for this MVP)
-        // In a real system, you might need a quorum (minimum total weight)
+        // 3. Determine if it passed
         $proposal->update([
             'status' => 'passed',
-            'description' => $proposal->description . "\n\n--- GOVERNANCE RESULT ---\nPassed with winner: {$winnerOption}"
+            'merkle_root' => $merkleRoot,
+            'description' => $proposal->description . "\n\n--- GOVERNANCE RESULT ---\nPassed with winner: {$winnerOption}\nMerkle Root: {$merkleRoot}"
         ]);
 
         Log::info("Governance: Proposal {$proposal->id} ('{$proposal->title}') finalized as PASSED. Winner: {$winnerOption}");
 
-        // 3. Trigger Policy Execution
+        // 3. Notify Voters
+        $voters = \App\Models\User::whereHas('governanceVotes', function($q) use ($proposal) {
+            $q->where('governance_proposal_id', $proposal->id);
+        })->get();
+
+        foreach ($voters as $voter) {
+            $voter->notify(new \App\Notifications\ProposalFinalizedNotification($proposal, $proposal->status, $winnerOption));
+        }
+
+        // 4. Trigger Policy Execution
         if ($proposal->status === 'passed' && !empty($proposal->execution_payload)) {
             Log::info("Governance: Triggering execution for proposal {$proposal->id}");
             $executor = new \App\Services\Governance\PolicyExecutor();
