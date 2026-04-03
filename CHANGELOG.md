@@ -578,3 +578,8 @@ All notable changes to this project will be documented in this file.
 - Replaced the single-file `App.js` with an `app/` directory using file-based routing.
 - Integrated `expo-router` v3.5.0 and updated core dependencies for React 19 and React Native 0.83.
 - Standardized the entry point to `expo-router/entry` and added deep linking support via a new URI scheme.
+
+## [1.0.81] - 2026-04-02
+### Added
+- **ActivityPub Search Aggregator**: Enhanced `ActivityPubSearchController` to support keyword searches. It now parallel-queries multiple "Discovery Hubs" (Mastodon instances) via `Http::pool` to provide a unified federated search interface.
+- **Geo-Screener Bloom Filter**: Integrated a Redis-based "Active Cells" filter into `GeoScreenerService.php`. This short-circuits proximity queries for geographic areas with no known activity, significantly reducing load on the Rust microservice.

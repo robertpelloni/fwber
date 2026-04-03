@@ -1,10 +1,19 @@
-# Project Status — fwber v1.0.80 (Mobile Expo Router)
+# Project Status — fwber v1.0.81 (Federated Search Aggregator)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.80 "Mobile Expo Router"
+**Version:** 1.0.81 "Federated Search Aggregator"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
+
+## ActivityPub Aggregation & Discovery
+- **Parallel Search Jobs:** Updated `ActivityPubSearchController` to use `Http::pool` for parallel querying of top ActivityPub discovery hubs. 
+- **Keyword Support:** Added support for broad keyword searches in addition to specific WebFinger handles, enabling organic discovery of the Fediverse.
+- **Unified Actor Mapping:** Implemented a standardized transformer to map various external Actor formats into a consistent internal JSON schema for the React frontend.
+
+## Geo-Screener Performance Optimization
+- **Redis Activity Filter:** Implemented an "Active Cells" Bloom filter proxy in PHP. 
+- **Latency Reduction:** By checking Redis before hitting the Rust microservice over HTTP, we achieve zero network latency for searches in empty or cold geographic zones.
 
 ## Mobile Architecture Refactor
 - **Expo Router Integration:** Successfully migrated the `mobile/` directory to the modern filesystem-based routing paradigm. Deleted redundant `App.js` and `index.js`.
@@ -64,6 +73,8 @@
 - **Billing validation from the previous slice remains the current premium reference path**: `php artisan test tests\Feature\PremiumControllerTest.php tests\Feature\StripeWebhookTest.php`, plus frontend `npm run lint`, `npm run type-check`, and `cmd /c "npm run build"`, already passed for `v1.0.71`.
 
 ## ✅ Release Focus
+- [x] Aggregate federated search results in parallel.
+- [x] Implement Redis Bloom Filter for geo-caching.
 - [x] Migrate Mobile app to Expo Router.
 - [x] Standardize Mobile directory structure.
 - [x] Load test EventStore under high record volume.

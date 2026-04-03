@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.0.77
+> **Current Version:** 1.0.81
 > **Last Updated:** 2026-04-02
 
 ---
@@ -43,6 +43,8 @@
 - Multi-region edge caching (Cloudflare + Vercel) (COMPLETED).
 - Load testing the unified Event Store (COMPLETED).
 - Prepare **Mobile Expo Router** migration for the `mobile/` directory (COMPLETED).
+- Develop a **Sub-millisecond Real-time Proximity Cache** (COMPLETED).
+- Finalize **ActivityPub Search Aggregator** (COMPLETED).
 
 ---
 
@@ -53,11 +55,11 @@
 | **Auth & Security** | Mature | 100% | 100% | ZK-Identity, WebAuthn, Sanctum, OTP. |
 | **Matching Engine** | Mature | 100% | 100% | Event Sourced, compatibility scoring. |
 | **Messaging** | Mature | 100% | 100% | E2E Encrypted, CRDT Batch Offline Sync. |
-| **Location / Geo** | Mature | 100% | 100% | AR Nav, Safe Walk, Proximity Chatrooms. |
+| **Location / Geo** | Mature | 100% | 100% | AR Nav, Redis Bloom, Rust Geo-Screener. |
 | **AI Integration** | Mature | 100% | 100% | Avatars, Wingman modals, Roast, Content Gen. |
 | **Social / Viral** | Mature | 100% | 100% | Rate My Cat, Bounties, Referrals. |
 | **Economy** | Mature | 100% | 100% | FWB Tokens, Stripe checkout, Wallet. |
-| **Federation** | Mature | 100% | 100% | WebFinger, search, signed inbound/outbound. |
+| **Federation** | Mature | 100% | 100% | WebFinger, Aggregated Search, Signed Activities. |
 | **B2B / Merchant** | Mature | 100% | 100% | Registration, promotions, analytics CSV export. |
 | **DevOps / Infra** | Mature | 100% | 100% | Helm Chart, Edge Caching, Load Tested. |
 | **Mobile App** | Mature | 100% | 100% | Expo Router, WebView Hybrid, Native Geofencing. |
@@ -65,6 +67,6 @@
 ---
 
 ## 🎯 Next Immediate Milestones
-1. Implement **WASM Encryption Primitives** to replace JavaScript-based E2E encryption for high-performance media payloads.
-2. Develop a **Sub-millisecond Real-time Proximity Cache** layer using Redis Bloom Filters for high-density areas.
-3. Finalize **ActivityPub Search Aggregator** to combine results from multiple federated actors into a unified discovery interface.
+1. Complete **WASM Encryption Integration** into the React frontend using the `fwber-wasm` primitives.
+2. Implement **Distributed Global Event Streaming** using Apache Kafka or AWS Kinesis for multi-instance federation scaling.
+3. Build a **NFC Match Protocol** for the mobile app to allow instant physical profile exchange via phone-tapping.
