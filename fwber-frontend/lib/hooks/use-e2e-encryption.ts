@@ -6,18 +6,18 @@ import * as Storage from '@/lib/e2e/storage';
 import * as Crypto from '@/lib/e2e/crypto';
 
 export function useE2EEncryption() {
-  const { user } = useAuth();
+  const { user, isAuthenticated, token } = useAuth();
   const [isReady, setIsReady] = useState(false);
   const [sharedKeys, setSharedKeys] = useState<Record<string, any>>({});
 
   // Initialize Keys
   useEffect(() => {
-    if (!user) return;
+    if (!isAuthenticated || !user) return;
 
     const initKeys = async () => {
       try {
-        let keyPair = await Storage.getKeyPair(user.id);
-        let metadata = await Storage.getKeyPairMetadata(user.id);
+        let keyPair = await Storage.getKeyPair(user.id, 'ecdh');
+        let metadata = await Storage.getKeyPairMetadata(user.id, 'ecdh');
         
         const KEY_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
         const needsRotation = metadata && (Date.now() - metadata.createdAt > KEY_MAX_AGE_MS);
@@ -25,7 +25,12 @@ export function useE2EEncryption() {
         if (!keyPair || needsRotation) {
           console.debug(needsRotation ? 'E2E keys expired. Rotating...' : 'Generating initial E2E keys...');
           keyPair = await Crypto.generateKeyPair();
-          await Storage.storeKeyPair(user.id, keyPair);
+          await Storage.storeKeyPair(user.id, keyPair, 'ecdh');
+
+          // --- FEDERATED KEY GENERATION ---
+          const rsaKeyPair = await Crypto.generateRsaKeyPair();
+          await Storage.storeKeyPair(user.id, rsaKeyPair, 'rsa');
+          // --------------------------------
 
           const publicKeyString = await Crypto.exportPublicKey(keyPair.publicKey);
           await securityApi.storePublicKey(publicKeyString);
@@ -41,7 +46,7 @@ export function useE2EEncryption() {
     };
 
     initKeys();
-  }, [user]);
+  }, [user, isAuthenticated]);
 
   // Get Shared Key (Derive or Cache)
   const getSharedKey = useCallback(async (peerId: string | number) => {
@@ -69,7 +74,7 @@ export function useE2EEncryption() {
     }
 
     // Handle Local Peer (Number)
-    const myKeys = await Storage.getKeyPair(user.id);
+    const myKeys = await Storage.getKeyPair(user.id, 'ecdh');
     if (!myKeys) throw new Error('E2E keys not initialized');
 
     try {
@@ -87,11 +92,11 @@ export function useE2EEncryption() {
   }, [user, sharedKeys]);
 
   const encrypt = useCallback(async (peerId: string | number, text: string) => {
-    const { type, key } = await getSharedKey(peerId);
-    if (type === 'rsa') {
-        return Crypto.encryptWithRsa(text, key);
+    const keyData = await getSharedKey(peerId);
+    if (keyData.type === 'rsa') {
+        return Crypto.encryptWithRsa(text, keyData.key);
     }
-    return Crypto.encryptMessage(text, key);
+    return Crypto.encryptMessage(text, keyData.key);
   }, [getSharedKey]);
 
   const decrypt = useCallback(async (peerId: string | number, encryptedText: string) => {
@@ -99,21 +104,23 @@ export function useE2EEncryption() {
     if (!keyData) return encryptedText; // Fallback
     
     if (keyData.type === 'rsa') {
-        // RSA decryption requires our PRIVATE key which must also be RSA
-        // Our current keys are ECDH. 
-        // NOTE: In a full federated AP system, the user should have BOTH ECDH and RSA keys.
-        // For this milestone, we've enabled OUTBOUND encryption.
-        return encryptedText; 
+        // RSA decryption requires our PRIVATE RSA key
+        const myRsaKeys = await Storage.getKeyPair(user!.id, 'rsa');
+        if (!myRsaKeys) return encryptedText;
+        return Crypto.decryptWithRsa(encryptedText, myRsaKeys.privateKey);
     }
     return Crypto.decryptMessage(encryptedText, keyData.key);
-  }, [getSharedKey]);
+  }, [user, getSharedKey]);
 
   const regenerateKeys = useCallback(async () => {
     if (!user) return;
     try {
 
       const keyPair = await Crypto.generateKeyPair();
-      await Storage.storeKeyPair(user.id, keyPair);
+      await Storage.storeKeyPair(user.id, keyPair, 'ecdh');
+
+      const rsaKeyPair = await Crypto.generateRsaKeyPair();
+      await Storage.storeKeyPair(user.id, rsaKeyPair, 'rsa');
 
       const publicKeyString = await Crypto.exportPublicKey(keyPair.publicKey);
       await securityApi.storePublicKey(publicKeyString);

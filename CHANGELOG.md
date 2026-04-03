@@ -654,3 +654,9 @@ All notable changes to this project will be documented in this file.
 ## [1.0.92] - 2026-04-02
 ### Fixed
 - **Migration Conflict**: Fixed a duplicate table creation error in the Governance migrations. Decoupled `governance_proposals` and `governance_votes` into their respective migration files to ensure deployment stability.
+
+## [1.0.93] - 2026-04-02
+### Added
+- **Cross-Instance E2E Decryption**: Completed the federated messaging security loop. Local users now generate RSA-OAEP keypairs that allow them to decrypt incoming direct messages from remote servers.
+- **Multi-Key Storage Engine**: Upgraded the browser IndexedDB storage to support concurrent storage of ECDH (local) and RSA (federated) keypairs.
+- **Automated Policy Enforcement**: Finalized the `ProcessGovernanceProposals` engine with full feature test coverage. The system now automatically reconciles community votes and finalizes proposal outcomes.

@@ -3,17 +3,20 @@
  *
  * Stores the user's private key securely in the browser.
  * The private key never leaves the device.
+ * Supports multiple key types (ECDH for local, RSA for federated).
  */
 
 const DB_NAME = 'fwber_e2e_keys';
-const DB_VERSION = 1;
-const STORE_KEYS = 'keys'; // Stores the user's own key pair
-const STORE_SESSIONS = 'sessions'; // Stores derived shared secrets for conversations (optional optimization)
+const DB_VERSION = 2;
+const STORE_KEYS = 'keys'; 
+const STORE_SESSIONS = 'sessions';
 
 export interface KeyPairStorage {
+  id: string; // userId:keyType
   userId: number;
+  keyType: 'ecdh' | 'rsa';
   publicKey: JsonWebKey;
-  privateKey: JsonWebKey; // Stored as non-extractable CryptoKey if possible, but IDB needs serializable. JWK is fine if IDB is secure.
+  privateKey: JsonWebKey; 
   createdAt: number;
 }
 
@@ -36,7 +39,7 @@ async function openDatabase(): Promise<IDBDatabase> {
       const db = (event.target as IDBOpenDBRequest).result;
 
       if (!db.objectStoreNames.contains(STORE_KEYS)) {
-        db.createObjectStore(STORE_KEYS, { keyPath: 'userId' });
+        db.createObjectStore(STORE_KEYS, { keyPath: 'id' });
       }
       
       if (!db.objectStoreNames.contains(STORE_SESSIONS)) {
@@ -46,7 +49,7 @@ async function openDatabase(): Promise<IDBDatabase> {
   });
 }
 
-export async function storeKeyPair(userId: number, keyPair: CryptoKeyPair): Promise<void> {
+export async function storeKeyPair(userId: number, keyPair: CryptoKeyPair, keyType: 'ecdh' | 'rsa' = 'ecdh'): Promise<void> {
   const db = await openDatabase();
   
   // Export keys to JWK for storage
@@ -57,7 +60,9 @@ export async function storeKeyPair(userId: number, keyPair: CryptoKeyPair): Prom
     const transaction = db.transaction(STORE_KEYS, 'readwrite');
     const store = transaction.objectStore(STORE_KEYS);
     const request = store.put({
+      id: `${userId}:${keyType}`,
       userId,
+      keyType,
       publicKey: publicKeyJwk,
       privateKey: privateKeyJwk,
       createdAt: Date.now(),
@@ -68,12 +73,12 @@ export async function storeKeyPair(userId: number, keyPair: CryptoKeyPair): Prom
   });
 }
 
-export async function getKeyPair(userId: number): Promise<CryptoKeyPair | null> {
+export async function getKeyPair(userId: number, keyType: 'ecdh' | 'rsa' = 'ecdh'): Promise<CryptoKeyPair | null> {
   const db = await openDatabase();
   return new Promise((resolve, reject) => {
     const transaction = db.transaction(STORE_KEYS, 'readonly');
     const store = transaction.objectStore(STORE_KEYS);
-    const request = store.get(userId);
+    const request = store.get(`${userId}:${keyType}`);
 
     request.onerror = () => reject(new Error('Failed to retrieve key pair'));
     request.onsuccess = async () => {
@@ -84,21 +89,27 @@ export async function getKeyPair(userId: number): Promise<CryptoKeyPair | null> 
       }
 
       try {
-        // Import keys back to CryptoKey objects
+        const algo = keyType === 'ecdh' 
+            ? { name: 'ECDH', namedCurve: 'P-256' }
+            : { name: 'RSA-OAEP', hash: 'SHA-256' };
+
+        const usages: KeyUsage[] = keyType === 'ecdh' ? [] : ['encrypt'];
+        const privUsages: KeyUsage[] = keyType === 'ecdh' ? ['deriveKey', 'deriveBits'] : ['decrypt'];
+
         const publicKey = await window.crypto.subtle.importKey(
           'jwk',
           result.publicKey,
-          { name: 'ECDH', namedCurve: 'P-256' },
+          algo,
           true,
-          []
+          usages
         );
 
         const privateKey = await window.crypto.subtle.importKey(
           'jwk',
           result.privateKey,
-          { name: 'ECDH', namedCurve: 'P-256' },
-          true, // Private key must be extractable to be stored/retrieved this way, or we use non-extractable and store CryptoKey directly if IDB supports it (modern browsers do)
-          ['deriveKey', 'deriveBits']
+          algo,
+          true,
+          privUsages
         );
 
         resolve({ publicKey, privateKey });
@@ -109,12 +120,12 @@ export async function getKeyPair(userId: number): Promise<CryptoKeyPair | null> 
   });
 }
 
-export async function getKeyPairMetadata(userId: number): Promise<{ createdAt: number } | null> {
+export async function getKeyPairMetadata(userId: number, keyType: 'ecdh' | 'rsa' = 'ecdh'): Promise<{ createdAt: number } | null> {
   const db = await openDatabase();
   return new Promise((resolve, reject) => {
     const transaction = db.transaction(STORE_KEYS, 'readonly');
     const store = transaction.objectStore(STORE_KEYS);
-    const request = store.get(userId);
+    const request = store.get(`${userId}:${keyType}`);
 
     request.onerror = () => reject(new Error('Failed to retrieve key pair metadata'));
     request.onsuccess = () => {

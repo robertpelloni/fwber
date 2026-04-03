@@ -46,6 +46,22 @@ export async function generateKeyPair(): Promise<CryptoKeyPair> {
 }
 
 /**
+ * Generate a new RSA-OAEP key pair for federated encryption.
+ */
+export async function generateRsaKeyPair(): Promise<CryptoKeyPair> {
+  return window.crypto.subtle.generateKey(
+    {
+      name: "RSA-OAEP",
+      modulusLength: 2048,
+      publicExponent: new Uint8Array([1, 0, 1]),
+      hash: "SHA-256",
+    },
+    true,
+    ["encrypt", "decrypt"]
+  ) as Promise<CryptoKeyPair>;
+}
+
+/**
  * Export public key to Base64 string (for API upload).
  */
 export async function exportPublicKey(key: CryptoKey): Promise<string> {
@@ -135,6 +151,30 @@ export async function encryptWithRsa(text: string, publicKey: CryptoKey): Promis
     data: Array.from(new Uint8Array(ciphertext)),
     algo: 'RSA-OAEP',
   });
+}
+
+/**
+ * Decrypt a message using an RSA Private Key.
+ */
+export async function decryptWithRsa(encryptedJson: string, privateKey: CryptoKey): Promise<string> {
+    try {
+        const payload = JSON.parse(encryptedJson);
+        const data = new Uint8Array(payload.data);
+
+        const decrypted = await window.crypto.subtle.decrypt(
+            {
+                name: 'RSA-OAEP',
+            },
+            privateKey,
+            data
+        );
+
+        const decoder = new TextDecoder();
+        return decoder.decode(decrypted);
+    } catch (e) {
+        console.error('RSA Decryption failed', e);
+        throw new Error('Failed to decrypt federated message');
+    }
 }
 
 /**
