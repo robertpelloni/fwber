@@ -132,6 +132,19 @@ class ProfileController extends Controller
     public function destroy(Request $request): JsonResponse
     {
         $user = auth()->user();
+        $userId = $user->id;
+
+        try {
+            // --- S3 / LOCAL STORAGE WIPING (DATA MINIMIZATION) ---
+            // Actively delete entire media directories to ensure no encrypted 
+            // or unencrypted artifacts are left orphaned in object storage.
+            \Illuminate\Support\Facades\Storage::disk('public')->deleteDirectory("photos/{$userId}");
+            \Illuminate\Support\Facades\Storage::disk('public')->deleteDirectory("messages/{$userId}");
+            \Illuminate\Support\Facades\Storage::disk('public')->deleteDirectory("verification/{$userId}");
+        } catch (\Exception $e) {
+            Log::error("Failed to delete media directories for user {$userId}: " . $e->getMessage());
+        }
+
         $user->delete();
         return response()->json(['success' => true, 'message' => 'Account deleted successfully']);
     }

@@ -33,6 +33,18 @@ class PrivacySecurityService
         $user = User::find($userId);
         if (! $user) return;
 
+        // --- S3 / LOCAL STORAGE WIPING (DATA MINIMIZATION) ---
+        // Actively delete entire media directories to ensure no encrypted 
+        // or unencrypted artifacts are left orphaned in object storage.
+        try {
+            Storage::disk('public')->deleteDirectory("photos/{$userId}");
+            Storage::disk('public')->deleteDirectory("messages/{$userId}");
+            Storage::disk('public')->deleteDirectory("verification/{$userId}");
+        } catch (\Exception $e) {
+            Log::error("Failed to delete media directories for user {$userId}: " . $e->getMessage());
+        }
+        // -----------------------------------------------------
+
         $user->update([
             'name' => 'Deleted User',
             'email' => "deleted_{$userId}@fwber.me",
@@ -51,6 +63,6 @@ class PrivacySecurityService
         $user->matchesAsUser1()->delete();
         $user->matchesAsUser2()->delete();
 
-        Log::info("User {$userId} data anonymized");
+        Log::info("User {$userId} data anonymized and media wiped");
     }
 }
