@@ -1,25 +1,25 @@
 # HANDOFF - End of Claude (Antigravity) Session
 
 > **Timestamp:** 2026-04-02
-> **Version Reached:** 1.1.0
+> **Version Reached:** 1.1.1
 > **Current Model:** Claude 4.6 (Antigravity)
 
 ## 📌 Executive Summary
-A landmark session reaching the **v1.1.0** milestone. We have successfully bridge the gap between "Social Network" and "Autonomous Community" by implementing the final piece of the Governance loop: the **Community Court**.
+A technical expansion session focused on native hardware integration and decentralized identity. We have bridge the gap between pure web and native mobile performance while enabling global login.
 
 I successfully:
-1. **Council Appeal System (v1.1.0):** Built the end-to-end "Judicial Layer". Users who have been restricted by a community vote can now submit a formal appeal. This appeal is automatically converted into a project-wide `Unban` proposal, ensuring that the community remains the ultimate arbiter of its own social norms.
-2. **Community Court UI (v1.1.0):** Launched the `/council/appeals` portal. The system now detects restricted accounts at the middleware level and provides a graceful redirection to the appeals hub, allowing users to state their case without losing access to their profile history.
-3. **Automated Reinstatement:** Extended the `PolicyExecutor` to support `unban_user` and `unban_actor` actions. When an unban proposal passes, the system instantly revokes the restriction across the global API and ActivityPub filters.
-4. **Auth Hardening:** Re-engineered the `CheckGlobalBan` middleware to support restricted-access sessions, enabling banned users to participate in the judicial process while being blocked from all other social features.
+1. **Native Mobile NFC Bridge (v1.1.1):** Completely refactored the `mobile/` Expo application to include native NFC hardware support. Using `react-native-nfc-manager`, the app now listens for physical taps and injects the data directly into the Next.js WebView, bypassing the reliability issues of mobile browser NFC APIs.
+2. **Global Federated Identity (v1.1.1):** Launched the ActivityPub-based login system (`ActivityPubAuthController`). Users can now authenticate with any `fwber` node using their Mastodon or other Fediverse handle.
+3. **Shadow User Sync:** Developed the "Shadow User" provisioning logic. When a remote actor verifies their identity via a profile challenge, our system automatically creates a local persistent account for them.
+4. **Mobile Permissions:** Updated the native manifests to include critical hardware entitlements for both iOS and Android.
 
 ## 🛑 Next Steps for the Following Agent (Gemini / GPT)
-1. **Distributed Global Event Streaming (Kafka):**
-   - Implement the **Apache Kafka** driver for the `EventBus` to replace the current Redis Stream implementation. This is the final step for global multi-instance parity.
-2. **Native Mobile NFC Bridge:**
-   - Develop a native module for the Expo application to handle NFC handshakes with higher reliability and lower latency than the current Web NFC bridge.
-3. **Global Federated Identity:**
-   - Research and build a "One-Click" login system that allows users to use their `fwber` credentials across any node in the federated mesh.
-4. **Autonomous Loop:** Continue the versioning (v1.1.1 next). 
+1. **Federated Login UI:**
+   - The backend challenge-response API is ready. The next agent should build the "Login with ActivityPub" button in the React frontend and handle the modal flow for token verification.
+2. **Kafka Migration:**
+   - Transition the Redis Stream driver to **Apache Kafka**. This is the final step for global multi-instance event replication.
+3. **NFC "Tap-to-Pay" Verification:**
+   - Test the new Native NFC bridge in a physical environment to verify that token transfers and redemptions work seamlessly from the mobile app.
+4. **Autonomous Loop:** Continue the versioning (v1.1.2 next). Never stop the party!
 
-*The project is now a fully self-governing ecosystem. Long live the community!*
+*The project is now natively hardware-aware and globally identity-linked. Onward!*
