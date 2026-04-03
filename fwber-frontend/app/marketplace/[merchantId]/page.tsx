@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { ShoppingBag, ArrowLeft, Loader2, Coins, CheckCircle2, QrCode } from 'lucide-react';
 import AppHeader from '@/components/AppHeader';
+import { DigitalReceipt } from '@/components/marketplace/DigitalReceipt';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -23,7 +24,7 @@ export default function MarketplacePage() {
     const [items, setItems] = useState<InventoryItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [purchasingId, setPurchasingId] = useState<number | null>(null);
-    const [redemptionCode, setRedemptionCode] = useState<string | null>(null);
+    const [lastTransaction, setLastTransaction] = useState<any>(null);
 
     useEffect(() => {
         if (merchantId) {
@@ -39,7 +40,14 @@ export default function MarketplacePage() {
         try {
             setPurchasingId(item.id);
             const res = await marketplaceApi.purchaseItem(item.id);
-            setRedemptionCode(res.redemption_code);
+            setLastTransaction({
+                id: res.redemption_code,
+                itemName: item.name,
+                price: item.price_tokens,
+                merchantName: 'Venue', // In a real app, fetch this from res
+                timestamp: new Date().toISOString(),
+                redemptionCode: res.redemption_code
+            });
             toast({
                 title: "Purchase Successful!",
                 description: `You bought ${item.name}.`,
@@ -109,34 +117,11 @@ export default function MarketplacePage() {
             </main>
 
             <AnimatePresence>
-                {redemptionCode && (
-                    <motion.div 
-                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-                    >
-                        <Card className="max-w-sm w-full bg-white dark:bg-zinc-900 border-amber-500 shadow-[0_0_50px_rgba(245,158,11,0.2)]">
-                            <CardHeader className="text-center">
-                                <div className="mx-auto w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mb-4">
-                                    <CheckCircle2 className="w-10 h-10 text-green-500" />
-                                </div>
-                                <CardTitle className="text-2xl font-black uppercase italic italic tracking-tighter">Purchase Confirmed</CardTitle>
-                                <CardDescription>Show this code to the merchant to redeem your item.</CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                                <div className="bg-zinc-100 dark:bg-zinc-800 p-8 rounded-2xl border-2 border-dashed border-zinc-300 dark:border-zinc-700 text-center">
-                                    <span className="text-3xl font-mono font-black tracking-widest text-amber-600">
-                                        {redemptionCode}
-                                    </span>
-                                </div>
-                                <div className="flex justify-center">
-                                    <QrCode className="w-32 h-32 opacity-20" />
-                                </div>
-                            </CardContent>
-                            <CardFooter>
-                                <Button className="w-full" onClick={() => setRedemptionCode(null)}>Close</Button>
-                            </CardFooter>
-                        </Card>
-                    </motion.div>
+                {lastTransaction && (
+                    <DigitalReceipt 
+                        {...lastTransaction}
+                        onClose={() => setLastTransaction(null)}
+                    />
                 )}
             </AnimatePresence>
         </div>

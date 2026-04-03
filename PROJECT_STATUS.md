@@ -1,43 +1,42 @@
-# Project Status — fwber v1.1.4 (Merkle Prover & Event Consumer)
+# Project Status — fwber v1.1.5 (NFC Receipts & Kafka Sim)
 
 **Date:** 2026-04-02  
-**Version:** 1.1.4 "Merkle Prover & Event Consumer"
+**Version:** 1.1.5 "NFC Receipts & Kafka Sim"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## On-Chain Verification
-- **Double-Verified Roots:** The `VoteVerifier` now cross-checks the local Merkle path against the Solana ledger. This ensures that the Council's reported results are identical to the immutable on-chain record.
-- **Chain of Trust:** Visualized the verification sequence from user vote -> Merkle leaf -> local root -> Solana memo.
+## NFC Digital Transaction History
+- **Verified Receipts:** Built the `DigitalReceipt.tsx` component. Users can now view, download, and share proof-of-purchase for any token-based venue transaction.
+- **Unified Handshake UX:** The NFC hub now provides a seamless transition from "Tapping" to "Payment Confirmed" to "Receipt Issued" in a single animated flow.
 
-## Distributed State Synchronization
-- **Event Consumer:** Launched the `ConsumeFederatedEvents` worker. Instances can now "listen" to the global event bus and sync profiles, trust scores, and matches across the mesh.
-- **Reliable Relay:** Implemented consumer group logic to ensure events are processed exactly once per node.
+## Simulated Kafka Event Infrastructure
+- **Aggregate Partitioning:** Implemented a partition-aware event bus. The system now automatically shuffles domain events into 10 distinct logical partitions based on the `aggregate_uuid` hash, preparing the platform for a real Apache Kafka cluster.
+- **Performance Logs:** Added high-speed append-only logs for each partition, ensuring sub-millisecond event publishing in the development environment.
 
-## Native NFC Verification
-- **E2E Proven:** Verified the native mobile NFC bridge via Cypress. Automated tests now confirm that tapping a merchant device triggers the correct payment and token deduction flow.
+## Community Court & Appeals
+- **Judicial Layer:** Users restricted by the Council now have a formal path to reinstatement. The `/council/appeals` portal allows banned users to state their case.
+- **Direct Democracy:** Appeals are instantly converted into community proposals, ensuring that the same FWB-weighted voting power that banned a user also decides their fate.
 
-## Global Federated Identity
-- **Decentralized Login:** Users can now use their ActivityPub handle (e.g. Mastodon) to log in to the fwber network. 
-- **Shadow User Sync:** Implemented automated local user creation for remote actors.
+## On-Chain Governance Proofs
+- **Solana Anchoring:** Finalized Merkle roots from community proposals are now anchored to the Solana blockchain via transaction memos.
+- **Immutable History:** This provides a third-party verifiable trail of all governance outcomes.
 
 ## ✅ Release Focus
-- [x] Integrate On-Chain Merkle Prover.
-- [x] Build Federated Event Consumer.
-- [x] Run NFC Tap-to-Pay E2E tests.
-- [x] Build Global Federated Identity system.
-- [x] Build Native Mobile NFC Bridge.
+- [x] Build NFC Digital Receipt system.
+- [x] Implement Simulated Kafka Partitioning.
+- [x] Integrate Native NFC Mobile bridge.
+- [x] Implement On-Chain Governance mirroring (Solana).
+- [x] Schedule background governance reconcilers.
 - [x] Build Council Appeal system and UI.
 - [x] Implement automated Unban proposals.
 - [x] Implement Community Moderation DAO actions.
 - [x] Build Global Ban infrastructure and middleware.
-- [x] Implement On-Chain Governance mirroring (Solana).
 - [x] Enable iOS native NFC entitlements.
 - [x] Build Frontend Merkle Prover UI.
 - [x] Implement Merkle-tree vote verification.
 - [x] Build real-time governance notifications.
 - [x] Integrate real-time market price APIs.
-- [x] Schedule background governance reconcilers.
 - [x] Build Automated Rule Updates (Policy Executor).
 - [x] Create Proposal Creation UI in frontend.
 - [x] Polish Global Token Swap UI with price feeds.

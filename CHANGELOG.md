@@ -739,3 +739,10 @@ All notable changes to this project will be documented in this file.
 - **On-Chain Merkle Prover**: Enhanced the Council UI to cross-reference local Merkle roots with Solana transaction memos. Users can now verify that the community tally matches the immutable blockchain record.
 - **Federated Event Consumer**: Built the `events:consume-federated` Artisan command. This enables `fwber` nodes to subscribe to the distributed event bus and replay domain events to maintain global state parity.
 - **NFC Tap-to-Pay E2E Tests**: Authored a complete Cypress suite for physical payment redemptions, verifying the native-to-web bridge and token transfer flow.
+
+## [1.1.5] - 2026-04-02
+### Added
+- **NFC Digital Receipts**: Launched a high-fidelity transaction confirmation UI for the Marketplace. Users now receive an interactive, printable digital receipt upon a successful Tap-to-Pay purchase.
+- **Simulated Kafka Partitioning**: Enhanced the `KafkaEventBus` with a local simulation mode. Domain events are now automatically partitioned by `aggregate_uuid` and stored in separate high-performance logs, mirroring Kafka's distributed scaling logic.
+### Changed
+- **NFC Physical Interaction Hub**: Integrated the `DigitalReceipt` component into the `NFCProfileExchange`, providing immediate feedback for both matches and marketplace redemptions.

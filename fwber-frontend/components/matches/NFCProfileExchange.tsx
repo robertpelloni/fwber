@@ -9,6 +9,7 @@ import { api } from '@/lib/api/client';
 import { useToast } from '@/components/ui/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNfc } from '@/lib/hooks/use-nfc';
+import { DigitalReceipt } from '@/components/marketplace/DigitalReceipt';
 
 import geohash from 'ngeohash';
 import { v4 as uuidv4 } from 'uuid';
@@ -20,6 +21,7 @@ export function NFCProfileExchange() {
     
     const [status, setStatus] = useState<'idle' | 'scanning' | 'writing' | 'success' | 'error' | 'payment_pending' | 'verifying'>('idle');
     const [pendingPayment, setPendingPayment] = useState<any>(null);
+    const [lastTransaction, setLastTransaction] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
 
     // Watch for native scans
@@ -140,16 +142,25 @@ export function NFCProfileExchange() {
         if (!pendingPayment) return;
         try {
             setStatus('verifying');
-            await api.post(`/marketplace/purchase/${pendingPayment.itemId}`, {}, {
+            const res = await api.post<any>(`/marketplace/purchase/${pendingPayment.itemId}`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
+            
+            setLastTransaction({
+                id: res.redemption_code,
+                itemName: pendingPayment.itemName,
+                price: pendingPayment.price,
+                merchantName: 'Venue', 
+                timestamp: new Date().toISOString(),
+                redemptionCode: res.redemption_code
+            });
+
             setStatus('success');
             toast({
                 title: "Payment Confirmed",
                 description: `Successfully paid ${pendingPayment.price} FWB to merchant.`,
             });
             setPendingPayment(null);
-            setTimeout(() => setStatus('idle'), 5000);
         } catch (err: any) {
             setStatus('error');
             setError(err.message || 'Payment failed');
@@ -241,6 +252,18 @@ export function NFCProfileExchange() {
                             <p className="text-xs text-red-400 text-center">{error}</p>
                             <Button variant="outline" size="sm" onClick={() => setStatus('idle')}>Try Again</Button>
                         </motion.div>
+                    )}
+                </AnimatePresence>
+
+                <AnimatePresence>
+                    {lastTransaction && (
+                        <DigitalReceipt 
+                            {...lastTransaction}
+                            onClose={() => {
+                                setLastTransaction(null);
+                                setStatus('idle');
+                            }}
+                        />
                     )}
                 </AnimatePresence>
             </CardContent>
