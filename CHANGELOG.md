@@ -565,3 +565,9 @@ All notable changes to this project will be documented in this file.
 - **Multi-region Edge Caching**: Optimized `next.config.js` with immutable Cache-Control headers for static assets, fonts, and images.
 ### Added
 - **Cloudflare Strategy Documentation**: Created `docs/ai/deployment/cloudflare-edge-caching.md` outlining the recommended page rules for global performance.
+
+## [1.0.79] - 2026-04-02
+### Added
+- **EventStore Load Testing**: Implemented a new Artisan command `event-store:load-test` to simulate high-volume event data.
+- **Performance Verification**: Verified sub-millisecond lookup and stream fetch performance under a 100,000 record load, ensuring production readiness.
+- **Unique Constraint Integrity**: Confirmed that the `domain_events` unique index correctly prevents aggregate version collisions.

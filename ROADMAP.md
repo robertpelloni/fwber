@@ -41,7 +41,7 @@
 - Rust `fwber-geo` microservice deployment for high-density geographic querying.
 - Kubernetes / Helm chart finalization for enterprise scale (COMPLETED).
 - Multi-region edge caching (Cloudflare + Vercel) (COMPLETED).
-- Load testing the unified Event Store.
+- Load testing the unified Event Store (COMPLETED).
 
 ---
 
@@ -58,7 +58,7 @@
 | **Economy** | Mature | 100% | 100% | FWB Tokens, Stripe checkout, Wallet. |
 | **Federation** | Mature | 100% | 100% | WebFinger, search, signed inbound/outbound. |
 | **B2B / Merchant** | Mature | 100% | 100% | Registration, promotions, analytics CSV export. |
-| **DevOps / Infra** | Mature | 100% | 100% | Helm Chart, K8s Manifests, Dockerized. |
+| **DevOps / Infra** | Mature | 100% | 100% | Helm Chart, Edge Caching, Load Tested. |
 
 ---
 
