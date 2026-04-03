@@ -388,7 +388,7 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
             </header>
 
             {showNav && (
-                <aside className="fixed inset-y-16 left-0 z-30 hidden w-72 border-r border-gray-200 bg-white/95 backdrop-blur dark:border-gray-800 dark:bg-gray-900/95 lg:flex lg:flex-col">
+                <aside className="fixed top-[4.625rem] bottom-0 left-0 z-30 hidden w-72 border-r border-gray-200 bg-white/95 backdrop-blur dark:border-gray-800 dark:bg-gray-900/95 lg:flex lg:flex-col">
                     <div className="flex-1 overflow-y-auto px-4 py-6">
                         <div className="mb-6 rounded-2xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white p-4 dark:border-gray-800 dark:from-gray-900 dark:to-gray-950">
                             <div className="mb-3 flex items-center gap-3">

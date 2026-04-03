@@ -1,12 +1,15 @@
-# Project Status — fwber v1.1.6 (WASM Benchmarks & Event Relay)
+# Project Status — fwber v1.1.7 (Sidebar UI Fix)
 
 **Date:** 2026-04-02  
-**Version:** 1.1.6 "WASM Benchmarks & Event Relay"
+**Version:** 1.1.7 "Sidebar UI Fix"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## Hardware Acceleration Verification
+## UI/UX Polish
+- **Sidebar Layout:** Resolved a visual bug where the main application navigation sidebar (`AppHeader.tsx`) did not reach the bottom of the screen. Replaced `inset-y-16` with precise top and bottom pinning to ensure a continuous visual column across all viewport heights.
+
+## NFC Digital Transaction History
 - **WASM Benchmarking:** Added a performance test suite to the Security Dashboard. Users can verify that large E2E payloads are processed significantly faster using the Rust/WASM engine compared to pure JS.
 - **Optimized Offloading:** Finalized the 5,000 character threshold for automatic WASM crypto offloading in the browser.
 
@@ -25,6 +28,7 @@
 - **Judicial Layer:** Users restricted by the Council now have a formal path to reinstatement.
 
 ## ✅ Release Focus
+- [x] Fix sidebar layout height issue.
 - [x] Build WASM Performance Benchmark UI.
 - [x] Implement Instance-to-Instance Event Relay.
 - [x] Schedule background governance reconcilers.

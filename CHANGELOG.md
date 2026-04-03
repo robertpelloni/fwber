@@ -753,3 +753,7 @@ All notable changes to this project will be documented in this file.
 - **Instance-to-Instance Event Relay**: Implemented the `FederatedRelayBus` for real-time domain event replication. Instances can now multi-cast important events (like trust score updates) to trusted peering partners.
 - **Composite Event Bus**: Refactored the backend to support simultaneous local and federated event publishing via a pluggable decorator pattern.
 - **Automated Reconciler Scheduling**: Finalized the 1-minute cron for governance proposals and 5-minute cron for federated social sync.
+
+## [1.1.7] - 2026-04-02
+### Fixed
+- **UI Layout**: Fixed the main application sidebar navigation. It now correctly extends completely to the bottom of the viewport on all pages, removing the unintended 4rem bottom gap.
