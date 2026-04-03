@@ -1,14 +1,15 @@
-# Project Status — fwber v1.0.96 (Merkle Audit & Real-time Council)
+# Project Status — fwber v1.0.97 (Merkle Prover & Audit UI)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.96 "Merkle Audit & Real-time Council"
+**Version:** 1.0.97 "Merkle Prover & Audit UI"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## Governance Transparency & Auditing
-- **Merkle Roots:** Finalized proposals now generate and store a SHA-256 Merkle root of all participant votes. This provides a decentralized proof-of-tally that users can verify independently.
-- **Real-time Notifications:** Integrated WebSocket alerts for the voting lifecycle. Participants are instantly notified via Laravel Reverb when a proposal shifts from `active` to `passed` or `failed`.
+## Cryptographic Vote Verification
+- **Frontend Prover:** Launched the `VoteVerifier.tsx` component. Users can now perform a local SHA-256 reconstruction of the Merkle path to verify their vote inclusion against the proposal's published root.
+- **Audit Interface:** Redesigned the `/council` portal with a dedicated "History & Audit" section, treating governance outcomes as permanent, verifiable records.
+- **Proof-as-a-Service:** The backend now provides a optimized proof-generation endpoint, reconstructing the Merkle tree on-the-fly to serve sibling hashes.
 
 ## Automated Policy & Rule Updates
 - **Closed-Loop Governance:** Proposals of type `policy` now automatically execute their associated changes upon passing.
@@ -30,18 +31,10 @@
 - **Price Simulation:** The swap interface now includes real-time simulated price feeds and 2% bridge fee calculations for transparent user expenditure.
 
 ## ✅ Release Focus
+- [x] Build Frontend Merkle Prover UI.
 - [x] Implement Merkle-tree vote verification.
 - [x] Build real-time governance notifications.
 - [x] Integrate real-time market price APIs.
-- [x] Schedule background governance reconcilers.
-- [x] Build Automated Rule Updates (Policy Executor).
-- [x] Create Proposal Creation UI in frontend.
-- [x] Polish Global Token Swap UI with price feeds.
-- [x] Implement Full Cross-Instance E2E Encryption/Decryption.
-- [x] Build Automated Proposal Execution jobs.
-- [x] Build Governance & Voting portal.
-- [x] Implement token-weighted voting logic.
-- [x] Build Global Token Exchange (Bridge) UI.
 - [x] Implement ZK-Age Verification.
 - [x] Build NFC "Tap-to-Pay" protocol for merchants.
 - [x] Enable Mobile NFC hardware permissions.

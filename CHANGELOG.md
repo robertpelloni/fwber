@@ -682,3 +682,10 @@ All notable changes to this project will be documented in this file.
 - **Governance Result Notifications**: Users now receive real-time WebSocket and database notifications when a proposal they voted on is finalized.
 - **Merkle Proposal Verification**: Implemented a cryptographic audit trail for the Governance Council. Each finalized proposal now carries a `merkle_root` of all weighted votes, ensuring mathematical transparency of the democratic outcome.
 - **MerkleTreeService**: Created a new utility for generating SHA-256 Merkle roots from vote datasets.
+
+## [1.0.97] - 2026-04-02
+### Added
+- **Frontend Merkle Prover**: Added a "Verify My Vote" feature to the Council dashboard. Users can now cryptographically prove their vote's inclusion in any finalized proposal root using SHA-256 reconstruction in the browser.
+- **Merkle Proof API**: Implemented a new endpoint `/api/governance/proposals/{id}/proof` that generates the sibling-hash path for a user's specific weighted vote.
+### Changed
+- **Council UI Overhaul**: Split the Council portal into "Active Proposals" and "History & Audit" sections for better clarity and long-term transparency.

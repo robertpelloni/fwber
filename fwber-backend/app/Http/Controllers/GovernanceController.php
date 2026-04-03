@@ -106,4 +106,43 @@ class GovernanceController extends Controller
             'vote' => $vote
         ]);
     }
+
+    /**
+     * Get the cryptographic proof for a user's vote in a finalized proposal.
+     */
+    public function getVoteProof(Request $request, int $proposalId): JsonResponse
+    {
+        $user = Auth::user();
+        $proposal = GovernanceProposal::findOrFail($proposalId);
+
+        if ($proposal->status === 'active') {
+            return response()->json(['error' => 'Proof is only available for finalized proposals.'], 400);
+        }
+
+        $userVote = GovernanceVote::where('user_id', $user->id)
+            ->where('governance_proposal_id', $proposal->id)
+            ->firstOrFail();
+
+        // 1. Get all votes to reconstruct the tree
+        $allVotes = DB::table('governance_votes')
+            ->where('governance_proposal_id', $proposal->id)
+            ->orderBy('id')
+            ->get();
+
+        $leaves = $allVotes->map(fn($v) => "{$v->user_id}:{$v->option_index}:{$v->token_weight}")->toArray();
+        $myLeaf = "{$userVote->user_id}:{$userVote->option_index}:{$userVote->token_weight}";
+
+        // 2. Generate the proof path
+        $merkleService = app(\App\Services\Governance\MerkleTreeService::class);
+        $proof = $merkleService->getProof($leaves, $myLeaf);
+
+        return response()->json([
+            'proposal_id' => $proposal->id,
+            'merkle_root' => $proposal->merkle_root,
+            'leaf' => $myLeaf,
+            'leaf_hash' => hash('sha256', $myLeaf),
+            'proof' => $proof,
+            'option_voted' => $proposal->options[$userVote->option_index]
+        ]);
+    }
 }
