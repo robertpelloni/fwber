@@ -1,19 +1,19 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.1.5  
+> **Version:** 1.1.6  
 > **Last Updated:** 2026-04-02
 
 ---
 
-## 🔴 Critical: Federated Social
-- [ ] **ActivityPub Group Follow**: Implement the logic to allow users to follow a federated Group actor, mirroring board posts to their home feed.
+## 🔴 Critical: Global Reliability
+- [ ] **Kafka/Kinesis Migration**: Finalize the event streaming migration from Redis to a distributed broker for global instance parity.
 
 ## 🟡 High: Feature Polish
-- [ ] **WASM Encryption Benchmarks**: Finalize the performance testing for the browser-based Rust crypto bridge.
+- [ ] **NFC "Tap-to-Pay" Production Test**: Perform a live token-to-inventory redemption using two native mobile devices.
 
 ## ✅ Recently Completed
-- [x] **NFC Digital Receipts**: Launched printable transaction confirmations.
-- [x] **Simulated Kafka Partitioning**: Built a partition-aware event bus for high-speed local logging.
+- [x] **WASM Performance Benchmarks**: Built hardware acceleration tests for browser-based crypto.
+- [x] **Instance Event Relay**: Implemented real-time domain event replication via ActivityPub.
 - [x] **Native NFC Bridge**: Fully integrated hardware access for mobile physical interactions.
 - [x] **On-Chain Governance Mirroring**: Anchored community proposal roots to Solana.
 - [x] **Council Appeal System**: Built the "Community Court" and appeals dashboard.

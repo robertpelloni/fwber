@@ -56,6 +56,9 @@ class ActivityPubInboxController extends Controller
 
             case 'Create':
                 return $this->handleCreate($user, $activity);
+
+            case 'Announce':
+                return $this->handleAnnounce($user, $activity);
         }
 
         return response()->json(['status' => 'received'], 202);
@@ -110,6 +113,46 @@ class ActivityPubInboxController extends Controller
         );
 
         return response()->json(['status' => 'post_stored'], 202);
+    }
+
+    /**
+     * Process an incoming Announce activity (Boost/Group Broadcast).
+     */
+    protected function handleAnnounce(User $user, array $activity)
+    {
+        $object = $activity['object'] ?? null;
+        
+        // If the object is the full Note (embedded)
+        if (is_array($object) && ($object['type'] ?? '') === 'Note') {
+            return $this->processAnnouncedNote($user, $activity, $object);
+        }
+
+        // If it's just a URI, we'd ideally fetch it, but for now we skip
+        return response()->json(['status' => 'announce_ignored_non_embedded'], 202);
+    }
+
+    protected function processAnnouncedNote(User $user, array $activity, array $note)
+    {
+        $groupActorUri = $activity['actor'];
+        $originalActorUri = $note['attributedTo'] ?? $groupActorUri;
+
+        \App\Models\FederatedPost::updateOrCreate(
+            ['guid' => $note['id']],
+            [
+                'actor_uri' => $originalActorUri,
+                'actor_username' => $note['preferredUsername'] ?? 'remote-user',
+                'actor_domain' => parse_url($originalActorUri, PHP_URL_HOST),
+                'content' => $note['content'] ?? '',
+                'url' => $note['url'] ?? null,
+                'published_at' => isset($note['published']) ? \Carbon\Carbon::parse($note['published']) : now(),
+                'metadata' => json_encode([
+                    'announced_by' => $groupActorUri,
+                    'original_activity' => $note
+                ]),
+            ]
+        );
+
+        return response()->json(['status' => 'announced_post_stored'], 202);
     }
 
     /**

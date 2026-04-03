@@ -746,3 +746,10 @@ All notable changes to this project will be documented in this file.
 - **Simulated Kafka Partitioning**: Enhanced the `KafkaEventBus` with a local simulation mode. Domain events are now automatically partitioned by `aggregate_uuid` and stored in separate high-performance logs, mirroring Kafka's distributed scaling logic.
 ### Changed
 - **NFC Physical Interaction Hub**: Integrated the `DigitalReceipt` component into the `NFCProfileExchange`, providing immediate feedback for both matches and marketplace redemptions.
+
+## [1.1.6] - 2026-04-02
+### Added
+- **WASM Performance Benchmarks**: Built a hardware acceleration test suite in the Security settings. Users can now benchmark the Rust-compiled WASM encryption engine against the browser's native JavaScript crypto to verify E2E performance gains.
+- **Instance-to-Instance Event Relay**: Implemented the `FederatedRelayBus` for real-time domain event replication. Instances can now multi-cast important events (like trust score updates) to trusted peering partners.
+- **Composite Event Bus**: Refactored the backend to support simultaneous local and federated event publishing via a pluggable decorator pattern.
+- **Automated Reconciler Scheduling**: Finalized the 1-minute cron for governance proposals and 5-minute cron for federated social sync.

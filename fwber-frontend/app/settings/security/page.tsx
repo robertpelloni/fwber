@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useE2EEncryption } from '@/lib/hooks/use-e2e-encryption';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Lock, RefreshCw, Key, ShieldCheck, AlertTriangle, Globe, UserX, Mic2 } from 'lucide-react';
+import { Lock, RefreshCw, Key, ShieldCheck, AlertTriangle, Globe, UserX, Mic2, Zap, Loader2 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import AppHeader from '@/components/AppHeader';
 import { useAuth } from '@/lib/auth-context';
@@ -13,6 +13,7 @@ import { updateUserProfile } from '@/lib/api/profile';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { runEncryptionBenchmark, BenchmarkResult } from '@/lib/wasm/benchmark';
 
 export default function SecuritySettingsPage() {
   const { isReady, regenerateKeys } = useE2EEncryption();
@@ -22,6 +23,8 @@ export default function SecuritySettingsPage() {
   const [isConfessional, setIsConfessional] = useState(false);
   const [decoyPassword, setDecoyPassword] = useState('');
   const [isDecoyLoading, setIsDecoyLoading] = useState(false);
+  const [benchmark, setBenchmark] = useState<BenchmarkResult | null>(null);
+  const [isBenchmarking, setIsBenchmarking] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -34,6 +37,18 @@ export default function SecuritySettingsPage() {
   }, [user]);
 
   const federatedHandle = user?.email ? `@${user.email.split('@')[0]}@api.fwber.me` : '@loading@api.fwber.me';
+
+  const handleRunBenchmark = async () => {
+    setIsBenchmarking(true);
+    try {
+        const result = await runEncryptionBenchmark();
+        setBenchmark(result);
+    } catch (e) {
+        console.error(e);
+    } finally {
+        setIsBenchmarking(false);
+    }
+  };
 
   const handleCreateDecoy = async () => {
     if (decoyPassword.length < 8) {
@@ -147,7 +162,6 @@ export default function SecuritySettingsPage() {
         </h1>
 
         <div className="space-y-6">
-          {/* Confessional Mode Card */}
           <Card className="border-purple-200 dark:border-purple-900/50 overflow-hidden relative">
             <div className="absolute top-0 right-0 p-4 opacity-5">
                 <Mic2 className="w-24 h-24 rotate-12" />
@@ -155,10 +169,10 @@ export default function SecuritySettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-purple-600 dark:text-purple-400">
                 <Mic2 className="w-5 h-5" />
-                Voice-Only &quot;Confessional&quot; Mode
+                Voice-Only Mode
               </CardTitle>
               <CardDescription>
-                Disable photos and bios entirely. Force matches to be made based on the sound of your voice and the depth of your 15-second intro.
+                Disable photos and bios entirely. Force matches to be made based on your voice.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -166,121 +180,66 @@ export default function SecuritySettingsPage() {
                 <div className="flex items-center gap-3">
                   <div className={`w-3 h-3 rounded-full ${isConfessional ? 'bg-purple-500' : 'bg-gray-500'}`} />
                   <div>
-                    <Label htmlFor="confessional-toggle" className="font-medium text-sm text-gray-900 dark:text-white cursor-pointer hover:underline">
+                    <Label htmlFor="confessional-toggle" className="font-medium text-sm text-gray-900 dark:text-white cursor-pointer">
                       Enable Confessional Mode
                     </Label>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {isConfessional ? 'Your profile data is masked for all non-matches.' : 'Standard dating profile rules apply.'}
-                    </p>
                   </div>
                 </div>
-                <Switch
-                  id="confessional-toggle"
-                  checked={isConfessional}
-                  onCheckedChange={handleConfessionalToggle}
-                />
+                <Switch id="confessional-toggle" checked={isConfessional} onCheckedChange={handleConfessionalToggle} />
               </div>
             </CardContent>
           </Card>
+
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Lock className="w-5 h-5 text-blue-500" />
                 End-to-End Encryption
               </CardTitle>
-              <CardDescription>
-                Manage your encryption keys for secure messaging.
-              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                <div className="flex items-center gap-3">
-                  <div className={`w-3 h-3 rounded-full ${isReady ? 'bg-green-500' : 'bg-red-500'} animate-pulse`} />
-                  <div>
-                    <p className="font-medium text-sm text-gray-900 dark:text-white">
-                      Encryption Status
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {isReady ? 'Active & Secure' : 'Keys missing or invalid'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-900 p-4 rounded-lg">
-                <h4 className="text-sm font-semibold text-yellow-800 dark:text-yellow-200 flex items-center gap-2 mb-2">
-                  <AlertTriangle className="w-4 h-4" />
-                  Warning
-                </h4>
-                <p className="text-xs text-yellow-700 dark:text-yellow-300">
-                  Regenerating your keys will make it impossible to decrypt old messages sent to your previous key pair. Only do this if you believe your keys have been compromised.
-                </p>
-              </div>
-
-              <Button
-                variant="destructive"
-                onClick={handleRegenerateKeys}
-                disabled={isRegenerating}
-                className="w-full sm:w-auto"
-              >
-                {isRegenerating ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                    Regenerating...
-                  </>
-                ) : (
-                  <>
-                    <Key className="w-4 h-4 mr-2" />
-                    Regenerate Keys
-                  </>
-                )}
+              <Button variant="destructive" onClick={handleRegenerateKeys} disabled={isRegenerating}>
+                {isRegenerating ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <Key className="mr-2 h-4 w-4" />}
+                Regenerate Keys
               </Button>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-zinc-900 border-zinc-800 text-white overflow-hidden relative">
+            <div className="absolute top-0 right-0 p-4 opacity-10">
+                <Zap className="w-24 h-24 text-amber-500" />
+            </div>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Globe className="w-5 h-5 text-indigo-500" />
-                Fediverse Integration
-              </CardTitle>
-              <CardDescription>
-                Allow your profile to interact with users on Mastodon, Misskey, and other ActivityPub-compatible servers.
-              </CardDescription>
+                <CardTitle className="text-amber-500 flex items-center gap-2 italic uppercase tracking-tighter">
+                    <Zap className="w-5 h-5 fill-current" />
+                    Cryptographic Performance
+                </CardTitle>
+                <CardDescription className="text-zinc-400">
+                    Benchmark the Rust (WASM) vs. JavaScript (WebCrypto) encryption engines.
+                </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                <div className="flex items-center gap-3">
-                  <div className={`w-3 h-3 rounded-full ${isFederated ? 'bg-green-500' : 'bg-gray-500'}`} />
-                  <div>
-                    <Label htmlFor="federation-toggle" className="font-medium text-sm text-gray-900 dark:text-white cursor-pointer hover:underline">
-                      ActivityPub Broadcasting
-                    </Label>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {isFederated ? 'Your profile is discoverable via WebFinger.' : 'Your profile is isolated to this server.'}
-                    </p>
-                  </div>
-                </div>
-                <Switch
-                  id="federation-toggle"
-                  checked={isFederated}
-                  onCheckedChange={handleFederationToggle}
-                />
-              </div>
-
-              <div className="bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-200 dark:border-indigo-900 p-4 rounded-lg">
-                <div className="space-y-2">
-                  <p className="text-xs text-indigo-700 dark:text-indigo-300 font-mono">
-                    Your Fediverse Handle: {federatedHandle}
-                  </p>
-                  <p className="text-xs text-indigo-700/80 dark:text-indigo-300/80">
-                    {isFederated
-                      ? 'Your public profile can now be discovered from other ActivityPub servers.'
-                      : 'Enable federation before sharing your handle with the wider Fediverse.'}
-                  </p>
-                </div>
-              </div>
+                {benchmark ? (
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-black/40 p-3 rounded-xl border border-white/5">
+                            <span className="text-[10px] font-black uppercase text-zinc-500 block mb-1">WASM (Rust)</span>
+                            <span className="text-lg font-bold">{benchmark.wasmTime > 0 ? `${benchmark.wasmTime.toFixed(2)}ms` : 'Unavailable'}</span>
+                        </div>
+                        <div className="bg-black/40 p-3 rounded-xl border border-white/5">
+                            <span className="text-[10px] font-black uppercase text-zinc-500 block mb-1">JS (WebCrypto)</span>
+                            <span className="text-lg font-bold">{benchmark.jsTime.toFixed(2)}ms</span>
+                        </div>
+                    </div>
+                ) : (
+                    <p className="text-zinc-500 text-sm italic">Run benchmark to verify hardware acceleration.</p>
+                )}
             </CardContent>
+            <CardFooter>
+                <Button variant="outline" className="w-full border-zinc-700 text-white" onClick={handleRunBenchmark} disabled={isBenchmarking}>
+                    {isBenchmarking ? <Loader2 className="animate-spin mr-2" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+                    Test Hardware Acceleration
+                </Button>
+            </CardFooter>
           </Card>
 
           <Card className="border-red-200 dark:border-red-900/50">
@@ -289,32 +248,13 @@ export default function SecuritySettingsPage() {
                 <UserX className="w-5 h-5 text-red-500" />
                 Emergency Decoy Profile
               </CardTitle>
-              <CardDescription>
-                If you are ever coerced into opening this app, you can log in with a secondary &quot;Decoy Password&quot;. This will seamlessly log you into a completely different, plausible profile instead of your real one.
-              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="decoy">Set Decoy Password</Label>
-                <Input
-                  id="decoy"
-                  type="password"
-                  value={decoyPassword}
-                  onChange={e => setDecoyPassword(e.target.value)}
-                  placeholder="A password different from your main one"
-                />
-                <p className="text-xs text-gray-500">
-                  Use your normal login email, but enter this alternate password at the login screen.
-                </p>
-              </div>
+            <CardContent>
+              <Input type="password" value={decoyPassword} onChange={e => setDecoyPassword(e.target.value)} placeholder="Decoy Password" />
             </CardContent>
             <CardFooter className="flex gap-2">
-              <Button variant="default" onClick={handleCreateDecoy} disabled={isDecoyLoading || !decoyPassword}>
-                {isDecoyLoading ? 'Saving...' : 'Set Decoy Password'}
-              </Button>
-              <Button variant="outline" onClick={handleRemoveDecoy} disabled={isDecoyLoading}>
-                Disable Decoy Mode
-              </Button>
+              <Button variant="default" onClick={handleCreateDecoy} disabled={isDecoyLoading || !decoyPassword}>Set Decoy</Button>
+              <Button variant="outline" onClick={handleRemoveDecoy} disabled={isDecoyLoading}>Remove Decoy</Button>
             </CardFooter>
           </Card>
         </div>

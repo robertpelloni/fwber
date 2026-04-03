@@ -1,33 +1,35 @@
-# Project Status — fwber v1.1.5 (NFC Receipts & Kafka Sim)
+# Project Status — fwber v1.1.6 (WASM Benchmarks & Event Relay)
 
 **Date:** 2026-04-02  
-**Version:** 1.1.5 "NFC Receipts & Kafka Sim"
+**Version:** 1.1.6 "WASM Benchmarks & Event Relay"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## NFC Digital Transaction History
-- **Verified Receipts:** Built the `DigitalReceipt.tsx` component. Users can now view, download, and share proof-of-purchase for any token-based venue transaction.
-- **Unified Handshake UX:** The NFC hub now provides a seamless transition from "Tapping" to "Payment Confirmed" to "Receipt Issued" in a single animated flow.
+## Hardware Acceleration Verification
+- **WASM Benchmarking:** Added a performance test suite to the Security Dashboard. Users can verify that large E2E payloads are processed significantly faster using the Rust/WASM engine compared to pure JS.
+- **Optimized Offloading:** Finalized the 5,000 character threshold for automatic WASM crypto offloading in the browser.
 
-## Simulated Kafka Event Infrastructure
-- **Aggregate Partitioning:** Implemented a partition-aware event bus. The system now automatically shuffles domain events into 10 distinct logical partitions based on the `aggregate_uuid` hash, preparing the platform for a real Apache Kafka cluster.
-- **Performance Logs:** Added high-speed append-only logs for each partition, ensuring sub-millisecond event publishing in the development environment.
+## Instance-to-Instance Mesh
+- **Event Relay:** Launched the `FederatedRelayBus`. Local domain events are now automatically wrapped in ActivityPub `Sync` activities and broadcasted to trusted `fwber` nodes.
+- **Mesh Parity:** This ensures that as users move between instances, their trust scores, reputation, and match history remain synchronized across the global mesh.
+
+## Native NFC & Mobile Bridge
+- **Hardware Verified:** Successfully integrated the `mobile/` native NFC manager with the web-based `NFCProfileExchange`.
+- **Visual Feedback:** Added a "Radar/Sonar" animation during the ZK-Location handshake.
+
+## On-Chain Governance Mirroring
+- **Solana Roots:** Finalized Merkle roots from community proposals are now anchored to the Solana blockchain.
 
 ## Community Court & Appeals
-- **Judicial Layer:** Users restricted by the Council now have a formal path to reinstatement. The `/council/appeals` portal allows banned users to state their case.
-- **Direct Democracy:** Appeals are instantly converted into community proposals, ensuring that the same FWB-weighted voting power that banned a user also decides their fate.
-
-## On-Chain Governance Proofs
-- **Solana Anchoring:** Finalized Merkle roots from community proposals are now anchored to the Solana blockchain via transaction memos.
-- **Immutable History:** This provides a third-party verifiable trail of all governance outcomes.
+- **Judicial Layer:** Users restricted by the Council now have a formal path to reinstatement.
 
 ## ✅ Release Focus
-- [x] Build NFC Digital Receipt system.
-- [x] Implement Simulated Kafka Partitioning.
+- [x] Build WASM Performance Benchmark UI.
+- [x] Implement Instance-to-Instance Event Relay.
+- [x] Schedule background governance reconcilers.
 - [x] Integrate Native NFC Mobile bridge.
 - [x] Implement On-Chain Governance mirroring (Solana).
-- [x] Schedule background governance reconcilers.
 - [x] Build Council Appeal system and UI.
 - [x] Implement automated Unban proposals.
 - [x] Implement Community Moderation DAO actions.

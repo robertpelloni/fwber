@@ -155,6 +155,7 @@ class ActivityPubSearchController extends Controller
     {
         $user = auth()->user();
         $actorId = $request->input('actor_id');
+        $actorType = $request->input('actor_type', 'Person');
 
         if (! $user) {
             return response()->json(['error' => 'Authentication required'], 401);
@@ -181,6 +182,7 @@ class ActivityPubSearchController extends Controller
                 [
                     'username' => $username,
                     'domain' => $domain,
+                    'actor_type' => $actorType,
                     'status' => 'pending',
                 ]
             );
