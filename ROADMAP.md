@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.0.89
+> **Current Version:** 1.0.90
 > **Last Updated:** 2026-04-02
 
 ---
@@ -59,6 +59,12 @@
 - Build an **AR Inventory Finder**.
 - Implement **Federated Secure DMs**.
 
+### Phase 8: Decentralized Governance (ACTIVE)
+- Build a **Governance & Voting** portal (Council) (COMPLETED).
+- Implement **Token-Weighted Voting Logic** (COMPLETED).
+- Implement **Cross-Instance E2E Encryption** using remote actor public keys.
+- Develop a **Global Token Exchange** to allow swapping FWB Tokens for other assets.
+
 ---
 
 ## 🧩 Feature Matrix Status
@@ -73,7 +79,7 @@
 | **Social / Viral** | Mature | 100% | 100% | Rate My Cat, Bounties, Federated Social. |
 | **Economy** | Mature | 100% | 100% | FWB Tokens, Stripe, Marketplace, NFC Pay. |
 | **Federation** | Mature | 100% | 100% | Search, Reputation, Groups, Secure DMs. |
-| **B2B / Merchant** | Mature | 100% | 100% | Registration, Inventory, Analytics, POS UI. |
+| **Governance** | Mature | 100% | 100% | Council Portal, Weighted Voting, Proposals. |
 | **DevOps / Infra** | Mature | 100% | 100% | Helm Chart, Edge Caching, Event Streaming. |
 | **Mobile App** | Mature | 100% | 100% | Expo Router, WebView Hybrid, NFC Support. |
 
@@ -81,5 +87,5 @@
 
 ## 🎯 Next Immediate Milestones
 1. Implement **Cross-Instance E2E Encryption** using remote actor public keys.
-2. Build a **Governance & Voting** portal for decentralized community moderation.
-3. Develop a **Global Token Exchange** to allow swapping FWB Tokens for other assets.
+2. Develop a **Global Token Exchange** to allow swapping FWB Tokens for other assets.
+3. Build **Automated Proposal Execution** jobs for community policy enforcement.

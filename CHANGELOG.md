@@ -637,3 +637,10 @@ All notable changes to this project will be documented in this file.
 - **Inbound DM Handling**: Updated the Inbox controller to process private `Note` activities with restricted `to` addressing.
 - **Outbound DM Routing**: Enhanced the Message Controller to automatically detect federated actor URIs and dispatch signed private activities via the delivery service.
 - **Unified Chat History**: Federated DMs are now seamlessly merged into the main messaging table, enabling cross-instance private conversations.
+
+## [1.0.90] - 2026-04-02
+### Added
+- **Governance Council Portal**: Launched the first phase of Decentralized Governance for the fwber platform.
+- **Token-Weighted Voting**: Implemented a core voting engine where a user's voting power is proportional to their FWB Token balance. 
+- **Council UI**: Built a high-fidelity dashboard (`/council`) for browsing and participating in active community proposals.
+- **Proposals Engine**: Created backend infrastructure to manage community-driven policy, moderation, and technical upgrades.

@@ -450,6 +450,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('marketplace/{merchantId}', [\App\Http\Controllers\MerchantInventoryController::class, 'index']);
     Route::post('marketplace/purchase/{itemId}', [\App\Http\Controllers\MerchantInventoryController::class, 'purchase']);
 
+    // Governance (Council)
+    Route::get('governance/proposals', [\App\Http\Controllers\GovernanceController::class, 'index']);
+    Route::post('governance/proposals', [\App\Http\Controllers\GovernanceController::class, 'store']);
+    Route::post('governance/proposals/{id}/vote', [\App\Http\Controllers\GovernanceController::class, 'vote']);
+
     // Merchant API (Authenticated)
     Route::post('merchant/keys', [\App\Http\Controllers\Api\MerchantController::class, 'generateKeys']);
     Route::post('merchant/payment/{id}/confirm', [\App\Http\Controllers\Api\MerchantController::class, 'confirm']);

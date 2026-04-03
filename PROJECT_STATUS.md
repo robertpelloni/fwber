@@ -1,10 +1,15 @@
-# Project Status — fwber v1.0.89 (Federated Secure DMs)
+# Project Status — fwber v1.0.90 (Governance Council)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.89 "Federated Secure DMs"
+**Version:** 1.0.90 "Governance Council"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
+
+## Decentralized Governance (The Council)
+- **Weighted Participation:** Users can now influence the project's direction. The `/council` portal calculates voting power based on liquid FWB Token balances.
+- **Proposal Lifecycle:** Implemented the full backend for creating and auditing community proposals across categories like Moderation, Policy, and Tech.
+- **Live Results:** The frontend visualizes aggregate voting weights using real-time progress bars and participation metrics.
 
 ## Federated Direct Messaging
 - **Cross-Instance DMs:** Users can now send private messages to any valid ActivityPub actor URI.
@@ -104,9 +109,9 @@
 - **Billing validation from the previous slice remains the current premium reference path**: `php artisan test tests\Feature\PremiumControllerTest.php tests\Feature\StripeWebhookTest.php`, plus frontend `npm run lint`, `npm run type-check`, and `cmd /c "npm run build"`, already passed for `v1.0.71`.
 
 ## ✅ Release Focus
+- [x] Build Governance & Voting portal.
+- [x] Implement token-weighted voting logic.
 - [x] Implement Federated Secure DMs.
-- [x] Build Federated Feed Aggregator.
-- [x] Build AR Inventory Finder UI.
 - [x] Implement ZK-Age Verification.
 - [x] Build NFC "Tap-to-Pay" protocol for merchants.
 - [x] Enable Mobile NFC hardware permissions.
