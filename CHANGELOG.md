@@ -697,3 +697,10 @@ All notable changes to this project will be documented in this file.
 - **iOS NFC Support**: Enabled native NFC entitlements and usage descriptions in the `mobile/` app for cross-platform physical verification parity.
 ### Changed
 - **Council Audit UX**: Updated the `/council` portal to display on-chain transaction hashes with direct links to the Solana Explorer.
+
+## [1.0.99] - 2026-04-02
+### Added
+- **Community Moderation DAO**: Extended the Governance system to support automated community-driven bans. The Council can now vote to block local users or federated actors.
+- **Global Ban Infrastructure**: Implemented the `global_bans` registry and `CheckGlobalBan` middleware to enforce community decisions across all API endpoints.
+- **Federated Filter**: Updated the ActivityPub Inbox to automatically reject activities from actors banned via community vote.
+- **On-Chain Audit Polish**: Enhanced the `VoteVerifier` to include a verification state for Solana-anchored roots, providing end-to-end transparency for governance outcomes.

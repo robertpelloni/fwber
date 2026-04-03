@@ -30,6 +30,14 @@ class PolicyExecutor
                     $this->updateSiteSetting($payload['params']);
                     break;
 
+                case 'ban_actor':
+                    $this->banActor($proposal, $payload['params']);
+                    break;
+
+                case 'ban_user':
+                    $this->banUser($proposal, $payload['params']);
+                    break;
+
                 default:
                     Log::warning("Governance Executor: Unknown action '{$action}' for proposal {$proposal->id}");
                     return false;
@@ -42,6 +50,46 @@ class PolicyExecutor
             Log::error("Governance Executor: Execution failed for proposal {$proposal->id}: " . $e->getMessage());
             return false;
         }
+    }
+
+    protected function banActor(GovernanceProposal $proposal, array $params): void
+    {
+        $actorUri = $params['actor_uri'];
+        $reason = $params['reason'] ?? "Community Vote: {$proposal->title}";
+
+        \App\Models\GlobalBan::updateOrCreate(
+            ['bannable_identifier' => $actorUri],
+            [
+                'type' => 'actor',
+                'reason' => $reason,
+                'proposal_id' => $proposal->id,
+            ]
+        );
+
+        Log::info("Governance Executor: Federated actor '{$actorUri}' banned via community vote.");
+    }
+
+    protected function banUser(GovernanceProposal $proposal, array $params): void
+    {
+        $userId = $params['user_id'];
+        $reason = $params['reason'] ?? "Community Vote: {$proposal->title}";
+
+        \App\Models\GlobalBan::updateOrCreate(
+            ['bannable_identifier' => (string) $userId],
+            [
+                'type' => 'user',
+                'reason' => $reason,
+                'proposal_id' => $proposal->id,
+            ]
+        );
+
+        // Also mark user as inactive in local DB
+        $user = \App\Models\User::find($userId);
+        if ($user) {
+            $user->update(['is_active' => false]);
+        }
+
+        Log::info("Governance Executor: Local user '{$userId}' banned via community vote.");
     }
 
     protected function updateSiteSetting(array $params): void

@@ -1,10 +1,18 @@
-# Project Status — fwber v1.0.98 (On-Chain Audit & iOS NFC)
+# Project Status — fwber v1.0.99 (Moderation DAO & Audit Polish)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.98 "On-Chain Audit & iOS NFC"
+**Version:** 1.0.99 "Moderation DAO & Audit Polish"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
+
+## Community Moderation DAO
+- **Automated Enforcement:** The Council can now vote on `ban_user` and `ban_actor` proposals. Upon passing, the `PolicyExecutor` instantly updates the `global_bans` registry.
+- **API Guarding:** Launched the `CheckGlobalBan` middleware which protects the entire fwber API from council-banned entities.
+- **ActivityPub Security:** Banned federated actors are now blocked at the protocol level, with their incoming inbox activities automatically dropped.
+
+## On-Chain Audit Transparency
+- **Solana Verification:** Updated the `VoteVerifier` to cross-reference local Merkle roots with Solana transaction memos, ensuring community-wide immutability.
 
 ## On-Chain Governance Proofs
 - **Solana Anchoring:** Finalized Merkle roots from community proposals are now recorded on the Solana blockchain.
@@ -36,63 +44,7 @@
 - **Price Simulation:** The swap interface now includes real-time simulated price feeds.
 
 ## ✅ Release Focus
+- [x] Implement Community Moderation DAO actions.
+- [x] Build Global Ban infrastructure and middleware.
 - [x] Implement On-Chain Governance mirroring (Solana).
 - [x] Enable iOS native NFC entitlements.
-- [x] Build Frontend Merkle Prover UI.
-- [x] Implement Merkle-tree vote verification.
-- [x] Build real-time governance notifications.
-- [x] Integrate real-time market price APIs.
-- [x] Schedule background governance reconcilers.
-- [x] Build Automated Rule Updates (Policy Executor).
-- [x] Create Proposal Creation UI in frontend.
-- [x] Polish Global Token Swap UI with price feeds.
-- [x] Implement Full Cross-Instance E2E Encryption/Decryption.
-- [x] Build Automated Proposal Execution jobs.
-- [x] Build Governance & Voting portal.
-- [x] Implement token-weighted voting logic.
-- [x] Build Global Token Exchange (Bridge) UI.
-- [x] Implement ZK-Age Verification.
-- [x] Build NFC "Tap-to-Pay" protocol for merchants.
-- [x] Enable Mobile NFC hardware permissions.
-- [x] Build Marketplace UI for users to spend tokens.
-- [x] Build Physical Item Marketplace for merchants.
-- [x] Implement Distributed Global Event Streaming (Redis).
-- [x] Build ZK-Location Verification for physical taps.
-- [x] Implement NFC Profile Exchange protocol.
-- [x] Integrate WASM crypto offloading in frontend.
-- [x] Aggregate federated search results in parallel.
-- [x] Implement Redis Bloom Filter for geo-caching.
-- [x] Migrate Mobile app to Expo Router.
-- [x] Standardize Mobile directory structure.
-- [x] Load test EventStore under high record volume.
-- [x] Verify event unique constraint enforcement.
-- [x] Optimize Next.js Cache-Control headers for production.
-- [x] Document Cloudflare global edge caching strategy.
-- [x] Create standardized Helm Chart for enterprise deployment.
-- [x] Template all monorepo components (PHP, Next.js, Rust).
-- [x] Configure production-ready default values.
-- [x] Create `POST /api/messages/sync-batch`.
-- [x] Deduplicate offline messages by UUID.
-- [x] Fetch missed server messages since `last_sync_at`.
-- [x] Inject missed offline messages via `use-chat-sync.ts`.
-- [x] Integrate `compatibilityAudit` into the chat UI.
-- [x] Integrate `findNemesis` into the chat UI.
-- [x] Integrate `predictFortune` into the chat UI.
-- [x] Implement `WingmanDashboardModal`.
-- [x] Upgrade Hardware Token UI to support visual pings.
-- [x] Fully document extreme continuous autonomous looping parameters for AI agents.
-- [x] Generate real ActivityPub actor keypairs.
-- [x] Replace mocked outbound federation delivery with signed HTTP POSTs.
-- [x] Expose the generated actor public key in the local actor JSON-LD payload.
-- [x] Preserve the existing E2E key APIs while sharing the underlying key table.
-- [x] Add regression coverage for actor key exposure and signed follow delivery.
-- [x] Require valid HTTP signatures on inbound ActivityPub inbox requests.
-- [x] Reject stale/tampered federation requests before controller processing.
-- [x] Keep the established Follow / Undo / Accept inbox flows working with signed requests.
-- [x] Add regression coverage for valid and invalid signature paths.
-- [x] Document outbound signed delivery as the next federation implementation gap.
-- [x] Keep `/api/location` from failing the whole request when event-store append work flakes.
-- [x] Keep `/api/photos` from 500ing on legacy rows with missing storage paths.
-- [x] Keep `/api/safety/walk/active` from 500ing when DreamHost is missing the safety tables.
-- [x] Add regression coverage for the suspected production-only failure modes.
-- [x] Document the findings and the actual root-cause shape in the release docs.

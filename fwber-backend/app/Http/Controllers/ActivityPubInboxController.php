@@ -27,6 +27,14 @@ class ActivityPubInboxController extends Controller
 
         $activity = $request->json()->all();
         $type = $activity['type'] ?? 'Unknown';
+        $actorUri = $activity['actor'] ?? null;
+
+        // --- GLOBAL BAN CHECK ---
+        if ($actorUri && \App\Models\GlobalBan::where('bannable_identifier', $actorUri)->exists()) {
+            Log::warning("ActivityPub: Dropping activity from banned actor: {$actorUri}");
+            return response()->json(['error' => 'Banned'], 403);
+        }
+        // ------------------------
 
         Log::info("ActivityPub: Received {$type} for user {$user->id}", $activity);
 
