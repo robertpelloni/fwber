@@ -562,7 +562,7 @@ dependencies = [
 
 [[package]]
 name = "fwber-geo"
-version = "0.1.0"
+version = "0.99.1"
 dependencies = [
  "actix-web",
  "dashmap",

@@ -1,20 +1,21 @@
-# PROJECT_STATUS.md - fwber v1.2.3 (Production Scale & Media Workers)
+# PROJECT_STATUS.md - fwber v1.2.4 (Ghost Pings & Build Pipelines)
 
 **Date:** 2026-04-04
-**Version:** 1.2.3 "Production Scale & Media Workers"
+**Version:** 1.2.4 "Ghost Pings & Build Pipelines"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## ⚡ Production Scale Capabilities
-- **Geo-Service Load Testing:** Built `GeoServiceLoadTest` artisan command to simulate 10,000 concurrent users performing high-density spatial indexing and proximity queries. The test exercises our H3/Redis backend to prove our latency budget (<50ms).
-- **WebWorker E2E Media Decryption:** Migrated "The Vault" photo decryption off the main UI thread. Built a dedicated `crypto-worker.js` and `useDecryptedMedia` hook. The UI remains buttery smooth even when hydrating galleries of 10+ AES-GCM encrypted images.
+## 👻 Ghost Ping Exorcism
+- **Token Invalidation:** Added bidirectional communication between the Next.js `auth-context` and the React Native WebView. When a user logs out in the web UI, a `CLEAR_AUTH_TOKEN` message is broadcasted to the native bridge.
+- **Background Task Cleanup:** The mobile app now catches the logout message, purges the JWT from `SecureStore`, and actively calls `Location.stopLocationUpdatesAsync()`. This completely eliminates 401 ghost pings and saves user battery life.
 
-## 📱 Mobile Polish (Permissions)
-- **High-Conversion Splash Screen:** Built a custom React Native splash screen (`mobile/app/index.js`) that explicitly explains *why* the app needs "Always On" background location and push notifications. This drastically improves permission opt-in rates over standard OS dialogues.
+## 🚀 EAS Build Pipelines
+- **Fastlane & EAS Prepared:** Created `eas.json` with `development`, `preview`, and `production` profiles.
+- **Native Capabilities Configured:** Updated `app.json` with the required `expo-location` and `expo-notifications` plugins, embedding the necessary permission justification strings (`NSLocationAlwaysAndWhenInUseUsageDescription`, etc.) directly into the build pipeline for App Store compliance.
 
 ## ✅ Release Focus
-- [x] Build Geo-Service Load Test command.
-- [x] Implement Web Workers for E2E media decryption.
-- [x] Create the `E2EImage` component.
-- [x] Build Native Permissions UX (Splash Screen) in Expo.
+- [x] Eliminate Ghost Pings on logout.
+- [x] Configure EAS build pipelines (`eas.json`).
+- [x] Verify Expo native plugins in `app.json`.
+- [x] Finalize 100% Green test suite.

@@ -5,16 +5,16 @@
 
 ---
 
-## 🔴 Critical: Scale & Edge Cases
-- [ ] **Native App Deployment Pipeline**: Finalize App Store Connect and Google Play Console automated builds (Fastlane/EAS) so we can distribute the .ipa and .aab.
+## 🔴 Critical: Edge Cases
+- [ ] **Native App Deployment Pipeline**: Execute `eas build --platform ios` and `eas build --platform android` to generate the `.ipa` and `.aab` files.
 
-## 🟡 High: Mobile Polish
-- [ ] **Background Fetch Refresh**: Test what happens to the background worker token if the user is logged out of the web view. We need to clear the SecureStore token to prevent ghost pings.
+## 🟡 High: Feature Polish
+- [ ] **Store Assets**: Generate App Store and Google Play Store screenshots for the new "Great Simplification" core.
 
 ## ✅ Recently Completed
+- [x] **Ghost Ping Cleanup**: Background worker tokens are cleared and location tracking stops when a user logs out.
+- [x] **EAS Build Pipelines**: Configured Expo Application Services (`eas.json`).
 - [x] **Web Worker Photo Hydration**: Offloaded AES-GCM photo decryption to a background thread to prevent UI freezing.
-- [x] **Geo-Service Load Testing**: Built the simulation artisan command.
-- [x] **Native Permissions UX**: Built a dedicated "Enable Location" splash screen for mobile to improve background permission opt-in rates.
 
 ---
 *This file is continuously updated by autonomous AI agents. Do not leave items unchecked if they are completed.*

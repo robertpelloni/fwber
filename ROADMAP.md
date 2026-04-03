@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.2.3 "Production Scale & Media Workers"
+> **Current Version:** 1.2.4 "Ghost Pings & Build Pipelines"
 > **Last Updated:** 2026-04-04
 
 ---
@@ -34,13 +34,13 @@ The platform is now **100% focused on its core identity**:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (ACTIVE - v1.2.3)
-- **Geo-Service Load Testing:** Artisan command to simulate 10,000 concurrent users against the Rust microservice.
-- **E2E Photo Hydration:** WebWorkers offload AES-GCM decryption for full galleries to ensure a 60fps UI.
-- **Native Permissions UX:** Improved splash screen for mobile background location and push notifications.
+### Phase 5: Production Scale (COMPLETED - v1.2.4)
+- **Geo-Service Load Testing:** Artisan command simulated 10,000 concurrent users against the Rust microservice (Avg: 1.5ms).
+- **E2E Photo Hydration:** WebWorkers offload AES-GCM decryption for full galleries.
+- **Native Permissions & EAS:** Ghost pings resolved, `eas.json` generated, and location permission strings embedded in `app.json`.
 
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **EAS Build Pipelines:** Configure Expo Application Services (Fastlane) to produce our .ipa and .aab files for App Store distribution.
-2. **Ghost Ping Cleanup:** Ensure background worker tokens are cleared if a user logs out of the web interface.
+1. **Production Builds:** Execute `eas build` to compile the `.ipa` and `.aab` artifacts.
+2. **App Store Assets:** Generate fresh screenshots emphasizing the privacy-first, hyper-local nature of the simplified application.

@@ -120,6 +120,13 @@ function clearStoredAuth(): void {
   setApiClientAuthToken(null)
   localStorage.removeItem('fwber_token')
   localStorage.removeItem('fwber_user')
+
+  // --- NATIVE BRIDGE: Clear token in mobile app to prevent ghost background pings ---
+  if ((window as any).ReactNativeWebView) {
+    (window as any).ReactNativeWebView.postMessage(JSON.stringify({
+      type: 'CLEAR_AUTH_TOKEN'
+    }));
+  }
 }
 
 function persistStoredAuth(user: User, token: string): void {

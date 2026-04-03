@@ -181,6 +181,18 @@ export default function Home() {
         }
       }
 
+      if (data.type === 'CLEAR_AUTH_TOKEN') {
+        // Purge token to prevent ghost background pings after logout
+        await SecureStore.deleteItemAsync('userToken');
+        
+        // Stop location tracking to save battery since they are logged out
+        const hasStarted = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
+        if (hasStarted) {
+            await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+            console.log('Background tracking stopped due to logout.');
+        }
+      }
+
       if (data.type === 'START_NFC_SCAN') {
         // Trigger native NFC prompt
         NfcManager.registerTagEvent();

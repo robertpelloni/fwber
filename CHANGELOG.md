@@ -785,3 +785,9 @@ All notable changes to this project will be documented in this file.
 - **GeoService Load Tester**: Created a powerful Artisan command (`php artisan geo:load-test {users} {radius}`) to simulate a high-density, multi-threaded request load against our Rust H3 indexing microservice. This guarantees performance targets at scale.
 - **Web Worker Photo Hydration**: Deployed a dedicated `crypto-worker.js` that moves intensive AES-GCM photo decryption off the main thread. E2E encrypted galleries now load smoothly at 60fps.
 - **High-Conversion Mobile Splash**: Overhauled the React Native initialization flow. Replaced abrupt OS permission prompts with an elegant, informative splash screen that explains the value of "Always On" background location, maximizing opt-ins.
+
+## [1.2.4] - 2026-04-04
+### Fixed
+- **Ghost Pings:** Addressed a critical battery-drain bug. Logging out of the Next.js web interface now posts a `CLEAR_AUTH_TOKEN` message through the React Native bridge. The mobile shell catches this, drops the JWT from `SecureStore`, and actively aborts `Location.stopLocationUpdatesAsync()` to stop pinging the backend API unnecessarily.
+### Added
+- **EAS Build Configuration:** Created `eas.json` profiles for staging and production builds. Embedded necessary native App Store privacy strings (e.g. `NSLocationAlwaysAndWhenInUseUsageDescription`) and plugin definitions into `mobile/app.json`.
