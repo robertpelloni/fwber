@@ -1,19 +1,19 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.0.79  
+> **Version:** 1.0.80  
 > **Last Updated:** 2026-04-02
 
 ---
 
-## 🔴 Critical: Bug Fixes & Stability
-- [x] **Load Test EventStore**: Conducted load testing on the `EventStore` table across 100,000 simulated records verifying sub-millisecond lookup times and strict unique constraint enforcement.
-- [x] **Mobile Expo Router Migration**: Migrated the `mobile/` directory from a single-file WebView wrapper to the modern Expo Router filesystem-based architecture.
+## 🔴 Critical: Performance & Security
+- [ ] **WASM Encryption Integration**: Compile the new `fwber-wasm` package and wire it into the frontend E2E hook to offload encryption to native Rust speed.
+- [ ] **Redis Bloom Filter Cache**: Implement a Bloom filter layer in `GeoScreenerService.php` to reduce Rust microservice hits for cold geographic areas.
 
-## 🟡 High: Performance & Edge
-- [x] **Multi-region Edge Caching**: Optimized Vercel `next.config.js` with immutable headers and documented Cloudflare edge caching strategies in `docs/ai/deployment/cloudflare-edge-caching.md`.
-- [ ] **WASM Encryption Primitives**: Port client-side encryption logic to Rust-compiled WASM for higher performance.
+## 🟡 High: Feature Expansion
+- [ ] **ActivityPub Search Aggregator**: Build a background job to aggregate Actor results from multiple configured instances during global search.
 
 ## ✅ Recently Completed
+- [x] **WASM Encryption Initiation**: Implemented AES-GCM-256 encryption primitives in Rust for browser-based E2E performance.
 - [x] **Mobile Expo Router Migration**: Refactored the React Native app to use file-based routing and a cleaner component structure.
 - [x] **EventStore Load Testing**: Verified performance and unique constraint integrity under high record volume via custom Artisan command.
 - [x] **Multi-region Edge Caching**: Configured immutable static headers and documented Cloudflare Page Rule strategies.
