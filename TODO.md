@@ -1,16 +1,16 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.2.0  
+> **Version:** 1.2.1  
 > **Last Updated:** 2026-04-04
 
 ---
 
 ## 🔴 Critical: Core Experience
-- [ ] **Battery-Efficient Background Location**: Implement OS-level background location tracking in the React Native Expo app to ensure proximity alerts trigger even when the app is closed.
-- [ ] **Push Notifications**: Integrate FCM/APNS to alert users of nearby matches or new secure messages.
+- [ ] **Battery-Efficient Background Location**: Complete the OS-level background location tracking implementation in the React Native app. Ensure `Location.startLocationUpdatesAsync` triggers backend updates correctly.
+- [ ] **Push Notifications**: Wire up the Firebase Cloud Messaging (FCM) tokens to Laravel notifications to send real-time alerts.
 
-## 🟡 High: Stability
-- [ ] **E2E Multi-Device Sync**: Polish the indexedDB key storage to support recovering E2E keys when a user logs in from a new browser.
+## 🟡 High: Stability & UX
+- [ ] **E2E Multi-Device Sync**: Polish the key storage logic to encrypt E2E private keys with a user passphrase and backup to the server.
 
 ## ✅ Recently Completed
 - [x] **The Great Simplification**: Permanently removed all non-core bloat (Federation, Governance, Economy, Gamification).

@@ -768,3 +768,8 @@ All notable changes to this project will be documented in this file.
 - **Economy & Gamification**: Removed FWB Tokens, Solana crypto bridges, Stripe checkout, leaderboards, daily streaks, and the viral "Rate My Cat" feature.
 - **AI Fluff**: Eliminated the AI Wingman, Roast Generator, Avatar Generation, and conversation starters.
 - **Codebase Reduction**: Dropped over 50 unneeded database tables and deleted hundreds of unused React components, massively accelerating build times and simplifying the codebase.
+
+## [1.2.1] - 2026-04-04
+### Added
+- **Mobile Background Location**: Began restructuring the Expo application to support battery-efficient OS-level background location tracking.
+- **Push Notification Architecture**: Initiated FCM/APNS integration preparations to allow native notifications for new matches and messages.

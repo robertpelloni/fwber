@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.2.0 "The Great Simplification"
+> **Current Version:** 1.2.1 "Mobile Core Polish"
 > **Last Updated:** 2026-04-04
 
 ---
