@@ -54,8 +54,11 @@ class ProcessGovernanceProposals implements ShouldQueue
 
         Log::info("Governance: Proposal {$proposal->id} ('{$proposal->title}') finalized as PASSED. Winner: {$winnerOption}");
 
-        // 3. Trigger Policy Actions (Future Milestone)
-        // Here we would call a service to actually change site config, 
-        // ban users, or move treasury funds based on $proposal->category.
+        // 3. Trigger Policy Execution
+        if ($proposal->status === 'passed' && !empty($proposal->execution_payload)) {
+            Log::info("Governance: Triggering execution for proposal {$proposal->id}");
+            $executor = new \App\Services\Governance\PolicyExecutor();
+            $executor->execute($proposal);
+        }
     }
 }

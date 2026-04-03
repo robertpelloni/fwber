@@ -18,6 +18,17 @@ export function SwapInterface() {
     const [address, setAddress] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [history, setHistory] = useState<any[]>([]);
+    const [mockPrice, setMockPrice] = useState(0.42); // 1 FWB = 0.42 USD
+
+    // Simulate price fluctuations
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setMockPrice(prev => prev + (Math.random() * 0.04 - 0.02));
+        }, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const estimatedReceive = parseFloat(amount || '0') * mockPrice * 0.98; // 2% fee
 
     const fetchHistory = async () => {
         try {
@@ -110,6 +121,21 @@ export function SwapInterface() {
                             value={address}
                             onChange={(e) => setAddress(e.target.value)}
                         />
+                    </div>
+
+                    <div className="bg-black/40 p-4 rounded-xl border border-white/5 space-y-2">
+                        <div className="flex justify-between text-xs">
+                            <span className="text-zinc-400">Rate</span>
+                            <span className="text-white font-mono">1 FWB ≈ ${mockPrice.toFixed(4)}</span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                            <span className="text-zinc-400">Bridge Fee (2%)</span>
+                            <span className="text-red-400">{(parseFloat(amount || '0') * mockPrice * 0.02).toFixed(4)} USD</span>
+                        </div>
+                        <div className="flex justify-between items-end pt-2 border-t border-white/5">
+                            <span className="text-indigo-300 font-bold uppercase text-[10px]">You Receive</span>
+                            <span className="text-xl font-black text-green-400 font-mono">${estimatedReceive.toFixed(2)} {targetAsset}</span>
+                        </div>
                     </div>
 
                     <Button 

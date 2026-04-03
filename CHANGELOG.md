@@ -660,3 +660,11 @@ All notable changes to this project will be documented in this file.
 - **Cross-Instance E2E Decryption**: Completed the federated messaging security loop. Local users now generate RSA-OAEP keypairs that allow them to decrypt incoming direct messages from remote servers.
 - **Multi-Key Storage Engine**: Upgraded the browser IndexedDB storage to support concurrent storage of ECDH (local) and RSA (federated) keypairs.
 - **Automated Policy Enforcement**: Finalized the `ProcessGovernanceProposals` engine with full feature test coverage. The system now automatically reconciles community votes and finalizes proposal outcomes.
+
+## [1.0.94] - 2026-04-02
+### Added
+- **Automated Policy Execution**: Integrated the `PolicyExecutor` service with the Governance engine. Passed proposals can now automatically trigger system changes, such as updating site-wide settings.
+- **Site Settings Management**: Created the `site_settings` infrastructure to allow for dynamic, community-governed configuration (e.g., token bonus amounts, participation thresholds).
+- **Proposal Creation UI**: Built the `CreateProposalModal` in the Council portal, allowing users to submit new proposals directly from the frontend.
+### Changed
+- **Token Swap UI Polish**: Enhanced the `SwapInterface` with a simulated real-time price feed and dynamic fee calculation for better user transparency.

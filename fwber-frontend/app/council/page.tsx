@@ -12,6 +12,7 @@ import { Gavel, Clock, Users, Zap, Loader2, ShieldCheck, TrendingUp } from 'luci
 import AppHeader from '@/components/AppHeader';
 import { formatDistanceToNow } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
+import { CreateProposalModal } from '@/components/council/CreateProposalModal';
 
 interface Proposal {
     id: number;
@@ -91,13 +92,16 @@ export default function CouncilPage() {
                         </h1>
                         <p className="text-zinc-500 font-bold uppercase tracking-widest text-sm mt-1">Decentralized Governance & Community Power</p>
                     </div>
-                    <div className="bg-purple-600/10 border border-purple-500/20 p-4 rounded-2xl flex items-center gap-4">
-                        <div className="p-2 bg-purple-600 rounded-full text-white">
-                            <Zap className="w-5 h-5 fill-current" />
-                        </div>
-                        <div>
-                            <p className="text-[10px] font-black uppercase text-purple-600 tracking-widest">Your Voting Power</p>
-                            <p className="text-xl font-black dark:text-white">{user?.token_balance || 0} FWB</p>
+                    <div className="flex items-center gap-4">
+                        <CreateProposalModal onSuccess={fetchProposals} />
+                        <div className="bg-purple-600/10 border border-purple-500/20 p-4 rounded-2xl flex items-center gap-4">
+                            <div className="p-2 bg-purple-600 rounded-full text-white">
+                                <Zap className="w-5 h-5 fill-current" />
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-black uppercase text-purple-600 tracking-widest">Your Voting Power</p>
+                                <p className="text-xl font-black dark:text-white">{user?.token_balance || 0} FWB</p>
+                            </div>
                         </div>
                     </div>
                 </div>

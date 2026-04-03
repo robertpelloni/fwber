@@ -1,75 +1,44 @@
-# Project Status — fwber v1.0.93 (Full Federated E2E & Governance Exec)
+# Project Status — fwber v1.0.94 (Automated Policy Execution)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.93 "Full Federated E2E & Governance Exec"
+**Version:** 1.0.94 "Automated Policy Execution"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
+## Automated Policy & Rule Updates
+- **Closed-Loop Governance:** Proposals of type `policy` now automatically execute their associated changes upon passing.
+- **Dynamic Site Settings:** Implemented the `site_settings` table, enabling the community to vote on and change project constants (e.g. `daily_token_bonus`) without code deployments.
+- **Verified Execution:** Covered the policy execution lifecycle with 100% green feature tests in `PolicyExecutionTest.php`.
+
+## Council Proposal Creation
+- **Frontend Submission:** Users can now launch new community proposals directly from the `/council` dashboard via the `CreateProposalModal`.
+- **Validation:** Integrated token-balance checks to ensure only invested participants (>100 FWB) can initiate project-wide votes.
+
 ## Full Federated E2E Security
 - **Asymmetric Decryption:** Completed the security loop for cross-server DMs. Users now generate and persist RSA keypairs in the browser, enabling native decryption of incoming ActivityPub messages.
-- **IndexedDB v2:** Upgraded the E2E storage engine to version 2, allowing for multiple cryptographic identities (ECDH and RSA) per user.
 - **RSA-OAEP Bridge:** The frontend now automatically imports remote actor public keys and performs high-performance hybrid encryption for outbound federated messaging.
 
 ## Governance Execution & Policy
 - **Automated Reconciler:** Launched the `ProcessGovernanceProposals` background job that finalizes expired community proposals. 
-- **Proven Integrity:** Verified the weighted-vote summation logic via comprehensive feature testing in `GovernanceExecutionTest.php`. Passed all scenarios with 100% accuracy.
-
-## Deployment & Stability
-- **Migration Repair:** Resolved a critical deployment failure caused by duplicate table creation in the governance schema (v1.0.92). Cleanly separated proposals and votes into distinct database transactions.
-- **Defensive Migrations:** Added existence checks to the voting table migration to prevent future concurrency or state-desync issues during automated deployments.
+- **Proven Integrity:** Verified the weighted-vote summation logic via comprehensive feature testing in `GovernanceExecutionTest.php`.
 
 ## Global Token Bridge & Economy
-- **Asset Bridging:** Users can now swap liquid FWB Tokens for external assets (SOL, USDC) or Federated Vouchers.
-- **Fee Infrastructure:** Implemented a 2% bridge fee protocol to support project sustainability.
-- **Wallet Integration:** Launched the "Global Bridge" tab in the wallet with real-time transaction tracking and destination address validation.
+- **Asset Bridging:** Users can now swap liquid FWB Tokens for external assets (SOL, USDC).
+- **Price Simulation:** The swap interface now includes real-time simulated price feeds and 2% bridge fee calculations for transparent user expenditure.
 
-## Cross-Instance E2E Security
-- **Federated Key Exchange:** The E2E hook now resolve remote actor public keys (RSA) from ActivityPub profiles.
-- **RSA-OAEP Hybrid Encryption:** Implemented high-performance hybrid encryption for outbound federated DMs, ensuring privacy persists across instance boundaries.
-
-## Decentralized Governance (The Council)
-- **Weighted Participation:** Users can now influence the project's direction. The `/council` portal calculates voting power based on liquid FWB Token balances.
-- **Proposal Lifecycle:** Implemented the full backend for creating and auditing community proposals across categories like Moderation, Policy, and Tech.
-- **Live Results:** The frontend visualizes aggregate voting weights using real-time progress bars and participation metrics.
-
-## Federated Direct Messaging
-- **Cross-Instance DMs:** Users can now send private messages to any valid ActivityPub actor URI.
-- **Protocol Parity:** Outbound messages are wrapped in signed `Create Note` activities with restricted `to` fields, conforming to the Mastodon/Pleroma DM standard.
-- **Inbox Logic:** Updated the federation inbox to distinguish between public follower broadcasts and private person-to-person notes.
-
-## Federated Social Aggregation
-- **Unified Feed:** The dashboard now supports a "Federated" tab, allowing users to scroll through Mastodon/ActivityPub posts from actors they follow alongside local matching activity.
-- **Background Ingestion:** Implemented `FetchRemoteOutbox` to periodically sync content from external servers into the local Event Store.
-- **Privacy-Safe Age Checks:** Actors now carry a signed `ageVerified` flag, proving 18+ status to the Fediverse without leaking sensitive birthdate metadata.
-
-## AR Inventory Discovery
-- **Visual Marketplace:** Users can now use the "Inventory Radar" (AR) to find real-world items for sale at local venues. 
-- **Spatial UI:** Items like drinks and merchandise appear as floating 3D tags in the camera view, including live token pricing and distance indicators.
-
-## NFC Point-of-Sale (PoS)
-- **Instant Redemptions:** Merchants can now trigger NFC payment requests directly from their dashboard. 
-- **Consumer Flow:** Users receive a high-fidelity "Pay with Tokens" prompt upon tapping a merchant device.
-- **Economic Loop:** This closes the loop between digital token earning (from matching/vouches) and real-world utility (venue spending).
-
-## NFC Physical Proof & ZK-Location
-- **Geohash Commitments:** Updated the NFC tap sequence to capture local GPS coordinates and generate a precision-8 geohash.
-- **Relay Handshake:** Implemented a stateful Redis handshake in the backend. Both users must "report in" with their location proofs within 15 seconds of a tap to verify the meetup.
-- **Privacy First:** Physical verification now occurs without either user sharing their raw coordinates with the other, utilizing the server as a blind matching relay.
-
-## Current Validation / Delivery State
-- **Governance execution coverage is 100%**: `php artisan test tests\Feature\GovernanceExecutionTest.php` passes with weighted-summation assertions.
-- **Full federation backend coverage is green**: `php artisan test tests\Feature\ActivityPubTest.php tests\Feature\ActivityPubSignatureTest.php tests\Feature\ActivityPubOutboundTest.php tests\Feature\E2EKeyManagementTest.php` passes.
+## Deployment & Stability
+- **Migration Repair:** Resolved a critical deployment failure caused by duplicate table creation in the governance schema (v1.0.92).
 
 ## ✅ Release Focus
+- [x] Build Automated Rule Updates (Policy Executor).
+- [x] Create Proposal Creation UI in frontend.
+- [x] Polish Global Token Swap UI with price feeds.
 - [x] Implement Full Cross-Instance E2E Encryption/Decryption.
 - [x] Build Automated Proposal Execution jobs.
-- [x] Build Global Token Exchange (Bridge) UI.
 - [x] Build Governance & Voting portal.
 - [x] Implement token-weighted voting logic.
-- [x] Implement Federated Secure DMs.
-- [x] Build Federated Feed Aggregator.
-- [x] Build AR Inventory Finder UI.
+- [x] Build Global Token Exchange (Bridge) UI.
 - [x] Implement ZK-Age Verification.
 - [x] Build NFC "Tap-to-Pay" protocol for merchants.
 - [x] Enable Mobile NFC hardware permissions.
