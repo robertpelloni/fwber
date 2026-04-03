@@ -668,3 +668,11 @@ All notable changes to this project will be documented in this file.
 - **Proposal Creation UI**: Built the `CreateProposalModal` in the Council portal, allowing users to submit new proposals directly from the frontend.
 ### Changed
 - **Token Swap UI Polish**: Enhanced the `SwapInterface` with a simulated real-time price feed and dynamic fee calculation for better user transparency.
+
+## [1.0.95] - 2026-04-02
+### Added
+- **Real-time Price Integration**: Integrated the CoinGecko API into the `SwapController` to provide live SOL/USDC exchange rates for FWB Token bridging.
+- **Automated Job Scheduling**: Configured the Laravel task scheduler (`console.php`) to automatically process expired governance proposals and ingest federated social content every few minutes.
+- **Market Rates API**: Created the `/api/economy/rates` endpoint to centralize FWB exchange rate logic and external market data.
+### Changed
+- **Wallet Polish**: Updated the `SwapInterface` to fetch and display live market rates and dynamic estimated receive amounts.

@@ -98,3 +98,15 @@ Schedule::job(new AnalyzeSlowRequests)->hourly()
 Schedule::command('cache:warm')->everyFiveMinutes()
     ->name('warm-cache')
     ->withoutOverlapping();
+
+// --- GOVERNANCE & FEDERATION AUTOMATION ---
+
+// Process expired governance proposals every minute
+Schedule::job(new \App\Jobs\ProcessGovernanceProposals)->everyMinute()
+    ->name('process-governance-proposals')
+    ->withoutOverlapping();
+
+// Ingest all federated content every 5 minutes
+Schedule::job(new \App\Jobs\IngestAllFederatedContent)->everyFiveMinutes()
+    ->name('ingest-federated-content')
+    ->withoutOverlapping();

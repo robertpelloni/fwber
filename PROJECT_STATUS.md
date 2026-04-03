@@ -1,10 +1,18 @@
-# Project Status — fwber v1.0.94 (Automated Policy Execution)
+# Project Status — fwber v1.0.95 (Real-time Rates & Task Automation)
 
 **Date:** 2026-04-02  
-**Version:** 1.0.94 "Automated Policy Execution"
+**Version:** 1.0.95 "Real-time Rates & Task Automation"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
+
+## Task Automation (Scheduler)
+- **Autonomous Governance:** The system now automatically reconciles community votes every 60 seconds using the Laravel task scheduler. 
+- **Federated Social Sync:** Configured background ingestion of ActivityPub outboxes to refresh the global social feed every 5 minutes.
+
+## Real-time Market Integration
+- **CoinGecko Bridge:** Integrated live price feeds for Solana (SOL) and Circle (USDC).
+- **Dynamic Swap Quotes:** The `/council` and wallet dashboards now calculate token conversions based on real-world market data instead of static simulations.
 
 ## Automated Policy & Rule Updates
 - **Closed-Loop Governance:** Proposals of type `policy` now automatically execute their associated changes upon passing.
@@ -31,6 +39,8 @@
 - **Migration Repair:** Resolved a critical deployment failure caused by duplicate table creation in the governance schema (v1.0.92).
 
 ## ✅ Release Focus
+- [x] Integrate real-time market price APIs.
+- [x] Schedule background governance reconcilers.
 - [x] Build Automated Rule Updates (Policy Executor).
 - [x] Create Proposal Creation UI in frontend.
 - [x] Polish Global Token Swap UI with price feeds.

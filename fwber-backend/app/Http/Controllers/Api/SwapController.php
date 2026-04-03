@@ -25,6 +25,54 @@ class SwapController extends Controller
     }
 
     /**
+     * Get live exchange rates for bridging.
+     */
+    public function getRates(): JsonResponse
+    {
+        // 1. Get base FWB price from site settings
+        $fwbUsdPrice = (float) (\App\Models\SiteSetting::where('key', 'fwb_usd_price')->value('value') ?? 0.50);
+
+        try {
+            // 2. Fetch external rates from CoinGecko (Free API)
+            $response = \Illuminate\Support\Facades\Http::timeout(3)
+                ->get('https://api.coingecko.com/api/v3/simple/price', [
+                    'ids' => 'solana,usd-coin',
+                    'vs_currencies' => 'usd'
+                ]);
+
+            $externalRates = $response->json();
+            $solPrice = $externalRates['solana']['usd'] ?? 150.0;
+            $usdcPrice = $externalRates['usd-coin']['usd'] ?? 1.0;
+
+            return response()->json([
+                'fwb_usd' => $fwbUsdPrice,
+                'sol_usd' => $solPrice,
+                'usdc_usd' => $usdcPrice,
+                'pairs' => [
+                    'SOL' => $fwbUsdPrice / $solPrice,
+                    'USDC' => $fwbUsdPrice / $usdcPrice,
+                ],
+                'timestamp' => now()->toIso8601String()
+            ]);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning("Bridge Rates: Failed to fetch external prices: " . $e->getMessage());
+            
+            // Fallback to static rates
+            return response()->json([
+                'fwb_usd' => $fwbUsdPrice,
+                'sol_usd' => 150.0,
+                'usdc_usd' => 1.0,
+                'pairs' => [
+                    'SOL' => $fwbUsdPrice / 150.0,
+                    'USDC' => $fwbUsdPrice,
+                ],
+                'is_fallback' => true
+            ]);
+        }
+    }
+
+    /**
      * Initiate a token swap/bridge.
      */
     public function initiate(Request $request): JsonResponse
