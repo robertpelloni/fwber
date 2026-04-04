@@ -1,34 +1,38 @@
-# PROJECT_STATUS.md - fwber v1.3.6 (Migration Column-Guard Hardening)
+# PROJECT_STATUS.md - fwber v1.3.7 (Restoration Foundation: AI + Payments)
 
 **Date:** 2026-04-04
-**Version:** 1.3.6 "Migration Column-Guard Hardening"
+**Version:** 1.3.7 "Restoration Foundation: AI + Payments"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
 ## 🎯 What This Release Solved
-After the first deployment-safe retry fix, deployment exposed a second real-world schema drift issue:
+You requested broad restoration of previously pruned systems except:
+1. ActivityPub / Federation
+2. Governance / DAO / Council / On-chain
+13. Journals / Scrapbooks / Icebreakers / extra profile-social layer
 
-- `SQLSTATE[42000]: Key column 'order' doesn't exist in table`
-- failing while adding `idx_photos_user_order`
+Because restoring everything in a single uncontrolled sweep would likely create a broken hybrid repo, this release begins the restoration in the safest order: **foundation first**.
 
-That means the deployment target's `photos` table does not fully match the current squashed local schema. Even though the migration had become idempotent with respect to duplicate indexes, it still assumed every indexed column existed.
+## 🧱 Restoration Foundation Restored
+- **AI provider restored:** `App\Providers\AiServiceProvider` is back in the active backend so LLM-backed services can be resolved again through the container.
+- **Payment provider restored:** `App\Providers\PaymentServiceProvider` is back in the active backend so payment gateway abstractions are once again bound through the container.
+- **Provider registration restored:** both providers were re-added to:
+  - `fwber-backend/bootstrap/providers.php`
+  - `fwber-backend/config/app.php`
 
-## 🛠️ Migration Guard Improvements
-- **Column-aware index creation added:** the migration now skips an index if any required column is missing.
-- **Retry safety expanded beyond duplicate keys:** the deploy no longer fails just because one environment is missing a column expected by a performance-only index.
-- **Photos table drift handled gracefully:** `idx_photos_user_order` is skipped when the `order` column is absent instead of crashing deployment.
+## Why This Is the Correct First Step
+The systems you asked to restore next — premium, merchant, wingman, roast generation, marketplace, relationship unlocks, and monetized flows — all depend on container wiring for AI and/or payment abstractions.
+
+Restoring those features before restoring the providers would create route/controller code that bootstraps into unresolved dependencies.
 
 ## ✅ Validation
-- **Expanded regression test:** `OptimizeCoreIndexesMigrationTest` now also simulates a `photos` table missing the `order` column.
 - **Backend validation passed:**
-  - `php artisan test tests/Feature/OptimizeCoreIndexesMigrationTest.php tests/Feature/NotificationSettingsAndAnalyticsTest.php tests/Feature/NotificationRoutingTest.php tests/Feature/BlockSafetyFlowTest.php tests/Feature/CoreDatingFlowTest.php`
-  - Result: **27 passed**
-- **Frontend build remained green:**
-  - `npm run build --prefix fwber-frontend`
+  - `php artisan test tests/Feature/CoreDatingFlowTest.php tests/Feature/OptimizeCoreIndexesMigrationTest.php`
+  - Result: **21 passed**
 
 ## ✅ Release Focus
-- [x] Skip index creation when the referenced columns do not exist.
-- [x] Extend migration regression coverage for missing-column deploy drift.
-- [x] Re-verify backend tests after the guard expansion.
-- [x] Keep frontend build verified after the backend-only fix.
+- [x] Restore AI service provider into the active backend.
+- [x] Restore payment service provider into the active backend.
+- [x] Re-register those providers in Laravel bootstrap/app config.
+- [x] Re-verify that the current core suite still passes after the restoration foundation landed.

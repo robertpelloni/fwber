@@ -1,87 +1,87 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-04
-> **Version Reached:** 1.3.6
+> **Version Reached:** 1.3.7
 > **Current Model:** GPT
 
 ## Executive Summary
-This session shipped **v1.3.6 "Migration Column-Guard Hardening"** in direct response to the follow-up deployment failure:
+This session shipped **v1.3.7 "Restoration Foundation: AI + Payments"**.
 
-- `SQLSTATE[42000]: Key column 'order' doesn't exist in table`
-- triggered while creating `idx_photos_user_order`
+You asked to restore everything except:
+1. ActivityPub / Federation
+2. Governance / DAO / Council / On-chain
+13. Journals / Scrapbooks / Icebreakers / extra profile-social layer
 
-This exposed the second half of the migration-hardening problem.
+Restoring all remaining systems in one uncontrolled sweep would likely produce a badly broken hybrid state. So I followed the safest plan: restore the **dependency foundation first**, starting with the backend providers that many of the requested systems rely on.
 
-In v1.3.5 I fixed duplicate-index retry safety.
-In this session I fixed **schema-drift safety**.
-
-The deploy target clearly has a `photos` table shape that does not fully match the current local squashed schema. A performance-only migration should never block the entire deployment just because an optional indexed column is missing on one environment.
+This release restores the container wiring for:
+- AI / Wingman / roast / content-generation style services
+- payment / premium / marketplace / monetization style services
 
 ---
 
 ## What I Changed
 
-### 1. Added column guards to the index optimization migration
-**File:** `fwber-backend/database/migrations/2026_04_03_212041_optimize_core_indexes.php`
+### 1. Restored `AiServiceProvider`
+**File:** `fwber-backend/app/Providers/AiServiceProvider.php`
 
-#### Previous state
-The migration already checked whether an index existed before creating it.
+This provider binds:
+- `App\Services\Ai\Llm\LlmManager`
 
-That solved:
-- duplicate-key deploy retries
+Why this matters:
+- multiple retained or restorable AI-related services still depend on `LlmManager`
+- examples already present in the active codebase include:
+  - `AiWingmanService`
+  - `ContentOptimizationService`
+  - `ContentModerationService`
+  - `RecommendationService`
+  - `TranslationService`
 
-But it still assumed:
-- every referenced column existed on every deploy target
-
-That assumption failed on the `photos` table where `order` was apparently missing.
-
-#### New behavior
-I expanded the migration so each index definition now requires:
-1. the target table exists
-2. the target index does not already exist
-3. **all referenced columns exist**
-
-Implemented:
-- `hasColumns(...)`
-- updated `addIndexIfMissing(...)` signature to accept the required column list
-
-#### Result
-This migration now degrades safely when deploy targets have drifted table shapes.
-
-Example fixed case:
-- `idx_photos_user_order` is skipped if `photos.order` is absent
-
-instead of crashing the deployment.
+Without restoring the provider, reactivating AI routes/controllers would lead to unresolved dependency failures.
 
 ---
 
-### 2. Expanded regression coverage for the missing-column scenario
-**File:** `fwber-backend/tests/Feature/OptimizeCoreIndexesMigrationTest.php`
+### 2. Restored `PaymentServiceProvider`
+**File:** `fwber-backend/app/Providers/PaymentServiceProvider.php`
 
-Added a second test that:
-- drops and recreates `photos`
-- intentionally omits the `order` column
-- runs the migration again
-- verifies it does not fail
+This provider restores binding for:
+- `PaymentGatewayInterface`
+- `MockPaymentGateway`
+- `StripePaymentGateway`
 
-This now covers both critical deployment paths:
-1. **re-run with existing indexes**
-2. **re-run on drifted schema missing indexed columns**
+Why this matters:
+- premium, merchant, marketplace, and monetization surfaces depend on a payment abstraction layer
+- the underlying payment service classes were still present in the repo, but the provider that binds them had been archived out of active bootstrapping
+
+Without restoring this provider first, payment/premium controllers would be restored into a container graph that cannot resolve their gateway dependencies safely.
+
+---
+
+### 3. Re-registered both providers in active Laravel boot config
+**Files:**
+- `fwber-backend/bootstrap/providers.php`
+- `fwber-backend/config/app.php`
+
+Both now include:
+- `App\Providers\PaymentServiceProvider::class`
+- `App\Providers\AiServiceProvider::class`
+
+Why this matters:
+Restoring provider files alone is not enough. Laravel must actually load them in the active runtime configuration.
 
 ---
 
 ## Validation Performed
 Executed:
-- `cd C:/Users/hyper/workspace/fwber/fwber-backend && php artisan test tests/Feature/OptimizeCoreIndexesMigrationTest.php tests/Feature/NotificationSettingsAndAnalyticsTest.php tests/Feature/NotificationRoutingTest.php tests/Feature/BlockSafetyFlowTest.php tests/Feature/CoreDatingFlowTest.php`
+- `cd C:/Users/hyper/workspace/fwber/fwber-backend && php artisan test tests/Feature/CoreDatingFlowTest.php tests/Feature/OptimizeCoreIndexesMigrationTest.php`
 
 Result:
-- **27 passed**
+- **21 passed**
 
-Also re-ran frontend production build:
-- `npm run build --prefix fwber-frontend`
-
-Result:
-- successful production build
+This confirmed:
+- current core behavior still works
+- migration hardening remains intact
+- provider restoration did not destabilize the active app bootstrap
 
 No processes were manually killed.
 
@@ -89,8 +89,10 @@ No processes were manually killed.
 
 ## Files Changed This Session
 ### Backend
-- `C:/Users/hyper/workspace/fwber/fwber-backend/database/migrations/2026_04_03_212041_optimize_core_indexes.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/tests/Feature/OptimizeCoreIndexesMigrationTest.php`
+- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Providers/AiServiceProvider.php`
+- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Providers/PaymentServiceProvider.php`
+- `C:/Users/hyper/workspace/fwber/fwber-backend/bootstrap/providers.php`
+- `C:/Users/hyper/workspace/fwber/fwber-backend/config/app.php`
 
 ### Documentation / release tracking
 - `C:/Users/hyper/workspace/fwber/VERSION`
@@ -109,34 +111,42 @@ No processes were manually killed.
 
 ## Important Findings / Analysis
 
-### 1. Deployment-safe migrations need two layers of defense
-Performance/index migrations must be defensive against:
-1. **duplicate index creation** after partial application
-2. **missing referenced columns** on drifted deploy targets
+### 1. Broad restoration must be sequenced, not dumped back wholesale
+Many of the requested features are not independent. For example:
+- AI route surfaces depend on `LlmManager`
+- premium and merchant features depend on payment gateway bindings
 
-v1.3.5 fixed the first case.
-v1.3.6 fixed the second.
+Restoring controllers/routes before provider wiring would create a broken halfway state.
 
-### 2. Performance migrations should degrade safely
-This migration does not define core business data; it adds performance indexes. That means the correct behavior under drift is to skip the impossible optimization, not to block the entire deployment.
+### 2. A surprising amount of supporting code is still present
+The repo still contains substantial AI and payment-related service code even after the simplification. That means the right restoration strategy is often to re-enable existing layers and route surfaces, not to rewrite everything from scratch.
 
-### 3. The deploy target schema has drifted from the local squashed schema
-The missing `photos.order` column strongly suggests at least one production/deploy environment is not fully aligned with the current local migration history. This should be assumed elsewhere too when writing future migration hardening.
+### 3. Best next slice is AI/Wingman, not marketplace yet
+The safest next active restore is likely:
+- Wingman / roast / AI route surface
+
+Why:
+- frontend still contains hooks and remnants for it
+- core service code is still present
+- dependency foundation is now restored
+- it is a smaller blast radius than restoring the full merchant/premium/marketplace stack immediately
 
 ---
 
 ## Recommended Next Steps
-1. **Redeploy immediately**
-   - the migration now protects against both duplicate-index and missing-column drift scenarios
-2. **Inspect the live schema after deploy**
-   - specifically compare the production `photos` table against the current local migration shape
-3. **Continue production login 500 root-cause audit**
-   - the frontend parsing layer is hardened, but the server-side cause still needs log inspection if it recurs
+1. **Phase B — Restore AI route surface**
+   - restore `AiWingmanController`
+   - restore minimal supporting model(s) like `ViralContent`
+   - reintroduce the active wingman/public-roast routes with graceful schema guards where necessary
+2. **Phase C — Restore payment/premium route surface**
+   - restore premium/payment controllers after AI surface is stable
+3. **Continue deploy verification**
+   - migration hardening work remains important while restoration proceeds
 
 ---
 
 ## Git / Release
-- Version bumped to **1.3.6**
+- Version bumped to **1.3.7**
 - Next git action: commit these changes and push to `origin/main`
 
-This release completed the migration hardening loop. The deployment blocker moved from "retry unsafe" to "schema drift unsafe," and that second failure mode is now covered too.
+This release is intentionally foundational rather than flashy. It restores the dependency graph needed for safe re-expansion of the non-federated, non-governance systems you asked to bring back.

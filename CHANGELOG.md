@@ -877,3 +877,11 @@ All notable changes to this project will be documented in this file.
 - Expanded `2026_04_03_212041_optimize_core_indexes.php` so it now skips index creation when the referenced columns do not exist, preventing deploy failures on drifted schemas such as `photos` tables missing the `order` column.
 - Extended `OptimizeCoreIndexesMigrationTest` to recreate a `photos` table without `order` and verify the migration still completes successfully.
 - Re-validated the backend slice with 27 passing tests across migration retry safety, missing-column guards, analytics/settings routing, notifications, safety, and the retained core dating flow.
+
+## [1.3.7] - 2026-04-04
+### Added
+- Restored `App\Providers\AiServiceProvider` and `App\Providers\PaymentServiceProvider` to the active backend, reactivating container bindings for LLM-backed services and payment gateway abstractions as the foundation for broader feature restoration.
+
+### Fixed
+- Re-registered the restored AI/payment providers in both `fwber-backend/bootstrap/providers.php` and `fwber-backend/config/app.php` so the Laravel app actually boots them in active runtime configuration.
+- Re-validated that the current core suite still passes after the restoration foundation landed: `php artisan test tests/Feature/CoreDatingFlowTest.php tests/Feature/OptimizeCoreIndexesMigrationTest.php` passed successfully.
