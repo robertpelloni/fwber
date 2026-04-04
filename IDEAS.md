@@ -34,3 +34,17 @@
 - **Message Edit/Unsend:** Provide a 5-minute window to unsend or edit E2E encrypted messages (handling the CRDT conflict resolution).
 - **Federated "Blocklists":** ActivityPub allows for importing shared blocklists (#Fediblock). Implementing a tool to import community blocklists would protect users proactively.
 - **Read Receipts toggle:** Users should have the option to disable read receipts globally or per-match for privacy.
+## 2026-04-04 - After Premium Restoration
+- Add a unified entitlement layer that can answer "is feature X premium/verified/merchant gated?" from one backend service instead of spreading gating rules across controllers.
+- Add a billing diagnostics page for admins that replays webhook payloads against a sandbox user, making Stripe rollout debugging safer after staged restorations.
+- Replace hard-coded plan presentation in the frontend with a shared generated contract from `config/premium.php` so product copy and backend price definitions never drift.
+
+## 2026-04-04 - After Deployment Health & Verification Surface
+- Add a tiny operator dashboard that consumes `/api/health` plus the geo-service and websocket domains so a single internal page can show cross-service rollout status during cutovers.
+- Add a deploy script wrapper that runs `php artisan deploy:verify --json`, parses critical failures, and emits a red/green summary suitable for CI/CD or Slack notifications.
+- Add a merchant/premium synthetic-check suite that runs against production nightly using seeded smoke-test accounts, verifying premium purchase eligibility, merchant queue access, and marketplace browsing without needing full end-to-end manual testing.
+
+## 2026-04-04 - After Marketplace Restoration
+- Add merchant location persistence and a true geo-aware nearby storefront feed so `marketplace/nearby` can rank by actual distance instead of a generic latest-items fallback.
+- Add merchant verification workflow screens and moderation tooling so restored storefronts can be trust-scored before wider rollout.
+- Unify premium and merchant billing receipts under a shared purchase-history surface in user settings.

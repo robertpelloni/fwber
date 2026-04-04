@@ -15,7 +15,8 @@ This document replaces the old DreamHost-first recommendation for current produc
 6. Run migrations and optimize caches
 7. Start queue, reverb, and geo services under `systemd`
 8. Issue TLS certificates
-9. Validate auth, roast, premium, merchant, and websocket flows
+9. Run `php artisan deploy:verify`
+10. Validate auth, roast, premium, merchant, websocket, and health endpoints
 
 ## See Also
 - `DEPLOY.md`

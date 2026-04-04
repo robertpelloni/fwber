@@ -140,6 +140,8 @@ Nginx virtual host templates exist in:
 ## 8. Validation Checklist
 
 After cutover:
+- [ ] `php artisan deploy:verify` reports healthy critical services
+- [ ] `/api/health`, `/api/health/liveness`, and `/api/health/readiness` respond correctly
 - [ ] auth routes behave correctly
 - [ ] websocket connection succeeds
 - [ ] geo endpoint is reachable

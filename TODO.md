@@ -1,29 +1,26 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.6.9
-> **Last Updated:** 2026-04-05
+> **Version:** 1.4.6  
+> **Last Updated:** 2026-04-04
 
 ---
 
 ## 🔴 Critical: Deployment & Verification
-- [ ] **Re-run Frontend GitHub Build With Install Strategy Fix**: Confirm the dedicated frontend workflow now completes successfully using `npm install` instead of `npm ci`.
-- [ ] **Deploy NodeInfo 500 Fix to Hetzner**: Verify `/nodeinfo/2.0` stops 500ing live after the guarded controller is in the deployed backend path.
-- [ ] **Verify Live Frontend API Recovery**: Confirm the dashboard and E2E restore calls now hit `api.fwber.me` instead of `www.fwber.me/api/*` after Vercel finishes deploying the updated frontend.
-- [ ] **Repair / Confirm Realtime Contract**: Re-check the live header connection badge and websocket/broadcast-auth behavior after the backend/public-route repair deploy.
-- [ ] **Production 500 Error Sweep**: Continue collecting and eliminating real production 500s before broadening restoration further.
-- [ ] **Map Remaining Removed Features for Full Restoration**: Once the live stack is stable, plan the broader feature reactivation sweep the user now wants.
+- [ ] **Hetzner VPS Provisioning Execution**: Complete server creation, DNS cutover, package install, env setup, and service configuration using the deployment docs plus `ops/hetzner/` templates.
+- [ ] **Redeploy After Restoration Phases**: Re-run deployment now that AI, premium/billing, marketplace/merchant, geo-aware merchant discovery, merchant trust scoring, merchant review prioritization, and deployment health verification are restored on top of the migration-hardening work.
+- [ ] **Production Stripe Verification**: Confirm live premium and marketplace purchase + webhook flows in an authenticated deployment environment with real secrets.
+- [ ] **Live Health Monitoring Wiring**: Hook `/api/health`, `/api/health/readiness`, and `php artisan deploy:verify` into the final uptime-monitoring / server-check process after the Hetzner box exists.
 
-## 🟡 High: Product Restoration
-- [ ] **Audit Remaining Dead Settings Links**: Continue replacing leftover settings entries that still point at retired/non-core surfaces with live restored or core destinations.
-- [ ] **Production Stripe Verification**: Confirm live premium and marketplace purchase + webhook flows in the Hetzner-hosted backend environment.
-- [ ] **DreamHost Backend Retirement**: Once Hetzner API cutover is fully validated, decommission the old DreamHost fwber backend path and remove stale provider dependencies.
+## 🟡 High: Product Polish
+- [ ] **Store Asset Production**: Execute the screenshot and copy plan in `mobile/STORE_ASSETS.md`.
 - [ ] **Real-Device Notification QA**: Verify foreground, background, and cold-start notification flows on physical iOS/Android devices now that routes and toasts are standardized.
+- [ ] **Production Login 500 Root Cause Audit**: Inspect live backend logs for the production `/api/auth/login` 500 so the server-side failure itself is fixed, not just the frontend error handling.
 
 ## ✅ Recently Completed
-- [x] **Frontend Workflow Install Strategy Fix**: Switched the dedicated frontend GitHub workflow to `npm install --no-fund --no-audit` to get past platform-sensitive optional dependency drift.
-- [x] **NodeInfo 500 Recovery + Frontend CI Runtime Fix**: Hardened discovery routes against missing federation columns and aligned the frontend GitHub workflow to Node.js 24.
-- [x] **Hetzner Log ACL Deploy Fix**: Removed the broken log permission override, switched to ACL-based shared log access, and repaired the live Hetzner server log directory ACLs.
-- [x] **Hetzner Backend Stability Repair**: Replaced the broken root route, restored the missing `WebFingerController`, hardened dashboard endpoints against missing `user_matches`, fixed the PHP 8.4 dashboard `limit` type bug, and added a corrective migration for drifted match tables.
+- [x] **Deployment Health & Verification Surface**: Activated `/api/health*`, added centralized dependency health evaluation, added `php artisan deploy:verify`, and updated Hetzner deployment docs.
+- [x] **Merchant Review Prioritization**: Added merchant moderation queue priority scoring, search, and inline review-note workflows.
+- [x] **Merchant Trust Scoring & Moderation**: Added trust-aware merchant scoring, moderator review endpoints, merchant moderation dashboard tab, and trust-weighted nearby marketplace ranking.
+- [x] **Geo-Aware Merchant Ranking**: Merchant profiles now persist location coordinates, the nearby marketplace API sorts by real distance, and AR overlays use returned merchant coordinates.
 
 ---
 *This file is continuously updated by autonomous AI agents. Do not leave items unchecked if they are completed.*

@@ -1,104 +1,160 @@
 # HANDOFF - End of GPT Session
 
-> **Timestamp:** 2026-04-05
-> **Version Reached:** 1.6.9
+> **Timestamp:** 2026-04-04
+> **Version Reached:** 1.4.6
 > **Current Model:** GPT
 
 ## Executive Summary
-This session continued the production-hardening loop after confirming that:
-- Hetzner backend deploys are green again
-- backend CI is green again
-- repository hygiene is green again
-- but the dedicated frontend GitHub build was still failing even after lockfile resync and Node 24 alignment
+This session continued the autonomous post-restoration loop and delivered **v1.4.6 "Deployment Health & Verification Surface"**.
 
-That remaining frontend failure turned out to be a CI install-strategy problem caused by platform-sensitive optional dependencies.
+After the merchant moderation improvements in v1.4.5, the next highest-value repo-native task was not another product feature. It was closing the operational gap between "code looks ready" and "a Hetzner cutover can be validated quickly and safely."
 
-This session completed **v1.6.9 "Frontend Workflow Install Strategy Fix"**.
+This release adds:
+- public backend health endpoints
+- centralized health evaluation logic
+- a deployment-verification Artisan command
+- deployment-doc updates that reference the real verification surface
 
----
-
-## What Was Root-Caused
-### 1. Backend side kept improving
-By this point:
-- `api.fwber.me/` was confirmed healthy and returning JSON
-- WebFinger no longer 500ed
-- Hetzner deploy workflow was green again after ACL-based log repair
-
-### 2. Frontend GitHub build still failed
-Even after:
-- lockfile resync
-- upgrading the workflow to Node 24
-
-GitHub still failed during frontend dependency installation.
-
-Failure signature:
-- `npm ci` rejected the install because of platform-sensitive optional dependency drift
-- errors referenced packages like:
-  - `bufferutil`
-  - `utf-8-validate`
-  - nested `react-native`
-  - nested `react@19.2.4`
-
-This points at wallet/native-adjacent dependency branches behaving differently between environments, even when the actual local build succeeds.
-
-### 3. Conclusion
-The issue was no longer about source app correctness.
-It was about using a too-strict install mode for a dependency graph that still contains optional/platform-variant branches.
+No processes were manually killed.
 
 ---
 
-## What Was Changed
-Updated:
-- `.github/workflows/frontend-build.yml`
+## What Changed
 
-Change:
-- replaced `npm ci` with:
-  - `npm install --no-fund --no-audit`
+### 1. Public health endpoints are now active
+**Files:**
+- `fwber-backend/app/Http/Controllers/HealthController.php`
+- `fwber-backend/routes/api.php`
 
-Why:
-- this restores build verification signal while the dependency graph is still being simplified
-- the workflow still performs the real production build, which is the important verification target right now
+Activated:
+- `GET /api/health`
+- `GET /api/health/liveness`
+- `GET /api/health/readiness`
+- `GET /api/health/metrics`
+
+Why this matters:
+- load balancers and uptime monitors now have a stable backend contract
+- post-cutover validation can be automated instead of done by intuition
+- operators can confirm the restored stack is serving traffic before debugging higher-level UX issues
+
+### 2. Health evaluation is now centralized
+**File:** `fwber-backend/app/Services/HealthStatusService.php`
+
+This service now owns dependency/status evaluation for:
+- database
+- Redis
+- cache
+- storage
+- queue
+- broadcast configuration
+
+Important behavior:
+- Redis is only considered **critical** when the active runtime configuration actually depends on Redis-backed services
+- this avoids false-red production alarms in environments where Redis is intentionally not part of the active path
+- both HTTP endpoints and CLI validation now share the same logic, preventing drift
+
+### 3. Added a deployment-verification command
+**File:** `fwber-backend/app/Console/Commands/DeployVerifyCommand.php`
+
+New command:
+- `php artisan deploy:verify`
+- `php artisan deploy:verify --json`
+
+Why it matters:
+- faster bootstrap validation on a fresh Hetzner box
+- safer redeploy verification after migrations or env changes
+- machine-readable output for future scripts or monitoring wrappers
+
+### 4. Deployment docs now point to the real verification contract
+**Files:**
+- `DEPLOY.md`
+- `docs/ai/deployment/hetzner-vercel-production.md`
+- `docs/deployment/HETZNER_VERCEL_DEPLOYMENT.md`
+
+Updated docs now explicitly instruct operators to:
+- run `php artisan deploy:verify`
+- check `/api/health`
+- verify liveness/readiness after cutover
+
+This is important because the repo already had strong provisioning templates, but the validation side was still too narrative/manual.
+
+### 5. Added regression coverage
+**File:** `fwber-backend/tests/Feature/HealthEndpointsTest.php`
+
+Covered:
+- health payload shape
+- liveness endpoint availability
+- readiness endpoint availability
+- metrics payload structure
 
 ---
 
-## Validation Context
-### Already green
-- `Deploy Backend (Hetzner)` ✅
-- `Backend CI (Tests & Linting)` ✅
-- `Repository Hygiene` ✅
+## Validation
 
-### Remaining next validation target
-- rerun `Frontend Build & Deploy (Vercel)` after this install-strategy fix lands
+### Backend test run
+Executed:
+- `php artisan test tests/Feature/HealthEndpointsTest.php tests/Feature/MerchantTrustModerationTest.php tests/Feature/MerchantRestoreTest.php tests/Feature/PremiumRestoreTest.php tests/Feature/AiWingmanRestoreTest.php tests/Feature/CoreDatingFlowTest.php tests/Feature/OptimizeCoreIndexesMigrationTest.php`
+
+Result:
+- **34 passed**
+
+### CLI verification run
+Executed:
+- `php artisan deploy:verify --json`
+
+Result:
+- **healthy**
+- local environment showed only expected **non-critical Redis degradation** because the current workstation config is not actively depending on Redis-backed services
 
 ---
 
-## Files Changed in This Slice
-- `.github/workflows/frontend-build.yml`
+## Files Changed This Session
+
+### Backend
+- `fwber-backend/app/Services/HealthStatusService.php`
+- `fwber-backend/app/Console/Commands/DeployVerifyCommand.php`
+- `fwber-backend/app/Http/Controllers/HealthController.php`
+- `fwber-backend/routes/api.php`
+- `fwber-backend/tests/Feature/HealthEndpointsTest.php`
+
+### Deployment docs
+- `DEPLOY.md`
+- `docs/ai/deployment/hetzner-vercel-production.md`
+- `docs/deployment/HETZNER_VERCEL_DEPLOYMENT.md`
+
+### Release tracking
+- `VERSION`
+- `VERSION.md`
+- `fwber-backend/VERSION`
+- `fwber-frontend/VERSION`
 - `CHANGELOG.md`
 - `PROJECT_STATUS.md`
 - `TODO.md`
-- `MEMORY.md`
 - `ROADMAP.md`
-- `DEPLOY.md`
+- `MEMORY.md`
 - `HANDOFF.md`
-- version files
+- `IDEAS.md`
 
 ---
 
 ## Git / Release
-- **Target Version:** `1.6.9`
-- **Recommended Commit Message:** `fix: use npm install in frontend github workflow for optional dependency drift (v1.6.9)`
+- **Target Version:** `1.4.6`
+- **Recommended Commit Message:** `feat: add deployment health endpoints and verification command (v1.4.6)`
 
 ---
 
-## Best Next Steps
-1. Commit and push `v1.6.9`
-2. Re-run `Frontend Build & Deploy (Vercel)`
-3. Re-check live `/nodeinfo/2.0` after the current backend deploy path has the guarded controller in place
-4. Continue live frontend runtime verification:
-   - dashboard API behavior
-   - E2E restore behavior
-   - realtime connected badge
-5. Only then begin broader full-feature restoration planning
+## Current Best Next Steps
+1. **Hetzner/Vercel deployment execution**
+   - provision the VPS
+   - place backend env
+   - install/restart systemd services
+   - run `php artisan deploy:verify`
+   - hit `/api/health*`
+2. **Production Stripe verification**
+   - validate premium purchase
+   - validate marketplace purchase
+   - validate webhook handling
+3. **Health-monitor wiring after live box exists**
+   - hook `/api/health` and readiness checks into uptime monitoring or deploy scripts
 
-No processes were manually killed.
+The repo is now materially better prepared for a live server cutover than it was at the start of this session.
