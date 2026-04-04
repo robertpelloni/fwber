@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.6.2 "GitHub Hetzner Deploy Validation"
+> **Current Version:** 1.6.3 "Workflow Stabilization Sweep"
 > **Last Updated:** 2026-04-04
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.6.2)
+### Phase 5: Production Scale (COMPLETED - v1.6.3)
+- **Workflow Stabilization Sweep:** Fixed backend/frontend GitHub workflow drift and converted stale duplicate pipelines into lightweight/manual forms so the real automation signal is no longer buried under legacy red runs.
 - **GitHub Hetzner Deploy Validation:** Added the required GitHub Hetzner secrets, re-ran the GitHub backend deploy workflow, and confirmed a green GitHub-triggered Hetzner deployment with successful smoke validation.
 - **GitHub Hetzner Deploy Rust Path Fix:** Patched the Hetzner deploy script so CI-triggered non-login SSH sessions source rustup's Cargo path before building `fwber-geo`, fixing the first GitHub Hetzner deployment failure.
 - **GitHub Backend Deploy Switched to Hetzner:** Replaced the stale GitHub Actions backend deployment job that still targeted DreamHost so CI deployment automation now matches the Hetzner production backend.
@@ -90,7 +91,7 @@ Explicitly still excluded from restoration:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Verify Live v1.5.9 Frontend Recovery:** Confirm dashboard requests, E2E key restore checks, and realtime auth all use the correct `api.fwber.me` / `ws.fwber.me` production surfaces after deployment.
-2. **Stabilize Remaining GitHub CI Pipelines:** Clean up the other failing/duplicative workflows so repository automation is uniformly green.
+1. **Re-run Modern GitHub Workflows:** Confirm `backend-tests.yml` and `frontend-build.yml` are green after the stabilization sweep.
+2. **Verify Live v1.5.9 Frontend Recovery:** Confirm dashboard requests, E2E key restore checks, and realtime auth all use the correct `api.fwber.me` / `ws.fwber.me` production surfaces after deployment.
 3. **Production Stripe Verification:** Confirm live Stripe checkout + webhook handling for both premium and marketplace purchases in the Hetzner-hosted backend environment.
 4. **DreamHost Retirement:** Once Hetzner API cutover is stable, retire the old DreamHost fwber backend path and remove stale provider dependencies.

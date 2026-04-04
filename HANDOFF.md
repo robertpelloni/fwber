@@ -1,142 +1,120 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-04
-> **Version Reached:** 1.6.2
+> **Version Reached:** 1.6.3
 > **Current Model:** GPT
 
 ## Executive Summary
-This session fully completed the GitHub-side Hetzner backend deployment transition and validation.
+After validating the GitHub Hetzner backend deploy, I continued into the next obvious problem: the repository still had several failing GitHub workflows, but most of those failures were workflow drift rather than product/runtime regressions.
 
-Final outcome in **v1.6.2 "GitHub Hetzner Deploy Validation"**:
-- Hetzner backend deployment via GitHub Actions is now configured correctly
-- Hetzner secrets were added to GitHub
-- a dedicated GitHub Actions SSH deploy key was created and installed on Hetzner
-- the first GitHub Hetzner deploy failure was root-caused to rustup PATH loading in non-login SSH shells
-- the deploy script was patched accordingly
-- the GitHub `Deploy Backend (Hetzner)` workflow then completed successfully end-to-end
-
-No processes were manually killed.
+This session completed **v1.6.3 "Workflow Stabilization Sweep"**.
 
 ---
 
-## Detailed Timeline
+## What Was Fixed
 
-### 1. Confirmed infrastructure reality
-Verified that the real backend deployment path was already Hetzner, not DreamHost:
-- live Hetzner deploy script worked manually
-- live backend on Hetzner was healthy
-- DreamHost backend workflow drift was a GitHub automation problem, not a runtime-hosting problem
+### 1. `backend-tests.yml`
+Problem:
+- the dedicated backend workflow tried to migrate during setup without forcing SQLite env values
+- GitHub Actions therefore attempted a MySQL connection and failed with `SQLSTATE[HY000] [2002] Connection refused`
 
-### 2. Switched GitHub backend deploy workflow to Hetzner
-Updated `.github/workflows/deploy-backend.yml` so backend deployment now SSHes to Hetzner and runs:
-- `./ops/hetzner/scripts/deploy-backend.sh`
+Fix:
+- set `DB_CONNECTION=sqlite`
+- set `DB_DATABASE=database/database.sqlite`
+- create the sqlite file before migrate
+- run `php artisan migrate:fresh` under those env vars
 
-### 3. Added GitHub Hetzner secrets and variable
-Configured repository secrets:
-- `HETZNER_HOST`
-- `HETZNER_USERNAME`
-- `HETZNER_SSH_KEY`
-- `HETZNER_PROJECT_PATH`
-- `HETZNER_REVERB_APP_KEY`
+Updated:
+- `.github/workflows/backend-tests.yml`
 
-Configured repository variable:
-- `FWBER_RUN_SMOKE_CHECK=1`
+### 2. `frontend-build.yml`
+Problem:
+- setup-node caching was configured with `cache: npm` but without `cache-dependency-path`
+- GitHub looked for a root lockfile instead of `fwber-frontend/package-lock.json`
+- this produced the lockfile-not-found failure in the modern dedicated frontend workflow
 
-### 4. Installed dedicated GitHub Actions SSH key on Hetzner
-- generated fresh SSH keypair for GitHub Actions
-- installed public key into `/home/deploy/.ssh/authorized_keys`
-- verified deploy-user SSH access using the new key
+Fix:
+- added:
+  - `cache-dependency-path: fwber-frontend/package-lock.json`
 
-### 5. Triggered first GitHub Hetzner deploy
-The workflow reached Hetzner correctly but failed during geo build.
+Updated:
+- `.github/workflows/frontend-build.yml`
 
-Root cause from logs:
-- manual deploys used rustup Cargo
-- GitHub SSH action used a non-login shell
-- non-login shell did not load rustup PATH
-- build fell back to old system Cargo 1.75.0
-- `fwber-geo` failed because its manifest requires `edition2024`
+### 3. `ci.yml`
+Problem:
+- the old monolithic CI workflow duplicated backend/frontend jobs that are already handled by dedicated workflows
+- those duplicates were creating extra red noise and obscuring the real deployment signal
 
-### 6. Patched deploy script for non-login shell correctness
-Updated `ops/hetzner/scripts/deploy-backend.sh` to:
-- source `~/.cargo/env`
-- prepend `~/.cargo/bin` to `PATH`
+Fix:
+- rewrote `ci.yml` into a lightweight **Repository Hygiene** workflow only
+- retained:
+  - version consistency checks
+  - license checks
+  - env/secret hygiene checks
+  - stale-handoff-file hygiene checks
+- removed duplicated backend/frontend build jobs
 
-### 7. Important nuance discovered
-The first run after the patch still failed because the remote shell had already loaded the **old** script before its internal `git pull` updated the file on disk.
+Updated:
+- `.github/workflows/ci.yml`
 
-That meant the next run was the real confirmation run.
+### 4. `deploy.yml`
+Problem:
+- the old deployment pipeline was stale and auto-ran on pushes even though the real production deploy path is now:
+  - Hetzner backend workflow
+  - Vercel frontend workflow
+- it also contained outdated assumptions and created additional red noise
 
-### 8. Re-ran GitHub workflow and confirmed success
-Confirmed green workflow:
-- `Deploy Backend (Hetzner)`
-- GitHub Actions run ID: `23990065008`
+Fix:
+- rewrote it into a **manual-only container publish** workflow
+- added clear summary output explaining it is not the primary production deployment path
+- retained optional Docker image publishing jobs behind manual inputs only
 
-Successful outcomes from GitHub-triggered deployment:
-- composer install
-- migrations
-- optimize
-- `php artisan deploy:verify`
-- `fwber-geo` release build under rustup toolchain
-- service restart path
-- smoke-check report generation
-- websocket smoke probe success
-
-Smoke summary from GitHub-triggered deploy:
-- **9 passes**
-- **3 expected warnings**
-- **0 failures**
-
-Warnings were only missing authenticated smoke tokens for:
-- premium
-- merchant
-- moderation
+Updated:
+- `.github/workflows/deploy.yml`
 
 ---
 
-## Remaining Observations
-### Live frontend still needs verification
-The backend deployment automation is now good, but there are still frontend/runtime verification items to check live:
-- dashboard requests should now hit `api.fwber.me`
-- E2E restore checks should no longer hit `www.fwber.me/api/*`
-- realtime badge should be rechecked after frontend rollout
+## Why This Matters
+At this point the real backend deployment path is healthy and verified:
+- GitHub → Hetzner backend deploy is green
+- smoke validation is green
 
-### Other GitHub workflows still show drift/failure
-Observed remaining GitHub automation issues outside the now-fixed backend deploy workflow:
-- `Frontend Build & Deploy (Vercel)` failed because `npm ci` reported lockfile/package drift in Actions
-- `Deployment Pipeline` and `CI` are duplicative/legacy and still failing
-- `deploy.yml` is outdated relative to current backend/frontend workflow split and still needs modernization or removal
+The remaining red GitHub badges were therefore mostly **automation drift**, not evidence that the product itself was broken.
 
-These are the next best cleanup targets.
+This release reduces that false-negative CI noise and aligns repository automation with the actual stack.
 
 ---
 
-## Files Changed Across This Session Slice
-- `.github/workflows/deploy-backend.yml`
-- `ops/hetzner/scripts/deploy-backend.sh`
+## Files Changed
+- `.github/workflows/backend-tests.yml`
+- `.github/workflows/frontend-build.yml`
+- `.github/workflows/ci.yml`
+- `.github/workflows/deploy.yml`
 - `CHANGELOG.md`
-- `DEPLOY.md`
 - `PROJECT_STATUS.md`
 - `TODO.md`
 - `MEMORY.md`
 - `ROADMAP.md`
+- `DEPLOY.md`
 - `HANDOFF.md`
-- root/backend/frontend version files
+- version files
 
 ---
 
-## Git / Release Progression
-- `v1.6.0` — switched GitHub backend deploy workflow from DreamHost to Hetzner
-- `v1.6.1` — fixed rustup Cargo PATH loading for GitHub-triggered non-login SSH deploys
-- `v1.6.2` — validated green GitHub Hetzner backend deploy end-to-end
+## Git / Release
+- **Target Version:** `1.6.3`
+- **Recommended Commit Message:** `chore: stabilize github workflows after hetzner cutover (v1.6.3)`
 
 ---
 
 ## Best Next Steps
-1. Clean up failing/duplicative GitHub workflows:
-   - `.github/workflows/ci.yml`
-   - `.github/workflows/deploy.yml`
-   - possibly frontend build lockfile drift
-2. Re-verify live frontend behavior for dashboard API + realtime recovery
-3. Continue production Stripe verification
-4. Retire remaining DreamHost backend dependencies after final confidence checks
+1. Commit and push `v1.6.3`
+2. Re-run:
+   - `Backend CI (Tests & Linting)`
+   - `Frontend Build & Deploy (Vercel)`
+   - `Repository Hygiene`
+3. Confirm those modern workflows go green
+4. Continue live frontend verification for dashboard API + realtime recovery
+5. Continue production Stripe verification
+
+No processes were manually killed.
