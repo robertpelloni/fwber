@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.1] - 2026-04-04 — GitHub Hetzner Deploy Rust Path Fix
+
+### Fixed
+- Hardened `ops/hetzner/scripts/deploy-backend.sh` so non-login SSH sessions (including GitHub Actions) explicitly source the rustup cargo environment from `~/.cargo/env` and prepend `~/.cargo/bin` to `PATH` before building `fwber-geo`.
+- This fixes the GitHub Hetzner deployment failure where the server used the old system Cargo (`1.75.0`) instead of the already-installed rustup toolchain required for the geo service's `edition2024` manifest.
+
 ## [1.6.0] - 2026-04-04 — GitHub Backend Deploy Switched to Hetzner
 
 ### Changed

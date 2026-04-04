@@ -1,20 +1,19 @@
-# PROJECT_STATUS.md - fwber v1.6.0 (GitHub Backend Deploy Switched to Hetzner)
+# PROJECT_STATUS.md - fwber v1.6.1 (GitHub Hetzner Deploy Rust Path Fix)
 
 **Date:** 2026-04-04
-**Version:** 1.6.0 "GitHub Backend Deploy Switched to Hetzner"
-**Status:** ✅ **BACKEND IS LIVE ON HETZNER AND CI DEPLOY TARGET NOW MATCHES REAL INFRASTRUCTURE**
+**Version:** 1.6.1 "GitHub Hetzner Deploy Rust Path Fix"
+**Status:** ✅ **GITHUB HETZNER DEPLOY FAILURE ROOT-CAUSED AND PATCHED**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release fixes deployment automation drift.
+This release fixes the first real GitHub Hetzner deployment failure after switching CI away from DreamHost.
 
 Delivered:
-- confirmed the live backend is deploying correctly on Hetzner via the in-repo deploy script
-- replaced the stale GitHub Actions backend deploy workflow that still pointed at DreamHost
-- aligned GitHub deployment automation with the actual Hetzner production topology
+- root-caused the GitHub deploy failure to non-login SSH sessions using the old system Cargo instead of rustup
+- patched the Hetzner deploy script to explicitly source rustup's cargo environment before geo builds
 
-## ✅ Current Reality
-- Manual/SSH-driven Hetzner deploys are working.
-- The stale GitHub Action was still configured for DreamHost before this release.
-- The workflow now targets Hetzner instead.
+## ✅ Why It Failed
+The server was correctly provisioned with a modern rustup toolchain, but GitHub Actions invoked the deploy script through a non-login SSH session, which did not load the deploy user's rustup PATH.
+
+That made `fwber-geo` build with the old system Cargo and fail on `edition2024`.

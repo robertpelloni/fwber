@@ -16,6 +16,18 @@ REPORT_DIR_ROOT="${FWBER_DEPLOY_REPORT_DIR:-$REPO_ROOT/logs/deploy-reports}"
 PYTHON_BIN="${FWBER_PYTHON_BIN:-python3}"
 SUDO_BIN=""
 
+# GitHub Actions and other non-login SSH executions do not reliably source the deploy user's
+# shell profile, which means Rust installed via rustup can disappear from PATH even though the
+# server is correctly provisioned. Prefer the rustup toolchain explicitly when present so geo
+# builds stay consistent across manual SSH sessions and CI-triggered deployments.
+if [ -f "$HOME/.cargo/env" ]; then
+  # shellcheck disable=SC1090
+  . "$HOME/.cargo/env"
+fi
+if [ -d "$HOME/.cargo/bin" ]; then
+  export PATH="$HOME/.cargo/bin:$PATH"
+fi
+
 if [ "$(id -u)" -ne 0 ]; then
   SUDO_BIN="sudo"
 fi

@@ -1,68 +1,76 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-04
-> **Version Reached:** 1.6.0
+> **Version Reached:** 1.6.1
 > **Current Model:** GPT
 
 ## Executive Summary
-The answer to the user's question was:
+After switching GitHub backend deployment from DreamHost to Hetzner, I added the required Hetzner secrets and triggered the workflow.
 
-- **Yes**, the backend is deploying correctly on **Hetzner** through the in-repo deploy path and manual SSH-driven execution.
-- **Yes**, the GitHub Actions backend deploy workflow was still stale and still pointed at **DreamHost**.
+The first real GitHub Hetzner deploy failed, but the failure was fully root-caused and patched in **v1.6.1 "GitHub Hetzner Deploy Rust Path Fix"**.
 
-This session fixed the automation drift in **v1.6.0 "GitHub Backend Deploy Switched to Hetzner"**.
+### Root cause
+- Manual Hetzner deploys worked.
+- GitHub Actions deploys failed while building `fwber-geo`.
+- The SSH action runs a **non-login shell**, so the deploy user's rustup toolchain was not loaded.
+- That caused the script to use the old system Cargo (`1.75.0`) instead of the installed rustup Cargo required for the geo crate's `edition2024` manifest.
 
----
+### Fix
+Updated `ops/hetzner/scripts/deploy-backend.sh` to:
+- source `~/.cargo/env` when present
+- prepend `~/.cargo/bin` to `PATH`
 
-## What I Verified
-
-### Hetzner backend deployment status
-Previously established and re-confirmed during the latest live ops work:
-- Hetzner repo is live at `/var/www/fwber/repo`
-- backend deploy script runs successfully there
-- backend services restart correctly
-- health endpoints are healthy
-- current production backend version was successfully advanced on Hetzner through the in-repo deploy path
-
-So the real backend deployment path is now Hetzner and it is working.
-
-### GitHub Actions drift
-Inspected:
-- `.github/workflows/deploy-backend.yml`
-
-It was still configured to:
-- SSH into DreamHost
-- use `DREAMHOST_HOST`, `DREAMHOST_USERNAME`, `DREAMHOST_SSH_KEY`
-- run the old DreamHost deploy path
-
-That meant CI automation had not caught up with the real infrastructure migration.
+This ensures CI-triggered SSH deployments and manual shells use the same Rust toolchain.
 
 ---
 
-## What Was Changed
+## What Was Done This Session
+
+### 1. Verified GitHub CLI access
+Confirmed:
+- `gh` installed
+- authenticated access to `robertpelloni/fwber`
+
+### 2. Created and installed Hetzner deploy secrets
+Added repository secrets:
+- `HETZNER_HOST`
+- `HETZNER_USERNAME`
+- `HETZNER_SSH_KEY`
+- `HETZNER_PROJECT_PATH`
+- `HETZNER_REVERB_APP_KEY`
+
+Added repository variable:
+- `FWBER_RUN_SMOKE_CHECK=1`
+
+### 3. Created dedicated GitHub Actions deploy key
+- generated a fresh SSH keypair for GitHub Actions
+- installed the public key in `/home/deploy/.ssh/authorized_keys` on Hetzner
+- verified SSH login for `deploy@5.161.250.43` using the new key
+
+### 4. Triggered the new GitHub Hetzner deploy workflow
+Triggered workflow:
+- `Deploy Backend (Hetzner)`
+
+The workflow now correctly reached Hetzner and began the real deploy.
+
+### 5. Root-caused the first workflow failure
+Failure details from GitHub logs:
+- composer install ran
+- migrations ran
+- deploy verify passed
+- failure happened on geo build
+- Cargo error showed system Cargo 1.75.0 lacking `edition2024` support
+
+### 6. Patched deploy script for CI shell behavior
 Updated:
-- `.github/workflows/deploy-backend.yml`
+- `ops/hetzner/scripts/deploy-backend.sh`
 
-Changes:
-- renamed workflow to **Deploy Backend (Hetzner)**
-- switched SSH target secrets to:
-  - `HETZNER_HOST`
-  - `HETZNER_USERNAME`
-  - `HETZNER_SSH_KEY`
-- added optional:
-  - `HETZNER_PROJECT_PATH`
-  - `HETZNER_REVERB_APP_KEY`
-- changed the workflow to run:
-  - `./ops/hetzner/scripts/deploy-backend.sh`
-- added `workflow_dispatch`
-- expanded trigger paths to include `ops/hetzner/**` and the workflow file itself
-
-This brings GitHub backend automation in line with the actual production topology.
+Added explicit rustup environment bootstrapping before `cargo build --release`.
 
 ---
 
-## Repo / Release Updates
-Updated for `v1.6.0`:
+## Files Changed
+- `ops/hetzner/scripts/deploy-backend.sh`
 - `CHANGELOG.md`
 - `PROJECT_STATUS.md`
 - `TODO.md`
@@ -70,22 +78,20 @@ Updated for `v1.6.0`:
 - `ROADMAP.md`
 - `DEPLOY.md`
 - `HANDOFF.md`
-- root/backend/frontend version files
+- version files
 
 ---
 
 ## Git / Release
-- **Target Version:** `1.6.0`
-- **Recommended Commit Message:** `chore: switch github backend deploy workflow from dreamhost to hetzner (v1.6.0)`
+- **Target Version:** `1.6.1`
+- **Recommended Commit Message:** `fix: load rustup cargo path during github hetzner deploys (v1.6.1)`
 
 ---
 
-## Important Follow-Up
-The workflow file is now correct, but GitHub must still have the correct repository secrets configured:
-- `HETZNER_HOST`
-- `HETZNER_USERNAME`
-- `HETZNER_SSH_KEY`
-- optional `HETZNER_PROJECT_PATH`
-- optional `HETZNER_REVERB_APP_KEY`
+## Best Next Step
+1. Commit and push `v1.6.1`
+2. Re-trigger `Deploy Backend (Hetzner)`
+3. Confirm GitHub Action succeeds end-to-end on Hetzner
+4. Continue live frontend verification for dashboard API + realtime recovery
 
-After those are set, the workflow should be manually triggered once to verify end-to-end CI deployment against Hetzner.
+No processes were manually killed.
