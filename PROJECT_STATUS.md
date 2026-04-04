@@ -1,20 +1,19 @@
-# PROJECT_STATUS.md - fwber v1.6.0 (GitHub Backend Deploy Switched to Hetzner)
+# PROJECT_STATUS.md - fwber v1.6.3 (Workflow Stabilization Sweep)
 
 **Date:** 2026-04-04
-**Version:** 1.6.0 "GitHub Backend Deploy Switched to Hetzner"
-**Status:** ✅ **BACKEND IS LIVE ON HETZNER AND CI DEPLOY TARGET NOW MATCHES REAL INFRASTRUCTURE**
+**Version:** 1.6.3 "Workflow Stabilization Sweep"
+**Status:** ✅ **PRIMARY DEPLOY PIPELINE GREEN; DUPLICATE CI NOISE BEING ELIMINATED**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release fixes deployment automation drift.
+This release focuses on stabilizing the remaining GitHub automation noise after backend Hetzner deployment was proven green.
 
 Delivered:
-- confirmed the live backend is deploying correctly on Hetzner via the in-repo deploy script
-- replaced the stale GitHub Actions backend deploy workflow that still pointed at DreamHost
-- aligned GitHub deployment automation with the actual Hetzner production topology
+- backend CI now uses SQLite correctly during setup
+- frontend build workflow now points npm cache at the real frontend lockfile
+- duplicate monolithic CI jobs removed from `ci.yml`
+- legacy `deploy.yml` is now manual-only container publishing instead of an always-on failing pipeline
 
-## ✅ Current Reality
-- Manual/SSH-driven Hetzner deploys are working.
-- The stale GitHub Action was still configured for DreamHost before this release.
-- The workflow now targets Hetzner instead.
+## ✅ Why This Matters
+The repo had reached the point where the real Hetzner backend deployment workflow was green, but older duplicate workflows were still failing and obscuring the signal. This release reduces that noise and aligns automation with the real stack.
